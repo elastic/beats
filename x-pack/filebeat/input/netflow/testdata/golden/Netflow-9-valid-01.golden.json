@@ -55,7 +55,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.100",
           "locality": "private",
           "port": 123
@@ -117,7 +117,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.248",
           "locality": "private",
           "port": 123
@@ -179,7 +179,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.100",
           "locality": "private",
           "port": 123
@@ -241,7 +241,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.201",
           "locality": "private",
           "port": 123
@@ -303,7 +303,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.100",
           "locality": "private",
           "port": 123
@@ -365,7 +365,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.202",
           "locality": "private",
           "port": 123
@@ -425,7 +425,7 @@
           "packets": 7,
           "protocol": "ipv6-icmp"
         },
-        "source": {
+        "source_ecs": {
           "port": 0
         }
       },

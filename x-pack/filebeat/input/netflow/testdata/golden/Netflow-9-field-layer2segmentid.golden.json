@@ -58,7 +58,7 @@
           "packets": 1,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.200.136",
           "locality": "private",
           "port": 61926

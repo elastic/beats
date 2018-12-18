@@ -63,7 +63,7 @@
           "packets": 1,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.9.146",
           "locality": "private",
           "port": 54017
@@ -133,7 +133,7 @@
           "packets": 2,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.17.42",
           "locality": "private",
           "port": 36484
@@ -203,7 +203,7 @@
           "packets": 1,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.22.111",
           "locality": "private",
           "port": 16814
@@ -273,7 +273,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.23.59",
           "locality": "private",
           "port": 53
@@ -343,7 +343,7 @@
           "packets": 1,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.34.71",
           "locality": "private",
           "port": 443
@@ -413,7 +413,7 @@
           "packets": 2,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.10.133",
           "locality": "private",
           "port": 35273
@@ -483,7 +483,7 @@
           "packets": 1,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.37.29",
           "locality": "private",
           "port": 80
@@ -553,7 +553,7 @@
           "packets": 1,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.32.176",
           "locality": "private",
           "port": 443
@@ -623,7 +623,7 @@
           "packets": 3,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.12.21",
           "locality": "private",
           "port": 443
@@ -693,7 +693,7 @@
           "packets": 2,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.4.212",
           "locality": "private",
           "port": 50691
@@ -763,7 +763,7 @@
           "packets": 325,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.33.122",
           "locality": "private",
           "port": 58814
@@ -833,7 +833,7 @@
           "packets": 1,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.20.242",
           "locality": "private",
           "port": 2013
@@ -903,7 +903,7 @@
           "packets": 1,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.13.25",
           "locality": "private",
           "port": 443
@@ -973,7 +973,7 @@
           "packets": 2,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.25.59",
           "locality": "private",
           "port": 443
@@ -1043,7 +1043,7 @@
           "packets": 97,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.7.73",
           "locality": "private",
           "port": 60312
@@ -1113,7 +1113,7 @@
           "packets": 58,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.19.50",
           "locality": "private",
           "port": 34452
@@ -1183,7 +1183,7 @@
           "packets": 21,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.28.150",
           "locality": "private",
           "port": 443
@@ -1253,7 +1253,7 @@
           "packets": 3,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.26.188",
           "locality": "private",
           "port": 993
@@ -1323,7 +1323,7 @@
           "packets": 5,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.29.34",
           "locality": "private",
           "port": 443
@@ -1393,7 +1393,7 @@
           "packets": 1,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.8.200",
           "locality": "private",
           "port": 23128
@@ -1463,7 +1463,7 @@
           "packets": 2,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.29.46",
           "locality": "private",
           "port": 443

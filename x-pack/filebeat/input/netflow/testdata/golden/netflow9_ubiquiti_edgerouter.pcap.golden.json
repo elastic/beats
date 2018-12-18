@@ -61,7 +61,7 @@
           "packets": 6,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.100.5.2",
           "locality": "private",
           "port": 43376
@@ -129,7 +129,7 @@
           "packets": 131,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.100.6.93",
           "locality": "private",
           "port": 54520
@@ -197,7 +197,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.100.4.1",
           "locality": "private",
           "port": 53
@@ -265,7 +265,7 @@
           "packets": 30,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.100.6.93",
           "locality": "private",
           "port": 54497
@@ -333,7 +333,7 @@
           "packets": 13,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.100.6.80",
           "locality": "private",
           "port": 50030
@@ -401,7 +401,7 @@
           "packets": 346,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.100.6.93",
           "locality": "private",
           "port": 54517
@@ -469,7 +469,7 @@
           "packets": 129,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.100.6.93",
           "locality": "private",
           "port": 54518
@@ -537,7 +537,7 @@
           "packets": 119,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.100.6.93",
           "locality": "private",
           "port": 54519
@@ -605,7 +605,7 @@
           "packets": 13,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.100.6.93",
           "locality": "private",
           "port": 54521
@@ -673,7 +673,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.1.4",
           "locality": "private",
           "port": 57253

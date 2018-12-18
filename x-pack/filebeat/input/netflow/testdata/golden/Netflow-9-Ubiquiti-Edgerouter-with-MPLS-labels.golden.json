@@ -62,7 +62,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.1.0.135",
           "locality": "private",
           "mac": "06:be:ef:be:ef:4f",
@@ -132,7 +132,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.1.0.136",
           "locality": "private",
           "mac": "06:be:ef:be:ef:4f",
@@ -202,7 +202,7 @@
           "packets": 15,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.1.0.232",
           "locality": "private",
           "mac": "06:be:ef:be:ef:4f",
@@ -272,7 +272,7 @@
           "packets": 8,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.1.0.232",
           "locality": "private",
           "mac": "06:be:ef:be:ef:4f",
@@ -342,7 +342,7 @@
           "packets": 21,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.5.0.91",
           "locality": "private",
           "mac": "06:be:ef:be:ef:4f",
@@ -412,7 +412,7 @@
           "packets": 30,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.1.0.30",
           "locality": "private",
           "mac": "06:be:ef:be:ef:4f",
@@ -482,7 +482,7 @@
           "packets": 4,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.3.0.100",
           "locality": "private",
           "mac": "06:be:ef:be:ef:4f",
@@ -552,7 +552,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.1.0.135",
           "locality": "private",
           "mac": "06:be:ef:be:ef:4f",
@@ -621,7 +621,7 @@
           "packets": 5,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.1.98",
           "locality": "private",
           "port": 55105
@@ -689,7 +689,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.4.0.251",
           "locality": "private",
           "port": 42506
@@ -757,7 +757,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.4.0.251",
           "locality": "private",
           "port": 40295
@@ -825,7 +825,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.4.0.251",
           "locality": "private",
           "port": 36071
@@ -893,7 +893,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.4.0.251",
           "locality": "private",
           "port": 49829
@@ -961,7 +961,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.4.0.251",
           "locality": "private",
           "port": 35059
@@ -1029,7 +1029,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.4.0.251",
           "locality": "private",
           "port": 38231
@@ -1097,7 +1097,7 @@
           "packets": 21,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.1.102",
           "locality": "private",
           "port": 47690

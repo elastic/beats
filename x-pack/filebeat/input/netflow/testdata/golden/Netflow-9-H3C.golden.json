@@ -66,7 +66,7 @@
           "packets": 697,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.22.166.30",
           "locality": "private",
           "port": 0
@@ -139,7 +139,7 @@
           "packets": 6,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.22.166.12",
           "locality": "private",
           "port": 0
@@ -212,7 +212,7 @@
           "packets": 21,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.22.166.33",
           "locality": "private",
           "port": 0
@@ -285,7 +285,7 @@
           "packets": 3,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.22.166.35",
           "locality": "private",
           "port": 0
@@ -358,7 +358,7 @@
           "packets": 20,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.22.166.36",
           "locality": "private",
           "port": 0
@@ -431,7 +431,7 @@
           "packets": 16,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.22.166.36",
           "locality": "private",
           "port": 0
@@ -504,7 +504,7 @@
           "packets": 37,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.22.166.28",
           "locality": "private",
           "port": 0
@@ -577,7 +577,7 @@
           "packets": 2135,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.22.166.35",
           "locality": "private",
           "port": 0
@@ -650,7 +650,7 @@
           "packets": 20,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.22.166.15",
           "locality": "private",
           "port": 0
@@ -723,7 +723,7 @@
           "packets": 2804,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.22.166.2",
           "locality": "private",
           "port": 0
@@ -796,7 +796,7 @@
           "packets": 25,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.22.166.28",
           "locality": "private",
           "port": 0
@@ -869,7 +869,7 @@
           "packets": 68,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.22.166.25",
           "locality": "private",
           "port": 0
@@ -942,7 +942,7 @@
           "packets": 30,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.22.166.25",
           "locality": "private",
           "port": 0
@@ -1015,7 +1015,7 @@
           "packets": 2,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.22.166.12",
           "locality": "private",
           "port": 0
@@ -1088,7 +1088,7 @@
           "packets": 220,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.22.166.17",
           "locality": "private",
           "port": 0
@@ -1161,7 +1161,7 @@
           "packets": 9,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.22.166.36",
           "locality": "private",
           "port": 0

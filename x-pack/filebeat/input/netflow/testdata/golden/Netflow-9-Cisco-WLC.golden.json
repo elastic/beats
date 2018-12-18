@@ -46,7 +46,7 @@
           "name": "Test-env",
           "packets": 83
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -101,7 +101,7 @@
           "name": "Test-env",
           "packets": 83
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },
@@ -152,7 +152,7 @@
           "name": "Test-env",
           "packets": 69
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -207,7 +207,7 @@
           "name": "Test-env",
           "packets": 69
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },
@@ -258,7 +258,7 @@
           "name": "Test-env",
           "packets": 1
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -311,7 +311,7 @@
           "name": "Test-env",
           "packets": 225
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -366,7 +366,7 @@
           "name": "Test-env",
           "packets": 154
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },
@@ -417,7 +417,7 @@
           "name": "Test-env",
           "packets": 63
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -472,7 +472,7 @@
           "name": "Test-env",
           "packets": 61
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },
@@ -523,7 +523,7 @@
           "name": "Test-env",
           "packets": 773
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -578,7 +578,7 @@
           "name": "Test-env",
           "packets": 1379
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },
@@ -629,7 +629,7 @@
           "name": "Test-env",
           "packets": 26
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -684,7 +684,7 @@
           "name": "Test-env",
           "packets": 26
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },
@@ -735,7 +735,7 @@
           "name": "Test-env",
           "packets": 20434
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -790,7 +790,7 @@
           "name": "Test-env",
           "packets": 40726
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },
@@ -841,7 +841,7 @@
           "name": "Test-env",
           "packets": 15
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -896,7 +896,7 @@
           "name": "Test-env",
           "packets": 14
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },
@@ -947,7 +947,7 @@
           "name": "Test-env",
           "packets": 16145
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -1002,7 +1002,7 @@
           "name": "Test-env",
           "packets": 53362
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },

@@ -60,7 +60,7 @@
           "packets": 6,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "bytes": 132,
           "ip": "172.16.32.201",
           "locality": "private",
@@ -135,7 +135,7 @@
           "packets": 8,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "bytes": 172,
           "ip": "172.16.32.100",
           "locality": "private",

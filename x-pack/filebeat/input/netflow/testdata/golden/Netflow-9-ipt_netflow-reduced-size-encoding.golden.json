@@ -62,7 +62,7 @@
           "packets": 3,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "37.122.1.226",
           "locality": "public",
           "mac": "90:e2:ba:23:09:fc",
@@ -132,7 +132,7 @@
           "packets": 1,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "5.141.231.166",
           "locality": "public",
           "mac": "90:e2:ba:23:09:fc",
@@ -202,7 +202,7 @@
           "packets": 11,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.233.128.4",
           "locality": "private",
           "mac": "00:04:96:97:b8:cd",
@@ -272,7 +272,7 @@
           "packets": 4,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "193.151.192.46",
           "locality": "public",
           "mac": "00:1a:4a:16:01:81",
@@ -342,7 +342,7 @@
           "packets": 3,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.235.197.6",
           "locality": "private",
           "mac": "00:04:96:97:b8:cd",
@@ -412,7 +412,7 @@
           "packets": 3,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.236.31.7",
           "locality": "private",
           "mac": "00:04:96:97:b8:cd",
@@ -482,7 +482,7 @@
           "packets": 15,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.233.151.8",
           "locality": "private",
           "mac": "00:04:96:97:b8:cd",
@@ -552,7 +552,7 @@
           "packets": 3,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.234.22.4",
           "locality": "private",
           "mac": "00:04:96:97:b8:cd",
@@ -622,7 +622,7 @@
           "packets": 22,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.233.36.7",
           "locality": "private",
           "mac": "00:04:96:97:b8:cd",
@@ -692,7 +692,7 @@
           "packets": 3,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.233.200.7",
           "locality": "private",
           "mac": "00:04:96:97:b8:cd",
@@ -762,7 +762,7 @@
           "packets": 3,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "23.43.139.27",
           "locality": "public",
           "mac": "90:e2:ba:23:09:fc",
@@ -832,7 +832,7 @@
           "packets": 3,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "2.17.140.47",
           "locality": "public",
           "mac": "90:e2:ba:23:09:fc",

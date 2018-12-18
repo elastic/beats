@@ -59,7 +59,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "181.214.87.71",
           "locality": "public",
           "port": 53787
@@ -125,7 +125,7 @@
           "direction": "unknown",
           "protocol": "ipv6-icmp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "0.0.0.0",
           "locality": "private",
           "port": 136
@@ -191,7 +191,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "5.188.11.35",
           "locality": "public",
           "port": 44155
@@ -257,7 +257,7 @@
           "direction": "unknown",
           "protocol": "icmp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "206.117.25.89",
           "locality": "public",
           "port": 0
@@ -323,7 +323,7 @@
           "direction": "unknown",
           "protocol": "ipv6-icmp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "0.0.0.0",
           "locality": "private",
           "port": 136
@@ -389,7 +389,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "185.232.29.199",
           "locality": "public",
           "port": 55869
@@ -455,7 +455,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "177.188.228.137",
           "locality": "public",
           "port": 9430
@@ -521,7 +521,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "138.44.161.14",
           "locality": "public",
           "port": 33689

@@ -55,7 +55,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.2",
           "locality": "private",
           "port": 61775
@@ -117,7 +117,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.2",
           "locality": "private",
           "port": 61776
@@ -179,7 +179,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.2",
           "locality": "private",
           "port": 61776
@@ -241,7 +241,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56635
@@ -303,7 +303,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56635
@@ -365,7 +365,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.2",
           "locality": "private",
           "port": 61773
@@ -427,7 +427,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.2",
           "locality": "private",
           "port": 61773
@@ -487,7 +487,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56649
@@ -549,7 +549,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56649
@@ -611,7 +611,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56649
@@ -671,7 +671,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.2",
           "locality": "private",
           "port": 61777
@@ -733,7 +733,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.2",
           "locality": "private",
           "port": 61777
@@ -795,7 +795,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.2",
           "locality": "private",
           "port": 61777
@@ -855,7 +855,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56650
@@ -917,7 +917,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56650
@@ -979,7 +979,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56650
@@ -1039,7 +1039,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56651
@@ -1101,7 +1101,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56651
@@ -1163,7 +1163,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 56651

@@ -67,7 +67,7 @@
           "packets": 9,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "20.20.20.20",
           "locality": "public",
           "port": 137

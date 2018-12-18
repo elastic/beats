@@ -67,7 +67,7 @@
           "packets": 0,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.236.5.4",
           "locality": "private",
           "mac": "00:50:56:b9:26:46",
@@ -142,7 +142,7 @@
           "packets": 0,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "64.235.151.76",
           "locality": "public",
           "mac": "00:00:00:00:00:00",

@@ -49,7 +49,7 @@
           "packets": 1,
           "protocol": "unknown (0)"
         },
-        "source": {
+        "source_ecs": {
           "ip": "0.0.0.0",
           "locality": "private",
           "port": 0

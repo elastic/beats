@@ -67,7 +67,7 @@
           "packets": 1,
           "protocol": "icmp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.30.18.62",
           "locality": "private",
           "mac": "00:50:56:91:56:86",
@@ -142,7 +142,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.30.18.62",
           "locality": "private",
           "mac": "00:50:56:91:56:86",
@@ -217,7 +217,7 @@
           "packets": 1,
           "protocol": "icmp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.10.172.60",
           "locality": "private",
           "mac": "00:18:19:9e:6c:01",
@@ -292,7 +292,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.10.172.60",
           "locality": "private",
           "mac": "00:18:19:9e:6c:01",
@@ -367,7 +367,7 @@
           "packets": 36,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.10.172.60",
           "locality": "private",
           "mac": "00:18:19:9e:6c:01",

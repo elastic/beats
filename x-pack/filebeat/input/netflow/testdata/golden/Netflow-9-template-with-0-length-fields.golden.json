@@ -59,7 +59,7 @@
           "packets": 0,
           "protocol": "unknown (2)"
         },
-        "source": {
+        "source_ecs": {
           "ip": "239.255.255.250",
           "locality": "public",
           "port": 0
@@ -125,7 +125,7 @@
           "packets": 0,
           "protocol": "unknown (2)"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.1.80",
           "locality": "private",
           "port": 0
@@ -191,7 +191,7 @@
           "packets": 0,
           "protocol": "unknown (2)"
         },
-        "source": {
+        "source_ecs": {
           "ip": "239.255.255.250",
           "locality": "public",
           "port": 0
@@ -257,7 +257,7 @@
           "packets": 1,
           "protocol": "unknown (2)"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.1.95",
           "locality": "private",
           "port": 0
@@ -323,7 +323,7 @@
           "packets": 0,
           "protocol": "unknown (2)"
         },
-        "source": {
+        "source_ecs": {
           "ip": "239.255.255.250",
           "locality": "public",
           "port": 0
@@ -389,7 +389,7 @@
           "packets": 0,
           "protocol": "unknown (2)"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.1.95",
           "locality": "private",
           "port": 0
@@ -455,7 +455,7 @@
           "packets": 0,
           "protocol": "unknown (2)"
         },
-        "source": {
+        "source_ecs": {
           "ip": "239.255.255.250",
           "locality": "public",
           "port": 0
@@ -521,7 +521,7 @@
           "packets": 1,
           "protocol": "unknown (2)"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.1.33",
           "locality": "private",
           "port": 0
@@ -587,7 +587,7 @@
           "packets": 0,
           "protocol": "unknown (2)"
         },
-        "source": {
+        "source_ecs": {
           "ip": "239.255.255.250",
           "locality": "public",
           "port": 0
@@ -653,7 +653,7 @@
           "packets": 0,
           "protocol": "unknown (2)"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.1.33",
           "locality": "private",
           "port": 0

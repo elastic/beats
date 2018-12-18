@@ -59,7 +59,7 @@
           "packets": 3,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "134.220.2.6",
           "locality": "public",
           "port": 88

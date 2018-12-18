@@ -53,7 +53,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.3",
           "locality": "private",
           "port": 137
@@ -113,7 +113,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.4",
           "locality": "private",
           "port": 58130

@@ -47,7 +47,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.1.228",
           "locality": "private",
           "port": 5878

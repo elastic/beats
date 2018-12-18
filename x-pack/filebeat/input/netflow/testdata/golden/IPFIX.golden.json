@@ -87,7 +87,7 @@
           "packets": 5,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.253.1",
           "locality": "private",
           "port": 60560
@@ -148,7 +148,7 @@
           "packets": 6,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.253.128",
           "locality": "private",
           "port": 22
@@ -209,7 +209,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.253.2",
           "locality": "private",
           "port": 53
@@ -270,7 +270,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.253.132",
           "locality": "private",
           "port": 35262
@@ -331,7 +331,7 @@
           "packets": 14,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "54.214.9.161",
           "locality": "public",
           "port": 443
@@ -392,7 +392,7 @@
           "packets": 13,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.253.132",
           "locality": "private",
           "port": 49935
@@ -453,7 +453,7 @@
           "packets": 1,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.253.130",
           "locality": "private",
           "port": 38254
@@ -514,7 +514,7 @@
           "packets": 4,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.253.1",
           "locality": "private",
           "port": 60560
@@ -575,7 +575,7 @@
           "packets": 3,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.253.128",
           "locality": "private",
           "port": 22
@@ -636,7 +636,7 @@
           "packets": 2,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.253.1",
           "locality": "private",
           "port": 65308
@@ -697,7 +697,7 @@
           "packets": 1,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.253.128",
           "locality": "private",
           "port": 22
@@ -758,7 +758,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.253.1",
           "locality": "private",
           "port": 5353

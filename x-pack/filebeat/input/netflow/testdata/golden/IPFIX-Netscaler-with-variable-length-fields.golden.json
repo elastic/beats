@@ -77,7 +77,7 @@
           "packets": 1,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 51053
@@ -149,7 +149,7 @@
           "packets": 2,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.0.1",
           "locality": "private",
           "port": 443
@@ -233,7 +233,7 @@
           "packets": 2,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 51053

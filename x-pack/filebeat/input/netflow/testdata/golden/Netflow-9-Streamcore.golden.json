@@ -54,7 +54,7 @@
           "packets": 3,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "100.78.40.201",
           "locality": "public",
           "port": 8080
@@ -115,7 +115,7 @@
           "packets": 4,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.231.128.150",
           "locality": "private",
           "port": 50073
@@ -176,7 +176,7 @@
           "packets": 10,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "100.78.40.201",
           "locality": "public",
           "port": 8080
@@ -237,7 +237,7 @@
           "packets": 11,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.27.8.20",
           "locality": "private",
           "port": 53483

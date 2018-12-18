@@ -59,7 +59,7 @@
           "packets": 2,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.18.65.21",
           "locality": "private",
           "port": 61209
@@ -125,7 +125,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.18.65.91",
           "locality": "private",
           "port": 138
@@ -191,7 +191,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.18.65.91",
           "locality": "private",
           "port": 138
@@ -257,7 +257,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.18.65.21",
           "locality": "private",
           "port": 61329
@@ -321,7 +321,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 61329
         }
       },

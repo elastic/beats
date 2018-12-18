@@ -55,7 +55,7 @@
           "packets": 0,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.99.130.239",
           "locality": "private",
           "mac": "00:00:00:00:00:00",
@@ -118,7 +118,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.99.252.50",
           "locality": "private",
           "mac": "00:00:00:00:00:00",
@@ -181,7 +181,7 @@
           "packets": 0,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.99.130.239",
           "locality": "private",
           "mac": "00:00:00:00:00:00",
@@ -244,7 +244,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.98.243.20",
           "locality": "private",
           "mac": "00:00:00:00:00:00",
@@ -307,7 +307,7 @@
           "packets": 0,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.99.168.140",
           "locality": "private",
           "mac": "00:00:00:00:00:00",
@@ -370,7 +370,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.98.243.20",
           "locality": "private",
           "mac": "00:00:00:00:00:00",
@@ -433,7 +433,7 @@
           "packets": 0,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.99.168.140",
           "locality": "private",
           "mac": "00:00:00:00:00:00",
@@ -496,7 +496,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.98.243.20",
           "locality": "private",
           "mac": "00:00:00:00:00:00",

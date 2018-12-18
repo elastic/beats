@@ -75,7 +75,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.1",
           "locality": "private",
           "mac": "00:50:56:c0:00:01",
@@ -127,7 +127,7 @@
           "direction": "unknown",
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.201",
           "locality": "private",
           "mac": "00:0c:29:70:86:09",
@@ -179,7 +179,7 @@
           "direction": "unknown",
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.100",
           "locality": "private",
           "mac": "00:0c:29:8d:af:c3",
@@ -231,7 +231,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.1",
           "locality": "private",
           "mac": "00:50:56:c0:00:01",
@@ -283,7 +283,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.201",
           "locality": "private",
           "mac": "00:0c:29:70:86:09",
@@ -335,7 +335,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.1",
           "locality": "private",
           "mac": "00:50:56:c0:00:01",
@@ -387,7 +387,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.201",
           "locality": "private",
           "mac": "00:0c:29:70:86:09",
@@ -439,7 +439,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.1",
           "locality": "private",
           "mac": "00:50:56:c0:00:01",
@@ -491,7 +491,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.201",
           "locality": "private",
           "mac": "00:0c:29:70:86:09",
@@ -543,7 +543,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.1",
           "locality": "private",
           "mac": "00:50:56:c0:00:01",
@@ -595,7 +595,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.201",
           "locality": "private",
           "mac": "00:0c:29:70:86:09",
@@ -647,7 +647,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.1",
           "locality": "private",
           "mac": "00:50:56:c0:00:01",
@@ -699,7 +699,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.201",
           "locality": "private",
           "mac": "00:0c:29:70:86:09",
@@ -751,7 +751,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.1",
           "locality": "private",
           "mac": "00:50:56:c0:00:01",
@@ -803,7 +803,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.201",
           "locality": "private",
           "mac": "00:0c:29:70:86:09",
@@ -855,7 +855,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.1",
           "locality": "private",
           "mac": "00:50:56:c0:00:01",
@@ -907,7 +907,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.201",
           "locality": "private",
           "mac": "00:0c:29:70:86:09",
@@ -959,7 +959,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.1",
           "locality": "private",
           "mac": "00:50:56:c0:00:01",
@@ -1011,7 +1011,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.201",
           "locality": "private",
           "mac": "00:0c:29:70:86:09",
@@ -1063,7 +1063,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.1",
           "locality": "private",
           "mac": "00:50:56:c0:00:01",
@@ -1115,7 +1115,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.201",
           "locality": "private",
           "mac": "00:0c:29:70:86:09",
@@ -1167,7 +1167,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.1",
           "locality": "private",
           "mac": "00:50:56:c0:00:01",
@@ -1219,7 +1219,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.201",
           "locality": "private",
           "mac": "00:0c:29:70:86:09",
@@ -1271,7 +1271,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.1",
           "locality": "private",
           "mac": "00:50:56:c0:00:01",
@@ -1323,7 +1323,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.201",
           "locality": "private",
           "mac": "00:0c:29:70:86:09",
@@ -1375,7 +1375,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.1",
           "locality": "private",
           "mac": "00:50:56:c0:00:01",
@@ -1427,7 +1427,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.201",
           "locality": "private",
           "mac": "00:0c:29:70:86:09",
@@ -1479,7 +1479,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.1",
           "locality": "private",
           "mac": "00:50:56:c0:00:01",
@@ -1531,7 +1531,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.16.32.201",
           "locality": "private",
           "mac": "00:0c:29:70:86:09",
