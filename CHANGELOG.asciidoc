@@ -279,6 +279,80 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Added support to calculate certificates' fingerprints (MD5, SHA-1, SHA-256). {issue}8180[8180]
 - Support new TLS version negotiation introduced in TLS 1.3. {issue}8647[8647].
 
+[[release-notes-6.5.4]]
+=== Beats version 6.5.4
+https://github.com/elastic/beats/compare/v6.5.3...v6.5.4[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Update Golang to 1.10.6. This fixes an issue in remote certificate validation CVE-2018-16875. {pull}9563[9563]
+
+*Filebeat*
+
+- Fix saved objects in filebeat haproxy dashboard. {pull}9417[9417]
+- Fixed a memory leak when harvesters are closed. {pull}7820[7820]
+
+==== Added
+
+*Filebeat*
+
+- Added support on Traefik for Common Log Format and Combined Log Format mixed which is the default Traefik format {issue}8015[8015] {issue}6111[6111] {pull}8768[8768].
+
+
+[[release-notes-6.5.3]]
+=== Beats version 6.5.3
+https://github.com/elastic/beats/compare/v6.5.2...v6.5.3[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Log events at the debug level when dropped by encoding problems. {pull}9251[9251]
+
+*Filebeat*
+
+- Correctly parse `December` or `Dec` in the Syslog input. {pull}9349[9349]
+- Don't generate incomplete configurations when logs collection is disabled by hints. {pull}9305[9305]
+- Stop runners disabled by hints after previously being started. {pull}9305[9305]
+- Fix installation of haproxy dashboard. {issue}9307[9307] {pull}9313[9313]
+
+[[release-notes-6.5.2]]
+=== Beats version 6.5.2
+https://github.com/elastic/beats/compare/v6.5.1...v6.5.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Propagate Sync error when running SafeFileRotate. {pull}9069[9069]
+
+*Metricbeat*
+
+- Fix panic on docker healthcheck collection on dockers without healthchecks. {pull}9171[9171]
+- Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
+
+[[release-notes-6.5.1]]
+=== Beats version 6.5.1
+https://github.com/elastic/beats/compare/v6.5.0...v6.5.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+- Fix windows binaries not having an enroll command. {issue}9096[9096] {pull}8836[8836]
+
+*Journalbeat*
+- Fix journalbeat sometimes hanging if output is unavailable. {pull}9106[9106]
+
+*Metricbeat*
+- Fix race condition when enriching events with kubernetes metadata. {issue}9055[9055] {issue}9067[9067]
+
+==== Added
+
+*Journalbeat*
+- Add minimal kibana dashboard. {pull}9106[9106]
+
 
 [[release-notes-6.5.0]]
 === Beats version 6.5.0
