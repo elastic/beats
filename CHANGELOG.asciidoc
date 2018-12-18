@@ -340,6 +340,7 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Make docker input check if container strings are empty {pull}7960[7960]
 - Keep unparsed user agent information in user_agent.original. {pull}8537[8537]
 - Allow to force CRI format parsing for better performance {pull}8424[8424]
+- Support mysql 5.7.22 slowlog starting with time information. {issue}7892[7892] {pull}9647[9647]
 
 *Heartbeat*
 
