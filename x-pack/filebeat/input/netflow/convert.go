@@ -268,6 +268,10 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 			ecsDest, ecsSource = ecsSource, ecsDest
 		}
 		ecsEvent["category"] = "network_session"
+
+		// Assume source is the client in biflows.
+		event.Fields["client"] = ecsSource
+		event.Fields["server"] = ecsDest
 	}
 
 	if hasRevBytes || hasRevPkts {
