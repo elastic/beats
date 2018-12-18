@@ -34,6 +34,10 @@ jobs:
       env: TARGETS="TEST_ENVIRONMENT=0 -C filebeat testsuite"
       go: $GO_VERSION
       stage: test
+    - os: linux
+      env: TARGETS="-C x-pack/filebeat unit"
+      go: $GO_VERSION
+      stage: test
 
     # Heartbeat
     - os: linux
