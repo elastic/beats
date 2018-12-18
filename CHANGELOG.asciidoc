@@ -52,6 +52,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 - Ignore non index fields in default_field for Elasticsearch. {pull}9549[9549]
 - Update Golang to 1.10.6. {pull}9563[9563]
 - Enforce validation for the Central Management access token. {issue}9621[9621]
+- Update Golang to 1.10.7. {pull}9640[9640]
 
 *Auditbeat*
 
