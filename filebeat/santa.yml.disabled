@@ -1,6 +1,0 @@
-- module: santa
-  log:
-    enabled: true
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the the default path.
-    #var.paths:

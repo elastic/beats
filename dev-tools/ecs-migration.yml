@@ -188,7 +188,9 @@
   to: source.geo.*
   alias: true
 
-## Apache
+# Filebeat modules
+
+## Apache module
 
 - from: apache2.access.user_name
   to: user.name
@@ -229,6 +231,27 @@
 
 - from: apache2.access.user_agent.*
   to: user_agent.*
+  alias: true
+
+### Error fileset
+- from: apache.error.message
+  to: message
+  alias: true
+
+- from: apache.error.level
+  to: log.level
+  alias: true
+
+- from: apache2.error.client
+  to: source.address
+  alias: true
+
+- from: apache2.error.pid
+  to: process.pid
+  alias: true
+
+- from: apache2.error.tid
+  to: process.thread.id
   alias: true
 
 # IIS module
@@ -440,3 +463,4 @@
   to: event.dataset
   alias: false
   comment: No alias mapping as field did not always exist
+

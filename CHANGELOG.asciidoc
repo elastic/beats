@@ -16,6 +16,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Update add_cloud_metadata fields to adjust to ECS. {pull}9265[9265]
 - Automaticall cap signed integers to 63bits. {pull}8991[8991]
 - Rename beat.timezone to event.timezone. {pull}9458[9458]
+- Use _doc as document type. {pull}9056[9056]{pull}9573[9573]
 - Update to Golang 1.11.3. {pull}9560[9560]
 
 *Auditbeat*
@@ -23,6 +24,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 *Filebeat*
 
 - Allow beats to blacklist certain part of the configuration while using Central Management. {pull}9099[9099]
+- Modify apache/error dataset to follow ECS. {pull}8963[8963]
 
 *Heartbeat*
 
@@ -54,6 +56,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - When collecting swap metrics for beats telemetry or system metricbeat module handle cases of free swap being bigger than total swap by assuming no swap is being used. {issue}6271[6271] {pull}9383[9383]
 - Adding logging traces at debug level when the pipeline client receives the following events: onFilteredOut, onDroppedOnPublish. {pull}9016[9016]
 - Ignore non index fields in default_field for Elasticsearch. {pull}9549[9549]
+- Enforce validation for the Central Management access token. {issue}9621[9621]
 
 *Auditbeat*
 
@@ -91,7 +94,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Unify dashboard exporter tools. {pull}9097[9097]
 
 - Unify dashboard exporter tools. {pull}9097[9097]
-- Use _doc as document type of the Elasticsearch major version is 7. {pull}9056[9056]
 - Add cache.ttl to add_host_metadata. {pull}9359[9359]
 - Add support for index lifecycle management (beta). {pull}7963[7963]
 - Always include Pod UID as part of Pod metadata. {pull]9517[9517]
@@ -108,6 +110,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Added support on Traefik for Common Log Format and Combined Log Format mixed which is the default Traefik format {issue}8015[8015] {issue}6111[6111] {pull}8768[8768].
 - Add support for multi-core thread_id in postgresql module {issue}9156[9156] {pull}9482[9482]
 - Added module for parsing Google Santa logs. {pull}9540[9540]
+- Added netflow input type that supports NetFlow v1, v5, v6, v7, v8, v9 and IPFIX. {issue}9399[9399]
 
 *Heartbeat*
 
