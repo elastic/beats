@@ -19,8 +19,12 @@ class BaseTest(TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.beat_name = "metricbeat"
-        self.beat_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+        if not hasattr(self, 'beat_name'):
+            self.beat_name = "metricbeat"
+
+        if not hasattr(self, 'beat_path'):
+            self.beat_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+
         super(BaseTest, self).setUpClass()
 
     def de_dot(self, existing_fields):

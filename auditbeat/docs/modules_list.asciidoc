@@ -8,5 +8,5 @@ This file is generated! See scripts/docs_collector.py
 
 --
 
-include::modules/auditd.asciidoc[]
-include::modules/file_integrity.asciidoc[]
+include::./modules/auditd.asciidoc[]
+include::./modules/file_integrity.asciidoc[]

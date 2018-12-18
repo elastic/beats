@@ -147,12 +147,12 @@ func expandFile(src, dst string, args ...map[string]interface{}) error {
 }
 
 // CWD return the current working directory.
-func CWD() string {
+func CWD(elem ...string) string {
 	wd, err := os.Getwd()
 	if err != nil {
 		panic(errors.Wrap(err, "failed to get the CWD"))
 	}
-	return wd
+	return filepath.Join(append([]string{wd}, elem...)...)
 }
 
 // EnvOr returns the value of the specified environment variable if it is
@@ -213,6 +213,13 @@ func dockerInfo() (*DockerInfo, error) {
 	}
 
 	return &info, nil
+}
+
+// HaveDockerCompose returns an error if docker-compose is not found on the
+// PATH.
+func HaveDockerCompose() error {
+	_, err := exec.LookPath("docker-compose")
+	return errors.Wrap(err, "docker-compose was not found on the PATH")
 }
 
 // FindReplace reads a file, performs a find/replace operation, then writes the
@@ -513,6 +520,29 @@ func FindFiles(globs ...string) ([]string, error) {
 	return configFiles, nil
 }
 
+// FindFilesRecursive recursively traverses from the CWD and invokes the given
+// match function on each regular file to determine if the given path should be
+// returned as a match.
+func FindFilesRecursive(match func(path string, info os.FileInfo) bool) ([]string, error) {
+	var matches []string
+	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !info.Mode().IsRegular() {
+			// continue
+			return nil
+		}
+
+		if match(filepath.ToSlash(path), info) {
+			matches = append(matches, path)
+		}
+		return nil
+	})
+	return matches, err
+}
+
 // FileConcat concatenates files and writes the output to out.
 func FileConcat(out string, perm os.FileMode, files ...string) error {
 	f, err := os.OpenFile(createDir(out), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, perm)
@@ -644,6 +674,17 @@ func IsUpToDate(dst string, sources ...string) bool {
 
 	execute, err := target.Path(dst, files...)
 	return err == nil && !execute
+}
+
+// LibbeatDir returns the libbeat directory. You can pass paths and
+// they will be joined and appended to the libbeat dir.
+func LibbeatDir(path ...string) string {
+	esBeatsDir, err := ElasticBeatsDir()
+	if err != nil {
+		panic(errors.Wrap(err, "failed determine libbeat dir location"))
+	}
+
+	return filepath.Join(append([]string{esBeatsDir, "libbeat"}, path...)...)
 }
 
 // createDir creates the parent directory for the given file.

@@ -13,6 +13,11 @@ REVIEWDOG_OPTIONS?=-diff "git diff master"
 REVIEWDOG_REPO=github.com/haya14busa/reviewdog/cmd/reviewdog
 XPACK_SUFFIX=x-pack/
 
+# PROJECTS_XPACK_PKG is a list of Beats that have independent packaging support
+# in the x-pack directory (rather than having the OSS build produce both sets
+# of artifacts). This will be removed once we complete the transition.
+PROJECTS_XPACK_PKG=x-pack/auditbeat
+
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
 # Also it builds the docs and the generators
 
@@ -150,8 +155,8 @@ snapshot:
 # Builds a release.
 .PHONY: release
 release: beats-dashboards
-	@$(foreach var,$(BEATS),$(MAKE) -C $(var) release || exit 1;)
-	@$(foreach var,$(BEATS), \
+	@$(foreach var,$(BEATS) $(PROJECTS_XPACK_PKG),$(MAKE) -C $(var) release || exit 1;)
+	@$(foreach var,$(BEATS) $(PROJECTS_XPACK_PKG), \
       test -d $(var)/build/distributions && test -n "$$(ls $(var)/build/distributions)" || exit 0; \
       mkdir -p build/distributions/$(subst $(XPACK_SUFFIX),'',$(var)) && mv -f $(var)/build/distributions/* build/distributions/$(subst $(XPACK_SUFFIX),'',$(var))/ || exit 1;)
 
