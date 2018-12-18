@@ -8,4 +8,4 @@ multiline:
   pattern: '^# User@Host: '
   negate: true
   match: after
-exclude_lines: ['^[\/\w\.]+, Version: .* started with:.*']   # Exclude the header
+exclude_lines: ['^[\/\w\.]+, Version: .* started with:.*', '^# Time:.*']   # Exclude the header

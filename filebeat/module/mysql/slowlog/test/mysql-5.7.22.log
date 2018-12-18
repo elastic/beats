@@ -1,0 +1,5 @@
+# Time: 2018-08-07T16:27:47.169604+08:00
+# User@Host: root[root] @  [218.76.8.37]  Id:  7234
+# Query_time: 15.000223  Lock_time: 0.000000 Rows_sent: 1  Rows_examined: 0
+SET timestamp=1533630467;
+select sleep(15);
