@@ -5,12 +5,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -52,14 +51,18 @@
           "protocol_identifier": 6,
           "responder_octets": 0,
           "responder_packets": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -68,12 +71,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -115,14 +117,18 @@
           "protocol_identifier": 6,
           "responder_octets": 0,
           "responder_packets": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -131,12 +137,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -178,14 +183,18 @@
           "protocol_identifier": 6,
           "responder_octets": 0,
           "responder_packets": 1,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 290,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -194,12 +203,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -241,14 +249,18 @@
           "protocol_identifier": 6,
           "responder_octets": 0,
           "responder_packets": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -257,12 +269,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -304,14 +315,18 @@
           "protocol_identifier": 6,
           "responder_octets": 0,
           "responder_packets": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -320,12 +335,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -367,14 +381,18 @@
           "protocol_identifier": 6,
           "responder_octets": 9437,
           "responder_packets": 18,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 290,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -383,12 +401,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -430,14 +447,18 @@
           "protocol_identifier": 6,
           "responder_octets": 0,
           "responder_packets": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -446,12 +467,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -493,14 +513,18 @@
           "protocol_identifier": 6,
           "responder_octets": 36894,
           "responder_packets": 47,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 290,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -509,12 +533,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -556,14 +579,18 @@
           "protocol_identifier": 6,
           "responder_octets": 6533,
           "responder_packets": 14,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -572,12 +599,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -619,14 +645,18 @@
           "protocol_identifier": 6,
           "responder_octets": 0,
           "responder_packets": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 290,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -635,12 +665,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -682,14 +711,18 @@
           "protocol_identifier": 6,
           "responder_octets": 0,
           "responder_packets": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 290,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -698,12 +731,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -745,14 +777,18 @@
           "protocol_identifier": 6,
           "responder_octets": 138,
           "responder_packets": 4,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -761,12 +797,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -808,14 +843,18 @@
           "protocol_identifier": 6,
           "responder_octets": 0,
           "responder_packets": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 290,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -824,12 +863,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -871,14 +909,18 @@
           "protocol_identifier": 6,
           "responder_octets": 6079,
           "responder_packets": 10,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -887,12 +929,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -934,14 +975,18 @@
           "protocol_identifier": 6,
           "responder_octets": 0,
           "responder_packets": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -950,12 +995,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -997,14 +1041,18 @@
           "protocol_identifier": 6,
           "responder_octets": 0,
           "responder_packets": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1013,12 +1061,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1060,14 +1107,18 @@
           "protocol_identifier": 6,
           "responder_octets": 3409,
           "responder_packets": 7,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 290,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1076,12 +1127,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1123,14 +1173,18 @@
           "protocol_identifier": 6,
           "responder_octets": 0,
           "responder_packets": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1139,12 +1193,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1186,14 +1239,18 @@
           "protocol_identifier": 6,
           "responder_octets": 0,
           "responder_packets": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1202,12 +1259,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1249,14 +1305,18 @@
           "protocol_identifier": 6,
           "responder_octets": 6305,
           "responder_packets": 15,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 290,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1265,12 +1325,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1312,14 +1371,18 @@
           "protocol_identifier": 6,
           "responder_octets": 3110,
           "responder_packets": 7,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1328,12 +1391,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1375,14 +1437,18 @@
           "protocol_identifier": 6,
           "responder_octets": 2,
           "responder_packets": 4,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1391,12 +1457,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1438,14 +1503,18 @@
           "protocol_identifier": 6,
           "responder_octets": 0,
           "responder_packets": 2,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 290,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1454,12 +1523,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1501,14 +1569,18 @@
           "protocol_identifier": 6,
           "responder_octets": 0,
           "responder_packets": 2,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 290,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1517,12 +1589,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1564,14 +1635,18 @@
           "protocol_identifier": 6,
           "responder_octets": 174,
           "responder_packets": 3,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 290,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1580,12 +1655,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1627,14 +1701,18 @@
           "protocol_identifier": 6,
           "responder_octets": 138,
           "responder_packets": 4,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1643,12 +1721,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1690,14 +1767,18 @@
           "protocol_identifier": 6,
           "responder_octets": 31,
           "responder_packets": 2,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1706,12 +1787,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1753,14 +1833,18 @@
           "protocol_identifier": 6,
           "responder_octets": 13482,
           "responder_packets": 17,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
@@ -1769,12 +1853,11 @@
       "Timestamp": "2018-07-03T10:47:00Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "10.101.255.2"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2018-07-03T10:47:00Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-07-03T10:47:00Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Vhs9T5k296w",
@@ -1816,14 +1899,18 @@
           "protocol_identifier": 6,
           "responder_octets": 28373,
           "responder_packets": 133,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0,
           "waasoptimization_segment": 16
         },
         "network": {
           "community_id": "1:idwO/QHAjbcGlF1bfQE9dPuu7T0=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "10.101.255.2"
         }
       },
       "Private": null
