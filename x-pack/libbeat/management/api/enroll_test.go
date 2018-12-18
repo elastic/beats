@@ -62,18 +62,49 @@ func TestEnrollValid(t *testing.T) {
 }
 
 func TestEnrollError(t *testing.T) {
-	beatUUID, err := uuid.NewV4()
-	if err != nil {
-		t.Fatal(err)
+	tests := []struct {
+		name         string
+		body         string
+		responseCode int
+	}{
+		{
+			name:         "invalid enrollment token",
+			body:         `{"message": "Invalid enrollment token"}`,
+			responseCode: 400,
+		},
+		{
+			name:         "invalid token response",
+			body:         `{"access_token": ""}`,
+			responseCode: 200,
+		},
 	}
 
-	server, client := newServerClientPair(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, `{"message": "Invalid enrollment token"}`, 400)
-	}))
-	defer server.Close()
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			beatUUID, err := uuid.NewV4()
+			if err != nil {
+				t.Fatal(err)
+			}
 
-	accessToken, err := client.Enroll("metricbeat", "beatname", "6.3.0", "myhostname.lan", beatUUID, "thisismyenrollmenttoken")
+			server, client := newServerClientPair(t, http.HandlerFunc(func(
+				w http.ResponseWriter,
+				r *http.Request,
+			) {
+				http.Error(w, test.body, test.responseCode)
+			}))
+			defer server.Close()
 
-	assert.NotNil(t, err)
-	assert.Equal(t, "", accessToken)
+			accessToken, err := client.Enroll(
+				"metricbeat",
+				"beatname",
+				"6.3.0",
+				"myhostname.lan",
+				beatUUID,
+				"thisismyenrollmenttoken",
+			)
+
+			assert.NotNil(t, err)
+			assert.Equal(t, "", accessToken)
+		})
+	}
 }
