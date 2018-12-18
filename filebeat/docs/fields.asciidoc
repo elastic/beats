@@ -301,7 +301,9 @@ Fields from the Apache error logs.
 *`apache2.error.level`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: log.level
 
 The severity level of the message.
 
@@ -321,7 +323,9 @@ The IP address of the client that generated the error.
 *`apache2.error.message`*::
 +
 --
-type: text
+type: alias
+
+alias to: message
 
 The logged message.
 
@@ -331,7 +335,9 @@ The logged message.
 *`apache2.error.pid`*::
 +
 --
-type: long
+type: alias
+
+alias to: process.pid
 
 The process ID.
 
@@ -341,7 +347,9 @@ The process ID.
 *`apache2.error.tid`*::
 +
 --
-type: long
+type: alias
+
+alias to: process.thread.id
 
 The thread ID.
 
@@ -3105,6 +3113,17 @@ This id normally changes across restarts, but `service.id` does not.
 Source fields describe details about the source of a packet/event. Source fields are usually populated in conjunction with destination fields.
 
 
+
+*`source.address`*::
++
+--
+type: keyword
+
+Some event source addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+
+--
 
 *`source.ip`*::
 +
