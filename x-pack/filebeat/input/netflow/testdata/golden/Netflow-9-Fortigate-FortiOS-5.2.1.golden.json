@@ -82,6 +82,7 @@
         },
         "network": {
           "bytes": 152,
+          "community_id": "1:tYgSz6Xox1AUTy0tyztkJXZmiIQ=",
           "direction": "unknown",
           "packets": 3,
           "protocol": "tcp"

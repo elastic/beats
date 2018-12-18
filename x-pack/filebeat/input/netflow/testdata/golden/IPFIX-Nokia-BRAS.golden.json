@@ -43,6 +43,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:JOQeKrnZDhP8AqJv8DtyiRwHnek=",
           "direction": "unknown",
           "protocol": "tcp"
         },

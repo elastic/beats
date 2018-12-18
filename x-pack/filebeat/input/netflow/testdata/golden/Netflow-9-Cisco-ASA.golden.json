@@ -46,6 +46,7 @@
         },
         "network": {
           "bytes": 56,
+          "community_id": "1:SmwvOXNzqf078/v4Sdnv4cSsPEI=",
           "direction": "unknown",
           "protocol": "icmp"
         },
@@ -102,6 +103,7 @@
         },
         "network": {
           "bytes": 56,
+          "community_id": "1:ze3NNjzfiQKBNJMVnoVNEOJInGg=",
           "direction": "unknown",
           "protocol": "icmp"
         },
@@ -158,6 +160,7 @@
         },
         "network": {
           "bytes": 56,
+          "community_id": "1:xvskJWklV13yhdmqo/CeIyXRtsY=",
           "direction": "unknown",
           "protocol": "icmp"
         },
@@ -214,6 +217,7 @@
         },
         "network": {
           "bytes": 56,
+          "community_id": "1:RThhKEIaevWgAeGJidFNVthplto=",
           "direction": "unknown",
           "protocol": "icmp"
         },
@@ -270,6 +274,7 @@
         },
         "network": {
           "bytes": 56,
+          "community_id": "1:xvskJWklV13yhdmqo/CeIyXRtsY=",
           "direction": "unknown",
           "protocol": "icmp"
         },
@@ -326,6 +331,7 @@
         },
         "network": {
           "bytes": 56,
+          "community_id": "1:u/b3SLdlsknqQeCYLejlqwSewgo=",
           "direction": "unknown",
           "protocol": "icmp"
         },
@@ -382,6 +388,7 @@
         },
         "network": {
           "bytes": 56,
+          "community_id": "1:kS6rsnr70uQ6xFsuYMkvCKSdW8k=",
           "direction": "unknown",
           "protocol": "icmp"
         },
@@ -438,6 +445,7 @@
         },
         "network": {
           "bytes": 56,
+          "community_id": "1:kS6rsnr70uQ6xFsuYMkvCKSdW8k=",
           "direction": "unknown",
           "protocol": "icmp"
         },
@@ -494,6 +502,7 @@
         },
         "network": {
           "bytes": 56,
+          "community_id": "1:SmwvOXNzqf078/v4Sdnv4cSsPEI=",
           "direction": "unknown",
           "protocol": "icmp"
         },
@@ -550,6 +559,7 @@
         },
         "network": {
           "bytes": 160,
+          "community_id": "1:xvskJWklV13yhdmqo/CeIyXRtsY=",
           "direction": "unknown",
           "protocol": "icmp"
         },
@@ -606,6 +616,7 @@
         },
         "network": {
           "bytes": 56,
+          "community_id": "1:ze3NNjzfiQKBNJMVnoVNEOJInGg=",
           "direction": "unknown",
           "protocol": "icmp"
         },
@@ -662,6 +673,7 @@
         },
         "network": {
           "bytes": 56,
+          "community_id": "1:xvskJWklV13yhdmqo/CeIyXRtsY=",
           "direction": "unknown",
           "protocol": "icmp"
         },
@@ -718,6 +730,7 @@
         },
         "network": {
           "bytes": 56,
+          "community_id": "1:RThhKEIaevWgAeGJidFNVthplto=",
           "direction": "unknown",
           "protocol": "icmp"
         },
@@ -774,6 +787,7 @@
         },
         "network": {
           "bytes": 56,
+          "community_id": "1:xvskJWklV13yhdmqo/CeIyXRtsY=",
           "direction": "unknown",
           "protocol": "icmp"
         },

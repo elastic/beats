@@ -55,6 +55,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:pMbHu2KSX2ETGFunUYvRZUVwkDA=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -120,6 +121,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:vK+Zeop1Y3GHxfFGVF2/COcNBWw=",
           "direction": "unknown",
           "protocol": "ipv6-icmp"
         },
@@ -185,6 +187,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:K4/7oSyucHcfZAc5dWGMTB7XWGw=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -250,6 +253,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:yBV3/K+LwXqfvm3nlYaqIPtS6UQ=",
           "direction": "unknown",
           "protocol": "icmp"
         },
@@ -315,6 +319,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:vK+Zeop1Y3GHxfFGVF2/COcNBWw=",
           "direction": "unknown",
           "protocol": "ipv6-icmp"
         },
@@ -380,6 +385,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:/Nqnh+qS63xOcLeH1LsIVNCCpvc=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -445,6 +451,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:3qkFUQpCFoQLLRqciw3v0aXVkvk=",
           "direction": "unknown",
           "protocol": "tcp"
         },
@@ -510,6 +517,7 @@
           "type": "netflow"
         },
         "network": {
+          "community_id": "1:v9ASezXn5L0vAVcmj8jxybrYJ6I=",
           "direction": "unknown",
           "protocol": "tcp"
         },
