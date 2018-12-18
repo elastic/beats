@@ -17,7 +17,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Automaticall cap signed integers to 63bits. {pull}8991[8991]
 - Rename beat.timezone to event.timezone. {pull}9458[9458]
 - Use _doc as document type. {pull}9056[9056]{pull}9573[9573]
-- Update to Golang 1.11.3. {pull}9560[9560]
 
 *Auditbeat*
 
@@ -57,6 +56,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Adding logging traces at debug level when the pipeline client receives the following events: onFilteredOut, onDroppedOnPublish. {pull}9016[9016]
 - Ignore non index fields in default_field for Elasticsearch. {pull}9549[9549]
 - Enforce validation for the Central Management access token. {issue}9621[9621]
+- Update to Golang 1.11.3. {pull}9560[9560]
+- Update to Golang 1.11.4. {pull}9627[9627]
 
 *Auditbeat*
 
