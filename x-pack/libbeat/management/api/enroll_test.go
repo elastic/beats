@@ -62,25 +62,22 @@ func TestEnrollValid(t *testing.T) {
 }
 
 func TestEnrollError(t *testing.T) {
-	tests := []struct {
-		name         string
+	tests := map[string]struct {
 		body         string
 		responseCode int
 	}{
-		{
-			name:         "invalid enrollment token",
+		"invalid enrollment token": {
 			body:         `{"message": "Invalid enrollment token"}`,
 			responseCode: 400,
 		},
-		{
-			name:         "invalid token response",
+		"invalid token response": {
 			body:         `{"access_token": ""}`,
 			responseCode: 200,
 		},
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
 			beatUUID, err := uuid.NewV4()
 			if err != nil {
 				t.Fatal(err)

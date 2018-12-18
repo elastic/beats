@@ -13,25 +13,22 @@ import (
 )
 
 func TestConfigValidate(t *testing.T) {
-	tests := []struct {
-		name   string
+	tests := map[string]struct {
 		config *common.Config
 		err    bool
 	}{
-		{
-			name:   "missing access_token",
+		"missing access_token": {
 			config: common.MustNewConfigFrom(map[string]interface{}{}),
 			err:    true,
 		},
-		{
-			name:   "access_token is present",
+		"access_token is present": {
 			config: common.MustNewConfigFrom(map[string]interface{}{"access_token": "abc1234"}),
 			err:    false,
 		},
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
 			c := defaultConfig()
 			err := test.config.Unpack(c)
 			if test.err {
