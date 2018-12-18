@@ -4239,25 +4239,98 @@ example:
 
 --
 
-*`elasticsearch.server.gc.collection_duration`*::
+[float]
+== old fields
+
+Old GC
+
+
+*`elasticsearch.server.gc.old.overhead_seq`*::
++
+--
+type: long
+
+example: 3449992
+
+Sequence number
+
+--
+
+[float]
+== collection_duration fields
+
+Time spent in GC
+
+
+*`elasticsearch.server.gc.old.collection_duration.time`*::
++
+--
+type: float
+
+example: 1.6
+
+Time duration in some units
+
+--
+
+*`elasticsearch.server.gc.old.collection_duration.unit`*::
 +
 --
 type: keyword
 
-example: 1.2s
+example: s
 
-Time spent collecting during GC
+Unit of time duration
 
 --
 
-*`elasticsearch.server.gc.observation_duration`*::
+*`elasticsearch.server.gc.old.collection_duration.time_in_millis`*::
 +
 --
-type: keyword
+type: float
 
-example: 1.8s
+example: 1600
+
+Time duration in milliseconds
+
+--
+
+[float]
+== observation_duration fields
 
 Total time over which collection was observed
+
+
+*`elasticsearch.server.gc.old.observation_duration.time`*::
++
+--
+type: float
+
+example: 1.8
+
+Time duration in some units
+
+--
+
+*`elasticsearch.server.gc.old.observation_duration.unit`*::
++
+--
+type: keyword
+
+example: s
+
+Unit of time duration
+
+--
+
+*`elasticsearch.server.gc.old.observation_duration.time_in_millis`*::
++
+--
+type: float
+
+example: 1800
+
+Time duration in milliseconds
 
 --
 
