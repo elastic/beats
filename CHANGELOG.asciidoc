@@ -16,6 +16,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Update add_cloud_metadata fields to adjust to ECS. {pull}9265[9265]
 - Automaticall cap signed integers to 63bits. {pull}8991[8991]
 - Rename beat.timezone to event.timezone. {pull}9458[9458]
+- Use _doc as document type. {pull}9056[9056]{pull}9573[9573]
 - Update to Golang 1.11.3. {pull}9560[9560]
 
 *Auditbeat*
@@ -90,7 +91,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 *Affecting all Beats*
 
 - Unify dashboard exporter tools. {pull}9097[9097]
-- Use _doc as document type of the Elasticsearch major version is 7. {pull}9056[9056]
 - Add cache.ttl to add_host_metadata. {pull}9359[9359]
 - Add support for index lifecycle management (beta). {pull}7963[7963]
 - Always include Pod UID as part of Pod metadata. {pull]9517[9517]
