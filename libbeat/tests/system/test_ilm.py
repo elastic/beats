@@ -6,6 +6,7 @@ import unittest
 import shutil
 import logging
 import datetime
+import time
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -198,6 +199,7 @@ class Test(BaseTest):
         policy = self.es.transport.perform_request('GET', "/_ilm/policy/" + self.policy_name)
         assert self.policy_name in policy
 
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_export_ilm_policy(self):
         """
@@ -222,6 +224,58 @@ class Test(BaseTest):
 
         assert self.log_contains('"max_age": "30d"')
         assert self.log_contains('"max_size": "50gb"')
+
+    @attr('integration')
+    def test_ilm_rollover(self):
+        """
+        Test ilm rollover
+        """
+
+        self.clean()
+
+        self.render_config_template(
+            elasticsearch={
+                "hosts": self.get_elasticsearch_url(),
+                "ilm.enabled": True,
+            },
+        )
+
+        body = {
+            "transient": {
+                "indices.lifecycle.poll_interval": "200ms"
+            }
+        }
+        self.es.transport.perform_request('PUT', "/_cluster/settings", body=body)
+
+        policy = {
+            "policy": {
+                "phases": {
+                    "hot": {
+                        "actions": {
+                            "rollover": {
+                                "max_docs": "1"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        self.es.transport.perform_request('PUT', "/_ilm/policy/" + self.policy_name, body=policy)
+
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+        self.wait_until(lambda: self.log_contains("Set setup.template.name"))
+        self.wait_until(lambda: self.log_contains_count("PublishEvents: 1 events have been published") > 4)
+        proc.check_kill_and_wait()
+
+        # Give time to do the rollovers
+        time.sleep(2)
+        indices = self.es.transport.perform_request('GET', '/_alias/mockbeat-9.9.9')
+
+        print indices
+        # Checks that at least 2 indices were created through rollover
+        assert len(indices) > 1
 
     def clean(self, alias_name=""):
 
