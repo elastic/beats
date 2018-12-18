@@ -5,12 +5,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -28,6 +27,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -36,12 +38,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -59,6 +60,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -67,12 +71,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -90,6 +93,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -98,12 +104,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -121,6 +126,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -129,12 +137,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -152,6 +159,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -160,12 +170,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -183,6 +192,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -191,12 +203,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -214,6 +225,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -222,12 +236,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -245,6 +258,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -253,12 +269,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -276,6 +291,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -284,12 +302,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -307,6 +324,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -315,12 +335,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -338,6 +357,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -346,12 +368,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -369,6 +390,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -377,12 +401,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -400,6 +423,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -408,12 +434,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -431,6 +456,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -439,12 +467,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -462,6 +489,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -470,12 +500,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -493,6 +522,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -501,12 +533,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -524,6 +555,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -532,12 +566,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -555,6 +588,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
@@ -563,12 +599,11 @@
       "Timestamp": "2016-12-06T10:09:48Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-06T10:09:48Z"
+          "category": "network_traffic",
+          "created": "2016-12-06T10:09:48Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -586,6 +621,9 @@
             "octet_delta_count": 3250896451
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null

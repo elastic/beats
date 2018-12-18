@@ -10,12 +10,11 @@
           "locality": "private",
           "port": 80
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-12-14T07:23:45Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-12-14T07:23:45Z",
+          "kind": "event"
         },
         "flow": {
           "id": "VHOuRvMCrLs",
@@ -40,12 +39,16 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "10.0.1.228",
           "source_transport_port": 5878,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:JOQeKrnZDhP8AqJv8DtyiRwHnek=",
           "direction": "unknown",
-          "protocol": "tcp"
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "10.0.1.228",

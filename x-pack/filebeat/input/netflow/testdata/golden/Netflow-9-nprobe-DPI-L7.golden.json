@@ -10,12 +10,11 @@
           "locality": "private",
           "port": 0
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "1970-01-01T00:08:22Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "1970-01-01T00:08:22Z",
+          "kind": "event"
         },
         "flow": {
           "id": "oFN7CMNpOLQ",
@@ -40,14 +39,18 @@
           "protocol_identifier": 0,
           "source_ipv4_address": "0.0.0.0",
           "source_transport_port": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 82,
           "community_id": "1:LFE/FJ5zfsQGP8HTeu6b6rxLS78=",
           "direction": "unknown",
+          "iana_number": 0,
           "packets": 1,
-          "protocol": "unknown (0)"
+          "transport": "unknown (0)"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "0.0.0.0",

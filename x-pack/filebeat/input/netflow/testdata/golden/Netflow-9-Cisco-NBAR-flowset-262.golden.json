@@ -11,14 +11,13 @@
           "mac": "1c:df:0f:7e:c3:58",
           "port": 2048
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.368Z",
+          "kind": "event",
           "start": "2017-02-14T11:10:19.368Z"
         },
         "flow": {
@@ -57,15 +56,19 @@
           "source_mac_address": "00:50:56:91:56:86",
           "source_transport_port": 0,
           "tcp_source_port": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "udp_destination_port": 0
         },
         "network": {
           "bytes": 44,
           "community_id": "1:OYl5x6oQNloID/wLIKpFGPIvN/U=",
           "direction": "inbound",
+          "iana_number": 1,
           "packets": 1,
-          "protocol": "icmp"
+          "transport": "icmp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "10.30.18.62",
@@ -86,14 +89,13 @@
           "mac": "1c:df:0f:7e:c3:58",
           "port": 161
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.368Z",
+          "kind": "event",
           "start": "2017-02-14T11:10:19.368Z"
         },
         "flow": {
@@ -132,15 +134,19 @@
           "source_mac_address": "00:50:56:91:56:86",
           "source_transport_port": 34220,
           "tcp_source_port": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "udp_destination_port": 161
         },
         "network": {
           "bytes": 106,
           "community_id": "1:CyRN90AZ56qtzUMojGTJ/nFWLGg=",
           "direction": "inbound",
+          "iana_number": 17,
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "10.30.18.62",
@@ -161,14 +167,13 @@
           "mac": "1c:df:0f:7e:c3:58",
           "port": 2048
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.924Z",
+          "kind": "event",
           "start": "2017-02-14T11:10:19.924Z"
         },
         "flow": {
@@ -207,15 +212,19 @@
           "source_mac_address": "00:18:19:9e:6c:01",
           "source_transport_port": 0,
           "tcp_source_port": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "udp_destination_port": 0
         },
         "network": {
           "bytes": 44,
           "community_id": "1:j8GnMqCJ2VnxNT6ZX5j3wFnLTu0=",
           "direction": "inbound",
+          "iana_number": 1,
           "packets": 1,
-          "protocol": "icmp"
+          "transport": "icmp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "10.10.172.60",
@@ -236,14 +245,13 @@
           "mac": "1c:df:0f:7e:c3:58",
           "port": 123
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-02-14T11:10:36Z",
           "duration": 0,
           "end": "2017-02-14T11:10:19.996Z",
+          "kind": "event",
           "start": "2017-02-14T11:10:19.996Z"
         },
         "flow": {
@@ -282,15 +290,19 @@
           "source_mac_address": "00:18:19:9e:6c:01",
           "source_transport_port": 123,
           "tcp_source_port": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "udp_destination_port": 123
         },
         "network": {
           "bytes": 76,
           "community_id": "1:CWcKykFvy1AWUIQAfWn2UBvkX2c=",
           "direction": "inbound",
+          "iana_number": 17,
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "10.10.172.60",
@@ -311,14 +323,13 @@
           "mac": "1c:df:0f:7e:c3:58",
           "port": 161
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-02-14T11:10:36Z",
           "duration": 72000000,
           "end": "2017-02-14T11:10:20.008Z",
+          "kind": "event",
           "start": "2017-02-14T11:10:19.936Z"
         },
         "flow": {
@@ -357,15 +368,19 @@
           "source_mac_address": "00:18:19:9e:6c:01",
           "source_transport_port": 45269,
           "tcp_source_port": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "udp_destination_port": 161
         },
         "network": {
           "bytes": 2794,
           "community_id": "1:eEsNJGUF4/LfUrgXBt8U4TWBA9M=",
           "direction": "inbound",
+          "iana_number": 17,
           "packets": 36,
-          "protocol": "udp"
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "10.10.172.60",

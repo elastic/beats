@@ -12,12 +12,11 @@
           "packets": 2,
           "port": 53
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2016-12-25T13:03:38Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2016-12-25T13:03:38Z",
+          "kind": "event"
         },
         "flow": {
           "id": "_tbAAnwoAu8",
@@ -50,15 +49,19 @@
           "silk_app_label": 53,
           "source_ipv4_address": "172.16.32.201",
           "source_transport_port": 46086,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vlan_id": 0
         },
         "network": {
           "bytes": 532,
           "community_id": "1:gQfwC1pqdEJoyqjxe8la2a1bW6g=",
           "direction": "unknown",
+          "iana_number": 17,
           "packets": 6,
-          "protocol": "udp"
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "bytes": 132,
@@ -81,12 +84,11 @@
           "packets": 2,
           "port": 9997
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2016-12-25T12:58:38Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2016-12-25T12:58:38Z",
+          "kind": "event"
         },
         "flow": {
           "id": "qznEzwF6uiM",
@@ -124,7 +126,7 @@
           "source_ipv4_address": "172.16.32.100",
           "source_transport_port": 63499,
           "tcp_sequence_number": 340533701,
-          "type": "netflow",
+          "type": "netflow_flow",
           "union_tcfp_lags": 17,
           "vlan_id": 0
         },
@@ -132,8 +134,12 @@
           "bytes": 356,
           "community_id": "1:/MUy9fW9u7vMDGqxcZLVrZX0ARU=",
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 8,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "bytes": 172,
@@ -149,12 +155,11 @@
       "Timestamp": "2016-12-25T13:03:33Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2016-12-25T13:03:33Z"
+          "category": "network_traffic",
+          "created": "2016-12-25T13:03:33Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -183,6 +188,9 @@
             "system_init_time_milliseconds": "2016-12-25T12:58:32Z"
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
