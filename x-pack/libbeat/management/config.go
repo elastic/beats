@@ -67,7 +67,7 @@ const ManagedConfigTemplate = `
 #xpack.monitoring.elasticsearch:
 `
 
-var errEmptyAccessToken = errors.New("access_token is empty, you must reenroll your beat")
+var errEmptyAccessToken = errors.New("access_token is empty, you must reenroll your Beat")
 
 // Config for central management
 type Config struct {
