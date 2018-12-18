@@ -97,6 +97,22 @@ endif::[]
 [[docker]]
 *docker:*
 
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+["source","sh",subs="attributes"]
+------------------------------------------------
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
+tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
+------------------------------------------------
+
+endif::[]
+
 See <<running-on-docker, Running on Docker>> for deploying Docker containers.
 
 [[win]]
