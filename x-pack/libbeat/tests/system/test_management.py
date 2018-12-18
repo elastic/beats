@@ -2,7 +2,6 @@ import sys
 import os
 import json
 import requests
-import unittest
 
 from base import BaseTest
 
@@ -12,7 +11,7 @@ KIBANA_PASSWORD = 'changeme'
 
 
 class TestManagement(BaseTest):
-    @unittest.skip('Skipped because of issue: https://github.com/elastic/beats/issues/9597')
+
     def test_enroll(self):
         """
         Enroll the beat in Kibana Central Management
@@ -43,7 +42,6 @@ class TestManagement(BaseTest):
         backup_content = open(config_path + ".bak", 'r').read()
         assert config_content == backup_content
 
-    @unittest.skip('Skipped because of issue: https://github.com/elastic/beats/issues/9597')
     def test_enroll_bad_pw(self):
         """
         Try to enroll the beat in Kibana Central Management with a bad password
@@ -67,7 +65,6 @@ class TestManagement(BaseTest):
         new_content = open(config_path, 'r').read()
         assert config_content == new_content
 
-    @unittest.skip('Skipped because of issue: https://github.com/elastic/beats/issues/9597')
     def test_fetch_configs(self):
         """
         Config is retrieved from Central Management and updates are applied
@@ -129,7 +126,6 @@ class TestManagement(BaseTest):
 
         proc.check_kill_and_wait()
 
-    @unittest.skip('Skipped because of issue: https://github.com/elastic/beats/issues/9597')
     def test_configs_cache(self):
         """
         Config cache is used if Kibana is not available
@@ -181,7 +177,6 @@ class TestManagement(BaseTest):
             1, output_file=output_file))
         proc.check_kill_and_wait()
 
-    @unittest.skip('Skipped because of issue: https://github.com/elastic/beats/issues/9597')
     def test_blacklist(self):
         """
         Blacklist blocks bad configs
