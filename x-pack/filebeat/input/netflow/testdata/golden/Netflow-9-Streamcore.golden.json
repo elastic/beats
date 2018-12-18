@@ -10,14 +10,13 @@
           "locality": "private",
           "port": 50073
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-01-11T11:48:15Z",
           "duration": 6012000000,
           "end": "2017-01-11T11:47:28.879Z",
+          "kind": "event",
           "start": "2017-01-11T11:47:22.867Z"
         },
         "flow": {
@@ -45,14 +44,18 @@
           "source_ipv4_address": "100.78.40.201",
           "source_transport_port": 8080,
           "tcp_control_bits": 19,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 128,
           "community_id": "1:Vq90QiM+mzZbbo5vY5GdjE9OrRc=",
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "100.78.40.201",
@@ -71,14 +74,13 @@
           "locality": "public",
           "port": 8080
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-01-11T11:48:15Z",
           "duration": 6020000000,
           "end": "2017-01-11T11:47:28.886Z",
+          "kind": "event",
           "start": "2017-01-11T11:47:22.866Z"
         },
         "flow": {
@@ -106,14 +108,18 @@
           "source_ipv4_address": "10.231.128.150",
           "source_transport_port": 50073,
           "tcp_control_bits": 19,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 172,
           "community_id": "1:q9x0h1eGokXApDL651a/13CjP74=",
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 4,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "10.231.128.150",
@@ -132,14 +138,13 @@
           "locality": "private",
           "port": 53483
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-01-11T11:23:51Z",
           "duration": 50997000000,
           "end": "2017-01-11T11:23:34.936Z",
+          "kind": "event",
           "start": "2017-01-11T11:22:43.939Z"
         },
         "flow": {
@@ -167,14 +172,18 @@
           "source_ipv4_address": "100.78.40.201",
           "source_transport_port": 8080,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 3943,
           "community_id": "1:2fY1XMUII4NBiXGj6I6Knj1Kg4A=",
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 10,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "100.78.40.201",
@@ -193,14 +202,13 @@
           "locality": "public",
           "port": 8080
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2017-01-11T11:23:51Z",
           "duration": 51015000000,
           "end": "2017-01-11T11:23:34.954Z",
+          "kind": "event",
           "start": "2017-01-11T11:22:43.939Z"
         },
         "flow": {
@@ -228,14 +236,18 @@
           "source_ipv4_address": "10.27.8.20",
           "source_transport_port": 53483,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 3052,
           "community_id": "1:yMe4rLBOcLy4kK6KxECnRMoxH5Y=",
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 11,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "10.27.8.20",

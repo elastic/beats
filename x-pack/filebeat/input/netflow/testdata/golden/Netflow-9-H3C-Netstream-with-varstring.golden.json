@@ -10,14 +10,13 @@
           "locality": "public",
           "port": 137
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-07-18T01:35:35Z",
           "duration": 29695000000,
           "end": "2018-07-18T01:35:02.969Z",
+          "kind": "event",
           "start": "2018-07-18T01:34:33.274Z"
         },
         "flow": {
@@ -57,15 +56,19 @@
           "source_transport_port": 137,
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vr_fname": ""
         },
         "network": {
           "bytes": 702,
           "community_id": "1:WP3Ss+M/Q16gnXrqnk6fwmPWvWc=",
           "direction": "inbound",
+          "iana_number": 17,
           "packets": 9,
-          "protocol": "udp"
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "20.20.20.20",

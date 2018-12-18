@@ -10,13 +10,12 @@
           "locality": "public",
           "port": 443
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-04-18T08:16:47Z",
-          "duration": 0
+          "duration": 0,
+          "kind": "event"
         },
         "flow": {
           "id": "xrwrnNR_Xgs",
@@ -58,14 +57,18 @@
           "source_transport_port": 51917,
           "timestamp": 1524039407,
           "traffic_type": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 0,
           "community_id": "1:hxVadzb8UUZ5YGGYtqj+E2mpQe8=",
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 0,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "10.236.5.4",
@@ -85,13 +88,12 @@
           "locality": "private",
           "port": 51917
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-04-18T08:16:47Z",
-          "duration": 0
+          "duration": 0,
+          "kind": "event"
         },
         "flow": {
           "id": "7BBLL0QpIjw",
@@ -133,14 +135,18 @@
           "source_transport_port": 443,
           "timestamp": 1524039407,
           "traffic_type": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 0,
           "community_id": "1:4oQU8uYa7F7RE/lIflbJOuU8Vc8=",
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 0,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "64.235.151.76",

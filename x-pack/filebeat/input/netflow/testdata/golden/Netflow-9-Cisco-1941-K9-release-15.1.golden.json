@@ -10,12 +10,11 @@
           "locality": "public",
           "port": 53
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "tNbQulf11TU",
@@ -44,14 +43,18 @@
           "source_mac_address": "ec:1f:72:11:9f:c1",
           "source_transport_port": 37301,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 75,
           "community_id": "1:bRyQGyObIc1D2o7DkHSOKH8tsio=",
           "direction": "inbound",
+          "iana_number": 17,
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.0.111",
@@ -71,12 +74,11 @@
           "locality": "public",
           "port": 53
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "wplOqUGEvng",
@@ -105,14 +107,18 @@
           "source_mac_address": "ec:1f:72:11:9f:c1",
           "source_transport_port": 58411,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 75,
           "community_id": "1:wbdTe6mwksAQ9lGcVDaWyoOTmhk=",
           "direction": "inbound",
+          "iana_number": 17,
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.0.111",
@@ -132,12 +138,11 @@
           "locality": "public",
           "port": 53
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "MGp1pcAULtY",
@@ -166,14 +171,18 @@
           "source_mac_address": "ec:1f:72:11:9f:c1",
           "source_transport_port": 37661,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 75,
           "community_id": "1:jP1p/7/u4HsUidwYdywfdEpcPKQ=",
           "direction": "inbound",
+          "iana_number": 17,
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.0.111",
@@ -193,12 +202,11 @@
           "locality": "public",
           "port": 53
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "BVWdRT29zFQ",
@@ -227,14 +235,18 @@
           "source_mac_address": "ec:1f:72:11:9f:c1",
           "source_transport_port": 60212,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 75,
           "community_id": "1:kKLFvXJJaQi9kI42KQJ2v2corCE=",
           "direction": "inbound",
+          "iana_number": 17,
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.0.111",
@@ -254,12 +266,11 @@
           "locality": "private",
           "port": 37450
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "yT-AD8ZRSJo",
@@ -288,14 +299,18 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 5222,
           "tcp_control_bits": 29,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 964,
           "community_id": "1:34znV7gBt2utWJHrTSPMwhTz2Eg=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 10,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "158.85.58.115",
@@ -315,12 +330,11 @@
           "locality": "public",
           "port": 443
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "hxO6SQDKQVY",
@@ -349,14 +363,18 @@
           "source_mac_address": "a4:d1:8c:e9:30:2c",
           "source_transport_port": 61490,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 2748,
           "community_id": "1:iXnrRyr8wo26XN0Ph22X++rTZeo=",
           "direction": "inbound",
+          "iana_number": 17,
           "packets": 8,
-          "protocol": "udp"
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.0.88",
@@ -376,12 +394,11 @@
           "locality": "private",
           "port": 61490
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "0-orkNwXKfY",
@@ -410,14 +427,18 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 0,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 2023,
           "community_id": "1:HD2M0NX2rS6y8B3MY+Iwv+XHRRI=",
           "direction": "outbound",
+          "iana_number": 17,
           "packets": 9,
-          "protocol": "udp"
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "216.58.212.195",
@@ -437,12 +458,11 @@
           "locality": "public",
           "port": 443
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "wlxoX3Rml10",
@@ -471,14 +491,18 @@
           "source_mac_address": "98:01:a7:9f:8d:5f",
           "source_transport_port": 50299,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 2180,
           "community_id": "1:uCD3Q6u5DuWp4BBrNuh08puZY6U=",
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 9,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.1.201",
@@ -498,12 +522,11 @@
           "locality": "private",
           "port": 50299
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "Em0tsl0c_AI",
@@ -532,14 +555,18 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 700,
           "community_id": "1:pbgT4RHa3Pkj4VUsV2ZuAXb7NJc=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 9,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "216.58.201.106",
@@ -559,12 +586,11 @@
           "locality": "private",
           "port": 61353
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "XDiXRMEwAoI",
@@ -593,14 +619,18 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 161,
           "community_id": "1:3UJAXfwRkrqnjorLTDfwA2lIK5o=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "52.236.33.163",
@@ -620,12 +650,11 @@
           "locality": "public",
           "port": 443
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "GyvkHwTpOVU",
@@ -654,14 +683,18 @@
           "source_mac_address": "1c:5c:f2:07:0f:2a",
           "source_transport_port": 61674,
           "tcp_control_bits": 27,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1764,
           "community_id": "1:mshcMglow3GUvCItk1pK74FLkzM=",
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 21,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.3.34",
@@ -681,12 +714,11 @@
           "locality": "private",
           "port": 61672
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "IKnO36OYWBE",
@@ -715,14 +747,18 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 31,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 13811,
           "community_id": "1:sCy/9s7UF0Bv1dEJGaPKptRstZA=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 30,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "209.197.3.19",
@@ -742,12 +778,11 @@
           "locality": "private",
           "port": 61674
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "l6f_GDBq5e4",
@@ -776,14 +811,18 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 27,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 4717,
           "community_id": "1:zoZ7/PcKboOk3QEq0Jc4k12H7AI=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 16,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "52.216.130.237",
@@ -803,12 +842,11 @@
           "locality": "public",
           "port": 443
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "xSntjtbHvZ8",
@@ -837,14 +875,18 @@
           "source_mac_address": "b0:34:95:0d:d2:5d",
           "source_transport_port": 51209,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 2419,
           "community_id": "1:m9W66mSxsAZlmvM70NmJT4nlrkk=",
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 13,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.0.157",
@@ -864,12 +906,11 @@
           "locality": "private",
           "port": 51209
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "7ZMa49AANa4",
@@ -898,14 +939,18 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 5551,
           "community_id": "1:GIrBDC9vXe7Zm4DMPiPtmJVTls4=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 10,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "172.217.23.232",
@@ -925,12 +970,11 @@
           "locality": "private",
           "port": 45584
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "TanHDUIaXUc",
@@ -959,14 +1003,18 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 25,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 187,
           "community_id": "1:P9h6YFje9lqATAkmHYS9HVVWzFY=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "107.21.232.174",
@@ -986,12 +1034,11 @@
           "locality": "public",
           "port": 443
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "6udpjf64Fpg",
@@ -1020,14 +1067,18 @@
           "source_mac_address": "dc:ef:ca:4c:da:57",
           "source_transport_port": 45584,
           "tcp_control_bits": 17,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 104,
           "community_id": "1:nJc3Pe5SE+C0yRtf3IBstM2/wf8=",
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.3.178",
@@ -1047,12 +1098,11 @@
           "locality": "public",
           "port": 2222
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "zT9kcrkDd6s",
@@ -1081,14 +1131,18 @@
           "source_mac_address": "70:18:8b:5c:c9:b5",
           "source_transport_port": 64233,
           "tcp_control_bits": 27,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 4050,
           "community_id": "1:O5rmXSFSnlff9/cA9+155LFPgBM=",
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 72,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.2.118",
@@ -1108,12 +1162,11 @@
           "locality": "private",
           "port": 64233
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "lSjcB0XXRjo",
@@ -1142,14 +1195,18 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 2222,
           "tcp_control_bits": 27,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 3719,
           "community_id": "1:nVIdFfXErPGzJhGjTgW3gNk911I=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 72,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "95.0.145.242",
@@ -1169,12 +1226,11 @@
           "locality": "public",
           "port": 443
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "ib00xbCp9fc",
@@ -1203,14 +1259,18 @@
           "source_mac_address": "8c:29:37:7a:28:c0",
           "source_transport_port": 54275,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1402,
           "community_id": "1:90Ag0hFjWyN3t7gH9CqeM/did5s=",
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 16,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.0.79",
@@ -1230,12 +1290,11 @@
           "locality": "public",
           "port": 443
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "KkgiVld-pKQ",
@@ -1264,14 +1323,18 @@
           "source_mac_address": "8c:29:37:7a:28:c0",
           "source_transport_port": 54276,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1538,
           "community_id": "1:NFDWVYhuGdQEmetBlCYqKsa3FxE=",
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 17,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.0.79",
@@ -1291,12 +1354,11 @@
           "locality": "private",
           "port": 54276
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "O105la3nsXk",
@@ -1325,14 +1387,18 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 13002,
           "community_id": "1:e26MIMDFVFBLLY7E0XTRE10o3Kw=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 14,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "23.5.100.66",
@@ -1352,12 +1418,11 @@
           "locality": "private",
           "port": 57007
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "zN13t8qHEGY",
@@ -1386,14 +1451,18 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1194,
           "community_id": "1:WFh30fi4saQVTIGUy+aRRPLprpI=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 4,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "170.251.180.15",
@@ -1413,12 +1482,11 @@
           "locality": "public",
           "port": 443
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "jhDgPTAZ-Pc",
@@ -1447,14 +1515,18 @@
           "source_mac_address": "90:61:ae:76:e5:e9",
           "source_transport_port": 57007,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 682,
           "community_id": "1:ZGG4Abe/Pqdj+7pSlunbDP7c/m4=",
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.0.61",
@@ -1474,12 +1546,11 @@
           "locality": "public",
           "port": 443
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "e12qk7vuXjM",
@@ -1508,14 +1579,18 @@
           "source_mac_address": "1c:5c:f2:07:0f:2a",
           "source_transport_port": 61694,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 1804,
           "community_id": "1:baiOQuB0TgMwKAioqCp4nnOKOoQ=",
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 11,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.3.34",
@@ -1535,12 +1610,11 @@
           "locality": "private",
           "port": 59459
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "98RPS4e6CzA",
@@ -1569,14 +1643,18 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 26,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 4774,
           "community_id": "1:kNqglsjDg0pb/geatAIkiyIYjyE=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 9,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "185.60.218.19",
@@ -1596,12 +1674,11 @@
           "locality": "public",
           "port": 443
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "A34Tj8bruZ4",
@@ -1630,14 +1707,18 @@
           "source_mac_address": "18:20:32:bb:1d:62",
           "source_transport_port": 64493,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 135,
           "community_id": "1:G9f5HTVvI5bDlLshQnVxCbSm9eE=",
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.3.200",
@@ -1657,12 +1738,11 @@
           "locality": "private",
           "port": 64493
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "uz-rc_F3l2I",
@@ -1691,14 +1771,18 @@
           "source_mac_address": "00:23:04:18:ef:40",
           "source_transport_port": 443,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 135,
           "community_id": "1:F6zH8IWQqM0vi7PdOT+JZyFBYeA=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "185.60.218.15",
@@ -1718,12 +1802,11 @@
           "locality": "public",
           "port": 5222
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-10-03T17:03:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-10-03T17:03:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "NXlrUC3DXDQ",
@@ -1752,14 +1835,18 @@
           "source_mac_address": "a0:39:f7:4d:49:d5",
           "source_transport_port": 35053,
           "tcp_control_bits": 24,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 194,
           "community_id": "1:+Xmm3JdD6oj+iaOxonwDPgB2lVY=",
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.0.95",
