@@ -522,7 +522,7 @@ func (ms *MetricSet) haveFilesChanged() (bool, error) {
 			return true, errors.Wrapf(err, "failed to stat %v", path)
 		}
 
-		ctime := time.Unix(stats.Ctim.Sec, stats.Ctim.Nsec)
+		ctime := time.Unix(int64(stats.Ctim.Sec), int64(stats.Ctim.Nsec))
 		if ms.lastRead.Before(ctime) {
 			ms.log.Debugf("File changed: %v (lastRead=%v, ctime=%v)", path, ms.lastRead, ctime)
 
