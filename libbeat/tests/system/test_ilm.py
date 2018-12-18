@@ -269,13 +269,8 @@ class Test(BaseTest):
         self.wait_until(lambda: self.log_contains_count("PublishEvents: 1 events have been published") > 4)
         proc.check_kill_and_wait()
 
-        # Give time to do the rollovers
-        time.sleep(2)
-        indices = self.es.transport.perform_request('GET', '/_alias/mockbeat-9.9.9')
-
-        print indices
         # Checks that at least 2 indices were created through rollover
-        assert len(indices) > 1
+        self.wait_until(lambda: len(self.es.transport.perform_request('GET', '/_alias/mockbeat-9.9.9')) > 1)
 
     def clean(self, alias_name=""):
 
