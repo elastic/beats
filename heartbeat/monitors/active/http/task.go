@@ -247,11 +247,13 @@ func execPing(
 	req = attachRequestBody(&ctx, req, body)
 	start, end, resp, errReason := execRequest(client, req, validator)
 
-	monitors.MergeEventFields(event, common.MapStr{"http": common.MapStr{
-		"rtt": common.MapStr{
-			"total": look.RTT(end.Sub(start)),
-		},
-	}})
+	if errReason == nil || errReason.Type() != "io" {
+		monitors.MergeEventFields(event, common.MapStr{"http": common.MapStr{
+			"rtt": common.MapStr{
+				"total": look.RTT(end.Sub(start)),
+			},
+		}})
+	}
 
 	if resp != nil {
 		monitors.MergeEventFields(event, common.MapStr{"http": common.MapStr{
