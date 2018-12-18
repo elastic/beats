@@ -4239,14 +4239,25 @@ example:
 
 --
 
-*`elasticsearch.server.gc_overhead`*::
+*`elasticsearch.server.gc.collection_duration`*::
 +
 --
-type: long
+type: keyword
 
-example: 
+example: 1.2s
 
+Time spent collecting during GC
 
+--
+
+*`elasticsearch.server.gc.observation_duration`*::
++
+--
+type: keyword
+
+example: 1.8s
+
+Total time over which collection was observed
 
 --
 

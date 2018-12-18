@@ -20,10 +20,13 @@
                 "field": "message",
                 "pattern_definitions": {
                     "GREEDYMULTILINE": "(.|\n)*",
-                    "INDEXNAME": "[a-zA-Z0-9_.-]*"
+                    "INDEXNAME": "[a-zA-Z0-9_.-]*",
+                    "GC_YOUNG": "\\[young\\]\\[%{NUMBER:elasticsearch.server.gc.young.one}\\]\\[%{NUMBER:elasticsearch.server.gc.young.two}\\]",
+                    "GC_REGULAR": "\\[%{NUMBER}\\]%{SPACE}overhead,%{SPACE}spent%{SPACE}\\[%{DATA:elasticsearch.server.gc.collection_duration}\\]%{SPACE}collecting%{SPACE}in%{SPACE}the%{SPACE}last%{SPACE}\\[%{DATA:elasticsearch.server.gc.observation_duration}\\]",
+                    "GC": "(%{SPACE}\\[gc\\](%{GC_YOUNG}|%{GC_REGULAR}))"
                 },
                 "patterns": [
-                    "\\[%{TIMESTAMP_ISO8601:elasticsearch.server.timestamp}\\]\\[%{LOGLEVEL:log.level}%{SPACE}?\\]\\[%{DATA:elasticsearch.server.component}%{SPACE}\\](%{SPACE})?(\\[%{DATA:elasticsearch.node.name}\\])?(%{SPACE})?(\\[gc\\](\\[young\\]\\[%{NUMBER:elasticsearch.server.gc.young.one}\\]\\[%{NUMBER:elasticsearch.server.gc.young.two}\\]|\\[%{NUMBER:elasticsearch.server.gc_overhead}\\]))?%{SPACE}((\\[%{INDEXNAME:elasticsearch.index.name}\\]|\\[%{INDEXNAME:elasticsearch.index.name}\\/%{DATA:elasticsearch.index.id}\\]))?%{SPACE}%{GREEDYMULTILINE:message}"
+                    "\\[%{TIMESTAMP_ISO8601:elasticsearch.server.timestamp}\\]\\[%{LOGLEVEL:log.level}%{SPACE}?\\]\\[%{DATA:elasticsearch.server.component}%{SPACE}\\](%{SPACE})?(\\[%{DATA:elasticsearch.node.name}\\])?(%{GC}|%{SPACE}((\\[%{INDEXNAME:elasticsearch.index.name}\\]|\\[%{INDEXNAME:elasticsearch.index.name}\\/%{DATA:elasticsearch.index.id}\\]))?%{SPACE}%{GREEDYMULTILINE:message})"
                 ]
             }
         },

@@ -205,20 +205,21 @@
         ], 
         "log.level": "WARN", 
         "log.offset": 9873, 
-        "message": "duration [3.8s], collections [1]/[4.3s], total [3.8s]/[8.8h], memory [16.5gb]->[15.7gb]/[30.8gb], all_po\nols {[young] [1.2gb]->[24mb]/[1.4gb]}{[survivor] [191.3mb]->[191.3mb]/[191.3mb]}{[old] [15.1gb]->[15.5gb]/[29.1gb]}", 
+        "message": "[2018-07-03T11:45:27,896][WARN ][o.e.m.j.JvmGcMonitorService] [srvmulpvlsk252_md] [gc][young][3449979][986594] duration [3.8s], collections [1]/[4.3s], total [3.8s]/[8.8h], memory [16.5gb]->[15.7gb]/[30.8gb], all_po\nols {[young] [1.2gb]->[24mb]/[1.4gb]}{[survivor] [191.3mb]->[191.3mb]/[191.3mb]}{[old] [15.1gb]->[15.5gb]/[29.1gb]}", 
         "service.name": "elasticsearch"
     }, 
     {
         "@timestamp": "2018-07-03T11:45:45,604", 
         "elasticsearch.node.name": "srvmulpvlsk252_md", 
         "elasticsearch.server.component": "o.e.m.j.JvmGcMonitorService", 
-        "elasticsearch.server.gc_overhead": "3449992", 
+        "elasticsearch.server.gc.collection_duration": "1.6s", 
+        "elasticsearch.server.gc.observation_duration": "1.8s", 
         "event.dataset": "server", 
         "event.module": "elasticsearch", 
         "input.type": "log", 
         "log.level": "WARN", 
         "log.offset": 10205, 
-        "message": "overhead, spent [1.6s] collecting in the last [1.8s]", 
+        "message": "[2018-07-03T11:45:45,604][WARN ][o.e.m.j.JvmGcMonitorService] [srvmulpvlsk252_md] [gc][3449992] overhead, spent [1.6s] collecting in the last [1.8s]", 
         "service.name": "elasticsearch"
     }, 
     {
