@@ -33,7 +33,7 @@ ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/x-pack/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-linux-x86_64.tar.gz
 tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
 ------------------------------------------------
 
@@ -52,7 +52,7 @@ ifeval::["{release-state}"!="unreleased"]
 
 ["source","sh",subs="attributes"]
 ------------------------------------------------
-curl -L -O https://artifacts.elastic.co/downloads/beats/x-pack/{beatname_lc}/{beatname_lc}-{version}-darwin-x86_64.tar.gz
+curl -L -O https://artifacts.elastic.co/downloads/beats/{beatname_lc}/{beatname_lc}-{version}-darwin-x86_64.tar.gz
 tar xzvf {beatname_lc}-{version}-darwin-x86_64.tar.gz
 ------------------------------------------------
 
