@@ -6798,16 +6798,6 @@ Redis log files
 
 
 
-*`redis.log.pid`*::
-+
---
-type: long
-
-The process ID of the Redis server.
-
-
---
-
 *`redis.log.role`*::
 +
 --
@@ -6818,23 +6808,30 @@ The role of the Redis instance. Can be one of `master`, `slave`, `child` (for RD
 
 --
 
+*`redis.log.pid`*::
++
+--
+type: alias
+
+alias to: process.pid
+
+--
+
 *`redis.log.level`*::
 +
 --
-type: keyword
+type: alias
 
-The log level. Can be one of `debug`, `verbose`, `notice`, or `warning`.
-
+alias to: log.level
 
 --
 
 *`redis.log.message`*::
 +
 --
-type: text
+type: alias
 
-The log message
-
+alias to: message
 
 --
 
