@@ -433,6 +433,20 @@
   to: user_agent.original
   alias: true
 
+## Redis module
+
+- from: redis.log.pid
+  to: process.pid
+  alias: true
+
+- from: redis.log.level
+  to: log.level
+  alias: true
+
+- from: redis.log.message
+  to: message
+  alias: true
+
 # From Auditbeat's auditd module.
 - from: source.hostname
   to: source.domain
