@@ -66,7 +66,7 @@ func TestBulk(t *testing.T) {
 	if err != nil {
 		t.Fatalf("SearchUri() returns an error: %s", err)
 	}
-	if result.Hits.Total != 1 {
+	if result.Hits.Total.Value != 1 {
 		t.Errorf("Wrong number of search results: %d", result.Hits.Total.Value)
 	}
 
@@ -167,7 +167,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	if err != nil {
 		t.Fatalf("SearchUri() returns an error: %s", err)
 	}
-	if result.Hits.Total != 1 {
+	if result.Hits.Total.Value != 1 {
 		t.Errorf("Wrong number of search results: %d", result.Hits.Total.Value)
 	}
 
@@ -178,7 +178,7 @@ func TestBulkMoreOperations(t *testing.T) {
 	if err != nil {
 		t.Fatalf("SearchUri() returns an error: %s", err)
 	}
-	if result.Hits.Total != 1 {
+	if result.Hits.Total.Value != 1 {
 		t.Errorf("Wrong number of search results: %d", result.Hits.Total.Value)
 	}
 
