@@ -32,16 +32,40 @@ import (
 
 type taskCanceller func() error
 
-type task struct {
+// configuredJob represents a job combined with its config and any
+// subsequent processors.
+type configuredJob struct {
 	job        Job
-	config     taskConfig
+	config     jobConfig
 	monitor    *Monitor
 	processors *processors.Processors
 	cancelFn   taskCanceller
 	client     beat.Client
 }
 
-type taskConfig struct {
+func newConfiguredJob(job Job, config jobConfig, monitor *Monitor) (*configuredJob, error) {
+	t := &configuredJob{
+		job:     job,
+		config:  config,
+		monitor: monitor,
+	}
+
+	processors, err := processors.New(config.Processors)
+	if err != nil {
+		return nil, ProcessorsError{err}
+	}
+	t.processors = processors
+
+	if err != nil {
+		logp.Critical("Could not create client for monitor configuredJob %+v", t.monitor)
+		return nil, errors.Wrap(err, "could not create client for monitor configuredJob")
+	}
+
+	return t, nil
+}
+
+// jobConfig represents fields needed to execute a single job.
+type jobConfig struct {
 	Name     string             `config:"name"`
 	Type     string             `config:"type"`
 	Schedule *schedule.Schedule `config:"schedule" validate:"required"`
@@ -51,45 +75,42 @@ type taskConfig struct {
 	Processors    processors.PluginConfig `config:"processors"`
 }
 
-// InvalidMonitorProcessorsError is used to indicate situations when processors could not be loaded.
+// ProcessorsError is used to indicate situations when processors could not be loaded.
 // This special type is used because these errors are caught and handled gracefully.
-type InvalidMonitorProcessorsError struct{ root error }
+type ProcessorsError struct{ root error }
 
-func (e InvalidMonitorProcessorsError) Error() string {
+func (e ProcessorsError) Error() string {
 	return fmt.Sprintf("could not load monitor processors: %s", e.root)
 }
 
-func newTask(job Job, config taskConfig, monitor *Monitor) (*task, error) {
-	t := &task{
-		job:     job,
-		config:  config,
-		monitor: monitor,
-	}
-
-	processors, err := processors.New(config.Processors)
-	if err != nil {
-		return nil, InvalidMonitorProcessorsError{err}
-	}
-	t.processors = processors
-
-	if err != nil {
-		logp.Critical("Could not create client for monitor task %+v", t.monitor)
-		return nil, errors.Wrap(err, "could not create client for monitor task")
-	}
-
-	return t, nil
-}
-
-func (t *task) prepareSchedulerJob(meta common.MapStr, run jobRunner) scheduler.TaskFunc {
+func (t *configuredJob) prepareSchedulerJob(meta common.MapStr, job Job) scheduler.TaskFunc {
 	return func() []scheduler.TaskFunc {
-		event, next, err := run()
+		event := &beat.Event{
+			Fields: common.MapStr{},
+		}
+		next, err := job.Run(event)
+		hasContinuations := len(next) > 0
+
 		if err != nil {
 			logp.Err("Job %v failed with: ", err)
 		}
 
-		if event.Fields != nil {
-			event.Fields.DeepUpdate(meta)
-			t.client.Publish(event)
+		if event != nil && event.Fields != nil {
+			MergeEventFields(event, meta)
+			// If continuations are present we defensively publish a clone of the event
+			// in the chance that the event shares underlying data with the events for continuations
+			// This prevents races where the pipeline publish could accidentally alter multiple events.
+			if hasContinuations {
+				clone := beat.Event{
+					Timestamp: event.Timestamp,
+					Meta:      event.Meta.Clone(),
+					Fields:    event.Fields.Clone(),
+				}
+				t.client.Publish(clone)
+			} else {
+				// no clone needed if no continuations
+				t.client.Publish(*event)
+			}
 		}
 
 		if len(next) == 0 {
@@ -104,7 +125,7 @@ func (t *task) prepareSchedulerJob(meta common.MapStr, run jobRunner) scheduler.
 	}
 }
 
-func (t *task) makeSchedulerTaskFunc() scheduler.TaskFunc {
+func (t *configuredJob) makeSchedulerTaskFunc() scheduler.TaskFunc {
 	name := t.config.Name
 	if name == "" {
 		name = t.config.Type
@@ -117,11 +138,11 @@ func (t *task) makeSchedulerTaskFunc() scheduler.TaskFunc {
 		},
 	}
 
-	return t.prepareSchedulerJob(meta, t.job.Run)
+	return t.prepareSchedulerJob(meta, t.job)
 }
 
-// Start schedules this task for execution.
-func (t *task) Start() {
+// Start schedules this configuredJob for execution.
+func (t *configuredJob) Start() {
 	var err error
 
 	t.client, err = t.monitor.pipelineConnector.ConnectWith(beat.ClientConfig{
@@ -141,8 +162,8 @@ func (t *task) Start() {
 	}
 }
 
-// Stop unschedules this task from execution.
-func (t *task) Stop() {
+// Stop unschedules this configuredJob from execution.
+func (t *configuredJob) Stop() {
 	if t.cancelFn != nil {
 		t.cancelFn()
 	}
