@@ -82,7 +82,7 @@ func GenerateFieldsGo(fieldsYML, out string) error {
 // GenerateModuleFieldsGo generates a fields.go file containing a copy of the
 // each module's field.yml data in a format that can be embedded in Beat's
 // binary.
-func GenerateModuleFieldsGo() error {
+func GenerateModuleFieldsGo(moduleDir string) error {
 	const moduleFieldsCmdPath = "dev-tools/cmd/module_fields/module_fields.go"
 
 	beatsDir, err := ElasticBeatsDir()
@@ -94,7 +94,7 @@ func GenerateModuleFieldsGo() error {
 		filepath.Join(beatsDir, moduleFieldsCmdPath),
 		"-beat", BeatName,
 		"-license", toLibbeatLicenseName(BeatLicense),
-		filepath.Join(CWD(), "module"),
+		filepath.Join(CWD(), moduleDir),
 	)
 
 	return moduleFieldsCmd()
@@ -103,6 +103,15 @@ func GenerateModuleFieldsGo() error {
 // GenerateModuleIncludeListGo generates an include/list.go file containing
 // a import statement for each module and dataset.
 func GenerateModuleIncludeListGo() error {
+	return GenerateIncludeListGo(nil, []string{
+		filepath.Join(CWD(), "module"),
+	})
+}
+
+// GenerateIncludeListGo generates an include/list.go file containing imports
+// for the packages that match the paths (or globs) in importDirs (optional)
+// and moduleDirs (optional).
+func GenerateIncludeListGo(importDirs []string, moduleDirs []string) error {
 	const moduleIncludeListCmdPath = "dev-tools/cmd/module_include_list/module_include_list.go"
 
 	beatsDir, err := ElasticBeatsDir()
@@ -113,10 +122,17 @@ func GenerateModuleIncludeListGo() error {
 	includeListCmd := sh.RunCmd("go", "run",
 		filepath.Join(beatsDir, moduleIncludeListCmdPath),
 		"-license", toLibbeatLicenseName(BeatLicense),
-		filepath.Join(CWD(), "module"),
 	)
 
-	return includeListCmd()
+	var args []string
+	for _, dir := range importDirs {
+		args = append(args, "-import", dir)
+	}
+	for _, dir := range moduleDirs {
+		args = append(args, "-moduleDir", dir)
+	}
+
+	return includeListCmd(args...)
 }
 
 // toLibbeatLicenseName translates the license type used in packages to
