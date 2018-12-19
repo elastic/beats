@@ -63,7 +63,7 @@ func TestParseSyslog(t *testing.T) {
 				hour:       2,
 				minute:     13,
 				second:     38,
-				nanosecond: 4000,
+				nanosecond: 400000,
 			},
 		},
 		{
@@ -81,8 +81,8 @@ func TestParseSyslog(t *testing.T) {
 				hour:       2,
 				minute:     13,
 				second:     38,
-				nanosecond: 6353220,
-				loc:        time.FixedZone("", int(-7*time.Hour)),
+				nanosecond: 635322000,
+				loc:        time.FixedZone("", -7*3600),
 			},
 		},
 		{
@@ -100,8 +100,8 @@ func TestParseSyslog(t *testing.T) {
 				hour:       2,
 				minute:     13,
 				second:     38,
-				nanosecond: 6353220,
-				loc:        time.FixedZone("", int(-7*time.Hour)),
+				nanosecond: 635322000,
+				loc:        time.FixedZone("", -7*3600),
 			},
 		},
 		{
@@ -119,8 +119,8 @@ func TestParseSyslog(t *testing.T) {
 				hour:       2,
 				minute:     13,
 				second:     38,
-				nanosecond: 6353220,
-				loc:        time.FixedZone("", int(-7*time.Hour)+int(-30*time.Minute)),
+				nanosecond: 635322000,
+				loc:        time.FixedZone("", -7*3600+-30*60),
 			},
 		},
 		{
@@ -138,8 +138,8 @@ func TestParseSyslog(t *testing.T) {
 				hour:       2,
 				minute:     13,
 				second:     38,
-				nanosecond: 6353220,
-				loc:        time.FixedZone("", int(-7*time.Hour)+int(-10*time.Minute)),
+				nanosecond: 635322000,
+				loc:        time.FixedZone("", -7*3600+-10*60),
 			},
 		},
 		{
@@ -157,8 +157,8 @@ func TestParseSyslog(t *testing.T) {
 				hour:       2,
 				minute:     13,
 				second:     38,
-				nanosecond: 6353220,
-				loc:        time.FixedZone("", int(-7*time.Hour)),
+				nanosecond: 635322000,
+				loc:        time.FixedZone("", -7*3600),
 			},
 		},
 		{
@@ -176,7 +176,7 @@ func TestParseSyslog(t *testing.T) {
 				hour:       2,
 				minute:     13,
 				second:     38,
-				nanosecond: 6353220,
+				nanosecond: 635322000,
 				loc:        time.UTC,
 			},
 		},
@@ -195,7 +195,7 @@ func TestParseSyslog(t *testing.T) {
 				hour:       2,
 				minute:     13,
 				second:     38,
-				nanosecond: 6353220,
+				nanosecond: 635322000,
 				loc:        time.UTC,
 			},
 		},
@@ -214,7 +214,7 @@ func TestParseSyslog(t *testing.T) {
 				hour:       2,
 				minute:     13,
 				second:     38,
-				nanosecond: 6353220,
+				nanosecond: 635322000,
 				loc:        time.UTC,
 			},
 		},
@@ -233,7 +233,7 @@ func TestParseSyslog(t *testing.T) {
 				hour:       2,
 				minute:     13,
 				second:     38,
-				nanosecond: 6353220,
+				nanosecond: 635322000,
 				loc:        time.UTC,
 			},
 		},
@@ -304,7 +304,7 @@ func TestParseSyslog(t *testing.T) {
 				minute:     31,
 				second:     24,
 				year:       2016,
-				nanosecond: 4000,
+				nanosecond: 400000,
 			},
 		},
 		{
@@ -341,7 +341,7 @@ func TestParseSyslog(t *testing.T) {
 		},
 		{
 			title: "time with nanosecond",
-			log:   []byte("Oct 11 22:14:15.0000005 --- last message repeated 1 time ---"),
+			log:   []byte("Oct 11 22:14:15.000000005 --- last message repeated 1 time ---"),
 			syslog: event{
 				priority:   -1,
 				message:    "--- last message repeated 1 time ---",
@@ -400,7 +400,7 @@ func TestParseSyslog(t *testing.T) {
 				hour:       22,
 				minute:     14,
 				second:     15,
-				nanosecond: 5764300,
+				nanosecond: 576430000,
 			},
 		},
 		{
@@ -558,6 +558,46 @@ func TestParseSyslog(t *testing.T) {
 			assert.Equal(t, test.syslog.loc, l.loc)
 		})
 	}
+}
+
+func TestMonth(t *testing.T) {
+	months := []time.Month{
+		time.January,
+		time.February,
+		time.March,
+		time.April,
+		time.May,
+		time.June,
+		time.July,
+		time.August,
+		time.September,
+		time.October,
+		time.November,
+		time.December,
+	}
+
+	t.Run("short month", func(t *testing.T) {
+		for _, month := range months {
+			shortMonth := month.String()[:3]
+			t.Run("Month "+shortMonth, func(t *testing.T) {
+				log := fmt.Sprintf("<34>%s 1 22:14:15 mymachine postfix/smtpd[2000]: 'su root' failed for lonvick on /dev/pts/8", shortMonth)
+				l := newEvent()
+				Parse([]byte(log), l)
+				assert.Equal(t, month, l.Month())
+			})
+		}
+	})
+
+	t.Run("full month", func(t *testing.T) {
+		for _, month := range months {
+			t.Run("Month "+month.String(), func(t *testing.T) {
+				log := fmt.Sprintf("<34>%s 1 22:14:15 mymachine postfix/smtpd[2000]: 'su root' failed for lonvick on /dev/pts/8", month.String())
+				l := newEvent()
+				Parse([]byte(log), l)
+				assert.Equal(t, month, l.Month())
+			})
+		}
+	})
 }
 
 func TestDay(t *testing.T) {

@@ -22,7 +22,7 @@ package instance
 import (
 	"testing"
 
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -57,5 +57,9 @@ func TestNewInstanceUUID(t *testing.T) {
 	}
 
 	// Make sure the UUID's are different
-	assert.NotEqual(t, b.Info.UUID, uuid.NewV4())
+	differentUUID, err := uuid.NewV4()
+	if err != nil {
+		t.Fatalf("error while generating UUID: %v", err)
+	}
+	assert.NotEqual(t, b.Info.UUID, differentUUID)
 }

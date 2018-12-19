@@ -1,3 +1,0 @@
-type: syslog
-protocol.udp:
-  host: "localhost:{{.syslog_port}}"

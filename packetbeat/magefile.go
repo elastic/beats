@@ -113,7 +113,7 @@ func Clean() error {
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
-// Use BEAT_VERSION_QUALIFIER to control the version qualifier.
+// Use VERSION_QUALIFIER to control the version qualifier.
 func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
@@ -136,8 +136,13 @@ func Update() error {
 	return sh.Run("make", "update")
 }
 
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
+// Fields generates a fields.yml and fields.go for the Beat.
+func Fields() {
+	mg.SerialDeps(fieldsYML, mage.GenerateAllInOneFieldsGo)
+}
+
+// fieldsYML generates the fields.yml file.
+func fieldsYML() error {
 	return mage.GenerateFieldsYAML("protos")
 }
 
@@ -447,6 +452,12 @@ func customizePackaging() {
 
 			args.Spec.ReplaceFile("{{.BeatName}}.yml", configYml)
 			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfigYml)
+		}
+
+		pkgType := args.Types[0]
+		switch pkgType {
+		case mage.Docker:
+			args.Spec.ExtraVar("linux_capabilities", "cap_net_raw,cap_net_admin=eip")
 		}
 	}
 }

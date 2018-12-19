@@ -82,11 +82,21 @@
           The number of Bytes read from the device per second.
       format: bytes
 
+    - name: iostat.read.await
+      type: float
+      description: >
+          The average time spent for read requests issued to the device to be served.
+
     - name: iostat.write.per_sec.bytes
       type: float
       description: >
           The number of Bytes write from the device per second.
       format: bytes
+
+    - name: iostat.write.await
+      type: float
+      description: >
+          The average time spent for write requests issued to the device to be served.
 
     - name: iostat.request.avg_size
       type: float

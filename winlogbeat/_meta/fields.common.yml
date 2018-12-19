@@ -171,12 +171,6 @@
         If you discover Winlogbeat not resolving SIDs, review the log for
         clues as to what the problem may be.
 
-    - name: user.name
-      type: keyword
-      required: false
-      description: >
-        The name of the account associated with this event.
-
     - name: user.domain
       type: keyword
       required: false

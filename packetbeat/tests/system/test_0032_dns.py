@@ -109,7 +109,7 @@ class Test(BaseTest):
         assert o["type"] == "dns"
         assert o["transport"] == "udp"
         assert o["method"] == "QUERY"
-        assert o["ip"] == "8.8.8.8"
+        assert o["server.ip"] == "8.8.8.8"
         assert o["query"] == "class IN, type TXT, elastic.co."
         assert o["dns.question.type"] == "TXT"
         assert o["status"] == "OK"

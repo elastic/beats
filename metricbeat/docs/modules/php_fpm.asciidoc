@@ -50,7 +50,9 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: php_fpm
-  metricsets: ["pool"]
+  metricsets:
+  - pool
+  #- process
   enabled: true
   period: 10s
   status_path: "/status"
@@ -67,5 +69,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-php_fpm-pool,pool>>
 
+* <<metricbeat-metricset-php_fpm-process,process>>
+
 include::php_fpm/pool.asciidoc[]
+
+include::php_fpm/process.asciidoc[]
 

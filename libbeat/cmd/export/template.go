@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/libbeat/template"
 )
 
-func GenTemplateConfigCmd(name, idxPrefix, beatVersion string) *cobra.Command {
+func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersion string) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "template",
 		Short: "Export index template to stdout",
@@ -42,7 +42,7 @@ func GenTemplateConfigCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)
 			}
-			err = b.Init()
+			err = b.InitWithSettings(settings)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)
@@ -57,7 +57,16 @@ func GenTemplateConfigCmd(name, idxPrefix, beatVersion string) *cobra.Command {
 				}
 			}
 
-			tmpl, err := template.New(b.Info.Version, index, version, cfg)
+			if version == "" {
+				version = b.Info.Version
+			}
+
+			esVersion, err := common.NewVersion(version)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Invalid Elasticsearch version: %s\n", err)
+			}
+
+			tmpl, err := template.New(b.Info.Version, index, *esVersion, cfg)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
 				os.Exit(1)

@@ -39,8 +39,9 @@ const (
 	fpmVersion = "1.10.0"
 
 	// Docker images. See https://github.com/elastic/golang-crossbuild.
-	beatsFPMImage        = "docker.elastic.co/beats-dev/fpm"
-	beatsCrossBuildImage = "docker.elastic.co/beats-dev/golang-crossbuild"
+	beatsFPMImage = "docker.elastic.co/beats-dev/fpm"
+	// BeatsCrossBuildImage is the image used for crossbuilding Beats.
+	BeatsCrossBuildImage = "docker.elastic.co/beats-dev/golang-crossbuild"
 
 	elasticBeatsImportPath = "github.com/elastic/beats"
 )
@@ -52,6 +53,7 @@ var (
 	GOARM        = EnvOr("GOARM", "")
 	Platform     = MakePlatformAttributes(GOOS, GOARCH, GOARM)
 	BinaryExt    = ""
+	XPackDir     = "../x-pack"
 	RaceDetector = false
 	TestCoverage = false
 
@@ -102,7 +104,7 @@ func init() {
 		panic(errors.Errorf("failed to parse SNAPSHOT env value", err))
 	}
 
-	versionQualifier, versionQualified = os.LookupEnv("BEAT_VERSION_QUALIFIER")
+	versionQualifier, versionQualified = os.LookupEnv("VERSION_QUALIFIER")
 }
 
 // EnvMap returns map containing the common settings variables and all variables
@@ -127,6 +129,7 @@ func varMap(args ...map[string]interface{}) map[string]interface{} {
 		"GOARM":           GOARM,
 		"Platform":        Platform,
 		"BinaryExt":       BinaryExt,
+		"XPackDir":        XPackDir,
 		"BeatName":        BeatName,
 		"BeatServiceName": BeatServiceName,
 		"BeatIndexPrefix": BeatIndexPrefix,
@@ -156,6 +159,7 @@ GOARCH           = {{.GOARCH}}
 GOARM            = {{.GOARM}}
 Platform         = {{.Platform}}
 BinaryExt        = {{.BinaryExt}}
+XPackDir         = {{.XPackDir}}
 BeatName         = {{.BeatName}}
 BeatServiceName  = {{.BeatServiceName}}
 BeatIndexPrefix  = {{.BeatIndexPrefix}}
@@ -247,8 +251,10 @@ func findElasticBeatsDir() (string, error) {
 
 	const devToolsImportPath = elasticBeatsImportPath + "/dev-tools/mage"
 
-	// Search in project vendor directories.
+	// Search in project vendor directories. Order is relevant
 	searchPaths := []string{
+		// beats directory of apm-server
+		filepath.Join(repo.RootDir, "_beats/dev-tools/vendor"),
 		filepath.Join(repo.RootDir, repo.SubDir, "vendor", devToolsImportPath),
 		filepath.Join(repo.RootDir, "vendor", devToolsImportPath),
 	}
@@ -260,24 +266,6 @@ func findElasticBeatsDir() (string, error) {
 	}
 
 	return "", errors.Errorf("failed to find %v in the project's vendor", devToolsImportPath)
-}
-
-// SetElasticBeatsDir explicitly sets the location of the Elastic Beats
-// directory. If not set then it will attempt to locate it.
-func SetElasticBeatsDir(dir string) {
-	elasticBeatsDirLock.Lock()
-	defer elasticBeatsDirLock.Unlock()
-
-	info, err := os.Stat(dir)
-	if err != nil {
-		panic(errors.Wrapf(err, "failed to read elastic beats dir at %v", dir))
-	}
-
-	if !info.IsDir() {
-		panic(errors.Errorf("elastic beats dir=%v is not a directory", dir))
-	}
-
-	elasticBeatsDirValue = filepath.Clean(dir)
 }
 
 var (
@@ -318,7 +306,7 @@ var (
 )
 
 // BeatQualifiedVersion returns the Beat's qualified version.  The value can be overwritten by
-// setting BEAT_VERSION_QUALIFIER in the environment.
+// setting VERSION_QUALIFIER in the environment.
 func BeatQualifiedVersion() (string, error) {
 	version, err := beatVersion()
 	if err != nil {

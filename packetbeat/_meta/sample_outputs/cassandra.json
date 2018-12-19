@@ -1,53 +1,64 @@
 {
-    "@timestamp": "2016-08-24T16:21:07.817Z",
-    "beat": {
-        "hostname": "Medcl.local",
-        "name": "Medcl.local"
+    "@timestamp": "2016-06-28T09:16:17.891Z",
+    "@metadata": {
+        "beat": "packetbeat",
+        "type": "doc",
+        "version": "7.0.0"
     },
-    "bytes_in": 88,
-    "bytes_out": 215,
+    "bytes_in": 110,
+    "server": {
+        "domain": "host.example.com",
+        "ip": "127.0.0.1",
+        "port": 9042
+    },
+    "bytes_out": 871,
+    "host": {
+        "name": "host.example.com"
+    },
     "cassandra": {
         "request": {
+            "query": "SELECT * FROM system_schema.tables WHERE keyspace_name = 'mykeyspace' AND table_name = 'users'",
             "headers": {
+                "version": "4",
                 "flags": "Default",
-                "length": 79,
+                "stream": 52,
                 "op": "QUERY",
-                "stream": 23,
-                "version": "4"
-            },
-            "query": "SELECT * FROM system_schema.keyspaces WHERE keyspace_name = 'mykeyspace'"
+                "length": 101
+            }
         },
         "response": {
             "headers": {
+                "version": "4",
                 "flags": "Default",
-                "length": 206,
+                "stream": 52,
                 "op": "RESULT",
-                "stream": 23,
-                "version": "4"
+                "length": 862
             },
             "result": {
-                "result_type": "rows",
+                "type": "rows",
                 "rows": {
                     "meta": {
-                        "col_count": 3,
-                        "flags": "GlobalTableSpec",
+                        "col_count": 19,
                         "keyspace": "system_schema",
-                        "table": "keyspaces"
+                        "table": "tables",
+                        "flags": "GlobalTableSpec"
                     },
                     "num_rows": 879461
                 }
             }
         }
     },
-    "client_ip": "127.0.0.1",
-    "client_port": 52749,
-    "client_proc": "",
-    "client_server": "Medcl.local",
-    "ip": "127.0.0.1",
-    "port": 9042,
-    "proc": "",
-    "responsetime": 6,
-    "server": "Medcl.local",
     "status": "OK",
+    "responsetime": 5,
+    "client": {
+        "port": 52749,
+        "domain": "host.example.com",
+        "ip": "127.0.0.1"
+    },
+    "agent": {
+        "type": "packetbeat",
+        "hostname": "host.example.com",
+        "version": "7.0.0"
+    },
     "type": "cassandra"
 }

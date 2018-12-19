@@ -1,0 +1,70 @@
+- key: santa
+  title: "Google Santa"
+  description: >
+    Santa Module
+  fields:
+    - name: santa
+      type: group
+      description: >
+      fields:
+
+        - name: action
+          type: keyword
+          example: EXEC
+          description: Action
+
+        - name: decision
+          type: keyword
+          example: ALLOW
+          description: Decision that santad took.
+
+        - name: reason
+          type: keyword
+          example: CERT
+          description: Reason for the decsision.
+
+        - name: mode
+          type: keyword
+          example: M
+          description: Operating mode of Santa.
+
+        - name: disk
+          type: group
+          description: Fields for DISKAPPEAR actions.
+          fields:
+            - name: volume
+              description: The volume name.
+
+            - name: bus
+              description: The disk bus protocol.
+
+            - name: serial
+              description: The disk serial number.
+
+            - name: bsdname
+              example: disk1s3
+              description: The disk BSD name.
+
+            - name: model
+              example: APPLE SSD SM0512L
+              description: The disk model.
+
+            - name: fs
+              example: apfs
+              description: The disk volume kind (filesystem type).
+
+            - name: mount
+              description: The disk volume path.
+
+    - name: certificate.common_name
+      type: keyword
+      description: Common name from code signing certificate.
+
+    - name: certificate.sha256
+      type: keyword
+      description: SHA256 hash of code signing certificate.
+
+    # Auditbeat FIM is using this field for the same purpose.
+    - name: hash.sha256
+      type: keyword
+      description: Hash of process executable.

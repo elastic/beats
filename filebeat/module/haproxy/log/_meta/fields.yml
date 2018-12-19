@@ -1,0 +1,61 @@
+- name: http
+  description: Please add description
+  type: group
+  fields: 
+
+  - name: response
+    description: Fields related to the HTTP response
+    type: group
+    fields:
+    - name: status_code
+      description: HTTP status code returned to the client.
+      type: long
+
+    - name: captured_cookie
+      description: >
+        Optional "name=value" entry indicating that the client had this cookie in the response.
+
+    - name: captured_headers
+      description: >
+        List of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
+      type: text
+
+  - name: request
+    description: Fields related to the HTTP request
+    type: group
+    fields:
+    - name: captured_cookie
+      description: >
+        Optional "name=value" entry indicating that the server has returned a cookie with its request.
+
+    - name: captured_headers
+      description: >
+        List of headers captured in the request due to the presence of the "capture request header" statement in the frontend.
+      type: text
+
+    - name: raw_request_line
+      description: Complete HTTP request line, including the method, request and HTTP version string.
+      type: text
+      
+    - name: time_active_ms
+      description: Time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
+      type: long
+
+    - name: time_wait_without_data_ms
+      description: Total time in milliseconds spent waiting for the server to send a full HTTP response, not counting data.
+      type: long
+
+    - name: time_wait_ms
+      description: Total time in milliseconds spent waiting for a full HTTP request from the client (not counting body) after the first byte was received.
+      type: long
+
+- name: tcp
+  description: TCP log format
+  type: group
+  fields:
+  - name: processing_time_ms
+    type: long
+    description: Total time in milliseconds elapsed between the accept and the last close
+  - name: connection_waiting_time_ms
+    type: long
+    description: Total time in milliseconds elapsed between the accept and the last close

@@ -62,9 +62,10 @@ Processors are valid:
 * At the top-level in the configuration. The processor is applied to all data
 collected by {beatname_uc}.
 * Under a specific {processor-scope}. The processor is applied to the data
-collected for that {processor-scope}. For example:
-+
+collected for that {processor-scope}.
 ifeval::["{beatname_lc}"=="filebeat"]
+For example:
++
 [source,yaml]
 ------
 - type: <input_type>
@@ -92,6 +93,8 @@ ifeval::["{beatname_lc}"=="metricbeat"]
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="auditbeat"]
+For example:
++
 [source,yaml]
 ----
 auditbeat.modules:
@@ -104,6 +107,8 @@ auditbeat.modules:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="packetbeat"]
+For example:
++
 [source,yaml]
 ----
 packetbeat.protocols:
@@ -129,6 +134,8 @@ packetbeat.flows:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="heartbeat"]
+For example:
++
 [source,yaml]
 ----
 heartbeat.monitors:
@@ -141,6 +148,8 @@ heartbeat.monitors:
 ----
 endif::[]
 ifeval::["{beatname_lc}"=="winlogbeat"]
+For example:
++
 [source,yaml]
 ----
 winlogbeat.event_logs:
@@ -726,6 +735,7 @@ metadata based on which Kubernetes pod the event originated from. Each event is
 annotated with:
 
 * Pod Name
+* Pod UID
 * Namespace
 * Labels
 
@@ -813,6 +823,20 @@ from Docker containers:
 * Image
 * Labels
 
+[NOTE]
+=====
+When running {beatname_uc} in a container, you need to provide access to
+Docker’s unix socket in order for the `add_docker_metadata` processor to work.
+You can do this by mounting the socket inside the container. For example:
+
+`docker run -v /var/run/docker.sock:/var/run/docker.sock ...`
+
+To avoid privilege issues, you may also need to add `--user=root` to the
+`docker run` flags. Because the user must be part of the docker group in order
+to access `/var/run/docker.sock`, root access is required if {beatname_uc} is
+running as non-root inside the container. 
+=====
+
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
@@ -824,6 +848,7 @@ processors:
     #match_source_index: 4
     #match_short_id: true
     #cleanup_timeout: 60
+    #labels.dedot: false
     # To connect to Docker over TLS you must specify a client and CA certificate.
     #ssl:
     #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -861,6 +886,8 @@ for container ID. It defaults to 4 to match
 `cleanup_timeout`:: (Optional) Time of inactivity to consider we can clean and
 forget metadata for a container, 60s by default.
 
+`labels.dedot`:: (Optional) Default to be false. If set to true, replace dots in
+ labels with `_`.
 
 [[add-host-metadata]]
 === Add Host metadata
@@ -872,11 +899,39 @@ beta[]
 processors:
 - add_host_metadata:
     netinfo.enabled: false
+    cache.ttl: 5m
+    geo:
+      name: nyc-dc1-rack1
+      location: 40.7128, -74.0060
+      continent_name: North America
+      country_iso_code: US
+      region_name: New York
+      region_iso_code: NY
+      city_name: New York
 -------------------------------------------------------------------------------
 
 It has the following settings:
 
 `netinfo.enabled`:: (Optional) Default false. Include IP addresses and MAC addresses as fields host.ip and host.mac
+
+`cache.ttl`:: (Optional) The processor uses an internal cache for the host metadata. This sets the cache expiration time. The default is 5m, negative values disable caching altogether.
+
+`geo.name`:: User definable token to be used for identifying a discrete location. Frequently a datacenter, rack, or similar.
+
+`geo.location`:: Longitude and latitude in comma separated format.
+
+`geo.continent_name`:: Name of the continent.
+
+`geo.country_name`:: Name of the country.
+
+`geo.region_name`:: Name of the region.
+
+`geo.city_name`:: Name of the city.
+
+`geo.country_iso_code`:: ISO country code.
+
+`geo.region_iso_code`:: ISO region code.
+
 
 The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
 The fields added to the event are looking as following:
@@ -893,15 +948,23 @@ The fields added to the event are looking as following:
          "build":"16G1212",
          "platform":"darwin",
          "version":"10.12.6",
-         "kernel":"16.7.0"
+         "kernel":"16.7.0",
+         "name":"Mac OS X"
       },
       "ip": ["192.168.0.1", "10.0.0.1"],
-      "mac": ["00:25:96:12:34:56", "72:00:06:ff:79:f1"]
+      "mac": ["00:25:96:12:34:56", "72:00:06:ff:79:f1"],
+      "geo": {
+          "continent_name": "North America",
+          "country_iso_code": "US",
+          "region_name": "New York",
+          "region_iso_code": "NY",
+          "city_name": "New York",
+          "name": "nyc-dc1-rack1",
+          "location": "40.7128, -74.0060"
+        }
    }
 }
 -------------------------------------------------------------------------------
-
-NOTE: The host information is refreshed every 5 minutes.
 
 [[dissect]]
 === Dissect strings

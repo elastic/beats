@@ -63,6 +63,9 @@ func TestEventConversionToBeatEvent(t *testing.T) {
 					"ms": 1000,
 				},
 			},
+			"service": common.MapStr{
+				"type": "docker",
+			},
 		}, e.Fields)
 	})
 
@@ -95,6 +98,9 @@ func TestEventConversionToBeatEvent(t *testing.T) {
 					"ms": 1000,
 				},
 			},
+			"service": common.MapStr{
+				"type": "docker",
+			},
 		}, e.Fields)
 	})
 
@@ -108,6 +114,46 @@ func TestEventConversionToBeatEvent(t *testing.T) {
 		assert.Equal(t, common.MapStr{
 			"module":    module,
 			"metricset": metricSet,
+			"service": common.MapStr{
+				"type": "docker",
+			},
+		}, e.Fields)
+	})
+
+	t.Run("with ID", func(t *testing.T) {
+		mbEvent := &Event{
+			ID:        "foobar",
+			Timestamp: timestamp,
+			RootFields: common.MapStr{
+				"type": "docker",
+			},
+			ModuleFields: common.MapStr{
+				"container": common.MapStr{
+					"name": "wordpress",
+				},
+			},
+			MetricSetFields: common.MapStr{
+				"ms": 1000,
+			},
+		}
+		e := mbEvent.BeatEvent(module, metricSet)
+		e = mbEvent.BeatEvent(module, metricSet)
+
+		assert.Equal(t, "foobar", e.Meta["id"])
+		assert.Equal(t, timestamp, e.Timestamp)
+		assert.Equal(t, common.MapStr{
+			"type": "docker",
+			"docker": common.MapStr{
+				"container": common.MapStr{
+					"name": "wordpress",
+				},
+				"uptime": common.MapStr{
+					"ms": 1000,
+				},
+			},
+			"service": common.MapStr{
+				"type": "docker",
+			},
 		}, e.Fields)
 	})
 
@@ -140,11 +186,16 @@ func TestAddMetricSetInfo(t *testing.T) {
 		AddMetricSetInfo(moduleName, metricSetName, &e)
 
 		assert.Equal(t, common.MapStr{
+			"event": common.MapStr{
+				"module":   moduleName,
+				"dataset":  moduleName + "." + metricSetName,
+				"duration": time.Duration(500000000),
+			},
+			"service": common.MapStr{
+				"address": host,
+			},
 			"metricset": common.MapStr{
-				"host":   host,
-				"module": moduleName,
-				"name":   metricSetName,
-				"rtt":    time.Duration(500000),
+				"name": metricSetName,
 			},
 		}, e.RootFields)
 	})
@@ -155,9 +206,12 @@ func TestAddMetricSetInfo(t *testing.T) {
 		AddMetricSetInfo(moduleName, metricSetName, &e)
 
 		assert.Equal(t, common.MapStr{
+			"event": common.MapStr{
+				"module":  moduleName,
+				"dataset": moduleName + "." + metricSetName,
+			},
 			"metricset": common.MapStr{
-				"module": moduleName,
-				"name":   metricSetName,
+				"name": metricSetName,
 			},
 		}, e.RootFields)
 	})

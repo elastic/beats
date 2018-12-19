@@ -84,8 +84,9 @@ func (l *logHints) CreateConfig(event bus.Event) []*common.Config {
 		hints, _ = hIface.(common.MapStr)
 	}
 
-	if builder.IsNoOp(hints, l.Key) == true {
-		return []*common.Config{config}
+	if builder.IsNoOp(hints, l.Key) {
+		logp.Debug("hints.builder", "disabled config in event: %+v", event)
+		return []*common.Config{}
 	}
 
 	inputConfig := l.getInputs(hints)
@@ -185,7 +186,7 @@ func (l *logHints) getFilesets(hints common.MapStr, module string) map[string]*f
 
 	moduleFilesets, err := l.Registry.ModuleFilesets(module)
 	if err != nil {
-		logp.Err("Error retrieving module filesets", err)
+		logp.Err("Error retrieving module filesets: %+v", err)
 		return nil
 	}
 

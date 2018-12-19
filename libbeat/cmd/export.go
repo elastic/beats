@@ -21,17 +21,19 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/libbeat/cmd/export"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 )
 
-func genExportCmd(name, idxPrefix, beatVersion string) *cobra.Command {
+func genExportCmd(settings instance.Settings, name, idxPrefix, beatVersion string) *cobra.Command {
 	exportCmd := &cobra.Command{
 		Use:   "export",
 		Short: "Export current config or index template",
 	}
 
-	exportCmd.AddCommand(export.GenExportConfigCmd(name, idxPrefix, beatVersion))
-	exportCmd.AddCommand(export.GenTemplateConfigCmd(name, idxPrefix, beatVersion))
+	exportCmd.AddCommand(export.GenExportConfigCmd(settings, name, idxPrefix, beatVersion))
+	exportCmd.AddCommand(export.GenTemplateConfigCmd(settings, name, idxPrefix, beatVersion))
 	exportCmd.AddCommand(export.GenDashboardCmd(name, idxPrefix, beatVersion))
+	exportCmd.AddCommand(export.GenGetILMPolicyCmd())
 
 	return exportCmd
 }

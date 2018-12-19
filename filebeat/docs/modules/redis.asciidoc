@@ -4,6 +4,7 @@ This file is generated! See scripts/docs_collector.py
 
 [[filebeat-module-redis]]
 :modulename: redis
+:has-dashboards: true
 
 == Redis module
 
@@ -97,6 +98,11 @@ left empty, `localhost:6379` is assumed.
 The password to use to connect to Redis, in case Redis authentication is enabled
 (the `requirepass` option in the Redis configuration).
 
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
 
 
 [float]

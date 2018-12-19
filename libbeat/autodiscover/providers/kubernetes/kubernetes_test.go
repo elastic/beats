@@ -23,6 +23,7 @@ import (
 
 	v1 "github.com/ericchiang/k8s/apis/core/v1"
 	metav1 "github.com/ericchiang/k8s/apis/meta/v1"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/autodiscover/template"
@@ -156,8 +157,14 @@ func TestEmitEvent(t *testing.T) {
 	namespace := "default"
 	podIP := "127.0.0.1"
 	containerID := "docker://foobar"
+	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	containerImage := "elastic/filebeat:6.3.0"
 	node := "node"
+	UUID, err := uuid.NewV4()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	tests := []struct {
 		Message  string
 		Flag     string
@@ -170,6 +177,7 @@ func TestEmitEvent(t *testing.T) {
 			Pod: &v1.Pod{
 				Metadata: &metav1.ObjectMeta{
 					Name:        &name,
+					Uid:         &uid,
 					Namespace:   &namespace,
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
@@ -194,8 +202,10 @@ func TestEmitEvent(t *testing.T) {
 				},
 			},
 			Expected: bus.Event{
-				"start": true,
-				"host":  "127.0.0.1",
+				"start":    true,
+				"host":     "127.0.0.1",
+				"id":       "foobar",
+				"provider": UUID,
 				"kubernetes": common.MapStr{
 					"container": common.MapStr{
 						"id":      "foobar",
@@ -205,6 +215,7 @@ func TestEmitEvent(t *testing.T) {
 					},
 					"pod": common.MapStr{
 						"name": "filebeat",
+						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 					},
 					"node": common.MapStr{
 						"name": "node",
@@ -219,11 +230,13 @@ func TestEmitEvent(t *testing.T) {
 							"name": "filebeat",
 						}, "pod": common.MapStr{
 							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 						}, "node": common.MapStr{
 							"name": "node",
 						},
 					},
 				},
+				"config": []*common.Config{},
 			},
 		},
 		{
@@ -232,6 +245,7 @@ func TestEmitEvent(t *testing.T) {
 			Pod: &v1.Pod{
 				Metadata: &metav1.ObjectMeta{
 					Name:        &name,
+					Uid:         &uid,
 					Namespace:   &namespace,
 					Labels:      map[string]string{},
 					Annotations: map[string]string{},
@@ -259,35 +273,38 @@ func TestEmitEvent(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		mapper, err := template.NewConfigMapper(nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		metaGen, err := kubernetes.NewMetaGenerator(common.NewConfig())
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		p := &Provider{
-			config:    defaultConfig(),
-			bus:       bus.New("test"),
-			metagen:   metaGen,
-			templates: mapper,
-		}
-
-		listener := p.bus.Subscribe()
-
-		p.emit(test.Pod, test.Flag)
-
-		select {
-		case event := <-listener.Events():
-			assert.Equal(t, test.Expected, event)
-		case <-time.After(2 * time.Second):
-			if test.Expected != nil {
-				t.Fatal("Timeout while waiting for event")
+		t.Run(test.Message, func(t *testing.T) {
+			mapper, err := template.NewConfigMapper(nil)
+			if err != nil {
+				t.Fatal(err)
 			}
-		}
+
+			metaGen, err := kubernetes.NewMetaGenerator(common.NewConfig())
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			p := &Provider{
+				config:    defaultConfig(),
+				bus:       bus.New("test"),
+				metagen:   metaGen,
+				templates: mapper,
+				uuid:      UUID,
+			}
+
+			listener := p.bus.Subscribe()
+
+			p.emit(test.Pod, test.Flag)
+
+			select {
+			case event := <-listener.Events():
+				assert.Equal(t, test.Expected, event, test.Message)
+			case <-time.After(2 * time.Second):
+				if test.Expected != nil {
+					t.Fatal("Timeout while waiting for event")
+				}
+			}
+		})
 	}
 }
 

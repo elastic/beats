@@ -20,9 +20,9 @@ package safemapstr
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 func TestPut(t *testing.T) {

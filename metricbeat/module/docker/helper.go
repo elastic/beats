@@ -29,13 +29,15 @@ import (
 type Container struct {
 	ID     string
 	Name   string
+	Image  string
 	Labels common.MapStr
 }
 
 func (c *Container) ToMapStr() common.MapStr {
 	m := common.MapStr{
-		"id":   c.ID,
-		"name": c.Name,
+		"id":    c.ID,
+		"name":  c.Name,
+		"image": c.Image,
 	}
 
 	if len(c.Labels) > 0 {
@@ -52,6 +54,7 @@ func NewContainer(container *types.Container, dedot bool) *Container {
 		ID:     container.ID,
 		Name:   ExtractContainerName(container.Names),
 		Labels: DeDotLabels(container.Labels, dedot),
+		Image:  container.Image,
 	}
 }
 
