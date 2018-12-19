@@ -20399,6 +20399,36 @@ All TCP listening ports
 
 --
 
+*`system.socket.summary.tcp.all.established`*::
++
+--
+type: integer
+
+Number of established TCP connections
+
+
+--
+
+*`system.socket.summary.tcp.all.close_wait`*::
++
+--
+type: integer
+
+Number of TCP connections in _close_wait_ state
+
+
+--
+
+*`system.socket.summary.tcp.all.time_wait`*::
++
+--
+type: integer
+
+Number of TCP connections in _time_wait_ state
+
+
+--
+
 [float]
 == udp fields
 
