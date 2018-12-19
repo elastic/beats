@@ -22,28 +22,28 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.2",
-          "destinationTransportPort": 137,
-          "egressVRFID": 0,
+          "destination_ipv4_address": "192.168.0.2",
+          "destination_transport_port": 137,
+          "egress_vrfid": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-12-01T17:04:39Z",
-            "uptimeMillis": 591967,
+            "uptime_millis": 591967,
             "version": 9
           },
-          "flowDirection": 0,
-          "flowEndSeconds": "2017-12-01T17:04:26Z",
-          "flowStartSeconds": "2017-12-01T17:04:26Z",
-          "ingressInterface": 13,
-          "ingressVRFID": 0,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 78,
-          "packetDeltaCount": 1,
-          "protocolIdentifier": 17,
-          "samplerId": 1,
-          "sourceIPv4Address": "192.168.0.3",
-          "sourceTransportPort": 137,
+          "flow_direction": 0,
+          "flow_end_seconds": "2017-12-01T17:04:26Z",
+          "flow_start_seconds": "2017-12-01T17:04:26Z",
+          "ingress_interface": 13,
+          "ingress_vrfid": 0,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 78,
+          "packet_delta_count": 1,
+          "protocol_identifier": 17,
+          "sampler_id": 1,
+          "source_ipv4_address": "192.168.0.3",
+          "source_transport_port": 137,
           "type": "netflow"
         },
         "network": {
@@ -53,7 +53,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.3",
           "locality": "private",
           "port": 137
@@ -82,28 +82,28 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.5",
-          "destinationTransportPort": 6343,
-          "egressInterface": 13,
-          "egressVRFID": 0,
+          "destination_ipv4_address": "192.168.0.5",
+          "destination_transport_port": 6343,
+          "egress_interface": 13,
+          "egress_vrfid": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-12-01T17:04:39Z",
-            "uptimeMillis": 591967,
+            "uptime_millis": 591967,
             "version": 9
           },
-          "flowDirection": 1,
-          "flowEndSeconds": "2017-12-01T17:04:29Z",
-          "flowStartSeconds": "2017-12-01T17:04:29Z",
-          "ingressVRFID": 0,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 232,
-          "packetDeltaCount": 1,
-          "protocolIdentifier": 17,
-          "samplerId": 1,
-          "sourceIPv4Address": "192.168.0.4",
-          "sourceTransportPort": 58130,
+          "flow_direction": 1,
+          "flow_end_seconds": "2017-12-01T17:04:29Z",
+          "flow_start_seconds": "2017-12-01T17:04:29Z",
+          "ingress_vrfid": 0,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 232,
+          "packet_delta_count": 1,
+          "protocol_identifier": 17,
+          "sampler_id": 1,
+          "source_ipv4_address": "192.168.0.4",
+          "source_transport_port": 58130,
           "type": "netflow"
         },
         "network": {
@@ -113,7 +113,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.4",
           "locality": "private",
           "port": 58130

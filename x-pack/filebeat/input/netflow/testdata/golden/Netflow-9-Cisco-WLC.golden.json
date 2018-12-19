@@ -20,24 +20,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "DQAB3w==",
+          "application_id": "DQAB3w==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 0,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 3320,
-          "packetDeltaCount": 83,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 3320,
+          "packet_delta_count": 83,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 3320,
@@ -46,7 +46,7 @@
           "name": "Test-env",
           "packets": 83
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -75,24 +75,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "DQAB3w==",
+          "application_id": "DQAB3w==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 1,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 3320,
-          "packetDeltaCount": 83,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 3320,
+          "packet_delta_count": 83,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 3320,
@@ -101,7 +101,7 @@
           "name": "Test-env",
           "packets": 83
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },
@@ -126,24 +126,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "AwAANQ==",
+          "application_id": "AwAANQ==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 0,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 7760,
-          "packetDeltaCount": 69,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 7760,
+          "packet_delta_count": 69,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 7760,
@@ -152,7 +152,7 @@
           "name": "Test-env",
           "packets": 69
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -181,24 +181,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "AwAANQ==",
+          "application_id": "AwAANQ==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 1,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 10229,
-          "packetDeltaCount": 69,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 10229,
+          "packet_delta_count": 69,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 10229,
@@ -207,7 +207,7 @@
           "name": "Test-env",
           "packets": 69
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },
@@ -232,24 +232,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "AwAAig==",
+          "application_id": "AwAAig==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 0,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 215,
-          "packetDeltaCount": 1,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 215,
+          "packet_delta_count": 1,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 215,
@@ -258,7 +258,7 @@
           "name": "Test-env",
           "packets": 1
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -285,24 +285,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "DQAAAQ==",
+          "application_id": "DQAAAQ==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 0,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 40854,
-          "packetDeltaCount": 225,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 40854,
+          "packet_delta_count": 225,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 40854,
@@ -311,7 +311,7 @@
           "name": "Test-env",
           "packets": 225
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -340,24 +340,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "DQAAAQ==",
+          "application_id": "DQAAAQ==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 1,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 35866,
-          "packetDeltaCount": 154,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 35866,
+          "packet_delta_count": 154,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 35866,
@@ -366,7 +366,7 @@
           "name": "Test-env",
           "packets": 154
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },
@@ -391,24 +391,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "AwAAUA==",
+          "application_id": "AwAAUA==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 0,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 12279,
-          "packetDeltaCount": 63,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 12279,
+          "packet_delta_count": 63,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 12279,
@@ -417,7 +417,7 @@
           "name": "Test-env",
           "packets": 63
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -446,24 +446,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "AwAAUA==",
+          "application_id": "AwAAUA==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 1,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 27287,
-          "packetDeltaCount": 61,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 27287,
+          "packet_delta_count": 61,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 27287,
@@ -472,7 +472,7 @@
           "name": "Test-env",
           "packets": 61
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },
@@ -497,24 +497,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "DQABxQ==",
+          "application_id": "DQABxQ==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 0,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 147145,
-          "packetDeltaCount": 773,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 147145,
+          "packet_delta_count": 773,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 147145,
@@ -523,7 +523,7 @@
           "name": "Test-env",
           "packets": 773
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -552,24 +552,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "DQABxQ==",
+          "application_id": "DQABxQ==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 1,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 1182695,
-          "packetDeltaCount": 1379,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 1182695,
+          "packet_delta_count": 1379,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 1182695,
@@ -578,7 +578,7 @@
           "name": "Test-env",
           "packets": 1379
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },
@@ -603,24 +603,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "DQACCA==",
+          "application_id": "DQACCA==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 0,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 6777,
-          "packetDeltaCount": 26,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 6777,
+          "packet_delta_count": 26,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 6777,
@@ -629,7 +629,7 @@
           "name": "Test-env",
           "packets": 26
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -658,24 +658,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "DQACCA==",
+          "application_id": "DQACCA==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 1,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 8625,
-          "packetDeltaCount": 26,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 8625,
+          "packet_delta_count": 26,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 8625,
@@ -684,7 +684,7 @@
           "name": "Test-env",
           "packets": 26
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },
@@ -709,24 +709,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "AwABuw==",
+          "application_id": "AwABuw==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 0,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 2433001,
-          "packetDeltaCount": 20434,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 2433001,
+          "packet_delta_count": 20434,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 2433001,
@@ -735,7 +735,7 @@
           "name": "Test-env",
           "packets": 20434
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -764,24 +764,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "AwABuw==",
+          "application_id": "AwABuw==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 1,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 56599680,
-          "packetDeltaCount": 40726,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 56599680,
+          "packet_delta_count": 40726,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 56599680,
@@ -790,7 +790,7 @@
           "name": "Test-env",
           "packets": 40726
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },
@@ -815,24 +815,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "AQAAAQ==",
+          "application_id": "AQAAAQ==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 0,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 1658,
-          "packetDeltaCount": 15,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 1658,
+          "packet_delta_count": 15,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 1658,
@@ -841,7 +841,7 @@
           "name": "Test-env",
           "packets": 15
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -870,24 +870,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "AQAAAQ==",
+          "application_id": "AQAAAQ==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 1,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 950,
-          "packetDeltaCount": 14,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 950,
+          "packet_delta_count": 14,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 950,
@@ -896,7 +896,7 @@
           "name": "Test-env",
           "packets": 14
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },
@@ -921,24 +921,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "DQABrw==",
+          "application_id": "DQABrw==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 0,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 1495567,
-          "packetDeltaCount": 16145,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 1495567,
+          "packet_delta_count": 16145,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 1495567,
@@ -947,7 +947,7 @@
           "name": "Test-env",
           "packets": 16145
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.20.121",
           "locality": "private",
           "mac": "34:02:86:75:c0:51"
@@ -976,24 +976,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "DQABrw==",
+          "application_id": "DQABrw==",
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 1,
+            "source_id": 1,
             "timestamp": "2017-06-22T06:31:14Z",
-            "uptimeMillis": 1336647838,
+            "uptime_millis": 1336647838,
             "version": 9
           },
-          "flowDirection": 1,
-          "ipDiffServCodePoint": 0,
-          "octetDeltaCount": 80973880,
-          "packetDeltaCount": 53362,
-          "postIpDiffServCodePoint": 0,
-          "staIPv4Address": "192.168.20.121",
-          "staMacAddress": "34:02:86:75:c0:51",
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 80973880,
+          "packet_delta_count": 53362,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
           "type": "netflow",
-          "wlanSSID": "Test-env",
-          "wtpMacAddress": "00:f6:63:cc:80:60"
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
         },
         "network": {
           "bytes": 80973880,
@@ -1002,7 +1002,7 @@
           "name": "Test-env",
           "packets": 53362
         },
-        "source": {
+        "source_ecs": {
           "mac": "00:f6:63:cc:80:60"
         }
       },

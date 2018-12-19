@@ -22,29 +22,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.128.17",
-          "destinationTransportPort": 123,
-          "egressInterface": 7,
+          "destination_ipv4_address": "192.168.128.17",
+          "destination_transport_port": 123,
+          "egress_interface": 7,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666794170,
-          "flowStartSysUpTime": 2666794170,
-          "ingressInterface": 13,
-          "ipNextHopIPv4Address": "192.168.224.1",
-          "ipVersion": 4,
-          "octetDeltaCount": 152,
-          "packetDeltaCount": 2,
-          "postNATDestinationIPv4Address": "192.168.128.17",
-          "postNATSourceIPv4Address": "192.168.230.216",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "10.10.8.197",
-          "sourceTransportPort": 123,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666794170,
+          "flow_start_sys_up_time": 2666794170,
+          "ingress_interface": 13,
+          "ip_next_hop_ipv4_address": "192.168.224.1",
+          "ip_version": 4,
+          "octet_delta_count": 152,
+          "packet_delta_count": 2,
+          "post_nadt_estination_ipv4_address": "192.168.128.17",
+          "post_nast_ource_ipv4_address": "192.168.230.216",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "10.10.8.197",
+          "source_transport_port": 123,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -54,7 +54,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.10.8.197",
           "locality": "private",
           "port": 123
@@ -83,29 +83,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.230.216",
-          "destinationTransportPort": 82,
-          "egressInterface": 11,
+          "destination_ipv4_address": "192.168.230.216",
+          "destination_transport_port": 82,
+          "egress_interface": 11,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666794210,
-          "flowStartSysUpTime": 2666794210,
-          "ingressInterface": 7,
-          "ipNextHopIPv4Address": "10.10.6.11",
-          "ipVersion": 4,
-          "octetDeltaCount": 502,
-          "packetDeltaCount": 8,
-          "postNATDestinationIPv4Address": "10.10.6.11",
-          "postNATSourceIPv4Address": "192.168.35.143",
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.35.143",
-          "sourceTransportPort": 46518,
-          "tcpControlBits": 2,
+          "flow_end_sys_up_time": 2666794210,
+          "flow_start_sys_up_time": 2666794210,
+          "ingress_interface": 7,
+          "ip_next_hop_ipv4_address": "10.10.6.11",
+          "ip_version": 4,
+          "octet_delta_count": 502,
+          "packet_delta_count": 8,
+          "post_nadt_estination_ipv4_address": "10.10.6.11",
+          "post_nast_ource_ipv4_address": "192.168.35.143",
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.35.143",
+          "source_transport_port": 46518,
+          "tcp_control_bits": 2,
           "type": "netflow"
         },
         "network": {
@@ -115,7 +115,7 @@
           "packets": 8,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.35.143",
           "locality": "private",
           "port": 46518
@@ -144,29 +144,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.35.143",
-          "destinationTransportPort": 46518,
-          "egressInterface": 7,
+          "destination_ipv4_address": "192.168.35.143",
+          "destination_transport_port": 46518,
+          "egress_interface": 7,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666794210,
-          "flowStartSysUpTime": 2666794210,
-          "ingressInterface": 11,
-          "ipNextHopIPv4Address": "192.168.224.1",
-          "ipVersion": 4,
-          "octetDeltaCount": 2233,
-          "packetDeltaCount": 8,
-          "postNATDestinationIPv4Address": "192.168.35.143",
-          "postNATSourceIPv4Address": "192.168.230.216",
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "10.10.6.11",
-          "sourceTransportPort": 80,
-          "tcpControlBits": 18,
+          "flow_end_sys_up_time": 2666794210,
+          "flow_start_sys_up_time": 2666794210,
+          "ingress_interface": 11,
+          "ip_next_hop_ipv4_address": "192.168.224.1",
+          "ip_version": 4,
+          "octet_delta_count": 2233,
+          "packet_delta_count": 8,
+          "post_nadt_estination_ipv4_address": "192.168.35.143",
+          "post_nast_ource_ipv4_address": "192.168.230.216",
+          "protocol_identifier": 6,
+          "source_ipv4_address": "10.10.6.11",
+          "source_transport_port": 80,
+          "tcp_control_bits": 18,
           "type": "netflow"
         },
         "network": {
@@ -176,7 +176,7 @@
           "packets": 8,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.10.6.11",
           "locality": "private",
           "port": 80
@@ -205,29 +205,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.230.216",
-          "destinationTransportPort": 123,
-          "egressInterface": 13,
+          "destination_ipv4_address": "192.168.230.216",
+          "destination_transport_port": 123,
+          "egress_interface": 13,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666794210,
-          "flowStartSysUpTime": 2666794210,
-          "ingressInterface": 7,
-          "ipNextHopIPv4Address": "10.10.8.197",
-          "ipVersion": 4,
-          "octetDeltaCount": 152,
-          "packetDeltaCount": 2,
-          "postNATDestinationIPv4Address": "10.10.8.197",
-          "postNATSourceIPv4Address": "192.168.128.17",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "192.168.128.17",
-          "sourceTransportPort": 123,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666794210,
+          "flow_start_sys_up_time": 2666794210,
+          "ingress_interface": 7,
+          "ip_next_hop_ipv4_address": "10.10.8.197",
+          "ip_version": 4,
+          "octet_delta_count": 152,
+          "packet_delta_count": 2,
+          "post_nadt_estination_ipv4_address": "10.10.8.197",
+          "post_nast_ource_ipv4_address": "192.168.128.17",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "192.168.128.17",
+          "source_transport_port": 123,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -237,7 +237,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.128.17",
           "locality": "private",
           "port": 123
@@ -266,29 +266,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.20.5.191",
-          "destinationTransportPort": 42502,
-          "egressInterface": 9,
+          "destination_ipv4_address": "172.20.5.191",
+          "destination_transport_port": 42502,
+          "egress_interface": 9,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666794300,
-          "flowStartSysUpTime": 2666793230,
-          "ingressInterface": 13,
-          "ipNextHopIPv4Address": "172.20.5.191",
-          "ipVersion": 4,
-          "octetDeltaCount": 79724,
-          "packetDeltaCount": 57,
-          "postNATDestinationIPv4Address": "172.20.5.191",
-          "postNATSourceIPv4Address": "10.10.8.220",
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "10.10.8.220",
-          "sourceTransportPort": 80,
-          "tcpControlBits": 18,
+          "flow_end_sys_up_time": 2666794300,
+          "flow_start_sys_up_time": 2666793230,
+          "ingress_interface": 13,
+          "ip_next_hop_ipv4_address": "172.20.5.191",
+          "ip_version": 4,
+          "octet_delta_count": 79724,
+          "packet_delta_count": 57,
+          "post_nadt_estination_ipv4_address": "172.20.5.191",
+          "post_nast_ource_ipv4_address": "10.10.8.220",
+          "protocol_identifier": 6,
+          "source_ipv4_address": "10.10.8.220",
+          "source_transport_port": 80,
+          "tcp_control_bits": 18,
           "type": "netflow"
         },
         "network": {
@@ -298,7 +298,7 @@
           "packets": 57,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.10.8.220",
           "locality": "private",
           "port": 80
@@ -327,29 +327,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.20.4.1",
-          "destinationTransportPort": 53,
-          "egressInterface": 0,
+          "destination_ipv4_address": "172.20.4.1",
+          "destination_transport_port": 53,
+          "egress_interface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666794320,
-          "flowStartSysUpTime": 2666794320,
-          "ingressInterface": 9,
-          "ipNextHopIPv4Address": "172.20.4.1",
-          "ipVersion": 4,
-          "octetDeltaCount": 161,
-          "packetDeltaCount": 3,
-          "postNATDestinationIPv4Address": "172.20.4.1",
-          "postNATSourceIPv4Address": "172.20.4.199",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "172.20.4.199",
-          "sourceTransportPort": 10240,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666794320,
+          "flow_start_sys_up_time": 2666794320,
+          "ingress_interface": 9,
+          "ip_next_hop_ipv4_address": "172.20.4.1",
+          "ip_version": 4,
+          "octet_delta_count": 161,
+          "packet_delta_count": 3,
+          "post_nadt_estination_ipv4_address": "172.20.4.1",
+          "post_nast_ource_ipv4_address": "172.20.4.199",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.20.4.199",
+          "source_transport_port": 10240,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -359,7 +359,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.20.4.199",
           "locality": "private",
           "port": 10240
@@ -388,29 +388,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.20.4.199",
-          "destinationTransportPort": 10240,
-          "egressInterface": 9,
+          "destination_ipv4_address": "172.20.4.199",
+          "destination_transport_port": 10240,
+          "egress_interface": 9,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666794320,
-          "flowStartSysUpTime": 2666794320,
-          "ingressInterface": 0,
-          "ipNextHopIPv4Address": "172.20.4.199",
-          "ipVersion": 4,
-          "octetDeltaCount": 245,
-          "packetDeltaCount": 3,
-          "postNATDestinationIPv4Address": "172.20.4.199",
-          "postNATSourceIPv4Address": "172.20.4.1",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "172.20.4.1",
-          "sourceTransportPort": 53,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666794320,
+          "flow_start_sys_up_time": 2666794320,
+          "ingress_interface": 0,
+          "ip_next_hop_ipv4_address": "172.20.4.199",
+          "ip_version": 4,
+          "octet_delta_count": 245,
+          "packet_delta_count": 3,
+          "post_nadt_estination_ipv4_address": "172.20.4.199",
+          "post_nast_ource_ipv4_address": "172.20.4.1",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.20.4.1",
+          "source_transport_port": 53,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -420,7 +420,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.20.4.1",
           "locality": "private",
           "port": 53
@@ -449,29 +449,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "10.10.8.34",
-          "destinationTransportPort": 0,
-          "egressInterface": 13,
+          "destination_ipv4_address": "10.10.8.34",
+          "destination_transport_port": 0,
+          "egress_interface": 13,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666794330,
-          "flowStartSysUpTime": 2666790320,
-          "ingressInterface": 9,
-          "ipNextHopIPv4Address": "10.10.8.34",
-          "ipVersion": 4,
-          "octetDeltaCount": 504,
-          "packetDeltaCount": 6,
-          "postNATDestinationIPv4Address": "10.10.8.34",
-          "postNATSourceIPv4Address": "172.20.4.30",
-          "protocolIdentifier": 1,
-          "sourceIPv4Address": "172.20.4.30",
-          "sourceTransportPort": 0,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666794330,
+          "flow_start_sys_up_time": 2666790320,
+          "ingress_interface": 9,
+          "ip_next_hop_ipv4_address": "10.10.8.34",
+          "ip_version": 4,
+          "octet_delta_count": 504,
+          "packet_delta_count": 6,
+          "post_nadt_estination_ipv4_address": "10.10.8.34",
+          "post_nast_ource_ipv4_address": "172.20.4.30",
+          "protocol_identifier": 1,
+          "source_ipv4_address": "172.20.4.30",
+          "source_transport_port": 0,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -481,7 +481,7 @@
           "packets": 6,
           "protocol": "icmp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.20.4.30",
           "locality": "private",
           "port": 0
@@ -510,29 +510,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.20.4.30",
-          "destinationTransportPort": 59571,
-          "egressInterface": 9,
+          "destination_ipv4_address": "172.20.4.30",
+          "destination_transport_port": 59571,
+          "egress_interface": 9,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666794400,
-          "flowStartSysUpTime": 2666792700,
-          "ingressInterface": 13,
-          "ipNextHopIPv4Address": "172.20.4.30",
-          "ipVersion": 4,
-          "octetDeltaCount": 784,
-          "packetDeltaCount": 6,
-          "postNATDestinationIPv4Address": "172.20.4.30",
-          "postNATSourceIPv4Address": "10.10.8.105",
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "10.10.8.105",
-          "sourceTransportPort": 22,
-          "tcpControlBits": 18,
+          "flow_end_sys_up_time": 2666794400,
+          "flow_start_sys_up_time": 2666792700,
+          "ingress_interface": 13,
+          "ip_next_hop_ipv4_address": "172.20.4.30",
+          "ip_version": 4,
+          "octet_delta_count": 784,
+          "packet_delta_count": 6,
+          "post_nadt_estination_ipv4_address": "172.20.4.30",
+          "post_nast_ource_ipv4_address": "10.10.8.105",
+          "protocol_identifier": 6,
+          "source_ipv4_address": "10.10.8.105",
+          "source_transport_port": 22,
+          "tcp_control_bits": 18,
           "type": "netflow"
         },
         "network": {
@@ -542,7 +542,7 @@
           "packets": 6,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.10.8.105",
           "locality": "private",
           "port": 22
@@ -571,29 +571,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "10.10.8.105",
-          "destinationTransportPort": 22,
-          "egressInterface": 13,
+          "destination_ipv4_address": "10.10.8.105",
+          "destination_transport_port": 22,
+          "egress_interface": 13,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666794400,
-          "flowStartSysUpTime": 2666792270,
-          "ingressInterface": 9,
-          "ipNextHopIPv4Address": "10.10.8.105",
-          "ipVersion": 4,
-          "octetDeltaCount": 433,
-          "packetDeltaCount": 8,
-          "postNATDestinationIPv4Address": "10.10.8.105",
-          "postNATSourceIPv4Address": "172.20.4.30",
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.20.4.30",
-          "sourceTransportPort": 59571,
-          "tcpControlBits": 2,
+          "flow_end_sys_up_time": 2666794400,
+          "flow_start_sys_up_time": 2666792270,
+          "ingress_interface": 9,
+          "ip_next_hop_ipv4_address": "10.10.8.105",
+          "ip_version": 4,
+          "octet_delta_count": 433,
+          "packet_delta_count": 8,
+          "post_nadt_estination_ipv4_address": "10.10.8.105",
+          "post_nast_ource_ipv4_address": "172.20.4.30",
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.20.4.30",
+          "source_transport_port": 59571,
+          "tcp_control_bits": 2,
           "type": "netflow"
         },
         "network": {
@@ -603,7 +603,7 @@
           "packets": 8,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.20.4.30",
           "locality": "private",
           "port": 59571
@@ -632,29 +632,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.183.199",
-          "destinationTransportPort": 6667,
-          "egressInterface": 7,
+          "destination_ipv4_address": "192.168.183.199",
+          "destination_transport_port": 6667,
+          "egress_interface": 7,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666794440,
-          "flowStartSysUpTime": 2666794440,
-          "ingressInterface": 12,
-          "ipNextHopIPv4Address": "192.168.224.1",
-          "ipVersion": 4,
-          "octetDeltaCount": 196,
-          "packetDeltaCount": 3,
-          "postNATDestinationIPv4Address": "192.168.183.199",
-          "postNATSourceIPv4Address": "192.168.230.216",
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "10.10.7.11",
-          "sourceTransportPort": 48378,
-          "tcpControlBits": 24,
+          "flow_end_sys_up_time": 2666794440,
+          "flow_start_sys_up_time": 2666794440,
+          "ingress_interface": 12,
+          "ip_next_hop_ipv4_address": "192.168.224.1",
+          "ip_version": 4,
+          "octet_delta_count": 196,
+          "packet_delta_count": 3,
+          "post_nadt_estination_ipv4_address": "192.168.183.199",
+          "post_nast_ource_ipv4_address": "192.168.230.216",
+          "protocol_identifier": 6,
+          "source_ipv4_address": "10.10.7.11",
+          "source_transport_port": 48378,
+          "tcp_control_bits": 24,
           "type": "netflow"
         },
         "network": {
@@ -664,7 +664,7 @@
           "packets": 3,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.10.7.11",
           "locality": "private",
           "port": 48378
@@ -693,29 +693,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.230.216",
-          "destinationTransportPort": 48378,
-          "egressInterface": 12,
+          "destination_ipv4_address": "192.168.230.216",
+          "destination_transport_port": 48378,
+          "egress_interface": 12,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666794490,
-          "flowStartSysUpTime": 2666794490,
-          "ingressInterface": 7,
-          "ipNextHopIPv4Address": "10.10.7.11",
-          "ipVersion": 4,
-          "octetDeltaCount": 206,
-          "packetDeltaCount": 3,
-          "postNATDestinationIPv4Address": "10.10.7.11",
-          "postNATSourceIPv4Address": "192.168.183.199",
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.183.199",
-          "sourceTransportPort": 6667,
-          "tcpControlBits": 16,
+          "flow_end_sys_up_time": 2666794490,
+          "flow_start_sys_up_time": 2666794490,
+          "ingress_interface": 7,
+          "ip_next_hop_ipv4_address": "10.10.7.11",
+          "ip_version": 4,
+          "octet_delta_count": 206,
+          "packet_delta_count": 3,
+          "post_nadt_estination_ipv4_address": "10.10.7.11",
+          "post_nast_ource_ipv4_address": "192.168.183.199",
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.183.199",
+          "source_transport_port": 6667,
+          "tcp_control_bits": 16,
           "type": "netflow"
         },
         "network": {
@@ -725,7 +725,7 @@
           "packets": 3,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.183.199",
           "locality": "private",
           "port": 6667
@@ -754,29 +754,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "172.20.4.30",
-          "destinationTransportPort": 0,
-          "egressInterface": 9,
+          "destination_ipv4_address": "172.20.4.30",
+          "destination_transport_port": 0,
+          "egress_interface": 9,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666794700,
-          "flowStartSysUpTime": 2666790400,
-          "ingressInterface": 13,
-          "ipNextHopIPv4Address": "172.20.4.30",
-          "ipVersion": 4,
-          "octetDeltaCount": 504,
-          "packetDeltaCount": 6,
-          "postNATDestinationIPv4Address": "172.20.4.30",
-          "postNATSourceIPv4Address": "10.10.8.34",
-          "protocolIdentifier": 1,
-          "sourceIPv4Address": "10.10.8.34",
-          "sourceTransportPort": 0,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666794700,
+          "flow_start_sys_up_time": 2666790400,
+          "ingress_interface": 13,
+          "ip_next_hop_ipv4_address": "172.20.4.30",
+          "ip_version": 4,
+          "octet_delta_count": 504,
+          "packet_delta_count": 6,
+          "post_nadt_estination_ipv4_address": "172.20.4.30",
+          "post_nast_ource_ipv4_address": "10.10.8.34",
+          "protocol_identifier": 1,
+          "source_ipv4_address": "10.10.8.34",
+          "source_transport_port": 0,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -786,7 +786,7 @@
           "packets": 6,
           "protocol": "icmp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.10.8.34",
           "locality": "private",
           "port": 0
@@ -815,29 +815,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "10.10.8.220",
-          "destinationTransportPort": 80,
-          "egressInterface": 13,
+          "destination_ipv4_address": "10.10.8.220",
+          "destination_transport_port": 80,
+          "egress_interface": 13,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666794930,
-          "flowStartSysUpTime": 2666792760,
-          "ingressInterface": 9,
-          "ipNextHopIPv4Address": "10.10.8.220",
-          "ipVersion": 4,
-          "octetDeltaCount": 3539,
-          "packetDeltaCount": 58,
-          "postNATDestinationIPv4Address": "10.10.8.220",
-          "postNATSourceIPv4Address": "172.20.5.191",
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.20.5.191",
-          "sourceTransportPort": 42502,
-          "tcpControlBits": 2,
+          "flow_end_sys_up_time": 2666794930,
+          "flow_start_sys_up_time": 2666792760,
+          "ingress_interface": 9,
+          "ip_next_hop_ipv4_address": "10.10.8.220",
+          "ip_version": 4,
+          "octet_delta_count": 3539,
+          "packet_delta_count": 58,
+          "post_nadt_estination_ipv4_address": "10.10.8.220",
+          "post_nast_ource_ipv4_address": "172.20.5.191",
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.20.5.191",
+          "source_transport_port": 42502,
+          "tcp_control_bits": 2,
           "type": "netflow"
         },
         "network": {
@@ -847,7 +847,7 @@
           "packets": 58,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.20.5.191",
           "locality": "private",
           "port": 42502
@@ -876,29 +876,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "255.255.255.255",
-          "destinationTransportPort": 5678,
-          "egressInterface": 9,
+          "destination_ipv4_address": "255.255.255.255",
+          "destination_transport_port": 5678,
+          "egress_interface": 9,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795740,
-          "flowStartSysUpTime": 2666795740,
-          "ingressInterface": 0,
-          "ipNextHopIPv4Address": "255.255.255.255",
-          "ipVersion": 4,
-          "octetDeltaCount": 495,
-          "packetDeltaCount": 3,
-          "postNATDestinationIPv4Address": "255.255.255.255",
-          "postNATSourceIPv4Address": "172.20.4.1",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "172.20.4.1",
-          "sourceTransportPort": 33332,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795740,
+          "flow_start_sys_up_time": 2666795740,
+          "ingress_interface": 0,
+          "ip_next_hop_ipv4_address": "255.255.255.255",
+          "ip_version": 4,
+          "octet_delta_count": 495,
+          "packet_delta_count": 3,
+          "post_nadt_estination_ipv4_address": "255.255.255.255",
+          "post_nast_ource_ipv4_address": "172.20.4.1",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.20.4.1",
+          "source_transport_port": 33332,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -908,7 +908,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.20.4.1",
           "locality": "private",
           "port": 33332
@@ -937,29 +937,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "255.255.255.255",
-          "destinationTransportPort": 5678,
-          "egressInterface": 0,
+          "destination_ipv4_address": "255.255.255.255",
+          "destination_transport_port": 5678,
+          "egress_interface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795740,
-          "flowStartSysUpTime": 2666795740,
-          "ingressInterface": 9,
-          "ipNextHopIPv4Address": "255.255.255.255",
-          "ipVersion": 4,
-          "octetDeltaCount": 330,
-          "packetDeltaCount": 2,
-          "postNATDestinationIPv4Address": "255.255.255.255",
-          "postNATSourceIPv4Address": "172.20.4.1",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "172.20.4.1",
-          "sourceTransportPort": 33332,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795740,
+          "flow_start_sys_up_time": 2666795740,
+          "ingress_interface": 9,
+          "ip_next_hop_ipv4_address": "255.255.255.255",
+          "ip_version": 4,
+          "octet_delta_count": 330,
+          "packet_delta_count": 2,
+          "post_nadt_estination_ipv4_address": "255.255.255.255",
+          "post_nast_ource_ipv4_address": "172.20.4.1",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.20.4.1",
+          "source_transport_port": 33332,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -969,7 +969,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.20.4.1",
           "locality": "private",
           "port": 33332
@@ -998,29 +998,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "255.255.255.255",
-          "destinationTransportPort": 5678,
-          "egressInterface": 10,
+          "destination_ipv4_address": "255.255.255.255",
+          "destination_transport_port": 5678,
+          "egress_interface": 10,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795740,
-          "flowStartSysUpTime": 2666795740,
-          "ingressInterface": 0,
-          "ipNextHopIPv4Address": "255.255.255.255",
-          "ipVersion": 4,
-          "octetDeltaCount": 435,
-          "packetDeltaCount": 3,
-          "postNATDestinationIPv4Address": "255.255.255.255",
-          "postNATSourceIPv4Address": "172.30.0.1",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "172.30.0.1",
-          "sourceTransportPort": 53298,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795740,
+          "flow_start_sys_up_time": 2666795740,
+          "ingress_interface": 0,
+          "ip_next_hop_ipv4_address": "255.255.255.255",
+          "ip_version": 4,
+          "octet_delta_count": 435,
+          "packet_delta_count": 3,
+          "post_nadt_estination_ipv4_address": "255.255.255.255",
+          "post_nast_ource_ipv4_address": "172.30.0.1",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.30.0.1",
+          "source_transport_port": 53298,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -1030,7 +1030,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.30.0.1",
           "locality": "private",
           "port": 53298
@@ -1059,29 +1059,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "255.255.255.255",
-          "destinationTransportPort": 5678,
-          "egressInterface": 0,
+          "destination_ipv4_address": "255.255.255.255",
+          "destination_transport_port": 5678,
+          "egress_interface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795740,
-          "flowStartSysUpTime": 2666795740,
-          "ingressInterface": 10,
-          "ipNextHopIPv4Address": "255.255.255.255",
-          "ipVersion": 4,
-          "octetDeltaCount": 290,
-          "packetDeltaCount": 2,
-          "postNATDestinationIPv4Address": "255.255.255.255",
-          "postNATSourceIPv4Address": "172.30.0.1",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "172.30.0.1",
-          "sourceTransportPort": 53298,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795740,
+          "flow_start_sys_up_time": 2666795740,
+          "ingress_interface": 10,
+          "ip_next_hop_ipv4_address": "255.255.255.255",
+          "ip_version": 4,
+          "octet_delta_count": 290,
+          "packet_delta_count": 2,
+          "post_nadt_estination_ipv4_address": "255.255.255.255",
+          "post_nast_ource_ipv4_address": "172.30.0.1",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.30.0.1",
+          "source_transport_port": 53298,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -1091,7 +1091,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.30.0.1",
           "locality": "private",
           "port": 53298
@@ -1120,29 +1120,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "255.255.255.255",
-          "destinationTransportPort": 5678,
-          "egressInterface": 11,
+          "destination_ipv4_address": "255.255.255.255",
+          "destination_transport_port": 5678,
+          "egress_interface": 11,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795740,
-          "flowStartSysUpTime": 2666795740,
-          "ingressInterface": 0,
-          "ipNextHopIPv4Address": "255.255.255.255",
-          "ipVersion": 4,
-          "octetDeltaCount": 495,
-          "packetDeltaCount": 3,
-          "postNATDestinationIPv4Address": "255.255.255.255",
-          "postNATSourceIPv4Address": "10.10.6.1",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "10.10.6.1",
-          "sourceTransportPort": 48172,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795740,
+          "flow_start_sys_up_time": 2666795740,
+          "ingress_interface": 0,
+          "ip_next_hop_ipv4_address": "255.255.255.255",
+          "ip_version": 4,
+          "octet_delta_count": 495,
+          "packet_delta_count": 3,
+          "post_nadt_estination_ipv4_address": "255.255.255.255",
+          "post_nast_ource_ipv4_address": "10.10.6.1",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "10.10.6.1",
+          "source_transport_port": 48172,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -1152,7 +1152,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.10.6.1",
           "locality": "private",
           "port": 48172
@@ -1181,29 +1181,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "255.255.255.255",
-          "destinationTransportPort": 5678,
-          "egressInterface": 0,
+          "destination_ipv4_address": "255.255.255.255",
+          "destination_transport_port": 5678,
+          "egress_interface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795740,
-          "flowStartSysUpTime": 2666795740,
-          "ingressInterface": 11,
-          "ipNextHopIPv4Address": "255.255.255.255",
-          "ipVersion": 4,
-          "octetDeltaCount": 330,
-          "packetDeltaCount": 2,
-          "postNATDestinationIPv4Address": "255.255.255.255",
-          "postNATSourceIPv4Address": "10.10.6.1",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "10.10.6.1",
-          "sourceTransportPort": 48172,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795740,
+          "flow_start_sys_up_time": 2666795740,
+          "ingress_interface": 11,
+          "ip_next_hop_ipv4_address": "255.255.255.255",
+          "ip_version": 4,
+          "octet_delta_count": 330,
+          "packet_delta_count": 2,
+          "post_nadt_estination_ipv4_address": "255.255.255.255",
+          "post_nast_ource_ipv4_address": "10.10.6.1",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "10.10.6.1",
+          "source_transport_port": 48172,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -1213,7 +1213,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.10.6.1",
           "locality": "private",
           "port": 48172
@@ -1242,29 +1242,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "255.255.255.255",
-          "destinationTransportPort": 5678,
-          "egressInterface": 12,
+          "destination_ipv4_address": "255.255.255.255",
+          "destination_transport_port": 5678,
+          "egress_interface": 12,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 0,
-          "ipNextHopIPv4Address": "255.255.255.255",
-          "ipVersion": 4,
-          "octetDeltaCount": 495,
-          "packetDeltaCount": 3,
-          "postNATDestinationIPv4Address": "255.255.255.255",
-          "postNATSourceIPv4Address": "10.10.7.1",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "10.10.7.1",
-          "sourceTransportPort": 48935,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 0,
+          "ip_next_hop_ipv4_address": "255.255.255.255",
+          "ip_version": 4,
+          "octet_delta_count": 495,
+          "packet_delta_count": 3,
+          "post_nadt_estination_ipv4_address": "255.255.255.255",
+          "post_nast_ource_ipv4_address": "10.10.7.1",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "10.10.7.1",
+          "source_transport_port": 48935,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -1274,7 +1274,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.10.7.1",
           "locality": "private",
           "port": 48935
@@ -1303,29 +1303,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "255.255.255.255",
-          "destinationTransportPort": 5678,
-          "egressInterface": 0,
+          "destination_ipv4_address": "255.255.255.255",
+          "destination_transport_port": 5678,
+          "egress_interface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 12,
-          "ipNextHopIPv4Address": "255.255.255.255",
-          "ipVersion": 4,
-          "octetDeltaCount": 330,
-          "packetDeltaCount": 2,
-          "postNATDestinationIPv4Address": "255.255.255.255",
-          "postNATSourceIPv4Address": "10.10.7.1",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "10.10.7.1",
-          "sourceTransportPort": 48935,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 12,
+          "ip_next_hop_ipv4_address": "255.255.255.255",
+          "ip_version": 4,
+          "octet_delta_count": 330,
+          "packet_delta_count": 2,
+          "post_nadt_estination_ipv4_address": "255.255.255.255",
+          "post_nast_ource_ipv4_address": "10.10.7.1",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "10.10.7.1",
+          "source_transport_port": 48935,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -1335,7 +1335,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.10.7.1",
           "locality": "private",
           "port": 48935
@@ -1364,29 +1364,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "255.255.255.255",
-          "destinationTransportPort": 5678,
-          "egressInterface": 13,
+          "destination_ipv4_address": "255.255.255.255",
+          "destination_transport_port": 5678,
+          "egress_interface": 13,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 0,
-          "ipNextHopIPv4Address": "255.255.255.255",
-          "ipVersion": 4,
-          "octetDeltaCount": 495,
-          "packetDeltaCount": 3,
-          "postNATDestinationIPv4Address": "255.255.255.255",
-          "postNATSourceIPv4Address": "10.10.8.1",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "10.10.8.1",
-          "sourceTransportPort": 51931,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 0,
+          "ip_next_hop_ipv4_address": "255.255.255.255",
+          "ip_version": 4,
+          "octet_delta_count": 495,
+          "packet_delta_count": 3,
+          "post_nadt_estination_ipv4_address": "255.255.255.255",
+          "post_nast_ource_ipv4_address": "10.10.8.1",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "10.10.8.1",
+          "source_transport_port": 51931,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -1396,7 +1396,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.10.8.1",
           "locality": "private",
           "port": 51931
@@ -1425,29 +1425,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "255.255.255.255",
-          "destinationTransportPort": 5678,
-          "egressInterface": 0,
+          "destination_ipv4_address": "255.255.255.255",
+          "destination_transport_port": 5678,
+          "egress_interface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 13,
-          "ipNextHopIPv4Address": "255.255.255.255",
-          "ipVersion": 4,
-          "octetDeltaCount": 330,
-          "packetDeltaCount": 2,
-          "postNATDestinationIPv4Address": "255.255.255.255",
-          "postNATSourceIPv4Address": "10.10.8.1",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "10.10.8.1",
-          "sourceTransportPort": 51931,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 13,
+          "ip_next_hop_ipv4_address": "255.255.255.255",
+          "ip_version": 4,
+          "octet_delta_count": 330,
+          "packet_delta_count": 2,
+          "post_nadt_estination_ipv4_address": "255.255.255.255",
+          "post_nast_ource_ipv4_address": "10.10.8.1",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "10.10.8.1",
+          "source_transport_port": 51931,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -1457,7 +1457,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.10.8.1",
           "locality": "private",
           "port": 51931
@@ -1486,29 +1486,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "255.255.255.255",
-          "destinationTransportPort": 5678,
-          "egressInterface": 14,
+          "destination_ipv4_address": "255.255.255.255",
+          "destination_transport_port": 5678,
+          "egress_interface": 14,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 0,
-          "ipNextHopIPv4Address": "255.255.255.255",
-          "ipVersion": 4,
-          "octetDeltaCount": 495,
-          "packetDeltaCount": 3,
-          "postNATDestinationIPv4Address": "255.255.255.255",
-          "postNATSourceIPv4Address": "10.20.0.1",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "10.20.0.1",
-          "sourceTransportPort": 43454,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 0,
+          "ip_next_hop_ipv4_address": "255.255.255.255",
+          "ip_version": 4,
+          "octet_delta_count": 495,
+          "packet_delta_count": 3,
+          "post_nadt_estination_ipv4_address": "255.255.255.255",
+          "post_nast_ource_ipv4_address": "10.20.0.1",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "10.20.0.1",
+          "source_transport_port": 43454,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -1518,7 +1518,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.20.0.1",
           "locality": "private",
           "port": 43454
@@ -1547,29 +1547,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "255.255.255.255",
-          "destinationTransportPort": 5678,
-          "egressInterface": 0,
+          "destination_ipv4_address": "255.255.255.255",
+          "destination_transport_port": 5678,
+          "egress_interface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 14,
-          "ipNextHopIPv4Address": "255.255.255.255",
-          "ipVersion": 4,
-          "octetDeltaCount": 330,
-          "packetDeltaCount": 2,
-          "postNATDestinationIPv4Address": "255.255.255.255",
-          "postNATSourceIPv4Address": "10.20.0.1",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "10.20.0.1",
-          "sourceTransportPort": 43454,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 14,
+          "ip_next_hop_ipv4_address": "255.255.255.255",
+          "ip_version": 4,
+          "octet_delta_count": 330,
+          "packet_delta_count": 2,
+          "post_nadt_estination_ipv4_address": "255.255.255.255",
+          "post_nast_ource_ipv4_address": "10.20.0.1",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "10.20.0.1",
+          "source_transport_port": 43454,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -1579,7 +1579,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.20.0.1",
           "locality": "private",
           "port": 43454
@@ -1608,29 +1608,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "255.255.255.255",
-          "destinationTransportPort": 5678,
-          "egressInterface": 15,
+          "destination_ipv4_address": "255.255.255.255",
+          "destination_transport_port": 5678,
+          "egress_interface": 15,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 0,
-          "ipNextHopIPv4Address": "255.255.255.255",
-          "ipVersion": 4,
-          "octetDeltaCount": 495,
-          "packetDeltaCount": 3,
-          "postNATDestinationIPv4Address": "255.255.255.255",
-          "postNATSourceIPv4Address": "10.10.10.1",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "10.10.10.1",
-          "sourceTransportPort": 52837,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 0,
+          "ip_next_hop_ipv4_address": "255.255.255.255",
+          "ip_version": 4,
+          "octet_delta_count": 495,
+          "packet_delta_count": 3,
+          "post_nadt_estination_ipv4_address": "255.255.255.255",
+          "post_nast_ource_ipv4_address": "10.10.10.1",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "10.10.10.1",
+          "source_transport_port": 52837,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -1640,7 +1640,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.10.10.1",
           "locality": "private",
           "port": 52837
@@ -1669,29 +1669,29 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "255.255.255.255",
-          "destinationTransportPort": 5678,
-          "egressInterface": 0,
+          "destination_ipv4_address": "255.255.255.255",
+          "destination_transport_port": 5678,
+          "egress_interface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 15,
-          "ipNextHopIPv4Address": "255.255.255.255",
-          "ipVersion": 4,
-          "octetDeltaCount": 330,
-          "packetDeltaCount": 2,
-          "postNATDestinationIPv4Address": "255.255.255.255",
-          "postNATSourceIPv4Address": "10.10.10.1",
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "10.10.10.1",
-          "sourceTransportPort": 52837,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 15,
+          "ip_next_hop_ipv4_address": "255.255.255.255",
+          "ip_version": 4,
+          "octet_delta_count": 330,
+          "packet_delta_count": 2,
+          "post_nadt_estination_ipv4_address": "255.255.255.255",
+          "post_nast_ource_ipv4_address": "10.10.10.1",
+          "protocol_identifier": 17,
+          "source_ipv4_address": "10.10.10.1",
+          "source_transport_port": 52837,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -1701,7 +1701,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.10.10.1",
           "locality": "private",
           "port": 52837
@@ -1728,27 +1728,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:401",
-          "destinationTransportPort": 5678,
-          "egressInterface": 9,
+          "destination_ipv6_address": "fe80::ff:fe00:401",
+          "destination_transport_port": 5678,
+          "egress_interface": 9,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795740,
-          "flowStartSysUpTime": 2666795740,
-          "ingressInterface": 0,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 555,
-          "packetDeltaCount": 3,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:401",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795740,
+          "flow_start_sys_up_time": 2666795740,
+          "ingress_interface": 0,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 555,
+          "packet_delta_count": 3,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:401",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -1758,7 +1758,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },
@@ -1783,27 +1783,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:401",
-          "destinationTransportPort": 5678,
-          "egressInterface": 0,
+          "destination_ipv6_address": "fe80::ff:fe00:401",
+          "destination_transport_port": 5678,
+          "egress_interface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795740,
-          "flowStartSysUpTime": 2666795740,
-          "ingressInterface": 9,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 370,
-          "packetDeltaCount": 2,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:401",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795740,
+          "flow_start_sys_up_time": 2666795740,
+          "ingress_interface": 9,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 370,
+          "packet_delta_count": 2,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:401",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -1813,7 +1813,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },
@@ -1838,27 +1838,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:501",
-          "destinationTransportPort": 5678,
-          "egressInterface": 10,
+          "destination_ipv6_address": "fe80::ff:fe00:501",
+          "destination_transport_port": 5678,
+          "egress_interface": 10,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795740,
-          "flowStartSysUpTime": 2666795740,
-          "ingressInterface": 0,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 495,
-          "packetDeltaCount": 3,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:501",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795740,
+          "flow_start_sys_up_time": 2666795740,
+          "ingress_interface": 0,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 495,
+          "packet_delta_count": 3,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:501",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -1868,7 +1868,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },
@@ -1893,27 +1893,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:501",
-          "destinationTransportPort": 5678,
-          "egressInterface": 0,
+          "destination_ipv6_address": "fe80::ff:fe00:501",
+          "destination_transport_port": 5678,
+          "egress_interface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795740,
-          "flowStartSysUpTime": 2666795740,
-          "ingressInterface": 10,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 330,
-          "packetDeltaCount": 2,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:501",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795740,
+          "flow_start_sys_up_time": 2666795740,
+          "ingress_interface": 10,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 330,
+          "packet_delta_count": 2,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:501",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -1923,7 +1923,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },
@@ -1948,27 +1948,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:601",
-          "destinationTransportPort": 5678,
-          "egressInterface": 11,
+          "destination_ipv6_address": "fe80::ff:fe00:601",
+          "destination_transport_port": 5678,
+          "egress_interface": 11,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795740,
-          "flowStartSysUpTime": 2666795740,
-          "ingressInterface": 0,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 555,
-          "packetDeltaCount": 3,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:601",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795740,
+          "flow_start_sys_up_time": 2666795740,
+          "ingress_interface": 0,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 555,
+          "packet_delta_count": 3,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:601",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -1978,7 +1978,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },
@@ -2003,27 +2003,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:601",
-          "destinationTransportPort": 5678,
-          "egressInterface": 0,
+          "destination_ipv6_address": "fe80::ff:fe00:601",
+          "destination_transport_port": 5678,
+          "egress_interface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795740,
-          "flowStartSysUpTime": 2666795740,
-          "ingressInterface": 11,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 370,
-          "packetDeltaCount": 2,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:601",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795740,
+          "flow_start_sys_up_time": 2666795740,
+          "ingress_interface": 11,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 370,
+          "packet_delta_count": 2,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:601",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -2033,7 +2033,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },
@@ -2058,27 +2058,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:701",
-          "destinationTransportPort": 5678,
-          "egressInterface": 12,
+          "destination_ipv6_address": "fe80::ff:fe00:701",
+          "destination_transport_port": 5678,
+          "egress_interface": 12,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 0,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 555,
-          "packetDeltaCount": 3,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:701",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 0,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 555,
+          "packet_delta_count": 3,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:701",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -2088,7 +2088,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },
@@ -2113,27 +2113,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:701",
-          "destinationTransportPort": 5678,
-          "egressInterface": 0,
+          "destination_ipv6_address": "fe80::ff:fe00:701",
+          "destination_transport_port": 5678,
+          "egress_interface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 12,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 370,
-          "packetDeltaCount": 2,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:701",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 12,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 370,
+          "packet_delta_count": 2,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:701",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -2143,7 +2143,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },
@@ -2168,27 +2168,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:801",
-          "destinationTransportPort": 5678,
-          "egressInterface": 13,
+          "destination_ipv6_address": "fe80::ff:fe00:801",
+          "destination_transport_port": 5678,
+          "egress_interface": 13,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 0,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 555,
-          "packetDeltaCount": 3,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:801",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 0,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 555,
+          "packet_delta_count": 3,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:801",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -2198,7 +2198,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },
@@ -2223,27 +2223,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:801",
-          "destinationTransportPort": 5678,
-          "egressInterface": 0,
+          "destination_ipv6_address": "fe80::ff:fe00:801",
+          "destination_transport_port": 5678,
+          "egress_interface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 13,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 370,
-          "packetDeltaCount": 2,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:801",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 13,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 370,
+          "packet_delta_count": 2,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:801",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -2253,7 +2253,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },
@@ -2278,27 +2278,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:901",
-          "destinationTransportPort": 5678,
-          "egressInterface": 14,
+          "destination_ipv6_address": "fe80::ff:fe00:901",
+          "destination_transport_port": 5678,
+          "egress_interface": 14,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 0,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 555,
-          "packetDeltaCount": 3,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:901",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 0,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 555,
+          "packet_delta_count": 3,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:901",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -2308,7 +2308,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },
@@ -2333,27 +2333,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:901",
-          "destinationTransportPort": 5678,
-          "egressInterface": 0,
+          "destination_ipv6_address": "fe80::ff:fe00:901",
+          "destination_transport_port": 5678,
+          "egress_interface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 14,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 370,
-          "packetDeltaCount": 2,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:901",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 14,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 370,
+          "packet_delta_count": 2,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:901",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -2363,7 +2363,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },
@@ -2388,27 +2388,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:1001",
-          "destinationTransportPort": 5678,
-          "egressInterface": 15,
+          "destination_ipv6_address": "fe80::ff:fe00:1001",
+          "destination_transport_port": 5678,
+          "egress_interface": 15,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 0,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 555,
-          "packetDeltaCount": 3,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:1001",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 0,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 555,
+          "packet_delta_count": 3,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:1001",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -2418,7 +2418,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },
@@ -2443,27 +2443,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:1001",
-          "destinationTransportPort": 5678,
-          "egressInterface": 0,
+          "destination_ipv6_address": "fe80::ff:fe00:1001",
+          "destination_transport_port": 5678,
+          "egress_interface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 15,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 370,
-          "packetDeltaCount": 2,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:1001",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 15,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 370,
+          "packet_delta_count": 2,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:1001",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -2473,7 +2473,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },
@@ -2498,27 +2498,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:1101",
-          "destinationTransportPort": 5678,
-          "egressInterface": 16,
+          "destination_ipv6_address": "fe80::ff:fe00:1101",
+          "destination_transport_port": 5678,
+          "egress_interface": 16,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 0,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 555,
-          "packetDeltaCount": 3,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:1101",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 0,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 555,
+          "packet_delta_count": 3,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:1101",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -2528,7 +2528,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },
@@ -2553,27 +2553,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:1101",
-          "destinationTransportPort": 5678,
-          "egressInterface": 0,
+          "destination_ipv6_address": "fe80::ff:fe00:1101",
+          "destination_transport_port": 5678,
+          "egress_interface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 16,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 370,
-          "packetDeltaCount": 2,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:1101",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 16,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 370,
+          "packet_delta_count": 2,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:1101",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -2583,7 +2583,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },
@@ -2608,27 +2608,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:1201",
-          "destinationTransportPort": 5678,
-          "egressInterface": 17,
+          "destination_ipv6_address": "fe80::ff:fe00:1201",
+          "destination_transport_port": 5678,
+          "egress_interface": 17,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 0,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 555,
-          "packetDeltaCount": 3,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:1201",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 0,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 555,
+          "packet_delta_count": 3,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:1201",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -2638,7 +2638,7 @@
           "packets": 3,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },
@@ -2663,27 +2663,27 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv6Address": "fe80::ff:fe00:1201",
-          "destinationTransportPort": 5678,
-          "egressInterface": 0,
+          "destination_ipv6_address": "fe80::ff:fe00:1201",
+          "destination_transport_port": 5678,
+          "egress_interface": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-07-19T16:18:08Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndSysUpTime": 2666795750,
-          "flowStartSysUpTime": 2666795750,
-          "ingressInterface": 17,
-          "ipNextHopIPv6Address": "ff02::1",
-          "ipVersion": 6,
-          "octetDeltaCount": 370,
-          "packetDeltaCount": 2,
-          "protocolIdentifier": 17,
-          "sourceIPv6Address": "fe80::ff:fe00:1201",
-          "sourceTransportPort": 5678,
-          "tcpControlBits": 0,
+          "flow_end_sys_up_time": 2666795750,
+          "flow_start_sys_up_time": 2666795750,
+          "ingress_interface": 17,
+          "ip_next_hop_ipv6_address": "ff02::1",
+          "ip_version": 6,
+          "octet_delta_count": 370,
+          "packet_delta_count": 2,
+          "protocol_identifier": 17,
+          "source_ipv6_address": "fe80::ff:fe00:1201",
+          "source_transport_port": 5678,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -2693,7 +2693,7 @@
           "packets": 2,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "port": 5678
         }
       },

@@ -22,24 +22,24 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "10.0.0.34",
-          "destinationTransportPort": 80,
+          "destination_ipv4_address": "10.0.0.34",
+          "destination_transport_port": 80,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 2228226,
+            "source_id": 2228226,
             "timestamp": "2017-12-14T07:23:45Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowId": 3389049088,
-          "flowStartMilliseconds": "2017-12-14T07:23:45.148Z",
-          "natInsideSvcid": 100,
-          "natOutsideSvcid": 0,
-          "natSubString": "USER1@10.10.0.123",
-          "paddingOctets": "AA==",
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "10.0.1.228",
-          "sourceTransportPort": 5878,
+          "flow_id": 3389049088,
+          "flow_start_milliseconds": "2017-12-14T07:23:45.148Z",
+          "nat_inside_svcid": 100,
+          "nat_outside_svcid": 0,
+          "nat_sub_string": "USER1@10.10.0.123",
+          "padding_octets": "AA==",
+          "protocol_identifier": 6,
+          "source_ipv4_address": "10.0.1.228",
+          "source_transport_port": 5878,
           "type": "netflow"
         },
         "network": {
@@ -47,7 +47,7 @@
           "direction": "unknown",
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "10.0.1.228",
           "locality": "private",
           "port": 5878

@@ -25,31 +25,31 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "80.82.237.40",
-          "destinationTransportPort": 445,
+          "destination_ipv4_address": "80.82.237.40",
+          "destination_transport_port": 445,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 262144,
+            "source_id": 262144,
             "timestamp": "2018-01-16T09:45:02Z",
-            "uptimeMillis": 5584000,
+            "uptime_millis": 5584000,
             "version": 9
           },
-          "flowDirection": 0,
-          "flowEndSysUpTime": 5569000,
-          "flowStartSysUpTime": 5569000,
-          "ingressInterface": 7,
-          "ingressVRFID": 0,
-          "ipClassOfService": 0,
-          "layer2SegmentId": 0,
-          "octetDeltaCount": 52,
-          "packetDeltaCount": 1,
-          "paddingOctets": "AAA=",
-          "protocolIdentifier": 6,
-          "samplerId": 98,
-          "sourceIPv4Address": "192.168.200.136",
-          "sourceTransportPort": 61926,
+          "flow_direction": 0,
+          "flow_end_sys_up_time": 5569000,
+          "flow_start_sys_up_time": 5569000,
+          "ingress_interface": 7,
+          "ingress_vrfid": 0,
+          "ip_class_of_service": 0,
+          "layer2_segment_id": 0,
+          "octet_delta_count": 52,
+          "packet_delta_count": 1,
+          "padding_octets": "AAA=",
+          "protocol_identifier": 6,
+          "sampler_id": 98,
+          "source_ipv4_address": "192.168.200.136",
+          "source_transport_port": 61926,
           "type": "netflow",
-          "vlanId": 3174
+          "vlan_id": 3174
         },
         "network": {
           "bytes": 52,
@@ -58,7 +58,7 @@
           "packets": 1,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.200.136",
           "locality": "private",
           "port": 61926

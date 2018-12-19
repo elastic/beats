@@ -22,24 +22,24 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "AAAAUg==",
-          "applicationName": "\u0000\u0000\u0000\u0000\u0000\"\u0000\u0000\u0000\u0000\u0004",
-          "destinationIPv4Address": "0.0.0.0",
-          "destinationTransportPort": 0,
+          "application_id": "AAAAUg==",
+          "application_name": "\u0000\u0000\u0000\u0000\u0000\"\u0000\u0000\u0000\u0000\u0004",
+          "destination_ipv4_address": "0.0.0.0",
+          "destination_transport_port": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "1970-01-01T00:08:22Z",
-            "uptimeMillis": 91000,
+            "uptime_millis": 91000,
             "version": 9
           },
-          "flowEndSysUpTime": 104000,
-          "flowStartSysUpTime": 101000,
-          "octetDeltaCount": 82,
-          "packetDeltaCount": 1,
-          "protocolIdentifier": 0,
-          "sourceIPv4Address": "0.0.0.0",
-          "sourceTransportPort": 0,
+          "flow_end_sys_up_time": 104000,
+          "flow_start_sys_up_time": 101000,
+          "octet_delta_count": 82,
+          "packet_delta_count": 1,
+          "protocol_identifier": 0,
+          "source_ipv4_address": "0.0.0.0",
+          "source_transport_port": 0,
           "type": "netflow"
         },
         "network": {
@@ -49,7 +49,7 @@
           "packets": 1,
           "protocol": "unknown (0)"
         },
-        "source": {
+        "source_ecs": {
           "ip": "0.0.0.0",
           "locality": "private",
           "port": 0

@@ -22,28 +22,28 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "BQAASA==",
-          "destinationIPv4Address": "62.217.193.1",
-          "destinationTransportPort": 53,
-          "dot1qVlanId": 0,
+          "application_id": "BQAASA==",
+          "destination_ipv4_address": "62.217.193.1",
+          "destination_transport_port": 53,
+          "dot1q_vlan_id": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 0,
-          "ingressInterface": 17,
-          "ipClassOfService": 0,
-          "ipNextHopIPv4Address": "0.0.0.0",
-          "octetDeltaCount": 75,
-          "packetDeltaCount": 1,
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "192.168.0.111",
-          "sourceMacAddress": "ec:1f:72:11:9f:c1",
-          "sourceTransportPort": 37301,
-          "tcpControlBits": 0,
+          "flow_direction": 0,
+          "ingress_interface": 17,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "0.0.0.0",
+          "octet_delta_count": 75,
+          "packet_delta_count": 1,
+          "protocol_identifier": 17,
+          "source_ipv4_address": "192.168.0.111",
+          "source_mac_address": "ec:1f:72:11:9f:c1",
+          "source_transport_port": 37301,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -53,7 +53,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.111",
           "locality": "private",
           "mac": "ec:1f:72:11:9f:c1",
@@ -83,28 +83,28 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "BQAASA==",
-          "destinationIPv4Address": "62.217.193.65",
-          "destinationTransportPort": 53,
-          "dot1qVlanId": 0,
+          "application_id": "BQAASA==",
+          "destination_ipv4_address": "62.217.193.65",
+          "destination_transport_port": 53,
+          "dot1q_vlan_id": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 0,
-          "ingressInterface": 17,
-          "ipClassOfService": 0,
-          "ipNextHopIPv4Address": "0.0.0.0",
-          "octetDeltaCount": 75,
-          "packetDeltaCount": 1,
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "192.168.0.111",
-          "sourceMacAddress": "ec:1f:72:11:9f:c1",
-          "sourceTransportPort": 58411,
-          "tcpControlBits": 0,
+          "flow_direction": 0,
+          "ingress_interface": 17,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "0.0.0.0",
+          "octet_delta_count": 75,
+          "packet_delta_count": 1,
+          "protocol_identifier": 17,
+          "source_ipv4_address": "192.168.0.111",
+          "source_mac_address": "ec:1f:72:11:9f:c1",
+          "source_transport_port": 58411,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -114,7 +114,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.111",
           "locality": "private",
           "mac": "ec:1f:72:11:9f:c1",
@@ -144,28 +144,28 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "BQAASA==",
-          "destinationIPv4Address": "62.217.193.1",
-          "destinationTransportPort": 53,
-          "dot1qVlanId": 0,
+          "application_id": "BQAASA==",
+          "destination_ipv4_address": "62.217.193.1",
+          "destination_transport_port": 53,
+          "dot1q_vlan_id": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 0,
-          "ingressInterface": 17,
-          "ipClassOfService": 0,
-          "ipNextHopIPv4Address": "0.0.0.0",
-          "octetDeltaCount": 75,
-          "packetDeltaCount": 1,
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "192.168.0.111",
-          "sourceMacAddress": "ec:1f:72:11:9f:c1",
-          "sourceTransportPort": 37661,
-          "tcpControlBits": 0,
+          "flow_direction": 0,
+          "ingress_interface": 17,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "0.0.0.0",
+          "octet_delta_count": 75,
+          "packet_delta_count": 1,
+          "protocol_identifier": 17,
+          "source_ipv4_address": "192.168.0.111",
+          "source_mac_address": "ec:1f:72:11:9f:c1",
+          "source_transport_port": 37661,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -175,7 +175,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.111",
           "locality": "private",
           "mac": "ec:1f:72:11:9f:c1",
@@ -205,28 +205,28 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "BQAASA==",
-          "destinationIPv4Address": "62.217.193.65",
-          "destinationTransportPort": 53,
-          "dot1qVlanId": 0,
+          "application_id": "BQAASA==",
+          "destination_ipv4_address": "62.217.193.65",
+          "destination_transport_port": 53,
+          "dot1q_vlan_id": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 0,
-          "ingressInterface": 17,
-          "ipClassOfService": 0,
-          "ipNextHopIPv4Address": "0.0.0.0",
-          "octetDeltaCount": 75,
-          "packetDeltaCount": 1,
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "192.168.0.111",
-          "sourceMacAddress": "ec:1f:72:11:9f:c1",
-          "sourceTransportPort": 60212,
-          "tcpControlBits": 0,
+          "flow_direction": 0,
+          "ingress_interface": 17,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "0.0.0.0",
+          "octet_delta_count": 75,
+          "packet_delta_count": 1,
+          "protocol_identifier": 17,
+          "source_ipv4_address": "192.168.0.111",
+          "source_mac_address": "ec:1f:72:11:9f:c1",
+          "source_transport_port": 60212,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -236,7 +236,7 @@
           "packets": 1,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.111",
           "locality": "private",
           "mac": "ec:1f:72:11:9f:c1",
@@ -266,28 +266,28 @@
           "locality": "public"
         },
         "netflow": {
-          "applicationId": "BQAAAQ==",
-          "destinationIPv4Address": "192.168.3.142",
-          "destinationTransportPort": 37450,
-          "dot1qVlanId": 872,
+          "application_id": "BQAAAQ==",
+          "destination_ipv4_address": "192.168.3.142",
+          "destination_transport_port": 37450,
+          "dot1q_vlan_id": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 1,
-          "ingressInterface": 11,
-          "ipClassOfService": 48,
-          "ipNextHopIPv4Address": "192.168.3.142",
-          "octetDeltaCount": 964,
-          "packetDeltaCount": 10,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "158.85.58.115",
-          "sourceMacAddress": "00:23:04:18:ef:40",
-          "sourceTransportPort": 5222,
-          "tcpControlBits": 29,
+          "flow_direction": 1,
+          "ingress_interface": 11,
+          "ip_class_of_service": 48,
+          "ip_next_hop_ipv4_address": "192.168.3.142",
+          "octet_delta_count": 964,
+          "packet_delta_count": 10,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "158.85.58.115",
+          "source_mac_address": "00:23:04:18:ef:40",
+          "source_transport_port": 5222,
+          "tcp_control_bits": 29,
           "type": "netflow"
         },
         "network": {
@@ -297,7 +297,7 @@
           "packets": 10,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "158.85.58.115",
           "locality": "public",
           "mac": "00:23:04:18:ef:40",
@@ -327,28 +327,28 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "BQAAQg==",
-          "destinationIPv4Address": "216.58.212.195",
-          "destinationTransportPort": 443,
-          "dot1qVlanId": 0,
+          "application_id": "BQAAQg==",
+          "destination_ipv4_address": "216.58.212.195",
+          "destination_transport_port": 443,
+          "dot1q_vlan_id": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 0,
-          "ingressInterface": 17,
-          "ipClassOfService": 0,
-          "ipNextHopIPv4Address": "109.166.216.93",
-          "octetDeltaCount": 2748,
-          "packetDeltaCount": 8,
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "192.168.0.88",
-          "sourceMacAddress": "a4:d1:8c:e9:30:2c",
-          "sourceTransportPort": 61490,
-          "tcpControlBits": 0,
+          "flow_direction": 0,
+          "ingress_interface": 17,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "109.166.216.93",
+          "octet_delta_count": 2748,
+          "packet_delta_count": 8,
+          "protocol_identifier": 17,
+          "source_ipv4_address": "192.168.0.88",
+          "source_mac_address": "a4:d1:8c:e9:30:2c",
+          "source_transport_port": 61490,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -358,7 +358,7 @@
           "packets": 8,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.88",
           "locality": "private",
           "mac": "a4:d1:8c:e9:30:2c",
@@ -388,28 +388,28 @@
           "locality": "public"
         },
         "netflow": {
-          "applicationId": "BQAAAQ==",
-          "destinationIPv4Address": "192.168.0.88",
-          "destinationTransportPort": 61490,
-          "dot1qVlanId": 872,
+          "application_id": "BQAAAQ==",
+          "destination_ipv4_address": "192.168.0.88",
+          "destination_transport_port": 61490,
+          "dot1q_vlan_id": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 1,
-          "ingressInterface": 11,
-          "ipClassOfService": 48,
-          "ipNextHopIPv4Address": "192.168.0.88",
-          "octetDeltaCount": 2023,
-          "packetDeltaCount": 9,
-          "protocolIdentifier": 17,
-          "sourceIPv4Address": "216.58.212.195",
-          "sourceMacAddress": "00:23:04:18:ef:40",
-          "sourceTransportPort": 443,
-          "tcpControlBits": 0,
+          "flow_direction": 1,
+          "ingress_interface": 11,
+          "ip_class_of_service": 48,
+          "ip_next_hop_ipv4_address": "192.168.0.88",
+          "octet_delta_count": 2023,
+          "packet_delta_count": 9,
+          "protocol_identifier": 17,
+          "source_ipv4_address": "216.58.212.195",
+          "source_mac_address": "00:23:04:18:ef:40",
+          "source_transport_port": 443,
+          "tcp_control_bits": 0,
           "type": "netflow"
         },
         "network": {
@@ -419,7 +419,7 @@
           "packets": 9,
           "protocol": "udp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "216.58.212.195",
           "locality": "public",
           "mac": "00:23:04:18:ef:40",
@@ -449,28 +449,28 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "BQAAAQ==",
-          "destinationIPv4Address": "216.58.201.106",
-          "destinationTransportPort": 443,
-          "dot1qVlanId": 0,
+          "application_id": "BQAAAQ==",
+          "destination_ipv4_address": "216.58.201.106",
+          "destination_transport_port": 443,
+          "dot1q_vlan_id": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 0,
-          "ingressInterface": 17,
-          "ipClassOfService": 0,
-          "ipNextHopIPv4Address": "109.166.216.93",
-          "octetDeltaCount": 2180,
-          "packetDeltaCount": 9,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.1.201",
-          "sourceMacAddress": "98:01:a7:9f:8d:5f",
-          "sourceTransportPort": 50299,
-          "tcpControlBits": 24,
+          "flow_direction": 0,
+          "ingress_interface": 17,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "109.166.216.93",
+          "octet_delta_count": 2180,
+          "packet_delta_count": 9,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.1.201",
+          "source_mac_address": "98:01:a7:9f:8d:5f",
+          "source_transport_port": 50299,
+          "tcp_control_bits": 24,
           "type": "netflow"
         },
         "network": {
@@ -480,7 +480,7 @@
           "packets": 9,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.1.201",
           "locality": "private",
           "mac": "98:01:a7:9f:8d:5f",
@@ -510,28 +510,28 @@
           "locality": "public"
         },
         "netflow": {
-          "applicationId": "BQAAEA==",
-          "destinationIPv4Address": "192.168.1.201",
-          "destinationTransportPort": 50299,
-          "dot1qVlanId": 872,
+          "application_id": "BQAAEA==",
+          "destination_ipv4_address": "192.168.1.201",
+          "destination_transport_port": 50299,
+          "dot1q_vlan_id": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 1,
-          "ingressInterface": 11,
-          "ipClassOfService": 48,
-          "ipNextHopIPv4Address": "192.168.1.201",
-          "octetDeltaCount": 700,
-          "packetDeltaCount": 9,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "216.58.201.106",
-          "sourceMacAddress": "00:23:04:18:ef:40",
-          "sourceTransportPort": 443,
-          "tcpControlBits": 24,
+          "flow_direction": 1,
+          "ingress_interface": 11,
+          "ip_class_of_service": 48,
+          "ip_next_hop_ipv4_address": "192.168.1.201",
+          "octet_delta_count": 700,
+          "packet_delta_count": 9,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "216.58.201.106",
+          "source_mac_address": "00:23:04:18:ef:40",
+          "source_transport_port": 443,
+          "tcp_control_bits": 24,
           "type": "netflow"
         },
         "network": {
@@ -541,7 +541,7 @@
           "packets": 9,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "216.58.201.106",
           "locality": "public",
           "mac": "00:23:04:18:ef:40",
@@ -571,28 +571,28 @@
           "locality": "public"
         },
         "netflow": {
-          "applicationId": "BQAAEA==",
-          "destinationIPv4Address": "192.168.2.118",
-          "destinationTransportPort": 61353,
-          "dot1qVlanId": 872,
+          "application_id": "BQAAEA==",
+          "destination_ipv4_address": "192.168.2.118",
+          "destination_transport_port": 61353,
+          "dot1q_vlan_id": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 1,
-          "ingressInterface": 11,
-          "ipClassOfService": 48,
-          "ipNextHopIPv4Address": "192.168.2.118",
-          "octetDeltaCount": 161,
-          "packetDeltaCount": 2,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "52.236.33.163",
-          "sourceMacAddress": "00:23:04:18:ef:40",
-          "sourceTransportPort": 443,
-          "tcpControlBits": 24,
+          "flow_direction": 1,
+          "ingress_interface": 11,
+          "ip_class_of_service": 48,
+          "ip_next_hop_ipv4_address": "192.168.2.118",
+          "octet_delta_count": 161,
+          "packet_delta_count": 2,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "52.236.33.163",
+          "source_mac_address": "00:23:04:18:ef:40",
+          "source_transport_port": 443,
+          "tcp_control_bits": 24,
           "type": "netflow"
         },
         "network": {
@@ -602,7 +602,7 @@
           "packets": 2,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "52.236.33.163",
           "locality": "public",
           "mac": "00:23:04:18:ef:40",
@@ -632,28 +632,28 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "BQAAEA==",
-          "destinationIPv4Address": "52.216.130.237",
-          "destinationTransportPort": 443,
-          "dot1qVlanId": 0,
+          "application_id": "BQAAEA==",
+          "destination_ipv4_address": "52.216.130.237",
+          "destination_transport_port": 443,
+          "dot1q_vlan_id": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 0,
-          "ingressInterface": 17,
-          "ipClassOfService": 0,
-          "ipNextHopIPv4Address": "109.166.216.93",
-          "octetDeltaCount": 1764,
-          "packetDeltaCount": 21,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.3.34",
-          "sourceMacAddress": "1c:5c:f2:07:0f:2a",
-          "sourceTransportPort": 61674,
-          "tcpControlBits": 27,
+          "flow_direction": 0,
+          "ingress_interface": 17,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "109.166.216.93",
+          "octet_delta_count": 1764,
+          "packet_delta_count": 21,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.3.34",
+          "source_mac_address": "1c:5c:f2:07:0f:2a",
+          "source_transport_port": 61674,
+          "tcp_control_bits": 27,
           "type": "netflow"
         },
         "network": {
@@ -663,7 +663,7 @@
           "packets": 21,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.3.34",
           "locality": "private",
           "mac": "1c:5c:f2:07:0f:2a",
@@ -693,28 +693,28 @@
           "locality": "public"
         },
         "netflow": {
-          "applicationId": "BQAAEA==",
-          "destinationIPv4Address": "192.168.3.34",
-          "destinationTransportPort": 61672,
-          "dot1qVlanId": 872,
+          "application_id": "BQAAEA==",
+          "destination_ipv4_address": "192.168.3.34",
+          "destination_transport_port": 61672,
+          "dot1q_vlan_id": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 1,
-          "ingressInterface": 11,
-          "ipClassOfService": 48,
-          "ipNextHopIPv4Address": "192.168.3.34",
-          "octetDeltaCount": 13811,
-          "packetDeltaCount": 30,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "209.197.3.19",
-          "sourceMacAddress": "00:23:04:18:ef:40",
-          "sourceTransportPort": 443,
-          "tcpControlBits": 31,
+          "flow_direction": 1,
+          "ingress_interface": 11,
+          "ip_class_of_service": 48,
+          "ip_next_hop_ipv4_address": "192.168.3.34",
+          "octet_delta_count": 13811,
+          "packet_delta_count": 30,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "209.197.3.19",
+          "source_mac_address": "00:23:04:18:ef:40",
+          "source_transport_port": 443,
+          "tcp_control_bits": 31,
           "type": "netflow"
         },
         "network": {
@@ -724,7 +724,7 @@
           "packets": 30,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "209.197.3.19",
           "locality": "public",
           "mac": "00:23:04:18:ef:40",
@@ -754,28 +754,28 @@
           "locality": "public"
         },
         "netflow": {
-          "applicationId": "BQAAEA==",
-          "destinationIPv4Address": "192.168.3.34",
-          "destinationTransportPort": 61674,
-          "dot1qVlanId": 872,
+          "application_id": "BQAAEA==",
+          "destination_ipv4_address": "192.168.3.34",
+          "destination_transport_port": 61674,
+          "dot1q_vlan_id": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 1,
-          "ingressInterface": 11,
-          "ipClassOfService": 48,
-          "ipNextHopIPv4Address": "192.168.3.34",
-          "octetDeltaCount": 4717,
-          "packetDeltaCount": 16,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "52.216.130.237",
-          "sourceMacAddress": "00:23:04:18:ef:40",
-          "sourceTransportPort": 443,
-          "tcpControlBits": 27,
+          "flow_direction": 1,
+          "ingress_interface": 11,
+          "ip_class_of_service": 48,
+          "ip_next_hop_ipv4_address": "192.168.3.34",
+          "octet_delta_count": 4717,
+          "packet_delta_count": 16,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "52.216.130.237",
+          "source_mac_address": "00:23:04:18:ef:40",
+          "source_transport_port": 443,
+          "tcp_control_bits": 27,
           "type": "netflow"
         },
         "network": {
@@ -785,7 +785,7 @@
           "packets": 16,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "52.216.130.237",
           "locality": "public",
           "mac": "00:23:04:18:ef:40",
@@ -815,28 +815,28 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "BQAAEA==",
-          "destinationIPv4Address": "172.217.23.232",
-          "destinationTransportPort": 443,
-          "dot1qVlanId": 0,
+          "application_id": "BQAAEA==",
+          "destination_ipv4_address": "172.217.23.232",
+          "destination_transport_port": 443,
+          "dot1q_vlan_id": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 0,
-          "ingressInterface": 17,
-          "ipClassOfService": 0,
-          "ipNextHopIPv4Address": "109.166.216.93",
-          "octetDeltaCount": 2419,
-          "packetDeltaCount": 13,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.157",
-          "sourceMacAddress": "b0:34:95:0d:d2:5d",
-          "sourceTransportPort": 51209,
-          "tcpControlBits": 26,
+          "flow_direction": 0,
+          "ingress_interface": 17,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "109.166.216.93",
+          "octet_delta_count": 2419,
+          "packet_delta_count": 13,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.157",
+          "source_mac_address": "b0:34:95:0d:d2:5d",
+          "source_transport_port": 51209,
+          "tcp_control_bits": 26,
           "type": "netflow"
         },
         "network": {
@@ -846,7 +846,7 @@
           "packets": 13,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.157",
           "locality": "private",
           "mac": "b0:34:95:0d:d2:5d",
@@ -876,28 +876,28 @@
           "locality": "public"
         },
         "netflow": {
-          "applicationId": "BQAAEA==",
-          "destinationIPv4Address": "192.168.0.157",
-          "destinationTransportPort": 51209,
-          "dot1qVlanId": 872,
+          "application_id": "BQAAEA==",
+          "destination_ipv4_address": "192.168.0.157",
+          "destination_transport_port": 51209,
+          "dot1q_vlan_id": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 1,
-          "ingressInterface": 11,
-          "ipClassOfService": 48,
-          "ipNextHopIPv4Address": "192.168.0.157",
-          "octetDeltaCount": 5551,
-          "packetDeltaCount": 10,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "172.217.23.232",
-          "sourceMacAddress": "00:23:04:18:ef:40",
-          "sourceTransportPort": 443,
-          "tcpControlBits": 26,
+          "flow_direction": 1,
+          "ingress_interface": 11,
+          "ip_class_of_service": 48,
+          "ip_next_hop_ipv4_address": "192.168.0.157",
+          "octet_delta_count": 5551,
+          "packet_delta_count": 10,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.217.23.232",
+          "source_mac_address": "00:23:04:18:ef:40",
+          "source_transport_port": 443,
+          "tcp_control_bits": 26,
           "type": "netflow"
         },
         "network": {
@@ -907,7 +907,7 @@
           "packets": 10,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "172.217.23.232",
           "locality": "public",
           "mac": "00:23:04:18:ef:40",
@@ -937,28 +937,28 @@
           "locality": "public"
         },
         "netflow": {
-          "applicationId": "BQAAEA==",
-          "destinationIPv4Address": "192.168.3.178",
-          "destinationTransportPort": 45584,
-          "dot1qVlanId": 872,
+          "application_id": "BQAAEA==",
+          "destination_ipv4_address": "192.168.3.178",
+          "destination_transport_port": 45584,
+          "dot1q_vlan_id": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 1,
-          "ingressInterface": 11,
-          "ipClassOfService": 48,
-          "ipNextHopIPv4Address": "192.168.3.178",
-          "octetDeltaCount": 187,
-          "packetDeltaCount": 3,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "107.21.232.174",
-          "sourceMacAddress": "00:23:04:18:ef:40",
-          "sourceTransportPort": 443,
-          "tcpControlBits": 25,
+          "flow_direction": 1,
+          "ingress_interface": 11,
+          "ip_class_of_service": 48,
+          "ip_next_hop_ipv4_address": "192.168.3.178",
+          "octet_delta_count": 187,
+          "packet_delta_count": 3,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "107.21.232.174",
+          "source_mac_address": "00:23:04:18:ef:40",
+          "source_transport_port": 443,
+          "tcp_control_bits": 25,
           "type": "netflow"
         },
         "network": {
@@ -968,7 +968,7 @@
           "packets": 3,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "107.21.232.174",
           "locality": "public",
           "mac": "00:23:04:18:ef:40",
@@ -998,28 +998,28 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "BQAAEA==",
-          "destinationIPv4Address": "107.21.232.174",
-          "destinationTransportPort": 443,
-          "dot1qVlanId": 0,
+          "application_id": "BQAAEA==",
+          "destination_ipv4_address": "107.21.232.174",
+          "destination_transport_port": 443,
+          "dot1q_vlan_id": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 0,
-          "ingressInterface": 17,
-          "ipClassOfService": 0,
-          "ipNextHopIPv4Address": "109.166.216.93",
-          "octetDeltaCount": 104,
-          "packetDeltaCount": 2,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.3.178",
-          "sourceMacAddress": "dc:ef:ca:4c:da:57",
-          "sourceTransportPort": 45584,
-          "tcpControlBits": 17,
+          "flow_direction": 0,
+          "ingress_interface": 17,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "109.166.216.93",
+          "octet_delta_count": 104,
+          "packet_delta_count": 2,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.3.178",
+          "source_mac_address": "dc:ef:ca:4c:da:57",
+          "source_transport_port": 45584,
+          "tcp_control_bits": 17,
           "type": "netflow"
         },
         "network": {
@@ -1029,7 +1029,7 @@
           "packets": 2,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.3.178",
           "locality": "private",
           "mac": "dc:ef:ca:4c:da:57",
@@ -1059,28 +1059,28 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "BQAAAQ==",
-          "destinationIPv4Address": "95.0.145.242",
-          "destinationTransportPort": 2222,
-          "dot1qVlanId": 0,
+          "application_id": "BQAAAQ==",
+          "destination_ipv4_address": "95.0.145.242",
+          "destination_transport_port": 2222,
+          "dot1q_vlan_id": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 0,
-          "ingressInterface": 17,
-          "ipClassOfService": 0,
-          "ipNextHopIPv4Address": "109.166.216.93",
-          "octetDeltaCount": 4050,
-          "packetDeltaCount": 72,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.2.118",
-          "sourceMacAddress": "70:18:8b:5c:c9:b5",
-          "sourceTransportPort": 64233,
-          "tcpControlBits": 27,
+          "flow_direction": 0,
+          "ingress_interface": 17,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "109.166.216.93",
+          "octet_delta_count": 4050,
+          "packet_delta_count": 72,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.2.118",
+          "source_mac_address": "70:18:8b:5c:c9:b5",
+          "source_transport_port": 64233,
+          "tcp_control_bits": 27,
           "type": "netflow"
         },
         "network": {
@@ -1090,7 +1090,7 @@
           "packets": 72,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.2.118",
           "locality": "private",
           "mac": "70:18:8b:5c:c9:b5",
@@ -1120,28 +1120,28 @@
           "locality": "public"
         },
         "netflow": {
-          "applicationId": "BQAAAQ==",
-          "destinationIPv4Address": "192.168.2.118",
-          "destinationTransportPort": 64233,
-          "dot1qVlanId": 872,
+          "application_id": "BQAAAQ==",
+          "destination_ipv4_address": "192.168.2.118",
+          "destination_transport_port": 64233,
+          "dot1q_vlan_id": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 1,
-          "ingressInterface": 11,
-          "ipClassOfService": 48,
-          "ipNextHopIPv4Address": "192.168.2.118",
-          "octetDeltaCount": 3719,
-          "packetDeltaCount": 72,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "95.0.145.242",
-          "sourceMacAddress": "00:23:04:18:ef:40",
-          "sourceTransportPort": 2222,
-          "tcpControlBits": 27,
+          "flow_direction": 1,
+          "ingress_interface": 11,
+          "ip_class_of_service": 48,
+          "ip_next_hop_ipv4_address": "192.168.2.118",
+          "octet_delta_count": 3719,
+          "packet_delta_count": 72,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "95.0.145.242",
+          "source_mac_address": "00:23:04:18:ef:40",
+          "source_transport_port": 2222,
+          "tcp_control_bits": 27,
           "type": "netflow"
         },
         "network": {
@@ -1151,7 +1151,7 @@
           "packets": 72,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "95.0.145.242",
           "locality": "public",
           "mac": "00:23:04:18:ef:40",
@@ -1181,28 +1181,28 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "BQAAEA==",
-          "destinationIPv4Address": "23.5.100.66",
-          "destinationTransportPort": 443,
-          "dot1qVlanId": 0,
+          "application_id": "BQAAEA==",
+          "destination_ipv4_address": "23.5.100.66",
+          "destination_transport_port": 443,
+          "dot1q_vlan_id": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 0,
-          "ingressInterface": 17,
-          "ipClassOfService": 0,
-          "ipNextHopIPv4Address": "109.166.216.93",
-          "octetDeltaCount": 1402,
-          "packetDeltaCount": 16,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.79",
-          "sourceMacAddress": "8c:29:37:7a:28:c0",
-          "sourceTransportPort": 54275,
-          "tcpControlBits": 26,
+          "flow_direction": 0,
+          "ingress_interface": 17,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "109.166.216.93",
+          "octet_delta_count": 1402,
+          "packet_delta_count": 16,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.79",
+          "source_mac_address": "8c:29:37:7a:28:c0",
+          "source_transport_port": 54275,
+          "tcp_control_bits": 26,
           "type": "netflow"
         },
         "network": {
@@ -1212,7 +1212,7 @@
           "packets": 16,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.79",
           "locality": "private",
           "mac": "8c:29:37:7a:28:c0",
@@ -1242,28 +1242,28 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "BQAAEA==",
-          "destinationIPv4Address": "23.5.100.66",
-          "destinationTransportPort": 443,
-          "dot1qVlanId": 0,
+          "application_id": "BQAAEA==",
+          "destination_ipv4_address": "23.5.100.66",
+          "destination_transport_port": 443,
+          "dot1q_vlan_id": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 0,
-          "ingressInterface": 17,
-          "ipClassOfService": 0,
-          "ipNextHopIPv4Address": "109.166.216.93",
-          "octetDeltaCount": 1538,
-          "packetDeltaCount": 17,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.79",
-          "sourceMacAddress": "8c:29:37:7a:28:c0",
-          "sourceTransportPort": 54276,
-          "tcpControlBits": 26,
+          "flow_direction": 0,
+          "ingress_interface": 17,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "109.166.216.93",
+          "octet_delta_count": 1538,
+          "packet_delta_count": 17,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.79",
+          "source_mac_address": "8c:29:37:7a:28:c0",
+          "source_transport_port": 54276,
+          "tcp_control_bits": 26,
           "type": "netflow"
         },
         "network": {
@@ -1273,7 +1273,7 @@
           "packets": 17,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.79",
           "locality": "private",
           "mac": "8c:29:37:7a:28:c0",
@@ -1303,28 +1303,28 @@
           "locality": "public"
         },
         "netflow": {
-          "applicationId": "BQAAEA==",
-          "destinationIPv4Address": "192.168.0.79",
-          "destinationTransportPort": 54276,
-          "dot1qVlanId": 872,
+          "application_id": "BQAAEA==",
+          "destination_ipv4_address": "192.168.0.79",
+          "destination_transport_port": 54276,
+          "dot1q_vlan_id": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 1,
-          "ingressInterface": 11,
-          "ipClassOfService": 48,
-          "ipNextHopIPv4Address": "192.168.0.79",
-          "octetDeltaCount": 13002,
-          "packetDeltaCount": 14,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "23.5.100.66",
-          "sourceMacAddress": "00:23:04:18:ef:40",
-          "sourceTransportPort": 443,
-          "tcpControlBits": 26,
+          "flow_direction": 1,
+          "ingress_interface": 11,
+          "ip_class_of_service": 48,
+          "ip_next_hop_ipv4_address": "192.168.0.79",
+          "octet_delta_count": 13002,
+          "packet_delta_count": 14,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "23.5.100.66",
+          "source_mac_address": "00:23:04:18:ef:40",
+          "source_transport_port": 443,
+          "tcp_control_bits": 26,
           "type": "netflow"
         },
         "network": {
@@ -1334,7 +1334,7 @@
           "packets": 14,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "23.5.100.66",
           "locality": "public",
           "mac": "00:23:04:18:ef:40",
@@ -1364,28 +1364,28 @@
           "locality": "public"
         },
         "netflow": {
-          "applicationId": "BQAAEA==",
-          "destinationIPv4Address": "192.168.0.61",
-          "destinationTransportPort": 57007,
-          "dot1qVlanId": 872,
+          "application_id": "BQAAEA==",
+          "destination_ipv4_address": "192.168.0.61",
+          "destination_transport_port": 57007,
+          "dot1q_vlan_id": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 1,
-          "ingressInterface": 11,
-          "ipClassOfService": 48,
-          "ipNextHopIPv4Address": "192.168.0.61",
-          "octetDeltaCount": 1194,
-          "packetDeltaCount": 4,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "170.251.180.15",
-          "sourceMacAddress": "00:23:04:18:ef:40",
-          "sourceTransportPort": 443,
-          "tcpControlBits": 24,
+          "flow_direction": 1,
+          "ingress_interface": 11,
+          "ip_class_of_service": 48,
+          "ip_next_hop_ipv4_address": "192.168.0.61",
+          "octet_delta_count": 1194,
+          "packet_delta_count": 4,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "170.251.180.15",
+          "source_mac_address": "00:23:04:18:ef:40",
+          "source_transport_port": 443,
+          "tcp_control_bits": 24,
           "type": "netflow"
         },
         "network": {
@@ -1395,7 +1395,7 @@
           "packets": 4,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "170.251.180.15",
           "locality": "public",
           "mac": "00:23:04:18:ef:40",
@@ -1425,28 +1425,28 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "BQAAEA==",
-          "destinationIPv4Address": "170.251.180.15",
-          "destinationTransportPort": 443,
-          "dot1qVlanId": 0,
+          "application_id": "BQAAEA==",
+          "destination_ipv4_address": "170.251.180.15",
+          "destination_transport_port": 443,
+          "dot1q_vlan_id": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 0,
-          "ingressInterface": 17,
-          "ipClassOfService": 0,
-          "ipNextHopIPv4Address": "109.166.216.93",
-          "octetDeltaCount": 682,
-          "packetDeltaCount": 2,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.61",
-          "sourceMacAddress": "90:61:ae:76:e5:e9",
-          "sourceTransportPort": 57007,
-          "tcpControlBits": 24,
+          "flow_direction": 0,
+          "ingress_interface": 17,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "109.166.216.93",
+          "octet_delta_count": 682,
+          "packet_delta_count": 2,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.61",
+          "source_mac_address": "90:61:ae:76:e5:e9",
+          "source_transport_port": 57007,
+          "tcp_control_bits": 24,
           "type": "netflow"
         },
         "network": {
@@ -1456,7 +1456,7 @@
           "packets": 2,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.61",
           "locality": "private",
           "mac": "90:61:ae:76:e5:e9",
@@ -1486,28 +1486,28 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "BQAAEA==",
-          "destinationIPv4Address": "74.119.119.84",
-          "destinationTransportPort": 443,
-          "dot1qVlanId": 0,
+          "application_id": "BQAAEA==",
+          "destination_ipv4_address": "74.119.119.84",
+          "destination_transport_port": 443,
+          "dot1q_vlan_id": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 0,
-          "ingressInterface": 17,
-          "ipClassOfService": 0,
-          "ipNextHopIPv4Address": "109.166.216.93",
-          "octetDeltaCount": 1804,
-          "packetDeltaCount": 11,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.3.34",
-          "sourceMacAddress": "1c:5c:f2:07:0f:2a",
-          "sourceTransportPort": 61694,
-          "tcpControlBits": 26,
+          "flow_direction": 0,
+          "ingress_interface": 17,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "109.166.216.93",
+          "octet_delta_count": 1804,
+          "packet_delta_count": 11,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.3.34",
+          "source_mac_address": "1c:5c:f2:07:0f:2a",
+          "source_transport_port": 61694,
+          "tcp_control_bits": 26,
           "type": "netflow"
         },
         "network": {
@@ -1517,7 +1517,7 @@
           "packets": 11,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.3.34",
           "locality": "private",
           "mac": "1c:5c:f2:07:0f:2a",
@@ -1547,28 +1547,28 @@
           "locality": "public"
         },
         "netflow": {
-          "applicationId": "BQAAAQ==",
-          "destinationIPv4Address": "192.168.3.142",
-          "destinationTransportPort": 59459,
-          "dot1qVlanId": 872,
+          "application_id": "BQAAAQ==",
+          "destination_ipv4_address": "192.168.3.142",
+          "destination_transport_port": 59459,
+          "dot1q_vlan_id": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 1,
-          "ingressInterface": 11,
-          "ipClassOfService": 48,
-          "ipNextHopIPv4Address": "192.168.3.142",
-          "octetDeltaCount": 4774,
-          "packetDeltaCount": 9,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "185.60.218.19",
-          "sourceMacAddress": "00:23:04:18:ef:40",
-          "sourceTransportPort": 443,
-          "tcpControlBits": 26,
+          "flow_direction": 1,
+          "ingress_interface": 11,
+          "ip_class_of_service": 48,
+          "ip_next_hop_ipv4_address": "192.168.3.142",
+          "octet_delta_count": 4774,
+          "packet_delta_count": 9,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "185.60.218.19",
+          "source_mac_address": "00:23:04:18:ef:40",
+          "source_transport_port": 443,
+          "tcp_control_bits": 26,
           "type": "netflow"
         },
         "network": {
@@ -1578,7 +1578,7 @@
           "packets": 9,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "185.60.218.19",
           "locality": "public",
           "mac": "00:23:04:18:ef:40",
@@ -1608,28 +1608,28 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "BQAAAQ==",
-          "destinationIPv4Address": "185.60.218.15",
-          "destinationTransportPort": 443,
-          "dot1qVlanId": 0,
+          "application_id": "BQAAAQ==",
+          "destination_ipv4_address": "185.60.218.15",
+          "destination_transport_port": 443,
+          "dot1q_vlan_id": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 0,
-          "ingressInterface": 17,
-          "ipClassOfService": 0,
-          "ipNextHopIPv4Address": "109.166.216.93",
-          "octetDeltaCount": 135,
-          "packetDeltaCount": 2,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.3.200",
-          "sourceMacAddress": "18:20:32:bb:1d:62",
-          "sourceTransportPort": 64493,
-          "tcpControlBits": 24,
+          "flow_direction": 0,
+          "ingress_interface": 17,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "109.166.216.93",
+          "octet_delta_count": 135,
+          "packet_delta_count": 2,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.3.200",
+          "source_mac_address": "18:20:32:bb:1d:62",
+          "source_transport_port": 64493,
+          "tcp_control_bits": 24,
           "type": "netflow"
         },
         "network": {
@@ -1639,7 +1639,7 @@
           "packets": 2,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.3.200",
           "locality": "private",
           "mac": "18:20:32:bb:1d:62",
@@ -1669,28 +1669,28 @@
           "locality": "public"
         },
         "netflow": {
-          "applicationId": "BQAAEA==",
-          "destinationIPv4Address": "192.168.3.200",
-          "destinationTransportPort": 64493,
-          "dot1qVlanId": 872,
+          "application_id": "BQAAEA==",
+          "destination_ipv4_address": "192.168.3.200",
+          "destination_transport_port": 64493,
+          "dot1q_vlan_id": 872,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 1,
-          "ingressInterface": 11,
-          "ipClassOfService": 48,
-          "ipNextHopIPv4Address": "192.168.3.200",
-          "octetDeltaCount": 135,
-          "packetDeltaCount": 2,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "185.60.218.15",
-          "sourceMacAddress": "00:23:04:18:ef:40",
-          "sourceTransportPort": 443,
-          "tcpControlBits": 24,
+          "flow_direction": 1,
+          "ingress_interface": 11,
+          "ip_class_of_service": 48,
+          "ip_next_hop_ipv4_address": "192.168.3.200",
+          "octet_delta_count": 135,
+          "packet_delta_count": 2,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "185.60.218.15",
+          "source_mac_address": "00:23:04:18:ef:40",
+          "source_transport_port": 443,
+          "tcp_control_bits": 24,
           "type": "netflow"
         },
         "network": {
@@ -1700,7 +1700,7 @@
           "packets": 2,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "185.60.218.15",
           "locality": "public",
           "mac": "00:23:04:18:ef:40",
@@ -1730,28 +1730,28 @@
           "locality": "private"
         },
         "netflow": {
-          "applicationId": "BQAAAQ==",
-          "destinationIPv4Address": "169.45.214.246",
-          "destinationTransportPort": 5222,
-          "dot1qVlanId": 0,
+          "application_id": "BQAAAQ==",
+          "destination_ipv4_address": "169.45.214.246",
+          "destination_transport_port": 5222,
+          "dot1q_vlan_id": 0,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 0,
+            "source_id": 0,
             "timestamp": "2017-10-03T17:03:39Z",
-            "uptimeMillis": 210280120,
+            "uptime_millis": 210280120,
             "version": 9
           },
-          "flowDirection": 0,
-          "ingressInterface": 17,
-          "ipClassOfService": 0,
-          "ipNextHopIPv4Address": "109.166.216.93",
-          "octetDeltaCount": 194,
-          "packetDeltaCount": 3,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.95",
-          "sourceMacAddress": "a0:39:f7:4d:49:d5",
-          "sourceTransportPort": 35053,
-          "tcpControlBits": 24,
+          "flow_direction": 0,
+          "ingress_interface": 17,
+          "ip_class_of_service": 0,
+          "ip_next_hop_ipv4_address": "109.166.216.93",
+          "octet_delta_count": 194,
+          "packet_delta_count": 3,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.95",
+          "source_mac_address": "a0:39:f7:4d:49:d5",
+          "source_transport_port": 35053,
+          "tcp_control_bits": 24,
           "type": "netflow"
         },
         "network": {
@@ -1761,7 +1761,7 @@
           "packets": 3,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.95",
           "locality": "private",
           "mac": "a0:39:f7:4d:49:d5",

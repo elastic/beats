@@ -22,25 +22,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.1",
-          "destinationTransportPort": 80,
-          "egressInterface": 1,
+          "destination_ipv4_address": "192.168.0.1",
+          "destination_transport_port": 80,
+          "egress_interface": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:29:59Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 1,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 373,
-          "packetDeltaCount": 7,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.17",
-          "sourceTransportPort": 64020,
+          "flow_end_milliseconds": "2016-07-21T13:29:59Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 1,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 373,
+          "packet_delta_count": 7,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.17",
+          "source_transport_port": 64020,
           "type": "netflow"
         },
         "network": {
@@ -50,7 +50,7 @@
           "packets": 7,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 64020
@@ -79,25 +79,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.17",
-          "destinationTransportPort": 64020,
-          "egressInterface": 1,
+          "destination_ipv4_address": "192.168.0.17",
+          "destination_transport_port": 64020,
+          "egress_interface": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:29:59Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 1,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 6634,
-          "packetDeltaCount": 8,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.1",
-          "sourceTransportPort": 80,
+          "flow_end_milliseconds": "2016-07-21T13:29:59Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 1,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 6634,
+          "packet_delta_count": 8,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.1",
+          "source_transport_port": 80,
           "type": "netflow"
         },
         "network": {
@@ -107,7 +107,7 @@
           "packets": 8,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 80
@@ -136,25 +136,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.1",
-          "destinationTransportPort": 80,
-          "egressInterface": 2,
+          "destination_ipv4_address": "192.168.0.1",
+          "destination_transport_port": 80,
+          "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:01Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 2,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 453,
-          "packetDeltaCount": 9,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.17",
-          "sourceTransportPort": 64021,
+          "flow_end_milliseconds": "2016-07-21T13:30:01Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 2,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 453,
+          "packet_delta_count": 9,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.17",
+          "source_transport_port": 64021,
           "type": "netflow"
         },
         "network": {
@@ -164,7 +164,7 @@
           "packets": 9,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 64021
@@ -193,25 +193,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.17",
-          "destinationTransportPort": 64021,
-          "egressInterface": 2,
+          "destination_ipv4_address": "192.168.0.17",
+          "destination_transport_port": 64021,
+          "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:01Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 2,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 10893,
-          "packetDeltaCount": 11,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.1",
-          "sourceTransportPort": 80,
+          "flow_end_milliseconds": "2016-07-21T13:30:01Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 2,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 10893,
+          "packet_delta_count": 11,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.1",
+          "source_transport_port": 80,
           "type": "netflow"
         },
         "network": {
@@ -221,7 +221,7 @@
           "packets": 11,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 80
@@ -250,25 +250,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.1",
-          "destinationTransportPort": 80,
-          "egressInterface": 1,
+          "destination_ipv4_address": "192.168.0.1",
+          "destination_transport_port": 80,
+          "egress_interface": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:01Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 1,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 453,
-          "packetDeltaCount": 9,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.17",
-          "sourceTransportPort": 64021,
+          "flow_end_milliseconds": "2016-07-21T13:30:01Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 1,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 453,
+          "packet_delta_count": 9,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.17",
+          "source_transport_port": 64021,
           "type": "netflow"
         },
         "network": {
@@ -278,7 +278,7 @@
           "packets": 9,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 64021
@@ -307,25 +307,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.17",
-          "destinationTransportPort": 64021,
-          "egressInterface": 1,
+          "destination_ipv4_address": "192.168.0.17",
+          "destination_transport_port": 64021,
+          "egress_interface": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:01Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 1,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 10893,
-          "packetDeltaCount": 11,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.1",
-          "sourceTransportPort": 80,
+          "flow_end_milliseconds": "2016-07-21T13:30:01Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 1,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 10893,
+          "packet_delta_count": 11,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.1",
+          "source_transport_port": 80,
           "type": "netflow"
         },
         "network": {
@@ -335,7 +335,7 @@
           "packets": 11,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 80
@@ -364,25 +364,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.1",
-          "destinationTransportPort": 80,
-          "egressInterface": 2,
+          "destination_ipv4_address": "192.168.0.1",
+          "destination_transport_port": 80,
+          "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:29:59Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 2,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 373,
-          "packetDeltaCount": 7,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.17",
-          "sourceTransportPort": 64022,
+          "flow_end_milliseconds": "2016-07-21T13:29:59Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 2,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 373,
+          "packet_delta_count": 7,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.17",
+          "source_transport_port": 64022,
           "type": "netflow"
         },
         "network": {
@@ -392,7 +392,7 @@
           "packets": 7,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 64022
@@ -421,25 +421,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.17",
-          "destinationTransportPort": 64022,
-          "egressInterface": 2,
+          "destination_ipv4_address": "192.168.0.17",
+          "destination_transport_port": 64022,
+          "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:29:59Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 2,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 6780,
-          "packetDeltaCount": 8,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.1",
-          "sourceTransportPort": 80,
+          "flow_end_milliseconds": "2016-07-21T13:29:59Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 2,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 6780,
+          "packet_delta_count": 8,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.1",
+          "source_transport_port": 80,
           "type": "netflow"
         },
         "network": {
@@ -449,7 +449,7 @@
           "packets": 8,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 80
@@ -478,25 +478,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.1",
-          "destinationTransportPort": 80,
-          "egressInterface": 1,
+          "destination_ipv4_address": "192.168.0.1",
+          "destination_transport_port": 80,
+          "egress_interface": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:29:59Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 1,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 373,
-          "packetDeltaCount": 7,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.17",
-          "sourceTransportPort": 64022,
+          "flow_end_milliseconds": "2016-07-21T13:29:59Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 1,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 373,
+          "packet_delta_count": 7,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.17",
+          "source_transport_port": 64022,
           "type": "netflow"
         },
         "network": {
@@ -506,7 +506,7 @@
           "packets": 7,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 64022
@@ -535,25 +535,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.17",
-          "destinationTransportPort": 64022,
-          "egressInterface": 1,
+          "destination_ipv4_address": "192.168.0.17",
+          "destination_transport_port": 64022,
+          "egress_interface": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:29:59Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 1,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 6780,
-          "packetDeltaCount": 8,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.1",
-          "sourceTransportPort": 80,
+          "flow_end_milliseconds": "2016-07-21T13:29:59Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 1,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 6780,
+          "packet_delta_count": 8,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.1",
+          "source_transport_port": 80,
           "type": "netflow"
         },
         "network": {
@@ -563,7 +563,7 @@
           "packets": 8,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 80
@@ -592,25 +592,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.1",
-          "destinationTransportPort": 80,
-          "egressInterface": 2,
+          "destination_ipv4_address": "192.168.0.1",
+          "destination_transport_port": 80,
+          "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:01Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 2,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 373,
-          "packetDeltaCount": 7,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.17",
-          "sourceTransportPort": 64023,
+          "flow_end_milliseconds": "2016-07-21T13:30:01Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 2,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 373,
+          "packet_delta_count": 7,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.17",
+          "source_transport_port": 64023,
           "type": "netflow"
         },
         "network": {
@@ -620,7 +620,7 @@
           "packets": 7,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 64023
@@ -649,25 +649,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.17",
-          "destinationTransportPort": 64023,
-          "egressInterface": 2,
+          "destination_ipv4_address": "192.168.0.17",
+          "destination_transport_port": 64023,
+          "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:01Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 2,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 7319,
-          "packetDeltaCount": 9,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.1",
-          "sourceTransportPort": 80,
+          "flow_end_milliseconds": "2016-07-21T13:30:01Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 2,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 7319,
+          "packet_delta_count": 9,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.1",
+          "source_transport_port": 80,
           "type": "netflow"
         },
         "network": {
@@ -677,7 +677,7 @@
           "packets": 9,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 80
@@ -706,25 +706,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.1",
-          "destinationTransportPort": 80,
-          "egressInterface": 1,
+          "destination_ipv4_address": "192.168.0.1",
+          "destination_transport_port": 80,
+          "egress_interface": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:01Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 1,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 373,
-          "packetDeltaCount": 7,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.17",
-          "sourceTransportPort": 64023,
+          "flow_end_milliseconds": "2016-07-21T13:30:01Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 1,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 373,
+          "packet_delta_count": 7,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.17",
+          "source_transport_port": 64023,
           "type": "netflow"
         },
         "network": {
@@ -734,7 +734,7 @@
           "packets": 7,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 64023
@@ -763,25 +763,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.17",
-          "destinationTransportPort": 64023,
-          "egressInterface": 1,
+          "destination_ipv4_address": "192.168.0.17",
+          "destination_transport_port": 64023,
+          "egress_interface": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:01Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 1,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 7319,
-          "packetDeltaCount": 9,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.1",
-          "sourceTransportPort": 80,
+          "flow_end_milliseconds": "2016-07-21T13:30:01Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 1,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 7319,
+          "packet_delta_count": 9,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.1",
+          "source_transport_port": 80,
           "type": "netflow"
         },
         "network": {
@@ -791,7 +791,7 @@
           "packets": 9,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 80
@@ -820,25 +820,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.1",
-          "destinationTransportPort": 80,
-          "egressInterface": 2,
+          "destination_ipv4_address": "192.168.0.1",
+          "destination_transport_port": 80,
+          "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:00Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 2,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 333,
-          "packetDeltaCount": 6,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.17",
-          "sourceTransportPort": 64024,
+          "flow_end_milliseconds": "2016-07-21T13:30:00Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 2,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 333,
+          "packet_delta_count": 6,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.17",
+          "source_transport_port": 64024,
           "type": "netflow"
         },
         "network": {
@@ -848,7 +848,7 @@
           "packets": 6,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 64024
@@ -877,25 +877,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.17",
-          "destinationTransportPort": 64024,
-          "egressInterface": 2,
+          "destination_ipv4_address": "192.168.0.17",
+          "destination_transport_port": 64024,
+          "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:00Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 2,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 1833,
-          "packetDeltaCount": 5,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.1",
-          "sourceTransportPort": 80,
+          "flow_end_milliseconds": "2016-07-21T13:30:00Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 2,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 1833,
+          "packet_delta_count": 5,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.1",
+          "source_transport_port": 80,
           "type": "netflow"
         },
         "network": {
@@ -905,7 +905,7 @@
           "packets": 5,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 80
@@ -934,25 +934,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.1",
-          "destinationTransportPort": 80,
-          "egressInterface": 1,
+          "destination_ipv4_address": "192.168.0.1",
+          "destination_transport_port": 80,
+          "egress_interface": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:00Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 1,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 333,
-          "packetDeltaCount": 6,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.17",
-          "sourceTransportPort": 64024,
+          "flow_end_milliseconds": "2016-07-21T13:30:00Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 1,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 333,
+          "packet_delta_count": 6,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.17",
+          "source_transport_port": 64024,
           "type": "netflow"
         },
         "network": {
@@ -962,7 +962,7 @@
           "packets": 6,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 64024
@@ -991,25 +991,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.17",
-          "destinationTransportPort": 64024,
-          "egressInterface": 1,
+          "destination_ipv4_address": "192.168.0.17",
+          "destination_transport_port": 64024,
+          "egress_interface": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:00Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 1,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 1833,
-          "packetDeltaCount": 5,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.1",
-          "sourceTransportPort": 80,
+          "flow_end_milliseconds": "2016-07-21T13:30:00Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 1,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 1833,
+          "packet_delta_count": 5,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.1",
+          "source_transport_port": 80,
           "type": "netflow"
         },
         "network": {
@@ -1019,7 +1019,7 @@
           "packets": 5,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 80
@@ -1048,25 +1048,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.1",
-          "destinationTransportPort": 80,
-          "egressInterface": 2,
+          "destination_ipv4_address": "192.168.0.1",
+          "destination_transport_port": 80,
+          "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:00Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 2,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 453,
-          "packetDeltaCount": 9,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.17",
-          "sourceTransportPort": 64025,
+          "flow_end_milliseconds": "2016-07-21T13:30:00Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 2,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 453,
+          "packet_delta_count": 9,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.17",
+          "source_transport_port": 64025,
           "type": "netflow"
         },
         "network": {
@@ -1076,7 +1076,7 @@
           "packets": 9,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 64025
@@ -1105,25 +1105,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.17",
-          "destinationTransportPort": 64025,
-          "egressInterface": 2,
+          "destination_ipv4_address": "192.168.0.17",
+          "destination_transport_port": 64025,
+          "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:00Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 2,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 10550,
-          "packetDeltaCount": 11,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.1",
-          "sourceTransportPort": 80,
+          "flow_end_milliseconds": "2016-07-21T13:30:00Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 2,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 10550,
+          "packet_delta_count": 11,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.1",
+          "source_transport_port": 80,
           "type": "netflow"
         },
         "network": {
@@ -1133,7 +1133,7 @@
           "packets": 11,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 80
@@ -1162,25 +1162,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.1",
-          "destinationTransportPort": 80,
-          "egressInterface": 1,
+          "destination_ipv4_address": "192.168.0.1",
+          "destination_transport_port": 80,
+          "egress_interface": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:00Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 1,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 453,
-          "packetDeltaCount": 9,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.17",
-          "sourceTransportPort": 64025,
+          "flow_end_milliseconds": "2016-07-21T13:30:00Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 1,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 453,
+          "packet_delta_count": 9,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.17",
+          "source_transport_port": 64025,
           "type": "netflow"
         },
         "network": {
@@ -1190,7 +1190,7 @@
           "packets": 9,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 64025
@@ -1219,25 +1219,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.17",
-          "destinationTransportPort": 64025,
-          "egressInterface": 1,
+          "destination_ipv4_address": "192.168.0.17",
+          "destination_transport_port": 64025,
+          "egress_interface": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:00Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 1,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 10550,
-          "packetDeltaCount": 11,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.1",
-          "sourceTransportPort": 80,
+          "flow_end_milliseconds": "2016-07-21T13:30:00Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 1,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 10550,
+          "packet_delta_count": 11,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.1",
+          "source_transport_port": 80,
           "type": "netflow"
         },
         "network": {
@@ -1247,7 +1247,7 @@
           "packets": 11,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 80
@@ -1276,25 +1276,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.1",
-          "destinationTransportPort": 80,
-          "egressInterface": 2,
+          "destination_ipv4_address": "192.168.0.1",
+          "destination_transport_port": 80,
+          "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:01Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 2,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 373,
-          "packetDeltaCount": 7,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.17",
-          "sourceTransportPort": 64026,
+          "flow_end_milliseconds": "2016-07-21T13:30:01Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 2,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 373,
+          "packet_delta_count": 7,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.17",
+          "source_transport_port": 64026,
           "type": "netflow"
         },
         "network": {
@@ -1304,7 +1304,7 @@
           "packets": 7,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 64026
@@ -1333,25 +1333,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.17",
-          "destinationTransportPort": 64026,
-          "egressInterface": 2,
+          "destination_ipv4_address": "192.168.0.17",
+          "destination_transport_port": 64026,
+          "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:01Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 2,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 6425,
-          "packetDeltaCount": 8,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.1",
-          "sourceTransportPort": 80,
+          "flow_end_milliseconds": "2016-07-21T13:30:01Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 2,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 6425,
+          "packet_delta_count": 8,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.1",
+          "source_transport_port": 80,
           "type": "netflow"
         },
         "network": {
@@ -1361,7 +1361,7 @@
           "packets": 8,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 80
@@ -1390,25 +1390,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.1",
-          "destinationTransportPort": 80,
-          "egressInterface": 1,
+          "destination_ipv4_address": "192.168.0.1",
+          "destination_transport_port": 80,
+          "egress_interface": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:01Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 1,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 373,
-          "packetDeltaCount": 7,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.17",
-          "sourceTransportPort": 64026,
+          "flow_end_milliseconds": "2016-07-21T13:30:01Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 1,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 373,
+          "packet_delta_count": 7,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.17",
+          "source_transport_port": 64026,
           "type": "netflow"
         },
         "network": {
@@ -1418,7 +1418,7 @@
           "packets": 7,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.17",
           "locality": "private",
           "port": 64026
@@ -1447,25 +1447,25 @@
           "locality": "private"
         },
         "netflow": {
-          "destinationIPv4Address": "192.168.0.17",
-          "destinationTransportPort": 64026,
-          "egressInterface": 1,
+          "destination_ipv4_address": "192.168.0.17",
+          "destination_transport_port": 64026,
+          "egress_interface": 1,
           "exporter": {
             "address": "192.0.2.1:4444",
-            "sourceId": 42,
+            "source_id": 42,
             "timestamp": "2016-07-21T13:30:37Z",
-            "uptimeMillis": 0,
+            "uptime_millis": 0,
             "version": 10
           },
-          "flowEndMilliseconds": "2016-07-21T13:30:01Z",
-          "flowStartMilliseconds": "2016-07-21T13:29:59Z",
-          "ingressInterface": 1,
-          "ipClassOfService": 0,
-          "octetDeltaCount": 6425,
-          "packetDeltaCount": 8,
-          "protocolIdentifier": 6,
-          "sourceIPv4Address": "192.168.0.1",
-          "sourceTransportPort": 80,
+          "flow_end_milliseconds": "2016-07-21T13:30:01Z",
+          "flow_start_milliseconds": "2016-07-21T13:29:59Z",
+          "ingress_interface": 1,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 6425,
+          "packet_delta_count": 8,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "192.168.0.1",
+          "source_transport_port": 80,
           "type": "netflow"
         },
         "network": {
@@ -1475,7 +1475,7 @@
           "packets": 8,
           "protocol": "tcp"
         },
-        "source": {
+        "source_ecs": {
           "ip": "192.168.0.1",
           "locality": "private",
           "port": 80
