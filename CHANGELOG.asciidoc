@@ -56,6 +56,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - When collecting swap metrics for beats telemetry or system metricbeat module handle cases of free swap being bigger than total swap by assuming no swap is being used. {issue}6271[6271] {pull}9383[9383]
 - Adding logging traces at debug level when the pipeline client receives the following events: onFilteredOut, onDroppedOnPublish. {pull}9016[9016]
 - Ignore non index fields in default_field for Elasticsearch. {pull}9549[9549]
+- Update Kibana index pattern attributes for objects that are disabled. {pull}9644[9644]
 - Enforce validation for the Central Management access token. {issue}9621[9621]
 
 *Auditbeat*
@@ -125,6 +126,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Add freebsd support for the uptime metricset. {pull}9413[9413]
 - Add `host.os.name` field to add_host_metadata processor. {issue}8948[8948] {pull}9405[9405]
 - Add `key` metricset to the Redis module. {issue}9582[9582] {pull}9657[9657]
+- Add more TCP statuses to `socket_summary` metricset. {pull}9430[9430]
 
 *Packetbeat*
 
