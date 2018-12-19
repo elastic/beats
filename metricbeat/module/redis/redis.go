@@ -29,6 +29,15 @@ import (
 	rd "github.com/garyburd/redigo/redis"
 )
 
+const (
+	TypeNone      = "none"
+	TypeString    = "string"
+	TypeList      = "list"
+	TypeSet       = "set"
+	TypeSortedSet = "zset"
+	TypeHash      = "hash"
+)
+
 // ParseRedisInfo parses the string returned by the INFO command
 // Every line is split up into key and value
 func ParseRedisInfo(info string) map[string]string {
@@ -82,7 +91,7 @@ func FetchKeyInfo(c rd.Conn, key string) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	if keyType == "none" {
+	if keyType == TypeNone {
 		// Ignore it, it has been removed
 		return nil, nil
 	}
@@ -103,20 +112,20 @@ func FetchKeyInfo(c rd.Conn, key string) (map[string]interface{}, error) {
 	lenCommand := ""
 
 	switch keyType {
-	case "string":
+	case TypeString:
 		value, err := rd.String(c.Do("GET", key))
 		if err != nil {
 			return nil, err
 		}
 		info["value"] = value
 		lenCommand = "STRLEN"
-	case "list":
+	case TypeList:
 		lenCommand = "LLEN"
-	case "set":
+	case TypeSet:
 		lenCommand = "SCARD"
-	case "zset":
+	case TypeSortedSet:
 		lenCommand = "ZCARD"
-	case "hash":
+	case TypeHash:
 		lenCommand = "HLEN"
 	default:
 		logp.Debug("redis", "Not supported length for type %s", keyType)
