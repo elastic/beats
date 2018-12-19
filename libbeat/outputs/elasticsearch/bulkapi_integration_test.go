@@ -67,7 +67,7 @@ func TestBulk(t *testing.T) {
 		t.Fatalf("SearchUri() returns an error: %s", err)
 	}
 	if result.Hits.Total != 1 {
-		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
+		t.Errorf("Wrong number of search results: %d", result.Hits.Total.Value)
 	}
 
 	_, _, err = client.Delete(index, "", "", nil)
@@ -168,7 +168,7 @@ func TestBulkMoreOperations(t *testing.T) {
 		t.Fatalf("SearchUri() returns an error: %s", err)
 	}
 	if result.Hits.Total != 1 {
-		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
+		t.Errorf("Wrong number of search results: %d", result.Hits.Total.Value)
 	}
 
 	params = map[string]string{
@@ -179,7 +179,7 @@ func TestBulkMoreOperations(t *testing.T) {
 		t.Fatalf("SearchUri() returns an error: %s", err)
 	}
 	if result.Hits.Total != 1 {
-		t.Errorf("Wrong number of search results: %d", result.Hits.Total)
+		t.Errorf("Wrong number of search results: %d", result.Hits.Total.Value)
 	}
 
 	_, _, err = client.Delete(index, "", "", nil)
