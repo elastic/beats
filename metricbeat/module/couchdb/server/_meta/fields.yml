@@ -6,796 +6,639 @@
     - name: httpd
       type: group
       description: >
-        Example field
+        HTTP statistics
       fields:
-        - name: viewReads
+        - name: view_reads
           type: group
           description: >
+             Number of view reads
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: bulk_requests
           type: group
           description: >
+            Number of bulk requests
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: clients_requesting_changes
           type: group
           description: >
+            Number of clients for continuous _changes
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: temporary_view_reads
           type: group
           description: >
+            Number of temporary view reads
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: requests
           type: group
           description: >
+            Number of HTTP requests
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
     - name: httpd_request_methods
       type: group
       description: >
-        Example field
+        HTTP request methods
       fields:
         - name: COPY
           type: group
           description: >
+            Number of HTTP COPY requests
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: HEAD
           type: group
           description: >
+            Number of HTTP HEAD requests
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: > 
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: POST
           type: group
-          description: >                  
+          description: >
+            Number of HTTP POST requests
           fields:
             - name: description
-              type: keyword  
-              description: >
-            - name: current          
+              type: keyword
+            - name: current
               type: scaled_float
-              description: >             
             - name: sum
-              type: scaled_float                    
-              description: >
+              type: scaled_float
             - name: mean
               type: scaled_float
-              description: >
-            - name: stddev    
+            - name: stddev
               type: scaled_float
-              description: >     
             - name: min
-              type: scaled_float          
-              description: >
-            - name: max                    
               type: scaled_float
-              description: >
+            - name: max
+              type: scaled_float
+
         - name: DELETE
           type: group
-          description: >       
+          description: >
+            Number of HTTP DELETE requests
           fields:
             - name: description
-              type: keyword  
-              description: >
-            - name: current          
+              type: keyword
+            - name: current
               type: scaled_float
-              description: >             
             - name: sum
-              type: scaled_float                    
-              description: >
+              type: scaled_float
             - name: mean
               type: scaled_float
-              description: >
-            - name: stddev    
+            - name: stddev
               type: scaled_float
-              description: >     
             - name: min
-              type: scaled_float          
-              description: >
-            - name: max                    
               type: scaled_float
-              description: >
+            - name: max
+              type: scaled_float
+
         - name: GET
           type: group
-          description: >                  
+          description: >
+            Number of HTTP GET requests
           fields:
             - name: description
-              type: keyword  
-              description: >
-            - name: current          
+              type: keyword
+            - name: current
               type: scaled_float
-              description: >             
             - name: sum
-              type: scaled_float                    
-              description: >
+              type: scaled_float
             - name: mean
               type: scaled_float
-              description: >
-            - name: stddev    
+            - name: stddev
               type: scaled_float
-              description: >     
             - name: min
-              type: scaled_float          
-              description: >
-            - name: max                    
               type: scaled_float
-              description: >
+            - name: max
+              type: scaled_float
+
         - name: PUT
           type: group
-          description: >                  
+          description: >
+            Number of HTTP PUT requests
           fields:
             - name: description
-              type: keyword  
-              description: >
-            - name: current          
+              type: keyword
+            - name: current
               type: scaled_float
-              description: >             
             - name: sum
-              type: scaled_float                    
-              description: >
+              type: scaled_float
             - name: mean
               type: scaled_float
-              description: >
-            - name: stddev    
+            - name: stddev
               type: scaled_float
-              description: >     
             - name: min
-              type: scaled_float          
-              description: >
-            - name: max                    
               type: scaled_float
-              description: >
+            - name: max
+              type: scaled_float
+
     - name: httpd_status_codes
       type: group
       description: >
-        Example field
+        HTTP status codes statistics
       fields:
         - name: num200
           type: group
           description: >
+            Number of HTTP 200 OK responses
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: num201
           type: group
           description: >
+            Number of HTTP 201 Created responses
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
-            - name: mean  
+            - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: num202
           type: group
           description: >
+            Number of HTTP 202 Accepted responses
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
-            - name: mean  
+            - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: num301
           type: group
           description: >
+            Number of HTTP 301 Moved Permanently responses
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
-            - name: mean  
+            - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: num304
           type: group
           description: >
+            Number of HTTP 304 Not Modified responses
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
-            - name: mean  
+            - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: num400
           type: group
           description: >
+            Number of HTTP 400 Bad Request responses
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
-            - name: mean  
+            - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: num401
           type: group
           description: >
+            Number of HTTP 401 Unauthorized responses
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
-            - name: mean  
+            - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: num403
           type: group
           description: >
+            Number of HTTP 403 Forbidden responses
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
-            - name: mean  
+            - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: num404
           type: group
           description: >
+             Number of HTTP 404 Not Found responses
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
-            - name: mean  
+            - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: num405
           type: group
           description: >
+            Number of HTTP 405 Method Not Allowed responses
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: num409
           type: group
           description: >
+            Number of HTTP 409 Conflict responses
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: num412
           type: group
           description: >
+            Number of HTTP 412 Precondition Failed responses
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: num500
           type: group
           description: >
+            Number of HTTP 500 Internal Server Error responses
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
     - name: couchdb 
       type: group
       description: >
-        Example field
+        couchdb statistics
       fields:
         - name: database_writes
           type: group
           description: >
+            Number of times a database was changed
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: open_databases
           type: group
           description: >
+            Number of open databases
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: >  
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: auth_cache_misses
           type: group
           description: >
+            Number of authentication cache misses
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: > 
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: request_time
           type: group
           description: >
+            Length of a request inside CouchDB without MochiWeb
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: > 
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: database_reads
           type: group
           description: >
+            Number of times a document was read from a database
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: > 
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: auth_cache_hits
           type: group
           description: >
+            Number of authentication cache hits
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: > 
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
+
         - name: open_os_files
           type: group
           description: >
+            Number of file descriptors CouchDB has open
           fields:
             - name: description
               type: keyword
-              description: >
             - name: current
               type: scaled_float
-              description: >
             - name: sum
               type: scaled_float
-              description: > 
             - name: mean
               type: scaled_float
-              description: >
             - name: stddev
               type: scaled_float
-              description: >
             - name: min
               type: scaled_float
-              description: >
             - name: max
               type: scaled_float
-              description: >
-
