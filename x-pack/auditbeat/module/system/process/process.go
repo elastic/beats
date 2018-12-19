@@ -297,6 +297,12 @@ func (ms *MetricSet) getProcessInfos() ([]*ProcessInfo, error) {
 
 		pInfo, err := process.Info()
 		if err != nil {
+			if os.IsNotExist(err) {
+				// Skip - process probably just terminated since our call
+				// to Pids()
+				continue
+			}
+
 			if os.Geteuid() != 0 {
 				if os.IsPermission(err) || runtime.GOOS == "darwin" {
 					/*
