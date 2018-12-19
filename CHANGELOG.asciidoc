@@ -7,7 +7,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.5.3...6.5[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.5.4...6.5[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -33,14 +33,9 @@ https://github.com/elastic/beats/compare/v6.5.3...6.5[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Update Golang to 1.10.6. {pull}9563[9563]
-
 *Auditbeat*
 
 *Filebeat*
-
-- Fix saved objects in filebeat haproxy dashboard. {pull}9417[9417]
-- Fixed a memory leak when harvesters are closed. {pull}7820[7820]
 
 *Heartbeat*
 
@@ -61,8 +56,6 @@ https://github.com/elastic/beats/compare/v6.5.3...6.5[Check the HEAD diff]
 *Auditbeat*
 
 *Filebeat*
-
-- Added support on Traefik for Common Log Format and Combined Log Format mixed which is the default Traefik format {issue}8015[8015] {issue}6111[6111] {pull}8768[8768].
 
 *Heartbeat*
 
@@ -98,6 +91,28 @@ https://github.com/elastic/beats/compare/v6.5.3...6.5[Check the HEAD diff]
 
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-6.5.4]]
+=== Beats version 6.5.4
+https://github.com/elastic/beats/compare/v6.5.3...v6.5.4[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Update Golang to 1.10.6. This fixes an issue in remote certificate validation CVE-2018-16875. {pull}9563[9563]
+
+*Filebeat*
+
+- Fix saved objects in filebeat haproxy dashboard. {pull}9417[9417]
+- Fixed a memory leak when harvesters are closed. {pull}7820[7820]
+
+==== Added
+
+*Filebeat*
+
+- Added support on Traefik for Common Log Format and Combined Log Format mixed which is the default Traefik format {issue}8015[8015] {issue}6111[6111] {pull}8768[8768].
+
 
 [[release-notes-6.5.3]]
 === Beats version 6.5.3
