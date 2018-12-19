@@ -29,6 +29,7 @@ import (
 	rd "github.com/garyburd/redigo/redis"
 )
 
+// Redis types
 const (
 	TypeNone      = "none"
 	TypeString    = "string"
