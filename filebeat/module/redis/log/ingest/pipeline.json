@@ -5,8 +5,8 @@
       "grok": {
         "field": "message",
         "patterns": [
-          "(%{POSINT:redis.log.pid}:%{CHAR:redis.log.role} )?%{REDISTIMESTAMP:redis.log.timestamp} %{REDISLEVEL:redis.log.level} %{GREEDYDATA:redis.log.message}",
-          "%{POSINT:redis.log.pid}:signal-handler \\(%{POSINT:redis.log.timestamp}\\) %{GREEDYDATA:redis.log.message}"
+          "(%{POSINT:process.pid:long}:%{CHAR:redis.log.role} )?%{REDISTIMESTAMP:redis.log.timestamp} %{REDISLEVEL:log.level} %{GREEDYDATA:message}",
+          "%{POSINT:process.pid:long}:signal-handler \\(%{POSINT:redis.log.timestamp}\\) %{GREEDYDATA:message}"
         ],
         "pattern_definitions": {
           "CHAR": "[a-zA-Z]",
@@ -16,16 +16,12 @@
     }, {
       "script": {
         "lang": "painless",
-        "inline": "if (ctx.redis.log.level == '.') {\n          ctx.redis.log.level = 'debug';\n        } else if (ctx.redis.log.level == '-') {\n          ctx.redis.log.level = 'verbose';\n        } else if (ctx.redis.log.level == '*') {\n          ctx.redis.log.level = 'notice';\n        } else if (ctx.redis.log.level == '#') {\n          ctx.redis.log.level = 'warning';\n        }"
+        "inline": "if (ctx.log.level == '.') {\n          ctx.log.level = 'debug';\n        } else if (ctx.log.level == '-') {\n          ctx.log.level = 'verbose';\n        } else if (ctx.log.level == '*') {\n          ctx.log.level = 'notice';\n        } else if (ctx.log.level == '#') {\n          ctx.log.level = 'warning';\n        }"
       }
     }, {
       "script": {
         "lang": "painless",
         "inline": "if (ctx.redis.log.role == 'M') {\n          ctx.redis.log.role = 'master';\n        } else if (ctx.redis.log.role == 'S') {\n          ctx.redis.log.role = 'slave';\n        } else if (ctx.redis.log.role == 'C') {\n          ctx.redis.log.role = 'child';\n        } else if (ctx.redis.log.role == 'X') {\n          ctx.redis.log.role = 'sentinel';\n        }\n        "
-      }
-    }, {
-      "remove": {
-        "field": "message"
       }
     }, {
       "rename": {

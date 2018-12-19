@@ -69,6 +69,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Stop runners disabled by hints after previously being started. {pull}9305[9305]
 - Fix saved objects in filebeat haproxy dashboard. {pull}9417[9417]
 - Use `log.source.address` instead of `log.source.ip` for network input sources. {pull}9487[9487]
+- Rename many `redis.log.*` fields to map to ECS. {pull}9315[9315]
 
 *Heartbeat*
 
