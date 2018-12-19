@@ -81,6 +81,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 - Fix race condition when enriching events with kubernetes metadata. {issue}9055[9055] {issue}9067[9067]
 - Fix panic on docker healthcheck collection on dockers without healthchecks. {pull}9171[9171]
 - Fix issue with not collecting Elasticsearch cross-cluster replication stats correctly. {pull}9179[9179]
+- The `node.name` field in the `elasticsearch/node` metricset now correctly reports the Elasticsarch node name. Previously this field was incorrectly reporting the node ID instead. {pull}9209[9209]
 
 *Packetbeat*
 
@@ -125,6 +126,8 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 
 - Collect custom cluster `display_name` in `elasticsearch/cluster_stats` metricset. {pull}8445[8445]
 - Test etcd module with etcd 3.3. {pull}9068[9068]
+- All `elasticsearch` metricsets now have module-level `cluster.id` and `cluster.name` fields. {pull}8770[8770] {pull}8771[8771] {pull}9164[9164] {pull}9165[9165] {pull}9166[9166] {pull}9168[9168]
+- All `elasticsearch` node-level metricsets now have `node.id` and `node.name` fields. {pull}9168[9168] {pull}9209[9209]
 - Add settings to disable docker and cgroup cpu metrics per core. {issue}9187[9187] {pull}9194[9194] {pull}9589[9589]
 - The `elasticsearch/node` metricset now reports the Elasticsearch cluster UUID. {pull}8771[8771]
 - Support GET requests in Jolokia module. {issue}8566[8566] {pull}9226[9226]
