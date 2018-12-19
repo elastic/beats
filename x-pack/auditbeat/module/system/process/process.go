@@ -284,22 +284,22 @@ func processEvent(process *Process, eventType string, action eventAction) mb.Eve
 }
 
 func processMessage(process *Process, action eventAction) string {
-	if process.Error == nil {
-		var actionString string
-		switch action {
-		case eventActionProcessStarted:
-			actionString = "STARTED"
-		case eventActionProcessStopped:
-			actionString = "STOPPED"
-		case eventActionExistingProcess:
-			actionString = "is RUNNING"
-		}
-
-		return fmt.Sprintf("Process %v (PID: %d) %v",
-			process.Info.Name, process.Info.PID, actionString)
-	} else {
+	if process.Error != nil {
 		return fmt.Sprintf("ERROR for PID %d: %v", process.Info.PID, process.Error)
 	}
+
+	var actionString string
+	switch action {
+	case eventActionProcessStarted:
+		actionString = "STARTED"
+	case eventActionProcessStopped:
+		actionString = "STOPPED"
+	case eventActionExistingProcess:
+		actionString = "is RUNNING"
+	}
+
+	return fmt.Sprintf("Process %v (PID: %d) %v",
+		process.Info.Name, process.Info.PID, actionString)
 }
 
 func convertToCacheable(processes []*Process) []cache.Cacheable {
