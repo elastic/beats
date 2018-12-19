@@ -2406,82 +2406,70 @@ Contains CouchDB server stats
 [float]
 == httpd fields
 
-Example field
+HTTP statistics
 
 
 
 [float]
-== viewReads fields
+== view_reads fields
+
+Number of view reads
 
 
 
-
-*`couchdb.server.httpd.viewReads.description`*::
+*`couchdb.server.httpd.view_reads.description`*::
 +
 --
 type: keyword
 
-
-
 --
 
-*`couchdb.server.httpd.viewReads.current`*::
+*`couchdb.server.httpd.view_reads.current`*::
 +
 --
 type: scaled_float
 
-
-
 --
 
-*`couchdb.server.httpd.viewReads.sum`*::
+*`couchdb.server.httpd.view_reads.sum`*::
 +
 --
 type: scaled_float
 
-
-
 --
 
-*`couchdb.server.httpd.viewReads.mean`*::
+*`couchdb.server.httpd.view_reads.mean`*::
 +
 --
 type: scaled_float
 
-
-
 --
 
-*`couchdb.server.httpd.viewReads.stddev`*::
+*`couchdb.server.httpd.view_reads.stddev`*::
 +
 --
 type: scaled_float
 
-
-
 --
 
-*`couchdb.server.httpd.viewReads.min`*::
+*`couchdb.server.httpd.view_reads.min`*::
 +
 --
 type: scaled_float
 
-
-
 --
 
-*`couchdb.server.httpd.viewReads.max`*::
+*`couchdb.server.httpd.view_reads.max`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
 [float]
 == bulk_requests fields
 
+Number of bulk requests
 
 
 
@@ -2490,16 +2478,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd.bulk_requests.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2508,16 +2492,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd.bulk_requests.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2526,16 +2506,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd.bulk_requests.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2544,13 +2520,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == clients_requesting_changes fields
 
+Number of clients for continuous _changes
 
 
 
@@ -2559,16 +2534,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd.clients_requesting_changes.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2577,16 +2548,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd.clients_requesting_changes.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2595,16 +2562,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd.clients_requesting_changes.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2613,13 +2576,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == temporary_view_reads fields
 
+Number of temporary view reads
 
 
 
@@ -2628,16 +2590,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd.temporary_view_reads.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2646,16 +2604,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd.temporary_view_reads.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2664,16 +2618,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd.temporary_view_reads.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2682,13 +2632,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == requests fields
 
+Number of HTTP requests
 
 
 
@@ -2697,16 +2646,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd.requests.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2715,16 +2660,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd.requests.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2733,16 +2674,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd.requests.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2751,20 +2688,19 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == httpd_request_methods fields
 
-Example field
+HTTP request methods
 
 
 
 [float]
 == COPY fields
 
+Number of HTTP COPY requests
 
 
 
@@ -2773,16 +2709,12 @@ Example field
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.COPY.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2791,16 +2723,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.COPY.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2809,16 +2737,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.COPY.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2827,13 +2751,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == HEAD fields
 
+Number of HTTP HEAD requests
 
 
 
@@ -2842,16 +2765,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.HEAD.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2860,16 +2779,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.HEAD.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2878,16 +2793,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.HEAD.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2896,13 +2807,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == POST fields
 
+Number of HTTP POST requests
 
 
 
@@ -2911,16 +2821,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.POST.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2929,16 +2835,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.POST.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2947,16 +2849,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.POST.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2965,13 +2863,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == DELETE fields
 
+Number of HTTP DELETE requests
 
 
 
@@ -2980,16 +2877,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.DELETE.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -2998,16 +2891,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.DELETE.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3016,16 +2905,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.DELETE.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3034,13 +2919,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == GET fields
 
+Number of HTTP GET requests
 
 
 
@@ -3049,16 +2933,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.GET.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3067,16 +2947,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.GET.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3085,16 +2961,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.GET.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3103,13 +2975,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == PUT fields
 
+Number of HTTP PUT requests
 
 
 
@@ -3118,16 +2989,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.PUT.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3136,16 +3003,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.PUT.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3154,16 +3017,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_request_methods.PUT.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3172,20 +3031,19 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == httpd_status_codes fields
 
-Example field
+HTTP status codes statistics
 
 
 
 [float]
 == num200 fields
 
+Number of HTTP 200 OK responses
 
 
 
@@ -3194,16 +3052,12 @@ Example field
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num200.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3212,16 +3066,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num200.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3230,16 +3080,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num200.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3248,13 +3094,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == num201 fields
 
+Number of HTTP 201 Created responses
 
 
 
@@ -3263,16 +3108,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num201.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3281,16 +3122,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num201.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3299,16 +3136,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num201.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3317,13 +3150,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == num202 fields
 
+Number of HTTP 202 Accepted responses
 
 
 
@@ -3332,16 +3164,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num202.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3350,16 +3178,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num202.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3368,16 +3192,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num202.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3386,13 +3206,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == num301 fields
 
+Number of HTTP 301 Moved Permanently responses
 
 
 
@@ -3401,16 +3220,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num301.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3419,16 +3234,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num301.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3437,16 +3248,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num301.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3455,13 +3262,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == num304 fields
 
+Number of HTTP 304 Not Modified responses
 
 
 
@@ -3470,16 +3276,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num304.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3488,16 +3290,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num304.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3506,16 +3304,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num304.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3524,13 +3318,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == num400 fields
 
+Number of HTTP 400 Bad Request responses
 
 
 
@@ -3539,16 +3332,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num400.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3557,16 +3346,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num400.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3575,16 +3360,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num400.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3593,13 +3374,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == num401 fields
 
+Number of HTTP 401 Unauthorized responses
 
 
 
@@ -3608,16 +3388,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num401.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3626,16 +3402,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num401.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3644,16 +3416,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num401.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3662,13 +3430,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == num403 fields
 
+Number of HTTP 403 Forbidden responses
 
 
 
@@ -3677,16 +3444,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num403.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3695,16 +3458,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num403.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3713,16 +3472,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num403.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3731,13 +3486,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == num404 fields
 
+Number of HTTP 404 Not Found responses
 
 
 
@@ -3746,16 +3500,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num404.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3764,16 +3514,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num404.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3782,16 +3528,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num404.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3800,13 +3542,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == num405 fields
 
+Number of HTTP 405 Method Not Allowed responses
 
 
 
@@ -3815,16 +3556,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num405.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3833,16 +3570,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num405.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3851,16 +3584,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num405.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3869,13 +3598,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == num409 fields
 
+Number of HTTP 409 Conflict responses
 
 
 
@@ -3884,16 +3612,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num409.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3902,16 +3626,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num409.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3920,16 +3640,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num409.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3938,13 +3654,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == num412 fields
 
+Number of HTTP 412 Precondition Failed responses
 
 
 
@@ -3953,16 +3668,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num412.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3971,16 +3682,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num412.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -3989,16 +3696,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num412.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4007,13 +3710,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == num500 fields
 
+Number of HTTP 500 Internal Server Error responses
 
 
 
@@ -4022,16 +3724,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num500.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4040,16 +3738,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num500.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4058,16 +3752,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.httpd_status_codes.num500.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4076,20 +3766,19 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == couchdb fields
 
-Example field
+couchdb statistics
 
 
 
 [float]
 == database_writes fields
 
+Number of times a database was changed
 
 
 
@@ -4098,16 +3787,12 @@ Example field
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.couchdb.database_writes.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4116,16 +3801,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.couchdb.database_writes.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4134,16 +3815,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.couchdb.database_writes.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4152,13 +3829,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == open_databases fields
 
+Number of open databases
 
 
 
@@ -4167,16 +3843,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.couchdb.open_databases.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4185,16 +3857,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.couchdb.open_databases.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4203,16 +3871,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.couchdb.open_databases.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4221,13 +3885,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == auth_cache_misses fields
 
+Number of authentication cache misses
 
 
 
@@ -4236,16 +3899,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.couchdb.auth_cache_misses.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4254,16 +3913,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.couchdb.auth_cache_misses.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4272,16 +3927,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.couchdb.auth_cache_misses.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4290,13 +3941,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == request_time fields
 
+Length of a request inside CouchDB without MochiWeb
 
 
 
@@ -4305,16 +3955,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.couchdb.request_time.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4323,16 +3969,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.couchdb.request_time.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4341,16 +3983,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.couchdb.request_time.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4359,13 +3997,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == database_reads fields
 
+Number of times a document was read from a database
 
 
 
@@ -4374,16 +4011,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.couchdb.database_reads.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4392,16 +4025,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.couchdb.database_reads.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4410,16 +4039,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.couchdb.database_reads.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4428,13 +4053,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == auth_cache_hits fields
 
+Number of authentication cache hits
 
 
 
@@ -4443,16 +4067,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.couchdb.auth_cache_hits.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4461,16 +4081,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.couchdb.auth_cache_hits.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4479,16 +4095,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.couchdb.auth_cache_hits.min`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4497,13 +4109,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 [float]
 == open_os_files fields
 
+Number of file descriptors CouchDB has open
 
 
 
@@ -4512,16 +4123,12 @@ type: scaled_float
 --
 type: keyword
 
-
-
 --
 
 *`couchdb.server.couchdb.open_os_files.current`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4530,16 +4137,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.couchdb.open_os_files.mean`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
@@ -4548,8 +4151,6 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.couchdb.open_os_files.min`*::
@@ -4557,16 +4158,12 @@ type: scaled_float
 --
 type: scaled_float
 
-
-
 --
 
 *`couchdb.server.couchdb.open_os_files.max`*::
 +
 --
 type: scaled_float
-
-
 
 --
 
