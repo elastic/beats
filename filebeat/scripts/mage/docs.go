@@ -18,38 +18,26 @@
 package mage
 
 import (
-	"log"
-
 	"github.com/magefile/mage/sh"
+
+	"github.com/elastic/beats/dev-tools/mage"
 )
 
-type docsBuilder struct{}
-
-// Docs holds the utilities for building documentation.
-var Docs = docsBuilder{}
-
-// FieldDocs generates docs/fields.asciidoc from the specified fields.yml file.
-func (b docsBuilder) FieldDocs(fieldsYML string) error {
-	// Run the docs_collector.py script.
-	ve, err := PythonVirtualenv()
+// CollectDocs executes the Filebeat docs_collector script to collect/generate
+// documentation from each module.
+func CollectDocs() error {
+	ve, err := mage.PythonVirtualenv()
 	if err != nil {
 		return err
 	}
 
-	python, err := LookVirtualenvPath(ve, "python")
+	python, err := mage.LookVirtualenvPath(ve, "python")
 	if err != nil {
 		return err
 	}
 
-	esBeats, err := ElasticBeatsDir()
-	if err != nil {
-		return err
-	}
-
-	log.Println(">> Generating docs/fields.asciidoc for", BeatName)
-	return sh.Run(python, LibbeatDir("scripts/generate_fields_docs.py"),
-		fieldsYML,                     // Path to fields.yml.
-		BeatName,                      // Beat title.
-		esBeats,                       // Path to general beats folder.
-		"--output_path", OSSBeatDir()) // It writes to {output_path}/docs/fields.asciidoc.
+	// TODO: Port this script to Go.
+	return sh.Run(python,
+		mage.OSSBeatDir("scripts/docs_collector.py"),
+		"--beat", mage.BeatName)
 }

@@ -5,11 +5,14 @@ services:
     depends_on:
       - proxy_dep
     env_file:
-      - ${PWD}/build/test.env
       - ${PWD}/input/redis/_meta/env
     environment:
-      - KIBANA_HOST=kibana
-      - KIBANA_PORT=5601
+    - ES_HOST=elasticsearch
+    - ES_PORT=9200
+    - ES_USER=beats
+    - ES_PASS=testing
+    - KIBANA_HOST=kibana
+    - KIBANA_PORT=5601
     working_dir: /go/src/github.com/elastic/beats/filebeat
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
