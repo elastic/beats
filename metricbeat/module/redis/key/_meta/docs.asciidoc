@@ -2,7 +2,7 @@ The Redis `key` metricset collects information about Redis keys.
 
 For each key matching one of the configured patterns, an event is sent to
 Elasticsearch with information about this key, what includes the type, its
-length when available, the value when it is a string, and its ttl.
+length when available, and its ttl.
 
 Patterns are configured as a list containing these fields:
 * `pattern` (required): pattern for key names, as accepted by the Redis

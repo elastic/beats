@@ -20379,16 +20379,6 @@ Length of the key (Number of elements for lists, length for strings, cardinality
 
 --
 
-*`redis.key.value`*::
-+
---
-type: text
-
-Value of the key for keys of type `string`.
-
-
---
-
 *`redis.key.expire.ttl`*::
 +
 --

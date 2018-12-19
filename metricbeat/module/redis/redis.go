@@ -113,11 +113,6 @@ func FetchKeyInfo(c rd.Conn, key string) (map[string]interface{}, error) {
 
 	switch keyType {
 	case TypeString:
-		value, err := rd.String(c.Do("GET", key))
-		if err != nil {
-			return nil, err
-		}
-		info["value"] = value
 		lenCommand = "STRLEN"
 	case TypeList:
 		lenCommand = "LLEN"

@@ -19,15 +19,14 @@
             },
             "length": 3,
             "name": "foo",
-            "type": "string",
-            "value": "bar"
+            "type": "string"
         },
         "keyspace": {
             "id": "db0"
         }
     },
     "service": {
-        "address": "192.168.16.2:6379",
+        "address": "192.168.32.2:6379",
         "type": "redis"
     }
 }

@@ -92,7 +92,6 @@ func TestFetchKeyInfo(t *testing.T) {
 			Expected: map[string]interface{}{
 				"name":   "string-key",
 				"type":   "string",
-				"value":  "foo",
 				"length": int64(3),
 				"expire": map[string]interface{}{
 					"ttl": int64(-1),
@@ -108,7 +107,6 @@ func TestFetchKeyInfo(t *testing.T) {
 			Expected: map[string]interface{}{
 				"name":   "string-key",
 				"type":   "string",
-				"value":  "foo",
 				"length": int64(3),
 				"expire": map[string]interface{}{
 					"ttl": int64(60),

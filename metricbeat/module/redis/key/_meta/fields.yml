@@ -19,11 +19,6 @@
       description: >
         Length of the key (Number of elements for lists, length for strings, cardinality for sets).
 
-    - name: value
-      type: text
-      description: >
-        Value of the key for keys of type `string`.
-
     - name: expire.ttl
       type: long
       description: >
