@@ -20,10 +20,15 @@ package index_recovery
 import (
 	"encoding/json"
 
+	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 var (
@@ -50,29 +55,45 @@ var (
 	}
 )
 
-func eventsMapping(r mb.ReporterV2, content []byte) error {
+func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
 
 	var data map[string]map[string][]map[string]interface{}
 
 	err := json.Unmarshal(content, &data)
 	if err != nil {
+		err = errors.Wrap(err, "failure parsing Elasticsearch Recovery API response")
+		r.Error(err)
 		return err
 	}
 
+	var errs multierror.Errors
 	for indexName, d := range data {
 		shards, ok := d["shards"]
 		if !ok {
+			err = elastic.MakeErrorForMissingField(indexName+".shards", elastic.Elasticsearch)
+			r.Error(err)
+			errs = append(errs, err)
 			continue
 		}
 		for _, data := range shards {
 			event := mb.Event{}
-			event.ModuleFields = common.MapStr{}
-			event.MetricSetFields, _ = schema.Apply(data)
-			event.ModuleFields.Put("index.name", indexName)
+
 			event.RootFields = common.MapStr{}
-			event.RootFields.Put("service.name", "elasticsearch")
+			event.RootFields.Put("service.name", elasticsearch.ModuleName)
+
+			event.ModuleFields = common.MapStr{}
+			event.ModuleFields.Put("cluster.name", info.ClusterName)
+			event.ModuleFields.Put("cluster.id", info.ClusterID)
+			event.ModuleFields.Put("index.name", indexName)
+
+			event.MetricSetFields, err = schema.Apply(data)
+			if err != nil {
+				event.Error = errors.Wrap(err, "failure applying shard schema")
+				errs = append(errs, event.Error)
+			}
+
 			r.Event(event)
 		}
 	}
-	return nil
+	return errs.Err()
 }

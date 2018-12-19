@@ -14,7 +14,7 @@ class Test(BaseTest):
         objs = self.read_output()
         assert all([o["type"] == "amqp" for o in objs])
         assert len(objs) == 2
-        assert all([o["port"] == 5672 for o in objs])
+        assert all([o["server.port"] == 5672 for o in objs])
 
         assert objs[0]["method"] == "queue.declare"
         assert objs[0]["status"] == "OK"

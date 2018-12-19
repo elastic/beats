@@ -16,11 +16,11 @@ If you have issues installing or running {beatname_uc}, read the following tips:
 [[getting-help]]
 == Get help
 
-include::../../libbeat/docs/getting-help.asciidoc[]
+include::{libbeat-dir}/docs/getting-help.asciidoc[]
 
 //sets block macro for debugging.asciidoc included in next section
 
 [[enable-metricbeat-debugging]]
 == Debug
 
-include::../../libbeat/docs/debugging.asciidoc[]
+include::{libbeat-dir}/docs/debugging.asciidoc[]

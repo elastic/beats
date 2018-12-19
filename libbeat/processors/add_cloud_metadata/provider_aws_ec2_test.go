@@ -81,14 +81,16 @@ func TestRetrieveAWSMetadata(t *testing.T) {
 	}
 
 	expected := common.MapStr{
-		"meta": common.MapStr{
-			"cloud": common.MapStr{
-				"provider":          "ec2",
-				"instance_id":       "i-11111111",
-				"machine_type":      "t2.medium",
-				"region":            "us-east-1",
-				"availability_zone": "us-east-1c",
+		"cloud": common.MapStr{
+			"provider": "ec2",
+			"instance": common.MapStr{
+				"id": "i-11111111",
 			},
+			"machine": common.MapStr{
+				"type": "t2.medium",
+			},
+			"region":            "us-east-1",
+			"availability_zone": "us-east-1c",
 		},
 	}
 	assert.Equal(t, expected, actual.Fields)

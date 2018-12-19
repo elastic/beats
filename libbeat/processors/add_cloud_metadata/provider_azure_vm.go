@@ -29,10 +29,14 @@ func newAzureVmMetadataFetcher(config *common.Config) (*metadataFetcher, error) 
 	azHeaders := map[string]string{"Metadata": "true"}
 	azSchema := func(m map[string]interface{}) common.MapStr {
 		out, _ := s.Schema{
-			"instance_id":   c.Str("vmId"),
-			"instance_name": c.Str("name"),
-			"machine_type":  c.Str("vmSize"),
-			"region":        c.Str("location"),
+			"instance": s.Object{
+				"id":   c.Str("vmId"),
+				"name": c.Str("name"),
+			},
+			"machine": s.Object{
+				"type": c.Str("vmSize"),
+			},
+			"region": c.Str("location"),
 		}.Apply(m)
 		return out
 	}

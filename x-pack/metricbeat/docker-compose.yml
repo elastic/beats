@@ -1,0 +1,11 @@
+version: '2.1'
+services:
+  beat:
+    build: ../../metricbeat
+    environment:
+      - TEST_ENVIRONMENT=false
+    working_dir: /go/src/github.com/elastic/beats/x-pack/metricbeat
+    volumes:
+      - ${PWD}/../..:/go/src/github.com/elastic/beats/
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: make

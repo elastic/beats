@@ -41,7 +41,7 @@ func newQcloudMetadataFetcher(c *common.Config) (*metadataFetcher, error) {
 	}
 	responseHandlers := map[string]responseHandler{
 		urls[0]: func(all []byte, result *result) error {
-			result.metadata["instance_id"] = string(all)
+			result.metadata.Put("instance.id", string(all))
 			return nil
 		},
 		urls[1]: func(all []byte, result *result) error {

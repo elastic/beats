@@ -40,7 +40,11 @@ func TestWhenPriorityIsSet(t *testing.T) {
 	event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
 
 	expected := common.MapStr{
-		"source":   "127.0.0.1",
+		"log": common.MapStr{
+			"source": common.MapStr{
+				"address": "127.0.0.1",
+			},
+		},
 		"message":  "hello world",
 		"hostname": "wopr",
 		"process": common.MapStr{
@@ -69,7 +73,11 @@ func TestWhenPriorityIsNotSet(t *testing.T) {
 	m := dummyMetadata()
 	event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
 	expected := common.MapStr{
-		"source":   "127.0.0.1",
+		"log": common.MapStr{
+			"source": common.MapStr{
+				"address": "127.0.0.1",
+			},
+		},
 		"message":  "hello world",
 		"hostname": "wopr",
 		"process": common.MapStr{

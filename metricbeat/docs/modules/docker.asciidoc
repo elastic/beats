@@ -50,6 +50,9 @@ metricbeat.modules:
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
 
+  # If set to true, collects metrics per core.
+  #cpu.cores: true
+
   # To connect to Docker over TLS you must specify a client and CA certificate.
   #ssl:
     #certificate_authority: "/etc/pki/root/ca.pem"

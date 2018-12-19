@@ -27,7 +27,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -213,7 +215,8 @@ func TestGetPipelineNginx(t *testing.T) {
 	fs := getModuleForTesting(t, "nginx", "access")
 	assert.NoError(t, fs.Read("5.2.0"))
 
-	pipelineID, content, err := fs.GetPipeline("5.2.0")
+	version := common.MustNewVersion("5.2.0")
+	pipelineID, content, err := fs.GetPipeline(*version)
 	assert.NoError(t, err)
 	assert.Equal(t, "filebeat-5.2.0-nginx-access-default", pipelineID)
 	assert.Contains(t, content, "description")
@@ -234,27 +237,31 @@ func TestGetPipelineConvertTS(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NoError(t, fs.Read("6.1.0"))
 
-	// ES 6.0.0 should not have beat.timezone referenced
-	pipelineID, content, err := fs.GetPipeline("6.0.0")
-	assert.NoError(t, err)
-	assert.Equal(t, "filebeat-6.1.0-system-syslog-pipeline", pipelineID)
-	marshaled, err := json.Marshal(content)
-	assert.NoError(t, err)
-	assert.NotContains(t, string(marshaled), "beat.timezone")
+	cases := map[string]struct {
+		Beat     string
+		Timezone bool
+	}{
+		"6.0.0": {Timezone: false},
+		"6.1.0": {Timezone: true},
+		"6.2.0": {Timezone: true},
+	}
 
-	// ES 6.1.0 should have beat.timezone referenced
-	pipelineID, content, err = fs.GetPipeline("6.1.0")
-	assert.NoError(t, err)
-	assert.Equal(t, "filebeat-6.1.0-system-syslog-pipeline", pipelineID)
-	marshaled, err = json.Marshal(content)
-	assert.NoError(t, err)
-	assert.Contains(t, string(marshaled), "beat.timezone")
+	for esVersion, cfg := range cases {
+		pipelineName := "filebeat-6.1.0-system-syslog-pipeline"
 
-	// ES 6.2.0 should have beat.timezone referenced
-	pipelineID, content, err = fs.GetPipeline("6.2.0")
-	assert.NoError(t, err)
-	assert.Equal(t, "filebeat-6.1.0-system-syslog-pipeline", pipelineID)
-	marshaled, err = json.Marshal(content)
-	assert.NoError(t, err)
-	assert.Contains(t, string(marshaled), "beat.timezone")
+		t.Run(fmt.Sprintf("es=%v", esVersion), func(t *testing.T) {
+			ver := common.MustNewVersion(esVersion)
+			pipelineID, content, err := fs.GetPipeline(*ver)
+			require.NoError(t, err)
+			assert.Equal(t, pipelineName, pipelineID)
+
+			marshaled, err := json.Marshal(content)
+			require.NoError(t, err)
+			if cfg.Timezone {
+				assert.Contains(t, string(marshaled), "beat.timezone")
+			} else {
+				assert.NotContains(t, string(marshaled), "beat.timezone")
+			}
+		})
+	}
 }

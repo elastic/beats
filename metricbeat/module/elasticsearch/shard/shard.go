@@ -18,16 +18,16 @@
 package shard
 
 import (
-	"fmt"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet("elasticsearch", "shard", New,
+	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "shard", New,
 		mb.WithHostParser(elasticsearch.HostParser),
 		mb.DefaultMetricSet(),
 		mb.WithNamespace("elasticsearch.shard"),
@@ -35,7 +35,7 @@ func init() {
 }
 
 const (
-	statePath = "/_cluster/state/version,master_node,routing_table"
+	statePath = "/_cluster/state/version,nodes,master_node,routing_table"
 )
 
 // MetricSet type defines all fields of the MetricSet
@@ -45,7 +45,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The elasticsearch shard metricset is beta")
+	cfgwarn.Beta("the " + base.FullyQualifiedName() + " metricset is beta")
 
 	// Get the stats from the local node
 	ms, err := elasticsearch.NewMetricSet(base, statePath)
@@ -59,25 +59,31 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+statePath)
 	if err != nil {
-		r.Error(fmt.Errorf("Error fetch master info: %s", err))
+		err := errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug("elasticsearch", "Trying to fetch shard stats from a non master node.")
+		m.Log.Debug("trying to fetch shard stats from a non-master node")
 		return
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
 	if m.XPack {
-		eventsMappingXPack(r, m, content)
+		err = eventsMappingXPack(r, m, content)
 	} else {
-		eventsMapping(r, content)
+		err = eventsMapping(r, content)
+	}
+
+	if err != nil {
+		m.Log.Error(err)
+		return
 	}
 }

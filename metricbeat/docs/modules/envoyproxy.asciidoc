@@ -7,8 +7,6 @@ This file is generated! See scripts/docs_collector.py
 
 experimental[]
 
-== envoyproxy module
-
 This is the envoyproxy module.
 
 The default metricset is `server`.

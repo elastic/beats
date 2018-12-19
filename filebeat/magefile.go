@@ -75,7 +75,7 @@ func Clean() error {
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
-// Use BEAT_VERSION_QUALIFIER to control the version qualifier.
+// Use VERSION_QUALIFIER to control the version qualifier.
 func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
@@ -83,7 +83,7 @@ func Package() {
 	mage.UseElasticBeatPackaging()
 	customizePackaging()
 
-	mg.Deps(Update, prepareModulePackaging)
+	mg.Deps(Update, prepareModulePackagingOSS, prepareModulePackagingXPack)
 	mg.Deps(CrossBuild, CrossBuildXPack, CrossBuildGoDaemon)
 	mg.SerialDeps(mage.Package, TestPackages)
 }
@@ -95,7 +95,15 @@ func TestPackages() error {
 
 // Update updates the generated files (aka make update).
 func Update() error {
-	return sh.Run("make", "update")
+	if err := sh.Run("make", "update"); err != nil {
+		return err
+	}
+
+	// XXX (andrewkroh on 2018-10-14): This is a temporary solution for enabling
+	// X-Pack modules for Filebeat. Packaging for X-Pack will be fully migrated
+	// to a magefile.go in the x-pack/filebeat directory and this will be
+	// removed.
+	return mage.Mage("../x-pack/filebeat", "update")
 }
 
 // Fields generates a fields.yml for the Beat.
@@ -117,12 +125,47 @@ func GoTestIntegration(ctx context.Context) error {
 	return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
 }
 
+// ExportDashboard exports a dashboard and writes it into the correct directory
+//
+// Required ENV variables:
+// * MODULE: Name of the module
+// * ID: Dashboard id
+func ExportDashboard() error {
+	return mage.ExportDashboard()
+}
+
 // -----------------------------------------------------------------------------
 // Customizations specific to Filebeat.
 // - Include modules directory in packages (minus _meta and test files).
 // - Include modules.d directory in packages.
 
-var modulesDirGenerated = filepath.Clean("build/packaging/modules")
+var (
+	dirModuleGeneratedOSS     = filepath.Clean("build/package/modules-oss")
+	dirModuleGeneratedXPack   = filepath.Clean("build/package/modules-x-pack")
+	dirModulesDGeneratedXPack = filepath.Clean("build/packaging/modules.d-x-pack")
+)
+
+func replacePackageFileSource(args mage.OSPackageArgs, replacements map[string]string) {
+	missing := make(map[string]struct{})
+	for key := range replacements {
+		missing[key] = struct{}{}
+	}
+	for key, contents := range args.Spec.Files {
+		oldSource := args.Spec.Files[key].Source
+		if newSource, found := replacements[oldSource]; found {
+			contents.Source = newSource
+			args.Spec.Files[key] = contents
+			delete(missing, oldSource)
+		}
+	}
+	if len(missing) > 0 {
+		asList := make([]string, 0, len(missing))
+		for path := range missing {
+			asList = append(asList, path)
+		}
+		panic(errors.Errorf("the following file sources were not found for replacement: %v", asList))
+	}
+}
 
 // customizePackaging modifies the package specs to add the modules and
 // modules.d directory.
@@ -131,51 +174,118 @@ func customizePackaging() {
 		moduleTarget = "module"
 		module       = mage.PackageFile{
 			Mode:   0644,
-			Source: modulesDirGenerated,
+			Source: dirModuleGeneratedOSS,
+		}
+		moduleXPack = mage.PackageFile{
+			Mode:   0644,
+			Source: dirModuleGeneratedXPack,
 		}
 
 		modulesDTarget = "modules.d"
 		modulesD       = mage.PackageFile{
-			Mode:   0644,
-			Source: "modules.d",
-			Config: true,
+			Mode:    0644,
+			Source:  "modules.d",
+			Config:  true,
+			Modules: true,
+		}
+		modulesDXPack = mage.PackageFile{
+			Mode:    0644,
+			Source:  dirModulesDGeneratedXPack,
+			Config:  true,
+			Modules: true,
 		}
 	)
 
 	for _, args := range mage.Packages {
+		mods := module
+		modsD := modulesD
 		pkgType := args.Types[0]
+		if args.Spec.License == "Elastic License" {
+			mods = moduleXPack
+			modsD = modulesDXPack
+			replacePackageFileSource(args, map[string]string{
+				"fields.yml":                  "../x-pack/{{.BeatName}}/fields.yml",
+				"{{.BeatName}}.reference.yml": "../x-pack/{{.BeatName}}/{{.BeatName}}.reference.yml",
+				"_meta/kibana.generated":      "../x-pack/{{.BeatName}}/build/kibana",
+			})
+			if pkgType != mage.Docker {
+				replacePackageFileSource(args, map[string]string{
+					"{{.BeatName}}.yml": "../x-pack/{{.BeatName}}/{{.BeatName}}.yml",
+				})
+			}
+		}
+
 		switch pkgType {
-		case mage.TarGz, mage.Zip:
-			args.Spec.Files[moduleTarget] = module
-			args.Spec.Files[modulesDTarget] = modulesD
+		case mage.TarGz, mage.Zip, mage.Docker:
+			args.Spec.Files[moduleTarget] = mods
+			args.Spec.Files[modulesDTarget] = modsD
 		case mage.Deb, mage.RPM:
-			args.Spec.Files["/usr/share/{{.BeatName}}/"+moduleTarget] = module
-			args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modulesD
+			args.Spec.Files["/usr/share/{{.BeatName}}/"+moduleTarget] = mods
+			args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modsD
 		case mage.DMG:
-			args.Spec.Files["/Library/Application Support/{{.BeatVendor}}/{{.BeatName}}"+moduleTarget] = module
-			args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modulesD
+			args.Spec.Files["/Library/Application Support/{{.BeatVendor}}/{{.BeatName}}"+moduleTarget] = mods
+			args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modsD
 		default:
 			panic(errors.Errorf("unhandled package type: %v", pkgType))
 		}
 	}
 }
 
-// prepareModulePackaging copies the module dir to the build dir and excludes
+// prepareModulePackagingOSS copies the module dir to the build dir and excludes
 // _meta and test files so that they are not included in packages.
-func prepareModulePackaging() error {
-	if err := sh.Rm(modulesDirGenerated); err != nil {
+func prepareModulePackagingOSS() error {
+	if err := sh.Rm(dirModuleGeneratedOSS); err != nil {
 		return err
 	}
 
 	copy := &mage.CopyTask{
 		Source:  "module",
-		Dest:    modulesDirGenerated,
+		Dest:    dirModuleGeneratedOSS,
 		Mode:    0644,
 		DirMode: 0755,
 		Exclude: []string{
 			"/_meta",
 			"/test",
+			"fields.go",
 		},
 	}
 	return copy.Execute()
+}
+
+// prepareModulePackagingXPack generates modules and modules.d directories
+// for an x-pack distribution, excluding _meta and test files so that they are
+// not included in packages.
+func prepareModulePackagingXPack() error {
+	err := mage.Clean([]string{
+		dirModuleGeneratedXPack,
+		dirModulesDGeneratedXPack,
+	})
+	if err != nil {
+		return err
+	}
+
+	for _, copyAction := range []struct {
+		src, dst string
+	}{
+		{"module", dirModuleGeneratedXPack},
+		{"../x-pack/filebeat/module", dirModuleGeneratedXPack},
+		{"modules.d", dirModulesDGeneratedXPack},
+		{"../x-pack/filebeat/modules.d", dirModulesDGeneratedXPack},
+	} {
+		err := (&mage.CopyTask{
+			Source:  copyAction.src,
+			Dest:    copyAction.dst,
+			Mode:    0644,
+			DirMode: 0755,
+			Exclude: []string{
+				"/_meta",
+				"/test",
+				"fields.go",
+			},
+		}).Execute()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

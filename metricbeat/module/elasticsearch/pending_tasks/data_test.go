@@ -23,12 +23,20 @@ import (
 	"io/ioutil"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
-	s "github.com/elastic/beats/libbeat/common/schema"
+	"github.com/elastic/beats/metricbeat/mb"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
+
+var info = elasticsearch.Info{
+	ClusterID:   "1234",
+	ClusterName: "helloworld",
+}
 
 //Events Mapping
 
@@ -37,7 +45,8 @@ func TestEmptyQueueShouldGiveNoError(t *testing.T) {
 	content, err := ioutil.ReadFile(file)
 	assert.NoError(t, err)
 
-	_, err = eventsMapping(content)
+	reporter := &mbtest.CapturingReporterV2{}
+	err = eventsMapping(reporter, info, content)
 	assert.NoError(t, err)
 }
 
@@ -46,8 +55,11 @@ func TestNotEmptyQueueShouldGiveNoError(t *testing.T) {
 	content, err := ioutil.ReadFile(file)
 	assert.NoError(t, err)
 
-	_, err = eventsMapping(content)
+	reporter := &mbtest.CapturingReporterV2{}
+	err = eventsMapping(reporter, info, content)
 	assert.NoError(t, err)
+	assert.True(t, len(reporter.GetEvents()) >= 1)
+	assert.Zero(t, len(reporter.GetErrors()))
 }
 
 func TestEmptyQueueShouldGiveZeroEvent(t *testing.T) {
@@ -55,18 +67,10 @@ func TestEmptyQueueShouldGiveZeroEvent(t *testing.T) {
 	content, err := ioutil.ReadFile(file)
 	assert.NoError(t, err)
 
-	events, _ := eventsMapping(content)
-	assert.Zero(t, len(events))
-}
-
-func TestEmptyQueueShouldGiveNilEvent(t *testing.T) {
-	file := "./_meta/test/empty.json"
-	content, err := ioutil.ReadFile(file)
-	assert.NoError(t, err)
-
-	events, _ := eventsMapping(content)
-
-	assert.Nil(t, events)
+	reporter := &mbtest.CapturingReporterV2{}
+	err = eventsMapping(reporter, info, content)
+	assert.Zero(t, len(reporter.GetEvents()))
+	assert.Zero(t, len(reporter.GetErrors()))
 }
 
 func TestNotEmptyQueueShouldGiveSeveralEvents(t *testing.T) {
@@ -74,9 +78,10 @@ func TestNotEmptyQueueShouldGiveSeveralEvents(t *testing.T) {
 	content, err := ioutil.ReadFile(file)
 	assert.NoError(t, err)
 
-	events, _ := eventsMapping(content)
-
-	assert.Equal(t, 3, len(events))
+	reporter := &mbtest.CapturingReporterV2{}
+	err = eventsMapping(reporter, info, content)
+	assert.Equal(t, 3, len(reporter.GetEvents()))
+	assert.Zero(t, len(reporter.GetErrors()))
 }
 
 func TestInvalidJsonForRequiredFieldShouldThrowError(t *testing.T) {
@@ -84,12 +89,8 @@ func TestInvalidJsonForRequiredFieldShouldThrowError(t *testing.T) {
 	content, err := ioutil.ReadFile(file)
 	assert.NoError(t, err)
 
-	var notFoundKeys []string
-	expectedNotFoundKeys := []string{"source"}
-	_, err = eventsMapping(content, s.NotFoundKeys(func(keys []string) {
-		notFoundKeys = keys
-	}))
-	assert.ElementsMatch(t, expectedNotFoundKeys, notFoundKeys)
+	reporter := &mbtest.CapturingReporterV2{}
+	err = eventsMapping(reporter, info, content)
 	assert.Error(t, err)
 }
 
@@ -98,46 +99,112 @@ func TestInvalidJsonForBadFormatShouldThrowError(t *testing.T) {
 	content, err := ioutil.ReadFile(file)
 	assert.NoError(t, err)
 
-	_, err = eventsMapping(content)
+	reporter := &mbtest.CapturingReporterV2{}
+	err = eventsMapping(reporter, info, content)
 	assert.Error(t, err)
 }
 
 func TestEventsMappedMatchToContentReceived(t *testing.T) {
 	testCases := []struct {
 		given    string
-		expected []common.MapStr
+		expected []mb.Event
 	}{
-		{"./_meta/test/empty.json", []common.MapStr(nil)},
-		{"./_meta/test/task.622.json", []common.MapStr{common.MapStr{
-			"priority":         "URGENT",
-			"source":           "create-index [foo_9], cause [api]",
-			"time_in_queue.ms": int64(86),
-			"insert_order":     int64(101),
-		}}},
-		{"./_meta/test/tasks.622.json", []common.MapStr{common.MapStr{
-			"priority":         "URGENT",
-			"source":           "create-index [foo_9], cause [api]",
-			"time_in_queue.ms": int64(86),
-			"insert_order":     int64(101)},
-			common.MapStr{
-				"priority":         "HIGH",
-				"source":           "shard-started ([foo_2][1], node[tMTocMvQQgGCkj7QDHl3OA], [P], s[INITIALIZING]), reason [after recovery from shard_store]",
-				"time_in_queue.ms": int64(842),
-				"insert_order":     int64(46),
-			}, common.MapStr{
-				"priority":         "HIGH",
-				"source":           "shard-started ([foo_2][0], node[tMTocMvQQgGCkj7QDHl3OA], [P], s[INITIALIZING]), reason [after recovery from shard_store]",
-				"time_in_queue.ms": int64(858),
-				"insert_order":     int64(45),
-			}}},
+		{"./_meta/test/empty.json", []mb.Event(nil)},
+		{"./_meta/test/task.622.json", []mb.Event{
+			mb.Event{
+				RootFields: common.MapStr{
+					"service": common.MapStr{
+						"name": "elasticsearch",
+					},
+				},
+				ModuleFields: common.MapStr{
+					"cluster": common.MapStr{
+						"id":   "1234",
+						"name": "helloworld",
+					},
+				},
+				MetricSetFields: common.MapStr{
+					"priority":         "URGENT",
+					"source":           "create-index [foo_9], cause [api]",
+					"time_in_queue.ms": int64(86),
+					"insert_order":     int64(101),
+				},
+				Timestamp: time.Time{},
+				Took:      0,
+			},
+		}},
+		{"./_meta/test/tasks.622.json", []mb.Event{
+			mb.Event{
+				RootFields: common.MapStr{
+					"service": common.MapStr{
+						"name": "elasticsearch",
+					},
+				},
+				ModuleFields: common.MapStr{
+					"cluster": common.MapStr{
+						"id":   "1234",
+						"name": "helloworld",
+					},
+				},
+				MetricSetFields: common.MapStr{
+					"priority":         "URGENT",
+					"source":           "create-index [foo_9], cause [api]",
+					"time_in_queue.ms": int64(86),
+					"insert_order":     int64(101),
+				},
+				Timestamp: time.Time{},
+				Took:      0,
+			},
+			mb.Event{
+				RootFields: common.MapStr{
+					"service": common.MapStr{
+						"name": "elasticsearch",
+					},
+				},
+				ModuleFields: common.MapStr{
+					"cluster": common.MapStr{
+						"id":   "1234",
+						"name": "helloworld",
+					},
+				},
+				MetricSetFields: common.MapStr{"priority": "HIGH",
+					"source":           "shard-started ([foo_2][1], node[tMTocMvQQgGCkj7QDHl3OA], [P], s[INITIALIZING]), reason [after recovery from shard_store]",
+					"time_in_queue.ms": int64(842),
+					"insert_order":     int64(46),
+				},
+				Timestamp: time.Time{},
+				Took:      0,
+			}, mb.Event{
+				RootFields: common.MapStr{
+					"service": common.MapStr{
+						"name": "elasticsearch",
+					},
+				},
+				ModuleFields: common.MapStr{
+					"cluster": common.MapStr{
+						"id":   "1234",
+						"name": "helloworld",
+					},
+				},
+				MetricSetFields: common.MapStr{
+					"priority":         "HIGH",
+					"source":           "shard-started ([foo_2][0], node[tMTocMvQQgGCkj7QDHl3OA], [P], s[INITIALIZING]), reason [after recovery from shard_store]",
+					"time_in_queue.ms": int64(858),
+					"insert_order":     int64(45),
+				}, Timestamp: time.Time{},
+				Took: 0,
+			},
+		}},
 	}
 
 	for _, testCase := range testCases {
 		content, err := ioutil.ReadFile(testCase.given)
 		assert.NoError(t, err)
 
-		events, _ := eventsMapping(content)
+		reporter := &mbtest.CapturingReporterV2{}
+		err = eventsMapping(reporter, info, content)
 
+		events := reporter.GetEvents()
 		if !reflect.DeepEqual(testCase.expected, events) {
 			t.Errorf("Expected %v, actual: %v", testCase.expected, events)
 		}

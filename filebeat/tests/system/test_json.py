@@ -59,10 +59,8 @@ class Test(BaseTest):
         output = self.read_output()
         assert len(output) == 19
 
-        assert all("log" in o for o in output)
         assert all("time" in o for o in output)
         assert all(o["stream"] == "stdout" for o in output)
-        assert all("windows" not in o["log"] for o in output)
 
     def test_simple_json_overwrite(self):
         """

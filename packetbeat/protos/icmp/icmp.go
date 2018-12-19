@@ -94,7 +94,7 @@ func (icmp *icmpPlugin) init(results protos.Reporter, config *icmpConfig) error 
 	var err error
 	icmp.localIps, err = common.LocalIPAddrs()
 	if err != nil {
-		logp.Err("icmp", "Error getting local IP addresses: %s", err)
+		logp.Err("Error getting local IP addresses: %+v", err)
 		icmp.localIps = []net.IP{}
 	}
 	logp.Debug("icmp", "Local IP addresses: %s", icmp.localIps)
@@ -283,11 +283,15 @@ func (icmp *icmpPlugin) publishTransaction(trans *icmpTransaction) {
 
 	logp.Debug("icmp", "Publishing transaction. %s", &trans.tuple)
 
-	fields := common.MapStr{}
-
 	// common fields - group "env"
-	fields["client_ip"] = trans.tuple.srcIP
-	fields["ip"] = trans.tuple.dstIP
+	fields := common.MapStr{
+		"client": common.MapStr{
+			"ip": trans.tuple.srcIP,
+		},
+		"server": common.MapStr{
+			"ip": trans.tuple.dstIP,
+		},
+	}
 
 	// common fields - group "event"
 	fields["type"] = "icmp"            // protocol name

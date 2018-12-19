@@ -1,0 +1,6 @@
+- module: foo
+  metricsets: ["bar"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+

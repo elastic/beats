@@ -50,6 +50,12 @@ func eventMapping(cont *types.Container, m *MetricSet) common.MapStr {
 		logp.Err("Error inspecting container %v: %v", cont.ID, err)
 		return nil
 	}
+
+	// Check if the container has any health check
+	if container.State.Health == nil {
+		return nil
+	}
+
 	lastEvent := len(container.State.Health.Log) - 1
 
 	// Checks if a healthcheck already happened

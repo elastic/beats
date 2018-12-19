@@ -1,0 +1,48 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "action": "existing_user",
+        "dataset": "user",
+        "id": "b0bbc4e2-9540-4aaf-b74e-ef9de506e852",
+        "kind": "state",
+        "module": "system"
+    },
+    "message": "Existing user elastic (UID: 1002, Groups: elastic,docker)",
+    "service": {
+        "type": "system"
+    },
+    "system": {
+        "audit": {
+            "user": {
+                "dir": "/home/elastic",
+                "gid": 1002,
+                "group": [
+                    {
+                        "gid": 1002,
+                        "name": "elastic"
+                    },
+                    {
+                        "gid": 999,
+                        "name": "docker"
+                    }
+                ],
+                "name": "elastic",
+                "password": {
+                    "last_changed": "2018-12-07T00:00:00Z",
+                    "type": "shadow_password"
+                },
+                "shell": "/usr/bin/zsh",
+                "uid": 1002,
+                "user_information": ",,,"
+            }
+        }
+    },
+    "user": {
+        "id": 1002,
+        "name": "elastic"
+    }
+}

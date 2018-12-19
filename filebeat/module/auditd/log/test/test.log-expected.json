@@ -11,11 +11,10 @@
         "auditd.log.ses": "4294967295", 
         "auditd.log.src": "192.168.2.0", 
         "auditd.log.src_prefixlen": "24", 
-        "fileset.module": "auditd", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "auditd", 
         "input.type": "log", 
-        "offset": 0, 
-        "prospector.type": "log"
+        "log.offset": 0
     }, 
     {
         "@timestamp": "2017-01-31T20:17:14.891Z", 
@@ -45,10 +44,9 @@
         "auditd.log.syscall": "44", 
         "auditd.log.tty": "(none)", 
         "auditd.log.uid": "0", 
-        "fileset.module": "auditd", 
-        "fileset.name": "log", 
+        "event.dataset": "log", 
+        "event.module": "auditd", 
         "input.type": "log", 
-        "offset": 174, 
-        "prospector.type": "log"
+        "log.offset": 174
     }
 ]

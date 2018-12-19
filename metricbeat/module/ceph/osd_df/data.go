@@ -47,7 +47,7 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	var d OsdDfRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		logp.Err("Error: ", err)
+		logp.Err("Error: %+v", err)
 		return nil, err
 	}
 
