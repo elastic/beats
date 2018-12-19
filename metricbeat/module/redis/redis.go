@@ -137,11 +137,12 @@ func FetchKeyInfo(c rd.Conn, key string) (map[string]interface{}, error) {
 	return info, nil
 }
 
-// FetchKeys gets a list of keys based on a pattern using SCAN, `max` is a
+// FetchKeys gets a list of keys based on a pattern using SCAN, `limit` is a
 // safeguard to limit the number of commands executed and the number of keys
-// returned, it is not a hard-limit to the length of the string. Setting
-// `max` to 0 disables the limit.
-func FetchKeys(c rd.Conn, pattern string, max uint) ([]string, error) {
+// returned, if more than `limit` keys are being collected the method stops
+// and returns the keys already collected. Setting `limit` to ' disables this
+// limit.
+func FetchKeys(c rd.Conn, pattern string, limit uint) ([]string, error) {
 	cursor := 0
 	var keys []string
 	for {
@@ -158,7 +159,7 @@ func FetchKeys(c rd.Conn, pattern string, max uint) ([]string, error) {
 
 		keys = append(keys, scanKeys...)
 
-		if cursor == 0 || (max > 0 && len(keys) > int(max)) {
+		if cursor == 0 || (limit > 0 && len(keys) > int(limit)) {
 			break
 		}
 	}

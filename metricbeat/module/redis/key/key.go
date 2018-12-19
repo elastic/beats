@@ -49,7 +49,7 @@ type MetricSet struct {
 type KeyPattern struct {
 	Keyspace uint   `config:"keyspace"`
 	Pattern  string `config:"pattern" validate:"required"`
-	Max      uint   `config:"max"`
+	Limit    uint   `config:"limit"`
 }
 
 // New creates new instance of MetricSet
@@ -88,14 +88,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 			continue
 		}
 
-		keys, err := redis.FetchKeys(conn, p.Pattern, p.Max)
+		keys, err := redis.FetchKeys(conn, p.Pattern, p.Limit)
 		if err != nil {
 			logp.Err("Failed to fetch list of keys in keyspace %d with pattern '%s': %s", p.Keyspace, p.Pattern, err)
 			continue
 		}
-		if p.Max > 0 && len(keys) > int(p.Max) {
-			debugf("Collecting stats for %d keys, but there are more available for pattern '%s' in keyspace %d", p.Max)
-			keys = keys[:p.Max]
+		if p.Limit > 0 && len(keys) > int(p.Limit) {
+			debugf("Collecting stats for %d keys, but there are more available for pattern '%s' in keyspace %d", p.Limit)
+			keys = keys[:p.Limit]
 		}
 
 		for _, key := range keys {
