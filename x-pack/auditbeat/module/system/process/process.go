@@ -36,6 +36,7 @@ const (
 
 	eventTypeState = "state"
 	eventTypeEvent = "event"
+	eventTypeError = "error"
 )
 
 type eventAction uint8
@@ -44,6 +45,7 @@ const (
 	eventActionExistingProcess eventAction = iota
 	eventActionProcessStarted
 	eventActionProcessStopped
+	eventActionProcessError
 )
 
 func (action eventAction) String() string {
@@ -54,6 +56,8 @@ func (action eventAction) String() string {
 		return "process_started"
 	case eventActionProcessStopped:
 		return "process_stopped"
+	case eventActionProcessError:
+		return "process_error"
 	default:
 		return ""
 	}
@@ -197,13 +201,14 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 		return errors.Wrap(err, "error generating state ID")
 	}
 	for _, p := range processes {
-		if p.Error != nil {
+		if p.Error == nil {
+			event := processEvent(p, eventTypeState, eventActionExistingProcess)
+			event.RootFields.Put("event.id", stateID.String())
+			report.Event(event)
+		} else {
 			ms.log.Warn(p.Error)
+			report.Event(processEvent(p, eventTypeError, eventActionProcessError))
 		}
-
-		event := processEvent(p, eventTypeState, eventActionExistingProcess)
-		event.RootFields.Put("event.id", stateID.String())
-		report.Event(event)
 	}
 
 	if ms.cache != nil {
@@ -237,21 +242,23 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	for _, cacheValue := range started {
 		p := cacheValue.(*Process)
 
-		if p.Error != nil {
+		if p.Error == nil {
+			report.Event(processEvent(p, eventTypeEvent, eventActionProcessStarted))
+		} else {
 			ms.log.Warn(p.Error)
+			report.Event(processEvent(p, eventTypeError, eventActionProcessError))
 		}
-
-		report.Event(processEvent(p, eventTypeEvent, eventActionProcessStarted))
 	}
 
 	for _, cacheValue := range stopped {
 		p := cacheValue.(*Process)
 
-		if p.Error != nil {
+		if p.Error == nil {
+			report.Event(processEvent(p, eventTypeEvent, eventActionProcessStopped))
+		} else {
 			ms.log.Warn(p.Error)
+			report.Event(processEvent(p, eventTypeError, eventActionProcessError))
 		}
-
-		report.Event(processEvent(p, eventTypeEvent, eventActionProcessStopped))
 	}
 
 	return nil
