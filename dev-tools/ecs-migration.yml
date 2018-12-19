@@ -448,6 +448,29 @@
   to: message
   alias: true
 
+## Icinga module
+
+- from: icinga.debug.message
+  to: message
+  alias: true
+- from: icinga.debug.severity
+  to: message
+  alias: true
+
+- from: icinga.main.message
+  to: message
+  alias: true
+- from: icinga.main.severity
+  to: message
+  alias: true
+
+- from: icinga.startup.message
+  to: message
+  alias: true
+- from: icinga.startup.severity
+  to: message
+  alias: true
+
 # Auditbeat
 
 ## From Auditbeat's auditd module.
