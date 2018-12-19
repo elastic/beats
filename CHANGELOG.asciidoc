@@ -50,9 +50,9 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 - Refresh host metadata in add_host_metadata. {pull}9359[9359]
 - When collecting swap metrics for beats telemetry or system metricbeat module handle cases of free swap being bigger than total swap by assuming no swap is being used. {issue}6271[6271] {pull}9383[9383]
 - Ignore non index fields in default_field for Elasticsearch. {pull}9549[9549]
-- Update Golang to 1.10.6. {pull}9563[9563]
 - Update Kibana index pattern attributes for objects that are disabled. {pull}9644[9644]
 - Enforce validation for the Central Management access token. {issue}9621[9621]
+- Update Golang to 1.10.7. {pull}9640[9640]
 
 *Auditbeat*
 
