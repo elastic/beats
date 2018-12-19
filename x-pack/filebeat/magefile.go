@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -20,6 +21,12 @@ import (
 func init() {
 	mage.BeatDescription = "Filebeat sends log files to Logstash or directly to Elasticsearch."
 	mage.BeatLicense = "Elastic License"
+}
+
+// Aliases provides compatibility with CI while we transition all Beats
+// to having common testing targets.
+var Aliases = map[string]interface{}{
+	"goTestUnit": GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.
@@ -61,6 +68,18 @@ func Config() {
 // Update is an alias for running fields, dashboards, config.
 func Update() {
 	mg.SerialDeps(Fields, Dashboards, Config)
+}
+
+// UnitTest executes the unit tests.
+func UnitTest() {
+	mg.SerialDeps(GoUnitTest)
+}
+
+// GoUnitTest executes the Go unit tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoUnitTest(ctx context.Context) error {
+	return mage.GoTest(ctx, mage.DefaultGoTestUnitArgs())
 }
 
 // -----------------------------------------------------------------------------

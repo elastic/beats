@@ -5,12 +5,11 @@
       "Timestamp": "2015-10-08T19:06:29Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2015-10-08T19:06:29Z"
+          "category": "network_traffic",
+          "created": "2015-10-08T19:06:29Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -28,6 +27,9 @@
             "octet_delta_count": 0
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null

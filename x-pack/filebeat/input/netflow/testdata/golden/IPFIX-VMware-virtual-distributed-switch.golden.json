@@ -10,12 +10,11 @@
           "locality": "private",
           "port": 5985
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2016-12-22T12:17:52Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2016-12-22T12:17:52Z",
+          "kind": "event"
         },
         "flow": {
           "id": "p2ZChbTH1YU",
@@ -47,7 +46,7 @@
           "source_ipv4_address": "172.18.65.21",
           "source_transport_port": 61209,
           "tcp_control_bits": 2,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vmware_egress_interface_attr": 2,
           "vmware_ingress_interface_attr": 1,
           "vmware_vxlan_export_role": 0
@@ -56,8 +55,12 @@
           "bytes": 100,
           "community_id": "1:Rs7Lnh/lOTiJTtqZqBdEOBbKchs=",
           "direction": "outbound",
+          "iana_number": 6,
           "packets": 2,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "172.18.65.21",
@@ -76,12 +79,11 @@
           "locality": "private",
           "port": 138
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2016-12-22T12:17:56Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2016-12-22T12:17:56Z",
+          "kind": "event"
         },
         "flow": {
           "id": "J4VOqDnsqno",
@@ -113,7 +115,7 @@
           "source_ipv4_address": "172.18.65.91",
           "source_transport_port": 138,
           "tcp_control_bits": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vmware_egress_interface_attr": 2,
           "vmware_ingress_interface_attr": 1,
           "vmware_vxlan_export_role": 0
@@ -122,8 +124,12 @@
           "bytes": 229,
           "community_id": "1:dfYpWxplvmUP34MWL1A0xpN2SRw=",
           "direction": "outbound",
+          "iana_number": 17,
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "172.18.65.91",
@@ -142,12 +148,11 @@
           "locality": "private",
           "port": 138
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2016-12-22T12:17:56Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2016-12-22T12:17:56Z",
+          "kind": "event"
         },
         "flow": {
           "id": "J4VOqDnsqno",
@@ -179,7 +184,7 @@
           "source_ipv4_address": "172.18.65.91",
           "source_transport_port": 138,
           "tcp_control_bits": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vmware_egress_interface_attr": 2,
           "vmware_ingress_interface_attr": 1,
           "vmware_vxlan_export_role": 0
@@ -188,8 +193,12 @@
           "bytes": 229,
           "community_id": "1:dfYpWxplvmUP34MWL1A0xpN2SRw=",
           "direction": "outbound",
+          "iana_number": 17,
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "172.18.65.91",
@@ -208,12 +217,11 @@
           "locality": "private",
           "port": 5355
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2016-12-22T12:26:04Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2016-12-22T12:26:04Z",
+          "kind": "event"
         },
         "flow": {
           "id": "iPG_hIy8oDM",
@@ -245,7 +253,7 @@
           "source_ipv4_address": "172.18.65.21",
           "source_transport_port": 61329,
           "tcp_control_bits": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vmware_egress_interface_attr": 2,
           "vmware_ingress_interface_attr": 1,
           "vmware_vxlan_export_role": 0
@@ -254,8 +262,12 @@
           "bytes": 104,
           "community_id": "1:ZPVVwcy+Kfw9UUtwR8lyWYv8htU=",
           "direction": "outbound",
+          "iana_number": 17,
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "172.18.65.21",
@@ -272,12 +284,11 @@
         "destination": {
           "port": 5355
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2016-12-22T12:26:04Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2016-12-22T12:26:04Z",
+          "kind": "event"
         },
         "flow": {
           "id": "y_Vml2vPNtw",
@@ -309,7 +320,7 @@
           "source_ipv6_address": "fe80::5187:5cd8:d750:cdc9",
           "source_transport_port": 61329,
           "tcp_control_bits": 0,
-          "type": "netflow",
+          "type": "netflow_flow",
           "vmware_egress_interface_attr": 2,
           "vmware_ingress_interface_attr": 1,
           "vmware_vxlan_export_role": 0
@@ -318,8 +329,12 @@
           "bytes": 144,
           "community_id": "1:Nl0K3f1AqKrkGYEhoNHcgFAr/EY=",
           "direction": "outbound",
+          "iana_number": 17,
           "packets": 2,
-          "protocol": "udp"
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "port": 61329

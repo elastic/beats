@@ -5,12 +5,11 @@
       "Timestamp": "2018-06-01T15:11:53Z",
       "Meta": null,
       "Fields": {
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
           "action": "netflow_options",
-          "created": "2018-06-01T15:11:53Z"
+          "category": "network_traffic",
+          "created": "2018-06-01T15:11:53Z",
+          "kind": "event"
         },
         "netflow": {
           "exporter": {
@@ -36,6 +35,9 @@
             "exporting_process_id": 2
           },
           "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         }
       },
       "Private": null
