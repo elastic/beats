@@ -479,6 +479,9 @@ class Test(metricbeat.BaseTest):
 
             assert isinstance(tcp["all"]["count"], int)
             assert isinstance(tcp["all"]["listening"], int)
+            assert isinstance(tcp["all"]["established"], int)
+            assert isinstance(tcp["all"]["close_wait"], int)
+            assert isinstance(tcp["all"]["time_wait"], int)
 
             assert isinstance(udp["all"]["count"], int)
 
