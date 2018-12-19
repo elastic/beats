@@ -4,8 +4,8 @@
     "grok": {
       "field": "message",
       "patterns":[
-        "%{IPORHOST:apache2.access.remote_ip} - %{DATA:user.name} \\[%{HTTPDATE:apache2.access.time}\\] \"%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}\" %{NUMBER:http.response.status_code:int} (?:%{NUMBER:apache2.access.body_sent.bytes:int}|-)( \"%{DATA:http.request.referrer}\")?( \"%{DATA:apache2.access.agent}\")?",
-        "%{IPORHOST:apache2.access.remote_ip} - %{DATA:user.name} \\[%{HTTPDATE:apache2.access.time}\\] \"-\" %{NUMBER:http.response.status_code:int} -"
+        "%{IPORHOST:apache2.access.remote_ip} - %{DATA:user.name} \\[%{HTTPDATE:apache2.access.time}\\] \"%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}\" %{NUMBER:http.response.status_code:long} (?:%{NUMBER:apache2.access.body_sent.bytes:long}|-)( \"%{DATA:http.request.referrer}\")?( \"%{DATA:apache2.access.agent}\")?",
+        "%{IPORHOST:apache2.access.remote_ip} - %{DATA:user.name} \\[%{HTTPDATE:apache2.access.time}\\] \"-\" %{NUMBER:http.response.status_code:long} -"
         ],
       "ignore_missing": true
     }
