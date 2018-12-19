@@ -154,7 +154,7 @@ func getFlowsFromDat(t testing.TB, name string, datFiles ...string) TestResult {
 		WithProtocols(protocol.Registry.All()...).
 		WithSequenceResetEnabled(false).
 		WithExpiration(0).
-		WithLogOutput(test.TestLogWriter{t})
+		WithLogOutput(test.TestLogWriter{TB: t})
 
 	decoder, err := decoder.NewDecoder(config)
 	if !assert.NoError(t, err) {
@@ -205,7 +205,7 @@ func getFlowsFromPCAP(t testing.TB, name, pcapFile string) TestResult {
 		WithProtocols(protocol.Registry.All()...).
 		WithSequenceResetEnabled(false).
 		WithExpiration(0).
-		WithLogOutput(test.TestLogWriter{t})
+		WithLogOutput(test.TestLogWriter{TB: t})
 
 	decoder, err := decoder.NewDecoder(config)
 	if !assert.NoError(t, err) {

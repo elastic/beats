@@ -159,7 +159,7 @@ func TestSessionReset(t *testing.T) {
 	}
 	t.Run("Reset disabled", func(t *testing.T) {
 		cfg := config.Defaults()
-		cfg.WithSequenceResetEnabled(false).WithLogOutput(test.TestLogWriter{t})
+		cfg.WithSequenceResetEnabled(false).WithLogOutput(test.TestLogWriter{TB: t})
 		proto := New(cfg)
 		flows, err := proto.OnPacket(test.MakePacket(templatePacket), addr)
 		assert.NoError(t, err)
@@ -170,7 +170,7 @@ func TestSessionReset(t *testing.T) {
 	})
 	t.Run("Reset enabled", func(t *testing.T) {
 		cfg := config.Defaults()
-		cfg.WithSequenceResetEnabled(true).WithLogOutput(test.TestLogWriter{t})
+		cfg.WithSequenceResetEnabled(true).WithLogOutput(test.TestLogWriter{TB: t})
 		proto := New(cfg)
 		flows, err := proto.OnPacket(test.MakePacket(templatePacket), addr)
 		assert.NoError(t, err)
