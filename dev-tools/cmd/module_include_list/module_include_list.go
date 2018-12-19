@@ -26,6 +26,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"text/template"
 
@@ -132,6 +133,8 @@ func main() {
 		imports = append(imports, filepath.ToSlash(
 			filepath.Join(repo.ImportPath, importDir)))
 	}
+
+	sort.Strings(imports)
 
 	// Populate the template.
 	var buf bytes.Buffer
