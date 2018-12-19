@@ -22,10 +22,7 @@ func TestData(t *testing.T) {
 		t.Fatal("no events were generated")
 	}
 
-	// The first process (events[0]) is usually something like systemd,
-	// the last few are test processes, so we pick something more interesting
-	// towards the end.
-	fullEvent := mbtest.StandardizeEvent(f, events[len(events)-8], core.AddDatasetToEvent)
+	fullEvent := mbtest.StandardizeEvent(f, events[0], core.AddDatasetToEvent)
 	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 
