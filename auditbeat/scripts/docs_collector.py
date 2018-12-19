@@ -153,20 +153,10 @@ For a description of each field in the metricset, see the
 
     module_list_output = generated_note
     for m, title in sorted(six.iteritems(modules_list)):
-        if m == "system":
-            # This is a very crude way of excluding references to X-Pack docs from
-            # the build until the docs build is updated with the new folder.
-            # TODO: Remove at the earliest possible time.
-            continue
         module_list_output += "  * <<{beatname_lc}-module-" + m + "," + title + ">>\n"
 
     module_list_output += "\n\n--\n\n"
     for module_name, module_path in sorted(six.iteritems(module_dirs)):
-        if module_name == "system":
-            # This is a very crude way of excluding references to X-Pack docs from
-            # the build until the docs build is updated with the new folder.
-            # TODO: Remove at the earliest possible time.
-            continue
         rel_path_to_module_docs = os.path.relpath(module_docs_path(module_path), docs_path)
         module_list_output += "include::" + \
             os.path.join(rel_path_to_module_docs, "modules", module_name + ".asciidoc") + "[]\n"
