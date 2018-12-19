@@ -63,6 +63,7 @@ class Test(metricbeat.BaseTest):
             host=self.compose_hosts()[0],
             port=os.getenv('REDIS_PORT', '6379'),
             db=0)
+        r.flushall()
         r.set('foo', 'bar')
 
         self.render_config_template(modules=[{
@@ -97,7 +98,7 @@ class Test(metricbeat.BaseTest):
             host=self.compose_hosts()[0],
             port=os.getenv('REDIS_PORT', '6379'),
             db=0)
-        r.delete('list-key')
+        r.flushall()
         r.rpush('list-key', 'one', 'two', 'three')
 
         self.render_config_template(modules=[{

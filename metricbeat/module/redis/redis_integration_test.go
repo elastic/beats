@@ -32,13 +32,6 @@ import (
 
 var host = GetRedisEnvHost() + ":" + GetRedisEnvPort()
 
-var lastDB = uint(0)
-
-func nextDB() uint {
-	lastDB++
-	return lastDB
-}
-
 func TestFetchKeys(t *testing.T) {
 	compose.EnsureUp(t, "redis")
 
@@ -48,7 +41,7 @@ func TestFetchKeys(t *testing.T) {
 	}
 	defer conn.Close()
 
-	Select(conn, nextDB())
+	conn.Do("FLUSHALL")
 	conn.Do("SET", "foo", "bar")
 	conn.Do("LPUSH", "foo-list", "42")
 
@@ -74,7 +67,7 @@ func TestFetchKeyInfo(t *testing.T) {
 	}
 	defer conn.Close()
 
-	Select(conn, nextDB())
+	conn.Do("FLUSHALL")
 
 	cases := []struct {
 		Title    string
