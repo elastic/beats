@@ -10,14 +10,13 @@
           "locality": "public",
           "port": 50234
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
+          "action": "netflow_flow",
+          "category": "network_traffic",
           "created": "2018-06-06T13:20:17Z",
           "duration": 0,
           "end": "2018-06-06T13:20:02Z",
+          "kind": "event",
           "start": "2018-06-06T13:20:02Z"
         },
         "flow": {
@@ -50,14 +49,18 @@
           "source_ipv4_address": "134.220.2.6",
           "source_transport_port": 88,
           "tcp_control_bits": 94,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 363,
           "community_id": "1:0PLHlww9zxRlvByabAFlUctNy14=",
           "direction": "inbound",
+          "iana_number": 6,
           "packets": 3,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "134.220.2.6",

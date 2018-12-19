@@ -10,12 +10,11 @@
           "locality": "private",
           "port": 137
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-12-01T17:04:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-12-01T17:04:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "XApOh2nrI60",
@@ -44,14 +43,18 @@
           "sampler_id": 1,
           "source_ipv4_address": "192.168.0.3",
           "source_transport_port": 137,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 78,
           "community_id": "1:exuCftrHyAyRt6vQ7silX0RyM6c=",
           "direction": "inbound",
+          "iana_number": 17,
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.0.3",
@@ -70,12 +73,11 @@
           "locality": "private",
           "port": 6343
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-12-01T17:04:39Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-12-01T17:04:39Z",
+          "kind": "event"
         },
         "flow": {
           "id": "eTDK1gD4I9Y",
@@ -104,14 +106,18 @@
           "sampler_id": 1,
           "source_ipv4_address": "192.168.0.4",
           "source_transport_port": 58130,
-          "type": "netflow"
+          "type": "netflow_flow"
         },
         "network": {
           "bytes": 232,
           "community_id": "1:0CGjtxAvSJC5Eo2OErzsmgtb9JE=",
           "direction": "outbound",
+          "iana_number": 17,
           "packets": 1,
-          "protocol": "udp"
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "192.168.0.4",
