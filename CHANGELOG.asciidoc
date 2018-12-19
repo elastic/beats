@@ -115,6 +115,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 - Add event.dataset to module events. {pull}9457[9457]
 - Add field log.source.address and log.file.path to replace source. {pull}9435[9435]
 - Add support for multi-core thread_id in postgresql module {issue}9156[9156] {pull}9482[9482]
+- Added netflow input type that supports NetFlow v1, v5, v6, v7, v8, v9 and IPFIX. {issue}9399[9399]
 
 *Heartbeat*
 

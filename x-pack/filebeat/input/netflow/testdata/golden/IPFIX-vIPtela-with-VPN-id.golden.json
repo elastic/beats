@@ -10,12 +10,11 @@
           "locality": "private",
           "port": 443
         },
-        "device": {
-          "ip": "192.0.2.1"
-        },
         "event": {
-          "action": "netflow",
-          "created": "2017-11-21T14:32:15Z"
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-11-21T14:32:15Z",
+          "kind": "event"
         },
         "flow": {
           "id": "5qh7ipMbBV0",
@@ -52,15 +51,19 @@
           "source_ipv4_address": "10.113.7.54",
           "source_transport_port": 41717,
           "tcp_control_bits": 16,
-          "type": "netflow",
+          "type": "netflow_flow",
           "viptela_vpin_d": 100
         },
         "network": {
           "bytes": 775,
           "community_id": "1:+fvsmN9SnAg8yt/KBn6yA19IrXE=",
           "direction": "unknown",
+          "iana_number": 6,
           "packets": 8,
-          "protocol": "tcp"
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
         },
         "source_ecs": {
           "ip": "10.113.7.54",

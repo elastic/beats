@@ -55,7 +55,7 @@ func toBeatEventCommon(flow record.Record) (event beat.Event) {
 	// Nest Type into netflow fields
 	switch flow.Type {
 	case record.Flow:
-		flow.Fields["type"] = "netflow"
+		flow.Fields["type"] = "netflow_flow"
 	case record.Options:
 		flow.Fields["type"] = "netflow_options"
 	default:
@@ -64,8 +64,10 @@ func toBeatEventCommon(flow record.Record) (event beat.Event) {
 
 	// ECS Fields -- event
 	ecsEvent := common.MapStr{
-		"created": flow.Timestamp,
-		"action":  flow.Fields["type"],
+		"created":  flow.Timestamp,
+		"kind":     "event",
+		"category": "network_traffic",
+		"action":   flow.Fields["type"],
 	}
 	// ECS Fields -- device
 	ecsDevice := common.MapStr{}
@@ -75,9 +77,9 @@ func toBeatEventCommon(flow record.Record) (event beat.Event) {
 
 	event.Timestamp = flow.Timestamp
 	event.Fields = common.MapStr{
-		"netflow": fieldNameConverter.ToSnakeCase(flow.Fields),
-		"event":   ecsEvent,
-		"device":  ecsDevice,
+		"netflow":  fieldNameConverter.ToSnakeCase(flow.Fields),
+		"event":    ecsEvent,
+		"observer": ecsDevice,
 	}
 	return
 }
@@ -240,7 +242,8 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 	// ECS Fields -- network
 	ecsNetwork := common.MapStr{}
 	if proto, found := getKeyUint64(flow.Fields, "protocolIdentifier"); found {
-		ecsNetwork["protocol"] = IPProtocol(proto).String()
+		ecsNetwork["transport"] = IPProtocol(proto).String()
+		ecsNetwork["iana_number"] = proto
 	}
 	countBytes, hasBytes := getKeyUint64(flow.Fields, "octetDeltaCount")
 	if !hasBytes {
@@ -283,6 +286,18 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 			countPkts += revPkts
 		}
 		ecsNetwork["packets"] = countPkts
+	}
+
+	if biflowDir, isBiflow := getKeyUint64(flow.Fields, "biflowDirection"); isBiflow && len(ecsSource) > 0 && len(ecsDest) > 0 {
+		// swap source and destination if biflowDirection is reverseInitiator
+		if biflowDir == 2 {
+			ecsDest, ecsSource = ecsSource, ecsDest
+		}
+		ecsEvent["category"] = "network_session"
+
+		// Assume source is the client in biflows.
+		event.Fields["client"] = ecsSource
+		event.Fields["server"] = ecsDest
 	}
 
 	ecsNetwork["direction"] = "unknown"
