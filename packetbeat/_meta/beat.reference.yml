@@ -11,7 +11,7 @@
 
 # Select the network interface to sniff the data. You can use the "any"
 # keyword to sniff on all connected interfaces.
-packetbeat.interfaces.device: any
+packetbeat.interfaces.device: {{ call .device .GOOS }}
 
 # Packetbeat supports three sniffer types:
 # * pcap, which uses the libpcap library and works on most platforms, but it's
