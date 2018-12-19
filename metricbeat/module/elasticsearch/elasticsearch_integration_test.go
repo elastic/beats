@@ -167,7 +167,7 @@ func createIndex(host string) error {
 func enableTrialLicense(host string) error {
 	client := &http.Client{}
 
-	enableXPackURL := "/_xpack/license/start_trial?acknowledge=true"
+	enableXPackURL := "/_license/start_trial?acknowledge=true"
 
 	req, err := http.NewRequest("POST", "http://"+host+enableXPackURL, nil)
 	if err != nil {
@@ -198,7 +198,9 @@ func createMLJob(host string) error {
 		return err
 	}
 
-	jobURL := "/_xpack/ml/anomaly_detectors/total-requests"
+	client := &http.Client{}
+
+	jobURL := "/_ml/anomaly_detectors/total-requests"
 
 	if checkExists("http://" + host + jobURL) {
 		return nil

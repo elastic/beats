@@ -130,7 +130,7 @@ func TestImportJobs(t *testing.T) {
 
 	// check by GETing back
 
-	status, response, err := client.Request("GET", "/_xpack/ml/anomaly_detectors", "", nil, nil)
+	status, response, err := client.Request("GET", "/_ml/anomaly_detectors", "", nil, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, 200, status)
 
@@ -157,7 +157,7 @@ func TestImportJobs(t *testing.T) {
 	}
 	assert.True(t, found)
 
-	status, response, err = client.Request("GET", "/_xpack/ml/datafeeds", "", nil, nil)
+	status, response, err = client.Request("GET", "/_ml/datafeeds", "", nil, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, 200, status)
 

@@ -33,7 +33,7 @@ func init() {
 }
 
 const (
-	jobPath = "/_xpack/ml/anomaly_detectors/_all/_stats"
+	jobPath = "/_ml/anomaly_detectors/_all/_stats"
 )
 
 // MetricSet for ml job

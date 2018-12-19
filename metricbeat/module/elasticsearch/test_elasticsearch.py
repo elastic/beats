@@ -52,8 +52,15 @@ class Test(metricbeat.BaseTest):
                 os.getenv('ES_PORT', '9200')]
 
     def create_ml_job(self, es):
+        # Enable xpack trial
+        try:
+            es.transport.perform_request('POST', "/_license/start_trial?acknowledge=true")
+        except:
+            e = sys.exc_info()[0]
+            print "Trial already enabled. Error: {}".format(e)
+
         # Check if an ml job already exists
-        response = es.transport.perform_request('GET', "/_xpack/ml/anomaly_detectors/_all/")
+        response = es.transport.perform_request('GET', "/_ml/anomaly_detectors/_all/")
         if response["count"] > 0:
             return
 
@@ -63,7 +70,7 @@ class Test(metricbeat.BaseTest):
         with open(file, 'r') as f:
             body = json.load(f)
 
-        path = "/_xpack/ml/anomaly_detectors/test"
+        path = "/_ml/anomaly_detectors/test"
         es.transport.perform_request('PUT', path, body=body)
 
     def create_ccr_stats(self, es):

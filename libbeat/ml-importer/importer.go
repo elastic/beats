@@ -35,8 +35,8 @@ import (
 )
 
 var (
-	esDataFeedURL        = "/_xpack/ml/datafeeds/datafeed-%s"
-	esJobURL             = "/_xpack/ml/anomaly_detectors/%s"
+	esDataFeedURL        = "/_ml/datafeeds/datafeed-%s"
+	esJobURL             = "/_ml/anomaly_detectors/%s"
 	kibanaGetModuleURL   = "/api/ml/modules/get_module/%s"
 	kibanaRecognizeURL   = "/api/ml/modules/recognize/%s"
 	kibanaSetupModuleURL = "/api/ml/modules/setup/%s"

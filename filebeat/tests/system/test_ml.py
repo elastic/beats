@@ -49,22 +49,22 @@ class Test(BaseTest):
         from elasticsearch import AuthorizationException
 
         try:
-            output = self.es.transport.perform_request("POST", "/_xpack/license/start_trial?acknowledge=true")
+            output = self.es.transport.perform_request("POST", "/_license/start_trial?acknowledge=true")
         except AuthorizationException:
             print("License already enabled")
 
         print("Test modules_flag: {}".format(modules_flag))
 
         # Clean any previous state
-        for df in self.es.transport.perform_request("GET", "/_xpack/ml/datafeeds/")["datafeeds"]:
+        for df in self.es.transport.perform_request("GET", "/_ml/datafeeds/")["datafeeds"]:
             if df["datafeed_id"] == 'filebeat-nginx-access-response_code':
                 self.es.transport.perform_request(
-                    "DELETE", "/_xpack/ml/datafeeds/" + df["datafeed_id"])
+                    "DELETE", "/_ml/datafeeds/" + df["datafeed_id"])
 
-        for df in self.es.transport.perform_request("GET", "/_xpack/ml/anomaly_detectors/")["jobs"]:
+        for df in self.es.transport.perform_request("GET", "/_ml/anomaly_detectors/")["jobs"]:
             if df["job_id"] == 'datafeed-filebeat-nginx-access-response_code':
                 self.es.transport.perform_request(
-                    "DELETE", "/_xpack/ml/anomaly_detectors/" + df["job_id"])
+                    "DELETE", "/_ml/anomaly_detectors/" + df["job_id"])
 
         shutil.rmtree(os.path.join(self.working_dir,
                                    "modules.d"), ignore_errors=True)
@@ -109,10 +109,10 @@ class Test(BaseTest):
         # Check result
         self.wait_until(lambda: "filebeat-nginx-access-response_code" in
                                 (df["job_id"] for df in self.es.transport.perform_request(
-                                    "GET", "/_xpack/ml/anomaly_detectors/")["jobs"]),
+                                    "GET", "/_ml/anomaly_detectors/")["jobs"]),
                         max_timeout=60)
         self.wait_until(lambda: "datafeed-filebeat-nginx-access-response_code" in
-                                (df["datafeed_id"] for df in self.es.transport.perform_request("GET", "/_xpack/ml/datafeeds/")["datafeeds"]))
+                                (df["datafeed_id"] for df in self.es.transport.perform_request("GET", "/_ml/datafeeds/")["datafeeds"]))
 
         beat.kill()
 
