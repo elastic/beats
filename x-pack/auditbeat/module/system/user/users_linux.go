@@ -103,7 +103,7 @@ func enrichWithGroups(users []*User) error {
 
 		groupIds, err := goUser.GroupIds()
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "error getting group IDs for user %v (UID: %v)", u.Name, u.UID)
 		}
 
 		for _, gid := range groupIds {
@@ -111,7 +111,7 @@ func enrichWithGroups(users []*User) error {
 			if !found {
 				group, err = user.LookupGroupId(gid)
 				if err != nil {
-					return err
+					return errors.Wrapf(err, "error looking up group ID %v for user %v (UID: %v)", gid, u.Name, u.UID)
 				}
 				gidCache[gid] = group
 			}
