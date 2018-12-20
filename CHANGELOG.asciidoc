@@ -182,6 +182,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...v7.0.0-alpha2[Check the
 - Rename many `redis.log.*` fields to map to ECS. {pull}9315[9315]
 - Rename many `icinga.*` fields to map to ECS. {pull}9294[9294]
 - Rename many `postgresql.log.*` fields to map to ECS. {pull}9303[9303]
+- Rename many `kafka.log.*` fields to map to ECS. {pull}9297[9297]
 
 *Metricbeat*
 

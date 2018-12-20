@@ -376,6 +376,16 @@
   to: network.forwarded_ip
   alias: true
 
+## Kafka module
+
+- from: kafka.log.level
+  to: log.level
+  alias: true
+
+- from: kafka.log.message
+  to: message
+  alias: true
+
 ## NGINX module
 
 - from: nginx.access.user_name

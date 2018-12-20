@@ -5444,31 +5444,21 @@ Kafka log lines.
 
 
 
-*`kafka.log.timestamp`*::
-+
---
-The timestamp from the log line.
-
-
---
-
 *`kafka.log.level`*::
 +
 --
-example: WARN
+type: alias
 
-The log level.
-
+alias to: log.level
 
 --
 
 *`kafka.log.message`*::
 +
 --
-type: text
+type: alias
 
-The logged message.
-
+alias to: message
 
 --
 
