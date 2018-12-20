@@ -14,7 +14,7 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-ceph-cluster_health,cluster_health>> beta[]  
 |<<metricbeat-metricset-ceph-cluster_status,cluster_status>> beta[]  
 |<<metricbeat-metricset-ceph-monitor_health,monitor_health>> beta[]  
-|<<metricbeat-metricset-ceph-osd_df,osd_df>> experimental[]  
+|<<metricbeat-metricset-ceph-osd_df,osd_df>> beta[]  
 |<<metricbeat-metricset-ceph-osd_tree,osd_tree>> beta[]  
 |<<metricbeat-metricset-ceph-pool_disk,pool_disk>> beta[]  
 |<<metricbeat-module-couchbase,Couchbase>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
