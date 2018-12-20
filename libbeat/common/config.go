@@ -263,6 +263,7 @@ func (c *Config) PrintDebugf(msg string, params ...interface{}) {
 	}
 }
 
+// Enabled return the configured enabled value or true by default.
 func (c *Config) Enabled() bool {
 	testEnabled := struct {
 		Enabled bool `config:"enabled"`
