@@ -4813,20 +4813,18 @@ Specifies what component of Icinga logged the message.
 *`icinga.debug.severity`*::
 +
 --
-type: keyword
+type: alias
 
-Possible values are "debug", "notice", "information", "warning" or "critical".
-
+alias to: log.level
 
 --
 
 *`icinga.debug.message`*::
 +
 --
-type: text
+type: alias
 
-The logged message.
-
+alias to: message
 
 --
 
@@ -4850,20 +4848,18 @@ Specifies what component of Icinga logged the message.
 *`icinga.main.severity`*::
 +
 --
-type: keyword
+type: alias
 
-Possible values are "debug", "notice", "information", "warning" or "critical".
-
+alias to: log.level
 
 --
 
 *`icinga.main.message`*::
 +
 --
-type: text
+type: alias
 
-The logged message.
-
+alias to: message
 
 --
 
@@ -4887,20 +4883,18 @@ Specifies what component of Icinga logged the message.
 *`icinga.startup.severity`*::
 +
 --
-type: keyword
+type: alias
 
-Possible values are "debug", "notice", "information", "warning" or "critical".
-
+alias to: log.level
 
 --
 
 *`icinga.startup.message`*::
 +
 --
-type: text
+type: alias
 
-The logged message.
-
+alias to: message
 
 --
 
