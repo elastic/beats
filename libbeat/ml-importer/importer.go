@@ -228,7 +228,7 @@ func checkResponse(r []byte) error {
 
 	for _, feed := range resp.Datafeeds {
 		if !feed.Success {
-			if strings.HasPrefix(feed.Error.Msg, "[resource_already_exists_exception]") {
+			if strings.HasPrefix(feed.Error.Msg, "[status_exception] A datafeed") || strings.HasPrefix(feed.Error.Msg, "[resource_already_exists_exception]") {
 				logp.Debug("machine-learning", "Datafeed already exists: %s, error: %s", feed.ID, feed.Error.Msg)
 				continue
 			}
