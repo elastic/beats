@@ -82,12 +82,6 @@
                 "ignore_missing": true
             }
         },
-        {
-            "uppercase": {
-                "field": "http.request.method",
-                "ignore_missing": true
-            }
-        },
 
         {
             "rename": {
@@ -106,6 +100,13 @@
         {
             "rename": {
                 "field": "kibana.log.meta.req.remoteAddress",
+                "target_field": "source.address",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.address",
                 "target_field": "source.ip",
                 "ignore_missing": true
             }

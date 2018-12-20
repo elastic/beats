@@ -5,7 +5,7 @@
         "event.dataset": "log",
         "event.duration": 26000000,
         "event.module": "kibana",
-        "http.request.method": "GET",
+        "http.request.method": "get",
         "http.request.referrer": "http://localhost:5601/app/kibana",
         "http.response.content_length": 9,
         "http.response.elapsed_time": 26,
