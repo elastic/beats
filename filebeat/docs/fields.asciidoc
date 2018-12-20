@@ -5765,7 +5765,7 @@ alias to: url.original
 
 --
 
-*`kibana.log.kibana.log.meta.meta.statusCode`*::
+*`kibana.log.kibana.log.meta.statusCode`*::
 +
 --
 type: alias

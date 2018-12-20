@@ -35,7 +35,7 @@
       type: alias
       path: url.original
       migration: true
-    - name: kibana.log.meta.meta.statusCode
+    - name: kibana.log.meta.statusCode
       type: alias
       path: http.response.status_code
       migration: true
