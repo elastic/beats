@@ -32,10 +32,17 @@ import (
 // moduleDirs specifies additional directories to search for modules. The
 // contents of each fields.yml will be included in the generated file.
 func GenerateFieldsYAML(moduleDirs ...string) error {
-	return generateFieldsYAML(OSSBeatDir(), moduleDirs...)
+	return generateFieldsYAML(OSSBeatDir(), "fields.yml", moduleDirs...)
 }
 
-func generateFieldsYAML(baseDir string, moduleDirs ...string) error {
+// GenerateFieldsYAMLTo generates a YAML file containing the field definitions
+// for the Beat. It's the same as GenerateFieldsYAML but with a configurable
+// output file.
+func GenerateFieldsYAMLTo(output string, moduleDirs ...string) error {
+	return generateFieldsYAML(OSSBeatDir(), output, moduleDirs...)
+}
+
+func generateFieldsYAML(baseDir, output string, moduleDirs ...string) error {
 	const globalFieldsCmdPath = "libbeat/scripts/cmd/global_fields/main.go"
 
 	beatsDir, err := ElasticBeatsDir()
@@ -47,7 +54,7 @@ func generateFieldsYAML(baseDir string, moduleDirs ...string) error {
 		filepath.Join(beatsDir, globalFieldsCmdPath),
 		"-es_beats_path", beatsDir,
 		"-beat_path", baseDir,
-		"-out", "fields.yml",
+		"-out", output,
 	)
 
 	return globalFieldsCmd(moduleDirs...)

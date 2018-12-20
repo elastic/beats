@@ -56,8 +56,6 @@ class TestKeystore(BaseTest):
         """
         args = [self.test_binary,
                 "-systemTest",
-                "-test.coverprofile",
-                os.path.join(self.working_dir, "coverage.cov"),
                 "-c", os.path.join(self.working_dir, self.beat_name + ".yml"),
                 "-e", "-v", "-d", "*",
                 "keystore", "add", key, "--stdin",

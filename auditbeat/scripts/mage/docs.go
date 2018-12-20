@@ -86,16 +86,5 @@ func CollectDocs(basePaths ...string) error {
 		return err
 	}
 
-	esBeats, err := mage.ElasticBeatsDir()
-	if err != nil {
-		return err
-	}
-
-	return sh.Run(python, mage.LibbeatDir("scripts/generate_fields_docs.py"),
-		XpackBeatDir(), mage.BeatName, esBeats, "--output_path", mage.OSSBeatDir())
-}
-
-// XpackBeatDir returns the x-pack/{beatname} directory for a Beat.
-func XpackBeatDir() string {
-	return mage.OSSBeatDir("../x-pack", mage.BeatName)
+	return mage.Docs.FieldDocs(mage.XPackBeatDir("fields.yml"))
 }
