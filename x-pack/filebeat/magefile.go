@@ -9,9 +9,7 @@ package main
 import (
 	"context"
 	"os"
-	"path/filepath"
 	"regexp"
-	"strings"
 
 	"github.com/magefile/mage/mg"
 
@@ -50,9 +48,14 @@ func Clean() error {
 	return mage.Clean()
 }
 
-// Fields generates a fields.yml and fields.go for each module.
+// Fields generates the fields.yml file and a fields.go for each module and
+// input.
 func Fields() {
-	mg.Deps(fieldsYML, moduleFieldsGo)
+	mg.Deps(fieldsYML, moduleFieldsGo, inputFieldsGo)
+}
+
+func inputFieldsGo() error {
+	return mage.GenerateModuleFieldsGo("input")
 }
 
 func moduleFieldsGo() error {
@@ -71,12 +74,16 @@ func Dashboards() error {
 
 // Config generates both the short and reference configs.
 func Config() {
-	mg.Deps(shortConfig, referenceConfig, createDirModulesD)
+	mg.Deps(shortConfig, referenceConfig, mage.GenerateDirModulesD)
 }
 
 // Update is an alias for executing fields, dashboards, config.
 func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config, mage.GenerateModuleIncludeListGo)
+	mg.SerialDeps(Fields, Dashboards, Config, includeList)
+}
+
+func includeList() error {
+	return mage.GenerateIncludeListGo([]string{"input/*"}, []string{"module"})
 }
 
 // Fmt formats source code and adds file headers.
@@ -150,7 +157,7 @@ const (
 // for an x-pack distribution, excluding _meta and test files so that they are
 // not included in packages.
 func prepareModulePackaging() error {
-	mg.Deps(createDirModulesD)
+	mg.Deps(mage.GenerateDirModulesD)
 
 	err := mage.Clean([]string{
 		dirModuleGenerated,
@@ -229,34 +236,5 @@ func referenceConfig() error {
 	mage.MustFileConcat(configFile, 0640, configParts...)
 	mage.MustFindReplace(configFile, regexp.MustCompile("beatname"), mage.BeatName)
 	mage.MustFindReplace(configFile, regexp.MustCompile("beat-index-prefix"), mage.BeatIndexPrefix)
-	return nil
-}
-
-func createDirModulesD() error {
-	if err := os.RemoveAll("modules.d"); err != nil {
-		return err
-	}
-
-	shortConfigs, err := filepath.Glob("module/*/_meta/config.yml")
-	if err != nil {
-		return err
-	}
-
-	for _, f := range shortConfigs {
-		parts := strings.Split(filepath.ToSlash(f), "/")
-		if len(parts) < 2 {
-			continue
-		}
-		moduleName := parts[1]
-
-		cp := mage.CopyTask{
-			Source: f,
-			Dest:   filepath.Join("modules.d", moduleName+".yml.disabled"),
-			Mode:   0644,
-		}
-		if err = cp.Execute(); err != nil {
-			return err
-		}
-	}
 	return nil
 }
