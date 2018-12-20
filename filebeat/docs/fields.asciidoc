@@ -6268,6 +6268,221 @@ Module for parsing the MariaDB log files.
 Fields from the MariaDB log files.
 
 
+
+[float]
+== error fields
+
+Contains fields from the MySQL error logs.
+
+
+
+*`mariadb.error.timestamp`*::
++
+--
+The timestamp from the log line.
+
+
+--
+
+*`mariadb.error.thread_id`*::
++
+--
+type: long
+
+As of MySQL 5.7.2, this is the thread id. For MySQL versions prior to 5.7.2, this field contains the process id.
+
+
+--
+
+*`mariadb.error.level`*::
++
+--
+example: Warning
+
+The log level.
+
+--
+
+*`mariadb.error.message`*::
++
+--
+type: text
+
+The logged message.
+
+
+--
+
+[float]
+== slowlog fields
+
+Contains fields from the MySQL slow logs.
+
+
+
+*`mariadb.slowlog.user`*::
++
+--
+The MySQL user that created the query.
+
+
+--
+
+*`mariadb.slowlog.current_user`*::
++
+--
+The MySQL user that created the query.
+
+
+--
+
+*`mariadb.slowlog.host`*::
++
+--
+The host from where the user that created the query logged in.
+
+
+--
+
+*`mariadb.slowlog.client_host`*::
++
+--
+The host from where the user that created the query logged in.
+
+
+--
+
+*`mariadb.slowlog.ip`*::
++
+--
+The IP address from where the user that created the query logged in.
+
+
+--
+
+*`mariadb.slowlog.client_ip`*::
++
+--
+The IP address from where the user that created the query logged in.
+
+
+--
+
+*`mariadb.slowlog.query_time.sec`*::
++
+--
+type: float
+
+The total time the query took, in seconds, as a floating point number.
+
+
+--
+
+*`mariadb.slowlog.lock_time.sec`*::
++
+--
+type: float
+
+The amount of time the query waited for the lock to be available. The value is in seconds, as a floating point number.
+
+
+--
+
+*`mariadb.slowlog.rows_sent`*::
++
+--
+type: long
+
+The number of rows returned by the query.
+
+
+--
+
+*`mariadb.slowlog.rows_examined`*::
++
+--
+type: long
+
+The number of rows scanned by the query.
+
+
+--
+
+*`mariadb.slowlog.timestamp`*::
++
+--
+type: long
+
+The unix timestamp taken from the `SET timestamp` query.
+
+
+--
+
+*`mariadb.slowlog.query`*::
++
+--
+The slow query.
+
+
+--
+
+*`mariadb.slowlog.id`*::
++
+--
+type: long
+
+The connection ID for the query.
+
+
+--
+
+*`mariadb.slowlog.schema`*::
++
+--
+type: keyword
+
+The schema where the query was executed
+
+
+--
+
+*`mariadb.slowlog.lock_time`*::
++
+--
+type: date
+
+Lock time
+
+
+--
+
+*`mariadb.slowlog.time`*::
++
+--
+type: date
+
+Time where the query was executed
+
+
+--
+
+*`mariadb.slowlog.query_cache_hit`*::
++
+--
+type: keyword
+
+If the query hit cache
+
+
+--
+
+*`mariadb.slowlog.thread_id`*::
++
+--
+type: keyword
+
+--
+
 [[exported-fields-mongodb]]
 == mongodb fields
 

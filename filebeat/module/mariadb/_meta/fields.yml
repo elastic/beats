@@ -2,6 +2,7 @@
   title: "MariaDB"
   description: >
     Module for parsing the MariaDB log files.
+  release: experimental
   short_config: true
   fields:
     - name: mariadb
