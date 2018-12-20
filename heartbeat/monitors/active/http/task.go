@@ -223,6 +223,11 @@ func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Reques
 		request.SetBasicAuth(config.Username, config.Password)
 	}
 	for k, v := range config.Check.Request.SendHeaders {
+		// defining the Host header isn't enough. See https://github.com/golang/go/issues/7682
+		if k == "Host" {
+			request.Host = v
+		}
+
 		request.Header.Add(k, v)
 	}
 
