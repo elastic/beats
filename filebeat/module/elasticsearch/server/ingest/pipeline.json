@@ -39,6 +39,16 @@
             }
         },
         {
+            "remove": {
+                "field": [
+                    "elasticsearch.server.gc.collection_duration.time",
+                    "elasticsearch.server.gc.collection_duration.unit",
+                    "elasticsearch.server.gc.observation_duration.time",
+                    "elasticsearch.server.gc.observation_duration.unit"
+                ]
+            }
+        },
+        {
             "rename": {
                 "field": "elasticsearch.server.timestamp",
                 "target_field": "@timestamp"

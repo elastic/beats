@@ -27,35 +27,11 @@
       description: "Sequence number"
       example: 3449992
       type: long
-    - name: collection_duration
-      description: "Time spent in GC"
-      type: group
-      fields:
-        - name: time
-          description: "Time duration in some units"
-          example: 1.6
-          type: float
-        - name: unit
-          description: "Unit of time duration"
-          example: s
-          type: keyword
-        - name: ms
-          description: "Time duration in milliseconds"
-          example: 1600
-          type: float
-    - name: observation_duration
-      description: "Total time over which collection was observed"
-      type: group
-      fields:
-        - name: time
-          description: "Time duration in some units"
-          example: 1.8
-          type: float
-        - name: unit
-          description: "Unit of time duration"
-          example: s
-          type: keyword
-        - name: ms
-          description: "Time duration in milliseconds"
-          example: 1800
-          type: float
+    - name: collection_duration.ms
+      description: "Time spent in GC, in milliseconds"
+      example: 1600
+      type: float
+    - name: observation_duration.ms
+      description: "Total time over which collection was observed, in milliseconds"
+      example: 1800
+      type: float

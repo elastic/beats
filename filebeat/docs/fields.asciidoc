@@ -4250,34 +4250,6 @@ Sequence number
 
 --
 
-[float]
-== collection_duration fields
-
-Time spent in GC
-
-
-*`elasticsearch.server.gc.collection_duration.time`*::
-+
---
-type: float
-
-example: 1.6
-
-Time duration in some units
-
---
-
-*`elasticsearch.server.gc.collection_duration.unit`*::
-+
---
-type: keyword
-
-example: s
-
-Unit of time duration
-
---
-
 *`elasticsearch.server.gc.collection_duration.ms`*::
 +
 --
@@ -4285,35 +4257,7 @@ type: float
 
 example: 1600
 
-Time duration in milliseconds
-
---
-
-[float]
-== observation_duration fields
-
-Total time over which collection was observed
-
-
-*`elasticsearch.server.gc.observation_duration.time`*::
-+
---
-type: float
-
-example: 1.8
-
-Time duration in some units
-
---
-
-*`elasticsearch.server.gc.observation_duration.unit`*::
-+
---
-type: keyword
-
-example: s
-
-Unit of time duration
+Time spent in GC, in milliseconds
 
 --
 
@@ -4324,7 +4268,7 @@ type: float
 
 example: 1800
 
-Time duration in milliseconds
+Total time over which collection was observed, in milliseconds
 
 --
 
