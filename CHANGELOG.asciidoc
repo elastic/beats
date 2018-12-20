@@ -6,6 +6,96 @@
 ////////////////////////////////////////////////////////////
 // Template, add newest changes here
 
+=== Beats version avoid-hardcoded-slash-log-in-docker-path
+https://github.com/jp-paillet/beats.git[Check the HEAD diff]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+*Auditbeat*
+
+*Filebeat*
+
+- Allow beats to parse docker inputs outside an hardcoded directory structure. {pull}9620[9620]
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+*Auditbeat*
+
+*Filebeat*
+
+- Reworked the initialization of container's paths. {pull}9620[9620]
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Added
+
+*Affecting all Beats*
+
+*Auditbeat*
+
+*Filebeat*
+
+- Added `containers.suffix` input configuration option to avoid the static addition of the "/*.log" in paths. {issue}8988[8988] {pull}9620[9620]
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Functionbeat*
+
+==== Deprecated
+
+*Affecting all Beats*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+
+////////////////////////////////////////////////////////////
+
 === Beats version HEAD
 https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD diff]
 
