@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("functionbeat", "fields.yml", Asset); err != nil {
+	if err := asset.SetFields("functionbeat", "fields.yml", asset.BeatFieldsPri, Asset); err != nil {
 		panic(err)
 	}
 }
