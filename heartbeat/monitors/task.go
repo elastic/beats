@@ -123,9 +123,11 @@ func (t *task) makeSchedulerTaskFunc() scheduler.TaskFunc {
 // Start schedules this task for execution.
 func (t *task) Start() {
 	var err error
+
 	t.client, err = t.monitor.pipelineConnector.ConnectWith(beat.ClientConfig{
 		EventMetadata: t.config.EventMetadata,
 		Processor:     t.processors,
+		Fields:        common.MapStr{"event": common.MapStr{"dataset": "uptime"}},
 	})
 	if err != nil {
 		logp.Err("could not start monitor: %v", err)
