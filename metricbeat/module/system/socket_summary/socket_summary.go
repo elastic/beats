@@ -64,11 +64,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 	var (
-		allConns     = len(conns)
-		allListening = 0
-		tcpConns     = 0
-		tcpListening = 0
-		udpConns     = 0
+		allConns       = len(conns)
+		allListening   = 0
+		tcpConns       = 0
+		tcpListening   = 0
+		tcpClosewait   = 0
+		tcpEstablished = 0
+		tcpTimewait    = 0
+		udpConns       = 0
 	)
 
 	for _, conn := range conns {
@@ -78,7 +81,15 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 		switch conn.Type {
 		case syscall.SOCK_STREAM:
 			tcpConns++
-
+			if conn.Status == "ESTABLISHED" {
+				tcpEstablished++
+			}
+			if conn.Status == "CLOSE_WAIT" {
+				tcpClosewait++
+			}
+			if conn.Status == "TIME_WAIT" {
+				tcpTimewait++
+			}
 			if conn.Status == "LISTEN" {
 				tcpListening++
 			}
@@ -94,8 +105,11 @@ func calculateConnStats(conns []net.ConnectionStat) common.MapStr {
 		},
 		"tcp": common.MapStr{
 			"all": common.MapStr{
-				"count":     tcpConns,
-				"listening": tcpListening,
+				"count":       tcpConns,
+				"listening":   tcpListening,
+				"established": tcpEstablished,
+				"close_wait":  tcpClosewait,
+				"time_wait":   tcpTimewait,
 			},
 		},
 		"udp": common.MapStr{

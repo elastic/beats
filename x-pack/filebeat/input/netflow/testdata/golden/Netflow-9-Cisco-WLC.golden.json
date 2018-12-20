@@ -1,0 +1,1050 @@
+{
+  "test_name": "Netflow 9 Cisco WLC",
+  "events": [
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQAB3w==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 3320,
+          "packet_delta_count": 83,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 3320,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 83
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQAB3w==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 3320,
+          "packet_delta_count": 83,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 3320,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 83
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AwAANQ==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 7760,
+          "packet_delta_count": 69,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 7760,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 69
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AwAANQ==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 10229,
+          "packet_delta_count": 69,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 10229,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 69
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AwAAig==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 215,
+          "packet_delta_count": 1,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 215,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 1
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQAAAQ==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 40854,
+          "packet_delta_count": 225,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 40854,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 225
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQAAAQ==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 35866,
+          "packet_delta_count": 154,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 35866,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 154
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AwAAUA==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 12279,
+          "packet_delta_count": 63,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 12279,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 63
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AwAAUA==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 27287,
+          "packet_delta_count": 61,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 27287,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 61
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQABxQ==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 147145,
+          "packet_delta_count": 773,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 147145,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 773
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQABxQ==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 1182695,
+          "packet_delta_count": 1379,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 1182695,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 1379
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQACCA==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 6777,
+          "packet_delta_count": 26,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 6777,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 26
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQACCA==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 8625,
+          "packet_delta_count": 26,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 8625,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 26
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AwABuw==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 2433001,
+          "packet_delta_count": 20434,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 2433001,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 20434
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AwABuw==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 56599680,
+          "packet_delta_count": 40726,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 56599680,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 40726
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AQAAAQ==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 1658,
+          "packet_delta_count": 15,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 1658,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 15
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "AQAAAQ==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 950,
+          "packet_delta_count": 14,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 950,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 14
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "mac": "00:f6:63:cc:80:60"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "lTcFptYSabQ",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQABrw==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 0,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 1495567,
+          "packet_delta_count": 16145,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 1495567,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "inbound",
+          "name": "Test-env",
+          "packets": 16145
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2017-06-22T06:31:14Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "192.168.20.121",
+          "locality": "private",
+          "mac": "34:02:86:75:c0:51"
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2017-06-22T06:31:14Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Q1JIGzkHw0I",
+          "locality": "private"
+        },
+        "netflow": {
+          "application_id": "DQABrw==",
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 1,
+            "timestamp": "2017-06-22T06:31:14Z",
+            "uptime_millis": 1336647838,
+            "version": 9
+          },
+          "flow_direction": 1,
+          "ip_diff_serv_code_point": 0,
+          "octet_delta_count": 80973880,
+          "packet_delta_count": 53362,
+          "post_ip_diff_serv_code_point": 0,
+          "sta_ipv4_address": "192.168.20.121",
+          "sta_mac_address": "34:02:86:75:c0:51",
+          "type": "netflow_flow",
+          "wlan_ssid": "Test-env",
+          "wtp_mac_address": "00:f6:63:cc:80:60"
+        },
+        "network": {
+          "bytes": 80973880,
+          "community_id": "1:UlZHnBlCtQefFmKlqGRdvpX2F6E=",
+          "direction": "outbound",
+          "name": "Test-env",
+          "packets": 53362
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "mac": "00:f6:63:cc:80:60"
+        }
+      },
+      "Private": null
+    }
+  ]
+}

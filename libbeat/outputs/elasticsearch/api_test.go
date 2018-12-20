@@ -59,7 +59,7 @@ func GetValidQueryResult() QueryResult {
 
 func GetValidSearchResults() SearchResults {
 	hits := Hits{
-		Total: 0,
+		Total: Total{Value: 0, Relation: "eq"},
 		Hits:  nil,
 	}
 
@@ -121,7 +121,7 @@ func TestReadSearchResult(t *testing.T) {
     		"successful" : 2,
     		"failed" : 1
   		},
-  		"hits" : {},
+			"hits" : { "total": { "value": 0, "relation": "eq" } },
   		"aggs" : {}
   	}`)
 

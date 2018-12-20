@@ -22,7 +22,7 @@ import (
 
 func init() {
 	mage.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
-	mage.BeatLicense = "Elastic"
+	mage.BeatLicense = "Elastic License"
 }
 
 // Build builds the Beat binary.
@@ -78,7 +78,11 @@ func TestPackages() error {
 
 // Fields generates a fields.yml and fields.go for each module.
 func Fields() {
-	mg.Deps(fieldsYML, mage.GenerateModuleFieldsGo)
+	mg.Deps(fieldsYML, moduleFieldsGo)
+}
+
+func moduleFieldsGo() error {
+	return mage.GenerateModuleFieldsGo("module")
 }
 
 // fieldsYML generates a fields.yml based on filebeat + x-pack/filebeat/modules.

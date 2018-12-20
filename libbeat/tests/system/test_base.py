@@ -119,9 +119,12 @@ class Test(BaseTest):
                      "-systemTest",
                      "-v",
                      "-d", "*",
-                     "-test.coverprofile",
-                     os.path.join(self.working_dir, "coverage.cov")
                      ])
+        if os.getenv("TEST_COVERAGE") == "true":
+            args.extend([
+                "-test.coverprofile",
+                os.path.join(self.working_dir, "coverage.cov"),
+            ])
 
         assert self.log_contains("error loading config file") is False
 

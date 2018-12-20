@@ -73,13 +73,13 @@ func TestRetrieveQCloudMetadata(t *testing.T) {
 	}
 
 	expected := common.MapStr{
-		"meta": common.MapStr{
-			"cloud": common.MapStr{
-				"provider":          "qcloud",
-				"instance_id":       "ins-qcloudv5",
-				"region":            "china-south-gz",
-				"availability_zone": "gz-azone2",
+		"cloud": common.MapStr{
+			"provider": "qcloud",
+			"instance": common.MapStr{
+				"id": "ins-qcloudv5",
 			},
+			"region":            "china-south-gz",
+			"availability_zone": "gz-azone2",
 		},
 	}
 	assert.Equal(t, expected, actual.Fields)

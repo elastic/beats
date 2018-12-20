@@ -5,9 +5,9 @@
     Contains common beat fields available in all event types.
   fields:
     - name: beat.timezone
-      description: >
-        The timezone as returned by the operating system on which the Beat is
-        running.
+      type: alias
+      migration: true
+      path: event.timezone
 
     - name: "@timestamp"
       type: date

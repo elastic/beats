@@ -693,8 +693,31 @@ func OSSBeatDir(path ...string) string {
 	return filepath.Join(append([]string{ossDir}, path...)...)
 }
 
+// XPackBeatDir returns the X-Pack beat directory. You can pass paths and they
+// will be joined and appended to the X-Pack beat dir.
+func XPackBeatDir(path ...string) string {
+	return OSSBeatDir(append([]string{XPackDir, BeatName}, path...)...)
+}
+
+// LibbeatDir returns the libbeat directory. You can pass paths and
+// they will be joined and appended to the libbeat dir.
+func LibbeatDir(path ...string) string {
+	esBeatsDir, err := ElasticBeatsDir()
+	if err != nil {
+		panic(errors.Wrap(err, "failed determine libbeat dir location"))
+	}
+
+	return filepath.Join(append([]string{esBeatsDir, "libbeat"}, path...)...)
+}
+
 // createDir creates the parent directory for the given file.
+// Deprecated: Use CreateDir.
 func createDir(file string) string {
+	return CreateDir(file)
+}
+
+// CreateDir creates the parent directory for the given file.
+func CreateDir(file string) string {
 	// Create the output directory.
 	if dir := filepath.Dir(file); dir != "." {
 		if err := os.MkdirAll(dir, 0755); err != nil {
