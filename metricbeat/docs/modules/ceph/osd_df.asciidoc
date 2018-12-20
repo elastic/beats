@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-ceph-osd_df]]
 === Ceph osd_df metricset
 
-experimental[]
+beta[]
 
 include::../../../module/ceph/osd_df/_meta/docs.asciidoc[]
 

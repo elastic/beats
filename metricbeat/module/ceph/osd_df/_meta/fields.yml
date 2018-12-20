@@ -1,6 +1,6 @@
 - name: osd_df
   type: group
-  release: experimental
+  release: beta
   description: >
     ceph osd disk usage information
   fields:
