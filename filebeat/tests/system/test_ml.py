@@ -93,6 +93,9 @@ class Test(BaseTest):
             "-c", cfgfile
         ]
 
+        # Skipping dashboard loading to speed up tests, unfortunately only works for setup and not --setup
+        cmd += ["-E", "setup.dashboards.enabled=false"]
+
         if setup_flag:
             cmd += ["--setup"]
         else:
