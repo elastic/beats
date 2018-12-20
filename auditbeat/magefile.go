@@ -93,8 +93,28 @@ func TestPackages() error {
 	return mage.TestPackages()
 }
 
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
+// Fields generates fields.yml and fields.go files for the Beat.
+func Fields() {
+	mg.Deps(libbeatAndAuditbetaCommonFieldsGo)
+	mg.Deps(fieldsYML)
+}
+
+// libbeatAndAuditbetaCommonFieldsGo generates a fields.go containing both
+// libbeat and auditbeat's common fields.
+func libbeatAndAuditbetaCommonFieldsGo() error {
+	if err := mage.GenerateFieldsYAML(); err != nil {
+		return err
+	}
+	return mage.GenerateAllInOneFieldsGo()
+}
+
+// moduleFieldsGo generates a fields.go for each module.
+//func moduleFieldsGo() error {
+//	return mage.GenerateModuleFieldsGo("module")
+//}
+
+// fieldsYML generates the fields.yml file containing all fields.
+func fieldsYML() error {
 	return mage.GenerateFieldsYAML("module")
 }
 
