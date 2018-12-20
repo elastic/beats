@@ -92,6 +92,8 @@ func readPasswdFile(readPasswords bool) ([]*User, error) {
 }
 
 func enrichWithGroups(users []*User) error {
+	gidCache := make(map[string]*user.Group, len(users))
+
 	for _, u := range users {
 		goUser := user.User{
 			Uid:      u.UID,
@@ -105,9 +107,13 @@ func enrichWithGroups(users []*User) error {
 		}
 
 		for _, gid := range groupIds {
-			group, err := user.LookupGroupId(gid)
-			if err != nil {
-				return err
+			group, found := gidCache[gid]
+			if !found {
+				group, err = user.LookupGroupId(gid)
+				if err != nil {
+					return err
+				}
+				gidCache[gid] = group
 			}
 
 			u.Groups = append(u.Groups, group)
