@@ -434,7 +434,7 @@ func ownerHasExclusiveWritePerms(name string) error {
 			nameAbs = name
 		}
 		return fmt.Errorf(`config file ("%v") can only be writable by the `+
-			`owner but the permissions are "%v" (to fix the permissions use: `+
+			`owner but the permissions are "%v". (To fix the permissions use: `+
 			`'chmod go-w %v')`,
 			name, perm, nameAbs)
 	}

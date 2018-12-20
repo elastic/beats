@@ -388,7 +388,7 @@ func (k *FileKeystore) checkPermissions(f string) error {
 			nameAbs = f
 		}
 		return fmt.Errorf(`file ("%v") can only be writable and readable by the `+
-			`owner but the permissions are "%v" (to fix the permissions use: `+
+			`owner but the permissions are "%v". (To fix the permissions use: `+
 			`'chmod go-wrx %v')`,
 			f, perm, nameAbs)
 	}
