@@ -49,8 +49,14 @@ type SearchResults struct {
 
 // Hits contains the hits.
 type Hits struct {
-	Total int
+	Total Total
 	Hits  []json.RawMessage `json:"hits"`
+}
+
+// Total contains the number of element fetched and the relation.
+type Total struct {
+	Value    int    `json:"value"`
+	Relation string `json:"relation"`
 }
 
 // CountResults contains the count of results.

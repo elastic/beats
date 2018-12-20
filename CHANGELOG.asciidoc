@@ -17,7 +17,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Automaticall cap signed integers to 63bits. {pull}8991[8991]
 - Rename beat.timezone to event.timezone. {pull}9458[9458]
 - Use _doc as document type. {pull}9056[9056]{pull}9573[9573]
-- Update to Golang 1.11.3. {pull}9560[9560]
 
 *Auditbeat*
 
@@ -27,6 +26,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Modify apache/error dataset to follow ECS. {pull}8963[8963]
 
 *Heartbeat*
+
+- Remove monitor generator script that was rarely used. {pull}9648[9648]
 
 *Journalbeat*
 
@@ -58,6 +59,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Ignore non index fields in default_field for Elasticsearch. {pull}9549[9549]
 - Update Kibana index pattern attributes for objects that are disabled. {pull}9644[9644]
 - Enforce validation for the Central Management access token. {issue}9621[9621]
+- Update to Golang 1.11.4. {pull}9627[9627]
 
 *Auditbeat*
 
@@ -69,6 +71,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Stop runners disabled by hints after previously being started. {pull}9305[9305]
 - Fix saved objects in filebeat haproxy dashboard. {pull}9417[9417]
 - Use `log.source.address` instead of `log.source.ip` for network input sources. {pull}9487[9487]
+- Rename many `redis.log.*` fields to map to ECS. {pull}9315[9315]
 
 *Heartbeat*
 

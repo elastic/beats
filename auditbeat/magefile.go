@@ -131,13 +131,13 @@ func Docs() {
 
 // combinedDocs builds combined documentation for both OSS and X-Pack.
 func combinedDocs() error {
-	return auditbeat.CollectDocs(mage.OSSBeatDir(), auditbeat.XpackBeatDir())
+	return auditbeat.CollectDocs(mage.OSSBeatDir(), mage.XPackBeatDir())
 }
 
 // xpackFields creates x-pack/auditbeat/fields.yml - necessary to build
 // a combined documentation.
 func xpackFields() error {
-	return mage.Mage(auditbeat.XpackBeatDir(), "fields")
+	return mage.Mage(mage.XPackBeatDir(), "fields")
 }
 
 // Fmt formats source code and adds file headers.
