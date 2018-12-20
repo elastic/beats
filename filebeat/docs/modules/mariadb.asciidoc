@@ -1,0 +1,75 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-mariadb]]
+:modulename: mariadb
+
+== MariaDB module
+
+The +{modulename}+ module collects and parses the slow logs and error logs
+created by Rodrigo Floriano de Souza - @rdglinux <https://churrops.io/>
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+The  +{modulename}+ module was tested with logs from versions 6.3.0.
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
+image::./images/kibana-mariadb.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for slow logs and error logs:
+
+["source","yaml",subs="attributes"]
+-----
+- module: mariadb
+  error:
+    enabled: true
+    var.paths: ["/path/to/log/mariadb/error.log*"]
+  slowlog:
+    enabled: true
+    var.paths: ["/path/to/log/mariadb/mariadb-slow.log*"]
+-----
+
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+./{beatname_lc} --modules {modulename} -M "mariadb.error.var.paths=[/path/to/log/mariadb/error.log*]" -M "mariadb.slowlog.var.paths=[/path/to/log/mariadb/mariadb-slow.log*]"
+-----
+
+ 
+
+//set the fileset name used in the included example
+:fileset_ex: error
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `error` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `slowlog` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-mariadb,exported fields>> section.
+

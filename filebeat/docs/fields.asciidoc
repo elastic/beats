@@ -28,6 +28,7 @@ grouped in the following categories:
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
 * <<exported-fields-logstash>>
+* <<exported-fields-mariadb>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-netflow>>
@@ -6253,6 +6254,19 @@ type: alias
 alias to: event.duration
 
 --
+
+[[exported-fields-mariadb]]
+== MariaDB fields
+
+Module for parsing the MariaDB log files.
+
+
+
+[float]
+== mariadb fields
+
+Fields from the MariaDB log files.
+
 
 [[exported-fields-mongodb]]
 == mongodb fields

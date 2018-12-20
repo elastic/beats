@@ -1,3 +1,6 @@
+# Module: mariadb
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-mariadb.html
+
 - module: mariadb
   # Error logs
   error:
@@ -5,7 +8,7 @@
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
-    # var.paths: [""]
+    #var.paths:
 
   # Slow logs
   slowlog:
@@ -13,4 +16,4 @@
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
-    # var.paths: [""]
+    #var.paths:
