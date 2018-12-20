@@ -30,11 +30,13 @@ grouped in the following categories:
 * <<exported-fields-logstash>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
+* <<exported-fields-netflow>>
 * <<exported-fields-nginx>>
 * <<exported-fields-osquery>>
 * <<exported-fields-postgresql>>
 * <<exported-fields-redis>>
 * <<exported-fields-santa>>
+* <<exported-fields-suricata>>
 * <<exported-fields-system>>
 * <<exported-fields-traefik>>
 
@@ -6279,6 +6281,3209 @@ The connection ID for the query.
 
 --
 
+[[exported-fields-netflow]]
+== NetFlow fields
+
+Fields from NetFlow and IPFIX flows.
+
+
+
+[float]
+== netflow fields
+
+Fields from NetFlow and IPFIX.
+
+
+
+*`netflow.type`*::
++
+--
+type: keyword
+
+The type of NetFlow record described by this event.
+
+
+--
+
+[float]
+== exporter fields
+
+Metadata related to the exporter device that generated this record.
+
+
+
+*`netflow.exporter.address`*::
++
+--
+type: keyword
+
+Exporter's network address in IP:port format.
+
+
+--
+
+*`netflow.exporter.source_id`*::
++
+--
+type: long
+
+Observation domain ID to which this record belongs.
+
+
+--
+
+*`netflow.exporter.timestamp`*::
++
+--
+type: date
+
+Time and date of export.
+
+
+--
+
+*`netflow.exporter.uptime_millis`*::
++
+--
+type: long
+
+How long the exporter process has been running, in milliseconds.
+
+
+--
+
+*`netflow.exporter.version`*::
++
+--
+type: long
+
+NetFlow version used.
+
+
+--
+
+*`netflow.octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.packet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.delta_flow_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.protocol_identifier`*::
++
+--
+type: short
+
+--
+
+*`netflow.ip_class_of_service`*::
++
+--
+type: short
+
+--
+
+*`netflow.tcp_control_bits`*::
++
+--
+type: integer
+
+--
+
+*`netflow.source_transport_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.source_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.source_ipv4_prefix_length`*::
++
+--
+type: short
+
+--
+
+*`netflow.ingress_interface`*::
++
+--
+type: long
+
+--
+
+*`netflow.destination_transport_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.destination_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.destination_ipv4_prefix_length`*::
++
+--
+type: short
+
+--
+
+*`netflow.egress_interface`*::
++
+--
+type: long
+
+--
+
+*`netflow.ip_next_hop_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.bgp_source_as_number`*::
++
+--
+type: long
+
+--
+
+*`netflow.bgp_destination_as_number`*::
++
+--
+type: long
+
+--
+
+*`netflow.bgp_next_hop_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.post_mcast_packet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_mcast_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_end_sys_up_time`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_start_sys_up_time`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_packet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.minimum_ip_total_length`*::
++
+--
+type: long
+
+--
+
+*`netflow.maximum_ip_total_length`*::
++
+--
+type: long
+
+--
+
+*`netflow.source_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.destination_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.source_ipv6_prefix_length`*::
++
+--
+type: short
+
+--
+
+*`netflow.destination_ipv6_prefix_length`*::
++
+--
+type: short
+
+--
+
+*`netflow.flow_label_ipv6`*::
++
+--
+type: long
+
+--
+
+*`netflow.icmp_type_code_ipv4`*::
++
+--
+type: integer
+
+--
+
+*`netflow.igmp_type`*::
++
+--
+type: short
+
+--
+
+*`netflow.sampling_interval`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_algorithm`*::
++
+--
+type: short
+
+--
+
+*`netflow.flow_active_timeout`*::
++
+--
+type: integer
+
+--
+
+*`netflow.flow_idle_timeout`*::
++
+--
+type: integer
+
+--
+
+*`netflow.engine_type`*::
++
+--
+type: short
+
+--
+
+*`netflow.engine_id`*::
++
+--
+type: short
+
+--
+
+*`netflow.exported_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.exported_message_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.exported_flow_record_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.ipv4_router_sc`*::
++
+--
+type: ip
+
+--
+
+*`netflow.source_ipv4_prefix`*::
++
+--
+type: ip
+
+--
+
+*`netflow.destination_ipv4_prefix`*::
++
+--
+type: ip
+
+--
+
+*`netflow.mpls_top_label_type`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_top_label_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.sampler_id`*::
++
+--
+type: short
+
+--
+
+*`netflow.sampler_mode`*::
++
+--
+type: short
+
+--
+
+*`netflow.sampler_random_interval`*::
++
+--
+type: long
+
+--
+
+*`netflow.class_id`*::
++
+--
+type: short
+
+--
+
+*`netflow.minimum_ttl`*::
++
+--
+type: short
+
+--
+
+*`netflow.maximum_ttl`*::
++
+--
+type: short
+
+--
+
+*`netflow.fragment_identification`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_ip_class_of_service`*::
++
+--
+type: short
+
+--
+
+*`netflow.source_mac_address`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.post_destination_mac_address`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.vlan_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.post_vlan_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.ip_version`*::
++
+--
+type: short
+
+--
+
+*`netflow.flow_direction`*::
++
+--
+type: short
+
+--
+
+*`netflow.ip_next_hop_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.bgp_next_hop_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.ipv6_extension_headers`*::
++
+--
+type: long
+
+--
+
+*`netflow.mpls_top_label_stack_section`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section2`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section3`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section4`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section5`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section6`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section7`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section8`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section9`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section10`*::
++
+--
+type: short
+
+--
+
+*`netflow.destination_mac_address`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.post_source_mac_address`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.interface_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.interface_description`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.sampler_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.flags_and_sampler_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.fragment_offset`*::
++
+--
+type: integer
+
+--
+
+*`netflow.forwarding_status`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_vpn_route_distinguisher`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_top_label_prefix_length`*::
++
+--
+type: short
+
+--
+
+*`netflow.src_traffic_index`*::
++
+--
+type: long
+
+--
+
+*`netflow.dst_traffic_index`*::
++
+--
+type: long
+
+--
+
+*`netflow.application_description`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.application_id`*::
++
+--
+type: short
+
+--
+
+*`netflow.application_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.post_ip_diff_serv_code_point`*::
++
+--
+type: short
+
+--
+
+*`netflow.multicast_replication_factor`*::
++
+--
+type: long
+
+--
+
+*`netflow.class_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.classification_engine_id`*::
++
+--
+type: short
+
+--
+
+*`netflow.layer2packet_section_offset`*::
++
+--
+type: integer
+
+--
+
+*`netflow.layer2packet_section_size`*::
++
+--
+type: integer
+
+--
+
+*`netflow.layer2packet_section_data`*::
++
+--
+type: short
+
+--
+
+*`netflow.bgp_next_adjacent_as_number`*::
++
+--
+type: long
+
+--
+
+*`netflow.bgp_prev_adjacent_as_number`*::
++
+--
+type: long
+
+--
+
+*`netflow.exporter_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.exporter_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.dropped_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.dropped_packet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.dropped_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.dropped_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_end_reason`*::
++
+--
+type: short
+
+--
+
+*`netflow.common_properties_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.observation_point_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.icmp_type_code_ipv6`*::
++
+--
+type: integer
+
+--
+
+*`netflow.mpls_top_label_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.line_card_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.port_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.metering_process_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.exporting_process_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.template_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.wlan_channel_id`*::
++
+--
+type: short
+
+--
+
+*`netflow.wlan_ssid`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.flow_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.observation_domain_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_start_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_end_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_start_milliseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_end_milliseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_start_microseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_end_microseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_start_nanoseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_end_nanoseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_start_delta_microseconds`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_end_delta_microseconds`*::
++
+--
+type: long
+
+--
+
+*`netflow.system_init_time_milliseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_duration_milliseconds`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_duration_microseconds`*::
++
+--
+type: long
+
+--
+
+*`netflow.observed_flow_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.ignored_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.ignored_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.not_sent_flow_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.not_sent_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.not_sent_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.destination_ipv6_prefix`*::
++
+--
+type: ip
+
+--
+
+*`netflow.source_ipv6_prefix`*::
++
+--
+type: ip
+
+--
+
+*`netflow.post_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_key_indicator`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_mcast_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_mcast_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.icmp_type_ipv4`*::
++
+--
+type: short
+
+--
+
+*`netflow.icmp_code_ipv4`*::
++
+--
+type: short
+
+--
+
+*`netflow.icmp_type_ipv6`*::
++
+--
+type: short
+
+--
+
+*`netflow.icmp_code_ipv6`*::
++
+--
+type: short
+
+--
+
+*`netflow.udp_source_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.udp_destination_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.tcp_source_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.tcp_destination_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.tcp_sequence_number`*::
++
+--
+type: long
+
+--
+
+*`netflow.tcp_acknowledgement_number`*::
++
+--
+type: long
+
+--
+
+*`netflow.tcp_window_size`*::
++
+--
+type: integer
+
+--
+
+*`netflow.tcp_urgent_pointer`*::
++
+--
+type: integer
+
+--
+
+*`netflow.tcp_header_length`*::
++
+--
+type: short
+
+--
+
+*`netflow.ip_header_length`*::
++
+--
+type: short
+
+--
+
+*`netflow.total_length_ipv4`*::
++
+--
+type: integer
+
+--
+
+*`netflow.payload_length_ipv6`*::
++
+--
+type: integer
+
+--
+
+*`netflow.ip_ttl`*::
++
+--
+type: short
+
+--
+
+*`netflow.next_header_ipv6`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_payload_length`*::
++
+--
+type: long
+
+--
+
+*`netflow.ip_diff_serv_code_point`*::
++
+--
+type: short
+
+--
+
+*`netflow.ip_precedence`*::
++
+--
+type: short
+
+--
+
+*`netflow.fragment_flags`*::
++
+--
+type: short
+
+--
+
+*`netflow.octet_delta_sum_of_squares`*::
++
+--
+type: long
+
+--
+
+*`netflow.octet_total_sum_of_squares`*::
++
+--
+type: long
+
+--
+
+*`netflow.mpls_top_label_ttl`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_length`*::
++
+--
+type: long
+
+--
+
+*`netflow.mpls_label_stack_depth`*::
++
+--
+type: long
+
+--
+
+*`netflow.mpls_top_label_exp`*::
++
+--
+type: short
+
+--
+
+*`netflow.ip_payload_length`*::
++
+--
+type: long
+
+--
+
+*`netflow.udp_message_length`*::
++
+--
+type: integer
+
+--
+
+*`netflow.is_multicast`*::
++
+--
+type: short
+
+--
+
+*`netflow.ipv4_ihl`*::
++
+--
+type: short
+
+--
+
+*`netflow.ipv4_options`*::
++
+--
+type: long
+
+--
+
+*`netflow.tcp_options`*::
++
+--
+type: long
+
+--
+
+*`netflow.padding_octets`*::
++
+--
+type: short
+
+--
+
+*`netflow.collector_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.collector_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.export_interface`*::
++
+--
+type: long
+
+--
+
+*`netflow.export_protocol_version`*::
++
+--
+type: short
+
+--
+
+*`netflow.export_transport_protocol`*::
++
+--
+type: short
+
+--
+
+*`netflow.collector_transport_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.exporter_transport_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.tcp_syn_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.tcp_fin_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.tcp_rst_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.tcp_psh_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.tcp_ack_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.tcp_urg_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.ip_total_length`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_nast_ource_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.post_nadt_estination_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.post_napst_ource_transport_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.post_napdt_estination_transport_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.nat_originating_address_realm`*::
++
+--
+type: short
+
+--
+
+*`netflow.nat_event`*::
++
+--
+type: short
+
+--
+
+*`netflow.initiator_octets`*::
++
+--
+type: long
+
+--
+
+*`netflow.responder_octets`*::
++
+--
+type: long
+
+--
+
+*`netflow.firewall_event`*::
++
+--
+type: short
+
+--
+
+*`netflow.ingress_vrfid`*::
++
+--
+type: long
+
+--
+
+*`netflow.egress_vrfid`*::
++
+--
+type: long
+
+--
+
+*`netflow.vr_fname`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.post_mpls_top_label_exp`*::
++
+--
+type: short
+
+--
+
+*`netflow.tcp_window_scale`*::
++
+--
+type: integer
+
+--
+
+*`netflow.biflow_direction`*::
++
+--
+type: short
+
+--
+
+*`netflow.ethernet_header_length`*::
++
+--
+type: short
+
+--
+
+*`netflow.ethernet_payload_length`*::
++
+--
+type: integer
+
+--
+
+*`netflow.ethernet_total_length`*::
++
+--
+type: integer
+
+--
+
+*`netflow.dot1q_vlan_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.dot1q_priority`*::
++
+--
+type: short
+
+--
+
+*`netflow.dot1q_customer_vlan_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.dot1q_customer_priority`*::
++
+--
+type: short
+
+--
+
+*`netflow.metro_evc_id`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.metro_evc_type`*::
++
+--
+type: short
+
+--
+
+*`netflow.pseudo_wire_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.pseudo_wire_type`*::
++
+--
+type: integer
+
+--
+
+*`netflow.pseudo_wire_control_word`*::
++
+--
+type: long
+
+--
+
+*`netflow.ingress_physical_interface`*::
++
+--
+type: long
+
+--
+
+*`netflow.egress_physical_interface`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_dot1q_vlan_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.post_dot1q_customer_vlan_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.ethernet_type`*::
++
+--
+type: integer
+
+--
+
+*`netflow.post_ip_precedence`*::
++
+--
+type: short
+
+--
+
+*`netflow.collection_time_milliseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.export_sctp_stream_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.max_export_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.max_flow_end_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.message_md5_checksum`*::
++
+--
+type: short
+
+--
+
+*`netflow.message_scope`*::
++
+--
+type: short
+
+--
+
+*`netflow.min_export_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.min_flow_start_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.opaque_octets`*::
++
+--
+type: short
+
+--
+
+*`netflow.session_scope`*::
++
+--
+type: short
+
+--
+
+*`netflow.max_flow_end_microseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.max_flow_end_milliseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.max_flow_end_nanoseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.min_flow_start_microseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.min_flow_start_milliseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.min_flow_start_nanoseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.collector_certificate`*::
++
+--
+type: short
+
+--
+
+*`netflow.exporter_certificate`*::
++
+--
+type: short
+
+--
+
+*`netflow.data_records_reliability`*::
++
+--
+type: boolean
+
+--
+
+*`netflow.observation_point_type`*::
++
+--
+type: short
+
+--
+
+*`netflow.new_connection_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.connection_sum_duration_seconds`*::
++
+--
+type: long
+
+--
+
+*`netflow.connection_transaction_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_nast_ource_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.post_nadt_estination_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.nat_pool_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.nat_pool_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.anonymization_flags`*::
++
+--
+type: integer
+
+--
+
+*`netflow.anonymization_technique`*::
++
+--
+type: integer
+
+--
+
+*`netflow.information_element_index`*::
++
+--
+type: integer
+
+--
+
+*`netflow.p2p_technology`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.tunnel_technology`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.encrypted_technology`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.bgp_validity_state`*::
++
+--
+type: short
+
+--
+
+*`netflow.ip_sec_spi`*::
++
+--
+type: long
+
+--
+
+*`netflow.gre_key`*::
++
+--
+type: long
+
+--
+
+*`netflow.nat_type`*::
++
+--
+type: short
+
+--
+
+*`netflow.initiator_packets`*::
++
+--
+type: long
+
+--
+
+*`netflow.responder_packets`*::
++
+--
+type: long
+
+--
+
+*`netflow.observation_domain_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.selection_sequence_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.selector_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.information_element_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.selector_algorithm`*::
++
+--
+type: integer
+
+--
+
+*`netflow.sampling_packet_interval`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_packet_space`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_time_interval`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_time_space`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_size`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_population`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_probability`*::
++
+--
+type: double
+
+--
+
+*`netflow.data_link_frame_size`*::
++
+--
+type: integer
+
+--
+
+*`netflow.ip_header_packet_section`*::
++
+--
+type: short
+
+--
+
+*`netflow.ip_payload_packet_section`*::
++
+--
+type: short
+
+--
+
+*`netflow.data_link_frame_section`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_payload_packet_section`*::
++
+--
+type: short
+
+--
+
+*`netflow.selector_id_total_pkts_observed`*::
++
+--
+type: long
+
+--
+
+*`netflow.selector_id_total_pkts_selected`*::
++
+--
+type: long
+
+--
+
+*`netflow.absolute_error`*::
++
+--
+type: double
+
+--
+
+*`netflow.relative_error`*::
++
+--
+type: double
+
+--
+
+*`netflow.observation_time_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.observation_time_milliseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.observation_time_microseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.observation_time_nanoseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.digest_hash_value`*::
++
+--
+type: long
+
+--
+
+*`netflow.hash_ipp_ayload_offset`*::
++
+--
+type: long
+
+--
+
+*`netflow.hash_ipp_ayload_size`*::
++
+--
+type: long
+
+--
+
+*`netflow.hash_output_range_min`*::
++
+--
+type: long
+
+--
+
+*`netflow.hash_output_range_max`*::
++
+--
+type: long
+
+--
+
+*`netflow.hash_selected_range_min`*::
++
+--
+type: long
+
+--
+
+*`netflow.hash_selected_range_max`*::
++
+--
+type: long
+
+--
+
+*`netflow.hash_digest_output`*::
++
+--
+type: boolean
+
+--
+
+*`netflow.hash_initialiser_value`*::
++
+--
+type: long
+
+--
+
+*`netflow.selector_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.upper_cli_imit`*::
++
+--
+type: double
+
+--
+
+*`netflow.lower_cli_imit`*::
++
+--
+type: double
+
+--
+
+*`netflow.confidence_level`*::
++
+--
+type: double
+
+--
+
+*`netflow.information_element_data_type`*::
++
+--
+type: short
+
+--
+
+*`netflow.information_element_description`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.information_element_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.information_element_range_begin`*::
++
+--
+type: long
+
+--
+
+*`netflow.information_element_range_end`*::
++
+--
+type: long
+
+--
+
+*`netflow.information_element_semantics`*::
++
+--
+type: short
+
+--
+
+*`netflow.information_element_units`*::
++
+--
+type: integer
+
+--
+
+*`netflow.private_enterprise_number`*::
++
+--
+type: long
+
+--
+
+*`netflow.virtual_station_interface_id`*::
++
+--
+type: short
+
+--
+
+*`netflow.virtual_station_interface_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.virtual_station_uuid`*::
++
+--
+type: short
+
+--
+
+*`netflow.virtual_station_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.layer2_segment_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.layer2_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.layer2_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.ingress_unicast_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.ingress_multicast_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.ingress_broadcast_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.egress_unicast_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.egress_broadcast_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.monitoring_interval_start_milli_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.monitoring_interval_end_milli_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.port_range_start`*::
++
+--
+type: integer
+
+--
+
+*`netflow.port_range_end`*::
++
+--
+type: integer
+
+--
+
+*`netflow.port_range_step_size`*::
++
+--
+type: integer
+
+--
+
+*`netflow.port_range_num_ports`*::
++
+--
+type: integer
+
+--
+
+*`netflow.sta_mac_address`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.sta_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.wtp_mac_address`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.ingress_interface_type`*::
++
+--
+type: long
+
+--
+
+*`netflow.egress_interface_type`*::
++
+--
+type: long
+
+--
+
+*`netflow.rtp_sequence_number`*::
++
+--
+type: integer
+
+--
+
+*`netflow.user_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.application_category_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.application_sub_category_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.application_group_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.original_flows_present`*::
++
+--
+type: long
+
+--
+
+*`netflow.original_flows_initiated`*::
++
+--
+type: long
+
+--
+
+*`netflow.original_flows_completed`*::
++
+--
+type: long
+
+--
+
+*`netflow.distinct_count_of_sourc_eipa_ddress`*::
++
+--
+type: long
+
+--
+
+*`netflow.distinct_count_of_destinatio_nipa_ddress`*::
++
+--
+type: long
+
+--
+
+*`netflow.distinct_count_of_source_ipv4_address`*::
++
+--
+type: long
+
+--
+
+*`netflow.distinct_count_of_destination_ipv4_address`*::
++
+--
+type: long
+
+--
+
+*`netflow.distinct_count_of_source_ipv6_address`*::
++
+--
+type: long
+
+--
+
+*`netflow.distinct_count_of_destination_ipv6_address`*::
++
+--
+type: long
+
+--
+
+*`netflow.value_distribution_method`*::
++
+--
+type: short
+
+--
+
+*`netflow.rfc3550_jitter_milliseconds`*::
++
+--
+type: long
+
+--
+
+*`netflow.rfc3550_jitter_microseconds`*::
++
+--
+type: long
+
+--
+
+*`netflow.rfc3550_jitter_nanoseconds`*::
++
+--
+type: long
+
+--
+
+*`netflow.dot1q_dei`*::
++
+--
+type: boolean
+
+--
+
+*`netflow.dot1q_customer_dei`*::
++
+--
+type: boolean
+
+--
+
+*`netflow.flow_selector_algorithm`*::
++
+--
+type: integer
+
+--
+
+*`netflow.flow_selected_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_selected_packet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_selected_flow_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.selector_itd_otal_flows_observed`*::
++
+--
+type: long
+
+--
+
+*`netflow.selector_itd_otal_flows_selected`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_flow_interval`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_flow_spacing`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_sampling_time_interval`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_sampling_time_spacing`*::
++
+--
+type: long
+
+--
+
+*`netflow.hash_flow_domain`*::
++
+--
+type: integer
+
+--
+
+*`netflow.transport_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.transport_packet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.original_exporter_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.original_exporter_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.original_observation_domain_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.intermediate_process_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.ignored_data_record_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.data_link_frame_type`*::
++
+--
+type: integer
+
+--
+
+*`netflow.section_offset`*::
++
+--
+type: integer
+
+--
+
+*`netflow.section_exported_octets`*::
++
+--
+type: integer
+
+--
+
+*`netflow.dot1q_service_instance_tag`*::
++
+--
+type: short
+
+--
+
+*`netflow.dot1q_service_instance_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.dot1q_service_instance_priority`*::
++
+--
+type: short
+
+--
+
+*`netflow.dot1q_customer_source_mac_address`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.dot1q_customer_destination_mac_address`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.post_layer2_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_mcast_layer2_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_layer2_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_mcast_layer2_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.minimum_layer2_total_length`*::
++
+--
+type: long
+
+--
+
+*`netflow.maximum_layer2_total_length`*::
++
+--
+type: long
+
+--
+
+*`netflow.dropped_layer2_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.dropped_layer2_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.ignored_layer2_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.not_sent_layer2_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.layer2_octet_delta_sum_of_squares`*::
++
+--
+type: long
+
+--
+
+*`netflow.layer2_octet_total_sum_of_squares`*::
++
+--
+type: long
+
+--
+
+*`netflow.layer2_frame_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.layer2_frame_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.pseudo_wire_destination_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.ignored_layer2_frame_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.mib_object_value_integer`*::
++
+--
+type: integer
+
+--
+
+*`netflow.mib_object_value_octet_string`*::
++
+--
+type: short
+
+--
+
+*`netflow.mib_object_value_oid`*::
++
+--
+type: short
+
+--
+
+*`netflow.mib_object_value_bits`*::
++
+--
+type: short
+
+--
+
+*`netflow.mib_object_valuei_pa_ddress`*::
++
+--
+type: ip
+
+--
+
+*`netflow.mib_object_value_counter`*::
++
+--
+type: long
+
+--
+
+*`netflow.mib_object_value_gauge`*::
++
+--
+type: long
+
+--
+
+*`netflow.mib_object_value_time_ticks`*::
++
+--
+type: long
+
+--
+
+*`netflow.mib_object_value_unsigned`*::
++
+--
+type: long
+
+--
+
+*`netflow.mib_object_identifier`*::
++
+--
+type: short
+
+--
+
+*`netflow.mib_sub_identifier`*::
++
+--
+type: long
+
+--
+
+*`netflow.mib_index_indicator`*::
++
+--
+type: long
+
+--
+
+*`netflow.mib_capture_time_semantics`*::
++
+--
+type: short
+
+--
+
+*`netflow.mib_context_engine_id`*::
++
+--
+type: short
+
+--
+
+*`netflow.mib_context_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.mib_object_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.mib_object_description`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.mib_object_syntax`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.mib_module_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.mobile_imsi`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.mobile_msisdn`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.http_status_code`*::
++
+--
+type: integer
+
+--
+
+*`netflow.source_transport_ports_limit`*::
++
+--
+type: integer
+
+--
+
+*`netflow.http_request_method`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.http_request_host`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.http_request_target`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.http_message_version`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.nat_instance_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.internal_address_realm`*::
++
+--
+type: short
+
+--
+
+*`netflow.external_address_realm`*::
++
+--
+type: short
+
+--
+
+*`netflow.nat_quota_exceeded_event`*::
++
+--
+type: long
+
+--
+
+*`netflow.nat_threshold_event`*::
++
+--
+type: long
+
+--
+
+*`netflow.http_user_agent`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.http_content_type`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.http_reason_phrase`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.max_session_entries`*::
++
+--
+type: long
+
+--
+
+*`netflow.max_bieb_ntries`*::
++
+--
+type: long
+
+--
+
+*`netflow.max_entries_per_user`*::
++
+--
+type: long
+
+--
+
+*`netflow.max_subscribers`*::
++
+--
+type: long
+
+--
+
+*`netflow.max_fragments_pending_reassembly`*::
++
+--
+type: long
+
+--
+
+*`netflow.address_pool_high_threshold`*::
++
+--
+type: long
+
+--
+
+*`netflow.address_pool_low_threshold`*::
++
+--
+type: long
+
+--
+
+*`netflow.address_port_mapping_high_threshold`*::
++
+--
+type: long
+
+--
+
+*`netflow.address_port_mapping_low_threshold`*::
++
+--
+type: long
+
+--
+
+*`netflow.address_port_mapping_per_user_high_threshold`*::
++
+--
+type: long
+
+--
+
+*`netflow.global_address_mapping_high_threshold`*::
++
+--
+type: long
+
+--
+
+*`netflow.vpn_identifier`*::
++
+--
+type: short
+
+--
+
 [[exported-fields-nginx]]
 == Nginx fields
 
@@ -7034,6 +10239,1486 @@ SHA256 hash of code signing certificate.
 type: keyword
 
 Hash of process executable.
+
+--
+
+[[exported-fields-suricata]]
+== Suricata fields
+
+Module for handling the EVE JSON logs produced by Suricata.
+
+
+
+[float]
+== suricata fields
+
+Fields from the Suricata EVE log file.
+
+
+
+[float]
+== eve fields
+
+Fields exported by the EVE JSON logs
+
+
+
+*`suricata.eve.event_type`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.app_proto_orig`*::
++
+--
+type: keyword
+
+--
+
+
+*`suricata.eve.tcp.tcp_flags`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tcp.psh`*::
++
+--
+type: boolean
+
+--
+
+*`suricata.eve.tcp.tcp_flags_tc`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tcp.ack`*::
++
+--
+type: boolean
+
+--
+
+*`suricata.eve.tcp.syn`*::
++
+--
+type: boolean
+
+--
+
+*`suricata.eve.tcp.state`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tcp.tcp_flags_ts`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tcp.rst`*::
++
+--
+type: boolean
+
+--
+
+*`suricata.eve.tcp.fin`*::
++
+--
+type: boolean
+
+--
+
+
+*`suricata.eve.fileinfo.sha1`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.fileinfo.filename`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.fileinfo.tx_id`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.fileinfo.state`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.fileinfo.stored`*::
++
+--
+type: boolean
+
+--
+
+*`suricata.eve.fileinfo.gaps`*::
++
+--
+type: boolean
+
+--
+
+*`suricata.eve.fileinfo.sha256`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.fileinfo.md5`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.fileinfo.size`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.icmp_type`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.dest_port`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.src_port`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.proto`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.pcap_cnt`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.src_ip`*::
++
+--
+type: ip
+
+--
+
+
+*`suricata.eve.dns.type`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.dns.rrtype`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.dns.rrname`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.dns.rdata`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.dns.tx_id`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.dns.ttl`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.dns.rcode`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.dns.id`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.flow_id`*::
++
+--
+type: keyword
+
+--
+
+
+*`suricata.eve.email.status`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.dest_ip`*::
++
+--
+type: ip
+
+--
+
+*`suricata.eve.icmp_code`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.http.status`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.http.redirect`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.http.http_user_agent`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.http.protocol`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.http.http_refer`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.http.url`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.http.hostname`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.http.length`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.http.http_method`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.http.http_content_type`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.timestamp`*::
++
+--
+type: date
+
+--
+
+*`suricata.eve.in_iface`*::
++
+--
+type: keyword
+
+--
+
+
+*`suricata.eve.alert.category`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.severity`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.alert.rev`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.alert.gid`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.alert.signature`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.action`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.signature_id`*::
++
+--
+type: long
+
+--
+
+
+
+*`suricata.eve.ssh.client.proto_version`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.ssh.client.software_version`*::
++
+--
+type: keyword
+
+--
+
+
+*`suricata.eve.ssh.server.proto_version`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.ssh.server.software_version`*::
++
+--
+type: keyword
+
+--
+
+
+
+*`suricata.eve.stats.capture.kernel_packets`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.capture.kernel_drops`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.capture.kernel_ifdrops`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.uptime`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.detect.alert`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.http.memcap`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.http.memuse`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.file_store.open_files`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.defrag.max_frag_hits`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.defrag.ipv4.timeouts`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.defrag.ipv4.fragments`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.defrag.ipv4.reassembled`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.defrag.ipv6.timeouts`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.defrag.ipv6.fragments`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.defrag.ipv6.reassembled`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.flow.tcp_reuse`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.udp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.memcap`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.emerg_mode_entered`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.emerg_mode_over`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.tcp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.icmpv6`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.icmpv4`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.spare`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.memuse`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.tcp.pseudo_failed`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.ssn_memcap_drop`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.insert_data_overlap_fail`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.sessions`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.pseudo`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.synack`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.insert_data_normal_fail`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.syn`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.memuse`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.invalid_checksum`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.segment_memcap_drop`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.overlap`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.insert_list_fail`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.rst`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.stream_depth_reached`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.reassembly_memuse`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.reassembly_gap`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.overlap_diff_data`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.no_flow`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.decoder.avg_pkt_size`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.bytes`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.tcp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.raw`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.ppp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.vlan_qinq`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.null`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.decoder.ltnull.unsupported_type`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.ltnull.pkt_too_small`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.invalid`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.gre`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.ipv4`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.ipv6`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.pkts`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.ipv6_in_ipv6`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.decoder.ipraw.invalid_ip_version`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.pppoe`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.udp`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.decoder.dce.pkt_too_small`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.vlan`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.sctp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.max_pkt_size`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.teredo`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.mpls`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.sll`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.icmpv6`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.icmpv4`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.erspan`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.ethernet`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.ipv4_in_ipv6`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.ieee8021ah`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.dns.memcap_global`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.dns.memcap_state`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.dns.memuse`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.flow_mgr.rows_busy`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.flows_timeout`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.flows_notimeout`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.rows_skipped`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.closed_pruned`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.new_pruned`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.flows_removed`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.bypassed_pruned`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.est_pruned`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.flows_timeout_inuse`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.flows_checked`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.rows_maxlen`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.rows_checked`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.rows_empty`*::
++
+--
+type: long
+
+--
+
+
+
+*`suricata.eve.stats.app_layer.flow.tls`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.ftp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.http`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.failed_udp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.dns_udp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.dns_tcp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.smtp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.failed_tcp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.msn`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.ssh`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.imap`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.dcerpc_udp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.dcerpc_tcp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.smb`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.app_layer.tx.tls`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.ftp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.http`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.dns_udp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.dns_tcp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.smtp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.ssh`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.dcerpc_udp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.dcerpc_tcp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.smb`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.tls.notbefore`*::
++
+--
+type: date
+
+--
+
+*`suricata.eve.tls.issuerdn`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tls.sni`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tls.version`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tls.session_resumed`*::
++
+--
+type: boolean
+
+--
+
+*`suricata.eve.tls.fingerprint`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tls.serial`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tls.notafter`*::
++
+--
+type: date
+
+--
+
+*`suricata.eve.tls.subject`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.app_proto_ts`*::
++
+--
+type: keyword
+
+--
+
+
+*`suricata.eve.flow.bytes_toclient`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.flow.start`*::
++
+--
+type: date
+
+--
+
+*`suricata.eve.flow.pkts_toclient`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.flow.age`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.flow.state`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.flow.bytes_toserver`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.flow.reason`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.flow.pkts_toserver`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.flow.end`*::
++
+--
+type: date
+
+--
+
+*`suricata.eve.flow.alerted`*::
++
+--
+type: boolean
+
+--
+
+*`suricata.eve.app_proto`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tx_id`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.app_proto_tc`*::
++
+--
+type: keyword
+
+--
+
+
+*`suricata.eve.smtp.rcpt_to`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.smtp.mail_from`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.smtp.helo`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.app_proto_expected`*::
++
+--
+type: keyword
 
 --
 

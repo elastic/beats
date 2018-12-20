@@ -27,6 +27,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/magefile/mage/mg"
+
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
@@ -63,8 +65,11 @@ func (t ConfigFileType) IsDocker() bool { return t&DockerConfigType > 0 }
 // ConfigFileParams defines the files that make up each config file.
 type ConfigFileParams struct {
 	ShortParts     []string // List of files or globs.
+	ShortDeps      []interface{}
 	ReferenceParts []string // List of files or globs.
+	ReferenceDeps  []interface{}
 	DockerParts    []string // List of files or globs.
+	DockerDeps     []interface{}
 	ExtraVars      map[string]interface{}
 }
 
@@ -122,18 +127,21 @@ func makeConfigTemplates(types ConfigFileType, args ConfigFileParams) error {
 	var err error
 
 	if types.IsShort() {
+		mg.SerialDeps(args.ShortDeps...)
 		if err = makeConfigTemplate(shortTemplate, 0600, args.ShortParts...); err != nil {
 			return err
 		}
 	}
 
 	if types.IsReference() {
+		mg.SerialDeps(args.ReferenceDeps...)
 		if err = makeConfigTemplate(referenceTemplate, 0644, args.ReferenceParts...); err != nil {
 			return err
 		}
 	}
 
 	if types.IsDocker() {
+		mg.SerialDeps(args.DockerDeps...)
 		if err = makeConfigTemplate(dockerTemplate, 0600, args.DockerParts...); err != nil {
 			return err
 		}
