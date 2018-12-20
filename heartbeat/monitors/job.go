@@ -23,19 +23,26 @@ import (
 
 // A Job represents a unit of execution, and may return multiple continuation jobs.
 type Job interface {
+	ID() string
 	Name() string
 	Run(event *beat.Event) ([]Job, error)
 }
 
 // NamedJob represents a job with an explicitly specified name.
 type NamedJob struct {
+	id   string
 	name string
 	run  func(event *beat.Event) ([]Job, error)
 }
 
 // CreateNamedJob makes a new NamedJob.
-func CreateNamedJob(name string, run func(event *beat.Event) ([]Job, error)) *NamedJob {
-	return &NamedJob{name, run}
+func CreateNamedJob(id string, name string, run func(event *beat.Event) ([]Job, error)) *NamedJob {
+	return &NamedJob{id, name, run}
+}
+
+// ID returns a unique ID for this Job.
+func (f *NamedJob) ID() string {
+	return f.id
 }
 
 // Name returns the name of this job.
@@ -51,6 +58,11 @@ func (f *NamedJob) Run(event *beat.Event) ([]Job, error) {
 // AnonJob represents a job with no assigned name, backed by just a function.
 type AnonJob func(event *beat.Event) ([]Job, error)
 
+// ID returns a unique ID for this Job.
+func (aj AnonJob) ID() string {
+	return ""
+}
+
 // Name returns "" for AnonJob values.
 func (aj AnonJob) Name() string {
 	return ""
@@ -64,8 +76,8 @@ func (aj AnonJob) Run(event *beat.Event) ([]Job, error) {
 // AfterJob creates a wrapped version of the given Job that runs additional
 // code after the original Job, possibly altering return values.
 func AfterJob(j Job, after func(*beat.Event, []Job, error) ([]Job, error)) Job {
-
 	return CreateNamedJob(
+		j.ID(),
 		j.Name(),
 		func(event *beat.Event) ([]Job, error) {
 			next, err := j.Run(event)

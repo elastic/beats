@@ -156,7 +156,7 @@ func (t *configuredJob) Start() {
 	}
 
 	tf := t.makeSchedulerTaskFunc()
-	t.cancelFn, err = t.monitor.scheduler.Add(t.config.Schedule, t.job.Name(), tf)
+	t.cancelFn, err = t.monitor.scheduler.Add(t.config.Schedule, t.job.ID(), tf)
 	if err != nil {
 		logp.Err("could not start monitor: %v", err)
 	}

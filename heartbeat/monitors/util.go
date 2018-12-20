@@ -87,11 +87,6 @@ func (s IPSettings) Network() string {
 func WithErrAsField(job Job) Job {
 	return AfterJob(job, func(event *beat.Event, jobs []Job, err error) ([]Job, error) {
 		if err != nil {
-			// Handle the case where we have a parent configuredJob that only spawns subtasks
-			// that has itself encountered an error
-			if event == nil {
-				event = &beat.Event{}
-			}
 			MergeEventFields(event, common.MapStr{
 				"error": look.Reason(err),
 			})
@@ -107,6 +102,7 @@ func WithErrAsField(job Job) Job {
 // It adds the monitor.duration and monitor.status fields.
 func TimeAndCheckJob(job Job) Job {
 	return CreateNamedJob(
+		"",
 		job.Name(),
 		func(event *beat.Event) ([]Job, error) {
 			start := time.Now()
@@ -133,6 +129,7 @@ func TimeAndCheckJob(job Job) Job {
 // WithJobId wraps the given Job setting the monitor.id field.
 func WithJobId(id string, job Job) Job {
 	return CreateNamedJob(
+		"",
 		id,
 		WithFields(
 			common.MapStr{
@@ -296,7 +293,7 @@ func makeByHostAllIPJob(
 	network := settings.IP.Network()
 	filter := makeIPFilter(network)
 
-	return CreateNamedJob(settings.Name, func(event *beat.Event) ([]Job, error) {
+	return CreateNamedJob("", settings.Name, func(event *beat.Event) ([]Job, error) {
 		// TODO: check for better DNS IP lookup support:
 		//         - The net.LookupIP drops ipv6 zone index
 		//
@@ -356,16 +353,32 @@ func resolveErr(event *beat.Event, host string, err error) {
 	})
 }
 
+// WithID wraps the given job and any continuations it spawns setting the monitor.id field and setting
+// the Job's ID property to the given ID as well.
+func WithID(id string, origJob Job) Job {
+	fieldWrappedJob := WithFields(common.MapStr{"monitor": common.MapStr{"id": id}}, origJob)
+
+	return CreateNamedJob(id, fieldWrappedJob.Name(), func(event *beat.Event) ([]Job, error) {
+		conts, err := fieldWrappedJob.Run(event)
+		if err != nil {
+			return nil, err
+		}
+
+		return WrapAll(conts, func(cont Job) Job {
+			return WithID(id, cont)
+		}), nil
+	})
+}
+
 // WithFields wraps a TaskRunner, updating all events returned with the set of
 // fields configured.
 func WithFields(fields common.MapStr, job Job) Job {
 	return AfterJob(job, func(event *beat.Event, cont []Job, err error) ([]Job, error) {
 		MergeEventFields(event, fields)
 
-		for i := range cont {
-			cont[i] = WithFields(fields, cont[i])
-		}
-		return cont, err
+		return WrapAll(cont, func(job Job) Job {
+			return WithFields(fields, job)
+		}), err
 	})
 }
 
@@ -417,8 +430,8 @@ func filterIPs(ips []net.IP, filt func(net.IP) bool) []net.IP {
 
 // MakeHostJobSettings creates a new HostJobSettings structure without any global
 // event fields.
-func MakeHostJobSettings(name, host string, ip IPSettings) HostJobSettings {
-	return HostJobSettings{Name: name, Host: host, IP: ip}
+func MakeHostJobSettings(host string, ip IPSettings) HostJobSettings {
+	return HostJobSettings{Host: host, IP: ip}
 }
 
 // WithFields adds new event fields to a Job. Existing fields will be

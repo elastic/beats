@@ -25,10 +25,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/scheduler"
+	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
 func TestMonitor(t *testing.T) {
-	serverMonConf := mockPluginConf(t, "@every 1ms", "http://example.net")
+	serverMonConf := mockPluginConf(t, "", "@every 1ms", "http://example.net")
 	reg := mockPluginsReg()
 	pipelineConnector := &MockPipelineConnector{}
 
@@ -58,6 +59,10 @@ func TestMonitor(t *testing.T) {
 			// This could (possibly?) lock on a single core system otherwise
 			time.Sleep(time.Microsecond)
 		}
+
+		for _, event := range pcClient.Publishes() {
+			mapvaltest.Test(t, mockEventMonitorValidator(""), event.Fields)
+		}
 	}
 
 	if !success {
@@ -66,4 +71,28 @@ func TestMonitor(t *testing.T) {
 
 	mon.Stop()
 	assert.Equal(t, true, pcClient.closed)
+}
+
+func TestDuplicateMonitorIDs(t *testing.T) {
+	serverMonConf := mockPluginConf(t, "custom", "@every 1ms", "http://example.net")
+	reg := mockPluginsReg()
+	pipelineConnector := &MockPipelineConnector{}
+
+	sched := scheduler.New(1)
+	err := sched.Start()
+	require.NoError(t, err)
+	defer sched.Stop()
+
+	makeTestMon := func() (*Monitor, error) {
+		return newMonitor(serverMonConf, reg, pipelineConnector, sched, false)
+	}
+
+	m1, m1Err := makeTestMon()
+	assert.NoError(t, m1Err)
+	_, m2Err := makeTestMon()
+	assert.Error(t, m2Err)
+
+	m1.Stop()
+	_, m3Err := makeTestMon()
+	assert.NoError(t, m3Err)
 }
