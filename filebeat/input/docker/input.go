@@ -69,14 +69,8 @@ func NewInput(
 		return nil, errors.New("Docker input requires at least one entry under 'containers.ids'")
 	}
 
-	if len(config.Containers.Suffix) == 0 {
-		for idx, containerID := range config.Containers.IDs {
-			cfg.SetString("paths", idx, path.Join(config.Containers.Path, containerID))
-		}
-	} else {
-		for idx, containerID := range config.Containers.IDs {
-			cfg.SetString("paths", idx, path.Join(config.Containers.Path, strings.Join([]string{containerID, config.Containers.Suffix}, "")))
-		}
+	for idx, containerID := range config.Containers.IDs {
+		cfg.SetString("paths", idx, path.Join(config.Containers.Path, strings.Join([]string{containerID, config.Containers.Suffix}, "")))
 	}
 
 	if err := checkStream(config.Containers.Stream); err != nil {

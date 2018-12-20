@@ -22,7 +22,7 @@ var defaultConfig = config{
 	Containers: containers{
 		IDs:    []string{},
 		Path:   "/var/lib/docker/containers",
-		Suffix:	"/*.log",
+		Suffix: "/*.log",
 		Stream: "all",
 	},
 }
@@ -41,9 +41,9 @@ type config struct {
 }
 
 type containers struct {
-	IDs  []string `config:"ids"`
-	Path string   `config:"path"`
-	Suffix string `config:"suffix"`
+	IDs    []string `config:"ids"`
+	Path   string   `config:"path"`
+	Suffix string   `config:"suffix"`
 
 	// Stream can be all, stdout or stderr
 	Stream string `config:"stream"`
