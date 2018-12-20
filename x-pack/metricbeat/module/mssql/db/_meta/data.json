@@ -1,0 +1,41 @@
+{
+    "@timestamp": "2018-12-20T11:32:46.549Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "7.0.0"
+    },
+    "mssql": {
+        "db": {
+            "database": {
+                "id": "1"
+            },
+            "log_space_usage": {
+                "used.bytes": 458752,
+                "used.pct": 58.94736862182617,
+                "since_last_backup.bytes": 163840,
+                "total.bytes": 778240
+            }
+        }
+    },
+    "event": {
+        "dataset": "mssql.db",
+        "module": "mssql",
+        "duration": 897031
+    },
+    "host": {
+        "name": "b0f21c796541"
+    },
+    "agent": {
+        "hostname": "b0f21c796541",
+        "version": "7.0.0",
+        "type": "metricbeat"
+    },
+    "metricset": {
+        "name": "db"
+    },
+    "service": {
+        "address": "mssql",
+        "type": "mssql"
+    }
+}

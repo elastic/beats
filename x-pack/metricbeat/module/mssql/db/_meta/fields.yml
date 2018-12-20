@@ -1,0 +1,28 @@
+- name: db
+  type: group
+  description: >
+    db
+  fields:
+    - name: database
+      type: group
+      description: Database metricset
+      fields:
+        - name: id
+          description: The database ID
+          type: keyword
+    - name: log_space_usage
+      type: group
+      description: Space usage information for the transaction log
+      fields:
+        - name: total.bytes
+          description: The size of the log
+          type: long
+        - name: used.bytes
+          description: The occupied size of the log
+          type: long
+        - name: used.pct
+          description: The occupied size of the log as a percent of the total log size
+          type: float
+        - name: since_last_backup.bytes
+          description: The amount of space used since the last log backup
+          type: long
