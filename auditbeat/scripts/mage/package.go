@@ -23,23 +23,36 @@ import (
 	"github.com/elastic/beats/dev-tools/mage"
 )
 
+// PackagingFlavor specifies the type of packaging (OSS vs X-Pack).
+type PackagingFlavor uint8
+
+// Packaging flavors.
+const (
+	OSSPackaging PackagingFlavor = iota
+	XPackPackaging
+)
+
 // CustomizePackaging modifies the package specs to use templated config files
 // instead of the defaults.
 //
 // Customizations specific to Auditbeat:
 // - Include audit.rules.d directory in packages.
-func CustomizePackaging() {
+func CustomizePackaging(pkgFlavor PackagingFlavor) {
 	var (
 		shortConfig = mage.PackageFile{
 			Mode:   0600,
 			Source: "{{.PackageDir}}/auditbeat.yml",
-			Dep:    generateShortConfig,
+			Dep: func(spec mage.PackageSpec) error {
+				return generateConfig(pkgFlavor, mage.ShortConfigType, spec)
+			},
 			Config: true,
 		}
 		referenceConfig = mage.PackageFile{
 			Mode:   0644,
 			Source: "{{.PackageDir}}/auditbeat.reference.yml",
-			Dep:    generateReferenceConfig,
+			Dep: func(spec mage.PackageSpec) error {
+				return generateConfig(pkgFlavor, mage.ReferenceConfigType, spec)
+			},
 		}
 	)
 
@@ -95,20 +108,20 @@ func CustomizePackaging() {
 	}
 }
 
-func generateReferenceConfig(spec mage.PackageSpec) error {
-	params := map[string]interface{}{
-		"Reference": true,
-		"ArchBits":  archBits,
+func generateConfig(pkgFlavor PackagingFlavor, ct mage.ConfigFileType, spec mage.PackageSpec) error {
+	var args mage.ConfigFileParams
+	switch pkgFlavor {
+	case OSSPackaging:
+		args = OSSConfigFileParams()
+	case XPackPackaging:
+		args = XPackConfigFileParams()
+	default:
+		panic(errors.Errorf("Invalid packaging flavor (either oss or xpack): %v", pkgFlavor))
 	}
-	return spec.ExpandFile(referenceConfigTemplate,
-		"{{.PackageDir}}/auditbeat.reference.yml", params)
-}
 
-func generateShortConfig(spec mage.PackageSpec) error {
-	params := map[string]interface{}{
-		"Reference": false,
-		"ArchBits":  archBits,
-	}
-	return spec.ExpandFile(shortConfigTemplate,
-		"{{.PackageDir}}/auditbeat.yml", params)
+	// PackageDir isn't exported but we can grab it's value this way.
+	packageDir := spec.MustExpand("{{.PackageDir}}")
+	args.ExtraVars["GOOS"] = spec.OS
+	args.ExtraVars["GOARCH"] = spec.MustExpand("{{.GOARCH}}")
+	return mage.Config(ct, args, packageDir)
 }

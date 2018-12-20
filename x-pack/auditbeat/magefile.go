@@ -69,7 +69,7 @@ func Package() {
 
 	mage.UseElasticBeatXPackPackaging()
 	mage.PackageKibanaDashboardsFromBuildDir()
-	auditbeat.CustomizePackaging()
+	auditbeat.CustomizePackaging(auditbeat.XPackPackaging)
 
 	mg.SerialDeps(Fields, Dashboards, Config, mage.GenerateModuleIncludeListGo)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
@@ -81,12 +81,26 @@ func TestPackages() error {
 	return mage.TestPackages()
 }
 
-// Fields generates a fields.yml and include/fields.go.
-func Fields() {
-	mg.SerialDeps(fieldsYML, mage.GenerateAllInOneFieldsGo)
+// Update is an alias for running fields, dashboards, config.
+func Update() {
+	mg.SerialDeps(Fields, Dashboards, Config, mage.GenerateModuleIncludeListGo)
 }
 
-// fieldsYML generates a fields.yml based on auditbeat + x-pack/auditbeat/modules.
+// Config generates both the short and reference configs.
+func Config() error {
+	return mage.Config(mage.AllConfigTypes, auditbeat.XPackConfigFileParams(), ".")
+}
+
+// Fields generates a fields.yml and include/fields.go.
+func Fields() {
+	mg.SerialDeps(fieldsYML, moduleFieldsGo)
+}
+
+func moduleFieldsGo() error {
+	return mage.GenerateModuleFieldsGo("module")
+}
+
+// fieldsYML generates the fields.yml file containing all fields.
 func fieldsYML() error {
 	return mage.GenerateFieldsYAML(mage.OSSBeatDir("module"), "module")
 }
@@ -103,24 +117,6 @@ func ExportDashboard() error {
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
 	return mage.KibanaDashboards(mage.OSSBeatDir("module"), "module")
-}
-
-// Config generates both the short and reference configs.
-func Config() error {
-	return auditbeat.Config(
-		mage.OSSBeatDir(auditbeat.ConfigTemplateGlob),
-		auditbeat.ConfigTemplateGlob)
-}
-
-// Update is an alias for running fields, dashboards, config.
-func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config, mage.GenerateModuleIncludeListGo,
-		Docs)
-}
-
-// Docs collects the documentation.
-func Docs() error {
-	return auditbeat.CollectDocs(mage.OSSBeatDir(), mage.XPackBeatDir())
 }
 
 // Fmt formats source code and adds file headers.
