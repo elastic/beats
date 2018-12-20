@@ -7,12 +7,13 @@ services:
     env_file:
       - ${PWD}/input/redis/_meta/env
     environment:
-    - ES_HOST=elasticsearch
-    - ES_PORT=9200
-    - ES_USER=beats
-    - ES_PASS=testing
-    - KIBANA_HOST=kibana
-    - KIBANA_PORT=5601
+      - BEAT_STRICT_PERMS=false
+      - ES_HOST=elasticsearch
+      - ES_PORT=9200
+      - ES_USER=beats
+      - ES_PASS=testing
+      - KIBANA_HOST=kibana
+      - KIBANA_PORT=5601
     working_dir: /go/src/github.com/elastic/beats/filebeat
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
