@@ -9892,24 +9892,6 @@ The timestamp from the log line.
 
 --
 
-*`postgresql.log.timezone`*::
-+
---
-The timezone of timestamp.
-
-
---
-
-*`postgresql.log.thread_id`*::
-+
---
-type: long
-
-Process id
-
-
---
-
 *`postgresql.log.core_id`*::
 +
 --
@@ -9920,30 +9902,12 @@ Core id
 
 --
 
-*`postgresql.log.user`*::
-+
---
-example: admin
-
-Name of user
-
---
-
 *`postgresql.log.database`*::
 +
 --
 example: mydb
 
 Name of database
-
---
-
-*`postgresql.log.level`*::
-+
---
-example: FATAL
-
-The log level.
 
 --
 
@@ -9967,13 +9931,48 @@ Query statement.
 
 --
 
+*`postgresql.log.timezone`*::
++
+--
+type: alias
+
+alias to: event.timezone
+
+--
+
+*`postgresql.log.thread_id`*::
++
+--
+type: alias
+
+alias to: process.pid
+
+--
+
+*`postgresql.log.user`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`postgresql.log.level`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
 *`postgresql.log.message`*::
 +
 --
-type: text
+type: alias
 
-The logged message.
-
+alias to: message
 
 --
 

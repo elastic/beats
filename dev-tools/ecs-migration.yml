@@ -434,6 +434,28 @@
   to: user_agent.original
   alias: true
 
+## PostgreSQL module
+
+- from: postgresql.log.timezone
+  to: event.timezone
+  alias: true
+
+- from: postgresql.log.thread_id
+  to: process.pid
+  alias: true
+
+- from: postgresql.log.user
+  to: user.name
+  alias: true
+
+- from: postgresql.log.level
+  to: log.level
+  alias: true
+
+- from: postgresql.log.message
+  to: message
+  alias: true
+
 ## Redis module
 
 - from: redis.log.pid
