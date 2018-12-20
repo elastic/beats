@@ -26,12 +26,17 @@ cleanup() {
     if [ "$os" == "Darwin" ]; then
       # Clean images accept for the ones we're currently using in order to
       # gain some disk space.
+      echo "Disk space before image cleanup:"
       df -h /
+      docker system df
+      echo "Cleaning images"
       docker images --format "{{.ID}} {{.Repository}}:{{.Tag}}" \
         | grep -v "docker.elastic.co/beats-dev/golang-crossbuild:$(cat .go-version)-" \
         | awk '{print $1}' \
         | xargs docker rmi -f || true
+      echo "Disk space after image cleanup:"
       df -h /
+      docker system df
     fi
   fi
 
