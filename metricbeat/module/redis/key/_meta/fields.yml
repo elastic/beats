@@ -2,7 +2,7 @@
   type: group
   description: >
     `key` contains information about keys.
-  release: beta
+  release: ga
   fields:
     - name: name
       type: keyword

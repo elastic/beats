@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-redis-key]]
 === Redis key metricset
 
-beta[]
-
 include::../../../module/redis/key/_meta/docs.asciidoc[]
 
 
