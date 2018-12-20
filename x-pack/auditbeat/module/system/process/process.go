@@ -255,9 +255,6 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 
 		if p.Error == nil {
 			report.Event(processEvent(p, eventTypeEvent, eventActionProcessStopped))
-		} else {
-			ms.log.Warn(p.Error)
-			report.Event(processEvent(p, eventTypeError, eventActionProcessError))
 		}
 	}
 
@@ -372,7 +369,7 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 							ms.suppressPermissionWarnings = true
 						}
 
-						continue
+						//continue
 					}
 				}
 
