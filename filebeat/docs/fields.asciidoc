@@ -4278,7 +4278,7 @@ Unit of time duration
 
 --
 
-*`elasticsearch.server.gc.collection_duration.time_in_millis`*::
+*`elasticsearch.server.gc.collection_duration.ms`*::
 +
 --
 type: float
@@ -4317,7 +4317,7 @@ Unit of time duration
 
 --
 
-*`elasticsearch.server.gc.observation_duration.time_in_millis`*::
+*`elasticsearch.server.gc.observation_duration.ms`*::
 +
 --
 type: float

@@ -39,7 +39,7 @@
           description: "Unit of time duration"
           example: s
           type: keyword
-        - name: time_in_millis
+        - name: ms
           description: "Time duration in milliseconds"
           example: 1600
           type: float
@@ -55,7 +55,7 @@
           description: "Unit of time duration"
           example: s
           type: keyword
-        - name: time_in_millis
+        - name: ms
           description: "Time duration in milliseconds"
           example: 1800
           type: float
