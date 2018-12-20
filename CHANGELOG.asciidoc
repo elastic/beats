@@ -7,7 +7,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -17,12 +17,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Automaticall cap signed integers to 63bits. {pull}8991[8991]
 - Rename beat.timezone to event.timezone. {pull}9458[9458]
 - Use _doc as document type. {pull}9056[9056]{pull}9573[9573]
+- Update to Golang 1.11.3. {pull}9560[9560]
 
 *Auditbeat*
 
 *Filebeat*
 
-- Allow beats to blacklist certain part of the configuration while using Central Management. {pull}9099[9099]
 - Modify apache/error dataset to follow ECS. {pull}8963[8963]
 
 *Heartbeat*
@@ -33,7 +33,115 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 *Metricbeat*
 
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Enforce validation for the Central Management access token. {issue}9621[9621]
+
+*Auditbeat*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Added
+
+*Affecting all Beats*
+
+*Auditbeat*
+
+- Add system module. {pull}9546[9546]
+
+*Filebeat*
+
+- Added module for parsing Google Santa logs. {pull}9540[9540]
+- Added netflow input type that supports NetFlow v1, v5, v6, v7, v8, v9 and IPFIX. {issue}9399[9399]
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Functionbeat*
+
+==== Deprecated
+
+*Affecting all Beats*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+
+////////////////////////////////////////////////////////////
+
+[[release-notes-7.0.0-alpha2]]
+=== Beats version 7.0.0-alpha2
+https://github.com/elastic/beats/compare/v7.0.0-alpha1...v7.0.0-alpha2[Check the HEAD diff]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Update add_cloud_metadata fields to adjust to ECS. {pull}9265[9265]
+- Automaticall cap signed integers to 63bits. {pull}8991[8991]
+- Rename beat.timezone to event.timezone. {pull}9458[9458]
+- Use _doc as document type. {pull}9056[9056]
+- Removed dashboards and index patterns generation for Kibana 5. {pull}8927[8927]
+- On systems with systemd, the Beats log is now written to journald by default rather than file. To revert this behaviour override BEAT_LOG_OPTS with an empty value. {pull}8942[8942].
+
+*Auditbeat*
+
+- Remove warning for deprecated option: "filters". {pull}9002[9002]
+
+*Filebeat*
+
 - Allow beats to blacklist certain part of the configuration while using Central Management. {pull}9099[9099]
+- Remove warnings for deprecated options: "spool_size", "publish_async", "idle_timeout". {pull}9002[9002]
+- Rename many `haproxy.*` fields to map to ECS. {pull}9117[9117]
+- Rename many `iis.access.*` fields to map to ECS. {pull}9084[9084]
+- IIS module's user agent string is no longer encoded (`+` replaced with spaces). {pull}9084[9084]
+- Rename many `system.syslog.*` fields to map to ECS. {pull}9135[9135]
+- Rename many `nginx.access.*` fields to map to ECS. {pull}9081[9081]
+- Rename many `system.auth.*` fields to map to ECS. {pull}9138[9138]
+- Rename many `apache2.access.*` fields to map to ECS. {pull}9245[9245]
+
+*Metricbeat*
+
+- Allow beats to blacklist certain part of the configuration while using Central Management. {pull}9099[9099]
+- Remove warning for deprecated option: "filters". {pull}9002[9002]
 
 *Packetbeat*
 
@@ -41,16 +149,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Renamed several client and server fields. IP, port, and process metadata are
   now contained under the client and server namespaces. {issue}9303[9303]
 
-*Winlogbeat*
-
 *Functionbeat*
 
 - The CLI will now log CloudFormation Stack events. {issue}8912[8912]
+- Function concurrency is now set to 5 instead of unreserved. {pull}8992[8992]
 
 ==== Bugfixes
 
 *Affecting all Beats*
 
+- Propagate Sync error when running SafeFileRotate. {pull}9069[9069]
 - Fix autodiscover configurations stopping when metadata is missing. {pull}8851[8851]
 - Log events at the debug level when dropped by encoding problems. {pull}9251[9251]
 - Refresh host metadata in add_host_metadata. {pull}9359[9359]
@@ -73,10 +181,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Use `log.source.address` instead of `log.source.ip` for network input sources. {pull}9487[9487]
 - Rename many `redis.log.*` fields to map to ECS. {pull}9315[9315]
 
-*Heartbeat*
-
-*Journalbeat*
-
 *Metricbeat*
 
 - Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
@@ -88,10 +192,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 
 - Fix issue with process monitor associating traffic to the wrong process. {issue}9151[9151] {pull}9443[9443]
 
-*Winlogbeat*
-
-*Functionbeat*
-
 ==== Added
 
 *Affecting all Beats*
@@ -99,22 +199,22 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Unify dashboard exporter tools. {pull}9097[9097]
 - Add cache.ttl to add_host_metadata. {pull}9359[9359]
 - Add support for index lifecycle management (beta). {pull}7963[7963]
-- Always include Pod UID as part of Pod metadata. {pull]9517[9517]
-
-*Auditbeat*
-
-- Add system module. {pull}9546[9546]
+- Always include Pod UID as part of Pod metadata. {pull}9517[9517]
+- Autodiscovery no longer requires that the `condition` field be set. If left unset all configs will be matched. {pull}9029[9029]
+- Add geo fields to `add_host_metadata` processor. {pull}9392[9392]
 
 *Filebeat*
 
+- Added the `redirect_stderr` option that allows panics to be logged to log files. {pull}8430[8430]
 - Added `detect_null_bytes` selector to detect null bytes from a io.reader. {pull}9210[9210]
 - Added `syslog_host` variable to HAProxy module to allow syslog listener to bind to configured host. {pull}9366[9366]
 - Added support on Traefik for Common Log Format and Combined Log Format mixed which is the default Traefik format {issue}8015[8015] {issue}6111[6111] {pull}8768[8768].
 - Add support for multi-core thread_id in postgresql module {issue}9156[9156] {pull}9482[9482]
-- Added module for parsing Google Santa logs. {pull}9540[9540]
-- Added netflow input type that supports NetFlow v1, v5, v6, v7, v8, v9 and IPFIX. {issue}9399[9399]
 
 *Heartbeat*
+
+- Add last monitor status to dashboard table. Further break out monitors in dashboard table by monitor.ip. {pull}9022[9022]
+- Add central management support. {pull}9254[9254]
 
 *Journalbeat*
 
@@ -130,33 +230,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...master[Check the HEAD d
 - Add `host.os.name` field to add_host_metadata processor. {issue}8948[8948] {pull}9405[9405]
 - Add more TCP statuses to `socket_summary` metricset. {pull}9430[9430]
 
-*Packetbeat*
-
-*Functionbeat*
-
 ==== Deprecated
 
-*Affecting all Beats*
-
-*Filebeat*
-
-*Heartbeat*
-
-*Journalbeat*
-
 *Metricbeat*
+
 - event.duration is now in nano and not microseconds anymore. {pull}8941[8941]
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-
-////////////////////////////////////////////////////////////
 
 [[release-notes-7.0.0-alpha1]]
 === Beats version 7.0.0-alpha1
@@ -167,15 +245,12 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 *Affecting all Beats*
 
 - Dissect syntax change, use * instead of ? when working with field reference. {issue}8054[8054]
-- On systems with systemd, the Beats log is now written to journald by default rather than file. To revert this behaviour override BEAT_LOG_OPTS with an empty value. {pull}8942[8942].
-- Removed dashboards and index patterns generation for Kibana 5. {pull}8927[8927]
 
 *Auditbeat*
 
 - Use `initial_scan` action for new paths. {pull}7954[7954]
 - Rename beat.name to agent.type, beat.hostname to agent.hostname, beat.version to agent.version.
 - Rename `source.hostname` to `source.domain` in the auditd module. {pull}9027[9027]
-- Remove warning for deprecated option: "filters". {pull}9002[9002]
 
 *Filebeat*
 
@@ -185,22 +260,6 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Remove the deprecated `prospector(s)` option in the configuration use `input(s)` instead. {pull}8909[8909]
 - Rename `offset` to `log.offset`. {pull}8923[8923]
 - Rename `source_ecs` to `source` in the Filebeat Suricata module. {pull}8983[8983]
-- Remove warnings for deprecated options: "spool_size", "publish_async", "idle_timeout". {pull}9002[9002]
-- Rename many `system.syslog.*` fields to map to ECS. {pull}9135[9135]
-- Rename many `iis.access.*` fields to map to ECS. {pull}9084[9084]
-- IIS module's user agent string is no longer encoded (`+` replaced with spaces). {pull}9084[9084]
-- Rename many `haproxy.*` fields to map to ECS. {pull}9117[9117]
-- Rename many `nginx.access.*` fields to map to ECS. {pull}9081[9081]
-- Rename many `system.auth.*` fields to map to ECS. {pull}9138[9138]
-- Rename many `apache2.access.*` fields to map to ECS. {pull}9245[9245]
-
-*Metricbeat*
-
-- Remove warning for deprecated option: "filters". {pull}9002[9002]
-
-*Functionbeat*
-
-- Function concurrency is now set to 5 instead of unreserved. {pull}8992[8992]
 
 ==== Bugfixes
 
@@ -210,7 +269,6 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Fixed Support `add_docker_metadata` in Windows by identifying systems' path separator. {issue}7797[7797]
 - Do not panic when no tokenizer string is configured for a dissect processor. {issue}8895[8895]
 - Start autodiscover consumers before producers. {pull}7926[7926]
-- Propagate Sync error when running SafeFileRotate. {pull}9069[9069]
 
 *Filebeat*
 
@@ -245,7 +303,6 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Allow Bus to buffer events in case listeners are not configured. {pull}8527[8527]
 - Dissect will now flag event on parsing error. {pull}8751[8751]
 - add_cloud_metadata initialization is performed asynchronously to avoid delays on startup. {pull}8845[8845]
-- Added the `redirect_stderr` option that allows panics to be logged to log files. {pull}8430[8430]
 - Add DeDot method in add_docker_metadata processor in libbeat. {issue}9350[9350] {pull}9505[9505]
 
 *Filebeat*
@@ -278,6 +335,80 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Add support to decode HTTP bodies compressed with `gzip` and `deflate`. {pull}7915[7915]
 - Added support to calculate certificates' fingerprints (MD5, SHA-1, SHA-256). {issue}8180[8180]
 - Support new TLS version negotiation introduced in TLS 1.3. {issue}8647[8647].
+
+[[release-notes-6.5.4]]
+=== Beats version 6.5.4
+https://github.com/elastic/beats/compare/v6.5.3...v6.5.4[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Update Golang to 1.10.6. This fixes an issue in remote certificate validation CVE-2018-16875. {pull}9563[9563]
+
+*Filebeat*
+
+- Fix saved objects in filebeat haproxy dashboard. {pull}9417[9417]
+- Fixed a memory leak when harvesters are closed. {pull}7820[7820]
+
+==== Added
+
+*Filebeat*
+
+- Added support on Traefik for Common Log Format and Combined Log Format mixed which is the default Traefik format {issue}8015[8015] {issue}6111[6111] {pull}8768[8768].
+
+
+[[release-notes-6.5.3]]
+=== Beats version 6.5.3
+https://github.com/elastic/beats/compare/v6.5.2...v6.5.3[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Log events at the debug level when dropped by encoding problems. {pull}9251[9251]
+
+*Filebeat*
+
+- Correctly parse `December` or `Dec` in the Syslog input. {pull}9349[9349]
+- Don't generate incomplete configurations when logs collection is disabled by hints. {pull}9305[9305]
+- Stop runners disabled by hints after previously being started. {pull}9305[9305]
+- Fix installation of haproxy dashboard. {issue}9307[9307] {pull}9313[9313]
+
+[[release-notes-6.5.2]]
+=== Beats version 6.5.2
+https://github.com/elastic/beats/compare/v6.5.1...v6.5.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Propagate Sync error when running SafeFileRotate. {pull}9069[9069]
+
+*Metricbeat*
+
+- Fix panic on docker healthcheck collection on dockers without healthchecks. {pull}9171[9171]
+- Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
+
+[[release-notes-6.5.1]]
+=== Beats version 6.5.1
+https://github.com/elastic/beats/compare/v6.5.0...v6.5.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+- Fix windows binaries not having an enroll command. {issue}9096[9096] {pull}8836[8836]
+
+*Journalbeat*
+- Fix journalbeat sometimes hanging if output is unavailable. {pull}9106[9106]
+
+*Metricbeat*
+- Fix race condition when enriching events with kubernetes metadata. {issue}9055[9055] {issue}9067[9067]
+
+==== Added
+
+*Journalbeat*
+- Add minimal kibana dashboard. {pull}9106[9106]
 
 
 [[release-notes-6.5.0]]
@@ -372,7 +503,6 @@ https://github.com/elastic/beats/compare/v6.4.0...v6.5.0[View commits]
 - Add Beats Central Management {pull}8559[8559]
 - Report configured queue type. {pull}8091[8091]
 - Enable `host` and `cloud` metadata processors by default. {pull}8596[8596]
-- Autodiscovery no longer requires that the `condition` field be set. If left unset all configs will be matched. {pull}9029[9029]
 
 *Filebeat*
 
@@ -393,7 +523,6 @@ https://github.com/elastic/beats/compare/v6.4.0...v6.5.0[View commits]
 - Added support for extra TLS/x509 metadata. {pull}7944[7944]
 - Added stats and state metrics for number of monitors and endpoints started. {pull}8621[8621]
 - Add last monitor status to dashboard table. Further break out monitors in dashboard table by monitor.ip. {pull}9022[9022]
-- Add central management support. {pull}9254[9254]
 
 *Journalbeat*
 
@@ -1790,6 +1919,132 @@ https://github.com/elastic/beats/compare/v5.4.0...v6.0.0-alpha1[View commits]
 *Filebeat*
 
 - Prospector reloading only works properly with new files. {pull}3546[3546]
+
+
+[[release-notes-5.6.14]]
+=== Beats version 5.6.14
+https://github.com/elastic/beats/compare/v5.6.13...v5.6.14[View commits]
+
+No changes in this version.
+
+[[release-notes-5.6.13]]
+=== Beats version 5.6.13
+https://github.com/elastic/beats/compare/v5.6.12...v5.6.13[View commits]
+
+No changes in this version.
+
+[[release-notes-5.6.12]]
+=== Beats version 5.6.12
+https://github.com/elastic/beats/compare/v5.6.11...v5.6.12[View commits]
+
+No changes in this version.
+
+[[release-notes-5.6.11]]
+=== Beats version 5.6.11
+https://github.com/elastic/beats/compare/v5.6.10...v5.6.11[View commits]
+
+No changes in this version.
+
+[[release-notes-5.6.10]]
+=== Beats version 5.6.10
+https://github.com/elastic/beats/compare/v5.6.9...v5.6.10[View commits]
+
+==== Bugfixes
+
+*Packetbeat*
+
+- Fix an out of bounds access in HTTP parser caused by malformed request. {pull}6997[6997]
+
+[[release-notes-5.6.9]]
+=== Beats version 5.6.9
+https://github.com/elastic/beats/compare/v5.6.8...v5.6.9[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix a type issue when specifying certicate authority when using the `import_dashboards` command. {pull}6678[6678]
+
+*Packetbeat*
+
+- Fix http status phrase parsing not allow spaces. {pull}5312[5312]
+- Fix http parse to allow to parse get request with space in the URI. {pull}5495[5495]
+- Fix mysql SQL parser to trim `\r` from Windows Server `SELECT\r\n\t1`. {pull}5572[5572]
+- Fix corruption when parsing repeated headers in an HTTP request or response. {pull}6325[6325]
+- Fix panic when parsing partial AMQP messages. {pull}6384[6384]
+- Fix out of bounds access to slice in MongoDB parser. {pull}6256[6256]
+- Fix sniffer hanging on exit under Linux. {pull}6535[6535]
+- Fix bounds check error in http parser causing a panic. {pull}6750[6750]
+- HTTP parses successfully on empty status phrase. {issue}6176[6176]
+- HTTP parser supports broken status line. {pull}6631[6631]
+
+
+[[release-notes-5.6.8]]
+=== Beats version 5.6.8
+https://github.com/elastic/beats/compare/v5.6.7...v5.6.8[View commits]
+
+==== Bugfixes
+
+*Winlogbeat*
+
+- Fixed a crash under Windows 2003 and XP when an event had less insert strings than required by its format string. {pull}6247[6247]
+
+
+[[release-notes-5.6.7]]
+=== Beats version 5.6.7
+https://github.com/elastic/beats/compare/v5.6.6...v5.6.7[View commits]
+
+No changes in this release.
+
+
+[[release-notes-5.6.6]]
+=== Beats version 5.6.6
+https://github.com/elastic/beats/compare/v5.6.5...v5.6.6[View commits]
+
+No changes in this release.
+
+
+[[release-notes-5.6.5]]
+=== Beats version 5.6.5
+https://github.com/elastic/beats/compare/v5.6.4...v5.6.5[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix duplicate batches of events in retry queue. {pull}5520[5520]
+
+*Metricbeat*
+
+- Clarify meaning of percentages reported by system core metricset. {pull}5565[5565]
+- Fix map overwrite in docker diskio module. {issue}5582[5582]
+
+[[release-notes-5.6.4]]
+=== Beats version 5.6.4
+https://github.com/elastic/beats/compare/v5.6.3...v5.6.4[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix race condition in internal logging rotator. {pull}4519[4519]
+
+*Packetbeat*
+
+- Fix missing length check in the PostgreSQL module. {pull}5457[5457]
+
+==== Added
+
+*Affecting all Beats*
+
+- Add support for enabling TLS renegotiation. {issue}4386[4386]
+- Add setting to enable/disable the slow start in logstash output. {pull}5400[5400]
+
+[[release-notes-5.6.3]]
+=== Beats version 5.6.3
+https://github.com/elastic/beats/compare/v5.6.2...v5.6.3[View commits]
+
+No changes in this release.
 
 [[release-notes-5.6.2]]
 === Beats version 5.6.2
