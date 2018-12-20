@@ -205,6 +205,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...v7.0.0-alpha2[Check the
 - Always include Pod UID as part of Pod metadata. {pull}9517[9517]
 - Autodiscovery no longer requires that the `condition` field be set. If left unset all configs will be matched. {pull}9029[9029]
 - Add geo fields to `add_host_metadata` processor. {pull}9392[9392]
+- Release Jolokia autodiscover as GA. {pull}9706[9706]
 
 *Filebeat*
 
