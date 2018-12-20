@@ -437,7 +437,7 @@
 ## PostgreSQL module
 
 - from: postgresql.log.timezone
-  to:
+  to: event.timezone
   alias: true
 
 - from: postgresql.log.thread_id
