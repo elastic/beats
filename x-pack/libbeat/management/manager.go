@@ -176,8 +176,10 @@ func (cm *ConfigManager) fetch() bool {
 	configs, err := cm.client.Configuration(cm.config.AccessToken, cm.beatUUID, cm.cache.ConfigOK)
 
 	if api.IsConfigurationNotFound(err) {
-		cm.logger.Error("Disabling all running configuration because no configurations were found for this Beat, the endpoint returned a 404 or the beat is not enrolled with central management")
-		cm.cache.Configs = api.ConfigBlocks{}
+		if cm.cache.HasConfig() {
+			cm.logger.Error("Disabling all running configuration because no configurations were found for this Beat, the endpoint returned a 404 or the beat is not enrolled with central management")
+			cm.cache.Configs = api.ConfigBlocks{}
+		}
 		return true
 	}
 
