@@ -1,7 +1,7 @@
 - key: mssql
   title: "mssql"
   description: >
-    beta[]
+  release: beta
 
     mssql module
   fields:

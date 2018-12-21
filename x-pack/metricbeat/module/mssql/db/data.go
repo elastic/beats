@@ -16,10 +16,16 @@ var (
 		},
 		// Returns space usage information for the transaction log.
 		"log_space_usage": s.Object{
-			"total.bytes":             c.Int("total_log_size_in_bytes"),
-			"used.bytes":              c.Int("used_log_space_in_bytes"),
-			"used.pct":                c.Float("used_log_space_in_percent"),
-			"since_last_backup.bytes": c.Int("log_space_in_bytes_since_last_backup"),
+			"total": s.Object{
+				"bytes": c.Int("total_log_size_in_bytes"),
+			},
+			"used": s.Object{
+				"bytes": c.Int("used_log_space_in_bytes"),
+				"pct":   c.Float("used_log_space_in_percent"),
+			},
+			"since_last_backup": s.Object{
+				"bytes": c.Int("log_space_in_bytes_since_last_backup"),
+			},
 		},
 	}
 )

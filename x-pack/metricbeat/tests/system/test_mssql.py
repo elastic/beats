@@ -40,8 +40,8 @@ class Test(XPackTest):
         evt = output[0]
 
         self.assertItemsEqual(self.de_dot(MSSQL_FIELDS), evt.keys())
-        self.assertTrue(evt["mssql"]["db"]["log_space_usage"]["used.pct"] > 0)
-        self.assertTrue(evt["mssql"]["db"]["log_space_usage"]["used.bytes"] > 0)
+        self.assertTrue(evt["mssql"]["db"]["log_space_usage"]["used"]["pct"] > 0)
+        self.assertTrue(evt["mssql"]["db"]["log_space_usage"]["used"]["bytes"] > 0)
 
         self.assert_fields_are_documented(evt)
 
