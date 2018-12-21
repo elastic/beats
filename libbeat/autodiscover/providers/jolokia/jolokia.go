@@ -24,7 +24,6 @@ import (
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 )
 
 func init() {
@@ -51,8 +50,6 @@ type Provider struct {
 // AutodiscoverBuilder builds a Jolokia Discovery autodiscover provider, it fails if
 // there is some problem with the configuration
 func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
-	cfgwarn.Experimental("The Jolokia Discovery autodiscover is experimental")
-
 	config := defaultConfig()
 	err := c.Unpack(&config)
 	if err != nil {

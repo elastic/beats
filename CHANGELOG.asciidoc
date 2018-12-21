@@ -73,6 +73,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Update field definitions for `http` to ECS Beta 2 {pull}9645[9645]
+- Release Jolokia autodiscover as GA. {pull}9706[9706]
 
 *Auditbeat*
 
