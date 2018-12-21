@@ -1662,9 +1662,22 @@ Fields related to HTTP activity.
 --
 type: keyword
 
-example: GET, POST, PUT
+example: get, post, put
 
 Http request method.
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS"  section.
+
+
+--
+
+*`http.request.body.content`*::
++
+--
+type: keyword
+
+example: Hello world
+
+The full http request body.
 
 
 --
@@ -1693,7 +1706,7 @@ Http response status code.
 
 --
 
-*`http.response.body`*::
+*`http.response.body.content`*::
 +
 --
 type: keyword
@@ -1713,6 +1726,54 @@ type: keyword
 example: 1.1
 
 Http version.
+
+
+--
+
+*`http.request.bytes`*::
++
+--
+type: long
+
+example: 1437
+
+Total size in bytes of the request (body and headers).
+
+
+--
+
+*`http.request.body.bytes`*::
++
+--
+type: long
+
+example: 887
+
+Size in bytes of the request body.
+
+
+--
+
+*`http.response.bytes`*::
++
+--
+type: long
+
+example: 1437
+
+Total size in bytes of the response (body and headers).
+
+
+--
+
+*`http.response.body.bytes`*::
++
+--
+type: long
+
+example: 887
+
+Size in bytes of the response body.
 
 
 --
