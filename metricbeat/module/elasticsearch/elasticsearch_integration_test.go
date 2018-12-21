@@ -72,6 +72,9 @@ func TestFetch(t *testing.T) {
 	err = createMLJob(host)
 	assert.NoError(t, err)
 
+	err = createCCRStats(host)
+	assert.NoError(t, err)
+
 	for _, metricSet := range metricSets {
 		checkSkip(t, metricSet, host)
 		t.Run(metricSet, func(t *testing.T) {
@@ -187,36 +190,71 @@ func createMLJob(host string) error {
 		return err
 	}
 
-	client := &http.Client{}
-
 	jobURL := "/_xpack/ml/anomaly_detectors/total-requests"
 
 	if checkExists("http://" + host + jobURL) {
 		return nil
 	}
 
-	req, err := http.NewRequest("PUT", "http://"+host+jobURL, bytes.NewReader(mlJob))
-	if err != nil {
-		return err
-	}
-	req.Header.Add("Content-Type", "application/json")
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
+	body, resp, err := httpPutJSON(host, jobURL, mlJob)
 
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("HTTP error loading ml job %d: %s, %s", resp.StatusCode, resp.Status, body)
 	}
 
 	return nil
+}
+
+func createCCRStats(host string) error {
+	err := setupCCRRemote(host)
+	if err != nil {
+		return err
+	}
+
+	err = createCCRLeaderIndex(host)
+	if err != nil {
+		return err
+	}
+
+	err = createCCRFollowerIndex(host)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func setupCCRRemote(host string) error {
+	remoteSettings, err := ioutil.ReadFile("ccr/_meta/test/test_remote_settings.json")
+	if err != nil {
+		return err
+	}
+
+	settingsURL := "/_cluster/settings"
+	_, _, err = httpPutJSON(host, settingsURL, remoteSettings)
+	return err
+}
+
+func createCCRLeaderIndex(host string) error {
+	leaderIndex, err := ioutil.ReadFile("ccr/_meta/test/test_leader_index.json")
+	if err != nil {
+		return err
+	}
+
+	indexURL := "/pied_piper"
+	_, _, err = httpPutJSON(host, indexURL, leaderIndex)
+	return err
+}
+
+func createCCRFollowerIndex(host string) error {
+	followerIndex, err := ioutil.ReadFile("ccr/_meta/test/test_follower_index.json")
+	if err != nil {
+		return err
+	}
+
+	followURL := "/rats/_ccr/follow"
+	_, _, err = httpPutJSON(host, followURL, followerIndex)
+	return err
 }
 
 func checkExists(url string) bool {
@@ -276,4 +314,26 @@ func getElasticsearchVersion(elasticsearchHostPort string) (string, error) {
 		return "", err
 	}
 	return version.(string), nil
+}
+
+func httpPutJSON(host, path string, body []byte) ([]byte, *http.Response, error) {
+	req, err := http.NewRequest("PUT", "http://"+host+path, bytes.NewReader(body))
+	if err != nil {
+		return nil, nil, err
+	}
+	req.Header.Add("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return body, resp, nil
 }
