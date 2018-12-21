@@ -104,6 +104,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 - Add cache.ttl to add_host_metadata. {pull}9359[9359]
 - Add support for index lifecycle management (beta). {pull}7963[7963]
 - Always include Pod UID as part of Pod metadata. {pull]9517[9517]
+- Release Jolokia autodiscover as GA. {pull}9706[9706]
 
 *Auditbeat*
 
