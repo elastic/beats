@@ -1,2 +1,19 @@
-This is the mssql module.
+This is the https://www.microsoft.com/en-us/sql-server/sql-server-2017[Microsoft SQL 2017] Metricbeat module. It is still in beta and under active development to add new Metricsets and introduce enhancements.
 
+The idea is to improve the current set of metrics by fetching data from https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/system-dynamic-management-views?view=sql-server-2017[System Dynamic Management Views]. A curated dashboard will also be included soon.
+
+https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sql-server-operating-system-related-dynamic-management-views-transact-sql?view=sql-server-2017[Operating system, Performance] and  https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/server-related-dynamic-management-views-and-functions-transact-sql?view=sql-server-2017[Server] Metricsets are under active development already.
+
+[float]
+== Compatibility
+
+The module is being tested with https://hub.docker.com/r/microsoft/mssql-server-linux/[2017 GA] version under Linux. We'll also test it under various Windows versions to ensure correctness as soon as possible.
+
+[float]
+== Metricsets
+
+The following Metricset is already included:
+
+=== `db`
+
+`db` Metricset fetches a set of values from https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-log-space-usage-transact-sql?view=sql-server-2017[log space usage] which returns space usage information for the transaction log for each different database.
