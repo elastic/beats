@@ -45,6 +45,11 @@ func CrossBuild() error {
 	return mage.CrossBuild()
 }
 
+// Clean cleans all generated files and build artifacts.
+func Clean() error {
+	return mage.Clean()
+}
+
 // Fields generates the fields.yml file and a fields.go for each module and
 // input.
 func Fields() {
@@ -67,6 +72,15 @@ func fieldsYML() error {
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
 	return mage.KibanaDashboards(mage.OSSBeatDir("module"), "module")
+}
+
+// ExportDashboard exports a dashboard and writes it into the correct directory.
+//
+// Required environment variables:
+// - MODULE: Name of the module
+// - ID:     Dashboard id
+func ExportDashboard() error {
+	return mage.ExportDashboard()
 }
 
 // Config generates both the short and reference configs.
