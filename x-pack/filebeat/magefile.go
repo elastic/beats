@@ -83,9 +83,26 @@ func includeList() error {
 	return mage.GenerateIncludeListGo([]string{"input/*"}, []string{"module"})
 }
 
+// Fmt formats source code and adds file headers.
+func Fmt() {
+	mg.Deps(mage.Format)
+}
+
+// Check runs fmt and update then returns an error if any modifications are found.
+func Check() {
+	mg.SerialDeps(mage.Format, Update, mage.Check)
+}
+
+// IntegTest executes integration tests (it uses Docker to run the tests).
+func IntegTest() {
+	mage.AddIntegTestUsage()
+	defer mage.StopIntegTestEnv()
+	mg.SerialDeps(GoIntegTest, PythonIntegTest)
+}
+
 // UnitTest executes the unit tests.
 func UnitTest() {
-	mg.SerialDeps(GoUnitTest)
+	mg.SerialDeps(GoUnitTest, PythonUnitTest)
 }
 
 // GoUnitTest executes the Go unit tests.
@@ -93,6 +110,34 @@ func UnitTest() {
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoUnitTest(ctx context.Context) error {
 	return mage.GoTest(ctx, mage.DefaultGoTestUnitArgs())
+}
+
+// GoIntegTest executes the Go integration tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoIntegTest(ctx context.Context) error {
+	return mage.RunIntegTest("goIntegTest", func() error {
+		return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
+	})
+}
+
+// PythonUnitTest executes the python system tests.
+func PythonUnitTest() error {
+	mg.Deps(mage.BuildSystemTestBinary)
+	return mage.PythonNoseTest(mage.DefaultPythonTestUnitArgs())
+}
+
+// PythonIntegTest executes the python system tests in the integration environment (Docker).
+func PythonIntegTest(ctx context.Context) error {
+	if !mage.IsInIntegTestEnv() {
+		mg.Deps(Fields)
+	}
+	return mage.RunIntegTest("pythonIntegTest", func() error {
+		mg.Deps(mage.BuildSystemTestBinary)
+		args := mage.DefaultPythonTestIntegrationArgs()
+		args.Env["MODULES_PATH"] = mage.CWD("module")
+		return mage.PythonNoseTest(args)
+	})
 }
 
 // -----------------------------------------------------------------------------
