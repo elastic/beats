@@ -1751,36 +1751,36 @@
 			"revisionTime": "2017-08-19T20:10:35Z"
 		},
 		{
-			"checksumSHA1": "wZ7Q/3JyIlVKeYVqRUGh1zuLa9E=",
+			"checksumSHA1": "KUrV5Esg6Wdcrv+hDc6/p0Q3/qw=",
 			"path": "github.com/shirou/gopsutil",
-			"revision": "4a180b209f5f494e5923cfce81ea30ba23915877",
-			"revisionTime": "2018-06-25T08:11:43Z",
-			"version": "v2.18.06",
-			"versionExact": "v2.18.06"
+			"revision": "0f70a4a06f7a1039305ec9b3ba9c2800f8929fba",
+			"revisionTime": "2018-11-24T14:38:04Z",
+			"version": "v2.18.11",
+			"versionExact": "v2.18.11"
 		},
 		{
-			"checksumSHA1": "RPCF/ke7rAfTtFnU1M3jCZIKsj0=",
+			"checksumSHA1": "Qr93LUVvC2g/aTZSXEIrw4OhuXQ=",
 			"path": "github.com/shirou/gopsutil/disk",
-			"revision": "4a180b209f5f494e5923cfce81ea30ba23915877",
-			"revisionTime": "2018-06-25T08:11:43Z",
-			"version": "v2.18.06",
-			"versionExact": "v2.18.06"
+			"revision": "0f70a4a06f7a1039305ec9b3ba9c2800f8929fba",
+			"revisionTime": "2018-11-24T14:38:04Z",
+			"version": "v2.18.11",
+			"versionExact": "v2.18.11"
 		},
 		{
-			"checksumSHA1": "ElneFnzdyg/mWfMFukLUHdy9DHY=",
+			"checksumSHA1": "GR7l7Ez4ppxIfonl7aJayYRVPWc=",
 			"path": "github.com/shirou/gopsutil/internal/common",
-			"revision": "4a180b209f5f494e5923cfce81ea30ba23915877",
-			"revisionTime": "2018-06-25T08:11:43Z",
-			"version": "v2.18.06",
-			"versionExact": "v2.18.06"
+			"revision": "0f70a4a06f7a1039305ec9b3ba9c2800f8929fba",
+			"revisionTime": "2018-11-24T14:38:04Z",
+			"version": "v2.18.11",
+			"versionExact": "v2.18.11"
 		},
 		{
-			"checksumSHA1": "cqp+0Xxb51xFf3ekjlaS/EpipZU=",
+			"checksumSHA1": "wAc1Qo6T9MTYdSog78uJfCYZPtc=",
 			"path": "github.com/shirou/gopsutil/net",
-			"revision": "4a180b209f5f494e5923cfce81ea30ba23915877",
-			"revisionTime": "2018-06-25T08:11:43Z",
-			"version": "v2.18.06",
-			"versionExact": "v2.18.06"
+			"revision": "0f70a4a06f7a1039305ec9b3ba9c2800f8929fba",
+			"revisionTime": "2018-11-24T14:38:04Z",
+			"version": "v2.18.11",
+			"versionExact": "v2.18.11"
 		},
 		{
 			"checksumSHA1": "e7mAb9jMke2ASQGZepFgOmfBFzM=",
