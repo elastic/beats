@@ -676,6 +676,23 @@ func IsUpToDate(dst string, sources ...string) bool {
 	return err == nil && !execute
 }
 
+// OSSBeatDir returns the OSS beat directory. You can pass paths and they will
+// be joined and appended to the OSS beat dir.
+func OSSBeatDir(path ...string) string {
+	ossDir := CWD()
+
+	// Check if we need to correct ossDir because it's in x-pack.
+	if parentDir := filepath.Base(filepath.Dir(ossDir)); parentDir == "x-pack" {
+		// If the OSS version of the beat exists.
+		tmp := filepath.Join(ossDir, "../..", BeatName)
+		if _, err := os.Stat(tmp); !os.IsNotExist(err) {
+			ossDir = tmp
+		}
+	}
+
+	return filepath.Join(append([]string{ossDir}, path...)...)
+}
+
 // LibbeatDir returns the libbeat directory. You can pass paths and
 // they will be joined and appended to the libbeat dir.
 func LibbeatDir(path ...string) string {

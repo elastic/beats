@@ -35,7 +35,7 @@ jobs:
       go: $GO_VERSION
       stage: test
     - os: linux
-      env: TARGETS="-C x-pack/filebeat unit"
+      env: TARGETS="-C x-pack/filebeat testsuite"
       go: $GO_VERSION
       stage: test
 
