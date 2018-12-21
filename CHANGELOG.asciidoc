@@ -32,6 +32,8 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
 - Allow beats to blacklist certain part of the configuration while using Central Management. {pull}9099[9099]
 
+- Add `key` metricset to the Redis module. {issue}9582[9582] {pull}9657[9657] {pull}9746[9746]
+
 *Packetbeat*
 
 *Packetbeat*

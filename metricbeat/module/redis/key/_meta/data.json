@@ -17,6 +17,7 @@
             "expire": {
                 "ttl": 360
             },
+            "id": "0:foo",
             "length": 3,
             "name": "foo",
             "type": "string"
