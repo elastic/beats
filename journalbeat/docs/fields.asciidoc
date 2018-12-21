@@ -716,9 +716,21 @@ This id normally changes across restarts, but `agent.id` does not.
 [float]
 == client fields
 
-A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records. For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjuction with server fields.  Client fields are generally not populated for packet-level events. 
+A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records. For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields.  Client fields are generally not populated for packet-level events.
+Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
 
+
+*`client.address`*::
++
+--
+type: keyword
+
+Some event client addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+
+--
 
 *`client.ip`*::
 +
@@ -1056,6 +1068,17 @@ Destination fields describe details about the destination of a packet/event. Des
 
 
 
+*`destination.address`*::
++
+--
+type: keyword
+
+Some event destination addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+
+--
+
 *`destination.ip`*::
 +
 --
@@ -1238,13 +1261,13 @@ Meta-information specific to ECS.
 --
 type: keyword
 
-example: 1.0.0-beta1
+example: 1.0.0-beta2
 
 required: True
 
 ECS version this event conforms to. `ecs.version` is a required field and must exist in all events.
 When querying across multiple indices -- which may conform to slightly different ECS versions -- this field lets integrations adjust to the schema version of the events.
-The current version is 1.0.0-beta1 .
+The current version is 1.0.0-beta2 .
 
 
 --
@@ -2120,9 +2143,10 @@ Name given by operators to sections of their network.
 --
 type: keyword
 
-example: IPv4
+example: ipv4
 
-In the OSI Model this would be the Network Layer. IPv4, IPv6, IPSec, PIM, etc
+In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS" section.
 
 
 --
@@ -2144,9 +2168,10 @@ IANA Protocol Number (https://www.iana.org/assignments/protocol-numbers/protocol
 --
 type: keyword
 
-example: TCP
+example: tcp
 
-Same as network.iana_number, but instead using the Keyword name of the transport layer (UDP, TCP, IPv6-ICMP, etc.)
+Same as network.iana_number, but instead using the Keyword name of the transport layer (udp, tcp, ipv6-icmp, etc.)
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS"  section.
 
 
 --
@@ -2156,9 +2181,10 @@ Same as network.iana_number, but instead using the Keyword name of the transport
 --
 type: keyword
 
-example: AIM
+example: aim
 
 A name given to an application. This can be arbitrarily assigned for things like microservices, but also apply to things like skype, icq, facebook, twitter. This would be used in situations where the vendor or service can be decoded such as from the source/dest IP owners, ports, or wire format.
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS" section.
 
 
 --
@@ -2170,7 +2196,8 @@ type: keyword
 
 example: http
 
-L7 Network protocol name. ex. http, lumberjack, transport protocol
+L7 Network protocol name. ex. http, lumberjack, transport protocol.
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS" section.
 
 
 --
@@ -2726,8 +2753,20 @@ All of the IPs seen on your event.
 == server fields
 
 A Server is defined as the responder in a network connection for events regarding sessions, connections, or bidirectional flow records. For TCP events, the server is the receiver of the initial SYN packet(s) of the TCP connection. For other protocols, the server is generally the responder in the network transaction. Some systems actually use the term "responder" to refer the server in TCP connections. The server fields describe details about the system acting as the server in the network event. Server fields are usually populated in conjunction with client fields. Server fields are generally not populated for packet-level events.
+Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
 
+
+*`server.address`*::
++
+--
+type: keyword
+
+Some event server addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+
+--
 
 *`server.ip`*::
 +
@@ -3385,8 +3424,6 @@ example: Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.
 
 Unparsed version of the user_agent.
 
-
-Field is not indexed.
 
 --
 
