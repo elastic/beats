@@ -1,5 +1,6 @@
 import jinja2
 import os
+import unittest
 
 from auditbeat import BaseTest as AuditbeatTest
 
@@ -26,6 +27,7 @@ class AuditbeatXPackTest(AuditbeatTest):
         )
 
     # Adapted from metricbeat.py
+    @unittest.skip("Skipped as flaky")
     def check_metricset(self, module, metricset, fields=[], warnings_allowed=False):
         """
         Method to test a metricset for its fields
