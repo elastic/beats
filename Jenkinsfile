@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-library identifier: 'apm@master',
+library identifier: 'apm@v1.0.2',
 retriever: modernSCM(
   [$class: 'GitSCMSource',
   credentialsId: 'f94e9298-83ae-417e-ba91-85c279771570',
@@ -36,7 +36,9 @@ pipeline {
       }
       options { skipDefaultCheckout() }
       steps {
-        gitCheckout(basedir: "${BASE_DIR}")
+        dir("${BASE_DIR}"){
+            checkout scm
+        }
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
         script {
           env.GO_VERSION = readFile("${BASE_DIR}/.go-version")
