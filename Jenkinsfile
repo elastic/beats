@@ -85,8 +85,8 @@ pipeline {
         withEnvWrapper() {
           unstash 'source'
           dir("${BASE_DIR}"){
-            sh './deploy/kubernetes/.travis/setup.sh'
-            sh 'make -C ./deploy/kubernetes test'
+            bash './deploy/kubernetes/.travis/setup.sh'
+            bash 'make -C ./deploy/kubernetes test'
           }
         }
       }
