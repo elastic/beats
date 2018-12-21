@@ -17,7 +17,7 @@ import (
 	_ "github.com/denisenkom/go-mssqldb"
 )
 
-// NewFetcher is called from all metricsets to initialize their fetching routines. It opens a different connection to
+// NewFetcher is called from every metricset to initialize their fetching routines. It opens a different connection to
 // the database for each fetch operation
 func NewFetcher(uri string, qs []string, schema *s.Schema, log *logp.Logger) (*Fetcher, error) {
 	db, err := sql.Open("sqlserver", uri)
@@ -41,7 +41,7 @@ func NewFetcher(uri string, qs []string, schema *s.Schema, log *logp.Logger) (*F
 	return f, nil
 }
 
-// Fetcher will make queries concurrently to the database to fetch results. It
+// Fetcher will make queries sequentially to the database to fetch results. It
 // must be created by each metricset and fed with the queries that must be
 // executed, a SQL implementor and a pointer to the schema to "apply". A
 // metricset could, potentially, need more than one query to fill all its
@@ -86,17 +86,20 @@ func newRowsResult(reporter mb.ReporterV2, columnNames []string, rows *sql.Rows)
 	}
 }
 
-// getEventsWithQuery performs the query on the database and converts the rows
-// to an slice of common.MapStr.
-func (f *Fetcher) getEventsWithQuery(db *sql.DB, query string, reporter mb.ReporterV2) error {
-	// Returns the global status, also for versions previous 5.0.2
-	rows, err := db.Query(query)
+// getEventsWithQuery performs the query on the database and creates a rowsResultHandler to handle them
+func (f *Fetcher) getEventsWithQuery(db *sql.DB, query string, reporter mb.ReporterV2) (err error) {
+	var rows *sql.Rows
+	rows, err = db.Query(query)
 	if err != nil {
 		return errors.Wrapf(err, "error performing db query='%v'", query)
 	}
 	defer func() {
-		if err = rows.Close(); err != nil {
-			logp.Error(errors.Wrap(err, "error closing query row"))
+		if err2 := rows.Close(); err != nil {
+			if err != nil {
+				err = errors.Wrap(err, err2.Error())
+			} else {
+				err = err2
+			}
 		}
 	}()
 
@@ -114,7 +117,7 @@ func (f *Fetcher) getEventsWithQuery(db *sql.DB, query string, reporter mb.Repor
 	return nil
 }
 
-// handleRowResult is called for each row result
+// handle is called with the result of each query.
 func (rr *rowsResultHandler) handle(s *s.Schema) (err error) {
 	for rr.rows.Next() {
 		// We assign pointers to the destination to pass it to Scan.
@@ -139,6 +142,7 @@ func (rr *rowsResultHandler) handle(s *s.Schema) (err error) {
 
 		result, err := s.Apply(mapOfResults)
 		if err != nil {
+			err = errors.Wrap(err, "error trying to apply schema")
 			logp.Error(err)
 			rr.reporter.Error(err)
 			continue
