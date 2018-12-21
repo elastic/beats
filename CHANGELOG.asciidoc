@@ -73,6 +73,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Added module for parsing Google Santa logs. {pull}9540[9540]
 - Added netflow input type that supports NetFlow v1, v5, v6, v7, v8, v9 and IPFIX. {issue}9399[9399]
+- Added `containers.suffix` input configuration option to avoid the static addition of the "/*.log" in paths. {issue}8988[8988] {pull}9620[9620]
 
 *Heartbeat*
 
