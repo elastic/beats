@@ -4,8 +4,6 @@ import sys
 import time
 import unittest
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../auditbeat/tests/system'))
-
 from auditbeat_xpack import *
 
 COMMON_FIELDS = ["@timestamp", "host.name", "event.module", "event.dataset"]
@@ -24,6 +22,7 @@ class Test(AuditbeatXPackTest):
         self.check_metricset("system", "host", COMMON_FIELDS + fields, warnings_allowed=True)
 
     @unittest.skipIf(sys.platform == "darwin" and os.geteuid != 0, "Requires root on macOS")
+    @unittest.skipIf(sys.platform == "win32", "Fails on Windows - https://github.com/elastic/beats/issues/9748")
     def test_metricset_process(self):
         """
         process metricset collects information about processes running on a system.
