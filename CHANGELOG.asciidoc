@@ -141,6 +141,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Add freebsd support for the uptime metricset. {pull}9413[9413]
 - Add `host.os.name` field to add_host_metadata processor. {issue}8948[8948] {pull}9405[9405]
 - Add field `event.dataset` which is `{module}.{metricset).
+- Add `key` metricset to the Redis module. {issue}9582[9582] {pull}9657[9657]
 - Add more TCP statuses to `socket_summary` metricset. {pull}9430[9430]
 - Remove experimental tag from ceph metricsets. {pull}9708[9708]
 - Add `socket_summary` metricset to system defaults, removing experimental tag and supporting Windows {pull}9709[9709]
