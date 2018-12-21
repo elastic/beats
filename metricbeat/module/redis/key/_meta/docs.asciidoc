@@ -23,3 +23,10 @@ whose name starts with `pipeline-*`, with a limit of 20 keys.
     - name: 'pipeline-*'
       limit: 20
 ------------------------------------------------------------------------------
+
+[float]
+=== Dashboard
+
+The Redis key metricset comes with a predefined dashboard. For example:
+
+image::./images/metricbeat_redis_key_dashboard.png[]
