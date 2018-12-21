@@ -67,6 +67,28 @@ pipeline {
         }
       }
     }
+    /**
+    Run Kuberentes tests
+    */
+    stage('Kubernetes') {
+      agent { label 'linux && immutable' }
+      options { skipDefaultCheckout() }
+      environment {
+        PATH = "${env.PATH}:${env.WORKSPACE}/bin"
+        HOME = "${env.WORKSPACE}"
+        GOPATH = "${env.WORKSPACE}"
+        TRAVIS_K8S_VERSION = "v1.10.0"
+      }
+      steps {
+        withEnvWrapper() {
+          unstash 'source'
+          dir("${BASE_DIR}"){
+            sh './deploy/kubernetes/.travis/setup.sh'
+            sh 'make -C ./deploy/kubernetes test'
+          }
+        }
+      }
+    }
   }
   post {
     success {
