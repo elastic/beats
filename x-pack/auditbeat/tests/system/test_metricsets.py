@@ -4,8 +4,6 @@ import sys
 import time
 import unittest
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../auditbeat/tests/system'))
-
 from auditbeat_xpack import *
 
 COMMON_FIELDS = ["@timestamp", "host.name", "event.module", "event.dataset"]
