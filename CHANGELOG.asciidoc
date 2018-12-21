@@ -139,6 +139,7 @@ https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
 - Add `host.os.name` field to add_host_metadata processor. {issue}8948[8948] {pull}9405[9405]
 - Add field `event.dataset` which is `{module}.{metricset).
 - Add more TCP statuses to `socket_summary` metricset. {pull}9430[9430]
+- Remove experimental tag from ceph metricsets. {pull}9708[9708]
 
 *Packetbeat*
 
