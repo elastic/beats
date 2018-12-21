@@ -25,6 +25,7 @@ import (
 )
 
 func eventMapping(r mb.ReporterV2, keyspace uint, info map[string]interface{}) {
+	info["id"] = fmt.Sprintf("%d:%s", keyspace, info["name"])
 	r.Event(mb.Event{
 		MetricSetFields: info,
 		ModuleFields: common.MapStr{
