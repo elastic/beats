@@ -80,6 +80,7 @@ pipeline {
         HOME = "${env.WORKSPACE}"
         GOPATH = "${env.WORKSPACE}"
         TRAVIS_K8S_VERSION = "v1.10.0"
+        TRAVIS_MINIKUBE_VERSION="v0.25.2"
       }
       steps {
         withEnvWrapper() {
