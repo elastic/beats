@@ -18,17 +18,12 @@
 package socket_summary
 
 import (
-	"runtime"
 	"syscall"
 
-	"github.com/pkg/errors"
+	"github.com/shirou/gopsutil/net"
 
 	"github.com/elastic/beats/libbeat/common"
-
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
-
-	"github.com/shirou/gopsutil/net"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -38,6 +33,7 @@ import (
 func init() {
 	mb.Registry.MustAddMetricSet("system", "socket_summary", New,
 		mb.WithNamespace("system.socket.summary"),
+		mb.DefaultMetricSet(),
 	)
 }
 
@@ -52,11 +48,6 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The socket_summary metricset is experimental.")
-	if runtime.GOOS == "windows" {
-		return nil, errors.New("socket_summary metricset is not supported in Windows")
-	}
-
 	return &MetricSet{
 		BaseMetricSet: base,
 	}, nil
