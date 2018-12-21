@@ -20328,6 +20328,16 @@ Key name.
 
 --
 
+*`redis.key.id`*::
++
+--
+type: keyword
+
+Unique id for this key (With the form <keyspace>:<name>).
+
+
+--
+
 *`redis.key.type`*::
 +
 --
