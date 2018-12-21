@@ -629,7 +629,7 @@ func (http *httpPlugin) collectHeaders(m *message) interface{} {
 
 func (http *httpPlugin) setBody(result common.MapStr, m *message) {
 	if m.sendBody && len(m.body) > 0 {
-		result["body"] = string(m.body)
+		result.Put("body.content", string(m.body))
 	}
 }
 
