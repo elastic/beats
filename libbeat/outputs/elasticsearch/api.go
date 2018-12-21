@@ -19,6 +19,8 @@ package elasticsearch
 
 import (
 	"encoding/json"
+	"fmt"
+	"strconv"
 
 	"github.com/pkg/errors"
 )
@@ -57,6 +59,27 @@ type Hits struct {
 type Total struct {
 	Value    int    `json:"value"`
 	Relation string `json:"relation"`
+}
+
+// UnmarshalJSON correctly unmarshal the hits response between ES 6.0 and ES 7.0.
+func (t *Total) UnmarshalJSON(b []byte) error {
+	value := struct {
+		Value    int    `json:"value"`
+		Relation string `json:"relation"`
+	}{}
+
+	if err := json.Unmarshal(b, &value); err == nil {
+		*t = value
+		return nil
+	}
+
+	// fallback for Elasticsearch < 7
+	if i, err := strconv.Atoi(string(b)); err == nil {
+		*t = Total{Value: i, Relation: "eq"}
+		return nil
+	}
+
+	return fmt.Errorf("could not unmarshal JSON value '%s'", string(b))
 }
 
 // CountResults contains the count of results.
