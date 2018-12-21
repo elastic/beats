@@ -34,7 +34,7 @@ func Build() error {
 	return mage.Build(mage.DefaultBuildArgs())
 }
 
-// GolangCrossBuild build the Beat binary inside of the golang-builder.
+// GolangCrossBuild builds the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
 	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
@@ -45,9 +45,18 @@ func CrossBuild() error {
 	return mage.CrossBuild()
 }
 
-// Fields generates a fields.yml and fields.go for each module.
+// Fields generates the fields.yml file and a fields.go for each module and
+// input.
 func Fields() {
-	mg.Deps(fieldsYML, mage.GenerateModuleFieldsGo)
+	mg.Deps(fieldsYML, moduleFieldsGo, inputFieldsGo)
+}
+
+func inputFieldsGo() error {
+	return mage.GenerateModuleFieldsGo("input")
+}
+
+func moduleFieldsGo() error {
+	return mage.GenerateModuleFieldsGo("module")
 }
 
 // fieldsYML generates a fields.yml based on filebeat + x-pack/filebeat/modules.
@@ -65,9 +74,13 @@ func Config() {
 	mg.Deps(shortConfig, referenceConfig, createDirModulesD)
 }
 
-// Update is an alias for running fields, dashboards, config.
+// Update is an alias for executing fields, dashboards, config.
 func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config)
+	mg.SerialDeps(Fields, Dashboards, Config, includeList)
+}
+
+func includeList() error {
+	return mage.GenerateIncludeListGo([]string{"input/*"}, []string{"module"})
 }
 
 // UnitTest executes the unit tests.
