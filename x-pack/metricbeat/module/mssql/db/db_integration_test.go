@@ -43,12 +43,3 @@ func TestFetch(t *testing.T) {
 		assert.True(t, userPercentFloat > 0)
 	}
 }
-
-func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("db"))
-
-	err := mbtest.WriteEventsReporterV2(f, t, "_meta")
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}

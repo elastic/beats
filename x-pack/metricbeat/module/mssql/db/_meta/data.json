@@ -1,9 +1,16 @@
 {
-    "@timestamp": "2018-12-20T11:32:46.549Z",
-    "@metadata": {
-        "beat": "metricbeat",
-        "type": "_doc",
-        "version": "7.0.0"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "mssql.db",
+        "duration": 115000,
+        "module": "mssql"
+    },
+    "metricset": {
+        "name": "db"
     },
     "mssql": {
         "db": {
@@ -11,31 +18,21 @@
                 "id": "1"
             },
             "log_space_usage": {
-                "used.bytes": 458752,
-                "used.pct": 58.94736862182617,
-                "since_last_backup.bytes": 163840,
-                "total.bytes": 778240
+                "since_last_backup": {
+                    "bytes": 462848
+                },
+                "total": {
+                    "bytes": 2088960
+                },
+                "used": {
+                    "bytes": 1028096,
+                    "pct": 49.2156867980957
+                }
             }
         }
     },
-    "event": {
-        "dataset": "mssql.db",
-        "module": "mssql",
-        "duration": 897031
-    },
-    "host": {
-        "name": "b0f21c796541"
-    },
-    "agent": {
-        "hostname": "b0f21c796541",
-        "version": "7.0.0",
-        "type": "metricbeat"
-    },
-    "metricset": {
-        "name": "db"
-    },
     "service": {
-        "address": "mssql",
+        "address": "172.26.0.2",
         "type": "mssql"
     }
 }
