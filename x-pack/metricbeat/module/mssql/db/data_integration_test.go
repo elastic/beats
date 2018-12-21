@@ -5,9 +5,10 @@
 package db
 
 import (
+	"testing"
+
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	mtest "github.com/elastic/beats/x-pack/metricbeat/module/mssql/testing"
-	"testing"
 )
 
 func TestData(t *testing.T) {
