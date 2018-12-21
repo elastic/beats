@@ -35,6 +35,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Adjust Packetbeat `http` fields to ECS Beta 2 {pull}9645[9645]
+  - `http.request.body` moves to `http.request.body.content`
+  - `http.response.body` moves to `http.response.body.content`
+
 *Winlogbeat*
 
 *Functionbeat*
@@ -51,6 +55,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
+- Made monitors.d configuration part of the default config. {pull}9004[9004]
+
 *Journalbeat*
 
 *Metricbeat*
@@ -65,6 +71,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Update field definitions for `http` to ECS Beta 2 {pull}9645[9645]
 - Release Jolokia autodiscover as GA. {pull}9706[9706]
 
 *Auditbeat*
@@ -75,12 +82,18 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Added module for parsing Google Santa logs. {pull}9540[9540]
 - Added netflow input type that supports NetFlow v1, v5, v6, v7, v8, v9 and IPFIX. {issue}9399[9399]
+- Add option to modules.yml file to indicate that a module has been moved {pull}9432[9432].
 
 *Heartbeat*
+
+- Fixed rare issue where TLS connections to endpoints with x509 certificates missing either notBefore or notAfter would cause the check to fail with a stacktrace.  {pull}9566[9566]
+
 
 *Journalbeat*
 
 *Metricbeat*
+
+- Add `key` metricset to the Redis module. {issue}9582[9582] {pull}9657[9657] {pull}9746[9746]
 
 *Packetbeat*
 

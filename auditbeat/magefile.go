@@ -81,7 +81,7 @@ func Package() {
 
 	mage.UseElasticBeatOSSPackaging()
 	mage.PackageKibanaDashboardsFromBuildDir()
-	auditbeat.CustomizePackaging()
+	auditbeat.CustomizePackaging(auditbeat.OSSPackaging)
 
 	mg.SerialDeps(Fields, Dashboards, Config, mage.GenerateModuleIncludeListGo)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
@@ -93,8 +93,40 @@ func TestPackages() error {
 	return mage.TestPackages()
 }
 
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
+// Update is an alias for running fields, dashboards, config, includes.
+func Update() {
+	mg.SerialDeps(Fields, Dashboards, Config,
+		mage.GenerateModuleIncludeListGo, Docs)
+}
+
+// Config generates both the short/reference configs and populates the modules.d
+// directory.
+func Config() error {
+	return mage.Config(mage.AllConfigTypes, auditbeat.OSSConfigFileParams(), ".")
+}
+
+// Fields generates fields.yml and fields.go files for the Beat.
+func Fields() {
+	mg.Deps(libbeatAndAuditbeatCommonFieldsGo, moduleFieldsGo)
+	mg.Deps(fieldsYML)
+}
+
+// libbeatAndAuditbeatCommonFieldsGo generates a fields.go containing both
+// libbeat and auditbeat's common fields.
+func libbeatAndAuditbeatCommonFieldsGo() error {
+	if err := mage.GenerateFieldsYAML(); err != nil {
+		return err
+	}
+	return mage.GenerateAllInOneFieldsGo()
+}
+
+// moduleFieldsGo generates a fields.go for each module.
+func moduleFieldsGo() error {
+	return mage.GenerateModuleFieldsGo("module")
+}
+
+// fieldsYML generates the fields.yml file containing all fields.
+func fieldsYML() error {
 	return mage.GenerateFieldsYAML("module")
 }
 
@@ -112,32 +144,9 @@ func Dashboards() error {
 	return mage.KibanaDashboards("module")
 }
 
-// Config generates both the short/reference configs and populates the modules.d
-// directory.
-func Config() error {
-	return auditbeat.Config(auditbeat.ConfigTemplateGlob)
-}
-
-// Update is an alias for running fields, dashboards, config, includes.
-func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config,
-		mage.GenerateModuleIncludeListGo, Docs)
-}
-
 // Docs collects the documentation.
 func Docs() {
-	mg.SerialDeps(xpackFields, combinedDocs)
-}
-
-// combinedDocs builds combined documentation for both OSS and X-Pack.
-func combinedDocs() error {
-	return auditbeat.CollectDocs(mage.OSSBeatDir(), mage.XPackBeatDir())
-}
-
-// xpackFields creates x-pack/auditbeat/fields.yml - necessary to build
-// a combined documentation.
-func xpackFields() error {
-	return mage.Mage(mage.XPackBeatDir(), "fields")
+	mg.Deps(auditbeat.ModuleDocs, auditbeat.FieldDocs)
 }
 
 // Fmt formats source code and adds file headers.

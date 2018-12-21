@@ -23,13 +23,6 @@
       description: >
         The file offset the reported line starts at.
 
-    - name: message
-      type: text
-      ignore_above: 0
-      required: true
-      description: >
-        The content of the line read from the log file.
-
     - name: stream
       type: keyword
       required: false
