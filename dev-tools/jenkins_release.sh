@@ -12,6 +12,34 @@ docker_setup
 cleanup() {
   echo "Running cleanup..."
   rm -rf $TEMP_PYTHON_ENV
+
+  if docker info > /dev/null ; then
+    echo "Killing all running containers..."
+    ids=$(docker ps -q)
+    if [ -n "$ids" ]; then
+      docker kill $ids
+    fi  
+    echo "Cleaning stopped docker containers and dangling images/networks/volumes..."
+    docker system prune -f || true
+
+    os=$(uname -s)
+    if [ "$os" == "Darwin" ]; then
+      # Clean images accept for the ones we're currently using in order to
+      # gain some disk space.
+      echo "Disk space before image cleanup:"
+      df -h /
+      docker system df
+      echo "Cleaning images"
+      docker images --format "{{.ID}} {{.Repository}}:{{.Tag}}" \
+        | grep -v "docker.elastic.co/beats-dev/golang-crossbuild:$(cat .go-version)-" \
+        | awk '{print $1}' \
+        | xargs docker rmi -f || true
+      echo "Disk space after image cleanup:"
+      df -h /
+      docker system df
+    fi
+  fi
+
   echo "Cleanup complete."
 }
 trap cleanup EXIT
