@@ -37,30 +37,6 @@ alias to: event.timezone
 
 --
 
-*`@timestamp`*::
-+
---
-type: date
-
-example: August 26th 2016, 12:35:53.332
-
-format: date
-
-required: True
-
-The timestamp when the event log record was generated.
-
-
---
-
-*`tags`*::
-+
---
-Arbitrary tags that can be set per Beat and per transaction type.
-
-
---
-
 *`fields`*::
 +
 --
@@ -543,18 +519,6 @@ The identifier of the message. A syslog compatibility field.
 
 --
 
-*`message`*::
-+
---
-type: text
-
-required: True
-
-The logged message.
-
-
---
-
 *`custom`*::
 +
 --
@@ -621,6 +585,61 @@ Image labels.
 ECS fields.
 
 
+
+*`@timestamp`*::
++
+--
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+required: True
+
+Date/time when the event originated.
+For log events this is the date/time when the event was generated, and not when it was read.
+Required field for all events.
+
+
+--
+
+*`tags`*::
++
+--
+type: keyword
+
+example: ["production", "env2"]
+
+List of keywords used to tag each event.
+
+
+--
+
+*`labels`*::
++
+--
+type: object
+
+example: {'application': 'foo-bar', 'env': 'production'}
+
+Key/value pairs.
+Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
+Example: `docker` and `k8s` labels.
+
+
+--
+
+*`message`*::
++
+--
+type: text
+
+example: Hello World
+
+For log events the message field contains the log message.
+In other use cases the message field can be used to concatenate different values which are then freely searchable. If multiple messages exist, they can be combined into one message.
+
+
+--
 
 [float]
 == agent fields
@@ -690,68 +709,6 @@ example: 8a4f500f
 
 Ephemeral identifier of this agent (if one exists).
 This id normally changes across restarts, but `agent.id` does not.
-
-
---
-
-[float]
-== base fields
-
-The base set contains all fields which are on the top level. These fields are common across all types of events.
-
-
-
-*`base.@timestamp`*::
-+
---
-type: date
-
-example: 2016-05-23T08:05:34.853Z
-
-required: True
-
-Date/time when the event originated.
-For log events this is the date/time when the event was generated, and not when it was read.
-Required field for all events.
-
-
---
-
-*`base.tags`*::
-+
---
-type: keyword
-
-example: ["production", "env2"]
-
-List of keywords used to tag each event.
-
-
---
-
-*`base.labels`*::
-+
---
-type: object
-
-example: {'application': 'foo-bar', 'env': 'production'}
-
-Key/value pairs.
-Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
-Example: `docker` and `k8s` labels.
-
-
---
-
-*`base.message`*::
-+
---
-type: text
-
-example: Hello World
-
-For log events the message field contains the log message.
-In other use cases the message field can be used to concatenate different values which are then freely searchable. If multiple messages exist, they can be combined into one message.
 
 
 --
