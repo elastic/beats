@@ -36,7 +36,9 @@ pipeline {
       }
       options { skipDefaultCheckout() }
       steps {
-        gitCheckout(basedir: "${BASE_DIR}")
+        dir("${BASE_DIR}"){
+            checkout scm
+        }
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
         script {
           env.GO_VERSION = readFile("${BASE_DIR}/.go-version")
