@@ -35,6 +35,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Adjust Packetbeat `http` fields to ECS Beta 2 {pull}9645[9645]
+  - `http.request.body` moves to `http.request.body.content`
+  - `http.response.body` moves to `http.response.body.content`
+
 *Winlogbeat*
 
 *Functionbeat*
@@ -66,6 +70,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Added
 
 *Affecting all Beats*
+
+- Update field definitions for `http` to ECS Beta 2 {pull}9645[9645]
 
 *Auditbeat*
 
