@@ -121,6 +121,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Add support for ssl_request_log in apache2 module. {issue}8088[8088] {pull}9833[9833]
 
 *Heartbeat*
+- Made monitors.d configuration part of the default config. {pull}9004[9004]
 
 *Journalbeat*
 
