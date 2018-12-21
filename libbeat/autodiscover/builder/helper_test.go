@@ -47,7 +47,7 @@ func TestGenerateHints(t *testing.T) {
 				"co.elastic.metrics/module":         "prometheus",
 				"co.elastic.metrics/period":         "10s",
 				"co.elastic.metrics.foobar/period":  "15s",
-				"co.elastic.metrics.foobar1/period": "15s",
+				"co.elastic.metrics.foobar1/period": "12s",
 				"not.to.include":                    "true",
 			},
 			result: common.MapStr{
@@ -77,20 +77,92 @@ func TestGenerateHintsCustomSeparator(t *testing.T) {
 	tests := []struct {
 		annotations map[string]string
 		result      common.MapStr
+		separator   string
+		container   string
 	}{
-		// Scenarios being tested:
-		// logs-include must be included under hints.logs
+		// Scenarios being tested: with . as separator
+		// logs.include must be included under hints.logs
 		// not_to_include must not be part of hints
-		// not.to.include must not be part of hints.metrics
+		// not_to_include must not be part of hints.metrics
+		// metrics.period must be set to 15s as container has higher priority than global hint
+		// metrics.foobar1.period must be set as it can't be distinguished between container or hint
 		{
 			annotations: map[string]string{
-				"co.elastic.logs-include":           "true",
-				"not_to_include":         "false",
-				"co.elastic.metrics/not.to.include": "false",
+				"co.elastic.logs.include":           "true",
+				"not_to_include":                    "false",
+				"co.elastic.metrics/not_to_include": "false",
+				"co.elastic.metrics.period":         "10s",
+				"co.elastic.metrics.foobar.period":  "15s",
+				"co.elastic.metrics.foobar1.period": "12s",
 			},
+			container: "foobar",
+			separator: "\\.",
 			result: common.MapStr{
 				"logs": common.MapStr{
 					"include": "true",
+				},
+				"metrics": common.MapStr{
+					"period": "15s",
+					"foobar1": common.MapStr{
+						"period": "12s",
+					},
+				},
+			},
+		},
+		// Scenarios being tested: with . as separator and . in container
+		// logs.include must be included under hints.logs
+		// not_to_include must not be part of hints
+		// not_to_include must not be part of hints.metrics
+		// metrics.period must be set to 15s as container has higher priority than global hint
+		// metrics.foo.bar1.period must be set as it can't be distinguished between container or hint
+		{
+			annotations: map[string]string{
+				"co.elastic.logs.include":            "true",
+				"not_to_include":                     "false",
+				"co.elastic.metrics/not_to_include":  "false",
+				"co.elastic.metrics.period":          "10s",
+				"co.elastic.metrics.foo.bar.period":  "15s",
+				"co.elastic.metrics.foo.bar1.period": "12s",
+			},
+			container: "foo.bar",
+			separator: "\\.",
+			result: common.MapStr{
+				"logs": common.MapStr{
+					"include": "true",
+				},
+				"metrics": common.MapStr{
+					"period": "15s",
+					"foo": common.MapStr{
+						"bar1": common.MapStr{
+							"period": "12s",
+						},
+					},
+				},
+			},
+		},
+		// Scenarios being tested: with - as separator and . in container
+		// logs.include must be included under hints.logs
+		// not_to_include must not be part of hints
+		// not_to_include must not be part of hints.metrics
+		// metrics.period must be set to 15s as container has higher priority than global hint
+		// metrics.foo.bar1.period must not be set as it can be distinguished between container or hint
+		{
+			annotations: map[string]string{
+				"co.elastic.logs-include":            "true",
+				"not.to-include":                     "false",
+				"co.elastic-metrics.not.to.include":  "false",
+				"co.elastic.metrics-period":          "10s",
+				"co.elastic.metrics.foo.bar-period":  "15s",
+				"co.elastic.metrics.foo.bar1-period": "12s",
+			},
+			container: "foo.bar",
+			separator: "-",
+			result: common.MapStr{
+				"logs": common.MapStr{
+					"include": "true",
+				},
+				"metrics": common.MapStr{
+					"period": "15s",
 				},
 			},
 		},
@@ -101,6 +173,6 @@ func TestGenerateHintsCustomSeparator(t *testing.T) {
 		for k, v := range test.annotations {
 			annMap.Put(k, v)
 		}
-		assert.Equal(t, test.result, GenerateHints(annMap, "foobar", "co.elastic", "-"))
+		assert.Equal(t, test.result, GenerateHints(annMap, test.container, "co.elastic", test.separator))
 	}
 }

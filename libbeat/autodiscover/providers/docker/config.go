@@ -19,7 +19,6 @@ package docker
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
@@ -52,12 +51,10 @@ func (c *Config) Validate() error {
 	if c.Prefix[len(c.Prefix)-1] == '.' && c.Prefix != "." {
 		c.Prefix = c.Prefix[:len(c.Prefix)-2]
 	}
-	if len(c.Separator) != 1 {
-		return fmt.Errorf("separator '%v' must be a single character", c.Separator)
-	}
-	// Make sure that separator isn't included in prefix
-	if strings.Contains(c.Prefix, c.Separator) {
-		return fmt.Errorf("separator '%v' must not be included in prefix '%v'", c.Prefix, c.Separator)
+	switch c.Separator {
+	case "/", "-", ".", "_":
+	default:
+		return fmt.Errorf("invalid separator value '%v' as its neither docker label recommended nor the elastic default. Please use one of: '/', '-', '.', '_'", c.Separator)
 	}
 	return nil
 }

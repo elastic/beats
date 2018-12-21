@@ -21,28 +21,36 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
-func TestConfigSeparatorIncludedInPrefix(t *testing.T) {
-	config := defaultConfig()
-	config.Separator = "."
-
-	err := config.Validate()
-	assert.Error(t, err)
-}
-
-func TestConfigSeparatorNotIncludedInPrefix(t *testing.T) {
-	config := defaultConfig()
-	config.Separator = "-"
-
-	err := config.Validate()
+func TestConfigUnpackDefault(t *testing.T) {
+	rawConfig, err := common.NewConfigFrom(map[string]interface{}{})
 	assert.NoError(t, err)
+	config := defaultConfig()
+	err = rawConfig.Unpack(&config)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, config.Separator)
+	assert.Equal(t, "/", config.Separator)
 }
 
-func TestConfigSeparatorNotASingleCharacter(t *testing.T) {
+func TestConfigUnpackInvalidSeparator(t *testing.T) {
+	rawConfig, err := common.NewConfigFrom(map[string]interface{}{
+		"separator": "#",
+	})
+	assert.NoError(t, err)
 	config := defaultConfig()
-	config.Separator = "this_is_to_long"
-
-	err := config.Validate()
+	err = rawConfig.Unpack(&config)
 	assert.Error(t, err)
+}
+
+func TestConfigUnpackValidSeparator(t *testing.T) {
+	rawConfig, err := common.NewConfigFrom(map[string]interface{}{
+		"separator": ".",
+	})
+	assert.NoError(t, err)
+	config := defaultConfig()
+	err = rawConfig.Unpack(&config)
+	assert.NoError(t, err)
 }

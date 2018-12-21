@@ -20,6 +20,7 @@ package builder
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -156,39 +157,19 @@ func IsNoOp(hints common.MapStr, key string) bool {
 
 // GenerateHints parses annotations based on a prefix and sets up hints that can be picked up by individual Beats.
 func GenerateHints(annotations common.MapStr, container, prefix string, separator string) common.MapStr {
+	validPrefix := regexp.MustCompile("^(?P<Module>[a-zA-Z0-9]*)\\.?(" + container + ")?" + separator + "(?P<Key>.*)$")
 	hints := common.MapStr{}
 	if rawEntries, err := annotations.GetValue(prefix); err == nil {
 		if entries, ok := rawEntries.(common.MapStr); ok {
-			for key, rawValue := range entries {
-				// If there are top level hints like co.elastic.logs/ then just add the values after the /
+			for key, rawValue := range entries.Flatten() {
 				// Only consider namespaced annotations
-				parts := strings.Split(key, separator)
-				if len(parts) == 2 {
-					hintKey := fmt.Sprintf("%s.%s", parts[0], parts[1])
-					// Insert only if there is no entry already. container level annotations take
-					// higher priority.
-					if _, err := hints.GetValue(hintKey); err != nil {
+				parts := validPrefix.FindStringSubmatch(key)
+				if len(parts) == 4 {
+					// Rebuild hintKey without container
+					hintKey := fmt.Sprintf("%s.%s", parts[1], parts[3])
+					// Container scoped values override global ones
+					if _, err := hints.GetValue(hintKey); len(parts[2]) > 0 || err != nil {
 						hints.Put(hintKey, rawValue)
-					}
-				} else if container != "" {
-					// Only consider annotations that are of type common.MapStr as we are looking for
-					// container level nesting
-					builderHints, ok := rawValue.(common.MapStr)
-					if !ok {
-						continue
-					}
-
-					// Check for <containerName>/ prefix
-					for hintKey, rawVal := range builderHints {
-						if strings.HasPrefix(hintKey, container) {
-							// Split the key to get part[1] to be the hint
-							parts := strings.Split(hintKey, separator)
-							if len(parts) == 2 {
-								// key will be the hint type
-								hintKey := fmt.Sprintf("%s.%s", key, parts[1])
-								hints.Put(hintKey, rawVal)
-							}
-						}
 					}
 				}
 			}
