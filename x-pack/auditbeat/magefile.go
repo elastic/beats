@@ -81,9 +81,9 @@ func TestPackages() error {
 	return mage.TestPackages()
 }
 
-// Fields generates a fields.yml and include/fields.go.
+// Fields generates a fields.yml and for each module generate a fields.go.
 func Fields() {
-	mg.SerialDeps(fieldsYML, mage.GenerateAllInOneFieldsGo)
+	mg.SerialDeps(fieldsYML, mage.GenerateModuleFieldsGo)
 }
 
 // fieldsYML generates a fields.yml based on auditbeat + x-pack/auditbeat/modules.
