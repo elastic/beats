@@ -7,9 +7,9 @@ exclude_files: [".gz$"]
 
 processors:
 - dissect:
-    tokenizer: '%{traefik.access.remote_ip} %{traefik.access.user_identifier} %{traefik.access.user_name} [%{traefik.access.time}]
-    "%{traefik.access.method} %{traefik.access.url} HTTP/%{traefik.access.http_version}"
-    %{traefik.access.response_code} %{traefik.access.message}'
+    tokenizer: '%{source.address} %{traefik.access.user_identifier} %{user.name} [%{traefik.access.time}]
+    "%{http.request.method} %{url.original} HTTP/%{http.version}"
+    %{http.response.status_code} %{traefik.access.message}'
 
     field: "message"
     target_prefix: ""
