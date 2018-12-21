@@ -97,6 +97,8 @@
   alias6: true
 
 
+# Filebeat modules
+
 # Suricata module
 
 - from: source_ecs.ip
@@ -130,6 +132,8 @@
 - from: source_ecs.geo.region_iso_code
   to: source.geo.region_iso_code
   alias: true
+
+## System module
 
 - from: system.syslog.hostname
   to: host.hostname
@@ -188,7 +192,7 @@
   to: source.geo.*
   alias: true
 
-## Apache
+## Apache module
 
 - from: apache2.access.user_name
   to: user.name
@@ -231,7 +235,28 @@
   to: user_agent.*
   alias: true
 
-# IIS module
+### Error fileset
+- from: apache.error.message
+  to: message
+  alias: true
+
+- from: apache.error.level
+  to: log.level
+  alias: true
+
+- from: apache2.error.client
+  to: source.address
+  alias: true
+
+- from: apache2.error.pid
+  to: process.pid
+  alias: true
+
+- from: apache2.error.tid
+  to: process.thread.id
+  alias: true
+
+## IIS module
 
 - from: iis.access.server_ip
   to: destination.ip
@@ -289,8 +314,6 @@
   to: source.geo.region_iso_code
   alias: true
 
-# Note: `http` is not officially in ECS yet
-
 - from: iis.access.method
   to: http.request.method
   alias: true
@@ -303,7 +326,8 @@
   to: http.request.referrer
   alias: true
 
-# HAProxy module
+## HAProxy module
+
 - from: haproxy.client.port
   to: source.port
   alias: true
@@ -352,6 +376,18 @@
   to: network.forwarded_ip
   alias: true
 
+## Kafka module
+
+- from: kafka.log.level
+  to: log.level
+  alias: true
+
+- from: kafka.log.message
+  to: message
+  alias: true
+
+## NGINX module
+
 - from: nginx.access.user_name
   to: user.name
   alias: true
@@ -363,8 +399,6 @@
 - from: nginx.access.agent
   to: user_agent.original
   alias: true
-
-# Note: `http` is not officially in ECS yet
 
 - from: nginx.access.response_code
   to: http.response.status_code
@@ -410,12 +444,75 @@
   to: user_agent.original
   alias: true
 
-# From Auditbeat's auditd module.
+## PostgreSQL module
+
+- from: postgresql.log.timezone
+  to: event.timezone
+  alias: true
+
+- from: postgresql.log.thread_id
+  to: process.pid
+  alias: true
+
+- from: postgresql.log.user
+  to: user.name
+  alias: true
+
+- from: postgresql.log.level
+  to: log.level
+  alias: true
+
+- from: postgresql.log.message
+  to: message
+  alias: true
+
+## Redis module
+
+- from: redis.log.pid
+  to: process.pid
+  alias: true
+
+- from: redis.log.level
+  to: log.level
+  alias: true
+
+- from: redis.log.message
+  to: message
+  alias: true
+
+## Icinga module
+
+- from: icinga.debug.message
+  to: message
+  alias: true
+- from: icinga.debug.severity
+  to: log.level
+  alias: true
+
+- from: icinga.main.message
+  to: message
+  alias: true
+- from: icinga.main.severity
+  to: log.level
+  alias: true
+
+- from: icinga.startup.message
+  to: message
+  alias: true
+- from: icinga.startup.severity
+  to: log.level
+  alias: true
+
+# Auditbeat
+
+## From Auditbeat's auditd module.
 - from: source.hostname
   to: source.domain
   alias: true
 
-# Metricbeat base fields
+# Metricbeat
+
+## Metricbeat base fields
 - from: metricset.name
   to: event.dataset
   alias: false

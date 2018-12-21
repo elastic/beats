@@ -3,7 +3,50 @@
   description: >
     ECS fields.
   fields:
-    
+
+    - name: "@timestamp"
+      type: date
+      level: core
+      required: true
+      example: "2016-05-23T08:05:34.853Z"
+      description: >
+        Date/time when the event originated.
+
+        For log events this is the date/time when the event was generated, and
+        not when it was read.
+
+        Required field for all events.
+
+    - name: tags
+      level: core
+      type: keyword
+      example: "[\"production\", \"env2\"]"
+      description: >
+        List of keywords used to tag each event.
+
+    - name: labels
+      level: core
+      type: object
+      example: {env: production, application: foo-bar}
+      description: >
+        Key/value pairs.
+
+        Can be used to add meta information to events. Should not contain nested
+        objects. All values are stored as keyword.
+
+        Example: `docker` and `k8s` labels.
+
+    - name: message
+      level: core
+      type: text
+      example: "Hello World"
+      description: >
+        For log events the message field contains the log message.
+
+        In other use cases the message field can be used to concatenate
+        different values which are then freely searchable. If multiple
+        messages exist, they can be combined into one message.
+
     - name: agent
       title: Agent
       group: 2
@@ -67,56 +110,7 @@
     
             This id normally changes across restarts, but `agent.id` does not.
           example: 8a4f500f
-    
-    - name: base
-      title: Base
-      group: 1
-      description: >
-        The base set contains all fields which are on the top level. These fields are common across all types of events.
-      type: group
-      fields:
-        - name: "@timestamp"
-          type: date
-          level: core
-          required: true
-          example: "2016-05-23T08:05:34.853Z"
-          description: >
-            Date/time when the event originated.
-    
-            For log events this is the date/time when the event was generated, and
-            not when it was read.
-    
-            Required field for all events.
-    
-        - name: tags
-          level: core
-          type: keyword
-          example: "[\"production\", \"env2\"]"
-          description: >
-            List of keywords used to tag each event.
-    
-        - name: labels
-          level: core
-          type: object
-          example: {env: production, application: foo-bar}
-          description: >
-            Key/value pairs.
-    
-            Can be used to add meta information to events. Should not contain nested
-            objects. All values are stored as keyword.
-    
-            Example: `docker` and `k8s` labels.
-    
-        - name: message
-          level: core
-          type: text
-          example: "Hello World"
-          description: >
-            For log events the message field contains the log message.
-    
-            In other use cases the message field can be used to concatenate
-            different values which are then freely searchable. If multiple
-            messages exist, they can be combined into one message.
+
     
     - name: client
       title: Client
@@ -1740,7 +1734,17 @@
         packet/event. Source fields are usually populated in conjunction with destination fields.
       type: group
       fields:
-    
+        - name: address
+          level: extended
+          type: keyword
+          description: >
+            Some event source addresses are defined ambiguously. The event will
+            sometimes list an IP, a domain or a unix socket.  You should always
+            store the raw address in the `.address` field.
+
+            Then it should be duplicated to `.ip` or `.domain`, depending on which
+            one it is.
+
         - name: ip
           level: core
           type: ip

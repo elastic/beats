@@ -39,11 +39,12 @@ import (
 // if it finds any modifications. If executed in in verbose mode it will write
 // the results of 'git diff' to stdout to indicate what changes have been made.
 //
-// It also checks the file permissions of nosetests test cases and YAML files.
+// It checks the file permissions of nosetests test cases and YAML files.
+// It checks .go source files using 'go vet'.
 func Check() error {
-	fmt.Println(">> check: Checking for modified files or incorrect permissions")
+	fmt.Println(">> check: Checking source code for common problems")
 
-	mg.Deps(CheckNosetestsNotExecutable, CheckYAMLNotExecutable)
+	mg.Deps(GoVet, CheckNosetestsNotExecutable, CheckYAMLNotExecutable)
 
 	changes, err := GitDiffIndex()
 	if err != nil {
@@ -177,4 +178,10 @@ func CheckYAMLNotExecutable() error {
 
 	}
 	return nil
+}
+
+// GoVet vets the .go source code using 'go vet'.
+func GoVet() error {
+	err := sh.RunV("go", "vet", "./...")
+	return errors.Wrap(err, "failed running go vet, please fix the issues reported")
 }

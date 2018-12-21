@@ -287,11 +287,22 @@ func (ms *MetricSet) getProcessInfos() ([]*ProcessInfo, error) {
 	for _, pid := range pids {
 		process, err := sysinfo.Process(pid)
 		if err != nil {
+			if os.IsNotExist(err) {
+				// Skip - process probably just terminated since our call
+				// to Pids()
+				continue
+			}
 			return nil, errors.Wrap(err, "failed to load process")
 		}
 
 		pInfo, err := process.Info()
 		if err != nil {
+			if os.IsNotExist(err) {
+				// Skip - process probably just terminated since our call
+				// to Pids()
+				continue
+			}
+
 			if os.Geteuid() != 0 {
 				if os.IsPermission(err) || runtime.GOOS == "darwin" {
 					/*

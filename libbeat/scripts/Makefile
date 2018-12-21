@@ -340,7 +340,7 @@ endif
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat ]] && echo true ),true)
 	@# Update docs
 	@mkdir -p docs
-	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD) ${BEAT_TITLE} ${ES_BEATS}
+	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD)/fields.yml ${BEAT_TITLE} ${ES_BEATS}
 endif
 
 	@mkdir -p $(PWD)/_meta/kibana.generated

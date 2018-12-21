@@ -39,7 +39,7 @@
                 How long the exporter process has been running, in milliseconds.
 
             - name: version
-              type: int
+              type: long
               description: >
                 NetFlow version used.
 
