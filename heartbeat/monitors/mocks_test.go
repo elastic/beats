@@ -101,9 +101,9 @@ func mockEventMonitorValidator(id string) mapval.Validator {
 	return mapval.Strict(mapval.Compose(
 		mapval.MustCompile(mapval.Map{
 			"monitor": mapval.Map{
-				"id":         idMatcher,
-				"pluginName": "test",
-				"type":       "test",
+				"id":   idMatcher,
+				"name": "",
+				"type": "test",
 			},
 		}),
 		mapval.MustCompile(mockEventCustomFields()),

@@ -21,11 +21,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/libbeat/testing/mapvaltest"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/scheduler"
-	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
 func TestMonitor(t *testing.T) {
@@ -42,7 +43,6 @@ func TestMonitor(t *testing.T) {
 	require.NoError(t, err)
 
 	mon.Start()
-	defer mon.Stop()
 
 	require.Equal(t, 1, len(pipelineConnector.clients))
 	pcClient := pipelineConnector.clients[0]
@@ -54,14 +54,17 @@ func TestMonitor(t *testing.T) {
 		count := len(pcClient.Publishes())
 		if count >= 1 {
 			success = true
+
+			mon.Stop()
+			pcClient.Close()
+
+			for _, event := range pcClient.Publishes() {
+				mapvaltest.Test(t, mockEventMonitorValidator(""), event.Fields)
+			}
 		} else {
 			// Let's yield this goroutine so we don't spin
 			// This could (possibly?) lock on a single core system otherwise
 			time.Sleep(time.Microsecond)
-		}
-
-		for _, event := range pcClient.Publishes() {
-			mapvaltest.Test(t, mockEventMonitorValidator(""), event.Fields)
 		}
 	}
 

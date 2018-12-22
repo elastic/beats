@@ -51,7 +51,7 @@ func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
 	job := jobs[0]
 
 	event := &beat.Event{}
-	_, err = job.Run(event)
+	_, err = job(event)
 	require.NoError(t, err)
 
 	require.Equal(t, 1, endpoints)
@@ -74,7 +74,7 @@ func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string
 	job := jobs[0]
 
 	event := &beat.Event{}
-	_, err = job.Run(event)
+	_, err = job(event)
 	require.NoError(t, err)
 
 	require.Equal(t, 1, endpoints)

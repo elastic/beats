@@ -67,7 +67,7 @@ func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interfa
 	job := jobs[0]
 
 	event := &beat.Event{}
-	_, err = job.Run(event)
+	_, err = job(event)
 	require.NoError(t, err)
 
 	require.Equal(t, 1, endpoints)
@@ -239,7 +239,7 @@ func TestLargeResponse(t *testing.T) {
 	job := jobs[0]
 
 	event := &beat.Event{}
-	_, err = job.Run(event)
+	_, err = job(event)
 	require.NoError(t, err)
 
 	port, err := hbtest.ServerPort(server)

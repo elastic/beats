@@ -132,7 +132,7 @@ func newMonitor(
 
 		// If they have an explicit ID in the config set it to exactly that
 		idWrapper = func(job Job) Job {
-			return WithID(m.id, m.name, job)
+			return WithMonitorMeta(m.id, m.name, m.pluginName, job)
 		}
 	} else {
 		// If there's no explicit ID generate one
@@ -141,7 +141,12 @@ func newMonitor(
 			return nil, err
 		}
 		idWrapper = func(job Job) Job {
-			return WithID(fmt.Sprintf("auto-%s-%#X", m.pluginName, hash), mpi.Name, job)
+			return WithMonitorMeta(
+				fmt.Sprintf("auto-%s-%#X", mpi.Type, hash),
+				mpi.Name,
+				mpi.Type,
+				job,
+			)
 		}
 	}
 
@@ -314,4 +319,17 @@ func (m *Monitor) Stop() {
 	}
 
 	m.stats.stopMonitor(int64(m.endpoints))
+}
+
+// WithMonitorMeta ensures that monitor.{id,name,type} are present.
+func WithMonitorMeta(id string, name string, typ string, origJob Job) Job {
+	return WithFields(
+		common.MapStr{
+			"monitor": common.MapStr{
+				"id":   id,
+				"name": name,
+				"type": typ},
+		},
+		origJob,
+	)
 }
