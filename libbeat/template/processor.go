@@ -49,7 +49,7 @@ func (p *Processor) Process(fields common.Fields, path string, output common.Map
 		case "ip":
 			mapping = p.ip(&field)
 		case "scaled_float":
-			mapping = p.scaledFloat(&field)
+			mapping = p.scaledFloat(&field, field.ScalingFactor)
 		case "half_float":
 			mapping = p.halfFloat(&field)
 		case "integer":
@@ -119,14 +119,13 @@ func (p *Processor) integer(f *common.Field) common.MapStr {
 	return property
 }
 
-func (p *Processor) scaledFloat(f *common.Field) common.MapStr {
+func (p *Processor) scaledFloat(f *common.Field, scalingFactor int) common.MapStr {
 	property := getDefaultProperties(f)
 	property["type"] = "scaled_float"
 
 	if p.EsVersion.IsMajor(2) {
 		property["type"] = "float"
 	} else {
-		scalingFactor := f.ScalingFactor
 		// Set default scaling factor
 		if scalingFactor == 0 {
 			scalingFactor = defaultScalingFactor
@@ -256,33 +255,41 @@ func (p *Processor) alias(f *common.Field) common.MapStr {
 }
 
 func (p *Processor) object(f *common.Field) common.MapStr {
-	dynProperties := getDefaultProperties(f)
-
-	matchType := func(onlyType string) string {
-		if f.ObjectTypeMappingType != "" {
-			return f.ObjectTypeMappingType
+	matchType := func(onlyType string, mt string) string {
+		if mt != "" {
+			return mt
 		}
 		return onlyType
 	}
 
-	switch f.ObjectType {
-	case "scaled_float":
-		dynProperties = p.scaledFloat(f)
-		addDynamicTemplate(f, dynProperties, matchType("*"))
-	case "text":
-		dynProperties["type"] = "text"
+	otParams := f.ObjectTypeParams
+	if f.ObjectType != "" {
+		objectTypeParam := common.ObjectTypeCfg{f.ObjectType, f.ObjectTypeMappingType, f.ScalingFactor}
+		otParams = append(otParams, objectTypeParam)
+	}
 
-		if p.EsVersion.IsMajor(2) {
-			dynProperties["type"] = "string"
-			dynProperties["index"] = "analyzed"
+	for _, otp := range otParams {
+		dynProperties := getDefaultProperties(f)
+
+		switch otp.ObjectType {
+		case "scaled_float":
+			dynProperties = p.scaledFloat(f, otp.ScalingFactor)
+			addDynamicTemplate(f, dynProperties, matchType("*", otp.ObjectTypeMappingType))
+		case "text":
+			dynProperties["type"] = "text"
+
+			if p.EsVersion.IsMajor(2) {
+				dynProperties["type"] = "string"
+				dynProperties["index"] = "analyzed"
+			}
+			addDynamicTemplate(f, dynProperties, matchType("string", otp.ObjectTypeMappingType))
+		case "keyword":
+			dynProperties["type"] = otp.ObjectType
+			addDynamicTemplate(f, dynProperties, matchType("string", otp.ObjectTypeMappingType))
+		case "byte", "double", "float", "long", "short", "boolean":
+			dynProperties["type"] = otp.ObjectType
+			addDynamicTemplate(f, dynProperties, matchType(otp.ObjectType, otp.ObjectTypeMappingType))
 		}
-		addDynamicTemplate(f, dynProperties, matchType("string"))
-	case "keyword":
-		dynProperties["type"] = f.ObjectType
-		addDynamicTemplate(f, dynProperties, matchType("string"))
-	case "byte", "double", "float", "long", "short":
-		dynProperties["type"] = f.ObjectType
-		addDynamicTemplate(f, dynProperties, matchType(f.ObjectType))
 	}
 
 	properties := getDefaultProperties(f)

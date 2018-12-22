@@ -34,25 +34,28 @@ import (
 type Fields []Field
 
 type Field struct {
-	Name                  string      `config:"name"`
-	Type                  string      `config:"type"`
-	Description           string      `config:"description"`
-	Format                string      `config:"format"`
-	ScalingFactor         int         `config:"scaling_factor"`
-	Fields                Fields      `config:"fields"`
-	MultiFields           Fields      `config:"multi_fields"`
-	ObjectType            string      `config:"object_type"`
-	ObjectTypeMappingType string      `config:"object_type_mapping_type"`
-	Enabled               *bool       `config:"enabled"`
-	Analyzer              string      `config:"analyzer"`
-	SearchAnalyzer        string      `config:"search_analyzer"`
-	Norms                 bool        `config:"norms"`
-	Dynamic               DynamicType `config:"dynamic"`
-	Index                 *bool       `config:"index"`
-	DocValues             *bool       `config:"doc_values"`
-	CopyTo                string      `config:"copy_to"`
-	IgnoreAbove           int         `config:"ignore_above"`
-	AliasPath             string      `config:"path"`
+	Name           string      `config:"name"`
+	Type           string      `config:"type"`
+	Description    string      `config:"description"`
+	Format         string      `config:"format"`
+	Fields         Fields      `config:"fields"`
+	MultiFields    Fields      `config:"multi_fields"`
+	Enabled        *bool       `config:"enabled"`
+	Analyzer       string      `config:"analyzer"`
+	SearchAnalyzer string      `config:"search_analyzer"`
+	Norms          bool        `config:"norms"`
+	Dynamic        DynamicType `config:"dynamic"`
+	Index          *bool       `config:"index"`
+	DocValues      *bool       `config:"doc_values"`
+	CopyTo         string      `config:"copy_to"`
+	IgnoreAbove    int         `config:"ignore_above"`
+	AliasPath      string      `config:"path"`
+
+	ScalingFactor         int    `config:"scaling_factor"`
+	ObjectType            string `config:"object_type"`
+	ObjectTypeMappingType string `config:"object_type_mapping_type"`
+
+	ObjectTypeParams []ObjectTypeCfg `config:"object_type_params"`
 
 	// Kibana specific
 	Analyzed     *bool  `config:"analyzed"`
@@ -71,6 +74,12 @@ type Field struct {
 
 	Overwrite bool `config:"overwrite"`
 	Path      string
+}
+
+type ObjectTypeCfg struct {
+	ObjectType            string `config:"object_type"`
+	ObjectTypeMappingType string `config:"object_type_mapping_type"`
+	ScalingFactor         int    `config:"scaling_factor"`
 }
 
 type VersionizedString struct {
