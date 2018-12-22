@@ -129,14 +129,14 @@ func (b *Builder) Run(
 // correctly resolved endpoint.
 func MakeDialerJobs(
 	b *Builder,
-	typ, scheme string,
+	scheme string,
 	endpoints []Endpoint,
 	mode monitors.IPSettings,
 	fn func(event *beat.Event, dialer transport.Dialer, addr string) error,
 ) ([]monitors.Job, error) {
 	var jobs []monitors.Job
 	for _, endpoint := range endpoints {
-		endpointJobs, err := makeEndpointJobs(b, typ, scheme, endpoint, mode, fn)
+		endpointJobs, err := makeEndpointJobs(b, scheme, endpoint, mode, fn)
 		if err != nil {
 			return nil, err
 		}
@@ -148,7 +148,7 @@ func MakeDialerJobs(
 
 func makeEndpointJobs(
 	b *Builder,
-	typ, scheme string,
+	scheme string,
 	endpoint Endpoint,
 	mode monitors.IPSettings,
 	fn func(*beat.Event, transport.Dialer, string) error,

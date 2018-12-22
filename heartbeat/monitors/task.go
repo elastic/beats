@@ -66,7 +66,7 @@ func newConfiguredJob(job Job, config jobConfig, monitor *Monitor) (*configuredJ
 
 // jobConfig represents fields needed to execute a single job.
 type jobConfig struct {
-	Name     string             `config:"name"`
+	Name     string             `config:"pluginName"`
 	Type     string             `config:"type"`
 	Schedule *schedule.Schedule `config:"schedule" validate:"required"`
 
@@ -96,7 +96,7 @@ func (t *configuredJob) prepareSchedulerJob(meta common.MapStr, job Job) schedul
 		}
 
 		if event != nil && event.Fields != nil {
-			MergeEventFields(event, meta)
+			event.Fields.DeepUpdate(meta)
 			// If continuations are present we defensively publish a clone of the event
 			// in the chance that the event shares underlying data with the events for continuations
 			// This prevents races where the pipeline publish could accidentally alter multiple events.
@@ -133,8 +133,8 @@ func (t *configuredJob) makeSchedulerTaskFunc() scheduler.TaskFunc {
 
 	meta := common.MapStr{
 		"monitor": common.MapStr{
-			"name": name,
-			"type": t.config.Type,
+			"pluginName": name,
+			"type":       t.config.Type,
 		},
 	}
 

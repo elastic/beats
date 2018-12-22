@@ -28,7 +28,7 @@ type Job interface {
 	Run(event *beat.Event) ([]Job, error)
 }
 
-// NamedJob represents a job with an explicitly specified name.
+// NamedJob represents a job with an explicitly specified pluginName.
 type NamedJob struct {
 	id   string
 	name string
@@ -40,12 +40,12 @@ func CreateNamedJob(id string, name string, run func(event *beat.Event) ([]Job, 
 	return &NamedJob{id, name, run}
 }
 
-// ID returns a unique ID for this Job.
+// ID returns a the configured ID for this Job or "" if none is configured.
 func (f *NamedJob) ID() string {
 	return f.id
 }
 
-// Name returns the name of this job.
+// Name returns the pluginName of this job.
 func (f *NamedJob) Name() string {
 	return f.name
 }
@@ -55,7 +55,7 @@ func (f *NamedJob) Run(event *beat.Event) ([]Job, error) {
 	return f.run(event)
 }
 
-// AnonJob represents a job with no assigned name, backed by just a function.
+// AnonJob represents a job with no assigned pluginName, backed by just a function.
 type AnonJob func(event *beat.Event) ([]Job, error)
 
 // ID returns a unique ID for this Job.
@@ -85,19 +85,6 @@ func AfterJob(j Job, after func(*beat.Event, []Job, error) ([]Job, error)) Job {
 			return after(event, next, err)
 		},
 	)
-}
-
-// AfterJobSuccess creates a wrapped version of the given Job that runs additional
-// code after the original job if the original Job succeeds, possibly altering
-// return values.
-func AfterJobSuccess(j Job, after func(*beat.Event, []Job, error) ([]Job, error)) Job {
-	return AfterJob(j, func(event *beat.Event, cont []Job, err error) ([]Job, error) {
-		if err != nil {
-			return cont, err
-		}
-
-		return after(event, cont, err)
-	})
 }
 
 // MakeSimpleJob creates a new Job from a callback function. The callback should

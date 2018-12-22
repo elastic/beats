@@ -40,7 +40,6 @@ type IPSettings struct {
 // HostJobSettings configures a Job including Host lookups and global fields to be added
 // to every event.
 type HostJobSettings struct {
-	Name   string
 	Host   string
 	IP     IPSettings
 	Fields common.MapStr
@@ -66,7 +65,7 @@ var DefaultIPSettings = IPSettings{
 // emptyTask is a helper value for a Noop.
 var emptyTask = MakeSimpleCont(func(*beat.Event) error { return nil })
 
-// Network determines the Network type used for IP name resolution, based on the
+// Network determines the Network type used for IP pluginName resolution, based on the
 // provided settings.
 func (s IPSettings) Network() string {
 	switch {
@@ -102,7 +101,7 @@ func WithErrAsField(job Job) Job {
 // It adds the monitor.duration and monitor.status fields.
 func TimeAndCheckJob(job Job) Job {
 	return CreateNamedJob(
-		"",
+		job.ID(),
 		job.Name(),
 		func(event *beat.Event) ([]Job, error) {
 			start := time.Now()
@@ -123,20 +122,6 @@ func TimeAndCheckJob(job Job) Job {
 			wrappedCont := WrapAll(cont, TimeAndCheckJob)
 			return wrappedCont, err
 		},
-	)
-}
-
-// WithJobId wraps the given Job setting the monitor.id field.
-func WithJobId(id string, job Job) Job {
-	return CreateNamedJob(
-		"",
-		id,
-		WithFields(
-			common.MapStr{
-				"monitor": common.MapStr{"id": id},
-			},
-			job,
-		).Run,
 	)
 }
 
@@ -232,7 +217,7 @@ func MakeByIPJob(
 }
 
 // MakeByHostJob creates a new Job including host lookup. The pingFactory will be used to
-// build one or multiple Tasks after name lookup according to settings.
+// build one or multiple Tasks after pluginName lookup according to settings.
 //
 // A pingFactory instance is normally build with MakePingIPFactory,
 // MakePingAllIPFactory or MakePingAllIPPortFactory.
@@ -293,7 +278,7 @@ func makeByHostAllIPJob(
 	network := settings.IP.Network()
 	filter := makeIPFilter(network)
 
-	return CreateNamedJob("", settings.Name, func(event *beat.Event) ([]Job, error) {
+	return AnonJob(func(event *beat.Event) ([]Job, error) {
 		// TODO: check for better DNS IP lookup support:
 		//         - The net.LookupIP drops ipv6 zone index
 		//
@@ -355,17 +340,17 @@ func resolveErr(event *beat.Event, host string, err error) {
 
 // WithID wraps the given job and any continuations it spawns setting the monitor.id field and setting
 // the Job's ID property to the given ID as well.
-func WithID(id string, origJob Job) Job {
+func WithID(id string, name string, origJob Job) Job {
 	fieldWrappedJob := WithFields(common.MapStr{"monitor": common.MapStr{"id": id}}, origJob)
 
-	return CreateNamedJob(id, fieldWrappedJob.Name(), func(event *beat.Event) ([]Job, error) {
+	return CreateNamedJob(id, name, func(event *beat.Event) ([]Job, error) {
 		conts, err := fieldWrappedJob.Run(event)
 		if err != nil {
 			return nil, err
 		}
 
 		return WrapAll(conts, func(cont Job) Job {
-			return WithID(id, cont)
+			return WithID(id, name, cont)
 		}), nil
 	})
 }
@@ -379,18 +364,6 @@ func WithFields(fields common.MapStr, job Job) Job {
 		return WrapAll(cont, func(job Job) Job {
 			return WithFields(fields, job)
 		}), err
-	})
-}
-
-func withStart(field string, start time.Time, r Job) Job {
-	return AfterJobSuccess(r, func(event *beat.Event, cont []Job, err error) ([]Job, error) {
-		event.Fields.Put(field, look.RTT(time.Since(start)))
-
-		for i := range cont {
-			cont[i] = withStart(field, start, cont[i])
-		}
-
-		return cont, err
 	})
 }
 
@@ -464,6 +437,7 @@ func MergeEventFields(e *beat.Event, merge common.MapStr) {
 	if e.Fields != nil {
 		e.Fields.DeepUpdate(merge)
 	} else {
-		e.Fields = merge
+		// Clone to be defensive against races
+		e.Fields = merge.Clone()
 	}
 }

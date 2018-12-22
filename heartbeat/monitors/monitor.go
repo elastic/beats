@@ -38,6 +38,7 @@ import (
 type Monitor struct {
 	id             string
 	name           string
+	pluginName     string
 	config         *common.Config
 	registrar      *pluginsReg
 	uniqueName     string
@@ -64,7 +65,7 @@ type Monitor struct {
 // String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
 // values because it may be invoked from another thread in cfgfile/runner.
 func (m *Monitor) String() string {
-	return fmt.Sprintf("Monitor<name: %s, enabled: %t>", m.name, m.enabled)
+	return fmt.Sprintf("Monitor<pluginName: %s, enabled: %t>", m.name, m.enabled)
 }
 
 func checkMonitorConfig(config *common.Config, registrar *pluginsReg, allowWatches bool) error {
@@ -108,7 +109,8 @@ func newMonitor(
 
 	m := &Monitor{
 		id:                mpi.ID,
-		name:              monitorPlugin.name,
+		name:              mpi.Name,
+		pluginName:        monitorPlugin.name,
 		scheduler:         scheduler,
 		configuredJobs:    []*configuredJob{},
 		pipelineConnector: pipelineConnector,
@@ -130,7 +132,7 @@ func newMonitor(
 
 		// If they have an explicit ID in the config set it to exactly that
 		idWrapper = func(job Job) Job {
-			return WithID(m.id, job)
+			return WithID(m.id, m.name, job)
 		}
 	} else {
 		// If there's no explicit ID generate one
@@ -139,7 +141,7 @@ func newMonitor(
 			return nil, err
 		}
 		idWrapper = func(job Job) Job {
-			return WithID(fmt.Sprintf("auto-%s-%#X", mpi.Type, hash), job)
+			return WithID(fmt.Sprintf("auto-%s-%#X", m.pluginName, hash), mpi.Name, job)
 		}
 	}
 
