@@ -578,30 +578,6 @@ alias to: event.timezone
 
 --
 
-*`@timestamp`*::
-+
---
-type: date
-
-example: August 26th 2016, 12:35:53.332
-
-format: date
-
-required: True
-
-The timestamp when the event log record was generated.
-
-
---
-
-*`tags`*::
-+
---
-Arbitrary tags that can be set per Beat and per transaction type.
-
-
---
-
 *`fields`*::
 +
 --
@@ -764,6 +740,61 @@ ECS fields.
 
 
 
+*`@timestamp`*::
++
+--
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+required: True
+
+Date/time when the event originated.
+For log events this is the date/time when the event was generated, and not when it was read.
+Required field for all events.
+
+
+--
+
+*`tags`*::
++
+--
+type: keyword
+
+example: ["production", "env2"]
+
+List of keywords used to tag each event.
+
+
+--
+
+*`labels`*::
++
+--
+type: object
+
+example: {'application': 'foo-bar', 'env': 'production'}
+
+Key/value pairs.
+Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
+Example: `docker` and `k8s` labels.
+
+
+--
+
+*`message`*::
++
+--
+type: text
+
+example: Hello World
+
+For log events the message field contains the log message.
+In other use cases the message field can be used to concatenate different values which are then freely searchable. If multiple messages exist, they can be combined into one message.
+
+
+--
+
 [float]
 == agent fields
 
@@ -837,73 +868,23 @@ This id normally changes across restarts, but `agent.id` does not.
 --
 
 [float]
-== base fields
+== client fields
 
-The base set contains all fields which are on the top level. These fields are common across all types of events.
-
-
-
-*`base.@timestamp`*::
-+
---
-type: date
-
-example: 2016-05-23T08:05:34.853Z
-
-required: True
-
-Date/time when the event originated.
-For log events this is the date/time when the event was generated, and not when it was read.
-Required field for all events.
+A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records. For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields.  Client fields are generally not populated for packet-level events.
+Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
 
---
 
-*`base.tags`*::
+*`client.address`*::
 +
 --
 type: keyword
 
-example: ["production", "env2"]
-
-List of keywords used to tag each event.
-
-
---
-
-*`base.labels`*::
-+
---
-type: object
-
-example: {'application': 'foo-bar', 'env': 'production'}
-
-Key/value pairs.
-Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
-Example: `docker` and `k8s` labels.
+Some event client addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
 
 
 --
-
-*`base.message`*::
-+
---
-type: text
-
-example: Hello World
-
-For log events the message field contains the log message.
-In other use cases the message field can be used to concatenate different values which are then freely searchable. If multiple messages exist, they can be combined into one message.
-
-
---
-
-[float]
-== client fields
-
-A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records. For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjuction with server fields.  Client fields are generally not populated for packet-level events. 
-
-
 
 *`client.ip`*::
 +
@@ -1241,6 +1222,17 @@ Destination fields describe details about the destination of a packet/event. Des
 
 
 
+*`destination.address`*::
++
+--
+type: keyword
+
+Some event destination addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+
+--
+
 *`destination.ip`*::
 +
 --
@@ -1423,13 +1415,13 @@ Meta-information specific to ECS.
 --
 type: keyword
 
-example: 1.0.0-beta1
+example: 1.0.0-beta2
 
 required: True
 
 ECS version this event conforms to. `ecs.version` is a required field and must exist in all events.
 When querying across multiple indices -- which may conform to slightly different ECS versions -- this field lets integrations adjust to the schema version of the events.
-The current version is 1.0.0-beta1 .
+The current version is 1.0.0-beta2 .
 
 
 --
@@ -2128,9 +2120,22 @@ Fields related to HTTP activity.
 --
 type: keyword
 
-example: GET, POST, PUT
+example: get, post, put
 
 Http request method.
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS"  section.
+
+
+--
+
+*`http.request.body.content`*::
++
+--
+type: keyword
+
+example: Hello world
+
+The full http request body.
 
 
 --
@@ -2159,7 +2164,7 @@ Http response status code.
 
 --
 
-*`http.response.body`*::
+*`http.response.body.content`*::
 +
 --
 type: keyword
@@ -2179,6 +2184,54 @@ type: keyword
 example: 1.1
 
 Http version.
+
+
+--
+
+*`http.request.bytes`*::
++
+--
+type: long
+
+example: 1437
+
+Total size in bytes of the request (body and headers).
+
+
+--
+
+*`http.request.body.bytes`*::
++
+--
+type: long
+
+example: 887
+
+Size in bytes of the request body.
+
+
+--
+
+*`http.response.bytes`*::
++
+--
+type: long
+
+example: 1437
+
+Total size in bytes of the response (body and headers).
+
+
+--
+
+*`http.response.body.bytes`*::
++
+--
+type: long
+
+example: 887
+
+Size in bytes of the response body.
 
 
 --
@@ -2244,9 +2297,10 @@ Name given by operators to sections of their network.
 --
 type: keyword
 
-example: IPv4
+example: ipv4
 
-In the OSI Model this would be the Network Layer. IPv4, IPv6, IPSec, PIM, etc
+In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS" section.
 
 
 --
@@ -2268,9 +2322,10 @@ IANA Protocol Number (https://www.iana.org/assignments/protocol-numbers/protocol
 --
 type: keyword
 
-example: TCP
+example: tcp
 
-Same as network.iana_number, but instead using the Keyword name of the transport layer (UDP, TCP, IPv6-ICMP, etc.)
+Same as network.iana_number, but instead using the Keyword name of the transport layer (udp, tcp, ipv6-icmp, etc.)
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS"  section.
 
 
 --
@@ -2280,9 +2335,10 @@ Same as network.iana_number, but instead using the Keyword name of the transport
 --
 type: keyword
 
-example: AIM
+example: aim
 
 A name given to an application. This can be arbitrarily assigned for things like microservices, but also apply to things like skype, icq, facebook, twitter. This would be used in situations where the vendor or service can be decoded such as from the source/dest IP owners, ports, or wire format.
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS" section.
 
 
 --
@@ -2294,7 +2350,8 @@ type: keyword
 
 example: http
 
-L7 Network protocol name. ex. http, lumberjack, transport protocol
+L7 Network protocol name. ex. http, lumberjack, transport protocol.
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS" section.
 
 
 --
@@ -2850,8 +2907,20 @@ All of the IPs seen on your event.
 == server fields
 
 A Server is defined as the responder in a network connection for events regarding sessions, connections, or bidirectional flow records. For TCP events, the server is the receiver of the initial SYN packet(s) of the TCP connection. For other protocols, the server is generally the responder in the network transaction. Some systems actually use the term "responder" to refer the server in TCP connections. The server fields describe details about the system acting as the server in the network event. Server fields are usually populated in conjunction with client fields. Server fields are generally not populated for packet-level events.
+Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
 
+
+*`server.address`*::
++
+--
+type: keyword
+
+Some event server addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+
+--
 
 *`server.ip`*::
 +
@@ -3509,8 +3578,6 @@ example: Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.
 
 Unparsed version of the user_agent.
 
-
-Field is not indexed.
 
 --
 
@@ -5444,31 +5511,21 @@ Kafka log lines.
 
 
 
-*`kafka.log.timestamp`*::
-+
---
-The timestamp from the log line.
-
-
---
-
 *`kafka.log.level`*::
 +
 --
-example: WARN
+type: alias
 
-The log level.
-
+alias to: log.level
 
 --
 
 *`kafka.log.message`*::
 +
 --
-type: text
+type: alias
 
-The logged message.
-
+alias to: message
 
 --
 
@@ -5703,18 +5760,6 @@ type: long
 required: False
 
 The file offset the reported line starts at.
-
-
---
-
-*`message`*::
-+
---
-type: text
-
-required: True
-
-The content of the line read from the log file.
 
 
 --
@@ -9892,24 +9937,6 @@ The timestamp from the log line.
 
 --
 
-*`postgresql.log.timezone`*::
-+
---
-The timezone of timestamp.
-
-
---
-
-*`postgresql.log.thread_id`*::
-+
---
-type: long
-
-Process id
-
-
---
-
 *`postgresql.log.core_id`*::
 +
 --
@@ -9920,30 +9947,12 @@ Core id
 
 --
 
-*`postgresql.log.user`*::
-+
---
-example: admin
-
-Name of user
-
---
-
 *`postgresql.log.database`*::
 +
 --
 example: mydb
 
 Name of database
-
---
-
-*`postgresql.log.level`*::
-+
---
-example: FATAL
-
-The log level.
 
 --
 
@@ -9967,13 +9976,48 @@ Query statement.
 
 --
 
+*`postgresql.log.timezone`*::
++
+--
+type: alias
+
+alias to: event.timezone
+
+--
+
+*`postgresql.log.thread_id`*::
++
+--
+type: alias
+
+alias to: process.pid
+
+--
+
+*`postgresql.log.user`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`postgresql.log.level`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
 *`postgresql.log.message`*::
 +
 --
-type: text
+type: alias
 
-The logged message.
-
+alias to: message
 
 --
 
@@ -12097,32 +12141,12 @@ Contains fields for the Traefik access logs.
 
 
 
-*`traefik.access.remote_ip`*::
-+
---
-type: keyword
-
-Client IP address.
-
-
---
-
 *`traefik.access.duration`*::
 +
 --
 type: long
 
 Duration of the access entry.
-
-
---
-
-*`traefik.access.user_name`*::
-+
---
-type: keyword
-
-The user name used when basic authentication is used.
 
 
 --
@@ -12137,48 +12161,6 @@ Is the RFC 1413 identity of the client
 
 --
 
-*`traefik.access.method`*::
-+
---
-type: keyword
-
-example: GET
-
-The request HTTP method.
-
-
---
-
-*`traefik.access.url`*::
-+
---
-type: keyword
-
-The request HTTP URL.
-
-
---
-
-*`traefik.access.http_version`*::
-+
---
-type: keyword
-
-The HTTP version.
-
-
---
-
-*`traefik.access.response_code`*::
-+
---
-type: long
-
-The HTTP response code.
-
-
---
-
 *`traefik.access.body_sent.bytes`*::
 +
 --
@@ -12187,214 +12169,6 @@ type: long
 format: bytes
 
 The number of bytes of the server response body.
-
-
---
-
-*`traefik.access.referrer`*::
-+
---
-type: keyword
-
-The HTTP referrer.
-
-
---
-
-*`traefik.access.agent`*::
-+
---
-type: text
-
-Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
-
-
---
-
-[float]
-== user_agent fields
-
-Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
-
-
-
-*`traefik.access.user_agent.device`*::
-+
---
-type: keyword
-
-The name of the physical device.
-
-
---
-
-*`traefik.access.user_agent.build`*::
-+
---
-type: keyword
-
-The build of the user agent.
-
-
---
-
-*`traefik.access.user_agent.major`*::
-+
---
-type: long
-
-The major version of the user agent.
-
-
---
-
-*`traefik.access.user_agent.minor`*::
-+
---
-type: long
-
-The minor version of the user agent.
-
-
---
-
-*`traefik.access.user_agent.patch`*::
-+
---
-type: keyword
-
-The patch version of the user agent.
-
-
---
-
-*`traefik.access.user_agent.name`*::
-+
---
-type: keyword
-
-example: Chrome
-
-The name of the user agent.
-
-
---
-
-*`traefik.access.user_agent.os`*::
-+
---
-type: keyword
-
-The name of the operating system.
-
-
---
-
-*`traefik.access.user_agent.os_major`*::
-+
---
-type: long
-
-The major version of the operating system.
-
-
---
-
-*`traefik.access.user_agent.os_minor`*::
-+
---
-type: long
-
-The minor version of the operating system.
-
-
---
-
-*`traefik.access.user_agent.os_name`*::
-+
---
-type: keyword
-
-The name of the operating system.
-
-
---
-
-*`traefik.access.user_agent.original`*::
-+
---
-type: text
-
-Original user agent value before parsing by ingest-user-agent plugin.
-
-
-Field is not indexed.
-
---
-
-[float]
-== geoip fields
-
-Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
-
-
-*`traefik.access.geoip.continent_name`*::
-+
---
-type: keyword
-
-The name of the continent.
-
-
---
-
-*`traefik.access.geoip.country_iso_code`*::
-+
---
-type: keyword
-
-Country ISO code.
-
-
---
-
-*`traefik.access.geoip.location`*::
-+
---
-type: geo_point
-
-The longitude and latitude.
-
-
---
-
-*`traefik.access.geoip.region_name`*::
-+
---
-type: keyword
-
-The region name.
-
-
---
-
-*`traefik.access.geoip.city_name`*::
-+
---
-type: keyword
-
-The city name.
-
-
---
-
-*`traefik.access.geoip.region_iso_code`*::
-+
---
-type: keyword
-
-Region ISO code.
 
 
 --
@@ -12425,6 +12199,224 @@ The name of the frontend used
 type: text
 
 The url of the backend where request is forwarded
+
+--
+
+*`traefik.access.remote_ip`*::
++
+--
+type: alias
+
+alias to: source.address
+
+--
+
+*`traefik.access.user_name`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`traefik.access.method`*::
++
+--
+type: alias
+
+alias to: http.request.method
+
+--
+
+*`traefik.access.url`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`traefik.access.http_version`*::
++
+--
+type: alias
+
+alias to: http.version
+
+--
+
+*`traefik.access.response_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
+*`traefik.access.referrer`*::
++
+--
+type: alias
+
+alias to: http.request.referrer
+
+--
+
+*`traefik.access.agent`*::
++
+--
+type: alias
+
+alias to: user_agent.original
+
+--
+
+
+*`traefik.access.user_agent.device`*::
++
+--
+type: alias
+
+alias to: user_agent.device
+
+--
+
+*`traefik.access.user_agent.major`*::
++
+--
+type: alias
+
+alias to: user_agent.major
+
+--
+
+*`traefik.access.user_agent.minor`*::
++
+--
+type: alias
+
+alias to: user_agent.minor
+
+--
+
+*`traefik.access.user_agent.patch`*::
++
+--
+type: alias
+
+alias to: user_agent.patch
+
+--
+
+*`traefik.access.user_agent.name`*::
++
+--
+type: alias
+
+alias to: user_agent.name
+
+--
+
+*`traefik.access.user_agent.os`*::
++
+--
+type: alias
+
+alias to: user_agent.os.full_name
+
+--
+
+*`traefik.access.user_agent.os_major`*::
++
+--
+type: alias
+
+alias to: user_agent.os.major
+
+--
+
+*`traefik.access.user_agent.os_minor`*::
++
+--
+type: alias
+
+alias to: user_agent.os.minor
+
+--
+
+*`traefik.access.user_agent.os_name`*::
++
+--
+type: alias
+
+alias to: user_agent.os.name
+
+--
+
+*`traefik.access.user_agent.original`*::
++
+--
+type: alias
+
+alias to: user_agent.original
+
+--
+
+
+*`traefik.access.geoip.continent_name`*::
++
+--
+type: alias
+
+alias to: source.geo.continent_name
+
+--
+
+*`traefik.access.geoip.country_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.country_iso_code
+
+--
+
+*`traefik.access.geoip.location`*::
++
+--
+type: alias
+
+alias to: source.geo.location
+
+--
+
+*`traefik.access.geoip.region_name`*::
++
+--
+type: alias
+
+alias to: source.geo.region_name
+
+--
+
+*`traefik.access.geoip.city_name`*::
++
+--
+type: alias
+
+alias to: source.geo.city_name
+
+--
+
+*`traefik.access.geoip.region_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.region_iso_code
 
 --
 

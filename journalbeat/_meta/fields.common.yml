@@ -309,11 +309,6 @@
           example: "su"
           description: >
             The identifier of the message. A syslog compatibility field.
-    - name: message
-      type: text
-      required: true
-      description: >
-        The logged message.
     - name: custom
       type: nested
       required: false

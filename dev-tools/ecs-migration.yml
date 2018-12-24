@@ -376,6 +376,16 @@
   to: network.forwarded_ip
   alias: true
 
+## Kafka module
+
+- from: kafka.log.level
+  to: log.level
+  alias: true
+
+- from: kafka.log.message
+  to: message
+  alias: true
+
 ## NGINX module
 
 - from: nginx.access.user_name
@@ -434,6 +444,28 @@
   to: user_agent.original
   alias: true
 
+## PostgreSQL module
+
+- from: postgresql.log.timezone
+  to: event.timezone
+  alias: true
+
+- from: postgresql.log.thread_id
+  to: process.pid
+  alias: true
+
+- from: postgresql.log.user
+  to: user.name
+  alias: true
+
+- from: postgresql.log.level
+  to: log.level
+  alias: true
+
+- from: postgresql.log.message
+  to: message
+  alias: true
+
 ## Redis module
 
 - from: redis.log.pid
@@ -469,6 +501,72 @@
   alias: true
 - from: icinga.startup.severity
   to: log.level
+  alias: true
+
+## Traefik module
+
+- from: traefik.access.remote_ip
+  to: source.address
+  alias: true
+
+- from: traefik.access.url
+  to: url.original
+  alias: true
+
+- from: traefik.access.user_name
+  to: user.name
+  alias: true
+
+- from: traefik.access.agent
+  to: user_agent.original
+  alias: true
+
+- from: traefik.access.user_agent.original
+  to: user_agent.original
+  alias: true
+
+- from: traefik.access.user_agent.*
+  to: user_agent.*
+  alias: true
+
+- from: traefik.access.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+
+- from: traefik.access.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+
+- from: traefik.access.geoip.location
+  to: source.geo.location
+  alias: true
+
+- from: traefik.access.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+
+- from: traefik.access.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+
+- from: traefik.access.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+
+- from: traefik.access.method
+  to: http.request.method
+  alias: true
+
+- from: traefik.access.response_code
+  to: http.response.status_code
+  alias: true
+
+- from: traefik.access.referrer
+  to: http.request.referrer
+  alias: true
+
+- from: traefik.access.http_version
+  to: http.version
   alias: true
 
 # Auditbeat
