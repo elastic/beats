@@ -12,7 +12,8 @@ import (
 )
 
 func TestData(t *testing.T) {
-	t.Skip()
+	t.Skip("Skipping `data.json` generation test")
+
 	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("db"))
 
 	err := mbtest.WriteEventsReporterV2(f, t, "")
