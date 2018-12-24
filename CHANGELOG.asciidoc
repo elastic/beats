@@ -33,12 +33,6 @@ https://github.com/elastic/beats/compare/v6.5.4...6.5[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Fix autodiscover configurations stopping when metadata is missing. {pull}8851[8851]
-- Log events at the debug level when dropped by encoding problems. {pull}9251[9251]
-- Refresh host metadata in add_host_metadata. {pull}9359[9359]
-- When collecting swap metrics for beats telemetry or system metricbeat module handle cases of free swap being bigger than total swap by assuming no swap is being used. {issue}6271[6271] {pull}9383[9383]
-- Adding logging traces at debug level when the pipeline client receives the following events: onFilteredOut, onDroppedOnPublish. {pull}9016[9016]
-- Ignore non index fields in default_field for Elasticsearch. {pull}9549[9549]
 - Enforce validation for the Central Management access token. {issue}9621[9621]
 
 *Auditbeat*

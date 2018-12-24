@@ -5,10 +5,10 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 )
