@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/pkg/errors"
+	"errors"
 
 	"github.com/elastic/beats/libbeat/common/reload"
 
