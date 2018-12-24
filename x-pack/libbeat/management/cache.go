@@ -61,3 +61,8 @@ func (c *Cache) Save() error {
 	// move temporary file into final location
 	return file.SafeFileRotate(path, tempFile)
 }
+
+// HasConfig returns true if configs are cached.
+func (c *Cache) HasConfig() bool {
+	return len(c.Configs) > 0
+}
