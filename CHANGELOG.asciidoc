@@ -35,6 +35,9 @@ https://github.com/elastic/beats/compare/1035569addc4a3b29ffa14f8a08c27c1ace16ef
 
 *Affecting all Beats*
 
+- Enforce validation for the Central Management access token. {issue}9621[9621]
+- Allow to unenroll a Beat from the UI. {issue}9452[9452]
+
 *Auditbeat*
 
 *Filebeat*
