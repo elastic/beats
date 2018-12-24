@@ -76,29 +76,27 @@ pipeline {
           Run unit tests and report junit results.
         */
         stage('Filebeat') {
-          parallel {
-            stage('Unit Test') {
-              agent { label 'linux && immutable' }
-              options { skipDefaultCheckout() }
-              environment {
-                PATH = "${env.PATH}:${env.WORKSPACE}/bin"
-                HOME = "${env.WORKSPACE}"
-                GOPATH = "${env.WORKSPACE}"
-              }
-              steps {
-                withEnvWrapper() {
-                  unstash 'source'
-                  dir("${BASE_DIR}"){
-                    sh './filebeat/scripts/jenkins/unit-test.sh'
-                  }
+          stage('Unit Test') {
+            agent { label 'linux && immutable' }
+            options { skipDefaultCheckout() }
+            environment {
+              PATH = "${env.PATH}:${env.WORKSPACE}/bin"
+              HOME = "${env.WORKSPACE}"
+              GOPATH = "${env.WORKSPACE}"
+            }
+            steps {
+              withEnvWrapper() {
+                unstash 'source'
+                dir("${BASE_DIR}"){
+                  sh './filebeat/scripts/jenkins/unit-test.sh'
                 }
               }
-              post {
-                always {
-                  junit(allowEmptyResults: true,
-                    keepLongStdio: true,
-                    testResults: "${BASE_DIR}/build/junit-*.xml")
-                }
+            }
+            post {
+              always {
+                junit(allowEmptyResults: true,
+                  keepLongStdio: true,
+                  testResults: "${BASE_DIR}/build/junit-*.xml")
               }
             }
           }
