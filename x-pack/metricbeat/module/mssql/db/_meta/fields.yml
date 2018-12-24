@@ -1,11 +1,10 @@
 - name: db
   type: group
-  description: >
-    db
+  description: db metricset will fetch information about each db from a sql server
   fields:
     - name: database
       type: group
-      description: Database metricset
+      description: Database where the metrics have been fetched from
       fields:
         - name: id
           description: The database ID
