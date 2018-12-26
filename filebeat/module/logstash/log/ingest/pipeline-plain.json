@@ -43,6 +43,11 @@
               {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
               "ignore_failure": true
             }
+        },
+        {
+            "remove": {
+                "field": "logstash.log.timestamp"
+            }
         }
     ]
 }
