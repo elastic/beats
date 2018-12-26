@@ -37,8 +37,11 @@
   }, {
     "script": {
       "lang": "painless",
-      "inline": "boolean isPrivate(def ip) { try { StringTokenizer tok = new StringTokenizer(ip, '.'); int firstByte = Integer.parseInt(tok.nextToken());       int secondByte = Integer.parseInt(tok.nextToken());       if (firstByte == 10) {         return true;       }       if (firstByte == 192 && secondByte == 168) {         return true;       }       if (firstByte == 172 && secondByte >= 16 && secondByte <= 31) {         return true;       }       if (firstByte == 127) {         return true;       }       return false;     } catch (Exception e) {       return false;     }   }   def found = false;   for (def item : ctx.network.forwarded_ip) {     if (!isPrivate(item)) {       ctx.source.ip = item;       found = true;       break;     }   }   if (!found) {     ctx.source.ip = ctx.network.forwarded_ip[0];   }"
+      "source": "boolean isPrivate(def dot, def ip) { try { StringTokenizer tok = new StringTokenizer(ip, dot); int firstByte = Integer.parseInt(tok.nextToken());       int secondByte = Integer.parseInt(tok.nextToken());       if (firstByte == 10) {         return true;       }       if (firstByte == 192 && secondByte == 168) {         return true;       }       if (firstByte == 172 && secondByte >= 16 && secondByte <= 31) {         return true;       }       if (firstByte == 127) {         return true;       }       return false;     } catch (Exception e) {       return false;     }   }   def found = false;   for (def item : ctx.network.forwarded_ip) {     if (!isPrivate(params.dot, item)) {       ctx.source.ip = item;       found = true;       break;     }   }   if (!found) {     ctx.source.ip = ctx.network.forwarded_ip[0];   }",
+      "params": {
+        "dot": "."
       }
+    }
   }, {
     "remove":{
       "field": "message"
