@@ -5,6 +5,7 @@
 package process
 
 import (
+	"runtime"
 	"testing"
 
 	"github.com/elastic/beats/auditbeat/core"
@@ -12,6 +13,9 @@ import (
 )
 
 func TestData(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Fails on Windows - https://github.com/elastic/beats/issues/9748")
+	}
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
@@ -22,10 +26,7 @@ func TestData(t *testing.T) {
 		t.Fatal("no events were generated")
 	}
 
-	// The first process (events[0]) is usually something like systemd,
-	// the last few are test processes, so we pick something more interesting
-	// towards the end.
-	fullEvent := mbtest.StandardizeEvent(f, events[len(events)-8], core.AddDatasetToEvent)
+	fullEvent := mbtest.StandardizeEvent(f, events[0], core.AddDatasetToEvent)
 	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 
