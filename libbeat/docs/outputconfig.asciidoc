@@ -222,9 +222,14 @@ endif::apm-server[]
 ifdef::apm-server[]
 The index name to write events to. The default is
 +"apm-%\{[beat.version]\}-{type\}-%\{+yyyy.MM.dd\}"+ (for example,
-+"apm-{version}-transaction-{localdate}"+). If you change this setting, you also
-need to configure the `setup.template.name` and `setup.template.pattern` options
-(see <<configuration-template>>).
++"apm-{version}-transaction-{localdate}"+). See
+<<exploring-es-data,Exploring data in Elasticsearch>> for more information on
+default index configuration.
+
+IMPORTANT: If you change this setting,
+you need to configure the `setup.template.name` and `setup.template.pattern` options
+(see <<configuration-template>>). You also must set the default index configuration
+in the `apm-server.yml` file.
 
 NOTE: `beat.version` is a field managed by Beats that is added to every document.
 It holds the current version of APM Server.
