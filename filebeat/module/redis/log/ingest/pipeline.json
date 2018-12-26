@@ -32,7 +32,17 @@
         {
             "script": {
                 "lang": "painless",
-                "inline": "if (ctx.redis.log.role == 'M') {\n          ctx.redis.log.role = 'master';\n        } else if (ctx.redis.log.role == 'S') {\n          ctx.redis.log.role = 'slave';\n        } else if (ctx.redis.log.role == 'C') {\n          ctx.redis.log.role = 'child';\n        } else if (ctx.redis.log.role == 'X') {\n          ctx.redis.log.role = 'sentinel';\n        }\n        "
+                "source": "if (ctx.redis.log.role == params.master_abbrev) {\n          ctx.redis.log.role = params.master;\n        } else if (ctx.redis.log.role == params.slave_abbrev) {\n          ctx.redis.log.role = params.slave;\n        } else if (ctx.redis.log.role == params.child_abbrev) {\n          ctx.redis.log.role = params.child;\n        } else if (ctx.redis.log.role == params.sentinel_abbrev) {\n          ctx.redis.log.role = params.sentinel;\n        }\n        ",
+                "params": {
+                    "master_abbrev": "M",
+                    "master": "master",
+                    "slave_abbrev": "S",
+                    "slave": "slave",
+                    "child_abbrev": "C",
+                    "child": "child",
+                    "sentinel_abbrev": "X",
+                    "sentinel": "sentinel"
+                }
             }
         },
         {
