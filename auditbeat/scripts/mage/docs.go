@@ -28,13 +28,17 @@ import (
 	"github.com/elastic/beats/dev-tools/mage"
 )
 
-// CollectDocs collects documentation from modules.
-func CollectDocs(basePaths ...string) error {
+// ModuleDocs collects documentation from modules (both OSS and X-Pack).
+func ModuleDocs() error {
+	dirsWithModules := []string{
+		mage.OSSBeatDir(),
+		mage.XPackBeatDir(),
+	}
 
 	// Generate config.yml files for each module.
 	var configFiles []string
-	for _, path := range basePaths {
-		files, err := mage.FindFiles(filepath.Join(path, ConfigTemplateGlob))
+	for _, path := range dirsWithModules {
+		files, err := mage.FindFiles(filepath.Join(path, configTemplateGlob))
 		if err != nil {
 			return errors.Wrap(err, "failed to find config templates")
 		}
@@ -57,7 +61,7 @@ func CollectDocs(basePaths ...string) error {
 	defer mage.Clean(configs)
 
 	// Remove old.
-	for _, path := range basePaths {
+	for _, path := range dirsWithModules {
 		if err := os.RemoveAll(filepath.Join(path, "docs/modules")); err != nil {
 			return err
 		}
@@ -79,23 +83,21 @@ func CollectDocs(basePaths ...string) error {
 
 	// TODO: Port this script to Go.
 	args := []string{mage.OSSBeatDir("scripts/docs_collector.py"), "--base-paths"}
-	args = append(args, basePaths...)
+	args = append(args, dirsWithModules...)
 
-	err = sh.Run(python, args...)
-	if err != nil {
-		return err
-	}
-
-	esBeats, err := mage.ElasticBeatsDir()
-	if err != nil {
-		return err
-	}
-
-	return sh.Run(python, mage.LibbeatDir("scripts/generate_fields_docs.py"),
-		XpackBeatDir(), mage.BeatName, esBeats, "--output_path", mage.OSSBeatDir())
+	return sh.Run(python, args...)
 }
 
-// XpackBeatDir returns the x-pack/{beatname} directory for a Beat.
-func XpackBeatDir() string {
-	return mage.OSSBeatDir("../x-pack", mage.BeatName)
+// FieldDocs generates docs/fields.asciidoc containing all fields
+// (including x-pack).
+func FieldDocs() error {
+	inputs := []string{
+		mage.OSSBeatDir("module"),
+		mage.XPackBeatDir("module"),
+	}
+	output := mage.CreateDir("build/fields/fields.all.yml")
+	if err := mage.GenerateFieldsYAMLTo(output, inputs...); err != nil {
+		return err
+	}
+	return mage.Docs.FieldDocs(output)
 }

@@ -3,18 +3,18 @@
         "event.dataset": "startup", 
         "event.module": "icinga", 
         "icinga.startup.facility": "cli", 
-        "icinga.startup.message": "Icinga application loader (version: r2.6.3-1)", 
-        "icinga.startup.severity": "information", 
         "input.type": "log", 
-        "log.offset": 0
+        "log.level": "information", 
+        "log.offset": 0, 
+        "message": "Icinga application loader (version: r2.6.3-1)"
     }, 
     {
         "event.dataset": "startup", 
         "event.module": "icinga", 
         "icinga.startup.facility": "cli", 
-        "icinga.startup.message": "Loading configuration file(s).", 
-        "icinga.startup.severity": "information", 
         "input.type": "log", 
-        "log.offset": 63
+        "log.level": "information", 
+        "log.offset": 63, 
+        "message": "Loading configuration file(s)."
     }
 ]

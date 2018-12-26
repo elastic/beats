@@ -3,6 +3,7 @@
   type: group
   description: >
     Summary metrics of open sockets in the host system
+  release: ga
   fields:
     - name: all
       type: group
@@ -35,6 +36,18 @@
               type: integer
               description: >
                 All TCP listening ports
+            - name: established
+              type: integer
+              description: >
+                Number of established TCP connections
+            - name: close_wait
+              type: integer
+              description: >
+                Number of TCP connections in _close_wait_ state
+            - name: time_wait
+              type: integer
+              description: >
+                Number of TCP connections in _time_wait_ state
     - name: udp
       type: group
       description: >
@@ -49,5 +62,6 @@
               type: integer
               description: >
                 All open TCP connections
+
 
 

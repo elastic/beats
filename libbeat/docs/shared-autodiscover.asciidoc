@@ -191,7 +191,7 @@ After they are de-duplicated, only one will be used.
 
 ifdef::autodiscoverJolokia[]
 [float]
-===== Jolokia (experimental)
+===== Jolokia
 
 The Jolokia autodiscover provider uses Jolokia Discovery to find agents running
 in your host or your network.

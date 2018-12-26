@@ -63,6 +63,7 @@ class Test(metricbeat.BaseTest):
             host=self.compose_hosts()[0],
             port=os.getenv('REDIS_PORT', '6379'),
             db=0)
+        r.flushall()
         r.set('foo', 'bar')
 
         self.render_config_template(modules=[{
@@ -83,6 +84,43 @@ class Test(metricbeat.BaseTest):
         self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
         redis_info = evt["redis"]["keyspace"]
         self.assertItemsEqual(self.de_dot(REDIS_KEYSPACE_FIELDS), redis_info.keys())
+        self.assert_fields_are_documented(evt)
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_key(self):
+        """
+        Test redis key metricset
+        """
+
+        # At least one event must be inserted so db stats exist
+        r = redis.StrictRedis(
+            host=self.compose_hosts()[0],
+            port=os.getenv('REDIS_PORT', '6379'),
+            db=0)
+        r.flushall()
+        r.rpush('list-key', 'one', 'two', 'three')
+
+        self.render_config_template(modules=[{
+            "name": "redis",
+            "metricsets": ["key"],
+            "hosts": self.get_hosts(),
+            "period": "5s",
+            "additional_content": """
+  key.patterns:
+    - pattern: list-key
+"""
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        output = self.read_output_json()
+        self.assertEqual(len(output), 1)
+        evt = output[0]
+
+        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")

@@ -1,6 +1,6 @@
-:stack-version: 7.0.0-alpha1
+:stack-version: 7.0.0-alpha2
 :doc-branch: master
-:go-version: 1.11.3
+:go-version: 1.11.4
 :release-state: prerelease
 :python: 2.7.9
 :docker: 1.12
