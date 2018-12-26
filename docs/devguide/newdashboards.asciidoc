@@ -232,7 +232,7 @@ MODULE=redis ID=AV4REOpp5NkDleZmzKkE mage exportDashboard
 
 [source,shell]
 ---------------
-./filebeat export dashboard -id 7fea2930-478e-11e7-b1f0-cb29bac6bf8b >> Filebeat-redis.json
+./filebeat export dashboard -dashboard 7fea2930-478e-11e7-b1f0-cb29bac6bf8b >> Filebeat-redis.json
 ---------------
 
 This generates a `AV4REOpp5NkDleZmzKkE.json` file inside dashboard directory in the redis module.
