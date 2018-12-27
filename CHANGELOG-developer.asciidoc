@@ -13,9 +13,9 @@ other Beats should be migrated.
 Note: This changelog was only started after the 6.3 release.
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.3.0..master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.3.0..6.x[Check the HEAD diff]
 
-The list below covers the major changes between 6.3.0 and master only.
+The list below covers the major changes between 6.3.0 and HEAD only.
 
 ==== Breaking changes
 
