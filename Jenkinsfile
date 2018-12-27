@@ -13,7 +13,7 @@ pipeline {
     BASE_DIR="src/github.com/elastic/beats"
   }
   options {
-    timeout(time: 1, unit: 'HOURS') 
+    timeout(time: 1, unit: 'HOURS')
     buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
@@ -49,10 +49,10 @@ pipeline {
     Updating generated files for Beat.
     Checks the GO environment.
     Checks the Python environment.
-    Checks YAML files are generated. 
+    Checks YAML files are generated.
     Validate that all updates were committed.
     */
-    stage('Intake') { 
+    stage('Intake') {
       agent { label 'linux && immutable' }
       options { skipDefaultCheckout() }
       environment {
@@ -101,6 +101,35 @@ pipeline {
         }
       }
     }
+    /**
+    Build the documentation and archive it.
+    Finally archive the results.
+    */
+    stage('Documentation') {
+      agent { label 'linux && immutable' }
+      options { skipDefaultCheckout() }
+      environment {
+        PATH = "${env.PATH}:${env.WORKSPACE}/bin"
+        HOME = "${env.WORKSPACE}"
+        GOPATH = "${env.WORKSPACE}"
+      }
+      steps {
+        withEnvWrapper() {
+          unstash 'source'
+          dir("${BASE_DIR}"){
+            sh """#!/bin/bash
+            set -euxo pipefail
+            make docs
+            """
+          }
+        }
+      }
+      post{
+        success {
+          tar(file: "doc-files.tgz", archive: true, dir: "html_docs", pathPrefix: "${BASE_DIR}/build")
+        }
+      }
+    }
   }
   post {
     success {
@@ -109,7 +138,7 @@ pipeline {
     aborted {
       echoColor(text: '[ABORTED]', colorfg: 'magenta', colorbg: 'default')
     }
-    failure { 
+    failure {
       echoColor(text: '[FAILURE]', colorfg: 'red', colorbg: 'default')
       //step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: "${NOTIFY_TO}", sendToIndividuals: false])
     }
