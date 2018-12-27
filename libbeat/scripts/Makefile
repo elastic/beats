@@ -455,3 +455,8 @@ release: mage
 .PHONY: snapshot
 snapshot: mage
 	@SNAPSHOT=true mage package
+
+ifdef NO_COLLECT
+.PHONY: collect
+collect:
+endif
