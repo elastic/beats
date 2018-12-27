@@ -1,0 +1,120 @@
+// Use these for links to issue and pulls. Note issues and pulls redirect one to
+// each other on Github, so don't worry too much on using the right prefix.
+:issue: https://github.com/elastic/beats/issues/
+:pull: https://github.com/elastic/beats/pull/
+
+=== Beats version HEAD
+https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD diff]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Update add_cloud_metadata fields to adjust to ECS. {pull}9265[9265]
+- Automaticall cap signed integers to 63bits. {pull}8991[8991]
+- Rename beat.timezone to event.timezone. {pull}9458[9458]
+- Use _doc as document type. {pull}9056[9056]{pull}9573[9573]
+- Update to Golang 1.11.3. {pull}9560[9560]
+
+*Auditbeat*
+
+*Filebeat*
+
+- Modify apache/error dataset to follow ECS. {pull}8963[8963]
+- Rename many `traefik.access.*` fields to map to ECS. {pull}9005[9005]
+
+*Heartbeat*
+
+- Remove monitor generator script that was rarely used. {pull}9648[9648]
+
+*Journalbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+- Adjust Packetbeat `http` fields to ECS Beta 2 {pull}9645[9645]
+  - `http.request.body` moves to `http.request.body.content`
+  - `http.response.body` moves to `http.response.body.content`
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Enforce validation for the Central Management access token. {issue}9621[9621]
+
+*Auditbeat*
+
+*Filebeat*
+
+*Heartbeat*
+
+- Made monitors.d configuration part of the default config. {pull}9004[9004]
+
+*Journalbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Added
+
+*Affecting all Beats*
+
+- Update field definitions for `http` to ECS Beta 2 {pull}9645[9645]
+
+*Auditbeat*
+
+- Add system module. {pull}9546[9546]
+
+*Filebeat*
+
+- Added module for parsing Google Santa logs. {pull}9540[9540]
+- Added netflow input type that supports NetFlow v1, v5, v6, v7, v8, v9 and IPFIX. {issue}9399[9399]
+- Add option to modules.yml file to indicate that a module has been moved {pull}9432[9432].
+
+*Heartbeat*
+
+- Fixed rare issue where TLS connections to endpoints with x509 certificates missing either notBefore or notAfter would cause the check to fail with a stacktrace.  {pull}9566[9566]
+
+
+*Journalbeat*
+
+*Metricbeat*
+
+- Add `key` metricset to the Redis module. {issue}9582[9582] {pull}9657[9657] {pull}9746[9746]
+- Add `socket_summary` metricset to system defaults, removing experimental tag and supporting Windows {pull}9709[9709]
+
+*Packetbeat*
+
+*Functionbeat*
+
+==== Deprecated
+
+*Affecting all Beats*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+
