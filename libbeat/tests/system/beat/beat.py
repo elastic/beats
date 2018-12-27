@@ -133,6 +133,11 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if not hasattr(self, 'test_binary'):
             self.test_binary = os.path.abspath(self.beat_path + "/" + self.beat_name + ".test")
 
+        self.template_paths.append([
+            self.beat_path,
+            os.path.abspath(os.path.join(self.beat_path, "../libbeat"))
+        ])
+
         # Create build path
         build_dir = self.beat_path + "/build"
         self.build_path = build_dir + "/system-tests/"
@@ -295,10 +300,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
     def setUp(self):
 
         self.template_env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader([
-                self.beat_path,
-                os.path.abspath(os.path.join(self.beat_path, "../libbeat"))
-            ])
+            loader=jinja2.FileSystemLoader(self.template_paths)
         )
 
         # create working dir
