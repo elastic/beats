@@ -1,0 +1,39 @@
+- name: db
+  type: group
+  description: db metricset will fetch information about each db from a sql server
+  fields:
+    - name: database
+      type: group
+      description: Database where the metrics have been fetched from
+      fields:
+        - name: id
+          description: The database ID
+          type: keyword
+    - name: log_space_usage
+      type: group
+      description: Space usage information for the transaction log
+      fields:
+        - name: total
+          type: group
+          description: Total space usage
+          fields:
+            - name: bytes
+              description: The size of the log
+              type: long
+        - name: used
+          type: group
+          description: The occupied size of the log
+          fields:
+            - name: bytes
+              description: The occupied size of the log in bytes
+              type: long
+            - name: pct
+              description: A percentaje of the occupied size of the log as a percent of the total log size
+              type: float
+        - name: since_last_backup
+          description: The amount of space used since the last log backup
+          type: group
+          fields:
+            - name: bytes
+              description: The amount of space used since the last log backup in bytes
+              type: long

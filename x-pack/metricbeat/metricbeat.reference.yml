@@ -494,6 +494,14 @@ metricbeat.modules:
   # Password to use when connecting to MongoDB. Empty by default.
   #password: pass
 
+#-------------------------------- Mssql Module --------------------------------
+- module: mssql
+  metricsets:
+    - "db"
+  hosts: ["sqlserver://sa@localhost"]
+  period: 10s
+
+
 #-------------------------------- Munin Module --------------------------------
 - module: munin
   metricsets: ["node"]
