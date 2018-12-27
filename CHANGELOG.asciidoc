@@ -7,7 +7,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v6.5.0...6.x[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 
 ==== Breaking changes
 
