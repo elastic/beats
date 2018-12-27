@@ -1,9 +1,11 @@
-version: '2.1'
+version: '3'
 services:
   beat:
+    restart: on-failure
     build: ${PWD}/.
     depends_on:
-      - proxy_dep
+      - elasticsearch
+      - kibana
     env_file:
       - ${PWD}/build/test.env
     working_dir: /go/src/github.com/elastic/beats/x-pack/libbeat
@@ -12,17 +14,6 @@ services:
       # We launch docker containers to test docker autodiscover:
       - /var/run/docker.sock:/var/run/docker.sock
     command: make
-
-  # This is a proxy used to block beats until all services are healthy.
-  # See: https://github.com/docker/compose/issues/4369
-  proxy_dep:
-    image: busybox
-    depends_on:
-      elasticsearch: { condition: service_healthy }
-      kibana: { condition: service_healthy }
-    healthcheck:
-      interval: 1s
-      retries: 2400
 
   elasticsearch:
     extends:
@@ -42,6 +33,7 @@ services:
     command: bash -c "bin/elasticsearch-keystore create && echo changeme | bin/elasticsearch-keystore add --stdin bootstrap.password && /usr/local/bin/docker-entrypoint.sh eswrapper"
 
   kibana:
+    depends_on: elasticsearch
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: kibana
