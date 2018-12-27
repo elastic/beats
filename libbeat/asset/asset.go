@@ -17,7 +17,21 @@
 
 package asset
 
-import "text/template"
+import (
+	"math"
+	"text/template"
+)
+
+type Priority int32
+
+const (
+	Highest          Priority = 1
+	ECSFieldsPri     Priority = 5
+	LibbeatFieldsPri Priority = 10
+	BeatFieldsPri    Priority = 50
+	ModuleFieldsPri  Priority = 100
+	Lowest           Priority = math.MaxInt32
+)
 
 var Template = template.Must(template.New("normalizations").Parse(`
 {{ .License }}
@@ -31,7 +45,7 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("{{ .Beat }}", "{{ .Name }}", Asset); err != nil {
+	if err := asset.SetFields("{{ .Beat }}", "{{ .Name }}", {{ .Priority }}, Asset); err != nil {
 		panic(err)
 	}
 }
@@ -44,9 +58,10 @@ func Asset() string {
 `))
 
 type Data struct {
-	License string
-	Beat    string
-	Name    string
-	Data    string
-	Package string
+	License  string
+	Beat     string
+	Name     string
+	Priority string
+	Data     string
+	Package  string
 }
