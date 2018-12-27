@@ -37,7 +37,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "host.name", 
+                                "field": "metricset.host", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -113,7 +113,7 @@
                             "enabled": true, 
                             "id": "1", 
                             "params": {
-                                "field": "host.name"
+                                "field": "metricset.host"
                             }, 
                             "schema": "metric", 
                             "type": "cardinality"
