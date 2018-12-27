@@ -62,3 +62,4 @@ The list below covers the major changes between 6.3.0 and HEAD only.
 - Allow to disable config resolver using the `Settings.DisableConfigResolver` field when initializing libbeat. {pull}8769[8769]
 - Add `mage.AddPlatforms` to allow to specify dependent platforms when building a beat. {pull}8889[8889]
 - Add docker image building to `mage.Package`. {pull}8898[8898]
+- Filesets can now define multiple ingest pipelines, with the first one considered as the entry point pipeline. {pull}8914[8914]
