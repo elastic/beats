@@ -7,6 +7,7 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
+	"github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface"
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -14,15 +15,29 @@ import (
 
 type opDeleteCloudFormation struct {
 	log       *logp.Logger
-	svc       *cloudformation.CloudFormation
+	svc       cloudformationiface.CloudFormationAPI
 	stackName string
 }
 
-func (o *opDeleteCloudFormation) Execute() error {
+func (o *opDeleteCloudFormation) Execute(ctx executionContext) error {
+	c, ok := ctx.(*stackContext)
+	if !ok {
+		return errWrongContext
+	}
+
 	uuid, err := uuid.NewV4()
 	if err != nil {
 		return err
 	}
+
+	// retrieve the stack id from the name so we can have access to the Stack events when the
+	// stack is completely deleted.
+	stackID, err := queryStackID(o.svc, aws.String(o.stackName))
+	if err != nil {
+		return err
+	}
+	c.ID = stackID
+
 	input := &cloudformation.DeleteStackInput{
 		ClientRequestToken: aws.String(uuid.String()),
 		StackName:          aws.String(o.stackName),
@@ -34,13 +49,14 @@ func (o *opDeleteCloudFormation) Execute() error {
 		o.log.Debugf("Could not delete the stack, response: %v", resp)
 		return err
 	}
+
 	return nil
 }
 
 func newOpDeleteCloudFormation(
 	log *logp.Logger,
-	cfg aws.Config,
+	svc cloudformationiface.CloudFormationAPI,
 	stackName string,
 ) *opDeleteCloudFormation {
-	return &opDeleteCloudFormation{log: log, svc: cloudformation.New(cfg), stackName: stackName}
+	return &opDeleteCloudFormation{log: log, svc: svc, stackName: stackName}
 }
