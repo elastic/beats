@@ -106,23 +106,89 @@ pipeline {
     Finally archive the results.
     */
     stage('Documentation') {
-      agent { label 'linux && immutable' }
-      options { skipDefaultCheckout() }
-      environment {
-        PATH = "${env.PATH}:${env.WORKSPACE}/bin"
-        HOME = "${env.WORKSPACE}"
-        GOPATH = "${env.WORKSPACE}"
-      }
-      steps {
-        withEnvWrapper() {
-          unstash 'source'
-          dir("${BASE_DIR}"){
-            sh """#!/bin/bash
-            set -euxo pipefail
-            make docs
-            """
+      failFast true
+      parallel {
+        stage('Libbeat docs') {
+          agent { label 'linux && immutable' }
+          options { skipDefaultCheckout() }
+          environment {
+            PATH = "${env.PATH}:${env.WORKSPACE}/bin"
+            HOME = "${env.WORKSPACE}"
+            GOPATH = "${env.WORKSPACE}"
+          }
+          steps {
+            withEnvWrapper() {
+              unstash 'source'
+              dir("${BASE_DIR}"){
+                sh """#!/bin/bash
+                set -euxo pipefail
+                make -C libbeat docs
+                """
+              }
+            }
           }
         }
+
+        stage('Filebeat docs') {
+          agent { label 'linux && immutable' }
+          options { skipDefaultCheckout() }
+          environment {
+            PATH = "${env.PATH}:${env.WORKSPACE}/bin"
+            HOME = "${env.WORKSPACE}"
+            GOPATH = "${env.WORKSPACE}"
+          }
+          steps {
+            withEnvWrapper() {
+              unstash 'source'
+              dir("${BASE_DIR}"){
+                sh """#!/bin/bash
+                set -euxo pipefail
+                make -C filebeat docs
+                """
+              }
+            }
+          }
+        }
+
+        stage('Metricbeat docs') {
+          agent { label 'linux && immutable' }
+          options { skipDefaultCheckout() }
+          environment {
+            PATH = "${env.PATH}:${env.WORKSPACE}/bin"
+            HOME = "${env.WORKSPACE}"
+            GOPATH = "${env.WORKSPACE}"
+          }
+          steps {
+            withEnvWrapper() {
+              unstash 'source'
+              dir("${BASE_DIR}"){
+                sh """#!/bin/bash
+                set -euxo pipefail
+                make -C  metricbeat docs
+                """
+              }
+            }
+          }
+        }
+
+        stage('Dev guide docs') {
+          agent { label 'linux && immutable' }
+          options { skipDefaultCheckout() }
+          environment {
+            PATH = "${env.PATH}:${env.WORKSPACE}/bin"
+            HOME = "${env.WORKSPACE}"
+            GOPATH = "${env.WORKSPACE}"
+          }
+          steps {
+            withEnvWrapper() {
+              unstash 'source'
+              dir("${BASE_DIR}"){
+                sh "./script/build_docs.sh dev-guide github.com/elastic/beats/docs/devguide ./build"
+              }
+            }
+          }
+        }
+
       }
       post{
         success {
