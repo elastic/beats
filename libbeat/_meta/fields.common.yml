@@ -8,6 +8,7 @@
       type: alias
       migration: true
       path: event.timezone
+      migration: true
 
     - name: fields
       type: object

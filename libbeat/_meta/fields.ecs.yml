@@ -2191,10 +2191,12 @@
     - name: beat.name
       type: alias
       path: agent.type
+      migration: true
 
     - name: beat.hostname
       type: alias
       path: agent.hostname
+      migration: true
 
     # This is not in ECS.
     # TODO: https://github.com/elastic/ecs/issues/178
