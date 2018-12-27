@@ -1,0 +1,124 @@
+###################### Metricbeat Configuration Template #######################
+
+metricbeat.modules:
+{% for m in modules -%}
+- module: {{ m.name }}
+  {% if m.enabled is defined -%}
+  enabled: {{ m.enabled }}
+  {% endif -%}
+
+  {% if m.hosts -%}
+  hosts:
+    {% for host in m.hosts -%}
+    - '{{ host }}'
+    {% endfor %}
+  {% endif -%}
+
+  {% if m.socket -%}
+  socket: "{{ m.socket }}"
+  {% endif -%}
+
+  {% if m.username -%}
+  username: {{ m.username }}
+  {% endif -%}
+
+  {% if m.password -%}
+  password: {{ m.password }}
+  {% endif -%}
+
+  {% if m.metricsets -%}
+  metricsets:
+    {% for ms in m.metricsets -%}
+    - {{ ms }}
+    {% endfor %}
+  {% endif -%}
+
+  {% if m.period -%}
+  period: {{ m.period }}
+  {% endif -%}
+
+  {% if m.path -%}
+  metrics_path: {{ m.path }}
+  {% endif -%}
+
+  {% if m.port -%}
+  port: {{ m.port }}
+  {% endif -%}
+
+  {% if m.timeout -%}
+  timeout: {{ m.timeout }}
+  {% endif -%}
+
+  {% if m.namespace -%}
+  namespace: {{ m.namespace }}
+  {% endif -%}
+
+  {% if m.processes -%}
+  processes: {{ m.processes }}
+  {% endif -%}
+
+  {% if m.processors is defined -%}
+  processors:
+    {% for p in m.processors -%}
+    {% for k, v in p.items() -%}
+    - {{ k }}.fields: [
+      {%- for field in v -%}
+      '{{ field }}' {%- if not loop.last %}, {% endif -%}
+      {%- endfor -%}
+    ]
+    {%- endfor %}
+    {%- endfor %}
+  {% endif -%}
+
+  {% if m.tags is defined -%}
+  tags:
+    {% for tag in m.tags -%}
+    - {{ tag }}
+    {% endfor %}
+  {% endif -%}
+
+  {% if m.fields is defined -%}
+  {% if m.fields_under_root %}fields_under_root: true{% endif %}
+  fields:
+    {% for k, v in m.fields.items() -%}
+    {{ k }}: {{ v }}
+    {%- endfor %}
+  {% endif -%}
+
+  {% if m.extras -%}
+  {% for k, v in m.extras.items() -%}
+  {{ k }}: {{ v }}
+  {% endfor %}
+  {% endif -%}
+  {% if m.additional_content -%}
+  {{ m.additional_content }}
+  {% endif -%}
+{%- endfor %}
+
+{% if reload or reload_path -%}
+metricbeat.config.modules:
+  path: {{ reload_path|default("${path.config}/modules.d/*.yml") }}
+  reload.period: 1s
+  reload.enabled: {{ reload|default("false")}}
+{% endif -%}
+
+# Disable random start delay for metricsets.
+metricbeat.max_start_delay: 0
+
+
+#============================== Autodiscover ==================================
+
+{% if autodiscover %}
+metricbeat.autodiscover:
+  providers:
+  {%- for provider, settings in autodiscover.items() %}
+  - type: {{provider}}
+    {%- if settings %}
+    {%- for k, v in settings.items() %}
+    {{k}}: {{v | default([])}}
+    {%- endfor %}
+    {%- endif %}
+  {%- endfor %}
+{% endif %}
+
+{% include './tests/system/config/libbeat.yml.j2' %}
