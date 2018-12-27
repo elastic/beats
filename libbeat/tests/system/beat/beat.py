@@ -133,10 +133,14 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if not hasattr(self, 'test_binary'):
             self.test_binary = os.path.abspath(self.beat_path + "/" + self.beat_name + ".test")
 
-        self.template_paths.append([
+        template_paths = [
             self.beat_path,
             os.path.abspath(os.path.join(self.beat_path, "../libbeat"))
-        ])
+        ]
+        if not hasattr(self, 'template_paths'):
+            self.template_paths = template_paths
+        else:
+            self.template_paths.append(template_paths)
 
         # Create build path
         build_dir = self.beat_path + "/build"
