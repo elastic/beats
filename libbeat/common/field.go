@@ -52,6 +52,7 @@ type Field struct {
 	CopyTo         string      `config:"copy_to"`
 	IgnoreAbove    int         `config:"ignore_above"`
 	AliasPath      string      `config:"path"`
+	MigrationAlias bool        `config:"migration"`
 
 	ObjectType            string          `config:"object_type"`
 	ObjectTypeMappingType string          `config:"object_type_mapping_type"`
@@ -64,6 +65,7 @@ type Field struct {
 	Searchable   *bool  `config:"searchable"`
 	Aggregatable *bool  `config:"aggregatable"`
 	Script       string `config:"script"`
+
 	// Kibana params
 	Pattern              string              `config:"pattern"`
 	InputFormat          string              `config:"input_format"`
