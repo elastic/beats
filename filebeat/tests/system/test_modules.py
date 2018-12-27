@@ -69,7 +69,7 @@ class Test(BaseTest):
 
         body = {
             "transient": {
-                "script.max_compilations_rate": "100/1m"
+                "script.max_compilations_rate": "1000/1m"
             }
         }
 
