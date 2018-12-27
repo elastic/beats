@@ -13,27 +13,34 @@
     - name: meta.cloud.provider
       type: alias
       path: cloud.provider
+      migration: true
 
     - name: meta.cloud.instance_id
       type: alias
       path: cloud.instance.id
+      migration: true
 
     - name: meta.cloud.instance_name
       type: alias
       path: cloud.instance.name
+      migration: true
 
     - name: meta.cloud.machine_type
       type: alias
       path: cloud.machine.type
+      migration: true
 
     - name: meta.cloud.availability_zone
       type: alias
       path: cloud.availability_zone
+      migration: true
 
     - name: meta.cloud.project_id
       type: alias
       path: cloud.project.id
+      migration: true
 
     - name: meta.cloud.region
       type: alias
       path: cloud.region
+      migration: true
