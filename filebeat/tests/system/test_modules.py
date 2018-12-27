@@ -67,6 +67,14 @@ class Test(BaseTest):
 
         self.index_name = "test-filebeat-modules"
 
+        body = {
+            "transient": {
+                "script.max_compilations_rate": "1000/1m"
+            }
+        }
+
+        self.es.transport.perform_request('PUT', "/_cluster/settings", body=body)
+
     @parameterized.expand(load_fileset_test_cases)
     @unittest.skipIf(not INTEGRATION_TESTS,
                      "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
