@@ -25,6 +25,7 @@ package fileset
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -32,8 +33,6 @@ import (
 	"runtime"
 	"strings"
 	"text/template"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
