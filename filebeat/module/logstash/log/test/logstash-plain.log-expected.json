@@ -1,27 +1,27 @@
 [
     {
-        "@timestamp": "2017-10-23T14:20:12,046", 
-        "ecs.version": "1.0.0-beta2", 
-        "event.dataset": "log", 
-        "event.module": "logstash", 
-        "input.type": "log", 
-        "log.offset": 0, 
-        "logstash.log.level": "INFO", 
-        "logstash.log.message": "Initializing module {:module_name=>\"fb_apache\", :directory=>\"/usr/share/logstash/modules/fb_apache/configuration\"}", 
+        "@timestamp": "2017-10-23T14:20:12.046Z",
+        "ecs.version": "1.0.0-beta2",
+        "event.dataset": "log",
+        "event.module": "logstash",
+        "input.type": "log",
+        "log.offset": 0,
+        "logstash.log.level": "INFO",
+        "logstash.log.message": "Initializing module {:module_name=>\"fb_apache\", :directory=>\"/usr/share/logstash/modules/fb_apache/configuration\"}",
         "logstash.log.module": "logstash.modules.scaffold"
-    }, 
+    },
     {
-        "@timestamp": "2017-11-20T03:55:00,318", 
-        "ecs.version": "1.0.0-beta2", 
-        "event.dataset": "log", 
-        "event.module": "logstash", 
-        "input.type": "log", 
+        "@timestamp": "2017-11-20T03:55:00.318Z",
+        "ecs.version": "1.0.0-beta2",
+        "event.dataset": "log",
+        "event.module": "logstash",
+        "input.type": "log",
         "log.flags": [
             "multiline"
-        ], 
-        "log.offset": 175, 
-        "logstash.log.level": "INFO", 
-        "logstash.log.message": "(0.058950s) Select Name as [person.name]\n, Address as [person.address]\nfrom people\n", 
+        ],
+        "log.offset": 175,
+        "logstash.log.level": "INFO",
+        "logstash.log.message": "(0.058950s) Select Name as [person.name]\n, Address as [person.address]\nfrom people\n",
         "logstash.log.module": "logstash.inputs.jdbc     "
     }
 ]
