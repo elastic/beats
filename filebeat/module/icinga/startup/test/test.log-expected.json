@@ -1,22 +1,22 @@
 [
     {
-        "ecs.version": "1.0.0-beta2", 
-        "event.dataset": "startup", 
-        "event.module": "icinga", 
-        "icinga.startup.facility": "cli", 
-        "input.type": "log", 
-        "log.level": "information", 
-        "log.offset": 0, 
+        "ecs.version": "1.0.0-beta2",
+        "event.dataset": "startup",
+        "event.module": "icinga",
+        "icinga.startup.facility": "cli",
+        "input.type": "log",
+        "log.level": "information",
+        "log.offset": 0,
         "message": "Icinga application loader (version: r2.6.3-1)"
-    }, 
+    },
     {
-        "ecs.version": "1.0.0-beta2", 
-        "event.dataset": "startup", 
-        "event.module": "icinga", 
-        "icinga.startup.facility": "cli", 
-        "input.type": "log", 
-        "log.level": "information", 
-        "log.offset": 63, 
+        "ecs.version": "1.0.0-beta2",
+        "event.dataset": "startup",
+        "event.module": "icinga",
+        "icinga.startup.facility": "cli",
+        "input.type": "log",
+        "log.level": "information",
+        "log.offset": 63,
         "message": "Loading configuration file(s)."
     }
 ]

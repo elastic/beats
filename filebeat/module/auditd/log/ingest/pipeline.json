@@ -71,7 +71,7 @@
         },
         {
             "convert": {
-                "field" : "auditd.log.sequence",
+                "field": "auditd.log.sequence",
                 "type": "integer",
                 "ignore_missing": true
             }
@@ -79,7 +79,11 @@
         {
             "script": {
                 "lang": "painless",
-                "inline": "    String trimQuotes(def v) {\n        if (v.startsWith(\"'\") || v.startsWith('\"')) {\n          v = v.substring(1, v.length());\n        }\n        if (v.endsWith(\"'\") || v.endsWith('\"')) {\n          v = v.substring(0, v.length()-1);\n        }  \n        return v;\n    }\n    \n    boolean isHexAscii(String v) {\n      def len = v.length();\n      if (len == 0 || len % 2 != 0) {\n        return false; \n      }\n  \n      for (int i = 0 ; i < len ; i++) {\n        if (Character.digit(v.charAt(i), 16) == -1) {\n          return false;\n        }\n      }\n\n      return true;\n    }\n    \n    String convertHexToString(String hex) {\n\t    StringBuilder sb = new StringBuilder();\n\n      for (int i=0; i < hex.length() - 1; i+=2) {\n          String output = hex.substring(i, (i + 2));\n          int decimal = Integer.parseInt(output, 16);\n          sb.append((char)decimal);\n      }\n\n      return sb.toString();\n    }\n    \n    def possibleHexKeys = ['exe', 'cmd'];\n    \n    def audit = ctx.auditd.get(\"log\");\n    Iterator entries = audit.entrySet().iterator();\n    while (entries.hasNext()) {\n      def e = entries.next();\n      def k = e.getKey();\n      def v = e.getValue(); \n\n      // Remove entries whose value is ?\n      if (v == \"?\" || v == \"(null)\" || v == \"\") {\n        entries.remove();\n        continue;\n      }\n      \n      // Convert hex values to ASCII.\n      if (possibleHexKeys.contains(k) && isHexAscii(v)) {\n        v = convertHexToString(v);\n        audit.put(k, v);\n      }\n      \n      // Trim quotes.\n      if (v instanceof String) {\n        v = trimQuotes(v);\n        audit.put(k, v);\n      }\n      \n      // Convert arch.\n      if (k == \"arch\" && v == \"c000003e\") {\n        audit.put(k, \"x86_64\");\n      }\n    }"
+                "source": "    String trimQuotes(def singleQuote, def doubleQuote, def v) {\n        if (v.startsWith(singleQuote) || v.startsWith(doubleQuote)) {\n          v = v.substring(1, v.length());\n        }\n        if (v.endsWith(singleQuote) || v.endsWith(doubleQuote)) {\n          v = v.substring(0, v.length()-1);\n        }  \n        return v;\n    }\n    \n    boolean isHexAscii(String v) {\n      def len = v.length();\n      if (len == 0 || len % 2 != 0) {\n        return false; \n      }\n  \n      for (int i = 0 ; i < len ; i++) {\n        if (Character.digit(v.charAt(i), 16) == -1) {\n          return false;\n        }\n      }\n\n      return true;\n    }\n    \n    String convertHexToString(String hex) {\n\t    StringBuilder sb = new StringBuilder();\n\n      for (int i=0; i < hex.length() - 1; i+=2) {\n          String output = hex.substring(i, (i + 2));\n          int decimal = Integer.parseInt(output, 16);\n          sb.append((char)decimal);\n      }\n\n      return sb.toString();\n    }\n    \n    def possibleHexKeys = ['exe', 'cmd'];\n    \n    def audit = ctx.auditd.get(\"log\");\n    Iterator entries = audit.entrySet().iterator();\n    while (entries.hasNext()) {\n      def e = entries.next();\n      def k = e.getKey();\n      def v = e.getValue(); \n\n      // Remove entries whose value is ?\n      if (v == \"?\" || v == \"(null)\" || v == \"\") {\n        entries.remove();\n        continue;\n      }\n      \n      // Convert hex values to ASCII.\n      if (possibleHexKeys.contains(k) && isHexAscii(v)) {\n        v = convertHexToString(v);\n        audit.put(k, v);\n      }\n      \n      // Trim quotes.\n      if (v instanceof String) {\n        v = trimQuotes(params.single_quote, params.double_quote, v);\n        audit.put(k, v);\n      }\n      \n      // Convert arch.\n      if (k == \"arch\" && v == \"c000003e\") {\n        audit.put(k, \"x86_64\");\n      }\n    }",
+                "params": {
+                    "single_quote": "'",
+                    "double_quote": "\""
+                }
             }
         },
         {
