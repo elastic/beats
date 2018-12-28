@@ -1,0 +1,15 @@
+# This is a yml based example for the conversion. key defines the target, from defines where the current values is
+# and type specifies the type it should be converted to.
+
+- key: lastname
+  from: name
+  type: int
+
+- key: git
+  from: social.github
+  type: int
+
+- key: number.nine
+  from: nine
+  type: int
+

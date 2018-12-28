@@ -1,0 +1,10 @@
+{
+    "name" : "ruflin",
+    "age" : 5,
+    "social" : {
+        "github" : "github.com/ruflin",
+        "twitter" : "twitter.com/ruflin"
+    },
+    "kids": ["Linus", "Yuna"],
+    "nine": 9.0
+}
