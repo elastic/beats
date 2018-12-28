@@ -542,30 +542,27 @@ Docker stats collected from Docker.
 *`docker.container.id`*::
 +
 --
-type: keyword
+type: alias
 
-Unique container id.
-
+alias to: container.id
 
 --
 
 *`docker.container.image`*::
 +
 --
-type: keyword
+type: alias
 
-Name of the image the container was built on.
-
+alias to: container.image.name
 
 --
 
 *`docker.container.name`*::
 +
 --
-type: keyword
+type: alias
 
-Container name.
-
+alias to: container.name
 
 --
 

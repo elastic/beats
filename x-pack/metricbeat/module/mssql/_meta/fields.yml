@@ -1,0 +1,9 @@
+- key: mssql
+  title: "mssql"
+  description: MS SQL module
+  release: beta
+  fields:
+    - name: mssql
+      type: group
+      description: >
+      fields:

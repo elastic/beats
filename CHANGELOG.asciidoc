@@ -18,6 +18,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename beat.timezone to event.timezone. {pull}9458[9458]
 - Use _doc as document type. {pull}9056[9056]{pull}9573[9573]
 - Update to Golang 1.11.3. {pull}9560[9560]
+- Migrate add_docker_metadata fields to ECS.
 
 *Auditbeat*
 
@@ -201,6 +202,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...v7.0.0-alpha2[Check the
 - Rename many `icinga.*` fields to map to ECS. {pull}9294[9294]
 - Rename many `postgresql.log.*` fields to map to ECS. {pull}9303[9303]
 - Rename many `kafka.log.*` fields to map to ECS. {pull}9297[9297]
+- Add `convert_timezone` option to Logstash module to convert dates to UTC. {issue}9756[9756] {pull}9797[9797]
 
 *Metricbeat*
 
@@ -253,6 +255,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...v7.0.0-alpha2[Check the
 - Add `host.os.name` field to add_host_metadata processor. {issue}8948[8948] {pull}9405[9405]
 - Add more TCP statuses to `socket_summary` metricset. {pull}9430[9430]
 - Remove experimental tag from ceph metricsets. {pull}9708[9708]
+- Add MS SQL module to X-Pack {pull}9414[9414
 
 ==== Deprecated
 

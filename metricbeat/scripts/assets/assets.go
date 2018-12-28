@@ -70,11 +70,12 @@ func main() {
 
 		var buf bytes.Buffer
 		asset.Template.Execute(&buf, asset.Data{
-			License: licenses.ASL2,
-			Beat:    "metricbeat",
-			Name:    module,
-			Data:    encData,
-			Package: module,
+			License:  licenses.ASL2,
+			Beat:     "metricbeat",
+			Name:     module,
+			Priority: "asset.ModuleFieldsPri",
+			Data:     encData,
+			Package:  module,
 		})
 
 		bs, err := format.Source(buf.Bytes())

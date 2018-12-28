@@ -1,6 +1,7 @@
 [
     {
-        "@timestamp": "2018-06-29T10:06:14,933", 
+        "@timestamp": "2018-06-29T10:06:14.933Z", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.06.26", 
         "elasticsearch.node.name": "v_VJhjV", 
         "elasticsearch.shard.id": "0", 
@@ -22,7 +23,8 @@
         "service.name": "elasticsearch"
     }, 
     {
-        "@timestamp": "2018-06-29T10:06:14,943", 
+        "@timestamp": "2018-06-29T10:06:14.943Z", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.06.26", 
         "elasticsearch.node.name": "v_VJhjV", 
         "elasticsearch.shard.id": "0", 
@@ -44,7 +46,8 @@
         "service.name": "elasticsearch"
     }, 
     {
-        "@timestamp": "2018-06-29T09:01:01,821", 
+        "@timestamp": "2018-06-29T09:01:01.821Z", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.06.26", 
         "elasticsearch.node.name": "v_VJhjV", 
         "elasticsearch.shard.id": "0", 
@@ -66,7 +69,8 @@
         "service.name": "elasticsearch"
     }, 
     {
-        "@timestamp": "2018-06-29T09:01:01,827", 
+        "@timestamp": "2018-06-29T09:01:01.827Z", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.06.26", 
         "elasticsearch.node.name": "v_VJhjV", 
         "elasticsearch.shard.id": "0", 
@@ -88,7 +92,8 @@
         "service.name": "elasticsearch"
     }, 
     {
-        "@timestamp": "2018-07-04T13:48:07,452", 
+        "@timestamp": "2018-07-04T13:48:07.452Z", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg", 
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04", 
         "elasticsearch.node.name": "v_VJhjV", 
@@ -108,7 +113,8 @@
         "service.name": "elasticsearch"
     }, 
     {
-        "@timestamp": "2018-07-04T21:51:30,411", 
+        "@timestamp": "2018-07-04T21:51:30.411Z", 
+        "ecs.version": "1.0.0-beta2", 
         "elasticsearch.index.id": "VLKxBLvUSYuIMKzpacGjRg", 
         "elasticsearch.index.name": "metricbeat-6.3.0-2018.07.04", 
         "elasticsearch.node.name": "v_VJhjV", 

@@ -33,7 +33,7 @@ func TestGetFields(t *testing.T) {
 		return d
 	}
 
-	SetFields("test", "foo", f)
+	SetFields("test", "foo", 1, f)
 	newData, err := GetFields("test")
 	assert.NoError(t, err)
 	assert.Equal(t, data, string(newData))

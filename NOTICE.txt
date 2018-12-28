@@ -10,6 +10,15 @@ Third party libraries used by the Elastic Beats project:
 
 
 --------------------------------------------------------------------
+Dependency: cloud.google.com/go
+Revision: 632e11ec7c242a85e1931e4a8fdda2002316569f
+License type (autodetected): Apache-2.0
+./vendor/cloud.google.com/go/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/aerospike/aerospike-client-go
 Revision: 0f3b54da6bdc2c31c505f9afbc5f434dd2089658
 License type (autodetected): Apache-2.0
@@ -303,6 +312,40 @@ ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
 WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+--------------------------------------------------------------------
+Dependency: github.com/denisenkom/go-mssqldb
+Revision: 4e0d7dc8888fbb59764060e99b7b68e77a6f9698
+License type (autodetected): BSD-3-Clause
+./vendor/github.com/denisenkom/go-mssqldb/LICENSE.txt:
+--------------------------------------------------------------------
+Copyright (c) 2012 The Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 --------------------------------------------------------------------
 Dependency: github.com/digitalocean/go-libvirt
 Revision: 59d541f19311883ad82708651353009fb207d8a9
