@@ -1,0 +1,32 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "mssql.performance",
+        "duration": 115000,
+        "module": "mssql"
+    },
+    "metricset": {
+        "name": "performance"
+    },
+    "mssql": {
+        "performance": {
+            "batch_requests": {},
+            "compilations": {},
+            "lock_waits": {},
+            "page_life_expectancy": {
+                "sec": 11
+            },
+            "page_splits": {},
+            "recompilations": {},
+            "transactions": {}
+        }
+    },
+    "service": {
+        "address": "172.26.0.2",
+        "type": "mssql"
+    }
+}
