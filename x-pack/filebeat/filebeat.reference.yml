@@ -129,7 +129,7 @@ filebeat.modules:
     #var.convert_timezone: false
 
 
-#------------------------------- Haproxy Module -------------------------------
+#-------------------------------- Haproxy Module --------------------------------
 - module: haproxy
   # All logs
   log:
