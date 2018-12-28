@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2018-08-07T08:27:47.000Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "slowlog", 
         "event.module": "mysql", 
         "input.type": "log", 
@@ -20,6 +21,7 @@
     }, 
     {
         "@timestamp": "2018-08-07T08:27:47.000Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "slowlog", 
         "event.module": "mysql", 
         "input.type": "log", 
@@ -38,6 +40,7 @@
     }, 
     {
         "@timestamp": "2018-08-07T08:27:47.000Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "slowlog", 
         "event.module": "mysql", 
         "input.type": "log", 
@@ -58,6 +61,7 @@
     }, 
     {
         "@timestamp": "2018-08-07T08:27:47.000Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "slowlog", 
         "event.module": "mysql", 
         "input.type": "log", 
