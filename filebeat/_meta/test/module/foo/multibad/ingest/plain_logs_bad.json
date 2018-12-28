@@ -1,0 +1,12 @@
+{
+    "processors": [
+        {
+            "invalid_processor": {
+                "field": "message",
+                "patterns": [
+                    "^%{DATA:some_data}"
+                ]
+            }
+        }
+    ]
+}
