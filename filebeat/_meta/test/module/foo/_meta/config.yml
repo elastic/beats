@@ -1,0 +1,8 @@
+- module: foo
+  # Fileset with multiple pipelines
+  multi:
+    enabled: true
+
+  # Fileset with multiple pipelines with the last one being bad
+  multibad:
+    enabled: true

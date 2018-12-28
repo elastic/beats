@@ -1,0 +1,6 @@
+- module: mssql
+  metricsets:
+    - "db"
+  hosts: ["sqlserver://sa@localhost"]
+  period: 10s
+

@@ -34,9 +34,19 @@
             }
         },
         {
-            "rename": {
+            "date": {
                 "field": "logstash.log.timestamp",
-                "target_field": "@timestamp"
+                "target_field": "@timestamp",
+                "formats": [
+                  "ISO8601"
+              ],
+              {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
+              "ignore_failure": true
+            }
+        },
+        {
+            "remove": {
+                "field": "logstash.log.timestamp"
             }
         }
     ]
