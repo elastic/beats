@@ -56,13 +56,13 @@ type MLConfig struct {
 type MLLoader interface {
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
 	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
-	GetVersion() string
+	GetVersion() common.Version
 }
 
 // MLSetupper is a subset of the Kibana client API capable of setting up ML objects.
 type MLSetupper interface {
 	Request(method, path string, params url.Values, headers http.Header, body io.Reader) (int, []byte, error)
-	GetVersion() string
+	GetVersion() common.Version
 }
 
 // MLResponse stores the relevant parts of the response from Kibana to check for errors.
@@ -125,10 +125,11 @@ func ImportMachineLearningJob(esClient MLLoader, cfg *MLConfig) error {
 	datafeedURL := fmt.Sprintf(esDataFeedURL, cfg.ID)
 
 	if len(cfg.MinVersion) > 0 {
-		esVersion, err := common.NewVersion(esClient.GetVersion())
-		if err != nil {
-			return errors.Errorf("Error parsing ES version: %s: %v", esClient.GetVersion(), err)
+		esVersion := esClient.GetVersion()
+		if !esVersion.IsValid() {
+			return errors.New("Invalid Elasticsearch version")
 		}
+
 		minVersion, err := common.NewVersion(cfg.MinVersion)
 		if err != nil {
 			return errors.Errorf("Error parsing min_version: %s: %v", minVersion, err)
@@ -136,7 +137,7 @@ func ImportMachineLearningJob(esClient MLLoader, cfg *MLConfig) error {
 
 		if esVersion.LessThan(minVersion) {
 			logp.Debug("machine-learning", "Skipping job %s, because ES version (%s) is smaller than min version (%s)",
-				cfg.ID, esVersion, minVersion)
+				cfg.ID, esVersion.String(), minVersion)
 			return nil
 		}
 	}

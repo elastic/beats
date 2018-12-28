@@ -19,6 +19,7 @@ package dashboards
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"path"
@@ -33,7 +34,7 @@ import (
 type ElasticsearchLoader struct {
 	client       *elasticsearch.Client
 	config       *Config
-	version      string
+	version      common.Version
 	msgOutputter MessageOutputter
 }
 
@@ -48,6 +49,9 @@ func NewElasticsearchLoader(cfg *common.Config, dashboardsConfig *Config, msgOut
 	}
 
 	version := esClient.GetVersion()
+	if !version.IsValid() {
+		return nil, errors.New("No valid Elasticsearch version available")
+	}
 
 	loader := ElasticsearchLoader{
 		client:       esClient,
@@ -56,7 +60,7 @@ func NewElasticsearchLoader(cfg *common.Config, dashboardsConfig *Config, msgOut
 		msgOutputter: msgOutputter,
 	}
 
-	loader.statusMsg("Initialize the Elasticsearch %s loader", version)
+	loader.statusMsg("Initialize the Elasticsearch %s loader", version.String())
 
 	return &loader, nil
 }
