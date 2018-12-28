@@ -8,6 +8,16 @@
       description: >
         Client IP address or hostname.
 
+    - name: ssl_protocol
+      type: keyword
+      description: >
+        SSL protocol version.
+
+    - name: ssl_cipher
+      type: keyword
+      description: >
+        SSL cipher name.
+
     - name: body_sent.bytes
       type: long
       format: bytes
