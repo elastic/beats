@@ -1,0 +1,30 @@
+[
+    {
+        "@timestamp": "2016-10-25T14:49:34.000Z",
+        "event.dataset": "nginx.error",
+        "fileset.module": "nginx",
+        "fileset.name": "error",
+        "input.type": "log",
+        "nginx.error.connection_id": "1",
+        "nginx.error.level": "error",
+        "nginx.error.message": "open() \"/usr/local/Cellar/nginx/1.10.2_1/html/favicon.ico\" failed (2: No such file or directory), client: 127.0.0.1, server: localhost, request: \"GET /favicon.ico HTTP/1.1\", host: \"localhost:8080\", referrer: \"http://localhost:8080/\"",
+        "nginx.error.pid": "54053",
+        "nginx.error.tid": "0",
+        "offset": 0,
+        "prospector.type": "log"
+    },
+    {
+        "@timestamp": "2016-10-25T14:50:44.000Z",
+        "event.dataset": "nginx.error",
+        "fileset.module": "nginx",
+        "fileset.name": "error",
+        "input.type": "log",
+        "nginx.error.connection_id": "3",
+        "nginx.error.level": "error",
+        "nginx.error.message": "open() \"/usr/local/Cellar/nginx/1.10.2_1/html/adsasd\" failed (2: No such file or directory), client: 127.0.0.1, server: localhost, request: \"GET /adsasd HTTP/1.1\", host: \"localhost:8080\"",
+        "nginx.error.pid": "54053",
+        "nginx.error.tid": "0",
+        "offset": 273,
+        "prospector.type": "log"
+    }
+]
