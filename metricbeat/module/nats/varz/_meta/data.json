@@ -1,0 +1,69 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"nats",
+        "name":"varz",
+        "rtt":44269
+    },
+    "nats":{
+        "varz":{
+            "metrics": {
+                "port": 4222,
+                "uptime": "2h41m42s",
+                "write_deadline": 2e+09,
+                "proto": 1,
+                "host": "0.0.0.0",
+                "http_port": 8222,
+                "cluster": {
+                    "cluster_port": 6222,
+                    "auth_timeout": 2,
+                    "addr": "0.0.0.0"
+                },
+                "now": "2018-12-28T12:33:53.026864929Z",
+                "connections": 0,
+                "out_msgs": 0,
+                "out_bytes": 0,
+                "version": "1.3.0",
+                "git_commit": "eed4fbc",
+                "http_host": "0.0.0.0",
+                "https_port": 0,
+                "config_load_time": "2018-12-28T09:42:25.713335762Z",
+                "go": "go1.11",
+                "tls_timeout": 0.5,
+                "total_connections": 0,
+                "max_pending": 2.68435456e+08,
+                "server_id": "bUAdpRFtMWddIBWw80Yd9D",
+                "auth_timeout": 1,
+                "in_bytes": 0,
+                "subscriptions": 0,
+                "ping_interval": 1.2e+11,
+                "routes": 0,
+                "remotes": 0,
+                "slow_consumers": 0,
+                "max_payload": 1.048576e+06,
+                "in_msgs": 0,
+                "http_req_stats": {
+                    "/": 1,
+                    "/connz": 181,
+                    "/routez": 199,
+                    "/subsz": 289,
+                    "/varz": 183
+                },
+                "max_connections": 65536,
+                "cpu": 0,
+                "mem": 4.292608e+06,
+                "cores": 8,
+                "addr": "0.0.0.0",
+                "ping_max": 2,
+                "max_control_line": 1024,
+                "start": "2018-12-28T09:42:25.713335762Z"
+            }
+        }
+    },
+    "type":"metricsets"
+}

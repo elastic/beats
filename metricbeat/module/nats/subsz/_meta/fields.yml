@@ -1,0 +1,24 @@
+- name: subz
+  type: group
+  description: >
+    Contains nats subscriptions related metrics
+  fields:
+    - name: metrics
+      type: group
+      description: >
+        Metrics of subz URI
+      fields:
+        - name: metrics.server_id
+          type: string
+        - name: metrics.now
+          type: date
+        - name: metrics.num_connections
+          type: integer
+        - name: metrics.total
+          type: integer
+        - name: metrics.offset
+          type: integer
+        - name: metrics.limit
+          type: integer
+        - name: metrics.connections
+          type: nested

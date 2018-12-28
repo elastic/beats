@@ -1,0 +1,26 @@
+- name: connz
+  type: group
+  description: >
+    Contains nats connection related metrics
+  fields:
+    - name: metrics
+      type: group
+      description: >
+        Metrics of connz URI
+      fields:
+        - name: metrics.num_subscriptions
+          type: integer
+        - name: metrics.num_cache
+          type: integer
+        - name: metrics.num_inserts
+          type: integer
+        - name: metrics.num_removes
+          type: integer
+        - name: metrics.num_matches
+          type: integer
+        - name: metrics.cache_hit_rate
+          type: integer
+        - name: metrics.max_fanout
+          type: integer
+        - name: metrics.avg_fanout
+          type: integer

@@ -1,0 +1,24 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"nats",
+        "name":"routez",
+        "rtt":44269
+    },
+    "nats":{
+        "routez":{
+            "metrics": {
+                "num_routes": 0,
+                "routes": [],
+                "server_id": "bUAdpRFtMWddIBWw80Yd9D",
+                "now": "2018-12-28T12:33:53.02604721Z"
+            }
+        }
+    },
+    "type":"metricsets"
+}
