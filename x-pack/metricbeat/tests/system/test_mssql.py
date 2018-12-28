@@ -43,6 +43,8 @@ class Test(XPackTest):
         self.assertTrue(evt["mssql"]["db"]["log_space_usage"]["used"]["pct"] > 0)
         self.assertTrue(evt["mssql"]["db"]["log_space_usage"]["used"]["bytes"] > 0)
 
+        self.assert_fields_are_documented(evt)
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_performance(self):
