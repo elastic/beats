@@ -5,8 +5,8 @@
             "grok": {
                 "field": "message",
                 "patterns": [
-                    "(%{POSINT:process.pid:long}:%{CHAR:redis.log.role} )?%{REDISTIMESTAMP:redis.log.timestamp} %{REDISLEVEL:log.level} %{GREEDYDATA:message}",
-                    "%{POSINT:process.pid:long}:signal-handler \\(%{POSINT:redis.log.timestamp}\\) %{GREEDYDATA:message}"
+                    "(%{POSINT:redis.log.pid:long}:%{CHAR:redis.log.role} )?%{REDISTIMESTAMP:redis.log.timestamp} %{REDISLEVEL:redis.log.level} %{GREEDYDATA:redis.log.message}",
+                    "%{POSINT:redis.log.pid:long}:signal-handler \\(%{POSINT:redis.log.timestamp}\\) %{GREEDYDATA:redis.log.message}"
                 ],
                 "pattern_definitions": {
                     "CHAR": "[a-zA-Z]",
@@ -17,7 +17,7 @@
         {
             "script": {
                 "lang": "painless",
-                "source": "if (ctx.log.level == params.dot) {\n          ctx.log.level = params.debug;\n        } else if (ctx.log.level == params.dash) {\n          ctx.log.level = params.verbose;\n        } else if (ctx.log.level == params.asterisk) {\n          ctx.log.level = params.notice;\n        } else if (ctx.log.level == params.hash) {\n          ctx.log.level = params.warning;\n        }",
+                "source": "if (ctx.redis.log.level == params.dot) {\n          ctx.redis.log.level = params.debug;\n        } else if (ctx.redis.log.level == params.dash) {\n          ctx.redis.log.level = params.verbose;\n        } else if (ctx.redis.log.level == params.asterisk) {\n          ctx.redis.log.level = params.notice;\n        } else if (ctx.redis.log.level == params.hash) {\n          ctx.redis.log.level = params.warning;\n        }",
                 "params": {
                     "dot": ".",
                     "debug": "debug",
@@ -44,6 +44,11 @@
                     "sentinel_abbrev": "X",
                     "sentinel": "sentinel"
                 }
+            }
+        },
+        {
+            "remove": {
+                "field": "message"
             }
         },
         {
