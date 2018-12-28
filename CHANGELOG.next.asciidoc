@@ -51,6 +51,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Add `convert_timezone` option to Elasticsearch module to convert dates to UTC. {issue}9756[9756] {pull}9761[9761]
+
 *Heartbeat*
 
 - Made monitors.d configuration part of the default config. {pull}9004[9004]
