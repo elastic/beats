@@ -22,7 +22,6 @@ package fileset
 import (
 	"encoding/json"
 	"path/filepath"
-	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -142,11 +141,5 @@ func TestAvailableProcessors(t *testing.T) {
 
 func hasIngest(client *elasticsearch.Client) bool {
 	v := client.GetVersion()
-	majorVersion := string(v[0])
-	version, err := strconv.Atoi(majorVersion)
-	if err != nil {
-		return true
-	}
-
-	return version >= 5
+	return v.Major >= 5
 }

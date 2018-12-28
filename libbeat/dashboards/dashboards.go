@@ -22,8 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
-	"strconv"
-	"strings"
 
 	errw "github.com/pkg/errors"
 
@@ -106,12 +104,7 @@ func ImportDashboards(
 
 		esLoader.statusMsg("Elasticsearch URL %v", esLoader.client.Connection.URL)
 
-		majorVersion, _, err := getMajorAndMinorVersion(esLoader.version)
-		if err != nil {
-			return fmt.Errorf("wrong Elasticsearch version: %v", err)
-		}
-
-		if majorVersion < 6 {
+		if esLoader.version.Major < 6 {
 			importVia = importViaES
 		} else {
 			importVia = useKibana
@@ -145,17 +138,16 @@ func setupAndImportDashboardsViaKibana(ctx context.Context, hostname string, kib
 }
 
 func ImportDashboardsViaKibana(kibanaLoader *KibanaLoader) error {
-
-	if !isKibanaAPIavailable(kibanaLoader.version) {
-		return fmt.Errorf("Kibana API is not available in Kibana version %s", kibanaLoader.version)
+	version := kibanaLoader.version
+	if !version.IsValid() {
+		return errors.New("No valid kibana version available")
 	}
 
-	version, err := common.NewVersion(kibanaLoader.version)
-	if err != nil {
-		return fmt.Errorf("Invalid Kibana version: %s", kibanaLoader.version)
+	if !isKibanaAPIavailable(version) {
+		return fmt.Errorf("Kibana API is not available in Kibana version %s", version.String())
 	}
 
-	importer, err := NewImporter(*version, kibanaLoader.config, kibanaLoader)
+	importer, err := NewImporter(version, kibanaLoader.config, kibanaLoader)
 	if err != nil {
 		return fmt.Errorf("fail to create a Kibana importer for loading the dashboards: %v", err)
 	}
@@ -187,40 +179,6 @@ func ImportDashboardsViaElasticsearch(esLoader *ElasticsearchLoader) error {
 	return nil
 }
 
-func getMajorAndMinorVersion(version string) (int, int, error) {
-	fields := strings.Split(version, ".")
-	if len(fields) != 3 {
-		return 0, 0, fmt.Errorf("wrong version %s", version)
-	}
-	majorVersion := fields[0]
-	minorVersion := fields[1]
-
-	majorVersionInt, err := strconv.Atoi(majorVersion)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	minorVersionInt, err := strconv.Atoi(minorVersion)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	return majorVersionInt, minorVersionInt, nil
-}
-
-func isKibanaAPIavailable(version string) bool {
-	majorVersion, minorVersion, err := getMajorAndMinorVersion(version)
-	if err != nil {
-		return false
-	}
-
-	if majorVersion == 5 && minorVersion >= 6 {
-		return true
-	}
-
-	if majorVersion >= 6 {
-		return true
-	}
-
-	return false
+func isKibanaAPIavailable(version common.Version) bool {
+	return (version.Major == 5 && version.Minor >= 6) || version.Major >= 6
 }

@@ -20,7 +20,6 @@
 package dashboards
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -40,8 +39,9 @@ func TestImporter(t *testing.T) {
 	}
 
 	client := estest.GetTestingElasticsearch(t)
-	if strings.HasPrefix(client.Connection.GetVersion(), "6.") ||
-		strings.HasPrefix(client.Connection.GetVersion(), "7.") {
+	major := client.GetVersion().Major
+
+	if major == 6 || major == 7 {
 		t.Skip("Skipping tests for Elasticsearch 6.x releases")
 	}
 
@@ -76,8 +76,8 @@ func TestImporterEmptyBeat(t *testing.T) {
 	}
 
 	client := estest.GetTestingElasticsearch(t)
-	if strings.HasPrefix(client.Connection.GetVersion(), "6.") ||
-		strings.HasPrefix(client.Connection.GetVersion(), "7.") {
+	major := client.GetVersion().Major
+	if major == 6 || major == 7 {
 		t.Skip("Skipping tests for Elasticsearch 6.x releases")
 	}
 
