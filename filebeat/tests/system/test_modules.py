@@ -168,7 +168,7 @@ class Test(BaseTest):
                     objects[k] = self.flatten_object(obj, {}, "")
                     clean_keys(objects[k])
 
-                json.dump(objects, f, indent=4, sort_keys=True)
+                json.dump(objects, f, indent=4, separators=(',', ': '), sort_keys=True)
 
         with open(test_file + "-expected.json", "r") as f:
             expected = json.load(f)

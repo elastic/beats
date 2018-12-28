@@ -22,6 +22,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Modify apache/error dataset to follow ECS. {pull}8963[8963]
 - Rename many `traefik.access.*` fields to map to ECS. {pull}9005[9005]
+- Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
 
 *Heartbeat*
 
@@ -83,6 +84,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added module for parsing Google Santa logs. {pull}9540[9540]
 - Added netflow input type that supports NetFlow v1, v5, v6, v7, v8, v9 and IPFIX. {issue}9399[9399]
 - Add option to modules.yml file to indicate that a module has been moved {pull}9432[9432].
+- Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
 
 *Heartbeat*
 
