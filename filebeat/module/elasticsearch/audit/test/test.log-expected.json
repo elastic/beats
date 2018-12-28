@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2018-06-19T05:16:15,549", 
+        "@timestamp": "2018-06-19T05:16:15.549Z", 
         "ecs.version": "1.0.0-beta2", 
         "elasticsearch.audit.event_type": "authentication_failed", 
         "elasticsearch.audit.layer": "rest", 
@@ -15,7 +15,7 @@
         "service.name": "elasticsearch"
     }, 
     {
-        "@timestamp": "2018-06-19T05:07:52,304", 
+        "@timestamp": "2018-06-19T05:07:52.304Z", 
         "ecs.version": "1.0.0-beta2", 
         "elasticsearch.audit.event_type": "authentication_failed", 
         "elasticsearch.audit.layer": "rest", 
@@ -31,7 +31,7 @@
         "service.name": "elasticsearch"
     }, 
     {
-        "@timestamp": "2018-06-19T05:00:15,778", 
+        "@timestamp": "2018-06-19T05:00:15.778Z", 
         "ecs.version": "1.0.0-beta2", 
         "elasticsearch.audit.action": "indices:data/read/scroll/clear", 
         "elasticsearch.audit.event_type": "access_granted", 
@@ -48,7 +48,7 @@
         "service.name": "elasticsearch"
     }, 
     {
-        "@timestamp": "2018-06-19T05:07:45,544", 
+        "@timestamp": "2018-06-19T05:07:45.544Z", 
         "ecs.version": "1.0.0-beta2", 
         "elasticsearch.audit.event_type": "anonymous_access_denied", 
         "elasticsearch.audit.layer": "rest", 
@@ -63,7 +63,7 @@
         "service.name": "elasticsearch"
     }, 
     {
-        "@timestamp": "2018-06-19T05:26:27,268", 
+        "@timestamp": "2018-06-19T05:26:27.268Z", 
         "ecs.version": "1.0.0-beta2", 
         "elasticsearch.audit.event_type": "authentication_failed", 
         "elasticsearch.audit.layer": "rest", 
@@ -78,7 +78,7 @@
         "service.name": "elasticsearch"
     }, 
     {
-        "@timestamp": "2018-06-19T05:55:26,898", 
+        "@timestamp": "2018-06-19T05:55:26.898Z", 
         "ecs.version": "1.0.0-beta2", 
         "elasticsearch.audit.action": "cluster:monitor/main", 
         "elasticsearch.audit.event_type": "access_denied", 
@@ -95,7 +95,7 @@
         "service.name": "elasticsearch"
     }, 
     {
-        "@timestamp": "2018-06-19T05:24:15,190", 
+        "@timestamp": "2018-06-19T05:24:15.190Z", 
         "ecs.version": "1.0.0-beta2", 
         "elasticsearch.audit.event_type": "authentication_failed", 
         "elasticsearch.audit.layer": "rest", 
