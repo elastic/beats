@@ -154,10 +154,9 @@ func loadConfigWithDefaults(config *ilmConfig, b *Beat) {
 }
 
 func checkElasticsearchVersionIlm(client *elasticsearch.Client) error {
-	esVer := client.GetVersion()
-	esV, err := common.NewVersion(esVer)
-	if err != nil {
-		return err
+	esVersion := client.GetVersion()
+	if !esVersion.IsValid() {
+		return errors.New("Unknown Elasticsearch version")
 	}
 
 	requiredVersion, err := common.NewVersion("6.6.0")
@@ -165,8 +164,8 @@ func checkElasticsearchVersionIlm(client *elasticsearch.Client) error {
 		return err
 	}
 
-	if esV.LessThan(requiredVersion) {
-		return fmt.Errorf("ILM requires at least Elasticsearch 6.6.0. Used version: %s", esV.String())
+	if esVersion.LessThan(requiredVersion) {
+		return fmt.Errorf("ILM requires at least Elasticsearch 6.6.0. Used version: %s", esVersion.String())
 	}
 
 	return nil

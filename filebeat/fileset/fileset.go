@@ -25,6 +25,7 @@ package fileset
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -192,15 +193,14 @@ func (fs *Fileset) evaluateVars() (map[string]interface{}, error) {
 
 // turnOffElasticsearchVars re-evaluates the variables that have `min_elasticsearch_version`
 // set.
-func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersion string) (map[string]interface{}, error) {
+func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersion common.Version) (map[string]interface{}, error) {
 	retVars := map[string]interface{}{}
 	for key, val := range vars {
 		retVars[key] = val
 	}
 
-	haveVersion, err := common.NewVersion(esVersion)
-	if err != nil {
-		return vars, fmt.Errorf("Error parsing version %s: %v", esVersion, err)
+	if !esVersion.IsValid() {
+		return vars, errors.New("Unknown Elasticsearch version")
 	}
 
 	for _, vals := range fs.manifest.Vars {
@@ -217,11 +217,11 @@ func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersi
 				return vars, fmt.Errorf("Error parsing version %s: %v", minESVersion["version"].(string), err)
 			}
 
-			logp.Debug("fileset", "Comparing ES version %s with requirement of %s", haveVersion, minVersion)
+			logp.Debug("fileset", "Comparing ES version %s with requirement of %s", esVersion.String(), minVersion)
 
-			if haveVersion.LessThan(minVersion) {
+			if esVersion.LessThan(minVersion) {
 				retVars[name] = minESVersion["value"]
-				logp.Info("Setting var %s (%s) to %v because Elasticsearch version is %s", name, fs, minESVersion["value"], haveVersion)
+				logp.Info("Setting var %s (%s) to %v because Elasticsearch version is %s", name, fs, minESVersion["value"], esVersion.String())
 			}
 		}
 	}
@@ -358,7 +358,7 @@ func (fs *Fileset) getPipelineID(beatVersion string) (string, error) {
 }
 
 // GetPipeline returns the JSON content of the Ingest Node pipeline that parses the logs.
-func (fs *Fileset) GetPipeline(esVersion string) (pipelineID string, content map[string]interface{}, err error) {
+func (fs *Fileset) GetPipeline(esVersion common.Version) (pipelineID string, content map[string]interface{}, err error) {
 	path, err := applyTemplate(fs.vars, fs.manifest.IngestPipeline, false)
 	if err != nil {
 		return "", nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
