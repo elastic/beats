@@ -140,13 +140,13 @@ func (rr *rowsResultHandler) handle(s *s.Schema) (err error) {
 			}
 		}
 
-		result, err := s.Apply(mapOfResults)
-		if err != nil {
-			err = errors.Wrap(err, "error trying to apply schema")
-			logp.Error(err)
-			rr.reporter.Error(err)
-			continue
-		}
+		result, _ := s.Apply(mapOfResults)
+		//if err != nil {
+		//	err = errors.Wrap(err, "error trying to apply schema")
+		//	logp.Error(err)
+		//	rr.reporter.Error(err)
+		//	continue
+		//}
 
 		rr.reporter.Event(mb.Event{MetricSetFields: result})
 	}
