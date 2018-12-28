@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2017-04-04T11:43:09.000Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "debug", 
         "event.module": "icinga", 
         "icinga.debug.facility": "GraphiteWriter", 
@@ -11,6 +12,7 @@
     }, 
     {
         "@timestamp": "2017-04-04T11:43:09.000Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "debug", 
         "event.module": "icinga", 
         "icinga.debug.facility": "IdoMysqlConnection", 
@@ -21,6 +23,7 @@
     }, 
     {
         "@timestamp": "2017-04-04T11:43:11.000Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "debug", 
         "event.module": "icinga", 
         "icinga.debug.facility": "Process", 

@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -12,6 +13,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -23,6 +25,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -34,6 +37,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.677Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -45,6 +49,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.724Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -56,6 +61,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.724Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -67,6 +73,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.744Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -78,6 +85,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:50:55.170Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -89,6 +97,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:50:55.487Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -100,6 +109,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.606Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -111,6 +121,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.606Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -122,6 +133,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.606Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -133,6 +145,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.606Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -144,6 +157,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.606Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -155,6 +169,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.688Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -166,6 +181,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -177,6 +193,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -188,6 +205,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -199,6 +217,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -210,6 +229,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:50:55.170Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -221,6 +241,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:50:56.180Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -232,6 +253,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:15:42.095Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -243,6 +265,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.606Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -254,6 +277,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.606Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -265,6 +289,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.688Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -276,6 +301,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -287,6 +313,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -298,6 +325,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:44:56.657Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -309,6 +337,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:50:55.487Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -320,6 +349,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T12:50:56.180Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -331,6 +361,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:11:41.401Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -342,6 +373,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.605Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -353,6 +385,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.605Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
@@ -364,6 +397,7 @@
     }, 
     {
         "@timestamp": "2018-02-05T13:49:45.606Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "log", 
         "event.module": "mongodb", 
         "input.type": "log", 
