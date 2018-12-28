@@ -16,6 +16,7 @@
         },
         {
             "script": {
+                "lang": "painless",
                 "source": "if (ctx.log.level == params.dot) {\n          ctx.log.level = params.debug;\n        } else if (ctx.log.level == params.dash) {\n          ctx.log.level = params.verbose;\n        } else if (ctx.log.level == params.asterisk) {\n          ctx.log.level = params.notice;\n        } else if (ctx.log.level == params.hash) {\n          ctx.log.level = params.warning;\n        }",
                 "params": {
                     "dot": ".",
