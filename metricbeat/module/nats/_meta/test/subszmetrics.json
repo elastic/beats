@@ -1,0 +1,10 @@
+{
+    "avg_fanout": 0,
+    "num_subscriptions": 42,
+    "num_cache": 0,
+    "num_inserts": 0,
+    "num_removes": 0,
+    "num_matches": 0,
+    "cache_hit_rate": 0,
+    "max_fanout": 0
+}

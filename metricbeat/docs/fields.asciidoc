@@ -42,6 +42,7 @@ grouped in the following categories:
 * <<exported-fields-mongodb>>
 * <<exported-fields-munin>>
 * <<exported-fields-mysql>>
+* <<exported-fields-nats>>
 * <<exported-fields-nginx>>
 * <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
@@ -17214,6 +17215,482 @@ type: long
 
 The number of UPDATE queries since startup.
 
+
+--
+
+[[exported-fields-nats]]
+== Nats fields
+
+nats Module
+
+
+
+[float]
+== nats fields
+
+`nats` contains statistics that were read from Nats
+
+
+
+[float]
+== connz fields
+
+Contains nats connection related metrics
+
+
+
+[float]
+== metrics fields
+
+Metrics of connz URI
+
+
+
+*`nats.connz.metrics.metrics.num_subscriptions`*::
++
+--
+type: integer
+
+--
+
+*`nats.connz.metrics.metrics.num_cache`*::
++
+--
+type: integer
+
+--
+
+*`nats.connz.metrics.metrics.num_inserts`*::
++
+--
+type: integer
+
+--
+
+*`nats.connz.metrics.metrics.num_removes`*::
++
+--
+type: integer
+
+--
+
+*`nats.connz.metrics.metrics.num_matches`*::
++
+--
+type: integer
+
+--
+
+*`nats.connz.metrics.metrics.cache_hit_rate`*::
++
+--
+type: integer
+
+--
+
+*`nats.connz.metrics.metrics.max_fanout`*::
++
+--
+type: integer
+
+--
+
+*`nats.connz.metrics.metrics.avg_fanout`*::
++
+--
+type: integer
+
+--
+
+[float]
+== routez fields
+
+Contains nats routes related metrics
+
+
+
+[float]
+== metrics fields
+
+Metrics of routez URI
+
+
+
+*`nats.routez.metrics.metrics.server_id`*::
++
+--
+type: string
+
+--
+
+*`nats.routez.metrics.metrics.now`*::
++
+--
+type: date
+
+--
+
+*`nats.routez.metrics.metrics.num_routes`*::
++
+--
+type: integer
+
+--
+
+*`nats.routez.metrics.metrics.routes`*::
++
+--
+type: nested
+
+--
+
+[float]
+== subz fields
+
+Contains nats subscriptions related metrics
+
+
+
+[float]
+== metrics fields
+
+Metrics of subz URI
+
+
+
+*`nats.subz.metrics.metrics.server_id`*::
++
+--
+type: string
+
+--
+
+*`nats.subz.metrics.metrics.now`*::
++
+--
+type: date
+
+--
+
+*`nats.subz.metrics.metrics.num_connections`*::
++
+--
+type: integer
+
+--
+
+*`nats.subz.metrics.metrics.total`*::
++
+--
+type: integer
+
+--
+
+*`nats.subz.metrics.metrics.offset`*::
++
+--
+type: integer
+
+--
+
+*`nats.subz.metrics.metrics.limit`*::
++
+--
+type: integer
+
+--
+
+*`nats.subz.metrics.metrics.connections`*::
++
+--
+type: nested
+
+--
+
+[float]
+== varz fields
+
+Contains nats var related metrics
+
+
+
+[float]
+== metrics fields
+
+Metrics of varz URI
+
+
+
+*`nats.varz.metrics.metrics.server_id`*::
++
+--
+type: string
+
+--
+
+*`nats.varz.metrics.metrics.version`*::
++
+--
+type: string
+
+--
+
+*`nats.varz.metrics.metrics.proto`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.git_commit`*::
++
+--
+type: string
+
+--
+
+*`nats.varz.metrics.metrics.go`*::
++
+--
+type: string
+
+--
+
+*`nats.varz.metrics.metrics.host`*::
++
+--
+type: string
+
+--
+
+*`nats.varz.metrics.metrics.addr`*::
++
+--
+type: string
+
+--
+
+*`nats.varz.metrics.metrics.max_connections`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.ping_interval`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.ping_max`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.http_host`*::
++
+--
+type: string
+
+--
+
+*`nats.varz.metrics.metrics.http_port`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.https_port`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.auth_timeout`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.max_control_line`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.cluster`*::
++
+--
+type: object
+
+--
+
+*`nats.varz.metrics.metrics.tls_timeout`*::
++
+--
+type: float
+
+--
+
+*`nats.varz.metrics.metrics.port`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.max_payload`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.start`*::
++
+--
+type: date
+
+--
+
+*`nats.varz.metrics.metrics.now`*::
++
+--
+type: date
+
+--
+
+*`nats.varz.metrics.metrics.uptime`*::
++
+--
+type: string
+
+--
+
+*`nats.varz.metrics.metrics.mem`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.cores`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.cpu`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.connections`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.total_connections`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.routes`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.remotes`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.in_msgs`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.out_msgs`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.in_bytes`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.out_bytes`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.slow_consumers`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.max_pending`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.write_deadline`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.subscriptions`*::
++
+--
+type: integer
+
+--
+
+*`nats.varz.metrics.metrics.http_req_stats`*::
++
+--
+type: object
+
+--
+
+*`nats.varz.metrics.metrics.config_load_time`*::
++
+--
+type: date
 
 --
 
