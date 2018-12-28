@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2016-12-26T16:22:08.000Z", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "error", 
         "event.module": "apache2", 
         "input.type": "log", 
@@ -12,6 +13,7 @@
     {
         "@timestamp": "2016-12-26T16:15:55.103Z", 
         "apache2.error.module": "core", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "error", 
         "event.module": "apache2", 
         "input.type": "log", 
@@ -23,6 +25,7 @@
     {
         "@timestamp": "2011-09-09T10:42:29.902Z", 
         "apache2.error.module": "core", 
+        "ecs.version": "1.0.0-beta2", 
         "event.dataset": "error", 
         "event.module": "apache2", 
         "input.type": "log", 
