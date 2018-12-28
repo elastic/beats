@@ -19,8 +19,9 @@ package varz
 
 import (
 	"encoding/json"
-	"github.com/elastic/beats/libbeat/common"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 type Varz struct {
@@ -44,29 +45,29 @@ type Varz struct {
 		ClusterPort int    `json:"cluster_port"`
 		AuthTimeout int    `json:"auth_timeout"`
 	} `json:"cluster"`
-	TLSTimeout       float64   `json:"tls_timeout"`
-	Port             int       `json:"port"`
-	MaxPayload       int       `json:"max_payload"`
-	Start            time.Time `json:"start"`
-	Now              time.Time `json:"now"`
-	Uptime           string    `json:"uptime"`
-	Mem              int       `json:"mem"`
-	Cores            int       `json:"cores"`
-	CPU              int       `json:"cpu"`
-	Connections      int       `json:"connections"`
-	TotalConnections int       `json:"total_connections"`
-	Routes           int       `json:"routes"`
-	Remotes          int       `json:"remotes"`
-	InMsgs           int       `json:"in_msgs"`
-	OutMsgs          int       `json:"out_msgs"`
-	InBytes          int       `json:"in_bytes"`
-	OutBytes         int       `json:"out_bytes"`
-	SlowConsumers    int       `json:"slow_consumers"`
-	MaxPending       int       `json:"max_pending"`
-	WriteDeadline    int       `json:"write_deadline"`
-	Subscriptions    int       `json:"subscriptions"`
+	TLSTimeout       float64     `json:"tls_timeout"`
+	Port             int         `json:"port"`
+	MaxPayload       int         `json:"max_payload"`
+	Start            time.Time   `json:"start"`
+	Now              time.Time   `json:"now"`
+	Uptime           string      `json:"uptime"`
+	Mem              int         `json:"mem"`
+	Cores            int         `json:"cores"`
+	CPU              int         `json:"cpu"`
+	Connections      int         `json:"connections"`
+	TotalConnections int         `json:"total_connections"`
+	Routes           int         `json:"routes"`
+	Remotes          int         `json:"remotes"`
+	InMsgs           int         `json:"in_msgs"`
+	OutMsgs          int         `json:"out_msgs"`
+	InBytes          int         `json:"in_bytes"`
+	OutBytes         int         `json:"out_bytes"`
+	SlowConsumers    int         `json:"slow_consumers"`
+	MaxPending       int         `json:"max_pending"`
+	WriteDeadline    int         `json:"write_deadline"`
+	Subscriptions    int         `json:"subscriptions"`
 	HTTPReqStats     interface{} `json:"http_req_stats"`
-	ConfigLoadTime time.Time `json:"config_load_time"`
+	ConfigLoadTime   time.Time   `json:"config_load_time"`
 }
 
 func eventMapping(content []byte) common.MapStr {

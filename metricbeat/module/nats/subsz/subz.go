@@ -25,8 +25,6 @@ import (
 	"github.com/elastic/beats/metricbeat/mb/parse"
 )
 
-
-
 const (
 	defaultScheme = "http"
 	defaultPath   = "/subsz"

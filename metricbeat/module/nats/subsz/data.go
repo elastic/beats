@@ -19,6 +19,7 @@ package subsz
 
 import (
 	"encoding/json"
+
 	"github.com/elastic/beats/libbeat/common"
 )
 

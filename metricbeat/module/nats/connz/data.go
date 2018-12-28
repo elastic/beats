@@ -19,8 +19,9 @@ package connz
 
 import (
 	"encoding/json"
-	"github.com/elastic/beats/libbeat/common"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 type Connz struct {
