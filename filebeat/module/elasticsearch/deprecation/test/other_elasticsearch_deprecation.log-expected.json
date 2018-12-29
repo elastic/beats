@@ -7,8 +7,8 @@
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
-        "offset": 0,
         "message": "Deprecated field [inline] used, expected [source] instead",
+        "offset": 0,
         "prospector.type": "log",
         "service.name": "elasticsearch"
     },
@@ -20,8 +20,8 @@
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
-        "offset": 118,
         "message": "Deprecated field [inline] used, expected [source] instead",
+        "offset": 118,
         "prospector.type": "log",
         "service.name": "elasticsearch"
     },
@@ -33,8 +33,8 @@
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
-        "offset": 236,
         "message": "Fielddata access on the _uid field is deprecated, use _id instead",
+        "offset": 236,
         "prospector.type": "log",
         "service.name": "elasticsearch"
     },
@@ -46,8 +46,8 @@
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
-        "offset": 362,
         "message": "Fielddata access on the _uid field is deprecated, use _id instead",
+        "offset": 362,
         "prospector.type": "log",
         "service.name": "elasticsearch"
     },
@@ -59,8 +59,8 @@
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
+        "message": "Fielddata access on the _uid field is deprecated, use _id instead",
         "offset": 488,
-        "message": "Fielddata access on the _uid field is deprecated, use _id instead",
         "prospector.type": "log",
         "service.name": "elasticsearch"
     },
@@ -72,8 +72,8 @@
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
+        "message": "Fielddata access on the _uid field is deprecated, use _id instead",
         "offset": 614,
-        "message": "Fielddata access on the _uid field is deprecated, use _id instead",
         "prospector.type": "log",
         "service.name": "elasticsearch"
     },
@@ -85,8 +85,8 @@
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
+        "message": "Fielddata access on the _uid field is deprecated, use _id instead",
         "offset": 740,
-        "message": "Fielddata access on the _uid field is deprecated, use _id instead",
         "prospector.type": "log",
         "service.name": "elasticsearch"
     },
@@ -98,8 +98,8 @@
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
+        "message": "Fielddata access on the _uid field is deprecated, use _id instead",
         "offset": 866,
-        "message": "Fielddata access on the _uid field is deprecated, use _id instead",
         "prospector.type": "log",
         "service.name": "elasticsearch"
     },
@@ -111,8 +111,8 @@
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
-        "offset": 992,
         "message": "Fielddata access on the _uid field is deprecated, use _id instead",
+        "offset": 992,
         "prospector.type": "log",
         "service.name": "elasticsearch"
     },
@@ -124,8 +124,8 @@
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
-        "offset": 1118,
         "message": "[_all] is deprecated in 6.0+ and will be removed in 7.0. As a replacement, you can use [copy_to] on mapping fields to create your own catch all field.",
+        "offset": 1118,
         "prospector.type": "log",
         "service.name": "elasticsearch"
     },
@@ -137,8 +137,8 @@
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
-        "offset": 1329,
         "message": "[_all] is deprecated in 6.0+ and will be removed in 7.0. As a replacement, you can use [copy_to] on mapping fields to create your own catch all field.",
+        "offset": 1329,
         "prospector.type": "log",
         "service.name": "elasticsearch"
     },
@@ -150,8 +150,8 @@
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
-        "offset": 1540,
         "message": "[_all] is deprecated in 6.0+ and will be removed in 7.0. As a replacement, you can use [copy_to] on mapping fields to create your own catch all field.",
+        "offset": 1540,
         "prospector.type": "log",
         "service.name": "elasticsearch"
     },
@@ -163,8 +163,8 @@
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
-        "offset": 1751,
         "message": "Deprecated aggregation order key [_term] used, replaced by [_key]",
+        "offset": 1751,
         "prospector.type": "log",
         "service.name": "elasticsearch"
     },
@@ -176,8 +176,8 @@
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
-        "offset": 1882,
         "message": "Deprecated field [template] used, replaced by [index_patterns]",
+        "offset": 1882,
         "prospector.type": "log",
         "service.name": "elasticsearch"
     },
@@ -189,8 +189,8 @@
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
-        "offset": 2019,
         "message": "[_default_] mapping is deprecated since it is not useful anymore now that indexes cannot have more than one type",
+        "offset": 2019,
         "prospector.type": "log",
         "service.name": "elasticsearch"
     },
@@ -202,8 +202,8 @@
         "fileset.name": "deprecation",
         "input.type": "log",
         "log.level": "WARN",
-        "offset": 2192,
         "message": "[_default_] mapping is deprecated since it is not useful anymore now that indexes cannot have more than one type",
+        "offset": 2192,
         "prospector.type": "log",
         "service.name": "elasticsearch"
     }
