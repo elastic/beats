@@ -63,6 +63,9 @@ https://github.com/elastic/beats/compare/1035569addc4a3b29ffa14f8a08c27c1ace16ef
 
 *Heartbeat*
 
+- Fixed rare issue where TLS connections to endpoints with x509 certificates missing either notBefore or notAfter would cause the check to fail with a stacktrace.  {pull}9566[9566]
+
+
 *Journalbeat*
 
 *Metricbeat*

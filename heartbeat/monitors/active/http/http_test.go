@@ -18,12 +18,17 @@
 package http
 
 import (
+	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path"
 	"testing"
+
+	"github.com/elastic/beats/libbeat/common/file"
 
 	"github.com/stretchr/testify/require"
 
@@ -36,19 +41,21 @@ import (
 )
 
 func testRequest(t *testing.T, testURL string) beat.Event {
-	return testTLSRequest(t, testURL, "")
+	return testTLSRequest(t, testURL, nil)
 }
 
 // testTLSRequest tests the given request. certPath is optional, if given
 // an empty string no cert will be set.
-func testTLSRequest(t *testing.T, testURL string, certPath string) beat.Event {
+func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interface{}) beat.Event {
 	configSrc := map[string]interface{}{
 		"urls":    testURL,
 		"timeout": "1s",
 	}
 
-	if certPath != "" {
-		configSrc["ssl.certificate_authorities"] = certPath
+	if extraConfig != nil {
+		for k, v := range extraConfig {
+			configSrc[k] = v
+		}
 	}
 
 	config, err := common.NewConfigFrom(configSrc)
@@ -247,8 +254,10 @@ func TestLargeResponse(t *testing.T) {
 	)
 }
 
-func TestHTTPSServer(t *testing.T) {
-	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
+func runHTTPSServerCheck(
+	t *testing.T,
+	server *httptest.Server,
+	reqExtraConfig map[string]interface{}) {
 	port, err := hbtest.ServerPort(server)
 	require.NoError(t, err)
 
@@ -261,7 +270,12 @@ func TestHTTPSServer(t *testing.T) {
 	require.NoError(t, certFile.Close())
 	defer os.Remove(certFile.Name())
 
-	event := testTLSRequest(t, server.URL, certFile.Name())
+	mergedExtraConfig := map[string]interface{}{"ssl.certificate_authorities": certFile.Name()}
+	for k, v := range reqExtraConfig {
+		mergedExtraConfig[k] = v
+	}
+
+	event := testTLSRequest(t, server.URL, mergedExtraConfig)
 
 	mapvaltest.Test(
 		t,
@@ -272,6 +286,50 @@ func TestHTTPSServer(t *testing.T) {
 			respondingHTTPChecks(server.URL, http.StatusOK),
 		)),
 		event.Fields,
+	)
+}
+
+func TestHTTPSServer(t *testing.T) {
+	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
+
+	runHTTPSServerCheck(t, server, nil)
+}
+
+func TestHTTPSx509Auth(t *testing.T) {
+	wd, err := os.Getwd()
+	require.NoError(t, err)
+	clientKeyPath := path.Join(wd, "testdata", "client_key.pem")
+	clientCertPath := path.Join(wd, "testdata", "client_cert.pem")
+
+	certReader, err := file.ReadOpen(clientCertPath)
+	require.NoError(t, err)
+
+	clientCertBytes, err := ioutil.ReadAll(certReader)
+	require.NoError(t, err)
+
+	clientCerts := x509.NewCertPool()
+	certAdded := clientCerts.AppendCertsFromPEM(clientCertBytes)
+	require.True(t, certAdded)
+
+	tlsConf := &tls.Config{
+		ClientAuth: tls.RequireAndVerifyClientCert,
+		ClientCAs:  clientCerts,
+		MinVersion: tls.VersionTLS12,
+	}
+	tlsConf.BuildNameToCertificate()
+
+	server := httptest.NewUnstartedServer(hbtest.HelloWorldHandler(http.StatusOK))
+	server.TLS = tlsConf
+	server.StartTLS()
+	defer server.Close()
+
+	runHTTPSServerCheck(
+		t,
+		server,
+		map[string]interface{}{
+			"ssl.certificate": clientCertPath,
+			"ssl.key":         clientKeyPath,
+		},
 	)
 }
 
