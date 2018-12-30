@@ -305,7 +305,7 @@ func (sip *sipPlugin) ParseUDP(pkt *protos.Packet) {
 
 	sipMsg.ts = pkt.Ts
 	sipMsg.tuple = pkt.Tuple
-	sipMsg.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(&pkt.Tuple)
+	sipMsg.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleUDP(&pkt.Tuple)
 
 	// parse sip headers.
 	// if the message was malformed, the message will be rejected

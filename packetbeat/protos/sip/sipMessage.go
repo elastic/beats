@@ -19,7 +19,7 @@ import (
 type sipMessage struct {
 	ts           time.Time          // Time when the message was received.
 	tuple        common.IPPortTuple // Source and destination addresses of packet.
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 	transport    transport
 
 	// SIP FirstLines
