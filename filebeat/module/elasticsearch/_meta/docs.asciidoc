@@ -1,0 +1,104 @@
+:modulename: elasticsearch
+:has-dashboards: false
+
+== Elasticsearch module
+
+beta[]
+
+This is the elasticsearch module.
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+The Elasticsearch module is compatible with Elasticsearch 6.2 and newer.
+
+
+include::../include/running-modules.asciidoc[]
+
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: server
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `server` log fileset settings
+
+include::../include/var-paths.asciidoc[]
++
+Example config:
++
+[source,yaml]
+----
+  server:
+    enabled: true
+    var.paths:
+      - /var/log/elasticsearch/*.log
+----
+
+[float]
+==== `gc` log fileset settings
+
+include::../include/var-paths.asciidoc[]
++
+Example config:
++
+[source,yaml]
+----
+  gc:
+    var.paths:
+      - /var/log/elasticsearch/gc.log.[0-9]*
+      - /var/log/elasticsearch/gc.log
+----
+
+[float]
+==== `audit` log fileset settings
+
+include::../include/var-paths.asciidoc[]
++
+Example config:
++
+[source,yaml]
+----
+  audit:
+    var.paths:
+      - /var/log/elasticsearch/*_access.log
+----
+
+[float]
+==== `slowlog` log fileset settings
+
+include::../include/var-paths.asciidoc[]
++
+Example config:
++
+[source,yaml]
+----
+  slowlog:
+    var.paths:
+      - /var/log/elasticsearch/*_index_search_slowlog.log
+      - /var/log/elasticsearch/*_index_indexing_slowlog.log
+----
+
+[float]
+==== `deprecation` log fileset settings
+
+include::../include/var-paths.asciidoc[]
++
+Example config:
++
+[source,yaml]
+----
+  deprecation:
+    var.paths:
+      - /var/log/elasticsearch/*_deprecation.log
+----
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

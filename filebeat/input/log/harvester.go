@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // Package log harvests different inputs for new information. Currently
 // two harvester types exist:
 //
@@ -20,7 +37,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -31,10 +48,14 @@ import (
 
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
-	"github.com/elastic/beats/filebeat/harvester/encoding"
-	"github.com/elastic/beats/filebeat/harvester/reader"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/filebeat/util"
+	"github.com/elastic/beats/libbeat/reader"
+	"github.com/elastic/beats/libbeat/reader/debug"
+	"github.com/elastic/beats/libbeat/reader/multiline"
+	"github.com/elastic/beats/libbeat/reader/readfile"
+	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/libbeat/reader/readjson"
 )
 
 var (
@@ -51,6 +72,9 @@ var (
 	ErrInactive     = errors.New("file inactive")
 	ErrClosed       = errors.New("reader closed")
 )
+
+// OutletFactory provides an outlet for the harvester
+type OutletFactory func() channel.Outleter
 
 // Harvester contains all harvester related data
 type Harvester struct {
@@ -75,8 +99,8 @@ type Harvester struct {
 	encoding        encoding.Encoding
 
 	// event/state publishing
-	forwarder    *harvester.Forwarder
-	publishState func(*util.Data) bool
+	outletFactory OutletFactory
+	publishState  func(*util.Data) bool
 
 	onTerminate func()
 }
@@ -87,17 +111,23 @@ func NewHarvester(
 	state file.State,
 	states *file.States,
 	publishState func(*util.Data) bool,
-	outlet channel.Outleter,
+	outletFactory OutletFactory,
 ) (*Harvester, error) {
 
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
+
 	h := &Harvester{
-		config:       defaultConfig,
-		state:        state,
-		states:       states,
-		publishState: publishState,
-		done:         make(chan struct{}),
-		stopWg:       &sync.WaitGroup{},
-		id:           uuid.NewV4(),
+		config:        defaultConfig,
+		state:         state,
+		states:        states,
+		publishState:  publishState,
+		done:          make(chan struct{}),
+		stopWg:        &sync.WaitGroup{},
+		id:            id,
+		outletFactory: outletFactory,
 	}
 
 	if err := config.Unpack(&h.config); err != nil {
@@ -116,8 +146,6 @@ func NewHarvester(
 	}
 
 	// Add outlet signal so harvester can also stop itself
-	outlet = channel.CloseOnSignal(outlet, h.done)
-	h.forwarder = harvester.NewForwarder(outlet)
 	return h, nil
 }
 
@@ -164,6 +192,10 @@ func (h *Harvester) Run() error {
 	if h.onTerminate != nil {
 		defer h.onTerminate()
 	}
+
+	outlet := channel.CloseOnSignal(h.outletFactory(), h.done)
+	forwarder := harvester.NewForwarder(outlet)
+
 	// This is to make sure a harvester is not started anymore if stop was already
 	// called before the harvester was started. The waitgroup is not incremented afterwards
 	// as otherwise it could happened that between checking for the close channel and incrementing
@@ -246,7 +278,7 @@ func (h *Harvester) Run() error {
 			case ErrInactive:
 				logp.Info("File is inactive: %s. Closing because close_inactive of %v reached.", h.state.Source, h.config.CloseInactive)
 			default:
-				logp.Err("Read line error: %s; File: ", err, h.state.Source)
+				logp.Err("Read line error: %v; File: %v", err, h.state.Source)
 			}
 			return nil
 		}
@@ -261,6 +293,7 @@ func (h *Harvester) Run() error {
 		// This is important in case sending is not successful so on shutdown
 		// the old offset is reported
 		state := h.getState()
+		startingOffset := state.Offset
 		state.Offset += int64(message.Bytes)
 
 		// Create state event
@@ -274,8 +307,12 @@ func (h *Harvester) Run() error {
 		// Check if data should be added to event. Only export non empty events.
 		if !message.IsEmpty() && h.shouldExportLine(text) {
 			fields := common.MapStr{
-				"source": state.Source,
-				"offset": state.Offset, // Offset here is the offset before the starting char.
+				"log": common.MapStr{
+					"offset": startingOffset, // Offset here is the offset before the starting char.
+					"file": common.MapStr{
+						"path": state.Source,
+					},
+				},
 			}
 			fields.DeepUpdate(message.Fields)
 
@@ -290,7 +327,7 @@ func (h *Harvester) Run() error {
 			}
 
 			if h.config.JSON != nil && len(jsonFields) > 0 {
-				ts := reader.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
+				ts := readjson.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
 				if !ts.IsZero() {
 					// there was a `@timestamp` key in the event, so overwrite
 					// the resulting timestamp
@@ -308,7 +345,7 @@ func (h *Harvester) Run() error {
 
 		// Always send event to update state, also if lines was skipped
 		// Stop harvester in case of an error
-		if !h.sendEvent(data) {
+		if !h.sendEvent(data, forwarder) {
 			return nil
 		}
 
@@ -335,12 +372,12 @@ func (h *Harvester) Stop() {
 
 // sendEvent sends event to the spooler channel
 // Return false if event was not sent
-func (h *Harvester) sendEvent(data *util.Data) bool {
+func (h *Harvester) sendEvent(data *util.Data, forwarder *harvester.Forwarder) bool {
 	if h.source.HasState() {
 		h.states.Update(data.GetState())
 	}
 
-	err := h.forwarder.Send(data)
+	err := forwarder.Send(data)
 	return err == nil
 }
 
@@ -522,28 +559,33 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
-	r, err = reader.NewEncode(h.log, h.encoding, h.config.BufferSize)
+	reader, err := debug.AppendReaders(h.log)
 	if err != nil {
 		return nil, err
 	}
 
-	if h.config.DockerJSON != "" {
+	r, err = readfile.NewEncodeReader(reader, h.encoding, h.config.BufferSize)
+	if err != nil {
+		return nil, err
+	}
+
+	if h.config.DockerJSON != nil {
 		// Docker json-file format, add custom parsing to the pipeline
-		r = reader.NewDockerJSON(r, h.config.DockerJSON)
+		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.ForceCRI, h.config.DockerJSON.CRIFlags)
 	}
 
 	if h.config.JSON != nil {
-		r = reader.NewJSON(r, h.config.JSON)
+		r = readjson.NewJSONReader(r, h.config.JSON)
 	}
 
-	r = reader.NewStripNewline(r)
+	r = readfile.NewStripNewline(r)
 
 	if h.config.Multiline != nil {
-		r, err = reader.NewMultiline(r, "\n", h.config.MaxBytes, h.config.Multiline)
+		r, err = multiline.New(r, "\n", h.config.MaxBytes, h.config.Multiline)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return reader.NewLimit(r, h.config.MaxBytes), nil
+	return readfile.NewLimitReader(r, h.config.MaxBytes), nil
 }

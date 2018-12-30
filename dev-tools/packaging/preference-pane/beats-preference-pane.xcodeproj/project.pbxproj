@@ -1,0 +1,523 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3A0F656C205D5AE9009DBAE7 /* setboot.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A0F656B205D5AE9009DBAE7 /* setboot.m */; };
+		3A34B24E203B1F480079E62C /* Beats.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A34B24C203B1F480079E62C /* Beats.h */; };
+		3A34B251203B239F0079E62C /* Beats.icns in Resources */ = {isa = PBXBuildFile; fileRef = 3A34B250203B239F0079E62C /* Beats.icns */; };
+		3A6BA0642062CEAA00A05921 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A6BA0632062CEAA00A05921 /* config.h */; };
+		3A6F9AB6202C939D0046F40E /* BeatsPrefPane.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A6F9AB5202C939D0046F40E /* BeatsPrefPane.h */; };
+		3A6F9AB8202C939D0046F40E /* BeatsPrefPane.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A6F9AB7202C939D0046F40E /* BeatsPrefPane.m */; };
+		3A6F9ABD202C939D0046F40E /* BeatsPrefPane.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3A6F9ABB202C939D0046F40E /* BeatsPrefPane.xib */; };
+		3A8FA06D20626DEF0091102D /* common.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AC0A94420626C7B00741C93 /* common.m */; };
+		3A915924205EB4F4007DE746 /* EditorWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A915921205EB4F4007DE746 /* EditorWindow.h */; };
+		3A915925205EB4F4007DE746 /* EditorWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 3A915922205EB4F4007DE746 /* EditorWindow.m */; };
+		3A915926205EB4F4007DE746 /* Base.lproj/EditorWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3A915923205EB4F4007DE746 /* Base.lproj/EditorWindow.xib */; };
+		3AA415CE2051B206008915AA /* BeatsService.h in Headers */ = {isa = PBXBuildFile; fileRef = 3AA415CC2051B206008915AA /* BeatsService.h */; };
+		3AA415CF2051B206008915AA /* BeatsService.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AA415CD2051B206008915AA /* BeatsService.m */; };
+		3AA415DD20582B34008915AA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AA415DC20582B34008915AA /* main.m */; };
+		3AA415E4205833A3008915AA /* helper in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3AA415DA20582B34008915AA /* helper */; };
+		3AC0A94620626C7C00741C93 /* common.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AC0A94420626C7B00741C93 /* common.m */; };
+		3AD0D414203CE40800338653 /* BeatViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 3AD0D411203CE40800338653 /* BeatViewController.h */; };
+		3AD0D415203CE40800338653 /* BeatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AD0D412203CE40800338653 /* BeatViewController.m */; };
+		3AD0D419203CECDA00338653 /* TabViewDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 3AD0D417203CECDA00338653 /* TabViewDelegate.h */; };
+		3AD0D41A203CECDA00338653 /* TabViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AD0D418203CECDA00338653 /* TabViewDelegate.m */; };
+		3AD0D420203D791100338653 /* Base.lproj/BeatView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3AD0D41F203D791100338653 /* Base.lproj/BeatView.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3A0F6569205BE29D009DBAE7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3A6F9AA9202C939D0046F40E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3AA415D920582B34008915AA;
+			remoteInfo = helper;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		3AA415D820582B34008915AA /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3AA415E32058339A008915AA /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				3AA415E4205833A3008915AA /* helper in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		3A0F656B205D5AE9009DBAE7 /* setboot.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = setboot.m; sourceTree = "<group>"; };
+		3A34B24C203B1F480079E62C /* Beats.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Beats.h; sourceTree = "<group>"; };
+		3A34B250203B239F0079E62C /* Beats.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Beats.icns; sourceTree = "<group>"; };
+		3A6BA0632062CEAA00A05921 /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		3A6F9AB2202C939D0046F40E /* Beats.prefPane */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Beats.prefPane; sourceTree = BUILT_PRODUCTS_DIR; };
+		3A6F9AB5202C939D0046F40E /* BeatsPrefPane.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BeatsPrefPane.h; sourceTree = "<group>"; };
+		3A6F9AB7202C939D0046F40E /* BeatsPrefPane.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BeatsPrefPane.m; sourceTree = "<group>"; };
+		3A6F9ABC202C939D0046F40E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/BeatsPrefPane.xib; sourceTree = "<group>"; };
+		3A6F9ABE202C939D0046F40E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3A915921205EB4F4007DE746 /* EditorWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EditorWindow.h; sourceTree = "<group>"; };
+		3A915922205EB4F4007DE746 /* EditorWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EditorWindow.m; sourceTree = "<group>"; };
+		3A915923205EB4F4007DE746 /* Base.lproj/EditorWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Base.lproj/EditorWindow.xib; sourceTree = "<group>"; };
+		3AA415CC2051B206008915AA /* BeatsService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BeatsService.h; sourceTree = "<group>"; };
+		3AA415CD2051B206008915AA /* BeatsService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BeatsService.m; sourceTree = "<group>"; };
+		3AA415D520572B5A008915AA /* Authorization.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Authorization.h; sourceTree = "<group>"; };
+		3AA415DA20582B34008915AA /* helper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = helper; sourceTree = BUILT_PRODUCTS_DIR; };
+		3AA415DC20582B34008915AA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		3AC0A94420626C7B00741C93 /* common.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = common.m; sourceTree = "<group>"; };
+		3AC0A94520626C7C00741C93 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		3AD0D411203CE40800338653 /* BeatViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BeatViewController.h; sourceTree = "<group>"; };
+		3AD0D412203CE40800338653 /* BeatViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BeatViewController.m; sourceTree = "<group>"; };
+		3AD0D417203CECDA00338653 /* TabViewDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TabViewDelegate.h; sourceTree = "<group>"; };
+		3AD0D418203CECDA00338653 /* TabViewDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TabViewDelegate.m; sourceTree = "<group>"; };
+		3AD0D41F203D791100338653 /* Base.lproj/BeatView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Base.lproj/BeatView.xib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3A6F9AAE202C939D0046F40E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3AA415D720582B34008915AA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3A6F9AA8202C939D0046F40E = {
+			isa = PBXGroup;
+			children = (
+				3A6F9AB4202C939D0046F40E /* beats-preference-pane */,
+				3AA415DB20582B34008915AA /* helper */,
+				3A6F9AB3202C939D0046F40E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3A6F9AB3202C939D0046F40E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3A6F9AB2202C939D0046F40E /* Beats.prefPane */,
+				3AA415DA20582B34008915AA /* helper */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3A6F9AB4202C939D0046F40E /* beats-preference-pane */ = {
+			isa = PBXGroup;
+			children = (
+				3AC0A94320626C6B00741C93 /* common */,
+				3AA415C9205159E1008915AA /* beats */,
+				3AD0D41F203D791100338653 /* Base.lproj/BeatView.xib */,
+				3A34B250203B239F0079E62C /* Beats.icns */,
+				3A6F9AB5202C939D0046F40E /* BeatsPrefPane.h */,
+				3A6F9AB7202C939D0046F40E /* BeatsPrefPane.m */,
+				3A6F9ABB202C939D0046F40E /* BeatsPrefPane.xib */,
+				3A6F9ABE202C939D0046F40E /* Info.plist */,
+				3AD0D411203CE40800338653 /* BeatViewController.h */,
+				3AD0D412203CE40800338653 /* BeatViewController.m */,
+				3AD0D417203CECDA00338653 /* TabViewDelegate.h */,
+				3AD0D418203CECDA00338653 /* TabViewDelegate.m */,
+				3AA415D520572B5A008915AA /* Authorization.h */,
+				3A915921205EB4F4007DE746 /* EditorWindow.h */,
+				3A915922205EB4F4007DE746 /* EditorWindow.m */,
+				3A915923205EB4F4007DE746 /* Base.lproj/EditorWindow.xib */,
+				3A6BA0632062CEAA00A05921 /* config.h */,
+			);
+			path = "beats-preference-pane";
+			sourceTree = "<group>";
+		};
+		3AA415C9205159E1008915AA /* beats */ = {
+			isa = PBXGroup;
+			children = (
+				3A34B24C203B1F480079E62C /* Beats.h */,
+				3AA415CC2051B206008915AA /* BeatsService.h */,
+				3AA415CD2051B206008915AA /* BeatsService.m */,
+			);
+			path = beats;
+			sourceTree = "<group>";
+		};
+		3AA415DB20582B34008915AA /* helper */ = {
+			isa = PBXGroup;
+			children = (
+				3AA415DC20582B34008915AA /* main.m */,
+				3A0F656B205D5AE9009DBAE7 /* setboot.m */,
+			);
+			path = helper;
+			sourceTree = "<group>";
+		};
+		3AC0A94320626C6B00741C93 /* common */ = {
+			isa = PBXGroup;
+			children = (
+				3AC0A94520626C7C00741C93 /* common.h */,
+				3AC0A94420626C7B00741C93 /* common.m */,
+			);
+			path = common;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		3A6F9AAF202C939D0046F40E /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3AD0D414203CE40800338653 /* BeatViewController.h in Headers */,
+				3A34B24E203B1F480079E62C /* Beats.h in Headers */,
+				3AA415CE2051B206008915AA /* BeatsService.h in Headers */,
+				3A6BA0642062CEAA00A05921 /* config.h in Headers */,
+				3A915924205EB4F4007DE746 /* EditorWindow.h in Headers */,
+				3A6F9AB6202C939D0046F40E /* BeatsPrefPane.h in Headers */,
+				3AD0D419203CECDA00338653 /* TabViewDelegate.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		3A6F9AB1202C939D0046F40E /* Beats */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3A6F9AC1202C939D0046F40E /* Build configuration list for PBXNativeTarget "Beats" */;
+			buildPhases = (
+				3A6F9AAD202C939D0046F40E /* Sources */,
+				3A6F9AAE202C939D0046F40E /* Frameworks */,
+				3A6F9AAF202C939D0046F40E /* Headers */,
+				3A6F9AB0202C939D0046F40E /* Resources */,
+				3AA415E32058339A008915AA /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3A0F656A205BE29D009DBAE7 /* PBXTargetDependency */,
+			);
+			name = Beats;
+			productName = "beats-preference-pane";
+			productReference = 3A6F9AB2202C939D0046F40E /* Beats.prefPane */;
+			productType = "com.apple.product-type.bundle";
+		};
+		3AA415D920582B34008915AA /* helper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3AA415DE20582B34008915AA /* Build configuration list for PBXNativeTarget "helper" */;
+			buildPhases = (
+				3AA415D620582B34008915AA /* Sources */,
+				3AA415D720582B34008915AA /* Frameworks */,
+				3AA415D820582B34008915AA /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = helper;
+			productName = "launchctl-helper";
+			productReference = 3AA415DA20582B34008915AA /* helper */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3A6F9AA9202C939D0046F40E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0920;
+				ORGANIZATIONNAME = Elastic;
+				TargetAttributes = {
+					3A6F9AB1202C939D0046F40E = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+					};
+					3AA415D920582B34008915AA = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 3A6F9AAC202C939D0046F40E /* Build configuration list for PBXProject "beats-preference-pane" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 3A6F9AA8202C939D0046F40E;
+			productRefGroup = 3A6F9AB3202C939D0046F40E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3AA415D920582B34008915AA /* helper */,
+				3A6F9AB1202C939D0046F40E /* Beats */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3A6F9AB0202C939D0046F40E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3A915926205EB4F4007DE746 /* Base.lproj/EditorWindow.xib in Resources */,
+				3A34B251203B239F0079E62C /* Beats.icns in Resources */,
+				3AD0D420203D791100338653 /* Base.lproj/BeatView.xib in Resources */,
+				3A6F9ABD202C939D0046F40E /* BeatsPrefPane.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3A6F9AAD202C939D0046F40E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3A8FA06D20626DEF0091102D /* common.m in Sources */,
+				3A915925205EB4F4007DE746 /* EditorWindow.m in Sources */,
+				3AD0D41A203CECDA00338653 /* TabViewDelegate.m in Sources */,
+				3A6F9AB8202C939D0046F40E /* BeatsPrefPane.m in Sources */,
+				3AA415CF2051B206008915AA /* BeatsService.m in Sources */,
+				3AD0D415203CE40800338653 /* BeatViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3AA415D620582B34008915AA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3A0F656C205D5AE9009DBAE7 /* setboot.m in Sources */,
+				3AA415DD20582B34008915AA /* main.m in Sources */,
+				3AC0A94620626C7C00741C93 /* common.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3A0F656A205BE29D009DBAE7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3AA415D920582B34008915AA /* helper */;
+			targetProxy = 3A0F6569205BE29D009DBAE7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		3A6F9ABB202C939D0046F40E /* BeatsPrefPane.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3A6F9ABC202C939D0046F40E /* Base */,
+			);
+			name = BeatsPrefPane.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		3A6F9ABF202C939D0046F40E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		3A6F9AC0202C939D0046F40E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		3A6F9AC2202C939D0046F40E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = UZ3M9EEN74;
+				INFOPLIST_FILE = "beats-preference-pane/Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/PreferencePanes";
+				PRODUCT_BUNDLE_IDENTIFIER = "co.elastic.beats-preference-pane";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = prefPane;
+			};
+			name = Debug;
+		};
+		3A6F9AC3202C939D0046F40E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = UZ3M9EEN74;
+				INFOPLIST_FILE = "beats-preference-pane/Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/PreferencePanes";
+				PRODUCT_BUNDLE_IDENTIFIER = "co.elastic.beats-preference-pane";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = prefPane;
+			};
+			name = Release;
+		};
+		3AA415DF20582B34008915AA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = UZ3M9EEN74;
+				INSTALL_PATH = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+			};
+			name = Debug;
+		};
+		3AA415E020582B34008915AA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = UZ3M9EEN74;
+				INSTALL_PATH = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3A6F9AAC202C939D0046F40E /* Build configuration list for PBXProject "beats-preference-pane" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3A6F9ABF202C939D0046F40E /* Debug */,
+				3A6F9AC0202C939D0046F40E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3A6F9AC1202C939D0046F40E /* Build configuration list for PBXNativeTarget "Beats" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3A6F9AC2202C939D0046F40E /* Debug */,
+				3A6F9AC3202C939D0046F40E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3AA415DE20582B34008915AA /* Build configuration list for PBXNativeTarget "helper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3AA415DF20582B34008915AA /* Debug */,
+				3AA415E020582B34008915AA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3A6F9AA9202C939D0046F40E /* Project object */;
+}

@@ -1,10 +1,20 @@
-- module: docker
-  metricsets: ["container", "cpu", "diskio", "healthcheck", "info", "memory", "network"]
-  hosts: ["unix:///var/run/docker.sock"]
-  period: 10s
+# Module: docker
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-docker.html
 
-  # Replace dots in labels with `_`. Set to false to keep dots
-  labels.dedot: true
+- module: docker
+  #metricsets:
+  #  - container
+  #  - cpu
+  #  - diskio
+  #  - healthcheck
+  #  - info
+  #  - memory
+  #  - network
+  period: 10s
+  hosts: ["unix:///var/run/docker.sock"]
+
+  # If set to true, replace dots in labels with `_`.
+  #labels.dedot: false
 
   # To connect to Docker over TLS you must specify a client and CA certificate.
   #ssl:

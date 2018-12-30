@@ -1,0 +1,20 @@
+# Delete and stop the service if it already exists.
+if (Get-Service {{.BeatName}} -ErrorAction SilentlyContinue) {
+  $service = Get-WmiObject -Class Win32_Service -Filter "name='{{.BeatName}}'"
+  $service.StopService()
+  Start-Sleep -s 1
+  $service.delete()
+}
+
+$workdir = Split-Path $MyInvocation.MyCommand.Path
+
+# Create the new service.
+New-Service -name {{.BeatName}} `
+  -displayName {{.BeatName | title}} `
+  -binaryPathName "`"$workdir\{{.BeatName}}.exe`" -c `"$workdir\{{.BeatName}}.yml`" -path.home `"$workdir`" -path.data `"C:\ProgramData\{{.BeatName}}`" -path.logs `"C:\ProgramData\{{.BeatName}}\logs`""
+
+# Attempt to set the service to delayed start using sc config.
+Try {
+  Start-Process -FilePath sc.exe -ArgumentList 'config {{.BeatName}} start=delayed-auto'
+}
+Catch { Write-Host "An error occured setting the service to delayed start." -ForegroundColor Red }

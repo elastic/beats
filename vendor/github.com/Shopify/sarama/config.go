@@ -1,7 +1,11 @@
 package sarama
 
 import (
+	"compress/gzip"
 	"crypto/tls"
+	"fmt"
+	"io/ioutil"
+	"net"
 	"regexp"
 	"time"
 
@@ -14,6 +18,13 @@ var validID = regexp.MustCompile(`\A[A-Za-z0-9._-]+\z`)
 
 // Config is used to pass multiple configuration options to Sarama's constructors.
 type Config struct {
+	// Admin is the namespace for ClusterAdmin properties used by the administrative Kafka client.
+	Admin struct {
+		// The maximum duration the administrative Kafka client will wait for ClusterAdmin operations,
+		// including topics, brokers, configurations and ACLs (defaults to 3 seconds).
+		Timeout time.Duration
+	}
+
 	// Net is the namespace for network-level properties used by the Broker, and
 	// shared by the Client/Producer/Consumer.
 	Net struct {
@@ -55,6 +66,12 @@ type Config struct {
 		// KeepAlive specifies the keep-alive period for an active network connection.
 		// If zero, keep-alives are disabled. (default is 0: disabled).
 		KeepAlive time.Duration
+
+		// LocalAddr is the local address to use when dialing an
+		// address. The address must be of a compatible type for the
+		// network being dialed.
+		// If nil, a local address is automatically chosen.
+		LocalAddr net.Addr
 	}
 
 	// Metadata is the namespace for metadata management properties used by the
@@ -72,6 +89,12 @@ type Config struct {
 		// Defaults to 10 minutes. Set to 0 to disable. Similar to
 		// `topic.metadata.refresh.interval.ms` in the JVM version.
 		RefreshFrequency time.Duration
+
+		// Whether to maintain a full set of metadata for all topics, or just
+		// the minimal set that has been necessary so far. The full set is simpler
+		// and usually more convenient, but can take up a substantial amount of
+		// memory if you have many topics and partitions. Defaults to true.
+		Full bool
 	}
 
 	// Producer is the namespace for configuration related to producing messages,
@@ -93,13 +116,20 @@ type Config struct {
 		// The type of compression to use on messages (defaults to no compression).
 		// Similar to `compression.codec` setting of the JVM producer.
 		Compression CompressionCodec
+		// The level of compression to use on messages. The meaning depends
+		// on the actual compression type used and defaults to default compression
+		// level for the codec.
+		CompressionLevel int
 		// Generates partitioners for choosing the partition to send messages to
 		// (defaults to hashing the message key). Similar to the `partitioner.class`
 		// setting for the JVM producer.
 		Partitioner PartitionerConstructor
 
 		// Return specifies what channels will be populated. If they are set to true,
-		// you must read from the respective channels to prevent deadlock.
+		// you must read from the respective channels to prevent deadlock. If,
+		// however, this config is used to create a `SyncProducer`, both must be set
+		// to true and you shall not read from the channels since the producer does
+		// this internally.
 		Return struct {
 			// If enabled, successfully delivered messages will be returned on the
 			// Successes channel (default disabled).
@@ -166,7 +196,7 @@ type Config struct {
 			// Equivalent to the JVM's `fetch.min.bytes`.
 			Min int32
 			// The default number of message bytes to fetch from the broker in each
-			// request (default 32768). This should be larger than the majority of
+			// request (default 1MB). This should be larger than the majority of
 			// your messages, or else the consumer will spend a lot of time
 			// negotiating sizes and not actually consuming. Similar to the JVM's
 			// `fetch.message.max.bytes`.
@@ -187,11 +217,23 @@ type Config struct {
 		// Equivalent to the JVM's `fetch.wait.max.ms`.
 		MaxWaitTime time.Duration
 
-		// The maximum amount of time the consumer expects a message takes to process
-		// for the user. If writing to the Messages channel takes longer than this,
-		// that partition will stop fetching more messages until it can proceed again.
+		// The maximum amount of time the consumer expects a message takes to
+		// process for the user. If writing to the Messages channel takes longer
+		// than this, that partition will stop fetching more messages until it
+		// can proceed again.
 		// Note that, since the Messages channel is buffered, the actual grace time is
 		// (MaxProcessingTime * ChanneBufferSize). Defaults to 100ms.
+		// If a message is not written to the Messages channel between two ticks
+		// of the expiryTicker then a timeout is detected.
+		// Using a ticker instead of a timer to detect timeouts should typically
+		// result in many fewer calls to Timer functions which may result in a
+		// significant performance improvement if many messages are being sent
+		// and timeouts are infrequent.
+		// The disadvantage of using a ticker instead of a timer is that
+		// timeouts will be less accurate. That is, the effective timeout could
+		// be between `MaxProcessingTime` and `2 * MaxProcessingTime`. For
+		// example, if `MaxProcessingTime` is 100ms then a delay of 180ms
+		// between two messages being sent may not be recognized as a timeout.
 		MaxProcessingTime time.Duration
 
 		// Return specifies what channels will be populated. If they are set to true,
@@ -220,6 +262,12 @@ type Config struct {
 			// broker version 0.9.0 or later.
 			// (default is 0: disabled).
 			Retention time.Duration
+
+			Retry struct {
+				// The total number of times to retry failing commit
+				// requests during OffsetManager shutdown (default 3).
+				Max int
+			}
 		}
 	}
 
@@ -251,6 +299,8 @@ type Config struct {
 func NewConfig() *Config {
 	c := &Config{}
 
+	c.Admin.Timeout = 3 * time.Second
+
 	c.Net.MaxOpenRequests = 5
 	c.Net.DialTimeout = 30 * time.Second
 	c.Net.ReadTimeout = 30 * time.Second
@@ -260,6 +310,7 @@ func NewConfig() *Config {
 	c.Metadata.Retry.Max = 3
 	c.Metadata.Retry.Backoff = 250 * time.Millisecond
 	c.Metadata.RefreshFrequency = 10 * time.Minute
+	c.Metadata.Full = true
 
 	c.Producer.MaxMessageBytes = 1000000
 	c.Producer.RequiredAcks = WaitForLocal
@@ -268,19 +319,21 @@ func NewConfig() *Config {
 	c.Producer.Retry.Max = 3
 	c.Producer.Retry.Backoff = 100 * time.Millisecond
 	c.Producer.Return.Errors = true
+	c.Producer.CompressionLevel = CompressionLevelDefault
 
 	c.Consumer.Fetch.Min = 1
-	c.Consumer.Fetch.Default = 32768
+	c.Consumer.Fetch.Default = 1024 * 1024
 	c.Consumer.Retry.Backoff = 2 * time.Second
 	c.Consumer.MaxWaitTime = 250 * time.Millisecond
 	c.Consumer.MaxProcessingTime = 100 * time.Millisecond
 	c.Consumer.Return.Errors = false
 	c.Consumer.Offsets.CommitInterval = 1 * time.Second
 	c.Consumer.Offsets.Initial = OffsetNewest
+	c.Consumer.Offsets.Retry.Max = 3
 
 	c.ClientID = defaultClientID
 	c.ChannelBufferSize = 256
-	c.Version = minVersion
+	c.Version = MinVersion
 	c.MetricRegistry = metrics.NewRegistry()
 
 	return c
@@ -347,6 +400,12 @@ func (c *Config) Validate() error {
 		return ConfigurationError("Net.SASL.Password must not be empty when SASL is enabled")
 	}
 
+	// validate the Admin values
+	switch {
+	case c.Admin.Timeout <= 0:
+		return ConfigurationError("Admin.Timeout must be > 0")
+	}
+
 	// validate the Metadata values
 	switch {
 	case c.Metadata.Retry.Max < 0:
@@ -387,6 +446,14 @@ func (c *Config) Validate() error {
 		return ConfigurationError("lz4 compression requires Version >= V0_10_0_0")
 	}
 
+	if c.Producer.Compression == CompressionGZIP {
+		if c.Producer.CompressionLevel != CompressionLevelDefault {
+			if _, err := gzip.NewWriterLevel(ioutil.Discard, c.Producer.CompressionLevel); err != nil {
+				return ConfigurationError(fmt.Sprintf("gzip compression does not work with level %d: %v", c.Producer.CompressionLevel, err))
+			}
+		}
+	}
+
 	// validate the Consumer values
 	switch {
 	case c.Consumer.Fetch.Min <= 0:
@@ -405,7 +472,8 @@ func (c *Config) Validate() error {
 		return ConfigurationError("Consumer.Offsets.CommitInterval must be > 0")
 	case c.Consumer.Offsets.Initial != OffsetOldest && c.Consumer.Offsets.Initial != OffsetNewest:
 		return ConfigurationError("Consumer.Offsets.Initial must be OffsetOldest or OffsetNewest")
-
+	case c.Consumer.Offsets.Retry.Max < 0:
+		return ConfigurationError("Consumer.Offsets.Retry.Max must be >= 0")
 	}
 
 	// validate misc shared values

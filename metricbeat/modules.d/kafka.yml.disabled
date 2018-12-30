@@ -1,5 +1,10 @@
+# Module: kafka
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-kafka.html
+
 - module: kafka
-  metricsets: ["partition"]
+  #metricsets:
+  #  - partition
+  #  - consumergroup
   period: 10s
   hosts: ["localhost:9092"]
 

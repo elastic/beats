@@ -1,0 +1,3 @@
+2018-03-03T19:37:06.157+0500: 14597.826: [GC (CMS Initial Mark) [1 CMS-initial-mark: 131804K(174784K)] 142444K(253440K), 0.0021716 secs] [Times: user=0.01 sys=0.00, real=0.00 secs]
+2018-06-11T01:53:11.382+0000: 1396138.752: Total time for which application threads were stopped: 0.0083760 seconds, Stopping threads took: 0.0000702 seconds
+2018-06-30T16:35:26.632+0500: 224.671: [GC (CMS Final Remark) [YG occupancy: 113198 K (157248 K)]224.671: [Rescan (parallel) , 0.0148273 secs]224.686: [weak refs processing, 0.0003647 secs]224.687: [class unloading, 0.0188407 secs]224.705: [scrub symbol table, 0.0100207 secs]224.715: [scrub string table, 0.0005253 secs][1 CMS-remark: 277821K(349568K)] 391020K(506816K), 0.0457689 secs] [Times: user=0.12 sys=0.00, real=0.04 secs]

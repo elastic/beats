@@ -1,0 +1,27 @@
+# cgo pthread
+mprotect
+set_robust_list
+tgkill
+time
+
+# cgo os/user
+access
+open
+stat
+
+# cgo tsg/gopacket
+poll
+fcntl64
+
+# system testing binaries w/ race detector
+clock_gettime
+pipe
+pipe2
+getdents
+getppid
+gettimeofday
+nanosleep
+readlink
+rename
+unlink
+wait4

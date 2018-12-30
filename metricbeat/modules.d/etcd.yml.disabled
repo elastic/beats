@@ -1,5 +1,12 @@
+# Module: etcd
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-etcd.html
+
 - module: etcd
-  metricsets: ["leader", "self", "store"]
+  #metricsets:
+  #  - leader
+  #  - self
+  #  - store
   period: 10s
   hosts: ["localhost:2379"]
-
+  #username: "user"
+  #password: "secret"

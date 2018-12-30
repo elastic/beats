@@ -29,7 +29,7 @@
       type: integer
       description: >
         number of append requests this node has processed
-    - name: recv.bandwithrate
+    - name: recv.bandwidthrate
       type: scaled_float
       description: >
         number of bytes per second this node is receiving (follower only)
@@ -42,7 +42,7 @@
       type: integer
       description: >
          number of requests that this node has sent
-    - name: send.bandwithrate
+    - name: send.bandwidthrate
       type: scaled_float
       description: >
         number of bytes per second this node is sending (leader only). This value is undefined on single member clusters.

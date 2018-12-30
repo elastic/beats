@@ -1,0 +1,11 @@
+- module: kvm
+  metricsets: ["dommemstat"]
+  enabled: true
+  period: 10s
+  hosts: ["unix:///var/run/libvirt/libvirt-sock"]
+  # For remote hosts, setup network access in libvirtd.conf
+  # and use the tcp scheme:
+  # hosts: [ "tcp://<host>:16509" ]
+
+  # Timeout to connect to Libvirt server
+  #timeout: 1s

@@ -16,7 +16,9 @@
                 "biggest_input_buf": 0,
                 "blocked": 0,
                 "connected": 1,
-                "longest_output_list": 0
+                "longest_output_list": 0,
+                "max_input_buffer": 0,
+                "max_output_buffer": 0
             },
             "cluster": {
                 "enabled": false
@@ -31,6 +33,10 @@
             },
             "memory": {
                 "allocator": "jemalloc-4.0.3",
+                "max": {
+                    "policy": "noeviction",
+                    "value": 0
+                },
                 "used": {
                     "lua": 37888,
                     "peak": 822240,

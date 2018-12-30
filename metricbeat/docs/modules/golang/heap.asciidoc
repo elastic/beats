@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-golang-heap]]
 === Golang heap metricset
 
-experimental[]
+beta[]
 
 include::../../../module/golang/heap/_meta/docs.asciidoc[]
 

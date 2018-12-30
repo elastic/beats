@@ -1,0 +1,213 @@
+- key: dhcpv4
+  title: "DHCPv4"
+  description: DHCPv4 event fields
+  fields:
+    - name: dhcpv4
+      type: group
+      fields:
+        - name: transaction_id
+          type: keyword
+          description: |
+            Transaction ID, a random number chosen by the
+            client, used by the client and server to associate
+            messages and responses between a client and a
+            server.
+
+        - name: seconds
+          type: long
+          description: |
+            Number of seconds elapsed since client began address acquisition or
+            renewal process.
+
+        - name: flags
+          type: keyword
+          description: |
+            Flags are set by the client to indicate how the DHCP server should
+            its reply -- either unicast or broadcast.
+
+        - name: client_ip
+          type: ip
+          description: The current IP address of the client.
+
+        - name: assigned_ip
+          type: ip
+          description: |
+            The IP address that the DHCP server is assigning to the client.
+            This field is also known as "your" IP address.
+
+        - name: server_ip
+          type: ip
+          description: |
+            The IP address of the DHCP server that the client should use for the
+            next step in the bootstrap process.
+
+        - name: relay_ip
+          type: ip
+          description: |
+            The relay IP address used by the client to contact the server
+            (i.e. a DHCP relay server).
+
+        - name: client_mac
+          type: keyword
+          description: The client's MAC address (layer two).
+
+        - name: server_name
+          type: keyword
+          description: |
+            The name of the server sending the message. Optional. Used in
+            DHCPOFFER or DHCPACK messages.
+
+        - name: op_code
+          type: keyword
+          example: bootreply
+          description: |
+            The message op code (bootrequest or bootreply).
+
+        - name: hops
+          type: long
+          description: The number of hops the DHCP message went through.
+
+        - name: hardware_type
+          type: keyword
+          description: |
+            The type of hardware used for the local network (Ethernet,
+            LocalTalk, etc).
+
+        - name: option
+          type: group
+          fields:
+            - name: message_type
+              type: keyword
+              example: ack
+              description: |
+                The specific type of DHCP message being sent (e.g. discover,
+                offer, request, decline, ack, nak, release, inform).
+
+            - name: parameter_request_list
+              type: keyword
+              description: |
+                This option is used by a DHCP client to request values for
+                specified configuration parameters.
+
+            - name: requested_ip_address
+              type: ip
+              description: |
+                This option is used in a client request (DHCPDISCOVER) to allow
+                the client to request that a particular IP address be assigned.
+
+            - name: server_identifier
+              type: ip
+              description: |
+                IP address of the individual DHCP server which handled this
+                message.
+
+            - name: broadcast_address
+              type: ip
+              description: |
+                This option specifies the broadcast address in use on the
+                client's subnet.
+
+            - name: max_dhcp_message_size
+              type: long
+              description: |
+                This option specifies the maximum length DHCP message that the
+                client is willing to accept.
+
+            - name: class_identifier
+              type: keyword
+              description: |
+                This option is used by DHCP clients to optionally identify the
+                vendor type and configuration of a DHCP client. Vendors may
+                choose to define specific vendor class identifiers to convey
+                particular configuration or other identification information
+                about a client.  For example, the identifier may encode the
+                client's hardware configuration.
+
+            - name: domain_name
+              type: keyword
+              description: |
+                This option specifies the domain name that client should use
+                when resolving hostnames via the Domain Name System.
+
+            - name: dns_servers
+              type: ip
+              description: |
+                The domain name server option specifies a list of Domain Name
+                System servers available to the client.
+
+            - name: vendor_identifying_options
+              type: object
+              description: |
+                A DHCP client may use this option to unambiguously identify the
+                vendor that manufactured the hardware on which the client is
+                running, the software in use, or an industry consortium to which
+                the vendor belongs. This field is described in RFC 3925.
+
+            - name: subnet_mask
+              type: ip
+              description: |
+                The subnet mask that the client should use on the currnet
+                network.
+
+            - name: utc_time_offset_sec
+              type: long
+              description: |
+                The time offset field specifies the offset of the client's
+                subnet in seconds from Coordinated Universal Time (UTC).
+
+            - name: router
+              type: ip
+              description: |
+                The router option specifies a list of IP addresses for routers
+                on the client's subnet.
+
+            - name: time_servers
+              type: ip
+              description: |
+                The time server option specifies a list of RFC 868 time servers
+                available to the client.
+
+            - name: ntp_servers
+              type: ip
+              description: |
+                This option specifies a list of IP addresses indicating NTP
+                servers available to the client.
+
+            - name: hostname
+              type: keyword
+              description: |
+                This option specifies the name of the client.
+
+            - name: ip_address_lease_time_sec
+              type: long
+              description: |
+                This option is used in a client request (DHCPDISCOVER or
+                DHCPREQUEST) to allow the client to request a lease time for the
+                IP address.  In a server reply (DHCPOFFER), a DHCP server uses
+                this option to specify the lease time it is willing to offer.
+
+            - name: message
+              type: text
+              description: |
+                This option is used by a DHCP server to provide an error message
+                to a DHCP client in a DHCPNAK message in the event of a failure.
+                A client may use this option in a DHCPDECLINE message to
+                indicate the why the client declined the offered parameters.
+
+            - name: renewal_time_sec
+              type: long
+              description: |
+                This option specifies the time interval from address assignment
+                until the client transitions to the RENEWING state.
+
+            - name: rebinding_time_sec
+              type: long
+              description: |
+                This option specifies the time interval from address assignment
+                until the client transitions to the REBINDING state.
+
+            - name: boot_file_name
+              type: keyword
+              description: |
+                This option is used to identify a bootfile when the 'file' field
+                in the DHCP header has been used for DHCP options.

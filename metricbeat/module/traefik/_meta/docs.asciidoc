@@ -1,0 +1,6 @@
+This module periodically fetches metrics from a https://traefik.io/[Traefik]
+instance. The Traefik instance must be configured to expose it's HTTP API.
+
+=== Compatibility
+
+The Traefik metricsets were tested with Traefik 1.6.

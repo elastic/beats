@@ -1,0 +1,15 @@
+ifeval::["{has-dashboards}"=="true"]
+. Explore your data in {kib}:
++
+.. Open your browser and navigate to the *Dashboard* overview in {kib}:
+http://localhost:5601/app/kibana#/dashboards[http://localhost:5601/app/kibana#/dashboards].
+Replace `localhost` with the name of the {kib} host. If you're using an
+https://cloud.elastic.co/[Elastic Cloud] instance, log in to your cloud account,
+then navigate to the {kib} endpoint in your deployment.
+.. If necessary, log in with your {kib} username and password.
+.. Enter the module name in the search box, then open a dashboard and explore
+the visualizations for your parsed logs.
++
+TIP: If you don’t see data in {kib}, try changing the date range to a larger
+range. By default, {kib} shows the last 15 minutes.
+endif::[]

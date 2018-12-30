@@ -1,0 +1,11 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/mongodb/mongodb.log
+    os.windows:
+      - c:\data\log\mongod.log
+
+ingest_pipeline: ingest/pipeline.json
+input: config/log.yml

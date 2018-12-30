@@ -1,5 +1,9 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
     "auditd": {
         "data": {
             "acct": "(invalid user)",
@@ -22,19 +26,21 @@
             }
         }
     },
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "action": "logged-in",
         "category": "user-login",
         "module": "auditd",
         "type": "user_login"
     },
+    "network": {
+        "direction": "incoming"
+    },
     "process": {
         "exe": "/usr/sbin/sshd",
         "pid": "12635"
+    },
+    "source": {
+        "ip": "179.38.151.221"
     },
     "user": {
         "auid": "unset",

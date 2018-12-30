@@ -6,7 +6,7 @@ from nose.plugins.attrib import attr
 HAPROXY_FIELDS = metricbeat.COMMON_FIELDS + ["haproxy"]
 
 
-class Test(metricbeat.BaseTest):
+class HaproxyTest(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['haproxy']
 
@@ -32,7 +32,7 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "haproxy",
             "metricsets": ["info"],
-            "hosts": ["tcp://%s:%d" % (os.getenv('HAPROXY_HOST', 'localhost'), 14567)],
+            "hosts": ["tcp://%s:%d" % (self.compose_hosts()[0], 14567)],
             "period": "5s"
         }])
         self._test_info()
@@ -59,7 +59,7 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "haproxy",
             "metricsets": ["stat"],
-            "hosts": ["tcp://%s:%d" % (os.getenv('HAPROXY_HOST', 'localhost'), 14567)],
+            "hosts": ["tcp://%s:%d" % (self.compose_hosts()[0], 14567)],
             "period": "5s"
         }])
         self._test_stat()
@@ -72,7 +72,7 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "haproxy",
             "metricsets": ["stat"],
-            "hosts": ["http://%s:%d/stats" % (os.getenv('HAPROXY_HOST', 'localhost'), 14568)],
+            "hosts": ["http://%s:%d/stats" % (self.compose_hosts()[0], 14568)],
             "period": "5s"
         }])
         self._test_stat()
@@ -87,7 +87,15 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["stat"],
             "username": "admin",
             "password": "admin",
-            "hosts": ["http://%s:%d/stats" % (os.getenv('HAPROXY_HOST', 'localhost'), 14569)],
+            "hosts": ["http://%s:%d/stats" % (self.compose_hosts()[0], 14569)],
             "period": "5s"
         }])
         self._test_stat()
+
+
+class Haproxy_1_6_Test(HaproxyTest):
+    COMPOSE_SERVICES = ['haproxy_1_6']
+
+
+class Haproxy_1_7_Test(HaproxyTest):
+    COMPOSE_SERVICES = ['haproxy_1_7']

@@ -1,12 +1,28 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package template
 
 import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/conditions"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/processors"
-
-	ucfg "github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg"
 )
 
 // Mapper maps config templates with conditions, if a match happens on a discover event
@@ -15,31 +31,31 @@ type Mapper []*ConditionMap
 
 // ConditionMap maps a condition to the configs to use when it's triggered
 type ConditionMap struct {
-	Condition *processors.Condition
+	Condition conditions.Condition
 	Configs   []*common.Config
 }
 
 // MapperSettings holds user settings to build Mapper
 type MapperSettings []*struct {
-	ConditionConfig *processors.ConditionConfig `config:"condition"`
-	Configs         []*common.Config            `config:"config"`
+	ConditionConfig *conditions.Config `config:"condition"`
+	Configs         []*common.Config   `config:"config"`
 }
 
 // NewConfigMapper builds a template Mapper from given settings
-func NewConfigMapper(configs MapperSettings) (*Mapper, error) {
-	var mapper Mapper
+func NewConfigMapper(configs MapperSettings) (mapper Mapper, err error) {
 	for _, c := range configs {
-		condition, err := processors.NewCondition(c.ConditionConfig)
-		if err != nil {
-			return nil, err
+		condMap := &ConditionMap{Configs: c.Configs}
+		if c.ConditionConfig != nil {
+			condMap.Condition, err = conditions.NewCondition(c.ConditionConfig)
+			if err != nil {
+				return nil, err
+			}
 		}
-		mapper = append(mapper, &ConditionMap{
-			Condition: condition,
-			Configs:   c.Configs,
-		})
+
+		mapper = append(mapper, condMap)
 	}
 
-	return &mapper, nil
+	return mapper, nil
 }
 
 // Event adapts MapStr to processors.ValuesMap interface
@@ -55,11 +71,13 @@ func (e Event) GetValue(key string) (interface{}, error) {
 }
 
 // GetConfig returns a matching Config if any, nil otherwise
-func (c *Mapper) GetConfig(event bus.Event) []*common.Config {
+func (c Mapper) GetConfig(event bus.Event) []*common.Config {
 	var result []*common.Config
 
-	for _, mapping := range *c {
-		if mapping.Configs != nil && !mapping.Condition.Check(Event(event)) {
+	for _, mapping := range c {
+		// An empty condition matches everything
+		conditionOk := mapping.Condition == nil || mapping.Condition.Check(Event(event))
+		if mapping.Configs != nil && !conditionOk {
 			continue
 		}
 

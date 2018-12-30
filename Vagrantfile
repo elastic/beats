@@ -11,7 +11,7 @@
 # Usage and Features:
 #   - Two users exist: Administrator and Vagrant. Both have the password: vagrant
 #   - Use 'vagrant ssh' to open a Windows command prompt.
-#   - Use 'vagrant rdp' to open a Windows Remote Deskop session. Mac users must
+#   - Use 'vagrant rdp' to open a Windows Remote Desktop session. Mac users must
 #     install the Microsoft Remote Desktop Client from the App Store.
 #   - There is a desktop shortcut labeled "Beats Shell" that opens a command prompt
 #     to C:\Gopath\src\github.com\elastic\beats where the code is mounted.
@@ -26,6 +26,8 @@
 #   - Folder syncing doesn't work well. Consider copying the files into the box or
 #     cloning the project inside the box.
 
+GO_VERSION = File.read(File.join(File.dirname(__FILE__), ".go-version")).strip
+
 # Provisioning for Windows PowerShell
 $winPsProvision = <<SCRIPT
 echo 'Creating github.com\elastic in the GOPATH'
@@ -33,17 +35,28 @@ New-Item -itemtype directory -path "C:\\Gopath\\src\\github.com\\elastic" -force
 echo "Symlinking C:\\Vagrant to C:\\Gopath\\src\\github.com\\elastic"
 cmd /c mklink /d C:\\Gopath\\src\\github.com\\elastic\\beats \\\\vboxsvr\\vagrant
 
+echo "Installing gvm to manage go version"
+[Net.ServicePointManager]::SecurityProtocol = "tls12"
+Invoke-WebRequest -URI https://github.com/andrewkroh/gvm/releases/download/v0.1.0/gvm-windows-amd64.exe -Outfile C:\Windows\System32\gvm.exe
+C:\Windows\System32\gvm.exe --format=powershell #{GO_VERSION} | Invoke-Expression
+go version
+
+echo "Configure environment variables"
+[System.Environment]::SetEnvironmentVariable("GOROOT", "C:\\Users\\vagrant\\.gvm\\versions\\go#{GO_VERSION}.windows.amd64", [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable("PATH", "$env:GOROOT\\bin;$env:PATH", [System.EnvironmentVariableTarget]::Machine)
+
 echo "Creating Beats Shell desktop shortcut"
 $WshShell = New-Object -comObject WScript.Shell
 $Shortcut = $WshShell.CreateShortcut("$Home\\Desktop\\Beats Shell.lnk")
 $Shortcut.TargetPath = "cmd.exe"
-$Shortcut.Arguments = "/K cd /d C:\\Gopath\\src\\github.com\\elastic\\beats"
+$Shortcut.Arguments = '/c "SET GOROOT=C:\\Users\\vagrant\\.gvm\\versions\\go#{GO_VERSION}.windows.amd64&PATH=C:\\Users\\vagrant\\.gvm\\versions\\go#{GO_VERSION}.windows.amd64\\bin;%PATH%" && START'
+$Shortcut.WorkingDirectory = "C:\\Gopath\\src\\github.com\\elastic\\beats"
 $Shortcut.Save()
 
 echo "Disable automatic updates"
-$AUSettigns = (New-Object -com "Microsoft.Update.AutoUpdate").Settings
-$AUSettigns.NotificationLevel = 1
-$AUSettigns.Save()
+$AUSettings = (New-Object -com "Microsoft.Update.AutoUpdate").Settings
+$AUSettings.NotificationLevel = 1
+$AUSettings.Save()
 SCRIPT
 
 # Provisioning for Unix/Linux
@@ -59,11 +72,12 @@ SCRIPT
 $linuxGvmProvision = <<SCRIPT
 mkdir -p ~/bin
 if [ ! -e "~/bin/gvm" ]; then
-  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.0.5/gvm-linux-amd64
+  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.1.0/gvm-linux-amd64
   chmod +x ~/bin/gvm
+  ~/bin/gvm $GO_VERSION
   echo 'export GOPATH=$HOME/go' >> ~/.bash_profile
   echo 'export PATH=$HOME/bin:$GOPATH/bin:$PATH' >> ~/.bash_profile
-  echo 'eval "$(gvm 1.9.4)"' >> ~/.bash_profile
+  echo 'eval "$(gvm #{GO_VERSION})"' >> ~/.bash_profile
 fi
 SCRIPT
 
@@ -132,8 +146,19 @@ Vagrant.configure(2) do |config|
     c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
   end
 
-  config.vm.define "fedora26", primary: true do |c|
-    c.vm.box = "bento/fedora-26"
+  config.vm.define "centos6", primary: true do |c|
+    c.vm.box = "bento/centos-6.9"
+    c.vm.network :forwarded_port, guest: 22,   host: 2229,  id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: "yum install -y make gcc python-pip python-virtualenv git"
+
+    c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  end
+
+  config.vm.define "fedora27", primary: true do |c|
+    c.vm.box = "bento/fedora-27"
     c.vm.network :forwarded_port, guest: 22,   host: 2227,  id: "ssh", auto_correct: true
 
     c.vm.provision "shell", inline: $unixProvision, privileged: false
@@ -141,6 +166,49 @@ Vagrant.configure(2) do |config|
     c.vm.provision "shell", inline: "dnf install -y make gcc python-pip python-virtualenv git"
 
     c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  end
+
+  config.vm.define "archlinux", primary: true do |c|
+    c.vm.box = "archlinux/archlinux"
+    c.vm.network :forwarded_port, guest: 22,   host: 2228,  id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: "pacman -Sy && pacman -S --noconfirm make gcc python-pip python-virtualenv git"
+
+    c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  end
+
+  config.vm.define "ubuntu1804", primary: true do |c|
+    c.vm.box = "ubuntu/bionic64"
+    c.vm.network :forwarded_port, guest: 22,   host: 2229,  id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: "apt-get update && apt-get install -y make gcc python-pip python-virtualenv git"
+
+    c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  end
+
+  config.vm.define "sles12", primary: true do |c|
+    c.vm.box = "elastic/sles-12-x86_64"
+    c.vm.network :forwarded_port, guest: 22,   host: 2230,  id: "ssh", auto_correct: true
+
+    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", inline: $linuxGvmProvision, privileged: false
+    c.vm.provision "shell", inline: "pip install virtualenv"
+
+    c.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  end
+
+  # Windows Server 2016
+  config.vm.define "win2016", primary: true do |machine|
+    machine.vm.box = "elastic/windows-2016-x86_64"
+    machine.vm.provision "shell", inline: $winPsProvision
+
+    machine.vm.provider "virtualbox" do |v|
+      v.memory = 4096
+    end
   end
 
 end

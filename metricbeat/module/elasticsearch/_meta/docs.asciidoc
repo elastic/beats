@@ -1,1 +1,9 @@
-The Elasticsearch module contains a minimal set of metrics to enable monitoring of Elasticsearch across multiple versions. To monitor more Elasticsearch metrics, use our {monitoringdoc}/xpack-monitoring.html[X-Pack monitoring] which is available under a free basic license.
+The Elasticsearch module contains a minimal set of metrics to enable monitoring of Elasticsearch across multiple versions. To monitor more Elasticsearch metrics, use our {monitoringdoc}/xpack-monitoring.html[monitoring] feature.
+
+The default metricsets are `node` and `node_stats`.
+
+[float]
+=== Compability
+
+The Elasticsearch module is tested with Elasticsearch 6.3 and is expected to
+work with all 6.x versions.

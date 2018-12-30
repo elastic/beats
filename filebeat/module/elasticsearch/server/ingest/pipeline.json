@@ -1,0 +1,76 @@
+{
+    "description": "Pipeline for parsing the Elasticsearch server log file.",
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ],
+    "processors": [
+        {
+            "rename": {
+                "field": "@timestamp",
+                "target_field": "event.created"
+            }
+        },
+        {
+            "grok": {
+                "field": "message",
+                "pattern_definitions": {
+                    "GREEDYMULTILINE": "(.|\n)*",
+                    "INDEXNAME": "[a-zA-Z0-9_.-]*",
+                    "GC_ALL": "\\[gc\\]\\[%{NUMBER:elasticsearch.server.gc.overhead_seq}\\] overhead, spent \\[%{NUMBER:elasticsearch.server.gc.collection_duration.time:float}%{DATA:elasticsearch.server.gc.collection_duration.unit}\\] collecting in the last \\[%{NUMBER:elasticsearch.server.gc.observation_duration.time:float}%{DATA:elasticsearch.server.gc.observation_duration.unit}\\]",
+                    "GC_YOUNG": "\\[gc\\]\\[young\\]\\[%{NUMBER:elasticsearch.server.gc.young.one}\\]\\[%{NUMBER:elasticsearch.server.gc.young.two}\\]%{SPACE}%{GREEDYMULTILINE:message}",
+                    "LOG_HEADER": "\\[%{TIMESTAMP_ISO8601:elasticsearch.server.timestamp}\\]\\[%{LOGLEVEL:log.level}%{SPACE}?\\]\\[%{DATA:elasticsearch.server.component}%{SPACE}\\](%{SPACE})?(\\[%{DATA:elasticsearch.node.name}\\])?(%{SPACE})?"
+                },
+                "patterns": [
+                    "%{LOG_HEADER}%{GC_ALL}",
+                    "%{LOG_HEADER}%{GC_YOUNG}",
+                    "%{LOG_HEADER}%{SPACE}((\\[%{INDEXNAME:elasticsearch.index.name}\\]|\\[%{INDEXNAME:elasticsearch.index.name}\\/%{DATA:elasticsearch.index.id}\\]))?%{SPACE}%{GREEDYMULTILINE:message}"
+                ]
+            }
+        },
+        {
+            "script": {
+                "lang": "painless",
+                "source": "if (ctx.elasticsearch.server.gc != null && ctx.elasticsearch.server.gc.observation_duration != null) { if (ctx.elasticsearch.server.gc.observation_duration.unit == params.seconds_unit) { ctx.elasticsearch.server.gc.observation_duration.ms = ctx.elasticsearch.server.gc.observation_duration.time * params.ms_in_one_s;}if (ctx.elasticsearch.server.gc.observation_duration.unit == params.milliseconds_unit) { ctx.elasticsearch.server.gc.observation_duration.ms = ctx.elasticsearch.server.gc.observation_duration.time; } if (ctx.elasticsearch.server.gc.observation_duration.unit == params.minutes_unit) { ctx.elasticsearch.server.gc.observation_duration.ms = ctx.elasticsearch.server.gc.observation_duration.time * params.ms_in_one_m; }} if (ctx.elasticsearch.server.gc != null && ctx.elasticsearch.server.gc.collection_duration != null) { if (ctx.elasticsearch.server.gc.collection_duration.unit == params.seconds_unit) { ctx.elasticsearch.server.gc.collection_duration.ms = ctx.elasticsearch.server.gc.collection_duration.time * params.ms_in_one_s;} if (ctx.elasticsearch.server.gc.collection_duration.unit == params.milliseconds_unit) {ctx.elasticsearch.server.gc.collection_duration.ms = ctx.elasticsearch.server.gc.collection_duration.time; } if (ctx.elasticsearch.server.gc.collection_duration.unit == params.minutes_unit) { ctx.elasticsearch.server.gc.collection_duration.ms = ctx.elasticsearch.server.gc.collection_duration.time * params.ms_in_one_m; }}",
+                "params": {
+                    "minutes_unit": "m",
+                    "seconds_unit": "s",
+                    "milliseconds_unit": "ms",
+                    "ms_in_one_s": 1000,
+                    "ms_in_one_m": 60000
+                }
+            }
+        },
+        {
+            "remove": {
+                "field": [
+                    "elasticsearch.server.gc.collection_duration.time",
+                    "elasticsearch.server.gc.collection_duration.unit",
+                    "elasticsearch.server.gc.observation_duration.time",
+                    "elasticsearch.server.gc.observation_duration.unit"
+                ],
+                "ignore_missing": true
+            }
+        },
+        {
+            "date": {
+                "field": "elasticsearch.server.timestamp",
+                "target_field": "@timestamp",
+                "formats": [
+                    "ISO8601"
+                ],
+                {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
+                "ignore_failure": true
+            }
+        },
+        {
+            "remove": {
+                "field": "elasticsearch.server.timestamp"
+            }
+        }
+    ]
+}

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////
-//// This content is shared by Filebeat inputs that use the prospector
+//// This content is shared by Filebeat inputs that use the input
 //// to process files on disk (includes options for managing physical files)
 //// If you add IDs to sections, make sure you use attributes to create
 //// unique IDs for each input that includes this file. Use the format:
@@ -94,7 +94,7 @@ harvester is started and the latest changes will be picked up after
 We recommended that you set `close_inactive` to a value that is larger than the
 least frequent updates to your log files. For example, if your log files get
 updated every few seconds, you can safely set `close_inactive` to `1m`. If there
-are log files with very different update rates, you can use multiple 
+are log files with very different update rates, you can use multiple
 configurations with different values.
 
 Setting `close_inactive` to a lower value means that file handles are closed
@@ -348,9 +348,10 @@ specifying 10s for `max_backoff` means that, at the worst, a new line could be
 added to the log file if {beatname_uc} has backed off multiple times. The
 default is 10s.
 
-Requirement: max_backoff should always be set to `max_backoff <=
-scan_frequency`. In case `max_backoff` should be bigger, it is recommended to
-close the file handler instead let the {beatname_uc} pick up the file again.
+Requirement: Set `max_backoff` to be greater than or equal to `backoff` and
+less than or equal to `scan_frequency` (`backoff <= max_backoff <= scan_frequency`).
+If `max_backoff` needs to be higher, it is recommended to close the file handler
+instead and let {beatname_uc} pick up the file again.
 
 [float]
 ===== `backoff_factor`

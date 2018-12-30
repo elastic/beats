@@ -90,7 +90,7 @@ class TestCommands(BaseTest):
             extra_args=["--setup",
                         "--path.config", self.working_dir,
                         "-E", "setup.dashboards.file=" +
-                        os.path.join("../../dashboards/testdata", "testbeat-dashboards.zip"),
+                        os.path.join(self.beat_path, "tests", "files", "testbeat-dashboards.zip"),
                         "-E", "setup.dashboards.beat=testbeat",
                         "-E", "setup.kibana.protocol=http",
                         "-E", "setup.kibana.host=" + self.get_kibana_host(),
@@ -148,6 +148,24 @@ class TestCommands(BaseTest):
         assert exit_code == 0
         assert self.log_contains("filename: mockbeat")
         assert self.log_contains("period: 1234")
+
+    def test_export_config_environment_variable(self):
+        """
+        Test export config works but doesn"t expose environment variable.
+        """
+        self.render_config_template("mockbeat",
+                                    os.path.join(self.working_dir,
+                                                 "libbeat.yml"),
+                                    metrics_period="${METRIC_PERIOD}")
+
+        exit_code = self.run_beat(
+            logging_args=[],
+            extra_args=["export", "config"],
+            config="libbeat.yml", env={'METRIC_PERIOD': '1234'})
+
+        assert exit_code == 0
+        assert self.log_contains("filename: mockbeat")
+        assert self.log_contains("period: ${METRIC_PERIOD}")
 
     def test_export_template(self):
         """

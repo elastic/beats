@@ -12,6 +12,13 @@ All metricsets with the `state_` prefix require `hosts` field pointing to kube-s
 service within the cluster, while the rest should be pointed to kubelet service. Check the
 example configuration on how to do it.
 
+The default metricsets are `container`, `node`, `pod`, `system` and `volume`.
+
+[float]
+=== Compability
+
+The Kubernetes module is tested with Kubernetes 1.8.0, 1.9.4 and 1.10.0.
+
 
 [float]
 === Example configuration
@@ -25,20 +32,30 @@ metricbeat.modules:
 # Node metrics, from kubelet:
 - module: kubernetes
   metricsets:
-    - node
-    - system
-    - pod
     - container
+    - node
+    - pod
+    - system
     - volume
   period: 10s
   hosts: ["localhost:10255"]
-  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+  enabled: true
+  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #ssl.certificate_authorities:
+  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
   #ssl.certificate: "/etc/pki/client/cert.pem"
   #ssl.key: "/etc/pki/client/cert.key"
 
+  # Enriching parameters:
+  add_metadata: true
+  in_cluster: true
+  # When used outside the cluster:
+  #host: node_name
+  #kube_config: ~/.kube/config
+
 # State metrics from kube-state-metrics service:
 - module: kubernetes
-  enabled: false
+  enabled: true
   metricsets:
     - state_node
     - state_deployment
@@ -49,19 +66,36 @@ metricbeat.modules:
   period: 10s
   hosts: ["kube-state-metrics:8080"]
 
+  # Enriching parameters:
+  add_metadata: true
+  in_cluster: true
+  # When used outside the cluster:
+  #host: node_name
+  #kube_config: ~/.kube/config
+
 # Kubernetes events
 - module: kubernetes
-  enabled: false
+  enabled: true
   metricsets:
     - event
+
+# Kubernetes API server
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - apiserver
+  hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
 ----
 
-This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets
 
 The following metricsets are available:
+
+* <<metricbeat-metricset-kubernetes-apiserver,apiserver>>
 
 * <<metricbeat-metricset-kubernetes-container,container>>
 
@@ -86,6 +120,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-kubernetes-system,system>>
 
 * <<metricbeat-metricset-kubernetes-volume,volume>>
+
+include::kubernetes/apiserver.asciidoc[]
 
 include::kubernetes/container.asciidoc[]
 

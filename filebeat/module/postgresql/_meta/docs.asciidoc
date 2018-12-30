@@ -1,4 +1,5 @@
 :modulename: postgresql
+:has-dashboards: true
 
 == PostgreSQL module
 
@@ -49,7 +50,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules {modulename} -M "postgresql.log.var.paths=[/path/to/log/postgres/*.log*]"
+-M "postgresql.log.var.paths=[/path/to/log/postgres/*.log*]"
 -----
 
 
@@ -63,3 +64,9 @@ include::../include/config-option-intro.asciidoc[]
 
 include::../include/var-paths.asciidoc[]
 
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

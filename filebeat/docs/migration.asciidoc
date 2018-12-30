@@ -13,7 +13,7 @@ to use for tailing log files and forwarding them to Logstash.
   changed.
 * Command line options were removed and moved to the configuration file.
 * Configuration options for outputs are now inherited from libbeat. For details, see the {libbeat}/index.html[Beats Platform Reference].
-* The https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash] is required.
+* The {logstash-ref}/plugins-inputs-beats.html[Beats input plugin for Logstash] is required.
 
 The following topics describe how to migrate from
 https://github.com/elastic/logstash-forwarder[Logstash Forwarder] to {beatname_uc}:
@@ -29,8 +29,10 @@ https://github.com/elastic/logstash-forwarder[Logstash Forwarder] to {beatname_u
 [[migration-input-plugin]]
 == Migrate to the Beats input plugin for Logstash
 
-{beatname_uc} requires the https://www.elastic.co/guide/en/logstash/current/plugins-inputs-beats.html[Beats input plugin for Logstash].
-For information about getting started with this plugin, see {libbeat}/logstash-installation.html#logstash-setup[Setting up Logstash].
+{beatname_uc} requires the {logstash-ref}/plugins-inputs-beats.html[Beats input
+plugin for Logstash]. For information about getting started with this plugin,
+see {stack-gs}/get-started-elastic-stack.html#logstash-setup[Configure Logstash to
+listen for Beats input] in the {stack} getting started tutorial.
 
 In both the 1.5.x and 2.x versions of Logstash, this plugin can be loaded in
 parallel with the

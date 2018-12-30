@@ -1,4 +1,5 @@
 :modulename: apache2
+:has-dashboards: true
 
 == Apache2 module
 
@@ -51,7 +52,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules {modulename} -M "apache2.access.var.paths=[/path/to/apache2/access.log*]" -M "apache2.error.var.paths=[/path/to/log/apache2/error.log*]"
+-M "apache2.access.var.paths=[/path/to/apache2/access.log*]" -M "apache2.error.var.paths=[/path/to/log/apache2/error.log*]"
 -----
 
 
@@ -69,3 +70,9 @@ include::../include/var-paths.asciidoc[]
 ==== `error` log fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

@@ -17,7 +17,7 @@ else
     echo "$docs_dir already exists. Not cloning."
 fi
 
-index_list="$(find ${GOPATH%%:*}/src/$path -name 'index.asciidoc')"
+index_list="$(find ${GOPATH%%:*}/src/$path -name 'index.asciidoc' -maxdepth 1)"
 for index in $index_list
 do
   echo "Building docs for ${name}..."

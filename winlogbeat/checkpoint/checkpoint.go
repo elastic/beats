@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // Package checkpoint persists event log state information to disk so that
 // event log monitoring can resume from the last read event in the case of a
 // restart or unexpected interruption.
@@ -23,6 +40,7 @@ type Checkpoint struct {
 	done          chan struct{}  // Channel for shutting down the checkpoint worker.
 	once          sync.Once      // Used to guarantee shutdown happens once.
 	file          string         // File where the state is persisted.
+	fileLock      sync.RWMutex   // Lock that protects concurrent reads/writes to file.
 	numUpdates    int            // Number of updates received since last persisting to disk.
 	maxUpdates    int            // Maximum number of updates to buffer before persisting to disk.
 	flushInterval time.Duration  // Maximum time interval that can pass before persisting to disk.
@@ -191,6 +209,9 @@ func (c *Checkpoint) persist() bool {
 
 // flush writes the current state to disk.
 func (c *Checkpoint) flush() error {
+	c.fileLock.Lock()
+	defer c.fileLock.Unlock()
+
 	tempFile := c.file + ".new"
 	file, err := create(tempFile)
 	if os.IsNotExist(err) {
@@ -241,6 +262,9 @@ func (c *Checkpoint) flush() error {
 // read loads the persisted state from disk. If the file does not exists then
 // the method returns nil and no error.
 func (c *Checkpoint) read() (*PersistedState, error) {
+	c.fileLock.RLock()
+	defer c.fileLock.RUnlock()
+
 	contents, err := ioutil.ReadFile(c.file)
 	if err != nil {
 		if os.IsNotExist(err) {

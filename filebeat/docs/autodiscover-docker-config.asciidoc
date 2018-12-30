@@ -7,7 +7,7 @@ filebeat.autodiscover:
     - type: docker
       templates:
         - condition:
-            equals:
+            contains:
               docker.container.image: redis
           config:
             - type: docker
@@ -27,8 +27,8 @@ filebeat.autodiscover:
     - type: docker
       templates:
         - condition:
-            equals:
-              docker.container.image: "redis"
+            contains:
+              docker.container.image: redis
           config:
             - module: redis
               log:

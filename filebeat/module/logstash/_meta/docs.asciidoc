@@ -1,4 +1,6 @@
 :modulename: logstash
+:has-dashboards: true
+
 == Logstash module
 
 The +{modulename}+ module parse logstash regular logs and the slow log, it will support the plain text format
@@ -57,7 +59,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules {modulename} -M "logstash.log.var.paths=[/path/to/log/logstash/logstash-server.log*]" -M "logstash.slowlog.var.paths=[/path/to/log/logstash/logstash-slowlog.log*]"
+-M "logstash.log.var.paths=[/path/to/log/logstash/logstash-server.log*]" -M "logstash.slowlog.var.paths=[/path/to/log/logstash/logstash-slowlog.log*]"
 -----
 
 
@@ -86,3 +88,9 @@ include::../include/var-paths.asciidoc[]
 
 The configured Logstash log format. Possible values are: `json` or `plain`. The
 default is `plain`.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

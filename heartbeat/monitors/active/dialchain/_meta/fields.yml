@@ -32,6 +32,12 @@
       description: >
         TLS layer related fields.
       fields:
+        - name: certificate_not_valid_before
+          type: date
+          description: Earliest time at which the connection's certificates are valid.
+        - name: certificate_not_valid_after
+          type: date
+          description: Latest time at which the connection's certificates are valid.
         - name: rtt
           type: group
           description: >

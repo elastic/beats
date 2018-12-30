@@ -21,10 +21,10 @@
 			"revisionTime": "2017-01-17T14:01:51Z"
 		},
 		{
-			"checksumSHA1": "yPWWiioidIJuDhVSDe+ogjTmJ18=",
-			"path": "github.com/tsg/gotpl",
-			"revision": "a4179fb207b3ef8a96681fc9c9b6e20f99a6d2ef",
-			"revisionTime": "2015-08-11T13:42:54Z"
+			"checksumSHA1": "nlhGP9VLnwbYrykVzBdJMppDrFs=",
+			"path": "github.com/tsg/go-daemon",
+			"revision": "c6e0d1a849861166320520e9bae9bbda5f2ecb03",
+			"revisionTime": "2016-04-14T21:23:35Z"
 		},
 		{
 			"checksumSHA1": "TT1rac6kpQp2vz24m5yDGUNQ/QQ=",
@@ -75,10 +75,10 @@
 			"revisionTime": "2017-03-30T16:02:45Z"
 		},
 		{
-			"checksumSHA1": "qOmvuDm+F+2nQQecUZBVkZrTn6Y=",
-			"path": "gopkg.in/yaml.v2",
-			"revision": "d670f9405373e636a5a2765eea47fac0c9bc91a4",
-			"revisionTime": "2018-01-09T11:43:31Z"
+			"checksumSHA1": "DnH0WldhYTUVJnsx3vlNLP0Yh/A=",
+			"path": "golang.org/x/tools/go/vcs",
+			"revision": "a5b4c53f6e8bdcafa95a94671bf2d1203365858b",
+			"revisionTime": "2018-05-20T07:57:22Z"
 		}
 	],
 	"rootPath": "github.com/elastic/beats/dev-tools"

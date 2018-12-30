@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build !integration
 
 package tls
@@ -139,4 +156,75 @@ func TestParseSrp(t *testing.T) {
 	assert.Equal(t, "root", r.(string))
 	r = parseSrp(*mkBuf(t, "FF726f6f74", 5))
 	assert.Nil(t, r)
+}
+
+func TestParseSupportedVersions(t *testing.T) {
+	for _, testCase := range []struct {
+		title    string
+		data     string
+		expected interface{}
+	}{
+		{
+			title:    "negotiation",
+			data:     "080304030303020301",
+			expected: []string{"TLS 1.3", "TLS 1.2", "TLS 1.1", "TLS 1.0"},
+		},
+		{
+			title:    "negotiation with GREASE",
+			data:     "0c7a7a0304030303020301fafa",
+			expected: []string{"TLS 1.3", "TLS 1.2", "TLS 1.1", "TLS 1.0"},
+		},
+		{
+			title:    "selected TLS 1.3",
+			data:     "0304",
+			expected: "TLS 1.3",
+		},
+		{
+			title:    "selected future version",
+			data:     "0305",
+			expected: "TLS 1.4",
+		},
+		{
+			title: "empty error",
+			data:  "00",
+		},
+		{
+			title: "odd length error",
+			data:  "0b7a7a0304030303020301FF",
+		},
+		{
+			title: "out of bounds",
+			data:  "FF",
+		},
+		{
+			title: "out of bounds (2)",
+			data:  "805a5a03040302",
+		},
+		{
+			title:    "valid excess data",
+			data:     "0403030304FFFFFFFFFFFFFF",
+			expected: []string{"TLS 1.2", "TLS 1.3"},
+		},
+	} {
+		t.Run(testCase.title, func(t *testing.T) {
+			r := parseSupportedVersions(*mkBuf(t, testCase.data, len(testCase.data)/2))
+			if testCase.expected == nil {
+				assert.Nil(t, r, testCase.data)
+				return
+			}
+			switch v := testCase.expected.(type) {
+			case string:
+				version, ok := r.(string)
+				assert.True(t, ok)
+				assert.Equal(t, v, version)
+			case []string:
+				list, ok := r.([]string)
+				assert.True(t, ok)
+				assert.Len(t, list, len(v))
+				assert.Equal(t, v, list)
+			default:
+				assert.Fail(t, "wrong expected type", v)
+			}
+		})
+	}
 }

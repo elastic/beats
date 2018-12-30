@@ -5,10 +5,14 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-kafka]]
 == Kafka module
 
-beta[]
-
 This is the Kafka module.
 
+The default metricsets are `consumergroup` and `partition`.
+
+[float]
+=== Compability
+
+This module is tested with Kafka 0.10.2.1, 1.1.0 and 2.0.0.
 
 
 [float]
@@ -21,9 +25,10 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: kafka
-  metricsets: ["partition"]
+  metricsets: ["consumergroup", "partition"]
   period: 10s
   hosts: ["localhost:9092"]
+  enabled: true
 
   #client_id: metricbeat
   #retries: 3

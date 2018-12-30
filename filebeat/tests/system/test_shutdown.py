@@ -64,8 +64,13 @@ class Test(BaseTest):
 
         # we allow for a potential race in the harvester shutdown here.
         # In some cases the registry offset might match the penultimate offset.
-        assert (offset == outputs[-1]["offset"] or
-                offset == outputs[-2]["offset"])
+
+        eol_offset = 1
+        if os.name == "nt":
+            eol_offset += 1
+
+        assert (offset == (outputs[-1]["log.offset"] + eol_offset + len(outputs[-1]["message"])) or
+                offset == (outputs[-2]["log.offset"] + eol_offset + len(outputs[-2]["message"])))
 
     def test_shutdown_wait_timeout(self):
         """
@@ -143,15 +148,14 @@ class Test(BaseTest):
     def nasa_logs(self):
 
         # Uncompress the nasa log file.
-        nasa_log = '../files/logs/nasa-50k.log'
+        nasa_log = os.path.join(self.beat_path, "tests", "files", "logs", "nasa-50k.log")
         if not os.path.isfile(nasa_log):
-            with gzip.open('../files/logs/nasa-50k.log.gz', 'rb') as infile:
+            with gzip.open(nasa_log + ".gz", 'rb') as infile:
                 with open(nasa_log, 'w') as outfile:
                     for line in infile:
                         outfile.write(line)
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/nasa-50k.log"],
-                        source_dir="../files",
                         target_dir="log")
 
     def test_stopping_empty_path(self):

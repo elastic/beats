@@ -4,3 +4,10 @@ agent and https://github.com/kubernetes/kube-state-metrics[kube-state-metrics] s
 All metricsets with the `state_` prefix require `hosts` field pointing to kube-stat-metrics
 service within the cluster, while the rest should be pointed to kubelet service. Check the
 example configuration on how to do it.
+
+The default metricsets are `container`, `node`, `pod`, `system` and `volume`.
+
+[float]
+=== Compability
+
+The Kubernetes module is tested with Kubernetes 1.8.0, 1.9.4 and 1.10.0.

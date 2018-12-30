@@ -1,16 +1,19 @@
-// Copyright 2018 Elasticsearch Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 // +build darwin,amd64,cgo
 
@@ -24,6 +27,7 @@ import "C"
 import (
 	"bytes"
 	"encoding/binary"
+	"os"
 	"time"
 	"unsafe"
 
@@ -44,22 +48,26 @@ func (s darwinSystem) Process(pid int) (types.Process, error) {
 	return &p, nil
 }
 
+func (s darwinSystem) Self() (types.Process, error) {
+	return s.Process(os.Getpid())
+}
+
 type process struct {
-	pid   int
-	cwd   string
-	exe   string
-	args  []string
-	env   map[string]string
-	task  procTaskAllInfo
-	vnode procVnodePathInfo
+	pid  int
+	cwd  string
+	exe  string
+	args []string
+	env  map[string]string
 }
 
 func (p *process) Info() (types.ProcessInfo, error) {
-	if err := getProcTaskAllInfo(p.pid, &p.task); err != nil {
+	var task procTaskAllInfo
+	if err := getProcTaskAllInfo(p.pid, &task); err != nil {
 		return types.ProcessInfo{}, err
 	}
 
-	if err := getProcVnodePathInfo(p.pid, &p.vnode); err != nil {
+	var vnode procVnodePathInfo
+	if err := getProcVnodePathInfo(p.pid, &vnode); err != nil {
 		return types.ProcessInfo{}, err
 	}
 
@@ -68,14 +76,14 @@ func (p *process) Info() (types.ProcessInfo, error) {
 	}
 
 	return types.ProcessInfo{
-		Name: int8SliceToString(p.task.Pbsd.Pbi_name[:]),
+		Name: int8SliceToString(task.Pbsd.Pbi_name[:]),
 		PID:  p.pid,
-		PPID: int(p.task.Pbsd.Pbi_ppid),
-		CWD:  int8SliceToString(p.vnode.Cdir.Path[:]),
+		PPID: int(task.Pbsd.Pbi_ppid),
+		CWD:  int8SliceToString(vnode.Cdir.Path[:]),
 		Exe:  p.exe,
 		Args: p.args,
-		StartTime: time.Unix(int64(p.task.Pbsd.Pbi_start_tvsec),
-			int64(p.task.Pbsd.Pbi_start_tvusec)*int64(time.Microsecond)),
+		StartTime: time.Unix(int64(task.Pbsd.Pbi_start_tvsec),
+			int64(task.Pbsd.Pbi_start_tvusec)*int64(time.Microsecond)),
 	}, nil
 }
 
@@ -83,24 +91,30 @@ func (p *process) Environment() (map[string]string, error) {
 	return p.env, nil
 }
 
-func (p *process) CPUTime() types.CPUTimes {
-	return types.CPUTimes{
-		Timestamp: time.Now(),
-		User:      time.Duration(p.task.Ptinfo.Total_user),
-		System:    time.Duration(p.task.Ptinfo.Total_system),
+func (p *process) CPUTime() (types.CPUTimes, error) {
+	var task procTaskAllInfo
+	if err := getProcTaskAllInfo(p.pid, &task); err != nil {
+		return types.CPUTimes{}, err
 	}
+	return types.CPUTimes{
+		User:   time.Duration(task.Ptinfo.Total_user),
+		System: time.Duration(task.Ptinfo.Total_system),
+	}, nil
 }
 
-func (p *process) Memory() types.MemoryInfo {
-	return types.MemoryInfo{
-		Timestamp: time.Now(),
-		Virtual:   p.task.Ptinfo.Virtual_size,
-		Resident:  p.task.Ptinfo.Resident_size,
-		Metrics: map[string]uint64{
-			"page_ins":    uint64(p.task.Ptinfo.Pageins),
-			"page_faults": uint64(p.task.Ptinfo.Faults),
-		},
+func (p *process) Memory() (types.MemoryInfo, error) {
+	var task procTaskAllInfo
+	if err := getProcTaskAllInfo(p.pid, &task); err != nil {
+		return types.MemoryInfo{}, err
 	}
+	return types.MemoryInfo{
+		Virtual:  task.Ptinfo.Virtual_size,
+		Resident: task.Ptinfo.Resident_size,
+		Metrics: map[string]uint64{
+			"page_ins":    uint64(task.Ptinfo.Pageins),
+			"page_faults": uint64(task.Ptinfo.Faults),
+		},
+	}, nil
 }
 
 func getProcTaskAllInfo(pid int, info *procTaskAllInfo) error {

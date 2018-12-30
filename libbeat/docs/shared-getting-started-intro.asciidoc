@@ -1,0 +1,22 @@
+
+To get started with your own {beatname_uc} setup, install and configure these
+related products:
+
+* {es} for storing and indexing the data.
+* {kib} for the UI.
+* {ls} (optional) for parsing and enhancing the data.
+
+See {stack-gs}/get-started-elastic-stack.html[Getting started with the {stack}]
+for more information about installing these products.
+
+[TIP]
+==============
+You can skip having to install {es} and {kib} by using our
+https://www.elastic.co/cloud/elasticsearch-service[hosted {es} Service] on
+Elastic Cloud. The {es} Service is available on both AWS and GCP.
+https://www.elastic.co/cloud/elasticsearch-service/signup[Try out the {es}
+Service for free].
+==============
+
+After installing the {stack}, read the following topics to learn how to
+install, configure, and run {beatname_uc}:

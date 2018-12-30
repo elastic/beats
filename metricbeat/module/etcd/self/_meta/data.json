@@ -17,14 +17,14 @@
                 "appendrequest": {
                     "count": 0
                 },
-                "bandwithrate": 0,
+                "bandwidthrate": 0,
                 "pkgrate": 0
             },
             "send": {
                 "appendrequest": {
                     "count": 0
                 },
-                "bandwithrate": 0,
+                "bandwidthrate": 0,
                 "pkgrate": 0
             },
             "starttime": "2017-12-07T07:20:32.340598119Z",

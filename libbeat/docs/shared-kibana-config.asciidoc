@@ -11,6 +11,11 @@
 
 [[setup-kibana-endpoint]]
 == Set up the Kibana endpoint
+ifdef::deprecate_dashboard_loading[]
+
+deprecated[{deprecate_dashboard_loading}]
+
+endif::[]
 
 ifeval::["{beatname_lc}" == "apm-server"]
 The Kibana dashboards are loaded into Kibana via the Kibana API.
@@ -30,7 +35,7 @@ Here is an example configuration:
 
 [source,yaml]
 ----
-setup.kibana.host: "localhost:5601"
+setup.kibana.host: "http://localhost:5601"
 ----
 
 [float]
@@ -66,7 +71,7 @@ Example config:
 [source,yaml]
 ----
 setup.kibana.host: "192.0.2.255:5601"
-setup.kibana.protocol: "https"
+setup.kibana.protocol: "http"
 setup.kibana.path: /kibana
 ----
 
@@ -104,8 +109,7 @@ Example configuration:
 
 [source,yaml]
 ----
-setup.kibana.host: "192.0.2.255:5601"
-setup.kibana.protocol: "https"
+setup.kibana.host: "https://192.0.2.255:5601"
 setup.kibana.ssl.enabled: true
 setup.kibana.ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 setup.kibana.ssl.certificate: "/etc/pki/client/cert.pem"

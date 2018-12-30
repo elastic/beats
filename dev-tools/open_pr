@@ -53,7 +53,7 @@ def main():
     if args.labels:
         labels.extend(args.labels.split(","))
     if args.wip:
-        lables += "in progress"
+        labels += "in progress"
 
     # get version and set a version label on the original PR
     version = get_version(os.getcwd())

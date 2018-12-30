@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package tls
 
 import (
@@ -49,6 +66,7 @@ var extensionMap = map[uint16]extension{
 	13:     {"signature_algorithms", parseSignatureSchemes, false},
 	16:     {"application_layer_protocol_negotiation", parseALPN, false},
 	35:     {"session_ticket", parseTicket, false},
+	43:     {"supported_versions", parseSupportedVersions, false},
 	0xff01: {"renegotiation_info", ignoreContent, false},
 }
 
@@ -254,4 +272,48 @@ func parseALPN(buffer bufferView) interface{} {
 		pos += 1 + int(strlen)
 	}
 	return protos
+}
+
+func parseSupportedVersions(buffer bufferView) interface{} {
+	// Parsing the supported_versions extensions requires knowing whether the
+	// extension is included in a client_hello or server_hello, but a workaround
+	// can be done by looking at the extension length.
+
+	// Server-side extension has length 2: Selected version (2 bytes)
+	if buffer.length() == 2 {
+		var ver tlsVersion
+		if !buffer.read8(0, &ver.major) || !buffer.read8(1, &ver.minor) {
+			return nil
+		}
+		return ver.String()
+	}
+
+	// Client-side extension has at least 3 bytes: 1 byte length + 2 byte entry
+	if buffer.length() >= 3 {
+		var listBytes uint8
+		if !buffer.read8(0, &listBytes) {
+			return nil
+		}
+		if 1+int(listBytes) > buffer.length() || listBytes&1 != 0 {
+			return nil
+		}
+
+		numEntries := int(listBytes) / 2
+		if numEntries == 0 {
+			return nil
+		}
+		list := make([]string, 0, numEntries)
+		for i := 0; i < numEntries; i++ {
+			var val uint16
+			if !buffer.read16Net(1+2*i, &val) {
+				return nil
+			}
+			if !isGreaseValue(val) {
+				list = append(list, tlsVersion{major: uint8(val >> 8), minor: uint8(val & 0xff)}.String())
+			}
+		}
+		return list
+	}
+
+	return nil
 }

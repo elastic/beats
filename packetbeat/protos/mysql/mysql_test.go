@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build !integration
 
 package mysql
@@ -6,6 +23,7 @@ import (
 	"encoding/hex"
 	"net"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -14,9 +32,10 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/packetbeat/protos"
-
-	"time"
+	"github.com/elastic/beats/packetbeat/protos/tcp"
 )
+
+const serverPort = 3306
 
 type eventStore struct {
 	events []beat.Event
@@ -38,6 +57,7 @@ func mysqlModForTests(store *eventStore) *mysqlPlugin {
 
 	var mysql mysqlPlugin
 	config := defaultConfig
+	config.Ports = []int{serverPort}
 	mysql.init(callback, &config)
 	return &mysql
 }
@@ -65,7 +85,7 @@ func TestMySQLParser_simpleRequest(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
+	stream := &mysqlStream{data: message, message: new(mysqlMessage), isClient: true}
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -347,7 +367,7 @@ func TestParseMySQL_simpleUpdateResponse(t *testing.T) {
 		countHandleMysql++
 	}
 
-	mysql.Parse(&pkt, &tuple, 1, private)
+	mysql.Parse(&pkt, &tuple, tcp.TCPDirectionOriginal, private)
 
 	if countHandleMysql != 1 {
 		t.Errorf("handleMysql not called")
@@ -388,7 +408,7 @@ func TestParseMySQL_threeResponses(t *testing.T) {
 		countHandleMysql++
 	}
 
-	mysql.Parse(&pkt, &tuple, 1, private)
+	mysql.Parse(&pkt, &tuple, tcp.TCPDirectionOriginal, private)
 
 	if countHandleMysql != 3 {
 		t.Errorf("handleMysql not called three times")
@@ -430,7 +450,7 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 		countHandleMysql++
 	}
 
-	private = mysql.Parse(&pkt, &tuple, 1, private).(mysqlPrivateData)
+	private = mysql.Parse(&pkt, &tuple, tcp.TCPDirectionOriginal, private).(mysqlPrivateData)
 	if countHandleMysql != 0 {
 		t.Errorf("handleMysql called on first run")
 	}
@@ -463,10 +483,12 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 func testTCPTuple() *common.TCPTuple {
 	t := &common.TCPTuple{
 		IPLength: 4,
-		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
-		SrcPort: 6512, DstPort: 3306,
+		BaseTuple: common.BaseTuple{
+			SrcIP: net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
+			SrcPort: 6512, DstPort: serverPort,
+		},
 	}
-	t.ComputeHashebles()
+	t.ComputeHashables()
 	return t
 }
 
@@ -521,17 +543,17 @@ func Test_gap_in_response(t *testing.T) {
 
 	private := protos.ProtocolData(new(mysqlPrivateData))
 
-	private = mysql.Parse(&req, tcptuple, 0, private)
-	private = mysql.Parse(&resp, tcptuple, 1, private)
+	private = mysql.Parse(&req, tcptuple, tcp.TCPDirectionOriginal, private)
+	private = mysql.Parse(&resp, tcptuple, tcp.TCPDirectionReverse, private)
 
 	logp.Debug("mysql", "Now sending gap..")
 
-	_, drop := mysql.GapInStream(tcptuple, 1, 10, private)
+	_, drop := mysql.GapInStream(tcptuple, tcp.TCPDirectionReverse, 10, private)
 	assert.Equal(t, true, drop)
 
 	trans := expectTransaction(t, store)
 	assert.NotNil(t, trans)
-	assert.Equal(t, trans["notes"], []string{"Packet loss while capturing the response"})
+	assert.Equal(t, []string{"Packet loss while capturing the response"}, trans["notes"])
 }
 
 // Test that loss of data during the request doesn't result in a
@@ -548,7 +570,7 @@ func Test_gap_in_eat_message(t *testing.T) {
 			"66726f6d20746573")
 	assert.Nil(t, err)
 
-	stream := &mysqlStream{data: reqData, message: new(mysqlMessage)}
+	stream := &mysqlStream{data: reqData, message: new(mysqlMessage), isClient: true}
 	ok, complete := mysqlMessageParser(stream)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)

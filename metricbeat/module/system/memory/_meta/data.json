@@ -1,36 +1,42 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "event": {
+        "dataset": "system.memory",
+        "duration": 115000,
+        "module": "system"
+    },
     "metricset": {
-        "module": "system",
-        "name": "memory",
-        "rtt": 115
+        "name": "memory"
+    },
+    "service": {
+        "type": "system"
     },
     "system": {
         "memory": {
             "actual": {
-                "free": 1311326208,
+                "free": 5384859648,
                 "used": {
-                    "bytes": 2827796480,
-                    "pct": 0.6832
+                    "bytes": 11795009536,
+                    "pct": 0.6866
                 }
             },
-            "free": 588627968,
+            "free": 941989888,
             "swap": {
-                "free": 23846912,
-                "total": 1073737728,
+                "free": 1152122880,
+                "total": 3221225472,
                 "used": {
-                    "bytes": 1049890816,
-                    "pct": 0.9778
+                    "bytes": 2069102592,
+                    "pct": 0.6423
                 }
             },
-            "total": 4139122688,
+            "total": 17179869184,
             "used": {
-                "bytes": 3550494720,
-                "pct": 0.8578
+                "bytes": 16237879296,
+                "pct": 0.9452
             }
         }
     }

@@ -5,9 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-uwsgi]]
 == uwsgi module
 
-experimental[]
-
-== uwsgi module
+beta[]
 
 This is the uwsgi module. By default collects the `stats` metricset, using
 http://uwsgi-docs.readthedocs.io/en/latest/StatsServer.html[StatsServer].
@@ -39,6 +37,9 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: uwsgi
+  metricsets: ["status"]
+  enable: true
+  period: 10s
   hosts: ["tcp://127.0.0.1:9191"]
 ----
 

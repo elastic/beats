@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // Created by cgo -godefs - DO NOT EDIT
 // cgo -godefs defs_darwin.go
 
@@ -109,4 +126,62 @@ type vnodeInfoPath struct {
 type procVnodePathInfo struct {
 	Cdir vnodeInfoPath
 	Rdir vnodeInfoPath
+}
+
+type vmStatisticsData struct {
+	Free_count        uint32
+	Active_count      uint32
+	Inactive_count    uint32
+	Wire_count        uint32
+	Zero_fill_count   uint32
+	Reactivations     uint32
+	Pageins           uint32
+	Pageouts          uint32
+	Faults            uint32
+	Cow_faults        uint32
+	Lookups           uint32
+	Hits              uint32
+	Purgeable_count   uint32
+	Purges            uint32
+	Speculative_count uint32
+}
+
+type vmStatistics64Data struct {
+	Free_count                             uint32
+	Active_count                           uint32
+	Inactive_count                         uint32
+	Wire_count                             uint32
+	Zero_fill_count                        uint64
+	Reactivations                          uint64
+	Pageins                                uint64
+	Pageouts                               uint64
+	Faults                                 uint64
+	Cow_faults                             uint64
+	Lookups                                uint64
+	Hits                                   uint64
+	Purges                                 uint64
+	Purgeable_count                        uint32
+	Speculative_count                      uint32
+	Decompressions                         uint64
+	Compressions                           uint64
+	Swapins                                uint64
+	Swapouts                               uint64
+	Compressor_page_count                  uint32
+	Throttled_count                        uint32
+	External_page_count                    uint32
+	Internal_page_count                    uint32
+	Total_uncompressed_pages_in_compressor uint64
+}
+
+type vmSize uint64
+
+const (
+	cpuStateUser   = 0x0
+	cpuStateSystem = 0x1
+	cpuStateIdle   = 0x2
+	cpuStateNice   = 0x3
+)
+
+type hostCPULoadInfo struct {
+	Ticks [4]uint32
 }

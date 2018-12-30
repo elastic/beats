@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package http
 
 import (
@@ -19,18 +36,19 @@ func init() {
 
 var debugf = logp.MakeDebug("http")
 
+// Create makes a new HTTP monitor
 func create(
-	info monitors.Info,
+	name string,
 	cfg *common.Config,
-) ([]monitors.Job, error) {
+) (jobs []monitors.Job, endpoints int, err error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	tls, err := outputs.LoadTLSConfig(config.TLS)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var body []byte
@@ -41,44 +59,48 @@ func create(
 		compression := config.Check.Request.Compression
 		enc, err = getContentEncoder(compression.Type, compression.Level)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		buf := bytes.NewBuffer(nil)
 		err = enc.Encode(buf, bytes.NewBufferString(config.Check.Request.SendBody))
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		body = buf.Bytes()
 	}
 
-	validator := makeValidateResponse(&config.Check.Response)
+	validator, err := makeValidateResponse(&config.Check.Response)
+	if err != nil {
+		return nil, 0, err
+	}
 
-	jobs := make([]monitors.Job, len(config.URLs))
+	jobs = make([]monitors.Job, len(config.URLs))
 
 	if config.ProxyURL != "" {
 		transport, err := newRoundTripper(&config, tls)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		for i, url := range config.URLs {
 			jobs[i], err = newHTTPMonitorHostJob(url, &config, transport, enc, body, validator)
 			if err != nil {
-				return nil, err
+				return nil, 0, err
 			}
 		}
 	} else {
 		for i, url := range config.URLs {
 			jobs[i], err = newHTTPMonitorIPsJob(&config, url, tls, enc, body, validator)
 			if err != nil {
-				return nil, err
+				return nil, 0, err
 			}
 		}
 	}
 
-	return jobs, nil
+	errWrappedJobs := monitors.WrapAll(jobs, monitors.WithErrAsField)
+	return errWrappedJobs, len(config.URLs), nil
 }
 
 func newRoundTripper(config *Config, tls *transport.TLSConfig) (*http.Transport, error) {

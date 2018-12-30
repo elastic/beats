@@ -1,7 +1,26 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package kubernetes
 
 import (
 	"time"
+
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/builder"
@@ -22,15 +41,16 @@ func init() {
 type Provider struct {
 	config    *Config
 	bus       bus.Bus
+	uuid      uuid.UUID
 	watcher   kubernetes.Watcher
 	metagen   kubernetes.MetaGenerator
-	templates *template.Mapper
+	templates template.Mapper
 	builders  autodiscover.Builders
 	appenders autodiscover.Appenders
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
 	cfgwarn.Beta("The kubernetes autodiscover is beta")
 	config := defaultConfig()
 	err := c.Unpack(&config)
@@ -43,7 +63,10 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		return nil, err
 	}
 
-	metagen := kubernetes.NewMetaGenerator(config.IncludeAnnotations, config.IncludeLabels, config.ExcludeLabels)
+	metagen, err := kubernetes.NewMetaGenerator(c)
+	if err != nil {
+		return nil, err
+	}
 
 	config.Host = kubernetes.DiscoverKubernetesNode(config.Host, config.InCluster, client)
 
@@ -53,7 +76,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 		Namespace:   config.Namespace,
 	})
 	if err != nil {
-		logp.Err("kubernetes: Couldn't create watcher for %t", &kubernetes.Pod{})
+		logp.Err("kubernetes: Couldn't create watcher for %T", &kubernetes.Pod{})
 		return nil, err
 	}
 
@@ -75,6 +98,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	p := &Provider{
 		config:    config,
 		bus:       bus,
+		uuid:      uuid,
 		templates: mapper,
 		builders:  builders,
 		appenders: appenders,
@@ -84,13 +108,16 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 
 	watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 		AddFunc: func(obj kubernetes.Resource) {
+			logp.Debug("kubernetes", "Watcher Pod add: %+v", obj)
 			p.emit(obj.(*kubernetes.Pod), "start")
 		},
 		UpdateFunc: func(obj kubernetes.Resource) {
+			logp.Debug("kubernetes", "Watcher Pod update: %+v", obj)
 			p.emit(obj.(*kubernetes.Pod), "stop")
 			p.emit(obj.(*kubernetes.Pod), "start")
 		},
 		DeleteFunc: func(obj kubernetes.Resource) {
+			logp.Debug("kubernetes", "Watcher Pod delete: %+v", obj)
 			time.AfterFunc(config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
 		},
 	})
@@ -113,28 +140,40 @@ func (p *Provider) emit(pod *kubernetes.Pod, flag string) {
 	p.emitEvents(pod, flag, pod.Spec.InitContainers, pod.Status.InitContainerStatuses)
 }
 
-func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernetes.Container,
-	containerstatuses []kubernetes.PodContainerStatus) {
-	host := pod.Status.PodIP
+func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*kubernetes.Container,
+	containerstatuses []*kubernetes.PodContainerStatus) {
+	host := pod.Status.GetPodIP()
+
+	// Do not emit events without host (container is still being configured)
+	if host == "" {
+		return
+	}
 
 	// Collect all container IDs and runtimes from status information.
 	containerIDs := map[string]string{}
 	runtimes := map[string]string{}
 	for _, c := range containerstatuses {
-		cid, runtime := c.GetContainerIDWithRuntime()
-		containerIDs[c.Name] = cid
-		runtimes[c.Name] = runtime
+		cid, runtime := kubernetes.ContainerIDWithRuntime(c)
+		containerIDs[c.GetName()] = cid
+		runtimes[c.GetName()] = runtime
 	}
 
 	// Emit container and port information
 	for _, c := range containers {
-		cmeta := common.MapStr{
-			"id":      containerIDs[c.Name],
-			"name":    c.Name,
-			"image":   c.Image,
-			"runtime": runtimes[c.Name],
+		cid := containerIDs[c.GetName()]
+
+		// If there is a container ID that is empty then ignore it. It either means that the container is still starting
+		// up or the container is shutting down.
+		if cid == "" {
+			continue
 		}
-		meta := p.metagen.ContainerMetadata(pod, c.Name)
+		cmeta := common.MapStr{
+			"id":      cid,
+			"name":    c.GetName(),
+			"image":   c.GetImage(),
+			"runtime": runtimes[c.GetName()],
+		}
+		meta := p.metagen.ContainerMetadata(pod, c.GetName())
 
 		// Information that can be used in discovering a workload
 		kubemeta := meta.Clone()
@@ -150,6 +189,8 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kub
 		// Without this check there would be overlapping configurations with and without ports.
 		if len(c.Ports) == 0 {
 			event := bus.Event{
+				"provider":   p.uuid,
+				"id":         cid,
 				flag:         true,
 				"host":       host,
 				"kubernetes": kubemeta,
@@ -162,9 +203,11 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []kub
 
 		for _, port := range c.Ports {
 			event := bus.Event{
+				"provider":   p.uuid,
+				"id":         cid,
 				flag:         true,
 				"host":       host,
-				"port":       port.ContainerPort,
+				"port":       port.GetContainerPort(),
 				"kubernetes": kubemeta,
 				"meta": common.MapStr{
 					"kubernetes": meta,

@@ -55,6 +55,23 @@ metricbeat.modules:
       attributes:
         - attr: Value
           field: compaction.pending_tasks
+
+- module: jolokia
+  metricsets: ["jmx"]
+  enabled: true
+  period: 10s
+  namespace: "jolokia_metrics"
+  hosts: ["localhost:4004"]
+  jmx.mappings:
+    - mbean: 'Catalina:type=Server'
+      attributes:
+        - attr: serverInfo
+          field: server_info
+      target:
+        url: 'service:jmx:rmi:///jndi/rmi://jolokia:7091/jmxrmi'
+        user: 'monitorRole'
+        password: 'QED'
+
 #================================ Outputs =====================================
 
 #-------------------------- Elasticsearch output ------------------------------

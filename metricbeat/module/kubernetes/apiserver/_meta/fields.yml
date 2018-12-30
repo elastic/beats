@@ -1,0 +1,43 @@
+- name: apiserver
+  type: group
+  description: >
+    Kubernetes API server metrics
+  release: beta
+  fields:
+    - name: request.client
+      type: keyword
+      description: >
+        Client doing the requests
+    - name: request.resource
+      type: keyword
+      description: >
+        Requested resource
+    - name: request.subresource
+      type: keyword
+      description: >
+        Requested subresource
+    - name: request.scope
+      type: keyword
+      description: >
+        Request scope (cluster, namespace, resource)
+    - name: request.verb
+      type: keyword
+      description: >
+        Request HTTP verb
+    - name: request.count
+      type: long
+      description: >
+        Total number of requests
+    - name: request.latency.sum
+      type: long
+      description: >
+        Requests latency, sum of latencies in microseconds
+    - name: request.latency.count
+      type: long
+      description: >
+        Request latency, number of requests
+    - name: request.latency.bucket
+      type: object
+      object_type: long
+      description: >
+        Request latency histogram buckets

@@ -30,7 +30,7 @@ class Test(BaseTest):
             self.es = Elasticsearch([self.get_elasticsearch_url()])
 
         # Copy system module
-        shutil.copytree(os.path.join("module", "test"),
+        shutil.copytree(os.path.join(self.beat_path, "tests", "system", "module", "test"),
                         os.path.join(self.working_dir, "module", "test"))
 
     def test_reload(self):
@@ -151,7 +151,7 @@ class Test(BaseTest):
 
         # Wait until input is stopped
         self.wait_until(
-            lambda: self.log_contains("Runner stopped:"),
+            lambda: self.log_contains("Stopping runner:"),
             max_timeout=15)
 
         with open(logfile, 'a') as f:

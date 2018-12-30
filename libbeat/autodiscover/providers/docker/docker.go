@@ -1,6 +1,25 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package docker
 
 import (
+	"github.com/gofrs/uuid"
+
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
@@ -20,17 +39,18 @@ func init() {
 type Provider struct {
 	config        *Config
 	bus           bus.Bus
+	uuid          uuid.UUID
 	builders      autodiscover.Builders
 	appenders     autodiscover.Appenders
 	watcher       docker.Watcher
-	templates     *template.Mapper
+	templates     template.Mapper
 	stop          chan interface{}
 	startListener bus.Listener
 	stopListener  bus.Listener
 }
 
 // AutodiscoverBuilder builds and returns an autodiscover provider
-func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, error) {
+func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodiscover.Provider, error) {
 	cfgwarn.Beta("The docker autodiscover is beta")
 	config := defaultConfig()
 	err := c.Unpack(&config)
@@ -68,6 +88,7 @@ func AutodiscoverBuilder(bus bus.Bus, c *common.Config) (autodiscover.Provider, 
 	return &Provider{
 		config:        config,
 		bus:           bus,
+		uuid:          uuid,
 		builders:      builders,
 		appenders:     appenders,
 		templates:     mapper,
@@ -109,7 +130,6 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 	if len(container.IPAddresses) > 0 {
 		host = container.IPAddresses[0]
 	}
-
 	labelMap := common.MapStr{}
 	for k, v := range container.Labels {
 		safemapstr.Put(labelMap, k, v)
@@ -126,9 +146,11 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 	// Without this check there would be overlapping configurations with and without ports.
 	if len(container.Ports) == 0 {
 		event := bus.Event{
-			flag:     true,
-			"host":   host,
-			"docker": meta,
+			"provider": d.uuid,
+			"id":       container.ID,
+			flag:       true,
+			"host":     host,
+			"docker":   meta,
 			"meta": common.MapStr{
 				"docker": meta,
 			},
@@ -140,10 +162,12 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 	// Emit container container and port information
 	for _, port := range container.Ports {
 		event := bus.Event{
-			flag:     true,
-			"host":   host,
-			"port":   port.PrivatePort,
-			"docker": meta,
+			"provider": d.uuid,
+			"id":       container.ID,
+			flag:       true,
+			"host":     host,
+			"port":     port.PrivatePort,
+			"docker":   meta,
 			"meta": common.MapStr{
 				"docker": meta,
 			},
@@ -176,9 +200,9 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 	e := bus.Event{}
 	var dockerMeta common.MapStr
 
-	if rawDocker, ok := event["docker"]; ok {
+	if rawDocker, err := common.MapStr(event).GetValue("docker.container"); err == nil {
 		dockerMeta = rawDocker.(common.MapStr)
-		e["docker"] = dockerMeta
+		e["container"] = dockerMeta
 	}
 
 	if host, ok := event["host"]; ok {
@@ -187,7 +211,7 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 	if port, ok := event["port"]; ok {
 		e["port"] = port
 	}
-	if labels, err := dockerMeta.GetValue("container.labels"); err == nil {
+	if labels, err := dockerMeta.GetValue("labels"); err == nil {
 		hints := builder.GenerateHints(labels.(common.MapStr), "", d.config.Prefix)
 		e["hints"] = hints
 	}

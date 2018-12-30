@@ -1,7 +1,26 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package elasticsearch
 
 import (
 	"encoding/json"
+	"fmt"
+	"strconv"
 
 	"github.com/pkg/errors"
 )
@@ -32,8 +51,35 @@ type SearchResults struct {
 
 // Hits contains the hits.
 type Hits struct {
-	Total int
+	Total Total
 	Hits  []json.RawMessage `json:"hits"`
+}
+
+// Total contains the number of element fetched and the relation.
+type Total struct {
+	Value    int    `json:"value"`
+	Relation string `json:"relation"`
+}
+
+// UnmarshalJSON correctly unmarshal the hits response between ES 6.0 and ES 7.0.
+func (t *Total) UnmarshalJSON(b []byte) error {
+	value := struct {
+		Value    int    `json:"value"`
+		Relation string `json:"relation"`
+	}{}
+
+	if err := json.Unmarshal(b, &value); err == nil {
+		*t = value
+		return nil
+	}
+
+	// fallback for Elasticsearch < 7
+	if i, err := strconv.Atoi(string(b)); err == nil {
+		*t = Total{Value: i, Relation: "eq"}
+		return nil
+	}
+
+	return fmt.Errorf("could not unmarshal JSON value '%s'", string(b))
 }
 
 // CountResults contains the count of results.
@@ -144,6 +190,16 @@ func (es *Connection) IndexExists(index string) (int, error) {
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete.html
 func (es *Connection) Delete(index string, docType string, id string, params map[string]string) (int, *QueryResult, error) {
 	return withQueryResult(es.apiCall("DELETE", index, docType, id, "", params, nil))
+}
+
+// PipelineExists checks if a pipeline with name id already exists.
+// Using: https://www.elastic.co/guide/en/elasticsearch/reference/current/get-pipeline-api.html
+func (es *Connection) PipelineExists(id string) (bool, error) {
+	status, _, err := es.apiCall("GET", "_ingest", "pipeline", id, "", nil, nil)
+	if status == 404 {
+		return false, nil
+	}
+	return status == 200, err
 }
 
 // CreatePipeline create a new ingest pipeline with name id.

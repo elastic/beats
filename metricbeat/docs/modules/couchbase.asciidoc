@@ -10,6 +10,11 @@ beta[]
 This module periodically fetches metrics from https://www.couchbase.com/[Couchbase]
 servers. The default metricsets are `bucket`, `cluster`, `node`.
 
+[float]
+=== Compatibility
+
+The Couchbase module is tested with Couchbase 4.5.1.
+
 
 [float]
 === Example configuration
@@ -21,10 +26,14 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: couchbase
+  metricsets: ["bucket", "cluster", "node"]
+  period: 10s
   hosts: ["localhost:8091"]
+  enabled: true
 ----
 
-This module supports TLS connection when using `ssl` config field, as described in <<configuration-ssl>>.
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets

@@ -4,7 +4,7 @@
     Jolokia module
   short_config: false
   release: ga
-  settings: ["ssl"]
+  settings: ["ssl", "http"]
   fields:
     - name: jolokia
       type: group

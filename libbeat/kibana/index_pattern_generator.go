@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package kibana
 
 import (
@@ -20,20 +37,19 @@ type IndexPatternGenerator struct {
 }
 
 // Create an instance of the Kibana Index Pattern Generator
-func NewGenerator(indexName, beatName, beatDir, beatVersion string, version common.Version) (*IndexPatternGenerator, error) {
+func NewGenerator(indexName, beatName, fieldsYAMLFile, outputDir, beatVersion string, version common.Version) (*IndexPatternGenerator, error) {
 	beatName = clean(beatName)
 
-	fieldsYaml := filepath.Join(beatDir, "fields.yml")
-	if _, err := os.Stat(fieldsYaml); err != nil {
+	if _, err := os.Stat(fieldsYAMLFile); err != nil {
 		return nil, err
 	}
 
 	return &IndexPatternGenerator{
 		indexName:      indexName,
-		fieldsYaml:     fieldsYaml,
+		fieldsYaml:     fieldsYAMLFile,
 		beatVersion:    beatVersion,
 		version:        version,
-		targetDir:      createTargetDir(beatDir, version),
+		targetDir:      createTargetDir(outputDir, version),
 		targetFilename: beatName + ".json",
 	}, nil
 }
@@ -152,9 +168,9 @@ func dumpToFile(f string, pattern common.MapStr) error {
 }
 
 func createTargetDir(baseDir string, version common.Version) string {
-	targetDir := filepath.Join(baseDir, "_meta", "kibana", getVersionPath(version), "index-pattern")
+	targetDir := filepath.Join(baseDir, getVersionPath(version), "index-pattern")
 	if _, err := os.Stat(targetDir); os.IsNotExist(err) {
-		os.MkdirAll(targetDir, 0777)
+		os.MkdirAll(targetDir, 0755)
 	}
 	return targetDir
 }

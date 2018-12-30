@@ -1,0 +1,75 @@
+{
+    "@timestamp": "2018-11-30T01:17:10.010Z",
+    "@metadata": {
+        "beat": "packetbeat",
+        "type": "doc",
+        "version": "7.0.0"
+    },
+    "flow": {
+        "id": "EQwA////DP//////FBgBAAEIACfVnVpSVAASNQIKAAIPgtMmkVFbuwG7AAAAAAAAAA",
+        "final": false
+    },
+    "network": {
+        "bytes": 7566,
+        "packets": 28,
+        "type": "ipv4",
+        "transport": "tcp"
+    },
+    "process": {
+        "exe": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+        "start": "2018-11-30T01:15:50.119Z",
+        "pid": 3468,
+        "name": "chrome.exe",
+        "args": [
+            "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+        ],
+        "ppid": 1860
+    },
+    "source": {
+        "bytes": 2008,
+        "process": {
+            "name": "chrome.exe",
+            "args": [
+                "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+            ],
+            "ppid": 1860,
+            "exe": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+            "start": "2018-11-30T01:15:50.119Z",
+            "pid": 3468
+        },
+        "mac": "08:00:27:d5:9d:5a",
+        "ip": "10.0.2.15",
+        "port": 23377,
+        "packets": 12
+    },
+    "destination": {
+        "packets": 16,
+        "bytes": 5558,
+        "mac": "52:54:00:12:35:02",
+        "ip": "130.211.38.145",
+        "port": 443
+    },
+    "agent": {
+        "hostname": "vagrant-2012-r2",
+        "version": "7.0.0",
+        "type": "packetbeat"
+    },
+    "host": {
+        "name": "vagrant-2012-r2",
+        "os": {
+            "kernel": "6.3.9600.16384 (winblue_rtm.130821-1623)",
+            "build": "9600.0",
+            "platform": "windows",
+            "version": "6.3",
+            "family": "windows"
+        },
+        "id": "42f11c3b-3062-4874-9ea3-50e0e08c4434",
+        "architecture": "x86_64"
+    },
+    "event": {
+        "end": "2018-11-30T01:16:45.645Z",
+        "duration": 3965826800,
+        "type": "flow",
+        "start": "2018-11-30T01:16:41.679Z"
+    }
+}

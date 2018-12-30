@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package report
 
 import (
@@ -13,11 +30,15 @@ type config struct {
 	Reporter common.ConfigNamespace `config:",inline"`
 }
 
+type Settings struct {
+	DefaultUsername string
+}
+
 type Reporter interface {
 	Stop()
 }
 
-type ReporterFactory func(beat.Info, *common.Config) (Reporter, error)
+type ReporterFactory func(beat.Info, Settings, *common.Config) (Reporter, error)
 
 var (
 	defaultConfig = config{}
@@ -34,6 +55,7 @@ func RegisterReporterFactory(name string, f ReporterFactory) {
 
 func New(
 	beat beat.Info,
+	settings Settings,
 	cfg *common.Config,
 	outputs common.ConfigNamespace,
 ) (Reporter, error) {
@@ -47,7 +69,7 @@ func New(
 		return nil, fmt.Errorf("unknown reporter type '%v'", name)
 	}
 
-	return f(beat, cfg)
+	return f(beat, settings, cfg)
 }
 
 func getReporterConfig(

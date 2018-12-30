@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package file_integrity
 
 import (
@@ -27,6 +44,7 @@ var validHashes = []HashType{
 	SHA1,
 	SHA224, SHA256, SHA384, SHA512, SHA512_224, SHA512_256,
 	SHA3_224, SHA3_256, SHA3_384, SHA3_512,
+	XXH64,
 }
 
 // Enum of hash types.
@@ -46,6 +64,7 @@ const (
 	SHA512      HashType = "sha512"
 	SHA512_224  HashType = "sha512_224"
 	SHA512_256  HashType = "sha512_256"
+	XXH64       HashType = "xxh64"
 )
 
 // Config contains the configuration parameters for the file integrity
@@ -60,6 +79,7 @@ type Config struct {
 	ScanRateBytesPerSec uint64          `config:",ignore"`
 	Recursive           bool            `config:"recursive"` // Recursive enables recursive monitoring of directories.
 	ExcludeFiles        []match.Matcher `config:"exclude_files"`
+	IncludeFiles        []match.Matcher `config:"include_files"`
 }
 
 // Validate validates the config data and return an error explaining all the
@@ -121,6 +141,20 @@ func deduplicate(in []string) []string {
 // IsExcludedPath checks if a path matches the exclude_files regular expressions.
 func (c *Config) IsExcludedPath(path string) bool {
 	for _, matcher := range c.ExcludeFiles {
+		if matcher.MatchString(path) {
+			return true
+		}
+	}
+	return false
+}
+
+// IsIncludedPath checks if a path matches the include_files regular expressions.
+func (c *Config) IsIncludedPath(path string) bool {
+	if len(c.IncludeFiles) == 0 {
+		return true
+	}
+
+	for _, matcher := range c.IncludeFiles {
 		if matcher.MatchString(path) {
 			return true
 		}

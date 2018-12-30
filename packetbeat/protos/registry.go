@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package protos
 
 import (
@@ -48,6 +65,15 @@ type UDPPlugin interface {
 
 	// ParseUDP is invoked when UDP payload data is available for parsing.
 	ParseUDP(pkt *Packet)
+}
+
+// ExpirationAwareTCPPlugin is a TCPPlugin that also provides the Expired()
+// method. No need to use this type directly, just implement the method.
+type ExpirationAwareTCPPlugin interface {
+	TCPPlugin
+
+	// Expired is called when the TCP stream is expired due to connection timeout.
+	Expired(tuple *common.TCPTuple, private ProtocolData)
 }
 
 // Protocol identifier.

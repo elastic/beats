@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package cpu
 
 import (
@@ -9,9 +26,10 @@ import (
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("docker", "cpu", New, docker.HostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("docker", "cpu", New,
+		mb.WithHostParser(docker.HostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 type MetricSet struct {
@@ -33,10 +51,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	cpuConfig := struct {
+		Cores bool `config:"cpu.cores"`
+	}{
+		Cores: true,
+	}
+	if err := base.Module().UnpackConfig(&cpuConfig); err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		dockerClient:  client,
-		cpuService:    &CPUService{},
+		cpuService:    &CPUService{Cores: cpuConfig.Cores},
 		dedot:         config.DeDot,
 	}, nil
 }

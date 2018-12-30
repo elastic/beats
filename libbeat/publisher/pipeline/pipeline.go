@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // Package pipeline combines all publisher functionality (processors, queue,
 // outputs) to create instances of complete publisher pipelines, beats can
 // connect to publish events to.
@@ -11,6 +28,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -22,7 +40,7 @@ import (
 // Pipeline implementation providint all beats publisher functionality.
 // The pipeline consists of clients, processors, a central queue, an output
 // controller and the actual outputs.
-// The queue implementing the queue.Queue interface is the most entral entity
+// The queue implementing the queue.Queue interface is the most central entity
 // to the pipeline, providing support for pushung, batching and pulling events.
 // The pipeline adds different ACKing strategies and wait close support on top
 // of the queue. For handling ACKs, the pipeline keeps track of filtered out events,
@@ -62,9 +80,9 @@ type pipelineProcessors struct {
 	// The pipeline its processor settings for
 	// constructing the clients complete processor
 	// pipeline on connect.
-	beatsMeta common.MapStr
-	fields    common.MapStr
-	tags      []string
+	builtinMeta common.MapStr
+	fields      common.MapStr
+	tags        []string
 
 	processors beat.Processor
 
@@ -91,8 +109,8 @@ type Settings struct {
 // processors, so all processors configured with the pipeline or client will see
 // the same/complete event.
 type Annotations struct {
-	Beat  common.MapStr
-	Event common.EventMetadata
+	Event   common.EventMetadata
+	Builtin common.MapStr
 }
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.
@@ -134,6 +152,7 @@ type queueFactory func(queue.Eventer) (queue.Queue, error)
 // queue and outputs will be closed.
 func New(
 	beat beat.Info,
+	monitors Monitors,
 	metrics *monitoring.Registry,
 	queueFactory queueFactory,
 	out outputs.Group,
@@ -141,7 +160,7 @@ func New(
 ) (*Pipeline, error) {
 	var err error
 
-	log := defaultLogger
+	log := logp.NewLogger("publish")
 	annotations := settings.Annotations
 	processors := settings.Processors
 	disabledOutput := settings.Disabled
@@ -173,9 +192,20 @@ func New(
 	if err != nil {
 		return nil, err
 	}
-	p.eventSema = newSema(p.queue.BufferConfig().Events)
 
-	p.output = newOutputController(log, p.observer, p.queue)
+	if count := p.queue.BufferConfig().Events; count > 0 {
+		p.eventSema = newSema(count)
+	}
+
+	maxEvents := p.queue.BufferConfig().Events
+	if maxEvents <= 0 {
+		// Maximum number of events until acker starts blocking.
+		// Only active if pipeline can drop events.
+		maxEvents = 64000
+	}
+	p.eventSema = newSema(maxEvents)
+
+	p.output = newOutputController(beat, monitors, log, p.observer, p.queue)
 	p.output.Set(out)
 
 	return p, nil
@@ -390,8 +420,8 @@ func makePipelineProcessors(
 		p.processors = tmp
 	}
 
-	if meta := annotations.Beat; meta != nil {
-		p.beatsMeta = common.MapStr{"beat": meta}
+	if meta := annotations.Builtin; meta != nil {
+		p.builtinMeta = meta
 	}
 
 	if em := annotations.Event; len(em.Fields) > 0 {
@@ -405,4 +435,9 @@ func makePipelineProcessors(
 	}
 
 	return p
+}
+
+// OutputReloader returns a reloadable object for the output section of this pipeline
+func (p *Pipeline) OutputReloader() reload.Reloadable {
+	return p.output
 }

@@ -1,13 +1,30 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package jmx
 
 import (
-	"encoding/json"
 	"strings"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 const (
@@ -78,11 +95,7 @@ type eventKey struct {
 	mbean, event string
 }
 
-func eventMapping(content []byte, mapping AttributeMapping) ([]common.MapStr, error) {
-	var entries []Entry
-	if err := json.Unmarshal(content, &entries); err != nil {
-		return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
-	}
+func eventMapping(entries []Entry, mapping AttributeMapping) ([]common.MapStr, error) {
 
 	// Generate a different event for each wildcard mbean, and and additional one
 	// for non-wildcard requested mbeans, group them by event name if defined
@@ -149,7 +162,10 @@ func parseResponseEntry(
 ) error {
 	field, exists := mapping.Get(requestMbeanName, attributeName)
 	if !exists {
-		return errors.Errorf("metric key '%v' not found in response (%+v)", attributeName, mapping)
+		// This shouldn't ever happen, if it does it is probably that some of our
+		// assumptions when building the request and the mapping is wrong.
+		logp.Debug("jolokia.jmx", "mapping: %+v", mapping)
+		return errors.Errorf("metric key '%v' for mbean '%s' not found in mapping", attributeName, requestMbeanName)
 	}
 
 	var key eventKey

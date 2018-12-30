@@ -60,7 +60,7 @@ class Test(BaseTest):
 
     def test_first_class_op(self):
         """
-        Should cerrectly detect first-class opration in a middle of
+        Should correctly detect first-class operation in a middle of
         compound call
         """
         self.render_config_template(
@@ -73,3 +73,36 @@ class Test(BaseTest):
         o = objs[0]
 
         assert o["nfs.opcode"] == "CLOSE"
+
+    def test_first_class_op_v42(self):
+        """
+        Should correctly detect first-class nfs v4.2 opration in a middle of
+        compound call
+        """
+        self.render_config_template(
+            nfs_ports=[2049],
+        )
+        self.run_packetbeat(pcap="nfsv42_layoutstats.pcap")
+
+        objs = self.read_output()
+        assert len(objs) == 1
+        o = objs[0]
+
+        assert o["nfs.opcode"] == "LAYOUTSTATS"
+
+    def test_clone_notsupp_v42(self):
+        """
+        Should correctly detect first-class nfs v4.2 opration in a middle of
+        compound call and corresponding error code
+        """
+        self.render_config_template(
+            nfs_ports=[2049],
+        )
+        self.run_packetbeat(pcap="nfsv42_clone.pcap")
+
+        objs = self.read_output()
+        assert len(objs) == 1
+        o = objs[0]
+
+        assert o["nfs.opcode"] == "CLONE"
+        assert o["nfs.status"] == "NFSERR_NOTSUPP"

@@ -1,6 +1,8 @@
 This module periodically fetches metrics from
 https://www.postgresql.org/[PostgreSQL] servers.
 
+Default metricsets are `activity`, `bgwriter` and `database`.
+
 [float]
 === Module-specific configuration notes
 

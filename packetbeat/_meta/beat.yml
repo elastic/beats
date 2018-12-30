@@ -11,7 +11,7 @@
 
 # Select the network interface to sniff the data. On Linux, you can use the
 # "any" keyword to sniff on all connected interfaces.
-packetbeat.interfaces.device: any
+packetbeat.interfaces.device: {{ call .device .GOOS }}
 
 #================================== Flows =====================================
 
@@ -39,6 +39,10 @@ packetbeat.protocols:
 - type: cassandra
   #Cassandra port for traffic monitoring.
   ports: [9042]
+
+- type: dhcpv4
+  # Configure the DHCP for IPv4 ports.
+  ports: [67, 68]
 
 - type: dns
   # Configure the ports where to listen for DNS traffic. You can disable

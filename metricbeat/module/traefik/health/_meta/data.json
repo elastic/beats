@@ -1,0 +1,29 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "metricset": {
+        "host": "127.0.0.1:8080",
+        "module": "traefik",
+        "name": "health",
+        "rtt": 115
+    },
+    "traefik": {
+        "health": {
+            "response": {
+                "avg_time": {
+                    "us": 32
+                },
+                "count": 15,
+                "status_codes": {
+                    "404": 15
+                }
+            },
+            "uptime": {
+                "sec": 1944
+            }
+        }
+    }
+}

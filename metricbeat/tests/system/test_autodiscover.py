@@ -25,7 +25,7 @@ class TestAutodiscover(metricbeat.BaseTest):
                 'docker': {
                     'templates': '''
                       - condition:
-                          equals.docker.container.image: memcached:1.5.3
+                          equals.docker.container.image: memcached:latest
                         config:
                           - module: memcached
                             metricsets: ["stats"]
@@ -37,21 +37,21 @@ class TestAutodiscover(metricbeat.BaseTest):
         )
 
         proc = self.start_beat()
-        docker_client.images.pull('memcached:1.5.3')
-        container = docker_client.containers.run('memcached:1.5.3', detach=True)
+        docker_client.images.pull('memcached:latest')
+        container = docker_client.containers.run('memcached:latest', detach=True)
 
-        self.wait_until(lambda: self.log_contains('Autodiscover starting runner: memcached'))
+        self.wait_until(lambda: self.log_contains('Starting runner: memcached'))
 
         self.wait_until(lambda: self.output_count(lambda x: x >= 1))
         container.stop()
 
-        self.wait_until(lambda: self.log_contains('Autodiscover stopping runner: memcached'))
+        self.wait_until(lambda: self.log_contains('Stopping runner: memcached'))
 
         output = self.read_output_json()
         proc.check_kill_and_wait()
 
         # Check metadata is added
-        assert output[0]['docker']['container']['image'] == 'memcached:1.5.3'
+        assert output[0]['docker']['container']['image'] == 'memcached:latest'
         assert output[0]['docker']['container']['labels'] == {}
         assert 'name' in output[0]['docker']['container']
 
@@ -74,24 +74,24 @@ class TestAutodiscover(metricbeat.BaseTest):
         )
 
         proc = self.start_beat()
-        docker_client.images.pull('memcached:1.5.3')
+        docker_client.images.pull('memcached:latest')
         labels = {
             'co.elastic.metrics/module': 'memcached',
             'co.elastic.metrics/period': '1s',
             'co.elastic.metrics/hosts': "'${data.host}:11211'",
         }
-        container = docker_client.containers.run('memcached:1.5.3', labels=labels, detach=True)
+        container = docker_client.containers.run('memcached:latest', labels=labels, detach=True)
 
-        self.wait_until(lambda: self.log_contains('Autodiscover starting runner: memcached'))
+        self.wait_until(lambda: self.log_contains('Starting runner: memcached'))
 
         self.wait_until(lambda: self.output_count(lambda x: x >= 1))
         container.stop()
 
-        self.wait_until(lambda: self.log_contains('Autodiscover stopping runner: memcached'))
+        self.wait_until(lambda: self.log_contains('Stopping runner: memcached'))
 
         output = self.read_output_json()
         proc.check_kill_and_wait()
 
         # Check metadata is added
-        assert output[0]['docker']['container']['image'] == 'memcached:1.5.3'
+        assert output[0]['docker']['container']['image'] == 'memcached:latest'
         assert 'name' in output[0]['docker']['container']

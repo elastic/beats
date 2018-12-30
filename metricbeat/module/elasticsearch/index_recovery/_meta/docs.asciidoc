@@ -1,0 +1,15 @@
+This is the index_recovery metricset of the module Elasticsearch.
+
+By default only data about indices which are under active recovery are fetched.
+To gather data about all indices set `index_recovery.active_only: false`:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+- module: elasticsearch
+  metricsets:
+    - index_recovery
+  hosts: ["localhost:9200"]
+  index_recovery.active_only: false
+-------------------------------------------------------------------------------------
+
+

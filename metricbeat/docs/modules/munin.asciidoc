@@ -5,12 +5,18 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-munin]]
 == Munin module
 
-experimental[]
-
-== munin module
+beta[]
 
 This is the munin module.
 
+The default metricset is `node`.
+
+[float]
+=== Compatibility
+
+Munin module should be compatible with any implementation of the munin network
+protocol (http://guide.munin-monitoring.org/en/latest/master/network-protocol.html),
+it is tested with munin node 2.0.
 
 
 [float]
@@ -24,7 +30,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: munin
   metricsets: ["node"]
-  enabled: false
+  enabled: true
   period: 10s
   hosts: ["localhost:4949"]
   node.namespace: node
