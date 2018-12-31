@@ -9,6 +9,7 @@ This metricset is available on:
 - FreeBSD
 - Linux
 - macOS
+- Windows
 
 [float]
 === Configuration

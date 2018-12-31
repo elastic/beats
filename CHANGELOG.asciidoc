@@ -141,6 +141,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Add field `event.dataset` which is `{module}.{metricset).
 - Add more TCP statuses to `socket_summary` metricset. {pull}9430[9430]
 - Remove experimental tag from ceph metricsets. {pull}9708[9708]
+- Add `socket_summary` metricset to system defaults, removing experimental tag and supporting Windows {pull}9709[9709]
 
 *Packetbeat*
 
