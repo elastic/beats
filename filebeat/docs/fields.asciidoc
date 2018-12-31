@@ -72,7 +72,7 @@ Client IP address or hostname.
 
 --
 
-*`apache2.access.ssl_protocol`*::
+*`apache2.access.ssl.protocol`*::
 +
 --
 type: keyword
@@ -82,7 +82,7 @@ SSL protocol version.
 
 --
 
-*`apache2.access.ssl_cipher`*::
+*`apache2.access.ssl.cipher`*::
 +
 --
 type: keyword
