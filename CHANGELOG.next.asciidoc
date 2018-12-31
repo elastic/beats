@@ -76,6 +76,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Add missing journalbeat non breaking fixes. {pull}9106[9106]
 
 *Metricbeat*
+- Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
 
 - Add missing namespace field in http server metricset {pull}7890[7890]
 - Fix race condition when enriching events with kubernetes metadata. {issue}9055[9055] {issue}9067[9067]
