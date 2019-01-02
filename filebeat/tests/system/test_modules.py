@@ -67,6 +67,14 @@ class Test(BaseTest):
 
         self.index_name = "test-filebeat-modules"
 
+        body = {
+            "transient": {
+                "script.max_compilations_rate": "1000/1m"
+            }
+        }
+
+        self.es.transport.perform_request('PUT', "/_cluster/settings", body=body)
+
     @parameterized.expand(load_fileset_test_cases)
     @unittest.skipIf(not INTEGRATION_TESTS,
                      "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
@@ -160,7 +168,7 @@ class Test(BaseTest):
                     objects[k] = self.flatten_object(obj, {}, "")
                     clean_keys(objects[k])
 
-                json.dump(objects, f, indent=4, sort_keys=True)
+                json.dump(objects, f, indent=4, separators=(',', ': '), sort_keys=True)
 
         with open(test_file + "-expected.json", "r") as f:
             expected = json.load(f)

@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "NkpNQgmrdzGr9HUDL8Bp5YAxt0k=",
+			"path": "cloud.google.com/go/civil",
+			"revision": "632e11ec7c242a85e1931e4a8fdda2002316569f",
+			"revisionTime": "2018-10-26T23:03:58Z"
+		},
+		{
 			"checksumSHA1": "AzjRkOQtVBTwIw4RJLTygFhJs3s=",
 			"path": "github.com/Microsoft/go-winio",
 			"revision": "f533f7a102197536779ea3a8cb881d639e21ec5a",
@@ -471,6 +477,18 @@
 			"revisionTime": "2016-10-29T20:57:26Z",
 			"version": "v1.1.0",
 			"versionExact": "v1.1.0"
+		},
+		{
+			"checksumSHA1": "0rXUgJC/GgF8XbLxmJiMgC4peQQ=",
+			"path": "github.com/denisenkom/go-mssqldb",
+			"revision": "4e0d7dc8888fbb59764060e99b7b68e77a6f9698",
+			"revisionTime": "2018-10-14T14:49:52Z"
+		},
+		{
+			"checksumSHA1": "wu8t19t2rmyrrfDfdu9v7f/+iag=",
+			"path": "github.com/denisenkom/go-mssqldb/internal/cp",
+			"revision": "4e0d7dc8888fbb59764060e99b7b68e77a6f9698",
+			"revisionTime": "2018-10-14T14:49:52Z"
 		},
 		{
 			"checksumSHA1": "Gj+xR1VgFKKmFXYOJMnAczC3Znk=",
@@ -1545,58 +1563,65 @@
 			"revisionTime": "2017-02-10T14:05:23Z"
 		},
 		{
-			"checksumSHA1": "Kq6KC9PlUP58qiX0WzApE85SsLg=",
+			"checksumSHA1": "ASXhLVfIA2mzHf+7muYxT38JaHU=",
 			"path": "github.com/magefile/mage",
-			"revision": "11d15918ff3aa6f75cd6d3340a9507bb5309c679",
-			"revisionTime": "2018-10-17T17:03:14Z"
+			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
+			"revisionTime": "2018-12-11T21:18:45Z",
+			"version": "v1.8.0",
+			"versionExact": "v1.8.0"
 		},
 		{
-			"checksumSHA1": "KODorM0Am1g55qObNz3jVOdRVFs=",
-			"path": "github.com/magefile/mage/build",
-			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
-			"revisionTime": "2018-04-12T15:54:34Z"
+			"checksumSHA1": "fHpo/9Tke6VFfZZAT+PRnoNOiiY=",
+			"path": "github.com/magefile/mage/internal",
+			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
+			"revisionTime": "2018-12-11T21:18:45Z",
+			"version": "v1.8.0",
+			"versionExact": "v1.8.0"
 		},
 		{
-			"checksumSHA1": "9yeXUlqhNcsR7MlYMouJTO3AXv0=",
+			"checksumSHA1": "RVSwuhHOfojhN74rfwRe4AktDIA=",
 			"path": "github.com/magefile/mage/mage",
-			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
-			"revisionTime": "2018-04-12T15:54:34Z"
+			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
+			"revisionTime": "2018-12-11T21:18:45Z",
+			"version": "v1.8.0",
+			"versionExact": "v1.8.0"
 		},
 		{
-			"checksumSHA1": "TkAemcxaY44gsEjO1BiBxwlEI4A=",
+			"checksumSHA1": "irRTBkCBnOGMX+PZhOdHFUckgBY=",
 			"path": "github.com/magefile/mage/mg",
-			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
-			"revisionTime": "2018-04-12T15:54:34Z"
+			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
+			"revisionTime": "2018-12-11T21:18:45Z",
+			"version": "v1.8.0",
+			"versionExact": "v1.8.0"
 		},
 		{
-			"checksumSHA1": "b1qY9BFtpJnIZEa8yvpJCRbOhRM=",
+			"checksumSHA1": "QGt/JRmNp+D+lO0hHZsUUyH7y5U=",
 			"path": "github.com/magefile/mage/parse",
-			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
-			"revisionTime": "2018-04-12T15:54:34Z"
+			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
+			"revisionTime": "2018-12-11T21:18:45Z",
+			"version": "v1.8.0",
+			"versionExact": "v1.8.0"
 		},
 		{
-			"checksumSHA1": "fEuDveZzYX6oqYOT9jqyZROun/Q=",
-			"path": "github.com/magefile/mage/parse/srcimporter",
-			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
-			"revisionTime": "2018-04-12T15:54:34Z"
-		},
-		{
-			"checksumSHA1": "0/j3qlGc8fsWG42uIDZ5p8tVzPM=",
+			"checksumSHA1": "4JzH55TcYdctQksrCafgKT8lZRU=",
 			"path": "github.com/magefile/mage/sh",
-			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
-			"revisionTime": "2018-04-12T15:54:34Z"
+			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
+			"revisionTime": "2018-12-11T21:18:45Z",
+			"version": "v1.8.0",
+			"versionExact": "v1.8.0"
 		},
 		{
-			"checksumSHA1": "oAjx69UIs6F6hPh+2GQSBMaHAfc=",
+			"checksumSHA1": "91U4Tlwnjdmwjd0w/XNw3+fxFKo=",
 			"path": "github.com/magefile/mage/target",
-			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
-			"revisionTime": "2018-04-12T15:54:34Z"
+			"revision": "aedfce64c122eef47009b7f80c9771044753215d",
+			"revisionTime": "2018-12-11T21:18:45Z",
+			"version": "v1.8.0",
+			"versionExact": "v1.8.0"
 		},
 		{
-			"checksumSHA1": "He+VtZO7BsPDCZhZtJ1IkNp629o=",
-			"path": "github.com/magefile/mage/types",
-			"revision": "5e51f9ad1ed0886c5d06a8c46a09703cfc4d9034",
-			"revisionTime": "2018-04-12T15:54:34Z"
+			"path": "github.com/magefile/mage^",
+			"revision": "v1.8.0",
+			"version": "v1.8.0"
 		},
 		{
 			"checksumSHA1": "qNkx9+OTwZI6aFv7K9zuFCGODUw=",
@@ -1982,6 +2007,12 @@
 			"path": "golang.org/x/crypto/ed25519/internal/edwards25519",
 			"revision": "c126467f60eb25f8f27e5a981f32a87e3965053f",
 			"revisionTime": "2018-07-23T15:26:11Z"
+		},
+		{
+			"checksumSHA1": "MCeXr2RNeiG1XG6V+er1OR0qyeo=",
+			"path": "golang.org/x/crypto/md4",
+			"revision": "4d3f4d9ffa16a13f451c3b2999e9c49e9750bf06",
+			"revisionTime": "2018-10-23T16:52:47Z"
 		},
 		{
 			"checksumSHA1": "1MGpGDQqnUoRpv7VEcQrXOBydXE=",

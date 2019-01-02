@@ -40,8 +40,11 @@ services:
       - "xpack.security.enabled=true"
       - "xpack.license.self_generated.type=trial"
     command: bash -c "bin/elasticsearch-keystore create && echo changeme | bin/elasticsearch-keystore add --stdin bootstrap.password && /usr/local/bin/docker-entrypoint.sh eswrapper"
+    restart: on-failure:5
 
   kibana:
+    depends_on:
+      - elasticsearch
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: kibana
@@ -50,3 +53,4 @@ services:
       retries: 1200
       interval: 1s
     command: /usr/local/bin/kibana-docker --xpack.security.enabled=true --elasticsearch.username=elastic --elasticsearch.password=changeme
+    restart: on-failure:5

@@ -54,6 +54,28 @@
   alias6: true
   alias: true
 
+# Docker processor
+- from: docker.container.id
+  to: container.id
+  alias: true
+  alias6: true
+
+- from: docker.container.image
+  to: container.image.name
+  alias6: true
+  alias: true
+
+- from: docker.container.name
+  to: container.name
+  alias6: true
+  alias: true
+
+- from: docker.container.labels  # TODO: How to map these?
+  to: container.labels
+  alias6: false
+  alias: true
+
+
 # Filebeat modules
 
 ## Suricata module
