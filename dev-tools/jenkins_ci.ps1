@@ -48,11 +48,5 @@ New-Item -ItemType directory -Path build\coverage | Out-Null
 New-Item -ItemType directory -Path build\system-tests | Out-Null
 New-Item -ItemType directory -Path build\system-tests\run | Out-Null
 
-echo "Building fields.yml"
-exec { mage fields } "mage fields FAILURE"
-
-echo "Building $env:beat"
-exec { mage build } "Build FAILURE"
-
-echo "Unit testing $env:beat"
-exec { mage unitTest } "mage unitTest FAILURE"
+echo "Updating/Building/Testing $env:beat"
+exec { mage update build unitTest } "mage update build unitTest FAILURE"
