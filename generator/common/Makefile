@@ -5,6 +5,8 @@ BEAT_TYPE?=beat
 BEAT_PATH=${BUILD_DIR}/src/beatpath/testbeat
 ES_BEATS=${GOPATH}/src/github.com/elastic/beats
 PREPARE_COMMAND?=
+BUILD_CMD?=$(MAKE)
+TEST_CMD?=$(MAKE) unit
 
 # Runs test build for mock beat
 .PHONY: test
@@ -14,15 +16,15 @@ test: prepare-test
 	export PATH=$${GOPATH}/bin:${PATH}; \
 	cd ${BEAT_PATH} ; \
 	$(MAKE) copy-vendor || exit 1  ; \
-	${PREPARE_COMMAND} \
 	$(MAKE) git-init || exit 1 ; \
+	${PREPARE_COMMAND} \
 	$(MAKE) update || exit 1 ; \
 	git config user.email "beats-jenkins@test.com" || exit 1 ; \
 	git config user.name "beats-jenkins" || exit 1 ; \
 	$(MAKE) git-add || exit 1 ; \
 	$(MAKE) check CHECK_HEADERS_DISABLED=y || exit 1 ; \
-	$(MAKE) || exit 1 ; \
-	$(MAKE) unit
+	$(BUILD_CMD) || exit 1 ; \
+	$(TEST_CMD)
 
 .PHONY: prepare-test
 prepare-test:: python-env
@@ -30,6 +32,7 @@ prepare-test:: python-env
 	mkdir -p ${BUILD_DIR}/src/github.com/elastic/beats/
 	rsync -a \
 	  --include=vendor/github.com/magefile/mage/build \
+	  --include=dev-tools/mage/target/build \
 	  --exclude=build/ \
 	  --exclude=.git/ \
 	  ${PWD}/../../* ${BUILD_DIR}/src/github.com/elastic/beats/

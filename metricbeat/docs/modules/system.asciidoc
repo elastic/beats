@@ -31,7 +31,9 @@ metricbeat.modules:
 - module: system
   metricsets:
     - cpu             # CPU usage
+{{- if ne .GOOS "windows" }}
     - load            # CPU load averages
+{{- end }}
     - memory          # Memory usage
     - network         # Network IO
     - process         # Per process metrics
@@ -43,7 +45,9 @@ metricbeat.modules:
     #- filesystem     # File system usage for each mountpoint
     #- fsstat         # File system summary metrics
     #- raid           # Raid
+{{- if eq .GOOS "linux" }}
     #- socket         # Sockets and connection info (linux only)
+{{- end }}
   enabled: true
   period: 10s
   processes: ['.*']

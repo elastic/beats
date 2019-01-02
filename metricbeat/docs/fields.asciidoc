@@ -26,6 +26,7 @@ grouped in the following categories:
 * <<exported-fields-elasticsearch>>
 * <<exported-fields-envoyproxy>>
 * <<exported-fields-etcd>>
+* <<exported-fields-foo>>
 * <<exported-fields-golang>>
 * <<exported-fields-graphite>>
 * <<exported-fields-haproxy>>
@@ -8271,6 +8272,37 @@ type: integer
 +
 --
 type: integer
+
+--
+
+[[exported-fields-foo]]
+== foo fields
+
+experimental[]
+foo module
+
+
+
+[float]
+== foo fields
+
+
+
+
+[float]
+== bar fields
+
+bar
+
+
+
+*`foo.bar.example`*::
++
+--
+type: keyword
+
+Example field
+
 
 --
 

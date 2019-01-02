@@ -28,7 +28,6 @@ import (
 
 	// import modules
 	_ "github.com/elastic/beats/metricbeat/include"
-	_ "github.com/elastic/beats/metricbeat/include/fields"
 )
 
 // Name of this beat

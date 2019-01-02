@@ -32,4 +32,4 @@ git-init:
 .PHONY: git-add
 git-add:
 	git add -A
-	git commit -m "Add generated {beat} files"
+	git commit -q -m "Add generated {beat} files"

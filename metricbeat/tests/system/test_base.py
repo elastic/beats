@@ -58,7 +58,7 @@ class Test(BaseTest):
         Test that the dashboards can be loaded with `setup --dashboards`
         """
 
-        kibana_dir = os.path.join(self.beat_path, "_meta", "kibana.generated")
+        kibana_dir = os.path.join(self.beat_path, "build", "kibana")
         shutil.copytree(kibana_dir, os.path.join(self.working_dir, "kibana"))
 
         es = Elasticsearch([self.get_elasticsearch_url()])

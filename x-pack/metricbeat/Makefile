@@ -1,3 +1,4 @@
-ES_BEATS ?= ../..
-
-include $(ES_BEATS)/dev-tools/make/xpack.mk
+#
+# Includes
+#
+include ../../dev-tools/make/xpack.mk

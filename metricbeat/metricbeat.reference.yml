@@ -44,10 +44,10 @@ metricbeat.max_start_delay: 10s
 #              period: 10s
 #              hosts: ["${host}:2379"]
 
-#==========================  Modules configuration ============================
+#==========================  Modules configuration =============================
 metricbeat.modules:
 
-#------------------------------- System Module -------------------------------
+#-------------------------------- System Module --------------------------------
 - module: system
   metricsets:
     - cpu             # CPU usage
@@ -122,14 +122,14 @@ metricbeat.modules:
   # Diskio configurations
   #diskio.include_devices: []
 
-#------------------------------ Aerospike Module -----------------------------
+#------------------------------ Aerospike Module ------------------------------
 - module: aerospike
   metricsets: ["namespace"]
   enabled: true
   period: 10s
   hosts: ["localhost:3000"]
 
-#------------------------------- Apache Module -------------------------------
+#-------------------------------- Apache Module --------------------------------
 - module: apache
   metricsets: ["status"]
   period: 10s
@@ -147,21 +147,21 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: password
 
-#-------------------------------- Ceph Module --------------------------------
+#--------------------------------- Ceph Module ---------------------------------
 - module: ceph
   metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk", "osd_tree"]
   period: 10s
   hosts: ["localhost:5000"]
   enabled: true
 
-#------------------------------ Couchbase Module -----------------------------
+#------------------------------ Couchbase Module ------------------------------
 - module: couchbase
   metricsets: ["bucket", "cluster", "node"]
   period: 10s
   hosts: ["localhost:8091"]
   enabled: true
 
-#------------------------------- Docker Module -------------------------------
+#-------------------------------- Docker Module --------------------------------
 - module: docker
   metricsets:
     - "container"
@@ -188,7 +188,7 @@ metricbeat.modules:
     #certificate:           "/etc/pki/client/cert.pem"
     #key:                   "/etc/pki/client/cert.key"
 
-#----------------------------- Dropwizard Module -----------------------------
+#------------------------------ Dropwizard Module ------------------------------
 - module: dropwizard
   metricsets: ["collector"]
   period: 10s
@@ -197,7 +197,7 @@ metricbeat.modules:
   namespace: example
   enabled: true
 
-#---------------------------- Elasticsearch Module ---------------------------
+#---------------------------- Elasticsearch Module ----------------------------
 - module: elasticsearch
   metricsets:
     - node
@@ -216,19 +216,19 @@ metricbeat.modules:
   # Set to false to fetch all entries
   #index_recovery.active_only: true
 
-#----------------------------- envoyproxy Module -----------------------------
+#------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
   metricsets: ["server"]
   period: 10s
   hosts: ["localhost:9901"]
 
-#-------------------------------- Etcd Module --------------------------------
+#--------------------------------- Etcd Module ---------------------------------
 - module: etcd
   metricsets: ["leader", "self", "store"]
   period: 10s
   hosts: ["localhost:2379"]
 
-#------------------------------- Golang Module -------------------------------
+#-------------------------------- Golang Module --------------------------------
 - module: golang
   #metricsets:
   #  - expvar
@@ -240,7 +240,7 @@ metricbeat.modules:
     namespace: "example"
     path: "/debug/vars"
 
-#------------------------------ Graphite Module ------------------------------
+#------------------------------- Graphite Module -------------------------------
 - module: graphite
   metricsets: ["server"]
   enabled: true
@@ -264,14 +264,14 @@ metricbeat.modules:
   #    delimiter: "_"
 
 
-#------------------------------- HAProxy Module ------------------------------
+#------------------------------- HAProxy Module -------------------------------
 - module: haproxy
   metricsets: ["info", "stat"]
   period: 10s
   hosts: ["tcp://127.0.0.1:14567"]
   enabled: true
 
-#-------------------------------- HTTP Module --------------------------------
+#--------------------------------- HTTP Module ---------------------------------
 - module: http
   #metricsets:
   #  - json
@@ -300,7 +300,7 @@ metricbeat.modules:
   #    fields: # added to the the response in root. overwrites existing fields
   #      key: "value"
 
-#------------------------------- Jolokia Module ------------------------------
+#------------------------------- Jolokia Module -------------------------------
 - module: jolokia
   #metricsets: ["jmx"]
   period: 10s
@@ -331,7 +331,7 @@ metricbeat.modules:
   jmx.application:
   jmx.instance:
 
-#-------------------------------- Kafka Module -------------------------------
+#-------------------------------- Kafka Module --------------------------------
 - module: kafka
   metricsets: ["consumergroup", "partition"]
   period: 10s
@@ -359,7 +359,7 @@ metricbeat.modules:
   #username: ""
   #password: ""
 
-#------------------------------- Kibana Module -------------------------------
+#-------------------------------- Kibana Module --------------------------------
 - module: kibana
   metricsets: ["status"]
   period: 10s
@@ -367,7 +367,7 @@ metricbeat.modules:
   basepath: ""
   enabled: true
 
-#----------------------------- Kubernetes Module -----------------------------
+#------------------------------ Kubernetes Module ------------------------------
 # Node metrics, from kubelet:
 - module: kubernetes
   metricsets:
@@ -425,7 +425,7 @@ metricbeat.modules:
     - apiserver
   hosts: ["https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"]
 
-#--------------------------------- kvm Module --------------------------------
+#--------------------------------- Kvm Module ---------------------------------
 - module: kvm
   metricsets: ["dommemstat"]
   enabled: true
@@ -438,21 +438,21 @@ metricbeat.modules:
   # Timeout to connect to Libvirt server
   #timeout: 1s
 
-#------------------------------ Logstash Module ------------------------------
+#------------------------------- Logstash Module -------------------------------
 - module: logstash
   metricsets: ["node", "node_stats"]
   enabled: true
   period: 10s
   hosts: ["localhost:9600"]
 
-#------------------------------ Memcached Module -----------------------------
+#------------------------------ Memcached Module ------------------------------
 - module: memcached
   metricsets: ["stats"]
   period: 10s
   hosts: ["localhost:11211"]
   enabled: true
 
-#------------------------------- MongoDB Module ------------------------------
+#------------------------------- MongoDB Module -------------------------------
 - module: mongodb
   metricsets: ["dbstats", "status", "collstats", "metrics", "replstatus"]
   period: 10s
@@ -486,7 +486,7 @@ metricbeat.modules:
   # Password to use when connecting to MongoDB. Empty by default.
   #password: pass
 
-#-------------------------------- Munin Module -------------------------------
+#-------------------------------- Munin Module --------------------------------
 - module: munin
   metricsets: ["node"]
   enabled: true
@@ -494,7 +494,7 @@ metricbeat.modules:
   hosts: ["localhost:4949"]
   node.namespace: node
 
-#-------------------------------- MySQL Module -------------------------------
+#-------------------------------- MySQL Module --------------------------------
 - module: mysql
   metricsets:
     - "status"
@@ -515,7 +515,7 @@ metricbeat.modules:
   # By setting raw to true, all raw fields from the status metricset will be added to the event.
   #raw: false
 
-#-------------------------------- Nginx Module -------------------------------
+#-------------------------------- Nginx Module --------------------------------
 - module: nginx
   metricsets: ["stubstatus"]
   enabled: true
@@ -527,7 +527,7 @@ metricbeat.modules:
   # Path to server status. Default server-status
   server_status_path: "server-status"
 
-#------------------------------- PHP_FPM Module ------------------------------
+#------------------------------- PHP_FPM Module -------------------------------
 - module: php_fpm
   metricsets:
   - pool
@@ -537,7 +537,7 @@ metricbeat.modules:
   status_path: "/status"
   hosts: ["localhost:8080"]
 
-#----------------------------- PostgreSQL Module -----------------------------
+#------------------------------ PostgreSQL Module ------------------------------
 - module: postgresql
   enabled: true
   metricsets:
@@ -564,7 +564,7 @@ metricbeat.modules:
   # Password to use when connecting to PostgreSQL. Empty by default.
   #password: pass
 
-#----------------------------- Prometheus Module -----------------------------
+#------------------------------ Prometheus Module ------------------------------
 - module: prometheus
   metricsets: ["stats"]
   enabled: true
@@ -586,7 +586,7 @@ metricbeat.modules:
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 
-#------------------------------ RabbitMQ Module ------------------------------
+#------------------------------- RabbitMQ Module -------------------------------
 - module: rabbitmq
   metricsets: ["node", "queue", "connection"]
   enabled: true
@@ -600,7 +600,7 @@ metricbeat.modules:
   #username: guest
   #password: guest
 
-#-------------------------------- Redis Module -------------------------------
+#-------------------------------- Redis Module --------------------------------
 - module: redis
   metricsets: ["info", "keyspace"]
   enabled: true
@@ -632,20 +632,20 @@ metricbeat.modules:
   # Redis AUTH password. Empty by default.
   #password: foobared
 
-#------------------------------- traefik Module ------------------------------
+#------------------------------- Traefik Module -------------------------------
 - module: traefik
   metricsets: ["health"]
   period: 10s
   hosts: ["localhost:8080"]
 
-#-------------------------------- uwsgi Module -------------------------------
+#-------------------------------- Uwsgi Module --------------------------------
 - module: uwsgi
   metricsets: ["status"]
   enable: true
   period: 10s
   hosts: ["tcp://127.0.0.1:9191"]
 
-#------------------------------- vSphere Module ------------------------------
+#------------------------------- VSphere Module -------------------------------
 - module: vsphere
   enabled: true
   metricsets: ["datastore", "host", "virtualmachine"]
@@ -659,7 +659,7 @@ metricbeat.modules:
   # Get custom fields when using virtualmachine metric set. Default false.
   # get_custom_fields: false
 
-#------------------------------- Windows Module ------------------------------
+#------------------------------- Windows Module -------------------------------
 - module: windows
   metricsets: ["perfmon"]
   enabled: true
@@ -676,7 +676,7 @@ metricbeat.modules:
   enabled: true
   period: 60s
 
-#------------------------------ ZooKeeper Module -----------------------------
+#------------------------------ ZooKeeper Module ------------------------------
 - module: zookeeper
   enabled: true
   metricsets: ["mntr"]
