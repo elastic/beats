@@ -67,7 +67,7 @@ func Package() {
 // And for Windows it comments out the system/load metricset because it's
 // not supported.
 func customizePackaging() {
-	const shortConfigGlob = "modules/*/_meta/config.yml"
+	const shortConfigGlob = "module/*/_meta/config.yml"
 	inputGlobs := []string{mage.OSSBeatDir(shortConfigGlob)}
 	if mage.BeatProjectType == mage.XPackProject {
 		inputGlobs = append(inputGlobs, mage.XPackBeatDir(shortConfigGlob))
