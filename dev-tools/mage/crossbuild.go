@@ -162,16 +162,11 @@ func CrossBuildXPack(options ...CrossBuildOption) error {
 }
 
 // buildMage pre-compiles the magefile to a binary using the native GOOS/GOARCH
-// values for Docker. This is required to so that we can later pass GOOS and
-// GOARCH to mage for the cross-build. It has the benefit of speeding up the
-// build because the mage -compile is done only once rather than in each Docker
-// container.
+// values for Docker. It has the benefit of speeding up the build because the
+// mage -compile is done only once rather than in each Docker container.
 func buildMage() error {
-	env := map[string]string{
-		"GOOS":   "linux",
-		"GOARCH": "amd64",
-	}
-	return sh.RunWith(env, "mage", "-f", "-compile", createDir(filepath.Join("build", "mage-linux-amd64")))
+	return sh.Run("mage", "-f", "-goos=linux", "-goarch=amd64",
+		"-compile", CreateDir(filepath.Join("build", "mage-linux-amd64")))
 }
 
 func crossBuildImage(platform string) (string, error) {

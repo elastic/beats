@@ -23,6 +23,11 @@ PROJECTS_XPACK_PKG=x-pack/auditbeat x-pack/filebeat
 # remove this and treat all sub-projects the same.
 PROJECTS_XPACK_MAGE=x-pack/metricbeat $(PROJECTS_XPACK_PKG)
 
+#
+# Includes
+#
+include dev-tools/make/mage.mk
+
 # Runs complete testsuites (unit, system, integration) for all beats with coverage and race detection.
 # Also it builds the docs and the generators
 
@@ -176,11 +181,6 @@ release-manager-snapshot:
 .PHONY: release-manager-release
 release-manager-release:
 	./dev-tools/run_with_go_ver $(MAKE) release
-
-# Installs the mage build tool from the vendor directory.
-.PHONY: mage
-mage:
-	@go install github.com/elastic/beats/vendor/github.com/magefile/mage
 
 # Collects dashboards from all Beats and generates a zip file distribution.
 .PHONY: beats-dashboards
