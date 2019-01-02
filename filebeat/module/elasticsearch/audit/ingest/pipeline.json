@@ -156,12 +156,6 @@
             }
         },
         {
-            "remove": {
-                "if": "ctx.first_char == '{'",
-                "field": "elasticsearch.audit.user"
-            }
-        },
-        {
             "dot_expander": {
                 "if": "ctx.first_char == '{'",
                 "field": "request.name",
@@ -197,14 +191,14 @@
         },
         {
             "set": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit.url.path != null && ctx.elasticsearch.audit.url.query == null",
+                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.url?.path != null && ctx.elasticsearch.audit?.url?.query == null",
                 "field": "elasticsearch.audit.uri",
                 "value": "{{elasticsearch.audit.url.path}}"
             }
         },
         {
             "set": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit.url.path != null && ctx.elasticsearch.audit.url.query != null",
+                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.url?.path != null && ctx.elasticsearch.audit?.url?.query != null",
                 "field": "elasticsearch.audit.uri",
                 "value": "{{elasticsearch.audit.url.path}}?{{elasticsearch.audit.url.query}}"
             }
@@ -213,6 +207,18 @@
             "remove": {
                 "field": "elasticsearch.audit.sub_action",
                 "ignore_missing": true
+            }
+        },
+        {
+            "remove": {
+                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.url?.path != null",
+                "field": "elasticsearch.audit.url.path"
+            }
+        },
+        {
+            "remove": {
+                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.url?.query != null",
+                "field": "elasticsearch.audit.url.query"
             }
         },
         {
@@ -245,7 +251,7 @@
         },
         {
             "rename": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit.user.realm != null",
+                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.user?.realm != null",
                 "field": "elasticsearch.audit.user.realm",
                 "target_field": "elasticsearch.audit.user_realm"
             }
@@ -259,7 +265,7 @@
         },
         {
             "rename": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit.user.roles != null",
+                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.user?.roles != null",
                 "field": "elasticsearch.audit.user.roles",
                 "target_field": "elasticsearch.audit.user_roles"
             }
@@ -272,7 +278,7 @@
         },
         {
             "date": {
-                "field": "elasticsearch.audit.timestamp",
+                "field": "elasticsearch.audit.@timestamp",
                 "target_field": "@timestamp",
                 "formats": [
                     "ISO8601"
@@ -283,7 +289,7 @@
         },
         {
             "remove": {
-                "field": "elasticsearch.audit.timestamp"
+                "field": "elasticsearch.audit.@timestamp"
             }
         },
         {
