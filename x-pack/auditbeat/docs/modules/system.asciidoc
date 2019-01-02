@@ -15,7 +15,7 @@ running processes) and real-time changes (e.g. when a new process starts
 or stops).
 
 The module is fully implemented for Linux, and partially implemented
-for macOS (Darwin).
+for macOS (Darwin) and Windows.
 
 [float]
 === How it works
@@ -145,4 +145,3 @@ include::system/process.asciidoc[]
 include::system/socket.asciidoc[]
 
 include::system/user.asciidoc[]
-

@@ -4,4 +4,4 @@ experimental[]
 
 This is the `process` metricset of the system module.
 
-It is implemented for Linux and macOS (Darwin).
+It is implemented for Linux, macOS (Darwin), and Windows.
