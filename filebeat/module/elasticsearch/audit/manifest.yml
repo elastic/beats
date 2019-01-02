@@ -19,5 +19,9 @@ var:
       version: 6.1.0
       value: false
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline:
+  - ingest/pipeline.json
+  - ingest/pipeline-json.json
+  - ingest/pipeline-plaintext.json
+
 input: config/audit.yml
