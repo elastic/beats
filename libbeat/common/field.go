@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/elastic/go-ucfg/yaml"
+	"github.com/pkg/errors"
 )
 
 //This reflects allowed attributes for field definitions in the fields.yml.
@@ -51,11 +52,10 @@ type Field struct {
 	IgnoreAbove    int         `config:"ignore_above"`
 	AliasPath      string      `config:"path"`
 
-	ScalingFactor         int    `config:"scaling_factor"`
-	ObjectType            string `config:"object_type"`
-	ObjectTypeMappingType string `config:"object_type_mapping_type"`
-
-	ObjectTypeParams []ObjectTypeCfg `config:"object_type_params"`
+	ObjectType            string          `config:"object_type"`
+	ObjectTypeMappingType string          `config:"object_type_mapping_type"`
+	ScalingFactor         int             `config:"scaling_factor"`
+	ObjectTypeParams      []ObjectTypeCfg `config:"object_type_params"`
 
 	// Kibana specific
 	Analyzed     *bool  `config:"analyzed"`
@@ -76,6 +76,7 @@ type Field struct {
 	Path      string
 }
 
+// Config for defining type of object attributes
 type ObjectTypeCfg struct {
 	ObjectType            string `config:"object_type"`
 	ObjectTypeMappingType string `config:"object_type_mapping_type"`
@@ -100,6 +101,21 @@ func (d *DynamicType) Unpack(s string) error {
 	default:
 		return fmt.Errorf("'%v' is invalid dynamic setting", s)
 	}
+	return nil
+}
+
+func (f *Field) Unpack(c *Config) error {
+	type tmpField Field
+	var tf tmpField
+	if err := c.Unpack(&tf); err != nil {
+		return err
+	}
+
+	if len(tf.ObjectTypeParams) != 0 && (tf.ScalingFactor != 0 || tf.ObjectTypeMappingType != "" || tf.ObjectType != "") {
+		return errors.New("Mixing top level objectType configuration with array of object type configurations is forbidden.")
+	}
+
+	*f = Field(tf)
 	return nil
 }
 

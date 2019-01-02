@@ -20,6 +20,8 @@ package common
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/go-ucfg/yaml"
@@ -188,4 +190,42 @@ func TestGetKeys(t *testing.T) {
 	for _, test := range tests {
 		assert.Equal(t, test.keys, test.fields.GetKeys())
 	}
+}
+
+func TestFieldUnpack(t *testing.T) {
+	tests := []struct {
+		cfg   MapStr
+		field Field
+		err   bool
+	}{
+		{
+			cfg:   MapStr{"object_type": "scaled_float", "object_type_mapping_type": "float", "scaling_factor": 10},
+			field: Field{ObjectType: "scaled_float", ObjectTypeMappingType: "float", ScalingFactor: 10},
+			err:   false,
+		}, {
+			cfg: MapStr{"object_type_params": []MapStr{
+				{"object_type": "scaled_float", "object_type_mapping_type": "float", "scaling_factor": 100}}},
+			field: Field{ObjectTypeParams: []ObjectTypeCfg{{ObjectType: "scaled_float", ObjectTypeMappingType: "float", ScalingFactor: 100}}},
+			err:   false,
+		}, {
+			cfg: MapStr{
+				"object_type": "scaled_float", "object_type_mapping_type": "float",
+				"object_type_params": []MapStr{{"object_type": "scaled_float", "object_type_mapping_type": "float"}}},
+			err: true,
+		},
+	}
+
+	for _, test := range tests {
+		cfg, err := NewConfigFrom(test.cfg)
+		require.NoError(t, err)
+		var f Field
+		err = cfg.Unpack(&f)
+		if test.err {
+			assert.Error(t, err)
+		} else {
+			assert.NoError(t, err)
+			assert.Equal(t, test.field, f)
+		}
+	}
+
 }

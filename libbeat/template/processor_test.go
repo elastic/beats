@@ -18,7 +18,6 @@
 package template
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -44,21 +43,42 @@ func TestProcessor(t *testing.T) {
 			expected: common.MapStr{"type": "long"},
 		},
 		{
-			output: p.scaledFloat(&common.Field{Type: "scaled_float"}, 0),
+			output: p.scaledFloat(&common.Field{Type: "scaled_float"}),
 			expected: common.MapStr{
 				"type":           "scaled_float",
 				"scaling_factor": 1000,
 			},
 		},
 		{
-			output: p.scaledFloat(&common.Field{Type: "scaled_float", ScalingFactor: 100}, 10),
+			output: p.scaledFloat(&common.Field{Type: "scaled_float", ScalingFactor: 100}),
+			expected: common.MapStr{
+				"type":           "scaled_float",
+				"scaling_factor": 100,
+			},
+		},
+		{
+			output: p.scaledFloat(&common.Field{Type: "scaled_float"}, common.MapStr{scalingFactorKey: 0}),
+			expected: common.MapStr{
+				"type":           "scaled_float",
+				"scaling_factor": 1000,
+			},
+		},
+		{
+			output: p.scaledFloat(&common.Field{Type: "scaled_float"}, common.MapStr{"someKey": 10}),
+			expected: common.MapStr{
+				"type":           "scaled_float",
+				"scaling_factor": 1000,
+			},
+		},
+		{
+			output: p.scaledFloat(&common.Field{Type: "scaled_float"}, common.MapStr{scalingFactorKey: 10}),
 			expected: common.MapStr{
 				"type":           "scaled_float",
 				"scaling_factor": 10,
 			},
 		},
 		{
-			output:   pEsVersion2.scaledFloat(&common.Field{Type: "scaled_float"}, 0),
+			output:   pEsVersion2.scaledFloat(&common.Field{Type: "scaled_float"}),
 			expected: common.MapStr{"type": "float"},
 		},
 		{

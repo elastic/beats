@@ -34,6 +34,8 @@ var (
 	defaultIgnoreAbove   = 1024
 )
 
+const scalingFactorKey = "scalingFactor"
+
 // Process recursively processes the given fields and writes the template in the given output
 func (p *Processor) Process(fields common.Fields, path string, output common.MapStr) error {
 	for _, field := range fields {
@@ -49,7 +51,7 @@ func (p *Processor) Process(fields common.Fields, path string, output common.Map
 		case "ip":
 			mapping = p.ip(&field)
 		case "scaled_float":
-			mapping = p.scaledFloat(&field, field.ScalingFactor)
+			mapping = p.scaledFloat(&field)
 		case "half_float":
 			mapping = p.halfFloat(&field)
 		case "integer":
@@ -119,7 +121,7 @@ func (p *Processor) integer(f *common.Field) common.MapStr {
 	return property
 }
 
-func (p *Processor) scaledFloat(f *common.Field, scalingFactor int) common.MapStr {
+func (p *Processor) scaledFloat(f *common.Field, params ...common.MapStr) common.MapStr {
 	property := getDefaultProperties(f)
 	property["type"] = "scaled_float"
 
@@ -127,9 +129,19 @@ func (p *Processor) scaledFloat(f *common.Field, scalingFactor int) common.MapSt
 		property["type"] = "float"
 	} else {
 		// Set default scaling factor
-		if scalingFactor == 0 {
+		var scalingFactor int
+		if f.ScalingFactor != 0 {
+			scalingFactor = f.ScalingFactor
+		} else {
 			scalingFactor = defaultScalingFactor
 		}
+
+		if len(params) > 0 {
+			if s, ok := params[0][scalingFactorKey].(int); ok && s != 0 {
+				scalingFactor = s
+			}
+		}
+
 		property["scaling_factor"] = scalingFactor
 	}
 	return property
@@ -262,10 +274,12 @@ func (p *Processor) object(f *common.Field) common.MapStr {
 		return onlyType
 	}
 
-	otParams := f.ObjectTypeParams
-	if f.ObjectType != "" {
-		objectTypeParam := common.ObjectTypeCfg{f.ObjectType, f.ObjectTypeMappingType, f.ScalingFactor}
-		otParams = append(otParams, objectTypeParam)
+	var otParams []common.ObjectTypeCfg
+	if len(f.ObjectTypeParams) != 0 {
+		otParams = f.ObjectTypeParams
+	} else {
+		otParams = []common.ObjectTypeCfg{common.ObjectTypeCfg{
+			ObjectType: f.ObjectType, ObjectTypeMappingType: f.ObjectTypeMappingType, ScalingFactor: f.ScalingFactor}}
 	}
 
 	for _, otp := range otParams {
@@ -273,7 +287,7 @@ func (p *Processor) object(f *common.Field) common.MapStr {
 
 		switch otp.ObjectType {
 		case "scaled_float":
-			dynProperties = p.scaledFloat(f, otp.ScalingFactor)
+			dynProperties = p.scaledFloat(f, common.MapStr{scalingFactorKey: otp.ScalingFactor})
 			addDynamicTemplate(f, dynProperties, matchType("*", otp.ObjectTypeMappingType))
 		case "text":
 			dynProperties["type"] = "text"
