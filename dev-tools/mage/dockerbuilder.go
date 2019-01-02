@@ -163,7 +163,7 @@ func (b *dockerBuilder) dockerSave(tag string) error {
 	}
 
 	err = func() error {
-		f, err := os.Create(outputFile)
+		f, err := os.Create(CreateDir(outputFile))
 		if err != nil {
 			return err
 		}
