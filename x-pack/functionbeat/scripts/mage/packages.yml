@@ -68,6 +68,7 @@ shared:
       pkg/functionbeat:
         source: 'build/golang-crossbuild/{{.BeatName}}-linux-amd64'
         mode: 0755
+
 # specs is a list of named packaging "flavors".
 specs:
   functionbeat:
