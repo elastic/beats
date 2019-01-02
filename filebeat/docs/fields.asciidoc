@@ -184,6 +184,26 @@ Client IP address.
 
 --
 
+*`apache2.access.ssl.protocol`*::
++
+--
+type: keyword
+
+SSL protocol version.
+
+
+--
+
+*`apache2.access.ssl.cipher`*::
++
+--
+type: keyword
+
+SSL cipher name.
+
+
+--
+
 *`apache2.access.user_name`*::
 +
 --
