@@ -47,6 +47,7 @@ import (
 //sys _PdhCalculateCounterFromRawValue(counter PdhCounterHandle, format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhCalculateCounterFromRawValue
 //sys _PdhFormatFromRawValue(counterType uint32, format PdhCounterFormat, timeBase *uint64, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhFormatFromRawValue
 //sys _PdhCloseQuery(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCloseQuery
+//sys _PdhExpandWildCardPath(dataSource *uint16, wildcardPath string, expandedPathList *byte, pathListLength *uint32, expandFlag uint32) (errcode error) [failretval!=0] = pdh.PdhExpandWildCardPathW
 
 var (
 	sizeofPdhCounterValueItem = (int)(unsafe.Sizeof(pdhCounterValueItem{}))
@@ -193,6 +194,41 @@ func PdhFormatFromRawValue(format PdhCounterFormat, rawValue1 *PdhRawCounter, ra
 	return &value, nil
 }
 
+func PdhExpandWildCardPath(wildCardPath string) ([]string, error) {
+	if wildCardPath == "" {
+		return nil, errors.New("no wildcardpath given")
+	}
+
+	var bufferSize uint32
+	if err := _PdhExpandWildCardPath(nil, wildCardPath, nil, &bufferSize, 0); err != nil {
+		if PdhErrno(err.(syscall.Errno)) != PDH_MORE_DATA {
+			return nil, PdhErrno(err.(syscall.Errno))
+		}
+
+		expdPaths := make([]byte, bufferSize)
+		if err := _PdhExpandWildCardPath(nil, wildCardPath, &expdPaths[0], &bufferSize, 0); err != nil {
+			return nil, PdhErrno(err.(syscall.Errno))
+		}
+
+		var nameBuffer []string
+		var j int
+		for i := 0; i < len(expdPaths); i += 2 {
+			if expdPaths[i] == 0 && expdPaths[i+1] == 0 {
+				s, _, err := sys.UTF16BytesToString(expdPaths[j:i])
+				if err != nil {
+					return nil, err
+				}
+				nameBuffer = append(nameBuffer, s)
+				j = i + 2
+			}
+		}
+
+		return nameBuffer, nil
+	}
+
+	return nil, nil
+}
+
 func PdhCloseQuery(query PdhQueryHandle) error {
 	if err := _PdhCloseQuery(query); err != nil {
 		return PdhErrno(err.(syscall.Errno))
@@ -205,7 +241,6 @@ type Counter struct {
 	handle       PdhCounterHandle
 	format       PdhCounterFormat
 	instanceName string
-	wildcard     bool // wildcard indicates that the path contains a wildcard.
 }
 
 type Counters map[string]*Counter
@@ -234,7 +269,7 @@ func NewQuery(dataSource string) (*Query, error) {
 	}, nil
 }
 
-func (q *Query) AddCounter(counterPath string, format Format, instanceName string) error {
+func (q *Query) AddCounter(counterPath string, format Format, instanceName string, wildcard bool) error {
 	if _, found := q.counters[counterPath]; found {
 		return errors.New("counter already added")
 	}
@@ -243,8 +278,6 @@ func (q *Query) AddCounter(counterPath string, format Format, instanceName strin
 	if err != nil {
 		return err
 	}
-
-	wildcard := wildcardRegexp.MatchString(counterPath)
 
 	// Extract the instance name from the counterPath for non-wildcard paths.
 	if !wildcard && instanceName == "" {
@@ -256,7 +289,6 @@ func (q *Query) AddCounter(counterPath string, format Format, instanceName strin
 	q.counters[counterPath] = &Counter{
 		handle:       h,
 		instanceName: instanceName,
-		wildcard:     wildcard,
 	}
 	switch format {
 	case FloatFormat:
@@ -293,38 +325,18 @@ func (q *Query) Values() (map[string][]Value, error) {
 	rtn := make(map[string][]Value, len(q.counters))
 
 	for path, counter := range q.counters {
-		if counter.wildcard {
-			values, err := PdhGetFormattedCounterArray(counter.handle, counter.format|PdhFmtNoCap100)
-			if err != nil {
-				rtn[path] = append(rtn[path], Value{Err: err})
-				continue
-			}
+		_, value, err := PdhGetFormattedCounterValue(counter.handle, counter.format|PdhFmtNoCap100)
+		if err != nil {
+			rtn[path] = append(rtn[path], Value{Err: err})
+			continue
+		}
 
-			for i := 0; i < len(values); i++ {
-				var val interface{}
+		switch counter.format {
+		case PdhFmtDouble:
+			rtn[path] = append(rtn[path], Value{Measurement: *(*float64)(unsafe.Pointer(&value.LongValue)), Instance: counter.instanceName})
+		case PdhFmtLarge:
+			rtn[path] = append(rtn[path], Value{Measurement: *(*int64)(unsafe.Pointer(&value.LongValue)), Instance: counter.instanceName})
 
-				switch counter.format {
-				case PdhFmtDouble:
-					val = *(*float64)(unsafe.Pointer(&values[i].Value.LongValue))
-				case PdhFmtLarge:
-					val = *(*int64)(unsafe.Pointer(&values[i].Value.LongValue))
-				}
-
-				rtn[path] = append(rtn[path], Value{Instance: values[i].Name, Measurement: val})
-			}
-		} else {
-			_, value, err := PdhGetFormattedCounterValue(counter.handle, counter.format|PdhFmtNoCap100)
-			if err != nil {
-				rtn[path] = append(rtn[path], Value{Err: err})
-				continue
-			}
-
-			switch counter.format {
-			case PdhFmtDouble:
-				rtn[path] = append(rtn[path], Value{Measurement: *(*float64)(unsafe.Pointer(&value.LongValue)), Instance: counter.instanceName})
-			case PdhFmtLarge:
-				rtn[path] = append(rtn[path], Value{Measurement: *(*int64)(unsafe.Pointer(&value.LongValue)), Instance: counter.instanceName})
-			}
 		}
 	}
 
@@ -368,23 +380,37 @@ func NewPerfmonReader(config Config) (*PerfmonReader, error) {
 		case "long":
 			format = LongFormat
 		}
-		if err := query.AddCounter(counter.Query, format, counter.InstanceName); err != nil {
-			if config.IgnoreNECounters {
-				switch err {
-				case PDH_CSTATUS_NO_COUNTER, PDH_CSTATUS_NO_COUNTERNAME,
-					PDH_CSTATUS_NO_INSTANCE, PDH_CSTATUS_NO_OBJECT:
-					r.log.Infow("Ignoring non existent counter", "error", err,
-						logp.Namespace("perfmon"), "query", counter.Query)
-					continue
-				}
-			}
-			query.Close()
-			return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, counter.Query)
+
+		wildcard := true
+		values, err := PdhExpandWildCardPath(counter.Query)
+		if err != nil {
+			return nil, PdhErrno(err.(syscall.Errno))
 		}
 
-		r.instanceLabel[counter.Query] = counter.InstanceLabel
-		r.measurement[counter.Query] = counter.MeasurementLabel
+		// Add query manually if no wildcard is specified
+		if len(values) <= 0 {
+			values = append(values, counter.Query)
+			wildcard = false
+		}
 
+		for _, v := range values {
+			if err := query.AddCounter(v, format, counter.InstanceName, wildcard); err != nil {
+				if config.IgnoreNECounters {
+					switch err {
+					case PDH_CSTATUS_NO_COUNTER, PDH_CSTATUS_NO_COUNTERNAME,
+						PDH_CSTATUS_NO_INSTANCE, PDH_CSTATUS_NO_OBJECT:
+						r.log.Infow("Ignoring non existent counter", "error", err,
+							logp.Namespace("perfmon"), "query", counter.Query)
+						continue
+					}
+				}
+				query.Close()
+				return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, counter.Query)
+			}
+
+			r.instanceLabel[v] = counter.InstanceLabel
+			r.measurement[v] = counter.MeasurementLabel
+		}
 	}
 
 	return r, nil
