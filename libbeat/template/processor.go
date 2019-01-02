@@ -127,23 +127,22 @@ func (p *Processor) scaledFloat(f *common.Field, params ...common.MapStr) common
 
 	if p.EsVersion.IsMajor(2) {
 		property["type"] = "float"
-	} else {
-		// Set default scaling factor
-		var scalingFactor int
-		if f.ScalingFactor != 0 {
-			scalingFactor = f.ScalingFactor
-		} else {
-			scalingFactor = defaultScalingFactor
-		}
-
-		if len(params) > 0 {
-			if s, ok := params[0][scalingFactorKey].(int); ok && s != 0 {
-				scalingFactor = s
-			}
-		}
-
-		property["scaling_factor"] = scalingFactor
+		return property
 	}
+
+	// Set scaling factor
+	scalingFactor := defaultScalingFactor
+	if f.ScalingFactor != 0 && len(f.ObjectTypeParams) == 0 {
+		scalingFactor = f.ScalingFactor
+	}
+
+	if len(params) > 0 {
+		if s, ok := params[0][scalingFactorKey].(int); ok && s != 0 {
+			scalingFactor = s
+		}
+	}
+
+	property["scaling_factor"] = scalingFactor
 	return property
 }
 

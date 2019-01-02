@@ -21,8 +21,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/go-ucfg/yaml"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/go-ucfg/yaml"
 )
 
 //This reflects allowed attributes for field definitions in the fields.yml.
