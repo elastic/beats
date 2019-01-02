@@ -36,5 +36,11 @@ trap cleanup EXIT
 
 rm -rf ${GOPATH}/pkg
 cd ${beat}
+
+MAGEFILE_VERBOSE=0
+if [ "$beat" == "filebeat" ]; then
+    # Temporarily enable debug for Filebeat since Jenkins is not archiving logs.
+    export MAGEFILE_VERBOSE=1
+fi
 make mage
 RACE_DETECTOR=1 mage clean check build test
