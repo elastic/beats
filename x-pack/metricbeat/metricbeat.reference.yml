@@ -228,14 +228,6 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:2379"]
 
-#--------------------------------- Foo Module ---------------------------------
-- module: foo
-  metricsets: ["bar"]
-  enabled: false
-  period: 10s
-  hosts: ["localhost"]
-
-
 #-------------------------------- Golang Module --------------------------------
 - module: golang
   #metricsets:
