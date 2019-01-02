@@ -76,7 +76,7 @@ type Field struct {
 	Path      string
 }
 
-// Config for defining type of object attributes
+// ObjectTypeCfg defines type and configuration of object attributes
 type ObjectTypeCfg struct {
 	ObjectType            string `config:"object_type"`
 	ObjectTypeMappingType string `config:"object_type_mapping_type"`
@@ -104,6 +104,8 @@ func (d *DynamicType) Unpack(s string) error {
 	return nil
 }
 
+// Unpack checks if objectTypeParams are mixed with top level objectType configuration
+// and creates Field out of config
 func (f *Field) Unpack(c *Config) error {
 	type tmpField Field
 	var tf tmpField
@@ -112,7 +114,7 @@ func (f *Field) Unpack(c *Config) error {
 	}
 
 	if len(tf.ObjectTypeParams) != 0 && (tf.ScalingFactor != 0 || tf.ObjectTypeMappingType != "" || tf.ObjectType != "") {
-		return errors.New("Mixing top level objectType configuration with array of object type configurations is forbidden.")
+		return errors.New("mixing top level objectType configuration with array of object type configurations is forbidden")
 	}
 
 	*f = Field(tf)
