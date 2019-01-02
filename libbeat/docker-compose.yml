@@ -19,7 +19,7 @@ services:
       - KIBANA_HOST=kibana
       - KIBANA_PORT=5601
     env_file:
-      - ${PWD}/build/test.env
+      - ${PWD}/../testing/environments/test.env
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
       # Used for docker integration tests:
@@ -53,7 +53,7 @@ services:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: logstash
     env_file:
-      - ${PWD}/build/test.env
+      - ${PWD}/../testing/environments/test.env
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -73,7 +73,7 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     env_file:
-      - ${PWD}/build/test.env
+      - ${PWD}/../testing/environments/test.env
 
   kafka:
     build: ${ES_BEATS}/testing/environments/docker/kafka

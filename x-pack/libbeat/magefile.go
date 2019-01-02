@@ -7,31 +7,27 @@
 package main
 
 import (
-	"context"
+	"github.com/magefile/mage/mg"
 
 	"github.com/elastic/beats/dev-tools/mage"
+
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/common"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/build"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/test"
+	// mage:import
+	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
+	// TODO: Import integtest. Skipped due to https://github.com/elastic/beats/issues/9597.
+	// mage:import
+	libbeat "github.com/elastic/beats/libbeat/scripts/mage"
 )
 
-// Build builds the Beat binary.
-func Build() error {
-	return mage.Build(mage.DefaultBuildArgs())
+func init() {
+	libbeat.SelectLogic = mage.OSSProject
 }
 
-// Clean cleans all generated files and build artifacts.
-func Clean() error {
-	return mage.Clean()
-}
-
-// GoTestUnit executes the Go unit tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestUnit(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestUnitArgs())
-}
-
-// GoTestIntegration executes the Go integration tests.
-// Use TEST_COVERAGE=true to enable code coverage profiling.
-// Use RACE_DETECTOR=true to enable the race detector.
-func GoTestIntegration(ctx context.Context) error {
-	return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
-}
+// Update is an alias for update:all. This is a workaround for
+// https://github.com/magefile/mage/issues/217.
+func Update() { mg.Deps(libbeat.Update.All) }

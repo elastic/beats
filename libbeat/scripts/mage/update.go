@@ -15,35 +15,37 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build mage
-
-package main
+package mage
 
 import (
 	"github.com/magefile/mage/mg"
 
 	"github.com/elastic/beats/dev-tools/mage"
-
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/common"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/build"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/docs"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/test"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/unittest"
-	// mage:import
-	_ "github.com/elastic/beats/dev-tools/mage/target/integtest"
-	// mage:import
-	libbeat "github.com/elastic/beats/libbeat/scripts/mage"
+	"github.com/elastic/beats/dev-tools/mage/target/integtest"
+	"github.com/elastic/beats/dev-tools/mage/target/unittest"
 )
 
 func init() {
-	libbeat.SelectLogic = mage.OSSProject
+	unittest.RegisterGoTestDeps(Update.Fields)
+	unittest.RegisterPythonTestDeps(Update.Fields)
+
+	integtest.RegisterPythonTestDeps(Update.Fields)
 }
 
-// Update is an alias for update:all. This is a workaround for
-// https://github.com/magefile/mage/issues/217.
-func Update() { mg.Deps(libbeat.Update.All) }
+var (
+	// SelectLogic configures the types of project logic to use (OSS vs X-Pack).
+	SelectLogic mage.ProjectType
+)
+
+// Update target namespace.
+type Update mg.Namespace
+
+// All updates all generated content.
+func (Update) All() {
+	mg.Deps(Update.Fields)
+}
+
+// Fields updates all fields files (.go, .yml).
+func (Update) Fields() {
+	mg.Deps(fb.All)
+}

@@ -13,13 +13,13 @@ class KeystoreBase(BaseTest):
         Add new secret using the --stdin option
         """
         args = [self.test_binary,
-                "-systemTest",
-                "-test.coverprofile",
-                os.path.join(self.working_dir, "coverage.cov"),
-                "-c", os.path.join(self.working_dir, "mockbeat.yml"),
-                "-e", "-v", "-d", "*",
-                "keystore", "add", key, "--stdin",
-                ]
+                "-systemTest"]
+        if os.getenv("TEST_COVERAGE") == "true":
+            args += ["-test.coverprofile",
+                     os.path.join(self.working_dir, "coverage.cov")]
+        args += ["-c", os.path.join(self.working_dir, "mockbeat.yml"),
+                 "-e", "-v", "-d", "*",
+                 "keystore", "add", key, "--stdin"]
 
         if force:
             args.append("--force")
