@@ -47,7 +47,7 @@ import (
 //sys _PdhCalculateCounterFromRawValue(counter PdhCounterHandle, format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhCalculateCounterFromRawValue
 //sys _PdhFormatFromRawValue(counterType uint32, format PdhCounterFormat, timeBase *uint64, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter, value *PdhCounterValue) (errcode error) [failretval!=0] = pdh.PdhFormatFromRawValue
 //sys _PdhCloseQuery(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCloseQuery
-//sys _PdhExpandWildCardPath(dataSource *uint16, wildcardPath string, expandedPathList *byte, pathListLength *uint32, expandFlag uint32) (errcode error) [failretval!=0] = pdh.PdhExpandWildCardPathW
+//sys _PdhExpandWildCardPath(dataSource *uint16, wildcardPath string, expandedPathList *uint16, pathListLength *uint32, expandFlag uint32) (errcode error) [failretval!=0] = pdh.PdhExpandWildCardPathW
 
 var (
 	sizeofPdhCounterValueItem = (int)(unsafe.Sizeof(pdhCounterValueItem{}))
@@ -205,25 +205,30 @@ func PdhExpandWildCardPath(wildCardPath string) ([]string, error) {
 			return nil, PdhErrno(err.(syscall.Errno))
 		}
 
-		expdPaths := make([]byte, bufferSize)
+		expdPaths := make([]uint16, bufferSize)
 		if err := _PdhExpandWildCardPath(nil, wildCardPath, &expdPaths[0], &bufferSize, 0); err != nil {
 			return nil, PdhErrno(err.(syscall.Errno))
 		}
 
-		var nameBuffer []string
-		var j int
-		for i := 0; i < len(expdPaths); i += 2 {
-			if expdPaths[i] == 0 && expdPaths[i+1] == 0 {
-				s, _, err := sys.UTF16BytesToString(expdPaths[j:i])
-				if err != nil {
-					return nil, err
-				}
-				nameBuffer = append(nameBuffer, s)
-				j = i + 2
+		// Split the uint16 slice at null-terminators.
+		var startIdx int
+		var expdPathsUTF16 [][]uint16
+		for i, value := range expdPaths {
+			if value == 0 {
+				expdPathsUTF16 = append(expdPathsUTF16, expdPaths[startIdx:i])
+				startIdx = i + 1
 			}
 		}
 
-		return nameBuffer, nil
+		// Convert the utf16 slices to strings.
+		paths := make([]string, 0, len(expdPathsUTF16))
+		for _, pathUTF16 := range expdPathsUTF16 {
+			if len(pathUTF16) > 0 {
+				paths = append(paths, syscall.UTF16ToString(pathUTF16))
+			}
+		}
+
+		return paths, nil
 	}
 
 	return nil, nil
@@ -381,7 +386,7 @@ func NewPerfmonReader(config Config) (*PerfmonReader, error) {
 			format = LongFormat
 		}
 
-		wildcard := true
+		wildcard := wildcardRegexp.MatchString(counter.Query)
 		values, err := PdhExpandWildCardPath(counter.Query)
 		if err != nil {
 			return nil, PdhErrno(err.(syscall.Errno))
@@ -390,7 +395,6 @@ func NewPerfmonReader(config Config) (*PerfmonReader, error) {
 		// Add query manually if no wildcard is specified
 		if len(values) <= 0 {
 			values = append(values, counter.Query)
-			wildcard = false
 		}
 
 		for _, v := range values {
