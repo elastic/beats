@@ -18,8 +18,14 @@
 package mage
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/magefile/mage/mg"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/dev-tools/mage/target/build"
+	"github.com/elastic/beats/dev-tools/mage/target/pkg"
 
 	"github.com/elastic/beats/dev-tools/mage"
 )
@@ -29,10 +35,36 @@ const (
 	dirModulesDGenerated = "build/package/modules.d"
 )
 
-// CustomizePackaging modifies the package specs to add the modules and
+func init() {
+	mage.BeatDescription = "Filebeat sends log files to Logstash or directly to Elasticsearch."
+}
+
+// Package packages the Beat for distribution.
+// Use SNAPSHOT=true to build snapshots.
+// Use PLATFORMS to control the target platforms.
+// Use VERSION_QUALIFIER to control the version qualifier.
+func Package() {
+	start := time.Now()
+	defer func() { fmt.Println("package ran for", time.Since(start)) }()
+
+	switch SelectLogic {
+	case mage.OSSProject:
+		mage.UseElasticBeatOSSPackaging()
+	case mage.XPackProject:
+		mage.UseElasticBeatXPackPackaging()
+	}
+	mage.PackageKibanaDashboardsFromBuildDir()
+	customizePackaging()
+
+	mg.Deps(Update.All, prepareModulePackaging)
+	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
+	mg.SerialDeps(mage.Package, pkg.PackageTest)
+}
+
+// customizePackaging modifies the package specs to add the modules and
 // modules.d directory. You must declare a dependency on either
 // PrepareModulePackagingOSS or PrepareModulePackagingXPack.
-func CustomizePackaging() {
+func customizePackaging() {
 	var (
 		moduleTarget = "module"
 		module       = mage.PackageFile{
@@ -69,31 +101,32 @@ func CustomizePackaging() {
 	}
 }
 
-// PrepareModulePackagingOSS generates build/package/modules and
-// build/package/modules.d directories for use in packaging.
-func PrepareModulePackagingOSS() error {
-	return prepareModulePackaging([]struct{ Src, Dst string }{
-		{mage.OSSBeatDir("module"), dirModuleGenerated},
-		{mage.OSSBeatDir("modules.d"), dirModulesDGenerated},
-	}...)
-}
-
-// PrepareModulePackagingXPack generates build/package/modules and
-// build/package/modules.d directories for use in packaging.
-func PrepareModulePackagingXPack() error {
-	return prepareModulePackaging([]struct{ Src, Dst string }{
-		{mage.OSSBeatDir("module"), dirModuleGenerated},
-		{"module", dirModuleGenerated},
-		{mage.OSSBeatDir("modules.d"), dirModulesDGenerated},
-		{"modules.d", dirModulesDGenerated},
-	}...)
-}
-
 // prepareModulePackaging generates build/package/modules and
 // build/package/modules.d directories for use in packaging.
-func prepareModulePackaging(files ...struct{ Src, Dst string }) error {
+func prepareModulePackaging() error {
+	switch SelectLogic {
+	case mage.OSSProject:
+		return _prepareModulePackaging([]struct{ Src, Dst string }{
+			{mage.OSSBeatDir("module"), dirModuleGenerated},
+			{mage.OSSBeatDir("modules.d"), dirModulesDGenerated},
+		}...)
+	case mage.XPackProject:
+		return _prepareModulePackaging([]struct{ Src, Dst string }{
+			{mage.OSSBeatDir("module"), dirModuleGenerated},
+			{"module", dirModuleGenerated},
+			{mage.OSSBeatDir("modules.d"), dirModulesDGenerated},
+			{"modules.d", dirModulesDGenerated},
+		}...)
+	default:
+		panic(mage.ErrUnknownProjectType)
+	}
+}
+
+// _prepareModulePackaging generates build/package/modules and
+// build/package/modules.d directories for use in packaging.
+func _prepareModulePackaging(files ...struct{ Src, Dst string }) error {
 	// This depends on the modules.d directory being up-to-date.
-	mg.Deps(mage.GenerateDirModulesD)
+	mg.Deps(Update.ModulesD)
 
 	// Clean any existing generated directories.
 	if err := mage.Clean([]string{dirModuleGenerated, dirModulesDGenerated}); err != nil {

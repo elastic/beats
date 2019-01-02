@@ -4,10 +4,8 @@ services:
     build: ../../filebeat
     depends_on:
       - proxy_dep
-    environment:
-      - BEAT_STRICT_PERMS=false
-      - ES_HOST=elasticsearch
-      - ES_PORT=9200
+    env_file:
+      - ${PWD}/../../testing/environments/test.env
     working_dir: /go/src/github.com/elastic/beats/x-pack/filebeat
     volumes:
       - ${PWD}/../..:/go/src/github.com/elastic/beats/

@@ -1,16 +1,16 @@
-BEAT_NAME?=filebeat
-BEAT_TITLE?=Filebeat
-SYSTEM_TESTS?=true
-TEST_ENVIRONMENT?=true
-GOX_FLAGS=-arch="amd64 386 arm ppc64 ppc64le"
-ES_BEATS?=..
-EXCLUDE_COMMON_UPDATE_TARGET=true
+#
+# Variables
+#
+GOX_FLAGS := -arch="amd64 386 arm ppc64 ppc64le"
 
-include ${ES_BEATS}/libbeat/scripts/Makefile
+#
+# Includes
+#
+include ../dev-tools/make/oss.mk
 
-.PHONY: update
-update: mage
-	mage update
+#
+# Targets
+#
 
 # Creates a new module. Requires the params MODULE.
 .PHONY: create-module

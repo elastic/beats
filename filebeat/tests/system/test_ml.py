@@ -23,7 +23,7 @@ class Test(BaseTest):
                                             "/../../../../module")
 
         self.kibana_path = os.path.abspath(self.working_dir +
-                                           "/../../../../_meta/kibana.generated")
+                                           "/../../../../build/kibana")
 
         self.filebeat = os.path.abspath(self.working_dir +
                                         "/../../../../filebeat.test")
