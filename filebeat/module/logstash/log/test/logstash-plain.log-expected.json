@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2017-10-23T14:20:12,046",
+        "@timestamp": "2017-10-23T14:20:12.046Z",
         "event.dataset": "logstash.log",
         "fileset.module": "logstash",
         "fileset.name": "log",
@@ -12,7 +12,7 @@
         "prospector.type": "log"
     },
     {
-        "@timestamp": "2017-11-20T03:55:00,318",
+        "@timestamp": "2017-11-20T03:55:00.318Z",
         "event.dataset": "logstash.log",
         "fileset.module": "logstash",
         "fileset.name": "log",

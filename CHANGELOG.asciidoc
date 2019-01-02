@@ -69,6 +69,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Stop runners disabled by hints after previously being started. {pull}9305[9305]
 - Fix saved objects in filebeat haproxy dashboard. {pull}9417[9417]
 - Fixed a memory leak when harvesters are closed. {pull}7820[7820]
+- Add `convert_timezone` option to Logstash module to convert dates to UTC. {issue}9756[9756] {pull}9797[9797]
 
 *Heartbeat*
 
