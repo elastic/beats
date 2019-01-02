@@ -15,23 +15,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-/*
-Package winlogbeat contains the entrypoint to Winlogbeat which is a lightweight
-data shipper for Windows event logs. It ships events directly to Elasticsearch
-or Logstash. The data can then be visualized in Kibana.
-
-Downloads: https://www.elastic.co/downloads/beats/winlogbeat
-*/
-package main
+package mage
 
 import (
-	"os"
-
-	"github.com/elastic/beats/winlogbeat/cmd"
+	"github.com/elastic/beats/dev-tools/mage"
 )
 
-func main() {
-	if err := cmd.RootCmd.Execute(); err != nil {
-		os.Exit(1)
+// config generates short/reference configs.
+func config() error {
+	// NOTE: No Docker config.
+	return mage.Config(mage.ShortConfigType|mage.ReferenceConfigType, configFileParams(), ".")
+}
+
+func configFileParams() mage.ConfigFileParams {
+	return mage.ConfigFileParams{
+		ShortParts: []string{
+			mage.OSSBeatDir("_meta/beat.yml"),
+			mage.LibbeatDir("_meta/config.yml"),
+		},
+		ReferenceParts: []string{
+			mage.OSSBeatDir("_meta/beat.reference.yml"),
+			mage.LibbeatDir("_meta/config.reference.yml"),
+		},
+		DockerParts: []string{
+			mage.OSSBeatDir("_meta/beat.docker.yml"),
+			mage.LibbeatDir("_meta/config.docker.yml"),
+		},
+		ExtraVars: map[string]interface{}{
+			"GOOS": "windows",
+		},
 	}
 }
