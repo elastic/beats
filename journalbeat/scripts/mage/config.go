@@ -15,19 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package cmd
+package mage
 
 import (
-	"github.com/elastic/beats/journalbeat/beater"
-
-	cmd "github.com/elastic/beats/libbeat/cmd"
-
-	// Register includes.
-	_ "github.com/elastic/beats/journalbeat/include"
+	"github.com/elastic/beats/dev-tools/mage"
 )
 
-// Name of this beat
-var Name = "journalbeat"
+// config generates short/reference/docker configs.
+func config() error {
+	return mage.Config(mage.AllConfigTypes, configFileParams(), ".")
+}
 
-// RootCmd to handle beats cli
-var RootCmd = cmd.GenRootCmd(Name, "", beater.New)
+func configFileParams() mage.ConfigFileParams {
+	return mage.ConfigFileParams{
+		ShortParts: []string{
+			mage.OSSBeatDir("_meta/beat.yml"),
+			mage.LibbeatDir("_meta/config.yml"),
+		},
+		ReferenceParts: []string{
+			mage.OSSBeatDir("_meta/beat.yml"),
+			mage.LibbeatDir("_meta/config.reference.yml"),
+		},
+		DockerParts: []string{
+			mage.OSSBeatDir("_meta/beat.docker.yml"),
+			mage.LibbeatDir("_meta/config.docker.yml"),
+		},
+	}
+}

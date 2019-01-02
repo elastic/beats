@@ -8,8 +8,6 @@ import (
 	"os"
 
 	"github.com/elastic/beats/x-pack/journalbeat/cmd"
-
-	_ "github.com/elastic/beats/journalbeat/include"
 )
 
 func main() {

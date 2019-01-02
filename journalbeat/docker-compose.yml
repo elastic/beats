@@ -1,0 +1,8 @@
+version: '2.1'
+services:
+  beat:
+    build: ${PWD}/.
+    working_dir: /go/src/github.com/elastic/beats/journalbeat
+    volumes:
+      - ${PWD}/..:/go/src/github.com/elastic/beats/
+    command: make
