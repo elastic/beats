@@ -24,7 +24,6 @@ import (
 	"github.com/magefile/mage/mg"
 
 	"github.com/elastic/beats/dev-tools/mage"
-	"github.com/elastic/beats/dev-tools/mage/target/build"
 	"github.com/elastic/beats/dev-tools/mage/target/pkg"
 )
 
@@ -51,6 +50,6 @@ func Package() {
 	mage.PackageKibanaDashboardsFromBuildDir()
 
 	mg.Deps(Update.All)
-	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
+	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(mage.Package, pkg.PackageTest)
 }
