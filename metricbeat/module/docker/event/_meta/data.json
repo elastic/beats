@@ -1,0 +1,60 @@
+{
+    "@timestamp": "2019-01-02T22:41:02.000Z",
+    "@metadata": {
+      "beat": "metricbeat",
+      "type": "_doc",
+      "version": "7.0.0"
+    },
+    "host": {
+      "os": {
+        "platform": "ubuntu",
+        "version": "17.10 (Artful Aardvark)",
+        "family": "debian",
+        "name": "Ubuntu",
+        "kernel": "4.13.0-46-generic",
+        "codename": "artful"
+      },
+      "id": "28dac5af0b8f4f638a4b4b7c31cf9321",
+      "containerized": false,
+      "name": "X1",
+      "architecture": "x86_64"
+    },
+    "ecs": {
+      "version": "1.0.0-beta2"
+    },
+    "agent": {
+      "hostname": "X1",
+      "version": "7.0.0",
+      "type": "metricbeat"
+    },
+    "event": {
+      "dataset": "docker.event",
+      "module": "docker"
+    },
+    "metricset": {
+      "name": "event"
+    },
+    "service": {
+      "type": "docker",
+      "address": "/var/run/docker.sock"
+    },
+    "docker": {
+      "event": {
+        "status": "",
+        "id": "",
+        "from": "",
+        "type": "network",
+        "action": "disconnect",
+        "actor": {
+          "id": "71bd6e24455add714d79af625628c2f8fd9a2de3ec7f4f0a618bd799da820bf6",
+          "attributes": {
+            "type": "bridge",
+            "container": "8c229155b039c2adcb4fab1f987f35a0d1f913dfaa95f3113ed6e4f91eb5398c",
+            "name": "bridge"
+          }
+        },
+        "time": "2019-01-02T22:41:02.000Z"
+      }
+    }
+  }
+  
