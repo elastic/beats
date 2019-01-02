@@ -71,7 +71,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: auditbeat
-        image: docker.elastic.co/beats/auditbeat:7.0.0-alpha2
+        image: docker.elastic.co/beats/auditbeat:7.0.0
         args: [
           "-c", "/etc/auditbeat.yml"
         ]
@@ -182,4 +182,3 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: auditbeat
----

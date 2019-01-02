@@ -1,5 +1,6 @@
-# This script assumes Docker is already installed
-#!/bin/bash
+#!/usr/bin/env bash
+
+# This script assumes Docker is already installed.
 
 set -x
 set -e
