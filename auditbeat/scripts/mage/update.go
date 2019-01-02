@@ -22,14 +22,83 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/dev-tools/mage/target/build"
+	"github.com/elastic/beats/dev-tools/mage/target/common"
+	"github.com/elastic/beats/dev-tools/mage/target/dashboards"
+	"github.com/elastic/beats/dev-tools/mage/target/docs"
+	"github.com/elastic/beats/dev-tools/mage/target/integtest"
+	"github.com/elastic/beats/dev-tools/mage/target/unittest"
 )
 
+func init() {
+	common.RegisterCheckDeps(Update.All)
+
+	dashboards.RegisterImportDeps(build.Build, Update.Dashboards)
+
+	docs.RegisterDeps(Update.FieldDocs, Update.ModuleDocs)
+
+	unittest.RegisterGoTestDeps(Update.Fields)
+	unittest.RegisterPythonTestDeps(Update.Fields)
+
+	integtest.RegisterPythonTestDeps(Update.Fields, Update.Dashboards)
+}
+
+var (
+	// SelectLogic configures the types of project logic to use (OSS vs X-Pack).
+	SelectLogic mage.ProjectType
+)
+
+// Update target namespace.
+type Update mg.Namespace
+
+// All updates all generated content.
+func (Update) All() {
+	mg.Deps(Update.Fields, Update.Dashboards, Update.Config,
+		Update.Includes, Update.ModuleDocs, Update.FieldDocs)
+}
+
+// Fields updates all fields files (.go, .yml).
+func (Update) Fields() {
+	mg.Deps(fb.All)
+}
+
+// Includes updates include/list.go.
+func (Update) Includes() error {
+	return mage.GenerateModuleIncludeListGo()
+}
+
+// Config updates the Beat's config files.
+func (Update) Config() error {
+	return config()
+}
+
+// Dashboards collects all the dashboards and generates index patterns.
+func (Update) Dashboards() error {
+	mg.Deps(fb.FieldsYML)
+	switch SelectLogic {
+	case mage.OSSProject:
+		return mage.KibanaDashboards("module")
+	case mage.XPackProject:
+		return mage.KibanaDashboards(mage.OSSBeatDir("module"), "module")
+	default:
+		panic(mage.ErrUnknownProjectType)
+	}
+}
+
+// FieldDocs generates docs/fields.asciidoc containing all fields (including
+// x-pack).
+func (Update) FieldDocs() error {
+	mg.Deps(fb.FieldsAllYML)
+	return mage.Docs.FieldDocs(mage.FieldsAllYML)
+}
+
 // ModuleDocs collects documentation from modules (both OSS and X-Pack).
-func ModuleDocs() error {
+func (Update) ModuleDocs() error {
 	dirsWithModules := []string{
 		mage.OSSBeatDir(),
 		mage.XPackBeatDir(),
@@ -86,18 +155,4 @@ func ModuleDocs() error {
 	args = append(args, dirsWithModules...)
 
 	return sh.Run(python, args...)
-}
-
-// FieldDocs generates docs/fields.asciidoc containing all fields
-// (including x-pack).
-func FieldDocs() error {
-	inputs := []string{
-		mage.OSSBeatDir("module"),
-		mage.XPackBeatDir("module"),
-	}
-	output := mage.CreateDir("build/fields/fields.all.yml")
-	if err := mage.GenerateFieldsYAMLTo(output, inputs...); err != nil {
-		return err
-	}
-	return mage.Docs.FieldDocs(output)
 }

@@ -18,8 +18,6 @@
 package mage
 
 import (
-	"path/filepath"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/dev-tools/mage"
@@ -30,28 +28,24 @@ const (
 	configTemplateGlob = "module/*/_meta/config*.yml.tmpl"
 )
 
-// OSSConfigFileParams returns the parameters for generating OSS config.
-func OSSConfigFileParams() mage.ConfigFileParams {
-	params, err := configFileParams(mage.OSSBeatDir())
+// config generates short/reference/docker configs and populates the modules.d
+// directory.
+func config() error {
+	args, err := configFileParams()
 	if err != nil {
-		panic(err)
+		return err
 	}
-	return params
+	return mage.Config(mage.AllConfigTypes, args, ".")
 }
 
-// XPackConfigFileParams returns the parameters for generating X-Pack config.
-func XPackConfigFileParams() mage.ConfigFileParams {
-	params, err := configFileParams(mage.OSSBeatDir(), mage.XPackBeatDir())
-	if err != nil {
-		panic(err)
-	}
-	return params
-}
-
-func configFileParams(dirs ...string) (mage.ConfigFileParams, error) {
-	var globs []string
-	for _, dir := range dirs {
-		globs = append(globs, filepath.Join(dir, configTemplateGlob))
+func configFileParams() (mage.ConfigFileParams, error) {
+	globs := []string{mage.OSSBeatDir(configTemplateGlob)}
+	switch SelectLogic {
+	case mage.OSSProject:
+	case mage.XPackProject:
+		globs = append(globs, mage.XPackBeatDir(configTemplateGlob))
+	default:
+		panic(errors.Errorf("invalid SelectLogic value"))
 	}
 
 	configFiles, err := mage.FindFiles(globs...)

@@ -18,32 +18,56 @@
 package mage
 
 import (
+	"fmt"
+	"time"
+
+	"github.com/magefile/mage/mg"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/dev-tools/mage"
+	"github.com/elastic/beats/dev-tools/mage/target/build"
+	"github.com/elastic/beats/dev-tools/mage/target/pkg"
 )
 
-// PackagingFlavor specifies the type of packaging (OSS vs X-Pack).
-type PackagingFlavor uint8
+func init() {
+	mage.BeatDescription = "Audit the activities of users and processes on your system."
+}
 
-// Packaging flavors.
-const (
-	OSSPackaging PackagingFlavor = iota
-	XPackPackaging
-)
+// Package packages the Beat for distribution.
+// Use SNAPSHOT=true to build snapshots.
+// Use PLATFORMS to control the target platforms.
+// Use VERSION_QUALIFIER to control the version qualifier.
+func Package() {
+	start := time.Now()
+	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-// CustomizePackaging modifies the package specs to use templated config files
+	switch SelectLogic {
+	case mage.OSSProject:
+		mage.UseElasticBeatOSSPackaging()
+	case mage.XPackProject:
+		mage.UseElasticBeatXPackPackaging()
+	}
+	mage.PackageKibanaDashboardsFromBuildDir()
+	customizePackaging()
+
+	mg.SerialDeps(Update.All)
+	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
+	mg.SerialDeps(mage.Package, pkg.PackageTest)
+}
+
+// customizePackaging modifies the package specs to use templated config files
 // instead of the defaults.
 //
 // Customizations specific to Auditbeat:
 // - Include audit.rules.d directory in packages.
-func CustomizePackaging(pkgFlavor PackagingFlavor) {
+// - Generate OS specific config files.
+func customizePackaging() {
 	var (
 		shortConfig = mage.PackageFile{
 			Mode:   0600,
 			Source: "{{.PackageDir}}/auditbeat.yml",
 			Dep: func(spec mage.PackageSpec) error {
-				return generateConfig(pkgFlavor, mage.ShortConfigType, spec)
+				return generateConfig(mage.ShortConfigType, spec)
 			},
 			Config: true,
 		}
@@ -51,7 +75,7 @@ func CustomizePackaging(pkgFlavor PackagingFlavor) {
 			Mode:   0644,
 			Source: "{{.PackageDir}}/auditbeat.reference.yml",
 			Dep: func(spec mage.PackageSpec) error {
-				return generateConfig(pkgFlavor, mage.ReferenceConfigType, spec)
+				return generateConfig(mage.ReferenceConfigType, spec)
 			},
 		}
 	)
@@ -108,15 +132,10 @@ func CustomizePackaging(pkgFlavor PackagingFlavor) {
 	}
 }
 
-func generateConfig(pkgFlavor PackagingFlavor, ct mage.ConfigFileType, spec mage.PackageSpec) error {
-	var args mage.ConfigFileParams
-	switch pkgFlavor {
-	case OSSPackaging:
-		args = OSSConfigFileParams()
-	case XPackPackaging:
-		args = XPackConfigFileParams()
-	default:
-		panic(errors.Errorf("Invalid packaging flavor (either oss or xpack): %v", pkgFlavor))
+func generateConfig(ct mage.ConfigFileType, spec mage.PackageSpec) error {
+	args, err := configFileParams()
+	if err != nil {
+		return err
 	}
 
 	// PackageDir isn't exported but we can grab it's value this way.
