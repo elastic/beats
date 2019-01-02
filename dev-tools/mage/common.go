@@ -548,7 +548,7 @@ func FindFiles(globs ...string) ([]string, error) {
 func FindFilesRecursive(match func(path string, info os.FileInfo) bool) ([]string, error) {
 	var matches []string
 	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
-		if err != nil {
+		if err != nil && !os.IsNotExist(err) {
 			return err
 		}
 

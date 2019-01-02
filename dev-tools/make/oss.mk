@@ -1,7 +1,7 @@
 #
 # Variables
 #
-ES_BEATS   ?= ../..
+ES_BEATS   ?= ..
 PYTHON_ENV ?= $(ES_BEATS)
 
 #

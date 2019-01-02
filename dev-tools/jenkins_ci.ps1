@@ -55,12 +55,4 @@ echo "Building $env:beat"
 exec { mage build } "Build FAILURE"
 
 echo "Unit testing $env:beat"
-exec { mage goTestUnit } "mage goTestUnit FAILURE"
-
-echo "System testing $env:beat"
-# Get a CSV list of package names.
-$packages = $(go list ./... | select-string -Pattern "/vendor/" -NotMatch | select-string -Pattern "/scripts/cmd/" -NotMatch)
-$packages = ($packages|group|Select -ExpandProperty Name) -join ","
-exec { go test -race -c -cover -covermode=atomic -coverpkg $packages } "go test -race -cover FAILURE"
-Set-Location -Path tests/system
-exec { nosetests --with-timer --with-xunit --xunit-file=../../build/TEST-system.xml } "System test FAILURE"
+exec { mage unitTest } "mage unitTest FAILURE"

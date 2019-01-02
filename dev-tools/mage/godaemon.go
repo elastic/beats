@@ -21,6 +21,7 @@ import (
 	"errors"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 var (
@@ -42,7 +43,8 @@ func BuildGoDaemon() error {
 	}
 
 	// Test if binaries are up-to-date.
-	output := MustExpand("build/golang-crossbuild/god-{{.Platform.GOOS}}-{{.Platform.Arch}}")
+	crossbuildDir := "build/golang-crossbuild"
+	output := filepath.Join(crossbuildDir, MustExpand("god-{{.Platform.GOOS}}-{{.Platform.Arch}}"))
 	input := MustExpand("{{ elastic_beats_dir }}/dev-tools/vendor/github.com/tsg/go-daemon/god.c")
 	if IsUpToDate(output, input) {
 		log.Println(">>> buildGoDaemon is up-to-date for", Platform.Name)
@@ -68,7 +70,7 @@ func BuildGoDaemon() error {
 		compileCmd = append(compileCmd, "-m32")
 	}
 
-	defer DockerChown(output)
+	defer DockerChown(crossbuildDir)
 	return RunCmds(compileCmd)
 }
 

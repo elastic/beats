@@ -45,7 +45,9 @@ var (
 func Format() {
 	// Don't run AddLicenseHeaders and GoImports concurrently because they
 	// both can modify the same files.
-	mg.Deps(AddLicenseHeaders)
+	if BeatProjectType != CommunityProject {
+		mg.Deps(AddLicenseHeaders)
+	}
 	mg.Deps(GoImports, PythonAutopep8)
 }
 

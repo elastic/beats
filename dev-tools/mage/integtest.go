@@ -183,6 +183,27 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 	}
 	magePath := filepath.Join("/go/src", repo.ImportPath, "build/mage-linux-amd64")
 
+	// Pass through all variables beginning with BEAT_.
+	envVars := map[string]string{}
+	for _, env := range os.Environ() {
+		parts := strings.SplitN(env, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		key, value := parts[0], parts[1]
+		if strings.HasPrefix(key, "BEAT_") {
+			envVars[key] = value
+		}
+	}
+	for _, varName := range passThroughEnvVars {
+		if value, isSet := os.LookupEnv(varName); isSet {
+			envVars[varName] = value
+		}
+	}
+	if mg.Verbose() {
+		envVars[mg.VerboseEnv] = "1"
+	}
+
 	// Build docker-compose args.
 	args := []string{"-p", dockerComposeProjectName(), "run",
 		"-e", "DOCKER_COMPOSE_PROJECT_NAME=" + dockerComposeProjectName(),
@@ -194,11 +215,9 @@ func runInIntegTestEnv(mageTarget string, test func() error, passThroughEnvVars 
 	if err != nil {
 		return err
 	}
-	for _, envVar := range passThroughEnvVars {
-		args = append(args, "-e", envVar+"="+os.Getenv(envVar))
-	}
-	if mg.Verbose() {
-		args = append(args, "-e", "MAGEFILE_VERBOSE=1")
+
+	for key, value := range envVars {
+		args = append(args, "-e", key+"="+value)
 	}
 	args = append(args,
 		"-e", beatsDockerIntegrationTestEnvVar+"=true",
@@ -278,6 +297,9 @@ func integTestDockerComposeEnvVars() (map[string]string, error) {
 	}
 
 	return map[string]string{
+		// When using mage -d or make -C the PWD env var is not changed so we
+		// must manually set it to reflect the CWD.
+		"PWD":               CWD(),
 		"ES_BEATS":          esBeatsDir,
 		"STACK_ENVIRONMENT": StackEnvironment,
 		// Deprecated use STACK_ENVIRONMENT instead (it's more descriptive).

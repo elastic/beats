@@ -25,18 +25,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+const kibanaBuildDir = "build/kibana"
+
 // KibanaDashboards collects the Kibana dashboards files and generates the
 // index patterns based on the fields.yml file. It outputs to build/kibana.
 // Use PackageKibanaDashboardsFromBuildDir() with this.
 func KibanaDashboards(moduleDirs ...string) error {
-	var kibanaBuildDir = "build/kibana"
-
 	if err := os.MkdirAll(kibanaBuildDir, 0755); err != nil {
-		return err
-	}
-
-	// Create symlink from old directory so `make beats-dashboards` works.
-	if err := os.Symlink(filepath.Join("..", kibanaBuildDir), "_meta/kibana.generated"); err != nil && !os.IsExist(err) && !os.IsNotExist(err) {
 		return err
 	}
 
@@ -81,13 +76,18 @@ func KibanaDashboards(moduleDirs ...string) error {
 		return err
 	}
 
+	// Sanity check that fields.yml exists.
+	if _, err := os.Stat(FieldsYML); err != nil {
+		return errors.Wrapf(err, "failed checking if %v exists", FieldsYML)
+	}
+
 	// Generate Kibana index pattern files from fields.yml.
 	indexPatternCmd := sh.RunCmd("go", "run",
 		filepath.Join(esBeatsDir, "dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go"),
 		"-beat", BeatName,
 		"-version", beatVersion,
 		"-index", BeatIndexPrefix+"-*",
-		"-fields", "fields.yml",
+		"-fields", FieldsYML,
 		"-out", kibanaBuildDir,
 	)
 

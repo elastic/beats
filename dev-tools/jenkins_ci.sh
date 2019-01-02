@@ -21,8 +21,6 @@ cleanup() {
   rm -rf $TEMP_PYTHON_ENV
 
   if docker info > /dev/null ; then
-    make stop-environment || true
-    make fix-permissions || true
     echo "Killing all running containers..."
     ids=$(docker ps -q)
     if [ -n "$ids" ]; then
@@ -38,4 +36,5 @@ trap cleanup EXIT
 
 rm -rf ${GOPATH}/pkg
 cd ${beat}
-RACE_DETECTOR=1 make clean check testsuite
+make mage
+RACE_DETECTOR=1 mage clean check build test

@@ -47,7 +47,7 @@ pipeline {
     }
     /**
     Updating generated files for Beat.
-    Checks the GO environment.
+    Checks the Go environment.
     Checks the Python environment.
     Checks YAML files are generated. 
     Validate that all updates were committed.

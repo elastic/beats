@@ -37,16 +37,22 @@ var DefaultCleanPaths = []string{
 	"_meta/kibana/6/index-pattern/{{.BeatName}}.json",
 }
 
-// Clean clean generated build artifacts.
+// Clean clean generated build artifacts. Go globs are supported.
 func Clean(pathLists ...[]string) error {
 	if len(pathLists) == 0 {
 		pathLists = [][]string{DefaultCleanPaths}
 	}
 	for _, paths := range pathLists {
 		for _, f := range paths {
-			f = MustExpand(f)
-			if err := sh.Rm(f); err != nil {
+			files, err := FindFiles(MustExpand(f))
+			if err != nil {
 				return err
+			}
+
+			for _, f := range files {
+				if err := sh.Rm(f); err != nil {
+					return err
+				}
 			}
 		}
 	}

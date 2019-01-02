@@ -76,14 +76,18 @@ func UseElasticBeatWithoutXPackPackaging() {
 // MustUsePackaging will load a named spec from a named file, if any errors
 // occurs when loading the specs it will panic.
 //
-// NOTE: we assume that specFile is relative to the beatsDir.
+// NOTE: we assume that specFile is relative to the beatsDir if not absolute.
 func MustUsePackaging(specName, specFile string) {
-	beatsDir, err := ElasticBeatsDir()
-	if err != nil {
-		panic(err)
+	if !filepath.IsAbs(specFile) {
+		beatsDir, err := ElasticBeatsDir()
+		if err != nil {
+			panic(err)
+		}
+
+		specFile = filepath.Join(beatsDir, specFile)
 	}
 
-	err = LoadNamedSpec(specName, filepath.Join(beatsDir, specFile))
+	err := LoadNamedSpec(specName, specFile)
 	if err != nil {
 		panic(err)
 	}

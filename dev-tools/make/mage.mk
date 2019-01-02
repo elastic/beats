@@ -1,8 +1,18 @@
+#
+# Mage (https://magefile.org) is the main build tool used.
+#
+
+#
+# Variables
+#
 MAGE_VERSION     ?= v1.8.0
 MAGE_PRESENT     := $(shell mage --version 2> /dev/null | grep $(MAGE_VERSION))
 MAGE_IMPORT_PATH ?= github.com/elastic/beats/vendor/github.com/magefile/mage
 export MAGE_IMPORT_PATH
 
+#
+# Targets
+#
 .PHONY: mage
 mage:
 ifndef MAGE_PRESENT

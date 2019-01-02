@@ -102,7 +102,7 @@ func main() {
 		// Skip dirs that have no .go files.
 		goFiles, err := filepath.Glob(filepath.Join(dir, "*.go"))
 		if err != nil {
-			log.Fatal("Failed checking for .go files in package dir: %v", err)
+			log.Fatalf("Failed checking for .go files in package dir: %v", err)
 		}
 		if len(goFiles) == 0 {
 			continue
@@ -144,17 +144,17 @@ func main() {
 		Imports: imports,
 	})
 	if err != nil {
-		log.Fatal("Failed executing template: %v", err)
+		log.Fatalf("Failed executing template: %v", err)
 	}
 
 	// Create the output directory.
 	if err = os.MkdirAll(filepath.Dir(outFile), 0755); err != nil {
-		log.Fatal("Failed to create output directory: %v", err)
+		log.Fatalf("Failed to create output directory: %v", err)
 	}
 
 	// Write the output file.
 	if err = ioutil.WriteFile(outFile, buf.Bytes(), 0644); err != nil {
-		log.Fatal("Failed writing output file: %v", err)
+		log.Fatalf("Failed writing output file: %v", err)
 	}
 }
 
@@ -239,7 +239,7 @@ func hasInitMethod(file string) bool {
 		}
 	}
 	if err := scanner.Err(); err != nil {
-		log.Fatal("failed scanning %v: %v", file, err)
+		log.Fatalf("failed scanning %v: %v", file, err)
 	}
 	return false
 }
