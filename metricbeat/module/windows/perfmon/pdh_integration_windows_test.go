@@ -111,7 +111,7 @@ func TestQuery(t *testing.T) {
 	}
 	defer q.Close()
 
-	err = q.AddCounter(processorTimeCounter, FloatFormat, "", false)
+	err = q.AddCounter(processorTimeCounter, FloatFormat, "TestInstanceName", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -136,6 +136,7 @@ func TestQuery(t *testing.T) {
 	}
 
 	assert.NoError(t, value[0].Err)
+	assert.Equal(t, "TestInstanceName", value[0].Instance)
 }
 
 func TestExistingCounter(t *testing.T) {
@@ -342,6 +343,7 @@ func TestWildcardQuery(t *testing.T) {
 		CounterConfig: make([]CounterConfig, 1),
 	}
 	config.CounterConfig[0].InstanceLabel = "processor.name"
+	config.CounterConfig[0].InstanceName = "TestInstanceName"
 	config.CounterConfig[0].MeasurementLabel = "processor.time.pct"
 	config.CounterConfig[0].Query = `\Processor Information(*)\% Processor Time`
 	config.CounterConfig[0].Format = "float"
@@ -365,6 +367,12 @@ func TestWildcardQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.True(t, pctKey)
+
+	pct, err := values[0].MetricSetFields.GetValue("processor.name")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.NotEqual(t, "TestInstanceName", pct)
 
 	t.Log(values)
 }
