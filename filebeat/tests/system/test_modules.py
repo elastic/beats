@@ -207,7 +207,7 @@ def clean_keys(obj):
     # Remove timestamp for comparison where timestamp is not part of the log line
     if (obj["event.module"] == "icinga" and obj["event.dataset"] == "startup") or \
         (obj["event.module"] in ["redis", "haproxy"] and obj["event.dataset"] == "log") or \
-        (obj["event.module"] == "system" and obj["event.dataset"] in ["auth", "syslog"]):
+            (obj["event.module"] == "system" and obj["event.dataset"] in ["auth", "syslog"]):
         delete_key(obj, "@timestamp")
 
 
