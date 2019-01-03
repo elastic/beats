@@ -82,6 +82,8 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 		Since: fmt.Sprintf("%d", time.Now().Unix()),
 	}
 
+	defer m.dockerClient.Close()
+
 	for {
 		events, errors := m.dockerClient.Events(ctx, options)
 
