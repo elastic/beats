@@ -587,12 +587,27 @@
   to: http.version
   alias: true
 
+
 # Auditbeat
 
 ## From Auditbeat's auditd module.
 - from: source.hostname
   to: source.domain
   alias: true
+
+
+# Packetbeat
+
+- from: http.request.body
+  to: http.request.body.content
+  alias6: false
+  alias: false
+
+- from: http.response.body
+  to: http.response.body.content
+  alias6: false
+  alias: false
+
 
 # Metricbeat
 
