@@ -6481,6 +6481,9 @@ If the query hit cache
 --
 type: keyword
 
+Thread ID
+
+
 --
 
 [[exported-fields-mongodb]]
