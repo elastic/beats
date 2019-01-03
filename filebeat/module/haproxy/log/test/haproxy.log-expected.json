@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2018-07-30T09:03:52.726Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "log",
         "event.module": "haproxy",
