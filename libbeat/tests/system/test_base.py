@@ -203,14 +203,14 @@ class Test(BaseTest):
             return meta
 
         meta0 = run()
-        assert self.log_contains("Beat UUID: {}".format(meta0["uuid"]))
+        assert self.log_contains("Beat ID: {}".format(meta0["uuid"]))
 
         # remove log, restart beat and check meta file did not change
         # and same UUID is used in log output.
 
         os.remove(os.path.join(self.working_dir, "mockbeat.log"))
         meta1 = run()
-        assert self.log_contains("Beat UUID: {}".format(meta1["uuid"]))
+        assert self.log_contains("Beat ID: {}".format(meta1["uuid"]))
 
         # check meta file did not change between restarts
         assert meta0 == meta1

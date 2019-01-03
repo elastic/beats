@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2018-05-30T12:23:52.442Z",
+        "@timestamp": "2019-05-30T12:23:52.442Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "log",
         "event.module": "redis",
@@ -12,7 +12,7 @@
         "redis.log.role": "master"
     },
     {
-        "@timestamp": "2018-05-30T10:05:20.000Z",
+        "@timestamp": "2019-05-30T10:05:20.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "log",
         "event.module": "redis",
@@ -22,7 +22,7 @@
         "message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects."
     },
     {
-        "@timestamp": "2018-05-31T04:32:08.000Z",
+        "@timestamp": "2019-05-31T04:32:08.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "log",
         "event.module": "redis",
