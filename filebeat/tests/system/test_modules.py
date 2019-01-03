@@ -178,6 +178,7 @@ class Test(BaseTest):
 
         for ev in expected:
             found = False
+            clean_keys(ev)
             for obj in objects:
 
                 # Flatten objects for easier comparing
@@ -194,7 +195,7 @@ class Test(BaseTest):
 
 def clean_keys(obj):
     # These keys are host dependent
-    host_keys = ["host.name", "agent.hostname", "agent.type"]
+    host_keys = ["host.name", "agent.hostname", "agent.type", "agent.ephemeral_id", "agent.id"]
     # The create timestamps area always new
     time_keys = ["read_timestamp", "event.created"]
     # source path and beat.version can be different for each run
@@ -204,7 +205,9 @@ def clean_keys(obj):
         delete_key(obj, key)
 
     # Remove timestamp for comparison where timestamp is not part of the log line
-    if obj["event.module"] == "icinga" and obj["event.dataset"] == "startup":
+    if (obj["event.module"] == "icinga" and obj["event.dataset"] == "startup") or \
+        (obj["event.module"] in ["redis", "haproxy"] and obj["event.dataset"] == "log") or \
+            (obj["event.module"] == "system" and obj["event.dataset"] in ["auth", "syslog"]):
         delete_key(obj, "@timestamp")
 
 
