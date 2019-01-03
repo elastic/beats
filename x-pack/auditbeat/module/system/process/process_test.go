@@ -5,7 +5,6 @@
 package process
 
 import (
-	"runtime"
 	"testing"
 
 	"github.com/elastic/beats/auditbeat/core"
