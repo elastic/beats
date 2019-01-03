@@ -97,11 +97,11 @@ The `tcp` and `http` monitor types both support SSL/TLS and some proxy
 settings.
 
 [float]
-[[monitor-name]]
+[[monitor-id]]
 ==== `id`
 
 A unique identifier for this configuration. This should not change with edits to the monitor configuration
-regardless of changes to any config fields. Examples: `uploader-service`, `http://example.net`, `us-west-loadbalancer`.
+regardless of changes to any config fields. Examples: `uploader-service`, `http://example.net`, `us-west-loadbalancer`. Note that this uniqueness is only within a given beat instance. If you want to monitor the same endpoint from multiple locations it is recommended that those heartbeat instances use the same IDs so that their results can be correlated. You can use the `host.geo.name` property to disambiguate them.
 
 When querying against indexed monitor data this is the field you will be aggregating with. Appears in the
 <<exported-fields,exported fields>> as `monitor.id`.
