@@ -28,7 +28,6 @@ var ConfigOverrides = common.MustNewConfigFrom(map[string]interface{}{
 	"logging.level":          "debug",
 	"setup.template.enabled": true,
 	"queue.mem": map[string]interface{}{
-		"events":           "${output.elasticsearch.bulk_max_size}",
 		"flush.min_events": 10,
 		"flush.timeout":    "0.01s",
 	},

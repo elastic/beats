@@ -117,14 +117,14 @@ functionbeat.provider.aws.functions:
 #fields_under_root: false
 
 # Internal queue configuration for buffering events to be published.
-#queue:
+queue:
   # Queue type by name (default 'mem')
   # The memory queue will present all available events (up to the outputs
   # bulk_max_size) to the output, the moment the output is ready to server
   # another batch of events.
-  #mem:
+  mem:
     # Max number of events the queue can buffer.
-    #events: 4096
+    events: 50
 
     # Hints the minimum number of events stored in the queue,
     # before providing a batch of events to the outputs.

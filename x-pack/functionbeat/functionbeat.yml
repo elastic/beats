@@ -105,6 +105,14 @@ functionbeat.provider.aws.functions:
 #fields:
 #  env: staging
 
+queue:
+  # Queue type by name (default 'mem')
+  # The memory queue will present all available events (up to the outputs
+  # bulk_max_size) to the output, the moment the output is ready to server
+  # another batch of events.
+  mem:
+    # Max number of events the queue can buffer.
+    events: 50
 
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
