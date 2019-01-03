@@ -18,7 +18,7 @@ import (
 func TestEnrollValid(t *testing.T) {
 	beatUUID, err := uuid.NewV4()
 	if err != nil {
-		t.Fatalf("error while generating Beat UUID: %v", err)
+		t.Fatalf("error while generating Beat ID: %v", err)
 	}
 
 	server, client := newServerClientPair(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
