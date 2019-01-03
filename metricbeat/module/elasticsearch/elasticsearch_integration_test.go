@@ -198,8 +198,6 @@ func createMLJob(host string) error {
 		return err
 	}
 
-	client := &http.Client{}
-
 	jobURL := "/_ml/anomaly_detectors/total-requests"
 
 	if checkExists("http://" + host + jobURL) {
