@@ -170,7 +170,6 @@ class Test(BaseTest):
 
         for ev in expected:
             found = False
-            clean_keys(ev)
             for obj in objects:
 
                 # Flatten objects for easier comparing
