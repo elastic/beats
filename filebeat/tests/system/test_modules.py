@@ -176,11 +176,6 @@ class Test(BaseTest):
                 obj = self.flatten_object(obj, {}, "")
                 clean_keys(obj)
 
-                # Remove timestamp for comparison where timestamp is not part of the log line
-                if obj["fileset.module"] == "icinga" and obj["fileset.name"] == "startup":
-                    delete_key(obj, "@timestamp")
-                    delete_key(ev, "@timestamp")
-
                 if ev == obj:
                     found = True
                     break
@@ -199,6 +194,10 @@ def clean_keys(obj):
 
     for key in host_keys + time_keys + other_keys:
         delete_key(obj, key)
+
+    # Remove timestamp for comparison where timestamp is not part of the log line
+    if obj["event.dataset"] in ["icinga.startup", "redis.log", "haproxy.log", "system.auth", "system.syslog"]:
+        delete_key(obj, "@timestamp")
 
 
 def delete_key(obj, key):
