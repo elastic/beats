@@ -78,13 +78,15 @@ func createEvent(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = client.ContainerCreate(context.Background(), &container.Config{
+	resp, err := client.ContainerCreate(context.Background(), &container.Config{
 		Image: "busybox",
 		Cmd:   []string{"echo", "foo"},
 	}, nil, nil, "")
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	client.ContainerRemove(context.Background(), resp.ID, types.ContainerRemoveOptions{})
 }
 
 func getConfig() map[string]interface{} {
