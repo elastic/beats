@@ -1,8 +1,8 @@
 [
     {
-        "ecs.version": "1.0.0-beta2",
-        "event.dataset": "log",
-        "event.module": "haproxy",
+        "event.dataset": "haproxy.log",
+        "fileset.module": "haproxy",
+        "fileset.name": "log",
         "haproxy.backend_name": "docs_microservice",
         "haproxy.backend_queue": 0,
         "haproxy.bytes_read": 168,

@@ -1,8 +1,8 @@
 [
     {
-        "ecs.version": "1.0.0-beta2",
-        "event.dataset": "log",
-        "event.module": "redis",
+        "event.dataset": "redis.log",
+        "fileset.module": "redis",
+        "fileset.name": "log",
         "input.type": "log",
         "offset": 0,
         "prospector.type": "log",
@@ -12,9 +12,9 @@
         "redis.log.role": "master"
     },
     {
-        "ecs.version": "1.0.0-beta2",
-        "event.dataset": "log",
-        "event.module": "redis",
+        "event.dataset": "redis.log",
+        "fileset.module": "redis",
+        "fileset.name": "log",
         "input.type": "log",
         "offset": 76,
         "prospector.type": "log",
@@ -22,9 +22,9 @@
         "redis.log.message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects."
     },
     {
-        "ecs.version": "1.0.0-beta2",
-        "event.dataset": "log",
-        "event.module": "redis",
+        "event.dataset": "redis.log",
+        "fileset.module": "redis",
+        "fileset.name": "log",
         "input.type": "log",
         "offset": 165,
         "prospector.type": "log",
@@ -32,9 +32,9 @@
         "redis.log.message": "The server is now ready to accept connections on port 6379\""
     },
     {
-        "ecs.version": "1.0.0-beta2",
-        "event.dataset": "log",
-        "event.module": "redis",
+        "event.dataset": "redis.log",
+        "fileset.module": "redis",
+        "fileset.name": "log",
         "input.type": "log",
         "offset": 250,
         "prospector.type": "log",

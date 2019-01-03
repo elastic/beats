@@ -1,10 +1,8 @@
 [
     {
-        "ecs.version": "1.0.0-beta2",
-        "event.action": "Accepted",
-        "event.dataset": "auth",
-        "event.module": "system",
-        "host.hostname": "localhost",
+        "event.dataset": "system.auth",
+        "fileset.module": "system",
+        "fileset.name": "auth",
         "input.type": "log",
         "offset": 0,
         "prospector.type": "log",
@@ -19,11 +17,9 @@
         "system.auth.user": "vagrant"
     },
     {
-        "ecs.version": "1.0.0-beta2",
-        "event.action": "Accepted",
-        "event.dataset": "auth",
-        "event.module": "system",
-        "host.hostname": "localhost",
+        "event.dataset": "system.auth",
+        "fileset.module": "system",
+        "fileset.name": "auth",
         "input.type": "log",
         "offset": 152,
         "prospector.type": "log",
@@ -37,11 +33,9 @@
         "system.auth.user": "vagrant"
     },
     {
-        "ecs.version": "1.0.0-beta2",
-        "event.action": "Invalid",
-        "event.dataset": "auth",
-        "event.module": "system",
-        "host.hostname": "localhost",
+        "event.dataset": "system.auth",
+        "fileset.module": "system",
+        "fileset.name": "auth",
         "input.type": "log",
         "offset": 254,
         "prospector.type": "log",
@@ -53,11 +47,9 @@
         "system.auth.user": "test"
     },
     {
-        "ecs.version": "1.0.0-beta2",
-        "event.action": "Failed",
-        "event.dataset": "auth",
-        "event.module": "system",
-        "host.hostname": "slave22",
+        "event.dataset": "system.auth",
+        "fileset.module": "system",
+        "fileset.name": "auth",
         "input.type": "log",
         "offset": 324,
         "prospector.type": "log",
@@ -77,10 +69,9 @@
         "system.auth.user": "root"
     },
     {
-        "ecs.version": "1.0.0-beta2",
-        "event.dataset": "auth",
-        "event.module": "system",
-        "host.hostname": "localhost",
+        "event.dataset": "system.auth",
+        "fileset.module": "system",
+        "fileset.name": "auth",
         "input.type": "log",
         "offset": 420,
         "prospector.type": "log",
@@ -93,10 +84,9 @@
         "system.auth.user": "vagrant"
     },
     {
-        "ecs.version": "1.0.0-beta2",
-        "event.dataset": "auth",
-        "event.module": "system",
-        "host.hostname": "slave22",
+        "event.dataset": "system.auth",
+        "fileset.module": "system",
+        "fileset.name": "auth",
         "input.type": "log",
         "offset": 522,
         "prospector.type": "log",
@@ -106,10 +96,9 @@
         "system.auth.timestamp": "Feb 19 15:30:04"
     },
     {
-        "ecs.version": "1.0.0-beta2",
-        "event.dataset": "auth",
-        "event.module": "system",
-        "host.hostname": "localhost",
+        "event.dataset": "system.auth",
+        "fileset.module": "system",
+        "fileset.name": "auth",
         "input.type": "log",
         "offset": 617,
         "prospector.type": "log",
@@ -122,10 +111,9 @@
         "system.auth.user": "vagrant"
     },
     {
-        "ecs.version": "1.0.0-beta2",
-        "event.dataset": "auth",
-        "event.module": "system",
-        "host.hostname": "precise32",
+        "event.dataset": "system.auth",
+        "fileset.module": "system",
+        "fileset.name": "auth",
         "input.type": "log",
         "offset": 736,
         "prospector.type": "log",
@@ -139,12 +127,9 @@
         "system.auth.user": "tsg"
     },
     {
-        "ecs.version": "1.0.0-beta2",
-        "event.dataset": "auth",
-        "event.module": "system",
-        "group.id": 48,
-        "group.name": "apache",
-        "host.hostname": "localhost",
+        "event.dataset": "system.auth",
+        "fileset.module": "system",
+        "fileset.name": "auth",
         "input.type": "log",
         "offset": 861,
         "prospector.type": "log",
@@ -155,11 +140,9 @@
         "system.auth.timestamp": "Feb 22 11:47:05"
     },
     {
-        "ecs.version": "1.0.0-beta2",
-        "event.dataset": "auth",
-        "event.module": "system",
-        "group.id": 48,
-        "host.hostname": "localhost",
+        "event.dataset": "system.auth",
+        "fileset.module": "system",
+        "fileset.name": "auth",
         "input.type": "log",
         "offset": 934,
         "prospector.type": "log",
