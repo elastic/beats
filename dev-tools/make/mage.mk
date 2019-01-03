@@ -8,6 +8,6 @@ mage:
 ifndef MAGE_PRESENT
 	@echo Installing mage $(MAGE_VERSION) from vendor dir.
 	@go install -ldflags="-X $(MAGE_IMPORT_PATH)/mage.gitTag=$(MAGE_VERSION)" ${MAGE_IMPORT_PATH}
-	@-mage -clean 2> /dev/null || true
+	@-mage -clean
 endif
 	@true
