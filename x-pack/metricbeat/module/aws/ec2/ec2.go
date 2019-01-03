@@ -198,20 +198,24 @@ func reportCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 
 	event := mb.Event{}
 	event.RootFields = common.MapStr{}
-	event.RootFields.Put("service.name", aws.ModuleName)
-	event.RootFields.Put("cloud.provider", "ec2")
-	event.RootFields.Put("cloud.instance.id", instanceID)
-	event.RootFields.Put("cloud.machine.type", machineType)
-	event.RootFields.Put("cloud.availability_zone", *instanceOutput.Placement.AvailabilityZone)
-	event.RootFields.Put("cloud.image.id", *instanceOutput.ImageId)
-	event.RootFields.Put("cloud.region", regionName)
+	putRootFieldsInEvent(event, "service.name", aws.ModuleName, report)
+	putRootFieldsInEvent(event, "cloud.provider", "ec2", report)
+	putRootFieldsInEvent(event, "cloud.instance.id", instanceID, report)
+	putRootFieldsInEvent(event, "cloud.machine.type", machineType, report)
+	putRootFieldsInEvent(event, "cloud.availability_zone", *instanceOutput.Placement.AvailabilityZone, report)
+	putRootFieldsInEvent(event, "cloud.image.id", *instanceOutput.ImageId, report)
+	putRootFieldsInEvent(event, "cloud.region", regionName, report)
 
 	event.MetricSetFields = common.MapStr{}
 	for _, output := range getMetricDataOutput.MetricDataResults {
 		if len(output.Values) == 0 {
 			continue
 		}
-		event.MetricSetFields.Put(metricIDNameMap[*output.Id], output.Values[0])
+		_, err = event.MetricSetFields.Put(metricIDNameMap[*output.Id], output.Values[0])
+		if err != nil {
+			err = errors.Wrap(err, "event.MetricSetFields.Put failed")
+			logp.Error(err)
+		}
 	}
 	report.Event(event)
 }
@@ -337,4 +341,12 @@ func createMetricDataQuery(id string, metricName string, dimensions []cloudwatch
 		},
 	}
 	return
+}
+
+func putRootFieldsInEvent(event mb.Event, rootFieldName string, rootFieldValue string, report mb.ReporterV2) {
+	_, err := event.RootFields.Put(rootFieldName, rootFieldValue)
+	if err != nil {
+		err = errors.Wrap(err, "event.RootFields.Put failed")
+		logp.Error(err)
+	}
 }
