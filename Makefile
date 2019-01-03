@@ -77,7 +77,7 @@ clean:
 	@rm -rf build
 	@$(foreach var,$(PROJECTS) $(PROJECTS_XPACK_MAGE),$(MAKE) -C $(var) clean || exit 1;)
 	@$(MAKE) -C generator clean
-	@-mage -clean 2> /dev/null
+	@-mage -clean
 
 # Cleans up the vendor directory from unnecessary files
 # This should always be run after updating the dependencies
