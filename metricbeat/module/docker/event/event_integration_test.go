@@ -23,8 +23,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/client"
+	"golang.org/x/net/context"
+
 	"github.com/elastic/beats/auditbeat/core"
-	"github.com/elastic/beats/libbeat/tests/compose"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
@@ -38,7 +42,7 @@ func TestData(t *testing.T) {
 		close(done)
 	}()
 
-	compose.EnsureUp(t, "apache")
+	createEvent(t)
 	<-done
 
 	if len(events) == 0 {
@@ -59,6 +63,27 @@ func assertNoErrors(t *testing.T, events []mb.Event) {
 		if e.Error != nil {
 			t.Errorf("received error: %+v", e.Error)
 		}
+	}
+}
+
+func createEvent(t *testing.T) {
+	client, err := client.NewEnvClient()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer client.Close()
+
+	_, err = client.ImagePull(context.Background(), "busybox", types.ImagePullOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = client.ContainerCreate(context.Background(), &container.Config{
+		Image: "busybox",
+		Cmd:   []string{"echo", "foo"},
+	}, nil, nil, "")
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 
