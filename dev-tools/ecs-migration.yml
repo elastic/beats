@@ -76,10 +76,6 @@
   alias: true
 
 
-# Filebeat modules
-
-## Suricata module
-
 # Processor fields
 
 # Cloud
