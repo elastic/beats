@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2019-12-13T11:35:28.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "syslog",
         "event.module": "system",
@@ -15,7 +14,6 @@
         "process.pid": 21412
     },
     {
-        "@timestamp": "2019-12-13T11:35:28.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "syslog",
         "event.module": "system",
@@ -27,7 +25,6 @@
         "process.pid": 21412
     },
     {
-        "@timestamp": "2019-04-04T03:39:57.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "syslog",
         "event.module": "system",
