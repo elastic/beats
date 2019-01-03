@@ -8,26 +8,20 @@
         "event": {
             "actor": {
                 "attributes": {
-                    "com_docker_compose_config-hash": "304a077f5d6b5673cdc2ef567dcb762ddac985514d3b73c1563c2f1ae2f4bbe9",
-                    "com_docker_compose_container-number": "1",
-                    "com_docker_compose_oneoff": "False",
-                    "com_docker_compose_project": "metricbeat",
-                    "com_docker_compose_service": "apache",
-                    "com_docker_compose_version": "1.21.0",
-                    "image": "metricbeat_apache",
-                    "name": "metricbeat_apache_1"
+                    "image": "busybox",
+                    "name": "wizardly_knuth"
                 },
-                "id": "b7bd093f744ec9e2da9aea475c19c3a7fd9a4bdb392d79c7f1745498a7cc5415"
+                "id": "9d4c3af1d4a0268940205aad04a3c6bf434b32f45e0784dec5c283201ef299fc"
             },
-            "from": "metricbeat_apache",
-            "status": "exec_create: /bin/sh -c curl -f http://localhost"
+            "from": "busybox",
+            "status": "create"
         }
     },
     "event": {
-        "action": "exec_create: /bin/sh -c curl -f http://localhost",
-        "created": "2019-01-03T11:39:08Z",
+        "action": "create",
+        "created": "2019-01-03T12:44:52+01:00",
         "dataset": "event",
-        "id": "b7bd093f744ec9e2da9aea475c19c3a7fd9a4bdb392d79c7f1745498a7cc5415",
+        "id": "9d4c3af1d4a0268940205aad04a3c6bf434b32f45e0784dec5c283201ef299fc",
         "kind": "container",
         "module": "docker"
     },
