@@ -20,6 +20,8 @@
 package event
 
 import (
+	"io"
+	"os"
 	"testing"
 	"time"
 
@@ -73,10 +75,12 @@ func createEvent(t *testing.T) {
 	}
 	defer client.Close()
 
-	_, err = client.ImagePull(context.Background(), "busybox", types.ImagePullOptions{})
+	reader, err := client.ImagePull(context.Background(), "busybox", types.ImagePullOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
+	io.Copy(os.Stdout, reader)
+	reader.Close()
 
 	resp, err := client.ContainerCreate(context.Background(), &container.Config{
 		Image: "busybox",
