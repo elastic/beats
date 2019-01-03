@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2019-02-21T21:54:44.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.action": "Accepted",
         "event.dataset": "auth",
@@ -16,7 +15,6 @@
         "user.name": "vagrant"
     },
     {
-        "@timestamp": "2019-02-23T00:13:35.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.action": "Accepted",
         "event.dataset": "auth",
@@ -31,7 +29,6 @@
         "user.name": "vagrant"
     },
     {
-        "@timestamp": "2019-02-21T21:56:12.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.action": "Invalid",
         "event.dataset": "auth",
@@ -44,7 +41,6 @@
         "user.name": "test"
     },
     {
-        "@timestamp": "2019-02-20T08:35:22.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.action": "Failed",
         "event.dataset": "auth",
@@ -65,7 +61,6 @@
         "user.name": "root"
     },
     {
-        "@timestamp": "2019-02-21T23:35:33.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "auth",
         "event.module": "system",
@@ -79,7 +74,6 @@
         "user.name": "vagrant"
     },
     {
-        "@timestamp": "2019-02-19T15:30:04.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "auth",
         "event.module": "system",
@@ -95,7 +89,6 @@
         "system.auth.ssh.dropped_ip": "123.57.245.163"
     },
     {
-        "@timestamp": "2019-02-23T00:08:48.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "auth",
         "event.module": "system",
@@ -109,7 +102,6 @@
         "user.name": "vagrant"
     },
     {
-        "@timestamp": "2019-02-24T00:13:02.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "auth",
         "event.module": "system",
@@ -124,7 +116,6 @@
         "user.name": "tsg"
     },
     {
-        "@timestamp": "2019-02-22T11:47:05.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "auth",
         "event.module": "system",
@@ -136,7 +127,6 @@
         "process.pid": 6991
     },
     {
-        "@timestamp": "2019-02-22T11:47:05.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "auth",
         "event.module": "system",
