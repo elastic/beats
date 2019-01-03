@@ -54,6 +54,9 @@
   alias6: true
   alias: true
 
+
+# Processor fields
+
 # Docker processor
 - from: docker.container.id
   to: container.id
@@ -74,9 +77,6 @@
   to: container.labels
   alias6: false
   alias: true
-
-
-# Processor fields
 
 # Cloud
 - from: meta.cloud.provider
