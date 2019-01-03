@@ -1805,7 +1805,19 @@ type: keyword
 
 example: Mac OS X
 
-Operating system name.
+Operating system name, without the version.
+
+
+--
+
+*`host.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
 
 
 --
@@ -1827,7 +1839,7 @@ OS family (such as redhat, debian, freebsd, windows).
 --
 type: keyword
 
-example: 10.12.6-rc2
+example: 10.14.1
 
 Operating system version as a raw string.
 
@@ -2377,7 +2389,19 @@ type: keyword
 
 example: Mac OS X
 
-Operating system name.
+Operating system name, without the version.
+
+
+--
+
+*`observer.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
 
 
 --
@@ -2399,7 +2423,7 @@ OS family (such as redhat, debian, freebsd, windows).
 --
 type: keyword
 
-example: 10.12.6-rc2
+example: 10.14.1
 
 Operating system version as a raw string.
 
@@ -2576,7 +2600,19 @@ type: keyword
 
 example: Mac OS X
 
-Operating system name.
+Operating system name, without the version.
+
+
+--
+
+*`os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
 
 
 --
@@ -2598,7 +2634,7 @@ OS family (such as redhat, debian, freebsd, windows).
 --
 type: keyword
 
-example: 10.12.6-rc2
+example: 10.14.1
 
 Operating system version as a raw string.
 
@@ -3486,7 +3522,19 @@ type: keyword
 
 example: Mac OS X
 
-Operating system name.
+Operating system name, without the version.
+
+
+--
+
+*`user_agent.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
 
 
 --
@@ -3508,7 +3556,7 @@ OS family (such as redhat, debian, freebsd, windows).
 --
 type: keyword
 
-example: 10.12.6-rc2
+example: 10.14.1
 
 Operating system version as a raw string.
 
