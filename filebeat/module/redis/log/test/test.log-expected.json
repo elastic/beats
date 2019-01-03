@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2018-05-30T12:23:52.442Z", 
         "event.dataset": "redis.log", 
         "fileset.module": "redis", 
         "fileset.name": "log", 
@@ -13,7 +12,6 @@
         "redis.log.role": "master"
     }, 
     {
-        "@timestamp": "2018-05-30T10:05:20.000Z", 
         "event.dataset": "redis.log", 
         "fileset.module": "redis", 
         "fileset.name": "log", 
@@ -24,7 +22,6 @@
         "redis.log.message": "0 clients connected (0 slaves), 618932 bytes in use, 0 shared objects."
     }, 
     {
-        "@timestamp": "2018-05-31T04:32:08.000Z", 
         "event.dataset": "redis.log", 
         "fileset.module": "redis", 
         "fileset.name": "log", 
@@ -35,7 +32,6 @@
         "redis.log.message": "The server is now ready to accept connections on port 6379\""
     }, 
     {
-        "@timestamp": "2017-05-30T10:57:24.000Z", 
         "event.dataset": "redis.log", 
         "fileset.module": "redis", 
         "fileset.name": "log", 
