@@ -25,7 +25,7 @@ This file is generated! See scripts/docs_collector.py
 .9+| .9+|  |<<metricbeat-metricset-docker-container,container>>   
 |<<metricbeat-metricset-docker-cpu,cpu>>   
 |<<metricbeat-metricset-docker-diskio,diskio>>   
-|<<metricbeat-metricset-docker-event,event>> experimental[]  
+|<<metricbeat-metricset-docker-event,event>>   
 |<<metricbeat-metricset-docker-healthcheck,healthcheck>>   
 |<<metricbeat-metricset-docker-image,image>>   
 |<<metricbeat-metricset-docker-info,info>>   

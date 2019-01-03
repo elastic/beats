@@ -2,13 +2,16 @@
   type: group
   description: >
     Docker event
+  release: ga
   fields:
     - name: status
       type: keyword
       description: >
         Event status
     - name: id
-      type: keyword
+      type: alias
+      path: event.id
+      migration: true
       description: >
         Event id when available
     - name: from
@@ -16,15 +19,21 @@
       description: >
         Event source
     - name: type
-      type: keyword
+      type: alias
+      path: event.kind
+      migration: true
       description: >
         The type of object emitting the event
     - name: action
-      type: keyword
+      type: alias
+      path: event.action
+      migration: true
       description: >
         The type of event
     - name: time
-      type: date
+      type: alias
+      path: event.created
+      migration: true
       description: >
         Timestamp of event
     - name: actor
@@ -37,6 +46,7 @@
           description: >
             The ID of the object emitting the event
         - name: attributes
-          type: keyword
+          type: object
+          object_type: keyword
           description: >
             Various key/value attributes of the object, depending on its type

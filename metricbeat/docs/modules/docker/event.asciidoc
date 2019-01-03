@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-docker-event]]
 === Docker event metricset
 
-experimental[]
-
 include::../../../module/docker/event/_meta/docs.asciidoc[]
 
 

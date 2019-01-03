@@ -110,7 +110,7 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 func (m *MetricSet) reportEvent(reporter mb.PushReporterV2, event events.Message) {
 	time := time.Unix(event.Time, 0)
 
-	attributes := common.MapStr{}
+	attributes := make(map[string]string, len(event.Actor.Attributes))
 	for k, v := range event.Actor.Attributes {
 		if m.dedot {
 			k = common.DeDot(k)
@@ -120,17 +120,21 @@ func (m *MetricSet) reportEvent(reporter mb.PushReporterV2, event events.Message
 
 	reporter.Event(mb.Event{
 		Timestamp: time,
+		RootFields: common.MapStr{
+			"event": common.MapStr{
+				"kind":    event.Type,
+				"action":  event.Action,
+				"created": time,
+				"id":      event.ID,
+			},
+		},
 		MetricSetFields: common.MapStr{
 			"status": event.Status,
-			"id":     event.ID,
 			"from":   event.From,
-			"type":   event.Type,
-			"action": event.Action,
 			"actor": common.MapStr{
 				"id":         event.Actor.ID,
 				"attributes": attributes,
 			},
-			"time": time,
 		},
 	})
 }

@@ -6,7 +6,6 @@
     },
     "docker": {
         "event": {
-            "action": "exec_create: /bin/sh -c curl -f http://localhost",
             "actor": {
                 "attributes": {
                     "com_docker_compose_config-hash": "304a077f5d6b5673cdc2ef567dcb762ddac985514d3b73c1563c2f1ae2f4bbe9",
@@ -18,17 +17,18 @@
                     "image": "metricbeat_apache",
                     "name": "metricbeat_apache_1"
                 },
-                "id": "a591e701988ebca0a62b892f99b42fd492fc3fd4581cd630f18a53abd710dbd0"
+                "id": "b7bd093f744ec9e2da9aea475c19c3a7fd9a4bdb392d79c7f1745498a7cc5415"
             },
             "from": "metricbeat_apache",
-            "id": "a591e701988ebca0a62b892f99b42fd492fc3fd4581cd630f18a53abd710dbd0",
-            "status": "exec_create: /bin/sh -c curl -f http://localhost",
-            "time": "2019-01-02T23:29:38Z",
-            "type": "container"
+            "status": "exec_create: /bin/sh -c curl -f http://localhost"
         }
     },
     "event": {
+        "action": "exec_create: /bin/sh -c curl -f http://localhost",
+        "created": "2019-01-03T11:12:57Z",
         "dataset": "event",
+        "id": "b7bd093f744ec9e2da9aea475c19c3a7fd9a4bdb392d79c7f1745498a7cc5415",
+        "kind": "container",
         "module": "docker"
     },
     "service": {
