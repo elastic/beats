@@ -105,20 +105,14 @@ func (d *DynamicType) Unpack(s string) error {
 	return nil
 }
 
-// Unpack checks if objectTypeParams are mixed with top level objectType configuration
-// and creates Field out of config
-func (f *Field) Unpack(c *Config) error {
-	type tmpField Field
-	var tf tmpField
-	if err := c.Unpack(&tf); err != nil {
-		return err
+// Validate ensures objectTypeParams are not mixed with top level objectType configuration
+func (f *Field) Validate() error {
+	if len(f.ObjectTypeParams) == 0 {
+		return nil
 	}
-
-	if len(tf.ObjectTypeParams) != 0 && (tf.ScalingFactor != 0 || tf.ObjectTypeMappingType != "" || tf.ObjectType != "") {
+	if f.ScalingFactor != 0 || f.ObjectTypeMappingType != "" || f.ObjectType != "" {
 		return errors.New("mixing top level objectType configuration with array of object type configurations is forbidden")
 	}
-
-	*f = Field(tf)
 	return nil
 }
 
