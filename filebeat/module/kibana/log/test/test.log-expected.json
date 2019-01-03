@@ -28,46 +28,9 @@
         "service.name": [
             "kibana"
         ],
+        "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "url.original": "/ui/fonts/open_sans/open_sans_v15_latin_600.woff2",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36"
-    },
-    {
-        "@timestamp": "2018-05-09T10:59:12.000Z",
-        "ecs.version": "1.0.0-beta2",
-        "event.dataset": "log",
-        "event.module": "kibana",
-        "input.type": "log",
-        "kibana.log.meta.type": "log",
-        "kibana.log.tags": [
-            "debug",
-            "monitoring-ui",
-            "kibana-monitoring"
-        ],
-        "log.offset": 920,
-        "message": "Fetching data from kibana_stats collector",
-        "process.pid": 69776,
-        "service.name": [
-            "kibana"
-        ]
-    },
-    {
-        "@timestamp": "2018-05-09T10:59:12.000Z",
-        "ecs.version": "1.0.0-beta2",
-        "event.dataset": "log",
-        "event.module": "kibana",
-        "input.type": "log",
-        "kibana.log.meta.type": "log",
-        "kibana.log.tags": [
-            "reporting",
-            "debug",
-            "exportTypes"
-        ],
-        "log.offset": 1090,
-        "message": "Found exportType at /Users/ruflin/Downloads/6.3/kibana-6.3.0-darwin-x86_64/node_modules/x-pack/plugins/reporting/export_types/csv/server/index.js",
-        "process.pid": 69776,
-        "service.name": [
-            "kibana"
-        ]
     }
 ]

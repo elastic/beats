@@ -105,10 +105,9 @@
             }
         },
         {
-            "rename": {
-                "field": "source.address",
-                "target_field": "source.ip",
-                "ignore_missing": true
+            "set": {
+                "field": "source.ip",
+                "value": "{{source.address}}"
             }
         },
         {
