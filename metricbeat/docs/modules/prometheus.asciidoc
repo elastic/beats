@@ -52,9 +52,5 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-prometheus-collector,collector>>
 
-* <<metricbeat-metricset-prometheus-stats,stats>>
-
 include::prometheus/collector.asciidoc[]
-
-include::prometheus/stats.asciidoc[]
 

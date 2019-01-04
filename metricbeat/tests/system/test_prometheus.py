@@ -16,7 +16,7 @@ class Test(metricbeat.BaseTest):
         """
         self.render_config_template(modules=[{
             "name": "prometheus",
-            "metricsets": ["stats"],
+            "metricsets": ["collector"],
             "hosts": self.get_hosts(),
             "period": "5s"
         }])
