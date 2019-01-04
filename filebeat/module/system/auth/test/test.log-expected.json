@@ -1,10 +1,12 @@
 [
     {
         "ecs.version": "1.0.0-beta2",
+        "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.kind": "event",
         "event.module": "system",
+        "event.outcome": "success",
         "fileset.name": "auth",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -21,10 +23,12 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.kind": "event",
         "event.module": "system",
+        "event.outcome": "success",
         "fileset.name": "auth",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -40,10 +44,12 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.kind": "event",
         "event.module": "system",
+        "event.outcome": "failure",
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
@@ -106,6 +112,7 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.kind": "event",
@@ -194,10 +201,12 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.kind": "event",
         "event.module": "system",
+        "event.outcome": "success",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
         "input.type": "log",
@@ -214,6 +223,7 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.kind": "event",
@@ -253,6 +263,7 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.kind": "event",
@@ -267,6 +278,7 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.kind": "event",
@@ -281,6 +293,7 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.kind": "event",
@@ -372,6 +385,7 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.kind": "event",
@@ -386,6 +400,7 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.kind": "event",
@@ -400,6 +415,7 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.kind": "event",
@@ -426,6 +442,7 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.kind": "event",
@@ -443,6 +460,7 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.kind": "event",
@@ -457,6 +475,7 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.action": "ssh_login",
         "event.category": "authentication",
         "event.dataset": "system.auth",
         "event.kind": "event",

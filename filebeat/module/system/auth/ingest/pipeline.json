@@ -52,12 +52,33 @@
                 "if": "ctx.containsKey('process') && ctx.process.containsKey('name') && ctx.process.name == 'sshd'"
             }
         },
+        {
+            "set": {
+                "field": "event.action",
+                "value": "ssh_login",
+                "if": "ctx.event.containsKey('category') && ctx.event.category == 'authentication'"
+            }
+        },
+        {
+            "set": {
+                "field": "event.outcome",
+                "value": "success",
+                "if": "ctx.event.containsKey('action') && ctx.event.action == 'ssh_login' && ctx.system.auth.containsKey('ssh') && ctx.system.auth.ssh.containsKey('action') && ctx.system.auth.ssh.action == 'Accepted'"
+            }
+        },
+        {
+            "set": {
+                "field": "event.outcome",
+                "value": "failure",
+                "if": "ctx.event.containsKey('action') && ctx.event.action == 'ssh_login' && ctx.system.auth.containsKey('ssh') && ctx.system.auth.ssh.containsKey('action') && ctx.system.auth.ssh.action == 'Failed'"
+            }
+        },
 
         {
             "set": {
                 "field": "source.ip",
                 "value": "{{system.auth.ssh.dropped_ip}}",
-                "if": "ctx.containsKey('system') && ctx.system.containsKey('auth') && ctx.system.auth.containsKey('ssh') && ctx.system.auth.ssh.containsKey('dropped_ip')"
+                "if": "ctx.system.auth.containsKey('ssh') && ctx.system.auth.ssh.containsKey('dropped_ip')"
             }
         },
         {
