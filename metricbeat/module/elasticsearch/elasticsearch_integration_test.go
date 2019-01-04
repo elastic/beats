@@ -180,6 +180,14 @@ func enableTrialLicense(host string) error {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != 200 {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		return fmt.Errorf("could not enable trial license, response = %v", string(body))
+	}
+
 	return nil
 }
 
@@ -199,7 +207,7 @@ func createMLJob(host string) error {
 	body, resp, err := httpPutJSON(host, jobURL, mlJob)
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("HTTP error loading ml job %d: %s, %s", resp.StatusCode, resp.Status, body)
+		return fmt.Errorf("HTTP error loading ml job %d: %s, %s", resp.StatusCode, resp.Status, string(body))
 	}
 
 	return nil
