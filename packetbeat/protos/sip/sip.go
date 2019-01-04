@@ -41,7 +41,7 @@ const (
 
 // MessegeStatus
 const (
-	SipStatusReceived        = iota
+	SipStatusReceived = iota
 	SipStatusHeaderReceiving
 	SipStatusBodyReceiving
 	SipStatusRejected
@@ -49,15 +49,39 @@ const (
 
 // Detail parse mode
 const (
-	SipDetailURI          = iota // ex. sip:bob@example.com
-	SipDetailNameAddr            // ex. "Bob"<sip:bob@example.com>
-	SipDetailInt                 // ex. 123
-	SipDetailIntMethod           // ex. 123 INVITE
-	SipDetailIntIntMethod        // ex. 123 123 INVITE
-	SipDetailIntString           // ex. 123 INVITE
-	SipDetailIntInt              // ex. 123 123
-	SipDetailIntIntString        // ex. 123 123 INVITE
+	SipDetailURI = iota   // ex. sip:bob@example.com
+	SipDetailNameAddr     // ex. "Bob"<sip:bob@example.com>
+	SipDetailInt          // ex. 123
+	SipDetailIntMethod    // ex. 123 INVITE
+	SipDetailIntIntMethod // ex. 123 123 INVITE
+	SipDetailIntString    // ex. 123 INVITE
+	SipDetailIntInt       // ex. 123 123
+	SipDetailIntIntString // ex. 123 123 INVITE
 )
+
+// To converting compact form to full form
+// referfenced by https://www.iana.org/assignments/sip-parameters/sip-parameters.xhtml
+var cmpctFormToFullForm = map[byte]string{
+	'a': "accept-contact",      //[RFC3841]
+	'b': "referred-by",         //[RFC3892]
+	'c': "content-type",        //[RFC3261]
+	'd': "request-disposition", //[RFC3841]
+	'e': "content-encoding",    //[RFC3261]
+	'f': "from",                //[RFC3261]
+	'i': "call-id",             //[RFC3261]
+	'j': "reject-contact",      //[RFC3841]
+	'k': "supported",           //[RFC3261]
+	'l': "content-length",      //[RFC3261]
+	'm': "contact",             //[RFC3261]
+	'o': "event",               //[RFC6665] [RFC6446]
+	'r': "refer-to",            //[RFC3515]
+	's': "subject",             //[RFC3261]
+	't': "to",                  //[RFC3261]
+	'u': "allow-events",        //[RFC6665]
+	'v': "via",                 //[RFC3261] [RFC7118]
+	'x': "session-expires",     //[RFC4028]
+	'y': "identity",            //[RFC8224]
+}
 
 func init() {
 	// Memo: Secound argment*New* is below New function.
