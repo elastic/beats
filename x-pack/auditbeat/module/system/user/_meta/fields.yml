@@ -9,11 +9,11 @@
       description: >
           User name.
     - name: uid
-      type: integer
+      type: keyword
       description: >
           User ID.
     - name: gid
-      type: integer
+      type: keyword
       description: >
           Group ID.
     - name: dir
