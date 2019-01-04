@@ -1,6 +1,5 @@
 Feb 21 21:54:44 localhost sshd[3402]: Accepted publickey for vagrant from 10.0.2.2 port 63673 ssh2: RSA 39:33:99:e9:a0:dc:f2:33:a3:e5:72:3b:7c:3a:56:84
 Feb 23 00:13:35 localhost sshd[7483]: Accepted password for vagrant from 192.168.33.1 port 58803 ssh2
-Feb 21 21:56:12 localhost sshd[3430]: Invalid user test from 10.0.2.2
 Feb 20 08:35:22 slave22 sshd[5774]: Failed password for root from 116.31.116.24 port 29160 ssh2
 Feb 21 23:35:33 localhost sudo: vagrant : TTY=pts/0 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/ls
 Feb 19 15:30:04 slave22 sshd[18406]: Did not receive identification string from 123.57.245.163
@@ -8,3 +7,23 @@ Feb 23 00:08:48 localhost sudo: vagrant : TTY=pts/1 ; PWD=/home/vagrant ; USER=r
 Feb 24 00:13:02 precise32 sudo:      tsg : user NOT in sudoers ; TTY=pts/1 ; PWD=/home/vagrant ; USER=root ; COMMAND=/bin/ls
 Feb 22 11:47:05 localhost groupadd[6991]: new group: name=apache, GID=48
 Feb 22 11:47:05 localhost useradd[6995]: new user: name=apache, UID=48, GID=48, home=/usr/share/httpd, shell=/sbin/nologin
+Jan  4 15:43:53 ubuntu-xenial sshd[2124]: Accepted publickey for vagrant from 10.0.2.2 port 64484 ssh2: RSA SHA256:sKpJLT3xGfw7fCcOslGbKVMyIm+2MbYVCqVkV5a1zeQ
+Jan  4 15:43:53 ubuntu-xenial sshd[2124]: pam_unix(sshd:session): session opened for user vagrant by (uid=0)
+Jan  4 15:43:53 ubuntu-xenial systemd: pam_unix(systemd-user:session): session opened for user vagrant by (uid=0)
+Jan  4 15:43:53 ubuntu-xenial systemd-logind[1055]: New session 2 of user vagrant.
+Jan  4 16:20:27 ubuntu-xenial sshd[9448]: Received disconnect from 10.0.2.2 port 50729:11: disconnected by user
+Jan  4 16:20:27 ubuntu-xenial sshd[9448]: Disconnected from 10.0.2.2 port 50729
+Jan  4 16:20:27 ubuntu-xenial sshd[9415]: pam_unix(sshd:session): session closed for user vagrant
+Jan  4 16:20:27 ubuntu-xenial systemd-logind[1055]: Removed session 14.
+Jan  4 15:44:27 ubuntu-xenial sudo: pam_unix(sudo:session): session opened for user root by vagrant(uid=0)
+Jan  4 15:44:27 ubuntu-xenial su[8849]: Successful su for root by root
+Jan  4 15:44:27 ubuntu-xenial su[8849]: + /dev/pts/1 root:root
+Jan  4 15:44:27 ubuntu-xenial su[8849]: pam_unix(su:session): session opened for user root by vagrant(uid=0)
+Jan  4 15:44:27 ubuntu-xenial su[8849]: pam_systemd(su:session): Cannot create session: Already running in a session
+Jan  4 16:04:14 ubuntu-xenial sshd[1061]: Received signal 15; terminating.
+Jan  4 16:04:14 ubuntu-xenial sshd[9230]: Server listening on 0.0.0.0 port 22.
+Jan  4 16:04:14 ubuntu-xenial sshd[9230]: Server listening on :: port 22.
+Jan  4 16:04:14 ubuntu-xenial sudo: pam_unix(sudo:session): session closed for user root
+Jan  4 16:09:22 ubuntu-xenial sshd[9356]: Invalid user mat from 10.0.2.2
+Jan  4 16:09:22 ubuntu-xenial sshd[9356]: input_userauth_request: invalid user mat [preauth]
+Jan  4 16:09:22 ubuntu-xenial sshd[9356]: Connection closed by 10.0.2.2 port 49945 [preauth]
