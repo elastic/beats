@@ -21,6 +21,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/magefile/mage/mg"
@@ -65,8 +66,13 @@ func PackageBeatDashboards() error {
 	}
 
 	for _, beat := range Beats {
+		path := filepath.Join(beat, "_meta/kibana.generated")
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			path = filepath.Join(beat, "build/kibana")
+		}
+
 		spec.Files[beat] = mage.PackageFile{
-			Source: filepath.Join(beat, "_meta/kibana.generated"),
+			Source: path,
 		}
 	}
 
