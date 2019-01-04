@@ -49,14 +49,14 @@ const (
 
 // Detail parse mode
 const (
-	SipDetailURI = iota   // ex. sip:bob@example.com
-	SipDetailNameAddr     // ex. "Bob"<sip:bob@example.com>
-	SipDetailInt          // ex. 123
-	SipDetailIntMethod    // ex. 123 INVITE
-	SipDetailIntIntMethod // ex. 123 123 INVITE
-	SipDetailIntString    // ex. 123 INVITE
-	SipDetailIntInt       // ex. 123 123
-	SipDetailIntIntString // ex. 123 123 INVITE
+	SipDetailURI          = iota // ex. sip:bob@example.com
+	SipDetailNameAddr            // ex. "Bob"<sip:bob@example.com>
+	SipDetailInt                 // ex. 123
+	SipDetailIntMethod           // ex. 123 INVITE
+	SipDetailIntIntMethod        // ex. 123 123 INVITE
+	SipDetailIntString           // ex. 123 INVITE
+	SipDetailIntInt              // ex. 123 123
+	SipDetailIntIntString        // ex. 123 123 INVITE
 )
 
 // To converting compact form to full form

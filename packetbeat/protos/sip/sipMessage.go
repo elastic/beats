@@ -435,8 +435,8 @@ func (msg *sipMessage) parseSIPHeaderToMap(cutPosS []int, cutPosE []int) (*map[s
 
 			// Convert compact form to full form
 			if len(key) == 1 {
-				if val, ok := cmpctFormToFullForm[key[0]]; ok {
-					key=val
+				if fullKey, ok := cmpctFormToFullForm[key[0]]; ok {
+					key = fullKey
 				}
 			}
 
