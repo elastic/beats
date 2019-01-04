@@ -107,7 +107,8 @@
         {
             "set": {
                 "field": "source.ip",
-                "value": "{{source.address}}"
+                "value": "{{source.address}}",
+                "if": "ctx.containsKey('source') && ctx.source.containsKey('address')"
             }
         },
         {
