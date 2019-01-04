@@ -21,7 +21,7 @@
           "start": "2018-02-18T05:46:45Z"
         },
         "flow": {
-          "id": "e51_HB0pUk0",
+          "id": "XLC-7u3wi0U",
           "locality": "public"
         },
         "netflow": {
@@ -56,7 +56,7 @@
         },
         "network": {
           "bytes": 156,
-          "community_id": "1:6bApwXCshD5rqS4P4mVFwtobnBM=",
+          "community_id": "1:UB3lt1Isf0aF4UrkqLFDFJF9mqs=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 3,
@@ -94,7 +94,7 @@
           "start": "2018-02-18T05:46:53.992Z"
         },
         "flow": {
-          "id": "syYxgsNlkLw",
+          "id": "2mdiEm9z6pA",
           "locality": "public"
         },
         "netflow": {
@@ -129,7 +129,7 @@
         },
         "network": {
           "bytes": 48,
-          "community_id": "1:nHvXTDLBywv91YMJeWrLeJPdWP4=",
+          "community_id": "1:qRS02uGU7DQQhA2eIiypcWW646c=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 1,
@@ -167,8 +167,8 @@
           "start": "2018-02-18T05:46:46.336Z"
         },
         "flow": {
-          "id": "lOA4UGSSPSo",
-          "locality": "private"
+          "id": "IKsDJxZK5UA",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "212.224.113.74",
@@ -202,7 +202,7 @@
         },
         "network": {
           "bytes": 584,
-          "community_id": "1:3gZ5hR1U0fS2hvac/Y9iO8mcFDo=",
+          "community_id": "1:m2CtSpaQp+2xe8gg2IStCRuPvdE=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 11,
@@ -240,7 +240,7 @@
           "start": "2018-02-18T05:46:53.976Z"
         },
         "flow": {
-          "id": "0YHsWqnlq5A",
+          "id": "lfpS1KL7LwI",
           "locality": "public"
         },
         "netflow": {
@@ -275,7 +275,7 @@
         },
         "network": {
           "bytes": 577,
-          "community_id": "1:Uc3mP+7U3dbDz60McoL0jYl+KUQ=",
+          "community_id": "1:qBYG/gPpQslUYq/PoeUvwOTeciI=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 4,
@@ -313,8 +313,8 @@
           "start": "2018-02-18T05:46:52.82Z"
         },
         "flow": {
-          "id": "nVp4utJbp_Q",
-          "locality": "private"
+          "id": "HRyho8QOr5M",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "62.221.115.205",
@@ -348,7 +348,7 @@
         },
         "network": {
           "bytes": 152,
-          "community_id": "1:Wcok2NJh31VgMyBs70twGHpEg7M=",
+          "community_id": "1:IMkMWSeVEQtrGLMvUrWNrRloBnU=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 3,
@@ -386,8 +386,8 @@
           "start": "2018-02-18T05:46:45Z"
         },
         "flow": {
-          "id": "jqJsvE2EmTY",
-          "locality": "private"
+          "id": "jbL3H_oK7ok",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "37.146.125.64",
@@ -421,7 +421,7 @@
         },
         "network": {
           "bytes": 152,
-          "community_id": "1:tfHBMGf05/6z8XXBH1VvTg3Bp4k=",
+          "community_id": "1:x/J1qXHnaUwGcB8zD1GcpV9lWRs=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 3,
@@ -459,8 +459,8 @@
           "start": "2018-02-18T05:46:49.56Z"
         },
         "flow": {
-          "id": "vW9hpco_odQ",
-          "locality": "private"
+          "id": "ayKjfr1z0QU",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "52.198.214.72",
@@ -494,7 +494,7 @@
         },
         "network": {
           "bytes": 1809,
-          "community_id": "1:RkpTZIg7FeOitpZbe0ahhlzx90w=",
+          "community_id": "1:FsZvFeVrzzIyp2g1XhIbWdMJlww=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 15,
@@ -532,8 +532,8 @@
           "start": "2018-02-18T05:46:53.916Z"
         },
         "flow": {
-          "id": "XZPQT-klpQE",
-          "locality": "private"
+          "id": "B15R8wv_tVI",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "64.233.161.188",
@@ -567,7 +567,7 @@
         },
         "network": {
           "bytes": 234,
-          "community_id": "1:QdyoRIMjHbHZz9RohPLNm74w6QE=",
+          "community_id": "1:b6ds1NE3TsQ0PIp+pKuGWaqwsyc=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 3,
@@ -605,8 +605,8 @@
           "start": "2018-02-18T05:46:53.592Z"
         },
         "flow": {
-          "id": "zV8Gq7FFMug",
-          "locality": "private"
+          "id": "oYN-uwp504w",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "185.209.20.240",
@@ -640,7 +640,7 @@
         },
         "network": {
           "bytes": 1681,
-          "community_id": "1:ByBLMidnd0Tua+Vk+59YTRfjE3g=",
+          "community_id": "1:w1ulQqI1NNDG8118wxe2KjecAWs=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 22,
@@ -678,8 +678,8 @@
           "start": "2018-02-18T05:46:44.964Z"
         },
         "flow": {
-          "id": "V-jsfUlFYAA",
-          "locality": "private"
+          "id": "MUPum_LUoxk",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "84.39.245.175",
@@ -713,7 +713,7 @@
         },
         "network": {
           "bytes": 152,
-          "community_id": "1:+8jpPMTlqZM+u9QLxrPyk2/duOY=",
+          "community_id": "1:IQI7c8/Vlpqocm+uFFUkvbXPrIo=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 3,
@@ -751,7 +751,7 @@
           "start": "2018-02-18T05:46:53.932Z"
         },
         "flow": {
-          "id": "kHRVt7VxEJU",
+          "id": "YStkNP0pV1E",
           "locality": "public"
         },
         "netflow": {
@@ -786,7 +786,7 @@
         },
         "network": {
           "bytes": 1866,
-          "community_id": "1:hWEp1AGtGX7I3gL6btUapvplzdk=",
+          "community_id": "1:E4w2M65VHyHNlcgPcdFLuqutRQg=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 3,
@@ -824,7 +824,7 @@
           "start": "2018-02-18T05:46:53.8Z"
         },
         "flow": {
-          "id": "sYQ7ITvYnQw",
+          "id": "nkastJ_vPI4",
           "locality": "public"
         },
         "netflow": {
@@ -859,7 +859,7 @@
         },
         "network": {
           "bytes": 187,
-          "community_id": "1:ujpwO/BObx6DD8oop1f63tSyfcw=",
+          "community_id": "1:Ukfnc8AX67bQypWSmcn5huV+6qI=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 3,

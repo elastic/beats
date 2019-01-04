@@ -20,7 +20,7 @@
           "start": "2018-01-29T02:56:51.94Z"
         },
         "flow": {
-          "id": "edQPxE87Y_A",
+          "id": "d-FUjj8eKi8",
           "locality": "private"
         },
         "netflow": {
@@ -60,7 +60,7 @@
         },
         "network": {
           "bytes": 200,
-          "community_id": "1:UTBimnmI4MzXDTKLW5sOTHaZyKc=",
+          "community_id": "1:0qNFnK0G9V0IPgzhxvf+nGmenME=",
           "direction": "outbound",
           "iana_number": 6,
           "packets": 4,
