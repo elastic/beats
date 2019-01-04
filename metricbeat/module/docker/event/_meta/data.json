@@ -1,0 +1,31 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "docker": {
+        "event": {
+            "actor": {
+                "attributes": {
+                    "image": "busybox",
+                    "name": "wizardly_knuth"
+                },
+                "id": "9d4c3af1d4a0268940205aad04a3c6bf434b32f45e0784dec5c283201ef299fc"
+            },
+            "from": "busybox",
+            "status": "create"
+        }
+    },
+    "event": {
+        "action": "create",
+        "created": "2019-01-03T12:44:52+01:00",
+        "dataset": "event",
+        "id": "9d4c3af1d4a0268940205aad04a3c6bf434b32f45e0784dec5c283201ef299fc",
+        "kind": "container",
+        "module": "docker"
+    },
+    "service": {
+        "type": "docker"
+    }
+}
