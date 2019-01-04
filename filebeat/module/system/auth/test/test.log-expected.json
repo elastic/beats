@@ -117,6 +117,7 @@
         "event.dataset": "system.auth",
         "event.kind": "event",
         "event.module": "system",
+        "event.outcome": "failure",
         "fileset.name": "auth",
         "host.hostname": "slave22",
         "input.type": "log",
