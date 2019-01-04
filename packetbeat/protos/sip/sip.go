@@ -35,28 +35,28 @@ var (
 )
 
 const (
-	transportTCP = 0
-	transportUDP = 1
+	transportTCP = iota
+	transportUDP
 )
 
 // MessegeStatus
 const (
-	SipStatusReceived        = 0
-	SipStatusHeaderReceiving = 1
-	SipStatusBodyReceiving   = 2
-	SipStatusRejected        = 3
+	SipStatusReceived        = iota
+	SipStatusHeaderReceiving
+	SipStatusBodyReceiving
+	SipStatusRejected
 )
 
 // Detail parse mode
 const (
-	SipDetailURI          = 1 // ex. sip:bob@example.com
-	SipDetailNameAddr     = 2 // ex. "Bob"<sip:bob@example.com>
-	SipDetailInt          = 3 // ex. 123
-	SipDetailIntMethod    = 4 // ex. 123 INVITE
-	SipDetailIntIntMethod = 5 // ex. 123 123 INVITE
-	SipDetailIntString    = 6 // ex. 123 INVITE
-	SipDetailIntInt       = 7 // ex. 123 123
-	SipDetailIntIntString = 8 // ex. 123 123 INVITE
+	SipDetailURI          = iota // ex. sip:bob@example.com
+	SipDetailNameAddr            // ex. "Bob"<sip:bob@example.com>
+	SipDetailInt                 // ex. 123
+	SipDetailIntMethod           // ex. 123 INVITE
+	SipDetailIntIntMethod        // ex. 123 123 INVITE
+	SipDetailIntString           // ex. 123 INVITE
+	SipDetailIntInt              // ex. 123 123
+	SipDetailIntIntString        // ex. 123 123 INVITE
 )
 
 func init() {
