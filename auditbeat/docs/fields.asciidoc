@@ -3821,7 +3821,7 @@ User name.
 *`system.audit.user.uid`*::
 +
 --
-type: integer
+type: keyword
 
 User ID.
 
@@ -3831,7 +3831,7 @@ User ID.
 *`system.audit.user.gid`*::
 +
 --
-type: integer
+type: keyword
 
 Group ID.
 
