@@ -33,7 +33,7 @@ import (
 )
 
 // CCRStatsAPIAvailableVersion is the version of Elasticsearch since when the CCR stats API is available.
-const CCRStatsAPIAvailableVersion = "6.5.0"
+var CCRStatsAPIAvailableVersion = common.MustNewVersion("6.5.0")
 
 // Global clusterIdCache. Assumption is that the same node id never can belong to a different cluster id.
 var clusterIDCache = map[string]string{}
@@ -48,6 +48,11 @@ type Info struct {
 	Version     struct {
 		Number string `json:"number"`
 	} `json:"version"`
+}
+
+// GetVersion returns a Version object of the Elasticsearch version
+func (info *Info) GetVersion() (*common.Version, error) {
+	return common.NewVersion(info.Version.Number)
 }
 
 // NodeInfo struct cotains data about the node.
