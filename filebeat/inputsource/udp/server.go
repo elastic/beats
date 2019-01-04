@@ -24,7 +24,7 @@ import (
 	"sync"
 	"time"
 
-	humanize "github.com/dustin/go-humanize"
+	"github.com/dustin/go-humanize"
 	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/libbeat/logp"
 )
