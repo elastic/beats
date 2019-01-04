@@ -198,6 +198,7 @@ class Test(BaseTest):
         policy = self.es.transport.perform_request('GET', "/_ilm/policy/" + self.policy_name)
         assert self.policy_name in policy
 
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_export_ilm_policy(self):
         """

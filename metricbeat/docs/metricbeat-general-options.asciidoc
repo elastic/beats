@@ -31,4 +31,4 @@ metricbeat.max_start_delay: 10s
 ----
 
 
-include::../../libbeat/docs/generalconfig.asciidoc[]
+include::{libbeat-dir}/docs/generalconfig.asciidoc[]

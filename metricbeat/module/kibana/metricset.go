@@ -33,23 +33,18 @@ type MetricSet struct {
 // NewMetricSet creates a metricset that can be used to build other metricsets
 // within the Kibana module.
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
-	config := struct {
-		xPackEnabled bool `config:"xpack.enabled"`
-	}{
-		xPackEnabled: false,
-	}
-
+	config := DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
-	if config.xPackEnabled {
+	if config.XPackEnabled {
 		cfgwarn.Experimental("The experimental xpack.enabled flag in the " + base.FullyQualifiedName() + " metricset is enabled.")
 	}
 
 	return &MetricSet{
 		base,
-		config.xPackEnabled,
+		config.XPackEnabled,
 		logp.NewLogger(ModuleName),
 	}, nil
 }

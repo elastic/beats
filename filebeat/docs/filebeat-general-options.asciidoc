@@ -118,4 +118,4 @@ Example configuration:
 filebeat.shutdown_timeout: 5s
 -------------------------------------------------------------------------------------
 
-include::../../libbeat/docs/generalconfig.asciidoc[]
+include::{libbeat-dir}/docs/generalconfig.asciidoc[]

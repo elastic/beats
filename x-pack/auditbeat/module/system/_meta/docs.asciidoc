@@ -1,0 +1,92 @@
+[role="xpack"]
+
+== System Module
+
+experimental[]
+
+The `system` module collects various security related information about
+a system. All metricsets send both periodic state information (e.g. all currently
+running processes) and real-time changes (e.g. when a new process starts
+or stops).
+
+The module is fully implemented for Linux, and partially implemented
+for macOS (Darwin).
+
+[float]
+=== How it works
+
+Each metricset sends two kinds of information: state and events.
+
+State information is sent periodically and on startup (for some metricsets).
+A state update will consist of one event per object that is currently
+active on the system (e.g. a process). All events belonging to the same state
+update will share the same UUID in `event.id`.
+
+The frequency of state updates can be controlled for all metricsets using the
+`state.period` configuration option. Overrides are available per metricset.
+The default is `12h`.
+
+Event information is sent as the events occur (e.g. a process starts or stops).
+All metricsets are currently using a poll model to retrieve their data.
+The frequency of these polls is controlled using the `period` configuration
+parameter.
+
+[float]
+=== Configuration options
+
+This module has some configuration options for controlling its behavior. The
+following example shows all configuration options with their default values for
+Linux.
+
+NOTE: It is recommended to configure some metricsets separately. See below for a
+sample suggested configuration.
+
+[source,yaml]
+----
+- module: system
+  metricsets:
+    - host
+    - process
+    - socket
+    - user
+  period: 10s
+  state.period: 12h
+  user.detect_password_changes: true
+----
+
+*`period`*:: The frequency at which the metricsets check for changes. For most
+metricsets - esp. `process` and `socket` - a shorter period is recommended.
+
+*`state.period`*:: The frequency at which the metricsets send full state information.
+This option can be overridden per metricset using `{metricset}.state.period`.
+
+*`user.detect_password_changes`*:: If the `user` metricset is configured and
+this option is set to `true`, Auditbeat will read password information in `/etc/passwd`
+and `/etc/shadow` to detect password changes. A hash will be kept locally in
+the `beat.db` file to detect changes between Auditbeat restarts. The `beat.db` file
+should be readable only by the root user and be treated similar to the shadow file
+itself.
+
+[float]
+=== Suggested configuration
+
+Processes and sockets can be short-lived, so the chance of missing an update
+increases if the polling interval is too large.
+
+On the other hand, host and user information is unlikely to change frequently,
+so a longer polling interval can be used.
+
+[source,yaml]
+----
+- module: system
+  metricsets:
+    - host
+    - user
+  period: 1m
+  user.detect_password_changes: true
+
+- module: system
+    - process
+    - socket
+  period: 1s
+----

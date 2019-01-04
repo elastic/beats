@@ -205,15 +205,12 @@ func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.
 		indexSettings.Put("number_of_routing_shards", defaultNumberOfRoutingShards)
 	}
 
-	var mappingName string
+	mappingName := "_doc"
 	major := t.esVersion.Major
 	switch {
 	case major < 6:
 		mappingName = "_default_"
-	case major == 6:
-		mappingName = "doc"
 	case major >= 7:
-		mappingName = "_doc"
 		defaultFields = append(defaultFields, "fields.*")
 		indexSettings.Put("query.default_field", defaultFields)
 	}

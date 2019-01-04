@@ -35,7 +35,7 @@ func Enroll(beat *instance.Beat, kibanaURL, enrollmentToken string, force bool) 
 		return false, err
 	}
 
-	accessToken, err := client.Enroll(beat.Info.Beat, beat.Info.Name, beat.Info.Version, beat.Info.Hostname, beat.Info.UUID, enrollmentToken)
+	accessToken, err := client.Enroll(beat.Info.Beat, beat.Info.Name, beat.Info.Version, beat.Info.Hostname, beat.Info.ID, enrollmentToken)
 	if err != nil {
 		return false, err
 	}

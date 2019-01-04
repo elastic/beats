@@ -186,11 +186,16 @@ func TestAddMetricSetInfo(t *testing.T) {
 		AddMetricSetInfo(moduleName, metricSetName, &e)
 
 		assert.Equal(t, common.MapStr{
+			"event": common.MapStr{
+				"module":   moduleName,
+				"dataset":  moduleName + "." + metricSetName,
+				"duration": time.Duration(500000000),
+			},
+			"service": common.MapStr{
+				"address": host,
+			},
 			"metricset": common.MapStr{
-				"host":   host,
-				"module": moduleName,
-				"name":   metricSetName,
-				"rtt":    time.Duration(500000),
+				"name": metricSetName,
 			},
 		}, e.RootFields)
 	})
@@ -201,9 +206,12 @@ func TestAddMetricSetInfo(t *testing.T) {
 		AddMetricSetInfo(moduleName, metricSetName, &e)
 
 		assert.Equal(t, common.MapStr{
+			"event": common.MapStr{
+				"module":  moduleName,
+				"dataset": moduleName + "." + metricSetName,
+			},
 			"metricset": common.MapStr{
-				"module": moduleName,
-				"name":   metricSetName,
+				"name": metricSetName,
 			},
 		}, e.RootFields)
 	})

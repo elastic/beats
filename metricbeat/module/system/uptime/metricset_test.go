@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build darwin linux openbsd windows
+// +build darwin linux openbsd windows freebsd,cgo
 
 package uptime
 

@@ -1,0 +1,41 @@
+{{ if ne .GOOS "windows" -}}
+{{ if .Reference -}}
+# The system module collects security related information about a host.
+# All metricsets send both periodic state information (e.g. all currently
+# running processes) and real-time changes (e.g. when a new process starts
+# or stops).
+{{ end -}}
+- module: system
+  metricsets:
+    - host    # General host information, e.g. uptime, IPs
+    {{ if false -}}
+    - packages # Installed packages
+    {{- end -}}
+    - process # Started and stopped processes
+    {{ if eq .GOOS "linux" -}}
+    - socket  # Opened and closed sockets
+    - user    # User information
+    {{- end }}
+
+  # How often metricsets send state updates with the
+  # current state of the system (e.g. all currently
+  # running processes, all open sockets).
+  state.period: 12h
+{{ if .Reference }}
+  # The state.period can be overridden for any metricset.
+  # host.state.period: 12h
+  # process.state.period: 12h
+  # socket.state.period: 12h
+  # user.state.period: 12h
+{{ end }}
+  {{ if eq .GOOS "linux" -}}
+  # Enabled by default. Auditbeat will read password fields in
+  # /etc/passwd and /etc/shadow and store a hash locally to
+  # detect any changes.
+  user.detect_password_changes: true
+  {{- end }}
+  {{- if false -}}
+  {{/* Only remaining use in packages, to be removed completely. */}}
+  report_changes: true
+  {{- end -}}
+{{- end }}

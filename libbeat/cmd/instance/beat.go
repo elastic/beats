@@ -168,7 +168,7 @@ func Run(settings Settings, bt beat.Creator) error {
 		monitoring.NewString(registry, "version").Set(b.Info.Version)
 		monitoring.NewString(registry, "beat").Set(b.Info.Beat)
 		monitoring.NewString(registry, "name").Set(b.Info.Name)
-		monitoring.NewString(registry, "uuid").Set(b.Info.UUID.String())
+		monitoring.NewString(registry, "uuid").Set(b.Info.ID.String())
 		monitoring.NewString(registry, "hostname").Set(b.Info.Hostname)
 
 		// Add additional info to state registry. This is also reported to monitoring
@@ -176,7 +176,7 @@ func Run(settings Settings, bt beat.Creator) error {
 		serviceRegistry := stateRegistry.NewRegistry("service")
 		monitoring.NewString(serviceRegistry, "version").Set(b.Info.Version)
 		monitoring.NewString(serviceRegistry, "name").Set(b.Info.Beat)
-		monitoring.NewString(serviceRegistry, "id").Set(b.Info.UUID.String())
+		monitoring.NewString(serviceRegistry, "id").Set(b.Info.ID.String())
 		beatRegistry := stateRegistry.NewRegistry("beat")
 		monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
 		monitoring.NewFunc(stateRegistry, "host", host.ReportInfo, monitoring.Report)
@@ -216,7 +216,8 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 			Version:     v,
 			Name:        hostname,
 			Hostname:    hostname,
-			UUID:        id,
+			ID:          id,
+			EphemeralID: ephemeralID,
 		},
 		Fields: fields,
 	}
@@ -456,6 +457,20 @@ func (b *Beat) Setup(bt beat.Creator, template, setupDashboards, machineLearning
 				return fmt.Errorf("Template loading requested but the Elasticsearch output is not configured/enabled")
 			}
 
+			if b.Config.ILM.Enabled() {
+				cfgwarn.Beta("Index lifecycle management is enabled which is in beta.")
+
+				ilmCfg, err := getILMConfig(b)
+				if err != nil {
+					return err
+				}
+
+				err = b.prepareILMTemplate(ilmCfg)
+				if err != nil {
+					return err
+				}
+			}
+
 			esConfig := outCfg.Config()
 			if tmplCfg := b.Config.Template; tmplCfg == nil || tmplCfg.Enabled() {
 				loadCallback, err := b.templateLoadingCallback()
@@ -601,10 +616,10 @@ func (b *Beat) configure(settings Settings) error {
 		return err
 	}
 
-	logp.Info("Beat UUID: %v", b.Info.UUID)
+	logp.Info("Beat ID: %v", b.Info.ID)
 
 	// initialize config manager
-	b.ConfigManager, err = management.Factory()(b.Config.Management, reload.Register, b.Beat.Info.UUID)
+	b.ConfigManager, err = management.Factory()(b.Config.Management, reload.Register, b.Beat.Info.ID)
 	if err != nil {
 		return err
 	}
@@ -648,12 +663,12 @@ func (b *Beat) loadMeta() error {
 		f.Close()
 		valid := m.UUID != uuid.Nil
 		if valid {
-			b.Info.UUID = m.UUID
+			b.Info.ID = m.UUID
 			return nil
 		}
 	}
 
-	// file does not exist or UUID is invalid, let's create a new one
+	// file does not exist or ID is invalid, let's create a new one
 
 	// write temporary file first
 	tempFile := metaPath + ".new"
@@ -662,7 +677,7 @@ func (b *Beat) loadMeta() error {
 		return fmt.Errorf("Failed to create Beat meta file: %s", err)
 	}
 
-	err = json.NewEncoder(f).Encode(meta{UUID: b.Info.UUID})
+	err = json.NewEncoder(f).Encode(meta{UUID: b.Info.ID})
 	f.Close()
 	if err != nil {
 		return fmt.Errorf("Beat meta file failed to write: %s", err)
@@ -757,6 +772,19 @@ func (b *Beat) registerTemplateLoading() error {
 			return errors.New("setup.template.name and setup.template.pattern have to be set if index name is modified")
 		}
 
+		if b.Config.Template == nil || (b.Config.Template != nil && b.Config.Template.Enabled()) {
+
+			// load template through callback to make sure it is also loaded
+			// on reconnecting
+			callback, err := b.templateLoadingCallback()
+			if err != nil {
+				return err
+			}
+			elasticsearch.RegisterConnectCallback(callback)
+		} else if b.Config.ILM.Enabled() {
+			return errors.New("templates cannot be disable when using ILM")
+		}
+
 		if b.Config.ILM.Enabled() {
 			cfgwarn.Beta("Index lifecycle management is enabled which is in beta.")
 
@@ -765,33 +793,9 @@ func (b *Beat) registerTemplateLoading() error {
 				return err
 			}
 
-			// In case no template settings are set, config must be created
-			if b.Config.Template == nil {
-				b.Config.Template = common.NewConfig()
-			}
-			// Template name and pattern can't be configure when using ILM
-			logp.Info("Set setup.template.name to '%s' as ILM is enabled.", ilmCfg.RolloverAlias)
-			err = b.Config.Template.SetString("name", -1, ilmCfg.RolloverAlias)
+			err = b.prepareILMTemplate(ilmCfg)
 			if err != nil {
-				return errw.Wrap(err, "error setting setup.template.name")
-			}
-			pattern := fmt.Sprintf("%s-*", ilmCfg.RolloverAlias)
-			logp.Info("Set setup.template.pattern to '%s' as ILM is enabled.", pattern)
-			err = b.Config.Template.SetString("pattern", -1, pattern)
-			if err != nil {
-				return errw.Wrap(err, "error setting setup.template.pattern")
-			}
-
-			// rollover_alias and lifecycle.name can't be configured and will be overwritten
-			logp.Info("Set settings.index.lifecycle.rollover_alias in template to %s as ILM is enabled.", ilmCfg.RolloverAlias)
-			err = b.Config.Template.SetString("settings.index.lifecycle.rollover_alias", -1, ilmCfg.RolloverAlias)
-			if err != nil {
-				return errw.Wrap(err, "error setting settings.index.lifecycle.rollover_alias")
-			}
-			logp.Info("Set settings.index.lifecycle.name in template to %s as ILM is enabled.", ILMPolicyName)
-			err = b.Config.Template.SetString("settings.index.lifecycle.name", -1, ILMPolicyName)
-			if err != nil {
-				return errw.Wrap(err, "error setting settings.index.lifecycle.name")
+				return err
 			}
 
 			// Set the ingestion index to the rollover alias
@@ -828,19 +832,39 @@ func (b *Beat) registerTemplateLoading() error {
 
 			elasticsearch.RegisterConnectCallback(writeAliasCallback)
 		}
+	}
 
-		if b.Config.Template == nil || (b.Config.Template != nil && b.Config.Template.Enabled()) {
+	return nil
+}
 
-			// load template through callback to make sure it is also loaded
-			// on reconnecting
-			callback, err := b.templateLoadingCallback()
-			if err != nil {
-				return err
-			}
-			elasticsearch.RegisterConnectCallback(callback)
-		} else if b.Config.ILM.Enabled() {
-			return errors.New("templates cannot be disable when using ILM")
-		}
+func (b *Beat) prepareILMTemplate(ilmCfg *ilmConfig) error {
+	// In case no template settings are set, config must be created
+	if b.Config.Template == nil {
+		b.Config.Template = common.NewConfig()
+	}
+	// Template name and pattern can't be configure when using ILM
+	logp.Info("Set setup.template.name to '%s' as ILM is enabled.", ilmCfg.RolloverAlias)
+	err := b.Config.Template.SetString("name", -1, ilmCfg.RolloverAlias)
+	if err != nil {
+		return errw.Wrap(err, "error setting setup.template.name")
+	}
+	pattern := fmt.Sprintf("%s-*", ilmCfg.RolloverAlias)
+	logp.Info("Set setup.template.pattern to '%s' as ILM is enabled.", pattern)
+	err = b.Config.Template.SetString("pattern", -1, pattern)
+	if err != nil {
+		return errw.Wrap(err, "error setting setup.template.pattern")
+	}
+
+	// rollover_alias and lifecycle.name can't be configured and will be overwritten
+	logp.Info("Set settings.index.lifecycle.rollover_alias in template to %s as ILM is enabled.", ilmCfg.RolloverAlias)
+	err = b.Config.Template.SetString("settings.index.lifecycle.rollover_alias", -1, ilmCfg.RolloverAlias)
+	if err != nil {
+		return errw.Wrap(err, "error setting settings.index.lifecycle.rollover_alias")
+	}
+	logp.Info("Set settings.index.lifecycle.name in template to %s as ILM is enabled.", ILMPolicyName)
+	err = b.Config.Template.SetString("settings.index.lifecycle.name", -1, ILMPolicyName)
+	if err != nil {
+		return errw.Wrap(err, "error setting settings.index.lifecycle.name")
 	}
 
 	return nil
@@ -862,6 +886,8 @@ func (b *Beat) templateLoadingCallback() (func(esClient *elasticsearch.Client) e
 		if err != nil {
 			return fmt.Errorf("Error loading Elasticsearch template: %v", err)
 		}
+
+		logp.Info("Template successfully loaded.")
 
 		return nil
 	}
@@ -895,7 +921,7 @@ func logSystemInfo(info beat.Info) {
 	// Beat
 	beat := common.MapStr{
 		"type": info.Beat,
-		"uuid": info.UUID,
+		"uuid": info.ID,
 		"path": common.MapStr{
 			"config": paths.Resolve(paths.Config, ""),
 			"data":   paths.Resolve(paths.Data, ""),

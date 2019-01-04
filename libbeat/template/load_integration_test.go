@@ -356,7 +356,7 @@ func TestTemplateWithData(t *testing.T) {
 	assert.True(t, loader.CheckTemplate(tmpl.GetName()))
 
 	for _, test := range dataTests {
-		_, _, err = client.Index(tmpl.GetName(), "doc", "", nil, test.data)
+		_, _, err = client.Index(tmpl.GetName(), "_doc", "", nil, test.data)
 		if test.error {
 			assert.NotNil(t, err)
 
@@ -395,13 +395,7 @@ func getTemplate(t *testing.T, client ESClient, templateName string) testTemplat
 }
 
 func (tt *testTemplate) SourceEnabled() bool {
-	docType := "_doc"
-	major := tt.client.GetVersion().Major
-	if major < 7 {
-		docType = "doc"
-	}
-
-	key := fmt.Sprintf("mappings.%v._source.enabled", docType)
+	key := fmt.Sprintf("mappings._doc._source.enabled")
 
 	// _source.enabled is true if it's missing (default)
 	b, _ := tt.HasKey(key)

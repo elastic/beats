@@ -81,12 +81,17 @@ func Load(
 			Event: config.EventMetadata,
 			Builtin: common.MapStr{
 				"agent": common.MapStr{
-					"type":     beatInfo.Beat,
-					"hostname": beatInfo.Hostname,
-					"version":  beatInfo.Version,
+					"type":         beatInfo.Beat,
+					"hostname":     beatInfo.Hostname,
+					"version":      beatInfo.Version,
+					"id":           beatInfo.ID.String(),
+					"ephemeral_id": beatInfo.EphemeralID.String(),
 				},
 				"host": common.MapStr{
 					"name": name,
+				},
+				"ecs": common.MapStr{
+					"version": "1.0.0-beta2",
 				},
 			},
 		},

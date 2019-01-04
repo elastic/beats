@@ -20,7 +20,12 @@
 package main
 
 import (
+	"fmt"
 	"path/filepath"
+
+	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
+	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/dev-tools/mage"
 )
@@ -66,6 +71,27 @@ func PackageBeatDashboards() error {
 	}
 
 	return mage.PackageZip(spec.Evaluate())
+}
+
+// Fmt formats code and adds license headers.
+func Fmt() {
+	mg.Deps(mage.GoImports, mage.PythonAutopep8)
+	mg.Deps(addLicenseHeaders)
+}
+
+// addLicenseHeaders adds ASL2 headers to .go files outside of x-pack and
+// add Elastic headers to .go files in x-pack.
+func addLicenseHeaders() error {
+	fmt.Println(">> fmt - go-licenser: Adding missing headers")
+
+	if err := sh.Run("go", "get", mage.GoLicenserImportPath); err != nil {
+		return err
+	}
+
+	return multierr.Combine(
+		sh.RunV("go-licenser", "-license", "ASL2", "-exclude", "x-pack"),
+		sh.RunV("go-licenser", "-license", "Elastic", "x-pack"),
+	)
 }
 
 // DumpVariables writes the template variables and values to stdout.

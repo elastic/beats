@@ -57,6 +57,7 @@ metricbeat.modules:
     - process         # Per process metrics
     - process_summary # Process summary
     - uptime          # System Uptime
+    - socket_summary  # Socket summary
     #- core           # Per CPU core usage
     #- diskio         # Disk IO
     #- filesystem     # File system usage for each mountpoint
@@ -226,14 +227,6 @@ metricbeat.modules:
   metricsets: ["leader", "self", "store"]
   period: 10s
   hosts: ["localhost:2379"]
-
-#--------------------------------- Foo Module ---------------------------------
-- module: foo
-  metricsets: ["bar"]
-  enabled: false
-  period: 10s
-  hosts: ["localhost"]
-
 
 #-------------------------------- Golang Module --------------------------------
 - module: golang
@@ -492,6 +485,14 @@ metricbeat.modules:
 
   # Password to use when connecting to MongoDB. Empty by default.
   #password: pass
+
+#-------------------------------- Mssql Module --------------------------------
+- module: mssql
+  metricsets:
+    - "db"
+  hosts: ["sqlserver://sa@localhost"]
+  period: 10s
+
 
 #-------------------------------- Munin Module --------------------------------
 - module: munin
@@ -872,6 +873,7 @@ metricbeat.modules:
 #    match_source_index: 4
 #    match_short_id: false
 #    cleanup_timeout: 60
+#    labels.dedot: false
 #    # To connect to Docker over TLS you must specify a client and CA certificate.
 #    #ssl:
 #    #  certificate_authority: "/etc/pki/root/ca.pem"

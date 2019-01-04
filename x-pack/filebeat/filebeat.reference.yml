@@ -92,6 +92,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
+    #var.convert_timezone: false
+
   gc:
     enabled: true
     # Set custom paths for the log files. If left empty,
@@ -104,17 +107,27 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
+    #var.convert_timezone: false
+
   slowlog:
     enabled: true
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
+    #var.convert_timezone: false
+
   deprecation:
     enabled: true
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
+    #var.convert_timezone: false
+
 
 #------------------------------- Haproxy Module -------------------------------
 - module: haproxy
@@ -350,6 +363,14 @@ filebeat.modules:
 
     # Optional, the password to use when connecting to Redis.
     #var.password:
+
+#----------------------------- Google Santa Module -----------------------------
+- module: santa
+  log:
+    enabled: true
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the the default path.
+    #var.paths:
 
 #------------------------------- Suricata Module -------------------------------
 - module: suricata
@@ -739,6 +760,30 @@ filebeat.inputs:
   #  ids:
   #    - '*'
 
+#------------------------------ NetFlow input --------------------------------
+# Experimental: Config options for the Netflow/IPFIX collector over UDP input
+#- type: netflow
+  #enabled: false
+
+  # Address where the NetFlow Collector will bind
+  #host: ":2055"
+
+  # Maximum size of the message received over UDP
+  #max_message_size: 10KiB
+
+  # List of enabled protocols.
+  # Valid values are 'v1', 'v5', 'v6', 'v7', 'v8', 'v9' and 'ipfix'
+  #protocols: [ v5, v9, ipfix ]
+
+  # Expiration timeout
+  # This is the time before an idle session or unused template is expired.
+  # Only applicable to v9 and ipfix protocols. A value of zero disables expiration.
+  #expiration_timeout: 30m
+
+  # Queue size limits the number of netflow packets that are queued awaiting
+  # processing.
+  #queue_size: 8192
+
 #========================== Filebeat autodiscover ==============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules
@@ -975,6 +1020,7 @@ filebeat.inputs:
 #    match_source_index: 4
 #    match_short_id: false
 #    cleanup_timeout: 60
+#    labels.dedot: false
 #    # To connect to Docker over TLS you must specify a client and CA certificate.
 #    #ssl:
 #    #  certificate_authority: "/etc/pki/root/ca.pem"
