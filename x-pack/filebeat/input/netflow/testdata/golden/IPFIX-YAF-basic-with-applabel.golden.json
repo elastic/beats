@@ -19,7 +19,7 @@
           "kind": "event"
         },
         "flow": {
-          "id": "_tbAAnwoAu8",
+          "id": "QMH_S2K9KdI",
           "locality": "private"
         },
         "netflow": {
@@ -54,7 +54,7 @@
         },
         "network": {
           "bytes": 532,
-          "community_id": "1:gQfwC1pqdEJoyqjxe8la2a1bW6g=",
+          "community_id": "1:3NQ+f2IICsvUP3F8oQM9Js9FO6Q=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 6,
@@ -91,7 +91,7 @@
           "kind": "event"
         },
         "flow": {
-          "id": "qznEzwF6uiM",
+          "id": "YlvEOsG0NHc",
           "locality": "private"
         },
         "netflow": {
@@ -132,7 +132,7 @@
         },
         "network": {
           "bytes": 356,
-          "community_id": "1:/MUy9fW9u7vMDGqxcZLVrZX0ARU=",
+          "community_id": "1:H1pHO7CtjIP7Q5Rljq4l4EH1wf4=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 8,

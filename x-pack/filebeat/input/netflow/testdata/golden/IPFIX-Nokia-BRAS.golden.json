@@ -17,7 +17,7 @@
           "kind": "event"
         },
         "flow": {
-          "id": "VHOuRvMCrLs",
+          "id": "aVnWxMM8qxI",
           "locality": "private"
         },
         "netflow": {
@@ -42,7 +42,7 @@
           "type": "netflow_flow"
         },
         "network": {
-          "community_id": "1:JOQeKrnZDhP8AqJv8DtyiRwHnek=",
+          "community_id": "1:WBN/ZleczX2flsJWsHfNA7w+NGg=",
           "direction": "unknown",
           "iana_number": 6,
           "transport": "tcp"
