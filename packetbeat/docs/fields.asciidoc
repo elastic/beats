@@ -6443,7 +6443,7 @@ type: keyword
 
 example: OK
 
-SIP Response , status phrase
+SIP Response, status phrase
 
 
 --
