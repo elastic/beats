@@ -12,8 +12,8 @@ import (
 	"encoding/gob"
 	"fmt"
 	"io"
+	"os/user"
 	"runtime"
-	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -105,19 +105,13 @@ type User struct {
 	PasswordType     passwordType
 	PasswordChanged  time.Time
 	PasswordHashHash []byte
-	UID              uint32
-	GID              uint32
-	Groups           []Group
+	UID              string
+	GID              string
+	Groups           []*user.Group
 	UserInfo         string
 	Dir              string
 	Shell            string
 	Action           string
-}
-
-// Group contains information about a group.
-type Group struct {
-	Name string
-	GID  uint32
 }
 
 // Hash creates a hash for User.
@@ -128,14 +122,14 @@ func (user User) Hash() uint64 {
 	binary.Write(h, binary.BigEndian, uint8(user.PasswordType))
 	h.WriteString(user.PasswordChanged.String())
 	h.Write(user.PasswordHashHash)
-	h.WriteString(strconv.Itoa(int(user.UID)))
-	h.WriteString(strconv.Itoa(int(user.GID)))
+	h.WriteString(user.UID)
+	h.WriteString(user.GID)
 	h.WriteString(user.Dir)
 	h.WriteString(user.Shell)
 
 	for _, group := range user.Groups {
 		h.WriteString(group.Name)
-		h.WriteString(strconv.Itoa(int(group.GID)))
+		h.WriteString(group.Gid)
 	}
 
 	return h.Sum64()
@@ -167,7 +161,7 @@ func (user User) toMapStr() common.MapStr {
 		for _, group := range user.Groups {
 			groupMapStr = append(groupMapStr, common.MapStr{
 				"name": group.Name,
-				"gid":  group.GID,
+				"gid":  group.Gid,
 			})
 		}
 		evt.Put("group", groupMapStr)
@@ -347,7 +341,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 
 	if len(newInCache) > 0 && len(missingFromCache) > 0 {
 		// Check for changes to users
-		missingUserMap := make(map[uint32](*User))
+		missingUserMap := make(map[string](*User))
 		for _, missingUser := range missingFromCache {
 			missingUserMap[missingUser.(*User).UID] = missingUser.(*User)
 		}
@@ -441,7 +435,7 @@ func userMessage(user *User, action eventAction) string {
 		actionString, user.Name, user.UID, fmtGroups(user.Groups))
 }
 
-func fmtGroups(groups []Group) string {
+func fmtGroups(groups []*user.Group) string {
 	var b strings.Builder
 
 	b.WriteString(groups[0].Name)
