@@ -22,7 +22,6 @@ class Test(AuditbeatXPackTest):
         self.check_metricset("system", "host", COMMON_FIELDS + fields, warnings_allowed=True)
 
     @unittest.skipIf(sys.platform == "darwin" and os.geteuid != 0, "Requires root on macOS")
-    @unittest.skipIf(sys.platform == "win32", "Fails on Windows - https://github.com/elastic/beats/issues/9748")
     def test_metricset_process(self):
         """
         process metricset collects information about processes running on a system.
