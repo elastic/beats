@@ -198,6 +198,18 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 		ecsSource["mac"] = mac
 	}
 
+	// ECS Fields -- destination
+	if ip, found := getKeyIP(flow.Fields, "destinationIPv4Address"); found {
+		ecsDest["ip"] = ip
+		ecsDest["locality"] = getIPLocality(ip).String()
+	}
+	if destPort, found := getKeyUint64(flow.Fields, "destinationTransportPort"); found {
+		ecsDest["port"] = destPort
+	}
+	if mac, found := getKeyString(flow.Fields, "destinationMacAddress"); found {
+		ecsDest["mac"] = mac
+	}
+
 	// ECS Fields -- Flow
 	ecsFlow := common.MapStr{}
 	var srcIP, dstIP net.IP
@@ -226,18 +238,6 @@ func flowToBeatEvent(flow record.Record) (event beat.Event) {
 	}
 	ecsFlow["id"] = flowID(srcIP, dstIP, srcPort, dstPort, uint8(protocol))
 	ecsFlow["locality"] = getIPLocality(srcIP, dstIP).String()
-
-	// ECS Fields -- destination
-	if ip, found := getKeyIP(flow.Fields, "destinationIPv4Address"); found {
-		ecsDest["ip"] = ip
-		ecsDest["locality"] = getIPLocality(ip).String()
-	}
-	if destPort, found := getKeyUint64(flow.Fields, "destinationTransportPort"); found {
-		ecsDest["port"] = destPort
-	}
-	if mac, found := getKeyString(flow.Fields, "destinationMacAddress"); found {
-		ecsDest["mac"] = mac
-	}
 
 	// ECS Fields -- network
 	ecsNetwork := common.MapStr{}
