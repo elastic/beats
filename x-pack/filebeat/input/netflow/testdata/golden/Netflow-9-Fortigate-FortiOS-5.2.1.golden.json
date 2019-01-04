@@ -55,8 +55,8 @@
           "kind": "event"
         },
         "flow": {
-          "id": "jJrTIsjNw1M",
-          "locality": "private"
+          "id": "SKsZNpZob60",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "31.13.87.36",
@@ -83,7 +83,7 @@
         },
         "network": {
           "bytes": 152,
-          "community_id": "1:tYgSz6Xox1AUTy0tyztkJXZmiIQ=",
+          "community_id": "1:/WRdjqoOaqvaSKG3KADN7XCzjYI=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 3,
