@@ -122,6 +122,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
+- Close handle on signalEvent. {pull}9838[9838]
+
 *Functionbeat*
 
 ==== Known Issue
