@@ -51,7 +51,7 @@ import (
 
 var (
 	sizeofPdhCounterValueItem = (int)(unsafe.Sizeof(pdhCounterValueItem{}))
-	wildcardRegexp            = regexp.MustCompile(`.*\(\*\).*`)
+	wildcardRegexp            = regexp.MustCompile(`.*\(.*\*.*\).*|.*\(.*\)\\.*\*.*`)
 	instanceNameRegexp        = regexp.MustCompile(`.*\((.*)\).*`)
 	objectNameRegexp          = regexp.MustCompile(`\\([^\\]+)\\`)
 )
@@ -390,11 +390,6 @@ func NewPerfmonReader(config Config) (*PerfmonReader, error) {
 		values, err := PdhExpandWildCardPath(counter.Query)
 		if err != nil {
 			return nil, PdhErrno(err.(syscall.Errno))
-		}
-
-		// Add query manually if no wildcard is specified
-		if len(values) <= 0 {
-			values = append(values, counter.Query)
 		}
 
 		for _, v := range values {
