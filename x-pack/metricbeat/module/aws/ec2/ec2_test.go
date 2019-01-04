@@ -15,7 +15,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
@@ -158,30 +157,9 @@ func TestMockFetch(t *testing.T) {
 
 	assert.Equal(t, 2, len(events))
 	for _, event := range events {
-		// RootField
-		CheckRootField("service.name", event, t)
-		CheckRootField("cloud.availability_zone", event, t)
-		CheckRootField("cloud.provider", event, t)
-		CheckRootField("cloud.image.id", event, t)
-		CheckRootField("cloud.instance.id", event, t)
-		CheckRootField("cloud.machine.type", event, t)
-		CheckRootField("cloud.provider", event, t)
-		CheckRootField("cloud.region", event, t)
 		// MetricSetField
 		cpuTotalPct, err := event.MetricSetFields.GetValue("cpu.total.pct")
 		assert.NoError(t, err)
 		assert.Equal(t, 0.25, cpuTotalPct)
-	}
-}
-
-func CheckRootField(fieldName string, event mb.Event, t *testing.T) {
-	if ok, err := event.RootFields.HasKey(fieldName); ok {
-		assert.NoError(t, err)
-		metricValue, err := event.RootFields.GetValue(fieldName)
-		assert.NoError(t, err)
-		if userString, ok := metricValue.(string); !ok {
-			fmt.Println("Field "+fieldName+" is not a string: ", userString)
-			t.Fail()
-		}
 	}
 }

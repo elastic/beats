@@ -5,6 +5,7 @@
 package ec2
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
@@ -206,18 +207,21 @@ func reportCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 	putRootFieldsInEvent(event, "cloud.image.id", *instanceOutput.ImageId, report)
 	putRootFieldsInEvent(event, "cloud.region", regionName, report)
 
-	event.MetricSetFields = common.MapStr{}
+	mapOfResults := make(map[string]interface{})
 	for _, output := range getMetricDataOutput.MetricDataResults {
 		if len(output.Values) == 0 {
 			continue
 		}
-		_, err = event.MetricSetFields.Put(metricIDNameMap[*output.Id], output.Values[0])
-		if err != nil {
-			err = errors.Wrap(err, "event.MetricSetFields.Put failed")
-			logp.Error(err)
-		}
+		metricKey := metricIDNameMap[*output.Id]
+		mapOfResults[metricKey] = fmt.Sprint(output.Values[0])
 	}
-	report.Event(event)
+	result, err := eventMapping(mapOfResults)
+	if err != nil {
+		err = errors.Wrap(err, "Error trying to apply schema in AWS EC2 metricbeat module.")
+		logp.Error(err)
+		report.Error(err)
+	}
+	report.Event(mb.Event{MetricSetFields: result})
 }
 
 func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instancesOutputs map[string]ec2.Instance, err error) {

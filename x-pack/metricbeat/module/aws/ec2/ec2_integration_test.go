@@ -56,14 +56,14 @@ func TestFetch(t *testing.T) {
 
 		for _, event := range events {
 			// RootField
-			CheckRootField("service.name", event, t)
-			CheckRootField("cloud.availability_zone", event, t)
-			CheckRootField("cloud.provider", event, t)
-			CheckRootField("cloud.image.id", event, t)
-			CheckRootField("cloud.instance.id", event, t)
-			CheckRootField("cloud.machine.type", event, t)
-			CheckRootField("cloud.provider", event, t)
-			CheckRootField("cloud.region", event, t)
+			checkRootField("service.name", event, t)
+			checkRootField("cloud.availability_zone", event, t)
+			checkRootField("cloud.provider", event, t)
+			checkRootField("cloud.image.id", event, t)
+			checkRootField("cloud.instance.id", event, t)
+			checkRootField("cloud.machine.type", event, t)
+			checkRootField("cloud.provider", event, t)
+			checkRootField("cloud.region", event, t)
 			// MetricSetField
 			checkMetricSetField("cpu.total.pct", event, t)
 			checkMetricSetField("cpu.credit_usage", event, t)
@@ -101,6 +101,18 @@ func checkMetricSetField(metricName string, event mb.Event, t *testing.T) {
 		} else {
 			assert.True(t, userPercentFloat >= 0)
 			fmt.Println("succeed: userPercentFloat = ", userPercentFloat)
+		}
+	}
+}
+
+func checkRootField(fieldName string, event mb.Event, t *testing.T) {
+	if ok, err := event.RootFields.HasKey(fieldName); ok {
+		assert.NoError(t, err)
+		metricValue, err := event.RootFields.GetValue(fieldName)
+		assert.NoError(t, err)
+		if userString, ok := metricValue.(string); !ok {
+			fmt.Println("Field "+fieldName+" is not a string: ", userString)
+			t.Fail()
 		}
 	}
 }
