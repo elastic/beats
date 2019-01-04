@@ -366,6 +366,10 @@ specs:
       spec:
         <<: *macos_beat_pkg_spec
         <<: *elastic_license_for_macos_pkg
+        files:
+          /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/bin/{{.BeatName}}{{.BinaryExt}}:
+            mode: 0755
+            source: ../x-pack/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: linux
       types: [tgz]
