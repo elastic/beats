@@ -61,7 +61,7 @@ func New(config *Config, callback inputsource.NetworkFunc) *Server {
 func (u *Server) Start() error {
 	var err error
 
-	udpAdddr, _ := net.ResolveUDPAddr("udp", u.config.Host)
+	udpAdddr, err := net.ResolveUDPAddr("udp", u.config.Host)
 	u.Listener, err = net.ListenUDP("udp", udpAdddr)
 
 	socketSize := int(u.config.ReadBuffer) * humanize.KiByte
