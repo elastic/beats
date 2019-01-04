@@ -10,9 +10,13 @@
       fields:
         - name: metrics.server_id
           type: string
+          description: >
+            The server ID
         - name: metrics.now
           type: date
-        - name: metrics.num_routes
+          description: >
+            Server time of metric creation
+        - name: metrics.total
           type: integer
-        - name: metrics.routes
-          type: nested
+          description: >
+            The number of registered routes

@@ -8,19 +8,15 @@
       description: >
         Metrics of connz URI
       fields:
-        - name: metrics.num_subscriptions
+        - name: metrics.server_id
+          type: string
+          description: >
+            The server ID
+        - name: metrics.now
+          type: date
+          description: >
+            Server time of metric creation
+        - name: metrics.total
           type: integer
-        - name: metrics.num_cache
-          type: integer
-        - name: metrics.num_inserts
-          type: integer
-        - name: metrics.num_removes
-          type: integer
-        - name: metrics.num_matches
-          type: integer
-        - name: metrics.cache_hit_rate
-          type: integer
-        - name: metrics.max_fanout
-          type: integer
-        - name: metrics.avg_fanout
-          type: integer
+          description: >
+            The number of currently active clients

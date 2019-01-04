@@ -24,19 +24,45 @@ import (
 )
 
 type Subsz struct {
-	NumSubscriptions int `json:"num_subscriptions"`
-	NumCache         int `json:"num_cache"`
-	NumInserts       int `json:"num_inserts"`
-	NumRemoves       int `json:"num_removes"`
-	NumMatches       int `json:"num_matches"`
-	CacheHitRate     int `json:"cache_hit_rate"`
-	MaxFanout        int `json:"max_fanout"`
-	AvgFanout        int `json:"avg_fanout"`
+	NumSubscriptionsIn int `json:"num_subscriptions,omitempty"`
+	NumSubscriptions   int `json:"total"`
+	NumCacheIn         int `json:"num_cache,omitempty"`
+	NumCache           int `json:"cache.size"`
+	NumInsertsIn       int `json:"num_inserts,omitempty"`
+	NumInserts         int `json:"inserts"`
+	NumRemovesIn       int `json:"num_removes,omitempty"`
+	NumRemoves         int `json:"removes"`
+	NumMatchesIn       int `json:"num_matches,omitempty"`
+	NumMatches         int `json:"matches"`
+	CacheHitRateIn     int `json:"cache_hit_rate,omitempty"`
+	CacheHitRate       int `json:"cache.hit_rate"`
+	MaxFanoutIn        int `json:"max_fanout,omitempty"`
+	MaxFanout          int `json:"cache.fanout.max"`
+	AvgFanoutIn        int `json:"avg_fanout,omitempty"`
+	AvgFanout          int `json:"cache.fanout.avg"`
 }
 
 func eventMapping(content []byte) common.MapStr {
 	var data Subsz
 	json.Unmarshal(content, &data)
+
+	data.NumSubscriptions = data.NumSubscriptionsIn
+	data.NumSubscriptionsIn = 0
+	data.NumCache = data.NumCacheIn
+	data.NumCacheIn = 0
+	data.NumInserts = data.NumInsertsIn
+	data.NumInsertsIn = 0
+	data.NumRemoves = data.NumRemovesIn
+	data.NumRemovesIn = 0
+	data.NumMatches = data.NumMatchesIn
+	data.NumMatchesIn = 0
+	data.CacheHitRate = data.CacheHitRateIn
+	data.CacheHitRateIn = 0
+	data.MaxFanout = data.MaxFanoutIn
+	data.MaxFanoutIn = 0
+	data.AvgFanout = data.AvgFanoutIn
+	data.AvgFanoutIn = 0
+
 	// TODO: add error handling
 	event := common.MapStr{
 		"metrics": data,

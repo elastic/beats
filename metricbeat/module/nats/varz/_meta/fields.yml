@@ -10,79 +10,57 @@
       fields:
         - name: metrics.server_id
           type: string
-        - name: metrics.version
-          type: string
-        - name: metrics.proto
-          type: integer
-        - name: metrics.git_commit
-          type: string
-        - name: metrics.go
-          type: string
-        - name: metrics.host
-          type: string
-        - name: metrics.addr
-          type: string
-        - name: metrics.max_connections
-          type: integer
-        - name: metrics.ping_interval
-          type: integer
-        - name: metrics.ping_max
-          type: integer
-        - name: metrics.http_host
-          type: string
-        - name: metrics.http_port
-          type: integer
-        - name: metrics.https_port
-          type: integer
-        - name: metrics.auth_timeout
-          type: integer
-        - name: metrics.max_control_line
-          type: integer
-        - name: metrics.cluster
-          type: object
-        - name: metrics.tls_timeout
-          type: float
-        - name: metrics.port
-          type: integer
-        - name: metrics.max_payload
-          type: integer
-        - name: metrics.start
-          type: date
+          description: >
+            The server ID
         - name: metrics.now
           type: date
+          description: >
+            Server time of metric creation
         - name: metrics.uptime
           type: string
+          description: >
+            The period the server is up
         - name: metrics.mem
           type: integer
+          description: >
+            The current memory usage of NATS process
         - name: metrics.cores
           type: integer
+          description: >
+            The number of logical cores the NATS process runs on
         - name: metrics.cpu
           type: integer
-        - name: metrics.connections
-          type: integer
+          description: >
+            The current cpu usage of NATs process
         - name: metrics.total_connections
           type: integer
-        - name: metrics.routes
-          type: integer
+          description: >
+            The number of totally created clients
         - name: metrics.remotes
           type: integer
-        - name: metrics.in_msgs
+          description: >
+            The number of registered remotes
+        - name: metrics.msgs.in
           type: integer
-        - name: metrics.out_msgs
+          description: >
+            The amount of incoming messages
+        - name: metrics.msgs.out
           type: integer
-        - name: metrics.in_bytes
+          description: >
+            The amount of outgoing messages
+        - name: metrics.bytes.in
           type: integer
-        - name: metrics.out_bytes
+          description: >
+            The amount of incoming bytes
+        - name: metrics.bytes.out
           type: integer
+          description: >
+            The amount of outgoing bytes
         - name: metrics.slow_consumers
           type: integer
-        - name: metrics.max_pending
-          type: integer
-        - name: metrics.write_deadline
-          type: integer
-        - name: metrics.subscriptions
-          type: integer
+          description: >
+            The number of slow consumers currently on NATS
         - name: metrics.http_req_stats
           type: object
-        - name: metrics.config_load_time
-          type: date
+          description: >
+            TODO: Change this metric to a meaningful one

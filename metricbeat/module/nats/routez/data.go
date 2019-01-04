@@ -25,15 +25,19 @@ import (
 )
 
 type Routez struct {
-	ServerID  string        `json:"server_id"`
-	Now       time.Time     `json:"now"`
-	NumRoutes int           `json:"num_routes"`
-	Routes    []interface{} `json:"routes"`
+	ServerID    string    `json:"server_id"`
+	Now         time.Time `json:"now"`
+	NumRoutesIn int       `json:"num_routes,omitempty"`
+	NumRoutes   int       `json:"total"`
 }
 
 func eventMapping(content []byte) common.MapStr {
 	var data Routez
 	json.Unmarshal(content, &data)
+
+	data.NumRoutes = data.NumRoutesIn
+	data.NumRoutesIn = 0
+
 	// TODO: add error handling
 	event := common.MapStr{
 		"metrics": data,
