@@ -33,7 +33,7 @@
       fields:
       - name: action
         description: >
-          The SSH action. Can be one of "Accepted" or "Failed".
+          The SSH action. Can be one of "Accepted", "Failed", "Invalid".
       - name: method
         description: >
           The SSH authentication method. Can be one of "password" or "publickey".
