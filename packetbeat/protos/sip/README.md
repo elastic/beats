@@ -1,5 +1,5 @@
 # SIP(Session Initiation Protocol) for packetbeat
-The SIP(Session Initiation Protocol) is a communications protocol for signaling and controlling multimedia communication sessions. SIP is used many VoIP applications at not only enterprise uses but also telecom careers.
+The SIP(Session Initiation Protocol) is a communications protocol for signaling and controlling multimedia communication sessions. SIP is used many VoIP applications at not only enterprise uses but also telecom carriers.
 
 SIP is text-base protocol like HTTP. But SIP has various unique features like :
 - SIP is server-client model, but it roles may changes call by call.
