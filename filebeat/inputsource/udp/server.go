@@ -24,6 +24,7 @@ import (
 	"sync"
 	"time"
 
+	humanize "github.com/dustin/go-humanize"
 	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -40,7 +41,7 @@ const windowErrBuffer = "A message sent on a datagram socket was larger than the
 type Server struct {
 	config   *Config
 	callback inputsource.NetworkFunc
-	Listener net.PacketConn
+	Listener *net.UDPConn
 	log      *logp.Logger
 	wg       sync.WaitGroup
 	done     chan struct{}
@@ -59,7 +60,16 @@ func New(config *Config, callback inputsource.NetworkFunc) *Server {
 // Start starts the UDP Server and listen to incoming events.
 func (u *Server) Start() error {
 	var err error
-	u.Listener, err = net.ListenPacket("udp", u.config.Host)
+
+	udpAdddr, _ := net.ResolveUDPAddr("udp", u.config.Host)
+	u.Listener, err = net.ListenUDP("udp", udpAdddr)
+
+	socketSize := int(u.config.ReadBuffer) * humanize.KiByte
+
+	if socketSize != 0 {
+		err = u.Listener.SetReadBuffer(socketSize)
+	}
+
 	if err != nil {
 		return err
 	}
