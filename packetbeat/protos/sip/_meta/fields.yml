@@ -23,7 +23,7 @@
         - name: status-phrase
           type: keyword
           description: >
-            SIP Response , status phrase
+            SIP Response, status phrase
           example: OK
         - name: from
           type: keyword
