@@ -20,8 +20,8 @@
           "start": "2018-01-16T09:44:47Z"
         },
         "flow": {
-          "id": "sjsTHOXy2lQ",
-          "locality": "private"
+          "id": "tS3zN7t_rFg",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "80.82.237.40",
@@ -52,7 +52,7 @@
         },
         "network": {
           "bytes": 52,
-          "community_id": "1:4iAaWV/HzvAcwggo1MJCfjvj8No=",
+          "community_id": "1:V19XLX+69Hp20cyrswTBva1s5MM=",
           "direction": "inbound",
           "iana_number": 6,
           "packets": 1,

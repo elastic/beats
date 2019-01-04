@@ -18,8 +18,8 @@
           "kind": "event"
         },
         "flow": {
-          "id": "xrwrnNR_Xgs",
-          "locality": "private"
+          "id": "kSpZ1WuBhjc",
+          "locality": "public"
         },
         "netflow": {
           "audit_counter": 4157725,
@@ -61,7 +61,7 @@
         },
         "network": {
           "bytes": 0,
-          "community_id": "1:hxVadzb8UUZ5YGGYtqj+E2mpQe8=",
+          "community_id": "1:3g7/10xslZq/7OW7ucdoDYgE3IY=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 0,
@@ -96,7 +96,7 @@
           "kind": "event"
         },
         "flow": {
-          "id": "7BBLL0QpIjw",
+          "id": "kSpZ1WuBhjc",
           "locality": "public"
         },
         "netflow": {
@@ -139,7 +139,7 @@
         },
         "network": {
           "bytes": 0,
-          "community_id": "1:4oQU8uYa7F7RE/lIflbJOuU8Vc8=",
+          "community_id": "1:3g7/10xslZq/7OW7ucdoDYgE3IY=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 0,
