@@ -12004,6 +12004,14 @@ alias to: user.name
 --
 
 
+*`system.auth.ssh.action`*::
++
+--
+The SSH action. Can be one of "Accepted" or "Failed".
+
+
+--
+
 *`system.auth.ssh.method`*::
 +
 --

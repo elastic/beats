@@ -1,8 +1,9 @@
 [
     {
         "ecs.version": "1.0.0-beta2",
-        "event.action": "Accepted",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "localhost",
@@ -13,14 +14,16 @@
         "process.pid": 3402,
         "source.ip": "10.0.2.2",
         "source.port": 63673,
+        "system.auth.ssh.action": "Accepted",
         "system.auth.ssh.method": "publickey",
         "system.auth.ssh.signature": "RSA 39:33:99:e9:a0:dc:f2:33:a3:e5:72:3b:7c:3a:56:84",
         "user.name": "vagrant"
     },
     {
         "ecs.version": "1.0.0-beta2",
-        "event.action": "Accepted",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "localhost",
@@ -31,13 +34,15 @@
         "process.pid": 7483,
         "source.ip": "192.168.33.1",
         "source.port": 58803,
+        "system.auth.ssh.action": "Accepted",
         "system.auth.ssh.method": "password",
         "user.name": "vagrant"
     },
     {
         "ecs.version": "1.0.0-beta2",
-        "event.action": "Failed",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "slave22",
@@ -54,12 +59,14 @@
         "source.geo.region_name": "Guangdong",
         "source.ip": "116.31.116.24",
         "source.port": 29160,
+        "system.auth.ssh.action": "Failed",
         "system.auth.ssh.method": "password",
         "user.name": "root"
     },
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -76,6 +83,7 @@
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -87,6 +95,7 @@
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -97,7 +106,9 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "slave22",
@@ -116,6 +127,7 @@
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "localhost",
@@ -132,6 +144,7 @@
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "precise32",
@@ -149,6 +162,7 @@
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "group.id": 48,
@@ -163,6 +177,7 @@
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "group.id": 48,
@@ -179,8 +194,9 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
-        "event.action": "Accepted",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -191,13 +207,16 @@
         "process.pid": 2124,
         "source.ip": "10.0.2.2",
         "source.port": 64484,
+        "system.auth.ssh.action": "Accepted",
         "system.auth.ssh.method": "publickey",
         "system.auth.ssh.signature": "RSA SHA256:sKpJLT3xGfw7fCcOslGbKVMyIm+2MbYVCqVkV5a1zeQ",
         "user.name": "vagrant"
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -210,6 +229,7 @@
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -221,6 +241,7 @@
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -232,7 +253,9 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -244,7 +267,9 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -256,7 +281,9 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -269,6 +296,7 @@
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -281,6 +309,7 @@
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -292,6 +321,7 @@
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -304,6 +334,7 @@
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -316,6 +347,7 @@
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -328,6 +360,7 @@
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -339,7 +372,9 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -351,7 +386,9 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -363,7 +400,9 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -376,6 +415,7 @@
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -386,8 +426,9 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
-        "event.action": "Invalid",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -397,11 +438,14 @@
         "process.name": "sshd",
         "process.pid": 9356,
         "source.ip": "10.0.2.2",
+        "system.auth.ssh.action": "Invalid",
         "user.name": "mat"
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
@@ -413,7 +457,9 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
+        "event.category": "authentication",
         "event.dataset": "system.auth",
+        "event.kind": "event",
         "event.module": "system",
         "fileset.name": "auth",
         "host.hostname": "ubuntu-xenial",
