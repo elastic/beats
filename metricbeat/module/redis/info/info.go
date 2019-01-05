@@ -20,7 +20,6 @@ package info
 import (
 	"strconv"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -53,11 +52,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches metrics from Redis by issuing the INFO command.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	// Fetch default INFO.
 	info, err := redis.FetchRedisInfo("default", m.Connection())
 	if err != nil {
-		return nil, err
+		logp.Err("Failed to fetch redis info: %s", err)
+		r.Error(err)
+		return
 	}
 
 	// In 5.0 some fields are renamed, maintain both names, old ones will be deprecated
@@ -77,10 +78,12 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 
 	slowLogLength, err := redis.FetchSlowLogLength(m.Connection())
 	if err != nil {
-		return nil, err
+		logp.Err("Failed to fetch slow log length: %s", err)
+		r.Error(err)
+		return
 	}
 	info["slowlog_len"] = strconv.FormatInt(slowLogLength, 10)
 
 	debugf("Redis INFO from %s: %+v", m.Host(), info)
-	return eventMapping(info), nil
+	eventMapping(r, info)
 }

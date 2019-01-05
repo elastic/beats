@@ -40,13 +40,14 @@ var redisHost = redis.GetRedisEnvHost() + ":" + redis.GetRedisEnvPort()
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "redis")
 
-	f := mbtest.NewEventFetcher(t, getConfig(""))
-	event, err := f.Fetch()
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig(""))
+	events, err := mbtest.ReportingFetchV2(ms)
 	if err != nil {
 		t.Fatal("fetch", err)
 	}
+	event := events[0].MetricSetFields
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	t.Logf("%s/%s event: %+v", ms.Module().Name(), ms.Name(), event)
 
 	// Check fields
 	assert.Equal(t, 9, len(event))
@@ -57,14 +58,14 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "redis")
 
-	f := mbtest.NewEventFetcher(t, getConfig(""))
-
-	err := mbtest.WriteEvent(f, t)
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig(""))
+	err := mbtest.WriteEventsReporterV2(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}
 }
 
+// TODO: To be tested in the redis module
 func TestPasswords(t *testing.T) {
 	compose.EnsureUp(t, "redis")
 
@@ -82,23 +83,23 @@ func TestPasswords(t *testing.T) {
 	}
 
 	// Test Fetch metrics with missing password
-	f := mbtest.NewEventFetcher(t, getConfig(""))
-	_, err = f.Fetch()
-	if assert.Error(t, err, "missing password") {
-		assert.Contains(t, err, "NOAUTH Authentication required.")
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig(""))
+	_, errors := mbtest.ReportingFetchV2(ms)
+	if assert.NotEmpty(t, errors, "errors expected") && assert.Error(t, errors[0], "missing password") {
+		assert.Contains(t, errors[0], "NOAUTH Authentication required.")
 	}
 
 	// Config redis and metricset with an invalid password
-	f = mbtest.NewEventFetcher(t, getConfig("blah"))
-	_, err = f.Fetch()
-	if assert.Error(t, err, "invalid password") {
-		assert.Contains(t, err, "ERR invalid password")
+	ms = mbtest.NewReportingMetricSetV2(t, getConfig("blah"))
+	_, errors = mbtest.ReportingFetchV2(ms)
+	if assert.NotEmpty(t, errors, "errors expected") && assert.Error(t, errors[0], "invalid password") {
+		assert.Contains(t, errors[0], "ERR invalid password")
 	}
 
 	// Config redis and metricset with a valid password
-	f = mbtest.NewEventFetcher(t, getConfig(password))
-	_, err = f.Fetch()
-	assert.NoError(t, err, "valid password")
+	ms = mbtest.NewReportingMetricSetV2(t, getConfig(password))
+	_, errors = mbtest.ReportingFetchV2(ms)
+	assert.Empty(t, errors, "valid password")
 }
 
 // addPassword will add a password to redis.
