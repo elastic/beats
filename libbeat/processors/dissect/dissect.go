@@ -133,7 +133,7 @@ func (d *Dissector) resolve(s string, p positions) Map {
 		f.Apply(s[pos.start:pos.end], m)
 	}
 
-	for _, f := range d.parser.skipFields {
+	for _, f := range d.parser.referenceFields {
 		delete(m, f.Key())
 	}
 	return m
@@ -145,5 +145,10 @@ func New(tokenizer string) (*Dissector, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	if err := validate(p); err != nil {
+		return nil, err
+	}
+
 	return &Dissector{parser: p, raw: tokenizer}, nil
 }

@@ -22,10 +22,9 @@ import (
 	"io"
 	"math/rand"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
-
-	"strconv"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -356,6 +355,6 @@ func makeMeta(beat beat.Info) common.MapStr {
 		"version": beat.Version,
 		"name":    beat.Name,
 		"host":    beat.Hostname,
-		"uuid":    beat.UUID,
+		"uuid":    beat.ID,
 	}
 }

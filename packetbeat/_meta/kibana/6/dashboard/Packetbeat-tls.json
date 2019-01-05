@@ -447,7 +447,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "TLS version", 
-                                "field": "tls.server_hello.version", 
+                                "field": "tls.version", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -485,7 +485,7 @@
                     }
                 }, 
                 "savedSearchId": "8f0ff590-d37d-11e7-9914-4982455b3063", 
-                "title": "TLS Client Version", 
+                "title": "TLS Server Public Key Size", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -501,8 +501,8 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "customLabel": "Client version", 
-                                "field": "tls.client_hello.version", 
+                                "customLabel": "Public Key Size", 
+                                "field": "tls.server_certificate.public_key_size", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -518,7 +518,7 @@
                         "legendPosition": "right", 
                         "type": "pie"
                     }, 
-                    "title": "TLS Client Version", 
+                    "title": "Server Public Key Size", 
                     "type": "pie"
                 }
             }, 
@@ -1153,13 +1153,13 @@
                                     "store": "appState"
                                 }, 
                                 "exists": {
-                                    "field": "tls.server_hello.version"
+                                    "field": "tls.version"
                                 }, 
                                 "meta": {
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "packetbeat-*", 
-                                    "key": "tls.server_hello.version", 
+                                    "key": "tls.version", 
                                     "negate": false, 
                                     "type": "exists", 
                                     "value": "exists"
@@ -1207,13 +1207,13 @@
                                     "store": "appState"
                                 }, 
                                 "exists": {
-                                    "field": "tls.client_hello.version"
+                                    "field": "tls.server_certificate.public_key_size"
                                 }, 
                                 "meta": {
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "packetbeat-*", 
-                                    "key": "tls.client_hello.version", 
+                                    "key": "tls.server_certificate.public_key_size", 
                                     "negate": false, 
                                     "type": "exists", 
                                     "value": "exists"
@@ -1238,7 +1238,7 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "TLS Client Version", 
+                "title": "Server Public Key Size", 
                 "version": 1
             }, 
             "id": "8f0ff590-d37d-11e7-9914-4982455b3063", 

@@ -37,20 +37,19 @@ type IndexPatternGenerator struct {
 }
 
 // Create an instance of the Kibana Index Pattern Generator
-func NewGenerator(indexName, beatName, beatDir, beatVersion string, version common.Version) (*IndexPatternGenerator, error) {
+func NewGenerator(indexName, beatName, fieldsYAMLFile, outputDir, beatVersion string, version common.Version) (*IndexPatternGenerator, error) {
 	beatName = clean(beatName)
 
-	fieldsYaml := filepath.Join(beatDir, "fields.yml")
-	if _, err := os.Stat(fieldsYaml); err != nil {
+	if _, err := os.Stat(fieldsYAMLFile); err != nil {
 		return nil, err
 	}
 
 	return &IndexPatternGenerator{
 		indexName:      indexName,
-		fieldsYaml:     fieldsYaml,
+		fieldsYaml:     fieldsYAMLFile,
 		beatVersion:    beatVersion,
 		version:        version,
-		targetDir:      createTargetDir(beatDir, version),
+		targetDir:      createTargetDir(outputDir, version),
 		targetFilename: beatName + ".json",
 	}, nil
 }
@@ -169,9 +168,9 @@ func dumpToFile(f string, pattern common.MapStr) error {
 }
 
 func createTargetDir(baseDir string, version common.Version) string {
-	targetDir := filepath.Join(baseDir, "_meta", "kibana.generated", getVersionPath(version), "index-pattern")
+	targetDir := filepath.Join(baseDir, getVersionPath(version), "index-pattern")
 	if _, err := os.Stat(targetDir); os.IsNotExist(err) {
-		os.MkdirAll(targetDir, 0777)
+		os.MkdirAll(targetDir, 0755)
 	}
 	return targetDir
 }

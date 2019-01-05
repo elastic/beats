@@ -1,5 +1,4 @@
 from heartbeat import BaseTest
-import nose.tools
 import os
 
 
@@ -14,22 +13,22 @@ class Test(BaseTest):
         """
         server = self.start_server("hello world", 200)
         try:
-            self.setup()
+            self.setup_dynamic()
 
             cfg_file = "test.yml"
 
             self.write_dyn_config(
-                cfg_file, self.http_cfg("http://localhost:8185"))
+                cfg_file, self.http_cfg("http://localhost:{}".format(server.server_port)))
 
             self.wait_until(lambda: self.output_has(lines=1))
 
             self.assert_last_status("up")
 
             self.write_dyn_config(
-                cfg_file, self.http_cfg("http://localhost:8186"))
+                cfg_file, self.http_cfg("http://203.0.113.1:8186"))
 
             self.wait_until(lambda: self.last_output_line()[
-                            "http.url"] == "http://localhost:8186")
+                            "http.url"] == "http://203.0.113.1:8186")
 
             self.assert_last_status("down")
 
@@ -43,12 +42,12 @@ class Test(BaseTest):
         """
         server = self.start_server("hello world", 200)
         try:
-            self.setup()
+            self.setup_dynamic()
 
             cfg_file = "test.yml"
 
             self.write_dyn_config(
-                cfg_file, self.http_cfg("http://localhost:8185"))
+                cfg_file, self.http_cfg("http://localhost:{}".format(server.server_port)))
 
             self.wait_until(lambda: self.output_has(lines=2))
 
@@ -58,9 +57,9 @@ class Test(BaseTest):
 
             # Ensure the job was removed from the scheduler
             self.wait_until(lambda: self.log_contains(
-                "Remove scheduler job 'http@http://localhost:8185"))
+                "Remove scheduler job 'http@http://localhost:{}".format(server.server_port)))
             self.wait_until(lambda: self.log_contains(
-                "Job 'http@http://localhost:8185' returned"))
+                "Job 'http@http://localhost:{}' returned".format(server.server_port)))
 
             self.proc.check_kill_and_wait()
         finally:
@@ -70,7 +69,7 @@ class Test(BaseTest):
         """
         Test the addition of a dynamic config
         """
-        self.setup()
+        self.setup_dynamic()
 
         self.wait_until(lambda: self.log_contains(
             "Starting reload procedure, current runners: 0"))
@@ -78,7 +77,7 @@ class Test(BaseTest):
         server = self.start_server("hello world", 200)
         try:
             self.write_dyn_config(
-                "test.yml", self.http_cfg("http://localhost:8185"))
+                "test.yml", self.http_cfg("http://localhost:{}".format(server.server_port)))
 
             self.wait_until(lambda: self.log_contains(
                 "Starting reload procedure, current runners: 1"))
@@ -88,34 +87,3 @@ class Test(BaseTest):
             self.proc.check_kill_and_wait()
         finally:
             server.shutdown()
-
-    def setup(self):
-        os.mkdir(self.monitors_dir())
-        self.render_config_template(
-            reload=True,
-            reload_path=self.monitors_dir() + "*.yml",
-            flush_min_events=1,
-        )
-
-        self.proc = self.start_beat()
-
-    def write_dyn_config(self, filename, cfg):
-        with open(self.monitors_dir() + filename, 'w') as f:
-            f.write(cfg)
-
-    def monitors_dir(self):
-        return self.working_dir + "/monitors.d"
-
-    def assert_last_status(self, status):
-        nose.tools.eq_(self.last_output_line()["monitor.status"], status)
-
-    def last_output_line(self):
-        return self.read_output()[-1]
-
-    @staticmethod
-    def http_cfg(url):
-        return """
-- type: http
-  schedule: "@every 1s"
-  urls: ["{url}"]
-        """[1:-1].format(url=url)

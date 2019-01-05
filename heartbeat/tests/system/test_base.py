@@ -4,6 +4,7 @@ import unittest
 from heartbeat import BaseTest
 from elasticsearch import Elasticsearch
 from beat.beat import INTEGRATION_TESTS
+import nose.tools
 
 
 class Test(BaseTest):
@@ -130,3 +131,33 @@ class Test(BaseTest):
         assert exit_code == 0
         assert self.log_contains('Loaded index template')
         assert len(es.cat.templates(name='heartbeat-*', h='name')) > 0
+
+    def test_dataset(self):
+        """
+        Test that event.dataset is set to `uptime`
+        """
+        self.render_config_template(
+            monitors=[
+                {
+                    "type": "http",
+                    "urls": ["http://localhost:9200"]
+                },
+                {
+                    "type": "tcp",
+                    "hosts": ["localhost:9200"]
+                }
+            ]
+        )
+
+        try:
+            heartbeat_proc = self.start_beat()
+            self.wait_until(lambda: self.output_lines() >= 2)
+        finally:
+            heartbeat_proc.check_kill_and_wait()
+
+        for output in self.read_output():
+            nose.tools.assert_equal(
+                output["event.dataset"],
+                "uptime",
+                "Check for event.dataset in {} failed".format(output)
+            )

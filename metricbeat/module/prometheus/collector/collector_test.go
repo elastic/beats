@@ -150,6 +150,34 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 				labelHash: "#",
 			},
 		},
+		{
+			Family: &dto.MetricFamily{
+				Name: proto.String("http_request_duration_microseconds"),
+				Help: proto.String("foo"),
+				Type: dto.MetricType_UNTYPED.Enum(),
+				Metric: []*dto.Metric{
+					{
+						Label: []*dto.LabelPair{
+							{
+								Name:  proto.String("handler"),
+								Value: proto.String("query"),
+							},
+						},
+						Untyped: &dto.Untyped{
+							Value: proto.Float64(10),
+						},
+					},
+				},
+			},
+			Event: PromEvent{
+				key: "http_request_duration_microseconds",
+				value: common.MapStr{
+					"value": float64(10),
+				},
+				labelHash: labels.String(),
+				labels:    labels,
+			},
+		},
 	}
 
 	for _, test := range tests {

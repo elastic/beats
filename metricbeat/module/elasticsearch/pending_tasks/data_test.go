@@ -30,7 +30,13 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
+
+var info = elasticsearch.Info{
+	ClusterID:   "1234",
+	ClusterName: "helloworld",
+}
 
 //Events Mapping
 
@@ -40,7 +46,7 @@ func TestEmptyQueueShouldGiveNoError(t *testing.T) {
 	assert.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventsMapping(reporter, content)
+	err = eventsMapping(reporter, info, content)
 	assert.NoError(t, err)
 }
 
@@ -50,7 +56,7 @@ func TestNotEmptyQueueShouldGiveNoError(t *testing.T) {
 	assert.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventsMapping(reporter, content)
+	err = eventsMapping(reporter, info, content)
 	assert.NoError(t, err)
 	assert.True(t, len(reporter.GetEvents()) >= 1)
 	assert.Zero(t, len(reporter.GetErrors()))
@@ -62,7 +68,7 @@ func TestEmptyQueueShouldGiveZeroEvent(t *testing.T) {
 	assert.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventsMapping(reporter, content)
+	err = eventsMapping(reporter, info, content)
 	assert.Zero(t, len(reporter.GetEvents()))
 	assert.Zero(t, len(reporter.GetErrors()))
 }
@@ -73,7 +79,7 @@ func TestNotEmptyQueueShouldGiveSeveralEvents(t *testing.T) {
 	assert.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventsMapping(reporter, content)
+	err = eventsMapping(reporter, info, content)
 	assert.Equal(t, 3, len(reporter.GetEvents()))
 	assert.Zero(t, len(reporter.GetErrors()))
 }
@@ -84,7 +90,7 @@ func TestInvalidJsonForRequiredFieldShouldThrowError(t *testing.T) {
 	assert.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventsMapping(reporter, content)
+	err = eventsMapping(reporter, info, content)
 	assert.Error(t, err)
 }
 
@@ -94,7 +100,7 @@ func TestInvalidJsonForBadFormatShouldThrowError(t *testing.T) {
 	assert.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventsMapping(reporter, content)
+	err = eventsMapping(reporter, info, content)
 	assert.Error(t, err)
 }
 
@@ -109,6 +115,12 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 				RootFields: common.MapStr{
 					"service": common.MapStr{
 						"name": "elasticsearch",
+					},
+				},
+				ModuleFields: common.MapStr{
+					"cluster": common.MapStr{
+						"id":   "1234",
+						"name": "helloworld",
 					},
 				},
 				MetricSetFields: common.MapStr{
@@ -128,6 +140,12 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 						"name": "elasticsearch",
 					},
 				},
+				ModuleFields: common.MapStr{
+					"cluster": common.MapStr{
+						"id":   "1234",
+						"name": "helloworld",
+					},
+				},
 				MetricSetFields: common.MapStr{
 					"priority":         "URGENT",
 					"source":           "create-index [foo_9], cause [api]",
@@ -143,6 +161,12 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 						"name": "elasticsearch",
 					},
 				},
+				ModuleFields: common.MapStr{
+					"cluster": common.MapStr{
+						"id":   "1234",
+						"name": "helloworld",
+					},
+				},
 				MetricSetFields: common.MapStr{"priority": "HIGH",
 					"source":           "shard-started ([foo_2][1], node[tMTocMvQQgGCkj7QDHl3OA], [P], s[INITIALIZING]), reason [after recovery from shard_store]",
 					"time_in_queue.ms": int64(842),
@@ -154,6 +178,12 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 				RootFields: common.MapStr{
 					"service": common.MapStr{
 						"name": "elasticsearch",
+					},
+				},
+				ModuleFields: common.MapStr{
+					"cluster": common.MapStr{
+						"id":   "1234",
+						"name": "helloworld",
 					},
 				},
 				MetricSetFields: common.MapStr{
@@ -172,7 +202,7 @@ func TestEventsMappedMatchToContentReceived(t *testing.T) {
 		assert.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
-		err = eventsMapping(reporter, content)
+		err = eventsMapping(reporter, info, content)
 
 		events := reporter.GetEvents()
 		if !reflect.DeepEqual(testCase.expected, events) {

@@ -1,0 +1,23 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/suricata/eve.json
+    os.darwin:
+      - /usr/local/var/log/suricata/eve.json
+    os.windows:
+      - 'c:/program files/suricata/log/eve.json'
+  - name: tags
+    default: [suricata]
+
+  # - name: nested_ecs
+  #   default: false
+ingest_pipeline: ingest/pipeline.json
+input: config/eve.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip
+- name: user_agent
+  plugin: ingest-user-agent

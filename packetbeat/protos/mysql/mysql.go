@@ -72,7 +72,7 @@ type mysqlMessage struct {
 	direction    uint8
 	isTruncated  bool
 	tcpTuple     common.TCPTuple
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 	raw          []byte
 	notes        []string
 }
@@ -801,7 +801,7 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 					var complete bool
 					text, off, complete, err = readLstring(data, off)
 					if err != nil || !complete {
-						logp.Debug("mysql", "Error parsing rows: %s %b", err, complete)
+						logp.Debug("mysql", "Error parsing rows: %+v %t", err, complete)
 						// nevertheless, return what we have so far
 						return fields, rows
 					}

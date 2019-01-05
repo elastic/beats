@@ -3,7 +3,7 @@ following notes:
 
 * If you are planning to add a new protocol, please read our [developer guide
 for adding new
-protocols](https://www.elastic.co/guide/en/beats/packetbeat/current/_developer_guide_adding_a_new_protocol.html)
+protocols](https://www.elastic.co/guide/en/beats/devguide/current/new-protocol.html)
 * Packetbeat uses Cgo, so in addition to having Go installed you need a C
   compiler
 * Packetbeat depends on libpcap. You need to install libpcap-dev on Debian

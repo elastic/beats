@@ -66,12 +66,8 @@ endif::[]
 --
 
 . Assign the writer role to the user that {beatname_uc} will use to connect to
-{es}. If you plan to load the pre-built {kib} dashboards, also assign the
-`kibana_user` role. 
-ifdef::has_ml_jobs[]
-If you plan to load machine learning jobs, assign the `machine_learning_admin`
-role.
-endif::[]
+{es}. Make sure you also assign any roles that are required for specific
+features. For the list of features and required roles, see <<feature-roles>>.
 
 .. To authenticate as a native user, create a user for {beatname_uc} to use
 internally and assign it the writer role, plus any other roles that are

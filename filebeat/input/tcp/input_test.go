@@ -42,6 +42,6 @@ func TestCreateEvent(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, string(message), m)
 
-	from, _ := event.GetValue("source")
+	from, _ := event.GetValue("log.source.address")
 	assert.Equal(t, ip, from)
 }

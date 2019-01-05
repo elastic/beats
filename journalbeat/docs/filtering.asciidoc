@@ -1,0 +1,32 @@
+[[filtering-and-enhancing-data]]
+== Filter and enhance the exported data
+
+Your use case might require only a subset of the data exported by {beatname_uc},
+or you might need to enhance the exported data (for example, by adding
+metadata). {beatname_uc} provides a couple of options for filtering and
+enhancing exported data.
+
+You can configure {beatname_uc} to include events that match specific filtering
+criteria. To do this, use the <<{beatname_lc}-include-matches,`include_matches`>>
+option. The advantage of this approach is that you can reduce the number of
+fields that {beatname_uc} needs to process.
+
+Another approach (the one described here) is to define processors to configure
+global processing across all data exported by {beatname_uc}.
+
+
+[float]
+[[using-processors]]
+=== Processors
+
+include::{libbeat-dir}/docs/processors.asciidoc[]
+
+// You must set the processor-scope attribute to resolve the attribute reference
+// defined in processors-using.asciidoc. The attribute is used to indicate where
+// processors are valid. If processors are valid in more than two locations
+// (root and :processor-scope:), you need to add a conditionally coded section
+// to processors-using.asciidoc.
+
+:processor-scope: input
+include::{libbeat-dir}/docs/processors-using.asciidoc[]
+:processor-scope!:

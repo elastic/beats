@@ -23,13 +23,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/cmd/instance"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 )
 
 func init() {

@@ -46,6 +46,11 @@ Here the response from `date.jsontest.com` is returned in the configured `http_j
 It is required to set a namespace in the general module config section.
 
 [float]
+==== json.is_array
+With this configuration enabled the `json` metricset expects the JSON structure returned by the HTTP endpoint to be an array. Further,
+it creates separate events for each element in the array.
+
+[float]
 ==== request.enabled
 With this configuration enabled additional information about the request are included. This includes the following information:
 

@@ -59,7 +59,7 @@ func Register(name string, fn FactoryFunc, stability feature.Stability) {
 // Factory retrieves config manager constructor. If no one is registered
 // it will create a nil manager
 func Factory() FactoryFunc {
-	factories, err := feature.Registry.LookupAll(Namespace)
+	factories, err := feature.GlobalRegistry().LookupAll(Namespace)
 	if err != nil {
 		return nilFactory
 	}

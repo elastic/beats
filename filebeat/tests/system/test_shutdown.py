@@ -69,8 +69,8 @@ class Test(BaseTest):
         if os.name == "nt":
             eol_offset += 1
 
-        assert (offset == (outputs[-1]["offset"] + eol_offset + len(outputs[-1]["message"])) or
-                offset == (outputs[-2]["offset"] + eol_offset + len(outputs[-2]["message"])))
+        assert (offset == (outputs[-1]["log.offset"] + eol_offset + len(outputs[-1]["message"])) or
+                offset == (outputs[-2]["log.offset"] + eol_offset + len(outputs[-2]["message"])))
 
     def test_shutdown_wait_timeout(self):
         """

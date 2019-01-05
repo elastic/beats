@@ -46,9 +46,9 @@ func init() {
 // MetricSet that fetches process metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	stats        *process.Stats
-	cgroup       *cgroup.Reader
-	cacheCmdLine bool
+	stats  *process.Stats
+	cgroup *cgroup.Reader
+	perCPU bool
 }
 
 // New creates and returns a new MetricSet.
@@ -67,6 +67,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			CacheCmdLine: config.CacheCmdLine,
 			IncludeTop:   config.IncludeTop,
 		},
+		perCPU: config.IncludePerCPU,
 	}
 	err := m.stats.Init()
 	if err != nil {
@@ -116,7 +117,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 				continue
 			}
 
-			if statsMap := cgroupStatsToMap(stats); statsMap != nil {
+			if statsMap := cgroupStatsToMap(stats, m.perCPU); statsMap != nil {
 				proc["cgroup"] = statsMap
 			}
 		}

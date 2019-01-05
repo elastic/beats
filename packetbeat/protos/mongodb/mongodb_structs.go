@@ -29,7 +29,7 @@ type mongodbMessage struct {
 	ts time.Time
 
 	tcpTuple     common.TCPTuple
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 	direction    uint8
 
 	isResponse      bool
@@ -79,7 +79,7 @@ type mongodbConnectionData struct {
 // Represent a full mongodb transaction (request/reply)
 // These transactions are the end product of this parser
 type transaction struct {
-	cmdline      *common.CmdlineTuple
+	cmdline      *common.ProcessTuple
 	src          common.Endpoint
 	dst          common.Endpoint
 	responseTime int32

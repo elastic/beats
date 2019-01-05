@@ -264,7 +264,7 @@ func runSimulate(url string, pipeline map[string]interface{}, logs []string, ver
 	for _, s := range sources {
 		d := common.MapStr{
 			"_index":  "index",
-			"_type":   "doc",
+			"_type":   "_doc",
 			"_id":     "id",
 			"_source": s,
 		}

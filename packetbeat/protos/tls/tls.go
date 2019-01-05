@@ -35,7 +35,7 @@ type stream struct {
 	applayer.Stream
 	parser       parser
 	tcptuple     *common.TCPTuple
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 }
 
 type tlsConnectionData struct {
@@ -358,18 +358,37 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	if len(fingerprints) > 0 {
 		tls["fingerprints"] = fingerprints
 	}
+
+	// TLS version in use
+	if conn.handshakeCompleted > 1 {
+		var version string
+		if serverHello != nil {
+			var ok bool
+			if value, exists := serverHello.extensions.Parsed["supported_versions"]; exists {
+				version, ok = value.(string)
+			}
+			if !ok {
+				version = serverHello.version.String()
+			}
+		} else if clientHello != nil {
+			version = clientHello.version.String()
+		}
+		tls["version"] = version
+	}
+
+	// set "server.domain" to SNI, if provided
+	if value, ok := clientHello.extensions.Parsed["server_name_indication"]; ok {
+		if list, ok := value.([]string); ok && len(list) > 0 {
+			dst.Domain = list[0]
+		}
+	}
+
 	fields := common.MapStr{
 		"type":   "tls",
 		"status": status,
 		"tls":    tls,
 		"src":    src,
 		"dst":    dst,
-	}
-	// set "server" to SNI, if provided
-	if value, ok := clientHello.extensions.Parsed["server_name_indication"]; ok {
-		if list, ok := value.([]string); ok && len(list) > 0 {
-			fields["server"] = list[0]
-		}
 	}
 
 	// set "responsetime" if handshake completed

@@ -14,7 +14,7 @@ The default metricsets are `leader`, `self` and `store`.
 [float]
 === Compatibility
 
-The etcd module is tested with etcd 3.2.
+The etcd module is tested with etcd 3.2 and 3.3.
 
 
 [float]

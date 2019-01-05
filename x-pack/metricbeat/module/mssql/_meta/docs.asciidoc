@@ -1,0 +1,15 @@
+This is the https://www.microsoft.com/en-us/sql-server/sql-server-2017[Microsoft SQL 2017] Metricbeat module. It is still in beta and under active development to add new Metricsets and introduce enhancements.
+
+[float]
+== Compatibility
+
+The module is being tested with https://hub.docker.com/r/microsoft/mssql-server-linux/[2017 GA] version under Linux
+
+[float]
+== Metricsets
+
+The following Metricset is already included:
+
+=== `db`
+
+`db` Metricset fetches a set of values from https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-log-space-usage-transact-sql?view=sql-server-2017[log space usage] which returns space usage information for the transaction log for each different database.

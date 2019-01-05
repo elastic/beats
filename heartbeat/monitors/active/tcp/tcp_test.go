@@ -45,15 +45,18 @@ func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
 	})
 	require.NoError(t, err)
 
-	jobs, err := create("tcp", config)
+	jobs, endpoints, err := create("tcp", config)
 	require.NoError(t, err)
 
 	job := jobs[0]
 
-	event, _, err := job.Run()
+	event := &beat.Event{}
+	_, err = job.Run(event)
 	require.NoError(t, err)
 
-	return &event
+	require.Equal(t, 1, endpoints)
+
+	return event
 }
 
 func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string) *beat.Event {
@@ -65,15 +68,18 @@ func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string
 	})
 	require.NoError(t, err)
 
-	jobs, err := create("tcp", config)
+	jobs, endpoints, err := create("tcp", config)
 	require.NoError(t, err)
 
 	job := jobs[0]
 
-	event, _, err := job.Run()
+	event := &beat.Event{}
+	_, err = job.Run(event)
 	require.NoError(t, err)
 
-	return &event
+	require.Equal(t, 1, endpoints)
+
+	return event
 }
 
 func setupServer(t *testing.T, serverCreator func(http.Handler) *httptest.Server) (*httptest.Server, uint16) {

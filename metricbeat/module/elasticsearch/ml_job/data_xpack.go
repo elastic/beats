@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -30,14 +31,9 @@ import (
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
-func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
-	info, err := elasticsearch.GetInfo(m.HTTP, m.HTTP.GetURI())
-	if err != nil {
-		return errors.Wrap(err, "failed to get info from Elasticsearch")
-	}
-
+func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	var data map[string]interface{}
-	err = json.Unmarshal(content, &data)
+	err := json.Unmarshal(content, &data)
 	if err != nil {
 		return errors.Wrap(err, "failure parsing Elasticsearch ML Job Stats API response")
 	}
@@ -52,9 +48,11 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		return fmt.Errorf("jobs is not an array of maps")
 	}
 
+	var errs multierror.Errors
 	for _, job := range jobsArr {
 		job, ok = job.(map[string]interface{})
 		if !ok {
+			errs = append(errs, fmt.Errorf("job is not a map"))
 			continue
 		}
 
@@ -71,5 +69,5 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 		r.Event(event)
 	}
 
-	return nil
+	return errs.Err()
 }

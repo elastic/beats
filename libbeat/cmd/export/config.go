@@ -45,6 +45,8 @@ func exportConfig(settings instance.Settings, name, idxPrefix, beatVersion strin
 		return fmt.Errorf("error initializing beat: %s", err)
 	}
 
+	settings.DisableConfigResolver = true
+
 	err = b.InitWithSettings(settings)
 	if err != nil {
 		return fmt.Errorf("error initializing beat: %s", err)

@@ -1,5 +1,5 @@
 filebeat:
-  prospectors:
+  inputs:
     - type: log
       paths:
         - /Users/ruflin/Dev/gopath/src/github.com/elastic/filebeat/tests/load/logs/*

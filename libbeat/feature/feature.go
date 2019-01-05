@@ -23,7 +23,7 @@ import (
 
 // Registry is the global plugin registry, this variable is meant to be temporary to move all the
 // internal factory to receive a context that include the current beat registry.
-var Registry = newRegistry()
+var registry = NewRegistry()
 
 // Featurable implements the description of a feature.
 type Featurable interface {
@@ -96,10 +96,15 @@ func New(namespace, name string, factory interface{}, description Describer) *Fe
 	}
 }
 
+// GlobalRegistry return the configured global registry.
+func GlobalRegistry() *Registry {
+	return registry
+}
+
 // RegisterBundle registers a bundle of features.
 func RegisterBundle(bundle *Bundle) error {
 	for _, f := range bundle.Features() {
-		err := Registry.Register(f)
+		err := GlobalRegistry().Register(f)
 		if err != nil {
 			return err
 		}
@@ -119,7 +124,7 @@ func MustRegisterBundle(bundle *Bundle) {
 // implementation.
 func OverwriteBundle(bundle *Bundle) error {
 	for _, f := range bundle.Features() {
-		err := Registry.Register(f)
+		err := GlobalRegistry().Register(f)
 		if err != nil {
 			return err
 		}
@@ -138,7 +143,7 @@ func MustOverwriteBundle(bundle *Bundle) {
 
 // Register register a new feature on the global registry.
 func Register(feature Featurable) error {
-	return Registry.Register(feature)
+	return GlobalRegistry().Register(feature)
 }
 
 // MustRegister register a new Feature on the global registry and panic on error.

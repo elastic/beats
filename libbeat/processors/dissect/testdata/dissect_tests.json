@@ -130,11 +130,10 @@
 	},
 	{
 		"name": "indirect field",
-		"tok": "%{key} %{\u0026key}",
+		"tok": "%{?key} %{\u0026key}",
 		"msg": "hello world",
 		"expected": {
 			"hello": "world",
-			"key": "hello"
 		},
 		"skip": false,
 		"fail": false
@@ -152,6 +151,16 @@
 	{
 		"name": "named skiped field with indirect",
 		"tok": "%{?key} %{\u0026key}",
+		"msg": "hello world",
+		"expected": {
+			"hello": "world"
+		},
+		"skip": false,
+		"fail": false
+	},
+	{
+		"name": "pointer field with indirect",
+		"tok": "%{*key} %{\u0026key}",
 		"msg": "hello world",
 		"expected": {
 			"hello": "world"

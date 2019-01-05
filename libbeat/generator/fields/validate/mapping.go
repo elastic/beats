@@ -198,7 +198,7 @@ func recursiveFattenFields(fields interface{}, prefix Prefix, mapping *Mapping, 
 	if hasRequired {
 		required, ok = requiredIf.(bool)
 		if !ok {
-			return errors.Errorf("field [%s](%s) has 'required' property but is not a boolean, but %T (value=%v)", requiredIf, requiredIf)
+			return errors.Errorf("field [%s](%s) has 'required' property but is not a boolean, but %T (value=%v)", key, prefix, requiredIf, requiredIf)
 		}
 	}
 
@@ -235,7 +235,7 @@ func recursiveFattenFields(fields interface{}, prefix Prefix, mapping *Mapping, 
 	if fieldsIf != nil {
 		innerFields, ok := fieldsIf.([]interface{})
 		if !ok {
-			return errors.Errorf("field [%s](%s) has a 'fields' tag of unexpected type (type=%T value=%v)", nameIf, nameIf)
+			return errors.Errorf("field [%s](%s) has a 'fields' tag of unexpected type (type=%T value=%v)", key, prefix, nameIf, nameIf)
 		}
 		for _, field := range innerFields {
 			if err := recursiveFattenFields(field, prefix, mapping, key); err != nil {

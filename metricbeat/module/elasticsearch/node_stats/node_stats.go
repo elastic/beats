@@ -19,6 +19,7 @@ package node_stats
 
 import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -58,13 +59,31 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
-	if m.MetricSet.XPack {
-		eventsMappingXPack(r, m, content)
-	} else {
-		eventsMapping(r, content)
+	info, err := elasticsearch.GetInfo(m.HTTP, m.getServiceURI())
+	if err != nil {
+		elastic.ReportAndLogError(err, r, m.Log)
+		return
 	}
+
+	if m.XPack {
+		err = eventsMappingXPack(r, m, *info, content)
+		if err != nil {
+			m.Log.Error(err)
+			return
+		}
+	} else {
+		err = eventsMapping(r, *info, content)
+		if err != nil {
+			elastic.ReportAndLogError(err, r, m.Log)
+			return
+		}
+	}
+}
+
+func (m *MetricSet) getServiceURI() string {
+	return m.HostData().SanitizedURI + nodeStatsPath
 }

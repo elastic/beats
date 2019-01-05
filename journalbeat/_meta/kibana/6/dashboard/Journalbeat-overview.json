@@ -1,0 +1,169 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "columns": [
+          "@timestamp",
+          "host.name",
+          "message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "index": "journalbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": "process.name:systemd"
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "[Journalbeat] Systemd messages",
+        "version": 1
+      },
+      "id": "aa003e90-e2b9-11e8-9f52-734e93de180d",
+      "type": "search",
+      "updated_at": "2018-11-07T18:19:28.377Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "@timestamp",
+          "host.name",
+          "journald.kernel.subsystem",
+          "message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "index": "journalbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": "syslog.facility:0 AND syslog.priority:\u003c4"
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "_score",
+          "desc"
+        ],
+        "title": "[Journalbeat] Kernel errors",
+        "version": 1
+      },
+      "id": "5db75310-e2ba-11e8-9f52-734e93de180d",
+      "type": "search",
+      "updated_at": "2018-11-07T18:24:29.889Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "@timestamp",
+          "host.name",
+          "process.name",
+          "message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "index": "journalbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": "syslog.facility:4"
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "_score",
+          "desc"
+        ],
+        "title": "[Journalbeat] Login authorization",
+        "version": 1
+      },
+      "id": "82408120-e2ba-11e8-9f52-734e93de180d",
+      "type": "search",
+      "updated_at": "2018-11-07T18:26:05.348Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "columns": [
+          "@timestamp",
+          "host.name",
+          "journald.kernel.subsystem",
+          "journald.kernel.device_node_path",
+          "message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "index": "journalbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": "journald.kernel.subsystem:usb OR journald.kernel.subsystem:hid"
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "_score",
+          "desc"
+        ],
+        "title": "[Journalbeat] USB and HID messages",
+        "version": 1
+      },
+      "id": "f0232670-e2ba-11e8-9f52-734e93de180d",
+      "type": "search",
+      "updated_at": "2018-11-07T18:28:35.543Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false,
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": null,
+        "timeRestore": false,
+        "title": "[Journalbeat] Overview",
+        "version": 1
+      },
+      "id": "f2de4440-e2b9-11e8-9f52-734e93de180d",
+      "type": "dashboard",
+      "updated_at": "2018-11-07T18:30:18.083Z",
+      "version": 2
+    }
+  ],
+  "version": "7.0.0-alpha1-SNAPSHOT"
+}

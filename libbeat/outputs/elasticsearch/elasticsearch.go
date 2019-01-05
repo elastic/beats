@@ -108,9 +108,9 @@ func makeES(
 		cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
 	}
 
-	if !cfg.HasField("index") {
-		pattern := fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", beat.IndexPrefix, beat.Version)
-		cfg.SetString("index", -1, pattern)
+	index, pipeline, err := buildSelectors(beat, cfg)
+	if err != nil {
+		return outputs.Fail(err)
 	}
 
 	config := defaultConfig
@@ -123,34 +123,9 @@ func makeES(
 		return outputs.Fail(err)
 	}
 
-	index, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
-		Key:              "index",
-		MultiKey:         "indices",
-		EnableSingleOnly: true,
-		FailEmpty:        true,
-	})
-	if err != nil {
-		return outputs.Fail(err)
-	}
-
 	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return outputs.Fail(err)
-	}
-
-	pipelineSel, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
-		Key:              "pipeline",
-		MultiKey:         "pipelines",
-		EnableSingleOnly: true,
-		FailEmpty:        false,
-	})
-	if err != nil {
-		return outputs.Fail(err)
-	}
-
-	var pipeline *outil.Selector
-	if !pipelineSel.IsEmpty() {
-		pipeline = &pipelineSel
 	}
 
 	proxyURL, err := parseProxyURL(config.ProxyURL)
@@ -199,6 +174,42 @@ func makeES(
 	}
 
 	return outputs.SuccessNet(config.LoadBalance, config.BulkMaxSize, config.MaxRetries, clients)
+}
+
+func buildSelectors(
+	beat beat.Info,
+	cfg *common.Config,
+) (index outil.Selector, pipeline *outil.Selector, err error) {
+	if !cfg.HasField("index") {
+		pattern := fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", beat.IndexPrefix, beat.Version)
+		cfg.SetString("index", -1, pattern)
+	}
+
+	index, err = outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "index",
+		MultiKey:         "indices",
+		EnableSingleOnly: true,
+		FailEmpty:        true,
+	})
+	if err != nil {
+		return index, pipeline, err
+	}
+
+	pipelineSel, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "pipeline",
+		MultiKey:         "pipelines",
+		EnableSingleOnly: true,
+		FailEmpty:        false,
+	})
+	if err != nil {
+		return index, pipeline, err
+	}
+
+	if !pipelineSel.IsEmpty() {
+		pipeline = &pipelineSel
+	}
+
+	return index, pipeline, err
 }
 
 // NewConnectedClient creates a new Elasticsearch client based on the given config.

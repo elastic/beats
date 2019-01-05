@@ -28,18 +28,18 @@ import (
 
 type mapper map[string]map[string]Featurable
 
-// Registry implements a global registry for any kind of feature in beats.
+// Registry implements a global FeatureRegistry for any kind of feature in beats.
 // feature are grouped by namespace, a namespace is a kind of plugin like outputs, inputs, or queue.
 // The feature name must be unique.
-type registry struct {
+type Registry struct {
 	sync.RWMutex
 	namespaces mapper
 	log        *logp.Logger
 }
 
 // NewRegistry returns a new registry.
-func newRegistry() *registry {
-	return &registry{
+func NewRegistry() *Registry {
+	return &Registry{
 		namespaces: make(mapper),
 		log:        logp.NewLogger("registry"),
 	}
@@ -47,7 +47,7 @@ func newRegistry() *registry {
 
 // Register registers a new feature into a specific namespace, namespace are lazy created.
 // Feature name must be unique.
-func (r *registry) Register(feature Featurable) error {
+func (r *Registry) Register(feature Featurable) error {
 	r.Lock()
 	defer r.Unlock()
 
@@ -97,7 +97,7 @@ func (r *registry) Register(feature Featurable) error {
 }
 
 // Unregister removes a feature from the registry.
-func (r *registry) Unregister(namespace, name string) error {
+func (r *Registry) Unregister(namespace, name string) error {
 	r.Lock()
 	defer r.Unlock()
 	ns := normalize(namespace)
@@ -117,7 +117,7 @@ func (r *registry) Unregister(namespace, name string) error {
 }
 
 // Lookup searches for a Feature by the namespace-name pair.
-func (r *registry) Lookup(namespace, name string) (Featurable, error) {
+func (r *Registry) Lookup(namespace, name string) (Featurable, error) {
 	r.RLock()
 	defer r.RUnlock()
 
@@ -138,7 +138,7 @@ func (r *registry) Lookup(namespace, name string) (Featurable, error) {
 }
 
 // LookupAll returns all the features for a specific namespace.
-func (r *registry) LookupAll(namespace string) ([]Featurable, error) {
+func (r *Registry) LookupAll(namespace string) ([]Featurable, error) {
 	r.RLock()
 	defer r.RUnlock()
 
@@ -160,7 +160,7 @@ func (r *registry) LookupAll(namespace string) ([]Featurable, error) {
 }
 
 // Overwrite allow to replace an existing feature with a new implementation.
-func (r *registry) Overwrite(feature Featurable) error {
+func (r *Registry) Overwrite(feature Featurable) error {
 	_, err := r.Lookup(feature.Namespace(), feature.Name())
 	if err == nil {
 		err := r.Unregister(feature.Namespace(), feature.Name())
@@ -173,7 +173,7 @@ func (r *registry) Overwrite(feature Featurable) error {
 }
 
 // Size returns the number of registered features in the registry.
-func (r *registry) Size() int {
+func (r *Registry) Size() int {
 	r.RLock()
 	defer r.RUnlock()
 

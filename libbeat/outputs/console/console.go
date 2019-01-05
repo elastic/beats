@@ -129,6 +129,7 @@ func (c *console) publishEvent(event *publisher.Event) bool {
 		}
 
 		logp.Critical("Unable to encode event: %v", err)
+		logp.Debug("console", "Failed event: %v", event)
 		return false
 	}
 

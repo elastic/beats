@@ -1,0 +1,74 @@
+{
+  "test_name": "Netflow 9 Palo Alto 1 flowset in large zero filled packet",
+  "events": [
+    {
+      "Timestamp": "2018-06-06T13:20:17Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "134.220.1.156",
+          "locality": "public",
+          "port": 50234
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2018-06-06T13:20:17Z",
+          "duration": 0,
+          "end": "2018-06-06T13:20:02Z",
+          "kind": "event",
+          "start": "2018-06-06T13:20:02Z"
+        },
+        "flow": {
+          "id": "A-NpGXd6eh4",
+          "locality": "public"
+        },
+        "netflow": {
+          "destination_ipv4_address": "134.220.1.156",
+          "destination_transport_port": 50234,
+          "egress_interface": 500010002,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 16777216,
+            "timestamp": "2018-06-06T13:20:17Z",
+            "uptime_millis": 1062408704,
+            "version": 9
+          },
+          "firewall_event": 2,
+          "flow_direction": 0,
+          "flow_end_sys_up_time": 1062393704,
+          "flow_id": 1428388,
+          "flow_start_sys_up_time": 1062393704,
+          "icmp_type_code_ipv4": 0,
+          "ingress_interface": 500010024,
+          "ip_class_of_service": 0,
+          "octet_delta_count": 363,
+          "packet_delta_count": 3,
+          "private_enterprise_number": 25461,
+          "protocol_identifier": 6,
+          "source_ipv4_address": "134.220.2.6",
+          "source_transport_port": 88,
+          "tcp_control_bits": 94,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "bytes": 363,
+          "community_id": "1:hc80jQer1W3Gz0bQrzvclI7gPC4=",
+          "direction": "inbound",
+          "iana_number": 6,
+          "packets": 3,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "134.220.2.6",
+          "locality": "public",
+          "port": 88
+        }
+      },
+      "Private": null
+    }
+  ]
+}
