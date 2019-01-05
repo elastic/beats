@@ -33,6 +33,7 @@ func TestDockerJSON(t *testing.T) {
 		input           [][]byte
 		stream          string
 		partial         bool
+		forceCRI        bool
 		criflags        bool
 		expectedError   bool
 		expectedMessage reader.Message
@@ -143,19 +144,19 @@ func TestDockerJSON(t *testing.T) {
 			},
 		},
 		{
-			name: "Split lines",
+			name: "CRI Split lines",
 			input: [][]byte{
 				[]byte(`2017-10-12T13:32:21.232861448Z stdout P 2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`),
 				[]byte(`2017-11-12T23:32:21.212771448Z stdout F  error`),
 			},
-			stream: "stdout",
+			stream:  "stdout",
+			partial: true,
 			expectedMessage: reader.Message{
 				Content: []byte("2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache error"),
 				Fields:  common.MapStr{"stream": "stdout"},
 				Ts:      time.Date(2017, 10, 12, 13, 32, 21, 232861448, time.UTC),
 				Bytes:   163,
 			},
-			partial:  true,
 			criflags: true,
 		},
 		{
@@ -189,12 +190,79 @@ func TestDockerJSON(t *testing.T) {
 				Bytes:   109,
 			},
 		},
+		{
+			name:          "Force CRI with JSON logs",
+			input:         [][]byte{[]byte(`{"log":"1:M 09 Nov 13:27:36.276 # User requested shutdown...\n","stream":"stdout"}`)},
+			stream:        "all",
+			forceCRI:      true,
+			expectedError: true,
+		},
+		{
+			name:   "Force CRI log no tags",
+			input:  [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`)},
+			stream: "all",
+			expectedMessage: reader.Message{
+				Content: []byte("2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache"),
+				Fields:  common.MapStr{"stream": "stdout"},
+				Ts:      time.Date(2017, 9, 12, 22, 32, 21, 212861448, time.UTC),
+				Bytes:   115,
+			},
+			forceCRI: true,
+			criflags: false,
+		},
+		{
+			name:   "Force CRI log with flags",
+			input:  [][]byte{[]byte(`2017-09-12T22:32:21.212861448Z stdout F 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`)},
+			stream: "all",
+			expectedMessage: reader.Message{
+				Content: []byte("2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache"),
+				Fields:  common.MapStr{"stream": "stdout"},
+				Ts:      time.Date(2017, 9, 12, 22, 32, 21, 212861448, time.UTC),
+				Bytes:   117,
+			},
+			forceCRI: true,
+			criflags: true,
+		},
+		{
+			name: "Force CRI split lines",
+			input: [][]byte{
+				[]byte(`2017-10-12T13:32:21.232861448Z stdout P 2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache`),
+				[]byte(`2017-11-12T23:32:21.212771448Z stdout F  error`),
+			},
+			stream:  "stdout",
+			partial: true,
+			expectedMessage: reader.Message{
+				Content: []byte("2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache error"),
+				Fields:  common.MapStr{"stream": "stdout"},
+				Ts:      time.Date(2017, 10, 12, 13, 32, 21, 232861448, time.UTC),
+				Bytes:   163,
+			},
+			forceCRI: true,
+			criflags: true,
+		},
+		{
+			name: "Force CRI split lines and remove \\n",
+			input: [][]byte{
+				[]byte("2017-10-12T13:32:21.232861448Z stdout P 2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache\n"),
+				[]byte("2017-11-12T23:32:21.212771448Z stdout F  error"),
+			},
+			stream: "stdout",
+			expectedMessage: reader.Message{
+				Content: []byte("2017-10-12 13:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache error"),
+				Fields:  common.MapStr{"stream": "stdout"},
+				Ts:      time.Date(2017, 10, 12, 13, 32, 21, 232861448, time.UTC),
+				Bytes:   164,
+			},
+			partial:  true,
+			forceCRI: true,
+			criflags: true,
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			r := &mockReader{messages: test.input}
-			json := New(r, test.stream, test.partial, test.criflags)
+			json := New(r, test.stream, test.partial, test.forceCRI, test.criflags)
 			message, err := json.Next()
 
 			if test.expectedError {

@@ -25,14 +25,14 @@ import (
 
 // ClientConfig to connect to Kibana
 type ClientConfig struct {
-	Protocol      string            `config:"protocol"`
-	Host          string            `config:"host"`
-	Path          string            `config:"path"`
-	SpaceID       string            `config:"space.id"`
-	Username      string            `config:"username"`
-	Password      string            `config:"password"`
-	TLS           *tlscommon.Config `config:"ssl"`
-	Timeout       time.Duration     `config:"timeout"`
+	Protocol      string            `config:"protocol" yaml:"protocol"`
+	Host          string            `config:"host" yaml:"host"`
+	Path          string            `config:"path" yaml:"path"`
+	SpaceID       string            `config:"space.id" yaml:"space.id"`
+	Username      string            `config:"username" yaml:"username"`
+	Password      string            `config:"password" yaml:"password"`
+	TLS           *tlscommon.Config `config:"ssl" yaml:"ssl"`
+	Timeout       time.Duration     `config:"timeout" yaml:"timeout"`
 	IgnoreVersion bool
 }
 

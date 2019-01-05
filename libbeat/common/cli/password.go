@@ -66,6 +66,7 @@ func stdin(p string) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "reading password input")
 	}
+	fmt.Println()
 	return string(bytePassword), nil
 }
 

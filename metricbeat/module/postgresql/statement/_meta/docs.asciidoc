@@ -1,3 +1,1 @@
-=== postgresql statement MetricSet
-
-This is the statement metricset of the module postgresql.
+This is the `statement` metricset of the PostgreSQL module. 

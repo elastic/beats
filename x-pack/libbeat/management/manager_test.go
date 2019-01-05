@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -30,7 +30,10 @@ func (r *reloadable) Reload(c *reload.ConfigWithMeta) error {
 
 func TestConfigManager(t *testing.T) {
 	registry := reload.NewRegistry()
-	id := uuid.NewV4()
+	id, err := uuid.NewV4()
+	if err != nil {
+		t.Fatalf("error while generating id: %v", err)
+	}
 	accessToken := "footoken"
 	reloadable := reloadable{
 		reloaded: make(chan *reload.ConfigWithMeta, 1),

@@ -9,12 +9,15 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestConfiguration(t *testing.T) {
-	beatUUID := uuid.NewV4()
+	beatUUID, err := uuid.NewV4()
+	if err != nil {
+		t.Fatalf("error while generating Beat UUID: %v", err)
+	}
 
 	server, client := newServerClientPair(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Check correct path is used

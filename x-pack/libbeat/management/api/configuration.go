@@ -10,7 +10,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common/reload"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/common"
 )

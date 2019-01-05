@@ -142,7 +142,7 @@ func apmIndicesExist(clusterState common.MapStr) (bool, error) {
 	return false, nil
 }
 
-func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
+func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -158,11 +158,6 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 	clusterName, ok := value.(string)
 	if !ok {
 		return fmt.Errorf("cluster name is not a string")
-	}
-
-	info, err := elasticsearch.GetInfo(m.HTTP, m.HTTP.GetURI())
-	if err != nil {
-		return errors.Wrap(err, "failed to get info from Elasticsearch")
 	}
 
 	license, err := elasticsearch.GetLicense(m.HTTP, m.HTTP.GetURI())

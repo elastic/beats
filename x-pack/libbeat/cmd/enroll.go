@@ -32,6 +32,7 @@ func getBeat(name, version string) (*instance.Beat, error) {
 
 func genEnrollCmd(name, version string) *cobra.Command {
 	var username, password string
+	var force bool
 
 	enrollCmd := cobra.Command{
 		Use:   "enroll <kibana_url> [<enrollment_token>]",
@@ -41,6 +42,10 @@ func genEnrollCmd(name, version string) *cobra.Command {
 		Args: cobra.RangeArgs(1, 2),
 		Run: cli.RunWith(func(cmd *cobra.Command, args []string) error {
 			beat, err := getBeat(name, version)
+			if err != nil {
+				return err
+			}
+
 			kibanaURL := args[0]
 
 			if username == "" && len(args) == 1 {
@@ -75,21 +80,27 @@ func genEnrollCmd(name, version string) *cobra.Command {
 				}
 				enrollmentToken, err = client.CreateEnrollmentToken()
 				if err != nil {
-					return errors.Wrap(err, "Creating a new enrollment token")
+					return errors.Wrap(err, "Error creating a new enrollment token")
 				}
 			}
 
-			if err = management.Enroll(beat, kibanaURL, enrollmentToken); err != nil {
+			enrolled, err := management.Enroll(beat, kibanaURL, enrollmentToken, force)
+			if err != nil {
 				return errors.Wrap(err, "Error while enrolling")
 			}
 
-			fmt.Println("Enrolled and ready to retrieve settings from Kibana")
+			if enrolled {
+				fmt.Println("Enrolled and ready to retrieve settings from Kibana")
+			} else {
+				fmt.Println("Enrollment was canceled by the user")
+			}
 			return nil
 		}),
 	}
 
 	enrollCmd.Flags().StringVar(&username, "username", "elastic", "Username to use when enrolling without token")
 	enrollCmd.Flags().StringVar(&password, "password", "stdin", "Method to read the password to use when enrolling without token (stdin or env:VAR_NAME)")
+	enrollCmd.Flags().BoolVar(&force, "force", false, "Force overwrite of current configuraiton, do not prompt for confirmation")
 
 	return &enrollCmd
 }

@@ -18,7 +18,6 @@
 package pipeline
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 
@@ -127,9 +126,7 @@ func loadOutput(
 	}
 
 	if !outcfg.IsSet() {
-		msg := "No outputs are defined. Please define one under the output section."
-		log.Info(msg)
-		return outputs.Fail(errors.New(msg))
+		return outputs.Group{}, nil
 	}
 
 	var (
