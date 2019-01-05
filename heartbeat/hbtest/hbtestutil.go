@@ -26,6 +26,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -47,6 +48,23 @@ func HelloWorldHandler(status int) http.HandlerFunc {
 			}
 			w.WriteHeader(status)
 			io.WriteString(w, HelloWorldBody)
+		},
+	)
+}
+
+// SizedResponseHandler responds with 200 to any request with a body
+// exactly the size of the `bytes` argument, where each byte is the
+// character 'x'
+func SizedResponseHandler(bytes int) http.HandlerFunc {
+	var body strings.Builder
+	for i := 0; i < bytes; i++ {
+		body.WriteString("x")
+	}
+
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(200)
+			io.WriteString(w, body.String())
 		},
 	)
 }

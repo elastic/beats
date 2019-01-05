@@ -19,7 +19,6 @@ package ccr
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/joeshaw/multierror"
@@ -32,7 +31,7 @@ import (
 )
 
 func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
-	var data map[string]interface{}
+	var data response
 	err := json.Unmarshal(content, &data)
 	if err != nil {
 		err = errors.Wrap(err, "failure parsing Elasticsearch CCR Stats API response")
@@ -41,29 +40,15 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 	}
 
 	var errors multierror.Errors
-	for _, followerShards := range data {
-
-		shards, ok := followerShards.([]interface{})
-		if !ok {
-			err := fmt.Errorf("shards is not an array")
-			errors = append(errors, err)
-			continue
-		}
-
-		for _, s := range shards {
-			shard, ok := s.(map[string]interface{})
-			if !ok {
-				err := fmt.Errorf("shard is not an object")
-				errors = append(errors, err)
-				continue
-			}
+	for _, followerIndex := range data.FollowStats.Indices {
+		for _, followerShard := range followerIndex.Shards {
 			event := mb.Event{}
 			event.RootFields = common.MapStr{
 				"cluster_uuid": info.ClusterID,
 				"timestamp":    common.Time(time.Now()),
 				"interval_ms":  m.Module().Config().Period / time.Millisecond,
 				"type":         "ccr_stats",
-				"ccr_stats":    shard,
+				"ccr_stats":    followerShard,
 			}
 
 			event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)

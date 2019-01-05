@@ -622,7 +622,7 @@ func addAddress(addr *aucoalesce.Address, key string, m common.MapStr) {
 	address := common.MapStr{}
 	m.Put(key, address)
 	if addr.Hostname != "" {
-		address["hostname"] = addr.Hostname
+		address["domain"] = addr.Hostname
 	}
 	if addr.IP != "" {
 		address["ip"] = addr.IP

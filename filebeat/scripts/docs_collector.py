@@ -2,6 +2,7 @@ import os
 import argparse
 import yaml
 import six
+import glob
 
 # Collects docs for all modules
 
@@ -17,12 +18,18 @@ This file is generated! See scripts/docs_collector.py
 
 """
 
+    # Include both OSS and Elastic licensed modules.
+    modules = []
+    modules.extend(glob.glob('module/*'))
+    modules.extend(glob.glob('../x-pack/filebeat/module/*'))
+
     modules_list = {}
 
     # Iterate over all modules
-    for module in sorted(os.listdir(base_dir)):
-
-        module_doc = path + "/" + module + "/_meta/docs.asciidoc"
+    for module in sorted(modules):
+        module_dir = os.path.abspath(module)
+        module = os.path.basename(module)
+        module_doc = os.path.join(module_dir, "_meta/docs.asciidoc")
 
         # Only check folders where docs.asciidoc exists
         if not os.path.isfile(module_doc):
@@ -34,7 +41,7 @@ This file is generated! See scripts/docs_collector.py
         with open(module_doc) as f:
             module_file += f.read()
 
-        beat_path = path + "/" + module + "/_meta"
+        beat_path = os.path.join(module_dir, "_meta")
 
         # Load title from fields.yml
         with open(beat_path + "/fields.yml") as f:

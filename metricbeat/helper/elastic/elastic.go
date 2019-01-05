@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 )
@@ -107,4 +109,10 @@ func IsFeatureAvailable(currentProductVersion, featureAvailableInProductVersion 
 	}
 
 	return !currentVersion.LessThan(wantVersion), nil
+}
+
+// ReportAndLogError reports and logs the given error
+func ReportAndLogError(err error, r mb.ReporterV2, l *logp.Logger) {
+	r.Error(err)
+	l.Error(err)
 }

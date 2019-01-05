@@ -34,8 +34,8 @@ class Test(metricbeat.BaseTest):
         print(evt)
         print(evt.keys())
         self.assertItemsEqual(self.de_dot([
-            'beat', '@timestamp', 'system', 'metricset.module',
-            'metricset.rtt', 'metricset.name', 'host'
+            'agent', '@timestamp', 'system', 'metricset.module',
+            'metricset.rtt', 'metricset.name', 'host', 'service', 'ecs', 'event'
         ]), evt.keys())
         cpu = evt["system"]["cpu"]
         print(cpu.keys())
@@ -270,7 +270,7 @@ class Test(metricbeat.BaseTest):
             }],
             processors=[{
                 "rename": {
-                    "fields": [{"from": "metricset.name", "to": "hello.world"}],
+                    "fields": [{"from": "event.dataset", "to": "hello.world"}],
                 },
             }]
         )
@@ -285,5 +285,5 @@ class Test(metricbeat.BaseTest):
         print(evt)
         print(evt.keys())
 
-        assert "name" not in output[0]["metricset"]
+        assert "dataset" not in output[0]["event"]
         assert "cpu" in output[0]["hello"]["world"]

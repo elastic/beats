@@ -5,8 +5,11 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"reflect"
+
+	"errors"
 
 	"github.com/elastic/beats/libbeat/common/reload"
 
@@ -14,6 +17,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 )
+
+var errConfigurationNotFound = errors.New("no configuration found, you need to enroll your Beat")
 
 // ConfigBlock stores a piece of config from central management
 type ConfigBlock struct {
@@ -46,7 +51,7 @@ func (c *ConfigBlock) ConfigWithMeta() (*reload.ConfigWithMeta, error) {
 }
 
 // Configuration retrieves the list of configuration blocks from Kibana
-func (c *Client) Configuration(accessToken string, beatUUID uuid.UUID) (ConfigBlocks, error) {
+func (c *Client) Configuration(accessToken string, beatUUID uuid.UUID, configOK bool) (ConfigBlocks, error) {
 	headers := http.Header{}
 	headers.Set("kbn-beats-access-token", accessToken)
 
@@ -56,7 +61,12 @@ func (c *Client) Configuration(accessToken string, beatUUID uuid.UUID) (ConfigBl
 			Raw  map[string]interface{} `json:"config"`
 		} `json:"configuration_blocks"`
 	}{}
-	_, err := c.request("GET", "/api/beats/agent/"+beatUUID.String()+"/configuration", nil, headers, &resp)
+	url := fmt.Sprintf("/api/beats/agent/%s/configuration?validSetting=%t", beatUUID, configOK)
+	statusCode, err := c.request("GET", url, nil, headers, &resp)
+	if statusCode == http.StatusNotFound {
+		return nil, errConfigurationNotFound
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -85,4 +95,9 @@ func ConfigBlocksEqual(a, b ConfigBlocks) bool {
 	}
 
 	return reflect.DeepEqual(a, b)
+}
+
+// IsConfigurationNotFound returns true if the configuration was not found.
+func IsConfigurationNotFound(err error) bool {
+	return err == errConfigurationNotFound
 }

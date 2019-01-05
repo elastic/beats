@@ -20,12 +20,13 @@ package readjson
 import (
 	"bytes"
 	"encoding/json"
+	"runtime"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/reader"
-
-	"github.com/pkg/errors"
 )
 
 // DockerJSONReader processor renames a given field
@@ -42,6 +43,8 @@ type DockerJSONReader struct {
 
 	// parse CRI flags
 	criflags bool
+
+	stripNewLine func(msg *reader.Message)
 }
 
 type logLine struct {
@@ -54,13 +57,21 @@ type logLine struct {
 
 // New creates a new reader renaming a field
 func New(r reader.Reader, stream string, partial bool, forceCRI bool, CRIFlags bool) *DockerJSONReader {
-	return &DockerJSONReader{
+	reader := DockerJSONReader{
 		stream:   stream,
 		partial:  partial,
 		reader:   r,
 		forceCRI: forceCRI,
 		criflags: CRIFlags,
 	}
+
+	if runtime.GOOS == "windows" {
+		reader.stripNewLine = stripNewLineWin
+	} else {
+		reader.stripNewLine = stripNewLine
+	}
+
+	return &reader
 }
 
 // parseCRILog parses logs in CRI log format.
@@ -112,7 +123,7 @@ func (p *DockerJSONReader) parseCRILog(message *reader.Message, msg *logLine) er
 	// Remove \n ending for partial messages
 	message.Content = log[i]
 	if partial {
-		stripNewLine(message)
+		p.stripNewLine(message)
 	}
 
 	return nil
@@ -191,4 +202,17 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 
 		return message, err
 	}
+}
+
+func stripNewLine(msg *reader.Message) {
+	l := len(msg.Content)
+	if l > 0 && msg.Content[l-1] == '\n' {
+		msg.Content = msg.Content[:l-1]
+	}
+}
+
+func stripNewLineWin(msg *reader.Message) {
+	msg.Content = bytes.TrimRightFunc(msg.Content, func(r rune) bool {
+		return r == '\n' || r == '\r'
+	})
 }

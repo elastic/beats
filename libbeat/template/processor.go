@@ -167,7 +167,9 @@ func (p *Processor) keyword(f *common.Field) common.MapStr {
 		fullName = f.Path + "." + f.Name
 	}
 
-	defaultFields = append(defaultFields, fullName)
+	if f.Index == nil || (f.Index != nil && *f.Index) {
+		defaultFields = append(defaultFields, fullName)
+	}
 
 	property["type"] = "keyword"
 
@@ -201,7 +203,9 @@ func (p *Processor) text(f *common.Field) common.MapStr {
 		fullName = f.Path + "." + f.Name
 	}
 
-	defaultFields = append(defaultFields, fullName)
+	if f.Index == nil || (f.Index != nil && *f.Index) {
+		defaultFields = append(defaultFields, fullName)
+	}
 
 	properties["type"] = "text"
 

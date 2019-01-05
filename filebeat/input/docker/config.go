@@ -29,11 +29,14 @@ var defaultConfig = config{
 type config struct {
 	Containers containers `config:"containers"`
 
-	// Partial configures the prospector to join partial lines
+	// Partial configures the input to join partial lines
 	Partial bool `config:"combine_partials"`
 
 	// Enable CRI flags parsing (to be switched to default in 7.0)
 	CRIFlags bool `config:"cri.parse_flags"`
+
+	// Fore CRI format (don't perform autodetection)
+	CRIForce bool `config:"cri.force"`
 }
 
 type containers struct {

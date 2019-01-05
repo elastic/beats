@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/monitoring"
 )
 
 type MockBeatClient struct {
@@ -89,21 +90,24 @@ func (pc *MockPipelineConnector) ConnectWith(beat.ClientConfig) (beat.Client, er
 }
 
 func createMockJob(name string, cfg *common.Config) ([]Job, error) {
-	j := MakeSimpleJob(JobSettings{}, func() (common.MapStr, error) {
-		return common.MapStr{
+	j := MakeSimpleJob(func(event *beat.Event) error {
+		MergeEventFields(event, common.MapStr{
 			"foo": "bar",
-		}, nil
+		})
+		return nil
 	})
 
 	return []Job{j}, nil
 }
 
 func mockPluginBuilder() pluginBuilder {
-	return pluginBuilder{"test", ActiveMonitor, func(s string, config *common.Config) ([]Job, error) {
+	reg := monitoring.NewRegistry()
+
+	return pluginBuilder{"test", ActiveMonitor, func(s string, config *common.Config) ([]Job, int, error) {
 		c := common.Config{}
 		j, err := createMockJob("test", &c)
-		return j, err
-	}}
+		return j, 1, err
+	}, newPluginCountersRecorder("test", reg)}
 }
 
 func mockPluginsReg() *pluginsReg {

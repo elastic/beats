@@ -5,6 +5,7 @@ from filebeat import BaseTest
 import codecs
 import os
 import time
+import unittest
 from nose.plugins.skip import Skip, SkipTest
 import shutil
 
@@ -263,6 +264,7 @@ class Test(BaseTest):
 
         assert len(output) == 5 + 6
 
+    @unittest.skipIf(os.name == 'nt', 'flaky test https://github.com/elastic/beats/issues/9213')
     def test_file_disappear_appear(self):
         """
         Checks that filebeat keeps running in case a log files is deleted

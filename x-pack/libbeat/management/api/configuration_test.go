@@ -16,7 +16,7 @@ import (
 func TestConfiguration(t *testing.T) {
 	beatUUID, err := uuid.NewV4()
 	if err != nil {
-		t.Fatalf("error while generating Beat UUID: %v", err)
+		t.Fatalf("error while generating Beat ID: %v", err)
 	}
 
 	server, client := newServerClientPair(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -26,11 +26,13 @@ func TestConfiguration(t *testing.T) {
 		// Check enrollment token is correct
 		assert.Equal(t, "thisismyenrollmenttoken", r.Header.Get("kbn-beats-access-token"))
 
+		assert.Equal(t, "false", r.URL.Query().Get("validSetting"))
+
 		fmt.Fprintf(w, `{"configuration_blocks":[{"type":"filebeat.modules","config":{"module":"apache2"}},{"type":"metricbeat.modules","config":{"module":"system","period":"10s"}}]}`)
 	}))
 	defer server.Close()
 
-	configs, err := client.Configuration("thisismyenrollmenttoken", beatUUID)
+	configs, err := client.Configuration("thisismyenrollmenttoken", beatUUID, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -166,4 +168,25 @@ func TestConfigBlocksEqual(t *testing.T) {
 			assert.Equal(t, test.equal, ConfigBlocksEqual(test.a, test.b))
 		})
 	}
+}
+
+func TestUnEnroll(t *testing.T) {
+	beatUUID, err := uuid.NewV4()
+	if err != nil {
+		t.Fatalf("error while generating Beat UUID: %v", err)
+	}
+
+	server, client := newServerClientPair(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Check correct path is used
+		assert.Equal(t, "/api/beats/agent/"+beatUUID.String()+"/configuration", r.URL.Path)
+
+		// Check enrollment token is correct
+		assert.Equal(t, "thisismyenrollmenttoken", r.Header.Get("kbn-beats-access-token"))
+
+		http.NotFound(w, r)
+	}))
+	defer server.Close()
+
+	_, err = client.Configuration("thisismyenrollmenttoken", beatUUID, false)
+	assert.True(t, IsConfigurationNotFound(err))
 }

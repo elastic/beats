@@ -1,0 +1,1633 @@
+{
+  "test_name": "Netflow 9 macaddress",
+  "events": [
+    {
+      "Timestamp": "2015-10-10T08:46:56Z",
+      "Meta": null,
+      "Fields": {
+        "event": {
+          "action": "netflow_options",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:46:56Z",
+          "kind": "event"
+        },
+        "netflow": {
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:46:56Z",
+            "uptime_millis": 30024,
+            "version": 9
+          },
+          "options": {
+            "exported_flow_record_total_count": 1,
+            "exported_message_total_count": 0
+          },
+          "scope": {
+            "octet_delta_count": 0
+          },
+          "type": "netflow_options"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 22
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "zQfsdfKgh-o",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 22,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 65058,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:xXTn9GECsRXx7t5CqUym4B1cCNU=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 65058
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.100",
+          "locality": "private",
+          "mac": "00:0c:29:8d:af:c3",
+          "port": 123
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Tw1iOKJ-dfE",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.100",
+          "destination_mac_address": "00:0c:29:8d:af:c3",
+          "destination_transport_port": 123,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 123,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:8JJSV5jQe+UfRnLVV/iA7sy8Nz0=",
+          "direction": "unknown",
+          "iana_number": 17,
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 123
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 123
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "NF1W3jyrHAA",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 123,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 17,
+          "source_ipv4_address": "172.16.32.100",
+          "source_mac_address": "00:0c:29:8d:af:c3",
+          "source_transport_port": 123,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:8JJSV5jQe+UfRnLVV/iA7sy8Nz0=",
+          "direction": "unknown",
+          "iana_number": 17,
+          "transport": "udp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.100",
+          "locality": "private",
+          "mac": "00:0c:29:8d:af:c3",
+          "port": 123
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 80
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "B-_-kE8PEgA",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 80,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59157,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:9a3xSEOGeCOgc8wHkqU7yt3aKi4=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59157
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59157
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "B-_-kE8PEgA",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59157,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 80,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:9a3xSEOGeCOgc8wHkqU7yt3aKi4=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 80
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 443
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "q6jss8DvXWE",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 443,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59158,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:tReeXdYbJqf6jxHsV/6j7S+FoNQ=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59158
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59158
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "q6jss8DvXWE",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59158,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 443,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:tReeXdYbJqf6jxHsV/6j7S+FoNQ=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 443
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 139
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "3TmuMjQR8Mk",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 139,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59159,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:cdysWB0MnAlJwcBbj7j+pGVyBGg=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59159
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59159
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "3TmuMjQR8Mk",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59159,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 139,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:cdysWB0MnAlJwcBbj7j+pGVyBGg=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 139
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 23
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "2KDgFVtVKGg",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 23,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59160,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:6giQWS+fyjMORsdQimfi53pgwMk=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59160
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59160
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "2KDgFVtVKGg",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59160,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 23,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:6giQWS+fyjMORsdQimfi53pgwMk=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 23
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 995
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "vwr6dNcr6FE",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 995,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59161,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:9TricJ4d/hl365P4avkWHSCNrfs=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59161
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59161
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "vwr6dNcr6FE",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59161,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 995,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:9TricJ4d/hl365P4avkWHSCNrfs=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 995
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 443
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "tmgCubSF_CU",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 443,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59162,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:6RszvU1rDWXVJ74Ktg0VviC8dHQ=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59162
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59162
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "tmgCubSF_CU",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59162,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 443,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:6RszvU1rDWXVJ74Ktg0VviC8dHQ=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 443
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 135
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Agzgga7RAr0",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 135,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59163,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:c+E4+ll1WxXDPNDgvxstOuxlZJ8=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59163
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59163
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Agzgga7RAr0",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59163,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 135,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:c+E4+ll1WxXDPNDgvxstOuxlZJ8=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 135
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 110
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "-cqFlm16mLc",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 110,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59164,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:4qi27nfOIgyBcA6+RYnuq/tZB/8=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59164
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59164
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "-cqFlm16mLc",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59164,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 110,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:4qi27nfOIgyBcA6+RYnuq/tZB/8=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 110
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 111
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Txfldw7-948",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 111,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59165,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:9grL4uqlG5JP5jXa8hCBLSZ1bAo=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59165
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59165
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "Txfldw7-948",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59165,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 111,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:9grL4uqlG5JP5jXa8hCBLSZ1bAo=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 111
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 143
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "iaXg6w051Ho",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 143,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59166,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:vY2zU7sBMSQd04PrR2LEa7Q2pFE=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59166
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59166
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "iaXg6w051Ho",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59166,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 143,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:vY2zU7sBMSQd04PrR2LEa7Q2pFE=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 143
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 3389
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "cEvEMCFhKJk",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 3389,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59167,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:Cf9adPldvSduPZshQSGGhNsc5PU=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59167
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59167
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "cEvEMCFhKJk",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59167,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 3389,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:Cf9adPldvSduPZshQSGGhNsc5PU=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 3389
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 80
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "DnN0kX-gR3Q",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 80,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59168,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:odV4cLKFeNM7n9PKTb6oi19upi4=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59168
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59168
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "DnN0kX-gR3Q",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59168,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 80,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:odV4cLKFeNM7n9PKTb6oi19upi4=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 80
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 25
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "-kLcuxmRzgk",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.201",
+          "destination_mac_address": "00:0c:29:70:86:09",
+          "destination_transport_port": 25,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.1",
+          "source_mac_address": "00:50:56:c0:00:01",
+          "source_transport_port": 59169,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:ZRD9IAxw9PMwqFA3PuRYzm0karc=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59169
+        }
+      },
+      "Private": null
+    },
+    {
+      "Timestamp": "2015-10-10T08:47:01Z",
+      "Meta": null,
+      "Fields": {
+        "destination": {
+          "ip": "172.16.32.1",
+          "locality": "private",
+          "mac": "00:50:56:c0:00:01",
+          "port": 59169
+        },
+        "event": {
+          "action": "netflow_flow",
+          "category": "network_traffic",
+          "created": "2015-10-10T08:47:01Z",
+          "kind": "event"
+        },
+        "flow": {
+          "id": "-kLcuxmRzgk",
+          "locality": "private"
+        },
+        "netflow": {
+          "destination_ipv4_address": "172.16.32.1",
+          "destination_mac_address": "00:50:56:c0:00:01",
+          "destination_transport_port": 59169,
+          "exporter": {
+            "address": "192.0.2.1:4444",
+            "source_id": 97,
+            "timestamp": "2015-10-10T08:47:01Z",
+            "uptime_millis": 34488,
+            "version": 9
+          },
+          "protocol_identifier": 6,
+          "source_ipv4_address": "172.16.32.201",
+          "source_mac_address": "00:0c:29:70:86:09",
+          "source_transport_port": 25,
+          "type": "netflow_flow"
+        },
+        "network": {
+          "community_id": "1:ZRD9IAxw9PMwqFA3PuRYzm0karc=",
+          "direction": "unknown",
+          "iana_number": 6,
+          "transport": "tcp"
+        },
+        "observer": {
+          "ip": "192.0.2.1"
+        },
+        "source": {
+          "ip": "172.16.32.201",
+          "locality": "private",
+          "mac": "00:0c:29:70:86:09",
+          "port": 25
+        }
+      },
+      "Private": null
+    }
+  ]
+}

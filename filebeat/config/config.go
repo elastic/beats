@@ -40,7 +40,6 @@ const (
 
 type Config struct {
 	Inputs                  []*common.Config     `config:"inputs"`
-	Prospectors             []*common.Config     `config:"prospectors"`
 	RegistryFile            string               `config:"registry_file"`
 	RegistryFilePermissions os.FileMode          `config:"registry_file_permissions"`
 	RegistryFlush           time.Duration        `config:"registry_flush"`
@@ -48,7 +47,6 @@ type Config struct {
 	ShutdownTimeout         time.Duration        `config:"shutdown_timeout"`
 	Modules                 []*common.Config     `config:"modules"`
 	ConfigInput             *common.Config       `config:"config.inputs"`
-	ConfigProspector        *common.Config       `config:"config.prospectors"`
 	ConfigModules           *common.Config       `config:"config.modules"`
 	Autodiscover            *autodiscover.Config `config:"autodiscover"`
 	OverwritePipelines      bool                 `config:"overwrite_pipelines"`
@@ -104,14 +102,6 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 		err := cfgfile.Read(&tmpConfig, file)
 		if err != nil {
 			return fmt.Errorf("Failed to read %s: %s", file, err)
-		}
-
-		if len(tmpConfig.Filebeat.Prospectors) > 0 {
-			cfgwarn.Deprecate("7.0.0", "prospectors are deprecated, Use `inputs` instead.")
-			if len(tmpConfig.Filebeat.Inputs) > 0 {
-				return fmt.Errorf("prospectors and inputs used in the configuration file, define only inputs not both")
-			}
-			tmpConfig.Filebeat.Inputs = append(tmpConfig.Filebeat.Inputs, tmpConfig.Filebeat.Prospectors...)
 		}
 
 		config.Inputs = append(config.Inputs, tmpConfig.Filebeat.Inputs...)

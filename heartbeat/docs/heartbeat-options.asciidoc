@@ -52,6 +52,8 @@ happening to you. To do so you would instead have your +heartbeat.yml+ file cont
 heartbeat.config.monitors:
   # Directory + glob pattern to search for configuration files
   path: /path/to/my/monitors.d/*.yml
+  # If enabled, heartbeat will periodically check the config.monitors path for changes
+  reload.enabled: true
   # How often to check for changes
   reload.period: 1s
 ----------------------------------------------------------------------
@@ -444,6 +446,7 @@ Under `check.response`, specify these options:
 it's set to 0, any status code other than 404 is accepted.
 *`headers`*:: The required response headers.
 *`body`*:: A list of regular expressions to match the the body output. Only a single expression needs to match.
+*`json`*:: A list of <<conditions,condition>> expressions executed against the body when parsed as JSON.
 
 The following configuration shows how to check the response when the body
 contains JSON:
@@ -459,7 +462,11 @@ contains JSON:
       'X-API-Key': '12345-mykey-67890'
   check.response:
     status: 200
-    body: '{"status": "ok"}'
+    json:
+      - description: check status
+        condition:
+          equals:
+            status: ok
 -------------------------------------------------------------------------------
 
 The following configuration shows how to check the response for multiple regex

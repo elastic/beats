@@ -1,17 +1,15 @@
-The System `socket_summary` metricset provides the summary of open network sockets in the host system.
+The System `socket_summary` metricset provides the summary of open network
+sockets in the host system.
 
-The following metrics are exported:
-* TCP
-    * all: All connections
-    * listening: All listening connections
-* UDP:
-    * all: All connections
+It collects a summary of metrics with the count of existing TCP and UDP
+connections and the count of listening ports.
 
 This metricset is available on:
 
 - FreeBSD
 - Linux
 - macOS
+- Windows
 
 [float]
 === Configuration

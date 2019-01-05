@@ -75,12 +75,6 @@
         logged: Success, Information, Warning, Error, Audit Success, and Audit
         Failure.
 
-    - name: message
-      type: text
-      required: false
-      description: >
-        The message from the event log record.
-
     - name: message_error
       type: keyword
       required: false

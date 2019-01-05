@@ -1,0 +1,19 @@
+2017-04-03 22:32:14.322 CEST [12975-1] [unknown]@[unknown] LOG:  incomplete startup packet
+2017-04-03 22:32:14.322 CEST [5404-1] postgres@user FATAL:  database "user" does not exist
+2017-04-03 22:35:22.389 CEST [5404-2] postgres@postgres LOG:  duration: 37.598 ms  statement: SELECT n.nspname as "Schema",
+	  c.relname as "Name",
+	  CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized view' WHEN 'i' THEN 'index' WHEN 'S' THEN 'sequence' WHEN 's' THEN 'special' WHEN 'f' THEN 'foreign table' END as "Type",
+	  pg_catalog.pg_get_userbyid(c.relowner) as "Owner"
+	FROM pg_catalog.pg_class c
+	     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+	WHERE c.relkind IN ('r','')
+	      AND n.nspname <> 'pg_catalog'
+	      AND n.nspname <> 'information_schema'
+	      AND n.nspname !~ '^pg_toast'
+	  AND pg_catalog.pg_table_is_visible(c.oid)
+	ORDER BY 1,2;
+2017-07-31 13:36:43.557 EST [835-1] LOG:  autovacuum launcher started
+2017-07-31 13:36:44.227 EST [832-1] LOG:  checkpoints are occurring too frequently (25 seconds apart)
+2017-07-31 13:46:02.670 EST [832-2] HINT:  Consider increasing the configuration parameter "max_wal_size".
+2017-07-31 13:46:23.016 EST [768-1] postgres@postgres FATAL:  the database system is starting up
+2017-07-31 13:46:55.637 EST [771-1] postgres@postgres FATAL:  the database system is starting up

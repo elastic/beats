@@ -69,7 +69,8 @@ type Field struct {
 	UrlTemplate          []VersionizedString `config:"url_template"`
 	OpenLinkInCurrentTab *bool               `config:"open_link_in_current_tab"`
 
-	Path string
+	Overwrite bool `config:"overwrite"`
+	Path      string
 }
 
 type VersionizedString struct {

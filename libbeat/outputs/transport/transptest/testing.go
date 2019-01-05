@@ -236,7 +236,7 @@ func GenCertForTestingPurpose(t *testing.T, host, name, keyPassword string) erro
 		NotAfter:              time.Now().AddDate(10, 0, 0),
 		SubjectKeyId:          []byte("12345"),
 		BasicConstraintsValid: true,
-		IsCA: true,
+		IsCA:                  true,
 		ExtKeyUsage: []x509.ExtKeyUsage{
 			x509.ExtKeyUsageClientAuth,
 			x509.ExtKeyUsageServerAuth},

@@ -38,7 +38,10 @@ type CPUStats struct {
 	SystemUsagePercentage       float64
 }
 
-type CPUService struct{}
+// CPUService is a helper to collect docker CPU metrics
+type CPUService struct {
+	Cores bool
+}
 
 func NewCpuService() *CPUService {
 	return &CPUService{}
@@ -57,10 +60,9 @@ func (c *CPUService) getCPUStatsList(rawStats []docker.Stat, dedot bool) []CPUSt
 func (c *CPUService) getCPUStats(myRawStat *docker.Stat, dedot bool) CPUStats {
 	usage := cpuUsage{Stat: myRawStat}
 
-	return CPUStats{
+	stats := CPUStats{
 		Time:                        common.Time(myRawStat.Stats.Read),
 		Container:                   docker.NewContainer(myRawStat.Container, dedot),
-		PerCpuUsage:                 usage.PerCPU(),
 		TotalUsage:                  usage.Total(),
 		UsageInKernelmode:           myRawStat.Stats.CPUStats.CPUUsage.UsageInKernelmode,
 		UsageInKernelmodePercentage: usage.InKernelMode(),
@@ -69,6 +71,12 @@ func (c *CPUService) getCPUStats(myRawStat *docker.Stat, dedot bool) CPUStats {
 		SystemUsage:                 myRawStat.Stats.CPUStats.SystemUsage,
 		SystemUsagePercentage:       usage.System(),
 	}
+
+	if c.Cores {
+		stats.PerCpuUsage = usage.PerCPU()
+	}
+
+	return stats
 }
 
 // TODO: These helper should be merged with the cpu helper in system/cpu

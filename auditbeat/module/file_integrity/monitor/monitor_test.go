@@ -248,7 +248,7 @@ func TestRecursiveSubdirPermissions(t *testing.T) {
 	// File "b/b" is missing because a watch to b couldn't be installed
 
 	expected := map[string]fsnotify.Op{
-		dest: fsnotify.Create,
+		dest:                       fsnotify.Create,
 		filepath.Join(dest, "a"):   fsnotify.Create,
 		filepath.Join(dest, "a/a"): fsnotify.Create,
 		filepath.Join(dest, "b"):   fsnotify.Create,

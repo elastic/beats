@@ -62,7 +62,6 @@ class Test(BaseTest):
         output = self.read_output()
 
         assert len(output) == 2
-        assert output[0]["prospector.type"] == "tcp"
         assert output[0]["input.type"] == "tcp"
 
         sock.close()

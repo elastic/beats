@@ -21,7 +21,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -58,31 +58,43 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
-	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+jobPath)
+	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.getServiceURI())
 	if err != nil {
-		r.Error(errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
+		err = errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug(elasticsearch.ModuleName, "Trying to fetch machine learning job stats from a non-master node.")
+		m.Log.Debug("trying to fetch machine learning job stats from a non-master node")
+		return
+	}
+
+	info, err := elasticsearch.GetInfo(m.HTTP, m.getServiceURI())
+	if err != nil {
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
 	if m.XPack {
-		eventsMappingXPack(r, m, content)
+		err = eventsMappingXPack(r, m, *info, content)
 	} else {
-		err = eventsMapping(r, content)
-		if err != nil {
-			r.Error(err)
-			return
-		}
+		err = eventsMapping(r, *info, content)
 	}
+
+	if err != nil {
+		m.Log.Error(err)
+		return
+	}
+}
+
+func (m *MetricSet) getServiceURI() string {
+	return m.HostData().SanitizedURI + jobPath
 }

@@ -6,4 +6,4 @@ var:
       - /var/log/kibana/kibana.stdout
 
 ingest_pipeline: ingest/pipeline.json
-prospector: config/log.yml
+input: config/log.yml
