@@ -20,7 +20,7 @@
           "start": "2017-01-11T11:47:22.867Z"
         },
         "flow": {
-          "id": "-6Te1tDf44E",
+          "id": "wdxUeEaOBho",
           "locality": "public"
         },
         "netflow": {
@@ -48,7 +48,7 @@
         },
         "network": {
           "bytes": 128,
-          "community_id": "1:Vq90QiM+mzZbbo5vY5GdjE9OrRc=",
+          "community_id": "1:7MtHGVqegLvVBZnjbdFbAv+jNIM=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 3,
@@ -84,8 +84,8 @@
           "start": "2017-01-11T11:47:22.866Z"
         },
         "flow": {
-          "id": "R1qTxPMgj7U",
-          "locality": "private"
+          "id": "wdxUeEaOBho",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "100.78.40.201",
@@ -112,7 +112,7 @@
         },
         "network": {
           "bytes": 172,
-          "community_id": "1:q9x0h1eGokXApDL651a/13CjP74=",
+          "community_id": "1:7MtHGVqegLvVBZnjbdFbAv+jNIM=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 4,
@@ -148,7 +148,7 @@
           "start": "2017-01-11T11:22:43.939Z"
         },
         "flow": {
-          "id": "99lFCpKjscc",
+          "id": "6_Ia6lqx2cg",
           "locality": "public"
         },
         "netflow": {
@@ -176,7 +176,7 @@
         },
         "network": {
           "bytes": 3943,
-          "community_id": "1:2fY1XMUII4NBiXGj6I6Knj1Kg4A=",
+          "community_id": "1:sO2dc+7dqGsF7s8EIdc2tq1XlhQ=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 10,
@@ -212,8 +212,8 @@
           "start": "2017-01-11T11:22:43.939Z"
         },
         "flow": {
-          "id": "qKNwoK4AM-I",
-          "locality": "private"
+          "id": "6_Ia6lqx2cg",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "100.78.40.201",
@@ -240,7 +240,7 @@
         },
         "network": {
           "bytes": 3052,
-          "community_id": "1:yMe4rLBOcLy4kK6KxECnRMoxH5Y=",
+          "community_id": "1:sO2dc+7dqGsF7s8EIdc2tq1XlhQ=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 11,

@@ -17,8 +17,8 @@
           "kind": "event"
         },
         "flow": {
-          "id": "4sqHgIUNdhc",
-          "locality": "private"
+          "id": "5JpExP8VeSU",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "2.2.2.11",
@@ -45,7 +45,7 @@
         },
         "network": {
           "bytes": 56,
-          "community_id": "1:SmwvOXNzqf078/v4Sdnv4cSsPEI=",
+          "community_id": "1:myH1DIuDZe/vHHCWbrfgfAthgew=",
           "direction": "unknown",
           "iana_number": 1,
           "transport": "icmp"
@@ -77,8 +77,8 @@
           "kind": "event"
         },
         "flow": {
-          "id": "3zooPayCX08",
-          "locality": "private"
+          "id": "MSQgezzAYh0",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "164.164.37.11",
@@ -105,7 +105,7 @@
         },
         "network": {
           "bytes": 56,
-          "community_id": "1:ze3NNjzfiQKBNJMVnoVNEOJInGg=",
+          "community_id": "1:V7bWHU0GRcqdysY463DKjFqxvKI=",
           "direction": "unknown",
           "iana_number": 1,
           "transport": "icmp"
@@ -137,7 +137,7 @@
           "kind": "event"
         },
         "flow": {
-          "id": "rjHIoePwVUY",
+          "id": "MSQgezzAYh0",
           "locality": "public"
         },
         "netflow": {
@@ -165,7 +165,7 @@
         },
         "network": {
           "bytes": 56,
-          "community_id": "1:xvskJWklV13yhdmqo/CeIyXRtsY=",
+          "community_id": "1:2DYf0o1HOtKayoor66sl7Vub2Oo=",
           "direction": "unknown",
           "iana_number": 1,
           "transport": "icmp"
@@ -197,8 +197,8 @@
           "kind": "event"
         },
         "flow": {
-          "id": "kTUBU9vFxdg",
-          "locality": "private"
+          "id": "ioGVEAJtaEQ",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "164.164.37.11",
@@ -225,7 +225,7 @@
         },
         "network": {
           "bytes": 56,
-          "community_id": "1:RThhKEIaevWgAeGJidFNVthplto=",
+          "community_id": "1:Zjs1q5mpf5QMXR1tU6wLZdnMtdA=",
           "direction": "unknown",
           "iana_number": 1,
           "transport": "icmp"
@@ -257,7 +257,7 @@
           "kind": "event"
         },
         "flow": {
-          "id": "xPJhkFDpNiU",
+          "id": "ioGVEAJtaEQ",
           "locality": "public"
         },
         "netflow": {
@@ -285,7 +285,7 @@
         },
         "network": {
           "bytes": 56,
-          "community_id": "1:xvskJWklV13yhdmqo/CeIyXRtsY=",
+          "community_id": "1:WNySyMxsWxABzgjoEp5ntzEwEgk=",
           "direction": "unknown",
           "iana_number": 1,
           "transport": "icmp"
@@ -317,8 +317,8 @@
           "kind": "event"
         },
         "flow": {
-          "id": "AxuXms6GBGk",
-          "locality": "private"
+          "id": "0xqELVtMeog",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "2.2.2.11",
@@ -345,7 +345,7 @@
         },
         "network": {
           "bytes": 56,
-          "community_id": "1:u/b3SLdlsknqQeCYLejlqwSewgo=",
+          "community_id": "1:PuujUZZmIcmzKkqujVxq5IpNdeM=",
           "direction": "unknown",
           "iana_number": 1,
           "transport": "icmp"
@@ -377,7 +377,7 @@
           "kind": "event"
         },
         "flow": {
-          "id": "gFKfPBsWfLM",
+          "id": "0xqELVtMeog",
           "locality": "public"
         },
         "netflow": {
@@ -405,7 +405,7 @@
         },
         "network": {
           "bytes": 56,
-          "community_id": "1:kS6rsnr70uQ6xFsuYMkvCKSdW8k=",
+          "community_id": "1:8u4RQjZfNIm4syRFBIcBDWdPF1Y=",
           "direction": "unknown",
           "iana_number": 1,
           "transport": "icmp"
@@ -437,7 +437,7 @@
           "kind": "event"
         },
         "flow": {
-          "id": "eHdG6rUdn28",
+          "id": "LA3WpK17LAw",
           "locality": "public"
         },
         "netflow": {
@@ -465,7 +465,7 @@
         },
         "network": {
           "bytes": 56,
-          "community_id": "1:kS6rsnr70uQ6xFsuYMkvCKSdW8k=",
+          "community_id": "1:4ynMlyrnyCCUUIBjD4py4iLgx6g=",
           "direction": "unknown",
           "iana_number": 1,
           "transport": "icmp"
@@ -497,8 +497,8 @@
           "kind": "event"
         },
         "flow": {
-          "id": "JVI-3U3vTiM",
-          "locality": "private"
+          "id": "LA3WpK17LAw",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "2.2.2.11",
@@ -525,7 +525,7 @@
         },
         "network": {
           "bytes": 56,
-          "community_id": "1:SmwvOXNzqf078/v4Sdnv4cSsPEI=",
+          "community_id": "1:myH1DIuDZe/vHHCWbrfgfAthgew=",
           "direction": "unknown",
           "iana_number": 1,
           "transport": "icmp"
@@ -557,7 +557,7 @@
           "kind": "event"
         },
         "flow": {
-          "id": "pc77-XHjAxs",
+          "id": "tBFZO1WrQyk",
           "locality": "public"
         },
         "netflow": {
@@ -585,7 +585,7 @@
         },
         "network": {
           "bytes": 160,
-          "community_id": "1:xvskJWklV13yhdmqo/CeIyXRtsY=",
+          "community_id": "1:R0zsc95RXUvk7jJdJGPDDw/ol88=",
           "direction": "unknown",
           "iana_number": 1,
           "transport": "icmp"
@@ -617,8 +617,8 @@
           "kind": "event"
         },
         "flow": {
-          "id": "Qh5mk2U4KjY",
-          "locality": "private"
+          "id": "oil2JqFPSyE",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "164.164.37.11",
@@ -645,7 +645,7 @@
         },
         "network": {
           "bytes": 56,
-          "community_id": "1:ze3NNjzfiQKBNJMVnoVNEOJInGg=",
+          "community_id": "1:V7bWHU0GRcqdysY463DKjFqxvKI=",
           "direction": "unknown",
           "iana_number": 1,
           "transport": "icmp"
@@ -677,7 +677,7 @@
           "kind": "event"
         },
         "flow": {
-          "id": "v3tlG0bhLIU",
+          "id": "oil2JqFPSyE",
           "locality": "public"
         },
         "netflow": {
@@ -705,7 +705,7 @@
         },
         "network": {
           "bytes": 56,
-          "community_id": "1:xvskJWklV13yhdmqo/CeIyXRtsY=",
+          "community_id": "1:2DYf0o1HOtKayoor66sl7Vub2Oo=",
           "direction": "unknown",
           "iana_number": 1,
           "transport": "icmp"
@@ -737,8 +737,8 @@
           "kind": "event"
         },
         "flow": {
-          "id": "arIGi4uQChk",
-          "locality": "private"
+          "id": "Pbk_o-xetL4",
+          "locality": "public"
         },
         "netflow": {
           "destination_ipv4_address": "164.164.37.11",
@@ -765,7 +765,7 @@
         },
         "network": {
           "bytes": 56,
-          "community_id": "1:RThhKEIaevWgAeGJidFNVthplto=",
+          "community_id": "1:Zjs1q5mpf5QMXR1tU6wLZdnMtdA=",
           "direction": "unknown",
           "iana_number": 1,
           "transport": "icmp"
@@ -797,7 +797,7 @@
           "kind": "event"
         },
         "flow": {
-          "id": "v3tlG0bhLIU",
+          "id": "Pbk_o-xetL4",
           "locality": "public"
         },
         "netflow": {
@@ -825,7 +825,7 @@
         },
         "network": {
           "bytes": 56,
-          "community_id": "1:xvskJWklV13yhdmqo/CeIyXRtsY=",
+          "community_id": "1:WNySyMxsWxABzgjoEp5ntzEwEgk=",
           "direction": "unknown",
           "iana_number": 1,
           "transport": "icmp"
