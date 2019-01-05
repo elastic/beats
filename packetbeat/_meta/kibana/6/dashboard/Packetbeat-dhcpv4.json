@@ -104,8 +104,8 @@
       },
       "id": "8460fcd0-8baa-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2018-07-19T23:34:10.931Z",
-      "version": 2
+      "updated_at": "2019-01-04T14:55:16.796Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -167,8 +167,8 @@
       },
       "id": "4ad9db20-8bab-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2018-07-20T01:34:04.130Z",
-      "version": 3
+      "updated_at": "2019-01-04T14:55:16.796Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -249,7 +249,7 @@
       },
       "id": "418dfbe0-8bac-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2018-07-19T23:34:18.526Z",
+      "updated_at": "2019-01-04T14:55:16.796Z",
       "version": 1
     },
     {
@@ -313,7 +313,7 @@
       },
       "id": "b8992150-8ba8-11e8-9676-ef67484126fb",
       "type": "search",
-      "updated_at": "2018-07-19T23:09:00.260Z",
+      "updated_at": "2019-01-04T14:55:16.796Z",
       "version": 1
     },
     {
@@ -379,7 +379,7 @@
       },
       "id": "d0120dc0-8bac-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2018-07-19T23:38:17.628Z",
+      "updated_at": "2019-01-04T14:55:16.796Z",
       "version": 1
     },
     {
@@ -445,7 +445,7 @@
       },
       "id": "11d33ea0-8bad-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2018-07-19T23:40:07.946Z",
+      "updated_at": "2019-01-04T14:55:16.796Z",
       "version": 1
     },
     {
@@ -521,8 +521,8 @@
       },
       "id": "f43a8f20-8bb5-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2018-07-20T01:12:43.593Z",
-      "version": 2
+      "updated_at": "2019-01-04T14:55:16.796Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -544,16 +544,115 @@
           "hidePanelTitles": false,
           "useMargins": true
         },
-        "panelsJSON": null,
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 9,
+              "i": "1",
+              "w": 48,
+              "x": 0,
+              "y": 7
+            },
+            "id": "8460fcd0-8baa-11e8-9676-ef67484126fb",
+            "panelIndex": "1",
+            "type": "visualization",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 7,
+              "i": "2",
+              "w": 8,
+              "x": 0,
+              "y": 0
+            },
+            "id": "4ad9db20-8bab-11e8-9676-ef67484126fb",
+            "panelIndex": "2",
+            "type": "visualization",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 7,
+              "i": "3",
+              "w": 11,
+              "x": 37,
+              "y": 0
+            },
+            "id": "418dfbe0-8bac-11e8-9676-ef67484126fb",
+            "panelIndex": "3",
+            "type": "visualization",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 14,
+              "i": "5",
+              "w": 48,
+              "x": 0,
+              "y": 16
+            },
+            "id": "b8992150-8ba8-11e8-9676-ef67484126fb",
+            "panelIndex": "5",
+            "type": "search",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 7,
+              "i": "6",
+              "w": 8,
+              "x": 8,
+              "y": 0
+            },
+            "id": "d0120dc0-8bac-11e8-9676-ef67484126fb",
+            "panelIndex": "6",
+            "type": "visualization",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 7,
+              "i": "7",
+              "w": 8,
+              "x": 16,
+              "y": 0
+            },
+            "id": "11d33ea0-8bad-11e8-9676-ef67484126fb",
+            "panelIndex": "7",
+            "type": "visualization",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 7,
+              "i": "8",
+              "w": 13,
+              "x": 24,
+              "y": 0
+            },
+            "id": "f43a8f20-8bb5-11e8-9676-ef67484126fb",
+            "panelIndex": "8",
+            "type": "visualization",
+            "version": "6.3.0"
+          }
+        ],
         "timeRestore": false,
         "title": "[Packetbeat] DHCPv4",
         "version": 1
       },
       "id": "a7b35890-8baa-11e8-9676-ef67484126fb",
       "type": "dashboard",
-      "updated_at": "2018-07-20T01:35:46.643Z",
-      "version": 7
+      "updated_at": "2019-01-04T15:03:10.809Z",
+      "version": 2
     }
   ],
-  "version": "6.3.0"
+  "version": "6.6.0-SNAPSHOT"
 }

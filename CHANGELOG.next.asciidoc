@@ -65,6 +65,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Fix DHCPv4 dashboard that wouldn't load in Kibana. {issue}9850[9850]
+
 *Winlogbeat*
 
 *Functionbeat*
