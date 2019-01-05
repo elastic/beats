@@ -31,7 +31,7 @@ type MetricSet struct {
 	pool *rd.Pool
 }
 
-// New creates new instance of MetricSet
+// NewMetricSet creates the base for Redis metricsets
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	// Unpack additional configuration options.
 	config := struct {
@@ -56,6 +56,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}, nil
 }
 
+// Connection returns a redis connection from the pool
 func (m *MetricSet) Connection() rd.Conn {
 	return m.pool.Get()
 }
