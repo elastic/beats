@@ -17233,181 +17233,6 @@ nats Module
 
 
 [float]
-== connz fields
-
-Contains nats connection related metrics
-
-
-
-[float]
-== metrics fields
-
-Metrics of connz URI
-
-
-
-*`nats.connz.metrics.metrics.num_subscriptions`*::
-+
---
-type: integer
-
---
-
-*`nats.connz.metrics.metrics.num_cache`*::
-+
---
-type: integer
-
---
-
-*`nats.connz.metrics.metrics.num_inserts`*::
-+
---
-type: integer
-
---
-
-*`nats.connz.metrics.metrics.num_removes`*::
-+
---
-type: integer
-
---
-
-*`nats.connz.metrics.metrics.num_matches`*::
-+
---
-type: integer
-
---
-
-*`nats.connz.metrics.metrics.cache_hit_rate`*::
-+
---
-type: integer
-
---
-
-*`nats.connz.metrics.metrics.max_fanout`*::
-+
---
-type: integer
-
---
-
-*`nats.connz.metrics.metrics.avg_fanout`*::
-+
---
-type: integer
-
---
-
-[float]
-== routez fields
-
-Contains nats routes related metrics
-
-
-
-[float]
-== metrics fields
-
-Metrics of routez URI
-
-
-
-*`nats.routez.metrics.metrics.server_id`*::
-+
---
-type: string
-
---
-
-*`nats.routez.metrics.metrics.now`*::
-+
---
-type: date
-
---
-
-*`nats.routez.metrics.metrics.num_routes`*::
-+
---
-type: integer
-
---
-
-*`nats.routez.metrics.metrics.routes`*::
-+
---
-type: nested
-
---
-
-[float]
-== subz fields
-
-Contains nats subscriptions related metrics
-
-
-
-[float]
-== metrics fields
-
-Metrics of subz URI
-
-
-
-*`nats.subz.metrics.metrics.server_id`*::
-+
---
-type: string
-
---
-
-*`nats.subz.metrics.metrics.now`*::
-+
---
-type: date
-
---
-
-*`nats.subz.metrics.metrics.num_connections`*::
-+
---
-type: integer
-
---
-
-*`nats.subz.metrics.metrics.total`*::
-+
---
-type: integer
-
---
-
-*`nats.subz.metrics.metrics.offset`*::
-+
---
-type: integer
-
---
-
-*`nats.subz.metrics.metrics.limit`*::
-+
---
-type: integer
-
---
-
-*`nats.subz.metrics.metrics.connections`*::
-+
---
-type: nested
-
---
-
-[float]
 == varz fields
 
 Contains nats var related metrics
@@ -17426,138 +17251,8 @@ Metrics of varz URI
 --
 type: string
 
---
+The server ID
 
-*`nats.varz.metrics.metrics.version`*::
-+
---
-type: string
-
---
-
-*`nats.varz.metrics.metrics.proto`*::
-+
---
-type: integer
-
---
-
-*`nats.varz.metrics.metrics.git_commit`*::
-+
---
-type: string
-
---
-
-*`nats.varz.metrics.metrics.go`*::
-+
---
-type: string
-
---
-
-*`nats.varz.metrics.metrics.host`*::
-+
---
-type: string
-
---
-
-*`nats.varz.metrics.metrics.addr`*::
-+
---
-type: string
-
---
-
-*`nats.varz.metrics.metrics.max_connections`*::
-+
---
-type: integer
-
---
-
-*`nats.varz.metrics.metrics.ping_interval`*::
-+
---
-type: integer
-
---
-
-*`nats.varz.metrics.metrics.ping_max`*::
-+
---
-type: integer
-
---
-
-*`nats.varz.metrics.metrics.http_host`*::
-+
---
-type: string
-
---
-
-*`nats.varz.metrics.metrics.http_port`*::
-+
---
-type: integer
-
---
-
-*`nats.varz.metrics.metrics.https_port`*::
-+
---
-type: integer
-
---
-
-*`nats.varz.metrics.metrics.auth_timeout`*::
-+
---
-type: integer
-
---
-
-*`nats.varz.metrics.metrics.max_control_line`*::
-+
---
-type: integer
-
---
-
-*`nats.varz.metrics.metrics.cluster`*::
-+
---
-type: object
-
---
-
-*`nats.varz.metrics.metrics.tls_timeout`*::
-+
---
-type: float
-
---
-
-*`nats.varz.metrics.metrics.port`*::
-+
---
-type: integer
-
---
-
-*`nats.varz.metrics.metrics.max_payload`*::
-+
---
-type: integer
-
---
-
-*`nats.varz.metrics.metrics.start`*::
-+
---
-type: date
 
 --
 
@@ -17566,12 +17261,18 @@ type: date
 --
 type: date
 
+Server time of metric creation
+
+
 --
 
 *`nats.varz.metrics.metrics.uptime`*::
 +
 --
 type: string
+
+The period the server is up
+
 
 --
 
@@ -17580,12 +17281,18 @@ type: string
 --
 type: integer
 
+The current memory usage of NATS process
+
+
 --
 
 *`nats.varz.metrics.metrics.cores`*::
 +
 --
 type: integer
+
+The number of logical cores the NATS process runs on
+
 
 --
 
@@ -17594,12 +17301,8 @@ type: integer
 --
 type: integer
 
---
+The current cpu usage of NATs process
 
-*`nats.varz.metrics.metrics.connections`*::
-+
---
-type: integer
 
 --
 
@@ -17608,12 +17311,8 @@ type: integer
 --
 type: integer
 
---
+The number of totally created clients
 
-*`nats.varz.metrics.metrics.routes`*::
-+
---
-type: integer
 
 --
 
@@ -17622,33 +17321,48 @@ type: integer
 --
 type: integer
 
+The number of registered remotes
+
+
 --
 
-*`nats.varz.metrics.metrics.in_msgs`*::
+*`nats.varz.metrics.metrics.msgs.in`*::
 +
 --
 type: integer
 
+The amount of incoming messages
+
+
 --
 
-*`nats.varz.metrics.metrics.out_msgs`*::
+*`nats.varz.metrics.metrics.msgs.out`*::
 +
 --
 type: integer
 
+The amount of outgoing messages
+
+
 --
 
-*`nats.varz.metrics.metrics.in_bytes`*::
+*`nats.varz.metrics.metrics.bytes.in`*::
 +
 --
 type: integer
 
+The amount of incoming bytes
+
+
 --
 
-*`nats.varz.metrics.metrics.out_bytes`*::
+*`nats.varz.metrics.metrics.bytes.out`*::
 +
 --
 type: integer
+
+The amount of outgoing bytes
+
 
 --
 
@@ -17657,40 +17371,58 @@ type: integer
 --
 type: integer
 
---
+The number of slow consumers currently on NATS
 
-*`nats.varz.metrics.metrics.max_pending`*::
-+
---
-type: integer
 
 --
 
-*`nats.varz.metrics.metrics.write_deadline`*::
-+
---
-type: integer
-
---
-
-*`nats.varz.metrics.metrics.subscriptions`*::
-+
---
-type: integer
-
---
-
-*`nats.varz.metrics.metrics.http_req_stats`*::
+*`nats.varz.metrics.metrics.http_req_stats.root_uri`*::
 +
 --
 type: object
 
+The number of hits on root monitoring uri
+
+
 --
 
-*`nats.varz.metrics.metrics.config_load_time`*::
+*`nats.varz.metrics.metrics.http_req_stats.connz_uri`*::
 +
 --
-type: date
+type: object
+
+The number of hits on connz monitoring uri
+
+
+--
+
+*`nats.varz.metrics.metrics.http_req_stats.routez_uri`*::
++
+--
+type: object
+
+The number of hits on routez monitoring uri
+
+
+--
+
+*`nats.varz.metrics.metrics.http_req_stats.subsz_uri`*::
++
+--
+type: object
+
+The number of hits on subsz monitoring uri
+
+
+--
+
+*`nats.varz.metrics.metrics.http_req_stats.varz_uri`*::
++
+--
+type: object
+
+The number of hits on varz monitoring uri
+
 
 --
 
