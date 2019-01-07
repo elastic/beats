@@ -591,8 +591,7 @@ The list of known Logstash servers to connect to. If load balancing is disabled,
 multiple hosts are configured, one host is selected randomly (there is no precedence).
 If one host becomes unreachable, another one is selected randomly.
 
-All entries in this list can contain a port number. If no port number is given, the
-value specified for <<port,`port`>> is used as the default port number.
+All entries in this list can contain a port number. The default port number 5044 will be used, if no number is given.
 
 ===== `compression_level`
 
@@ -649,14 +648,6 @@ Configures number of batches to be sent asynchronously to logstash while waiting
 for ACK from logstash. Output only becomes blocking once number of `pipelining`
 batches have been written. Pipelining is disabled if a values of 0 is
 configured. The default value is 2.
-
-[[port]]
-===== `port`
-
-deprecated[5.0.0]
-
-The default port to use if the port number is not given in <<hosts,`hosts`>>. The default port number
-is 5044.
 
 ===== `proxy_url`
 
@@ -1048,12 +1039,6 @@ distributed to the servers in the list. If one server becomes unreachable, the e
 distributed to the reachable servers only. You can define each Redis server by specifying
 `HOST` or `HOST:PORT`. For example: `"192.15.3.2"` or `"test.redis.io:12345"`. If you
 don't specify a port number, the value configured by `port` is used.
-
-===== `port`
-
-deprecated[5.0.0]
-
-The Redis port to use if `hosts` does not contain a port number. The default is 6379.
 
 ===== `index`
 
