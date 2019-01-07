@@ -7,7 +7,7 @@ exclude_files: [".gz$"]
 
 processors:
 - dissect:
-    tokenizer: '%{traefik.access.remote_ip} - %{traefik.access.user_name} [%{traefik.access.time}]
+    tokenizer: '%{traefik.access.remote_ip} %{traefik.access.user_identifier} %{traefik.access.user_name} [%{traefik.access.time}]
     "%{traefik.access.method} %{traefik.access.url} HTTP/%{traefik.access.http_version}"
     %{traefik.access.response_code} %{traefik.access.message}'
 

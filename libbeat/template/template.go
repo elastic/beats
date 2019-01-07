@@ -22,11 +22,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/go-ucfg/yaml"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
-	"github.com/elastic/go-ucfg/yaml"
 )
 
 var (
@@ -51,7 +52,7 @@ type Template struct {
 }
 
 // New creates a new template instance
-func New(beatVersion string, beatName string, esVersion string, config TemplateConfig) (*Template, error) {
+func New(beatVersion string, beatName string, esVersion common.Version, config TemplateConfig) (*Template, error) {
 	bV, err := common.NewVersion(beatVersion)
 	if err != nil {
 		return nil, err
@@ -95,21 +96,15 @@ func New(beatVersion string, beatName string, esVersion string, config TemplateC
 		return nil, err
 	}
 
-	// In case no esVersion is set, it is assumed the same as beat version
-	if esVersion == "" {
-		esVersion = beatVersion
-	}
-
-	esV, err := common.NewVersion(esVersion)
-	if err != nil {
-		return nil, err
+	if !esVersion.IsValid() {
+		esVersion = *bV
 	}
 
 	return &Template{
 		pattern:     pattern,
 		name:        name,
 		beatVersion: *bV,
-		esVersion:   *esV,
+		esVersion:   esVersion,
 		config:      config,
 	}, nil
 }

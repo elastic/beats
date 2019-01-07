@@ -19,8 +19,7 @@ class Test(BaseTest):
         )
         journalbeat_proc = self.start_beat()
 
-        self.wait_until(lambda: self.log_contains(
-            "journalbeat is running"), max_timeout=10)
+        self.wait_until(lambda: self.log_contains("journalbeat is running"))
 
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
@@ -33,6 +32,7 @@ class Test(BaseTest):
 
         self.render_config_template(
             journal_path=self.beat_path + "/tests/system/input/",
+            seek_method="tail",
             path=os.path.abspath(self.working_dir) + "/log/*"
         )
         journalbeat_proc = self.start_beat()
@@ -70,6 +70,36 @@ class Test(BaseTest):
             "Reading from the beginning of the journal file",
             # message can be read from test journal
             "\"message\": \"thinkpad_acpi: unhandled HKEY event 0x60b0\"",
+        ]
+        for snippet in required_log_snippets:
+            self.wait_until(lambda: self.log_contains(snippet),
+                            name="Line in '{}' Journalbeat log".format(snippet))
+
+        exit_code = journalbeat_proc.kill_and_wait()
+        assert exit_code == 0
+
+    @unittest.skipUnless(sys.platform.startswith("linux"), "Journald only on Linux")
+    def test_start_with_selected_journal_file_with_cursor_fallback(self):
+        """
+        Journalbeat is able to open a journal file and start to read it from the position configured by seek and cursor_seek_fallback.
+        """
+
+        self.render_config_template(
+            journal_path=self.beat_path + "/tests/system/input/test.journal",
+            seek_method="cursor",
+            cursor_seek_fallback="tail",
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            registry_file=self.beat_path + "/empty_test_registry",
+        )
+        journalbeat_proc = self.start_beat()
+
+        required_log_snippets = [
+            # journalbeat can be started
+            "journalbeat is running",
+            # journalbeat can seek to the position defined in cursor_seek_fallback.
+            "Seeking method set to cursor, but no state is saved for reader. Starting to read from the end",
+            # message can be read from test journal
+            "\"message\": \"thinkpad_acpi: please report the conditions when this event happened to ibm-acpi-devel@lists.sourceforge.net\"",
         ]
         for snippet in required_log_snippets:
             self.wait_until(lambda: self.log_contains(snippet),

@@ -12,6 +12,7 @@ This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 This document describes the fields that are exported by Filebeat. They are
 grouped in the following categories:
 
+* <<exported-fields-alias>>
 * <<exported-fields-apache2>>
 * <<exported-fields-auditd>>
 * <<exported-fields-beat>>
@@ -37,6 +38,121 @@ grouped in the following categories:
 * <<exported-fields-traefik>>
 
 --
+[[exported-fields-alias]]
+== Alias fields
+
+Alias fields for compatibility with 7.x.
+
+
+
+*`host.hostname`*::
++
+--
+type: alias
+
+alias to: beat.hostname
+
+--
+
+*`event.timezone`*::
++
+--
+type: alias
+
+alias to: beat.timezone
+
+--
+
+*`cloud.provider`*::
++
+--
+type: alias
+
+alias to: meta.cloud.provider
+
+--
+
+*`cloud.instance.id`*::
++
+--
+type: alias
+
+alias to: meta.cloud.instance_id
+
+--
+
+*`cloud.instance.name`*::
++
+--
+type: alias
+
+alias to: meta.cloud.instance_name
+
+--
+
+*`cloud.machine.type`*::
++
+--
+type: alias
+
+alias to: meta.cloud.machine_type
+
+--
+
+*`cloud.availability_zone`*::
++
+--
+type: alias
+
+alias to: meta.cloud.availability_zone
+
+--
+
+*`cloud.project.id`*::
++
+--
+type: alias
+
+alias to: meta.cloud.project_id
+
+--
+
+*`cloud.region`*::
++
+--
+type: alias
+
+alias to: meta.cloud.region
+
+--
+
+*`container.id`*::
++
+--
+type: alias
+
+alias to: docker.container.id
+
+--
+
+*`container.name`*::
++
+--
+type: alias
+
+alias to: docker.container.name
+
+--
+
+*`container.image.name`*::
++
+--
+type: alias
+
+alias to: docker.container.image
+
+--
+
 [[exported-fields-apache2]]
 == Apache2 fields
 
@@ -64,6 +180,26 @@ Contains fields for the Apache2 HTTPD access logs.
 type: keyword
 
 Client IP address.
+
+
+--
+
+*`apache2.access.ssl.protocol`*::
++
+--
+type: keyword
+
+SSL protocol version.
+
+
+--
+
+*`apache2.access.ssl.cipher`*::
++
+--
+type: keyword
+
+SSL cipher name.
 
 
 --
@@ -3008,6 +3144,14 @@ The Filebeat fileset that generated this event.
 
 --
 
+*`event.dataset`*::
++
+--
+The Filebeat dataset that generated this event.
+
+
+--
+
 *`syslog.facility`*::
 +
 --
@@ -3116,6 +3260,26 @@ Logging level.
 +
 --
 This field contains the flags of the event.
+
+
+--
+
+*`log.source.address`*::
++
+--
+type: keyword
+
+Log source address.
+
+
+--
+
+*`log.file.path`*::
++
+--
+type: keyword
+
+Log source path.
 
 
 --
@@ -3526,6 +3690,15 @@ Path to the file.
 type: long
 
 File size in bytes (field is only added when `type` is `file`).
+
+--
+
+*`event.module`*::
++
+--
+type: alias
+
+alias to: fileset.module
 
 --
 
@@ -4415,6 +4588,16 @@ Process id
 
 --
 
+*`postgresql.log.core_id`*::
++
+--
+type: long
+
+Core id
+
+
+--
+
 *`postgresql.log.user`*::
 +
 --
@@ -4993,12 +5176,32 @@ Client IP address.
 
 --
 
+*`traefik.access.duration`*::
++
+--
+type: long
+
+Duration of the access entry.
+
+
+--
+
 *`traefik.access.user_name`*::
 +
 --
 type: keyword
 
 The user name used when basic authentication is used.
+
+
+--
+
+*`traefik.access.user_identifier`*::
++
+--
+type: keyword
+
+Is the RFC 1413 identity of the client
 
 
 --
@@ -5090,6 +5293,16 @@ Contains the parsed User agent field. Only present if the user agent Elasticsear
 type: keyword
 
 The name of the physical device.
+
+
+--
+
+*`traefik.access.user_agent.build`*::
++
+--
+type: keyword
+
+The build of the user agent.
 
 
 --

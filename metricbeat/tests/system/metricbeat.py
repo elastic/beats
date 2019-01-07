@@ -2,12 +2,12 @@ import re
 import sys
 import os
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system'))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system')))
 
 from beat.beat import TestCase
 
 COMMON_FIELDS = ["@timestamp", "beat", "metricset.name", "metricset.host",
-                 "metricset.module", "metricset.rtt", "host.name"]
+                 "metricset.module", "metricset.rtt", "host.name", "event"]
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
@@ -19,8 +19,12 @@ class BaseTest(TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.beat_name = "metricbeat"
-        self.beat_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+        if not hasattr(self, 'beat_name'):
+            self.beat_name = "metricbeat"
+
+        if not hasattr(self, 'beat_path'):
+            self.beat_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+
         super(BaseTest, self).setUpClass()
 
     def de_dot(self, existing_fields):

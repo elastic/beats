@@ -739,6 +739,30 @@ filebeat.inputs:
   #  ids:
   #    - '*'
 
+#------------------------------ NetFlow input --------------------------------
+# Experimental: Config options for the Netflow/IPFIX collector over UDP input
+#- type: netflow
+  #enabled: false
+
+  # Address where the NetFlow Collector will bind
+  #host: ":2055"
+
+  # Maximum size of the message received over UDP
+  #max_message_size: 10KiB
+
+  # List of enabled protocols.
+  # Valid values are 'v1', 'v5', 'v6', 'v7', 'v8', 'v9' and 'ipfix'
+  #protocols: [ v5, v9, ipfix ]
+
+  # Expiration timeout
+  # This is the time before an idle session or unused template is expired.
+  # Only applicable to v9 and ipfix protocols. A value of zero disables expiration.
+  #expiration_timeout: 30m
+
+  # Queue size limits the number of netflow packets that are queued awaiting
+  # processing.
+  #queue_size: 8192
+
 #========================== Filebeat autodiscover ==============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules
@@ -766,6 +790,12 @@ filebeat.inputs:
 # Must be a valid Unix-style file permissions mask expressed in octal notation.
 # This option is not supported on Windows.
 #filebeat.registry_file_permissions: 0600
+
+# The timeout value that controls when registry entries are written to disk
+# (flushed). When an unwritten update exceeds this value, it triggers a write to
+# disk. When registry_flush is set to 0s, the registry is written to disk after
+# each batch of events has been published successfully. The default value is 0s.
+#filebeat.registry_flush: 0s
 
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines
@@ -969,6 +999,7 @@ filebeat.inputs:
 #    match_source_index: 4
 #    match_short_id: false
 #    cleanup_timeout: 60
+#    labels.dedot: false
 #    # To connect to Docker over TLS you must specify a client and CA certificate.
 #    #ssl:
 #    #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -1034,6 +1065,11 @@ output.elasticsearch:
   # In case you specify and additional path, the scheme is required: http://localhost:9200/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
+
+  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
+  #ilm.enabled: false
+  #ilm.rollover_alias: "filebeat"
+  #ilm.pattern: "{now/d}-000001"
 
   # Set gzip compression level.
   #compression_level: 0

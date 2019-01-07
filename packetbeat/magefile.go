@@ -447,5 +447,11 @@ func customizePackaging() {
 			args.Spec.ReplaceFile("{{.BeatName}}.yml", configYml)
 			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfigYml)
 		}
+
+		pkgType := args.Types[0]
+		switch pkgType {
+		case mage.Docker:
+			args.Spec.ExtraVar("linux_capabilities", "cap_net_raw,cap_net_admin=eip")
+		}
 	}
 }

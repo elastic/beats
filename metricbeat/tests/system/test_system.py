@@ -373,6 +373,9 @@ class Test(metricbeat.BaseTest):
             "extras": {
                 "process.env.whitelist": ["PATH"],
                 "process.include_cpu_ticks": True,
+
+                # Remove 'percpu' prior to checking documented fields because its keys are dynamic.
+                "process.include_per_cpu": False,
             }
         }])
         proc = self.start_beat()
@@ -394,10 +397,6 @@ class Test(metricbeat.BaseTest):
             env = process.pop("env", None)
             if env is not None:
                 found_env = True
-
-            # Remove 'percpu' prior to checking documented fields because its keys are dynamic.
-            if "cgroup" in process and "cpuacct" in process["cgroup"]:
-                del process["cgroup"]["cpuacct"]["percpu"]
 
             self.assert_fields_are_documented(evt)
 
@@ -449,7 +448,7 @@ class Test(metricbeat.BaseTest):
         assert isinstance(output["system.process.cpu.start_time"], six.string_types)
         self.check_username(output["system.process.username"])
 
-    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_socket_summary(self):
         """
         Test system/socket_summary output.
@@ -480,6 +479,9 @@ class Test(metricbeat.BaseTest):
 
             assert isinstance(tcp["all"]["count"], int)
             assert isinstance(tcp["all"]["listening"], int)
+            assert isinstance(tcp["all"]["established"], int)
+            assert isinstance(tcp["all"]["close_wait"], int)
+            assert isinstance(tcp["all"]["time_wait"], int)
 
             assert isinstance(udp["all"]["count"], int)
 

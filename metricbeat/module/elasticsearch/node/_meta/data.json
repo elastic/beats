@@ -6,10 +6,11 @@
     },
     "elasticsearch": {
         "cluster": {
-            "id": "91RpCx2xSQ21pVPTZfDK0Q",
-            "name": "elasticsearch"
+            "id": "wafoCXEDTrGxpYViNueSaA",
+            "name": "es1"
         },
         "node": {
+            "id": "v5gHTHqKSRa4bZ9vbyDy7g",
             "jvm": {
                 "memory": {
                     "heap": {
@@ -31,11 +32,11 @@
                 },
                 "version": "11.0.1"
             },
-            "name": "DSiWcTyeThWtUXLB9J0BMw",
+            "name": "es1_1",
             "process": {
                 "mlockall": false
             },
-            "version": "7.0.0-alpha1"
+            "version": "7.0.0"
         }
     },
     "metricset": {

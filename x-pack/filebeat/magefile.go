@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -19,7 +20,13 @@ import (
 
 func init() {
 	mage.BeatDescription = "Filebeat sends log files to Logstash or directly to Elasticsearch."
-	mage.BeatLicense = "Elastic"
+	mage.BeatLicense = "Elastic License"
+}
+
+// Aliases provides compatibility with CI while we transition all Beats
+// to having common testing targets.
+var Aliases = map[string]interface{}{
+	"goTestUnit": GoUnitTest, // dev-tools/jenkins_ci.ps1 uses this.
 }
 
 // Build builds the Beat binary.
@@ -27,7 +34,7 @@ func Build() error {
 	return mage.Build(mage.DefaultBuildArgs())
 }
 
-// GolangCrossBuild build the Beat binary inside of the golang-builder.
+// GolangCrossBuild builds the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
 	return mage.GolangCrossBuild(mage.DefaultGolangCrossBuildArgs())
@@ -38,14 +45,28 @@ func CrossBuild() error {
 	return mage.CrossBuild()
 }
 
-// Fields generates a fields.yml and fields.go for each module.
+// Clean cleans all generated files and build artifacts.
+func Clean() error {
+	return mage.Clean()
+}
+
+// Fields generates the fields.yml file and a fields.go for each module and
+// input.
 func Fields() {
-	mg.Deps(fieldsYML, mage.GenerateModuleFieldsGo)
+	mg.Deps(fieldsYML, moduleFieldsGo, inputFieldsGo)
+}
+
+func inputFieldsGo() error {
+	return mage.GenerateModuleFieldsGo("input")
+}
+
+func moduleFieldsGo() error {
+	return mage.GenerateModuleFieldsGo("module")
 }
 
 // fieldsYML generates a fields.yml based on filebeat + x-pack/filebeat/modules.
 func fieldsYML() error {
-	return mage.GenerateFieldsYAML(mage.OSSBeatDir("module"), "module")
+	return mage.GenerateFieldsYAML(mage.OSSBeatDir("module"), "module", "input")
 }
 
 // Dashboards collects all the dashboards and generates index patterns.
@@ -53,14 +74,84 @@ func Dashboards() error {
 	return mage.KibanaDashboards(mage.OSSBeatDir("module"), "module")
 }
 
+// ExportDashboard exports a dashboard and writes it into the correct directory.
+//
+// Required environment variables:
+// - MODULE: Name of the module
+// - ID:     Dashboard id
+func ExportDashboard() error {
+	return mage.ExportDashboard()
+}
+
 // Config generates both the short and reference configs.
 func Config() {
 	mg.Deps(shortConfig, referenceConfig, createDirModulesD)
 }
 
-// Update is an alias for running fields, dashboards, config.
+// Update is an alias for executing fields, dashboards, config.
 func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config)
+	mg.SerialDeps(Fields, Dashboards, Config, includeList)
+}
+
+func includeList() error {
+	return mage.GenerateIncludeListGo([]string{"input/*"}, []string{"module"})
+}
+
+// Fmt formats source code and adds file headers.
+func Fmt() {
+	mg.Deps(mage.Format)
+}
+
+// Check runs fmt and update then returns an error if any modifications are found.
+func Check() {
+	mg.SerialDeps(mage.Format, Update, mage.Check)
+}
+
+// IntegTest executes integration tests (it uses Docker to run the tests).
+func IntegTest() {
+	mage.AddIntegTestUsage()
+	defer mage.StopIntegTestEnv()
+	mg.SerialDeps(GoIntegTest, PythonIntegTest)
+}
+
+// UnitTest executes the unit tests.
+func UnitTest() {
+	mg.SerialDeps(GoUnitTest, PythonUnitTest)
+}
+
+// GoUnitTest executes the Go unit tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoUnitTest(ctx context.Context) error {
+	return mage.GoTest(ctx, mage.DefaultGoTestUnitArgs())
+}
+
+// GoIntegTest executes the Go integration tests.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func GoIntegTest(ctx context.Context) error {
+	return mage.RunIntegTest("goIntegTest", func() error {
+		return mage.GoTest(ctx, mage.DefaultGoTestIntegrationArgs())
+	})
+}
+
+// PythonUnitTest executes the python system tests.
+func PythonUnitTest() error {
+	mg.Deps(mage.BuildSystemTestBinary)
+	return mage.PythonNoseTest(mage.DefaultPythonTestUnitArgs())
+}
+
+// PythonIntegTest executes the python system tests in the integration environment (Docker).
+func PythonIntegTest(ctx context.Context) error {
+	if !mage.IsInIntegTestEnv() {
+		mg.Deps(Fields)
+	}
+	return mage.RunIntegTest("pythonIntegTest", func() error {
+		mg.Deps(mage.BuildSystemTestBinary)
+		args := mage.DefaultPythonTestIntegrationArgs()
+		args.Env["MODULES_PATH"] = mage.CWD("module")
+		return mage.PythonNoseTest(args)
+	})
 }
 
 // -----------------------------------------------------------------------------
@@ -142,6 +233,8 @@ func referenceConfig() error {
 	var configParts = []string{
 		mage.OSSBeatDir("_meta/common.reference.p1.yml"),
 		modulesConfigYml,
+		mage.OSSBeatDir("_meta/common.reference.inputs.yml"),
+		"_meta/common.reference.inputs.yml",
 		mage.OSSBeatDir("_meta/common.reference.p2.yml"),
 		"{{ elastic_beats_dir }}/libbeat/_meta/config.reference.yml",
 	}

@@ -159,7 +159,8 @@ class Test(BaseTest):
                 for k, obj in enumerate(objects):
                     objects[k] = self.flatten_object(obj, {}, "")
                     clean_keys(objects[k])
-                json.dump(objects, f, indent=4, sort_keys=True)
+
+                json.dump(objects, f, indent=4, separators=(',', ': '), sort_keys=True)
 
         with open(test_file + "-expected.json", "r") as f:
             expected = json.load(f)
@@ -175,11 +176,6 @@ class Test(BaseTest):
                 obj = self.flatten_object(obj, {}, "")
                 clean_keys(obj)
 
-                # Remove timestamp for comparison where timestamp is not part of the log line
-                if obj["fileset.module"] == "icinga" and obj["fileset.name"] == "startup":
-                    delete_key(obj, "@timestamp")
-                    delete_key(ev, "@timestamp")
-
                 if ev == obj:
                     found = True
                     break
@@ -190,14 +186,18 @@ class Test(BaseTest):
 
 def clean_keys(obj):
     # These keys are host dependent
-    host_keys = ["host.name", "beat.hostname", "beat.name"]
+    host_keys = ["host.name", "beat.hostname", "beat.name", "agent.ephemeral_id", "agent.id"]
     # The create timestamps area always new
     time_keys = ["read_timestamp", "event.created"]
     # source path and beat.version can be different for each run
-    other_keys = ["source", "beat.version"]
+    other_keys = ["source", "log.file.path", "beat.version"]
 
     for key in host_keys + time_keys + other_keys:
         delete_key(obj, key)
+
+    # Remove timestamp for comparison where timestamp is not part of the log line
+    if obj["event.dataset"] in ["icinga.startup", "redis.log", "haproxy.log", "system.auth", "system.syslog"]:
+        delete_key(obj, "@timestamp")
 
 
 def delete_key(obj, key):

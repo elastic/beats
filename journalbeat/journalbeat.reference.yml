@@ -25,6 +25,8 @@ journalbeat.inputs:
 
   # Position to start reading from journal. Valid values: head, tail, cursor
   seek: cursor
+  # Fallback position if no cursor data is available.
+  #cursor_seek_fallback: head
 
   # Exact matching for field values of events.
   # Matching for nginx entries: "systemd.unit=nginx"
@@ -235,6 +237,7 @@ journalbeat.inputs:
 #    match_source_index: 4
 #    match_short_id: false
 #    cleanup_timeout: 60
+#    labels.dedot: false
 #    # To connect to Docker over TLS you must specify a client and CA certificate.
 #    #ssl:
 #    #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -300,6 +303,11 @@ output.elasticsearch:
   # In case you specify and additional path, the scheme is required: http://localhost:9200/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
+
+  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
+  #ilm.enabled: false
+  #ilm.rollover_alias: "journalbeat"
+  #ilm.pattern: "{now/d}-000001"
 
   # Set gzip compression level.
   #compression_level: 0

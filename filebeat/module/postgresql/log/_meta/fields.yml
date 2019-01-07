@@ -12,7 +12,11 @@
     - name: thread_id
       type: long
       description: >
-          Process id
+        Process id
+    - name: core_id
+      type: long
+      description: >
+        Core id
     - name: user
       example: "admin"
       description:

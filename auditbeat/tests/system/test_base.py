@@ -63,7 +63,7 @@ class Test(BaseTest):
 
         dirs = [self.temp_dir("auditbeat_test")]
         with PathCleanup(dirs):
-            kibana_dir = os.path.join(self.beat_path, "_meta", "kibana.generated")
+            kibana_dir = os.path.join(self.beat_path, "build", "kibana")
             shutil.copytree(kibana_dir, os.path.join(self.working_dir, "kibana"))
 
             es = Elasticsearch([self.get_elasticsearch_url()])

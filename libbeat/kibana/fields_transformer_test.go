@@ -242,6 +242,13 @@ func TestTransformMisc(t *testing.T) {
 		{commonField: common.Field{Type: "binary"}, expected: false, attr: "doc_values"},
 		{commonField: common.Field{DocValues: &truthy, Type: "binary"}, expected: true, attr: "doc_values"},
 
+		// enabled - only applies to objects (and only if set)
+		{commonField: common.Field{Type: "binary", Enabled: &falsy}, expected: nil, attr: "enabled"},
+		{commonField: common.Field{Type: "binary", Enabled: &truthy}, expected: nil, attr: "enabled"},
+		{commonField: common.Field{Type: "object", Enabled: &truthy}, expected: true, attr: "enabled"},
+		{commonField: common.Field{Type: "object", Enabled: &falsy}, expected: false, attr: "enabled"},
+		{commonField: common.Field{Type: "object", Enabled: &falsy}, expected: false, attr: "doc_values"},
+
 		// indexed
 		{commonField: common.Field{Type: "binary"}, expected: false, attr: "indexed"},
 		{commonField: common.Field{Index: &truthy, Type: "binary"}, expected: false, attr: "indexed"},

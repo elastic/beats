@@ -14,6 +14,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :libbeat-docs: Beats Platform Reference
 :deb_os:
 :rpm_os:
+:linux_os:
 :no_dashboards:
 
 include::../../libbeat/docs/shared-beats-attributes.asciidoc[]

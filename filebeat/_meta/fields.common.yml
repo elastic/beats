@@ -56,6 +56,10 @@
       description: >
         The Filebeat fileset that generated this event.
 
+    - name: event.dataset
+      description: >
+        The Filebeat dataset that generated this event.
+
     - name: syslog.facility
       type: long
       required: false
@@ -111,6 +115,16 @@
     - name: log.flags
       description: >
         This field contains the flags of the event.
+
+    - name: log.source.address
+      type: keyword
+      description: >
+        Log source address.
+
+    - name: log.file.path
+      type: keyword
+      description: >
+        Log source path.
 
     - name: event.created
       type: date
@@ -356,3 +370,8 @@
           type: long
           description: File size in bytes (field is only added when `type` is
             `file`).
+
+    # Alias compatibility fields
+    - name: event.module
+      type: alias
+      path: fileset.module

@@ -57,6 +57,7 @@ metricbeat.modules:
     - process         # Per process metrics
     - process_summary # Process summary
     - uptime          # System Uptime
+    - socket_summary  # Socket summary
     #- core           # Per CPU core usage
     #- diskio         # Disk IO
     #- filesystem     # File system usage for each mountpoint
@@ -864,6 +865,7 @@ metricbeat.modules:
 #    match_source_index: 4
 #    match_short_id: false
 #    cleanup_timeout: 60
+#    labels.dedot: false
 #    # To connect to Docker over TLS you must specify a client and CA certificate.
 #    #ssl:
 #    #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -929,6 +931,11 @@ output.elasticsearch:
   # In case you specify and additional path, the scheme is required: http://localhost:9200/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
+
+  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
+  #ilm.enabled: false
+  #ilm.rollover_alias: "metricbeat"
+  #ilm.pattern: "{now/d}-000001"
 
   # Set gzip compression level.
   #compression_level: 0

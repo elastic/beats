@@ -34,7 +34,8 @@ func TestNumberOfRoutingShards(t *testing.T) {
 	config := TemplateConfig{}
 
 	// Test it exists in 6.1
-	template, err := New(beatVersion, beatName, "6.1.0", config)
+	ver := common.MustNewVersion("6.1.0")
+	template, err := New(beatVersion, beatName, *ver, config)
 	assert.NoError(t, err)
 
 	data := template.Generate(nil, nil)
@@ -44,7 +45,8 @@ func TestNumberOfRoutingShards(t *testing.T) {
 	assert.Equal(t, 30, shards.(int))
 
 	// Test it does not exist in 6.0
-	template, err = New(beatVersion, beatName, "6.0.0", config)
+	ver = common.MustNewVersion("6.0.0")
+	template, err = New(beatVersion, beatName, *ver, config)
 	assert.NoError(t, err)
 
 	data = template.Generate(nil, nil)
@@ -64,7 +66,8 @@ func TestNumberOfRoutingShardsOverwrite(t *testing.T) {
 	}
 
 	// Test it exists in 6.1
-	template, err := New(beatVersion, beatName, "6.1.0", config)
+	ver := common.MustNewVersion("6.1.0")
+	template, err := New(beatVersion, beatName, *ver, config)
 	assert.NoError(t, err)
 
 	data := template.Generate(nil, nil)

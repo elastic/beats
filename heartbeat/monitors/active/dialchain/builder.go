@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
@@ -96,7 +97,7 @@ func (b *Builder) AddLayer(l Layer) {
 // Build create a new dialer, that will always use the constant address, no matter
 // which address is used to connect using the dialer.
 // The dialer chain will add per layer information to the given event.
-func (b *Builder) Build(addr string, event common.MapStr) (transport.Dialer, error) {
+func (b *Builder) Build(addr string, event *beat.Event) (transport.Dialer, error) {
 	// clone template, as multiple instance of a dialer can exist at the same time
 	dchain := b.template.Clone()
 
@@ -110,18 +111,16 @@ func (b *Builder) Build(addr string, event common.MapStr) (transport.Dialer, err
 
 // Run executes the given function with a new dialer instance.
 func (b *Builder) Run(
+	event *beat.Event,
 	addr string,
-	fn func(transport.Dialer) (common.MapStr, error),
-) (common.MapStr, error) {
-	event := common.MapStr{}
+	fn func(*beat.Event, transport.Dialer) error,
+) error {
 	dialer, err := b.Build(addr, event)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	results, err := fn(dialer)
-	event.DeepUpdate(results)
-	return event, err
+	return fn(event, dialer)
 }
 
 // MakeDialerJobs creates a set of monitoring jobs. The jobs behavior depends
@@ -134,7 +133,7 @@ func MakeDialerJobs(
 	typ, scheme string,
 	endpoints []Endpoint,
 	mode monitors.IPSettings,
-	fn func(dialer transport.Dialer, addr string) (common.MapStr, error),
+	fn func(event *beat.Event, dialer transport.Dialer, addr string) error,
 ) ([]monitors.Job, error) {
 	var jobs []monitors.Job
 	for _, endpoint := range endpoints {
@@ -153,7 +152,7 @@ func makeEndpointJobs(
 	typ, scheme string,
 	endpoint Endpoint,
 	mode monitors.IPSettings,
-	fn func(transport.Dialer, string) (common.MapStr, error),
+	fn func(*beat.Event, transport.Dialer, string) error,
 ) ([]monitors.Job, error) {
 
 	fields := common.MapStr{
@@ -169,12 +168,10 @@ func makeEndpointJobs(
 	if b.resolveViaSocks5 {
 		jobs := make([]monitors.Job, len(endpoint.Ports))
 		for i, port := range endpoint.Ports {
-			jobName := jobName(typ, scheme, endpoint.Host, []uint16{port})
 			address := net.JoinHostPort(endpoint.Host, strconv.Itoa(int(port)))
-			settings := monitors.MakeJobSetting(jobName).WithFields(fields)
-			jobs[i] = monitors.MakeSimpleJob(settings, func() (common.MapStr, error) {
-				return b.Run(address, func(dialer transport.Dialer) (common.MapStr, error) {
-					return fn(dialer, address)
+			jobs[i] = monitors.MakeSimpleJob(func(event *beat.Event) error {
+				return b.Run(event, address, func(event *beat.Event, dialer transport.Dialer) error {
+					return fn(event, dialer, address)
 				})
 			})
 		}
@@ -183,26 +180,29 @@ func makeEndpointJobs(
 
 	// Create job that first resolves one or multiple IP (depending on
 	// config.Mode) in order to create one continuation Task per IP.
-	jobName := jobName(typ, scheme, endpoint.Host, endpoint.Ports)
-	settings := monitors.MakeHostJobSettings(jobName, endpoint.Host, mode).WithFields(fields)
+	jobID := jobID(typ, scheme, endpoint.Host, endpoint.Ports)
+	settings := monitors.MakeHostJobSettings(jobID, endpoint.Host, mode)
+
 	job, err := monitors.MakeByHostJob(settings,
 		monitors.MakePingAllIPPortFactory(endpoint.Ports,
-			func(ip *net.IPAddr, port uint16) (common.MapStr, error) {
+			func(event *beat.Event, ip *net.IPAddr, port uint16) error {
 				// use address from resolved IP
 				portStr := strconv.Itoa(int(port))
 				ipAddr := net.JoinHostPort(ip.String(), portStr)
 				hostAddr := net.JoinHostPort(endpoint.Host, portStr)
-				return b.Run(ipAddr, func(dialer transport.Dialer) (common.MapStr, error) {
-					return fn(dialer, hostAddr)
-				})
+				cb := func(event *beat.Event, dialer transport.Dialer) error {
+					return fn(event, dialer, hostAddr)
+				}
+				err := b.Run(event, ipAddr, cb)
+				return err
 			}))
 	if err != nil {
 		return nil, err
 	}
-	return []monitors.Job{job}, nil
+	return []monitors.Job{monitors.WithJobId(jobID, monitors.WithFields(fields, job))}, nil
 }
 
-func jobName(typ, jobType, host string, ports []uint16) string {
+func jobID(typ, jobType, host string, ports []uint16) string {
 	var h string
 	if len(ports) == 1 {
 		h = fmt.Sprintf("%v:%v", host, ports[0])

@@ -39,12 +39,12 @@ def document_fields(output, section, sections, path):
             document_field(output, field, newpath)
 
 
-def document_field(output, field, path):
+def document_field(output, field, field_path):
 
-    if "path" not in field:
-        field["path"] = path
+    if "field_path" not in field:
+        field["field_path"] = field_path
 
-    output.write("*`{}`*::\n+\n--\n".format(field["path"]))
+    output.write("*`{}`*::\n+\n--\n".format(field["field_path"]))
 
     if "deprecated" in field:
         output.write("\ndeprecated[{}]\n\n".format(field["deprecated"]))
@@ -57,7 +57,8 @@ def document_field(output, field, path):
         output.write("format: {}\n\n".format(field["format"]))
     if "required" in field:
         output.write("required: {}\n\n".format(field["required"]))
-
+    if "path" in field:
+        output.write("alias to: {}\n\n".format(field["path"]))
     if "description" in field:
         output.write("{}\n\n".format(field["description"]))
 
@@ -71,7 +72,7 @@ def document_field(output, field, path):
 
     if "multi_fields" in field:
         for subfield in field["multi_fields"]:
-            document_field(output, subfield, path + "." + subfield["name"])
+            document_field(output, subfield, field_path + "." + subfield["name"])
     output.write("--\n\n")
 
 
@@ -129,11 +130,12 @@ if __name__ == "__main__":
     parser.add_argument("path", help="Path to the beat folder")
     parser.add_argument("beattitle", help="The beat title")
     parser.add_argument("es_beats", help="The path to the general beats folder")
+    parser.add_argument("--output_path", default="", dest="output_path", help="Output path, if different from path")
 
     args = parser.parse_args()
 
     beat_path = args.path
-    beat_title = args.beattitle
+    beat_title = args.beattitle.title()
     es_beats = args.es_beats
 
     fields_yml = beat_path + "/fields.yml"
@@ -142,7 +144,10 @@ if __name__ == "__main__":
     with open(fields_yml) as f:
         fields = f.read()
 
-    output = open(beat_path + "/docs/fields.asciidoc", 'w')
+    if args.output_path is not "":
+        output = open(os.path.join(args.output_path, "docs/fields.asciidoc"), 'w')
+    else:
+        output = open(os.path.join(beat_path, "docs/fields.asciidoc"), 'w')
 
     try:
         fields_to_asciidoc(fields, output, beat_title)

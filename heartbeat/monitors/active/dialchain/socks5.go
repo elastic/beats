@@ -21,7 +21,7 @@ import (
 	"net"
 
 	"github.com/elastic/beats/heartbeat/look"
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -35,7 +35,7 @@ import (
 //    }
 //  }
 func SOCKS5Layer(config *transport.ProxyConfig) Layer {
-	return func(event common.MapStr, next transport.Dialer) (transport.Dialer, error) {
+	return func(event *beat.Event, next transport.Dialer) (transport.Dialer, error) {
 		var timer timer
 
 		dialer, err := transport.ProxyDialer(config, startTimerAfterDial(&timer, next))
@@ -48,7 +48,7 @@ func SOCKS5Layer(config *transport.ProxyConfig) Layer {
 			// TODO: add proxy url to event?
 
 			timer.stop()
-			event.Put("socks5.rtt.connect", look.RTT(timer.duration()))
+			event.Fields.Put("socks5.rtt.connect", look.RTT(timer.duration()))
 			return conn, nil
 		}), nil
 	}

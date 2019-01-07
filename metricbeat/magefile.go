@@ -130,14 +130,16 @@ func customizePackaging() {
 		unixModulesDir    = "/etc/{{.BeatName}}/modules.d"
 
 		modulesDir = mage.PackageFile{
-			Mode:   0644,
-			Source: "modules.d",
-			Config: true,
+			Mode:    0644,
+			Source:  "modules.d",
+			Config:  true,
+			Modules: true,
 		}
 		windowsModulesDir = mage.PackageFile{
-			Mode:   0644,
-			Source: "{{.PackageDir}}/modules.d",
-			Config: true,
+			Mode:    0644,
+			Source:  "{{.PackageDir}}/modules.d",
+			Config:  true,
+			Modules: true,
 			Dep: func(spec mage.PackageSpec) error {
 				if err := mage.Copy("modules.d", spec.MustExpand("{{.PackageDir}}/modules.d")); err != nil {
 					return errors.Wrap(err, "failed to copy modules.d dir")
@@ -173,7 +175,7 @@ func customizePackaging() {
 		default:
 			pkgType := args.Types[0]
 			switch pkgType {
-			case mage.TarGz, mage.Zip:
+			case mage.TarGz, mage.Zip, mage.Docker:
 				args.Spec.Files[archiveModulesDir] = modulesDir
 			case mage.Deb, mage.RPM, mage.DMG:
 				args.Spec.Files[unixModulesDir] = modulesDir

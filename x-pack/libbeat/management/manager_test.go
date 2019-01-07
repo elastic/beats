@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 	"time"
 
@@ -16,6 +17,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/reload"
+	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/x-pack/libbeat/management/api"
 )
 
@@ -93,6 +95,10 @@ func TestConfigManager(t *testing.T) {
 			"module": "system",
 		}),
 	}, config2)
+
+	// Cleanup
+	manager.Stop()
+	os.Remove(paths.Resolve(paths.Data, "management.yml"))
 }
 
 func TestRemoveItems(t *testing.T) {

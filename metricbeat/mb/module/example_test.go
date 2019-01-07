@@ -65,6 +65,7 @@ func ExampleWrapper() {
 		defer wg.Done()
 		for event := range output {
 			event.Fields.Put("metricset.rtt", 111)
+			event.Fields.Put("event.duration", 111000)
 
 			output, err := encodeEvent(event)
 			if err == nil {
@@ -90,6 +91,10 @@ func ExampleWrapper() {
 	//     "version": "1.2.3"
 	//   },
 	//   "@timestamp": "2016-05-10T23:27:58.485Z",
+	//   "event": {
+	//     "dataset": "fake.eventfetcher",
+	//     "duration": 111000
+	//   },
 	//   "fake": {
 	//     "eventfetcher": {
 	//       "metric": 1

@@ -43,7 +43,7 @@ type Connection struct {
 	Headers  map[string]string
 
 	http    *http.Client
-	version string
+	version common.Version
 }
 
 type Client struct {
@@ -146,7 +146,7 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 	}
 
 	if !config.IgnoreVersion {
-		if err = client.SetVersion(); err != nil {
+		if err = client.readVersion(); err != nil {
 			return nil, fmt.Errorf("fail to get the Kibana version: %v", err)
 		}
 	}
@@ -178,7 +178,7 @@ func (conn *Connection) Request(method, extraPath string,
 	}
 
 	if method != "GET" {
-		req.Header.Set("kbn-version", conn.version)
+		req.Header.Set("kbn-version", conn.version.String())
 	}
 
 	resp, err := conn.http.Do(req)
@@ -201,7 +201,7 @@ func (conn *Connection) Request(method, extraPath string,
 	return resp.StatusCode, result, retError
 }
 
-func (client *Client) SetVersion() error {
+func (client *Client) readVersion() error {
 	type kibanaVersionResponse struct {
 		Name    string `json:"name"`
 		Version struct {
@@ -221,11 +221,12 @@ func (client *Client) SetVersion() error {
 			err, truncateString(result))
 	}
 
-	var kibanaVersion kibanaVersionResponse
-	var kibanaVersion5x kibanaVersionResponse5x
+	var versionString string
 
+	var kibanaVersion kibanaVersionResponse
 	err = json.Unmarshal(result, &kibanaVersion)
 	if err != nil {
+		var kibanaVersion5x kibanaVersionResponse5x
 
 		// The response returned by /api/status is different in Kibana 5.x than in Kibana 6.x
 		err5x := json.Unmarshal(result, &kibanaVersion5x)
@@ -234,21 +235,28 @@ func (client *Client) SetVersion() error {
 			return fmt.Errorf("fail to unmarshal the response from GET %s/api/status. Response: %s. Kibana 5.x status api returns: %v. Kibana 6.x status api returns: %v",
 				client.Connection.URL, truncateString(result), err5x, err)
 		}
-		client.version = kibanaVersion5x.Version
+		versionString = kibanaVersion5x.Version
 	} else {
-
-		client.version = kibanaVersion.Version.Number
+		versionString = kibanaVersion.Version.Number
 
 		if kibanaVersion.Version.Snapshot {
 			// needed for the tests
-			client.version = client.version + "-SNAPSHOT"
+			versionString += "-SNAPSHOT"
 		}
 	}
 
+	version, err := common.NewVersion(versionString)
+	if err != nil {
+		return fmt.Errorf("fail to parse kibana version (%v): %+v", versionString, err)
+	}
+
+	client.version = *version
 	return nil
 }
 
-func (client *Client) GetVersion() string { return client.version }
+// GetVersion returns the version read from kibana. The version is not set if
+// IgnoreVersion was set when creating the client.
+func (client *Client) GetVersion() common.Version { return client.version }
 
 func (client *Client) ImportJSON(url string, params url.Values, jsonBody map[string]interface{}) error {
 
