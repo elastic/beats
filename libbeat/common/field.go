@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/go-ucfg/yaml"
 )
 
@@ -34,25 +36,27 @@ import (
 type Fields []Field
 
 type Field struct {
-	Name                  string      `config:"name"`
-	Type                  string      `config:"type"`
-	Description           string      `config:"description"`
-	Format                string      `config:"format"`
-	ScalingFactor         int         `config:"scaling_factor"`
-	Fields                Fields      `config:"fields"`
-	MultiFields           Fields      `config:"multi_fields"`
-	ObjectType            string      `config:"object_type"`
-	ObjectTypeMappingType string      `config:"object_type_mapping_type"`
-	Enabled               *bool       `config:"enabled"`
-	Analyzer              string      `config:"analyzer"`
-	SearchAnalyzer        string      `config:"search_analyzer"`
-	Norms                 bool        `config:"norms"`
-	Dynamic               DynamicType `config:"dynamic"`
-	Index                 *bool       `config:"index"`
-	DocValues             *bool       `config:"doc_values"`
-	CopyTo                string      `config:"copy_to"`
-	IgnoreAbove           int         `config:"ignore_above"`
-	AliasPath             string      `config:"path"`
+	Name           string      `config:"name"`
+	Type           string      `config:"type"`
+	Description    string      `config:"description"`
+	Format         string      `config:"format"`
+	Fields         Fields      `config:"fields"`
+	MultiFields    Fields      `config:"multi_fields"`
+	Enabled        *bool       `config:"enabled"`
+	Analyzer       string      `config:"analyzer"`
+	SearchAnalyzer string      `config:"search_analyzer"`
+	Norms          bool        `config:"norms"`
+	Dynamic        DynamicType `config:"dynamic"`
+	Index          *bool       `config:"index"`
+	DocValues      *bool       `config:"doc_values"`
+	CopyTo         string      `config:"copy_to"`
+	IgnoreAbove    int         `config:"ignore_above"`
+	AliasPath      string      `config:"path"`
+
+	ObjectType            string          `config:"object_type"`
+	ObjectTypeMappingType string          `config:"object_type_mapping_type"`
+	ScalingFactor         int             `config:"scaling_factor"`
+	ObjectTypeParams      []ObjectTypeCfg `config:"object_type_params"`
 
 	// Kibana specific
 	Analyzed     *bool  `config:"analyzed"`
@@ -72,6 +76,13 @@ type Field struct {
 	Path string
 }
 
+// ObjectTypeCfg defines type and configuration of object attributes
+type ObjectTypeCfg struct {
+	ObjectType            string `config:"object_type"`
+	ObjectTypeMappingType string `config:"object_type_mapping_type"`
+	ScalingFactor         int    `config:"scaling_factor"`
+}
+
 type VersionizedString struct {
 	MinVersion string `config:"min_version"`
 	Value      string `config:"value"`
@@ -89,6 +100,17 @@ func (d *DynamicType) Unpack(s string) error {
 		d.Value = s
 	default:
 		return fmt.Errorf("'%v' is invalid dynamic setting", s)
+	}
+	return nil
+}
+
+// Validate ensures objectTypeParams are not mixed with top level objectType configuration
+func (f *Field) Validate() error {
+	if len(f.ObjectTypeParams) == 0 {
+		return nil
+	}
+	if f.ScalingFactor != 0 || f.ObjectTypeMappingType != "" || f.ObjectType != "" {
+		return errors.New("mixing top level objectType configuration with array of object type configurations is forbidden")
 	}
 	return nil
 }
