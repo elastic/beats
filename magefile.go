@@ -22,19 +22,24 @@ package main
 import (
 	"path/filepath"
 
+	"os"
+	"path/filepath"
+
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/dev-tools/mage"
 )
 
 var (
 	// Beats is a list of Beats to collect dashboards from.
 	Beats = []string{
-		"auditbeat",
-		"filebeat",
 		"heartbeat",
 		"journalbeat",
-		"metricbeat",
 		"packetbeat",
 		"winlogbeat",
+		"x-pack/auditbeat",
+		"x-pack/filebeat",
+		"x-pack/metricbeat",
 		"x-pack/functionbeat",
 	}
 )
@@ -59,9 +64,19 @@ func PackageBeatDashboards() error {
 		OutputFile: "build/distributions/dashboards/{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}",
 	}
 
-	for _, beat := range Beats {
-		spec.Files[beat] = mage.PackageFile{
-			Source: filepath.Join(beat, "_meta/kibana.generated"),
+	for _, beatDir := range Beats {
+		// The generated dashboard content is moving in the build dir, but
+		// not all projects have been updated so detect which dir to use.
+		dashboardDir := filepath.Join(beatDir, "build/kibana")
+		legacyDir := filepath.Join(beatDir, "_meta/kibana.generated")
+		beatName := filepath.Base(beatDir)
+
+		if _, err := os.Stat(dashboardDir); err == nil {
+			spec.Files[beatName] = mage.PackageFile{Source: dashboardDir}
+		} else if _, err := os.Stat(legacyDir); err == nil {
+			spec.Files[beatName] = mage.PackageFile{Source: legacyDir}
+		} else {
+			return errors.Errorf("no dashboards found for %v", beatDir)
 		}
 	}
 
