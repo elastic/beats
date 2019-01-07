@@ -37,6 +37,7 @@ type Encoder struct {
 	config  Config
 }
 
+// Config is used to pass encoding parameters to New.
 type Config struct {
 	Pretty     bool
 	EscapeHTML bool
