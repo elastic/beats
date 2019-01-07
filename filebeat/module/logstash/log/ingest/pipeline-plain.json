@@ -18,19 +18,14 @@
                     "GREEDYMULTILINE" : "(.|\n)*"
                 },
                 "patterns": [
-                    "\\[%{TIMESTAMP_ISO8601:logstash.log.timestamp}\\]\\[%{LOGSTASH_LOGLEVEL:logstash.log.level}\\s?\\]\\[%{LOGSTASH_CLASS_MODULE:logstash.log.module}\\] %{GREEDYMULTILINE:logstash.log.message}"
+                    "\\[%{TIMESTAMP_ISO8601:logstash.log.timestamp}\\]\\[%{LOGSTASH_LOGLEVEL:log.level}\\s?\\]\\[%{LOGSTASH_CLASS_MODULE:logstash.log.module}\\] %{GREEDYMULTILINE:message}"
                 ]
-            }
-        },
-        {
-            "remove": {
-                "field": "message"
             }
         },
         {
             "rename": {
                 "field": "@timestamp",
-                "target_field": "read_timestamp"
+                "target_field": "event.created"
             }
         },
         {
