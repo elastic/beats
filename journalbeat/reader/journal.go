@@ -25,6 +25,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
+	"syscall"
 	"time"
 
 	"github.com/coreos/go-systemd/sdjournal"
@@ -180,24 +182,80 @@ func (r *Reader) seek(cursor string) {
 // Next waits until a new event shows up and returns it.
 // It blocks until an event is returned or an error occurs.
 func (r *Reader) Next() (*beat.Event, error) {
+	event, err := r.readEvent()
+	if err != nil {
+		return nil, err
+	}
+	if event != nil {
+		return event, nil
+	}
+
+	return r.waitUntilNewEventOrError()
+}
+
+func (r *Reader) waitUntilNewEventOrError() (*beat.Event, error) {
+	var wg sync.WaitGroup
+	defer wg.Wait()
+
+	changesChan := make(chan int)
+	defer close(changesChan)
+
 	for {
 		select {
 		case <-r.done:
 			return nil, nil
 		default:
-			event, err := r.readEvent()
-			if err != nil {
-				return nil, err
-			}
+			for {
+				wg.Add(1)
+				go r.waitForChange(&wg, changesChan)
 
-			if event == nil {
-				r.backoff.Wait()
-				continue
-			}
+				select {
+				case <-r.done:
+					return nil, nil
+				case c, ok := <-changesChan:
+					if !ok {
+						break
+					}
 
-			r.backoff.Reset()
-			return event, nil
+					switch c {
+					// no changes
+					case sdjournal.SD_JOURNAL_NOP:
+					// new entries are added or the journal has changed (e.g. vacuum, rotate)
+					case sdjournal.SD_JOURNAL_APPEND, sdjournal.SD_JOURNAL_INVALIDATE:
+						event, err := r.readEvent()
+						if err != nil {
+							return nil, err
+						}
+
+						if event == nil {
+							r.backoff.Wait()
+							continue
+						}
+
+						r.backoff.Reset()
+						return event, nil
+					default:
+						if c < 0 {
+							return nil, fmt.Errorf("error while waiting for event: %+v", syscall.Errno(-c))
+						}
+
+						r.logger.Errorf("Unknown return code from Wait: %d\n", c)
+					}
+				}
+			}
 		}
+	}
+}
+
+func (r *Reader) waitForChange(wg *sync.WaitGroup, changesChan chan int) {
+	defer wg.Done()
+
+	c := r.journal.Wait(100 * time.Millisecond)
+	select {
+	case <-r.done:
+		return
+	default:
+		changesChan <- c
 	}
 }
 
