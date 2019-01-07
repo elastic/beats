@@ -23,3 +23,5 @@ The list below covers the major changes between 7.0.0-alpha2 and master only.
 ==== Bugfixes
 
 ==== Added
+
+- Allow multiple object type configurations per field. {pull}9772[9772]
