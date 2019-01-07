@@ -309,7 +309,7 @@ func (m *Monitor) Stop() {
 	defer m.internalsMtx.Unlock()
 
 	// Free up the monitor ID for reuse
-	uniqueMonitorIDs.Delete(m.id)
+	defer uniqueMonitorIDs.Delete(m.id)
 
 	for _, t := range m.configuredJobs {
 		t.Stop()
@@ -329,7 +329,8 @@ func WithMonitorMeta(id string, name string, typ string, origJob Job) Job {
 			"monitor": common.MapStr{
 				"id":   id,
 				"name": name,
-				"type": typ},
+				"type": typ,
+			},
 		},
 		origJob,
 	)
