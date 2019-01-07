@@ -19,6 +19,7 @@ package monitors
 
 import (
 	"fmt"
+	"regexp"
 	"sync"
 	"testing"
 
@@ -26,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/mapval"
 	"github.com/elastic/beats/libbeat/monitoring"
 )
 
@@ -89,11 +91,32 @@ func (pc *MockPipelineConnector) ConnectWith(beat.ClientConfig) (beat.Client, er
 	return c, nil
 }
 
+func mockEventMonitorValidator(id string) mapval.Validator {
+	var idMatcher mapval.IsDef
+	if id == "" {
+		idMatcher = mapval.IsStringMatching(regexp.MustCompile(`^auto-test-.*`))
+	} else {
+		idMatcher = mapval.IsEqual(id)
+	}
+	return mapval.Strict(mapval.Compose(
+		mapval.MustCompile(mapval.Map{
+			"monitor": mapval.Map{
+				"id":   idMatcher,
+				"name": "",
+				"type": "test",
+			},
+		}),
+		mapval.MustCompile(mockEventCustomFields()),
+	))
+}
+
+func mockEventCustomFields() map[string]interface{} {
+	return common.MapStr{"foo": "bar"}
+}
+
 func createMockJob(name string, cfg *common.Config) ([]Job, error) {
 	j := MakeSimpleJob(func(event *beat.Event) error {
-		MergeEventFields(event, common.MapStr{
-			"foo": "bar",
-		})
+		MergeEventFields(event, mockEventCustomFields())
 		return nil
 	})
 
@@ -116,12 +139,18 @@ func mockPluginsReg() *pluginsReg {
 	return reg
 }
 
-func mockPluginConf(t *testing.T, schedule string, url string) *common.Config {
-	conf, err := common.NewConfigFrom(map[string]interface{}{
+func mockPluginConf(t *testing.T, id string, schedule string, url string) *common.Config {
+	confMap := map[string]interface{}{
 		"type":     "test",
 		"urls":     []string{url},
 		"schedule": schedule,
-	})
+	}
+
+	if id != "" {
+		confMap["id"] = id
+	}
+
+	conf, err := common.NewConfigFrom(confMap)
 	require.NoError(t, err)
 
 	return conf

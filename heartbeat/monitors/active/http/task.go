@@ -47,7 +47,6 @@ func newHTTPMonitorHostJob(
 	body []byte,
 	validator RespCheck,
 ) (monitors.Job, error) {
-	typ := config.Name
 
 	client := &http.Client{
 		CheckRedirect: makeCheckRedirect(config.MaxRedirects),
@@ -66,26 +65,24 @@ func newHTTPMonitorHostJob(
 
 	timeout := config.Timeout
 
-	id := fmt.Sprintf("%v@%v", typ, addr)
-	return monitors.WithJobId(id,
-		monitors.WithFields(
-			common.MapStr{
-				"monitor": common.MapStr{
-					"scheme": request.URL.Scheme,
-					"host":   hostname,
-				},
-				"http": common.MapStr{
-					"url": request.URL.String(),
-				},
-				"tcp": common.MapStr{
-					"port": port,
-				},
+	return monitors.WithFields(
+		common.MapStr{
+			"monitor": common.MapStr{
+				"scheme": request.URL.Scheme,
+				"host":   hostname,
 			},
-			monitors.MakeSimpleJob(func(event *beat.Event) error {
-				_, _, err := execPing(event, client, request, body, timeout, validator)
-				return err
-			}),
-		)), nil
+			"http": common.MapStr{
+				"url": request.URL.String(),
+			},
+			"tcp": common.MapStr{
+				"port": port,
+			},
+		},
+		monitors.MakeSimpleJob(func(event *beat.Event) error {
+			_, _, err := execPing(event, client, request, body, timeout, validator)
+			return err
+		}),
+	), nil
 }
 
 func newHTTPMonitorIPsJob(
@@ -96,7 +93,6 @@ func newHTTPMonitorIPsJob(
 	body []byte,
 	validator RespCheck,
 ) (monitors.Job, error) {
-	typ := config.Name
 
 	req, err := buildRequest(addr, config, enc)
 	if err != nil {
@@ -108,8 +104,7 @@ func newHTTPMonitorIPsJob(
 		return nil, err
 	}
 
-	id := fmt.Sprintf("%v@%v", typ, addr)
-	settings := monitors.MakeHostJobSettings(id, hostname, config.Mode)
+	settings := monitors.MakeHostJobSettings(hostname, config.Mode)
 
 	pingFactory := createPingFactory(config, port, tls, req, body, validator)
 	job, err := monitors.MakeByHostJob(settings, pingFactory)
@@ -126,7 +121,7 @@ func newHTTPMonitorIPsJob(
 		},
 	}
 
-	return monitors.WithJobId(id, monitors.WithFields(fields, job)), err
+	return monitors.WithFields(fields, job), err
 }
 
 func createPingFactory(

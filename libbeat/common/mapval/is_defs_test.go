@@ -18,6 +18,7 @@
 package mapval
 
 import (
+	"regexp"
 	"testing"
 	"time"
 
@@ -106,6 +107,13 @@ func TestIsNonEmptyString(t *testing.T) {
 	assertIsDefValid(t, IsNonEmptyString, "abc")
 	assertIsDefValid(t, IsNonEmptyString, "a")
 	assertIsDefInvalid(t, IsNonEmptyString, "")
+}
+
+func TestIsStringMatching(t *testing.T) {
+	id := IsStringMatching(regexp.MustCompile(`^f`))
+
+	assertIsDefValid(t, id, "fall")
+	assertIsDefInvalid(t, id, "potato")
 }
 
 func TestIsStringContaining(t *testing.T) {

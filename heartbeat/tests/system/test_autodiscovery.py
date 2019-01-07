@@ -28,6 +28,7 @@ class TestAutodiscover(BaseTest):
                           contains.docker.container.image: redis
                         config:
                           - type: tcp
+                            id: myid
                             hosts: ["${data.host}:${data.port}"]
                             schedule: "@every 1s"
                             timeout: 1s
@@ -56,9 +57,7 @@ class TestAutodiscover(BaseTest):
                         0]['IPAddress']
                     port = network_settings['Ports'].keys()[0].split("/")[0]
                     # Check metadata is added
-                    expected = 'tcp-tcp@%s:%s' % (host, port)
-                    actual = output[0]['monitor']['id']
-                    if expected == actual:
+                    if output[0]['monitor']['id'] == 'myid':
                         matched = True
 
         assert matched

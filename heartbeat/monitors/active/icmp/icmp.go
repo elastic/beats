@@ -78,16 +78,10 @@ func create(
 		return nil, 0, err
 	}
 
-	network := config.Mode.Network()
 	pingFactory := monitors.MakePingIPFactory(createPingIPFactory(&config))
 
 	for _, host := range config.Hosts {
-		jobName := fmt.Sprintf("icmp-%v-host-%v@%v", config.Name, network, host)
-		if ip := net.ParseIP(host); ip != nil {
-			jobName = fmt.Sprintf("icmp-%v-ip@%v", config.Name, ip.String())
-		}
-
-		settings := monitors.MakeHostJobSettings(jobName, host, config.Mode)
+		settings := monitors.MakeHostJobSettings(host, config.Mode)
 		err := addJob(monitors.MakeByHostJob(settings, pingFactory))
 		if err != nil {
 			return nil, 0, err

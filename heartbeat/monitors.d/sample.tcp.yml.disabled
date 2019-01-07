@@ -39,40 +39,46 @@
   ipv6: true
   mode: any
 
-    # List of ports to ping if host does not contain a port number
-    # ports: [80, 9200, 5044]
+  # List of ports to ping if host does not contain a port number
+  # ports: [80, 9200, 5044]
 
-    # Total test connection and data exchange timeout
-    #timeout: 16s
+  # Total test connection and data exchange timeout
+  #timeout: 16s
 
-    # Optional payload string to send to remote and expected answer. If none is
-    # configured, the endpoint is expected to be up if connection attempt was
-    # successful. If only `send_string` is configured, any response will be
-    # accepted as ok. If only `receive_string` is configured, no payload will be
-    # send, but client expects to receive expected payload on connect.
-    #check:
-    #send: ''
-    #receive: ''
+  # Optional payload string to send to remote and expected answer. If none is
+  # configured, the endpoint is expected to be up if connection attempt was
+  # successful. If only `send_string` is configured, any response will be
+  # accepted as ok. If only `receive_string` is configured, no payload will be
+  # send, but client expects to receive expected payload on connect.
+  #check:
+  #send: ''
+  #receive: ''
 
-    # SOCKS5 proxy url
-    # proxy_url: ''
+  # SOCKS5 proxy url
+  # proxy_url: ''
 
-    # Resolve hostnames locally instead on SOCKS5 server:
-    #proxy_use_local_resolver: false
+  # Resolve hostnames locally instead on SOCKS5 server:
+  #proxy_use_local_resolver: false
 
-    # TLS/SSL connection settings:
-    #ssl:
-    # Certificate Authorities
-    #certificate_authorities: ['']
+  # TLS/SSL connection settings:
+  #ssl:
+  # Certificate Authorities
+  #certificate_authorities: ['']
 
-    # Required TLS protocols
-    #supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
+  # Required TLS protocols
+  #supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
+  # The tags of the monitors are included in their own field with each
+  # transaction published. Tags make it easy to group servers by different
+  # logical properties.
+  #tags: ["service-X", "web-tier"]
 
-    # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
-    # Configure file json file to be watched for changes to the monitor:
-    #watch.poll_file:
-    # Path to check for updates.
-    #path:
+  # Optional fields that you can specify to add additional information to the
+  # monitor output. Fields can be scalar values, arrays, dictionaries, or any nested
+  # combination of these.
+  #fields:
+  #  env: staging
 
-    # Interval between file file changed checks.
-  #interval: 5s
+  # If this option is set to true, the custom fields are stored as top-level
+  # fields in the output document instead of being grouped under a fields
+  # sub-dictionary. Default is false.
+  #fields_under_root: false

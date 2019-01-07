@@ -19,7 +19,7 @@ MarkupSafe==1.0
 nose==1.3.7
 nose-timer==0.7.1
 pycodestyle==2.4.0
-PyYAML==3.12
+PyYAML==4.2b1
 redis==2.10.6
 requests==2.20.0
 six==1.11.0
