@@ -24,25 +24,31 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// Varz will output server information on the monitoring port at /varz.
 type Varz struct {
-	ServerID         string      `json:"server_id"`
-	Now              time.Time   `json:"now"`
-	Uptime           string      `json:"uptime"`
-	Mem              int         `json:"mem"`
-	Cores            int         `json:"cores"`
-	CPU              int         `json:"cpu"`
-	TotalConnections int         `json:"total_connections"`
-	Remotes          int         `json:"remotes"`
-	InMsgsIn         int         `json:"in_msgs,omitempty"`
-	InMsgs           int         `json:"msgs.in"`
-	OutMsgsIn        int         `json:"out_msgs,omitempty"`
-	OutMsgs          int         `json:"msgs.out"`
-	InBytesIn        int         `json:"in_bytes,omitempty"`
-	InBytes          int         `json:"bytes.in"`
-	OutBytesIn       int         `json:"out_bytes,omitempty"`
-	OutBytes         int         `json:"bytes.out"`
-	SlowConsumers    int         `json:"slow_consumers"`
-	HTTPReqStats     interface{} `json:"http_req_stats"`
+	ServerID         string         `json:"server_id"`
+	Now              time.Time      `json:"now"`
+	Uptime           string         `json:"uptime"`
+	Mem              int            `json:"mem"`
+	Cores            int            `json:"cores"`
+	CPU              int            `json:"cpu"`
+	TotalConnections int            `json:"total_connections"`
+	Remotes          int            `json:"remotes"`
+	InMsgsIn         int            `json:"in_msgs,omitempty"`
+	InMsgs           int            `json:"msgs.in"`
+	OutMsgsIn        int            `json:"out_msgs,omitempty"`
+	OutMsgs          int            `json:"msgs.out"`
+	InBytesIn        int            `json:"in_bytes,omitempty"`
+	InBytes          int            `json:"bytes.in"`
+	OutBytesIn       int            `json:"out_bytes,omitempty"`
+	OutBytes         int            `json:"bytes.out"`
+	SlowConsumers    int            `json:"slow_consumers"`
+	HTTPReqStats     map[string]int `json:"http_req_stats,omitempty"`
+	RootUriHits      int            `json:"http_req_stats.root_uri"`
+	ConnzUriHits     int            `json:"http_req_stats.connz_uri"`
+	RoutezUriHits    int            `json:"http_req_stats.routez_uri"`
+	SubszUriHits     int            `json:"http_req_stats.subsz_uri"`
+	VarzUriHits      int            `json:"http_req_stats.varz_uri"`
 }
 
 func eventMapping(content []byte) common.MapStr {
@@ -57,6 +63,12 @@ func eventMapping(content []byte) common.MapStr {
 	data.InBytesIn = 0
 	data.OutBytes = data.OutBytesIn
 	data.OutBytesIn = 0
+	data.RootUriHits = data.HTTPReqStats["/"]
+	data.ConnzUriHits = data.HTTPReqStats["/connz"]
+	data.RoutezUriHits = data.HTTPReqStats["/routez"]
+	data.SubszUriHits = data.HTTPReqStats["/subsz"]
+	data.VarzUriHits = data.HTTPReqStats["/varz"]
+	data.HTTPReqStats = make(map[string]int, 0)
 
 	// TODO: add error handling
 	event := common.MapStr{

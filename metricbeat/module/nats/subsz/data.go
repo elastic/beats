@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// Subsz  represents detail information on current connections.
 type Subsz struct {
 	NumSubscriptionsIn int `json:"num_subscriptions,omitempty"`
 	NumSubscriptions   int `json:"total"`

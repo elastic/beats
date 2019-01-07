@@ -60,7 +60,23 @@
           type: integer
           description: >
             The number of slow consumers currently on NATS
-        - name: metrics.http_req_stats
+        - name: metrics.http_req_stats.root_uri
           type: object
           description: >
-            TODO: Change this metric to a meaningful one
+             The number of hits on root monitoring uri
+        - name: metrics.http_req_stats.connz_uri
+          type: object
+          description: >
+            The number of hits on connz monitoring uri
+        - name: metrics.http_req_stats.routez_uri
+          type: object
+          description: >
+            The number of hits on routez monitoring uri
+        - name: metrics.http_req_stats.subsz_uri
+          type: object
+          description: >
+            The number of hits on subsz monitoring uri
+        - name: metrics.http_req_stats.varz_uri
+          type: object
+          description: >
+            The number of hits on varz monitoring uri

@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// Routez represents detailed information on current client connections.
 type Routez struct {
 	ServerID    string    `json:"server_id"`
 	Now         time.Time `json:"now"`

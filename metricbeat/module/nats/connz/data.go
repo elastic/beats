@@ -24,10 +24,11 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// Connz represents detailed information on current client connections.
 type Connz struct {
-	ServerID       string        `json:"server_id"`
-	Now            time.Time     `json:"now"`
-	Total          int           `json:"total"`
+	ServerID string    `json:"server_id"`
+	Now      time.Time `json:"now"`
+	Total    int       `json:"total"`
 }
 
 func eventMapping(content []byte) common.MapStr {

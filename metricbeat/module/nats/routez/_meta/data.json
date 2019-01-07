@@ -13,8 +13,7 @@
     "nats":{
         "routez":{
             "metrics": {
-                "num_routes": 0,
-                "routes": [],
+                "total": 10,
                 "server_id": "bUAdpRFtMWddIBWw80Yd9D",
                 "now": "2018-12-28T12:33:53.02604721Z"
             }

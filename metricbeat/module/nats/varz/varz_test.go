@@ -36,7 +36,7 @@ func TestEventMapping(t *testing.T) {
 	event := eventMapping(content)
 	metrics, _ := event["metrics"]
 	d, _ := metrics.(Varz)
-	assert.Equal(t, d.Connections, 42)
+	assert.Equal(t, d.TotalConnections, 35)
 }
 
 func TestFetchEventContent(t *testing.T) {
