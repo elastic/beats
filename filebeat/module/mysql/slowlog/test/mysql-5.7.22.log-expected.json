@@ -2,8 +2,9 @@
     {
         "@timestamp": "2018-08-07T08:27:47.000Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "slowlog",
+        "event.dataset": "mysql.slowlog",
         "event.module": "mysql",
+        "fileset.name": "slowlog",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -22,8 +23,9 @@
     {
         "@timestamp": "2018-08-07T08:27:47.000Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "slowlog",
+        "event.dataset": "mysql.slowlog",
         "event.module": "mysql",
+        "fileset.name": "slowlog",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -41,8 +43,9 @@
     {
         "@timestamp": "2018-08-07T08:27:47.000Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "slowlog",
+        "event.dataset": "mysql.slowlog",
         "event.module": "mysql",
+        "fileset.name": "slowlog",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -62,8 +65,9 @@
     {
         "@timestamp": "2018-08-07T08:27:47.000Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "slowlog",
+        "event.dataset": "mysql.slowlog",
         "event.module": "mysql",
+        "fileset.name": "slowlog",
         "input.type": "log",
         "log.flags": [
             "multiline"
