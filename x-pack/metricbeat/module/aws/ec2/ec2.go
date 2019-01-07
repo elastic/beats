@@ -199,29 +199,38 @@ func reportCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 
 	event := mb.Event{}
 	event.RootFields = common.MapStr{}
-	putRootFieldsInEvent(event, "service.name", aws.ModuleName, report)
-	putRootFieldsInEvent(event, "cloud.provider", "ec2", report)
-	putRootFieldsInEvent(event, "cloud.instance.id", instanceID, report)
-	putRootFieldsInEvent(event, "cloud.machine.type", machineType, report)
-	putRootFieldsInEvent(event, "cloud.availability_zone", *instanceOutput.Placement.AvailabilityZone, report)
-	putRootFieldsInEvent(event, "cloud.image.id", *instanceOutput.ImageId, report)
-	putRootFieldsInEvent(event, "cloud.region", regionName, report)
+	mapOfRootFieldsResults := make(map[string]interface{})
+	mapOfRootFieldsResults["service.name"] = aws.ModuleName
+	mapOfRootFieldsResults["cloud.provider"] = "ec2"
+	mapOfRootFieldsResults["cloud.instance.id"] = instanceID
+	mapOfRootFieldsResults["cloud.machine.type"] = machineType
+	mapOfRootFieldsResults["cloud.availability_zone"] = *instanceOutput.Placement.AvailabilityZone
+	mapOfRootFieldsResults["cloud.image.id"] = *instanceOutput.ImageId
+	mapOfRootFieldsResults["cloud.region"] = regionName
 
-	mapOfResults := make(map[string]interface{})
-	for _, output := range getMetricDataOutput.MetricDataResults {
-		if len(output.Values) == 0 {
-			continue
-		}
-		metricKey := metricIDNameMap[*output.Id]
-		mapOfResults[metricKey] = fmt.Sprint(output.Values[0])
-	}
-	result, err := eventMapping(mapOfResults)
+	resultRootFields, err := eventMapping(mapOfRootFieldsResults, schemaRootFields)
 	if err != nil {
 		err = errors.Wrap(err, "Error trying to apply schema in AWS EC2 metricbeat module.")
 		logp.Error(err)
 		report.Error(err)
 	}
-	report.Event(mb.Event{MetricSetFields: result})
+
+	mapOfMetricSetFieldResults := make(map[string]interface{})
+	for _, output := range getMetricDataOutput.MetricDataResults {
+		if len(output.Values) == 0 {
+			continue
+		}
+		metricKey := metricIDNameMap[*output.Id]
+		mapOfMetricSetFieldResults[metricKey] = fmt.Sprint(output.Values[0])
+	}
+
+	resultMetricSetFields, err := eventMapping(mapOfMetricSetFieldResults, schemaMetricSetFields)
+	if err != nil {
+		err = errors.Wrap(err, "Error trying to apply schema in AWS EC2 metricbeat module.")
+		logp.Error(err)
+		report.Error(err)
+	}
+	report.Event(mb.Event{MetricSetFields: resultMetricSetFields, RootFields: resultRootFields})
 }
 
 func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instancesOutputs map[string]ec2.Instance, err error) {

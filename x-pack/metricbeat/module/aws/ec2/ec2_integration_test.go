@@ -55,32 +55,33 @@ func TestFetch(t *testing.T) {
 		t.Logf("Module: %s Metricset: %s", awsMetricSet.Module().Name(), awsMetricSet.Name())
 
 		for _, event := range events {
+			fmt.Println("event = ", event)
 			// RootField
-			checkRootField("service.name", event, t)
-			checkRootField("cloud.availability_zone", event, t)
-			checkRootField("cloud.provider", event, t)
-			checkRootField("cloud.image.id", event, t)
-			checkRootField("cloud.instance.id", event, t)
-			checkRootField("cloud.machine.type", event, t)
-			checkRootField("cloud.provider", event, t)
-			checkRootField("cloud.region", event, t)
+			checkEventField("service.name", "string", event, t)
+			checkEventField("cloud.availability_zone", "string", event, t)
+			checkEventField("cloud.provider", "string", event, t)
+			checkEventField("cloud.image.id", "string", event, t)
+			checkEventField("cloud.instance.id", "string", event, t)
+			checkEventField("cloud.machine.type", "string", event, t)
+			checkEventField("cloud.provider", "string", event, t)
+			checkEventField("cloud.region", "string", event, t)
 			// MetricSetField
-			checkMetricSetField("cpu.total.pct", event, t)
-			checkMetricSetField("cpu.credit_usage", event, t)
-			checkMetricSetField("cpu.credit_balance", event, t)
-			checkMetricSetField("cpu.surplus_credit_balance", event, t)
-			checkMetricSetField("cpu.surplus_credits_charged", event, t)
-			checkMetricSetField("network.in.packets", event, t)
-			checkMetricSetField("network.out.packets", event, t)
-			checkMetricSetField("network.in.bytes", event, t)
-			checkMetricSetField("network.out.bytes", event, t)
-			checkMetricSetField("diskio.read.bytes", event, t)
-			checkMetricSetField("diskio.write.bytes", event, t)
-			checkMetricSetField("diskio.read.ops", event, t)
-			checkMetricSetField("diskio.write.ops", event, t)
-			checkMetricSetField("status.check_failed", event, t)
-			checkMetricSetField("status.check_failed_system", event, t)
-			checkMetricSetField("status.check_failed_instance", event, t)
+			checkEventField("cpu.total.pct", "float", event, t)
+			checkEventField("cpu.credit_usage", "float", event, t)
+			checkEventField("cpu.credit_balance", "float", event, t)
+			checkEventField("cpu.surplus_credit_balance", "float", event, t)
+			checkEventField("cpu.surplus_credits_charged", "float", event, t)
+			checkEventField("network.in.packets", "float", event, t)
+			checkEventField("network.out.packets", "float", event, t)
+			checkEventField("network.in.bytes", "float", event, t)
+			checkEventField("network.out.bytes", "float", event, t)
+			checkEventField("diskio.read.bytes", "float", event, t)
+			checkEventField("diskio.write.bytes", "float", event, t)
+			checkEventField("diskio.read.ops", "float", event, t)
+			checkEventField("diskio.write.ops", "float", event, t)
+			checkEventField("status.check_failed", "int", event, t)
+			checkEventField("status.check_failed_system", "int", event, t)
+			checkEventField("status.check_failed_instance", "int", event, t)
 		}
 
 		err := mbtest.WriteEventsReporterV2(awsMetricSet, t, "")
@@ -90,29 +91,29 @@ func TestFetch(t *testing.T) {
 	}
 }
 
-func checkMetricSetField(metricName string, event mb.Event, t *testing.T) {
+func checkEventField(metricName string, expectedType string, event mb.Event, t *testing.T) {
 	if ok, err := event.MetricSetFields.HasKey(metricName); ok {
 		assert.NoError(t, err)
 		metricValue, err := event.MetricSetFields.GetValue(metricName)
 		assert.NoError(t, err)
-		if userPercentFloat, ok := metricValue.(float64); !ok {
-			fmt.Println("failed: userPercentFloat = ", userPercentFloat)
-			t.Fail()
-		} else {
-			assert.True(t, userPercentFloat >= 0)
-			fmt.Println("succeed: userPercentFloat = ", userPercentFloat)
-		}
-	}
-}
 
-func checkRootField(fieldName string, event mb.Event, t *testing.T) {
-	if ok, err := event.RootFields.HasKey(fieldName); ok {
-		assert.NoError(t, err)
-		metricValue, err := event.RootFields.GetValue(fieldName)
-		assert.NoError(t, err)
-		if userString, ok := metricValue.(string); !ok {
-			fmt.Println("Field "+fieldName+" is not a string: ", userString)
-			t.Fail()
+		switch metricValue.(type) {
+		case float64:
+			if expectedType != "float" {
+				t.Log("Failed: Field " + metricName + " is not in type " + expectedType)
+				t.Fail()
+			}
+		case string:
+			if expectedType != "string" {
+				t.Log("Failed: Field " + metricName + " is not in type " + expectedType)
+				t.Fail()
+			}
+		case int64:
+			if expectedType != "int" {
+				t.Log("Failed: Field " + metricName + " is not in type " + expectedType)
+				t.Fail()
+			}
 		}
+		t.Log("Succeed: Field " + metricName + " matches type " + expectedType)
 	}
 }

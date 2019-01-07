@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	schema = s.Schema{
+	schemaMetricSetFields = s.Schema{
 		"cpu": s.Object{
 			"total": s.Object{
 				"pct": c.Float("cpu.total.pct", s.Optional),
@@ -49,6 +49,28 @@ var (
 	}
 )
 
-func eventMapping(input map[string]interface{}) (common.MapStr, error) {
+var (
+	schemaRootFields = s.Schema{
+		"service": s.Object{
+			"name": c.Str("service.name", s.Optional),
+		},
+		"cloud": s.Object{
+			"provider": c.Str("cloud.provider", s.Optional),
+			"instance": s.Object{
+				"id": c.Str("cloud.instance.id", s.Optional),
+			},
+			"machine": s.Object{
+				"type": c.Str("cloud.machine.type", s.Optional),
+			},
+			"availability_zone": c.Str("cloud.availability_zone", s.Optional),
+			"image": s.Object{
+				"id": c.Str("cloud.image.id", s.Optional),
+			},
+			"region": c.Str("cloud.region", s.Optional),
+		},
+	}
+)
+
+func eventMapping(input map[string]interface{}, schema s.Schema) (common.MapStr, error) {
 	return schema.Apply(input)
 }
