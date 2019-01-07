@@ -33,11 +33,11 @@ var (
 	Beats = []string{
 		"heartbeat",
 		"journalbeat",
+		"metricbeat",
 		"packetbeat",
 		"winlogbeat",
 		"x-pack/auditbeat",
 		"x-pack/filebeat",
-		"x-pack/metricbeat",
 		"x-pack/functionbeat",
 	}
 )
