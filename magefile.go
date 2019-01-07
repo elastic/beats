@@ -20,8 +20,6 @@
 package main
 
 import (
-	"path/filepath"
-
 	"os"
 	"path/filepath"
 
