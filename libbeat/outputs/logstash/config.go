@@ -60,7 +60,7 @@ var defaultConfig = Config{
 		Init: 1 * time.Second,
 		Max:  60 * time.Second,
 	},
-	EscapeHTML: true,
+	EscapeHTML: false,
 }
 
 func newConfig() *Config {
