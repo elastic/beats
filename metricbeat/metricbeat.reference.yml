@@ -518,13 +518,10 @@ metricbeat.modules:
 
 #-------------------------------- Nats Module --------------------------------
 - module: nats
-  metricsets: ["varz", "connz", "routez", "subsz"]
+  metricsets: ["varz"]
   period: 10s
   hosts: ["localhost:8222"]
   #  varz_metrics_path: "/varz"
-  #  connz_metrics_path: "/connz"
-  #  routez_metrics_path: "/routez"
-  #  subsz_metrics_path: "/subsz"
 
 #-------------------------------- Nginx Module -------------------------------
 - module: nginx
@@ -813,7 +810,7 @@ metricbeat.modules:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# The supported processors are drop_fields, drop_event, include_fields, 
+# The supported processors are drop_fields, drop_event, include_fields,
 # decode_json_fields, and add_cloud_metadata.
 #
 # For example, you can use the following processors to keep the fields that
@@ -904,7 +901,7 @@ metricbeat.modules:
 #    match_pids: ["system.process.ppid"]
 #    target: system.process.parent
 #
-# The following example decodes fields containing JSON strings 
+# The following example decodes fields containing JSON strings
 # and replaces the strings with valid JSON objects.
 #
 #processors:

@@ -1,8 +1,5 @@
 - module: nats
-  metricsets: ["varz", "connz", "routez", "subsz"]
+  metricsets: ["varz"]
   period: 10s
   hosts: ["localhost:8222"]
   varz_metrics_path: "/varz"
-  connz_metrics_path: "/connz"
-  routez_metrics_path: "/routez"
-  subsz_metrics_path: "/subsz"

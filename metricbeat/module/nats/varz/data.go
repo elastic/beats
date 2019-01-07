@@ -44,11 +44,11 @@ type Varz struct {
 	OutBytes         int            `json:"bytes.out"`
 	SlowConsumers    int            `json:"slow_consumers"`
 	HTTPReqStats     map[string]int `json:"http_req_stats,omitempty"`
-	RootUriHits      int            `json:"http_req_stats.root_uri"`
-	ConnzUriHits     int            `json:"http_req_stats.connz_uri"`
-	RoutezUriHits    int            `json:"http_req_stats.routez_uri"`
-	SubszUriHits     int            `json:"http_req_stats.subsz_uri"`
-	VarzUriHits      int            `json:"http_req_stats.varz_uri"`
+	RootURIHits      int            `json:"http_req_stats.root_uri"`
+	ConnzURIHits     int            `json:"http_req_stats.connz_uri"`
+	RoutezURIHits    int            `json:"http_req_stats.routez_uri"`
+	SubszURIHits     int            `json:"http_req_stats.subsz_uri"`
+	VarzURIHits      int            `json:"http_req_stats.varz_uri"`
 }
 
 func eventMapping(content []byte) common.MapStr {
@@ -63,11 +63,11 @@ func eventMapping(content []byte) common.MapStr {
 	data.InBytesIn = 0
 	data.OutBytes = data.OutBytesIn
 	data.OutBytesIn = 0
-	data.RootUriHits = data.HTTPReqStats["/"]
-	data.ConnzUriHits = data.HTTPReqStats["/connz"]
-	data.RoutezUriHits = data.HTTPReqStats["/routez"]
-	data.SubszUriHits = data.HTTPReqStats["/subsz"]
-	data.VarzUriHits = data.HTTPReqStats["/varz"]
+	data.RootURIHits = data.HTTPReqStats["/"]
+	data.ConnzURIHits = data.HTTPReqStats["/connz"]
+	data.RoutezURIHits = data.HTTPReqStats["/routez"]
+	data.SubszURIHits = data.HTTPReqStats["/subsz"]
+	data.VarzURIHits = data.HTTPReqStats["/varz"]
 	data.HTTPReqStats = make(map[string]int, 0)
 
 	// TODO: add error handling
