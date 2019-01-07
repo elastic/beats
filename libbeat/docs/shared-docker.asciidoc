@@ -40,12 +40,14 @@ https://www.docker.elastic.co[www.docker.elastic.co].
 
 endif::[]
 
+ifndef::apm-server[]
+
 ==== Run the {beatname_uc} setup
 
 Running {beatname_uc} with the setup command will create the index pattern and
 load visualizations, dashboards, and machine learning jobs.  Run this command:
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat") or ("{beatname_lc}"=="heartbeat") or ("{beatname_lc}"=="apm-server")]
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat") or ("{beatname_lc}"=="heartbeat")]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
 docker run \
@@ -88,6 +90,8 @@ using this syntax:
 -E cloud.id=<Cloud ID from Elasticsearch Service> \
 -E cloud.auth=elastic:<elastic password>
 --------------------------------------------
+
+endif::apm-server[]
 
 ==== Configure {beatname_uc} on Docker
 
