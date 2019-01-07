@@ -27,6 +27,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Heartbeat*
 
 - Remove monitor generator script that was rarely used. {pull}9648[9648]
+- monitor IDs are now configurable. Auto generated monitor IDs now use a different formula based on a hash of their config values. If you wish to have continuity with the old format of monitor IDs you'll need to set the `id` property explicitly. {pull}9697[9697]
 
 *Journalbeat*
 

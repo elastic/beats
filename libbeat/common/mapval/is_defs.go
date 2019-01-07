@@ -20,6 +20,7 @@ package mapval
 import (
 	"fmt"
 	"reflect"
+	"regexp"
 	"strings"
 	"time"
 
@@ -204,6 +205,26 @@ var IsNonEmptyString = Is("is a non-empty string", func(path path, v interface{}
 
 	return ValidResult(path)
 })
+
+// IsStringMatching checks whether a value matches the given regexp.
+func IsStringMatching(regexp *regexp.Regexp) IsDef {
+	return Is("is string matching regexp", func(path path, v interface{}) *Results {
+		strV, errorResults := isStrCheck(path, v)
+		if errorResults != nil {
+			return errorResults
+		}
+
+		if !regexp.MatchString(strV) {
+			return SimpleResult(
+				path,
+				false,
+				fmt.Sprintf("String '%s' did not match regexp %s", strV, regexp.String()),
+			)
+		}
+
+		return ValidResult(path)
+	})
+}
 
 // IsStringContaining validates that the the actual value contains the specified substring.
 func IsStringContaining(needle string) IsDef {

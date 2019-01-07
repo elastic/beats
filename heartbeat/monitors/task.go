@@ -66,7 +66,7 @@ func newConfiguredJob(job Job, config jobConfig, monitor *Monitor) (*configuredJ
 
 // jobConfig represents fields needed to execute a single job.
 type jobConfig struct {
-	Name     string             `config:"name"`
+	Name     string             `config:"pluginName"`
 	Type     string             `config:"type"`
 	Schedule *schedule.Schedule `config:"schedule" validate:"required"`
 
@@ -83,12 +83,12 @@ func (e ProcessorsError) Error() string {
 	return fmt.Sprintf("could not load monitor processors: %s", e.root)
 }
 
-func (t *configuredJob) prepareSchedulerJob(meta common.MapStr, job Job) scheduler.TaskFunc {
+func (t *configuredJob) prepareSchedulerJob(job Job) scheduler.TaskFunc {
 	return func() []scheduler.TaskFunc {
 		event := &beat.Event{
 			Fields: common.MapStr{},
 		}
-		next, err := job.Run(event)
+		next, err := job(event)
 		hasContinuations := len(next) > 0
 
 		if err != nil {
@@ -96,7 +96,6 @@ func (t *configuredJob) prepareSchedulerJob(meta common.MapStr, job Job) schedul
 		}
 
 		if event != nil && event.Fields != nil {
-			MergeEventFields(event, meta)
 			// If continuations are present we defensively publish a clone of the event
 			// in the chance that the event shares underlying data with the events for continuations
 			// This prevents races where the pipeline publish could accidentally alter multiple events.
@@ -119,26 +118,14 @@ func (t *configuredJob) prepareSchedulerJob(meta common.MapStr, job Job) schedul
 
 		continuations := make([]scheduler.TaskFunc, len(next))
 		for i, n := range next {
-			continuations[i] = t.prepareSchedulerJob(meta, n)
+			continuations[i] = t.prepareSchedulerJob(n)
 		}
 		return continuations
 	}
 }
 
 func (t *configuredJob) makeSchedulerTaskFunc() scheduler.TaskFunc {
-	name := t.config.Name
-	if name == "" {
-		name = t.config.Type
-	}
-
-	meta := common.MapStr{
-		"monitor": common.MapStr{
-			"name": name,
-			"type": t.config.Type,
-		},
-	}
-
-	return t.prepareSchedulerJob(meta, t.job)
+	return t.prepareSchedulerJob(t.job)
 }
 
 // Start schedules this configuredJob for execution.
@@ -156,7 +143,7 @@ func (t *configuredJob) Start() {
 	}
 
 	tf := t.makeSchedulerTaskFunc()
-	t.cancelFn, err = t.monitor.scheduler.Add(t.config.Schedule, t.job.Name(), tf)
+	t.cancelFn, err = t.monitor.scheduler.Add(t.config.Schedule, t.monitor.id, tf)
 	if err != nil {
 		logp.Err("could not start monitor: %v", err)
 	}
