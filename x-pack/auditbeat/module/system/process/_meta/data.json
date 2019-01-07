@@ -1,0 +1,29 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "action": "existing_process",
+        "dataset": "process",
+        "id": "5795d53b-f7c2-463c-9c04-f316ae876d51",
+        "module": "system",
+        "kind": "state"
+    },
+    "message": "Process zsh (PID: 2363) is RUNNING",
+    "process": {
+        "args": [
+            "/usr/bin/zsh"
+        ],
+        "executable": "/bin/zsh",
+        "name": "zsh",
+        "pid": 2363,
+        "ppid": 2362,
+        "start": "2018-12-10T16:36:25.21Z",
+        "working_directory": "/home/elastic"
+    },
+    "service": {
+        "type": "system"
+    }
+}

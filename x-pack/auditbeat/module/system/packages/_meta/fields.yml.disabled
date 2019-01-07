@@ -1,0 +1,50 @@
+- name: packages
+  type: group
+  description: >
+    `packages` contains information about installed packages.
+  release: experimental
+  fields:
+  - name: package
+    type: array
+    description: >
+        One or more packages.
+    fields:
+    - name: status
+      type: keyword
+      description: >
+        Package change - `new`, `installed` or `removed`.
+    - name: package.name
+      type: keyword
+      description: >
+        Package name.
+    - name: package.version
+      type: keyword
+      description: >
+        Package version.
+    - name: package.release
+      type: keyword
+      description: >
+        Package release.
+    - name: package.arch
+      type: keyword
+      description: >
+        Package architecture.
+    - name: package.license
+      type: keyword
+      description: >
+        Package license.
+    - name: package.installtime
+      type: date
+      description: >
+        Package install time.
+    - name: package.size
+      type: long
+      description: >
+        Package size.
+    - name: package.summary
+      description: >
+        Package summary.
+    - name: package.url
+      type: keyword
+      description: >
+        Package URL.

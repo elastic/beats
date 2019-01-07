@@ -62,7 +62,7 @@ class Test(BaseTest):
         assert objs[0]["request"] == "ping()"
         assert objs[11]["response"] == "Exceptions: (1: (1: 4, 2: " + \
             "\"Cannot divide by 0\"))"
-        assert all([o["port"] == 9090 for o in objs])
+        assert all([o["server.port"] == 9090 for o in objs])
 
     def test_send_options_default(self):
         """

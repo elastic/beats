@@ -24,17 +24,17 @@ import (
 	"net"
 	"os"
 	"path/filepath"
-	"sync/atomic"
 	"syscall"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	sock "github.com/elastic/beats/metricbeat/helper/socket"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system"
 	"github.com/elastic/gosigar/sys/linux"
-
-	"github.com/pkg/errors"
 )
 
 var (
@@ -50,14 +50,13 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	readBuffer    []byte
-	seq           uint32
-	ptable        *ProcTable
+	netlink       *sock.NetlinkSession
+	ptable        *sock.ProcTable
 	euid          int
 	previousConns hashSet
 	currentConns  hashSet
 	reverseLookup *ReverseLookupCache
-	listeners     *ListenerTable
+	listeners     *sock.ListenerTable
 	users         UserCache
 }
 
@@ -72,7 +71,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.New("unexpected module type")
 	}
 
-	ptable, err := NewProcTable(filepath.Join(systemModule.HostFS, "/proc"))
+	ptable, err := sock.NewProcTable(filepath.Join(systemModule.HostFS, "/proc"))
 	if err != nil {
 		return nil, err
 	}
@@ -83,12 +82,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	m := &MetricSet{
 		BaseMetricSet: base,
-		readBuffer:    make([]byte, os.Getpagesize()),
+		netlink:       sock.NewNetlinkSession(),
 		ptable:        ptable,
 		euid:          os.Geteuid(),
 		previousConns: hashSet{},
 		currentConns:  hashSet{},
-		listeners:     NewListenerTable(),
+		listeners:     sock.NewListenerTable(),
 		users:         NewUserCache(),
 	}
 
@@ -114,10 +113,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		debugf("process table refresh had failures: %v", err)
 	}
 
-	// Send request over netlink and parse responses.
-	req := linux.NewInetDiagReq()
-	req.Header.Seq = atomic.AddUint32(&m.seq, 1)
-	sockets, err := linux.NetlinkInetDiagWithBuf(req, m.readBuffer, nil)
+	sockets, err := m.netlink.GetSocketList()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed requesting socket dump")
 	}
@@ -192,7 +188,7 @@ func (m *MetricSet) enrichConnectionData(c *connection) {
 		c.LocalIP, c.LocalPort, c.RemoteIP, c.RemotePort)
 
 	// Reverse DNS lookup on the remote IP.
-	if m.reverseLookup != nil && c.Direction != Listening {
+	if m.reverseLookup != nil && c.Direction != sock.Listening {
 		hostname, err := m.reverseLookup.Lookup(c.RemoteIP)
 		if err != nil {
 			c.DestHostError = err
@@ -227,7 +223,7 @@ type connection struct {
 	RemotePort int
 
 	State     linux.TCPState
-	Direction Direction
+	Direction sock.Direction
 
 	DestHost            string // Reverse lookup of dest IP.
 	DestHostETLDPlusOne string

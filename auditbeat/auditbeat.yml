@@ -48,7 +48,6 @@ auditbeat.modules:
   - /etc
 
 
-
 #==================== Elasticsearch template setting ==========================
 setup.template.settings:
   index.number_of_shards: 3
@@ -121,6 +120,9 @@ setup.kibana:
 output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
+
+  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
+  #ilm.enabled: false
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"

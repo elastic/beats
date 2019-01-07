@@ -21,10 +21,33 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 )
 
-// Job represents the work done by a single check by a given Monitor.
-type Job interface {
-	Name() string
-	Run() (beat.Event, []jobRunner, error)
+// A Job represents a unit of execution, and may return multiple continuation jobs.
+type Job func(event *beat.Event) ([]Job, error)
+
+// AfterJob creates a wrapped version of the given Job that runs additional
+// code after the original Job, possibly altering return values.
+func AfterJob(j Job, after func(*beat.Event, []Job, error) ([]Job, error)) Job {
+	return func(event *beat.Event) ([]Job, error) {
+		next, err := j(event)
+		return after(event, next, err)
+	}
 }
 
-type jobRunner func() (beat.Event, []jobRunner, error)
+// MakeSimpleJob creates a new Job from a callback function. The callback should
+// return an valid event and can not create any sub-tasks to be executed after
+// completion.
+func MakeSimpleJob(f func(*beat.Event) error) Job {
+	return func(event *beat.Event) ([]Job, error) {
+		return nil, f(event)
+	}
+}
+
+// WrapAll takes a list of jobs and wraps them all with the provided Job wrapping
+// function.
+func WrapAll(jobs []Job, fn func(Job) Job) []Job {
+	var wrapped []Job
+	for _, j := range jobs {
+		wrapped = append(wrapped, fn(j))
+	}
+	return wrapped
+}

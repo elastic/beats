@@ -1,29 +1,48 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "docker": {
         "image": {
-            "created": "2017-12-07T06:18:10.000Z",
+            "created": "2018-11-27T14:54:24.000Z",
             "id": {
-                "current": "sha256:8af9af305016ff6501ad0605e390e0a3b535265c0d0cf43375ea8149b794d1d3",
-                "parent": "sha256:d082cc35db8aef622e2a3e659cca62962158e72fbad5c8edd9f664007ae048f1"
+                "current": "sha256:bd0649cfa954c27054c5b4c67a2091e5d03f41a441e78b6971328cd3936a997f",
+                "parent": "sha256:a75037d73967907c74a2e5e219ae1eb10e9a35bb055a926eead2920866f75764"
+            },
+            "labels": {
+                "description": "Filebeat sends log files to Logstash or directly to Elasticsearch.",
+                "license": "ASL 2.0",
+                "org_label-schema_build-date": "20181006",
+                "org_label-schema_license": "GPLv2",
+                "org_label-schema_name": "filebeat",
+                "org_label-schema_schema-version": "1.0",
+                "org_label-schema_url": "https://www.elastic.co/products/beats/filebeat",
+                "org_label-schema_vcs-ref": "b9806f16b79dce1223119de94251cb1900f45e7f",
+                "org_label-schema_vcs-url": "github.com/elastic/beats",
+                "org_label-schema_vendor": "Elastic",
+                "org_label-schema_version": "7.0.0"
             },
             "size": {
-                "regular": 799052371,
-                "virtual": 799052371
+                "regular": 280257780,
+                "virtual": 280257780
             },
             "tags": [
-                "metricbeatsnapshotnoxpack700alpha1d71419298b58ed8b0a5b60a6d1e4a476ffaf80a8_beat:latest"
+                "docker.elastic.co/beats/filebeat-oss:7.0.0"
             ]
         }
     },
+    "event": {
+        "dataset": "docker.image",
+        "duration": 115000,
+        "module": "docker"
+    },
     "metricset": {
-        "host": "unix:///var/run/docker.sock",
-        "module": "docker",
-        "name": "image",
-        "rtt": 115
+        "name": "image"
+    },
+    "service": {
+        "type": "docker",
+        "uri": "/var/run/docker.sock"
     }
 }

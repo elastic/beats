@@ -4,29 +4,8 @@
       These fields contain data about the environment in which the
       transaction or flow was captured.
   fields:
-    - name: server
-      description: >
-        The name of the server that served the transaction.
-
-    - name: client_server
-      description: >
-        The name of the server that initiated the transaction.
-
-    - name: client_service
-      description: >
-        The name of the logical service that initiated the transaction.
-
-    - name: ip
-      description: >
-        The IP address of the server that served the transaction.
-      format: dotted notation.
-
-    - name: client_ip
-      description: >
-        The IP address of the server that initiated the transaction.
-      format: dotted notation.
-
     - name: real_ip
+      type: ip
       description: >
         If the server initiating the transaction is a proxy, this field
         contains the original client IP address.
@@ -36,24 +15,6 @@
         Unless this field is disabled, it always has a value, and it matches
         the `client_ip` for non proxy clients.
       format: Dotted notation.
-
-    - name: client_geoip
-      description: The GeoIP information of the client.
-      type: group
-      fields:
-        - name: location
-          type: geo_point
-          example: {lat: 51, lon: 9}
-          description: >
-            The GeoIP location of the `client_ip` address. This field is available
-            only if you define a
-            https://www.elastic.co/guide/en/elasticsearch/plugins/master/using-ingest-geoip.html[GeoIP Processor] as a pipeline in the
-            https://www.elastic.co/guide/en/elasticsearch/plugins/master/ingest-geoip.html[Ingest GeoIP processor plugin] or using Logstash.
-
-    - name: client_port
-      description: >
-        The layer 4 port of the process that initiated the transaction.
-      format: dotted notation.
 
     - name: transport
       description: >
@@ -66,231 +27,73 @@
         The type of the transaction (for example, HTTP, MySQL, Redis, or RUM) or "flow" in case of flows.
       required: true
 
-    - name: port
-      description: >
-        The layer 4 port of the process that served the transaction.
-      format: dotted notation.
-
-    - name: proc
+    - name: server.process.name
       description: >
         The name of the process that served the transaction.
 
-    - name: cmdline
+    - name: server.process.args
       description: >
         The command-line of the process that served the transaction.
 
-    - name: client_proc
+    - name: server.process.executable
+      description: >
+        Absolute path to the server process executable.
+
+    - name: server.process.working_directory
+      description: >
+        The working directory of the server process.
+
+    - name: server.process.start
+      description: >
+        The time the server process started.
+
+    - name: client.process.name
       description: >
         The name of the process that initiated the transaction.
 
-    - name: client_cmdline
+    - name: client.process.args
       description: >
         The command-line of the process that initiated the transaction.
 
-    - name: release
+    - name: client.process.executable
       description: >
-        The software release of the service serving the transaction.
-        This can be the commit id or a semantic version.
+        Absolute path to the client process executable.
+
+    - name: client.process.working_directory
+      description: >
+        The working directory of the client process.
+
+    - name: client.process.start
+      description: >
+        The time the client process started.
 
 - key: flows_event
   title: "Flow Event"
   description: >
     These fields contain data about the flow itself.
   fields:
-    - name: "start_time"
-      type: date
-      required: true
-      format: YYYY-MM-DDTHH:MM:SS.milliZ
-      example: 2015-01-24T14:06:05.071Z
-      description: >
-        The time, the first packet for the flow has been seen.
-
-    - name: "last_time"
-      type: date
-      required: true
-      format: YYYY-MM-DDTHH:MM:SS.milliZ
-      example: 2015-01-24T14:06:05.071Z
-      description: >
-        The time, the most recent processed packet for the flow has been seen.
-
-    - name: final
+    - name: flow.final
+      type: boolean
       description: >
         Indicates if event is last event in flow. If final is false, the event
         reports an intermediate flow state only.
 
-    - name: flow_id
+    - name: flow.id
       description: >
-        Internal flow id based on connection meta data and address.
+        Internal flow ID based on connection meta data and address.
 
-    - name: vlan
+    - name: flow.vlan
+      type: long
       description: >
-        Innermost VLAN address used in network packets.
-
-    - name: outer_vlan
-      description: >
-        Second innermost VLAN address used in network packets.
-
-
-    - name: source
-      type: group
-      description: >
-        Properties of the source host
-      fields:
-        - name: ip_location
-          type: geo_point
-          example: "40.715, -74.011"
-          description: >
-            The GeoIP location of the `ip_source` IP address. The field is a string
-            containing the latitude and longitude separated by a comma.
-
-        - name: outer_ip
-          description: >
-            Second innermost IPv4 source address as indicated by first packet seen
-            for the current flow.
-
-        - name: outer_ip_location
-          type: geo_point
-          example: "40.715, -74.011"
-          description: >
-            The GeoIP location of the `outer_ip_source` IP address. The field is a
-            string containing the latitude and longitude separated by a comma.
-
-        - name: ipv6
-          description: >
-            Innermost IPv6 source address as indicated by first packet seen for the
-            current flow.
-
-        - name: ipv6_location
-          type: geo_point
-          example: "60.715, -76.011"
-          description: >
-            The GeoIP location of the `ipv6_source` IP address. The field is a string
-            containing the latitude and longitude separated by a comma.
-
-        - name: outer_ipv6
-          description: >
-            Second innermost IPv6 source address as indicated by first packet seen
-            for the current flow.
-
-        - name: outer_ipv6_location
-          type: geo_point
-          example: "60.715, -76.011"
-          description: >
-            The GeoIP location of the `outer_ipv6_source` IP address. The field is a
-            string containing the latitude and longitude separated by a comma.
-
-        - name: stats
-          type: group
-          description: >
-            Object with source to destination flow measurements.
-          fields:
-            - name: net_packets_total
-              type: long
-              description: >
-                Total number of packets
-
-            - name: net_bytes_total
-              type: long
-              description: >
-                Total number of bytes
-
-    - name: dest
-      type: group
-      description: >
-        Properties of the destination host
-      fields:
-        - name: mac
-          description: >
-            Destination MAC address as indicated by first packet seen for the current flow.
-
-        - name: ip
-          description: >
-            Innermost IPv4 destination address as indicated by first packet seen for the
-            current flow.
-
-        - name: ip_location
-          type: geo_point
-          example: "40.715, -74.011"
-          description: >
-            The GeoIP location of the `ip_dest` IP address. The field is a string
-            containing the latitude and longitude separated by a comma.
-
-        - name: outer_ip
-          description: >
-            Second innermost IPv4 destination address as indicated by first packet
-            seen for the current flow.
-
-        - name: outer_ip_location
-          type: geo_point
-          example: "40.715, -74.011"
-          description: >
-            The GeoIP location of the `outer_ip_dest` IP address. The field is a
-            string containing the latitude and longitude separated by a comma.
-
-        - name: ipv6
-          description: >
-            Innermost IPv6 destination address as indicated by first packet seen for the
-            current flow.
-
-        - name: ipv6_location
-          type: geo_point
-          example: "60.715, -76.011"
-          description: >
-            The GeoIP location of the `ipv6_dest` IP address. The field is a string
-            containing the latitude and longitude separated by a comma.
-
-        - name: outer_ipv6
-          description: >
-            Second innermost IPv6 destination address as indicated by first packet
-            seen for the current flow.
-
-        - name: outer_ipv6_location
-          type: geo_point
-          example: "60.715, -76.011"
-          description: >
-            The GeoIP location of the `outer_ipv6_dest` IP address. The field is a
-            string containing the latitude and longitude separated by a comma.
-
-        - name: port
-          description: >
-            Destination port number as indicated by first packet seen for the current flow.
-
-        - name: stats
-          type: group
-          description: >
-            Object with destination to source flow measurements.
-          fields:
-            - name: net_packets_total
-              type: long
-              description: >
-                Total number of packets
-
-            - name: net_bytes_total
-              type: long
-              description: >
-                Total number of bytes
-    - name: icmp_id
-      description: >
-        ICMP id used in ICMP based flow.
-
-    - name: connection_id
-      description: >
-        optional TCP connection id
+        VLAN identifier from the 802.1q frame. In case of a multi-tagged frame
+        this field will be an array with the outer tag's VLAN identifier listed
+        first.
 
 - key: trans_event
   title: "Transaction Event"
   description: >
     These fields contain data about the transaction itself.
   fields:
-
-    - name: direction
-      required: true
-      description: >
-        Indicates whether the transaction is inbound (emitted by server)
-        or outbound (emitted by the client). Values can be in or out. No defaults.
-      possible_values:
-        - in
-        - out
 
     - name: status
       description: >

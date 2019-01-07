@@ -57,6 +57,27 @@ func TestProcessor(t *testing.T) {
 			},
 		},
 		{
+			output: p.scaledFloat(&common.Field{Type: "scaled_float"}, common.MapStr{scalingFactorKey: 0}),
+			expected: common.MapStr{
+				"type":           "scaled_float",
+				"scaling_factor": 1000,
+			},
+		},
+		{
+			output: p.scaledFloat(&common.Field{Type: "scaled_float"}, common.MapStr{"someKey": 10}),
+			expected: common.MapStr{
+				"type":           "scaled_float",
+				"scaling_factor": 1000,
+			},
+		},
+		{
+			output: p.scaledFloat(&common.Field{Type: "scaled_float"}, common.MapStr{scalingFactorKey: 10}),
+			expected: common.MapStr{
+				"type":           "scaled_float",
+				"scaling_factor": 10,
+			},
+		},
+		{
 			output:   pEsVersion2.scaledFloat(&common.Field{Type: "scaled_float"}),
 			expected: common.MapStr{"type": "float"},
 		},
@@ -264,22 +285,24 @@ func TestProcessor(t *testing.T) {
 	}
 }
 
-func TestDynamicTemplate(t *testing.T) {
+func TestDynamicTemplates(t *testing.T) {
 	p := &Processor{}
 	tests := []struct {
 		field    common.Field
-		expected common.MapStr
+		expected []common.MapStr
 	}{
 		{
 			field: common.Field{
 				Type: "object", ObjectType: "keyword",
 				Name: "context",
 			},
-			expected: common.MapStr{
-				"context": common.MapStr{
-					"mapping":            common.MapStr{"type": "keyword"},
-					"match_mapping_type": "string",
-					"path_match":         "context.*",
+			expected: []common.MapStr{
+				common.MapStr{
+					"context": common.MapStr{
+						"mapping":            common.MapStr{"type": "keyword"},
+						"match_mapping_type": "string",
+						"path_match":         "context.*",
+					},
 				},
 			},
 		},
@@ -288,11 +311,13 @@ func TestDynamicTemplate(t *testing.T) {
 				Type: "object", ObjectType: "long", ObjectTypeMappingType: "futuretype",
 				Path: "language", Name: "english",
 			},
-			expected: common.MapStr{
-				"language.english": common.MapStr{
-					"mapping":            common.MapStr{"type": "long"},
-					"match_mapping_type": "futuretype",
-					"path_match":         "language.english.*",
+			expected: []common.MapStr{
+				common.MapStr{
+					"language.english": common.MapStr{
+						"mapping":            common.MapStr{"type": "long"},
+						"match_mapping_type": "futuretype",
+						"path_match":         "language.english.*",
+					},
 				},
 			},
 		},
@@ -301,11 +326,13 @@ func TestDynamicTemplate(t *testing.T) {
 				Type: "object", ObjectType: "long", ObjectTypeMappingType: "*",
 				Path: "language", Name: "english",
 			},
-			expected: common.MapStr{
-				"language.english": common.MapStr{
-					"mapping":            common.MapStr{"type": "long"},
-					"match_mapping_type": "*",
-					"path_match":         "language.english.*",
+			expected: []common.MapStr{
+				common.MapStr{
+					"language.english": common.MapStr{
+						"mapping":            common.MapStr{"type": "long"},
+						"match_mapping_type": "*",
+						"path_match":         "language.english.*",
+					},
 				},
 			},
 		},
@@ -314,11 +341,13 @@ func TestDynamicTemplate(t *testing.T) {
 				Type: "object", ObjectType: "long",
 				Path: "language", Name: "english",
 			},
-			expected: common.MapStr{
-				"language.english": common.MapStr{
-					"mapping":            common.MapStr{"type": "long"},
-					"match_mapping_type": "long",
-					"path_match":         "language.english.*",
+			expected: []common.MapStr{
+				common.MapStr{
+					"language.english": common.MapStr{
+						"mapping":            common.MapStr{"type": "long"},
+						"match_mapping_type": "long",
+						"path_match":         "language.english.*",
+					},
 				},
 			},
 		},
@@ -327,11 +356,13 @@ func TestDynamicTemplate(t *testing.T) {
 				Type: "object", ObjectType: "text",
 				Path: "language", Name: "english",
 			},
-			expected: common.MapStr{
-				"language.english": common.MapStr{
-					"mapping":            common.MapStr{"type": "text"},
-					"match_mapping_type": "string",
-					"path_match":         "language.english.*",
+			expected: []common.MapStr{
+				common.MapStr{
+					"language.english": common.MapStr{
+						"mapping":            common.MapStr{"type": "text"},
+						"match_mapping_type": "string",
+						"path_match":         "language.english.*",
+					},
 				},
 			},
 		},
@@ -340,14 +371,16 @@ func TestDynamicTemplate(t *testing.T) {
 				Type: "object", ObjectType: "scaled_float",
 				Name: "core.*.pct",
 			},
-			expected: common.MapStr{
-				"core.*.pct": common.MapStr{
-					"mapping": common.MapStr{
-						"type":           "scaled_float",
-						"scaling_factor": defaultScalingFactor,
+			expected: []common.MapStr{
+				common.MapStr{
+					"core.*.pct": common.MapStr{
+						"mapping": common.MapStr{
+							"type":           "scaled_float",
+							"scaling_factor": defaultScalingFactor,
+						},
+						"match_mapping_type": "*",
+						"path_match":         "core.*.pct",
 					},
-					"match_mapping_type": "*",
-					"path_match":         "core.*.pct",
 				},
 			},
 		},
@@ -356,35 +389,72 @@ func TestDynamicTemplate(t *testing.T) {
 				Type: "object", ObjectType: "scaled_float",
 				Name: "core.*.pct", ScalingFactor: 100, ObjectTypeMappingType: "float",
 			},
-			expected: common.MapStr{
-				"core.*.pct": common.MapStr{
-					"mapping": common.MapStr{
-						"type":           "scaled_float",
-						"scaling_factor": 100,
+			expected: []common.MapStr{
+				common.MapStr{
+					"core.*.pct": common.MapStr{
+						"mapping": common.MapStr{
+							"type":           "scaled_float",
+							"scaling_factor": 100,
+						},
+						"match_mapping_type": "float",
+						"path_match":         "core.*.pct",
 					},
-					"match_mapping_type": "float",
-					"path_match":         "core.*.pct",
+				},
+			},
+		},
+		{
+			field: common.Field{
+				Type: "object", ObjectTypeParams: []common.ObjectTypeCfg{
+					{ObjectType: "float", ObjectTypeMappingType: "float"},
+					{ObjectType: "boolean"},
+					{ObjectType: "scaled_float", ScalingFactor: 10000},
+				},
+				Name: "context",
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"context": common.MapStr{
+						"mapping":            common.MapStr{"type": "float"},
+						"match_mapping_type": "float",
+						"path_match":         "context.*",
+					},
+				},
+				common.MapStr{
+					"context": common.MapStr{
+						"mapping":            common.MapStr{"type": "boolean"},
+						"match_mapping_type": "boolean",
+						"path_match":         "context.*",
+					},
+				},
+				common.MapStr{
+					"context": common.MapStr{
+						"mapping":            common.MapStr{"type": "scaled_float", "scaling_factor": 10000},
+						"match_mapping_type": "*",
+						"path_match":         "context.*",
+					},
 				},
 			},
 		},
 	}
 
-	for _, numericType := range []string{"byte", "double", "float", "long", "short"} {
+	for _, numericType := range []string{"byte", "double", "float", "long", "short", "boolean"} {
 		gen := struct {
 			field    common.Field
-			expected common.MapStr
+			expected []common.MapStr
 		}{
 			field: common.Field{
 				Type: "object", ObjectType: numericType,
 				Name: "somefield", ObjectTypeMappingType: "long",
 			},
-			expected: common.MapStr{
-				"somefield": common.MapStr{
-					"mapping": common.MapStr{
-						"type": numericType,
+			expected: []common.MapStr{
+				common.MapStr{
+					"somefield": common.MapStr{
+						"mapping": common.MapStr{
+							"type": numericType,
+						},
+						"match_mapping_type": "long",
+						"path_match":         "somefield.*",
 					},
-					"match_mapping_type": "long",
-					"path_match":         "somefield.*",
 				},
 			},
 		}
@@ -394,7 +464,7 @@ func TestDynamicTemplate(t *testing.T) {
 	for _, test := range tests {
 		dynamicTemplates = nil
 		p.object(&test.field)
-		assert.Equal(t, test.expected, dynamicTemplates[0])
+		assert.Equal(t, test.expected, dynamicTemplates)
 	}
 }
 

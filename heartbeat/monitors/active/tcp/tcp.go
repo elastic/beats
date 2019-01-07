@@ -23,13 +23,13 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
-
-	"github.com/elastic/beats/heartbeat/monitors"
-	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
 )
 
 func init() {
@@ -68,7 +68,6 @@ func create(
 		return nil, 0, err
 	}
 
-	typ := config.Name
 	timeout := config.Timeout
 	validator := makeValidateConn(&config)
 
@@ -87,9 +86,9 @@ func create(
 			return nil, 0, err
 		}
 
-		epJobs, err := dialchain.MakeDialerJobs(db, typ, scheme, eps, config.Mode,
-			func(dialer transport.Dialer, addr string) (common.MapStr, error) {
-				return pingHost(dialer, addr, timeout, validator)
+		epJobs, err := dialchain.MakeDialerJobs(db, scheme, eps, config.Mode,
+			func(event *beat.Event, dialer transport.Dialer, addr string) error {
+				return pingHost(event, dialer, addr, timeout, validator)
 			})
 		if err != nil {
 			return nil, 0, err
@@ -102,7 +101,9 @@ func create(
 	for _, hosts := range schemeHosts {
 		numHosts += len(hosts)
 	}
-	return jobs, numHosts, nil
+
+	errWrappedJobs := monitors.WrapAll(jobs, monitors.WithErrAsField)
+	return errWrappedJobs, numHosts, nil
 }
 
 func collectHosts(config *Config, defaultScheme string) (map[string][]dialchain.Endpoint, error) {

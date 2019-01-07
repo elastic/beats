@@ -133,17 +133,15 @@ func (p *dhcpv4Plugin) parseDHCPv4(pkt *protos.Packet) *beat.Event {
 		},
 	}
 
+	src, dst := common.MakeEndpointPair(pkt.Tuple.BaseTuple, nil)
 	if v4.Opcode() == dhcpv4.OpcodeBootReply {
-		event.PutValue("ip", pkt.Tuple.SrcIP.String())
-		event.PutValue("port", pkt.Tuple.SrcPort)
-		event.PutValue("client_ip", pkt.Tuple.DstIP.String())
-		event.PutValue("client_port", pkt.Tuple.DstPort)
+		// Reverse
+		event.PutValue("src", &dst)
+		event.PutValue("dst", &src)
 		event.PutValue("bytes_out", len(pkt.Payload))
 	} else {
-		event.PutValue("ip", pkt.Tuple.DstIP.String())
-		event.PutValue("port", pkt.Tuple.DstPort)
-		event.PutValue("client_ip", pkt.Tuple.SrcIP.String())
-		event.PutValue("client_port", pkt.Tuple.SrcPort)
+		event.PutValue("src", &src)
+		event.PutValue("dst", &dst)
 		event.PutValue("bytes_in", len(pkt.Payload))
 	}
 

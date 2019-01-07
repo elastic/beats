@@ -24,12 +24,12 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("metricbeat", "../metricbeat/_meta/fields.common.yml", Asset); err != nil {
+	if err := asset.SetFields("metricbeat", "../metricbeat/_meta/fields.common.yml", asset.BeatFieldsPri, Asset); err != nil {
 		panic(err)
 	}
 }
 
 // Asset returns asset data
 func Asset() string {
-	return "eJyUkz2O2zAQhXud4mH71QFUBAgWAVKl2gvMkmNzYJKjkCMrun0gxkpiYy3D6ijqvW9+nl5x4mWA05Q0d4CJRR7wtp09V1dkNNE84EsHAG+ajSTXiwgH4egr6EwS6SMyJINiBJ85G2wZufYdLp8NXfN4RabEAxJbEVfZ+qR+itwuP6Wuz3vgpoMeYIHxRwMLZDhy5kLGvt00dn+PtZ6fJG3a52FBq+3Dvmu1Kxi5IJlxKJowB3HhpoaZ1uHHyM7Y93gPUv+atTEj0YKshg/GWLiui5gD5+bjyejaAlEdxbjc7aHY1sK6zgFR8/HyovDPSQr7AVamB1P91hJRdMoeVmSESWpxSeKKVnaafd3dWh3J8VUpJ15mLX4f/GOTriP2S6Yk7p/zLXI13uuOf1Ea4/+11cdp8uqmtP0QPb7GmZaKlijFi1f30ne/AwAA//9Prh2/"
+	return "eJyUUktu2zAU3OsUg+yjA2hRoPAVcoEXchwS5Ucln6zq9gVpOqiN1kW04+ObD2f0ih88FpgcY04ToF4DF5xuZ8tqil/V57Tg2wQAp5xUfKoDhLNnsBVyER/kPRA+QUIAL0wKPVbWecJYW6bO8YokkQsitXhTqXPMdgvsl39Vbd+bY8chn6GOuGKgThQfTCyitP2ma88D2CwskOCljskq6paxdCcc/UeRq6yWjf8y285ftHrDPnF7J1ZZLt5wFmsLa32udsop0bQpxv6nrhjnE3EuOWJ33rgHO7u0IkOgUdoZb87XT9peGaIcSFnxTqyFtZW6O6bOY0XlngIhGwnheHhO62DwFv7cfKEdEV+H/CVxDX+G/J8nt4BtNlu8/WQzvoddjooecsaLzeZlnn4HAAD///yQ6RY="
 }

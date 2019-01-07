@@ -101,7 +101,7 @@ type hashableDNSTuple [maxDNSTupleRawSize]byte
 type dnsMessage struct {
 	ts           time.Time          // Time when the message was received.
 	tuple        common.IPPortTuple // Source and destination addresses of packet.
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 	data         *mkdns.Msg // Parsed DNS packet data.
 	length       int        // Length of the DNS message in bytes (without DecodeOffset).
 }
@@ -267,7 +267,7 @@ func (dns *dnsPlugin) setFromConfig(config *dnsConfig) error {
 	return nil
 }
 
-func newTransaction(ts time.Time, tuple dnsTuple, cmd common.CmdlineTuple) *dnsTransaction {
+func newTransaction(ts time.Time, tuple dnsTuple, cmd common.ProcessTuple) *dnsTransaction {
 	trans := &dnsTransaction{
 		transport: tuple.transport,
 		ts:        ts,

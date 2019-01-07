@@ -1,0 +1,7 @@
+[role="xpack"]
+
+experimental[]
+
+This is the `user` metricset of the system module.
+
+It is implemented for Linux only.

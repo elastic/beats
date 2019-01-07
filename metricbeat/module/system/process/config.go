@@ -29,6 +29,7 @@ type Config struct {
 	CacheCmdLine    bool                     `config:"process.cmdline.cache.enabled"`
 	IncludeTop      process.IncludeTopConfig `config:"process.include_top_n"`
 	IncludeCPUTicks bool                     `config:"process.include_cpu_ticks"`
+	IncludePerCPU   bool                     `config:"process.include_per_cpu"`
 	CPUTicks        *bool                    `config:"cpu_ticks"` // Deprecated
 }
 
@@ -47,4 +48,5 @@ var defaultConfig = Config{
 		ByCPU:    0,
 		ByMemory: 0,
 	},
+	IncludePerCPU: true,
 }
