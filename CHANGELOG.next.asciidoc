@@ -56,6 +56,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 *Auditbeat*
 
 *Filebeat*
+
 - Correctly parse `December` or `Dec` in the Syslog input. {pull}9349[9349]
 - Fix improperly set config for CRI Flag in Docker Input {pull}8899[8899]
 - Just enabling the `elasticsearch` fileset and starting Filebeat no longer causes an error. {pull}8891[8891]
@@ -66,6 +67,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Stop runners disabled by hints after previously being started. {pull}9305[9305]
 - Fix saved objects in filebeat haproxy dashboard. {pull}9417[9417]
 - Fixed a memory leak when harvesters are closed. {pull}7820[7820]
+- Support IPv6 addresses with zone id in IIS ingest pipeline. {issue}9836[9836] {pull}9869[9869]
 
 *Heartbeat*
 
