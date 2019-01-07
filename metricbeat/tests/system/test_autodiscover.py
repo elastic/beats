@@ -111,7 +111,8 @@ class TestAutodiscover(metricbeat.BaseTest):
                 'docker': {
                     'hints.enabled': 'true',
                     'appenders': '''
-                      - condition:
+                      - type: config
+                        condition:
                           equals.docker.container.image: memcached:latest
                         config:
                           fields:
