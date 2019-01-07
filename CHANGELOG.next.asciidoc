@@ -26,7 +26,6 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 
 *Metricbeat*
 
-- Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
 - Allow beats to blacklist certain part of the configuration while using Central Management. {pull}9099[9099]
 
 *Packetbeat*
@@ -56,6 +55,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 *Auditbeat*
 
 *Filebeat*
+
 - Correctly parse `December` or `Dec` in the Syslog input. {pull}9349[9349]
 - Fix improperly set config for CRI Flag in Docker Input {pull}8899[8899]
 - Just enabling the `elasticsearch` fileset and starting Filebeat no longer causes an error. {pull}8891[8891]
@@ -76,13 +76,14 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Add missing journalbeat non breaking fixes. {pull}9106[9106]
 
 *Metricbeat*
-- Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
 
+- Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
 - Add missing namespace field in http server metricset {pull}7890[7890]
 - Fix race condition when enriching events with kubernetes metadata. {issue}9055[9055] {issue}9067[9067]
 - Fix panic on docker healthcheck collection on dockers without healthchecks. {pull}9171[9171]
 - Fix issue with not collecting Elasticsearch cross-cluster replication stats correctly. {pull}9179[9179]
 - The `node.name` field in the `elasticsearch/node` metricset now correctly reports the Elasticsarch node name. Previously this field was incorrectly reporting the node ID instead. {pull}9209[9209]
+- Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
 
 *Packetbeat*
 
@@ -95,8 +96,8 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 ==== Added
 
 *Affecting all Beats*
-- Unify dashboard exporter tools. {pull}9097[9097]
 
+- Unify dashboard exporter tools. {pull}9097[9097]
 - Dissect will now flag event on parsing error. {pull}8751[8751]
 - Added the `redirect_stderr` option that allows panics to be logged to log files. {pull}8430[8430]
 - Add cache.ttl to add_host_metadata. {pull}9359[9359]
@@ -109,6 +110,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Add system module. {pull}9546[9546]
 
 *Filebeat*
+
 - Added `detect_null_bytes` selector to detect null bytes from a io.reader. {pull}9210[9210]
 - Added `syslog_host` variable to HAProxy module to allow syslog listener to bind to configured host. {pull}9366[9366]
 - Added support on Traefik for Common Log Format and Combined Log Format mixed which is the default Traefik format {issue}8015[8015] {issue}6111[6111] {pull}8768[8768].
@@ -142,6 +144,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Add field `event.dataset` which is `{module}.{metricset).
 - Add more TCP statuses to `socket_summary` metricset. {pull}9430[9430]
 - Remove experimental tag from ceph metricsets. {pull}9708[9708]
+- Add `key` metricset to the Redis module. {issue}9582[9582] {pull}9657[9657]
 
 *Packetbeat*
 

@@ -119,7 +119,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-rabbitmq-node,node>> beta[]  
 |<<metricbeat-metricset-rabbitmq-queue,queue>> beta[]  
 |<<metricbeat-module-redis,Redis>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-redis-info,info>>   
+.3+| .3+|  |<<metricbeat-metricset-redis-info,info>>   
+|<<metricbeat-metricset-redis-key,key>>   
 |<<metricbeat-metricset-redis-keyspace,keyspace>>   
 |<<metricbeat-module-system,System>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .14+| .14+|  |<<metricbeat-metricset-system-core,core>>   
