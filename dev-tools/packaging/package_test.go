@@ -55,13 +55,15 @@ var (
 	modulesDirPattern      = regexp.MustCompile(`module/.+`)
 	modulesDDirPattern     = regexp.MustCompile(`modules.d/$`)
 	modulesDFilePattern    = regexp.MustCompile(`modules.d/.+`)
+	monitorsDFilePattern   = regexp.MustCompile(`monitors.d/.+`)
 	systemdUnitFilePattern = regexp.MustCompile(`/lib/systemd/system/.*\.service`)
 )
 
 var (
-	files    = flag.String("files", "../build/distributions/*/*", "filepath glob containing package files")
-	modules  = flag.Bool("modules", false, "check modules folder contents")
-	modulesd = flag.Bool("modules.d", false, "check modules.d folder contents")
+	files     = flag.String("files", "../build/distributions/*/*", "filepath glob containing package files")
+	modules   = flag.Bool("modules", false, "check modules folder contents")
+	modulesd  = flag.Bool("modules.d", false, "check modules.d folder contents")
+	monitorsd = flag.Bool("monitors.d", false, "check monitors.d folder contents")
 )
 
 func TestRPM(t *testing.T) {
@@ -117,6 +119,7 @@ func checkRPM(t *testing.T, file string) {
 	checkModulesPermissions(t, p)
 	checkModulesPresent(t, "/usr/share", p)
 	checkModulesDPresent(t, "/etc/", p)
+	checkMonitorsDPresent(t, "/etc", p)
 	checkModulesOwner(t, p)
 	checkSystemdUnitPermissions(t, p)
 }
@@ -134,6 +137,7 @@ func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
 	checkManifestOwner(t, p)
 	checkModulesPresent(t, "./usr/share", p)
 	checkModulesDPresent(t, "./etc/", p)
+	checkMonitorsDPresent(t, "./etc/", p)
 	checkModulesPermissions(t, p)
 	checkModulesOwner(t, p)
 	checkSystemdUnitPermissions(t, p)
@@ -297,6 +301,12 @@ func checkModulesDPresent(t *testing.T, prefix string, p *packageFile) {
 	}
 }
 
+func checkMonitorsDPresent(t *testing.T, prefix string, p *packageFile) {
+	if *monitorsd {
+		checkMonitors(t, "monitors.d", prefix, monitorsDFilePattern, p)
+	}
+}
+
 func checkModules(t *testing.T, name, prefix string, r *regexp.Regexp, p *packageFile) {
 	t.Run(fmt.Sprintf("%s %s contents", p.Name, name), func(t *testing.T) {
 		minExpectedModules := 4
@@ -330,6 +340,23 @@ func checkSystemdUnitPermissions(t *testing.T, p *packageFile) {
 			}
 		}
 		t.Errorf("no systemd unit file found matching %v", configFilePattern)
+	})
+}
+
+func checkMonitors(t *testing.T, name, prefix string, r *regexp.Regexp, p *packageFile) {
+	t.Run(fmt.Sprintf("%s %s contents", p.Name, name), func(t *testing.T) {
+		minExpectedModules := 1
+		total := 0
+		for _, entry := range p.Contents {
+			if strings.HasPrefix(entry.File, prefix) && r.MatchString(entry.File) {
+				total++
+			}
+		}
+
+		if total < minExpectedModules {
+			t.Errorf("not enough monitors found under %s: actual=%d, expected>=%d",
+				name, total, minExpectedModules)
+		}
 	})
 }
 

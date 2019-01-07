@@ -89,7 +89,7 @@ func Package() {
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
-	return mage.TestPackages()
+	return mage.TestPackages(mage.WithMonitorsD())
 }
 
 // Update updates the generated files (aka make update).
@@ -117,11 +117,23 @@ func GoTestIntegration(ctx context.Context) error {
 }
 
 func customizePackaging() {
+	monitorsDTarget := "monitors.d"
+	unixMonitorsDir := "/etc/{{.BeatName}}/monitors.d"
+	monitorsD := mage.PackageFile{
+		Mode:   0644,
+		Source: "monitors.d",
+	}
+
 	for _, args := range mage.Packages {
 		pkgType := args.Types[0]
 		switch pkgType {
 		case mage.Docker:
 			args.Spec.ExtraVar("linux_capabilities", "cap_net_raw=eip")
+			args.Spec.Files[monitorsDTarget] = monitorsD
+		case mage.TarGz, mage.Zip:
+			args.Spec.Files[monitorsDTarget] = monitorsD
+		case mage.Deb, mage.RPM, mage.DMG:
+			args.Spec.Files[unixMonitorsDir] = monitorsD
 		}
 	}
 }
