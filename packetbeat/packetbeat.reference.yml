@@ -564,7 +564,7 @@ packetbeat.protocols:
       # Sets the write buffer size.
       #buffer_size: 1MiB
 
-      # Maximum duration after which events are flushed, if the write buffer
+      # Maximum duration after which events are flushed if the write buffer
       # is not full yet. The default value is 1s.
       #flush.timeout: 1s
 
@@ -578,7 +578,7 @@ packetbeat.protocols:
       #codec: cbor
     #read:
       # Reader flush timeout, waiting for more events to become available, so
-      # to fill a complete batch, as required by the outputs.
+      # to fill a complete batch as required by the outputs.
       # If flush_timeout is 0, all available events are forwarded to the
       # outputs immediately.
       # The default value is 0s.
@@ -735,7 +735,7 @@ output.elasticsearch:
   # Set gzip compression level.
   #compression_level: 0
 
-  # Configure escaping html symbols in strings.
+  # Configure escaping HTML symbols in strings.
   #escape_html: true
 
   # Optional protocol and basic auth credentials.
@@ -743,7 +743,7 @@ output.elasticsearch:
   #username: "elastic"
   #password: "changeme"
 
-  # Dictionary of HTTP parameters to pass within the url with index operations.
+  # Dictionary of HTTP parameters to pass within the URL with index operations.
   #parameters:
     #param1: value1
     #param2: value2
@@ -759,14 +759,14 @@ output.elasticsearch:
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
 
-  # Optional HTTP Path
+  # Optional HTTP path
   #path: "/elasticsearch"
 
   # Custom HTTP headers to add to each request
   #headers:
   #  X-My-Header: Contents of the header
 
-  # Proxy server url
+  # Proxy server URL
   #proxy_url: http://proxy:3128
 
   # The number of times a particular Elasticsearch index operation is attempted. If
@@ -789,39 +789,38 @@ output.elasticsearch:
   # Elasticsearch after a network error. The default is 60s.
   #backoff.max: 60s
 
-  # Configure http request timeout before failing a request to Elasticsearch.
+  # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
 
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
   # Configure SSL verification mode. If `none` is configured, all server hosts
-  # and certificates will be accepted. In this mode, SSL based connections are
+  # and certificates will be accepted. In this mode, SSL-based connections are
   # susceptible to man-in-the-middle attacks. Use only for testing. Default is
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
-  # SSL configuration. By default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -843,7 +842,7 @@ output.elasticsearch:
   # Set gzip compression level.
   #compression_level: 3
 
-  # Configure escaping html symbols in strings.
+  # Configure escaping HTML symbols in strings.
   #escape_html: true
 
   # Optional maximum time to live for a connection to Logstash, after which the
@@ -853,7 +852,7 @@ output.elasticsearch:
   # Not yet supported for async connections (i.e. with the "pipelining" option set)
   #ttl: 30s
 
-  # Optional load balance the events between the Logstash hosts. Default is false.
+  # Optionally load-balance events between Logstash hosts. Default is false.
   #loadbalance: false
 
   # Number of batches to be sent asynchronously to Logstash while processing
@@ -886,7 +885,7 @@ output.elasticsearch:
   # Resolve names locally when using a proxy server. Defaults to false.
   #proxy_use_local_resolver: false
 
-  # Enable SSL support. SSL is automatically enabled, if any SSL setting is set.
+  # Enable SSL support. SSL is automatically enabled if any SSL setting is set.
   #ssl.enabled: true
 
   # Configure SSL verification mode. If `none` is configured, all server hosts
@@ -895,7 +894,7 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
@@ -906,7 +905,7 @@ output.elasticsearch:
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
   # Optional passphrase for decrypting the Certificate Key.
@@ -915,7 +914,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -942,7 +941,7 @@ output.elasticsearch:
   # Boolean flag to enable or disable the output module.
   #enabled: true
 
-  # The list of Kafka broker addresses from where to fetch the cluster metadata.
+  # The list of Kafka broker addresses from which to fetch the cluster metadata.
   # The cluster metadata contain the actual Kafka brokers events are published
   # to.
   #hosts: ["localhost:9092"]
@@ -951,7 +950,7 @@ output.elasticsearch:
   # using any event field. To set the topic from document type use `%{[type]}`.
   #topic: beats
 
-  # The Kafka event key setting. Use format string to create unique event key.
+  # The Kafka event key setting. Use format string to create a unique event key.
   # By default no event key will be generated.
   #key: ''
 
@@ -977,20 +976,20 @@ output.elasticsearch:
 
   # Configure JSON encoding
   #codec.json:
-    # Pretty print json event
+    # Pretty-print JSON event
     #pretty: false
 
-    # Configure escaping html symbols in strings.
+    # Configure escaping HTML symbols in strings.
     #escape_html: true
 
-  # Metadata update configuration. Metadata do contain leader information
-  # deciding which broker to use when publishing.
+  # Metadata update configuration. Metadata contains leader information
+  # used to decide which broker to use when publishing.
   #metadata:
     # Max metadata request retry attempts when cluster is in middle of leader
     # election. Defaults to 3 retries.
     #retry.max: 3
 
-    # Waiting time between retries during leader elections. Default is 250ms.
+    # Wait time between retries during leader elections. Default is 250ms.
     #retry.backoff: 250ms
 
     # Refresh metadata interval. Defaults to every 10 minutes.
@@ -1000,7 +999,7 @@ output.elasticsearch:
   #worker: 1
 
   # The number of times to retry publishing an event after a publishing failure.
-  # After the specified number of retries, the events are typically dropped.
+  # After the specified number of retries, events are typically dropped.
   # Some Beats, such as Filebeat, ignore the max_retries setting and retry until
   # all events are published.  Set max_retries to a value less than 0 to retry
   # until all events are published. The default is 3.
@@ -1048,7 +1047,7 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Enable SSL support. SSL is automatically enabled, if any SSL setting is set.
+  # Enable SSL support. SSL is automatically enabled if any SSL setting is set.
   #ssl.enabled: true
 
   # Optional SSL configuration options. SSL is off by default.
@@ -1061,7 +1060,7 @@ output.elasticsearch:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
@@ -1077,7 +1076,7 @@ output.elasticsearch:
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
@@ -1094,10 +1093,10 @@ output.elasticsearch:
     # Pretty print json event
     #pretty: false
 
-    # Configure escaping html symbols in strings.
+    # Configure escaping HTML symbols in strings.
     #escape_html: true
 
-  # The list of Redis servers to connect to. If load balancing is enabled, the
+  # The list of Redis servers to connect to. If load-balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
   #hosts: ["localhost:6379"]
@@ -1110,7 +1109,7 @@ output.elasticsearch:
   # default is packetbeat.
   #key: packetbeat
 
-  # The password to authenticate with. The default is no authentication.
+  # The password to authenticate to Redis with. The default is no authentication.
   #password:
 
   # The Redis database number where the events are published. The default is 0.
@@ -1211,10 +1210,10 @@ output.elasticsearch:
 
   # Configure JSON encoding
   #codec.json:
-    # Pretty print json event
+    # Pretty-print JSON event
     #pretty: false
 
-    # Configure escaping html symbols in strings.
+    # Configure escaping HTML symbols in strings.
     #escape_html: true
 
   # Path to the directory where to save the generated files. The option is
@@ -1246,10 +1245,10 @@ output.elasticsearch:
 
   # Configure JSON encoding
   #codec.json:
-    # Pretty print json event
+    # Pretty-print JSON event
     #pretty: false
 
-    # Configure escaping html symbols in strings.
+    # Configure escaping HTML symbols in strings.
     #escape_html: true
 
 #================================= Paths ======================================
@@ -1337,12 +1336,12 @@ output.elasticsearch:
 #setup.template.enabled: true
 
 # Template name. By default the template name is "packetbeat-%{[beat.version]}"
-# The template name and pattern has to be set in case the elasticsearch index pattern is modified.
+# The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
 #setup.template.name: "packetbeat-%{[beat.version]}"
 
 # Template pattern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
 # The first part is the version of the beat and then -* is used to match all daily indices.
-# The template name and pattern has to be set in case the elasticsearch index pattern is modified.
+# The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
 #setup.template.pattern: "packetbeat-%{[beat.version]}-*"
 
 # Path to fields.yml file to generate the template
@@ -1355,10 +1354,10 @@ output.elasticsearch:
 #- name: field_name
 #  type: field_type
 
-# Enable json template loading. If this is enabled, the fields.yml is ignored.
+# Enable JSON template loading. If this is enabled, the fields.yml is ignored.
 #setup.template.json.enabled: false
 
-# Path to the json template file
+# Path to the JSON template file
 #setup.template.json.path: "${path.config}/template.json"
 
 # Name under which the template is stored in Elasticsearch
@@ -1400,7 +1399,7 @@ setup.kibana:
   #username: "elastic"
   #password: "changeme"
 
-  # Optional HTTP Path
+  # Optional HTTP path
   #path: ""
 
   # Use SSL settings for HTTPS. Default is true.
@@ -1412,27 +1411,27 @@ setup.kibana:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
-  # SSL configuration. By default is off.
+  # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
 
@@ -1491,10 +1490,10 @@ logging.files:
   # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
   # are boundary-aligned with minutes, hours, days, weeks, months, and years as
   # reported by the local system clock. All other intervals are calculated from the
-  # unix epoch. Defaults to disabled.
+  # Unix epoch. Defaults to disabled.
   #interval: 0
 
-# Set to true to log messages in json format.
+# Set to true to log messages in JSON format.
 #logging.json: false
 
 
@@ -1527,7 +1526,7 @@ logging.files:
   #username: "beats_system"
   #password: "changeme"
 
-  # Dictionary of HTTP parameters to pass within the url with index operations.
+  # Dictionary of HTTP parameters to pass within the URL with index operations.
   #parameters:
     #param1: value1
     #param2: value2
@@ -1559,7 +1558,7 @@ logging.files:
   # Elasticsearch after a network error. The default is 60s.
   #backoff.max: 60s
 
-  # Configure http request timeout before failing an request to Elasticsearch.
+  # Configure HTTP request timeout before failing an request to Elasticsearch.
   #timeout: 90
 
   # Use SSL settings for HTTPS.
@@ -1571,27 +1570,27 @@ logging.files:
   # `full`.
   #ssl.verification_mode: full
 
-  # List of supported/valid TLS versions. By default all TLS versions 1.0 up to
+  # List of supported/valid TLS versions. By default all TLS versions from 1.0 up to
   # 1.2 are enabled.
   #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
 
-  # SSL configuration. By default is off.
+  # SSL configuration. The default is off.
   # List of root certificates for HTTPS server verifications
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   # Certificate for SSL client authentication
   #ssl.certificate: "/etc/pki/client/cert.pem"
 
-  # Client Certificate Key
+  # Client certificate key
   #ssl.key: "/etc/pki/client/cert.key"
 
-  # Optional passphrase for decrypting the Certificate Key.
+  # Optional passphrase for decrypting the certificate key.
   #ssl.key_passphrase: ''
 
   # Configure cipher suites to be used for SSL connections
   #ssl.cipher_suites: []
 
-  # Configure curve types for ECDHE based cipher suites
+  # Configure curve types for ECDHE-based cipher suites
   #ssl.curve_types: []
 
   # Configure what types of renegotiation are supported. Valid options are
