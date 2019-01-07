@@ -31,6 +31,7 @@ import (
 )
 
 const (
+	// OutputPermission is the permission of dashboard output files.
 	OutputPermission = 0644
 )
 
