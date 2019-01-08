@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 *Filebeat*
 
 - Allow beats to blacklist certain part of the configuration while using Central Management. {pull}9099[9099]
+- Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
 
 *Heartbeat*
 
@@ -70,6 +71,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Fix saved objects in filebeat haproxy dashboard. {pull}9417[9417]
 - Fixed a memory leak when harvesters are closed. {pull}7820[7820]
 - Add `convert_timezone` option to Logstash module to convert dates to UTC. {issue}9756[9756] {pull}9797[9797]
+- Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
 
 *Heartbeat*
 

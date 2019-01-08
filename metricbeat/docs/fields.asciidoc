@@ -17696,6 +17696,63 @@ Count of slow operations
 --
 
 [float]
+== key fields
+
+`key` contains information about keys.
+
+
+
+*`redis.key.name`*::
++
+--
+type: keyword
+
+Key name.
+
+
+--
+
+*`redis.key.id`*::
++
+--
+type: keyword
+
+Unique id for this key (With the form <keyspace>:<name>).
+
+
+--
+
+*`redis.key.type`*::
++
+--
+type: keyword
+
+Key type as shown by `TYPE` command.
+
+
+--
+
+*`redis.key.length`*::
++
+--
+type: long
+
+Length of the key (Number of elements for lists, length for strings, cardinality for sets).
+
+
+--
+
+*`redis.key.expire.ttl`*::
++
+--
+type: long
+
+Seconds to expire.
+
+
+--
+
+[float]
 == keyspace fields
 
 `keyspace` contains the information about the keyspaces returned by the `INFO` command.

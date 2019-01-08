@@ -1416,14 +1416,36 @@ example:
 
 --
 
-*`elasticsearch.server.gc_overhead`*::
+*`elasticsearch.server.gc.overhead_seq`*::
 +
 --
 type: long
 
-example: 
+example: 3449992
 
+Sequence number
 
+--
+
+*`elasticsearch.server.gc.collection_duration.ms`*::
++
+--
+type: float
+
+example: 1600
+
+Time spent in GC, in milliseconds
+
+--
+
+*`elasticsearch.server.gc.observation_duration.ms`*::
++
+--
+type: float
+
+example: 1800
+
+Total time over which collection was observed, in milliseconds
 
 --
 
