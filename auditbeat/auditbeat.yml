@@ -48,7 +48,6 @@ auditbeat.modules:
   - /etc
 
 
-
 #==================== Elasticsearch template setting ==========================
 setup.template.settings:
   index.number_of_shards: 3

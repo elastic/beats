@@ -40,13 +40,13 @@ import (
 	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
-func testRequest(t *testing.T, testURL string) beat.Event {
+func testRequest(t *testing.T, testURL string) *beat.Event {
 	return testTLSRequest(t, testURL, nil)
 }
 
 // testTLSRequest tests the given request. certPath is optional, if given
 // an empty string no cert will be set.
-func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interface{}) beat.Event {
+func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interface{}) *beat.Event {
 	configSrc := map[string]interface{}{
 		"urls":    testURL,
 		"timeout": "1s",
@@ -66,7 +66,8 @@ func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interfa
 
 	job := jobs[0]
 
-	event, _, err := job.Run()
+	event := &beat.Event{}
+	_, err = job(event)
 	require.NoError(t, err)
 
 	require.Equal(t, 1, endpoints)
@@ -74,7 +75,7 @@ func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interfa
 	return event
 }
 
-func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, beat.Event) {
+func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, *beat.Event) {
 	server := httptest.NewServer(handlerFunc)
 	defer server.Close()
 	event := testRequest(t, server.URL)
@@ -187,7 +188,7 @@ func TestUpStatuses(t *testing.T) {
 			mapvaltest.Test(
 				t,
 				mapval.Strict(mapval.Compose(
-					hbtest.MonitorChecks("http@"+server.URL, server.URL, "127.0.0.1", "http", "up"),
+					hbtest.MonitorChecks(server.URL, "127.0.0.1", "http", "up"),
 					hbtest.RespondingTCPChecks(port),
 					respondingHTTPChecks(server.URL, status),
 				)),
@@ -208,7 +209,7 @@ func TestDownStatuses(t *testing.T) {
 			mapvaltest.Test(
 				t,
 				mapval.Strict(mapval.Compose(
-					hbtest.MonitorChecks("http@"+server.URL, server.URL, "127.0.0.1", "http", "down"),
+					hbtest.MonitorChecks(server.URL, "127.0.0.1", "http", "down"),
 					hbtest.RespondingTCPChecks(port),
 					respondingHTTPChecks(server.URL, status),
 					hbtest.ErrorChecks(fmt.Sprintf("%d", status), "validate"),
@@ -237,7 +238,8 @@ func TestLargeResponse(t *testing.T) {
 
 	job := jobs[0]
 
-	event, _, err := job.Run()
+	event := &beat.Event{}
+	_, err = job(event)
 	require.NoError(t, err)
 
 	port, err := hbtest.ServerPort(server)
@@ -246,7 +248,7 @@ func TestLargeResponse(t *testing.T) {
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			hbtest.MonitorChecks("http@"+server.URL, server.URL, "127.0.0.1", "http", "up"),
+			hbtest.MonitorChecks(server.URL, "127.0.0.1", "http", "up"),
 			hbtest.RespondingTCPChecks(port),
 			respondingHTTPChecks(server.URL, 200),
 		)),
@@ -280,7 +282,7 @@ func runHTTPSServerCheck(
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			hbtest.MonitorChecks("http@"+server.URL, server.URL, "127.0.0.1", "https", "up"),
+			hbtest.MonitorChecks(server.URL, "127.0.0.1", "https", "up"),
 			hbtest.RespondingTCPChecks(port),
 			hbtest.TLSChecks(0, 0, cert),
 			respondingHTTPChecks(server.URL, http.StatusOK),
@@ -345,7 +347,7 @@ func TestConnRefusedJob(t *testing.T) {
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			hbtest.MonitorChecks("http@"+url, url, ip, "http", "down"),
+			hbtest.MonitorChecks(url, ip, "http", "down"),
 			hbtest.TCPBaseChecks(port),
 			hbtest.ErrorChecks(url, "io"),
 			httpBaseChecks(url),
@@ -367,7 +369,7 @@ func TestUnreachableJob(t *testing.T) {
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			hbtest.MonitorChecks("http@"+url, url, ip, "http", "down"),
+			hbtest.MonitorChecks(url, ip, "http", "down"),
 			hbtest.TCPBaseChecks(uint16(port)),
 			hbtest.ErrorChecks(url, "io"),
 			httpBaseChecks(url),

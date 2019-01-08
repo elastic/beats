@@ -70,12 +70,12 @@ class Test(BaseTest):
         assert all([o["type"] == "icmp" for o in objs])
         assert all([o["bytes_in"] == 4 for o in objs])
         assert all([o["bytes_out"] == 4 for o in objs])
-        assert all([("port" in o) == False for o in objs])
+        assert all([("server.port" in o) == False for o in objs])
         assert all([("transport" in o) == False for o in objs])
 
     def assert_common_icmp4_fields(self, obj):
-        assert obj["ip"] == "10.0.0.2"
-        assert obj["client_ip"] == "10.0.0.1"
+        assert obj["server.ip"] == "10.0.0.2"
+        assert obj["client.ip"] == "10.0.0.1"
         assert obj["path"] == "10.0.0.2"
         assert obj["status"] == "OK"
         assert obj["icmp.request.message"] == "EchoRequest(0)"
@@ -86,8 +86,8 @@ class Test(BaseTest):
         assert obj["icmp.response.code"] == 0
 
     def assert_common_icmp6_fields(self, obj):
-        assert obj["ip"] == "::2"
-        assert obj["client_ip"] == "::1"
+        assert obj["server.ip"] == "::2"
+        assert obj["client.ip"] == "::1"
         assert obj["path"] == "::2"
         assert obj["status"] == "OK"
         assert obj["icmp.request.message"] == "EchoRequest(0)"

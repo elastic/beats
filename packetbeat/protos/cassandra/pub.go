@@ -107,9 +107,9 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 		timestamp = resp.Ts
 
 		dst := &common.Endpoint{
-			IP:   resp.Tuple.DstIP.String(),
-			Port: resp.Tuple.DstPort,
-			Proc: string(resp.CmdlineTuple.Dst),
+			IP:      resp.Tuple.DstIP.String(),
+			Port:    resp.Tuple.DstPort,
+			Process: resp.CmdlineTuple.Dst,
 		}
 		fields["dst"] = dst
 	}

@@ -77,7 +77,7 @@ type mysqlMessage struct {
 	direction    uint8
 	isTruncated  bool
 	tcpTuple     common.TCPTuple
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 	raw          []byte
 	notes        []string
 

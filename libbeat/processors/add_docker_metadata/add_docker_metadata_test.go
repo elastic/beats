@@ -129,21 +129,66 @@ func TestMatchContainer(t *testing.T) {
 	assert.NoError(t, err, "processing an event")
 
 	assert.EqualValues(t, common.MapStr{
-		"docker": common.MapStr{
-			"container": common.MapStr{
-				"id":    "container_id",
-				"image": "image",
-				"labels": common.MapStr{
-					"a": common.MapStr{
-						"x": "1",
-					},
-					"b": common.MapStr{
-						"value": "2",
-						"foo":   "3",
-					},
-				},
-				"name": "name",
+		"container": common.MapStr{
+			"id": "container_id",
+			"image": common.MapStr{
+				"name": "image",
 			},
+			"labels": common.MapStr{
+				"a": common.MapStr{
+					"x": "1",
+				},
+				"b": common.MapStr{
+					"value": "2",
+					"foo":   "3",
+				},
+			},
+			"name": "name",
+		},
+		"foo": "container_id",
+	}, result.Fields)
+}
+
+func TestMatchContainerWithDedot(t *testing.T) {
+	testConfig, err := common.NewConfigFrom(map[string]interface{}{
+		"match_fields": []string{"foo"},
+		"labels.dedot": true,
+	})
+	assert.NoError(t, err)
+
+	p, err := buildDockerMetadataProcessor(testConfig, MockWatcherFactory(
+		map[string]*docker.Container{
+			"container_id": &docker.Container{
+				ID:    "container_id",
+				Image: "image",
+				Name:  "name",
+				Labels: map[string]string{
+					"a.x":   "1",
+					"b":     "2",
+					"b.foo": "3",
+				},
+			},
+		}))
+	assert.NoError(t, err, "initializing add_docker_metadata processor")
+
+	input := common.MapStr{
+		"foo": "container_id",
+	}
+	result, err := p.Run(&beat.Event{Fields: input})
+	assert.NoError(t, err, "processing an event")
+
+	assert.EqualValues(t, common.MapStr{
+		"container": common.MapStr{
+			"id": "container_id",
+			"image": common.MapStr{
+				"name": "image",
+			},
+			"labels": common.MapStr{
+				"a_x":   "1",
+				"b":     "2",
+				"b_foo": "3",
+			},
+			"name": "name",
 		},
 		"foo": "container_id",
 	}, result.Fields)
@@ -183,16 +228,16 @@ func TestMatchSource(t *testing.T) {
 	assert.NoError(t, err, "processing an event")
 
 	assert.EqualValues(t, common.MapStr{
-		"docker": common.MapStr{
-			"container": common.MapStr{
-				"id":    "FABADA",
-				"image": "image",
-				"labels": common.MapStr{
-					"a": "1",
-					"b": "2",
-				},
-				"name": "name",
+		"container": common.MapStr{
+			"id": "FABADA",
+			"image": common.MapStr{
+				"name": "image",
 			},
+			"labels": common.MapStr{
+				"a": "1",
+				"b": "2",
+			},
+			"name": "name",
 		},
 		"source": inputSource,
 	}, result.Fields)
@@ -246,16 +291,16 @@ func TestMatchPIDs(t *testing.T) {
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	dockerMetadata := common.MapStr{
-		"docker": common.MapStr{
-			"container": common.MapStr{
-				"id":    "FABADA",
-				"image": "image",
-				"labels": common.MapStr{
-					"a": "1",
-					"b": "2",
-				},
-				"name": "name",
+		"container": common.MapStr{
+			"id": "FABADA",
+			"image": common.MapStr{
+				"name": "image",
 			},
+			"labels": common.MapStr{
+				"a": "1",
+				"b": "2",
+			},
+			"name": "name",
 		},
 	}
 

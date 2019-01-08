@@ -5,6 +5,7 @@ This metricset is available on:
 - Linux
 - macOS
 - OpenBSD
+- FreeBSD
 - Windows
 
 [float]

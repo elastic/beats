@@ -62,6 +62,10 @@ jobs:
       env: TARGETS="-C auditbeat crosscompile"
       go: $GO_VERSION
       stage: test
+    - os: linux
+      env: TARGETS="-C x-pack/auditbeat testsuite"
+      go: $GO_VERSION
+      stage: test
 
     # Libbeat
     - os: linux

@@ -19,13 +19,14 @@ package procs
 
 import (
 	"net"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
-	"github.com/elastic/gosigar"
+	"github.com/elastic/go-sysinfo"
 )
 
 // This controls how often process info for a running process is reloaded
@@ -50,8 +51,11 @@ type portProcMapping struct {
 }
 
 type process struct {
-	name        string
-	commandLine string
+	pid, ppid      int
+	name, exe, cwd string
+	args           []string
+	startTime      time.Time
+
 	// To control cache expiration
 	expiration time.Time
 }
@@ -61,8 +65,8 @@ type processWatcherImpl interface {
 	// GetLocalPortToPIDMapping returns the list of local port numbers and the PID
 	// that owns them.
 	GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[endpoint]int, err error)
-	// GetProcessCommandLine returns the command line for a given process.
-	GetProcessCommandLine(pid int) string
+	// GetProcess returns the process metadata.
+	GetProcess(pid int) *process
 	// GetLocalIPs returns the list of local addresses.
 	GetLocalIPs() ([]net.IP, error)
 }
@@ -116,20 +120,20 @@ func (proc *ProcessesWatcher) initWithImpl(config ProcsConfig, impl processWatch
 
 // FindProcessesTupleTCP looks up local process information for the source and
 // destination addresses of TCP tuple
-func (proc *ProcessesWatcher) FindProcessesTupleTCP(tuple *common.IPPortTuple) (procTuple *common.CmdlineTuple) {
+func (proc *ProcessesWatcher) FindProcessesTupleTCP(tuple *common.IPPortTuple) (procTuple *common.ProcessTuple) {
 	return proc.FindProcessesTuple(tuple, applayer.TransportTCP)
 }
 
 // FindProcessesTupleUDP looks up local process information for the source and
 // destination addresses of UDP tuple
-func (proc *ProcessesWatcher) FindProcessesTupleUDP(tuple *common.IPPortTuple) (procTuple *common.CmdlineTuple) {
+func (proc *ProcessesWatcher) FindProcessesTupleUDP(tuple *common.IPPortTuple) (procTuple *common.ProcessTuple) {
 	return proc.FindProcessesTuple(tuple, applayer.TransportUDP)
 }
 
 // FindProcessesTuple looks up local process information for the source and
 // destination addresses of a tuple for the given transport protocol
-func (proc *ProcessesWatcher) FindProcessesTuple(tuple *common.IPPortTuple, transport applayer.Transport) (procTuple *common.CmdlineTuple) {
-	procTuple = &common.CmdlineTuple{}
+func (proc *ProcessesWatcher) FindProcessesTuple(tuple *common.IPPortTuple, transport applayer.Transport) (procTuple *common.ProcessTuple) {
+	procTuple = &common.ProcessTuple{}
 
 	if !proc.enabled {
 		return
@@ -137,20 +141,28 @@ func (proc *ProcessesWatcher) FindProcessesTuple(tuple *common.IPPortTuple, tran
 
 	if proc.isLocalIP(tuple.SrcIP) {
 		if p := proc.findProc(tuple.SrcIP, tuple.SrcPort, transport); p != nil {
-			procTuple.Src = []byte(p.name)
-			procTuple.SrcCommand = []byte(p.commandLine)
+			procTuple.Src.PID = p.pid
+			procTuple.Src.PPID = p.ppid
+			procTuple.Src.Name = p.name
+			procTuple.Src.Args = p.args
+			procTuple.Src.Exe = p.exe
+			procTuple.Src.StartTime = p.startTime
 			if logp.IsDebug("procs") {
-				logp.Debug("procs", "Found process '%s' (%s) for %s:%d/%s", p.commandLine, p.name, tuple.SrcIP, tuple.SrcPort, transport)
+				logp.Debug("procs", "Found process '%s' (pid=%d) for %s:%d/%s", p.name, p.pid, tuple.SrcIP, tuple.SrcPort, transport)
 			}
 		}
 	}
 
 	if proc.isLocalIP(tuple.DstIP) {
 		if p := proc.findProc(tuple.DstIP, tuple.DstPort, transport); p != nil {
-			procTuple.Dst = []byte(p.name)
-			procTuple.DstCommand = []byte(p.commandLine)
+			procTuple.Dst.PID = p.pid
+			procTuple.Dst.PPID = p.ppid
+			procTuple.Dst.Name = p.name
+			procTuple.Dst.Args = p.args
+			procTuple.Dst.Exe = p.exe
+			procTuple.Dst.StartTime = p.startTime
 			if logp.IsDebug("procs") {
-				logp.Debug("procs", "Found process '%s' (%s) for %s:%d/%s", p.commandLine, p.name, tuple.DstIP, tuple.DstPort, transport)
+				logp.Debug("procs", "Found process '%s' (pid=%d) for %s:%d/%s", p.name, p.pid, tuple.DstIP, tuple.DstPort, transport)
 			}
 		}
 	}
@@ -238,8 +250,8 @@ func (proc *ProcessesWatcher) updateMappingEntry(transport applayer.Transport, e
 	proc.portProcMap[transport][e] = portProcMapping{endpoint: e, pid: pid, proc: p}
 
 	if logp.IsDebug("procsdetailed") {
-		logp.Debug("procsdetailed", "updateMappingEntry(): local=%s:%d/%s pid=%d process='%s' name=%s",
-			e.address, e.port, transport, pid, p.commandLine, p.name)
+		logp.Debug("procsdetailed", "updateMappingEntry(): local=%s:%d/%s pid=%d process='%s'",
+			e.address, e.port, transport, pid, p.name)
 	}
 }
 
@@ -262,13 +274,15 @@ func (proc *ProcessesWatcher) getProcessInfo(pid int) *process {
 		return p
 	}
 	// Not in cache, resolve process info
-	p := &process{
-		commandLine: proc.impl.GetProcessCommandLine(pid),
-		expiration:  time.Now().Add(processCacheExpiration),
+	p := proc.impl.GetProcess(pid)
+	if p == nil {
+		return nil
 	}
-	// see if the command-line matches any 'grep' pattern
+
+	// The packetbeat.procs.monitored*.cmdline_grep allows you to overwrite
+	// the process name with an alias.
 	for _, match := range proc.procConfig {
-		if strings.Contains(p.commandLine, match.CmdlineGrep) {
+		if strings.Contains(strings.Join(p.args, " "), match.CmdlineGrep) {
 			p.name = match.Process
 			break
 		}
@@ -286,16 +300,39 @@ func (proc *ProcessesWatcher) expireProcessCache() {
 	}
 }
 
-// GetProcessCommandLine returns the command line for a given process.
-func (proc *ProcessesWatcher) GetProcessCommandLine(pid int) (cmdLine string) {
-	var procArgs gosigar.ProcArgs
-	if err := procArgs.Get(pid); err == nil {
-		cmdLine = strings.Join(procArgs.List, " ")
-	} else {
-		// Save PID without command-line to avoid continued errors for this process
-		logp.Err("Unable to get command-line for pid %d: %v", pid, err)
+// GetProcess returns the process metadata.
+func (proc *ProcessesWatcher) GetProcess(pid int) *process {
+	if pid <= 0 {
+		return nil
 	}
-	return cmdLine
+
+	p, err := sysinfo.Process(pid)
+	if err != nil {
+		logp.Err("Unable to get command-line for PID %d: %v", pid, err)
+		return nil
+	}
+
+	info, err := p.Info()
+	if err != nil {
+		logp.Err("Unable to get command-line for PID %d: %v", pid, err)
+		return nil
+	}
+
+	name := info.Name
+	if len(info.Args) > 0 {
+		// Workaround the 20 char limit on comm values on Linux.
+		name = filepath.Base(info.Args[0])
+	}
+	return &process{
+		pid:        info.PID,
+		ppid:       info.PPID,
+		name:       name,
+		exe:        info.Exe,
+		cwd:        info.CWD,
+		args:       info.Args,
+		startTime:  info.StartTime,
+		expiration: time.Now().Add(processCacheExpiration),
+	}
 }
 
 // GetLocalIPs returns the list of local addresses.
