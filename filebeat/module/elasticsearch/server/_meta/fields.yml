@@ -23,7 +23,15 @@
         description: ""
         example: ""
         type: long
-  - name: gc_overhead
-    description: ""
-    example: ""
-    type: long
+    - name: overhead_seq
+      description: "Sequence number"
+      example: 3449992
+      type: long
+    - name: collection_duration.ms
+      description: "Time spent in GC, in milliseconds"
+      example: 1600
+      type: float
+    - name: observation_duration.ms
+      description: "Total time over which collection was observed, in milliseconds"
+      example: 1800
+      type: float
