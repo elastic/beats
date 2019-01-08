@@ -80,6 +80,11 @@ func main() {
 		if err != nil {
 			log.Fatalf("Error fetching files for module %v: %v", module, err)
 		}
+		if len(files) == 0 {
+			// This can happen on moved modules
+			log.Printf("No fields files for module %v", module)
+			continue
+		}
 
 		data, err := fields.GenerateFieldsYml(files)
 		if err != nil {
