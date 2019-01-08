@@ -1,29 +1,35 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
+    "beat": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "event": {
         "action": "existing_process",
         "dataset": "process",
-        "id": "5795d53b-f7c2-463c-9c04-f316ae876d51",
-        "module": "system",
-        "kind": "state"
+        "id": "5ee655ee-3f3c-4d20-8a5f-31531cd5ef5a",
+        "kind": "state",
+        "module": "system"
     },
-    "message": "Process zsh (PID: 2363) is RUNNING",
+    "message": "Process zsh (PID: 9086) by user elastic is RUNNING",
     "process": {
         "args": [
-            "/usr/bin/zsh"
+            "zsh"
         ],
         "executable": "/bin/zsh",
         "name": "zsh",
-        "pid": 2363,
-        "ppid": 2362,
-        "start": "2018-12-10T16:36:25.21Z",
+        "pid": 9086,
+        "ppid": 9085,
+        "start": "2019-01-09T12:05:44.87Z",
         "working_directory": "/home/elastic"
     },
-    "service": {
-        "type": "system"
+    "user": {
+        "egid": "1002",
+        "euid": "1002",
+        "gid": "1002",
+        "id": "1002",
+        "name": "elastic",
+        "sgid": "1002",
+        "suid": "1002"
     }
 }
