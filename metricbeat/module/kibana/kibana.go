@@ -57,23 +57,18 @@ func GetVersion(http *helper.HTTP, currentPath string) (*common.Version, error) 
 		return nil, err
 	}
 
-	var data common.MapStr
-	err = json.Unmarshal(content, &data)
+	var status struct {
+		Version struct {
+			Number string `json:"number"`
+		} `json:"version"`
+	}
+
+	err = json.Unmarshal(content, &status)
 	if err != nil {
 		return nil, err
 	}
 
-	versionNumber, err := data.GetValue("version.number")
-	if err != nil {
-		return nil, err
-	}
-
-	versionStr, ok := versionNumber.(string)
-	if !ok {
-		return nil, fmt.Errorf("Could not parse Kibana version in status API response")
-	}
-
-	return common.NewVersion(versionStr)
+	return common.NewVersion(status.Version.Number)
 }
 
 // IsStatsAPIAvailable returns whether the stats API is available in the given version of Kibana
