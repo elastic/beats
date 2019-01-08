@@ -8,27 +8,27 @@
         "ec2": {
             "cpu": {
                 "total": {
-                    "pct": 1.9520833333372138
+                    "pct": 3.37916666667054
                 }
             },
             "diskio": {
                 "read": {
-                    "bytes": 1313177.6,
-                    "ops": 241.4
+                    "bytes": 819.2,
+                    "ops": 0.2
                 },
                 "write": {
-                    "bytes": 35465625.6,
-                    "ops": 1809
+                    "bytes": 17932288,
+                    "ops": 1599.4
                 }
             },
             "network": {
                 "in": {
-                    "bytes": 42,
-                    "packets": 1
+                    "bytes": 94.8,
+                    "packets": 1.8
                 },
                 "out": {
-                    "bytes": 28,
-                    "packets": 1
+                    "bytes": 69.6,
+                    "packets": 1.8
                 }
             },
             "status": {
@@ -52,10 +52,13 @@
         "provider": "ec2",
         "region": "eu-central-1"
     },
+    "event": {
+        "dataset": "aws.ec2",
+        "duration": 115000,
+        "module": "aws"
+    },
     "metricset": {
-        "module": "aws",
-        "name": "ec2",
-        "rtt": 115
+        "name": "ec2"
     },
     "service": {
         "name": "aws",

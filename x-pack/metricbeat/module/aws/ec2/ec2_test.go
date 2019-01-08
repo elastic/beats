@@ -111,7 +111,7 @@ func TestGetInstanceIDs(t *testing.T) {
 
 func TestGetMetricDataPerRegion(t *testing.T) {
 	mockSvc := &MockCloudWatchClient{}
-	getMetricDataOutput, err := getMetricDataPerRegion("-10m", "i-123", nil, mockSvc)
+	getMetricDataOutput, err := getMetricDataPerRegion("-10m", 300, "i-123", nil, mockSvc)
 	if err != nil {
 		fmt.Println("failed getMetricDataPerRegion: ", err)
 		t.FailNow()
@@ -122,22 +122,53 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 	assert.Equal(t, 0.25, getMetricDataOutput.MetricDataResults[0].Values[0])
 }
 
-func TestConvertPeriodToDuration(t *testing.T) {
+func TestConvertPeriodToDurationWithDetailedMonitoring(t *testing.T) {
 	period1 := "300s"
-	duration1 := convertPeriodToDuration(period1)
+	duration1, periodSec1 := convertPeriodToDuration(period1, "enabled")
 	assert.Equal(t, "-600s", duration1)
+	assert.Equal(t, 300, periodSec1)
 
 	period2 := "30ss"
-	duration2 := convertPeriodToDuration(period2)
-	assert.Equal(t, "-10m", duration2)
+	duration2, periodSec2 := convertPeriodToDuration(period2, "enabled")
+	assert.Equal(t, "-120s", duration2)
+	assert.Equal(t, 60, periodSec2)
 
 	period3 := "10m"
-	duration3 := convertPeriodToDuration(period3)
+	duration3, periodSec3 := convertPeriodToDuration(period3, "enabled")
 	assert.Equal(t, "-20m", duration3)
+	assert.Equal(t, 600, periodSec3)
 
-	period4 := "5sm"
-	duration4 := convertPeriodToDuration(period4)
-	assert.Equal(t, "-10m", duration4)
+	period4 := "30s"
+	duration4, periodSec4 := convertPeriodToDuration(period4, "enabled")
+	assert.Equal(t, "-120s", duration4)
+	assert.Equal(t, 60, periodSec4)
+
+	period5 := "60s"
+	duration5, periodSec5 := convertPeriodToDuration(period5, "enabled")
+	assert.Equal(t, "-120s", duration5)
+	assert.Equal(t, 60, periodSec5)
+}
+
+func TestConvertPeriodToDurationWithBasicMonitoring(t *testing.T) {
+	period1 := "300s"
+	duration1, periodSec1 := convertPeriodToDuration(period1, "disabled")
+	assert.Equal(t, "-600s", duration1)
+	assert.Equal(t, 300, periodSec1)
+
+	period2 := "30ss"
+	duration2, periodSec2 := convertPeriodToDuration(period2, "disabled")
+	assert.Equal(t, "-600s", duration2)
+	assert.Equal(t, 300, periodSec2)
+
+	period3 := "10m"
+	duration3, periodSec3 := convertPeriodToDuration(period3, "disabled")
+	assert.Equal(t, "-20m", duration3)
+	assert.Equal(t, 600, periodSec3)
+
+	period5 := "60s"
+	duration5, periodSec5 := convertPeriodToDuration(period5, "disabled")
+	assert.Equal(t, "-600s", duration5)
+	assert.Equal(t, 300, periodSec5)
 }
 
 func TestMockFetch(t *testing.T) {
