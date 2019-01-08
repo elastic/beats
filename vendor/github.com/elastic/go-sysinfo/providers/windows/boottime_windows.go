@@ -20,7 +20,7 @@ package windows
 import (
 	"time"
 
-	"github.com/elastic/go-windows"
+	windows "github.com/elastic/go-windows"
 	"github.com/pkg/errors"
 )
 
