@@ -9,104 +9,29 @@
         HTTP statistics
       fields:
         - name: view_reads
-          type: group
+          type: scaled_float
           description: >
              Number of view reads
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
         - name: bulk_requests
-          type: group
+          type: scaled_float
           description: >
             Number of bulk requests
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
         - name: clients_requesting_changes
-          type: group
+          type: scaled_float
           description: >
             Number of clients for continuous _changes
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
         - name: temporary_view_reads
-          type: group
+          type: scaled_float
           description: >
             Number of temporary view reads
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
         - name: requests
-          type: group
+          type: scaled_float 
           description: >
             Number of HTTP requests
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
     - name: httpd_request_methods
       type: group
@@ -114,389 +39,104 @@
         HTTP request methods
       fields:
         - name: COPY
-          type: group
+          type: scaled_float
           description: >
             Number of HTTP COPY requests
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
         - name: HEAD
-          type: group
+          type: scaled_float
           description: >
             Number of HTTP HEAD requests
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
         - name: POST
-          type: group
+          type: scaled_float
           description: >
             Number of HTTP POST requests
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
         - name: DELETE
-          type: group
+          type: scaled_float
           description: >
             Number of HTTP DELETE requests
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
         - name: GET
-          type: group
+          type: scaled_float
           description: >
             Number of HTTP GET requests
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
         - name: PUT
-          type: group
+          type: scaled_float
           description: >
             Number of HTTP PUT requests
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
     - name: httpd_status_codes
       type: group
       description: >
         HTTP status codes statistics
       fields:
-        - name: num200
-          type: group
+        - name: "200"
+          type: scaled_float
           description: >
             Number of HTTP 200 OK responses
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
-        - name: num201
-          type: group
+        - name: "201"
+          type: scaled_float
           description: >
             Number of HTTP 201 Created responses
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
-        - name: num202
-          type: group
+        - name: "202"
+          type: scaled_float
           description: >
             Number of HTTP 202 Accepted responses
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
-        - name: num301
-          type: group
+        - name: "301"
+          type: scaled_float
           description: >
             Number of HTTP 301 Moved Permanently responses
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
-        - name: num304
-          type: group
+        - name: "304"
+          type: scaled_float
           description: >
             Number of HTTP 304 Not Modified responses
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
-        - name: num400
-          type: group
+        - name: "400"
+          type: scaled_float
           description: >
             Number of HTTP 400 Bad Request responses
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
-        - name: num401
-          type: group
+        - name: "401"
+          type: scaled_float
           description: >
             Number of HTTP 401 Unauthorized responses
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
-        - name: num403
-          type: group
+        - name: "403"
+          type: scaled_float
           description: >
             Number of HTTP 403 Forbidden responses
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
-        - name: num404
-          type: group
+        - name: "404"
+          type: scaled_float
           description: >
              Number of HTTP 404 Not Found responses
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
-        - name: num405
-          type: group
+        - name: "405"
+          type: scaled_float
           description: >
             Number of HTTP 405 Method Not Allowed responses
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
-        - name: num409
-          type: group
+        - name: "409"
+          type: scaled_float
           description: >
             Number of HTTP 409 Conflict responses
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
-        - name: num412
-          type: group
+        - name: "412"
+          type: scaled_float
           description: >
             Number of HTTP 412 Precondition Failed responses
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
-        - name: num500
-          type: group
+        - name: "500"
+          type: scaled_float
           description: >
             Number of HTTP 500 Internal Server Error responses
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
     - name: couchdb 
       type: group
@@ -504,141 +144,36 @@
         couchdb statistics
       fields:
         - name: database_writes
-          type: group
+          type: scaled_float
           description: >
             Number of times a database was changed
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
         - name: open_databases
-          type: group
+          type: scaled_float
           description: >
             Number of open databases
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
         - name: auth_cache_misses
-          type: group
+          type: scaled_float
           description: >
             Number of authentication cache misses
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
         - name: request_time
-          type: group
+          type: scaled_float
           description: >
             Length of a request inside CouchDB without MochiWeb
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
         - name: database_reads
-          type: group
+          type: scaled_float
           description: >
             Number of times a document was read from a database
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
         - name: auth_cache_hits
-          type: group
+          type: scaled_float
           description: >
             Number of authentication cache hits
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
 
         - name: open_os_files
-          type: group
+          type: scaled_float 
           description: >
             Number of file descriptors CouchDB has open
-          fields:
-            - name: description
-              type: keyword
-            - name: current
-              type: scaled_float
-            - name: sum
-              type: scaled_float
-            - name: mean
-              type: scaled_float
-            - name: stddev
-              type: scaled_float
-            - name: min
-              type: scaled_float
-            - name: max
-              type: scaled_float
