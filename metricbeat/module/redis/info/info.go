@@ -59,7 +59,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	info, err := redis.FetchRedisInfo("default", m.Connection())
 	if err != nil {
 		logp.Err("Failed to fetch redis info: %s", err)
-		r.Error(err)
 		return
 	}
 
@@ -81,7 +80,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	slowLogLength, err := redis.FetchSlowLogLength(m.Connection())
 	if err != nil {
 		logp.Err("Failed to fetch slow log length: %s", err)
-		r.Error(err)
 		return
 	}
 	info["slowlog_len"] = strconv.FormatInt(slowLogLength, 10)
