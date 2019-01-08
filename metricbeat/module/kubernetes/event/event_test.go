@@ -25,7 +25,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/kubernetes"
 )
 
 func TestGenerateMapStrFromEvent(t *testing.T) {
@@ -79,38 +78,38 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 		"prometheus_io/scrape": "false",
 	}
 
-	watchOptions1 := kubernetes.WatchOptions{
+	dedotConfig1 := dedotConfig{
 		LabelsDedot:      false,
 		AnnotationsDedot: false,
 	}
-	mapStrOutput1 := generateMapStrFromEvent(&mockEvent, watchOptions1)
+	mapStrOutput1 := generateMapStrFromEvent(&mockEvent, dedotConfig1)
 	metadata1 := mapStrOutput1["metadata"].(common.MapStr)
 	assert.Equal(t, expectedLabelsMapStrWithDot, metadata1["labels"])
 	assert.Equal(t, expectedAnnotationsMapStrWithDot, metadata1["annotations"])
 
-	watchOptions2 := kubernetes.WatchOptions{
+	dedotConfig2 := dedotConfig{
 		LabelsDedot:      true,
 		AnnotationsDedot: false,
 	}
-	mapStrOutput2 := generateMapStrFromEvent(&mockEvent, watchOptions2)
+	mapStrOutput2 := generateMapStrFromEvent(&mockEvent, dedotConfig2)
 	metadata2 := mapStrOutput2["metadata"].(common.MapStr)
 	assert.Equal(t, expectedLabelsMapStrWithDeDot, metadata2["labels"])
 	assert.Equal(t, expectedAnnotationsMapStrWithDot, metadata2["annotations"])
 
-	watchOptions3 := kubernetes.WatchOptions{
+	dedotConfig3 := dedotConfig{
 		LabelsDedot:      false,
 		AnnotationsDedot: true,
 	}
-	mapStrOutput3 := generateMapStrFromEvent(&mockEvent, watchOptions3)
+	mapStrOutput3 := generateMapStrFromEvent(&mockEvent, dedotConfig3)
 	metadata3 := mapStrOutput3["metadata"].(common.MapStr)
 	assert.Equal(t, expectedLabelsMapStrWithDot, metadata3["labels"])
 	assert.Equal(t, expectedAnnotationsMapStrWithDeDot, metadata3["annotations"])
 
-	watchOptions4 := kubernetes.WatchOptions{
+	dedotConfig4 := dedotConfig{
 		LabelsDedot:      true,
 		AnnotationsDedot: true,
 	}
-	mapStrOutput4 := generateMapStrFromEvent(&mockEvent, watchOptions4)
+	mapStrOutput4 := generateMapStrFromEvent(&mockEvent, dedotConfig4)
 	metadata4 := mapStrOutput4["metadata"].(common.MapStr)
 	assert.Equal(t, expectedLabelsMapStrWithDeDot, metadata4["labels"])
 	assert.Equal(t, expectedAnnotationsMapStrWithDeDot, metadata4["annotations"])

@@ -58,10 +58,6 @@ type WatchOptions struct {
 	Node string
 	// Namespace is used for filtering watched resource to given namespace, use "" for all namespaces
 	Namespace string
-	// LabelsDedot is used for replacing dots in labels with `_`
-	LabelsDedot bool
-	// AnnotationsDedot is used for replacing dots in labels with `_`
-	AnnotationsDedot bool
 }
 
 type watcher struct {
