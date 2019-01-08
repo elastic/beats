@@ -80,7 +80,7 @@ func TestProcessors(t *testing.T) {
 		{
 			name: "add agent metadata",
 			global: pipelineProcessors{
-				fields: common.MapStr{"global": 1},
+				fields: common.MapStr{"global": 1, "agent": common.MapStr{"foo": "bar"}},
 				tags:   []string{"tag"},
 			},
 			info: &beat.Info{
@@ -103,6 +103,7 @@ func TestProcessors(t *testing.T) {
 								"id":           "123e4567-e89b-12d3-a456-426655440001",
 								"type":         "test",
 								"version":      "0.1",
+								"foo":          "bar",
 							},
 							"value": "abc", "global": 1, "tags": []string{"tag"},
 						},

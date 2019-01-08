@@ -306,10 +306,7 @@ func makeAddAgentMetadataProcessor(info beat.Info) *processorFn {
 	if info.Name != info.Hostname {
 		metadata.Put("name", info.Name)
 	}
-	return newProcessor("add_agent_metadata", func(event *beat.Event) (*beat.Event, error) {
-		_, err := event.Fields.Put("agent", metadata)
-		return event, err
-	})
+	return makeAddFieldsProcessor("add_agent_metadata", common.MapStr{"agent": metadata}, true)
 }
 
 func debugPrintProcessor(info beat.Info) *processorFn {
