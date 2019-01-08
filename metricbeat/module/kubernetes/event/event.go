@@ -41,7 +41,8 @@ func init() {
 // MetricSet implements the mb.PushMetricSet interface, and therefore does not rely on polling.
 type MetricSet struct {
 	mb.BaseMetricSet
-	watcher kubernetes.Watcher
+	watcher      kubernetes.Watcher
+	watchOptions kubernetes.WatchOptions
 }
 
 // New create a new instance of the MetricSet
@@ -62,10 +63,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("fail to get kubernetes client: %s", err.Error())
 	}
 
-	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Event{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-		Namespace:   config.Namespace,
-	})
+	watchOptions := kubernetes.WatchOptions{
+		SyncTimeout:      config.SyncPeriod,
+		Namespace:        config.Namespace,
+		LabelsDedot:      config.LabelsDedot,
+		AnnotationsDedot: config.AnnotationsDedot,
+	}
+
+	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Event{}, watchOptions)
 	if err != nil {
 		return nil, fmt.Errorf("fail to init kubernetes watcher: %s", err.Error())
 	}
@@ -73,6 +78,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		watcher:       watcher,
+		watchOptions:  watchOptions,
 	}, nil
 }
 
@@ -81,10 +87,12 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 	now := time.Now()
 	handler := kubernetes.ResourceEventHandlerFuncs{
 		AddFunc: func(obj kubernetes.Resource) {
-			reporter.Event(generateMapStrFromEvent(obj.(*kubernetes.Event)))
+			fmt.Println("addfunc")
+			reporter.Event(generateMapStrFromEvent(obj.(*kubernetes.Event), m.watchOptions))
 		},
 		UpdateFunc: func(obj kubernetes.Resource) {
-			reporter.Event(generateMapStrFromEvent(obj.(*kubernetes.Event)))
+			fmt.Println("updatefun")
+			reporter.Event(generateMapStrFromEvent(obj.(*kubernetes.Event), m.watchOptions))
 		},
 		// ignore events that are deleted
 		DeleteFunc: nil,
@@ -107,7 +115,7 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 	return
 }
 
-func generateMapStrFromEvent(eve *kubernetes.Event) common.MapStr {
+func generateMapStrFromEvent(eve *kubernetes.Event, watchOptions kubernetes.WatchOptions) common.MapStr {
 	eventMeta := common.MapStr{
 		"timestamp": common.MapStr{
 			"created": kubernetes.Time(eve.Metadata.CreationTimestamp).UTC(),
@@ -123,7 +131,12 @@ func generateMapStrFromEvent(eve *kubernetes.Event) common.MapStr {
 	if len(eve.Metadata.Labels) != 0 {
 		labels := make(common.MapStr, len(eve.Metadata.Labels))
 		for k, v := range eve.Metadata.Labels {
-			safemapstr.Put(labels, k, v)
+			if watchOptions.LabelsDedot {
+				label := common.DeDot(k)
+				labels.Put(label, v)
+			} else {
+				safemapstr.Put(labels, k, v)
+			}
 		}
 
 		eventMeta["labels"] = labels
@@ -132,7 +145,12 @@ func generateMapStrFromEvent(eve *kubernetes.Event) common.MapStr {
 	if len(eve.Metadata.Annotations) != 0 {
 		annotations := make(common.MapStr, len(eve.Metadata.Annotations))
 		for k, v := range eve.Metadata.Annotations {
-			safemapstr.Put(annotations, k, v)
+			if watchOptions.AnnotationsDedot {
+				annotation := common.DeDot(k)
+				annotations.Put(annotation, v)
+			} else {
+				safemapstr.Put(annotations, k, v)
+			}
 		}
 
 		eventMeta["annotations"] = annotations
