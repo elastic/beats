@@ -18,12 +18,15 @@
 package publish
 
 import (
-	"errors"
+	"net"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/packetbeat/pb"
 )
 
 type TransactionPublisher struct {
@@ -35,7 +38,8 @@ type TransactionPublisher struct {
 
 type transProcessor struct {
 	ignoreOutgoing bool
-	localIPs       []string
+	localIPs       []net.IP // TODO: Periodically update this list.
+	localIPStrings []string // Deprecated. Use localIPs.
 	name           string
 }
 
@@ -47,9 +51,17 @@ func NewTransactionPublisher(
 	ignoreOutgoing bool,
 	canDrop bool,
 ) (*TransactionPublisher, error) {
-	localIPs, err := common.LocalIPAddrsAsStrings(false)
+	addrs, err := common.LocalIPAddrs()
 	if err != nil {
 		return nil, err
+	}
+	var localIPs []net.IP
+	var localIPStrings []string
+	for _, addr := range addrs {
+		if !addr.IsLoopback() {
+			localIPs = append(localIPs, addr)
+			localIPStrings = append(localIPStrings, addr.String())
+		}
 	}
 
 	p := &TransactionPublisher{
@@ -58,6 +70,7 @@ func NewTransactionPublisher(
 		canDrop:  canDrop,
 		processor: transProcessor{
 			localIPs:       localIPs,
+			localIPStrings: localIPStrings,
 			name:           name,
 			ignoreOutgoing: ignoreOutgoing,
 		},
@@ -137,6 +150,9 @@ func (p *transProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		return nil, nil
 	}
 
+	if err := marshalPacketbeatFields(event, p.localIPs); err != nil {
+		return nil, err
+	}
 	return event, nil
 }
 
@@ -216,7 +232,7 @@ func (p *transProcessor) normalizeTransAddr(event common.MapStr) bool {
 }
 
 func (p *transProcessor) IsPublisherIP(ip string) bool {
-	for _, myip := range p.localIPs {
+	for _, myip := range p.localIPStrings {
 		if myip == ip {
 			return true
 		}
@@ -258,4 +274,19 @@ func makeEndpoint(shipperName string, endpoint *common.Endpoint) (m common.MapSt
 	}
 
 	return m, process
+}
+
+func marshalPacketbeatFields(event *beat.Event, localIPs []net.IP) error {
+	defer delete(event.Fields, pb.FieldsKey)
+
+	fields, err := pb.GetFields(event.Fields)
+	if err != nil || fields == nil {
+		return err
+	}
+
+	if err := fields.ComputeValues(localIPs); err != nil {
+		return err
+	}
+
+	return fields.MarshalMapStr(event.Fields)
 }
