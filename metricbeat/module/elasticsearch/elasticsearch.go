@@ -43,9 +43,11 @@ const ModuleName = "elasticsearch"
 
 // Info construct contains the data from the Elasticsearch / endpoint
 type Info struct {
-	ClusterName string
-	ClusterID   string
-	Version     *common.Version
+	ClusterName string `json:"cluster_name"`
+	ClusterID   string `json:"cluster_uuid"`
+	Version     struct {
+		Number *common.Version `json:"number"`
+	} `json:"version"`
 }
 
 // NodeInfo struct cotains data about the node.
@@ -155,30 +157,13 @@ func GetInfo(http *helper.HTTP, uri string) (*Info, error) {
 		return nil, err
 	}
 
-	// Info construct contains the data from the Elasticsearch / endpoint
-	var info struct {
-		ClusterName string `json:"cluster_name"`
-		ClusterID   string `json:"cluster_uuid"`
-		Version     struct {
-			Number string `json:"number"`
-		} `json:"version"`
-	}
-
+	info := &Info{}
 	err = json.Unmarshal(content, &info)
 	if err != nil {
 		return nil, err
 	}
 
-	version, err := common.NewVersion(info.Version.Number)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Info{
-		info.ClusterName,
-		info.ClusterID,
-		version,
-	}, nil
+	return info, nil
 }
 
 func fetchPath(http *helper.HTTP, uri, path string, query string) ([]byte, error) {

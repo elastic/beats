@@ -18,6 +18,7 @@
 package common
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -149,4 +150,24 @@ func (v *Version) metaIsLessThanOrEqual(v1 *Version) bool {
 		return true
 	}
 	return v.Meta <= v1.Meta
+}
+
+// UnmarshalJSON unmarshals a JSON string version representation into a Version struct
+// Implements https://golang.org/pkg/encoding/json/#Unmarshaler
+func (v *Version) UnmarshalJSON(version []byte) error {
+	var versionStr string
+	err := json.Unmarshal(version, &versionStr)
+	if err != nil {
+		return err
+	}
+
+	ver, err := NewVersion(versionStr)
+
+	v.version = versionStr
+	v.Major = ver.Major
+	v.Minor = ver.Minor
+	v.Bugfix = ver.Bugfix
+	v.Meta = ver.Meta
+
+	return err
 }
