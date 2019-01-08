@@ -25,11 +25,13 @@ import (
 	dto "github.com/prometheus/client_model/go"
 )
 
+// PromEvent stores a set of one or more metrics with the same labels
 type PromEvent struct {
 	data   common.MapStr
 	labels common.MapStr
 }
 
+// LabelsHash returns a repeatable string that is unique for the set of labels in this event
 func (p *PromEvent) LabelsHash() string {
 	return p.labels.String()
 }
