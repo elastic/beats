@@ -162,12 +162,14 @@ func (v *Version) UnmarshalJSON(version []byte) error {
 	}
 
 	ver, err := NewVersion(versionStr)
+	if err != nil {
+		return err
+	}
 
-	v.version = versionStr
-	v.Major = ver.Major
-	v.Minor = ver.Minor
-	v.Bugfix = ver.Bugfix
-	v.Meta = ver.Meta
+	if ver == nil {
+		return fmt.Errorf("could not unmarshal version from JSON")
+	}
 
-	return err
+	*v = *ver
+	return nil
 }
