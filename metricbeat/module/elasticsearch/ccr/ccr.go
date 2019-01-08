@@ -79,16 +79,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	elasticsearchVersion, err := info.GetVersion()
-	if err != nil {
-		err = errors.Wrap(err, "error determining Elasticsearch version")
-		elastic.ReportAndLogError(err, r, m.Log)
-		return
-	}
-
 	// CCR is only available in Trial or Platinum license of Elasticsearch. So we check
 	// the license first.
-	ccrUnavailableMessage, err := m.checkCCRAvailability(elasticsearchVersion)
+	ccrUnavailableMessage, err := m.checkCCRAvailability(info.Version)
 	if err != nil {
 		err = errors.Wrap(err, "error determining if CCR is available")
 		elastic.ReportAndLogError(err, r, m.Log)
