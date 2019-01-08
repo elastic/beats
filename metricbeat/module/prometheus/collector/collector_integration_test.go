@@ -35,21 +35,18 @@ import (
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "prometheus")
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	event, err := f.Fetch()
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
+	err := mbtest.WriteEventsReporterV2(ms, t, "")
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}
-
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 }
 
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "prometheus")
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
-
-	err := mbtest.WriteEvents(f, t)
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
+	err := mbtest.WriteEventsReporterV2(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}
