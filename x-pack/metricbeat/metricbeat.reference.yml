@@ -163,8 +163,7 @@ metricbeat.modules:
 
 #------------------------------- Couchdb Module -------------------------------
 - module: couchdb
-  metricsets: 
-   - server
+  metricsets: ["server"]
   period: 10s
   hosts: ["localhost:5984"]
 
