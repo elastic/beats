@@ -21,6 +21,7 @@ import (
 	"time"
 
 	rd "github.com/garyburd/redigo/redis"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/metricbeat/mb"
 )
@@ -46,7 +47,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to unpack configuration")
 	}
 
 	return &MetricSet{

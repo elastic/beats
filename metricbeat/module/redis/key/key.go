@@ -18,6 +18,8 @@
 package key
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -54,12 +56,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}{}
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to unpack configuration for 'key' metricset")
 	}
 
 	ms, err := redis.NewMetricSet(base)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to create 'key' metricset")
 	}
 
 	return &MetricSet{
@@ -79,7 +81,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 		keys, err := redis.FetchKeys(conn, p.Pattern, p.Limit)
 		if err != nil {
-			logp.Err("Failed to fetch list of keys in keyspace %d with pattern '%s': %s", p.Keyspace, p.Pattern, err)
+			logp.Err("Failed to list keys in keyspace %d with pattern '%s': %s", p.Keyspace, p.Pattern, err)
 			continue
 		}
 		if p.Limit > 0 && len(keys) > int(p.Limit) {

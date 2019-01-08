@@ -20,6 +20,8 @@ package info
 import (
 	"strconv"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -46,7 +48,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms, err := redis.NewMetricSet(base)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to create 'info' metricset")
 	}
 	return &MetricSet{ms}, nil
 }
