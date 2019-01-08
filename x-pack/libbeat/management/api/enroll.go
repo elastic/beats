@@ -5,12 +5,24 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/common"
 )
+
+type enrollResponse struct {
+	AccessToken string `json:"access_token"`
+}
+
+func (e *enrollResponse) Validate() error {
+	if len(e.AccessToken) == 0 {
+		return errors.New("empty access_token")
+	}
+	return nil
+}
 
 // Enroll a beat in central management, this call returns a valid access token to retrieve configurations
 func (c *Client) Enroll(beatType, beatName, beatVersion, hostname string, beatUUID uuid.UUID, enrollmentToken string) (string, error) {
@@ -21,15 +33,17 @@ func (c *Client) Enroll(beatType, beatName, beatVersion, hostname string, beatUU
 		"host_name": hostname,
 	}
 
-	resp := struct {
-		AccessToken string `json:"access_token"`
-	}{}
+	resp := enrollResponse{}
 
 	headers := http.Header{}
 	headers.Set("kbn-beats-enrollment-token", enrollmentToken)
 
 	_, err := c.request("POST", "/api/beats/agent/"+beatUUID.String(), params, headers, &resp)
 	if err != nil {
+		return "", err
+	}
+
+	if err := resp.Validate(); err != nil {
 		return "", err
 	}
 
