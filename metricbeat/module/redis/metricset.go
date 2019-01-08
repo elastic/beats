@@ -47,7 +47,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to unpack configuration")
+		return nil, errors.Wrap(err, "failed to read configuration")
 	}
 
 	return &MetricSet{

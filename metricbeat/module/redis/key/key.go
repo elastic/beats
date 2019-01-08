@@ -56,7 +56,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}{}
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to unpack configuration for 'key' metricset")
+		return nil, errors.Wrap(err, "failed to read configuration for 'key' metricset")
 	}
 
 	ms, err := redis.NewMetricSet(base)
