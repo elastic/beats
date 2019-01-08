@@ -5163,7 +5163,7 @@ The number of bytes of the server request body.
 --
 type: alias
 
-alias to: destination.ip
+alias to: destination.address
 
 --
 
@@ -5217,7 +5217,7 @@ alias to: user.name
 --
 type: alias
 
-alias to: source.ip
+alias to: source.address
 
 --
 

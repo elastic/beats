@@ -281,11 +281,11 @@
 ## IIS module
 
 - from: iis.access.server_ip
-  to: destination.ip
+  to: destination.address
   alias: true
 
 - from: iis.access.remote_ip
-  to: source.ip
+  to: source.address
   alias: true
 
 - from: iis.access.url
