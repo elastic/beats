@@ -15,6 +15,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename beat.timezone to event.timezone. {pull}9458[9458]
 - Use _doc as document type. {pull}9056[9056]{pull}9573[9573]
 - Update to Golang 1.11.3. {pull}9560[9560]
+- Embedded html is not escaped anymore by default. {pull}9914[9914]
+- Remove port settings from Logstash and Redis output. {pull}9934[9934]
 
 *Auditbeat*
 
@@ -27,6 +29,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Heartbeat*
 
 - Remove monitor generator script that was rarely used. {pull}9648[9648]
+- monitor IDs are now configurable. Auto generated monitor IDs now use a different formula based on a hash of their config values. If you wish to have continuity with the old format of monitor IDs you'll need to set the `id` property explicitly. {pull}9697[9697]
 
 *Journalbeat*
 
@@ -53,6 +56,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - Add `convert_timezone` option to Elasticsearch module to convert dates to UTC. {issue}9756[9756] {pull}9761[9761]
+- Support IPv6 addresses with zone id in IIS ingest pipeline. {issue}9836[9836] {pull}9869[9869]
 
 *Heartbeat*
 
@@ -64,6 +68,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
 
 *Packetbeat*
+
+- Fix DHCPv4 dashboard that wouldn't load in Kibana. {issue}9850[9850]
 
 *Winlogbeat*
 

@@ -54,6 +54,9 @@
   alias6: true
   alias: true
 
+
+# Processor fields
+
 # Docker processor
 - from: docker.container.id
   to: container.id
@@ -75,45 +78,38 @@
   alias6: false
   alias: true
 
-
-# Filebeat modules
-
-## Suricata module
-
-# Processor fields
-
 # Cloud
-- form: meta.cloud.provider
+- from: meta.cloud.provider
   to: cloud.provider
   alias: true
   alias6: true
 
-- form: meta.cloud.instance_id
+- from: meta.cloud.instance_id
   to: cloud.instance.id
   alias: true
   alias6: true
 
-- form: meta.cloud.instance_name
+- from: meta.cloud.instance_name
   to: cloud.instance.name
   alias: true
   alias6: true
 
-- form: meta.cloud.machine_type
+- from: meta.cloud.machine_type
   to: cloud.machine.type
   alias: true
   alias6: true
 
-- form: meta.cloud.availability_zone
+- from: meta.cloud.availability_zone
   to: cloud.availability_zone
   alias: true
   alias6: true
 
-- form: meta.cloud.project_id
+- from: meta.cloud.project_id
   to: cloud.project.id
   alias: true
   alias6: true
 
-- form: meta.cloud.region
+- from: meta.cloud.region
   to: cloud.region
   alias: true
   alias6: true
@@ -591,12 +587,27 @@
   to: http.version
   alias: true
 
+
 # Auditbeat
 
 ## From Auditbeat's auditd module.
 - from: source.hostname
   to: source.domain
   alias: true
+
+
+# Packetbeat
+
+- from: http.request.body
+  to: http.request.body.content
+  alias6: false
+  alias: false
+
+- from: http.response.body
+  to: http.response.body.content
+  alias6: false
+  alias: false
+
 
 # Metricbeat
 
