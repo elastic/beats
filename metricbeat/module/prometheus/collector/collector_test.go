@@ -120,7 +120,7 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 						"http_request_duration_microseconds": float64(10),
 					},
 					labels: common.MapStr{
-						"quantile": float64(0.99),
+						"quantile": "0.99",
 					},
 				},
 			},
@@ -157,7 +157,7 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 					data: common.MapStr{
 						"http_request_duration_microseconds": uint64(10),
 					},
-					labels: common.MapStr{"le": float64(0.99)},
+					labels: common.MapStr{"le": "0.99"},
 				},
 			},
 		},

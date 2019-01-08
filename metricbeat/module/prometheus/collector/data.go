@@ -19,6 +19,7 @@ package collector
 
 import (
 	"math"
+	"strconv"
 
 	"github.com/elastic/beats/libbeat/common"
 
@@ -88,7 +89,7 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 				}
 
 				quantileLabels := labels.Clone()
-				quantileLabels["quantile"] = quantile.GetQuantile()
+				quantileLabels["quantile"] = strconv.FormatFloat(quantile.GetQuantile(), 'f', -1, 64)
 				events = append(events, PromEvent{
 					data: common.MapStr{
 						name: quantile.GetValue(),
@@ -110,8 +111,7 @@ func getPromEventsFromMetricFamily(mf *dto.MetricFamily) []PromEvent {
 
 			for _, bucket := range histogram.GetBucket() {
 				bucketLabels := labels.Clone()
-				// XXX 0 == +Inf?
-				bucketLabels["le"] = bucket.GetUpperBound()
+				bucketLabels["le"] = strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
 
 				events = append(events, PromEvent{
 					data: common.MapStr{
