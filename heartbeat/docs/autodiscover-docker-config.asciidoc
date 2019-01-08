@@ -15,9 +15,11 @@ heartbeat.autodiscover:
               schedule: "@every 1s"
               timeout: 1s
               fields:
-                container_id: "${data.docker.container.id}"
-                container_image: "${data.docker.container.image}"
-                container_name: "${data.docker.container.name}"
+                container.runtime: "docker"
+                container.id: "${data.docker.container.id}"
+                container.name: "${data.docker.container.name}"
+                container.image.image.name: "${data.docker.container.image}"
+              fields_as_root: true
 -------------------------------------------------------------------------------------
 
 This configuration launches a `redis` monitor for all containers running an image with `redis` in the name.
