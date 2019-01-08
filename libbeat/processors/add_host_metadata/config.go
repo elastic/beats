@@ -26,6 +26,7 @@ type Config struct {
 	NetInfoEnabled bool          `config:"netinfo.enabled"` // Add IP and MAC to event
 	CacheTTL       time.Duration `config:"cache.ttl"`
 	Geo            *GeoConfig    `config:"geo"`
+	Name           string        `config:"name"`
 }
 
 // GeoConfig contains geo configuration data.
