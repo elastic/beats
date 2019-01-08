@@ -1389,7 +1389,8 @@ endif::[]
 === Configure the output for the Elastic Cloud
 
 ifdef::apm-server[]
-NOTE: This page refers to using a separate instance of APM Server with an existing Elastic Cloud deployment of Elasticsearch and/or Kibana. APM Server is not yet supported on Elastic Cloud.
+NOTE: This page refers to using a separate instance of APM Server with an existing Elasticsearch Service deployment.
+APM Server is not yet supported on Elasticsearch Service.
 endif::apm-server[]
 
 ++++
