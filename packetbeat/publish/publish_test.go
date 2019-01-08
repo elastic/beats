@@ -100,18 +100,22 @@ func TestDirectionOut(t *testing.T) {
 		Fields: common.MapStr{
 			"type": "test",
 			"src": &common.Endpoint{
-				IP:      "192.145.2.4",
-				Port:    3267,
-				Name:    "server1",
-				Cmdline: "proc1 start",
-				Proc:    "proc1",
+				IP:     "192.145.2.4",
+				Port:   3267,
+				Domain: "server1",
+				Process: common.Process{
+					Args: []string{"proc1", "start"},
+					Name: "proc1",
+				},
 			},
 			"dst": &common.Endpoint{
-				IP:      "192.145.2.5",
-				Port:    32232,
-				Name:    "server2",
-				Cmdline: "proc2 start",
-				Proc:    "proc2",
+				IP:     "192.145.2.5",
+				Port:   32232,
+				Domain: "server2",
+				Process: common.Process{
+					Args: []string{"proc2", "start"},
+					Name: "proc2",
+				},
 			},
 		},
 	}
@@ -119,8 +123,10 @@ func TestDirectionOut(t *testing.T) {
 	if res, _ := processor.Run(&event); res == nil {
 		t.Fatalf("event has been filtered out")
 	}
-	assert.True(t, event.Fields["client_ip"] == "192.145.2.4")
-	assert.True(t, event.Fields["direction"] == "out")
+	clientIP, _ := event.GetValue("client.ip")
+	assert.Equal(t, "192.145.2.4", clientIP)
+	dir, _ := event.GetValue("network.direction")
+	assert.Equal(t, "outgoing", dir)
 }
 
 func TestDirectionIn(t *testing.T) {
@@ -135,18 +141,22 @@ func TestDirectionIn(t *testing.T) {
 		Fields: common.MapStr{
 			"type": "test",
 			"src": &common.Endpoint{
-				IP:      "192.145.2.4",
-				Port:    3267,
-				Name:    "server1",
-				Cmdline: "proc1 start",
-				Proc:    "proc1",
+				IP:     "192.145.2.4",
+				Port:   3267,
+				Domain: "server1",
+				Process: common.Process{
+					Args: []string{"proc1", "start"},
+					Name: "proc1",
+				},
 			},
 			"dst": &common.Endpoint{
-				IP:      "192.145.2.5",
-				Port:    32232,
-				Name:    "server2",
-				Cmdline: "proc2 start",
-				Proc:    "proc2",
+				IP:     "192.145.2.5",
+				Port:   32232,
+				Domain: "server2",
+				Process: common.Process{
+					Args: []string{"proc2", "start"},
+					Name: "proc2",
+				},
 			},
 		},
 	}
@@ -154,8 +164,10 @@ func TestDirectionIn(t *testing.T) {
 	if res, _ := processor.Run(&event); res == nil {
 		t.Fatalf("event has been filtered out")
 	}
-	assert.True(t, event.Fields["client_ip"] == "192.145.2.4")
-	assert.True(t, event.Fields["direction"] == "in")
+	clientIP, _ := event.GetValue("client.ip")
+	assert.Equal(t, "192.145.2.4", clientIP)
+	dir, _ := event.GetValue("network.direction")
+	assert.Equal(t, "incoming", dir)
 }
 
 func TestNoDirection(t *testing.T) {
@@ -170,18 +182,22 @@ func TestNoDirection(t *testing.T) {
 		Fields: common.MapStr{
 			"type": "test",
 			"src": &common.Endpoint{
-				IP:      "192.145.2.4",
-				Port:    3267,
-				Name:    "server1",
-				Cmdline: "proc1 start",
-				Proc:    "proc1",
+				IP:     "192.145.2.4",
+				Port:   3267,
+				Domain: "server1",
+				Process: common.Process{
+					Args: []string{"proc1", "start"},
+					Name: "proc1",
+				},
 			},
 			"dst": &common.Endpoint{
-				IP:      "192.145.2.5",
-				Port:    32232,
-				Name:    "server2",
-				Cmdline: "proc2 start",
-				Proc:    "proc2",
+				IP:     "192.145.2.5",
+				Port:   32232,
+				Domain: "server2",
+				Process: common.Process{
+					Args: []string{"proc2", "start"},
+					Name: "proc2",
+				},
 			},
 		},
 	}
@@ -189,7 +205,8 @@ func TestNoDirection(t *testing.T) {
 	if res, _ := processor.Run(&event); res == nil {
 		t.Fatalf("event has been filtered out")
 	}
-	assert.True(t, event.Fields["client_ip"] == "192.145.2.4")
-	_, ok := event.Fields["direction"]
-	assert.False(t, ok)
+	clientIP, _ := event.GetValue("client.ip")
+	assert.Equal(t, "192.145.2.4", clientIP)
+	dir, _ := event.GetValue("network.direction")
+	assert.Nil(t, dir)
 }

@@ -15,6 +15,12 @@
             - name: remote_ip
               type: alias
               path: apache.access.remote_ip
+            - name: ssl.protocol
+              type: alias
+              path: apache.access.ssl.protocol
+            - name: ssl.cipher
+              type: alias
+              path: apache.access.ssl.cipher
             - name: body_sent.bytes
               type: alias
               path: apache.access.body_sent.bytes

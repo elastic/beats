@@ -39,13 +39,14 @@ class BaseTest(TestCase):
         return server
 
     @staticmethod
-    def http_cfg(url):
+    def http_cfg(id, url):
         return """
 - type: http
+  id: "{id}"
   schedule: "@every 1s"
   timeout: 3s
   urls: ["{url}"]
-        """[1:-1].format(url=url)
+        """[1:-1].format(id=id, url=url)
 
     @staticmethod
     def tcp_cfg(*hosts):

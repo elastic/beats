@@ -189,7 +189,6 @@ func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
 
 func getCurrentModuleName(modulePath, module string) (string, bool) {
 	moduleConfigPath := filepath.Join(modulePath, module, "module.yml")
-	logp.Info("path: %s, module: %s, path: %s", modulePath, module, moduleConfigPath)
 	d, err := ioutil.ReadFile(moduleConfigPath)
 	if err != nil {
 		return module, false

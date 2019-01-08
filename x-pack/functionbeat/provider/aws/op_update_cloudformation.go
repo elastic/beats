@@ -7,6 +7,7 @@ package aws
 import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
+	"github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface"
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -14,12 +15,17 @@ import (
 
 type opUpdateCloudFormation struct {
 	log         *logp.Logger
-	svc         *cloudformation.CloudFormation
+	svc         cloudformationiface.CloudFormationAPI
 	templateURL string
 	stackName   string
 }
 
-func (o *opUpdateCloudFormation) Execute() error {
+func (o *opUpdateCloudFormation) Execute(ctx executionContext) error {
+	c, ok := ctx.(*stackContext)
+	if !ok {
+		return errWrongContext
+	}
+
 	uuid, err := uuid.NewV4()
 	if err != nil {
 		return err
@@ -36,20 +42,23 @@ func (o *opUpdateCloudFormation) Execute() error {
 	req := o.svc.UpdateStackRequest(input)
 	resp, err := req.Send()
 	if err != nil {
-		o.log.Debug("Could not update the cloudformation stack, resp: %s", resp)
+		o.log.Debugf("Could not update the cloudformation stack, resp: %+v", resp)
 		return err
 	}
+
+	c.ID = resp.StackId
+
 	return nil
 }
 
 func newOpUpdateCloudFormation(
 	log *logp.Logger,
-	cfg aws.Config,
+	svc cloudformationiface.CloudFormationAPI,
 	templateURL, stackName string,
 ) *opUpdateCloudFormation {
 	return &opUpdateCloudFormation{
 		log:         log,
-		svc:         cloudformation.New(cfg),
+		svc:         svc,
 		templateURL: templateURL,
 		stackName:   stackName,
 	}

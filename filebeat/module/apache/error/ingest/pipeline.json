@@ -5,25 +5,13 @@
       "grok": {
         "field": "message",
         "patterns": [
-          "\\[%{APACHE_TIME:apache.error.timestamp}\\] \\[%{LOGLEVEL:apache.error.level}\\]( \\[client %{IPORHOST:apache.error.client}\\])? %{GREEDYDATA:apache.error.message}",
-          "\\[%{APACHE_TIME:apache.error.timestamp}\\] \\[%{DATA:apache.error.module}:%{LOGLEVEL:apache.error.level}\\] \\[pid %{NUMBER:apache.error.pid}(:tid %{NUMBER:apache.error.tid})?\\]( \\[client %{IPORHOST:apache.error.client}\\])? %{GREEDYDATA:apache.error.message1}"
+          "\\[%{APACHE_TIME:apache.error.timestamp}\\] \\[%{LOGLEVEL:log.level}\\]( \\[client %{IPORHOST:source.address}\\])? %{GREEDYDATA:message}",
+          "\\[%{APACHE_TIME:apache.error.timestamp}\\] \\[%{DATA:apache.error.module}:%{LOGLEVEL:log.level}\\] \\[pid %{NUMBER:process.pid:long}(:tid %{NUMBER:process.thread.id:long})?\\]( \\[client %{IPORHOST:source.address}\\])? %{GREEDYDATA:message}"
         ],
         "pattern_definitions": {
           "APACHE_TIME": "%{DAY} %{MONTH} %{MONTHDAY} %{TIME} %{YEAR}"
         },
         "ignore_missing": true
-      }
-    },
-    {
-      "remove":{
-        "field": "message"
-      }
-    },
-    {
-      "rename": {
-        "field": "apache.error.message1",
-        "target_field": "apache.error.message",
-        "ignore_failure": true
       }
     },
     {

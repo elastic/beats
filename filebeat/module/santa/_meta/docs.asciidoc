@@ -1,0 +1,58 @@
+:modulename: santa
+:has-dashboards: true
+
+== Santa module
+
+The +{modulename}+ module collects and parses logs from
+https://github.com/google/santa[Google Santa], a security
+tool for macOS that monitors process executions and can blacklist/whitelist
+binaries.
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+The +{modulename}+ module was tested with logs from Santa 0.9.14.
+
+This module is available for MacOS only.
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard showing and overview of the processes
+that are executing.
+
+[role="screenshot"]
+image::./images/kibana-santa-log-overview.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The module is by default configured to read logs from `/var/log/santa.log`.
+
+["source","yaml",subs="attributes"]
+-----
+- module: santa
+  log:
+    enabled: true
+    var.paths: ["/var/log/santa.log"]
+    var.input: "file"
+-----
+
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+
+[float]
+==== `log` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

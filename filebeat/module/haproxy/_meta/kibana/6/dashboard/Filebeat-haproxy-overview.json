@@ -61,7 +61,7 @@
       },
       "id": "55251360-aa32-11e8-9c06-877f0445e3e0",
       "type": "visualization",
-      "updated_at": "2018-08-27T19:50:02.901Z",
+      "updated_at": "2018-12-06T11:35:36.721Z",
       "version": 2
     },
     {
@@ -125,8 +125,8 @@
       },
       "id": "7fb671f0-aa32-11e8-9c06-877f0445e3e0",
       "type": "visualization",
-      "updated_at": "2018-08-27T19:50:50.255Z",
-      "version": 1
+      "updated_at": "2018-12-06T11:35:36.721Z",
+      "version": 2
     },
     {
       "attributes": {
@@ -144,10 +144,9 @@
         "title": "IP Geohashes [Filebeat HAProxy]",
         "uiStateJSON": {
           "mapCenter": [
-            -9.275622176792098,
-            28.4765625
-          ],
-          "mapZoom": 2
+            14.944784875088372,
+            5.09765625
+          ]
         },
         "version": 1,
         "visState": {
@@ -156,7 +155,7 @@
               "enabled": true,
               "id": "1",
               "params": {
-                "field": "haproxy.client_ip"
+                "field": "haproxy.client.ip"
               },
               "schema": "metric",
               "type": "cardinality"
@@ -177,47 +176,30 @@
           ],
           "params": {
             "addTooltip": true,
-            "heatClusterSize": 1.5,
+            "heatBlur": 15,
+            "heatMaxZoom": 16,
+            "heatMinOpacity": 0.1,
+            "heatNormalizeData": true,
+            "heatRadius": 25,
             "isDesaturated": true,
             "legendPosition": "bottomright",
             "mapCenter": [
-              0,
-              0
+              15,
+              5
             ],
             "mapType": "Scaled Circle Markers",
             "mapZoom": 2,
             "wms": {
-              "baseLayersAreLoaded": {
-                "_c": [],
-                "_d": true,
-                "_h": 0,
-                "_n": false,
-                "_s": 1,
-                "_v": true
-              },
               "enabled": false,
               "options": {
+                "attribution": "Maps provided by USGS",
                 "format": "image/png",
-                "transparent": true
+                "layers": "0",
+                "styles": "",
+                "transparent": true,
+                "version": "1.3.0"
               },
-              "selectedTmsLayer": {
-                "attribution": "\u003cp\u003e\u0026#169; \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors | \u003ca href=\"https://www.elastic.co/elastic-maps-service\"\u003eElastic Maps Service\u003c/a\u003e\u003c/p\u003e\u0026#10;",
-                "id": "road_map",
-                "maxZoom": 18,
-                "minZoom": 0,
-                "subdomains": [],
-                "url": "https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree\u0026my_app_name=kibana\u0026my_app_version=6.3.2\u0026license=222b9c80-1528-4ddf-9a40-cc59d57f55bf"
-              },
-              "tmsLayers": [
-                {
-                  "attribution": "\u003cp\u003e\u0026#169; \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors | \u003ca href=\"https://www.elastic.co/elastic-maps-service\"\u003eElastic Maps Service\u003c/a\u003e\u003c/p\u003e\u0026#10;",
-                  "id": "road_map",
-                  "maxZoom": 18,
-                  "minZoom": 0,
-                  "subdomains": [],
-                  "url": "https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree\u0026my_app_name=kibana\u0026my_app_version=6.3.2\u0026license=222b9c80-1528-4ddf-9a40-cc59d57f55bf"
-                }
-              ]
+              "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
             }
           },
           "title": "IP Geohashes [Filebeat HAProxy]",
@@ -226,7 +208,7 @@
       },
       "id": "11f8b9c0-aa32-11e8-9c06-877f0445e3e0",
       "type": "visualization",
-      "updated_at": "2018-08-27T19:49:15.098Z",
+      "updated_at": "2018-12-06T11:35:36.721Z",
       "version": 2
     },
     {
@@ -368,22 +350,20 @@
       },
       "id": "68af8ef0-aa33-11e8-9c06-877f0445e3e0",
       "type": "visualization",
-      "updated_at": "2018-08-27T19:57:55.070Z",
+      "updated_at": "2018-12-06T11:35:36.721Z",
       "version": 2
     },
     {
       "attributes": {
-        "description": "",
+        "description": "Filebeat HAProxy module dashboard",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "highlightAll": true,
             "query": {
               "language": "lucene",
               "query": ""
-            },
-            "version": true
+            }
           }
         },
         "optionsJSON": {
@@ -391,16 +371,73 @@
           "hidePanelTitles": false,
           "useMargins": true
         },
-        "panelsJSON": null,
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "1",
+              "w": 24,
+              "x": 0,
+              "y": 0
+            },
+            "id": "55251360-aa32-11e8-9c06-877f0445e3e0",
+            "panelIndex": "1",
+            "type": "visualization",
+            "version": "6.5.2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "2",
+              "w": 24,
+              "x": 24,
+              "y": 0
+            },
+            "id": "7fb671f0-aa32-11e8-9c06-877f0445e3e0",
+            "panelIndex": "2",
+            "type": "visualization",
+            "version": "6.5.2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "3",
+              "w": 24,
+              "x": 0,
+              "y": 15
+            },
+            "id": "11f8b9c0-aa32-11e8-9c06-877f0445e3e0",
+            "panelIndex": "3",
+            "type": "visualization",
+            "version": "6.5.2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "4",
+              "w": 24,
+              "x": 24,
+              "y": 15
+            },
+            "id": "68af8ef0-aa33-11e8-9c06-877f0445e3e0",
+            "panelIndex": "4",
+            "type": "visualization",
+            "version": "6.5.2"
+          }
+        ],
         "timeRestore": false,
         "title": "[Filebeat HAProxy] Overview",
         "version": 1
       },
       "id": "3560d580-aa34-11e8-9c06-877f0445e3e0",
       "type": "dashboard",
-      "updated_at": "2018-08-27T20:03:04.536Z",
-      "version": 1
+      "updated_at": "2018-12-06T11:40:40.204Z",
+      "version": 6
     }
   ],
-  "version": "6.3.2"
+  "version": "6.5.2"
 }

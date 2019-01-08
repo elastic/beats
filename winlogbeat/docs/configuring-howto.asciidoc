@@ -40,32 +40,32 @@ include::./winlogbeat-options.asciidoc[]
 
 include::./winlogbeat-general-options.asciidoc[]
 
-include::../../libbeat/docs/queueconfig.asciidoc[]
+include::{libbeat-dir}/docs/queueconfig.asciidoc[]
 
-include::../../libbeat/docs/outputconfig.asciidoc[]
+include::{libbeat-dir}/docs/outputconfig.asciidoc[]
 
-include::../../libbeat/docs/shared-ssl-config.asciidoc[]
+include::{libbeat-dir}/docs/shared-ssl-config.asciidoc[]
 
 include::./winlogbeat-filtering.asciidoc[]
 
-include::../../libbeat/docs/shared-config-ingest.asciidoc[]
+include::{libbeat-dir}/docs/shared-config-ingest.asciidoc[]
 
-include::../../libbeat/docs/shared-path-config.asciidoc[]
+include::{libbeat-dir}/docs/shared-path-config.asciidoc[]
 
-include::../../libbeat/docs/shared-kibana-config.asciidoc[]
+include::{libbeat-dir}/docs/shared-kibana-config.asciidoc[]
 
-include::../../libbeat/docs/setup-config.asciidoc[]
+include::{libbeat-dir}/docs/setup-config.asciidoc[]
 
-include::../../libbeat/docs/loggingconfig.asciidoc[]
+include::{libbeat-dir}/docs/loggingconfig.asciidoc[]
 
 :standalone:
-include::../../libbeat/docs/shared-env-vars.asciidoc[]
+include::{libbeat-dir}/docs/shared-env-vars.asciidoc[]
 :standalone!:
 
 :standalone:
-include::../../libbeat/docs/yaml.asciidoc[]
+include::{libbeat-dir}/docs/yaml.asciidoc[]
 :standalone!:
 
-include::../../libbeat/docs/http-endpoint.asciidoc[]
+include::{libbeat-dir}/docs/http-endpoint.asciidoc[]
 
-include::../../libbeat/docs/reference-yml.asciidoc[]
+include::{libbeat-dir}/docs/reference-yml.asciidoc[]
