@@ -41,13 +41,6 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 		"prometheus.io/scrape": "false",
 	}
 
-	mockEvent := v1.Event{
-		Metadata: &k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta{
-			Labels:      labels,
-			Annotations: annotations,
-		},
-	}
-
 	expectedLabelsMapStrWithDot := common.MapStr{
 		"app": common.MapStr{
 			"kubernetes": common.MapStr{
@@ -57,6 +50,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 			},
 		},
 	}
+
 	expectedLabelsMapStrWithDeDot := common.MapStr{
 		"app_kubernetes_io/name":      "mysql",
 		"app_kubernetes_io/version":   "5.7.21",
@@ -71,6 +65,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 			"io/scrape": "false",
 		},
 	}
+
 	expectedAnnotationsMapStrWithDeDot := common.MapStr{
 		"prometheus_io/path":   "/metrics",
 		"prometheus_io/port":   "9102",
@@ -78,39 +73,80 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 		"prometheus_io/scrape": "false",
 	}
 
-	dedotConfig1 := dedotConfig{
-		LabelsDedot:      false,
-		AnnotationsDedot: false,
+	testCases := []struct {
+		mockEvent        v1.Event
+		expectedMetadata common.MapStr
+		dedotConfig      dedotConfig
+	}{
+		{
+			mockEvent: v1.Event{
+				Metadata: &k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta{
+					Labels:      labels,
+					Annotations: annotations,
+				},
+			},
+			expectedMetadata: common.MapStr{
+				"labels":      expectedLabelsMapStrWithDot,
+				"annotations": expectedAnnotationsMapStrWithDot,
+			},
+			dedotConfig: dedotConfig{
+				LabelsDedot:      false,
+				AnnotationsDedot: false,
+			},
+		},
+		{
+			mockEvent: v1.Event{
+				Metadata: &k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta{
+					Labels:      labels,
+					Annotations: annotations,
+				},
+			},
+			expectedMetadata: common.MapStr{
+				"labels":      expectedLabelsMapStrWithDeDot,
+				"annotations": expectedAnnotationsMapStrWithDot,
+			},
+			dedotConfig: dedotConfig{
+				LabelsDedot:      true,
+				AnnotationsDedot: false,
+			},
+		},
+		{
+			mockEvent: v1.Event{
+				Metadata: &k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta{
+					Labels:      labels,
+					Annotations: annotations,
+				},
+			},
+			expectedMetadata: common.MapStr{
+				"labels":      expectedLabelsMapStrWithDot,
+				"annotations": expectedAnnotationsMapStrWithDeDot,
+			},
+			dedotConfig: dedotConfig{
+				LabelsDedot:      false,
+				AnnotationsDedot: true,
+			},
+		},
+		{
+			mockEvent: v1.Event{
+				Metadata: &k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta{
+					Labels:      labels,
+					Annotations: annotations,
+				},
+			},
+			expectedMetadata: common.MapStr{
+				"labels":      expectedLabelsMapStrWithDeDot,
+				"annotations": expectedAnnotationsMapStrWithDeDot,
+			},
+			dedotConfig: dedotConfig{
+				LabelsDedot:      true,
+				AnnotationsDedot: true,
+			},
+		},
 	}
-	mapStrOutput1 := generateMapStrFromEvent(&mockEvent, dedotConfig1)
-	metadata1 := mapStrOutput1["metadata"].(common.MapStr)
-	assert.Equal(t, expectedLabelsMapStrWithDot, metadata1["labels"])
-	assert.Equal(t, expectedAnnotationsMapStrWithDot, metadata1["annotations"])
 
-	dedotConfig2 := dedotConfig{
-		LabelsDedot:      true,
-		AnnotationsDedot: false,
+	for _, test := range testCases {
+		mapStrOutput := generateMapStrFromEvent(&test.mockEvent, test.dedotConfig)
+		assert.Equal(t, test.expectedMetadata["labels"], mapStrOutput["metadata"].(common.MapStr)["labels"])
+		assert.Equal(t, test.expectedMetadata["annotations"], mapStrOutput["metadata"].(common.MapStr)["annotations"])
 	}
-	mapStrOutput2 := generateMapStrFromEvent(&mockEvent, dedotConfig2)
-	metadata2 := mapStrOutput2["metadata"].(common.MapStr)
-	assert.Equal(t, expectedLabelsMapStrWithDeDot, metadata2["labels"])
-	assert.Equal(t, expectedAnnotationsMapStrWithDot, metadata2["annotations"])
-
-	dedotConfig3 := dedotConfig{
-		LabelsDedot:      false,
-		AnnotationsDedot: true,
-	}
-	mapStrOutput3 := generateMapStrFromEvent(&mockEvent, dedotConfig3)
-	metadata3 := mapStrOutput3["metadata"].(common.MapStr)
-	assert.Equal(t, expectedLabelsMapStrWithDot, metadata3["labels"])
-	assert.Equal(t, expectedAnnotationsMapStrWithDeDot, metadata3["annotations"])
-
-	dedotConfig4 := dedotConfig{
-		LabelsDedot:      true,
-		AnnotationsDedot: true,
-	}
-	mapStrOutput4 := generateMapStrFromEvent(&mockEvent, dedotConfig4)
-	metadata4 := mapStrOutput4["metadata"].(common.MapStr)
-	assert.Equal(t, expectedLabelsMapStrWithDeDot, metadata4["labels"])
-	assert.Equal(t, expectedAnnotationsMapStrWithDeDot, metadata4["annotations"])
 }
