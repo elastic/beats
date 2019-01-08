@@ -1,8 +1,9 @@
 [
     {
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "log",
+        "event.dataset": "haproxy.log",
         "event.module": "haproxy",
+        "fileset.name": "log",
         "haproxy.backend_name": "app",
         "haproxy.backend_queue": 0,
         "haproxy.bytes_read": 212,

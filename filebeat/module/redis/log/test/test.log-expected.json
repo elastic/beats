@@ -1,8 +1,9 @@
 [
     {
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "log",
+        "event.dataset": "redis.log",
         "event.module": "redis",
+        "fileset.name": "log",
         "input.type": "log",
         "log.level": "notice",
         "log.offset": 0,
@@ -12,8 +13,9 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "log",
+        "event.dataset": "redis.log",
         "event.module": "redis",
+        "fileset.name": "log",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 76,
@@ -21,8 +23,9 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "log",
+        "event.dataset": "redis.log",
         "event.module": "redis",
+        "fileset.name": "log",
         "input.type": "log",
         "log.level": "notice",
         "log.offset": 165,
@@ -30,8 +33,9 @@
     },
     {
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "log",
+        "event.dataset": "redis.log",
         "event.module": "redis",
+        "fileset.name": "log",
         "input.type": "log",
         "log.offset": 250,
         "message": "Received SIGINT scheduling shutdown...",

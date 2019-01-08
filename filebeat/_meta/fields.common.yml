@@ -95,9 +95,9 @@
           type: keyword
 
     - name: fileset.name
-      type: alias
-      path: event.dataset
-      migration: true
+      type: keyword
+      description: >
+        The Filebeat fileset that generated this event.
 
     - name: fileset.module
       type: alias
