@@ -96,7 +96,8 @@ class Test(filebeat.BaseTest):
         assert exit_code == 0
 
         test_pipeline_path = os.path.join(self.beat_path, "tests", "system", "input", "my-module-pipeline.json")
-        fileset_pipeline = os.path.join(self.beat_path, "test_modules", "module", "my_module", "my_fileset", "ingest", "pipeline.json")
+        fileset_pipeline = os.path.join(self.beat_path, "test_modules", "module",
+                                        "my_module", "my_fileset", "ingest", "pipeline.json")
         shutil.copyfile(test_pipeline_path, fileset_pipeline)
 
         exit_code = self.run_beat(
