@@ -23,7 +23,7 @@ class Test(BaseTest):
                                             "/../../../../module")
 
         self.kibana_path = os.path.abspath(self.working_dir +
-                                           "/../../../../_meta/kibana.generated")
+                                           "/../../../../build/kibana")
 
         self.filebeat = os.path.abspath(self.working_dir +
                                         "/../../../../filebeat.test")
@@ -41,7 +41,6 @@ class Test(BaseTest):
     @unittest.skipIf(os.getenv("TESTING_ENVIRONMENT") == "2x",
                      "integration test not available on 2.x")
     @unittest.skipIf(os.name == "nt", "skipped on Windows")
-    @unittest.skip("Skip broken ML support.")
     def test_ml_setup(self, setup_flag, modules_flag):
         """ Test ML are installed in all possible ways """
         self._run_ml_test(setup_flag, modules_flag)
