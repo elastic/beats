@@ -63,7 +63,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	info, err := elasticsearch.GetInfo(m.HTTP, m.getServiceURI())
+	info, err := elasticsearch.GetInfo(m.HTTP, m.GetServiceURI())
 	if err != nil {
 		elastic.ReportAndLogError(err, r, m.Log)
 		return
@@ -82,8 +82,4 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 			return
 		}
 	}
-}
-
-func (m *MetricSet) getServiceURI() string {
-	return m.HostData().SanitizedURI + nodeStatsPath
 }
