@@ -13,7 +13,8 @@ Build Filebeat
 cd x-pack/filebeat
 make mage
 mage build update
-./filebeat setup --modules=bro -e -d "*" -c filebeat.yml -E 'setup.dashboards.directory=_meta/kibana'
+./filebeat setup -e
+./filebeat setup --modules bro --dashboards -E setup.dashboards.directory=build/kibana
 ```
 
 Install Bro (for MacOS with Brew)

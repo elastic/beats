@@ -10,11 +10,9 @@ json.keys_under_root: true
 
 processors:
   - drop_fields:
-      fields: ["source","orig_bytes","resp_bytes","tunnel_parents"]
+      fields: ["orig_bytes","resp_bytes","tunnel_parents"]
   - rename:
       fields:
-        - from: "source"
-          to: "filepath"
         - from: "ts"
           to: "event.created"
         - from: "id.orig_h"
