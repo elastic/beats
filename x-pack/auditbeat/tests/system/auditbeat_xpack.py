@@ -29,7 +29,7 @@ class AuditbeatXPackTest(MetricbeatTest):
         )
 
     # Adapted from metricbeat.py
-    def check_metricset(self, module, metricset, fields=[], warnings_allowed=False):
+    def check_metricset(self, module, metricset, fields=[], errors_allowed=False, warnings_allowed=False):
         """
         Method to test a metricset for its fields
         """
@@ -56,7 +56,7 @@ class AuditbeatXPackTest(MetricbeatTest):
                 raise Exception("Field '{}' not found in event.".format(f))
 
         # Check for presence of top-level error object.
-        if "error" in evt:
+        if not errors_allowed and "error" in evt:
             raise Exception("Event contains error.")
 
         self.assert_fields_are_documented(evt)
