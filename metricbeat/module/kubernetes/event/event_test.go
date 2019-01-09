@@ -73,12 +73,12 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 		"prometheus_io/scrape": "false",
 	}
 
-	testCases := []struct {
+	testCases := map[string]struct {
 		mockEvent        v1.Event
 		expectedMetadata common.MapStr
 		dedotConfig      dedotConfig
 	}{
-		{
+		"no dedots": {
 			mockEvent: v1.Event{
 				Metadata: &k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta{
 					Labels:      labels,
@@ -94,7 +94,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 				AnnotationsDedot: false,
 			},
 		},
-		{
+		"dedot labels": {
 			mockEvent: v1.Event{
 				Metadata: &k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta{
 					Labels:      labels,
@@ -110,7 +110,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 				AnnotationsDedot: false,
 			},
 		},
-		{
+		"dedot annotatoins": {
 			mockEvent: v1.Event{
 				Metadata: &k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta{
 					Labels:      labels,
@@ -126,7 +126,7 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 				AnnotationsDedot: true,
 			},
 		},
-		{
+		"dedot both labels and annotations": {
 			mockEvent: v1.Event{
 				Metadata: &k8s_io_apimachinery_pkg_apis_meta_v1.ObjectMeta{
 					Labels:      labels,
@@ -144,9 +144,11 @@ func TestGenerateMapStrFromEvent(t *testing.T) {
 		},
 	}
 
-	for _, test := range testCases {
-		mapStrOutput := generateMapStrFromEvent(&test.mockEvent, test.dedotConfig)
-		assert.Equal(t, test.expectedMetadata["labels"], mapStrOutput["metadata"].(common.MapStr)["labels"])
-		assert.Equal(t, test.expectedMetadata["annotations"], mapStrOutput["metadata"].(common.MapStr)["annotations"])
+	for name, test := range testCases {
+		t.Run(name, func(t *testing.T) {
+			mapStrOutput := generateMapStrFromEvent(&test.mockEvent, test.dedotConfig)
+			assert.Equal(t, test.expectedMetadata["labels"], mapStrOutput["metadata"].(common.MapStr)["labels"])
+			assert.Equal(t, test.expectedMetadata["annotations"], mapStrOutput["metadata"].(common.MapStr)["annotations"])
+		})
 	}
 }
