@@ -307,7 +307,7 @@ alias to: source.geo.region_iso_code
 --
 type: alias
 
-alias to: apache.error.level
+alias to: log.level
 
 --
 
@@ -325,7 +325,7 @@ alias to: apache.error.client
 --
 type: alias
 
-alias to: apache.error.message
+alias to: message
 
 --
 
@@ -334,7 +334,7 @@ alias to: apache.error.message
 --
 type: alias
 
-alias to: apache.error.pid
+alias to: process.pid
 
 --
 
@@ -343,7 +343,7 @@ alias to: apache.error.pid
 --
 type: alias
 
-alias to: apache.error.tid
+alias to: process.thread.id
 
 --
 

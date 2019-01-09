@@ -105,19 +105,19 @@
           fields:
             - name: level
               type: alias
-              path: apache.error.level
+              path: log.level
             - name: client
               type: alias
               path: apache.error.client
             - name: message
               type: alias
-              path: apache.error.message
+              path: message
             - name: pid
               type: alias
-              path: apache.error.pid
+              path: process.pid
             - name: tid
               type: alias
-              path: apache.error.tid
+              path: process.thread.id
             - name: module
               type: alias
               path: apache.error.module
