@@ -448,7 +448,7 @@ class Test(metricbeat.BaseTest):
         assert isinstance(output["system.process.cpu.start_time"], six.string_types)
         self.check_username(output["system.process.username"])
 
-    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_socket_summary(self):
         """
         Test system/socket_summary output.

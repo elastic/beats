@@ -67,6 +67,14 @@ class Test(BaseTest):
 
         self.index_name = "test-filebeat-modules"
 
+        body = {
+            "transient": {
+                "script.max_compilations_rate": "1000/1m"
+            }
+        }
+
+        self.es.transport.perform_request('PUT', "/_cluster/settings", body=body)
+
     @parameterized.expand(load_fileset_test_cases)
     @unittest.skipIf(not INTEGRATION_TESTS,
                      "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
@@ -114,6 +122,11 @@ class Test(BaseTest):
             "-M", "*.*.input.close_eof=true",
         ]
 
+        # Based on the convention that if a name contains -json the json format is needed. Currently used for LS.
+        if "-json" in test_file:
+            cmd.append("-M")
+            cmd.append("{module}.{fileset}.var.format=json".format(module=module, fileset=fileset))
+
         output_path = os.path.join(self.working_dir)
         output = open(os.path.join(output_path, "output.log"), "ab")
         output.write(" ".join(cmd) + "\n")
@@ -160,7 +173,7 @@ class Test(BaseTest):
                     objects[k] = self.flatten_object(obj, {}, "")
                     clean_keys(objects[k])
 
-                json.dump(objects, f, indent=4, sort_keys=True)
+                json.dump(objects, f, indent=4, separators=(',', ': '), sort_keys=True)
 
         with open(test_file + "-expected.json", "r") as f:
             expected = json.load(f)
@@ -186,7 +199,7 @@ class Test(BaseTest):
 
 def clean_keys(obj):
     # These keys are host dependent
-    host_keys = ["host.name", "agent.hostname", "agent.type"]
+    host_keys = ["host.name", "agent.hostname", "agent.type", "agent.ephemeral_id", "agent.id"]
     # The create timestamps area always new
     time_keys = ["read_timestamp", "event.created"]
     # source path and beat.version can be different for each run
@@ -196,7 +209,7 @@ def clean_keys(obj):
         delete_key(obj, key)
 
     # Remove timestamp for comparison where timestamp is not part of the log line
-    if obj["event.module"] == "icinga" and obj["event.dataset"] == "startup":
+    if (obj["event.dataset"] in ["icinga.startup", "redis.log", "haproxy.log", "system.auth", "system.syslog"]):
         delete_key(obj, "@timestamp")
 
 

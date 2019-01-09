@@ -18,6 +18,7 @@
 package instance
 
 import (
+	_ "github.com/elastic/beats/libbeat/autodiscover/appenders/config" // Register autodiscover appenders
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/docker" // Register autodiscover providers
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/jolokia"
 	_ "github.com/elastic/beats/libbeat/autodiscover/providers/kubernetes"

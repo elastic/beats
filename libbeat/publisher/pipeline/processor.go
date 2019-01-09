@@ -121,7 +121,12 @@ func newProcessorPipeline(
 		processors.add(makeAddFieldsProcessor("beatsMeta", meta, needsCopy))
 	}
 
-	// setup 7: pipeline processors list
+	// setup 7: add agent metadata
+	if !config.SkipAgentMetadata {
+		processors.add(makeAddAgentMetadataProcessor(info))
+	}
+
+	// setup 8: pipeline processors list
 	processors.add(global.processors)
 
 	// setup 9: debug print final event (P)
@@ -290,12 +295,29 @@ func makeAddDynMetaProcessor(
 	})
 }
 
+func makeAddAgentMetadataProcessor(info beat.Info) *processorFn {
+	metadata := common.MapStr{
+		"type":         info.Beat,
+		"ephemeral_id": info.EphemeralID.String(),
+		"hostname":     info.Hostname,
+		"id":           info.ID.String(),
+		"version":      info.Version,
+	}
+	if info.Name != info.Hostname {
+		metadata.Put("name", info.Name)
+	}
+	return makeAddFieldsProcessor("add_agent_metadata", common.MapStr{"agent": metadata}, true)
+}
+
 func debugPrintProcessor(info beat.Info) *processorFn {
 	// ensure only one go-routine is using the encoder (in case
 	// beat.Client is shared between multiple go-routines by accident)
 	var mux sync.Mutex
 
-	encoder := json.New(true, false, info.Version)
+	encoder := json.New(info.Version, json.Config{
+		Pretty:     true,
+		EscapeHTML: false,
+	})
 	return newProcessor("debugPrint", func(event *beat.Event) (*beat.Event, error) {
 		mux.Lock()
 		defer mux.Unlock()

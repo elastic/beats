@@ -825,30 +825,6 @@ alias to: event.timezone
 
 --
 
-*`@timestamp`*::
-+
---
-type: date
-
-example: August 26th 2016, 12:35:53.332
-
-format: date
-
-required: True
-
-The timestamp when the event log record was generated.
-
-
---
-
-*`tags`*::
-+
---
-Arbitrary tags that can be set per Beat and per transaction type.
-
-
---
-
 *`fields`*::
 +
 --
@@ -2384,30 +2360,27 @@ Docker stats collected from Docker.
 *`docker.container.id`*::
 +
 --
-type: keyword
+type: alias
 
-Unique container id.
-
+alias to: container.id
 
 --
 
 *`docker.container.image`*::
 +
 --
-type: keyword
+type: alias
 
-Name of the image the container was built on.
-
+alias to: container.image.name
 
 --
 
 *`docker.container.name`*::
 +
 --
-type: keyword
+type: alias
 
-Container name.
-
+alias to: container.name
 
 --
 
@@ -2785,6 +2758,108 @@ deprecated[6.4]
 type: scaled_float
 
 Number of reads and writes per second
+
+
+--
+
+[float]
+== event fields
+
+Docker event
+
+
+
+*`docker.event.status`*::
++
+--
+type: keyword
+
+Event status
+
+
+--
+
+*`docker.event.id`*::
++
+--
+type: alias
+
+alias to: event.id
+
+Event id when available
+
+
+--
+
+*`docker.event.from`*::
++
+--
+type: keyword
+
+Event source
+
+
+--
+
+*`docker.event.type`*::
++
+--
+type: alias
+
+alias to: event.kind
+
+The type of object emitting the event
+
+
+--
+
+*`docker.event.action`*::
++
+--
+type: alias
+
+alias to: event.action
+
+The type of event
+
+
+--
+
+*`docker.event.time`*::
++
+--
+type: alias
+
+alias to: event.created
+
+Timestamp of event
+
+
+--
+
+[float]
+== actor fields
+
+Actor
+
+
+
+*`docker.event.actor.id`*::
++
+--
+type: keyword
+
+The ID of the object emitting the event
+
+
+--
+
+*`docker.event.actor.attributes`*::
++
+--
+type: object
+
+Various key/value attributes of the object, depending on its type
 
 
 --
@@ -3364,6 +3439,61 @@ ECS fields.
 
 
 
+*`@timestamp`*::
++
+--
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+required: True
+
+Date/time when the event originated.
+For log events this is the date/time when the event was generated, and not when it was read.
+Required field for all events.
+
+
+--
+
+*`tags`*::
++
+--
+type: keyword
+
+example: ["production", "env2"]
+
+List of keywords used to tag each event.
+
+
+--
+
+*`labels`*::
++
+--
+type: object
+
+example: {'application': 'foo-bar', 'env': 'production'}
+
+Key/value pairs.
+Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
+Example: `docker` and `k8s` labels.
+
+
+--
+
+*`message`*::
++
+--
+type: text
+
+example: Hello World
+
+For log events the message field contains the log message.
+In other use cases the message field can be used to concatenate different values which are then freely searchable. If multiple messages exist, they can be combined into one message.
+
+
+--
+
 [float]
 == agent fields
 
@@ -3437,73 +3567,23 @@ This id normally changes across restarts, but `agent.id` does not.
 --
 
 [float]
-== base fields
+== client fields
 
-The base set contains all fields which are on the top level. These fields are common across all types of events.
-
-
-
-*`base.@timestamp`*::
-+
---
-type: date
-
-example: 2016-05-23T08:05:34.853Z
-
-required: True
-
-Date/time when the event originated.
-For log events this is the date/time when the event was generated, and not when it was read.
-Required field for all events.
+A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records. For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields.  Client fields are generally not populated for packet-level events.
+Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
 
---
 
-*`base.tags`*::
+*`client.address`*::
 +
 --
 type: keyword
 
-example: ["production", "env2"]
-
-List of keywords used to tag each event.
-
-
---
-
-*`base.labels`*::
-+
---
-type: object
-
-example: {'application': 'foo-bar', 'env': 'production'}
-
-Key/value pairs.
-Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
-Example: `docker` and `k8s` labels.
+Some event client addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
 
 
 --
-
-*`base.message`*::
-+
---
-type: text
-
-example: Hello World
-
-For log events the message field contains the log message.
-In other use cases the message field can be used to concatenate different values which are then freely searchable. If multiple messages exist, they can be combined into one message.
-
-
---
-
-[float]
-== client fields
-
-A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records. For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjuction with server fields.  Client fields are generally not populated for packet-level events. 
-
-
 
 *`client.ip`*::
 +
@@ -3841,6 +3921,17 @@ Destination fields describe details about the destination of a packet/event. Des
 
 
 
+*`destination.address`*::
++
+--
+type: keyword
+
+Some event destination addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+
+--
+
 *`destination.ip`*::
 +
 --
@@ -4023,13 +4114,13 @@ Meta-information specific to ECS.
 --
 type: keyword
 
-example: 1.0.0-beta1
+example: 1.0.0-beta2
 
 required: True
 
 ECS version this event conforms to. `ecs.version` is a required field and must exist in all events.
 When querying across multiple indices -- which may conform to slightly different ECS versions -- this field lets integrations adjust to the schema version of the events.
-The current version is 1.0.0-beta1 .
+The current version is 1.0.0-beta2 .
 
 
 --
@@ -4570,7 +4661,19 @@ type: keyword
 
 example: Mac OS X
 
-Operating system name.
+Operating system name, without the version.
+
+
+--
+
+*`host.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
 
 
 --
@@ -4592,7 +4695,7 @@ OS family (such as redhat, debian, freebsd, windows).
 --
 type: keyword
 
-example: 10.12.6-rc2
+example: 10.14.1
 
 Operating system version as a raw string.
 
@@ -4728,9 +4831,22 @@ Fields related to HTTP activity.
 --
 type: keyword
 
-example: GET, POST, PUT
+example: get, post, put
 
 Http request method.
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS"  section.
+
+
+--
+
+*`http.request.body.content`*::
++
+--
+type: keyword
+
+example: Hello world
+
+The full http request body.
 
 
 --
@@ -4759,7 +4875,7 @@ Http response status code.
 
 --
 
-*`http.response.body`*::
+*`http.response.body.content`*::
 +
 --
 type: keyword
@@ -4779,6 +4895,54 @@ type: keyword
 example: 1.1
 
 Http version.
+
+
+--
+
+*`http.request.bytes`*::
++
+--
+type: long
+
+example: 1437
+
+Total size in bytes of the request (body and headers).
+
+
+--
+
+*`http.request.body.bytes`*::
++
+--
+type: long
+
+example: 887
+
+Size in bytes of the request body.
+
+
+--
+
+*`http.response.bytes`*::
++
+--
+type: long
+
+example: 1437
+
+Total size in bytes of the response (body and headers).
+
+
+--
+
+*`http.response.body.bytes`*::
++
+--
+type: long
+
+example: 887
+
+Size in bytes of the response body.
 
 
 --
@@ -4844,9 +5008,10 @@ Name given by operators to sections of their network.
 --
 type: keyword
 
-example: IPv4
+example: ipv4
 
-In the OSI Model this would be the Network Layer. IPv4, IPv6, IPSec, PIM, etc
+In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS" section.
 
 
 --
@@ -4868,9 +5033,10 @@ IANA Protocol Number (https://www.iana.org/assignments/protocol-numbers/protocol
 --
 type: keyword
 
-example: TCP
+example: tcp
 
-Same as network.iana_number, but instead using the Keyword name of the transport layer (UDP, TCP, IPv6-ICMP, etc.)
+Same as network.iana_number, but instead using the Keyword name of the transport layer (udp, tcp, ipv6-icmp, etc.)
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS"  section.
 
 
 --
@@ -4880,9 +5046,10 @@ Same as network.iana_number, but instead using the Keyword name of the transport
 --
 type: keyword
 
-example: AIM
+example: aim
 
 A name given to an application. This can be arbitrarily assigned for things like microservices, but also apply to things like skype, icq, facebook, twitter. This would be used in situations where the vendor or service can be decoded such as from the source/dest IP owners, ports, or wire format.
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS" section.
 
 
 --
@@ -4894,7 +5061,8 @@ type: keyword
 
 example: http
 
-L7 Network protocol name. ex. http, lumberjack, transport protocol
+L7 Network protocol name. ex. http, lumberjack, transport protocol.
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS" section.
 
 
 --
@@ -5077,7 +5245,19 @@ type: keyword
 
 example: Mac OS X
 
-Operating system name.
+Operating system name, without the version.
+
+
+--
+
+*`observer.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
 
 
 --
@@ -5099,7 +5279,7 @@ OS family (such as redhat, debian, freebsd, windows).
 --
 type: keyword
 
-example: 10.12.6-rc2
+example: 10.14.1
 
 Operating system version as a raw string.
 
@@ -5276,7 +5456,19 @@ type: keyword
 
 example: Mac OS X
 
-Operating system name.
+Operating system name, without the version.
+
+
+--
+
+*`os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
 
 
 --
@@ -5298,7 +5490,7 @@ OS family (such as redhat, debian, freebsd, windows).
 --
 type: keyword
 
-example: 10.12.6-rc2
+example: 10.14.1
 
 Operating system version as a raw string.
 
@@ -5450,8 +5642,20 @@ All of the IPs seen on your event.
 == server fields
 
 A Server is defined as the responder in a network connection for events regarding sessions, connections, or bidirectional flow records. For TCP events, the server is the receiver of the initial SYN packet(s) of the TCP connection. For other protocols, the server is generally the responder in the network transaction. Some systems actually use the term "responder" to refer the server in TCP connections. The server fields describe details about the system acting as the server in the network event. Server fields are usually populated in conjunction with client fields. Server fields are generally not populated for packet-level events.
+Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
 
+
+*`server.address`*::
++
+--
+type: keyword
+
+Some event server addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+
+--
 
 *`server.ip`*::
 +
@@ -6110,8 +6314,6 @@ example: Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.
 Unparsed version of the user_agent.
 
 
-Field is not indexed.
-
 --
 
 *`user_agent.name`*::
@@ -6176,7 +6378,19 @@ type: keyword
 
 example: Mac OS X
 
-Operating system name.
+Operating system name, without the version.
+
+
+--
+
+*`user_agent.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
 
 
 --
@@ -6198,7 +6412,7 @@ OS family (such as redhat, debian, freebsd, windows).
 --
 type: keyword
 
-example: 10.12.6-rc2
+example: 10.14.1
 
 Operating system version as a raw string.
 
@@ -20338,6 +20552,63 @@ Number of keys that were skipped by the active defragmentation process
 type: long
 
 Count of slow operations
+
+
+--
+
+[float]
+== key fields
+
+`key` contains information about keys.
+
+
+
+*`redis.key.name`*::
++
+--
+type: keyword
+
+Key name.
+
+
+--
+
+*`redis.key.id`*::
++
+--
+type: keyword
+
+Unique id for this key (With the form <keyspace>:<name>).
+
+
+--
+
+*`redis.key.type`*::
++
+--
+type: keyword
+
+Key type as shown by `TYPE` command.
+
+
+--
+
+*`redis.key.length`*::
++
+--
+type: long
+
+Length of the key (Number of elements for lists, length for strings, cardinality for sets).
+
+
+--
+
+*`redis.key.expire.ttl`*::
++
+--
+type: long
+
+Seconds to expire.
 
 
 --

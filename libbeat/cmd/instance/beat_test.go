@@ -37,8 +37,8 @@ func TestNewInstance(t *testing.T) {
 	assert.Equal(t, "0.9", b.Info.Version)
 
 	// UUID4 should be 36 chars long
-	assert.Equal(t, 16, len(b.Info.UUID))
-	assert.Equal(t, 36, len(b.Info.UUID.String()))
+	assert.Equal(t, 16, len(b.Info.ID))
+	assert.Equal(t, 36, len(b.Info.ID.String()))
 
 	// indexPrefix set to name if empty
 	b, err = NewBeat("testbeat", "", "0.9")
@@ -56,10 +56,10 @@ func TestNewInstanceUUID(t *testing.T) {
 		panic(err)
 	}
 
-	// Make sure the UUID's are different
+	// Make sure the ID's are different
 	differentUUID, err := uuid.NewV4()
 	if err != nil {
-		t.Fatalf("error while generating UUID: %v", err)
+		t.Fatalf("error while generating ID: %v", err)
 	}
-	assert.NotEqual(t, b.Info.UUID, differentUUID)
+	assert.NotEqual(t, b.Info.ID, differentUUID)
 }

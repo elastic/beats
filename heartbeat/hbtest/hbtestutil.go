@@ -95,14 +95,13 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) mapval.
 
 // MonitorChecks creates a skima.Validator that represents the "monitor" field present
 // in all heartbeat events.
-func MonitorChecks(id string, host string, ip string, scheme string, status string) mapval.Validator {
+func MonitorChecks(host string, ip string, scheme string, status string) mapval.Validator {
 	return mapval.MustCompile(mapval.Map{
 		"monitor": mapval.Map{
 			// TODO: This is only optional because, for some reason, TCP returns
 			// this value, but HTTP does not. We should fix this
 			"host":        mapval.Optional(mapval.IsEqual(host)),
 			"duration.us": mapval.IsDuration,
-			"id":          id,
 			"ip":          ip,
 			"scheme":      scheme,
 			"status":      status,

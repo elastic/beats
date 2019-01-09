@@ -168,7 +168,7 @@ func Run(settings Settings, bt beat.Creator) error {
 		monitoring.NewString(registry, "version").Set(b.Info.Version)
 		monitoring.NewString(registry, "beat").Set(b.Info.Beat)
 		monitoring.NewString(registry, "name").Set(b.Info.Name)
-		monitoring.NewString(registry, "uuid").Set(b.Info.UUID.String())
+		monitoring.NewString(registry, "uuid").Set(b.Info.ID.String())
 		monitoring.NewString(registry, "hostname").Set(b.Info.Hostname)
 
 		// Add additional info to state registry. This is also reported to monitoring
@@ -176,7 +176,7 @@ func Run(settings Settings, bt beat.Creator) error {
 		serviceRegistry := stateRegistry.NewRegistry("service")
 		monitoring.NewString(serviceRegistry, "version").Set(b.Info.Version)
 		monitoring.NewString(serviceRegistry, "name").Set(b.Info.Beat)
-		monitoring.NewString(serviceRegistry, "id").Set(b.Info.UUID.String())
+		monitoring.NewString(serviceRegistry, "id").Set(b.Info.ID.String())
 		beatRegistry := stateRegistry.NewRegistry("beat")
 		monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
 		monitoring.NewFunc(stateRegistry, "host", host.ReportInfo, monitoring.Report)
@@ -216,7 +216,8 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 			Version:     v,
 			Name:        hostname,
 			Hostname:    hostname,
-			UUID:        id,
+			ID:          id,
+			EphemeralID: ephemeralID,
 		},
 		Fields: fields,
 	}
@@ -615,10 +616,10 @@ func (b *Beat) configure(settings Settings) error {
 		return err
 	}
 
-	logp.Info("Beat UUID: %v", b.Info.UUID)
+	logp.Info("Beat ID: %v", b.Info.ID)
 
 	// initialize config manager
-	b.ConfigManager, err = management.Factory()(b.Config.Management, reload.Register, b.Beat.Info.UUID)
+	b.ConfigManager, err = management.Factory()(b.Config.Management, reload.Register, b.Beat.Info.ID)
 	if err != nil {
 		return err
 	}
@@ -662,12 +663,12 @@ func (b *Beat) loadMeta() error {
 		f.Close()
 		valid := m.UUID != uuid.Nil
 		if valid {
-			b.Info.UUID = m.UUID
+			b.Info.ID = m.UUID
 			return nil
 		}
 	}
 
-	// file does not exist or UUID is invalid, let's create a new one
+	// file does not exist or ID is invalid, let's create a new one
 
 	// write temporary file first
 	tempFile := metaPath + ".new"
@@ -676,7 +677,7 @@ func (b *Beat) loadMeta() error {
 		return fmt.Errorf("Failed to create Beat meta file: %s", err)
 	}
 
-	err = json.NewEncoder(f).Encode(meta{UUID: b.Info.UUID})
+	err = json.NewEncoder(f).Encode(meta{UUID: b.Info.ID})
 	f.Close()
 	if err != nil {
 		return fmt.Errorf("Beat meta file failed to write: %s", err)
@@ -920,7 +921,7 @@ func logSystemInfo(info beat.Info) {
 	// Beat
 	beat := common.MapStr{
 		"type": info.Beat,
-		"uuid": info.UUID,
+		"uuid": info.ID,
 		"path": common.MapStr{
 			"config": paths.Resolve(paths.Config, ""),
 			"data":   paths.Resolve(paths.Data, ""),
