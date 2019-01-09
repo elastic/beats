@@ -11,7 +11,6 @@
     - name: id
       type: alias
       path: event.id
-      migration: true
       description: >
         Event id when available
     - name: from
@@ -21,19 +20,16 @@
     - name: type
       type: alias
       path: event.kind
-      migration: true
       description: >
         The type of object emitting the event
     - name: action
       type: alias
       path: event.action
-      migration: true
       description: >
         The type of event
     - name: time
       type: alias
       path: event.created
-      migration: true
       description: >
         Timestamp of event
     - name: actor
