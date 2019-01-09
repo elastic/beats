@@ -1,0 +1,130 @@
+{
+    "agent": {
+        "hostname": "bigisland.lan",
+        "id": "e9b18694-3529-4ff5-8996-40b5e71670d0",
+        "ephemeral_id": "14dc8f39-bb9c-47e8-9197-d5ce1d8356bd",
+        "type": "filebeat",
+        "version": "7.0.0"
+    },
+    "log": {
+        "file": {
+            "path": "/usr/local/var/logs/current/conn.log"
+        },
+        "offset": 481565
+    },
+    "destination": {
+        "geo": {
+            "continent_name": "North America",
+            "country_iso_code": "US",
+            "location": {
+                "lon": -97.822,
+                "lat": 37.751
+            }
+        },
+        "address": "17.248.128.151",
+        "port": 443,
+        "bytes": 12550,
+        "ip": "17.248.128.151",
+        "packets": 17
+    },
+    "source": {
+        "address": "192.168.86.167",
+        "port": 55010,
+        "bytes": 7337,
+        "ip": "192.168.86.167",
+        "packets": 22
+    },
+    "fileset": {
+        "name": "connection"
+    },
+    "tags": [
+        "bro"
+    ],
+    "network": {
+        "local_resp": false,
+        "application": "ssl",
+        "local_orig": true,
+        "transport": "tcp",
+        "missed_bytes": 0,
+        "connection_state": "SF",
+        "connection_history": "ShADadFf",
+        "direction": "outbound"
+    },
+    "input": {
+        "type": "log"
+    },
+    "@timestamp": "2019-01-08T21:10:18.636Z",
+    "ecs": {
+        "version": "1.0.0-beta2"
+    },
+    "host": {
+        "name": "bigisland.lan"
+    },
+    "event": {
+        "duration": 20000000000,
+        "created": 1546981792000,
+        "module": "bro",
+        "id": "Cu00My2F0RlLbdpIhj",
+        "dataset": "bro.connection"
+    }
+},
+{
+    "agent": {
+        "hostname": "bigisland.lan",
+        "id": "e9b18694-3529-4ff5-8996-40b5e71670d0",
+        "type": "filebeat",
+        "ephemeral_id": "14dc8f39-bb9c-47e8-9197-d5ce1d8356bd",
+        "version": "7.0.0"
+    },
+    "log": {
+        "file": {
+            "path": "/usr/local/var/logs/current/conn.log"
+        },
+        "offset": 642598
+    },
+    "destination": {
+        "address": "10.101.78.23",
+        "port": 15011,
+        "bytes": 0,
+        "ip": "10.101.78.23",
+        "packets": 0
+    },
+    "source": {
+        "address": "192.168.86.167",
+        "port": 55099,
+        "bytes": 64,
+        "ip": "192.168.86.167",
+        "packets": 1
+    },
+    "fileset": {
+        "name": "connection"
+    },
+    "tags": [
+        "bro"
+    ],
+    "network": {
+        "local_resp": true,
+        "local_orig": true,
+        "missed_bytes": 0,
+        "transport": "tcp",
+        "connection_state": "S0",
+        "connection_history": "S",
+        "direction": "internal"
+    },
+    "input": {
+        "type": "log"
+    },
+    "@timestamp": "2019-01-08T21:14:04.302Z",
+    "ecs": {
+        "version": "1.0.0-beta2"
+    },
+    "host": {
+        "name": "bigisland.lan"
+    },
+    "event": {
+        "created": 1546982038000,
+        "module": "bro",
+        "id": "CbA8BR3y7005dXdMLc",
+        "dataset": "bro.connection"
+    }
+}

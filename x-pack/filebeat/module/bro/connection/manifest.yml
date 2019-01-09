@@ -1,0 +1,19 @@
+module_version: 1.0
+
+var:
+  - name: connection_paths
+    default:
+      - /usr/local/var/logs/current/conn.log
+  - name: tags
+    default: [bro]
+
+  # - name: nested_ecs
+  #   default: false
+ingest_pipeline: ingest/pipeline.json
+input: config/connection.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip
+#- name: user_agent
+#  plugin: ingest-user-agent
