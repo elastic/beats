@@ -130,6 +130,18 @@ event:
 If the `include_annotations` config is added to the provider config, then the list of annotations present in the config
 are added to the event.
 
+If the `include_labels` config is added to the provider config, then the list of labels present in the config
+will be added to the event.
+
+If the `exclude_labels` config is added to the provider config, then the list of labels present in the config
+will be excluded from the event.
+
+if the `labels.dedot` config is set to be `true` in the provider config, then `.` in labels will be replaced with `_`.
+
+if the `annotations.dedot` config is set to be `true` in the provider config, then `.` in annotations will be replaced
+with `_`.
+
+
 For example:
 
 [source,yaml]
