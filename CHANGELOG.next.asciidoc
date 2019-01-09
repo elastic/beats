@@ -36,11 +36,14 @@ https://github.com/elastic/beats/compare/1035569addc4a3b29ffa14f8a08c27c1ace16ef
 
 *Filebeat*
 
+- Support IPv6 addresses with zone id in IIS ingest pipeline. {issue}9836[9836] {pull}9869[9869]
+
 *Heartbeat*
 
 *Journalbeat*
 
 *Metricbeat*
+
 - Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
 
 *Packetbeat*
