@@ -1,3 +1,4 @@
+{
   "couchdb": {
     "server": {
       "couchdb": {
@@ -41,3 +42,4 @@
       }
     }
   }
+}
