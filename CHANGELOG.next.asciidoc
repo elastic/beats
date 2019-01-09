@@ -67,6 +67,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Fix saved objects in filebeat haproxy dashboard. {pull}9417[9417]
 - Fixed a memory leak when harvesters are closed. {pull}7820[7820]
 - Add `convert_timezone` option to Elasticsearch module to convert dates to UTC. {issue}9756[9756] {pull}9761[9761]
+- Support IPv6 addresses with zone id in IIS ingest pipeline. {issue}9836[9836] {pull}9869[9869]
 
 *Heartbeat*
 
