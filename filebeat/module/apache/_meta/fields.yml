@@ -106,9 +106,6 @@
             - name: level
               type: alias
               path: log.level
-            - name: client
-              type: alias
-              path: apache.error.client
             - name: message
               type: alias
               path: message
