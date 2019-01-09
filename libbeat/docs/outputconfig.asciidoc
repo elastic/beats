@@ -211,15 +211,37 @@ for more information about the environment variables.
 [[index-option-es]]
 ===== `index`
 
+ifndef::apm-server[]
 The index name to write events to. The default is
 +"{beatname_lc}-%\{[beat.version]\}-%\{+yyyy.MM.dd\}"+ (for example,
 +"{beatname_lc}-{version}-{localdate}"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
 (see <<configuration-template>>).
+endif::apm-server[]
+
+ifdef::apm-server[]
+The index name to write events to. The default is
++"apm-%\{[beat.version]\}-{type\}-%\{+yyyy.MM.dd\}"+ (for example,
++"apm-{version}-transaction-{localdate}"+). See
+<<exploring-es-data,Exploring data in Elasticsearch>> for more information on
+default index configuration.
+
+IMPORTANT: If you change this setting,
+you need to configure the `setup.template.name` and `setup.template.pattern` options
+(see <<configuration-template>>). You also must set the default index configuration
+in the `apm-server.yml` file.
+
+NOTE: `beat.version` is a field managed by Beats that is added to every document.
+It holds the current version of APM Server.
+endif::apm-server[]
+
 ifndef::no_dashboards[]
 If you are using the pre-built Kibana
 dashboards, you also need to set the `setup.dashboards.index` option (see
 <<configuration-dashboards>>).
+ifdef::deprecate_dashboard_loading[]
+deprecated[{deprecate_dashboard_loading}]
+endif::deprecate_dashboard_loading[]
 endif::no_dashboards[]
 
 You can set the index dynamically by using a format string to access any event
@@ -248,12 +270,6 @@ See the <<indices-option-es,`indices`>> setting for other ways to set the index
 dynamically.
 
 
-ifdef::deprecate_dashboard_loading[]
-
-deprecated[{deprecate_dashboard_loading}]
-
-endif::[]
-
 [[indices-option-es]]
 ===== `indices`
 
@@ -275,8 +291,10 @@ to a new name.
 match.
 
 *`when`*:: A condition that must succeed in order to execute the current rule.
+ifndef::no-processors[]
 All the <<conditions,conditions>> supported by processors are also supported
-here. 
+here.
+endif::no-processors[]
 
 The following example sets the index based on whether the `message` field
 contains the specified string:
@@ -380,8 +398,10 @@ it to a new name.
 match.
 
 *`when`*:: A condition that must succeed in order to execute the current rule.
+ifndef::no-processors[]
 All the <<conditions,conditions>> supported by processors are also supported
-here. 
+here.
+endif::no-processors[]
 
 The following example sends events to a specific pipeline based on whether the
 `message` field contains the specified string:
@@ -864,8 +884,10 @@ to a new name.
 match.
 
 *`when`*:: A condition that must succeed in order to execute the current rule.
+ifndef::no-processors[]
 All the <<conditions,conditions>> supported by processors are also supported
-here. 
+here.
+endif::no-processors[] 
 
 
 ===== `key`
@@ -1089,8 +1111,10 @@ a new name.
 *`default`*:: The default string value to use if `mappings` does not find a match.
 
 *`when`*:: A condition that must succeed in order to execute the current rule.
+ifndef::no-processors[]
 All the <<conditions,conditions>> supported by processors are also supported
-here. 
+here.
+endif::no-processors[]
 
 Example `keys` settings:
 
@@ -1363,6 +1387,11 @@ endif::[]
 
 [[configure-cloud-id]]
 === Configure the output for the Elastic Cloud
+
+ifdef::apm-server[]
+NOTE: This page refers to using a separate instance of APM Server with an existing Elasticsearch Service deployment.
+APM Server is not yet supported on Elasticsearch Service.
+endif::apm-server[]
 
 ++++
 <titleabbrev>Cloud</titleabbrev>

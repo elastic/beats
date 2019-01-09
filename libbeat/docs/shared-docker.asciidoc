@@ -40,6 +40,8 @@ https://www.docker.elastic.co[www.docker.elastic.co].
 
 endif::[]
 
+ifndef::apm-server[]
+
 ==== Run the {beatname_uc} setup
 
 Running {beatname_uc} with the setup command will create the index pattern and
@@ -89,6 +91,8 @@ using this syntax:
 -E cloud.auth=elastic:<elastic password>
 --------------------------------------------
 
+endif::apm-server[]
+
 ==== Configure {beatname_uc} on Docker
 
 The Docker image provides several methods for configuring {beatname_uc}. The
@@ -102,7 +106,7 @@ Download this example configuration file as a starting point:
 
 ["source","sh",subs="attributes,callouts"]
 ------------------------------------------------
-curl -L -O https://raw.githubusercontent.com/elastic/beats/{doc-branch}/deploy/docker/{beatname_lc}.docker.yml
+curl -L -O {dockerconfig}
 ------------------------------------------------
 
 ===== Volume-mounted configuration
@@ -172,7 +176,7 @@ docker run -d \
 --------------------------------------------
 endif::[]
 
-ifeval::["{beatname_lc}"=="heartbeat"]
+ifeval::[("{beatname_lc}"=="heartbeat") or ("{beatname_lc}"=="apm-server")]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
 docker run -d \
