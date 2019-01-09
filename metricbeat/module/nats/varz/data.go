@@ -19,60 +19,64 @@ package varz
 
 import (
 	"encoding/json"
-	"time"
-
 	"github.com/elastic/beats/libbeat/common"
+	s "github.com/elastic/beats/libbeat/common/schema"
+	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/pkg/errors"
 )
 
-// Varz will output server information on the monitoring port at /varz.
-type Varz struct {
-	ServerID         string         `json:"server_id"`
-	Now              time.Time      `json:"now"`
-	Uptime           string         `json:"uptime"`
-	Mem              int            `json:"mem"`
-	Cores            int            `json:"cores"`
-	CPU              int            `json:"cpu"`
-	TotalConnections int            `json:"total_connections"`
-	Remotes          int            `json:"remotes"`
-	InMsgsIn         int            `json:"in_msgs,omitempty"`
-	InMsgs           int            `json:"msgs.in"`
-	OutMsgsIn        int            `json:"out_msgs,omitempty"`
-	OutMsgs          int            `json:"msgs.out"`
-	InBytesIn        int            `json:"in_bytes,omitempty"`
-	InBytes          int            `json:"bytes.in"`
-	OutBytesIn       int            `json:"out_bytes,omitempty"`
-	OutBytes         int            `json:"bytes.out"`
-	SlowConsumers    int            `json:"slow_consumers"`
-	HTTPReqStats     map[string]int `json:"http_req_stats,omitempty"`
-	RootURIHits      int            `json:"http_req_stats.root_uri"`
-	ConnzURIHits     int            `json:"http_req_stats.connz_uri"`
-	RoutezURIHits    int            `json:"http_req_stats.routez_uri"`
-	SubszURIHits     int            `json:"http_req_stats.subsz_uri"`
-	VarzURIHits      int            `json:"http_req_stats.varz_uri"`
-}
-
-func eventMapping(content []byte) common.MapStr {
-	var data Varz
-	json.Unmarshal(content, &data)
-
-	data.InMsgs = data.InMsgsIn
-	data.InMsgsIn = 0
-	data.OutMsgs = data.OutMsgsIn
-	data.OutMsgsIn = 0
-	data.InBytes = data.InBytesIn
-	data.InBytesIn = 0
-	data.OutBytes = data.OutBytesIn
-	data.OutBytesIn = 0
-	data.RootURIHits = data.HTTPReqStats["/"]
-	data.ConnzURIHits = data.HTTPReqStats["/connz"]
-	data.RoutezURIHits = data.HTTPReqStats["/routez"]
-	data.SubszURIHits = data.HTTPReqStats["/subsz"]
-	data.VarzURIHits = data.HTTPReqStats["/varz"]
-	data.HTTPReqStats = make(map[string]int, 0)
-
-	// TODO: add error handling
-	event := common.MapStr{
-		"metrics": data,
+var (
+	http_req_stats_schema = s.Schema{
+		"root_uri": c.Int("/"),
+		"connz_uri": c.Int("connz"),
+		"routez_uri": c.Int("routez"),
+		"subsz_uri": c.Int("subsz"),
+		"varz_uri": c.Int("varz"),
 	}
-	return event
+	varz_schema = s.Schema{
+		"server_id": c.Str("server_id"),
+		"now": c.Time("now"),
+		"uptime": c.Str("uptime"),
+		"mem": c.Int("mem"),
+		"cores": c.Int("cores"),
+		"cpu": c.Int("cpu"),
+		"total_connections": c.Int("total_connections"),
+		"remotes": c.Int("remotes"),
+		"in.msgs": c.Int("in_msgs"),
+		"out.msgs": c.Int("out_msgs"),
+		"in.bytes": c.Int("in_bytes"),
+		"out.bytes": c.Int("out_bytes"),
+		"slow_consumers": c.Int("slow_consumers"),
+		"http_req_stats": c.Dict("http_req_stats", http_req_stats_schema),
+	}
+)
+
+
+func eventMapping(content []byte) (common.MapStr, error) {
+	var event common.MapStr
+	var inInterface map[string]interface{}
+
+	err := json.Unmarshal(content, &inInterface)
+	if err != nil {
+		err = errors.Wrap(err, "failure parsing Nats varz API response")
+		return event, err
+	}
+
+	event, err = varz_schema.Apply(inInterface)
+
+	// TODO: convert uptime field here to long (secs)
+
+	d, _ := event.GetValue("http_req_stats")
+	http_stats := d.(map[string]interface{})
+	event.Put("http_req_stats.root_uri", http_stats["root_uri"])
+	event.Put("http_req_stats.connz_uri", http_stats["connz_uri"])
+	event.Put("http_req_stats.routez_uri", http_stats["routez_uri"])
+	event.Put("http_req_stats.subsz_uri", http_stats["subsz_uri"])
+	event.Put("http_req_stats.varz_uri", http_stats["varz_uri"])
+	event.Delete("http_req_stats")
+	if err != nil {
+		err = errors.Wrap(err, "failure applying index schema")
+		return event, err
+	}
+	return common.MapStr(inInterface), nil
 }

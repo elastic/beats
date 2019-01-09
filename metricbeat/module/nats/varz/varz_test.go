@@ -32,11 +32,11 @@ import (
 func TestEventMapping(t *testing.T) {
 	content, err := ioutil.ReadFile("../_meta/test/varzmetrics.json")
 	assert.NoError(t, err)
-
-	event := eventMapping(content)
-	metrics, _ := event["metrics"]
-	d, _ := metrics.(Varz)
-	assert.Equal(t, d.TotalConnections, 35)
+	event, err := eventMapping(content)
+	assert.NoError(t, err)
+	d, err := event.GetValue("total_connections")
+	assert.NoError(t, err)
+	assert.Equal(t, d, 35)
 }
 
 func TestFetchEventContent(t *testing.T) {
