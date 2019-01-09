@@ -114,5 +114,8 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	}); !isReported {
 		m.log.Warn("event not reported")
 	}
+}
 
+func (m *MetricSet) Close() error {
+	return m.db.Close()
 }
