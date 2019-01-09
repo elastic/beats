@@ -2353,7 +2353,6 @@ Number of items/documents that are replicas.
 [[exported-fields-couchdb]]
 == couchdb fields
 
-experimental[]
 couchdb module
 
 

@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-couchdb-server]]
 === couchdb server metricset
 
-experimental[]
+beta[]
 
 include::../../../module/couchdb/server/_meta/docs.asciidoc[]
 
