@@ -295,7 +295,10 @@ func debugPrintProcessor(info beat.Info) *processorFn {
 	// beat.Client is shared between multiple go-routines by accident)
 	var mux sync.Mutex
 
-	encoder := json.New(true, false, info.Version)
+	encoder := json.New(info.Version, json.Config{
+		Pretty:     true,
+		EscapeHTML: false,
+	})
 	return newProcessor("debugPrint", func(event *beat.Event) (*beat.Event, error) {
 		mux.Lock()
 		defer mux.Unlock()

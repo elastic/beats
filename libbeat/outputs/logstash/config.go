@@ -26,7 +26,6 @@ import (
 
 type Config struct {
 	Index            string                `config:"index"`
-	Port             int                   `config:"port"`
 	LoadBalance      bool                  `config:"loadbalance"`
 	BulkMaxSize      int                   `config:"bulk_max_size"`
 	SlowStart        bool                  `config:"slow_start"`
@@ -47,7 +46,6 @@ type Backoff struct {
 }
 
 var defaultConfig = Config{
-	Port:             5044,
 	LoadBalance:      false,
 	Pipelining:       2,
 	BulkMaxSize:      2048,
@@ -60,7 +58,7 @@ var defaultConfig = Config{
 		Init: 1 * time.Second,
 		Max:  60 * time.Second,
 	},
-	EscapeHTML: true,
+	EscapeHTML: false,
 }
 
 func newConfig() *Config {

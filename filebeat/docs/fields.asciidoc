@@ -5981,9 +5981,10 @@ type: keyword
 *`fileset.name`*::
 +
 --
-type: alias
+type: keyword
 
-alias to: event.dataset
+The Filebeat fileset that generated this event.
+
 
 --
 

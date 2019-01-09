@@ -744,7 +744,7 @@ output.elasticsearch:
   #compression_level: 0
 
   # Configure escaping HTML symbols in strings.
-  #escape_html: true
+  #escape_html: false
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
@@ -851,7 +851,7 @@ output.elasticsearch:
   #compression_level: 3
 
   # Configure escaping HTML symbols in strings.
-  #escape_html: true
+  #escape_html: false
 
   # Optional maximum time to live for a connection to Logstash, after which the
   # connection will be re-established.  A value of `0s` (the default) will
@@ -988,7 +988,7 @@ output.elasticsearch:
     #pretty: false
 
     # Configure escaping HTML symbols in strings.
-    #escape_html: true
+    #escape_html: false
 
   # Metadata update configuration. Metadata contains leader information
   # used to decide which broker to use when publishing.
@@ -1102,16 +1102,12 @@ output.elasticsearch:
     #pretty: false
 
     # Configure escaping HTML symbols in strings.
-    #escape_html: true
+    #escape_html: false
 
   # The list of Redis servers to connect to. If load-balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
   #hosts: ["localhost:6379"]
-
-  # The Redis port to use if hosts does not contain a port number. The default
-  # is 6379.
-  #port: 6379
 
   # The name of the Redis list or channel the events are published to. The
   # default is packetbeat.
@@ -1222,7 +1218,7 @@ output.elasticsearch:
     #pretty: false
 
     # Configure escaping HTML symbols in strings.
-    #escape_html: true
+    #escape_html: false
 
   # Path to the directory where to save the generated files. The option is
   # mandatory.
@@ -1257,7 +1253,7 @@ output.elasticsearch:
     #pretty: false
 
     # Configure escaping HTML symbols in strings.
-    #escape_html: true
+    #escape_html: false
 
 #================================= Paths ======================================
 
