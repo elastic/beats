@@ -55,4 +55,8 @@ class AuditbeatXPackTest(MetricbeatTest):
             if not f in flattened:
                 raise Exception("Field '{}' not found in event.".format(f))
 
+        # Check for presence of top-level error object.
+        if "error" in evt:
+            raise Exception("Event contains error.")
+
         self.assert_fields_are_documented(evt)

@@ -32,13 +32,18 @@ class Test(AuditbeatXPackTest):
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "packages", COMMON_FIELDS + fields, warnings_allowed=True)
 
-    @unittest.skipIf(sys.platform == "darwin" and os.geteuid != 0, "Requires root on macOS")
     def test_metricset_process(self):
         """
         process metricset collects information about processes running on a system.
         """
 
-        fields = ["process.pid", "user.name"]
+        fields = ["process.pid", "process.ppid", "process.name", "process.executable", "process.args",
+                  "process.start", "process.working_directory", "system.audit.process.uid",
+                  "system.audit.process.gid", "user.id", "user.name"]
+
+        if sys.platform != "win32":
+            fields.extend(["system.audit.process.euid", "system.audit.process.suid",
+                           "system.audit.process.egid", "system.audit.process.sgid"])
 
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "process", COMMON_FIELDS + fields, warnings_allowed=True)

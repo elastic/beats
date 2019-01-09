@@ -110,42 +110,6 @@ func (p Process) toMapStr() common.MapStr {
 	}
 }
 
-func (p Process) userMapStr() common.MapStr {
-	mapstr := common.MapStr{}
-
-	if p.User != nil {
-		mapstr.Put("name", p.User.Username)
-	}
-
-	if p.UserInfo != nil {
-		if p.UserInfo.UID != "" {
-			mapstr.Put("id", p.UserInfo.UID)
-		}
-
-		if p.UserInfo.EUID != "" {
-			mapstr.Put("euid", p.UserInfo.EUID)
-		}
-
-		if p.UserInfo.SUID != "" {
-			mapstr.Put("suid", p.UserInfo.SUID)
-		}
-
-		if p.UserInfo.GID != "" {
-			mapstr.Put("gid", p.UserInfo.GID)
-		}
-
-		if p.UserInfo.EGID != "" {
-			mapstr.Put("egid", p.UserInfo.EGID)
-		}
-
-		if p.UserInfo.SGID != "" {
-			mapstr.Put("sgid", p.UserInfo.SGID)
-		}
-	}
-
-	return mapstr
-}
-
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The %v/%v dataset is experimental", moduleName, metricsetName)
@@ -306,9 +270,24 @@ func processEvent(process *Process, eventType string, action eventAction) mb.Eve
 				"action": action.String(),
 			},
 			"process": process.toMapStr(),
-			"user":    process.userMapStr(),
 			"message": processMessage(process, action),
 		},
+	}
+
+	if process.UserInfo != nil {
+		putIfNotEmpty(&event.RootFields, "user.id", process.UserInfo.UID)
+
+		event.MetricSetFields = common.MapStr{}
+		putIfNotEmpty(&event.MetricSetFields, "uid", process.UserInfo.UID)
+		putIfNotEmpty(&event.MetricSetFields, "euid", process.UserInfo.EUID)
+		putIfNotEmpty(&event.MetricSetFields, "suid", process.UserInfo.SUID)
+		putIfNotEmpty(&event.MetricSetFields, "gid", process.UserInfo.GID)
+		putIfNotEmpty(&event.MetricSetFields, "egid", process.UserInfo.EGID)
+		putIfNotEmpty(&event.MetricSetFields, "sgid", process.UserInfo.SGID)
+	}
+
+	if process.User != nil {
+		event.RootFields.Put("user.name", process.User.Username)
 	}
 
 	if process.Error != nil {
@@ -316,6 +295,12 @@ func processEvent(process *Process, eventType string, action eventAction) mb.Eve
 	}
 
 	return event
+}
+
+func putIfNotEmpty(mapstr *common.MapStr, key string, value string) {
+	if value != "" {
+		mapstr.Put(key, value)
+	}
 }
 
 func processMessage(process *Process, action eventAction) string {

@@ -1,0 +1,32 @@
+- name: process
+  type: group
+  description: >
+    `process` contains additional process information.
+  release: experimental
+  fields:
+  - name: uid
+    type: keyword
+    description: >
+        On Linux and macOS (Darwin), the real user ID.
+        On Windows, the security identifier (SID) of the process access token.
+  - name: euid
+    type: keyword
+    description: >
+        On Linux and macOS (Darwin), the effective user ID.
+  - name: suid
+    type: keyword
+    description: >
+        On Linux and macOS (Darwin), the saved user ID.
+  - name: gid
+    type: keyword
+    description: >
+        On Linux and macOS (Darwin), the real group ID.
+        On Windows, the security identifier (SID) of the primary group of the process access token.
+  - name: egid
+    type: keyword
+    description: >
+        On Linux and macOS (Darwin), the effective group ID.
+  - name: sgid
+    type: keyword
+    description: >
+        On Linux and macOS (Darwin), the saved group ID.

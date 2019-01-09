@@ -7,7 +7,7 @@
     "event": {
         "action": "existing_process",
         "dataset": "process",
-        "id": "5ee655ee-3f3c-4d20-8a5f-31531cd5ef5a",
+        "id": "4c8f57c4-d6d5-4b6d-9119-d47b68e474d6",
         "kind": "state",
         "module": "system"
     },
@@ -23,13 +23,20 @@
         "start": "2019-01-09T12:05:44.87Z",
         "working_directory": "/home/elastic"
     },
+    "system": {
+        "audit": {
+            "process": {
+                "egid": "1002",
+                "euid": "1002",
+                "gid": "1002",
+                "sgid": "1002",
+                "suid": "1002",
+                "uid": "1002"
+            }
+        }
+    },
     "user": {
-        "egid": "1002",
-        "euid": "1002",
-        "gid": "1002",
         "id": "1002",
-        "name": "elastic",
-        "sgid": "1002",
-        "suid": "1002"
+        "name": "elastic"
     }
 }
