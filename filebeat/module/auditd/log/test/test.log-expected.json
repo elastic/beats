@@ -12,8 +12,9 @@
         "auditd.log.src": "192.168.2.0",
         "auditd.log.src_prefixlen": "24",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "log",
+        "event.dataset": "auditd.log",
         "event.module": "auditd",
+        "fileset.name": "log",
         "input.type": "log",
         "log.offset": 0
     },
@@ -46,8 +47,9 @@
         "auditd.log.tty": "(none)",
         "auditd.log.uid": "0",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "log",
+        "event.dataset": "auditd.log",
         "event.module": "auditd",
+        "fileset.name": "log",
         "input.type": "log",
         "log.offset": 174
     }

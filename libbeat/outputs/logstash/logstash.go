@@ -20,6 +20,7 @@ package logstash
 import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -29,6 +30,7 @@ import (
 const (
 	minWindowSize             int = 1
 	defaultStartMaxWindowSize int = 10
+	defaultPort                   = 5044
 )
 
 var debugf = logp.MakeDebug("logstash")
@@ -44,6 +46,11 @@ func makeLogstash(
 ) (outputs.Group, error) {
 	if !cfg.HasField("index") {
 		cfg.SetString("index", -1, beat.Beat)
+	}
+
+	err := cfgwarn.CheckRemoved6xSettings(cfg, "port")
+	if err != nil {
+		return outputs.Fail(err)
 	}
 
 	config := newConfig()
@@ -72,7 +79,7 @@ func makeLogstash(
 	for i, host := range hosts {
 		var client outputs.NetworkClient
 
-		conn, err := transport.NewClient(transp, "tcp", host, config.Port)
+		conn, err := transport.NewClient(transp, "tcp", host, defaultPort)
 		if err != nil {
 			return outputs.Fail(err)
 		}
