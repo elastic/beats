@@ -65,7 +65,7 @@ class Test(XPackTest):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        self.assertEqual(len(output), 8)
+        self.assertEqual(len(output), 1)
         evt = output[0]
 
         self.assertItemsEqual(self.de_dot(MSSQL_FIELDS), evt.keys())
