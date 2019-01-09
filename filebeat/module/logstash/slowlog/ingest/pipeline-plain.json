@@ -56,7 +56,10 @@
         },
         {
             "remove": {
-                "field": "logstash.slowlog.timestamp"
+                "field": [
+                    "message",
+                    "logstash.slowlog.timestamp"
+                ]
             }
         },
         {
