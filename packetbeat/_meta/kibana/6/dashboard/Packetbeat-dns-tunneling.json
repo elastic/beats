@@ -8,7 +8,7 @@
             "filter": []
           }
         },
-        "savedSearchId": "DNS",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
         "title": "Unique FQDNs per eTLD+1",
         "uiStateJSON": {
           "vis": {
@@ -76,7 +76,7 @@
             "filter": []
           }
         },
-        "savedSearchId": "DNS",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
         "title": "Unique FQDNs per eTLD+1 Table",
         "uiStateJSON": {
           "vis": {
@@ -157,7 +157,7 @@
             }
           }
         },
-        "savedSearchId": "DNS",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
         "title": "Bytes Transferred per Domain",
         "uiStateJSON": {
           "vis": {
@@ -456,10 +456,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "DNS",
+        "title": "DNS Protocol [Packetbeat]",
         "version": 1
       },
-      "id": "DNS",
+      "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
       "type": "search",
       "updated_at": "2019-01-08T00:20:16.879Z",
       "version": 3
