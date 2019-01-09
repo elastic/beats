@@ -10,12 +10,18 @@ references in the config file to set values that need to be configurable during 
 
 There are two different kinds of AWS credentials can be used here: `access keys` and `temporary security credentials`.
 `aws_access_key_id` and `aws_secret_access_key` are the two parts of `access keys` for AWS to authenticate AWS API requests.
-`access keys` are long-term credentials for an IAM user or the AWS account root user. A more AWS recommended way is to use
+`access keys` are long-term credentials for an IAM user or the AWS account root user. Please see
+https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys[AWS Access Keys
+ and Secret Access Keys] for more details. A more AWS recommended way is to use
 `temporary security credentials` instead of `access keys`. `temporary security credentials` consist of an access key ID,
 a secret access key, and a security token which typically returned from `GetSessionToken`. MFA-enabled IAM users would
-need to submit an MFA code while calling `GetSessionToken`. `aws_default_region` is to set the region for SDK to use.
+need to submit an MFA code while calling `GetSessionToken`. `aws_default_region` is to set the region for SDK to use. Please
+see https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html[Temporary Security Credentials] for more details.
+`sts get-session-token` AWS CLI can be used to generate temporary credentials. For example. with MFA-enabled:
 
-If `aws_access_key_id` or `aws_secret_access_key` not set, this module will report mock data instead.
+----
+aws> sts get-session-token --serial-number arn:aws:iam::1234:mfa/test@elastic.co --token-code 456789 --duration-seconds 129600
+----
 
 Here is an example of aws metricbeat module configuration:
 
@@ -31,6 +37,6 @@ metricbeat.modules:
   aws_default_region: '${AWS_REGION:us-west-1}'
 ----
 
-The Postgres  module comes with a predefined dashboard. For example:
+The AWS module comes with a predefined dashboard. For example:
 
 image::./images/metricbeat-aws-ec2-overview.png[]

@@ -7,7 +7,6 @@
 package ec2
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -55,7 +54,6 @@ func TestFetch(t *testing.T) {
 		t.Logf("Module: %s Metricset: %s", awsMetricSet.Module().Name(), awsMetricSet.Name())
 
 		for _, event := range events {
-			fmt.Println("event = ", event)
 			// RootField
 			checkEventField("service.name", "string", event, t)
 			checkEventField("cloud.availability_zone", "string", event, t)

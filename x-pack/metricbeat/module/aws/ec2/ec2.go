@@ -56,30 +56,30 @@ type MetricSet struct {
 }
 
 // metricIDNameMap is a translating map between createMetricDataQuery id
-// and aws ec2 module metric name.
-var metricIDNameMap = map[string]string{
-	"cpu1":     "cpu.total.pct",
-	"cpu2":     "cpu.credit_usage",
-	"cpu3":     "cpu.credit_balance",
-	"cpu4":     "cpu.surplus_credit_balance",
-	"cpu5":     "cpu.surplus_credits_charged",
-	"network1": "network.in.packets",
-	"network2": "network.out.packets",
-	"network3": "network.in.bytes",
-	"network4": "network.out.bytes",
-	"disk1":    "diskio.read.bytes",
-	"disk2":    "diskio.write.bytes",
-	"disk3":    "diskio.read.ops",
-	"disk4":    "diskio.write.ops",
-	"status1":  "status.check_failed",
-	"status2":  "status.check_failed_system",
-	"status3":  "status.check_failed_instance",
+// and aws ec2 module metric name, cloudwatch ec2 metric name.
+var metricIDNameMap = map[string][]string{
+	"cpu1":     {"cpu.total.pct", "CPUUtilization"},
+	"cpu2":     {"cpu.credit_usage", "CPUCreditUsage"},
+	"cpu3":     {"cpu.credit_balance", "CPUCreditBalance"},
+	"cpu4":     {"cpu.surplus_credit_balance", "CPUSurplusCreditBalance"},
+	"cpu5":     {"cpu.surplus_credits_charged", "CPUSurplusCreditsCharged"},
+	"network1": {"network.in.packets", "NetworkPacketsIn"},
+	"network2": {"network.out.packets", "NetworkPacketsOut"},
+	"network3": {"network.in.bytes", "NetworkIn"},
+	"network4": {"network.out.bytes", "NetworkOut"},
+	"disk1":    {"diskio.read.bytes", "DiskReadBytes"},
+	"disk2":    {"diskio.write.bytes", "DiskWriteBytes"},
+	"disk3":    {"diskio.read.ops", "DiskReadOps"},
+	"disk4":    {"diskio.write.ops", "DiskWriteOps"},
+	"status1":  {"status.check_failed", "StatusCheckFailed"},
+	"status2":  {"status.check_failed_system", "StatusCheckFailed_System"},
+	"status3":  {"status.check_failed_instance", "StatusCheckFailed_Instance"},
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The aws ec2 metricset is experimental.")
+	cfgwarn.Beta("The aws ec2 metricset is beta.")
 
 	config := aws.Config{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -122,7 +122,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	//Get a list of regions
 	regionsList, err := getRegions(svcEC2)
 	if err != nil {
-		report.Error(errors.Wrap(err, "getRegions failed"))
+		err = errors.Wrap(err, "getRegions failed")
+		logp.Error(err)
+		report.Error(err)
 		return
 	}
 
@@ -131,7 +133,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		svcEC2 := ec2.New(cfg)
 		instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2)
 		if err != nil {
-			report.Error(errors.Wrap(err, "getInstancesPerRegion failed, skipping region "+regionName))
+			err = errors.Wrap(err, "getInstancesPerRegion failed, skipping region "+regionName)
+			logp.Error(err)
+			report.Error(err)
 			continue
 		}
 
@@ -140,15 +144,16 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 			//Calculate duration based on period
 			detailedMonitoring := instancesOutputs[instanceID].Monitoring.State
 			durationString, periodSec := convertPeriodToDuration(m.config.Period, detailedMonitoring)
-			fmt.Println("instanceID = ", instanceID)
 			init := true
 			getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 			for init || getMetricDataOutput.NextToken != nil {
 				init = false
 				output, err := getMetricDataPerRegion(durationString, periodSec, instanceID, getMetricDataOutput.NextToken, svcCloudwatch)
 				if err != nil {
-					report.Error(errors.Wrap(err, "getMetricDataPerRegion failed"))
-					return
+					err = errors.Wrap(err, "getMetricDataPerRegion failed, skipping region "+regionName+" for instance "+instanceID)
+					logp.Error(err)
+					report.Error(err)
+					continue
 				}
 				getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
 			}
@@ -170,7 +175,6 @@ func (m *MetricSet) MockFetch(report mb.ReporterV2) {
 		detailedMonitoring := instancesOutputs[instanceID].Monitoring.State
 		//Calculate duration based on period
 		durationString, periodSec := convertPeriodToDuration(m.config.Period, detailedMonitoring)
-		fmt.Println("instanceID = ", instanceID)
 		getMetricDataOutput, err := getMetricDataPerRegion(durationString, periodSec, instanceID, nil, svcCloudwatchMock)
 		if err != nil {
 			report.Error(errors.Wrap(err, "getMetricDataPerRegion failed"))
@@ -223,7 +227,7 @@ func reportCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 			continue
 		}
 		metricKey := metricIDNameMap[*output.Id]
-		mapOfMetricSetFieldResults[metricKey] = fmt.Sprint(output.Values[0])
+		mapOfMetricSetFieldResults[metricKey[0]] = fmt.Sprint(output.Values[0])
 	}
 
 	resultMetricSetFields, err := eventMapping(mapOfMetricSetFieldResults, schemaMetricSetFields)
@@ -334,31 +338,17 @@ func getMetricDataPerRegion(durationString string, periodInSec int, instanceID s
 		Value: &instanceID,
 	}
 
-	metricDataQuery1 := createMetricDataQuery("cpu1", "CPUUtilization", periodInSec, []cloudwatch.Dimension{dim})
-	metricDataQuery2 := createMetricDataQuery("cpu2", "CPUCreditUsage", periodInSec, []cloudwatch.Dimension{dim})
-	metricDataQuery3 := createMetricDataQuery("cpu3", "CPUCreditBalance", periodInSec, []cloudwatch.Dimension{dim})
-	metricDataQuery4 := createMetricDataQuery("cpu4", "CPUSurplusCreditBalance", periodInSec, []cloudwatch.Dimension{dim})
-	metricDataQuery5 := createMetricDataQuery("cpu5", "CPUSurplusCreditsCharged", periodInSec, []cloudwatch.Dimension{dim})
-	metricDataQuery6 := createMetricDataQuery("network1", "NetworkPacketsIn", periodInSec, []cloudwatch.Dimension{dim})
-	metricDataQuery7 := createMetricDataQuery("network2", "NetworkPacketsOut", periodInSec, []cloudwatch.Dimension{dim})
-	metricDataQuery8 := createMetricDataQuery("network3", "NetworkIn", periodInSec, []cloudwatch.Dimension{dim})
-	metricDataQuery9 := createMetricDataQuery("network4", "NetworkOut", periodInSec, []cloudwatch.Dimension{dim})
-	metricDataQuery10 := createMetricDataQuery("disk1", "DiskReadBytes", periodInSec, []cloudwatch.Dimension{dim})
-	metricDataQuery11 := createMetricDataQuery("disk2", "DiskWriteBytes", periodInSec, []cloudwatch.Dimension{dim})
-	metricDataQuery12 := createMetricDataQuery("disk3", "DiskReadOps", periodInSec, []cloudwatch.Dimension{dim})
-	metricDataQuery13 := createMetricDataQuery("disk4", "DiskWriteOps", periodInSec, []cloudwatch.Dimension{dim})
-	metricDataQuery14 := createMetricDataQuery("status1", "StatusCheckFailed", periodInSec, []cloudwatch.Dimension{dim})
-	metricDataQuery15 := createMetricDataQuery("status2", "StatusCheckFailed_System", periodInSec, []cloudwatch.Dimension{dim})
-	metricDataQuery16 := createMetricDataQuery("status3", "StatusCheckFailed_Instance", periodInSec, []cloudwatch.Dimension{dim})
+	metricDataQueries := []cloudwatch.MetricDataQuery{}
+	for metricID, metricName := range metricIDNameMap {
+		metricDataQuery := createMetricDataQuery(metricID, metricName[1], periodInSec, []cloudwatch.Dimension{dim})
+		metricDataQueries = append(metricDataQueries, metricDataQuery)
+	}
 
 	getMetricDataInput := &cloudwatch.GetMetricDataInput{
-		NextToken: nextToken,
-		StartTime: &startTime,
-		EndTime:   &endTime,
-		MetricDataQueries: []cloudwatch.MetricDataQuery{metricDataQuery1, metricDataQuery2, metricDataQuery3, metricDataQuery4,
-			metricDataQuery5, metricDataQuery6, metricDataQuery7, metricDataQuery8,
-			metricDataQuery9, metricDataQuery10, metricDataQuery11, metricDataQuery12,
-			metricDataQuery13, metricDataQuery14, metricDataQuery15, metricDataQuery16},
+		NextToken:         nextToken,
+		StartTime:         &startTime,
+		EndTime:           &endTime,
+		MetricDataQueries: metricDataQueries,
 	}
 
 	req := svc.GetMetricDataRequest(getMetricDataInput)

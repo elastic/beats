@@ -2,9 +2,7 @@
   title: "aws"
   description: >
     `aws` module collects AWS monitoring metrics from AWS Cloudwatch.
-    experimental[]
-
-    aws module
+  release: beta
   fields:
     - name: aws
       type: group
