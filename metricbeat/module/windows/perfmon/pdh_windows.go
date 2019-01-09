@@ -389,20 +389,21 @@ func NewPerfmonReader(config Config) (*PerfmonReader, error) {
 		wildcard := wildcardRegexp.MatchString(counter.Query)
 		values, err := PdhExpandWildCardPath(counter.Query)
 		if err != nil {
-			return nil, PdhErrno(err.(syscall.Errno))
+			if config.IgnoreNECounters {
+				switch err {
+				case PDH_CSTATUS_NO_COUNTER, PDH_CSTATUS_NO_COUNTERNAME,
+					PDH_CSTATUS_NO_INSTANCE, PDH_CSTATUS_NO_OBJECT:
+					r.log.Infow("Ignoring non existent counter", "error", err,
+						logp.Namespace("perfmon"), "query", counter.Query)
+					continue
+				}
+			} else {
+				return nil, errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.Query)
+			}
 		}
 
 		for _, v := range values {
 			if err := query.AddCounter(v, format, counter.InstanceName, wildcard); err != nil {
-				if config.IgnoreNECounters {
-					switch err {
-					case PDH_CSTATUS_NO_COUNTER, PDH_CSTATUS_NO_COUNTERNAME,
-						PDH_CSTATUS_NO_INSTANCE, PDH_CSTATUS_NO_OBJECT:
-						r.log.Infow("Ignoring non existent counter", "error", err,
-							logp.Namespace("perfmon"), "query", counter.Query)
-						continue
-					}
-				}
 				query.Close()
 				return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, counter.Query)
 			}
