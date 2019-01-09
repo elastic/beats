@@ -23,7 +23,7 @@
         ],
         "log.level": "INFO",
         "log.offset": 175,
-        "logstash.log.module": "logstash.inputs.jdbc     ",
+        "logstash.log.module": "logstash.inputs.jdbc",
         "message": "(0.058950s) Select Name as [person.name]\n, Address as [person.address]\nfrom people\n"
     }
 ]
