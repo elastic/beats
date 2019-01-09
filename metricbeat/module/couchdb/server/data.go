@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Server type defines all fields of the Server Metricset
@@ -83,9 +84,14 @@ type General struct {
 	Current float64 `json:"current"`
 }
 
-func eventMapping(content []byte) common.MapStr {
+func eventMapping(content []byte) (common.MapStr, error) {
 	var data Server
-	json.Unmarshal(content, &data)
+	err := json.Unmarshal(content, &data)
+	if err != nil {
+		logp.Err("Error: %+v", err)
+		return nil, err
+	}
+
 	event := common.MapStr{
 		"httpd": common.MapStr{
 			"viewReads":                  data.Httpd.ViewReads.Current,
@@ -127,5 +133,5 @@ func eventMapping(content []byte) common.MapStr {
 			"open_os_files":     data.Couchdb.OpenOsFiles.Current,
 		},
 	}
-	return event
+	return event, nil
 }

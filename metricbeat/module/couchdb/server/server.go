@@ -52,7 +52,7 @@ type MetricSet struct {
 
 // New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The couchdb server metricset is experimental.")
+	cfgwarn.Beta("The couchdb server metricset is beta.")
 
 	config := struct{}{}
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -75,5 +75,9 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	if err != nil {
 		return nil, err
 	}
-	return eventMapping(content), nil
+	event, err := eventMapping(content)
+	if err != nil {
+		return nil, err
+	}
+	return event, nil
 }

@@ -30,8 +30,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const testFile = "../_meta/test/serverstats.json"
-
 func TestFetchEventContent(t *testing.T) {
 	absPath, err := filepath.Abs("../_meta/test/")
 	assert.NoError(t, err)
