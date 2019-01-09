@@ -2,6 +2,7 @@
   type: group
   description: >
     Contains CouchDB server stats
+  release: beta  
   fields:
     - name: httpd
       type: group

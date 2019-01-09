@@ -1,9 +1,8 @@
 - key: couchdb
   title: "couchdb"
   description: >
-    experimental[]
-
     couchdb module
+  release: beta
   fields:
     - name: couchdb
       type: group
