@@ -57,9 +57,16 @@ func main() {
 		log.Fatalf("Error parsing Kibana URL: %+v", err)
 	}
 
+	var user, pass string
+	if u.User != nil {
+		user = u.User.Username()
+		pass, _ = u.User.Password()
+	}
 	client, err := kibana.NewClientWithConfig(&kibana.ClientConfig{
 		Protocol: u.Scheme,
 		Host:     u.Host,
+		Username: user,
+		Password: pass,
 		SpaceID:  *spaceID,
 		Timeout:  kibanaTimeout,
 	})
