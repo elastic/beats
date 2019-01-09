@@ -14,15 +14,28 @@
     },
     "mssql": {
         "performance": {
-            "batch_requests": {},
-            "compilations": {},
-            "lock_waits": {},
-            "page_life_expectancy": {
-                "sec": 11
+            "batch_requests": {
+                "sec": 109695
             },
-            "page_splits": {},
-            "recompilations": {},
-            "transactions": {}
+            "buffer_cache_hit": {
+                "pct": 0.54
+            },
+            "compilations": {
+                "sec": 28814
+            },
+            "lock_waits": {
+                "sec": 3
+            },
+            "page_life_expectancy": {
+                "sec": 31783
+            },
+            "page_splits": {
+                "sec": 166
+            },
+            "recompilations": {
+                "sec": 0
+            },
+            "user_connections": 3
         }
     },
     "service": {

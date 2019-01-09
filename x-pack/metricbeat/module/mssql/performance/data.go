@@ -12,27 +12,26 @@ import (
 var (
 	schema = s.Schema{
 		"page_splits": s.Object{
-			"sec": c.Int("page_splits_sec"),
+			"sec": c.Int("Page Splits/sec", s.Optional),
 		},
 		"page_life_expectancy": s.Object{
-			"sec": c.Int("page_life_expectancy"),
+			"sec": c.Int("Page life expectancy", s.Optional),
 		},
 		"lock_waits": s.Object{
-			"sec": c.Int("lock_waits_sec"),
+			"sec": c.Int("Lock Waits/sec", s.Optional),
 		},
-		"user_connections": c.Int("user_connections"),
+		"user_connections": c.Int("User Connections", s.Optional),
 		"recompilations": s.Object{
-			"sec": c.Int("recompilations_sec"),
+			"sec": c.Int("SQL Re-Compilations/sec", s.Optional),
 		},
 		"compilations": s.Object{
-			"sec": c.Int("compilations_sec"),
-		},
-		"transactions": s.Object{
-			"sec": c.Int("transactions_sec"),
+			"sec": c.Int("SQL Compilations/sec", s.Optional),
 		},
 		"batch_requests": s.Object{
-			"sec": c.Int("batch_req_sec"),
+			"sec": c.Int("Batch Requests/sec", s.Optional),
 		},
-		"buffer_cache_hit_ratio": c.Float("buffer_cache_hit_ratio"),
+		"buffer_cache_hit": s.Object{
+			"pct": c.Float("Buffer cache hit ratio", s.Optional),
+		},
 	}
 )

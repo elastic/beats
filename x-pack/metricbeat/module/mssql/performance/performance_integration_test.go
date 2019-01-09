@@ -38,7 +38,7 @@ func TestFetch(t *testing.T) {
 		return func(v interface{}, key string) {
 			value, ok := v.(float64)
 			if !ok {
-				t.Fatalf("%v is not a int64, but %T", key, v)
+				t.Fatalf("%v is not a float64, but %T", key, v)
 			}
 
 			assert.Truef(t, f(value), "Value '%d' on field '%s' wasn't higher than 0", value, key)
@@ -75,21 +75,20 @@ func TestFetch(t *testing.T) {
 		{key: "user_connections", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "recompilations.sec", assertion: int64Assertion(int64EqualZero)},
 		{key: "compilations.sec", assertion: int64Assertion(int64HigherThanZero)},
-		{key: "transactions.sec", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "batch_requests.sec", assertion: int64Assertion(int64HigherThanZero)},
-		{key: "buffer_cache_hit_ratio", assertion: float64Assertion(float64HigherThanZero)},
+		{key: "buffer_cache_hit.pct", assertion: float64Assertion(float64HigherThanZero)},
 	}
 	for _, keyAssertion := range keys {
 		var found bool
 
 		for _, event := range events {
-			pageSplitsSeconds, err := event.MetricSetFields.GetValue(keyAssertion.key)
+			value, err := event.MetricSetFields.GetValue(keyAssertion.key)
 			if err != nil {
 				continue
 			}
 			found = true
 
-			keyAssertion.assertion(pageSplitsSeconds, keyAssertion.key)
+			keyAssertion.assertion(value, keyAssertion.key)
 		}
 
 		if !found {

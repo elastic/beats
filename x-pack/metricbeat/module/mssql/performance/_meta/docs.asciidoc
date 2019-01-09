@@ -8,6 +8,5 @@ We fetch the following data:
 * Total number of user connections.
 * Cumulative (per instance) recompilations time in seconds: Show diffs between periodic readings to identify periods of high SQL re-compilations.
 * Compilations time in seconds: Cumulative per instance. Show diffs between periodic readings to identify periods of high SQL compilations.
-* Transactions time in seconds: Cumulative per database. Show diffs between periodic readings to identify periods of high transaction activity.
 * Batch requests time in seconds: Cumulative per instance. Show diffs between periodic readings to identify periods of high request activity.
-* Buffer Cache hit ratio: Percentage of data pages found in buffer cache without having to read from disk.
+* Buffer Cache hit: Percentage of data pages found in buffer cache without having to read from disk.

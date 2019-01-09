@@ -46,14 +46,6 @@
           description: Compilations time in seconds
           type: long
 
-    - name: transactions
-      type: group
-      description: Cumulative per database. Show diffs between periodic readings to identify periods of high transaction activity.
-      fields:
-        - name: sec
-          description: Transactions time in seconds
-          type: long
-
     - name: batch_requests
       type: group
       description: Cumulative per instance. Show diffs between periodic readings to identify periods of high request activity.
@@ -62,6 +54,10 @@
           description: Batch requests time in seconds
           type: long
 
-    - name: buffer_cache_hit_ratio
-      type: double
-      description: Percentage of data pages found in buffer cache without having to read from disk
+    - name: buffer_cache_hit
+      type: group
+      description: Indicates the percentage of pages found in the buffer cache without having to read from disk
+      fields:
+        - name: pct
+          description: The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses
+          type: double

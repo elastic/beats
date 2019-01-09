@@ -5,6 +5,12 @@
 package performance
 
 import (
+	"database/sql"
+	"fmt"
+	"strings"
+
+	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -12,6 +18,13 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/mssql"
 )
+
+type performanceCounter struct {
+	objectName   string
+	instanceName string
+	counterName  string
+	counterValue *int64
+}
 
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
@@ -31,6 +44,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	log     *logp.Logger
 	fetcher *mssql.Fetcher
+	db      *sql.DB
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -40,26 +54,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	logger := logp.NewLogger("mssql.performance").With("host", base.HostData().SanitizedURI)
 
-	fetcher, err := mssql.NewFetcher(base.HostData().URI,
-		[]string{
-			`SELECT [cntr_value] as page_life_expectancy FROM sys.dm_os_performance_counters WHERE [object_name] = 'SQLServer:Buffer Manager' AND [counter_name] = 'Page life expectancy'`,
-			`SELECT (a.cntr_value * 1.0 / b.cntr_value) * 100.0 as buffer_cache_hit_ratio FROM sys.dm_os_performance_counters a JOIN  (SELECT cntr_value,OBJECT_NAME FROM sys.dm_os_performance_counters WHERE counter_name = 'Buffer cache hit ratio base' AND OBJECT_NAME = 'SQLServer:Buffer Manager') b ON  a.OBJECT_NAME = b.OBJECT_NAME WHERE a.counter_name = 'Buffer cache hit ratio' AND a.OBJECT_NAME = 'SQLServer:Buffer Manager';`,
-			"SELECT cntr_value as batch_req_sec FROM sys.dm_os_performance_counters WHERE counter_name = 'Batch Requests/sec';",
-			"SELECT cntr_value as transactions_sec, instance_name as db FROM sys.dm_os_performance_counters where counter_name = 'Transactions/sec';",
-			"SELECT cntr_value as compilations_sec FROM sys.dm_os_performance_counters where counter_name = 'SQL Compilations/sec';",
-			"SELECT cntr_value as recompilations_sec FROM sys.dm_os_performance_counters where counter_name = 'SQL Re-Compilations/sec';",
-			"SELECT cntr_value as user_connections FROM sys.dm_os_performance_counters WHERE counter_name = 'User Connections';",
-			"SELECT cntr_value as lock_waits_sec FROM sys.dm_os_performance_counters WHERE counter_name = 'Lock Waits/sec' and instance_name = '_Total';",
-			"SELECT cntr_value as page_splits_sec FROM sys.dm_os_performance_counters WHERE counter_name = 'Page splits/sec'",
-		}, &schema, logger)
+	db, err := mssql.NewConnection(base.HostData().URI)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating fetcher")
+		return nil, errors.Wrap(err, "could not create connection to db")
 	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
 		log:           logger,
-		fetcher:       fetcher,
+		db:            db,
 	}, nil
 }
 
@@ -67,10 +70,49 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
-	m.fetcher.Report(reporter)
-}
+	var err error
+	var rows *sql.Rows
+	rows, err = m.db.Query("SELECT object_name, counter_name, instance_name, cntr_value FROM sys.dm_os_performance_counters WHERE counter_name = 'SQL Compilations/sec' OR counter_name = 'SQL Re-Compilations/sec' OR counter_name = 'User Connections' OR counter_name = 'Page splits/sec' OR (counter_name = 'Lock Waits/sec' AND instance_name = '_Total') OR counter_name = 'Page splits/sec' OR (object_name = 'SQLServer:Buffer Manager' AND counter_name = 'Page life expectancy') OR counter_name = 'Batch Requests/sec' OR (counter_name = 'Buffer cache hit ratio' AND object_name = 'SQLServer:Buffer Manager') OR (counter_name = 'Lock Waits/sec' and instance_name = '_Total')")
+	if err != nil {
+		reporter.Error(errors.Wrapf(err, "error closing rows"))
+		return
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			m.log.Error("error closing rows: %s", err.Error())
+		}
+	}()
 
-// Close the connection to the server at the engine level
-func (m *MetricSet) Close() error {
-	return m.fetcher.Close()
+	mapStr := common.MapStr{}
+	for rows.Next() {
+		var row performanceCounter
+		if err = rows.Scan(&row.objectName, &row.counterName, &row.instanceName, &row.counterValue); err != nil {
+			reporter.Error(errors.Wrap(err, "error scanning rows"))
+			continue
+		}
+
+		//cell values contains spaces at the beginning and at the end of the 'actual' value. They must be removed.
+		row.counterName = strings.TrimSpace(row.counterName)
+		row.instanceName = strings.TrimSpace(row.instanceName)
+		row.objectName = strings.TrimSpace(row.objectName)
+
+		if row.counterName == "Buffer cache hit ratio" {
+			mapStr[row.counterName] = fmt.Sprintf("%v", float64(*row.counterValue)/100)
+		} else {
+			mapStr[row.counterName] = fmt.Sprintf("%v", *row.counterValue)
+		}
+	}
+
+	res, err := schema.Apply(mapStr)
+	if err != nil {
+		m.log.Error(errors.Wrap(err, "error applying schema"))
+		return
+	}
+
+	if isReported := reporter.Event(mb.Event{
+		MetricSetFields: res,
+	}); !isReported {
+		m.log.Warn("event not reported")
+	}
+
 }
