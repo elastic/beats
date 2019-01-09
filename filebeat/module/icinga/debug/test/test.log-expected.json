@@ -2,8 +2,9 @@
     {
         "@timestamp": "2017-04-04T11:43:09.000Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "debug",
+        "event.dataset": "icinga.debug",
         "event.module": "icinga",
+        "fileset.name": "debug",
         "icinga.debug.facility": "GraphiteWriter",
         "input.type": "log",
         "log.level": "debug",
@@ -13,8 +14,9 @@
     {
         "@timestamp": "2017-04-04T11:43:09.000Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "debug",
+        "event.dataset": "icinga.debug",
         "event.module": "icinga",
+        "fileset.name": "debug",
         "icinga.debug.facility": "IdoMysqlConnection",
         "input.type": "log",
         "log.level": "debug",
@@ -24,8 +26,9 @@
     {
         "@timestamp": "2017-04-04T11:43:11.000Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "debug",
+        "event.dataset": "icinga.debug",
         "event.module": "icinga",
+        "fileset.name": "debug",
         "icinga.debug.facility": "Process",
         "input.type": "log",
         "log.level": "notice",

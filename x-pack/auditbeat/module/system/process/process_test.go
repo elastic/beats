@@ -5,7 +5,6 @@
 package process
 
 import (
-	"runtime"
 	"testing"
 
 	"github.com/elastic/beats/auditbeat/core"
@@ -13,9 +12,6 @@ import (
 )
 
 func TestData(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("Fails on Windows - https://github.com/elastic/beats/issues/9748")
-	}
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {

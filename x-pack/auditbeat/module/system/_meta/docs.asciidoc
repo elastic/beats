@@ -9,8 +9,8 @@ a system. All metricsets send both periodic state information (e.g. all currentl
 running processes) and real-time changes (e.g. when a new process starts
 or stops).
 
-The module is fully implemented for Linux, and partially implemented
-for macOS (Darwin).
+The module is fully implemented for Linux. Some metricsets are also available
+for macOS (Darwin) and Windows.
 
 [float]
 === How it works

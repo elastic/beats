@@ -2,8 +2,9 @@
     {
         "@timestamp": "2017-10-30T09:57:58.243Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "slowlog",
+        "event.dataset": "logstash.slowlog",
         "event.module": "logstash",
+        "fileset.name": "slowlog",
         "input.type": "log",
         "log.offset": 0,
         "logstash.slowlog.event": "\"{\\\"@version\\\":\\\"1\\\",\\\"@timestamp\\\":\\\"2017-10-30T13:57:55.130Z\\\",\\\"host\\\":\\\"sashimi\\\",\\\"sequence\\\":0,\\\"message\\\":\\\"Hello world!\\\"}\"",

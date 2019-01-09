@@ -2,8 +2,9 @@
     {
         "@timestamp": "2017-04-04T09:16:34.000Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "main",
+        "event.dataset": "icinga.main",
         "event.module": "icinga",
+        "fileset.name": "main",
         "icinga.main.facility": "Notification",
         "input.type": "log",
         "log.level": "information",
@@ -13,8 +14,9 @@
     {
         "@timestamp": "2017-04-04T09:16:34.000Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "main",
+        "event.dataset": "icinga.main",
         "event.module": "icinga",
+        "fileset.name": "main",
         "icinga.main.facility": "PluginNotificationTask",
         "input.type": "log",
         "log.flags": [
@@ -27,8 +29,9 @@
     {
         "@timestamp": "2017-04-04T09:16:48.000Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "main",
+        "event.dataset": "icinga.main",
         "event.module": "icinga",
+        "fileset.name": "main",
         "icinga.main.facility": "IdoMysqlConnection",
         "input.type": "log",
         "log.level": "information",

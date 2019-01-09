@@ -1,0 +1,48 @@
+- name: event
+  type: group
+  description: >
+    Docker event
+  release: ga
+  fields:
+    - name: status
+      type: keyword
+      description: >
+        Event status
+    - name: id
+      type: alias
+      path: event.id
+      description: >
+        Event id when available
+    - name: from
+      type: keyword
+      description: >
+        Event source
+    - name: type
+      type: alias
+      path: event.kind
+      description: >
+        The type of object emitting the event
+    - name: action
+      type: alias
+      path: event.action
+      description: >
+        The type of event
+    - name: time
+      type: alias
+      path: event.created
+      description: >
+        Timestamp of event
+    - name: actor
+      type: group
+      description: >
+        Actor
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            The ID of the object emitting the event
+        - name: attributes
+          type: object
+          object_type: keyword
+          description: >
+            Various key/value attributes of the object, depending on its type
