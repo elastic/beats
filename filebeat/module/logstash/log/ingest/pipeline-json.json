@@ -53,13 +53,19 @@
         {
             "rename": {
                 "field": "logstash.log.logEvent.message",
-                "target_field": "logstash.log.message"
+                "target_field": "message"
             }
         },
         {
             "rename": {
                 "field": "logstash.log.logEvent",
                 "target_field": "logstash.log.log_event"
+            }
+        },
+        {
+            "rename": {
+                "field": "logstash.log.level",
+                "target_field": "log.level"
             }
         }
     ]

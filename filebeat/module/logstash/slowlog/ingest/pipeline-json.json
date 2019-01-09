@@ -82,6 +82,12 @@
                     "logstash.slowlog.logEvent"
                 ]
             }
+        },
+        {
+            "rename": {
+                "field": "logstash.slowlog.level",
+                "target_field": "log.level"
+            }
         }
     ]
 }
