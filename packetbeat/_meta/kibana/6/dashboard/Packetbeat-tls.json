@@ -556,11 +556,15 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "exclude": "xxx-nope",
+                "exclude": "",
                 "field": "tls.resumption_method",
                 "json": "{\n\"missing\": \"none\"\n}",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
                 "order": "desc",
                 "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
                 "size": 5
               },
               "schema": "segment",
@@ -571,16 +575,22 @@
             "addLegend": true,
             "addTooltip": true,
             "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "TLS Session Resume",
+          "title": "TLS Session Resume [Packetbeat]",
           "type": "pie"
         }
       },
       "id": "2c467370-d392-11e7-8fa0-232aa9259081",
       "type": "visualization",
-      "updated_at": "2019-01-10T02:09:42.328Z",
+      "updated_at": "2019-01-10T15:23:21.973Z",
       "version": 2
     },
     {
