@@ -74,6 +74,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 *Heartbeat*
 
 - Heartbeat now always downloads the entire body of HTTP endpoints, even if no checks against the body content are declared. This fixes an issue where timing metrics would be incorrect in scenarios where the body wasn't used since the connection would be closed soon after the headers were sent, but before the entire body was. {pull}8894[8894]
+- `Host` header can now be overridden for HTTP requests sent by Heartbeat monitors. {pull}9148[9516]
 
 *Journalbeat*
 
