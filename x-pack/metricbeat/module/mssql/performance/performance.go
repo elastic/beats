@@ -112,10 +112,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	if isReported := reporter.Event(mb.Event{
 		MetricSetFields: res,
 	}); !isReported {
-		m.log.Warn("event not reported")
+		m.log.Debug("event not reported")
 	}
 }
 
+// Close closes the db connection to MS SQL at the Metricset level
 func (m *MetricSet) Close() error {
 	return m.db.Close()
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// NewConnection returns a connection already established with MSSQL
 func NewConnection(uri string) (*sql.DB, error) {
 	db, err := sql.Open("sqlserver", uri)
 	if err != nil {
