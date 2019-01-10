@@ -1,0 +1,63 @@
+- name: performance
+  type: group
+  description: performance metricset fetches information about the Performance Counters
+  fields:
+    - name: page_splits
+      type: group
+      description: Cumulative per instance. Show diffs between periodic readings to identify periods of frequent page splits.
+      fields:
+        - name: sec
+          description: Page splits in seconds
+          type: long
+
+    - name: page_life_expectancy
+      type: group
+      description: The expected time in seconds that a data page will remain in the buffer pool
+      fields:
+        - name: sec
+          description: Page life expectancy in seconds
+          type: long
+
+    - name: lock_waits
+      type: group
+      description: Cumulative per instance. Show diffs between periodic readings to identify periods of high lock contention.
+      fields:
+        - name: sec
+          description: Lock wait time in seconds
+          type: long
+
+    - name: user_connections
+      description: Total number of user connections
+      type: long
+
+    - name: recompilations
+      type: group
+      description: Cumulative per instance. Show diffs between periodic readings to identify periods of high SQL re-compilations.
+      fields:
+        - name: sec
+          description: Recompilations time in seconds
+          type: long
+
+    - name: compilations
+      type: group
+      description: Cumulative per instance. Show diffs between periodic readings to identify periods of high SQL compilations.
+      fields:
+        - name: sec
+          description: Compilations time in seconds
+          type: long
+
+    - name: batch_requests
+      type: group
+      description: Cumulative per instance. Show diffs between periodic readings to identify periods of high request activity.
+      fields:
+        - name: sec
+          description: Batch requests time in seconds
+          type: long
+
+    - name: buffer_cache_hit
+      type: group
+      description: Indicates the percentage of pages found in the buffer cache without having to read from disk
+      fields:
+        - name: pct
+          description: The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses
+          type: double

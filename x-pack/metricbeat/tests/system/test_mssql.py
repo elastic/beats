@@ -45,6 +45,34 @@ class Test(XPackTest):
 
         self.assert_fields_are_documented(evt)
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_performance(self):
+        """
+        MSSQL module outputs an event.
+        """
+        self.render_config_template(modules=[{
+            "name": "mssql",
+            "metricsets": ["performance"],
+            "hosts": self.get_hosts(),
+            "username": self.get_username(),
+            "password": self.get_password(),
+            "period": "5s"
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        output = self.read_output_json()
+        self.assertEqual(len(output), 1)
+        evt = output[0]
+
+        self.assertItemsEqual(self.de_dot(MSSQL_FIELDS), evt.keys())
+        self.assertTrue(evt["mssql"]["performance"]["page_life_expectancy"]["sec"] > 0)
+
+        self.assert_fields_are_documented(evt)
+
     def get_hosts(self):
         return [os.getenv('MSSQL_HOST', 'mssql')]
 

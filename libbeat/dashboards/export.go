@@ -18,7 +18,6 @@
 package dashboards
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
@@ -32,7 +31,8 @@ import (
 )
 
 const (
-	dashboardPerm = 0644
+	// OutputPermission is the permission of dashboard output files.
+	OutputPermission = 0644
 )
 
 // ListYML is the yaml file which contains list of available dashboards.
@@ -92,10 +92,6 @@ func SaveToFile(dashboard common.MapStr, filename, root string, version common.V
 	}
 
 	out := filepath.Join(root, dashboardsPath, filename)
-	bytes, err := json.Marshal(dashboard)
-	if err != nil {
-		return err
-	}
 
-	return ioutil.WriteFile(out, bytes, dashboardPerm)
+	return ioutil.WriteFile(out, []byte(dashboard.StringToPrint()), OutputPermission)
 }

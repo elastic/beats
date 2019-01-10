@@ -17,6 +17,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update to Golang 1.11.3. {pull}9560[9560]
 - Embedded html is not escaped anymore by default. {pull}9914[9914]
 - Remove port settings from Logstash and Redis output. {pull}9934[9934]
+- Fix registry handle leak on Windows (https://github.com/elastic/go-sysinfo/pull/33). {pull}9920[9920]
 
 *Auditbeat*
 
@@ -40,6 +41,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adjust Packetbeat `http` fields to ECS Beta 2 {pull}9645[9645]
   - `http.request.body` moves to `http.request.body.content`
   - `http.response.body` moves to `http.response.body.content`
+- Changed DNS protocol fields to align with ECS. {pull}9941[9941]
+- Removed trailing dot from domain names reported by the DNS protocol. {pull}9941[9941]
 
 *Winlogbeat*
 
@@ -50,6 +53,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Enforce validation for the Central Management access token. {issue}9621[9621]
+- Fix config appender registration. {pull}9873[9873]
 
 *Auditbeat*
 
@@ -57,6 +61,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Add `convert_timezone` option to Elasticsearch module to convert dates to UTC. {issue}9756[9756] {pull}9761[9761]
 - Support IPv6 addresses with zone id in IIS ingest pipeline. {issue}9836[9836] {pull}9869[9869]
+- Support haproxy log lines without captured headers. {issue}9463[9463] {pull}9958[9958]
 
 *Heartbeat*
 
@@ -81,6 +86,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Update field definitions for `http` to ECS Beta 2 {pull}9645[9645]
 - Add `agent.id` and `agent.ephemeral_id` fields to all beats. {pull}9404[9404]
+- Add `name` config option to `add_host_metadata` processor. {pull}9943[9943]
 
 *Auditbeat*
 
@@ -94,6 +100,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
 - Support mysql 5.7.22 slowlog starting with time information. {issue}7892[7892] {pull}9647[9647]
 - Add support for ssl_request_log in apache2 module. {issue}8088[8088] {pull}9833[9833]
+- Add support for iis 7.5 log format. {issue}9753[9753] {pull}9967[9967]
 
 *Heartbeat*
 
@@ -107,6 +114,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `key` metricset to the Redis module. {issue}9582[9582] {pull}9657[9657] {pull}9746[9746]
 - Add `socket_summary` metricset to system defaults, removing experimental tag and supporting Windows {pull}9709[9709]
 - Add docker `event` metricset. {pull}9856[9856]
+- Add 'performance' metricset to x-pack mssql module {pull}9826[9826]
 
 *Packetbeat*
 

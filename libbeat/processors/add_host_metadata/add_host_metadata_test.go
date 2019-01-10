@@ -116,6 +116,34 @@ func TestConfigNetInfoEnabled(t *testing.T) {
 	assert.NotNil(t, v)
 }
 
+func TestConfigName(t *testing.T) {
+	event := &beat.Event{
+		Fields:    common.MapStr{},
+		Timestamp: time.Now(),
+	}
+
+	config := map[string]interface{}{
+		"name": "my-host",
+	}
+
+	testConfig, err := common.NewConfigFrom(config)
+	assert.NoError(t, err)
+
+	p, err := newHostMetadataProcessor(testConfig)
+	require.NoError(t, err)
+
+	newEvent, err := p.Run(event)
+	assert.NoError(t, err)
+
+	for configKey, configValue := range config {
+		t.Run(fmt.Sprintf("Check of %s", configKey), func(t *testing.T) {
+			v, err := newEvent.GetValue(fmt.Sprintf("host.%s", configKey))
+			assert.NoError(t, err)
+			assert.Equal(t, configValue, v, "Could not find in %s", newEvent)
+		})
+	}
+}
+
 func TestConfigGeoEnabled(t *testing.T) {
 	event := &beat.Event{
 		Fields:    common.MapStr{},
