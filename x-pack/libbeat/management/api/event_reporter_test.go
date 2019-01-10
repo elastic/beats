@@ -57,7 +57,7 @@ func testBatch(numberOfEvents, maxBatchSize int) func(*testing.T) {
 
 		go func() {
 			for i := 0; i < numberOfEvents; i++ {
-				reporter.AddEvents(event)
+				reporter.AddEvent(event)
 			}
 		}()
 

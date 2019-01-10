@@ -20,10 +20,11 @@ var debugK = "event_reporter"
 type EventReporter struct {
 	logger       *logp.Logger
 	client       AuthClienter
-	wg           sync.WaitGroup
-	events       chan Event
 	period       time.Duration
 	maxBatchSize int
+	done         chan struct{}
+	buffer       []Event
+	mu           sync.Mutex
 }
 
 // NewEventReporter returns a new event reporter
@@ -38,45 +39,42 @@ func NewEventReporter(
 		logger:       log,
 		client:       client,
 		period:       period,
-		events:       make(chan Event),
 		maxBatchSize: maxBatchSize,
+		done:         make(chan struct{}),
 	}
 }
 
 // Start starts the event reported and wait for new events.
 func (e *EventReporter) Start() {
-	e.wg.Add(1)
 	go e.worker()
-
 	e.logger.Info("Starting event reporter service")
 }
 
 // Stop stops the reporting events to the endpoint.
 func (e *EventReporter) Stop() {
 	e.logger.Info("Stopping event reporter service")
-	close(e.events)
-	e.wg.Wait()
+	close(e.done)
 }
 
 func (e *EventReporter) worker() {
-	defer e.wg.Done()
-
 	ticker := time.NewTicker(e.period)
 	defer ticker.Stop()
 
-	var buffer []Event
-	for {
+	var done bool
+
+	for !done {
 		select {
-		case event, ok := <-e.events:
-			if !ok {
-				e.reportEvents(buffer)
-				return
-			}
-			buffer = append(buffer, event)
+		case <-e.done:
+			done = true
 		case <-ticker.C:
-			e.reportEvents(buffer)
-			buffer = nil
 		}
+
+		var buf []Event
+		e.mu.Lock()
+		buf, e.buffer = e.buffer, nil
+		e.mu.Unlock()
+
+		e.reportEvents(buf)
 	}
 }
 
@@ -86,7 +84,6 @@ func (e *EventReporter) reportEvents(events []Event) {
 	}
 	e.logger.Debug("Reporting %d events to Kibana", len(events))
 
-	// NOTE: Should we retry here? or do X attempts.
 	if err := e.sendBatchEvents(events); err != nil {
 		e.logger.Errorf("could not send events, error: %+v", err)
 	}
@@ -118,14 +115,9 @@ func (e *EventReporter) sendEvents(events []Event) error {
 	return e.client.SendEvents(requests)
 }
 
-// AddEvents add an event to be send on the next tick.
-func (e *EventReporter) AddEvents(events ...Event) {
-	for _, event := range events {
-		e.events <- event
-	}
-}
-
 // AddEvent adds an event to be send on the next tick.
 func (e *EventReporter) AddEvent(event Event) {
-	e.events <- event
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.buffer = append(e.buffer, event)
 }
