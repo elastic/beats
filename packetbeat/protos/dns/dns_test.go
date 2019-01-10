@@ -79,6 +79,18 @@ type eventStore struct {
 }
 
 func (e *eventStore) publish(event beat.Event) {
+	pbf, err := pb.GetFields(event.Fields)
+	if err != nil || pbf == nil {
+		panic("_packetbeat not found")
+	}
+	delete(event.Fields, pb.FieldsKey)
+	if err = pbf.ComputeValues(nil); err != nil {
+		panic(err)
+	}
+	if err = pbf.MarshalMapStr(event.Fields); err != nil {
+		panic(err)
+	}
+
 	e.events = append(e.events, event)
 }
 
@@ -140,23 +152,6 @@ func expectResult(t testing.TB, e *eventStore) common.MapStr {
 // Retrieves a map value. The key should be the full dotted path to the element.
 func mapValue(t testing.TB, m common.MapStr, key string) interface{} {
 	t.Helper()
-
-	if marshaled, _ := m.HasKey(pb.FieldsKey + "Marshaled"); !marshaled {
-		fields, err := pb.GetFields(m)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if err := fields.ComputeValues(nil); err != nil {
-			t.Fatal(err)
-		}
-		if fields != nil {
-			m[pb.FieldsKey+"Marshaled"] = true
-			if err = fields.MarshalMapStr(m); err != nil {
-				t.Fatal(err)
-			}
-		}
-	}
-
 	return mapValueHelper(t, m, strings.Split(key, "."))
 }
 
@@ -264,16 +259,13 @@ func assertMapStrData(t testing.TB, m common.MapStr, q dnsTestMessage) {
 }
 
 func assertRequest(t testing.TB, m common.MapStr, q dnsTestMessage) {
-	f, err := pb.GetFields(m)
-	if err != nil || f == nil {
-		t.Fatalf("failed to get _packetbeat fields")
-	}
+	t.Helper()
 
 	assert.Equal(t, "dns", mapValue(t, m, "type"))
-	assert.Equal(t, forward.SrcIP.String(), f.Source.IP)
-	assert.EqualValues(t, forward.SrcPort, f.Source.Port)
-	assert.Equal(t, forward.DstIP.String(), f.Destination.IP)
-	assert.EqualValues(t, forward.DstPort, f.Destination.Port)
+	assert.Equal(t, forward.SrcIP.String(), mapValue(t, m, "source.ip"))
+	assert.EqualValues(t, forward.SrcPort, mapValue(t, m, "source.port"))
+	assert.Equal(t, forward.DstIP.String(), mapValue(t, m, "destination.ip"))
+	assert.EqualValues(t, forward.DstPort, mapValue(t, m, "destination.port"))
 	assert.Equal(t, fmt.Sprintf("class %s, type %s, %s", q.qClass, q.qType, q.qName), mapValue(t, m, "query"))
 	assert.Equal(t, q.qName, mapValue(t, m, "resource"))
 	assert.Equal(t, q.opcode, mapValue(t, m, "method"))

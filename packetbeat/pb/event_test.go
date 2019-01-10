@@ -19,7 +19,9 @@ package pb
 
 import (
 	"net"
+	"reflect"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -28,11 +30,8 @@ import (
 )
 
 func TestMarshalMapStr(t *testing.T) {
-	f := Fields{
-		Source: &ecs.Source{
-			IP: "127.0.0.1",
-		},
-	}
+	f := NewFields()
+	f.Source = &ecs.Source{IP: "127.0.0.1"}
 
 	m := common.MapStr{}
 	if err := f.MarshalMapStr(m); err != nil {
@@ -61,4 +60,10 @@ func TestComputeValues(t *testing.T) {
 	assert.NotZero(t, f.Network.CommunityID)
 	assert.Equal(t, f.Network.Type, "ipv4")
 	assert.Equal(t, f.Network.Direction, "outbound")
+}
+
+func TestIsEmptyValue(t *testing.T) {
+	assert.False(t, isEmptyValue(reflect.ValueOf(time.Duration(1))))
+	assert.False(t, isEmptyValue(reflect.ValueOf(time.Duration(0))))
+	assert.True(t, isEmptyValue(reflect.ValueOf(time.Duration(-1))))
 }

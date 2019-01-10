@@ -55,16 +55,21 @@ type Fields struct {
 	Process            *ecs.Process `ecs:"process"`
 }
 
+// NewFields returns a new Fields value.
+func NewFields() *Fields {
+	return &Fields{Event: ecs.Event{Duration: -1}}
+}
+
 // NewBeatEvent creates a new beat.Event populated with a Fields value and
 // returns both.
 func NewBeatEvent(timestamp time.Time) (beat.Event, *Fields) {
-	pbFields := &Fields{}
+	pbf := NewFields()
 	return beat.Event{
 		Timestamp: timestamp,
 		Fields: common.MapStr{
-			FieldsKey: pbFields,
+			FieldsKey: pbf,
 		},
-	}, pbFields
+	}, pbf
 }
 
 // GetFields returns a pointer to a Fields object if one is stored within the
@@ -195,8 +200,10 @@ func (f *Fields) ComputeValues(localIPs []net.IP) error {
 	}
 
 	// event.duration
-	if f.Event.Duration == 0 && !f.Event.Start.IsZero() && !f.Event.End.IsZero() {
-		f.Event.Duration = f.Event.End.Sub(f.Event.Start)
+	if f.Event.Duration == -1 && !f.Event.Start.IsZero() && !f.Event.End.IsZero() {
+		if elapsed := f.Event.End.Sub(f.Event.Start); elapsed >= 0 {
+			f.Event.Duration = elapsed
+		}
 	}
 
 	// client
@@ -282,7 +289,12 @@ func isEmptyValue(v reflect.Value) bool {
 		return v.Len() == 0
 	case reflect.Bool:
 		return !v.Bool()
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+	case reflect.Int64:
+		if duration, ok := v.Interface().(time.Duration); ok {
+			return duration < 0
+		}
+		return v.Int() == 0
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32:
 		return v.Int() == 0
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		return v.Uint() == 0
