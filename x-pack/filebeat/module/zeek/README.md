@@ -7,21 +7,40 @@
 
 ## How to try the module from source
 
-Install Bro (for MacOS with Brew)
+Install Zeek/Bro (for MacOS with Brew)
 
 ```
 brew install bro
 ```
 
-Configure Bro to process network traffic and generate logs. 
+Configure it to process network traffic and generate logs. 
 Edit `/usr/local/etc/node.cfg` to use the proper network interfaces. 
+Edit `/usr/local/etc/network.cfg` to specify local networks accordingly.
 Set `redef LogAscii::use_json=T;` in `/usr/local/share/bro/site/local.bro` to use JSON output. 
 
-Deploy Zeek
+Start Zeek/Bro
+```
+sudo broctl deploy
+```
+
+Install Zeek/Bro (for Ubuntu Linux)
+
+```
+apt install bro
+apt install broctl
+```
+
+Configure it to process network traffic and generate logs. 
+Edit `/etc/bro/node.cfg` to use the proper network interfaces. 
+Edit `/etc/bro/network.cfg` to specify local networks accordingly.
+Set `redef LogAscii::use_json=T;` in `/usr/share/bro/site/local.bro` to use JSON output. 
+
+Start Zeek/Bro
 
 ```
 sudo broctl deploy
 ```
+
 
 Build Filebeat
 
