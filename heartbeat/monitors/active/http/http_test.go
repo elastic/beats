@@ -24,17 +24,18 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"path"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common/file"
-
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/hbtest"
+	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/common/mapval"
 	btesting "github.com/elastic/beats/libbeat/testing"
 	"github.com/elastic/beats/libbeat/testing/mapvaltest"
@@ -85,9 +86,10 @@ func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, 
 
 // The minimum response is just the URL. Only to be used for unreachable server
 // tests.
-func httpBaseChecks(url string) mapval.Validator {
+func httpBaseChecks(urlStr string) mapval.Validator {
+	u, _ := url.Parse(urlStr)
 	return mapval.MustCompile(mapval.Map{
-		"http.url": url,
+		"url": monitors.URLFields(u),
 	})
 }
 
@@ -177,19 +179,24 @@ var downStatuses = []int{
 	http.StatusNetworkAuthenticationRequired,
 }
 
+func serverHostname(t *testing.T, server *httptest.Server) string {
+	surl, err := url.Parse(server.URL)
+	require.NoError(t, err)
+
+	return surl.Hostname()
+}
+
 func TestUpStatuses(t *testing.T) {
 	for _, status := range upStatuses {
 		status := status
 		t.Run(fmt.Sprintf("Test OK HTTP status %d", status), func(t *testing.T) {
 			server, event := checkServer(t, hbtest.HelloWorldHandler(status))
-			port, err := hbtest.ServerPort(server)
-			require.NoError(t, err)
 
 			mapvaltest.Test(
 				t,
 				mapval.Strict(mapval.Compose(
-					hbtest.MonitorChecks(server.URL, "127.0.0.1", "http", "up"),
-					hbtest.RespondingTCPChecks(port),
+					hbtest.BaseChecks("127.0.0.1", "up"),
+					hbtest.RespondingTCPChecks(),
 					respondingHTTPChecks(server.URL, status),
 				)),
 				event.Fields,
@@ -203,14 +210,12 @@ func TestDownStatuses(t *testing.T) {
 		status := status
 		t.Run(fmt.Sprintf("test down status %d", status), func(t *testing.T) {
 			server, event := checkServer(t, hbtest.HelloWorldHandler(status))
-			port, err := hbtest.ServerPort(server)
-			require.NoError(t, err)
 
 			mapvaltest.Test(
 				t,
 				mapval.Strict(mapval.Compose(
-					hbtest.MonitorChecks(server.URL, "127.0.0.1", "http", "down"),
-					hbtest.RespondingTCPChecks(port),
+					hbtest.BaseChecks("127.0.0.1", "down"),
+					hbtest.RespondingTCPChecks(),
 					respondingHTTPChecks(server.URL, status),
 					hbtest.ErrorChecks(fmt.Sprintf("%d", status), "validate"),
 				)),
@@ -242,14 +247,11 @@ func TestLargeResponse(t *testing.T) {
 	_, err = job(event)
 	require.NoError(t, err)
 
-	port, err := hbtest.ServerPort(server)
-	require.NoError(t, err)
-
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			hbtest.MonitorChecks(server.URL, "127.0.0.1", "http", "up"),
-			hbtest.RespondingTCPChecks(port),
+			hbtest.BaseChecks("127.0.0.1", "up"),
+			hbtest.RespondingTCPChecks(),
 			respondingHTTPChecks(server.URL, 200),
 		)),
 		event.Fields,
@@ -260,8 +262,6 @@ func runHTTPSServerCheck(
 	t *testing.T,
 	server *httptest.Server,
 	reqExtraConfig map[string]interface{}) {
-	port, err := hbtest.ServerPort(server)
-	require.NoError(t, err)
 
 	// Parse the cert so we can test against it.
 	cert, err := x509.ParseCertificate(server.TLS.Certificates[0].Certificate[0])
@@ -282,8 +282,8 @@ func runHTTPSServerCheck(
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			hbtest.MonitorChecks(server.URL, "127.0.0.1", "https", "up"),
-			hbtest.RespondingTCPChecks(port),
+			hbtest.BaseChecks("127.0.0.1", "up"),
+			hbtest.RespondingTCPChecks(),
 			hbtest.TLSChecks(0, 0, cert),
 			respondingHTTPChecks(server.URL, http.StatusOK),
 		)),
@@ -347,8 +347,7 @@ func TestConnRefusedJob(t *testing.T) {
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			hbtest.MonitorChecks(url, ip, "http", "down"),
-			hbtest.TCPBaseChecks(port),
+			hbtest.BaseChecks(ip, "down"),
 			hbtest.ErrorChecks(url, "io"),
 			httpBaseChecks(url),
 		)),
@@ -361,7 +360,7 @@ func TestUnreachableJob(t *testing.T) {
 	// See: https://tools.ietf.org/html/rfc6890
 	ip := "203.0.113.1"
 	// Port 80 is sometimes omitted in logs a non-standard one is easier to validate
-	port := 1234
+	port := uint16(1234)
 	url := fmt.Sprintf("http://%s:%d", ip, port)
 
 	event := testRequest(t, url)
@@ -369,8 +368,7 @@ func TestUnreachableJob(t *testing.T) {
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			hbtest.MonitorChecks(url, ip, "http", "down"),
-			hbtest.TCPBaseChecks(uint16(port)),
+			hbtest.BaseChecks(ip, "down"),
 			hbtest.ErrorChecks(url, "io"),
 			httpBaseChecks(url),
 		)),

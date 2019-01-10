@@ -88,11 +88,6 @@ func netDialer(timeout time.Duration) NetDialer {
 			if err != nil || portNum < 0 || portNum > (1<<16) {
 				return nil, fmt.Errorf("invalid port number '%v' used", port)
 			}
-			monitors.MergeEventFields(event, common.MapStr{
-				namespace: common.MapStr{
-					"port": uint16(portNum),
-				},
-			})
 
 			addresses, err := net.LookupHost(host)
 			if err != nil {

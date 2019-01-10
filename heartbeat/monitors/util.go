@@ -21,6 +21,8 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -252,14 +254,13 @@ func makeByHostAnyIPJob(
 		resolveStart := time.Now()
 		ip, err := net.ResolveIPAddr(network, host)
 		if err != nil {
-			resolveErr(event, host, err)
-			return nil, nil
+			return nil, err
 		}
 
 		resolveEnd := time.Now()
 		resolveRTT := resolveEnd.Sub(resolveStart)
 
-		ipFields := resolveIPEvent(host, ip.String(), resolveRTT)
+		ipFields := resolveIPEvent(ip.String(), resolveRTT)
 		return WithFields(ipFields, pingFactory(ip))(event)
 	}
 
@@ -281,8 +282,7 @@ func makeByHostAllIPJob(
 		resolveStart := time.Now()
 		ips, err := net.LookupIP(host)
 		if err != nil {
-			resolveErr(event, host, err)
-			return nil, nil
+			return nil, err
 		}
 
 		resolveEnd := time.Now()
@@ -294,44 +294,30 @@ func makeByHostAllIPJob(
 
 		if len(ips) == 0 {
 			err := fmt.Errorf("no %v address resolvable for host %v", network, host)
-			resolveErr(event, host, err)
-			return nil, nil
+			return nil, err
 		}
 
 		// create ip ping tasks
 		cont := make([]Job, len(ips))
 		for i, ip := range ips {
 			addr := &net.IPAddr{IP: ip}
-			ipFields := resolveIPEvent(host, ip.String(), resolveRTT)
+			ipFields := resolveIPEvent(ip.String(), resolveRTT)
 			cont[i] = TimeAndCheckJob(WithFields(ipFields, pingFactory(addr)))
 		}
 		return cont, nil
 	}
 }
 
-func resolveIPEvent(host, ip string, rtt time.Duration) common.MapStr {
+func resolveIPEvent(ip string, rtt time.Duration) common.MapStr {
 	return common.MapStr{
 		"monitor": common.MapStr{
-			"host": host,
-			"ip":   ip,
+			"ip": ip,
 		},
 		"resolve": common.MapStr{
-			"host": host,
-			"ip":   ip,
-			"rtt":  look.RTT(rtt),
+			"ip":  ip,
+			"rtt": look.RTT(rtt),
 		},
 	}
-}
-
-func resolveErr(event *beat.Event, host string, err error) {
-	MergeEventFields(event, common.MapStr{
-		"monitor": common.MapStr{
-			"host": host,
-		},
-		"resolve": common.MapStr{
-			"host": host,
-		},
-	})
 }
 
 // WithFields wraps a TaskRunner, updating all events returned with the set of
@@ -418,4 +404,47 @@ func MergeEventFields(e *beat.Event, merge common.MapStr) {
 	} else {
 		e.Fields = merge
 	}
+}
+
+// WithURLField wraps a job setting the "url" field appropriately using URLFields.
+func WithURLField(u *url.URL, job Job) Job {
+	return WithFields(common.MapStr{"url": URLFields(u)}, job)
+}
+
+// URLFields generates ECS compatible URL.* fields from a given url. It also sanitizes
+// the password making sure that, if present, it is replaced with the string '<hidden>'.
+func URLFields(u *url.URL) common.MapStr {
+	fields := common.MapStr{
+		"scheme": u.Scheme,
+		"domain": u.Hostname(),
+	}
+
+	if u.Port() != "" {
+		fields["port"], _ = strconv.ParseUint(u.Port(), 10, 8)
+	}
+
+	if u.Path != "" {
+		fields["path"] = u.Path
+	}
+
+	if u.RawQuery != "" {
+		fields["query"] = u.RawQuery
+	}
+
+	if u.User != nil {
+		if u.User.Username() != "" {
+			fields["username"] = u.User.Username()
+		}
+		if _, ok := u.User.Password(); ok {
+			// Sanitize the password if present
+			hiddenPass := "<hidden>"
+			u.User = url.UserPassword(u.User.Username(), hiddenPass)
+			fields["password"] = hiddenPass
+		}
+	}
+
+	// This is called last to ensure that the password is sanitized
+	fields["full"] = u.String()
+
+	return fields
 }
