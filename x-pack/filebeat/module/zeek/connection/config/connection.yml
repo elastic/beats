@@ -1,0 +1,53 @@
+type: log
+paths:
+{{ range $i, $path := .connection_paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: true
+
+processors:
+  - drop_fields:
+      fields: ["orig_bytes","resp_bytes","tunnel_parents"]
+  - rename:
+      fields:
+        - from: "ts"
+          to: "event.created"
+        - from: "id.orig_h"
+          to: "source.address"
+        - from: "id.orig_p"
+          to: "source.port"
+        - from: "id.resp_h"
+          to: "destination.address"
+        - from: "id.resp_p"
+          to: "destination.port"
+        - from: "proto"
+          to: "network.transport"
+        - from: "service"
+          to: "network.application"
+        - from: "duration"
+          to: "event.duration"
+        - from: "uid"
+          to: "event.id"
+        - from: "orig_ip_bytes"
+          to: "source.bytes"
+        - from: "resp_ip_bytes"
+          to: "destination.bytes"
+        - from: "missed_bytes"
+          to: "network.missed_bytes"
+        - from: "orig_pkts"
+          to: "source.packets"
+        - from: "resp_pkts"
+          to: "destination.packets"
+        - from: "local_orig"
+          to: "network.local_orig"
+        - from: "local_resp"
+          to: "network.local_resp"
+        - from: "conn_state"
+          to: "network.connection_state"
+        - from: "history"
+          to: "network.connection_history"
+      ignore_missing: true
+      fail_on_error: false

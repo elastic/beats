@@ -1,0 +1,3 @@
+dashboards:
+- id: c49d0430-1429-11e9-983c-271411c43b4c
+  file: Filebeat-Zeek-Overview.json

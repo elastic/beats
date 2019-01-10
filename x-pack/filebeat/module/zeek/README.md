@@ -1,0 +1,56 @@
+# Zeek (Bro) module
+
+## Caveats
+
+* Module is to be considered _alpha_.
+* Field names will be changing for 7.0 to comply with Elastic Common Schema (ECS).
+
+## How to try the module from source
+
+Install Bro (for MacOS with Brew)
+
+```
+brew install bro
+```
+
+Configure Bro to process network traffic and generate logs. 
+Edit `/usr/local/etc/node.cfg` to use the proper network interfaces. 
+Set `redef LogAscii::use_json=T;` in `/usr/local/share/bro/site/local.bro` to use JSON output. 
+
+Deploy Zeek
+
+```
+sudo broctl deploy
+```
+
+Build Filebeat
+
+```
+git clone git@github.com:elastic/beats.git
+cd beats/x-pack/filebeat
+make mage
+mage update
+mage build
+mage dashboards
+```
+
+Update filebeat.yml to point to Elasticsearch and Kibana. Setup Filebeat.
+
+```
+./filebeat setup -e
+```
+
+Enable the Filebeat zeek module
+
+```
+./filebeat setup --modules zeek --dashboards -E setup.dashboards.directory=build/kibana
+./filebeat modules enable zeek
+```
+
+Start Filebeat
+
+```
+./filebeat -e
+```
+
+Now, you should see the Zeek logs and dashboards in Kibana.
