@@ -1,5 +1,5 @@
 {
-  "description": "Pipeline for normalizing Bro conn.log",
+  "description": "Pipeline for normalizing Zeek conn.log",
   "processors": [
     {
       "script": {

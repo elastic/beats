@@ -5,7 +5,7 @@ var:
     default:
       - /usr/local/var/logs/current/conn.log
   - name: tags
-    default: [bro]
+    default: [zeek]
 
   # - name: nested_ecs
   #   default: false

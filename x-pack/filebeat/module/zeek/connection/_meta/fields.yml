@@ -1,7 +1,7 @@
 - name: connection
   type: group
   description: >
-    Fields exported by the Bro conn.log
+    Fields exported by the Zeek conn.log
   fields:
     - name: destination
       type: group

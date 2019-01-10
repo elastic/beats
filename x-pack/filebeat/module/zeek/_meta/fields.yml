@@ -1,0 +1,10 @@
+- key: zeek
+  title: zeek
+  description: >
+    Module for normalizing and ingesting the logs produced by Zeek.
+  fields:
+    - name: zeek
+      type: group
+      description: >
+        Fields from the Zeek log files.
+      fields:

@@ -1,7 +1,7 @@
-# Module: bro
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-bro.html
+# Module: zeek
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-zeek.html
 
-- module: bro
+- module: zeek
   # All logs
   connection:
     enabled: true
