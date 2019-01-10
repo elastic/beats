@@ -12,7 +12,7 @@
       description: >
         Server time of metric creation
     - name: uptime
-      type: string
+      type: long
       description: >
         The period the server is up
     - name: mem

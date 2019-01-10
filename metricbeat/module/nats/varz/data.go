@@ -22,6 +22,9 @@ import (
 
 	"github.com/pkg/errors"
 
+	"strconv"
+	"strings"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -53,6 +56,64 @@ var (
 	}
 )
 
+// Converts uptime from formatted string to seconds
+// input: "1y20d22h3m30s", output: 33343410
+func convertUptime(uptime string) (seconds int64, err error) {
+
+	var split []string
+	var years, days, hours, minutes, secs int64
+	if strings.Contains(uptime, "y") {
+		split = strings.Split(uptime, "y")
+		uptime = split[1]
+		years, err = strconv.ParseInt(split[0], 10, 64)
+		if err != nil {
+			return
+		}
+		seconds += years * 31536000
+	}
+
+	if strings.Contains(uptime, "d") {
+		split = strings.Split(uptime, "d")
+		uptime = split[1]
+		days, err = strconv.ParseInt(split[0], 10, 64)
+		if err != nil {
+			return
+		}
+		seconds += days * 86400
+	}
+
+	if strings.Contains(uptime, "h") {
+		split = strings.Split(uptime, "h")
+		uptime = split[1]
+		hours, err = strconv.ParseInt(split[0], 10, 64)
+		if err != nil {
+			return
+		}
+		seconds += hours * 3600
+	}
+
+	if strings.Contains(uptime, "m") {
+		split = strings.Split(uptime, "m")
+		uptime = split[1]
+		minutes, err = strconv.ParseInt(split[0], 10, 64)
+		if err != nil {
+			return
+		}
+		seconds += minutes * 60
+	}
+
+	if strings.Contains(uptime, "s") {
+		split = strings.Split(uptime, "s")
+		uptime = split[1]
+		secs, err = strconv.ParseInt(split[0], 10, 64)
+		if err != nil {
+			return
+		}
+		seconds += secs
+	}
+	return
+}
+
 func eventMapping(content []byte) (common.MapStr, error) {
 	var event common.MapStr
 	var inInterface map[string]interface{}
@@ -67,7 +128,14 @@ func eventMapping(content []byte) (common.MapStr, error) {
 		err = errors.Wrap(err, "failure applying index schema")
 		return event, err
 	}
-	// TODO: convert uptime field here to long (secs)
+
+	uptime, _ := event.GetValue("uptime")
+	uptime, err = convertUptime(uptime.(string))
+	if err != nil {
+		err = errors.Wrap(err, "failure converting uptime from string to integer")
+		return event, err
+	}
+	event.Put("uptime", uptime)
 
 	d, _ := event.GetValue("http_req_stats")
 	httpStats := d.(common.MapStr)
