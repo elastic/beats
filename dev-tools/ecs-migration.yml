@@ -636,3 +636,33 @@
   to: event.dataset
   alias: false
   comment: No alias mapping as field did not always exist
+
+# Packetbeat
+
+## Shared
+- from: bytes_in
+  to: source.bytes
+  alias: false
+  comment: Don't add an alias until all of Packetbeat stops using this field.
+
+- from: bytes_out
+  to: destination.bytes
+  alias: false
+  comment: Don't add an alias until all of Packetbeat stops using this field.
+
+- from: notes
+  to: error.message
+  alias: false
+  comment: Don't add an alias until all of Packetbeat stops using this field.
+
+- from: responsetime
+  to: event.duration
+  alias: false
+  comment: >
+    Units changed from usec to nsec. Don't add an alias until all of Packetbeat
+    stops using this field.
+
+- from: transport
+  to: network.transport
+  alias: false
+  comment: Don't add an alias until all of Packetbeat stops using this field.
