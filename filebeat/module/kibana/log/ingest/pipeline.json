@@ -58,7 +58,7 @@
                 "lang": "painless",
                 "source": "ctx.event.duration = Math.round(ctx.kibana.log.meta.res.responseTime * params.scale)",
                 "params": { "scale": 1000000 },
-                "if": "ctx.kibana.log.containsKey('meta') && ctx.kibana.log.meta.containsKey('res') && ctx.kibana.log.meta.res.containsKey('responseTime')"
+                "if": "ctx.kibana.log.meta?.res?.responseTime != null"
             }
         },
         {
@@ -108,7 +108,7 @@
             "set": {
                 "field": "source.ip",
                 "value": "{{source.address}}",
-                "if": "ctx.containsKey('source') && ctx.source.containsKey('address')"
+                "if": "ctx.source?.address != null"
             }
         },
         {
