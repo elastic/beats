@@ -156,7 +156,7 @@ func (h *Harvester) Run() error {
 					"slowlog": subEvent,
 				},
 				"event": common.MapStr{
-					"created": common.Time(time.Now().UTC()),
+					"created": time.Now(),
 				},
 			},
 		}
