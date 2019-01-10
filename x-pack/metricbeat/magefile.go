@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/dev-tools/mage"
@@ -104,9 +105,15 @@ func Config() {
 }
 
 // Update is an alias for running fields, dashboards, config.
-func Update() {
+func Update() error {
+	err := sh.Run("make", "-C", "../../metricbeat", "update")
+	if err != nil {
+		return err
+	}
+
 	mg.SerialDeps(Fields, Dashboards, Config, prepareModulePackaging,
 		mage.GenerateModuleIncludeListGo)
+	return nil
 }
 
 // Fmt formats source code and adds file headers.

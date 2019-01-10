@@ -88,8 +88,13 @@ func TestPackages() error {
 }
 
 // Update is an alias for running fields, dashboards, config.
-func Update() {
+func Update() error {
+	err := sh.Run("make", "-C", "../../auditbeat", "update")
+	if err != nil {
+		return err
+	}
 	mg.SerialDeps(Fields, Dashboards, Config, mage.GenerateModuleIncludeListGo)
+	return nil
 }
 
 // Config generates both the short and reference configs.

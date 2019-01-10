@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 
 	"github.com/elastic/beats/dev-tools/mage"
 	filebeat "github.com/elastic/beats/filebeat/scripts/mage"
@@ -124,9 +125,14 @@ func configYML() error {
 }
 
 // Update is an alias for executing fields, dashboards, config.
-func Update() {
+func Update() error {
+	err := sh.Run("make", "-C", "../../filebeat", "update")
+	if err != nil {
+		return err
+	}
 	mg.SerialDeps(Fields, Dashboards, Config, includeList,
 		filebeat.PrepareModulePackagingXPack)
+	return nil
 }
 
 func includeList() error {
