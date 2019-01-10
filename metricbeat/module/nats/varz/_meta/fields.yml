@@ -27,7 +27,7 @@
       type: integer
       description: >
         The current cpu usage of NATs process
-    - name: metrics.total_connections
+    - name: total_connections
       type: integer
       description: >
         The number of totally created clients

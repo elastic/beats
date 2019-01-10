@@ -34,9 +34,9 @@ func TestEventMapping(t *testing.T) {
 	assert.NoError(t, err)
 	event, err := eventMapping(content)
 	assert.NoError(t, err)
-	d, err := event.GetValue("total_connections")
+	d, err := event.GetValue("http_req_stats.subsz_uri")
 	assert.NoError(t, err)
-	assert.Equal(t, d, 35)
+	assert.Equal(t, d, int64(10))
 }
 
 func TestFetchEventContent(t *testing.T) {
