@@ -98,6 +98,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
 - Support mysql 5.7.22 slowlog starting with time information. {issue}7892[7892] {pull}9647[9647]
 - Add support for ssl_request_log in apache2 module. {issue}8088[8088] {pull}9833[9833]
+- Add support for iis 7.5 log format. {issue}9753[9753] {pull}9967[9967]
 
 *Heartbeat*
 
