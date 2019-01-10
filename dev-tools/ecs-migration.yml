@@ -254,11 +254,11 @@
   alias: true
 
 ### Error fileset
-- from: apache.error.message
+- from: apache2.error.message
   to: message
   alias: true
 
-- from: apache.error.level
+- from: apache2.error.level
   to: log.level
   alias: true
 
