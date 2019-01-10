@@ -71,6 +71,21 @@ tar xzvf {beatname_lc}-{version}-linux-x86_64.tar.gz
 
 endif::[]
 
+[[docker]]
+*docker:*
+
+ifeval::["{release-state}"=="unreleased"]
+
+Version {stack-version} of {beatname_uc} has not yet been released.
+
+endif::[]
+
+ifeval::["{release-state}"!="unreleased"]
+
+See <<running-on-docker, Running on Docker>> for deploying Docker containers.
+
+endif::[]
+
 [id="{beatname_lc}-configuration"]
 === Step 2: Configure {beatname_uc}
 
