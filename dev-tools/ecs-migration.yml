@@ -805,6 +805,7 @@
   alias: false
   comment: No alias mapping as field did not always exist
 
+
 # Packetbeat
 
 ## Shared
@@ -867,6 +868,40 @@
 - from: dest.stats.net_packets_total
   to: destination.packets
   alias: true
+
+## HTTP
+- from: http.request.body
+  to: http.request.body.content
+  alias: true
+
+- from: http.response.body
+  to: http.response.body.content
+  alias: true
+
+- from: http.response.code
+  to: http.response.status_code
+  alias: true
+
+- from: http.response.phrase
+  to: http.response.status_phrase
+  alias: true
+
+- from: http.request.params
+  to: url.query
+  alias: true
+
+- from: method
+  to: http.request.method
+  alias: false
+  comment: method is used by other protocols.
+
+- from: path
+  to: url.path
+  alias: false
+
+- from: real_ip
+  to: network.forwarded_ip
+  alias: false
 
 
 # Heartbeat

@@ -5411,14 +5411,6 @@ Information about the HTTP request and response.
 HTTP request
 
 
-*`http.request.params`*::
-+
---
-The query parameters or form values. The query parameters are available in the Request-URI and the form values are set in the HTTP body when the content-type is set to `x-www-form-urlencoded`.
-
-
---
-
 *`http.request.headers`*::
 +
 --
@@ -5429,34 +5421,16 @@ A map containing the captured header fields from the request. Which headers to c
 
 --
 
-*`http.request.body`*::
-+
---
-type: text
-
-The body of the HTTP request.
-
---
-
 [float]
 == response fields
 
 HTTP response
 
 
-*`http.response.code`*::
+*`http.response.status_phrase`*::
 +
 --
-example: 404
-
-The HTTP status code.
-
---
-
-*`http.response.phrase`*::
-+
---
-example: Not found.
+example: Not Found
 
 The HTTP status phrase.
 
