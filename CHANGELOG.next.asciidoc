@@ -11,6 +11,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 *Affecting all Beats*
 
 - Dissect syntax change, use * instead of ? when working with field reference. {issue}8054[8054]
+- Fix registry handle leak on Windows (https://github.com/elastic/go-sysinfo/pull/33). {pull}9920[9920]
 
 *Auditbeat*
 

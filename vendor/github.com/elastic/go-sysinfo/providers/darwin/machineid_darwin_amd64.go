@@ -15,32 +15,47 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package windows
+// +build darwin,amd64,cgo
+
+package darwin
+
+// #include <unistd.h>
+// #include <uuid/uuid.h>
+import "C"
 
 import (
+	"unsafe"
+
 	"github.com/pkg/errors"
-	"golang.org/x/sys/windows/registry"
 )
 
+// MachineID returns the Hardware UUID also accessible via
+// About this Mac -> System Report and as the field
+// IOPlatformUUID in the output of "ioreg -d2 -c IOPlatformExpertDevice".
 func MachineID() (string, error) {
-	return getMachineGUID()
+	return getHostUUID()
 }
 
-func getMachineGUID() (string, error) {
-	const key = registry.LOCAL_MACHINE
-	const path = `SOFTWARE\Microsoft\Cryptography`
-	const name = "MachineGuid"
+func getHostUUID() (string, error) {
+	var uuidC C.uuid_t
+	var id [unsafe.Sizeof(uuidC)]C.uchar
+	wait := C.struct_timespec{5, 0} // 5 seconds
 
-	k, err := registry.OpenKey(key, path, registry.READ|registry.WOW64_64KEY)
-	if err != nil {
-		return "", errors.Wrapf(err, `failed to open HKLM\%v`, path)
-	}
-	defer k.Close()
+	ret, err := C.gethostuuid(&id[0], &wait)
+	if ret != 0 {
+		if err != nil {
+			return "", errors.Wrapf(err, "gethostuuid failed with %v", ret)
+		}
 
-	guid, _, err := k.GetStringValue(name)
-	if err != nil {
-		return "", errors.Wrapf(err, `failed to get value of HKLM\%v\%v`, path, name)
+		return "", errors.Errorf("gethostuuid failed with %v", ret)
 	}
 
-	return guid, nil
+	var uuidStringC C.uuid_string_t
+	var uuid [unsafe.Sizeof(uuidStringC)]C.char
+	_, err = C.uuid_unparse_upper(&id[0], &uuid[0])
+	if err != nil {
+		return "", errors.Wrap(err, "uuid_unparse_upper failed")
+	}
+
+	return C.GoString(&uuid[0]), nil
 }
