@@ -111,6 +111,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `key` metricset to the Redis module. {issue}9582[9582] {pull}9657[9657] {pull}9746[9746]
 - Add `socket_summary` metricset to system defaults, removing experimental tag and supporting Windows {pull}9709[9709]
 - Add docker `event` metricset. {pull}9856[9856]
+- Add 'performance' metricset to x-pack mssql module {pull}9826[9826]
 
 *Packetbeat*
 
