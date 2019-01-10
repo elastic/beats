@@ -685,6 +685,10 @@
   to: url.full
   alias: true
 
+- from: http.url.raw
+  to: url.full
+  alias: true
+
 - from: tcp.port
   to: url.port
   alias: true

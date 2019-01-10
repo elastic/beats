@@ -13,6 +13,12 @@
           migration: true
           description: >
             Service url used by monitor.
+        - name: url.raw
+          type: alias
+          path: url.full
+          migration: true
+          description: >
+            Service url used by monitor.
         - name: rtt
           type: group
           description: >
