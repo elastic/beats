@@ -1,5 +1,5 @@
 {
-    "description": "Pipeline for parsing logstash logs in the plain format",
+    "description": "Pipeline for parsing logstash slowlogs in the plain format",
     "on_failure": [
         {
             "set": {
