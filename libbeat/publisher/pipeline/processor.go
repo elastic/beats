@@ -121,7 +121,12 @@ func newProcessorPipeline(
 		processors.add(makeAddFieldsProcessor("beatsMeta", meta, needsCopy))
 	}
 
-	// setup 7: pipeline processors list
+	// setup 7: add agent metadata
+	if !config.SkipAgentMetadata {
+		processors.add(makeAddAgentMetadataProcessor(info))
+	}
+
+	// setup 8: pipeline processors list
 	processors.add(global.processors)
 
 	// setup 9: debug print final event (P)
@@ -288,6 +293,20 @@ func makeAddDynMetaProcessor(
 
 		event.Fields.DeepUpdate(dynFields)
 	})
+}
+
+func makeAddAgentMetadataProcessor(info beat.Info) *processorFn {
+	metadata := common.MapStr{
+		"type":         info.Beat,
+		"ephemeral_id": info.EphemeralID.String(),
+		"hostname":     info.Hostname,
+		"id":           info.ID.String(),
+		"version":      info.Version,
+	}
+	if info.Name != info.Hostname {
+		metadata.Put("name", info.Name)
+	}
+	return makeAddFieldsProcessor("add_agent_metadata", common.MapStr{"agent": metadata}, true)
 }
 
 func debugPrintProcessor(info beat.Info) *processorFn {
