@@ -1,0 +1,12 @@
+`performance` Metricset fetches information from what's commonly known as https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-os-performance-counters-transact-sql?view=sql-server-2017[Performance Counters] in MSSQL.
+
+We fetch the following data:
+
+* Page splits per instance: Cumulative per instance. Show diffs between periodic readings to identify periods of frequent page splits.
+* Page life expectancy in seconds: The expected time in seconds that a data page will remain in the buffer pool.
+*  Lock wait time in seconds: Cumulative per instance. Show diffs between periodic readings to identify periods of high lock contention.
+* Total number of user connections.
+* Cumulative (per instance) recompilations time in seconds: Show diffs between periodic readings to identify periods of high SQL re-compilations.
+* Compilations time in seconds: Cumulative per instance. Show diffs between periodic readings to identify periods of high SQL compilations.
+* Batch requests time in seconds: Cumulative per instance. Show diffs between periodic readings to identify periods of high request activity.
+* Buffer Cache hit: Percentage of data pages found in buffer cache without having to read from disk.
