@@ -225,7 +225,7 @@ func eventMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, c
 		"interval_ms":   m.Module().Config().Period / time.Millisecond,
 		"type":          "cluster_stats",
 		"license":       l,
-		"version":       info.Version.Number,
+		"version":       info.Version.Number.String(),
 		"cluster_stats": clusterStats,
 		"cluster_state": clusterState,
 		"stack_stats":   stackStats,

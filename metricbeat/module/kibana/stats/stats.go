@@ -77,7 +77,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	isStatsAPIAvailable, err := kibana.IsStatsAPIAvailable(kibanaVersion)
+	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(kibanaVersion)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if ms.XPackEnabled {
 		cfgwarn.Experimental("The experimental xpack.enabled flag in the " + ms.FullyQualifiedName() + " metricset is enabled.")
 
-		isSettingsAPIAvailable, err := kibana.IsSettingsAPIAvailable(kibanaVersion)
+		isSettingsAPIAvailable := kibana.IsSettingsAPIAvailable(kibanaVersion)
 		if err != nil {
 			return nil, err
 		}
