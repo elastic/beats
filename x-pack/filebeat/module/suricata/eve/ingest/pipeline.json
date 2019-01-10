@@ -55,6 +55,13 @@
       }
     }
   , {"convert":
+      {"field": "suricata.eve.http.http_refer"
+      ,"target_field": "http.request.referrer"
+      ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
       {"field": "suricata.eve.fileinfo.filename"
       ,"target_field": "file.path"
       ,"type": "string"
@@ -93,7 +100,39 @@
       , "value": "{{suricata.eve.event_type}}"
       }
     }
-
+  , {"convert":
+      {"field": "suricata.eve.alert.category"
+      ,"target_field": "event.action"
+      ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.alert.action"
+      ,"target_field": "event.outcome"
+      ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.alert.severity"
+      ,"target_field": "event.severity"
+      ,"type": "integer"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.proto"
+      ,"target_field": "network.transport"
+      ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+  , { "lowercase":
+      { "field": "network.transport"
+      , "ignore_missing": true
+      }
+    }
   , { "user_agent":
       { "field": "user_agent.original"
       , "target_field": "user_agent"
