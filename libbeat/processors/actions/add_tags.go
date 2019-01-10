@@ -52,6 +52,9 @@ func createAddTags(c *common.Config) (processors.Processor, error) {
 	return NewAddTags(config.Target, config.Tags), nil
 }
 
+// NewAddTags creates a new processor for adding tags to a field.
+// If the target field already contains tags, then the new tags will be
+// appended to the existing list of tags.
 func NewAddTags(target string, tags []string) processors.Processor {
 	if target == "" {
 		target = common.TagsKey
