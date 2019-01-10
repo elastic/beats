@@ -25,7 +25,7 @@ func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) 
 		Request: &awssdk.Request{
 			Data: &ec2.DescribeRegionsOutput{
 				Regions: []ec2.Region{
-					ec2.Region{
+					{
 						RegionName: &regionName,
 					},
 				},
@@ -35,23 +35,28 @@ func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) 
 }
 
 func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInput) ec2.DescribeInstancesRequest {
+	monitoringState := ec2.Monitoring{
+		State: ec2.MonitoringState(ec2.MonitoringStateDisabled),
+	}
 	instance1 := ec2.Instance{
 		InstanceId:   awssdk.String("i-123"),
 		InstanceType: ec2.InstanceTypeT2Medium,
 		Placement:    &ec2.Placement{AvailabilityZone: awssdk.String("us-west-1a")},
 		ImageId:      awssdk.String("image-123"),
+		Monitoring:   &monitoringState,
 	}
 	instance2 := ec2.Instance{
 		InstanceId:   awssdk.String("i-456"),
 		InstanceType: ec2.InstanceTypeT2Micro,
 		Placement:    &ec2.Placement{AvailabilityZone: awssdk.String("us-west-1b")},
 		ImageId:      awssdk.String("image-456"),
+		Monitoring:   &monitoringState,
 	}
 	return ec2.DescribeInstancesRequest{
 		Request: &awssdk.Request{
 			Data: &ec2.DescribeInstancesOutput{
 				Reservations: []ec2.RunInstancesOutput{
-					ec2.RunInstancesOutput{Instances: []ec2.Instance{instance1, instance2}},
+					{Instances: []ec2.Instance{instance1, instance2}},
 				},
 			},
 		},
@@ -173,9 +178,11 @@ func TestConvertPeriodToDurationWithBasicMonitoring(t *testing.T) {
 
 func TestMockFetch(t *testing.T) {
 	mockCreds := map[string]interface{}{
-		"module":     "aws",
-		"period":     "300s",
-		"metricsets": []string{"ec2"},
+		"module":            "aws",
+		"period":            "300s",
+		"metricsets":        []string{"ec2"},
+		"access_key_id":     "mock",
+		"secret_access_key": "mock",
 	}
 
 	awsMetricSet := mbtest.NewReportingMetricSetV2(t, mockCreds)

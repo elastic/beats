@@ -28,16 +28,16 @@ func TestFetch(t *testing.T) {
 		t.Skip("Skipping TestFetch; $AWS_SECRET_ACCESS_KEY not set or set to empty")
 	} else {
 		tempCreds := map[string]interface{}{
-			"module":                "aws",
-			"period":                "300s",
-			"metricsets":            []string{"ec2"},
-			"aws_access_key_id":     accessKeyID,
-			"aws_secret_access_key": secretAccessKey,
-			"aws_default_region":    defaultRegion,
+			"module":            "aws",
+			"period":            "300s",
+			"metricsets":        []string{"ec2"},
+			"access_key_id":     accessKeyID,
+			"secret_access_key": secretAccessKey,
+			"default_region":    defaultRegion,
 		}
 
 		if okSessionToken && sessionToken != "" {
-			tempCreds["aws_session_token"] = sessionToken
+			tempCreds["session_token"] = sessionToken
 		}
 
 		awsMetricSet := mbtest.NewReportingMetricSetV2(t, tempCreds)

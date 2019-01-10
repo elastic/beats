@@ -8,11 +8,11 @@ import "github.com/elastic/beats/metricbeat/mb"
 
 // Config defines all required and optional parameters for aws metricsets
 type Config struct {
-	Period             string `config:"period"`
-	AwsAccessKeyID     string `config:"aws_access_key_id"`
-	AwsSecretAccessKey string `config:"aws_secret_access_key"`
-	AwsSessionToken    string `config:"aws_session_token"`
-	AwsDefaultRegion   string `config:"aws_default_region"`
+	Period          string `config:"period"`
+	AccessKeyID     string `config:"access_key_id"`
+	SecretAccessKey string `config:"secret_access_key"`
+	SessionToken    string `config:"session_token"`
+	DefaultRegion   string `config:"default_region"`
 }
 
 // MetricSet is the base metricset for all aws metricsets
@@ -24,7 +24,7 @@ type MetricSet struct {
 const ModuleName = "aws"
 
 func init() {
-	if err := mb.Registry.AddModule("aws", newModule); err != nil {
+	if err := mb.Registry.AddModule(ModuleName, newModule); err != nil {
 		panic(err)
 	}
 }

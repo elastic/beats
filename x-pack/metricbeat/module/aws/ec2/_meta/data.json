@@ -8,27 +8,27 @@
         "ec2": {
             "cpu": {
                 "total": {
-                    "pct": 3.37916666667054
+                    "pct": 3.25
                 }
             },
             "diskio": {
                 "read": {
-                    "bytes": 819.2,
-                    "ops": 0.2
+                    "bytes": 0,
+                    "ops": 0
                 },
                 "write": {
-                    "bytes": 17932288,
-                    "ops": 1599.4
+                    "bytes": 16301260.8,
+                    "ops": 1537.6
                 }
             },
             "network": {
                 "in": {
-                    "bytes": 94.8,
-                    "packets": 1.8
+                    "bytes": 112.8,
+                    "packets": 2
                 },
                 "out": {
-                    "bytes": 69.6,
-                    "packets": 1.8
+                    "bytes": 84.8,
+                    "packets": 2
                 }
             },
             "status": {
@@ -61,7 +61,7 @@
         "name": "ec2"
     },
     "service": {
-        "name": "aws",
+        "name": "ec2",
         "type": "aws"
     }
 }

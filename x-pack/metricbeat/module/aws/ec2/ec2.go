@@ -9,19 +9,17 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws/defaults"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/defaults"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
@@ -102,24 +100,29 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	//mock Fetch
-	if m.config.AwsAccessKeyID == "" || m.config.AwsSecretAccessKey == "" {
+	if m.config.AccessKeyID == "mock" || m.config.SecretAccessKey == "mock" {
 		m.MockFetch(report)
 		return
 	}
 
-	//actual fetch function
+	// actual fetch function
 	cfg := defaults.Config()
-	cfg.Credentials = awssdk.StaticCredentialsProvider{
-		Value: awssdk.Credentials{
-			AccessKeyID:     m.config.AwsAccessKeyID,
-			SecretAccessKey: m.config.AwsSecretAccessKey,
-			SessionToken:    m.config.AwsSessionToken,
-		},
+	awsCreds := awssdk.Credentials{
+		AccessKeyID:     m.config.AccessKeyID,
+		SecretAccessKey: m.config.SecretAccessKey,
 	}
-	cfg.Region = m.config.AwsDefaultRegion
+	if m.config.SessionToken != "" {
+		awsCreds.SessionToken = m.config.SessionToken
+	}
+
+	cfg.Credentials = awssdk.StaticCredentialsProvider{
+		Value: awsCreds,
+	}
+
+	cfg.Region = m.config.DefaultRegion
 
 	svcEC2 := ec2.New(cfg)
-	//Get a list of regions
+	// Get a list of regions
 	regionsList, err := getRegions(svcEC2)
 	if err != nil {
 		err = errors.Wrap(err, "getRegions failed")
@@ -179,7 +182,7 @@ func (m *MetricSet) MockFetch(report mb.ReporterV2) {
 		if err != nil {
 			report.Error(errors.Wrap(err, "getMetricDataPerRegion failed"))
 		}
-		reportCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], "us-west-1", report)
+		reportCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], m.config.DefaultRegion, report)
 	}
 }
 
@@ -206,7 +209,7 @@ func reportCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 	event := mb.Event{}
 	event.RootFields = common.MapStr{}
 	mapOfRootFieldsResults := make(map[string]interface{})
-	mapOfRootFieldsResults["service.name"] = aws.ModuleName
+	mapOfRootFieldsResults["service.name"] = "ec2"
 	mapOfRootFieldsResults["cloud.provider"] = "ec2"
 	mapOfRootFieldsResults["cloud.instance.id"] = instanceID
 	mapOfRootFieldsResults["cloud.machine.type"] = machineType
@@ -283,7 +286,7 @@ func convertPeriodToDuration(period string, detailedMonitoring ec2.MonitoringSta
 		// If failed converting string to int, then set default duration to "-600s" with basic monitoring and "-120s" with
 		// detailed monitoring.
 		numberPeriod = 300
-		if detailedMonitoring == "enabled" {
+		if detailedMonitoring == ec2.MonitoringStateEnabled {
 			numberPeriod = 60
 		}
 		duration = "-" + strconv.Itoa(numberPeriod*2) + "s"
@@ -296,24 +299,24 @@ func convertPeriodToDuration(period string, detailedMonitoring ec2.MonitoringSta
 	// if detailed monitoring is disabled, then period can be larger or equal than 5min.
 	switch unitPeriod {
 	case "s":
-		if detailedMonitoring == "disabled" && numberPeriod < 300 {
+		if detailedMonitoring == ec2.MonitoringStateDisabled && numberPeriod < 300 {
 			numberPeriod = 300
-		} else if detailedMonitoring == "enabled" && numberPeriod < 60 {
+		} else if detailedMonitoring == ec2.MonitoringStateEnabled && numberPeriod < 60 {
 			numberPeriod = 60
 		}
 		duration = "-" + strconv.Itoa(numberPeriod*2) + unitPeriod
 		periodInSeconds = numberPeriod
 	case "m":
-		if detailedMonitoring == "disabled" && numberPeriod < 5 {
+		if detailedMonitoring == ec2.MonitoringStateDisabled && numberPeriod < 5 {
 			numberPeriod = 5
-		} else if detailedMonitoring == "enabled" && numberPeriod < 1 {
+		} else if detailedMonitoring == ec2.MonitoringStateEnabled && numberPeriod < 1 {
 			numberPeriod = 1
 		}
 		duration = "-" + strconv.Itoa(numberPeriod*2) + unitPeriod
 		periodInSeconds = numberPeriod * 60
 	default:
 		numberPeriod = 300
-		if detailedMonitoring == "enabled" {
+		if detailedMonitoring == ec2.MonitoringStateEnabled {
 			numberPeriod = 60
 		}
 		duration = "-" + strconv.Itoa(numberPeriod*2) + "s"
