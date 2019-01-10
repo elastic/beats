@@ -60,8 +60,9 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 
 			// Filesets with multiple pipelines can only be supported by Elasticsearch >= 6.5.0
 			esVersion := esClient.GetVersion()
-			if len(pipelines) > 1 && esVersion.LessThan(common.MustNewVersion("6.5.0")) {
-				return fmt.Errorf("filesets with multiple pipelines require Elasticsearch >= 6.5.0. Currently running with Elasticsearch version %s", esVersion.String())
+			minESVersionRequired := common.MustNewVersion("6.5.0")
+			if len(pipelines) > 1 && esVersion.LessThan(minESVersionRequired) {
+				return fmt.Errorf("the %s/%s fileset has multiple pipelines, which are only supported with Elasticsearch >= %s. Currently running with Elasticsearch version %s", module, name, minESVersionRequired.String(), esVersion.String())
 			}
 
 			var pipelineIDsLoaded []string
