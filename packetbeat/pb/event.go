@@ -206,6 +206,11 @@ func (f *Fields) ComputeValues(localIPs []net.IP) error {
 		}
 	}
 
+	// event.dataset
+	if f.Event.Dataset == "" {
+		f.Event.Dataset = f.Network.Protocol
+	}
+
 	// client
 	if f.Client == nil && f.Source != nil {
 		client := ecs.Client(*f.Source)
@@ -240,14 +245,20 @@ func (f *Fields) MarshalMapStr(m common.MapStr) error {
 			continue
 		}
 
-		if err := writeECSStruct(m, tag, fieldValue); err != nil {
+		if err := marshalStruct(m, tag, fieldValue); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func writeECSStruct(m common.MapStr, key string, val reflect.Value) error {
+// MarshalStruct marshals any struct containing ecs or packetbeat tags into the
+// given MapStr. Zero-value and nil fields are always omitted.
+func MarshalStruct(m common.MapStr, key string, val interface{}) error {
+	return marshalStruct(m, key, reflect.ValueOf(val))
+}
+
+func marshalStruct(m common.MapStr, key string, val reflect.Value) error {
 	// Dereference pointers.
 	if val.Type().Kind() == reflect.Ptr {
 		if val.IsNil() {
@@ -265,7 +276,7 @@ func writeECSStruct(m common.MapStr, key string, val reflect.Value) error {
 	typ := val.Type()
 	for i := 0; i < typ.NumField(); i++ {
 		structField := typ.Field(i)
-		tag := structField.Tag.Get("ecs")
+		tag := getTag(structField)
 		if tag == "" {
 			break
 		}
@@ -280,6 +291,13 @@ func writeECSStruct(m common.MapStr, key string, val reflect.Value) error {
 		}
 	}
 	return nil
+}
+
+func getTag(f reflect.StructField) string {
+	if tag := f.Tag.Get("ecs"); tag != "" {
+		return tag
+	}
+	return f.Tag.Get("packetbeat")
 }
 
 // isEmptyValue returns true if the given value is empty.
