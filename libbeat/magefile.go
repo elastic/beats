@@ -22,6 +22,8 @@ package main
 import (
 	"context"
 
+	"github.com/magefile/mage/mg"
+
 	"github.com/elastic/beats/dev-tools/mage"
 )
 
@@ -36,11 +38,23 @@ func Clean() error {
 }
 
 // Fields generates a fields.yml for the Beat.
-func Fields() error {
-	mage.GenerateFieldsGo("libbeat")
-	mage.GenerateFieldsGo("beat")
-	mage.GenerateFieldsGo("module")
+func Fields() {
+	mg.Deps(generateModuleFields, generateBeatFields, generateLibbeatFields, generateFieldsYML)
+}
 
+func generateLibbeatFields() error {
+	return mage.GenerateFieldsGo("libbeat")
+}
+
+func generateBeatFields() error {
+	return mage.GenerateFieldsGo("beat")
+}
+
+func generateModuleFields() error {
+	return mage.GenerateFieldsGo("module")
+}
+
+func generateFieldsYML() error {
 	return mage.GenerateFieldsYAML("processors")
 }
 
