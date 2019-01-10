@@ -86,6 +86,7 @@ type Process struct {
 	Info     types.ProcessInfo
 	UserInfo *types.UserInfo
 	User     *user.User
+	Group    *user.Group
 	Error    error
 }
 
@@ -276,18 +277,21 @@ func processEvent(process *Process, eventType string, action eventAction) mb.Eve
 
 	if process.UserInfo != nil {
 		putIfNotEmpty(&event.RootFields, "user.id", process.UserInfo.UID)
+		putIfNotEmpty(&event.RootFields, "group.id", process.UserInfo.GID)
 
 		event.MetricSetFields = common.MapStr{}
-		putIfNotEmpty(&event.MetricSetFields, "uid", process.UserInfo.UID)
 		putIfNotEmpty(&event.MetricSetFields, "euid", process.UserInfo.EUID)
 		putIfNotEmpty(&event.MetricSetFields, "suid", process.UserInfo.SUID)
-		putIfNotEmpty(&event.MetricSetFields, "gid", process.UserInfo.GID)
 		putIfNotEmpty(&event.MetricSetFields, "egid", process.UserInfo.EGID)
 		putIfNotEmpty(&event.MetricSetFields, "sgid", process.UserInfo.SGID)
 	}
 
 	if process.User != nil {
 		event.RootFields.Put("user.name", process.User.Username)
+	}
+
+	if process.Group != nil {
+		event.RootFields.Put("group.name", process.Group.Name)
 	}
 
 	if process.Error != nil {
@@ -390,9 +394,14 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 		} else {
 			process.UserInfo = &userInfo
 
-			user, err := user.LookupId(userInfo.UID)
+			goUser, err := user.LookupId(userInfo.UID)
 			if err == nil {
-				process.User = user
+				process.User = goUser
+			}
+
+			group, err := user.LookupGroupId(userInfo.GID)
+			if err == nil {
+				process.Group = group
 			}
 		}
 

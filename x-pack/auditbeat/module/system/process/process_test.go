@@ -62,6 +62,10 @@ func TestProcessEvent(t *testing.T) {
 			Uid:      "1002",
 			Username: "elastic",
 		},
+		Group: &user.Group{
+			Gid:  "1002",
+			Name: "elastic",
+		},
 	}
 	eventType := eventTypeEvent
 	eventAction := eventActionProcessStarted
@@ -79,6 +83,8 @@ func TestProcessEvent(t *testing.T) {
 		"message":            "Process zsh (PID: 9086) by user elastic STARTED",
 		"user.id":            "1002",
 		"user.name":          "elastic",
+		"group.id":           "1002",
+		"group.name":         "elastic",
 		"process.pid":        9086,
 		"process.ppid":       9085,
 		"process.name":       "zsh",
@@ -99,10 +105,8 @@ func TestProcessEvent(t *testing.T) {
 	}
 
 	expectedMetricSetFields := map[string]interface{}{
-		"uid":  "1002",
 		"euid": "1002",
 		"suid": "1002",
-		"gid":  "1002",
 		"egid": "1002",
 		"sgid": "1002",
 	}

@@ -38,8 +38,7 @@ class Test(AuditbeatXPackTest):
         """
 
         fields = ["process.pid", "process.ppid", "process.name", "process.executable", "process.args",
-                  "process.start", "process.working_directory", "system.audit.process.uid",
-                  "system.audit.process.gid", "user.id", "user.name"]
+                  "process.start", "process.working_directory", "user.id", "user.name", "group.id", "group.name"]
 
         if sys.platform != "win32":
             fields.extend(["system.audit.process.euid", "system.audit.process.suid",

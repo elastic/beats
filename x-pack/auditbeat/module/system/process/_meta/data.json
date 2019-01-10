@@ -1,42 +1,47 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "event": {
         "action": "existing_process",
         "dataset": "process",
-        "id": "4c8f57c4-d6d5-4b6d-9119-d47b68e474d6",
+        "id": "b48db7f4-83ca-4b50-8d3a-294979141952",
         "kind": "state",
         "module": "system"
     },
-    "message": "Process zsh (PID: 9086) by user elastic is RUNNING",
+    "group": {
+        "id": "1000",
+        "name": "vagrant"
+    },
+    "message": "Process zsh (PID: 2530) by user vagrant is RUNNING",
     "process": {
         "args": [
-            "zsh"
+            "-zsh"
         ],
         "executable": "/bin/zsh",
         "name": "zsh",
-        "pid": 9086,
-        "ppid": 9085,
-        "start": "2019-01-09T12:05:44.87Z",
-        "working_directory": "/home/elastic"
+        "pid": 2530,
+        "ppid": 2529,
+        "start": "2019-01-10T13:43:54.53Z",
+        "working_directory": "/home/vagrant"
+    },
+    "service": {
+        "type": "system"
     },
     "system": {
         "audit": {
             "process": {
-                "egid": "1002",
-                "euid": "1002",
-                "gid": "1002",
-                "sgid": "1002",
-                "suid": "1002",
-                "uid": "1002"
+                "egid": "1000",
+                "euid": "1000",
+                "sgid": "1000",
+                "suid": "1000"
             }
         }
     },
     "user": {
-        "id": "1002",
-        "name": "elastic"
+        "id": "1000",
+        "name": "vagrant"
     }
 }

@@ -6286,16 +6286,6 @@ The operating system's kernel version.
 
 
 
-*`system.audit.process.uid`*::
-+
---
-type: keyword
-
-On Linux and macOS (Darwin), the real user ID. On Windows, the security identifier (SID) of the process access token.
-
-
---
-
 *`system.audit.process.euid`*::
 +
 --
@@ -6312,16 +6302,6 @@ On Linux and macOS (Darwin), the effective user ID.
 type: keyword
 
 On Linux and macOS (Darwin), the saved user ID.
-
-
---
-
-*`system.audit.process.gid`*::
-+
---
-type: keyword
-
-On Linux and macOS (Darwin), the real group ID. On Windows, the security identifier (SID) of the primary group of the process access token.
 
 
 --
