@@ -51,7 +51,7 @@
         {
             "rename": {
                 "field": "logstash.slowlog.logEvent.took_in_nanos",
-                "target_field": "logstash.slowlog.took_in_nanos"
+                "target_field": "event.duration"
             }
         },
         {
