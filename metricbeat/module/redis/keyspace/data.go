@@ -31,9 +31,13 @@ import (
 func eventsMapping(r mb.ReporterV2, info map[string]string) {
 	for key, space := range getKeyspaceStats(info) {
 		space["id"] = key
-		r.Event(mb.Event{
+		event := mb.Event{
 			MetricSetFields: space,
-		})
+		}
+		if !r.Event(event) {
+			debugf("Failed to report event, interrupting Fetch")
+			return
+		}
 	}
 }
 

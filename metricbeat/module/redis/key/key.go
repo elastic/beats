@@ -95,7 +95,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 				logp.Err("Failed to fetch key info for key %s in keyspace %d", key, p.Keyspace)
 				continue
 			}
-			eventMapping(r, p.Keyspace, keyInfo)
+			event := eventMapping(p.Keyspace, keyInfo)
+			if !r.Event(event) {
+				debugf("Failed to report event, interrupting Fetch")
+				return
+			}
 		}
 	}
 }
