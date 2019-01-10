@@ -666,3 +666,25 @@
   to: network.transport
   alias: false
   comment: Don't add an alias until all of Packetbeat stops using this field.
+
+# Heartbeat
+
+- from: monitor.scheme
+  to: url.scheme
+  alias: true
+
+- from: monitor.host
+  to: url.domain
+  alias: true
+
+ - from: resolve.host
+  to: url.domain
+  alias: true
+
+- from: http.url
+  to: url.full
+  alias: true
+
+- from: tcp.port
+  to: url.port
+  alias: true

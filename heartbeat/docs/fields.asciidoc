@@ -211,7 +211,9 @@ Duration in microseconds
 *`monitor.scheme`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: url.scheme
 
 Address url scheme. For example `tcp`, `tls`, `http`, and `https`.
 
@@ -221,7 +223,9 @@ Address url scheme. For example `tcp`, `tls`, `http`, and `https`.
 *`monitor.host`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: url.domain
 
 Hostname of service being monitored. Can be missing, if service is monitored by IP.
 
@@ -3414,20 +3418,12 @@ HTTP related fields.
 *`http.url`*::
 +
 --
-type: text
+type: alias
+
+alias to: url.full
 
 Service url used by monitor.
 
-
-*`http.url.raw`*::
-+
---
-type: keyword
-
-The service url used by monitor. This is a non-analyzed field that is useful for aggregations.
-
-
---
 
 --
 
@@ -3683,7 +3679,9 @@ Host lookup fields.
 *`resolve.host`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: url.domain
 
 Hostname of service being monitored.
 
@@ -3767,7 +3765,9 @@ TCP network layer related fields.
 *`tcp.port`*::
 +
 --
-type: integer
+type: alias
+
+alias to: url.port
 
 Service port number.
 
