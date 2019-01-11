@@ -30,7 +30,7 @@ import (
 )
 
 func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
-	tests := []struct {
+	cases := []struct {
 		name        string
 		esVersion   string
 		expectedErr string
@@ -52,50 +52,54 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		testFilesetManifest := &manifest{
-			Requires: struct {
-				Processors []ProcessorRequirement `config:"processors"`
-			}{
-				Processors: []ProcessorRequirement{},
-			},
-			IngestPipeline: []string{"pipeline-plain.json", "pipeline-json.json"},
-		}
-		testFileset := &Fileset{
-			name:       "fls",
-			modulePath: "./test/mod",
-			manifest:   testFilesetManifest,
-			vars: map[string]interface{}{
-				"builtin": map[string]interface{}{},
-			},
-			pipelineIDs: []string{"filebeat-7.0.0-mod-fls-pipeline-plain", "filebeat-7.0.0-mod-fls-pipeline-json"},
-		}
-		testRegistry := ModuleRegistry{
-			registry: map[string]map[string]*Fileset{
-				"mod": map[string]*Fileset{
-					"fls": testFileset,
+	for _, test := range cases {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			testFilesetManifest := &manifest{
+				Requires: struct {
+					Processors []ProcessorRequirement `config:"processors"`
+				}{
+					Processors: []ProcessorRequirement{},
 				},
-			},
-		}
+				IngestPipeline: []string{"pipeline-plain.json", "pipeline-json.json"},
+			}
+			testFileset := &Fileset{
+				name:       "fls",
+				modulePath: "./test/mod",
+				manifest:   testFilesetManifest,
+				vars: map[string]interface{}{
+					"builtin": map[string]interface{}{},
+				},
+				pipelineIDs: []string{"filebeat-7.0.0-mod-fls-pipeline-plain", "filebeat-7.0.0-mod-fls-pipeline-json"},
+			}
+			testRegistry := ModuleRegistry{
+				registry: map[string]map[string]*Fileset{
+					"mod": map[string]*Fileset{
+						"fls": testFileset,
+					},
+				},
+			}
 
-		testESServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("{\"version\":{\"number\":\"" + test.esVersion + "\"}}"))
-		}))
-		defer testESServer.Close()
+			testESServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Write([]byte("{\"version\":{\"number\":\"" + test.esVersion + "\"}}"))
+			}))
+			defer testESServer.Close()
 
-		testESClient, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
-			URL: testESServer.URL,
-		}, nil)
-		assert.NoError(t, err)
-
-		err = testESClient.Connect()
-		assert.NoError(t, err)
-
-		err = testRegistry.LoadPipelines(testESClient, false)
-		if test.expectedErr == "" {
+			testESClient, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
+				URL: testESServer.URL,
+			}, nil)
 			assert.NoError(t, err)
-		} else {
-			assert.Error(t, err, test.expectedErr)
-		}
+
+			err = testESClient.Connect()
+			assert.NoError(t, err)
+
+			err = testRegistry.LoadPipelines(testESClient, false)
+			if test.expectedErr == "" {
+				assert.NoError(t, err)
+			} else {
+				assert.Error(t, err, test.expectedErr)
+			}
+		})
 	}
 }
