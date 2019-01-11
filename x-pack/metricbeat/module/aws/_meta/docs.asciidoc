@@ -28,12 +28,14 @@ By default, Amazon EC2 sends metric data to CloudWatch every 5 minutes. With thi
 configuration should be larger or equal than `300s`. If `period` is set to be less than `300s`, the same cloudwatch metrics
 will be collected more than once which will cause extra fees without getting more granular metrics. For example, in `US East (N. Virginia)` region, it costs
 $0.01/1000 metrics requested using GetMetricData. Please see https://aws.amazon.com/cloudwatch/pricing/[AWS Cloudwatch Pricing]
-for more details.
+for more details. To avoid unnecessary charges, `period` is preferred to be set to `300s` or multiples of `300s`, such as
+`600s` and `900s`.
 
 For more granular monitoring data you can enable detailed monitoring on the instance to get metrics every 1 minute. With this
 detailed monitoring enabled, `period` in aws module configuration can be any number larger than `60s`. Since AWS sends metric
 data to CloudWatch in 1-minute periods, setting metricbeat module `period` less than `60s` will cause extra API requests which
-means extra charges on AWS.
+means extra charges on AWS. To avoid unnecessary charges, `period` is preferred to be set to `60s` or multiples of `60s`,
+such as `120s` and `180s`.
 
 Here is an example of aws metricbeat module configuration:
 

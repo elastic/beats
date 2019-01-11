@@ -34,23 +34,15 @@ func init() {
 	)
 }
 
-// MockEC2Client struct is used for unit tests.
-type MockEC2Client struct {
-	ec2iface.EC2API
-}
-
-// MockCloudWatchClient struct is used for unit tests.
-type MockCloudWatchClient struct {
-	cloudwatchiface.CloudWatchAPI
-}
-
 // MetricSet holds any configuration or state information. It must implement
 // the mb.MetricSet interface. And this is best achieved by embedding
 // mb.BaseMetricSet because it implements all of the required mb.MetricSet
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	config *aws.Config
+	moduleConfig *aws.Config
+	awsConfig    *awssdk.Config
+	regionsList  []string
 }
 
 // metricIDNameMap is a translating map between createMetricDataQuery id
@@ -79,9 +71,14 @@ var metricIDNameMap = map[string][]string{
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The aws ec2 metricset is beta.")
 
-	config := aws.Config{}
-	if err := base.Module().UnpackConfig(&config); err != nil {
+	moduleConfig := aws.Config{}
+	if err := base.Module().UnpackConfig(&moduleConfig); err != nil {
 		return nil, err
+	}
+
+	if moduleConfig.Period == "" {
+		err := errors.New("Period is not set in AWS module config.")
+		logp.Error(err)
 	}
 
 	metricSet, err := aws.NewMetricSet(base)
@@ -89,9 +86,34 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "error creating aws metricset")
 	}
 
+	// Get a list of regions
+	awsConfig := defaults.Config()
+	awsCreds := awssdk.Credentials{
+		AccessKeyID:     moduleConfig.AccessKeyID,
+		SecretAccessKey: moduleConfig.SecretAccessKey,
+	}
+	if moduleConfig.SessionToken != "" {
+		awsCreds.SessionToken = moduleConfig.SessionToken
+	}
+
+	awsConfig.Credentials = awssdk.StaticCredentialsProvider{
+		Value: awsCreds,
+	}
+
+	awsConfig.Region = moduleConfig.DefaultRegion
+
+	svcEC2 := ec2.New(awsConfig)
+	regionsList, err := getRegions(svcEC2)
+	if err != nil {
+		err = errors.Wrap(err, "getRegions failed")
+		logp.Error(err)
+	}
+
 	return &MetricSet{
-		MetricSet: metricSet,
-		config:    &config,
+		MetricSet:    metricSet,
+		moduleConfig: &moduleConfig,
+		awsConfig:    &awsConfig,
+		regionsList:  regionsList,
 	}, nil
 }
 
@@ -99,41 +121,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
-	//mock Fetch
-	if m.config.AccessKeyID == "mock" || m.config.SecretAccessKey == "mock" {
-		m.MockFetch(report)
-		return
-	}
-
-	// actual fetch function
-	cfg := defaults.Config()
-	awsCreds := awssdk.Credentials{
-		AccessKeyID:     m.config.AccessKeyID,
-		SecretAccessKey: m.config.SecretAccessKey,
-	}
-	if m.config.SessionToken != "" {
-		awsCreds.SessionToken = m.config.SessionToken
-	}
-
-	cfg.Credentials = awssdk.StaticCredentialsProvider{
-		Value: awsCreds,
-	}
-
-	cfg.Region = m.config.DefaultRegion
-
-	svcEC2 := ec2.New(cfg)
-	// Get a list of regions
-	regionsList, err := getRegions(svcEC2)
-	if err != nil {
-		err = errors.Wrap(err, "getRegions failed")
-		logp.Error(err)
-		report.Error(err)
-		return
-	}
-
-	for _, regionName := range regionsList {
-		cfg.Region = regionName
-		svcEC2 := ec2.New(cfg)
+	for _, regionName := range m.regionsList {
+		fmt.Println("regionName = ", regionName)
+		m.awsConfig.Region = regionName
+		// cfg.Region = regionName
+		svcEC2 := ec2.New(*m.awsConfig)
 		instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2)
 		if err != nil {
 			err = errors.Wrap(err, "getInstancesPerRegion failed, skipping region "+regionName)
@@ -142,11 +134,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 			continue
 		}
 
-		svcCloudwatch := cloudwatch.New(cfg)
+		svcCloudwatch := cloudwatch.New(*m.awsConfig)
 		for _, instanceID := range instanceIDs {
 			//Calculate duration based on period
 			detailedMonitoring := instancesOutputs[instanceID].Monitoring.State
-			durationString, periodSec := convertPeriodToDuration(m.config.Period, detailedMonitoring)
+			durationString, periodSec := convertPeriodToDuration(m.moduleConfig.Period, detailedMonitoring)
 			init := true
 			getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 			for init || getMetricDataOutput.NextToken != nil {
@@ -160,29 +152,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 				}
 				getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
 			}
-			reportCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], regionName, report)
+			event, err := createCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], regionName)
+			if err != nil {
+				report.Error(err)
+			}
+			report.Event(event)
 		}
-	}
-}
-
-// MockFetch methods implements the data gathering and data conversion using MockEC2Client and MockCloudWatchClient
-func (m *MetricSet) MockFetch(report mb.ReporterV2) {
-	svcEC2Mock := &MockEC2Client{}
-	instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2Mock)
-	if err != nil {
-		report.Error(errors.Wrap(err, "getInstancesPerRegion failed"))
-	}
-
-	svcCloudwatchMock := &MockCloudWatchClient{}
-	for _, instanceID := range instanceIDs {
-		detailedMonitoring := instancesOutputs[instanceID].Monitoring.State
-		//Calculate duration based on period
-		durationString, periodSec := convertPeriodToDuration(m.config.Period, detailedMonitoring)
-		getMetricDataOutput, err := getMetricDataPerRegion(durationString, periodSec, instanceID, nil, svcCloudwatchMock)
-		if err != nil {
-			report.Error(errors.Wrap(err, "getMetricDataPerRegion failed"))
-		}
-		reportCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], m.config.DefaultRegion, report)
 	}
 }
 
@@ -200,13 +175,13 @@ func getRegions(svc ec2iface.EC2API) (regionsList []string, err error) {
 	return
 }
 
-func reportCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput, instanceID string, instanceOutput ec2.Instance, regionName string, report mb.ReporterV2) {
+func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput, instanceID string, instanceOutput ec2.Instance, regionName string) (event mb.Event, err error) {
 	machineType, err := instanceOutput.InstanceType.MarshalValue()
 	if err != nil {
-		report.Error(errors.Wrap(err, "instance.InstanceType.MarshalValue failed"))
+		err = errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
+		logp.Error(err)
 	}
 
-	event := mb.Event{}
 	event.RootFields = common.MapStr{}
 	mapOfRootFieldsResults := make(map[string]interface{})
 	mapOfRootFieldsResults["service.name"] = "ec2"
@@ -221,7 +196,6 @@ func reportCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 	if err != nil {
 		err = errors.Wrap(err, "Error trying to apply schema in AWS EC2 metricbeat module.")
 		logp.Error(err)
-		report.Error(err)
 	}
 
 	mapOfMetricSetFieldResults := make(map[string]interface{})
@@ -237,9 +211,10 @@ func reportCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 	if err != nil {
 		err = errors.Wrap(err, "Error trying to apply schema in AWS EC2 metricbeat module.")
 		logp.Error(err)
-		report.Error(err)
 	}
-	report.Event(mb.Event{MetricSetFields: resultMetricSetFields, RootFields: resultRootFields})
+	event.RootFields = resultRootFields
+	event.MetricSetFields = resultMetricSetFields
+	return
 }
 
 func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instancesOutputs map[string]ec2.Instance, err error) {

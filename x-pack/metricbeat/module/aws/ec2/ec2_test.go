@@ -10,13 +10,28 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/stretchr/testify/assert"
 
-	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/libbeat/common"
 )
+
+// MockEC2Client struct is used for unit tests.
+type MockEC2Client struct {
+	ec2iface.EC2API
+}
+
+// MockCloudWatchClient struct is used for unit tests.
+type MockCloudWatchClient struct {
+	cloudwatchiface.CloudWatchAPI
+}
 
 var regionName = "us-west-1"
 
@@ -38,25 +53,18 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 	monitoringState := ec2.Monitoring{
 		State: ec2.MonitoringState(ec2.MonitoringStateDisabled),
 	}
-	instance1 := ec2.Instance{
+	instance := ec2.Instance{
 		InstanceId:   awssdk.String("i-123"),
 		InstanceType: ec2.InstanceTypeT2Medium,
 		Placement:    &ec2.Placement{AvailabilityZone: awssdk.String("us-west-1a")},
 		ImageId:      awssdk.String("image-123"),
 		Monitoring:   &monitoringState,
 	}
-	instance2 := ec2.Instance{
-		InstanceId:   awssdk.String("i-456"),
-		InstanceType: ec2.InstanceTypeT2Micro,
-		Placement:    &ec2.Placement{AvailabilityZone: awssdk.String("us-west-1b")},
-		ImageId:      awssdk.String("image-456"),
-		Monitoring:   &monitoringState,
-	}
 	return ec2.DescribeInstancesRequest{
 		Request: &awssdk.Request{
 			Data: &ec2.DescribeInstancesOutput{
 				Reservations: []ec2.RunInstancesOutput{
-					{Instances: []ec2.Instance{instance1, instance2}},
+					{Instances: []ec2.Instance{instance}},
 				},
 			},
 		},
@@ -71,7 +79,7 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 		Request: &awssdk.Request{
 			Data: &cloudwatch.GetMetricDataOutput{
 				MetricDataResults: []cloudwatch.MetricDataResult{
-					cloudwatch.MetricDataResult{
+					{
 						Id:     &id,
 						Label:  &label,
 						Values: []float64{value},
@@ -101,17 +109,13 @@ func TestGetInstanceIDs(t *testing.T) {
 		t.FailNow()
 	}
 
-	assert.Equal(t, 2, len(instanceIDs))
-	assert.Equal(t, 2, len(instancesOutputs))
+	assert.Equal(t, 1, len(instanceIDs))
+	assert.Equal(t, 1, len(instancesOutputs))
 
 	assert.Equal(t, "i-123", instanceIDs[0])
 	assert.Equal(t, ec2.InstanceType("t2.medium"), instancesOutputs["i-123"].InstanceType)
 	assert.Equal(t, awssdk.String("image-123"), instancesOutputs["i-123"].ImageId)
 	assert.Equal(t, awssdk.String("us-west-1a"), instancesOutputs["i-123"].Placement.AvailabilityZone)
-
-	assert.Equal(t, "i-456", instanceIDs[1])
-	assert.Equal(t, ec2.InstanceType("t2.micro"), instancesOutputs["i-456"].InstanceType)
-	assert.Equal(t, awssdk.String("us-west-1b"), instancesOutputs["i-456"].Placement.AvailabilityZone)
 }
 
 func TestGetMetricDataPerRegion(t *testing.T) {
@@ -176,28 +180,53 @@ func TestConvertPeriodToDurationWithBasicMonitoring(t *testing.T) {
 	assert.Equal(t, 300, periodSec5)
 }
 
-func TestMockFetch(t *testing.T) {
-	mockCreds := map[string]interface{}{
-		"module":            "aws",
-		"period":            "300s",
-		"metricsets":        []string{"ec2"},
-		"access_key_id":     "mock",
-		"secret_access_key": "mock",
+func TestCreateCloudWatchEvents(t *testing.T) {
+	mockModuleConfig := aws.Config{
+		Period:        "300s",
+		DefaultRegion: regionName,
 	}
 
-	awsMetricSet := mbtest.NewReportingMetricSetV2(t, mockCreds)
-	events, errs := mbtest.ReportingFetchV2(awsMetricSet)
-	assert.Empty(t, errs)
-	if !assert.NotEmpty(t, events) {
-		t.FailNow()
+	expectedEvent := mb.Event{
+		RootFields: common.MapStr{
+			"service": common.MapStr{"name": "ec2"},
+			"cloud": common.MapStr{
+				"image":             common.MapStr{"id": "image-123"},
+				"region":            regionName,
+				"provider":          "ec2",
+				"instance":          common.MapStr{"id": "i-123"},
+				"machine":           common.MapStr{"type": "t2.medium"},
+				"availability_zone": "us-west-1a",
+			},
+		},
+		MetricSetFields: common.MapStr{
+			"cpu": common.MapStr{
+				"total": common.MapStr{"pct": 0.25},
+			},
+		},
 	}
-	t.Logf("Module: %s Metricset: %s", awsMetricSet.Module().Name(), awsMetricSet.Name())
+	svcEC2Mock := &MockEC2Client{}
+	instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2Mock)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(instanceIDs))
+	instanceID := instanceIDs[0]
+	assert.Equal(t, "i-123", instanceID)
 
-	assert.Equal(t, 2, len(events))
-	for _, event := range events {
-		// MetricSetField
-		cpuTotalPct, err := event.MetricSetFields.GetValue("cpu.total.pct")
-		assert.NoError(t, err)
-		assert.Equal(t, 0.25, cpuTotalPct)
-	}
+	svcCloudwatchMock := &MockCloudWatchClient{}
+	detailedMonitoring := instancesOutputs[instanceID].Monitoring.State
+	//Calculate duration based on period
+	durationString, periodSec := convertPeriodToDuration(mockModuleConfig.Period, detailedMonitoring)
+	assert.Equal(t, "-600s", durationString)
+	assert.Equal(t, 300, periodSec)
+
+	getMetricDataOutput, err := getMetricDataPerRegion(durationString, periodSec, instanceID, nil, svcCloudwatchMock)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(getMetricDataOutput.MetricDataResults))
+	assert.Equal(t, "cpu1", *getMetricDataOutput.MetricDataResults[0].Id)
+	assert.Equal(t, "CPUUtilization", *getMetricDataOutput.MetricDataResults[0].Label)
+	assert.Equal(t, 0.25, getMetricDataOutput.MetricDataResults[0].Values[0])
+
+	event, err := createCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], mockModuleConfig.DefaultRegion)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedEvent.RootFields, event.RootFields)
+	assert.Equal(t, expectedEvent.MetricSetFields["cpu"], event.MetricSetFields["cpu"])
 }
