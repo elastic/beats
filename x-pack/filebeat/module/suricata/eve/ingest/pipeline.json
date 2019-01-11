@@ -145,6 +145,39 @@
       ,"ignore_missing": true
       }
     }
+  , {"convert":
+      {"field": "suricata.eve.flow.pkts_toclient"
+      ,"target_field": "destination.packets"
+      ,"type": "integer"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.flow.pkts_toserver"
+      ,"target_field": "source.packets"
+      ,"type": "integer"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.flow.bytes_toclient"
+      ,"target_field": "destination.bytes"
+      ,"type": "integer"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.flow.bytes_toserver"
+      ,"target_field": "source.bytes"
+      ,"type": "integer"
+      ,"ignore_missing": true
+      }
+    }
+  , { "script":
+      { "lang": "painless"
+      , "source": "long g(def map, def key) { if(map!=null && map[key]!=null) { return map[key]; } return 0; } def n=ctx['network']; if (n==null){n=new HashMap(); ctx['network']=n;}def s=ctx['source'], d=ctx['destination']; def sp=g(s,'packets'), sb=g(s,'bytes'), dp=g(d,'packets'), db=g(d,'bytes'); if(sb+db>0)n['bytes']=sb+db; if(sp+dp>0)n['packets']=sp+dp;"
+      }
+    }
   , {"date":
       {"field": "suricata.eve.flow.start"
       ,"target_field": "event.start"
