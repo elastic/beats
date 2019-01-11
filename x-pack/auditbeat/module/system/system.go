@@ -18,13 +18,13 @@ func init() {
 // SystemModuleConfig contains the configuration specific to the system module.
 type SystemModuleConfig struct {
 	// In Auditbeat, sub-modules are called datasets. This extends the module
-	// configuration to allow specifying them under "datasets:" rather than
-	// "metricsets:".
+	// configuration to allow specifying them under "datasets" rather than
+	// "metricsets".
 	DataSets []string `config:"datasets"`
 }
 
-// SystemModule is a custom implementation of the Module interface. Its puporse
-// is to allow configuring sub-modules as "datasets" rather than "metricsets".
+// SystemModule extends the Metricbeat BaseModule. The purpose is to allow
+// configuring sub-modules as "datasets" rather than "metricsets".
 type SystemModule struct {
 	mb.BaseModule
 	config SystemModuleConfig
@@ -38,8 +38,7 @@ func (m *SystemModule) Config() mb.ModuleConfig {
 	return config
 }
 
-// NewModule creates a new mb.Module instance and validates that at least one host has been
-// specified
+// NewModule creates a new mb.Module instance.
 func NewModule(base mb.BaseModule) (mb.Module, error) {
 	var config SystemModuleConfig
 	if err := base.UnpackConfig(&config); err != nil {
