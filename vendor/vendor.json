@@ -735,6 +735,12 @@
 			"revisionTime": "2016-08-05T00:47:13Z"
 		},
 		{
+			"checksumSHA1": "OZQRtN0dcKhClFiYq7sSq6h5Kz4=",
+			"path": "github.com/elastic/ecs/code/go/ecs",
+			"revision": "69de90eb6493e0804405321f48adfdfa488d6498",
+			"revisionTime": "2019-01-07T15:19:54Z"
+		},
+		{
 			"checksumSHA1": "vNnw1bUS8Ct+8H64QuA2DWRJ9SQ=",
 			"path": "github.com/elastic/go-libaudit",
 			"revision": "39073a2988f718067d85d27a4d18b1b57de5d947",

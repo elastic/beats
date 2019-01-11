@@ -90,7 +90,7 @@ func TestFilterEvent(t *testing.T) {
 
 func TestDirectionOut(t *testing.T) {
 	processor := transProcessor{
-		localIPs:       []string{"192.145.2.4"},
+		localIPStrings: []string{"192.145.2.4"},
 		ignoreOutgoing: false,
 		name:           "test",
 	}
@@ -131,7 +131,7 @@ func TestDirectionOut(t *testing.T) {
 
 func TestDirectionIn(t *testing.T) {
 	processor := transProcessor{
-		localIPs:       []string{"192.145.2.5"},
+		localIPStrings: []string{"192.145.2.5"},
 		ignoreOutgoing: false,
 		name:           "test",
 	}
@@ -172,7 +172,7 @@ func TestDirectionIn(t *testing.T) {
 
 func TestNoDirection(t *testing.T) {
 	processor := transProcessor{
-		localIPs:       []string{"192.145.2.6"},
+		localIPStrings: []string{"192.145.2.6"},
 		ignoreOutgoing: false,
 		name:           "test",
 	}

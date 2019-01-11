@@ -31,12 +31,11 @@ import (
 	"net"
 	"testing"
 
-	"github.com/elastic/beats/packetbeat/protos"
-	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/protos/tcp"
 )
 
 // Verify that the interface TCP has been satisfied.
@@ -57,10 +56,10 @@ var (
 		rcode:       "NOERROR",
 		qClass:      "IN",
 		qType:       "A",
-		qName:       "elastic.co.",
-		qEtld:       "elastic.co.",
+		qName:       "elastic.co",
+		qEtld:       "elastic.co",
 		answers:     []string{"54.201.204.244", "54.200.185.88"},
-		authorities: []string{"NS-835.AWSDNS-40.NET.", "NS-1183.AWSDNS-19.ORG.", "NS-2007.AWSDNS-58.CO.UK.", "NS-66.AWSDNS-08.COM."},
+		authorities: []string{"NS-835.AWSDNS-40.NET", "NS-1183.AWSDNS-19.ORG", "NS-2007.AWSDNS-58.CO.UK", "NS-66.AWSDNS-08.COM"},
 		request: []byte{
 			0x00, 0x1c, 0x2d, 0x9a, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x65,
 			0x6c, 0x61, 0x73, 0x74, 0x69, 0x63, 0x02, 0x63, 0x6f, 0x00, 0x00, 0x01, 0x00, 0x01,
@@ -88,9 +87,9 @@ var (
 		rcode:   "NOERROR",
 		qClass:  "IN",
 		qType:   "AXFR",
-		qName:   "etas.com.",
-		qEtld:   "etas.com.",
-		answers: []string{"training2003p.", "training2003p.", "1.1.1.1", "training2003p."},
+		qName:   "etas.com",
+		qEtld:   "etas.com",
+		answers: []string{"training2003p", "training2003p", "1.1.1.1", "training2003p"},
 		request: []byte{
 			0x00, 0x1c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x65,
 			0x74, 0x61, 0x73, 0x03, 0x63, 0x6f, 0x6d, 0x00, 0x00, 0xfc, 0x00, 0x01, 0x4d, 0x53,
@@ -119,10 +118,10 @@ var (
 		rcode:       "NOERROR",
 		qClass:      "IN",
 		qType:       "PTR",
-		qName:       "131.252.30.192.in-addr.arpa.",
-		qEtld:       "192.in-addr.arpa.",
-		answers:     []string{"github.com."},
-		authorities: []string{"ns1.p16.dynect.net.", "ns3.p16.dynect.net.", "ns4.p16.dynect.net.", "ns2.p16.dynect.net."},
+		qName:       "131.252.30.192.in-addr.arpa",
+		qEtld:       "192.in-addr.arpa",
+		answers:     []string{"github.com"},
+		authorities: []string{"ns1.p16.dynect.net", "ns3.p16.dynect.net", "ns4.p16.dynect.net", "ns2.p16.dynect.net"},
 		request: []byte{
 			0x00, 0x2d, 0x1a, 0x6e, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x31,
 			0x33, 0x31, 0x03, 0x32, 0x35, 0x32, 0x02, 0x33, 0x30, 0x03, 0x31, 0x39, 0x32, 0x07, 0x69, 0x6e,
@@ -151,8 +150,8 @@ var (
 		qType:  "TXT",
 		qName: "3.1o19ss00s2s17s4qp375sp49r830n2n4n923s8839052s7p7768s53365226pp3.659p1r741os37393" +
 			"648s2348o762q1066q53rq5p4614r1q4781qpr16n809qp4.879o3o734q9sns005o3pp76q83.2q65qns3spns" +
-			"1081s5rn5sr74opqrqnpq6rn3ro5.i.00.mac.sophosxl.net.",
-		qEtld: "sophosxl.net.",
+			"1081s5rn5sr74opqrqnpq6rn3ro5.i.00.mac.sophosxl.net",
+		qEtld: "sophosxl.net",
 		request: []byte{
 			0x00, 0xed, 0x88, 0xc1, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x33,
 			0x3f, 0x31, 0x6f, 0x31, 0x39, 0x73, 0x73, 0x30, 0x30, 0x73, 0x32, 0x73, 0x31, 0x37, 0x73, 0x34,
@@ -240,11 +239,11 @@ func TestParseTcp_errorNonDnsMsgResponse(t *testing.T) {
 
 	m := expectResult(t, results)
 	assertRequest(t, m, q)
-	assert.Equal(t, "tcp", mapValue(t, m, "transport"))
-	assert.Equal(t, len(q.request), mapValue(t, m, "bytes_in"))
-	assert.Nil(t, mapValue(t, m, "bytes_out"))
+	assert.Equal(t, "tcp", mapValue(t, m, "network.transport"))
+	assert.EqualValues(t, len(q.request), mapValue(t, m, "source.bytes"))
+	assert.Nil(t, mapValue(t, m, "destination.bytes"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, nonDNSMsg.responseError(), mapValue(t, m, "notes"))
+	assert.Equal(t, nonDNSMsg.responseError(), mapValue(t, m, "error.message"))
 }
 
 // Verify that a request message with length (first two bytes value) of zero is not published
@@ -279,11 +278,11 @@ func TestParseTcp_errorZeroLengthMsgResponse(t *testing.T) {
 
 	m := expectResult(t, results)
 	assertRequest(t, m, q)
-	assert.Equal(t, "tcp", mapValue(t, m, "transport"))
-	assert.Equal(t, len(q.request), mapValue(t, m, "bytes_in"))
-	assert.Nil(t, mapValue(t, m, "bytes_out"))
+	assert.Equal(t, "tcp", mapValue(t, m, "network.transport"))
+	assert.EqualValues(t, len(q.request), mapValue(t, m, "source.bytes"))
+	assert.Nil(t, mapValue(t, m, "destination.bytes"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, zeroLengthMsg.responseError(), mapValue(t, m, "notes"))
+	assert.Equal(t, zeroLengthMsg.responseError(), mapValue(t, m, "error.message"))
 }
 
 // Verify that an empty packet is safely handled (no panics).
@@ -336,12 +335,12 @@ func TestParseTcp_errorResponseOnly(t *testing.T) {
 
 	dns.Parse(packet, tcptuple, tcp.TCPDirectionOriginal, private)
 	m := expectResult(t, results)
-	assert.Equal(t, "tcp", mapValue(t, m, "transport"))
-	assert.Nil(t, mapValue(t, m, "bytes_in"))
-	assert.Equal(t, len(q.response), mapValue(t, m, "bytes_out"))
-	assert.Nil(t, mapValue(t, m, "responsetime"))
+	assert.Equal(t, "tcp", mapValue(t, m, "network.transport"))
+	assert.Nil(t, mapValue(t, m, "source.bytes"))
+	assert.EqualValues(t, len(q.response), mapValue(t, m, "destination.bytes"))
+	assert.Nil(t, mapValue(t, m, "event.duration"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, orphanedResponse.Error(), mapValue(t, m, "notes"))
+	assert.Equal(t, orphanedResponse.Error(), mapValue(t, m, "error.message"))
 	assertMapStrData(t, m, q)
 }
 
@@ -365,12 +364,12 @@ func TestParseTcp_errorDuplicateRequests(t *testing.T) {
 
 	m := expectResult(t, results)
 	assertRequest(t, m, q)
-	assert.Equal(t, "tcp", mapValue(t, m, "transport"))
-	assert.Equal(t, len(q.request), mapValue(t, m, "bytes_in"))
-	assert.Nil(t, mapValue(t, m, "bytes_out"))
-	assert.Nil(t, mapValue(t, m, "responsetime"))
+	assert.Equal(t, "tcp", mapValue(t, m, "network.transport"))
+	assert.EqualValues(t, len(q.request), mapValue(t, m, "source.bytes"))
+	assert.Nil(t, mapValue(t, m, "destination.bytes"))
+	assert.Nil(t, mapValue(t, m, "event.duration"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, duplicateQueryMsg.Error(), mapValue(t, m, "notes"))
+	assert.Equal(t, duplicateQueryMsg.Error(), mapValue(t, m, "error.message"))
 }
 
 // Same than the previous one but on the same stream
@@ -392,12 +391,12 @@ func TestParseTcp_errorDuplicateRequestsOneStream(t *testing.T) {
 
 	m := expectResult(t, results)
 	assertRequest(t, m, q)
-	assert.Equal(t, "tcp", mapValue(t, m, "transport"))
-	assert.Equal(t, len(q.request), mapValue(t, m, "bytes_in"))
-	assert.Nil(t, mapValue(t, m, "bytes_out"))
-	assert.Nil(t, mapValue(t, m, "responsetime"))
+	assert.Equal(t, "tcp", mapValue(t, m, "network.transport"))
+	assert.EqualValues(t, len(q.request), mapValue(t, m, "source.bytes"))
+	assert.Nil(t, mapValue(t, m, "destination.bytes"))
+	assert.Nil(t, mapValue(t, m, "event.duration"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, duplicateQueryMsg.Error(), mapValue(t, m, "notes"))
+	assert.Equal(t, duplicateQueryMsg.Error(), mapValue(t, m, "error.message"))
 }
 
 // Checks that PrepareNewMessage and Parse can manage two messages sharing one packet on the same stream
@@ -422,12 +421,12 @@ func TestParseTcp_errorDuplicateRequestsOnePacket(t *testing.T) {
 
 	m := expectResult(t, results)
 	assertRequest(t, m, q)
-	assert.Equal(t, "tcp", mapValue(t, m, "transport"))
-	assert.Equal(t, len(q.request), mapValue(t, m, "bytes_in"))
-	assert.Nil(t, mapValue(t, m, "bytes_out"))
-	assert.Nil(t, mapValue(t, m, "responsetime"))
+	assert.Equal(t, "tcp", mapValue(t, m, "network.transport"))
+	assert.EqualValues(t, len(q.request), mapValue(t, m, "source.bytes"))
+	assert.Nil(t, mapValue(t, m, "destination.bytes"))
+	assert.Nil(t, mapValue(t, m, "event.duration"))
 	assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
-	assert.Equal(t, duplicateQueryMsg.Error(), mapValue(t, m, "notes"))
+	assert.Equal(t, duplicateQueryMsg.Error(), mapValue(t, m, "error.message"))
 }
 
 // Verify that a split response packet is parsed and published
@@ -459,12 +458,12 @@ func TestParseTcp_splitResponse(t *testing.T) {
 	assert.Empty(t, dns.transactions.Size(), "There should be no transaction.")
 
 	m := expectResult(t, results)
-	assert.Equal(t, "tcp", mapValue(t, m, "transport"))
-	assert.Equal(t, len(tcpQuery.request), mapValue(t, m, "bytes_in"))
-	assert.Equal(t, len(tcpQuery.response), mapValue(t, m, "bytes_out"))
-	assert.NotNil(t, mapValue(t, m, "responsetime"))
+	assert.Equal(t, "tcp", mapValue(t, m, "network.transport"))
+	assert.EqualValues(t, len(tcpQuery.request), mapValue(t, m, "source.bytes"))
+	assert.EqualValues(t, len(tcpQuery.response), mapValue(t, m, "destination.bytes"))
+	assert.NotNil(t, mapValue(t, m, "event.duration"))
 	assert.Equal(t, common.OK_STATUS, mapValue(t, m, "status"))
-	assert.Nil(t, mapValue(t, m, "notes"))
+	assert.Nil(t, mapValue(t, m, "error.message"))
 	assertMapStrData(t, m, tcpQuery)
 }
 
@@ -511,7 +510,7 @@ func TestGap_errorResponse(t *testing.T) {
 
 	m := expectResult(t, results)
 	assertRequest(t, m, sophosTxtTCP)
-	assert.Equal(t, incompleteMsg.responseError(), mapValue(t, m, "notes"))
+	assert.Equal(t, incompleteMsg.responseError(), mapValue(t, m, "error.message"))
 	assert.Nil(t, mapValue(t, m, "answers"))
 }
 
@@ -557,7 +556,7 @@ func TestFin_errorResponse(t *testing.T) {
 
 	m := expectResult(t, results)
 	assertRequest(t, m, zoneAxfrTCP)
-	assert.Equal(t, incompleteMsg.responseError(), mapValue(t, m, "notes"))
+	assert.Equal(t, incompleteMsg.responseError(), mapValue(t, m, "error.message"))
 	assert.Nil(t, mapValue(t, m, "answers"))
 }
 
@@ -575,10 +574,10 @@ func parseTCPRequestResponse(t testing.TB, dns *dnsPlugin, results *eventStore, 
 	assert.Empty(t, dns.transactions.Size(), "There should be no transactions.")
 
 	m := expectResult(t, results)
-	assert.Equal(t, "tcp", mapValue(t, m, "transport"))
-	assert.Equal(t, len(q.request), mapValue(t, m, "bytes_in"))
-	assert.Equal(t, len(q.response), mapValue(t, m, "bytes_out"))
-	assert.NotNil(t, mapValue(t, m, "responsetime"))
+	assert.Equal(t, "tcp", mapValue(t, m, "network.transport"))
+	assert.EqualValues(t, len(q.request), mapValue(t, m, "source.bytes"))
+	assert.EqualValues(t, len(q.response), mapValue(t, m, "destination.bytes"))
+	assert.NotNil(t, mapValue(t, m, "event.duration"))
 
 	if assert.ObjectsAreEqual("NOERROR", mapValue(t, m, "dns.response_code")) {
 		assert.Equal(t, common.OK_STATUS, mapValue(t, m, "status"))
@@ -586,7 +585,7 @@ func parseTCPRequestResponse(t testing.TB, dns *dnsPlugin, results *eventStore, 
 		assert.Equal(t, common.ERROR_STATUS, mapValue(t, m, "status"))
 	}
 
-	assert.Nil(t, mapValue(t, m, "notes"))
+	assert.Nil(t, mapValue(t, m, "error.message"))
 	assertMapStrData(t, m, q)
 }
 

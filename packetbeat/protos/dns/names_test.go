@@ -29,9 +29,9 @@ package dns
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 type dnsTestMsg struct {
@@ -59,7 +59,7 @@ var (
 		},
 		question: common.MapStr{
 			"type": "NXT",
-			"name": "elastic.co.",
+			"name": "elastic.co",
 		},
 	}
 
@@ -70,7 +70,7 @@ var (
 		},
 		question: common.MapStr{
 			"type": "65280",
-			"name": "elastic.co.",
+			"name": "elastic.co",
 		},
 	}
 
@@ -82,7 +82,7 @@ var (
 		},
 		question: common.MapStr{
 			"type": "A",
-			"name": "www.ietf.org.",
+			"name": "www.ietf.org",
 		},
 		opt: common.MapStr{
 			"version": "0",
