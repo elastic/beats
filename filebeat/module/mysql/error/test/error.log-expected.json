@@ -7,7 +7,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 0,
-        "mysql.error.message": "mysqld_safe Starting mysqld daemon with databases from /usr/local/var/mysql",
+        "message": "mysqld_safe Starting mysqld daemon with databases from /usr/local/var/mysql",
         "mysql.error.timestamp": "161209 13:08:33"
     },
     {
@@ -17,11 +17,11 @@
         "event.module": "mysql",
         "fileset.name": "error",
         "input.type": "log",
+        "log.level": "Warning",
         "log.offset": 92,
-        "mysql.error.level": "Warning",
-        "mysql.error.message": "TIMESTAMP with implicit DEFAULT value is deprecated. Please use --explicit_defaults_for_timestamp server option (see documentation for more details).",
-        "mysql.error.thread_id": "0",
-        "mysql.error.timestamp": "2016-12-09T12:08:33.335060Z"
+        "message": "TIMESTAMP with implicit DEFAULT value is deprecated. Please use --explicit_defaults_for_timestamp server option (see documentation for more details).",
+        "mysql.error.timestamp": "2016-12-09T12:08:33.335060Z",
+        "process.thread.id": 0
     },
     {
         "@timestamp": "2016-12-09T12:08:33.335Z",
@@ -30,11 +30,11 @@
         "event.module": "mysql",
         "fileset.name": "error",
         "input.type": "log",
+        "log.level": "Warning",
         "log.offset": 282,
-        "mysql.error.level": "Warning",
-        "mysql.error.message": "Insecure configuration for --secure-file-priv: Current value does not restrict location of generated files. Consider setting it to a valid, non-empty path.",
-        "mysql.error.thread_id": "0",
-        "mysql.error.timestamp": "2016-12-09T12:08:33.335892Z"
+        "message": "Insecure configuration for --secure-file-priv: Current value does not restrict location of generated files. Consider setting it to a valid, non-empty path.",
+        "mysql.error.timestamp": "2016-12-09T12:08:33.335892Z",
+        "process.thread.id": 0
     },
     {
         "@timestamp": "2016-12-09T12:08:33.336Z",
@@ -43,11 +43,11 @@
         "event.module": "mysql",
         "fileset.name": "error",
         "input.type": "log",
+        "log.level": "Note",
         "log.offset": 478,
-        "mysql.error.level": "Note",
-        "mysql.error.message": "/usr/local/Cellar/mysql/5.7.10/bin/mysqld (mysqld 5.7.10) starting as process 61571 ...",
-        "mysql.error.thread_id": "0",
-        "mysql.error.timestamp": "2016-12-09T12:08:33.336610Z"
+        "message": "/usr/local/Cellar/mysql/5.7.10/bin/mysqld (mysqld 5.7.10) starting as process 61571 ...",
+        "mysql.error.timestamp": "2016-12-09T12:08:33.336610Z",
+        "process.thread.id": 0
     },
     {
         "@timestamp": "2016-12-09T12:08:33.345Z",
@@ -56,11 +56,11 @@
         "event.module": "mysql",
         "fileset.name": "error",
         "input.type": "log",
+        "log.level": "Warning",
         "log.offset": 603,
-        "mysql.error.level": "Warning",
-        "mysql.error.message": "Setting lower_case_table_names=2 because file system for /usr/local/var/mysql/ is case insensitive",
-        "mysql.error.thread_id": "0",
-        "mysql.error.timestamp": "2016-12-09T12:08:33.345527Z"
+        "message": "Setting lower_case_table_names=2 because file system for /usr/local/var/mysql/ is case insensitive",
+        "mysql.error.timestamp": "2016-12-09T12:08:33.345527Z",
+        "process.thread.id": 0
     },
     {
         "@timestamp": "2016-12-09T12:08:33.351Z",
@@ -69,11 +69,11 @@
         "event.module": "mysql",
         "fileset.name": "error",
         "input.type": "log",
+        "log.level": "Note",
         "log.offset": 742,
-        "mysql.error.level": "Note",
-        "mysql.error.message": "InnoDB: Mutexes and rw_locks use GCC atomic builtins",
-        "mysql.error.thread_id": "0",
-        "mysql.error.timestamp": "2016-12-09T12:08:33.351596Z"
+        "message": "InnoDB: Mutexes and rw_locks use GCC atomic builtins",
+        "mysql.error.timestamp": "2016-12-09T12:08:33.351596Z",
+        "process.thread.id": 0
     },
     {
         "@timestamp": "2016-12-09T12:08:33.784Z",
@@ -82,21 +82,20 @@
         "event.module": "mysql",
         "fileset.name": "error",
         "input.type": "log",
+        "log.level": "Note",
         "log.offset": 832,
-        "mysql.error.level": "Note",
-        "mysql.error.message": "/usr/local/Cellar/mysql/5.7.10/bin/mysqld: ready for connections.",
-        "mysql.error.thread_id": "0",
-        "mysql.error.timestamp": "2016-12-09T12:08:33.784722Z"
+        "message": "/usr/local/Cellar/mysql/5.7.10/bin/mysqld: ready for connections.",
+        "mysql.error.timestamp": "2016-12-09T12:08:33.784722Z",
+        "process.thread.id": 0
     },
     {
-        "@timestamp": "2019-01-11T02:59:49.816Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "mysql.error",
         "event.module": "mysql",
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 935,
-        "mysql.error.message": "Version: '5.7.10'  socket: '/tmp/mysql.sock'  port: 3306  Homebrew"
+        "message": "Version: '5.7.10'  socket: '/tmp/mysql.sock'  port: 3306  Homebrew"
     },
     {
         "@timestamp": "2016-12-09T22:21:02.443Z",
@@ -105,10 +104,10 @@
         "event.module": "mysql",
         "fileset.name": "error",
         "input.type": "log",
+        "log.level": "Note",
         "log.offset": 1002,
-        "mysql.error.level": "Note",
-        "mysql.error.message": "InnoDB: page_cleaner: 1000ms intended loop took 772568ms. The settings might not be optimal. (flushed=0 and evicted=0, during the time.)",
-        "mysql.error.thread_id": "0",
-        "mysql.error.timestamp": "2016-12-09T22:21:02.443689Z"
+        "message": "InnoDB: page_cleaner: 1000ms intended loop took 772568ms. The settings might not be optimal. (flushed=0 and evicted=0, during the time.)",
+        "mysql.error.timestamp": "2016-12-09T22:21:02.443689Z",
+        "process.thread.id": 0
     }
 ]
