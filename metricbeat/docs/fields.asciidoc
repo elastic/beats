@@ -17262,7 +17262,7 @@ Server time of metric creation
 *`nats.varz.uptime`*::
 +
 --
-type: string
+type: long
 
 The period the server is up
 

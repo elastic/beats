@@ -21,7 +21,6 @@ class Test(metricbeat.BaseTest):
             "period": "5s",
             "varz_metrics_path": "/varz"
         }])
-        print(self.get_hosts())
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
@@ -36,4 +35,7 @@ class Test(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return ["nats:8222"]
+        return ["{}:{}".format(
+            os.getenv('NATS_HOST', 'localhost'),
+            os.getenv('NATS_PORT', '8222')
+        )]
