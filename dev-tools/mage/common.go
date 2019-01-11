@@ -48,7 +48,6 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
-	"github.com/magefile/mage/types"
 	"github.com/pkg/errors"
 )
 
@@ -461,7 +460,7 @@ func numParallel() int {
 func ParallelCtx(ctx context.Context, fns ...interface{}) {
 	var fnWrappers []func(context.Context) error
 	for _, f := range fns {
-		fnWrapper := types.FuncTypeWrap(f)
+		fnWrapper := funcTypeWrap(f)
 		if fnWrapper == nil {
 			panic("attempted to add a dep that did not match required function type")
 		}
@@ -505,6 +504,29 @@ func ParallelCtx(ctx context.Context, fns ...interface{}) {
 // on GOMAXPROCS.
 func Parallel(fns ...interface{}) {
 	ParallelCtx(context.Background(), fns...)
+}
+
+// funcTypeWrap wraps a valid FuncType to FuncContextError
+func funcTypeWrap(fn interface{}) func(context.Context) error {
+	switch f := fn.(type) {
+	case func():
+		return func(context.Context) error {
+			f()
+			return nil
+		}
+	case func() error:
+		return func(context.Context) error {
+			return f()
+		}
+	case func(context.Context):
+		return func(ctx context.Context) error {
+			f(ctx)
+			return nil
+		}
+	case func(context.Context) error:
+		return f
+	}
+	return nil
 }
 
 // FindFiles return a list of file matching the given glob patterns.
@@ -693,6 +715,12 @@ func OSSBeatDir(path ...string) string {
 	return filepath.Join(append([]string{ossDir}, path...)...)
 }
 
+// XPackBeatDir returns the X-Pack beat directory. You can pass paths and they
+// will be joined and appended to the X-Pack beat dir.
+func XPackBeatDir(path ...string) string {
+	return OSSBeatDir(append([]string{XPackDir, BeatName}, path...)...)
+}
+
 // LibbeatDir returns the libbeat directory. You can pass paths and
 // they will be joined and appended to the libbeat dir.
 func LibbeatDir(path ...string) string {
@@ -705,7 +733,13 @@ func LibbeatDir(path ...string) string {
 }
 
 // createDir creates the parent directory for the given file.
+// Deprecated: Use CreateDir.
 func createDir(file string) string {
+	return CreateDir(file)
+}
+
+// CreateDir creates the parent directory for the given file.
+func CreateDir(file string) string {
 	// Create the output directory.
 	if dir := filepath.Dir(file); dir != "." {
 		if err := os.MkdirAll(dir, 0755); err != nil {

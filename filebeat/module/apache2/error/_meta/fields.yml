@@ -6,6 +6,7 @@
     - name: level
       type: alias
       path: log.level
+      migration: true
       description: >
         The severity level of the message.
     - name: client
@@ -15,16 +16,19 @@
     - name: message
       type: alias
       path: message
+      migration: true
       description: >
         The logged message.
     - name: pid
       type: alias
       path: process.pid
+      migration: true
       description: >
         The process ID.
     - name: tid
       type: alias
       path: process.thread.id
+      migration: true
       description: >
         The thread ID.
     - name: module

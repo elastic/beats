@@ -50,7 +50,7 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The ceph pool_disk metricset is experimental")
+	cfgwarn.Beta("The ceph pool_disk metricset is beta")
 
 	http, err := helper.NewHTTP(base)
 	if err != nil {

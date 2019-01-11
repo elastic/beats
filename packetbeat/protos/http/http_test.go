@@ -1196,12 +1196,12 @@ func TestHttpParser_includeBodyFor(t *testing.T) {
 
 	trans := expectTransaction(t, &store)
 	assert.NotNil(t, trans)
-	hasKey, err := trans.HasKey("http.request.body")
+	hasKey, err := trans.HasKey("http.request.body.content")
 	if err != nil {
 		t.Fatal(err)
 	}
 	assert.True(t, hasKey)
-	contents, err := trans.GetValue("http.response.body")
+	contents, err := trans.GetValue("http.response.body.content")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1416,9 +1416,9 @@ func TestHttp_includeBodies(t *testing.T) {
 
 		trans := expectTransaction(t, &store)
 		assert.NotNil(t, trans)
-		hasKey, _ := trans.HasKey("http.request.body")
+		hasKey, _ := trans.HasKey("http.request.body.content")
 		assert.Equal(t, testCase.hasRequest, hasKey, msg)
-		hasKey, _ = trans.HasKey("http.response.body")
+		hasKey, _ = trans.HasKey("http.response.body.content")
 		assert.Equal(t, testCase.hasResponse, hasKey, msg)
 	}
 }
@@ -1596,7 +1596,7 @@ func TestHTTP_Encodings(t *testing.T) {
 
 		trans := expectTransaction(t, &store)
 		assert.NotNil(t, trans, msg)
-		body, err := trans.GetValue("http.response.body")
+		body, err := trans.GetValue("http.response.body.content")
 		if err == nil {
 			assert.Equal(t, testData.expectedBody, body, msg)
 		} else {
@@ -1647,7 +1647,7 @@ func TestHTTP_Decoding_disabled(t *testing.T) {
 
 	trans := expectTransaction(t, &store)
 	assert.NotNil(t, trans)
-	body, err := trans.GetValue("http.response.body")
+	body, err := trans.GetValue("http.response.body.content")
 	if err != nil {
 		t.Fatal(err)
 	}

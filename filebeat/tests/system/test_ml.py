@@ -23,7 +23,7 @@ class Test(BaseTest):
                                             "/../../../../module")
 
         self.kibana_path = os.path.abspath(self.working_dir +
-                                           "/../../../../_meta/kibana.generated")
+                                           "/../../../../build/kibana")
 
         self.filebeat = os.path.abspath(self.working_dir +
                                         "/../../../../filebeat.test")
@@ -92,6 +92,9 @@ class Test(BaseTest):
             "-e", "-d", "*",
             "-c", cfgfile
         ]
+
+        # Skipping dashboard loading to speed up tests, unfortunately only works for setup and not --setup
+        cmd += ["-E", "setup.dashboards.enabled=false"]
 
         if setup_flag:
             cmd += ["--setup"]

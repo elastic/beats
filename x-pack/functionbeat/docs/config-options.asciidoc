@@ -37,9 +37,10 @@ the events to {es}.
     description: "lambda function for SQS events"
     triggers:
       - event_source_arn: arn:aws:sqs:us-east-1:123456789012:myevents
-output.elasticsearch:
-  cloud.id: "MyESDeployment:SomeLongString=="
-  cloud.auth: "elastic:SomeLongString"
+
+cloud.id: "MyESDeployment:SomeLongString=="
+cloud.auth: "elastic:SomeLongString"
+
 processors:
   - add_host_metadata: ~
   - add_cloud_metadata: ~
@@ -92,7 +93,7 @@ multiple functions and need more context about how each function is used.
 A list of triggers that will cause the function to execute. The list of valid
 triggers depends on the `type`. If `type` is `cloudwatch_logs` logs, specify a
 list of log groups. If `type` is `sqs`, specify a list of Amazon Resource Names
-(ARNs). 
+(ARNs).
 
 [float]
 [id="{beatname_lc}-filter_pattern"]
@@ -123,4 +124,4 @@ default is 128 MiB.
 ==== `dead_letter_config.target_arn`
 
 The dead letter queue to use for messages that can't be processed successfully.
-Set this option to an ARN that points to an SQS queue. 
+Set this option to an ARN that points to an SQS queue.

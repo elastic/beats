@@ -25,6 +25,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/magefile/mage/mg"
@@ -43,7 +44,8 @@ var (
 		libbeatRequirements,
 	}
 
-	pythonVirtualenvDir string // Location of python virtualenv (lazily set).
+	pythonVirtualenvDir  string // Location of python virtualenv (lazily set).
+	pythonVirtualenvLock sync.Mutex
 
 	// More globs may be needed in the future if tests are added in more places.
 	nosetestsTestFiles = []string{
@@ -147,6 +149,9 @@ func PythonNoseTest(params PythonTestArgs) error {
 // defined in the requirements file pointed to by requirementsTxt. It returns
 // the path to the virutalenv.
 func PythonVirtualenv() (string, error) {
+	pythonVirtualenvLock.Lock()
+	defer pythonVirtualenvLock.Unlock()
+
 	// Determine the location of the virtualenv.
 	ve, err := pythonVirtualenvPath()
 	if err != nil {

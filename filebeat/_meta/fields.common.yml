@@ -23,13 +23,6 @@
       description: >
         The file offset the reported line starts at.
 
-    - name: message
-      type: text
-      ignore_above: 0
-      required: true
-      description: >
-        The content of the line read from the log file.
-
     - name: stream
       type: keyword
       required: false
@@ -101,11 +94,12 @@
         - name: full_name
           type: keyword
 
-  # Temporary fix to get 7.0 dashboards working
     - name: fileset.name
-      type: alias
-      path: event.dataset
+      type: keyword
+      description: >
+        The Filebeat fileset that generated this event.
 
     - name: fileset.module
       type: alias
       path: event.module
+      migration: true

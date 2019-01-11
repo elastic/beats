@@ -3,17 +3,15 @@
   description: >
     Kafka log lines.
   fields:
-    - name: timestamp
-      description: >
-        The timestamp from the log line.
     - name: level
-      example: "WARN"
-      description: >
-        The log level.
+      type: alias
+      path: log.level
+      migration: true
     - name: message
-      type: text
-      description: >
-        The logged message.
+      type: alias
+      path: message
+      migration: true
+
     - name: component
       type: keyword
       description: >

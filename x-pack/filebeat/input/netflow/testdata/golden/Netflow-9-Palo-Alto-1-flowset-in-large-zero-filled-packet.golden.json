@@ -20,7 +20,7 @@
           "start": "2018-06-06T13:20:02Z"
         },
         "flow": {
-          "id": "NBJEjpgh6PA",
+          "id": "A-NpGXd6eh4",
           "locality": "public"
         },
         "netflow": {
@@ -53,7 +53,7 @@
         },
         "network": {
           "bytes": 363,
-          "community_id": "1:0PLHlww9zxRlvByabAFlUctNy14=",
+          "community_id": "1:hc80jQer1W3Gz0bQrzvclI7gPC4=",
           "direction": "inbound",
           "iana_number": 6,
           "packets": 3,

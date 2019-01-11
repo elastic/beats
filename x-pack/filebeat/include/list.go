@@ -8,5 +8,6 @@ package include
 
 import (
 	// Import packages that need to register themselves.
+	_ "github.com/elastic/beats/x-pack/filebeat/input/netflow"
 	_ "github.com/elastic/beats/x-pack/filebeat/module/suricata"
 )
