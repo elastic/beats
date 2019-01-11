@@ -14,9 +14,9 @@
     - name: uptime
       type: long
       description: >
-        The period the server is up
+        The period the server is up (sec)
     - name: mem
-      type: integer
+      type: long
       description: >
         The current memory usage of NATS process
     - name: cores
@@ -24,7 +24,7 @@
       description: >
         The number of logical cores the NATS process runs on
     - name: cpu
-      type: integer
+      type: float
       description: >
         The current cpu usage of NATs process
     - name: total_connections

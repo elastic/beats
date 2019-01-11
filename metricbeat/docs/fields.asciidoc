@@ -17264,7 +17264,7 @@ Server time of metric creation
 --
 type: long
 
-The period the server is up
+The period the server is up (sec)
 
 
 --
@@ -17272,7 +17272,7 @@ The period the server is up
 *`nats.stats.mem`*::
 +
 --
-type: integer
+type: long
 
 The current memory usage of NATS process
 
@@ -17292,7 +17292,7 @@ The number of logical cores the NATS process runs on
 *`nats.stats.cpu`*::
 +
 --
-type: integer
+type: float
 
 The current cpu usage of NATs process
 

@@ -71,6 +71,7 @@ func convertUptime(uptime string) (seconds int64, err error) {
 		uptime = split[1]
 		years, err = strconv.ParseInt(split[0], 10, 64)
 		if err != nil {
+			err = errors.Wrap(err, "invalid years format in json data")
 			return
 		}
 		seconds += years * 31536000
@@ -81,6 +82,7 @@ func convertUptime(uptime string) (seconds int64, err error) {
 		uptime = split[1]
 		days, err = strconv.ParseInt(split[0], 10, 64)
 		if err != nil {
+			err = errors.Wrap(err, "invalid days format in json data")
 			return
 		}
 		seconds += days * 86400
@@ -91,6 +93,7 @@ func convertUptime(uptime string) (seconds int64, err error) {
 		uptime = split[1]
 		hours, err = strconv.ParseInt(split[0], 10, 64)
 		if err != nil {
+			err = errors.Wrap(err, "invalid hours format in json data")
 			return
 		}
 		seconds += hours * 3600
@@ -101,6 +104,7 @@ func convertUptime(uptime string) (seconds int64, err error) {
 		uptime = split[1]
 		minutes, err = strconv.ParseInt(split[0], 10, 64)
 		if err != nil {
+			err = errors.Wrap(err, "invalid minutes format in json data")
 			return
 		}
 		seconds += minutes * 60
@@ -111,6 +115,7 @@ func convertUptime(uptime string) (seconds int64, err error) {
 		uptime = split[1]
 		secs, err = strconv.ParseInt(split[0], 10, 64)
 		if err != nil {
+			err = errors.Wrap(err, "invalid seconds format in json data")
 			return
 		}
 		seconds += secs
