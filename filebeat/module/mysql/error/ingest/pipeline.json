@@ -4,7 +4,7 @@
     "grok": {
         "field": "message",
         "patterns": [
-          "%{LOCALDATETIME:mysql.error.timestamp} (\\[%{DATA:mysql.error.level}\\] )?%{GREEDYDATA:message}",
+          "%{LOCALDATETIME:mysql.error.timestamp} (\\[%{DATA:log.level}\\] )?%{GREEDYDATA:message}",
           "%{DATA:mysql.error.timestamp} %{NUMBER:process.thread.id:long} \\[%{DATA:log.level}\\] %{GREEDYDATA:message}",
           "%{GREEDYDATA:message}"
         ],

@@ -7,3 +7,6 @@
 2016-12-09T12:08:33.784722Z 0 [Note] /usr/local/Cellar/mysql/5.7.10/bin/mysqld: ready for connections.
 Version: '5.7.10'  socket: '/tmp/mysql.sock'  port: 3306  Homebrew
 2016-12-09T22:21:02.443689Z 0 [Note] InnoDB: page_cleaner: 1000ms intended loop took 772568ms. The settings might not be optimal. (flushed=0 and evicted=0, during the time.)
+161209 14:18:50 [Warning] Using unique option prefix myisam-recover instead of myisam-recover-options is deprecated and will be removed in a future release. Please use the full name instead.
+161209 14:18:50 [Note] Plugin 'FEDERATED' is disabled.
+161209 14:18:50 InnoDB: The InnoDB memory heap is disabled
