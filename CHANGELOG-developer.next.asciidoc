@@ -23,3 +23,5 @@ The list below covers the major changes between 6.6.0 and 6.x only.
 ==== Bugfixes
 
 ==== Added
+
+- Allow multiple object type configurations per field. {pull}9772[9772]
