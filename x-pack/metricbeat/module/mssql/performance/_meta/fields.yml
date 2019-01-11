@@ -81,7 +81,6 @@
     - name: buffer
       type: group
       fields:
-        -
         - name: cache_hit
           type: group
           description: Indicates the percentage of pages found in the buffer cache without having to read from disk
