@@ -281,11 +281,11 @@
 ## IIS module
 
 - from: iis.access.server_ip
-  to: destination.ip
+  to: destination.address
   alias: true
 
 - from: iis.access.remote_ip
-  to: source.ip
+  to: source.address
   alias: true
 
 - from: iis.access.url
@@ -346,6 +346,62 @@
 
 - from: iis.access.referrer
   to: http.request.referrer
+  alias: true
+
+- from: iis.error.remote_ip
+  to: source.address
+  alias: true
+
+- from: iis.error.remote_port
+  to: source.port
+  alias: true
+
+- from: iis.error.server_ip
+  to: destination.address
+  alias: true
+
+- from: iis.error.server_port
+  to: destination.port
+  alias: true
+
+- from: iis.error.http_version
+  to: http.version
+  alias: true
+
+- from: iis.error.method
+  to: http.request.method
+  alias: true
+
+- from: iis.error.url
+  to: url.original
+  alias: true
+
+- from: iis.error.response_code
+  to: http.response.status_code
+  alias: true
+
+- from: iis.error.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+
+- from: iis.error.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+
+- from: iis.error.geoip.location
+  to: source.geo.location
+  alias: true
+
+- from: iis.error.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+
+- from: iis.error.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+
+- from: iis.error.geoip.region_iso_code
+  to: source.geo.region_iso_code
   alias: true
 
 ## HAProxy module

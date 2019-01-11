@@ -5163,7 +5163,7 @@ The number of bytes of the server request body.
 --
 type: alias
 
-alias to: destination.ip
+alias to: destination.address
 
 --
 
@@ -5217,7 +5217,7 @@ alias to: user.name
 --
 type: alias
 
-alias to: source.ip
+alias to: source.address
 
 --
 
@@ -5410,88 +5410,6 @@ Contains fields for IIS error logs.
 
 
 
-*`iis.error.remote_ip`*::
-+
---
-type: keyword
-
-The client IP address.
-
-
---
-
-*`iis.error.remote_port`*::
-+
---
-type: long
-
-The client port number.
-
-
---
-
-*`iis.error.server_ip`*::
-+
---
-type: keyword
-
-The server IP address.
-
-
---
-
-*`iis.error.server_port`*::
-+
---
-type: long
-
-The server port number.
-
-
---
-
-*`iis.error.http_version`*::
-+
---
-type: keyword
-
-The HTTP version.
-
-
---
-
-*`iis.error.method`*::
-+
---
-type: keyword
-
-example: GET
-
-The request HTTP method.
-
-
---
-
-*`iis.error.url`*::
-+
---
-type: keyword
-
-The request HTTP URL.
-
-
---
-
-*`iis.error.response_code`*::
-+
---
-type: long
-
-The HTTP response code.
-
-
---
-
 *`iis.error.reason_phrase`*::
 +
 --
@@ -5512,70 +5430,130 @@ The IIS application pool name.
 
 --
 
-[float]
-== geoip fields
+*`iis.error.remote_ip`*::
++
+--
+type: alias
 
-Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+alias to: source.address
 
+--
+
+*`iis.error.remote_port`*::
++
+--
+type: alias
+
+alias to: source.port
+
+--
+
+*`iis.error.server_ip`*::
++
+--
+type: alias
+
+alias to: destination.address
+
+--
+
+*`iis.error.server_port`*::
++
+--
+type: alias
+
+alias to: destination.port
+
+--
+
+*`iis.error.http_version`*::
++
+--
+type: alias
+
+alias to: http.version
+
+--
+
+*`iis.error.method`*::
++
+--
+type: alias
+
+alias to: http.request.method
+
+--
+
+*`iis.error.url`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`iis.error.response_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
 
 
 *`iis.error.geoip.continent_name`*::
 +
 --
-type: keyword
+type: alias
 
-The name of the continent.
-
+alias to: source.geo.continent_name
 
 --
 
 *`iis.error.geoip.country_iso_code`*::
 +
 --
-type: keyword
+type: alias
 
-Country ISO code.
-
+alias to: source.geo.country_iso_code
 
 --
 
 *`iis.error.geoip.location`*::
 +
 --
-type: geo_point
+type: alias
 
-The longitude and latitude.
-
+alias to: source.geo.location
 
 --
 
 *`iis.error.geoip.region_name`*::
 +
 --
-type: keyword
+type: alias
 
-The region name.
-
+alias to: source.geo.region_name
 
 --
 
 *`iis.error.geoip.city_name`*::
 +
 --
-type: keyword
+type: alias
 
-The city name.
-
+alias to: source.geo.city_name
 
 --
 
 *`iis.error.geoip.region_iso_code`*::
 +
 --
-type: keyword
+type: alias
 
-Region ISO code.
-
+alias to: source.geo.region_iso_code
 
 --
 
