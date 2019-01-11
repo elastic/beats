@@ -6,63 +6,59 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "31be7930-1426-11e9-983c-271411c43b4c",
             "query": {
               "language": "lucene",
               "query": ""
             }
           }
         },
-        "title": "Top Network Transport",
+        "title": "Time Series Count",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "network.transport",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
+          "aggs": [],
           "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": false,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "filebeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "filter": "tags:zeek",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "count"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "filter",
+                "stacked": "none"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
           },
-          "title": "Top Network Transport",
-          "type": "pie"
+          "title": "Time Series Count",
+          "type": "metrics"
         }
       },
-      "id": "3138a000-1429-11e9-983c-271411c43b4c",
+      "id": "fad258c0-1078-11e9-b27a-69e6e8b80a25",
       "type": "visualization",
-      "updated_at": "2019-01-10T04:48:31.510Z",
-      "version": 8
+      "updated_at": "2019-01-11T07:41:40.843Z",
+      "version": 28
     },
     {
       "attributes": {
@@ -70,142 +66,14 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "31be7930-1426-11e9-983c-271411c43b4c",
+            "index": "baa56500-1571-11e9-983c-271411c43b4c",
             "query": {
               "language": "lucene",
               "query": ""
             }
           }
         },
-        "title": "Top Network Application",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "network.application",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": false,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "Top Network Application",
-          "type": "pie"
-        }
-      },
-      "id": "49ed1680-1429-11e9-983c-271411c43b4c",
-      "type": "visualization",
-      "updated_at": "2019-01-10T04:48:31.510Z",
-      "version": 8
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "index": "31be7930-1426-11e9-983c-271411c43b4c",
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "title": "Top Network Direction",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "network.direction",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": false,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "Top Network Direction",
-          "type": "pie"
-        }
-      },
-      "id": "7271b520-1429-11e9-983c-271411c43b4c",
-      "type": "visualization",
-      "updated_at": "2019-01-10T04:48:31.510Z",
-      "version": 9
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "index": "31be7930-1426-11e9-983c-271411c43b4c",
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "title": "Top Destination Geo",
+        "title": "Top Destination Geo [Filebeat Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -264,14 +132,14 @@
               }
             }
           },
-          "title": "Top Destination Geo",
+          "title": "Top Destination Geo [Filebeat Zeek]",
           "type": "tile_map"
         }
       },
-      "id": "9a9ac640-1429-11e9-983c-271411c43b4c",
+      "id": "95417c70-1573-11e9-983c-271411c43b4c",
       "type": "visualization",
-      "updated_at": "2019-01-10T04:48:31.510Z",
-      "version": 8
+      "updated_at": "2019-01-11T07:36:18.103Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -279,58 +147,255 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
+            "index": "baa56500-1571-11e9-983c-271411c43b4c",
             "query": {
               "language": "lucene",
               "query": ""
             }
           }
         },
-        "title": "Time Series Count",
+        "title": "Top Network Transport [Filebeat Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
-          "aggs": [],
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "network.transport",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
           "params": {
-            "axis_formatter": "number",
-            "axis_position": "left",
-            "axis_scale": "normal",
-            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "",
-            "interval": "auto",
-            "series": [
-              {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "#68BC00",
-                "fill": 0.5,
-                "formatter": "number",
-                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "line_width": 1,
-                "metrics": [
-                  {
-                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "count"
-                  }
-                ],
-                "point_size": 1,
-                "separate_axis": 0,
-                "split_mode": "everything",
-                "stacked": "none"
-              }
-            ],
-            "show_grid": 1,
-            "show_legend": 1,
-            "time_field": "@timestamp",
-            "type": "timeseries"
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
           },
-          "title": "Time Series Count",
-          "type": "metrics"
+          "title": "Top Network Transport [Filebeat Zeek]",
+          "type": "pie"
         }
       },
-      "id": "fad258c0-1078-11e9-b27a-69e6e8b80a25",
+      "id": "cb1ea8f0-1572-11e9-983c-271411c43b4c",
       "type": "visualization",
-      "updated_at": "2019-01-10T04:48:31.510Z",
-      "version": 12
+      "updated_at": "2019-01-11T07:38:07.151Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "index": "baa56500-1571-11e9-983c-271411c43b4c",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Top Network Application [Filebeat Zeek]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "network.application",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "Top Network Application [Filebeat Zeek]",
+          "type": "pie"
+        }
+      },
+      "id": "b68e1290-1572-11e9-983c-271411c43b4c",
+      "type": "visualization",
+      "updated_at": "2019-01-11T07:38:28.350Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "index": "baa56500-1571-11e9-983c-271411c43b4c",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Top DNS Query [Filebeat Zeek]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "zeek.dns.query",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "Top DNS Query [Filebeat Zeek]",
+          "type": "pie"
+        }
+      },
+      "id": "037ac2b0-1573-11e9-983c-271411c43b4c",
+      "type": "visualization",
+      "updated_at": "2019-01-11T07:38:39.421Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "index": "baa56500-1571-11e9-983c-271411c43b4c",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Network Direction [Filebeat Zeek]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "network.direction",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "Network Direction [Filebeat Zeek]",
+          "type": "pie"
+        }
+      },
+      "id": "e6dbcb90-1572-11e9-983c-271411c43b4c",
+      "type": "visualization",
+      "updated_at": "2019-01-11T07:38:19.789Z",
+      "version": 2
     },
     {
       "attributes": {
@@ -354,82 +419,102 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 11,
-              "i": "1",
-              "w": 16,
-              "x": 0,
-              "y": 16
-            },
-            "id": "3138a000-1429-11e9-983c-271411c43b4c",
-            "panelIndex": "1",
-            "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 11,
-              "i": "2",
-              "w": 15,
-              "x": 16,
-              "y": 16
-            },
-            "id": "49ed1680-1429-11e9-983c-271411c43b4c",
-            "panelIndex": "2",
-            "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 11,
-              "i": "3",
-              "w": 16,
-              "x": 31,
-              "y": 16
-            },
-            "id": "7271b520-1429-11e9-983c-271411c43b4c",
-            "panelIndex": "3",
-            "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 16,
-              "i": "4",
-              "w": 47,
-              "x": 0,
-              "y": 0
-            },
-            "id": "9a9ac640-1429-11e9-983c-271411c43b4c",
-            "panelIndex": "4",
-            "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 9,
-              "i": "5",
+              "h": 10,
+              "i": "6",
               "w": 47,
               "x": 0,
               "y": 27
             },
             "id": "fad258c0-1078-11e9-b27a-69e6e8b80a25",
-            "panelIndex": "5",
+            "panelIndex": "6",
+            "type": "visualization",
+            "version": "6.5.4"
+          },
+          {
+            "embeddableConfig": {
+              "mapCenter": [
+                44.59046718130883,
+                -98.08593750000001
+              ],
+              "mapZoom": 2
+            },
+            "gridData": {
+              "h": 17,
+              "i": "7",
+              "w": 47,
+              "x": 0,
+              "y": 0
+            },
+            "id": "95417c70-1573-11e9-983c-271411c43b4c",
+            "panelIndex": "7",
+            "type": "visualization",
+            "version": "6.5.4"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "8",
+              "w": 11,
+              "x": 0,
+              "y": 17
+            },
+            "id": "cb1ea8f0-1572-11e9-983c-271411c43b4c",
+            "panelIndex": "8",
+            "type": "visualization",
+            "version": "6.5.4"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "9",
+              "w": 12,
+              "x": 11,
+              "y": 17
+            },
+            "id": "b68e1290-1572-11e9-983c-271411c43b4c",
+            "panelIndex": "9",
+            "type": "visualization",
+            "version": "6.5.4"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "10",
+              "w": 12,
+              "x": 35,
+              "y": 17
+            },
+            "id": "037ac2b0-1573-11e9-983c-271411c43b4c",
+            "panelIndex": "10",
+            "type": "visualization",
+            "version": "6.5.4"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "11",
+              "w": 12,
+              "x": 23,
+              "y": 17
+            },
+            "id": "e6dbcb90-1572-11e9-983c-271411c43b4c",
+            "panelIndex": "11",
             "type": "visualization",
             "version": "6.5.4"
           }
         ],
         "timeRestore": false,
-        "title": "Zeek",
+        "title": "Zeek Dashboard",
         "version": 1
       },
-      "id": "c49d0430-1429-11e9-983c-271411c43b4c",
+      "id": "f8910430-156e-11e9-983c-271411c43b4c",
       "type": "dashboard",
-      "updated_at": "2019-01-10T04:48:31.510Z",
-      "version": 2
+      "updated_at": "2019-01-11T07:47:12.295Z",
+      "version": 15
     }
   ],
   "version": "6.5.4"
