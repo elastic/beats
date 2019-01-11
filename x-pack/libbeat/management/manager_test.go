@@ -165,3 +165,36 @@ func TestRemoveItems(t *testing.T) {
 	manager.Stop()
 	os.Remove(paths.Resolve(paths.Data, "management.yml"))
 }
+
+func TestConfigValidate(t *testing.T) {
+	tests := map[string]struct {
+		config *common.Config
+		err    bool
+	}{
+		"missing access_token": {
+			config: common.MustNewConfigFrom(map[string]interface{}{}),
+			err:    true,
+		},
+		"access_token is present": {
+			config: common.MustNewConfigFrom(map[string]interface{}{"access_token": "abc1234"}),
+			err:    false,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			c := defaultConfig()
+			err := test.config.Unpack(c)
+			if assert.NoError(t, err) {
+				return
+			}
+
+			err = validateConfig(c)
+			if test.err {
+				assert.Error(t, err)
+				return
+			}
+			assert.NoError(t, err)
+		})
+	}
+}
