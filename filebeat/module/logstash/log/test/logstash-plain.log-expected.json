@@ -6,10 +6,10 @@
         "event.module": "logstash",
         "fileset.name": "log",
         "input.type": "log",
+        "log.level": "INFO",
         "log.offset": 0,
-        "logstash.log.level": "INFO",
-        "logstash.log.message": "Initializing module {:module_name=>\"fb_apache\", :directory=>\"/usr/share/logstash/modules/fb_apache/configuration\"}",
-        "logstash.log.module": "logstash.modules.scaffold"
+        "logstash.log.module": "logstash.modules.scaffold",
+        "message": "Initializing module {:module_name=>\"fb_apache\", :directory=>\"/usr/share/logstash/modules/fb_apache/configuration\"}"
     },
     {
         "@timestamp": "2017-11-20T03:55:00.318Z",
@@ -21,9 +21,9 @@
         "log.flags": [
             "multiline"
         ],
+        "log.level": "INFO",
         "log.offset": 175,
-        "logstash.log.level": "INFO",
-        "logstash.log.message": "(0.058950s) Select Name as [person.name]\n, Address as [person.address]\nfrom people\n",
-        "logstash.log.module": "logstash.inputs.jdbc     "
+        "logstash.log.module": "logstash.inputs.jdbc",
+        "message": "(0.058950s) Select Name as [person.name]\n, Address as [person.address]\nfrom people\n"
     }
 ]
