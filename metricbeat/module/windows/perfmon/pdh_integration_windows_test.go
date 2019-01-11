@@ -339,8 +339,8 @@ func TestWildcardQuery(t *testing.T) {
 
 func TestGroupByInstance(t *testing.T) {
 	config := Config{
-		CounterConfig: make([]CounterConfig, 3),
-		GroupMeasurements: true
+		CounterConfig:     make([]CounterConfig, 3),
+		GroupMeasurements: true,
 	}
 	config.CounterConfig[0].InstanceLabel = "processor.name"
 	config.CounterConfig[0].MeasurementLabel = "processor.time.pct"
