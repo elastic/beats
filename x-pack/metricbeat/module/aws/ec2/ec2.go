@@ -77,7 +77,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	if moduleConfig.Period == "" {
-		err := errors.New("Period is not set in AWS module config.")
+		err := errors.New("period is not set in AWS module config")
 		logp.Error(err)
 	}
 
