@@ -1,7 +1,4 @@
-CHANGELOG.md  merge=union
-CHANGELOG.asciidoc  merge=union
 CHANGELOG.next.asciidoc  merge=union
-CHANGELOG-developer.asciidoc  merge=union
 CHANGELOG-developer.next.asciidoc  merge=union
 
 # Keep these file types as CRLF (Windows).
