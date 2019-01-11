@@ -19,6 +19,7 @@ package hbtest
 
 import (
 	"crypto/x509"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -31,6 +32,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/libbeat/common/mapval"
 	"github.com/elastic/beats/libbeat/common/x509util"
 )
@@ -93,26 +95,34 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) mapval.
 	})
 }
 
-// MonitorChecks creates a skima.Validator that represents the "monitor" field present
+// BaseChecks creates a skima.Validator that represents the "monitor" field present
 // in all heartbeat events.
-func MonitorChecks(host string, ip string, scheme string, status string) mapval.Validator {
+func BaseChecks(ip string, status string) mapval.Validator {
+
 	return mapval.MustCompile(mapval.Map{
 		"monitor": mapval.Map{
-			// TODO: This is only optional because, for some reason, TCP returns
-			// this value, but HTTP does not. We should fix this
-			"host":        mapval.Optional(mapval.IsEqual(host)),
 			"duration.us": mapval.IsDuration,
 			"ip":          ip,
-			"scheme":      scheme,
 			"status":      status,
 		},
 	})
 }
 
-// TCPBaseChecks checks the minimum TCP response, which is only issued
-// without further fields when the endpoint does not respond.
-func TCPBaseChecks(port uint16) mapval.Validator {
-	return mapval.MustCompile(mapval.Map{"tcp.port": port})
+// SimpleURLChecks returns a check for a simple URL
+// with only a scheme, host, and port
+func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) mapval.Validator {
+
+	hostPort := host
+	if port != 0 {
+		hostPort = fmt.Sprintf("%s:%d", host, port)
+	}
+
+	u, err := url.Parse(fmt.Sprintf("%s://%s", scheme, hostPort))
+	require.NoError(t, err)
+
+	return mapval.MustCompile(mapval.Map{
+		"url": monitors.URLFields(u),
+	})
 }
 
 // ErrorChecks checks the standard heartbeat error hierarchy, which should
@@ -129,11 +139,8 @@ func ErrorChecks(msgSubstr string, errType string) mapval.Validator {
 
 // RespondingTCPChecks creates a skima.Validator that represents the "tcp" field present
 // in all heartbeat events that use a Tcp connection as part of their DialChain
-func RespondingTCPChecks(port uint16) mapval.Validator {
-	return mapval.Compose(
-		TCPBaseChecks(port),
-		mapval.MustCompile(mapval.Map{"tcp.rtt.connect.us": mapval.IsDuration}),
-	)
+func RespondingTCPChecks() mapval.Validator {
+	return mapval.MustCompile(mapval.Map{"tcp.rtt.connect.us": mapval.IsDuration})
 }
 
 // CertToTempFile takes a certificate and returns an *os.File with a PEM encoded

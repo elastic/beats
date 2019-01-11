@@ -4,14 +4,6 @@
   description: >
     Fields from the Logstash logs.
   fields:
-    - name: message
-      type: text
-      description: >
-        Contains the un-parsed log message
-    - name: level
-      type: keyword
-      description: >
-        The log level of the message, this correspond to Log4j levels.
     - name: module
       type: keyword
       description: >
@@ -25,3 +17,11 @@
       description: >
         key and value debugging information.
 
+    - name: message
+      type: alias
+      path: message
+      migration: true
+    - name: level
+      type: alias
+      path: log.level
+      migration: true

@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cli"
 	"github.com/elastic/beats/x-pack/libbeat/management"
 	"github.com/elastic/beats/x-pack/libbeat/management/api"
@@ -40,62 +41,67 @@ func genEnrollCmd(name, version string) *cobra.Command {
 		Long: `This will enroll in  Kibana Beats Central Management. If you pass an enrollment token
 		it will be used. You can also enroll using a username and password combination.`,
 		Args: cobra.RangeArgs(1, 2),
-		Run: cli.RunWith(func(cmd *cobra.Command, args []string) error {
-			beat, err := getBeat(name, version)
-			if err != nil {
-				return err
-			}
-
-			kibanaURL := args[0]
-
-			if username == "" && len(args) == 1 {
-				return errors.New("You should pass either an enrollment token or use --username flag")
-			}
-
-			var enrollmentToken string
-			if len(args) == 2 {
-				// use given enrollment token
-				enrollmentToken = args[1]
+		Run: cli.RunWith(
+			func(cmd *cobra.Command, args []string) error {
+				beat, err := getBeat(name, version)
 				if err != nil {
 					return err
 				}
-			} else {
+
+				kibanaURL := args[0]
+
+				if username == "" && len(args) == 1 {
+					return errors.New("You should pass either an enrollment token or use --username flag")
+				}
+
+				// Retrieve any available configuration avaible for Kibana, either
+				// from the configuration file or using `-E`.
+				kibanaRaw, err := kibanaConfig(beat.Config.Management)
+				if err != nil {
+					return err
+				}
+
 				// retrieve an enrollment token using username/password
-				config, err := api.ConfigFromURL(kibanaURL)
+				config, err := api.ConfigFromURL(kibanaURL, kibanaRaw)
 				if err != nil {
 					return err
 				}
 
-				// pass username/password
-				config.IgnoreVersion = true
-				config.Username = username
-				config.Password, err = cli.ReadPassword(password)
-				if err != nil {
-					return err
+				var enrollmentToken string
+				if len(args) == 2 {
+					// use given enrollment token
+					enrollmentToken = args[1]
+				} else {
+					// pass username/password
+					config.IgnoreVersion = true
+					config.Username = username
+					config.Password, err = cli.ReadPassword(password)
+					if err != nil {
+						return err
+					}
+
+					client, err := api.NewClient(config)
+					if err != nil {
+						return err
+					}
+					enrollmentToken, err = client.CreateEnrollmentToken()
+					if err != nil {
+						return errors.Wrap(err, "Error creating a new enrollment token")
+					}
 				}
 
-				client, err := api.NewClient(config)
+				enrolled, err := management.Enroll(beat, config, enrollmentToken, force)
 				if err != nil {
-					return err
+					return errors.Wrap(err, "Error while enrolling")
 				}
-				enrollmentToken, err = client.CreateEnrollmentToken()
-				if err != nil {
-					return errors.Wrap(err, "Error creating a new enrollment token")
+
+				if enrolled {
+					fmt.Println("Enrolled and ready to retrieve settings from Kibana")
+				} else {
+					fmt.Println("Enrollment was canceled by the user")
 				}
-			}
-
-			enrolled, err := management.Enroll(beat, kibanaURL, enrollmentToken, force)
-			if err != nil {
-				return errors.Wrap(err, "Error while enrolling")
-			}
-
-			if enrolled {
-				fmt.Println("Enrolled and ready to retrieve settings from Kibana")
-			} else {
-				fmt.Println("Enrollment was canceled by the user")
-			}
-			return nil
-		}),
+				return nil
+			}),
 	}
 
 	enrollCmd.Flags().StringVar(&username, "username", "elastic", "Username to use when enrolling without token")
@@ -103,4 +109,15 @@ func genEnrollCmd(name, version string) *cobra.Command {
 	enrollCmd.Flags().BoolVar(&force, "force", false, "Force overwrite of current configuraiton, do not prompt for confirmation")
 
 	return &enrollCmd
+}
+
+func kibanaConfig(config *common.Config) (*common.Config, error) {
+	if config != nil && config.HasField("kibana") {
+		sub, err := config.Child("kibana", -1)
+		if err != nil {
+			return nil, err
+		}
+		return sub, nil
+	}
+	return common.NewConfig(), nil
 }

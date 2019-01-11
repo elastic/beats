@@ -73,7 +73,7 @@ type Host struct {
 	// Uptime() in types.HostInfo recalculates the uptime every time it is called -
 	// so storing it permanently here.
 	uptime time.Duration
-	addrs  []net.Addr
+	ips    []net.IP
 	macs   []net.HardwareAddr
 }
 
@@ -124,8 +124,8 @@ func (host *Host) toMapStr() common.MapStr {
 	}
 
 	var ipStrings []string
-	for _, addr := range host.addrs {
-		ipStrings = append(ipStrings, ipString(addr))
+	for _, ip := range host.ips {
+		ipStrings = append(ipStrings, ip.String())
 	}
 	mapstr.Put("ip", ipStrings)
 
@@ -139,17 +139,6 @@ func (host *Host) toMapStr() common.MapStr {
 	mapstr.Put("mac", macStrings)
 
 	return mapstr
-}
-
-func ipString(addr net.Addr) string {
-	switch v := addr.(type) {
-	case *net.IPNet:
-		return v.IP.String()
-	case *net.IPAddr:
-		return v.IP.String()
-	default:
-		return ""
-	}
 }
 
 func init() {
@@ -303,7 +292,7 @@ func getHost() (*Host, error) {
 		return nil, errors.Wrap(err, "failed to load host information")
 	}
 
-	addrs, macs, err := getNetInfo()
+	ips, macs, err := getNetInfo()
 	if err != nil {
 		return nil, err
 	}
@@ -311,7 +300,7 @@ func getHost() (*Host, error) {
 	host := &Host{
 		info:   sysinfoHost.Info(),
 		uptime: sysinfoHost.Info().Uptime(),
-		addrs:  addrs,
+		ips:    ips,
 		macs:   macs,
 	}
 
@@ -333,8 +322,8 @@ func hostEvent(host *Host, eventType string, action eventAction) mb.Event {
 
 func hostMessage(host *Host, action eventAction) string {
 	var firstIP string
-	if len(host.addrs) > 0 {
-		firstIP = ipString(host.addrs[0])
+	if len(host.ips) > 0 {
+		firstIP = host.ips[0].String()
 	}
 
 	// Hostname + IP of the first non-loopback interface.
@@ -434,8 +423,9 @@ func (ms *MetricSet) restoreStateFromDisk() error {
 
 // getNetInfo is originally copied from libbeat/processors/add_host_metadata.go.
 // TODO: Maybe these two can share an implementation?
-func getNetInfo() ([]net.Addr, []net.HardwareAddr, error) {
-	var addrList []net.Addr
+func getNetInfo() ([]net.IP, []net.HardwareAddr, error) {
+	var ipv4List []net.IP
+	var ipv6List []net.IP
 	var hwList []net.HardwareAddr
 
 	// Get all interfaces and loop through them
@@ -462,8 +452,24 @@ func getNetInfo() ([]net.Addr, []net.HardwareAddr, error) {
 			continue
 		}
 
-		addrList = append(addrList, addrs...)
+		for _, addr := range addrs {
+			var ip net.IP
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+			default:
+				continue
+			}
+
+			if ip.To4() != nil {
+				ipv4List = append(ipv4List, ip)
+			} else {
+				ipv6List = append(ipv6List, ip)
+			}
+		}
 	}
 
-	return addrList, hwList, errs.Err()
+	return append(ipv4List, ipv6List...), hwList, errs.Err()
 }

@@ -56,7 +56,7 @@ func GetFields(beat string) ([]byte, error) {
 
 	// Get all priorities and sort them
 	beatRegistry := FieldsRegistry[beat]
-	priorities := make([]int, 0, len(FieldsRegistry))
+	priorities := make([]int, 0, len(beatRegistry))
 	for p := range beatRegistry {
 		priorities = append(priorities, p)
 	}

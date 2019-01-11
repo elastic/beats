@@ -1388,14 +1388,14 @@ endif::[]
 [[configure-cloud-id]]
 === Configure the output for the Elastic Cloud
 
+++++
+<titleabbrev>Cloud</titleabbrev>
+++++
+
 ifdef::apm-server[]
 NOTE: This page refers to using a separate instance of APM Server with an existing Elasticsearch Service deployment.
 APM Server is not yet supported on Elasticsearch Service.
 endif::apm-server[]
-
-++++
-<titleabbrev>Cloud</titleabbrev>
-++++
 
 {beatname_uc} comes with two settings that simplify the output configuration
 when used together with https://cloud.elastic.co/[Elastic Cloud]. When defined,
