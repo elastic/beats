@@ -55,6 +55,18 @@
       }
     }
   , {"convert":
+      {"field": "suricata.eve.http.url"
+      ,"target_field": "url.path"
+      ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+  , { "script":
+      { "lang": "painless"
+      , "source": "String[] split(String s, String sep) { def p=s.indexOf(sep); return p>=0? new String[]{s.substring(0,p), s.substring(p+1)} : new String[]{s};} def u=ctx['url']; def p=u!=null? u['path'] : null; if(p!=null) {def q=split(p,'#');if(q.length>1)u['fragment']=q[1];q=split(q[0],'?');if(q.length>1)u['query']=q[1];u['path']=q[0];}"
+      }
+    }
+  , {"convert":
       {"field": "suricata.eve.http.hostname"
       ,"target_field": "destination.domain"
       ,"type": "string"
