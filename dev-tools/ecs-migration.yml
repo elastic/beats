@@ -404,6 +404,36 @@
   to: message
   alias: true
 
+## Kibana module
+
+- from: kibana.log.meta.req.headers.referer
+  to: http.request.referrer
+  alias: true
+
+- from: kibana.log.meta.req.referer
+  to: http.request.referrer
+  alias: true
+
+- from: kibana.log.meta.req.headers.user-agent
+  to: user_agent.original
+  alias: true
+
+- from: kibana.log.meta.req.remoteAddress
+  to: source.address
+  alias: true
+
+- from: kibana.log.meta.req.url
+  to: url.original
+  alias: true
+
+- from: kibana.log.meta.meta.statusCode
+  to: http.response.status_code
+  alias: true
+
+- from: kibana.log.meta.method
+  to: http.request.method
+  alias: true
+
 ## NGINX module
 
 - from: nginx.access.user_name
