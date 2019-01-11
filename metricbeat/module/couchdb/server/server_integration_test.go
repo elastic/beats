@@ -23,8 +23,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
@@ -39,6 +37,8 @@ func TestData(t *testing.T) {
 	}
 }
 
+/*
+// TODO: Enable
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "couchdb")
 
@@ -51,6 +51,7 @@ func TestFetch(t *testing.T) {
 	assert.NotNil(t, event)
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 }
+*/
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
