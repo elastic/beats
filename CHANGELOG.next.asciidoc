@@ -53,6 +53,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Enforce validation for the Central Management access token. {issue}9621[9621]
 - Update Golang to 1.10.7. {pull}9640[9640]
 - Fix config appender registration. {pull}9873[9873]
+- Gracefully handle TLS options when enrolling a Beat. {issue}9129[9129]
 
 *Auditbeat*
 

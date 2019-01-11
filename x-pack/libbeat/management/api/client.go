@@ -25,7 +25,7 @@ type Client struct {
 }
 
 // ConfigFromURL generates a full kibana client config from an URL
-func ConfigFromURL(kibanaURL string) (*kibana.ClientConfig, error) {
+func ConfigFromURL(kibanaURL string, config *common.Config) (*kibana.ClientConfig, error) {
 	data, err := url.Parse(kibanaURL)
 	if err != nil {
 		return nil, err
@@ -37,14 +37,21 @@ func ConfigFromURL(kibanaURL string) (*kibana.ClientConfig, error) {
 		password, _ = data.User.Password()
 	}
 
-	return &kibana.ClientConfig{
-		Protocol: data.Scheme,
-		Host:     data.Host,
-		Path:     data.Path,
-		Username: username,
-		Password: password,
-		Timeout:  defaultTimeout,
-	}, nil
+	// Lets pick up any configuration from either the YAML or from the -E flags.
+	// and merge it with the provided URL.
+	kibana := kibana.ClientConfig{}
+	if err := config.Unpack(&kibana); err != nil {
+		return nil, err
+	}
+
+	kibana.Protocol = data.Scheme
+	kibana.Host = data.Host
+	kibana.Path = data.Path
+	kibana.Username = username
+	kibana.Password = password
+	kibana.Timeout = defaultTimeout
+
+	return &kibana, nil
 }
 
 // NewClient creates and returns a kibana client
