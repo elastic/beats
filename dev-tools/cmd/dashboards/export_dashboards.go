@@ -23,7 +23,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/url"
-	"os"
 	"path/filepath"
 	"time"
 
@@ -84,7 +83,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to export dashboards from YML file: %+v", err)
 		}
-		os.Exit(0)
+		return
 	}
 
 	if len(*dashboard) > 0 {
@@ -95,11 +94,15 @@ func main() {
 		if !quiet {
 			log.Printf("The dashboard %s was exported under '%s'\n", *dashboard, *fileOutput)
 		}
+		return
 	}
 }
 
 func exportDashboardsFromYML(client *kibana.Client, ymlFile string) error {
 	results, info, err := dashboards.ExportAllFromYml(client, ymlFile)
+	if err != nil {
+		return err
+	}
 	for i, r := range results {
 		log.Printf("id=%s, name=%s\n", info.Dashboards[i].ID, info.Dashboards[i].File)
 		r = dashboards.DecodeExported(r)
