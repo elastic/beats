@@ -114,6 +114,10 @@
   alias: true
   alias6: true
 
+# process processor
+- from: process.exe
+  to: process.executable
+  alias: true
 
 # Filebeat modules
 
@@ -643,6 +647,9 @@
   to: source.domain
   alias: true
 
+- from: process.exe
+  to: process.executable
+  alias: true
 
 # Packetbeat
 

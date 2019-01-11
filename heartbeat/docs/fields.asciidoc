@@ -21,6 +21,7 @@ grouped in the following categories:
 * <<exported-fields-http>>
 * <<exported-fields-icmp>>
 * <<exported-fields-kubernetes-processor>>
+* <<exported-fields-process>>
 * <<exported-fields-resolve>>
 * <<exported-fields-socks5>>
 * <<exported-fields-tcp>>
@@ -3660,6 +3661,23 @@ type: keyword
 
 Kubernetes container image
 
+
+--
+
+[[exported-fields-process]]
+== Process fields
+
+Process metadata fields
+
+
+
+
+*`process.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
 
 --
 
