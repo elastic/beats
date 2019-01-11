@@ -514,6 +514,22 @@
   to: user_agent.original
   alias: true
 
+- from: nginx.error.level
+  to: log.level
+  alias: true
+
+- from: nginx.error.pid
+  to: process.pid
+  alias: true
+
+- from: nginx.error.tid
+  to: process.thread.id
+  alias: true
+
+- from: nginx.error.message
+  to: message
+  alias: true
+
 ## PostgreSQL module
 
 - from: postgresql.log.timezone
