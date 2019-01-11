@@ -28,6 +28,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Modify apache/error dataset to follow ECS. {pull}8963[8963]
 - Rename many `traefik.access.*` fields to map to ECS. {pull}9005[9005]
 - Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
+- Rename many `iis.error.*` fields to map to ECS. {pull}9955[9955]
 - Rename a few `logstash.*` fields to map to ECS, remove logstash.slowlog.message. {pull}9935[9935]
 - Rename a few `mysql.*` fields to map to ECS. {pull}10008[10008]
 - Rename a few `nginx.error.*` fields to map to ECS. {pull}10007[10007]
@@ -67,7 +68,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - Add `convert_timezone` option to Elasticsearch module to convert dates to UTC. {issue}9756[9756] {pull}9761[9761]
-- Support IPv6 addresses with zone id in IIS ingest pipeline. {issue}9836[9836] {pull}9869[9869]
+- Support IPv6 addresses with zone id in IIS ingest pipeline.
+  {issue}9836[9836] error log: {pull}9869[9869], access log: {pull}9955[9955].
 - Support haproxy log lines without captured headers. {issue}9463[9463] {pull}9958[9958]
 
 *Heartbeat*
