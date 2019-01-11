@@ -72,7 +72,7 @@ func createAddLabels(c *common.Config) (processors.Processor, error) {
 // `shared` true if there is the chance of labels being changed/modified by
 // subsequent processors.
 func NewAddLabels(labels common.MapStr, shared bool) processors.Processor {
-	return &addLabels{labels: labels, shared: true}
+	return &addLabels{labels: labels, shared: shared}
 }
 
 func (af *addLabels) Run(event *beat.Event) (*beat.Event, error) {
