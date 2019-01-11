@@ -2380,7 +2380,7 @@ HTTP statistics
 *`couchdb.server.httpd.view_reads`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of view reads
 
@@ -2390,7 +2390,7 @@ Number of view reads
 *`couchdb.server.httpd.bulk_requests`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of bulk requests
 
@@ -2400,7 +2400,7 @@ Number of bulk requests
 *`couchdb.server.httpd.clients_requesting_changes`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of clients for continuous _changes
 
@@ -2410,7 +2410,7 @@ Number of clients for continuous _changes
 *`couchdb.server.httpd.temporary_view_reads`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of temporary view reads
 
@@ -2420,7 +2420,7 @@ Number of temporary view reads
 *`couchdb.server.httpd.requests`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP requests
 
@@ -2437,7 +2437,7 @@ HTTP request methods
 *`couchdb.server.httpd_request_methods.COPY`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP COPY requests
 
@@ -2447,7 +2447,7 @@ Number of HTTP COPY requests
 *`couchdb.server.httpd_request_methods.HEAD`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP HEAD requests
 
@@ -2457,7 +2457,7 @@ Number of HTTP HEAD requests
 *`couchdb.server.httpd_request_methods.POST`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP POST requests
 
@@ -2467,7 +2467,7 @@ Number of HTTP POST requests
 *`couchdb.server.httpd_request_methods.DELETE`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP DELETE requests
 
@@ -2477,7 +2477,7 @@ Number of HTTP DELETE requests
 *`couchdb.server.httpd_request_methods.GET`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP GET requests
 
@@ -2487,7 +2487,7 @@ Number of HTTP GET requests
 *`couchdb.server.httpd_request_methods.PUT`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP PUT requests
 
@@ -2504,7 +2504,7 @@ HTTP status codes statistics
 *`couchdb.server.httpd_status_codes.200`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP 200 OK responses
 
@@ -2514,7 +2514,7 @@ Number of HTTP 200 OK responses
 *`couchdb.server.httpd_status_codes.201`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP 201 Created responses
 
@@ -2524,7 +2524,7 @@ Number of HTTP 201 Created responses
 *`couchdb.server.httpd_status_codes.202`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP 202 Accepted responses
 
@@ -2534,7 +2534,7 @@ Number of HTTP 202 Accepted responses
 *`couchdb.server.httpd_status_codes.301`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP 301 Moved Permanently responses
 
@@ -2544,7 +2544,7 @@ Number of HTTP 301 Moved Permanently responses
 *`couchdb.server.httpd_status_codes.304`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP 304 Not Modified responses
 
@@ -2554,7 +2554,7 @@ Number of HTTP 304 Not Modified responses
 *`couchdb.server.httpd_status_codes.400`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP 400 Bad Request responses
 
@@ -2564,7 +2564,7 @@ Number of HTTP 400 Bad Request responses
 *`couchdb.server.httpd_status_codes.401`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP 401 Unauthorized responses
 
@@ -2574,7 +2574,7 @@ Number of HTTP 401 Unauthorized responses
 *`couchdb.server.httpd_status_codes.403`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP 403 Forbidden responses
 
@@ -2584,7 +2584,7 @@ Number of HTTP 403 Forbidden responses
 *`couchdb.server.httpd_status_codes.404`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP 404 Not Found responses
 
@@ -2594,7 +2594,7 @@ Number of HTTP 404 Not Found responses
 *`couchdb.server.httpd_status_codes.405`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP 405 Method Not Allowed responses
 
@@ -2604,7 +2604,7 @@ Number of HTTP 405 Method Not Allowed responses
 *`couchdb.server.httpd_status_codes.409`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP 409 Conflict responses
 
@@ -2614,7 +2614,7 @@ Number of HTTP 409 Conflict responses
 *`couchdb.server.httpd_status_codes.412`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP 412 Precondition Failed responses
 
@@ -2624,7 +2624,7 @@ Number of HTTP 412 Precondition Failed responses
 *`couchdb.server.httpd_status_codes.500`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of HTTP 500 Internal Server Error responses
 
@@ -2641,7 +2641,7 @@ couchdb statistics
 *`couchdb.server.couchdb.database_writes`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of times a database was changed
 
@@ -2651,7 +2651,7 @@ Number of times a database was changed
 *`couchdb.server.couchdb.open_databases`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of open databases
 
@@ -2661,7 +2661,7 @@ Number of open databases
 *`couchdb.server.couchdb.auth_cache_misses`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of authentication cache misses
 
@@ -2671,7 +2671,7 @@ Number of authentication cache misses
 *`couchdb.server.couchdb.request_time`*::
 +
 --
-type: scaled_float
+type: long
 
 Length of a request inside CouchDB without MochiWeb
 
@@ -2681,7 +2681,7 @@ Length of a request inside CouchDB without MochiWeb
 *`couchdb.server.couchdb.database_reads`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of times a document was read from a database
 
@@ -2691,7 +2691,7 @@ Number of times a document was read from a database
 *`couchdb.server.couchdb.auth_cache_hits`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of authentication cache hits
 
@@ -2701,7 +2701,7 @@ Number of authentication cache hits
 *`couchdb.server.couchdb.open_os_files`*::
 +
 --
-type: scaled_float
+type: long
 
 Number of file descriptors CouchDB has open
 
