@@ -22,6 +22,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Allow beats to blacklist certain part of the configuration while using Central Management. {pull}9099[9099]
 - Filesets with multiple ingest pipelines added in {pull}8914[8914] only work with Elasticsearch >= 6.5.0 {pull}10001[10001]
 - Add grok pattern to support redis 5.0.3 log timestamp. {issue}9819[9819] {pull}10033[10033]
+- Ingesting Elasticsearch audit logs is only supported with Elasticsearch 6.5.0 and above {pull}8852[8852]
 
 *Heartbeat*
 
@@ -153,6 +154,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Add convert_timezone to nginx module. {issue}9839[9839] {pull}10148[10148]
 - Add support for Percona in the `slowlog` fileset of `mysql` module. {issue}6665[6665] {pull}10227[10227]
 - Teach elasticsearch/audit fileset to parse out some more fields. {issue}10134[10134] {pull}10137[10137]
+- Added support for ingesting structured Elasticsearch audit logs {pull}8852[8852]
 
 *Heartbeat*
 - Made monitors.d configuration part of the default config. {pull}9004[9004]
