@@ -401,11 +401,12 @@ func (r *PerfmonReader) Read() ([]mb.Event, error) {
 			}
 
 			var eventKey string
-			if r.groupMeasurements {
+			if r.groupMeasurements && val.Err == nil {
 				// Send measurements with the same instance label as part of the same event
 				eventKey = val.Instance
 			} else {
 				// Send every measurement as an individual event
+				// If a counter contains an error, it will always be sent as an individual event
 				eventKey = counterPath + strconv.Itoa(ind)
 			}
 
