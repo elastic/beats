@@ -129,6 +129,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Added netflow input type that supports NetFlow v1, v5, v6, v7, v8, v9 and IPFIX. {issue}9399[9399]
 - Support mysql 5.7.22 slowlog starting with time information. {issue}7892[7892] {pull}9647[9647]
 - Add support for ssl_request_log in apache2 module. {issue}8088[8088] {pull}9833[9833]
+- Add support for iis 7.5 log format. {issue}9753[9753] {pull}9967[9967]
 
 *Heartbeat*
 - Made monitors.d configuration part of the default config. {pull}9004[9004]

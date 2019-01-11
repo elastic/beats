@@ -1,0 +1,27 @@
+[
+    {
+        "@timestamp": "2018-08-28T18:24:25.000Z",
+        "event.dataset": "iis.access",
+        "fileset.module": "iis",
+        "fileset.name": "access",
+        "iis.access.method": "GET",
+        "iis.access.port": "80",
+        "iis.access.query_string": "-",
+        "iis.access.remote_ip": "10.100.118.31",
+        "iis.access.request_time_ms": "792",
+        "iis.access.response_code": "404",
+        "iis.access.server_ip": "10.100.220.70",
+        "iis.access.sub_status": "4",
+        "iis.access.url": "/",
+        "iis.access.user_agent.device": "Other",
+        "iis.access.user_agent.name": "Other",
+        "iis.access.user_agent.original": "Mozilla/4.0+(compatible;+MSIE+7.0;+Windows+NT+6.3;+WOW64;+Trident/7.0;+.NET4.0E;+.NET4.0C;+.NET+CLR+3.5.30729;+.NET+CLR[+2.0.50727](tel:+2050727);+.NET+CLR+3.0.30729)",
+        "iis.access.user_agent.os": "Windows",
+        "iis.access.user_agent.os_name": "Windows",
+        "iis.access.user_name": "-",
+        "iis.access.win32_status": "2",
+        "input.type": "log",
+        "offset": 244,
+        "prospector.type": "log"
+    }
+]
