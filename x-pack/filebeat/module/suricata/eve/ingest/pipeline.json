@@ -128,6 +128,25 @@
       ,"ignore_missing": true
       }
     }
+  , {"date":
+      {"field": "suricata.eve.flow.start"
+      ,"target_field": "event.start"
+      ,"formats": ["ISO8601"]
+      ,"ignore_failure": true
+      }
+    }
+  , {"date":
+      {"field": "suricata.eve.timestamp"
+      ,"target_field": "event.end"
+      , "formats": ["ISO8601"]
+      ,"ignore_failure": true
+      }
+    }
+  , { "script":
+      { "lang": "painless"
+      , "source": "Instant ins(def d){try{return Instant.parse(d);}catch(Exception e){return null;}}def ev=ctx['event'];if(ev!=null){def start=ins(ev['start']); def end=ins(ev['end']); if(start!=null && end!=null && !start.isAfter(end)) {ev['duration'] = Duration.between(start,end).toNanos();}}"
+      }
+    }
   , {"convert":
       {"field": "suricata.eve.proto"
       ,"target_field": "network.transport"
