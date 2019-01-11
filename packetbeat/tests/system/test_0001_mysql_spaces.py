@@ -13,7 +13,7 @@ class Test(BaseTest):
         objs = self.read_output()
         assert all([o["type"] == "mysql" for o in objs])
         assert len(objs) == 7
-        assert all([o["port"] == 3306 for o in objs])
+        assert all([o["server.port"] == 3306 for o in objs])
 
         assert objs[0]["method"] == "SET"
         assert objs[0]["path"] == ""

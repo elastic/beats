@@ -206,7 +206,7 @@ func TestExcludedFiles(t *testing.T) {
 	}
 
 	wanted := map[string]bool{
-		dir: true,
+		dir:                              true,
 		filepath.Join(dir, "FILE.TXT"):   true,
 		filepath.Join(dir, ".gitignore"): true,
 	}
@@ -271,7 +271,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	}
 
 	wanted := map[string]bool{
-		dir: true,
+		dir:                                    true,
 		filepath.Join(dir, ".ssh"):             true,
 		filepath.Join(dir, ".ssh/known_hosts"): true,
 	}

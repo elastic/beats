@@ -110,6 +110,23 @@ func (r *Registry) MustRegisterList(name string, list ReloadableList) {
 	}
 }
 
+// GetRegisteredNames returns the list of names registered
+func (r *Registry) GetRegisteredNames() []string {
+	r.RLock()
+	defer r.RUnlock()
+	var names []string
+
+	for name := range r.confs {
+		names = append(names, name)
+	}
+
+	for name := range r.confsLists {
+		names = append(names, name)
+	}
+
+	return names
+}
+
 // GetReloadable returns the reloadable object with the given name, nil if not found
 func (r *Registry) GetReloadable(name string) Reloadable {
 	r.RLock()

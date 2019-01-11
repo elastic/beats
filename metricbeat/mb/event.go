@@ -18,6 +18,7 @@
 package mb
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -41,6 +42,7 @@ type Event struct {
 	Timestamp time.Time     // Timestamp when the event data was collected.
 	Error     error         // Error that occurred while collecting the event data.
 	Host      string        // Host from which the data was collected.
+	Service   string        // Service type
 	Took      time.Duration // Amount of time it took to collect the event data.
 }
 
@@ -64,6 +66,12 @@ func (e *Event) BeatEvent(module, metricSet string, modifiers ...EventModifier) 
 		b.Fields.Put(module, e.ModuleFields)
 		e.ModuleFields = nil
 	}
+
+	// If service is not set, falls back to the module name
+	if e.Service == "" {
+		e.Service = module
+	}
+	e.RootFields.Put("service.type", e.Service)
 
 	if len(e.MetricSetFields) > 0 {
 		switch e.Namespace {
@@ -109,27 +117,32 @@ func (e *Event) BeatEvent(module, metricSet string, modifiers ...EventModifier) 
 //       "rtt": 115
 //     }
 func AddMetricSetInfo(module, metricset string, event *Event) {
-	info := common.MapStr{
-		"name":   metricset,
-		"module": module,
+
+	if event.Namespace == "" {
+		event.Namespace = fmt.Sprintf("%s.%s", module, metricset)
+	}
+
+	e := common.MapStr{
+		"event": common.MapStr{
+			"dataset": event.Namespace,
+			"module":  module,
+		},
+		// TODO: This should only be sent if migration layer is enabled
+		"metricset": common.MapStr{
+			"name": metricset,
+		},
 	}
 	if event.Host != "" {
-		info["host"] = event.Host
+		e.Put("service.address", event.Host)
 	}
 	if event.Took > 0 {
-		info["rtt"] = event.Took / time.Microsecond
-	}
-	if event.Namespace != "" {
-		info["namespace"] = event.Namespace
-	}
-	info = common.MapStr{
-		"metricset": info,
+		e.Put("event.duration", event.Took/time.Nanosecond)
 	}
 
 	if event.RootFields == nil {
-		event.RootFields = info
+		event.RootFields = e
 	} else {
-		event.RootFields.DeepUpdate(info)
+		event.RootFields.DeepUpdate(e)
 	}
 }
 

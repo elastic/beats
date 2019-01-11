@@ -45,8 +45,8 @@ func createWriteThroughFile(path string) (*os.File, error) {
 		pathp, // Path
 		syscall.GENERIC_READ|syscall.GENERIC_WRITE,               // Access Mode
 		uint32(syscall.FILE_SHARE_READ|syscall.FILE_SHARE_WRITE), // Share Mode
-		nil, // Security Attributes
-		syscall.CREATE_ALWAYS,                                          // Create Mode
+		nil,                   // Security Attributes
+		syscall.CREATE_ALWAYS, // Create Mode
 		uint32(syscall.FILE_ATTRIBUTE_NORMAL|_FILE_FLAG_WRITE_THROUGH), // Flags and Attributes
 		0) // Template File
 

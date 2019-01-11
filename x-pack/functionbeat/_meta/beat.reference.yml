@@ -25,7 +25,7 @@ functionbeat.provider.aws.functions:
     description: "lambda function for cloudwatch logs"
 
     # Concurrency, is the reserved number of instances for that function.
-    # Default is unreserved.
+    # Default is 5.
     #
     # Note: There is a hard limit of 1000 functions of any kind per account.
     #concurrency: 5
@@ -62,7 +62,7 @@ functionbeat.provider.aws.functions:
     description: "lambda function for sqs events"
 
     # Concurrency, is the reserved number of instances for that function.
-    # Default is unreserved.
+    # Default is 5.
     #
     # Note: There is a hard limit of 1000 functions of any kind per account.
     #concurrency: 5

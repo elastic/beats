@@ -129,8 +129,8 @@
       },
       "id": "c7d46c60-86da-11e8-b59d-21efb914e65c",
       "type": "visualization",
-      "updated_at": "2018-10-22T11:25:34.250Z",
-      "version": 4
+      "updated_at": "2018-11-07T22:56:24.962Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -193,8 +193,8 @@
       },
       "id": "0a0aa630-86db-11e8-b59d-21efb914e65c",
       "type": "visualization",
-      "updated_at": "2018-10-22T11:26:45.879Z",
-      "version": 4
+      "updated_at": "2018-11-07T22:56:24.962Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -257,8 +257,8 @@
       },
       "id": "728f64c0-86db-11e8-b59d-21efb914e65c",
       "type": "visualization",
-      "updated_at": "2018-10-22T11:28:56.796Z",
-      "version": 4
+      "updated_at": "2018-11-07T22:56:24.962Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -389,8 +389,8 @@
       },
       "id": "9d5b5b50-86db-11e8-b59d-21efb914e65c",
       "type": "visualization",
-      "updated_at": "2018-10-22T11:26:06.499Z",
-      "version": 4
+      "updated_at": "2018-11-07T22:56:24.962Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -399,10 +399,10 @@
           "event.type",
           "suricata.eve.flow_id",
           "suricata.eve.proto",
-          "source_ecs.ip",
-          "suricata.eve.src_port",
-          "suricata.eve.dest_ip",
-          "suricata.eve.dest_port",
+          "source.ip",
+          "source.port",
+          "destination.ip",
+          "destination.port",
           "destination.geo.region_name",
           "destination.geo.country_iso_code"
         ],
@@ -445,7 +445,7 @@
                   "alias": null,
                   "disabled": false,
                   "index": "filebeat-*",
-                  "key": "fileset.module",
+                  "key": "event.module",
                   "negate": false,
                   "params": {
                     "query": "suricata",
@@ -456,7 +456,7 @@
                 },
                 "query": {
                   "match": {
-                    "fileset.module": {
+                    "event.module": {
                       "query": "suricata",
                       "type": "phrase"
                     }
@@ -482,8 +482,8 @@
       },
       "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c",
       "type": "search",
-      "updated_at": "2018-10-22T11:32:43.869Z",
-      "version": 3
+      "updated_at": "2018-11-07T22:56:24.962Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -515,7 +515,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Top Connection Source Countries",
-                "field": "source_ecs.geo.country_iso_code",
+                "field": "source.geo.country_iso_code",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -541,8 +541,8 @@
       },
       "id": "5f99eb50-86dc-11e8-b59d-21efb914e65c",
       "type": "visualization",
-      "updated_at": "2018-10-22T11:31:03.468Z",
-      "version": 4
+      "updated_at": "2018-11-07T22:56:24.962Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -600,8 +600,8 @@
       },
       "id": "8e7f88d0-86dc-11e8-b59d-21efb914e65c",
       "type": "visualization",
-      "updated_at": "2018-10-22T11:31:56.335Z",
-      "version": 4
+      "updated_at": "2018-11-07T22:56:24.962Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -664,8 +664,8 @@
       },
       "id": "0a363820-86dd-11e8-b59d-21efb914e65c",
       "type": "visualization",
-      "updated_at": "2018-10-22T11:27:45.760Z",
-      "version": 4
+      "updated_at": "2018-11-07T22:56:24.962Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -691,32 +691,6 @@
                   "alias": null,
                   "disabled": false,
                   "index": "filebeat-*",
-                  "key": "fileset.module",
-                  "negate": false,
-                  "params": {
-                    "query": "suricata",
-                    "type": "phrase"
-                  },
-                  "type": "phrase",
-                  "value": "suricata"
-                },
-                "query": {
-                  "match": {
-                    "fileset.module": {
-                      "query": "suricata",
-                      "type": "phrase"
-                    }
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "index": "filebeat-*",
                   "key": "event.type",
                   "negate": false,
                   "params": {
@@ -730,6 +704,32 @@
                   "match": {
                     "event.type": {
                       "query": "stats",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "filebeat-*",
+                  "key": "event.module",
+                  "negate": false,
+                  "params": {
+                    "query": "suricata",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "suricata"
+                },
+                "query": {
+                  "match": {
+                    "event.module": {
+                      "query": "suricata",
                       "type": "phrase"
                     }
                   }
@@ -754,8 +754,8 @@
       },
       "id": "d57a2db0-86ca-11e8-b59d-21efb914e65c",
       "type": "search",
-      "updated_at": "2018-10-22T11:33:41.467Z",
-      "version": 4
+      "updated_at": "2018-11-07T22:56:24.962Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -778,132 +778,132 @@
           "useMargins": true
         },
         "panelsJSON": [
-            {
-                "embeddableConfig": {},
-                "gridData": {
-                    "h": 10,
-                    "i": "1",
-                    "w": 48,
-                    "x": 0,
-                    "y": 0
-                },
-                "id": "c7d46c60-86da-11e8-b59d-21efb914e65c",
-                "panelIndex": "1",
-                "type": "visualization",
-                "version": "6.3.0"
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "1",
+              "w": 48,
+              "x": 0,
+              "y": 0
             },
-            {
-                "embeddableConfig": {},
-                "gridData": {
-                    "h": 14,
-                    "i": "2",
-                    "w": 9,
-                    "x": 0,
-                    "y": 20
-                },
-                "id": "0a0aa630-86db-11e8-b59d-21efb914e65c",
-                "panelIndex": "2",
-                "type": "visualization",
-                "version": "6.3.0"
+            "id": "c7d46c60-86da-11e8-b59d-21efb914e65c",
+            "panelIndex": "1",
+            "type": "visualization",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 14,
+              "i": "2",
+              "w": 9,
+              "x": 0,
+              "y": 20
             },
-            {
-                "embeddableConfig": {},
-                "gridData": {
-                    "h": 14,
-                    "i": "3",
-                    "w": 11,
-                    "x": 19,
-                    "y": 20
-                },
-                "id": "728f64c0-86db-11e8-b59d-21efb914e65c",
-                "panelIndex": "3",
-                "type": "visualization",
-                "version": "6.3.0"
+            "id": "0a0aa630-86db-11e8-b59d-21efb914e65c",
+            "panelIndex": "2",
+            "type": "visualization",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 14,
+              "i": "3",
+              "w": 11,
+              "x": 19,
+              "y": 20
             },
-            {
-                "embeddableConfig": {},
-                "gridData": {
-                    "h": 10,
-                    "i": "4",
-                    "w": 48,
-                    "x": 0,
-                    "y": 10
-                },
-                "id": "9d5b5b50-86db-11e8-b59d-21efb914e65c",
-                "panelIndex": "4",
-                "type": "visualization",
-                "version": "6.3.0"
+            "id": "728f64c0-86db-11e8-b59d-21efb914e65c",
+            "panelIndex": "3",
+            "type": "visualization",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 10,
+              "i": "4",
+              "w": 48,
+              "x": 0,
+              "y": 10
             },
-            {
-                "embeddableConfig": {},
-                "gridData": {
-                    "h": 19,
-                    "i": "5",
-                    "w": 48,
-                    "x": 0,
-                    "y": 34
-                },
-                "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c",
-                "panelIndex": "5",
-                "type": "search",
-                "version": "6.3.0"
+            "id": "9d5b5b50-86db-11e8-b59d-21efb914e65c",
+            "panelIndex": "4",
+            "type": "visualization",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 19,
+              "i": "5",
+              "w": 48,
+              "x": 0,
+              "y": 34
             },
-            {
-                "embeddableConfig": {},
-                "gridData": {
-                    "h": 14,
-                    "i": "6",
-                    "w": 9,
-                    "x": 30,
-                    "y": 20
-                },
-                "id": "5f99eb50-86dc-11e8-b59d-21efb914e65c",
-                "panelIndex": "6",
-                "type": "visualization",
-                "version": "6.3.0"
+            "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c",
+            "panelIndex": "5",
+            "type": "search",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 14,
+              "i": "6",
+              "w": 9,
+              "x": 30,
+              "y": 20
             },
-            {
-                "embeddableConfig": {},
-                "gridData": {
-                    "h": 14,
-                    "i": "7",
-                    "w": 9,
-                    "x": 39,
-                    "y": 20
-                },
-                "id": "8e7f88d0-86dc-11e8-b59d-21efb914e65c",
-                "panelIndex": "7",
-                "type": "visualization",
-                "version": "6.3.0"
+            "id": "5f99eb50-86dc-11e8-b59d-21efb914e65c",
+            "panelIndex": "6",
+            "type": "visualization",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 14,
+              "i": "7",
+              "w": 9,
+              "x": 39,
+              "y": 20
             },
-            {
-                "embeddableConfig": {},
-                "gridData": {
-                    "h": 14,
-                    "i": "8",
-                    "w": 10,
-                    "x": 9,
-                    "y": 20
-                },
-                "id": "0a363820-86dd-11e8-b59d-21efb914e65c",
-                "panelIndex": "8",
-                "type": "visualization",
-                "version": "6.3.0"
+            "id": "8e7f88d0-86dc-11e8-b59d-21efb914e65c",
+            "panelIndex": "7",
+            "type": "visualization",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 14,
+              "i": "8",
+              "w": 10,
+              "x": 9,
+              "y": 20
             },
-            {
-                "embeddableConfig": {},
-                "gridData": {
-                    "h": 16,
-                    "i": "9",
-                    "w": 48,
-                    "x": 0,
-                    "y": 53
-                },
-                "id": "d57a2db0-86ca-11e8-b59d-21efb914e65c",
-                "panelIndex": "9",
-                "type": "search",
-                "version": "6.3.0"
-            }
+            "id": "0a363820-86dd-11e8-b59d-21efb914e65c",
+            "panelIndex": "8",
+            "type": "visualization",
+            "version": "6.3.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 16,
+              "i": "9",
+              "w": 48,
+              "x": 0,
+              "y": 53
+            },
+            "id": "d57a2db0-86ca-11e8-b59d-21efb914e65c",
+            "panelIndex": "9",
+            "type": "search",
+            "version": "6.3.0"
+          }
         ],
         "timeRestore": false,
         "title": "[Suricata] Events Overview",
@@ -911,9 +911,9 @@
       },
       "id": "78289c40-86da-11e8-b59d-21efb914e65c",
       "type": "dashboard",
-      "updated_at": "2018-10-22T11:34:16.665Z",
-      "version": 4
+      "updated_at": "2018-11-07T22:56:24.962Z",
+      "version": 1
     }
   ],
-  "version": "6.4.2"
+  "version": "6.4.3"
 }

@@ -1,0 +1,3 @@
+TIP: Starting with {beatname_uc} 6.5, you can define and manage {beatname_uc}
+configurations in a central location in {kib}. For more information, see
+<<configuration-central-management,{beats} central management>>.

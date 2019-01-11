@@ -35,10 +35,6 @@ var DefaultCleanPaths = []string{
 	"_meta/kibana.generated",
 	"_meta/kibana/5/index-pattern/{{.BeatName}}.json",
 	"_meta/kibana/6/index-pattern/{{.BeatName}}.json",
-
-	"../x-pack/{{.BeatName}}/build",
-	"../x-pack/{{.BeatName}}/{{.BeatName}}",
-	"../x-pack/{{.BeatName}}/{{.BeatName}}.exe",
 }
 
 // Clean clean generated build artifacts.

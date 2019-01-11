@@ -19,7 +19,6 @@ package ccr
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -42,17 +41,25 @@ var (
 			"shard": s.Object{
 				"number": c.Int("shard_id"),
 			},
-			"operations_indexed": c.Int("number_of_operations_indexed"),
-			"time_since_last_fetch": s.Object{
-				"ms": c.Int("time_since_last_fetch_millis"),
+			"operations_written": c.Int("operations_written"),
+			"time_since_last_read": s.Object{
+				"ms": c.Int("time_since_last_read_millis"),
 			},
 			"global_checkpoint": c.Int("follower_global_checkpoint"),
 		},
 	}
 )
 
+type response struct {
+	FollowStats struct {
+		Indices []struct {
+			Shards []map[string]interface{} `json:"shards"`
+		} `json:"indices"`
+	} `json:"follow_stats"`
+}
+
 func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
-	var data map[string]interface{}
+	var data response
 	err := json.Unmarshal(content, &data)
 	if err != nil {
 		err = errors.Wrap(err, "failure parsing Elasticsearch CCR Stats API response")
@@ -61,17 +68,8 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 	}
 
 	var errs multierror.Errors
-	for _, followerShards := range data {
-
-		shards, ok := followerShards.([]interface{})
-		if !ok {
-			err := fmt.Errorf("shards is not an array")
-			errs = append(errs, err)
-			r.Error(err)
-			continue
-		}
-
-		for _, s := range shards {
+	for _, followerIndex := range data.FollowStats.Indices {
+		for _, followerShard := range followerIndex.Shards {
 			event := mb.Event{}
 			event.RootFields = common.MapStr{}
 			event.RootFields.Put("service.name", elasticsearch.ModuleName)
@@ -80,15 +78,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 			event.ModuleFields.Put("cluster.name", info.ClusterName)
 			event.ModuleFields.Put("cluster.id", info.ClusterID)
 
-			shard, ok := s.(map[string]interface{})
-			if !ok {
-				event.Error = fmt.Errorf("shard is not an object")
-				r.Event(event)
-				errs = append(errs, event.Error)
-				continue
-			}
-
-			event.MetricSetFields, err = schema.Apply(shard)
+			event.MetricSetFields, err = schema.Apply(followerShard)
 			if err != nil {
 				event.Error = errors.Wrap(err, "failure applying shard schema")
 				r.Event(event)

@@ -37,6 +37,7 @@ type Input struct {
 	done       chan struct{}
 	config     Config
 	pipeline   beat.Pipeline
+	client     beat.Client
 	states     map[string]checkpoint.JournalState
 	id         uuid.UUID
 	logger     *logp.Logger
@@ -66,11 +67,12 @@ func New(
 	var readers []*reader.Reader
 	if len(config.Paths) == 0 {
 		cfg := reader.Config{
-			Path:       reader.LocalSystemJournalID, // used to identify the state in the registry
-			Backoff:    config.Backoff,
-			MaxBackoff: config.MaxBackoff,
-			Seek:       config.Seek,
-			Matches:    config.Matches,
+			Path:               reader.LocalSystemJournalID, // used to identify the state in the registry
+			Backoff:            config.Backoff,
+			MaxBackoff:         config.MaxBackoff,
+			Seek:               config.Seek,
+			CursorSeekFallback: config.CursorSeekFallback,
+			Matches:            config.Matches,
 		}
 
 		state := states[reader.LocalSystemJournalID]
@@ -83,11 +85,12 @@ func New(
 
 	for _, p := range config.Paths {
 		cfg := reader.Config{
-			Path:       p,
-			Backoff:    config.Backoff,
-			MaxBackoff: config.MaxBackoff,
-			Seek:       config.Seek,
-			Matches:    config.Matches,
+			Path:               p,
+			Backoff:            config.Backoff,
+			MaxBackoff:         config.MaxBackoff,
+			Seek:               config.Seek,
+			CursorSeekFallback: config.CursorSeekFallback,
+			Matches:            config.Matches,
 		}
 		state := states[p]
 		r, err := reader.New(cfg, done, state, logger)
@@ -120,7 +123,8 @@ func New(
 // Run connects to the output, collects entries from the readers
 // and then publishes the events.
 func (i *Input) Run() {
-	client, err := i.pipeline.ConnectWith(beat.ClientConfig{
+	var err error
+	i.client, err = i.pipeline.ConnectWith(beat.ClientConfig{
 		PublishMode:   beat.GuaranteedSend,
 		EventMetadata: i.eventMeta,
 		Meta:          nil,
@@ -133,13 +137,12 @@ func (i *Input) Run() {
 		i.logger.Error("Error connecting to output: %v", err)
 		return
 	}
-	defer client.Close()
 
-	i.publishAll(client)
+	i.publishAll()
 }
 
 // publishAll reads events from all readers and publishes them.
-func (i *Input) publishAll(client beat.Client) {
+func (i *Input) publishAll() {
 	out := make(chan *beat.Event)
 	defer close(out)
 
@@ -179,13 +182,14 @@ func (i *Input) publishAll(client beat.Client) {
 		case <-i.done:
 			return
 		case e := <-out:
-			client.Publish(*e)
+			i.client.Publish(*e)
 		}
 	}
 }
 
 // Stop stops all readers of the input.
 func (i *Input) Stop() {
+	i.client.Close()
 	for _, r := range i.readers {
 		r.Close()
 	}

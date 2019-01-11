@@ -61,7 +61,7 @@ var (
 	}
 )
 
-func eventsMapping(r mb.ReporterV2, content []byte) error {
+func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
 	nodesStruct := struct {
 		ClusterName string                            `json:"cluster_name"`
 		Nodes       map[string]map[string]interface{} `json:"nodes"`
@@ -75,7 +75,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 	}
 
 	var errs multierror.Errors
-	for name, node := range nodesStruct.Nodes {
+	for id, node := range nodesStruct.Nodes {
 		event := mb.Event{}
 
 		event.RootFields = common.MapStr{}
@@ -83,6 +83,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 		event.ModuleFields = common.MapStr{}
 		event.ModuleFields.Put("cluster.name", nodesStruct.ClusterName)
+		event.ModuleFields.Put("cluster.id", info.ClusterID)
 
 		event.MetricSetFields, err = schema.Apply(node)
 		if err != nil {
@@ -92,8 +93,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 			continue
 		}
 
-		// Write name here as full name only available as key
-		event.MetricSetFields["name"] = name
+		event.MetricSetFields["id"] = id
 
 		r.Event(event)
 	}

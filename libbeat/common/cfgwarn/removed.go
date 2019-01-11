@@ -45,8 +45,10 @@ func checkRemovedSetting(cfg *common.Config, setting string) error {
 	path := segments[:L-1]
 
 	current := cfg
+
+	// we are looking for any key that match the name.
 	for _, p := range path {
-		current, _ := current.Child(p, -1)
+		current, _ = current.Child(p, -1)
 		if current == nil {
 			break
 		}
@@ -62,16 +64,6 @@ func checkRemovedSetting(cfg *common.Config, setting string) error {
 	}
 
 	return fmt.Errorf("setting '%v' has been removed", current.PathOf(name))
-}
-
-// CheckRemoved5xSettings prints a warning if the obsolete setting is used.
-func CheckRemoved5xSettings(cfg *common.Config, settings ...string) error {
-	return checkRemovedSettings(cfg, settings...)
-}
-
-// CheckRemoved5xSetting prints a warning if the obsolete setting is used.
-func CheckRemoved5xSetting(cfg *common.Config, setting string) error {
-	return checkRemovedSetting(cfg, setting)
 }
 
 // CheckRemoved6xSettings prints a warning if the obsolete setting is used.

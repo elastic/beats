@@ -22,7 +22,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 )
 
 var outputReg = map[string]Factory{}
@@ -59,10 +58,6 @@ func Load(info beat.Info, stats Observer, name string, config *common.Config) (G
 	factory := FindFactory(name)
 	if factory == nil {
 		return Group{}, fmt.Errorf("output type %v undefined", name)
-	}
-
-	if err := cfgwarn.CheckRemoved5xSetting(config, "flush_interval"); err != nil {
-		return Fail(err)
 	}
 
 	if stats == nil {

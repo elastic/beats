@@ -18,11 +18,10 @@
 package actions
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"reflect"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"

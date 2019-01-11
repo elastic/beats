@@ -18,7 +18,6 @@
 package jmx
 
 import (
-	"encoding/json"
 	"strings"
 
 	"github.com/joeshaw/multierror"
@@ -96,11 +95,7 @@ type eventKey struct {
 	mbean, event string
 }
 
-func eventMapping(content []byte, mapping AttributeMapping) ([]common.MapStr, error) {
-	var entries []Entry
-	if err := json.Unmarshal(content, &entries); err != nil {
-		return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
-	}
+func eventMapping(entries []Entry, mapping AttributeMapping) ([]common.MapStr, error) {
 
 	// Generate a different event for each wildcard mbean, and and additional one
 	// for non-wildcard requested mbeans, group them by event name if defined

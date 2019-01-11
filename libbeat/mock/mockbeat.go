@@ -49,14 +49,25 @@ func (mb *Mockbeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	// Wait until mockbeat is done
-	go client.Publish(beat.Event{
-		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"type":    "mock",
-			"message": "Mockbeat is alive!",
-		},
-	})
+	ticker := time.NewTicker(1 * time.Second)
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				client.Publish(beat.Event{
+					Timestamp: time.Now(),
+					Fields: common.MapStr{
+						"type":    "mock",
+						"message": "Mockbeat is alive!",
+					},
+				})
+			case <-mb.done:
+				ticker.Stop()
+				return
+			}
+		}
+	}()
+
 	<-mb.done
 	return nil
 }

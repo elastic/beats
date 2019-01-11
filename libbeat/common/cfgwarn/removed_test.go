@@ -50,14 +50,6 @@ func TestRemovedSetting(t *testing.T) {
 			}),
 			expected: errors.New("setting 'hello' has been removed"),
 		},
-		{
-			name:   "obsolete setting found",
-			lookup: "not.hello",
-			cfg: common.MustNewConfigFrom(map[string]interface{}{
-				"hello.world": "ok",
-			}),
-			expected: errors.New("setting 'hello' has been removed"),
-		},
 	}
 
 	functions := []struct {
@@ -104,16 +96,8 @@ func TestRemovedSettings(t *testing.T) {
 			expected: multierror.Errors{errors.New("setting 'hello' has been removed")}.Err(),
 		},
 		{
-			name:   "obsolete setting found",
-			lookup: []string{"not.hello"},
-			cfg: common.MustNewConfigFrom(map[string]interface{}{
-				"hello.world": "ok",
-			}),
-			expected: multierror.Errors{errors.New("setting 'hello' has been removed")}.Err(),
-		},
-		{
 			name:   "multiple obsolete settings",
-			lookup: []string{"not.hello", "bad"},
+			lookup: []string{"hello", "bad"},
 			cfg: common.MustNewConfigFrom(map[string]interface{}{
 				"hello.world": "ok",
 				"bad":         "true",
@@ -121,6 +105,18 @@ func TestRemovedSettings(t *testing.T) {
 			expected: multierror.Errors{
 				errors.New("setting 'hello' has been removed"),
 				errors.New("setting 'bad' has been removed"),
+			}.Err(),
+		},
+		{
+			name:   "multiple obsolete settings not on first level",
+			lookup: []string{"filebeat.config.prospectors", "filebeat.prospectors"},
+			cfg: common.MustNewConfigFrom(map[string]interface{}{
+				"filebeat.prospectors":        "ok",
+				"filebeat.config.prospectors": map[string]interface{}{"ok": "ok1"},
+			}),
+			expected: multierror.Errors{
+				errors.New("setting 'filebeat.config.prospectors' has been removed"),
+				errors.New("setting 'filebeat.prospectors' has been removed"),
 			}.Err(),
 		},
 	}

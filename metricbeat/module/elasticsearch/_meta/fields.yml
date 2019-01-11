@@ -24,3 +24,13 @@
           type: keyword
           description: >
             Elasticsearch state id.
+
+        - name: node.id
+          type: keyword
+          description: >
+            Node ID
+
+        - name: node.name
+          type: keyword
+          description: >
+            Node name.

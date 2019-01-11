@@ -40,7 +40,7 @@ var (
 	}
 )
 
-func eventsMapping(r mb.ReporterV2, content []byte) error {
+func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
 	tasksStruct := struct {
 		Tasks []map[string]interface{} `json:"tasks"`
 	}{}
@@ -62,6 +62,10 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 
 		event.RootFields = common.MapStr{}
 		event.RootFields.Put("service.name", elasticsearch.ModuleName)
+
+		event.ModuleFields = common.MapStr{}
+		event.ModuleFields.Put("cluster.name", info.ClusterName)
+		event.ModuleFields.Put("cluster.id", info.ClusterID)
 
 		event.MetricSetFields, err = schema.Apply(task)
 		if err != nil {

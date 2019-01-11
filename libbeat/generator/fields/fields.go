@@ -31,21 +31,35 @@ type YmlFile struct {
 	Indent int
 }
 
-func collectCommonFiles(esBeatsPath, beatPath string, fieldFiles []*YmlFile) ([]*YmlFile, error) {
-	commonFields := []string{
-		// Fields for custom beats
-		filepath.Join(beatPath, "_meta/fields.yml"),
-		filepath.Join(beatPath, "_meta/fields.common.yml"),
+// NewYmlFile performs some checks and then creates and returns a YmlFile struct
+func NewYmlFile(path string, indent int) (*YmlFile, error) {
+	_, err := os.Stat(path)
+
+	if os.IsNotExist(err) {
+		// skip
+		return nil, nil
 	}
 
+	if err != nil {
+		// return error
+		return nil, err
+	}
+
+	// All good, return file
+	return &YmlFile{
+		Path:   path,
+		Indent: indent,
+	}, nil
+}
+
+func collectCommonFiles(esBeatsPath, beatPath string, fieldFiles []*YmlFile) ([]*YmlFile, error) {
 	var libbeatFieldFiles []*YmlFile
 	var err error
+	commonFields := []string{filepath.Join(esBeatsPath, "libbeat/_meta/fields.ecs.yml")}
 	if !isLibbeat(beatPath) {
 		commonFields = append(commonFields,
 			filepath.Join(esBeatsPath, "libbeat/_meta/fields.common.yml"),
-			filepath.Join(esBeatsPath, "libbeat/_meta/fields.ecs.yml"),
 		)
-
 		libbeatModulesPath := filepath.Join(esBeatsPath, "libbeat/processors")
 		libbeatFieldFiles, err = CollectModuleFiles(libbeatModulesPath)
 		if err != nil {
@@ -53,18 +67,21 @@ func collectCommonFiles(esBeatsPath, beatPath string, fieldFiles []*YmlFile) ([]
 		}
 	}
 
+	// Fields for custom beats last, to enable overriding more generically defined fields
+	commonFields = append(commonFields,
+		filepath.Join(beatPath, "_meta/fields.common.yml"),
+		filepath.Join(beatPath, "_meta/fields.yml"),
+	)
+
 	var files []*YmlFile
 	for _, cf := range commonFields {
-		_, err := os.Stat(cf)
-		if os.IsNotExist(err) {
-			continue
-		} else if err != nil {
+		ymlFile, err := NewYmlFile(cf, 0)
+
+		if err != nil {
 			return nil, err
+		} else if ymlFile != nil {
+			files = append(files, ymlFile)
 		}
-		files = append(files, &YmlFile{
-			Path:   cf,
-			Indent: 0,
-		})
 	}
 
 	files = append(files, libbeatFieldFiles...)

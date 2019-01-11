@@ -153,8 +153,10 @@ func makeWorkQueue() workQueue {
 func (c *outputController) Reload(cfg *reload.ConfigWithMeta) error {
 	outputCfg := common.ConfigNamespace{}
 
-	if err := cfg.Config.Unpack(&outputCfg); err != nil {
-		return err
+	if cfg != nil {
+		if err := cfg.Config.Unpack(&outputCfg); err != nil {
+			return err
+		}
 	}
 
 	output, err := loadOutput(c.beat, c.monitors, outputCfg)

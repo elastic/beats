@@ -20,12 +20,13 @@ package icmp
 import (
 	"fmt"
 	"net"
-
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
+	"net/url"
 
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func init() {
@@ -49,14 +50,6 @@ func create(
 	// TODO: replace icmp package base reader/sender using raw sockets with
 	//       OS specific solution
 
-	addJob := func(t monitors.Job, err error) error {
-		if err != nil {
-			return err
-		}
-		jobs = append(jobs, t)
-		return nil
-	}
-
 	ipVersion := config.Mode.Network()
 	if len(config.Hosts) > 0 && ipVersion == "" {
 		err := fmt.Errorf("pinging hosts requires ipv4 or ipv6 mode enabled")
@@ -77,35 +70,41 @@ func create(
 		return nil, 0, err
 	}
 
-	network := config.Mode.Network()
 	pingFactory := monitors.MakePingIPFactory(createPingIPFactory(&config))
 
 	for _, host := range config.Hosts {
-		jobName := fmt.Sprintf("icmp-%v-host-%v@%v", config.Name, network, host)
-		if ip := net.ParseIP(host); ip != nil {
-			jobName = fmt.Sprintf("icmp-%v-ip@%v", config.Name, ip.String())
-		}
+		settings := monitors.MakeHostJobSettings(host, config.Mode)
+		job, err := monitors.MakeByHostJob(settings, pingFactory)
 
-		settings := monitors.MakeHostJobSettings(jobName, host, config.Mode)
-		err := addJob(monitors.MakeByHostJob(settings, pingFactory))
 		if err != nil {
 			return nil, 0, err
 		}
-	}
 
-	return jobs, len(config.Hosts), nil
-}
-
-func createPingIPFactory(config *Config) func(*net.IPAddr) (common.MapStr, error) {
-	return func(ip *net.IPAddr) (common.MapStr, error) {
-		rtt, n, err := loop.ping(ip, config.Timeout, config.Wait)
-
-		fields := common.MapStr{"requests": n}
-		if err == nil {
-			fields["rtt"] = look.RTT(rtt)
+		u, err := url.Parse(fmt.Sprintf("icmp://%s", host))
+		if err != nil {
+			return nil, 0, err
 		}
 
-		event := common.MapStr{"icmp": fields}
-		return event, err
+		jobs = append(jobs, monitors.WithURLField(u, job))
+	}
+
+	errWrappedJobs := monitors.WrapAll(jobs, monitors.WithErrAsField)
+	return errWrappedJobs, len(config.Hosts), nil
+}
+
+func createPingIPFactory(config *Config) func(*beat.Event, *net.IPAddr) error {
+	return func(event *beat.Event, ip *net.IPAddr) error {
+		rtt, n, err := loop.ping(ip, config.Timeout, config.Wait)
+		if err != nil {
+			return err
+		}
+
+		icmpFields := common.MapStr{"requests": n}
+		if err == nil {
+			icmpFields["rtt"] = look.RTT(rtt)
+			monitors.MergeEventFields(event, icmpFields)
+		}
+
+		return nil
 	}
 }

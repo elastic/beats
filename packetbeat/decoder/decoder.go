@@ -67,8 +67,8 @@ type Decoder struct {
 }
 
 const (
-	netPacketsTotalCounter = "net_packets_total"
-	netBytesTotalCounter   = "net_bytes_total"
+	netPacketsTotalCounter = "packets"
+	netBytesTotalCounter   = "bytes"
 )
 
 // New creates and initializes a new packet decoder.

@@ -18,7 +18,7 @@
 package dialchain
 
 import (
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -37,10 +37,10 @@ type DialerChain struct {
 
 // NetDialer provides the most low-level network layer for setting up a network
 // connection. NetDialer objects do not support wrapping any lower network layers.
-type NetDialer func(common.MapStr) (transport.Dialer, error)
+type NetDialer func(*beat.Event) (transport.Dialer, error)
 
 // Layer is a configured network layer, wrapping any lower-level network layers.
-type Layer func(common.MapStr, transport.Dialer) (transport.Dialer, error)
+type Layer func(*beat.Event, transport.Dialer) (transport.Dialer, error)
 
 // Clone create a shallow copy of c.
 func (c *DialerChain) Clone() *DialerChain {
@@ -53,7 +53,7 @@ func (c *DialerChain) Clone() *DialerChain {
 }
 
 // Build create a new transport.Dialer for use with other networking libraries.
-func (c *DialerChain) Build(event common.MapStr) (d transport.Dialer, err error) {
+func (c *DialerChain) Build(event *beat.Event) (d transport.Dialer, err error) {
 	d, err = c.Net.build(event)
 	if err != nil {
 		return
@@ -77,14 +77,14 @@ func (c *DialerChain) AddLayer(l Layer) {
 // TestBuild tries to build the DialerChain and reports any error reported by
 // one of the layers.
 func (c *DialerChain) TestBuild() error {
-	_, err := c.Build(common.MapStr{})
+	_, err := c.Build(&beat.Event{})
 	return err
 }
 
-func (d NetDialer) build(event common.MapStr) (transport.Dialer, error) {
+func (d NetDialer) build(event *beat.Event) (transport.Dialer, error) {
 	return d(event)
 }
 
-func (l Layer) build(event common.MapStr, next transport.Dialer) (transport.Dialer, error) {
+func (l Layer) build(event *beat.Event, next transport.Dialer) (transport.Dialer, error) {
 	return l(event, next)
 }

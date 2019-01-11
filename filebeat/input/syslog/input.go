@@ -205,7 +205,7 @@ func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time
 		"message": strings.TrimRight(ev.Message(), "\n"),
 		"log": common.MapStr{
 			"source": common.MapStr{
-				"ip": metadata.RemoteAddr.String(),
+				"address": metadata.RemoteAddr.String(),
 			},
 		},
 	}

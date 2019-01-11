@@ -36,6 +36,7 @@ func init() {
 
 var debugf = logp.MakeDebug("http")
 
+// Create makes a new HTTP monitor
 func create(
 	name string,
 	cfg *common.Config,
@@ -70,29 +71,44 @@ func create(
 		body = buf.Bytes()
 	}
 
-	validator := makeValidateResponse(&config.Check.Response)
+	validator, err := makeValidateResponse(&config.Check.Response)
+	if err != nil {
+		return nil, 0, err
+	}
 
-	jobs = make([]monitors.Job, len(config.URLs))
-
+	// Determine whether we're using a proxy or not and then use that to figure out how to
+	// run the job
+	var makeJob func(string) (monitors.Job, error)
 	if config.ProxyURL != "" {
 		transport, err := newRoundTripper(&config, tls)
 		if err != nil {
 			return nil, 0, err
 		}
 
-		for i, url := range config.URLs {
-			jobs[i], err = newHTTPMonitorHostJob(url, &config, transport, enc, body, validator)
-			if err != nil {
-				return nil, 0, err
-			}
+		makeJob = func(urlStr string) (monitors.Job, error) {
+			return newHTTPMonitorHostJob(urlStr, &config, transport, enc, body, validator)
 		}
 	} else {
-		for i, url := range config.URLs {
-			jobs[i], err = newHTTPMonitorIPsJob(&config, url, tls, enc, body, validator)
-			if err != nil {
-				return nil, 0, err
-			}
+		makeJob = func(urlStr string) (monitors.Job, error) {
+			return newHTTPMonitorIPsJob(&config, urlStr, tls, enc, body, validator)
 		}
+	}
+
+	jobs = make([]monitors.Job, len(config.URLs))
+	for i, urlStr := range config.URLs {
+		u, _ := url.Parse(urlStr)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		job, err := makeJob(urlStr)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		// Assign any execution errors to the error field and
+		// assign the url field
+		jobs[i] = monitors.WithErrAsField(monitors.WithURLField(u, job))
 	}
 
 	return jobs, len(config.URLs), nil

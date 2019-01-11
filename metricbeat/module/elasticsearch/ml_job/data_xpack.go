@@ -31,14 +31,9 @@ import (
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
-func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
-	info, err := elasticsearch.GetInfo(m.HTTP, m.HTTP.GetURI())
-	if err != nil {
-		return errors.Wrap(err, "failed to get info from Elasticsearch")
-	}
-
+func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	var data map[string]interface{}
-	err = json.Unmarshal(content, &data)
+	err := json.Unmarshal(content, &data)
 	if err != nil {
 		return errors.Wrap(err, "failure parsing Elasticsearch ML Job Stats API response")
 	}

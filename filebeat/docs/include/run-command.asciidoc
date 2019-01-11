@@ -13,6 +13,13 @@ service {beatname_lc} start
 ./{beatname_lc} -e
 ----
 
+*linux:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} -e
+----
+
 *win:*
 
 ["source","sh",subs="attributes"]

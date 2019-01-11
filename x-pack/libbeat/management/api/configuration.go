@@ -9,12 +9,16 @@ import (
 	"net/http"
 	"reflect"
 
+	"errors"
+
 	"github.com/elastic/beats/libbeat/common/reload"
 
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/common"
 )
+
+var errConfigurationNotFound = errors.New("no configuration found, you need to enroll your Beat")
 
 // ConfigBlock stores a piece of config from central management
 type ConfigBlock struct {
@@ -58,7 +62,11 @@ func (c *Client) Configuration(accessToken string, beatUUID uuid.UUID, configOK 
 		} `json:"configuration_blocks"`
 	}{}
 	url := fmt.Sprintf("/api/beats/agent/%s/configuration?validSetting=%t", beatUUID, configOK)
-	_, err := c.request("GET", url, nil, headers, &resp)
+	statusCode, err := c.request("GET", url, nil, headers, &resp)
+	if statusCode == http.StatusNotFound {
+		return nil, errConfigurationNotFound
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -87,4 +95,9 @@ func ConfigBlocksEqual(a, b ConfigBlocks) bool {
 	}
 
 	return reflect.DeepEqual(a, b)
+}
+
+// IsConfigurationNotFound returns true if the configuration was not found.
+func IsConfigurationNotFound(err error) bool {
+	return err == errConfigurationNotFound
 }
