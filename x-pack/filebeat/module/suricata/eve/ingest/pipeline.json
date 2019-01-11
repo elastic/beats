@@ -40,6 +40,11 @@
       ,"ignore_missing": true
       }
     }
+  , { "lowercase":
+      { "field": "http.request.method"
+      , "ignore_missing": true
+      }
+    }
   , {"convert":
       {"field": "suricata.eve.http.status"
       ,"target_field": "http.response.status_code"
