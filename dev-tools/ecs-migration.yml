@@ -114,6 +114,10 @@
   alias: true
   alias6: true
 
+# process processor
+- from: process.exe
+  to: process.executable
+  alias: true
 
 # Filebeat modules
 
@@ -254,11 +258,11 @@
   alias: true
 
 ### Error fileset
-- from: apache.error.message
+- from: apache2.error.message
   to: message
   alias: true
 
-- from: apache.error.level
+- from: apache2.error.level
   to: log.level
   alias: true
 
@@ -277,11 +281,11 @@
 ## IIS module
 
 - from: iis.access.server_ip
-  to: destination.ip
+  to: destination.address
   alias: true
 
 - from: iis.access.remote_ip
-  to: source.ip
+  to: source.address
   alias: true
 
 - from: iis.access.url
@@ -344,6 +348,62 @@
   to: http.request.referrer
   alias: true
 
+- from: iis.error.remote_ip
+  to: source.address
+  alias: true
+
+- from: iis.error.remote_port
+  to: source.port
+  alias: true
+
+- from: iis.error.server_ip
+  to: destination.address
+  alias: true
+
+- from: iis.error.server_port
+  to: destination.port
+  alias: true
+
+- from: iis.error.http_version
+  to: http.version
+  alias: true
+
+- from: iis.error.method
+  to: http.request.method
+  alias: true
+
+- from: iis.error.url
+  to: url.original
+  alias: true
+
+- from: iis.error.response_code
+  to: http.response.status_code
+  alias: true
+
+- from: iis.error.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+
+- from: iis.error.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+
+- from: iis.error.geoip.location
+  to: source.geo.location
+  alias: true
+
+- from: iis.error.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+
+- from: iis.error.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+
+- from: iis.error.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+
 ## HAProxy module
 
 - from: haproxy.client.port
@@ -404,6 +464,90 @@
   to: message
   alias: true
 
+## Kibana module
+
+- from: kibana.log.meta.req.headers.referer
+  to: http.request.referrer
+  alias: true
+
+- from: kibana.log.meta.req.referer
+  to: http.request.referrer
+  alias: true
+
+- from: kibana.log.meta.req.headers.user-agent
+  to: user_agent.original
+  alias: true
+
+- from: kibana.log.meta.req.remoteAddress
+  to: source.address
+  alias: true
+
+- from: kibana.log.meta.req.url
+  to: url.original
+  alias: true
+
+- from: kibana.log.meta.meta.statusCode
+  to: http.response.status_code
+  alias: true
+
+- from: kibana.log.meta.method
+  to: http.request.method
+  alias: true
+
+## Logstash module
+
+- from: logstash.log.level
+  to: log.level
+  alias: true
+
+- from: logstash.log.message
+  to: message
+  alias: true
+
+- from: logstash.slowlog.level
+  to: log.level
+  alias: true
+
+- from: logstash.slowlog.took_in_nanos
+  to: event.duration
+  alias: true
+
+## MongoDB module
+
+- from: mongodb.log.severity
+  to: log.level
+  alias: true
+
+- from: mongodb.log.message
+  to: message
+  alias: true
+
+## MySQL module
+
+- from: mysql.error.message
+  to: message
+  alias: true
+
+- from: mysql.error.level
+  to: log.level
+  alias: true
+
+- from: mysql.error.thread_id
+  to: process.thread.id
+  alias: true
+
+- from: mysql.slowlog.ip
+  to: source.ip
+  alias: true
+
+- from: mysql.slowlog.host
+  to: source.domain
+  alias: true
+
+- from: mysql.slowlog.user
+  to: user.name
+  alias: true
+
 ## NGINX module
 
 - from: nginx.access.user_name
@@ -460,6 +604,22 @@
 
 - from: nginx.access.agent
   to: user_agent.original
+  alias: true
+
+- from: nginx.error.level
+  to: log.level
+  alias: true
+
+- from: nginx.error.pid
+  to: process.pid
+  alias: true
+
+- from: nginx.error.tid
+  to: process.thread.id
+  alias: true
+
+- from: nginx.error.message
+  to: message
   alias: true
 
 ## PostgreSQL module
@@ -595,6 +755,9 @@
   to: source.domain
   alias: true
 
+- from: process.exe
+  to: process.executable
+  alias: true
 
 # Packetbeat
 
@@ -666,3 +829,25 @@
   to: network.transport
   alias: false
   comment: Don't add an alias until all of Packetbeat stops using this field.
+
+# Heartbeat
+
+- from: monitor.scheme
+  to: url.scheme
+  alias: true
+
+- from: monitor.host
+  to: url.domain
+  alias: true
+
+ - from: resolve.host
+  to: url.domain
+  alias: true
+
+- from: http.url
+  to: url.full
+  alias: true
+
+- from: tcp.port
+  to: url.port
+  alias: true

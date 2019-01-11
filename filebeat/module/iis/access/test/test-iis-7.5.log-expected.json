@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2018-08-28T18:24:25.000Z",
+        "destination.address": "10.100.220.70",
         "destination.ip": "10.100.220.70",
         "destination.port": 80,
         "ecs.version": "1.0.0-beta2",
@@ -14,6 +15,7 @@
         "iis.access.win32_status": 2,
         "input.type": "log",
         "log.offset": 244,
+        "source.address": "10.100.118.31",
         "source.ip": "10.100.118.31",
         "url.path": "/",
         "url.query": "-",

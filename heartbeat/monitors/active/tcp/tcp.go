@@ -88,6 +88,13 @@ func create(
 
 		epJobs, err := dialchain.MakeDialerJobs(db, scheme, eps, config.Mode,
 			func(event *beat.Event, dialer transport.Dialer, addr string) error {
+				u, err := url.Parse(fmt.Sprintf("%s://%s", scheme, addr))
+				if err != nil {
+					return err
+				}
+
+				monitors.MergeEventFields(event, common.MapStr{"url": monitors.URLFields(u)})
+
 				return pingHost(event, dialer, addr, timeout, validator)
 			})
 		if err != nil {
