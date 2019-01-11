@@ -39,6 +39,7 @@ grouped in the following categories:
 * <<exported-fields-suricata>>
 * <<exported-fields-system>>
 * <<exported-fields-traefik>>
+* <<exported-fields-zeek>>
 
 --
 [[exported-fields-apache2]]
@@ -12564,6 +12565,174 @@ alias to: source.geo.city_name
 type: alias
 
 alias to: source.geo.region_iso_code
+
+--
+
+[[exported-fields-zeek]]
+== Zeek fields
+
+Module for handling logs produced by Zeek/Bro
+
+
+
+[float]
+== zeek fields
+
+Fields from Zeek/Bro logs after normalization
+
+
+
+*`zeek.session_id`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.connection.local_orig`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.connection.local_resp`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.connection.missed_bytes`*::
++
+--
+type: long
+
+--
+
+*`zeek.connection.state`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.connection.history`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.trans_id`*::
++
+--
+type: integer
+
+--
+
+*`zeek.dns.rtt`*::
++
+--
+type: double
+
+--
+
+*`zeek.dns.query`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.qclass`*::
++
+--
+type: long
+
+--
+
+*`zeek.dns.qclass_name`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.qtype`*::
++
+--
+type: long
+
+--
+
+*`zeek.dns.qtype_name`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.rcode`*::
++
+--
+type: long
+
+--
+
+*`zeek.dns.rcode_name`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.AA`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.dns.TC`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.dns.RD`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.dns.RA`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.dns.answers`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.TTLs`*::
++
+--
+type: double
+
+--
+
+*`zeek.dns.rejected`*::
++
+--
+type: boolean
 
 --
 
