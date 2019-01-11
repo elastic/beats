@@ -31,24 +31,24 @@ import (
 
 func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 	cases := []struct {
-		name        string
-		esVersion   string
-		expectedErr string
+		name          string
+		esVersion     string
+		isErrExpected bool
 	}{
 		{
-			name:        "ES < 6.5.0",
-			esVersion:   "6.4.1",
-			expectedErr: "the mod/fls fileset has multiple pipelines, which are only supported with Elasticsearch >= 6.5.0. Currently running with Elasticsearch version 6.4.1",
+			name:          "ES < 6.5.0",
+			esVersion:     "6.4.1",
+			isErrExpected: true,
 		},
 		{
-			name:        "ES == 6.5.0",
-			esVersion:   "6.5.0",
-			expectedErr: "",
+			name:          "ES == 6.5.0",
+			esVersion:     "6.5.0",
+			isErrExpected: false,
 		},
 		{
-			name:        "ES > 6.5.0",
-			esVersion:   "6.6.0",
-			expectedErr: "",
+			name:          "ES > 6.5.0",
+			esVersion:     "6.6.0",
+			isErrExpected: false,
 		},
 	}
 
@@ -95,10 +95,10 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 			assert.NoError(t, err)
 
 			err = testRegistry.LoadPipelines(testESClient, false)
-			if test.expectedErr == "" {
-				assert.NoError(t, err)
+			if test.isErrExpected {
+				assert.IsType(t, MultiplePipelineUnsupportedError{}, err)
 			} else {
-				assert.Error(t, err, test.expectedErr)
+				assert.NoError(t, err)
 			}
 		})
 	}
