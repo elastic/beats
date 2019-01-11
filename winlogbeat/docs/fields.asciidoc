@@ -20,6 +20,7 @@ grouped in the following categories:
 * <<exported-fields-eventlog>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-kubernetes-processor>>
+* <<exported-fields-process>>
 
 --
 [[exported-fields-beat]]
@@ -3672,6 +3673,23 @@ type: keyword
 
 Kubernetes container image
 
+
+--
+
+[[exported-fields-process]]
+== Process fields
+
+Process metadata fields
+
+
+
+
+*`process.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
 
 --
 
