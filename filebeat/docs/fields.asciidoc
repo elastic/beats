@@ -6339,29 +6339,27 @@ The timestamp from the log line.
 *`mysql.error.thread_id`*::
 +
 --
-type: long
+type: alias
 
-As of MySQL 5.7.2, this is the thread id. For MySQL versions prior to 5.7.2, this field contains the process id.
-
+alias to: process.thread.id
 
 --
 
 *`mysql.error.level`*::
 +
 --
-example: Warning
+type: alias
 
-The log level.
+alias to: log.level
 
 --
 
 *`mysql.error.message`*::
 +
 --
-type: text
+type: alias
 
-The logged message.
-
+alias to: message
 
 --
 
@@ -6371,30 +6369,6 @@ The logged message.
 Contains fields from the MySQL slow logs.
 
 
-
-*`mysql.slowlog.user`*::
-+
---
-The MySQL user that created the query.
-
-
---
-
-*`mysql.slowlog.host`*::
-+
---
-The host from where the user that created the query logged in.
-
-
---
-
-*`mysql.slowlog.ip`*::
-+
---
-The IP address from where the user that created the query logged in.
-
-
---
 
 *`mysql.slowlog.query_time.sec`*::
 +
@@ -6461,6 +6435,33 @@ type: long
 
 The connection ID for the query.
 
+
+--
+
+*`mysql.slowlog.user`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`mysql.slowlog.host`*::
++
+--
+type: alias
+
+alias to: source.domain
+
+--
+
+*`mysql.slowlog.ip`*::
++
+--
+type: alias
+
+alias to: source.ip
 
 --
 
