@@ -5720,6 +5720,69 @@ type: object
 
 --
 
+*`kibana.log.kibana.log.meta.req.headers.referer`*::
++
+--
+type: alias
+
+alias to: http.request.referrer
+
+--
+
+*`kibana.log.kibana.log.meta.req.referer`*::
++
+--
+type: alias
+
+alias to: http.request.referrer
+
+--
+
+*`kibana.log.kibana.log.meta.req.headers.user-agent`*::
++
+--
+type: alias
+
+alias to: user_agent.original
+
+--
+
+*`kibana.log.kibana.log.meta.req.remoteAddress`*::
++
+--
+type: alias
+
+alias to: source.address
+
+--
+
+*`kibana.log.kibana.log.meta.req.url`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`kibana.log.kibana.log.meta.statusCode`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
+*`kibana.log.kibana.log.meta.method`*::
++
+--
+type: alias
+
+alias to: http.request.method
+
+--
+
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
