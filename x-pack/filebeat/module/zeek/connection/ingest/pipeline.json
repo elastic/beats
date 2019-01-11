@@ -21,6 +21,13 @@
       }
     },
     {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.id = ctx.zeek.session_id + \"-connection\"",
+        "ignore_failure": true
+      }
+    },
+    {
       "set": {
         "field": "source.ip",
         "value": "{{source.address}}"
@@ -35,7 +42,7 @@
     {
       "script": {
         "lang": "painless",
-        "source": "if (ctx.network.local_orig == true && ctx.network.local_resp == true) {ctx.network.direction = \"internal\"} else if (ctx.network.local_orig == true && ctx.network.local_resp == false) {ctx.network.direction = \"outbound\"} else if (ctx.network.local_orig == false && ctx.network.local_resp == true) {ctx.network.direction = \"inbound\"} else {ctx.network.direction = \"external\"}"
+        "source": "if (ctx.zeek.connection.local_orig == true && ctx.zeek.connection.local_resp == true) {ctx.network.direction = \"internal\"} else if (ctx.zeek.connection.local_orig == true && ctx.zeek.connection.local_resp == false) {ctx.network.direction = \"outbound\"} else if (ctx.zeek.connection.local_orig == false && ctx.zeek.connection.local_resp == true) {ctx.network.direction = \"inbound\"} else {ctx.network.direction = \"external\"}"
       }
     },
     {

@@ -1,132 +1,22 @@
-- name: connection
+- name: zeek
   type: group
   description: >
-    Fields exported by the Zeek conn.log
+    Fields from Zeek/Bro logs after normalization
   fields:
-    - name: destination
-      type: group
-      fields:
-      - name: address
-        type: keyword
+  - name: session_id
+    type: keyword
 
-      - name: bytes
-        type: long
+  - name: connection.local_orig
+    type: boolean
 
-      - name: geo
-        type: group
-        fields: 
-        - name: city_name
-          type: keyword
+  - name: connection.local_resp
+    type: boolean
 
-        - name: geo.continent_name
-          type: keyword
+  - name: connection.missed_bytes
+    type: long
 
-        - name: country_iso_code
-          type: keyword
+  - name: connection.state
+    type: keyword
 
-        - name: geo.country_name
-          type: keyword
-
-        - name: location
-          type: geo_point
-
-        - name: region_iso_code
-          type: keyword
-
-        - name: region_name
-          type: keyword
-
-      - name: ip 
-        type: ip
-
-      - name: packets
-        type: long
-
-      - name: port
-        type: long
-
-    - name: event
-      type: group
-      fields:
-      - name: id
-        type: keyword
-      
-      - name: created
-        type: date
-
-      - name: duration
-        type: long
-
-    - name: network
-      type: group
-      fields:
-      - name: application
-        type: keyword
-
-      - name: connection_history
-        type: keyword
-
-      - name: connection_state
-        type: keyword
-
-      - name: direction
-        type: keyword
-
-      - name: local_orig
-        type: boolean
-
-      - name: local_resp
-        type: boolean
-
-      - name: missed_bytes
-        type: long
-
-      - name: transport
-        type: keyword
-
-    - name: source
-      type: group
-      fields:
-      - name: address
-        type: keyword
-
-      - name: bytes
-        type: long
-
-      - name: geo
-        type: group
-        fields: 
-        - name: city_name
-          type: keyword
-
-        - name: geo.continent_name
-          type: keyword
-
-        - name: country_iso_code
-          type: keyword
-
-        - name: geo.country_name
-          type: keyword
-
-        - name: location
-          type: geo_point
-
-        - name: region_iso_code
-          type: keyword
-
-        - name: region_name
-          type: keyword
-
-      - name: ip 
-        type: ip
-
-      - name: packets
-        type: long
-
-      - name: port
-        type: long
-        
-
-
-
-    
+  - name: connection.history
+    type: keyword

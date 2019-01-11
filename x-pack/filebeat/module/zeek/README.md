@@ -48,7 +48,7 @@ Build Filebeat
 git clone git@github.com:elastic/beats.git
 cd beats/x-pack/filebeat
 make mage
-mage update
+mage clean update
 mage build
 mage dashboards
 ```
@@ -62,6 +62,7 @@ Update filebeat.yml to point to Elasticsearch and Kibana. Setup Filebeat.
 Enable the Filebeat zeek module
 
 ```
+./filebeat setup --modules zeek -e
 ./filebeat setup --modules zeek --dashboards -E setup.dashboards.directory=build/kibana
 ./filebeat modules enable zeek
 ```

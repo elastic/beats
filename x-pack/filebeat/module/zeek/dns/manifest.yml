@@ -1,18 +1,18 @@
 module_version: 1.0
 
 var:
-  - name: connection_paths
+  - name: dns_paths
     default:
-      - /var/log/bro/current/conn.log
+      - /var/log/bro/current/dns.log
     os.linux:
-      - /var/log/bro/current/conn.log
+      - /var/log/bro/current/dns.log
     os.darwin:
-      - /usr/local/var/logs/current/conn.log
+      - /usr/local/var/logs/current/dns.log
   - name: tags
     default: [zeek]
 
 ingest_pipeline: ingest/pipeline.json
-input: config/connection.yml
+input: config/dns.yml
 
 requires.processors:
 - name: geoip

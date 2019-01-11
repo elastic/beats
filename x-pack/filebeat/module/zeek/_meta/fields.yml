@@ -1,10 +1,5 @@
 - key: zeek
-  title: zeek
+  title: Zeek
   description: >
-    Module for normalizing and ingesting the logs produced by Zeek.
+    Module for handling logs produced by Zeek/Bro
   fields:
-    - name: zeek
-      type: group
-      description: >
-        Fields from the Zeek log files.
-      fields:
