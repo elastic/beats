@@ -45,6 +45,7 @@ grouped in the following categories:
 * <<exported-fields-nginx>>
 * <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
+* <<exported-fields-process>>
 * <<exported-fields-prometheus>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
@@ -18366,6 +18367,23 @@ type: long
 
 Total number of temp block cache written by the query.
 
+
+--
+
+[[exported-fields-process]]
+== Process fields
+
+Process metadata fields
+
+
+
+
+*`process.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
 
 --
 

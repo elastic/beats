@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/actions"
 )
 
 type program struct {
@@ -87,7 +88,7 @@ func newProcessorPipeline(
 	tags = append(tags, global.tags...)
 	tags = append(tags, config.EventMetadata.Tags...)
 	if len(tags) > 0 {
-		processors.add(makeAddTagsProcessor("tags", tags))
+		processors.add(actions.NewAddTags("tags", tags))
 	}
 
 	// setup 3, 4, 5: client config fields + pipeline fields + client fields + dyn metadata
@@ -98,17 +99,17 @@ func newProcessorPipeline(
 	}
 
 	if len(fields) > 0 {
-		// Enforce a copy of fields if dynamic fields are configured or beats
+		// Enforce a copy of fields if dynamic fields are configured or agent
 		// metadata will be merged into the fields.
 		// With dynamic fields potentially changing at any time, we need to copy,
 		// so we do not change shared structures be accident.
-		fieldsNeedsCopy := needsCopy || config.DynamicFields != nil || fields["beat"] != nil
-		processors.add(makeAddFieldsProcessor("fields", fields, fieldsNeedsCopy))
+		fieldsNeedsCopy := needsCopy || config.DynamicFields != nil || fields["agent"] != nil
+		processors.add(actions.NewAddLabels(fields, fieldsNeedsCopy))
 	}
 
 	if config.DynamicFields != nil {
 		checkCopy := func(m common.MapStr) bool {
-			return needsCopy || hasKey(m, "beat")
+			return needsCopy || hasKey(m, "agent")
 		}
 		processors.add(makeAddDynMetaProcessor("dynamicFields", config.DynamicFields, checkCopy))
 	}
@@ -118,12 +119,13 @@ func newProcessorPipeline(
 
 	// setup 6: add beats and host metadata
 	if meta := global.builtinMeta; len(meta) > 0 {
-		processors.add(makeAddFieldsProcessor("beatsMeta", meta, needsCopy))
+		processors.add(actions.NewAddLabels(meta, needsCopy))
 	}
 
 	// setup 7: add agent metadata
 	if !config.SkipAgentMetadata {
-		processors.add(makeAddAgentMetadataProcessor(info))
+		needsCopy := global.alwaysCopy || global.processors != nil
+		processors.add(actions.NewAddLabels(createAgentFields(info), needsCopy))
 	}
 
 	// setup 8: pipeline processors list
@@ -222,28 +224,6 @@ var dropDisabledProcessor = newProcessor("dropDisabled", func(event *beat.Event)
 	return nil, nil
 })
 
-func beatAnnotateProcessor(beatMeta common.MapStr) *processorFn {
-	const key = "beat"
-	return newAnnotateProcessor("annotateBeat", func(event *beat.Event) {
-		if orig, exists := event.Fields["beat"]; !exists {
-			event.Fields[key] = beatMeta.Clone()
-		} else if M, ok := orig.(common.MapStr); !ok {
-			event.Fields[key] = beatMeta.Clone()
-		} else {
-			event.Fields[key] = common.MapStrUnion(beatMeta, M)
-		}
-	})
-}
-
-func eventAnnotateProcessor(eventMeta common.EventMetadata) *processorFn {
-	return newAnnotateProcessor("annotateEvent", func(event *beat.Event) {
-		common.AddTags(event.Fields, eventMeta.Tags)
-		if fields := eventMeta.Fields; len(fields) > 0 {
-			common.MergeFields(event.Fields, fields.Clone(), eventMeta.FieldsUnderRoot)
-		}
-	})
-}
-
 func clientEventMeta(meta common.MapStr, needsCopy bool) *processorFn {
 	fn := func(event *beat.Event) { addMeta(event, meta) }
 	if needsCopy {
@@ -261,25 +241,6 @@ func addMeta(event *beat.Event, meta common.MapStr) {
 	}
 }
 
-func pipelineEventFields(fields common.MapStr, copy bool) *processorFn {
-	return makeAddFieldsProcessor("pipelineFields", fields, copy)
-}
-
-func makeAddTagsProcessor(name string, tags []string) *processorFn {
-	return newAnnotateProcessor(name, func(event *beat.Event) {
-		common.AddTags(event.Fields, tags)
-	})
-}
-
-func makeAddFieldsProcessor(name string, fields common.MapStr, copy bool) *processorFn {
-	fn := func(event *beat.Event) { event.Fields.DeepUpdate(fields) }
-	if copy {
-		fn = func(event *beat.Event) { event.Fields.DeepUpdate(fields.Clone()) }
-	}
-
-	return newAnnotateProcessor(name, fn)
-}
-
 func makeAddDynMetaProcessor(
 	name string,
 	meta *common.MapStrPointer,
@@ -295,7 +256,7 @@ func makeAddDynMetaProcessor(
 	})
 }
 
-func makeAddAgentMetadataProcessor(info beat.Info) *processorFn {
+func createAgentFields(info beat.Info) common.MapStr {
 	metadata := common.MapStr{
 		"type":         info.Beat,
 		"ephemeral_id": info.EphemeralID.String(),
@@ -306,7 +267,8 @@ func makeAddAgentMetadataProcessor(info beat.Info) *processorFn {
 	if info.Name != info.Hostname {
 		metadata.Put("name", info.Name)
 	}
-	return makeAddFieldsProcessor("add_agent_metadata", common.MapStr{"agent": metadata}, true)
+
+	return common.MapStr{"agent": metadata}
 }
 
 func debugPrintProcessor(info beat.Info) *processorFn {

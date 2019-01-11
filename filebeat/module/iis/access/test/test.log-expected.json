@@ -1,6 +1,7 @@
 [
     {
         "@timestamp": "2018-01-01T08:09:10.000Z",
+        "destination.address": "127.0.0.1",
         "destination.ip": "127.0.0.1",
         "destination.port": 80,
         "ecs.version": "1.0.0-beta2",
@@ -15,6 +16,7 @@
         "iis.access.win32_status": 0,
         "input.type": "log",
         "log.offset": 257,
+        "source.address": "85.181.35.98",
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
@@ -54,6 +56,7 @@
         "iis.access.win32_status": 0,
         "input.type": "log",
         "log.offset": 709,
+        "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "url.path": "/",
         "url.query": "-",
@@ -68,6 +71,7 @@
     },
     {
         "@timestamp": "2018-01-01T10:11:12.000Z",
+        "destination.address": "127.0.0.1",
         "destination.domain": "example.com",
         "destination.ip": "127.0.0.1",
         "destination.port": 80,
@@ -89,6 +93,7 @@
         "iis.access.win32_status": 0,
         "input.type": "log",
         "log.offset": 1204,
+        "source.address": "85.181.35.98",
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",

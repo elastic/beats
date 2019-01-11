@@ -20,11 +20,11 @@ package icmp
 import (
 	"fmt"
 	"net"
-
-	"github.com/elastic/beats/libbeat/beat"
+	"net/url"
 
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -50,14 +50,6 @@ func create(
 	// TODO: replace icmp package base reader/sender using raw sockets with
 	//       OS specific solution
 
-	addJob := func(t monitors.Job, err error) error {
-		if err != nil {
-			return err
-		}
-		jobs = append(jobs, t)
-		return nil
-	}
-
 	ipVersion := config.Mode.Network()
 	if len(config.Hosts) > 0 && ipVersion == "" {
 		err := fmt.Errorf("pinging hosts requires ipv4 or ipv6 mode enabled")
@@ -82,10 +74,18 @@ func create(
 
 	for _, host := range config.Hosts {
 		settings := monitors.MakeHostJobSettings(host, config.Mode)
-		err := addJob(monitors.MakeByHostJob(settings, pingFactory))
+		job, err := monitors.MakeByHostJob(settings, pingFactory)
+
 		if err != nil {
 			return nil, 0, err
 		}
+
+		u, err := url.Parse(fmt.Sprintf("icmp://%s", host))
+		if err != nil {
+			return nil, 0, err
+		}
+
+		jobs = append(jobs, monitors.WithURLField(u, job))
 	}
 
 	errWrappedJobs := monitors.WrapAll(jobs, monitors.WithErrAsField)
