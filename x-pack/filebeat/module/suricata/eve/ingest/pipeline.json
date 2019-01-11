@@ -102,7 +102,7 @@
     }
   , {"convert":
       {"field": "suricata.eve.alert.category"
-      ,"target_field": "event.action"
+      ,"target_field": "message"
       ,"type": "string"
       ,"ignore_missing": true
       }
