@@ -159,6 +159,18 @@
       , "ignore_missing": true
       }
     }
+  , {"convert":
+      {"field": "suricata.eve.app_proto"
+      ,"target_field": "network.protocol"
+      ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+  , { "lowercase":
+      { "field": "network.protocol"
+      , "ignore_missing": true
+      }
+    }
   , { "user_agent":
       { "field": "user_agent.original"
       , "target_field": "user_agent"
