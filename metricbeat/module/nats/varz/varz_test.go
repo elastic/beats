@@ -24,6 +24,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
@@ -34,7 +36,7 @@ func TestEventMapping(t *testing.T) {
 	assert.NoError(t, err)
 	event, err := eventMapping(content)
 	assert.NoError(t, err)
-	d, err := event.GetValue("http_req_stats.subsz_uri")
+	d := event["http"].(common.MapStr)["req_stats"].(common.MapStr)["uri"].(common.MapStr)["routez"]
 	assert.NoError(t, err)
 	assert.Equal(t, d, int64(10))
 }

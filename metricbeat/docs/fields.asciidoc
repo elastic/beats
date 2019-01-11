@@ -17319,22 +17319,19 @@ The number of registered remotes
 
 --
 
-*`nats.varz.in.msgs`*::
+[float]
+== in fields
+
+The amount of incoming data
+
+
+
+*`nats.varz.in.messages`*::
 +
 --
 type: integer
 
 The amount of incoming messages
-
-
---
-
-*`nats.varz.out.msgs`*::
-+
---
-type: integer
-
-The amount of outgoing messages
 
 
 --
@@ -17345,6 +17342,23 @@ The amount of outgoing messages
 type: integer
 
 The amount of incoming bytes
+
+
+--
+
+[float]
+== out fields
+
+The amount of outgoing data
+
+
+
+*`nats.varz.out.messages`*::
++
+--
+type: integer
+
+The amount of outgoing messages
 
 
 --
@@ -17415,6 +17429,77 @@ The number of hits on subsz monitoring uri
 type: object
 
 The number of hits on varz monitoring uri
+
+
+--
+
+[float]
+== http fields
+
+The http metrics of NATS server
+
+
+
+[float]
+== req_stats fields
+
+The requests statistics
+
+
+
+[float]
+== uri fields
+
+The request distribution on monitoring URIS
+
+
+
+*`nats.varz.http.req_stats.uri.routez`*::
++
+--
+type: integer
+
+The number of hits on routez monitoring uri
+
+
+--
+
+*`nats.varz.http.req_stats.uri.connz`*::
++
+--
+type: integer
+
+The number of hits on connz monitoring uri
+
+
+--
+
+*`nats.varz.http.req_stats.uri.varz`*::
++
+--
+type: integer
+
+The number of hits on varz monitoring uri
+
+
+--
+
+*`nats.varz.http.req_stats.uri.subsz`*::
++
+--
+type: integer
+
+The number of hits on subsz monitoring uri
+
+
+--
+
+*`nats.varz.http.req_stats.uri.root`*::
++
+--
+type: integer
+
+The number of hits on root monitoring uri
 
 
 --

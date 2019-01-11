@@ -47,12 +47,16 @@ var (
 		"cpu":               c.Int("cpu"),
 		"total_connections": c.Int("total_connections"),
 		"remotes":           c.Int("remotes"),
-		"in.msgs":           c.Int("in_msgs"),
-		"out.msgs":          c.Int("out_msgs"),
-		"in.bytes":          c.Int("in_bytes"),
-		"out.bytes":         c.Int("out_bytes"),
-		"slow_consumers":    c.Int("slow_consumers"),
-		"http_req_stats":    c.Dict("http_req_stats", httpReqStatsSchema),
+		"in": s.Object{
+			"messages": c.Int("in_msgs"),
+			"bytes":    c.Int("in_bytes"),
+		},
+		"out": s.Object{
+			"messages": c.Int("out_msgs"),
+			"bytes":    c.Int("out_bytes"),
+		},
+		"slow_consumers": c.Int("slow_consumers"),
+		"http_req_stats": c.Dict("http_req_stats", httpReqStatsSchema),
 	}
 )
 
@@ -129,22 +133,47 @@ func eventMapping(content []byte) (common.MapStr, error) {
 		return event, err
 	}
 
-	uptime, _ := event.GetValue("uptime")
+	uptime, err := event.GetValue("uptime")
+	if err != nil {
+		err = errors.Wrap(err, "failure retrieving uptime key")
+		return event, err
+	}
 	uptime, err = convertUptime(uptime.(string))
 	if err != nil {
 		err = errors.Wrap(err, "failure converting uptime from string to integer")
 		return event, err
 	}
-	event.Put("uptime", uptime)
+	_, err = event.Put("uptime", uptime)
+	if err != nil {
+		err = errors.Wrap(err, "failure updating uptime key")
+		return event, err
+	}
 
-	d, _ := event.GetValue("http_req_stats")
-	httpStats := d.(common.MapStr)
-	event.Delete("http_req_stats")
-	event["http_req_stats.root_uri"] = httpStats["root_uri"]
-	event["http_req_stats.connz_uri"] = httpStats["connz_uri"]
-	event["http_req_stats.routez_uri"] = httpStats["routez_uri"]
-	event["http_req_stats.subsz_uri"] = httpStats["subsz_uri"]
-	event["http_req_stats.varz_uri"] = httpStats["varz_uri"]
-
+	d, err := event.GetValue("http_req_stats")
+	if err != nil {
+		err = errors.Wrap(err, "failure retrieving http_req_stats key")
+		return event, err
+	}
+	httpStats, ok := d.(common.MapStr)
+	if !ok {
+		err = errors.Wrap(err, "failure casting http_req_stats to common.Mapstr")
+		return event, err
+	}
+	err = event.Delete("http_req_stats")
+	if err != nil {
+		err = errors.Wrap(err, "failure deleting http_req_stats key")
+		return event, err
+	}
+	event["http"] = common.MapStr{
+		"req_stats": common.MapStr{
+			"uri": common.MapStr{
+				"root":   httpStats["root_uri"],
+				"connz":  httpStats["connz_uri"],
+				"routez": httpStats["routez_uri"],
+				"subsz":  httpStats["subsz_uri"],
+				"varz":   httpStats["varz_uri"],
+			},
+		},
+	}
 	return event, nil
 }
