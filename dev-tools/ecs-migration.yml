@@ -456,6 +456,16 @@
   to: event.duration
   alias: true
 
+## MongoDB module
+
+- from: mongodb.log.severity
+  to: log.level
+  alias: true
+
+- from: mongodb.log.message
+  to: message
+  alias: true
+
 ## NGINX module
 
 - from: nginx.access.user_name

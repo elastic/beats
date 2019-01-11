@@ -6265,18 +6265,6 @@ Contains fields from MongoDB logs.
 
 
 
-*`mongodb.log.severity`*::
-+
---
-type: keyword
-
-example: I
-
-Severity level of message
-
-
---
-
 *`mongodb.log.component`*::
 +
 --
@@ -6301,13 +6289,21 @@ Context of message
 
 --
 
+*`mongodb.log.severity`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
 *`mongodb.log.message`*::
 +
 --
-type: text
+type: alias
 
-The message in the log line.
-
+alias to: message
 
 --
 
