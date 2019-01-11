@@ -1,0 +1,90 @@
+{
+    "agent": {
+        "hostname": "bigisland.lan",
+        "id": "ffd62e9b-a88e-4481-8554-226ca5d2431b",
+        "type": "filebeat",
+        "ephemeral_id": "aa4395d6-875e-42ec-8fe1-b3a7dabefa3e",
+        "version": "7.0.0"
+    },
+    "log": {
+        "file": {
+            "path": "/usr/local/var/logs/current/dns.log"
+        },
+        "offset": 229171
+    },
+    "destination": {
+        "address": "192.168.86.1",
+        "port": 53,
+        "ip": "192.168.86.1"
+    },
+    "zeek": {
+        "dns": {
+            "AA": false,
+            "TTLs": [
+                119,
+                119,
+                59
+            ],
+            "qclass_name": "C_INTERNET",
+            "qtype_name": "A",
+            "qtype": 1,
+            "rejected": false,
+            "query": "dd625ffb4fc54735b281862aa1cd6cd4.us-west1.gcp.cloud.es.io",
+            "answers": [
+                "proxy-production-us-west1.gcp.cloud.es.io",
+                "proxy-production-us-west1-v1-009.gcp.cloud.es.io",
+                "35.199.178.4"
+            ],
+            "rcode": 0,
+            "trans_id": 15209,
+            "TC": false,
+            "RA": true,
+            "rcode_name": "NOERROR",
+            "RD": true,
+            "rtt": 0.076967,
+            "Z": 0,
+            "qclass": 1
+        },
+        "session_id": "CAcJw21BbVedgFnYH3"
+    },
+    "source": {
+        "address": "192.168.86.167",
+        "port": 38339,
+        "ip": "192.168.86.167"
+    },
+    "fileset": {
+        "name": "dns"
+    },
+    "network": {
+        "transport": "udp"
+    },
+    "tags": [
+        "zeek"
+    ],
+    "input": {
+        "type": "log"
+    },
+    "@timestamp": "2019-01-11T06:33:38.406Z",
+    "ecs": {
+        "version": "1.0.0-beta2"
+    },
+    "host": {
+        "os": {
+            "build": "18C54",
+            "kernel": "18.2.0",
+            "name": "Mac OS X",
+            "family": "darwin",
+            "version": "10.14.2",
+            "platform": "darwin"
+        },
+        "name": "bigisland.lan",
+        "id": "2D94472E-26CF-51A1-B943-D017EE9329FD",
+        "architecture": "x86_64"
+    },
+    "event": {
+        "created": 1547188415000,
+        "module": "zeek",
+        "id": "CAcJw21BbVedgFnYH3-dns",
+        "dataset": "zeek.dns"
+    }
+}
