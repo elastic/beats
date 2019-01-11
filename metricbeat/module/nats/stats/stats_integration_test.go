@@ -17,7 +17,7 @@
 
 // +build integration
 
-package varz
+package stats
 
 import (
 	"os"
@@ -55,7 +55,7 @@ func TestFetch(t *testing.T) {
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "nats",
-		"metricsets": []string{"varz"},
+		"metricsets": []string{"stats"},
 		"hosts":      []string{GetEnvHost() + ":" + GetEnvPort()},
 	}
 }

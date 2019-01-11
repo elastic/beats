@@ -10,16 +10,16 @@ class Test(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['nats']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_varz(self):
+    def test_stats(self):
         """
-        nats varz test
+        nats stats test
         """
         self.render_config_template(modules=[{
             "name": "nats",
-            "metricsets": ["varz"],
+            "metricsets": ["stats"],
             "hosts": self.get_hosts(),
             "period": "5s",
-            "varz_metrics_path": "/varz"
+            "stats_metrics_path": "/stats"
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)

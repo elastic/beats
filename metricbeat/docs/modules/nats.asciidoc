@@ -11,7 +11,7 @@ This is the nats module.
 
 This is the Nats Module. The Nats module uses http://localhost:8222 APIs to collect metrics.
 
-The default metricsets are `varz`.
+The default metricsets are `stats`.
 
 [float]
 === Compatibility
@@ -29,10 +29,10 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: nats
-  metricsets: ["varz"]
+  metricsets: ["stats"]
   period: 10s
   hosts: ["localhost:8222"]
-  #varz_metrics_path: "/varz"
+  #stats_metrics_path: "/varz"
 ----
 
 [float]
@@ -40,7 +40,7 @@ metricbeat.modules:
 
 The following metricsets are available:
 
-* <<metricbeat-metricset-nats-varz,varz>>
+* <<metricbeat-metricset-nats-stats,stats>>
 
-include::nats/varz.asciidoc[]
+include::nats/stats.asciidoc[]
 

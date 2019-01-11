@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package varz
+package stats
 
 import (
 	"github.com/elastic/beats/libbeat/common"
@@ -34,7 +34,7 @@ var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
-		PathConfigKey: "varz_metrics_path",
+		PathConfigKey: "stats_metrics_path",
 	}.Build()
 )
 
@@ -43,7 +43,7 @@ var (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("nats", "varz", New,
+	mb.Registry.MustAddMetricSet("nats", "stats", New,
 		mb.WithHostParser(hostParser),
 		mb.DefaultMetricSet(),
 	)
@@ -61,7 +61,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The nats varz metricset is experimental.")
+	cfgwarn.Experimental("The nats stats metricset is experimental.")
 
 	config := struct{}{}
 	if err := base.Module().UnpackConfig(&config); err != nil {

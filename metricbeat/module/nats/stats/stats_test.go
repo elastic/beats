@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package varz
+package stats
 
 import (
 	"io/ioutil"
@@ -32,7 +32,7 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	content, err := ioutil.ReadFile("../_meta/test/varzmetrics.json")
+	content, err := ioutil.ReadFile("../_meta/test/statsmetrics.json")
 	assert.NoError(t, err)
 	event, err := eventMapping(content)
 	assert.NoError(t, err)
@@ -44,7 +44,7 @@ func TestEventMapping(t *testing.T) {
 func TestFetchEventContent(t *testing.T) {
 	absPath, err := filepath.Abs("../_meta/test/")
 
-	response, err := ioutil.ReadFile(absPath + "/varzmetrics.json")
+	response, err := ioutil.ReadFile(absPath + "/statsmetrics.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")
@@ -54,7 +54,7 @@ func TestFetchEventContent(t *testing.T) {
 
 	config := map[string]interface{}{
 		"module":     "nats",
-		"metricsets": []string{"varz"},
+		"metricsets": []string{"stats"},
 		"hosts":      []string{server.URL},
 	}
 	f := mbtest.NewEventFetcher(t, config)

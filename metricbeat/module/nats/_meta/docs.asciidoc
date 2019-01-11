@@ -2,7 +2,7 @@ This is the nats module.
 
 This is the Nats Module. The Nats module uses http://localhost:8222 APIs to collect metrics.
 
-The default metricsets are `varz`.
+The default metricsets are `stats`.
 
 [float]
 === Compatibility

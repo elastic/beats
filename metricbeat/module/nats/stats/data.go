@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package varz
+package stats
 
 import (
 	"encoding/json"
@@ -38,7 +38,7 @@ var (
 		"subsz_uri":  c.Int("/subsz"),
 		"varz_uri":   c.Int("/varz"),
 	}
-	varzSchema = s.Schema{
+	statsSchema = s.Schema{
 		"server_id":         c.Str("server_id"),
 		"now":               c.Str("now"),
 		"uptime":            c.Str("uptime"),
@@ -124,10 +124,10 @@ func eventMapping(content []byte) (common.MapStr, error) {
 
 	err := json.Unmarshal(content, &inInterface)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Nats varz API response")
+		err = errors.Wrap(err, "failure parsing Nats stats API response")
 		return event, err
 	}
-	event, err = varzSchema.Apply(inInterface)
+	event, err = statsSchema.Apply(inInterface)
 	if err != nil {
 		err = errors.Wrap(err, "failure applying index schema")
 		return event, err

@@ -1,4 +1,4 @@
-- name: varz
+- name: stats
   type: group
   description: >
     Contains nats var related metrics
@@ -81,10 +81,10 @@
       type: object
       description: >
         The number of hits on subsz monitoring uri
-    - name: http_req_stats.varz_uri
+    - name: http_req_stats.stats_uri
       type: object
       description: >
-        The number of hits on varz monitoring uri
+        The number of hits on stats monitoring uri
     - name: http
       type: group
       description: >

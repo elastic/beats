@@ -17233,13 +17233,13 @@ nats Module
 
 
 [float]
-== varz fields
+== stats fields
 
 Contains nats var related metrics
 
 
 
-*`nats.varz.server_id`*::
+*`nats.stats.server_id`*::
 +
 --
 type: keyword
@@ -17249,7 +17249,7 @@ The server ID
 
 --
 
-*`nats.varz.now`*::
+*`nats.stats.now`*::
 +
 --
 type: date
@@ -17259,7 +17259,7 @@ Server time of metric creation
 
 --
 
-*`nats.varz.uptime`*::
+*`nats.stats.uptime`*::
 +
 --
 type: long
@@ -17269,7 +17269,7 @@ The period the server is up
 
 --
 
-*`nats.varz.mem`*::
+*`nats.stats.mem`*::
 +
 --
 type: integer
@@ -17279,7 +17279,7 @@ The current memory usage of NATS process
 
 --
 
-*`nats.varz.cores`*::
+*`nats.stats.cores`*::
 +
 --
 type: integer
@@ -17289,7 +17289,7 @@ The number of logical cores the NATS process runs on
 
 --
 
-*`nats.varz.cpu`*::
+*`nats.stats.cpu`*::
 +
 --
 type: integer
@@ -17299,7 +17299,7 @@ The current cpu usage of NATs process
 
 --
 
-*`nats.varz.total_connections`*::
+*`nats.stats.total_connections`*::
 +
 --
 type: integer
@@ -17309,7 +17309,7 @@ The number of totally created clients
 
 --
 
-*`nats.varz.remotes`*::
+*`nats.stats.remotes`*::
 +
 --
 type: integer
@@ -17326,7 +17326,7 @@ The amount of incoming data
 
 
 
-*`nats.varz.in.messages`*::
+*`nats.stats.in.messages`*::
 +
 --
 type: integer
@@ -17336,7 +17336,7 @@ The amount of incoming messages
 
 --
 
-*`nats.varz.in.bytes`*::
+*`nats.stats.in.bytes`*::
 +
 --
 type: integer
@@ -17353,7 +17353,7 @@ The amount of outgoing data
 
 
 
-*`nats.varz.out.messages`*::
+*`nats.stats.out.messages`*::
 +
 --
 type: integer
@@ -17363,7 +17363,7 @@ The amount of outgoing messages
 
 --
 
-*`nats.varz.out.bytes`*::
+*`nats.stats.out.bytes`*::
 +
 --
 type: integer
@@ -17373,7 +17373,7 @@ The amount of outgoing bytes
 
 --
 
-*`nats.varz.slow_consumers`*::
+*`nats.stats.slow_consumers`*::
 +
 --
 type: integer
@@ -17383,7 +17383,7 @@ The number of slow consumers currently on NATS
 
 --
 
-*`nats.varz.http_req_stats.root_uri`*::
+*`nats.stats.http_req_stats.root_uri`*::
 +
 --
 type: object
@@ -17393,7 +17393,7 @@ The number of hits on root monitoring uri
 
 --
 
-*`nats.varz.http_req_stats.connz_uri`*::
+*`nats.stats.http_req_stats.connz_uri`*::
 +
 --
 type: object
@@ -17403,7 +17403,7 @@ The number of hits on connz monitoring uri
 
 --
 
-*`nats.varz.http_req_stats.routez_uri`*::
+*`nats.stats.http_req_stats.routez_uri`*::
 +
 --
 type: object
@@ -17413,7 +17413,7 @@ The number of hits on routez monitoring uri
 
 --
 
-*`nats.varz.http_req_stats.subsz_uri`*::
+*`nats.stats.http_req_stats.subsz_uri`*::
 +
 --
 type: object
@@ -17423,12 +17423,12 @@ The number of hits on subsz monitoring uri
 
 --
 
-*`nats.varz.http_req_stats.varz_uri`*::
+*`nats.stats.http_req_stats.stats_uri`*::
 +
 --
 type: object
 
-The number of hits on varz monitoring uri
+The number of hits on stats monitoring uri
 
 
 --
@@ -17454,7 +17454,7 @@ The request distribution on monitoring URIS
 
 
 
-*`nats.varz.http.req_stats.uri.routez`*::
+*`nats.stats.http.req_stats.uri.routez`*::
 +
 --
 type: integer
@@ -17464,7 +17464,7 @@ The number of hits on routez monitoring uri
 
 --
 
-*`nats.varz.http.req_stats.uri.connz`*::
+*`nats.stats.http.req_stats.uri.connz`*::
 +
 --
 type: integer
@@ -17474,7 +17474,7 @@ The number of hits on connz monitoring uri
 
 --
 
-*`nats.varz.http.req_stats.uri.varz`*::
+*`nats.stats.http.req_stats.uri.varz`*::
 +
 --
 type: integer
@@ -17484,7 +17484,7 @@ The number of hits on varz monitoring uri
 
 --
 
-*`nats.varz.http.req_stats.uri.subsz`*::
+*`nats.stats.http.req_stats.uri.subsz`*::
 +
 --
 type: integer
@@ -17494,7 +17494,7 @@ The number of hits on subsz monitoring uri
 
 --
 
-*`nats.varz.http.req_stats.uri.root`*::
+*`nats.stats.http.req_stats.uri.root`*::
 +
 --
 type: integer
