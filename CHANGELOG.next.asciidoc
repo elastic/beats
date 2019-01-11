@@ -29,6 +29,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename many `traefik.access.*` fields to map to ECS. {pull}9005[9005]
 - Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
 - Rename a few `logstash.*` fields to map to ECS, remove logstash.slowlog.message. {pull}9935[9935]
+- Rename a few `mysql.*` fields to map to ECS. {pull}10008[10008]
 - Rename a few `nginx.error.*` fields to map to ECS. {pull}10007[10007]
 
 *Heartbeat*

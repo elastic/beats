@@ -3,15 +3,6 @@
   description: >
     Contains fields from the MySQL slow logs.
   fields:
-    - name: user
-      description: >
-        The MySQL user that created the query.
-    - name: host
-      description: >
-        The host from where the user that created the query logged in.
-    - name: ip
-      description: >
-        The IP address from where the user that created the query logged in.
     - name: query_time.sec
       type: float
       description: >
@@ -40,3 +31,16 @@
       type: long
       description: >
         The connection ID for the query.
+
+    - name: user
+      type: alias
+      path: user.name
+      migration: true
+    - name: host
+      type: alias
+      path: source.domain
+      migration: true
+    - name: ip
+      type: alias
+      path: source.ip
+      migration: true
