@@ -9938,36 +9938,6 @@ Contains fields for the Nginx error logs.
 
 
 
-*`nginx.error.level`*::
-+
---
-type: keyword
-
-Error level (e.g. error, critical).
-
-
---
-
-*`nginx.error.pid`*::
-+
---
-type: long
-
-Process identifier (PID).
-
-
---
-
-*`nginx.error.tid`*::
-+
---
-type: long
-
-Thread identifier.
-
-
---
-
 *`nginx.error.connection_id`*::
 +
 --
@@ -9978,13 +9948,39 @@ Connection identifier.
 
 --
 
+*`nginx.error.level`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
+*`nginx.error.pid`*::
++
+--
+type: alias
+
+alias to: process.pid
+
+--
+
+*`nginx.error.tid`*::
++
+--
+type: alias
+
+alias to: process.thread.id
+
+--
+
 *`nginx.error.message`*::
 +
 --
-type: text
+type: alias
 
-The error message
-
+alias to: message
 
 --
 
