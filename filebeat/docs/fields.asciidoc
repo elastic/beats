@@ -6080,26 +6080,6 @@ Fields from the Logstash logs.
 
 
 
-*`logstash.log.message`*::
-+
---
-type: text
-
-Contains the un-parsed log message
-
-
---
-
-*`logstash.log.level`*::
-+
---
-type: keyword
-
-The log level of the message, this correspond to Log4j levels.
-
-
---
-
 *`logstash.log.module`*::
 +
 --
@@ -6130,6 +6110,24 @@ key and value debugging information.
 
 --
 
+*`logstash.log.message`*::
++
+--
+type: alias
+
+alias to: message
+
+--
+
+*`logstash.log.level`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
 [float]
 == slowlog fields
 
@@ -6143,16 +6141,6 @@ slowlog
 type: text
 
 Contains the un-parsed log message
-
-
---
-
-*`logstash.slowlog.level`*::
-+
---
-type: keyword
-
-The log level of the message, this correspond to Log4j levels.
 
 
 --
@@ -6217,16 +6205,6 @@ Execution time for the plugin in milliseconds.
 
 --
 
-*`logstash.slowlog.took_in_nanos`*::
-+
---
-type: long
-
-Execution time for the plugin in nanoseconds.
-
-
---
-
 *`logstash.slowlog.plugin_params`*::
 +
 --
@@ -6244,6 +6222,24 @@ type: object
 
 key -> value of the configuration used by the plugin.
 
+
+--
+
+*`logstash.slowlog.level`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
+*`logstash.slowlog.took_in_nanos`*::
++
+--
+type: alias
+
+alias to: event.duration
 
 --
 

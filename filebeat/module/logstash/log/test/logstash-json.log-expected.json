@@ -9,8 +9,8 @@
         "log.flags": [
             "multiline"
         ],
+        "log.level": "INFO",
         "log.offset": 0,
-        "logstash.log.level": "INFO",
         "logstash.log.log_event.count": 1,
         "logstash.log.log_event.running_pipelines": [
             {
@@ -24,8 +24,8 @@
                 }
             }
         ],
-        "logstash.log.message": "Pipelines running",
         "logstash.log.module": "logstash.agent",
-        "logstash.log.thread": "Ruby-0-Thread-1: /Users/mat/work/elastic/releases/6.5.1/logstash/lib/bootstrap/environment.rb:6"
+        "logstash.log.thread": "Ruby-0-Thread-1: /Users/mat/work/elastic/releases/6.5.1/logstash/lib/bootstrap/environment.rb:6",
+        "message": "Pipelines running"
     }
 ]

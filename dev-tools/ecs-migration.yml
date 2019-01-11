@@ -434,6 +434,24 @@
   to: http.request.method
   alias: true
 
+## Logstash module
+
+- from: logstash.log.level
+  to: log.level
+  alias: true
+
+- from: logstash.log.message
+  to: message
+  alias: true
+
+- from: logstash.slowlog.level
+  to: log.level
+  alias: true
+
+- from: logstash.slowlog.took_in_nanos
+  to: event.duration
+  alias: true
+
 ## NGINX module
 
 - from: nginx.access.user_name
