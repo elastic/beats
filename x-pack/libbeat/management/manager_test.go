@@ -292,7 +292,7 @@ func TestBadConfig(t *testing.T) {
 	reporter := addEventsReporterHandle(mux, id)
 	server := httptest.NewServer(mux)
 
-	c, err := api.ConfigFromURL(server.URL)
+	c, err := api.ConfigFromURL(server.URL, common.NewConfig())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -417,7 +417,7 @@ func addEventsReporterHandle(mux *http.ServeMux, uuid uuid.UUID) *collectEventRe
 
 func assertEvents(t *testing.T, events []api.Event, reporter *collectEventRequest) {
 	requests := reporter.Requests()
-	if assert.Equal(t, len(events), len(requests)) {
+	if !assert.Equal(t, len(events), len(requests)) {
 		return
 	}
 

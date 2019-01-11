@@ -25,6 +25,7 @@ type EventReporter struct {
 	done         chan struct{}
 	buffer       []Event
 	mu           sync.Mutex
+	wg           sync.WaitGroup
 }
 
 // NewEventReporter returns a new event reporter
@@ -46,6 +47,7 @@ func NewEventReporter(
 
 // Start starts the event reported and wait for new events.
 func (e *EventReporter) Start() {
+	e.wg.Add(1)
 	go e.worker()
 	e.logger.Info("Starting event reporter service")
 }
@@ -54,14 +56,15 @@ func (e *EventReporter) Start() {
 func (e *EventReporter) Stop() {
 	e.logger.Info("Stopping event reporter service")
 	close(e.done)
+	e.wg.Wait()
 }
 
 func (e *EventReporter) worker() {
+	defer e.wg.Done()
 	ticker := time.NewTicker(e.period)
 	defer ticker.Stop()
 
 	var done bool
-
 	for !done {
 		select {
 		case <-e.done:
