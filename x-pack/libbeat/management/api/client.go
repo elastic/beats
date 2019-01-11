@@ -66,7 +66,7 @@ func NewClient(cfg *kibana.ClientConfig) (*Client, error) {
 
 // do a request to the API and unmarshall the message, error if anything fails
 func (c *Client) request(method, extraPath string,
-	body interface{}, headers http.Header, message interface{}) (int, error) {
+	body interface{}, headers http.Header, resp interface{}) (int, error) {
 
 	bodyJSON, err := json.Marshal(body)
 	if err != nil {
@@ -86,7 +86,7 @@ func (c *Client) request(method, extraPath string,
 	if statusCode >= 300 {
 		err = extractError(result)
 	} else {
-		if err = json.Unmarshal(result, message); err != nil {
+		if err = json.Unmarshal(result, resp); err != nil {
 			return statusCode, errors.Wrap(err, "error unmarshaling Kibana response")
 		}
 	}
