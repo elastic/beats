@@ -55,6 +55,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Enforce validation for the Central Management access token. {issue}9621[9621]
 - Fix config appender registration. {pull}9873[9873]
+- Gracefully handle TLS options when enrolling a Beat. {issue}9129[9129]
 
 *Auditbeat*
 
