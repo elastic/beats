@@ -17,7 +17,7 @@
         "mysql.slowlog.query_time.sec": 15.000223,
         "mysql.slowlog.rows_examined": 0,
         "mysql.slowlog.rows_sent": 1,
-        "mysql.slowlog.timestamp": "1533630467",
+        "mysql.slowlog.timestamp": 1533630467,
         "source.ip": "218.76.8.37",
         "user.name": "root"
     },
@@ -38,7 +38,7 @@
         "mysql.slowlog.query_time.sec": 0.000153,
         "mysql.slowlog.rows_examined": 5,
         "mysql.slowlog.rows_sent": 1,
-        "mysql.slowlog.timestamp": "1533630467",
+        "mysql.slowlog.timestamp": 1533630467,
         "source.domain": "localhost",
         "user.name": "debian-sys-maint"
     },
@@ -60,7 +60,7 @@
         "mysql.slowlog.query_time.sec": 4.071491,
         "mysql.slowlog.rows_examined": 1489615,
         "mysql.slowlog.rows_sent": 1000,
-        "mysql.slowlog.timestamp": "1533630467",
+        "mysql.slowlog.timestamp": 1533630467,
         "source.domain": "apphost",
         "source.ip": "1.1.1.1",
         "user.name": "appuser"
@@ -83,7 +83,7 @@
         "mysql.slowlog.query_time.sec": 10.346539,
         "mysql.slowlog.rows_examined": 4751313,
         "mysql.slowlog.rows_sent": 0,
-        "mysql.slowlog.timestamp": "1533630467",
+        "mysql.slowlog.timestamp": 1533630467,
         "source.domain": "apphost",
         "source.ip": "1.1.1.1",
         "user.name": "appuser"
