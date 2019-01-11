@@ -466,6 +466,32 @@
   to: message
   alias: true
 
+## MySQL module
+
+- from: mysql.error.message
+  to: message
+  alias: true
+
+- from: mysql.error.level
+  to: log.level
+  alias: true
+
+- from: mysql.error.thread_id
+  to: process.thread.id
+  alias: true
+
+- from: mysql.slowlog.ip
+  to: source.ip
+  alias: true
+
+- from: mysql.slowlog.host
+  to: source.domain
+  alias: true
+
+- from: mysql.slowlog.user
+  to: user.name
+  alias: true
+
 ## NGINX module
 
 - from: nginx.access.user_name

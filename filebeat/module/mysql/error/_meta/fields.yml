@@ -6,16 +6,16 @@
     - name: timestamp
       description: >
         The timestamp from the log line.
+
     - name: thread_id
-      type: long
-      description: >
-        As of MySQL 5.7.2, this is the thread id. For MySQL versions prior to 5.7.2, this
-        field contains the process id.
+      type: alias
+      path: process.thread.id
+      migration: true
     - name: level
-      example: "Warning"
-      description:
-        The log level.
+      type: alias
+      path: log.level
+      migration: true
     - name: message
-      type: text
-      description: >
-        The logged message.
+      type: alias
+      path: message
+      migration: true
