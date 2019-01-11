@@ -60,7 +60,7 @@
         "mysql.slowlog.timestamp": "1533630467",
         "source.domain": "apphost",
         "source.ip": "1.1.1.1",
-        "user.name": "apphost"
+        "user.name": "appuser"
     },
     {
         "@timestamp": "2018-08-07T08:27:47.000Z",
@@ -82,6 +82,6 @@
         "mysql.slowlog.timestamp": "1533630467",
         "source.domain": "apphost",
         "source.ip": "1.1.1.1",
-        "user.name": "apphost"
+        "user.name": "appuser"
     }
 ]
