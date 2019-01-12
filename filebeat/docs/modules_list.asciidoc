@@ -22,6 +22,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-suricata>>
   * <<filebeat-module-system>>
   * <<filebeat-module-traefik>>
+  * <<filebeat-module-zeek>>
 
 
 --
