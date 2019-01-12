@@ -1,6 +1,6 @@
 type: log
 paths:
-{{ range $i, $path := .dns_paths }}
+{{ range $i, $path := .paths }}
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
@@ -9,6 +9,8 @@ tags: {{.tags}}
 json.keys_under_root: false
 
 processors:
+  - drop_fields:
+      fields: ["json.Z","json.auth","json.addl"]
   - rename:
       fields:
         - from: "json"

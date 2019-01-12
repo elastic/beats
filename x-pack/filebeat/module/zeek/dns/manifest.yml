@@ -1,7 +1,7 @@
 module_version: 1.0
 
 var:
-  - name: dns_paths
+  - name: paths
     default:
       - /var/log/bro/current/dns.log
     os.linux:

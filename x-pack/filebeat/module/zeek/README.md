@@ -55,13 +55,12 @@ mage build
 Update filebeat.yml to point to Elasticsearch and Kibana. Setup Filebeat.
 
 ```
-./filebeat setup -e
+./filebeat setup --modules zeek -e -E setup.dashboards.directory=build/kibana
 ```
 
 Enable the Filebeat zeek module
 
 ```
-./filebeat setup --modules zeek -e -E setup.dashboards.directory=build/kibana
 ./filebeat modules enable zeek
 ```
 
