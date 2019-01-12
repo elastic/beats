@@ -1,4 +1,4 @@
-- module: apache2
+- module: apache
   # Access logs
   access:
     enabled: true
