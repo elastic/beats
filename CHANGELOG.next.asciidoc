@@ -18,15 +18,20 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Embedded html is not escaped anymore by default. {pull}9914[9914]
 - Remove port settings from Logstash and Redis output. {pull}9934[9934]
 - Fix registry handle leak on Windows (https://github.com/elastic/go-sysinfo/pull/33). {pull}9920[9920]
+- Rename `process.exe` to `process.executable` in add_process_metadata to align with ECS. {pull}9949[9949]
 
 *Auditbeat*
+- Rename `process.exe` to `process.executable` in auditd module to align with ECS. {pull}9949[9949]
 
 *Filebeat*
 
 - Modify apache/error dataset to follow ECS. {pull}8963[8963]
 - Rename many `traefik.access.*` fields to map to ECS. {pull}9005[9005]
 - Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
+- Rename many `iis.error.*` fields to map to ECS. {pull}9955[9955]
 - Rename a few `logstash.*` fields to map to ECS, remove logstash.slowlog.message. {pull}9935[9935]
+- Rename a few `mysql.*` fields to map to ECS. {pull}10008[10008]
+- Rename a few `nginx.error.*` fields to map to ECS. {pull}10007[10007]
 
 *Heartbeat*
 
@@ -63,7 +68,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - Add `convert_timezone` option to Elasticsearch module to convert dates to UTC. {issue}9756[9756] {pull}9761[9761]
-- Support IPv6 addresses with zone id in IIS ingest pipeline. {issue}9836[9836] {pull}9869[9869]
+- Support IPv6 addresses with zone id in IIS ingest pipeline.
+  {issue}9836[9836] error log: {pull}9869[9869], access log: {pull}9955[9955].
 - Support haproxy log lines without captured headers. {issue}9463[9463] {pull}9958[9958]
 
 *Heartbeat*
@@ -90,6 +96,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update field definitions for `http` to ECS Beta 2 {pull}9645[9645]
 - Add `agent.id` and `agent.ephemeral_id` fields to all beats. {pull}9404[9404]
 - Add `name` config option to `add_host_metadata` processor. {pull}9943[9943]
+- Add `add_labels` and `add_tags` processors. {pull}9973[9973]
 
 *Auditbeat*
 

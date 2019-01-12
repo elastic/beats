@@ -34,6 +34,7 @@ grouped in the following categories:
 * <<exported-fields-nginx>>
 * <<exported-fields-osquery>>
 * <<exported-fields-postgresql>>
+* <<exported-fields-process>>
 * <<exported-fields-redis>>
 * <<exported-fields-santa>>
 * <<exported-fields-suricata>>
@@ -5162,7 +5163,7 @@ The number of bytes of the server request body.
 --
 type: alias
 
-alias to: destination.ip
+alias to: destination.address
 
 --
 
@@ -5216,7 +5217,7 @@ alias to: user.name
 --
 type: alias
 
-alias to: source.ip
+alias to: source.address
 
 --
 
@@ -5409,88 +5410,6 @@ Contains fields for IIS error logs.
 
 
 
-*`iis.error.remote_ip`*::
-+
---
-type: keyword
-
-The client IP address.
-
-
---
-
-*`iis.error.remote_port`*::
-+
---
-type: long
-
-The client port number.
-
-
---
-
-*`iis.error.server_ip`*::
-+
---
-type: keyword
-
-The server IP address.
-
-
---
-
-*`iis.error.server_port`*::
-+
---
-type: long
-
-The server port number.
-
-
---
-
-*`iis.error.http_version`*::
-+
---
-type: keyword
-
-The HTTP version.
-
-
---
-
-*`iis.error.method`*::
-+
---
-type: keyword
-
-example: GET
-
-The request HTTP method.
-
-
---
-
-*`iis.error.url`*::
-+
---
-type: keyword
-
-The request HTTP URL.
-
-
---
-
-*`iis.error.response_code`*::
-+
---
-type: long
-
-The HTTP response code.
-
-
---
-
 *`iis.error.reason_phrase`*::
 +
 --
@@ -5511,70 +5430,130 @@ The IIS application pool name.
 
 --
 
-[float]
-== geoip fields
+*`iis.error.remote_ip`*::
++
+--
+type: alias
 
-Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+alias to: source.address
 
+--
+
+*`iis.error.remote_port`*::
++
+--
+type: alias
+
+alias to: source.port
+
+--
+
+*`iis.error.server_ip`*::
++
+--
+type: alias
+
+alias to: destination.address
+
+--
+
+*`iis.error.server_port`*::
++
+--
+type: alias
+
+alias to: destination.port
+
+--
+
+*`iis.error.http_version`*::
++
+--
+type: alias
+
+alias to: http.version
+
+--
+
+*`iis.error.method`*::
++
+--
+type: alias
+
+alias to: http.request.method
+
+--
+
+*`iis.error.url`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`iis.error.response_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
 
 
 *`iis.error.geoip.continent_name`*::
 +
 --
-type: keyword
+type: alias
 
-The name of the continent.
-
+alias to: source.geo.continent_name
 
 --
 
 *`iis.error.geoip.country_iso_code`*::
 +
 --
-type: keyword
+type: alias
 
-Country ISO code.
-
+alias to: source.geo.country_iso_code
 
 --
 
 *`iis.error.geoip.location`*::
 +
 --
-type: geo_point
+type: alias
 
-The longitude and latitude.
-
+alias to: source.geo.location
 
 --
 
 *`iis.error.geoip.region_name`*::
 +
 --
-type: keyword
+type: alias
 
-The region name.
-
+alias to: source.geo.region_name
 
 --
 
 *`iis.error.geoip.city_name`*::
 +
 --
-type: keyword
+type: alias
 
-The city name.
-
+alias to: source.geo.city_name
 
 --
 
 *`iis.error.geoip.region_iso_code`*::
 +
 --
-type: keyword
+type: alias
 
-Region ISO code.
-
+alias to: source.geo.region_iso_code
 
 --
 
@@ -6264,18 +6243,6 @@ Contains fields from MongoDB logs.
 
 
 
-*`mongodb.log.severity`*::
-+
---
-type: keyword
-
-example: I
-
-Severity level of message
-
-
---
-
 *`mongodb.log.component`*::
 +
 --
@@ -6300,13 +6267,21 @@ Context of message
 
 --
 
+*`mongodb.log.severity`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
 *`mongodb.log.message`*::
 +
 --
-type: text
+type: alias
 
-The message in the log line.
-
+alias to: message
 
 --
 
@@ -6342,29 +6317,27 @@ The timestamp from the log line.
 *`mysql.error.thread_id`*::
 +
 --
-type: long
+type: alias
 
-As of MySQL 5.7.2, this is the thread id. For MySQL versions prior to 5.7.2, this field contains the process id.
-
+alias to: process.thread.id
 
 --
 
 *`mysql.error.level`*::
 +
 --
-example: Warning
+type: alias
 
-The log level.
+alias to: log.level
 
 --
 
 *`mysql.error.message`*::
 +
 --
-type: text
+type: alias
 
-The logged message.
-
+alias to: message
 
 --
 
@@ -6374,30 +6347,6 @@ The logged message.
 Contains fields from the MySQL slow logs.
 
 
-
-*`mysql.slowlog.user`*::
-+
---
-The MySQL user that created the query.
-
-
---
-
-*`mysql.slowlog.host`*::
-+
---
-The host from where the user that created the query logged in.
-
-
---
-
-*`mysql.slowlog.ip`*::
-+
---
-The IP address from where the user that created the query logged in.
-
-
---
 
 *`mysql.slowlog.query_time.sec`*::
 +
@@ -6464,6 +6413,33 @@ type: long
 
 The connection ID for the query.
 
+
+--
+
+*`mysql.slowlog.user`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`mysql.slowlog.host`*::
++
+--
+type: alias
+
+alias to: source.domain
+
+--
+
+*`mysql.slowlog.ip`*::
++
+--
+type: alias
+
+alias to: source.ip
 
 --
 
@@ -9937,36 +9913,6 @@ Contains fields for the Nginx error logs.
 
 
 
-*`nginx.error.level`*::
-+
---
-type: keyword
-
-Error level (e.g. error, critical).
-
-
---
-
-*`nginx.error.pid`*::
-+
---
-type: long
-
-Process identifier (PID).
-
-
---
-
-*`nginx.error.tid`*::
-+
---
-type: long
-
-Thread identifier.
-
-
---
-
 *`nginx.error.connection_id`*::
 +
 --
@@ -9977,13 +9923,39 @@ Connection identifier.
 
 --
 
+*`nginx.error.level`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
+*`nginx.error.pid`*::
++
+--
+type: alias
+
+alias to: process.pid
+
+--
+
+*`nginx.error.tid`*::
++
+--
+type: alias
+
+alias to: process.thread.id
+
+--
+
 *`nginx.error.message`*::
 +
 --
-type: text
+type: alias
 
-The error message
-
+alias to: message
 
 --
 
@@ -10165,6 +10137,23 @@ alias to: log.level
 type: alias
 
 alias to: message
+
+--
+
+[[exported-fields-process]]
+== Process fields
+
+Process metadata fields
+
+
+
+
+*`process.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
 
 --
 

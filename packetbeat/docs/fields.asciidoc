@@ -31,6 +31,7 @@ grouped in the following categories:
 * <<exported-fields-mysql>>
 * <<exported-fields-nfs>>
 * <<exported-fields-pgsql>>
+* <<exported-fields-process>>
 * <<exported-fields-raw>>
 * <<exported-fields-redis>>
 * <<exported-fields-thrift>>
@@ -6387,6 +6388,23 @@ If the SELECT query if successful, this field is set to the number of fields ret
 --
 If the SELECT query if successful, this field is set to the number of rows returned.
 
+
+--
+
+[[exported-fields-process]]
+== Process fields
+
+Process metadata fields
+
+
+
+
+*`process.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
 
 --
 
