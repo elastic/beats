@@ -56,11 +56,21 @@ var tlsCipherSuites = map[string]tlsCipherSuite{
 }
 
 var tlsCipherSuitesInverse = make(map[tlsCipherSuite]string, len(tlsCipherSuites))
+var tlsRenegotiationSupportTypesInverse = make(map[tlsRenegotiationSupport]string, len(tlsRenegotiationSupportTypes))
+var tlsVerificationModesInverse = make(map[TLSVerificationMode]string, len(tlsVerificationModes))
 
 // Init creates a inverse representation of the values mapping.
 func init() {
 	for cipherName, i := range tlsCipherSuites {
 		tlsCipherSuitesInverse[i] = cipherName
+	}
+
+	for name, t := range tlsRenegotiationSupportTypes {
+		tlsRenegotiationSupportTypesInverse[t] = name
+	}
+
+	for name, t := range tlsVerificationModes {
+		tlsVerificationModesInverse[t] = name
 	}
 }
 
@@ -166,16 +176,18 @@ var tlsVerificationModes = map[string]TLSVerificationMode{
 }
 
 func (m TLSVerificationMode) String() string {
-	modes := map[TLSVerificationMode]string{
-		VerifyFull: "full",
-		// VerifyCertificate: "certificate",
-		VerifyNone: "none",
-	}
-
-	if s, ok := modes[m]; ok {
+	if s, ok := tlsVerificationModesInverse[m]; ok {
 		return s
 	}
 	return "unknown"
+}
+
+// MarshalText marshal the verification mode into a human readable value.
+func (m TLSVerificationMode) MarshalText() ([]byte, error) {
+	if s, ok := tlsVerificationModesInverse[m]; ok {
+		return []byte(s), nil
+	}
+	return nil, fmt.Errorf("could not marshal '%+v' to text", m)
 }
 
 // Unpack unpacks the string into constants.
@@ -262,11 +274,19 @@ func (r *tlsRenegotiationSupport) Unpack(s string) error {
 	return nil
 }
 
+func (r tlsRenegotiationSupport) MarshalText() ([]byte, error) {
+	if t, found := tlsRenegotiationSupportTypesInverse[r]; found {
+		return []byte(t), nil
+	}
+
+	return nil, fmt.Errorf("could not marshal '%+v' to text", r)
+}
+
 // CertificateConfig define a common set of fields for a certificate.
 type CertificateConfig struct {
-	Certificate string `config:"certificate" yaml:"certificate"`
-	Key         string `config:"key" yaml:"key"`
-	Passphrase  string `config:"key_passphrase" yaml:"key_passphrase"`
+	Certificate string `config:"certificate" yaml:"certificate,omitempty"`
+	Key         string `config:"key" yaml:"key,omitempty"`
+	Passphrase  string `config:"key_passphrase" yaml:"key_passphrase,omitempty"`
 }
 
 // Validate validates the CertificateConfig

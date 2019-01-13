@@ -24,6 +24,8 @@ import (
 	"github.com/elastic/beats/libbeat/management"
 )
 
+var errEmptyAccessToken = errors.New("access_token is empty, you must reenroll your Beat")
+
 func init() {
 	management.Register("x-pack", NewConfigManager, feature.Beta)
 }
@@ -44,7 +46,7 @@ type ConfigManager struct {
 // NewConfigManager returns a X-Pack Beats Central Management manager
 func NewConfigManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
 	c := defaultConfig()
-	if config != nil {
+	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
 			return nil, errors.Wrap(err, "parsing central management settings")
 		}
@@ -58,6 +60,10 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 	var cache *Cache
 	if c.Enabled {
 		var err error
+
+		if err = validateConfig(c); err != nil {
+			return nil, errors.Wrap(err, "wrong settings for configurations")
+		}
 
 		// Initialize central management settings cache
 		cache = &Cache{
@@ -252,5 +258,12 @@ func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) error {
 		}
 	}
 
+	return nil
+}
+
+func validateConfig(config *Config) error {
+	if len(config.AccessToken) == 0 {
+		return errEmptyAccessToken
+	}
 	return nil
 }
