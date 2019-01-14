@@ -35,7 +35,7 @@ func init() {
 	processors.RegisterPlugin("add_tags",
 		configChecked(createAddTags,
 			requireFields("tags"),
-			allowedFields("tags", "when")))
+			allowedFields("tags", "target", "when")))
 }
 
 func createAddTags(c *common.Config) (processors.Processor, error) {
