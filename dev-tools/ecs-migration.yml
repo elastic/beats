@@ -872,11 +872,11 @@
 ## HTTP
 - from: http.request.body
   to: http.request.body.content
-  alias: true
+  alias: false
 
 - from: http.response.body
   to: http.response.body.content
-  alias: true
+  alias: false
 
 - from: http.response.code
   to: http.response.status_code

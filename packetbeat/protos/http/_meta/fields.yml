@@ -19,6 +19,11 @@
                 header name are present in the message, they will be separated by
                 commas.
 
+            - name: params
+              type: alias
+              migration: true
+              path: url.query
+
         - name: response
           description: HTTP response
           type: group
@@ -35,3 +40,13 @@
                 Which headers to capture is configurable. If headers with the
                 same header name are present in the message, they will be separated
                 by commas.
+
+            - name: code
+              type: alias
+              migration: true
+              path: http.response.status_code
+
+            - name: phrase
+              type: alias
+              migration: true
+              path: http.response.status_phrase
