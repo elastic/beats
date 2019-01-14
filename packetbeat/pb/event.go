@@ -153,23 +153,27 @@ func (f *Fields) ComputeValues(localIPs []net.IP) error {
 		flow.Protocol = 1
 		// TODO: Populate the ICMP type/code.
 	case f.Network.Transport == "ipv6-icmp":
-		flow.Protocol = 65
+		flow.Protocol = 58
 		// TODO: Populate the ICMP type/code.
 	}
-	f.Network.CommunityID = flowhash.CommunityID.Hash(flow)
+	if flow.Protocol > 0 && len(flow.SourceIP) > 0 && len(flow.DestinationIP) > 0 {
+		f.Network.CommunityID = flowhash.CommunityID.Hash(flow)
+	}
 
 	// network.type
-	if len(flow.SourceIP) > 0 {
-		if flow.SourceIP.To4() != nil {
-			f.Network.Type = "ipv4"
-		} else {
-			f.Network.Type = "ipv6"
-		}
-	} else if len(flow.DestinationIP) > 0 {
-		if flow.DestinationIP.To4() != nil {
-			f.Network.Type = "ipv4"
-		} else {
-			f.Network.Type = "ipv6"
+	if f.Network.Type == "" {
+		if len(flow.SourceIP) > 0 {
+			if flow.SourceIP.To4() != nil {
+				f.Network.Type = "ipv4"
+			} else {
+				f.Network.Type = "ipv6"
+			}
+		} else if len(flow.DestinationIP) > 0 {
+			if flow.DestinationIP.To4() != nil {
+				f.Network.Type = "ipv4"
+			} else {
+				f.Network.Type = "ipv6"
+			}
 		}
 	}
 
