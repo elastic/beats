@@ -35,7 +35,7 @@ class AuditbeatXPackTest(MetricbeatTest):
         """
         self.render_config_template(modules=[{
             "name": module,
-            "metricsets": [metricset],
+            "datasets": [metricset],
             "period": "10s",
         }])
         proc = self.start_beat()
