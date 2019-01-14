@@ -108,13 +108,13 @@ is an example configuration:
 ----
 auditbeat.modules:
 - module: system
-  metricsets:
+  datasets:
     - host    # General host information, e.g. uptime, IPs
     - process # Started and stopped processes
     - socket  # Opened and closed sockets
     - user    # User information
 
-  # How often metricsets send state updates with the
+  # How often datasets send state updates with the
   # current state of the system (e.g. all currently
   # running processes, all open sockets).
   state.period: 12h
