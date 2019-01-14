@@ -122,9 +122,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	for _, regionName := range m.regionsList {
-		fmt.Println("regionName = ", regionName)
 		m.awsConfig.Region = regionName
-		// cfg.Region = regionName
 		svcEC2 := ec2.New(*m.awsConfig)
 		instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2)
 		if err != nil {
