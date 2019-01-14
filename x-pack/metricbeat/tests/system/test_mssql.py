@@ -69,7 +69,7 @@ class Test(XPackTest):
         evt = output[0]
 
         self.assertItemsEqual(self.de_dot(MSSQL_FIELDS), evt.keys())
-        self.assertTrue(evt["mssql"]["performance"]["page_life_expectancy"]["sec"] > 0)
+        self.assertTrue(evt["mssql"]["performance"]["buffer"]["page_life_expectancy"]["sec"] > 0)
 
         self.assert_fields_are_documented(evt)
 

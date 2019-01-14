@@ -38,7 +38,7 @@ func init() {
 	processors.RegisterPlugin("add_labels",
 		configChecked(createAddLabels,
 			requireFields("labels"),
-			allowedFields("labels", "when")))
+			allowedFields("labels", "target", "when")))
 }
 
 func createAddLabels(c *common.Config) (processors.Processor, error) {
