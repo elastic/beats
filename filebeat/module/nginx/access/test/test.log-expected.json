@@ -17,6 +17,7 @@
             "127.0.0.1"
         ],
         "nginx.access.body_sent.bytes": 571,
+        "service.type": "nginx",
         "source.ip": "10.0.0.2",
         "url.original": "/ocelot",
         "user.name": "-",
@@ -46,6 +47,7 @@
             "172.17.0.1"
         ],
         "nginx.access.body_sent.bytes": 612,
+        "service.type": "nginx",
         "source.ip": "172.17.0.1",
         "url.original": "/stringpatch",
         "user.name": "-",
@@ -76,6 +78,7 @@
             "85.181.35.98"
         ],
         "nginx.access.body_sent.bytes": 571,
+        "service.type": "nginx",
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
@@ -112,6 +115,7 @@
             "85.181.35.98"
         ],
         "nginx.access.body_sent.bytes": 571,
+        "service.type": "nginx",
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
@@ -152,6 +156,7 @@
             "10.2.1.185"
         ],
         "nginx.access.body_sent.bytes": 25507,
+        "service.type": "nginx",
         "source.geo.city_name": "Springfield",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
@@ -186,6 +191,7 @@
             "10.2.2.121"
         ],
         "nginx.access.body_sent.bytes": 8571,
+        "service.type": "nginx",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "PT",
         "source.geo.location.lat": 39.5,
@@ -215,6 +221,7 @@
             "127.0.0.1"
         ],
         "nginx.access.body_sent.bytes": 0,
+        "service.type": "nginx",
         "source.ip": "127.0.0.1",
         "user.name": "-",
         "user_agent.device": "Other",

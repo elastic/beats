@@ -57,6 +57,7 @@ type inputOutletConfig struct {
 	// Output meta data settings
 	Pipeline string `config:"pipeline"` // ES Ingest pipeline name
 
+	ServiceType string `config:"service.type"` // ES Ingest pipeline name
 }
 
 // NewOutletFactory creates a new outlet factory for
@@ -112,10 +113,13 @@ func (f *OutletFactory) Create(p beat.Pipeline, cfg *common.Config, dynFields *c
 	if config.Fileset != "" {
 		fields.Put("fileset.name", config.Fileset)
 	}
+	if config.ServiceType != "" {
+		fields.Put("service.type", config.ServiceType)
+	} else {
+		fields.Put("service.type", config.Module)
+	}
 	if config.Type != "" {
-		fields["input"] = common.MapStr{
-			"type": config.Type,
-		}
+		fields.Put("input.type", config.Type)
 	}
 
 	client, err := p.ConnectWith(beat.ClientConfig{
