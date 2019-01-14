@@ -18,9 +18,10 @@
 package stats
 
 import (
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 )
@@ -56,6 +57,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	http *helper.HTTP
+	Log  *logp.Logger
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -75,20 +77,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		base,
 		http,
+		logp.NewLogger("nats"),
 	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	content, err := m.http.FetchContent()
 	if err != nil {
-		return nil, err
+		elastic.ReportAndLogError(err, r, m.Log)
+		return
 	}
-	event, err := eventMapping(content)
+	err = eventMapping(r, content)
 	if err != nil {
-		return nil, err
+		elastic.ReportAndLogError(err, r, m.Log)
+		return
 	}
-	return event, nil
 }

@@ -24,8 +24,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
@@ -34,17 +32,19 @@ import (
 func TestEventMapping(t *testing.T) {
 	content, err := ioutil.ReadFile("../_meta/test/statsmetrics.json")
 	assert.NoError(t, err)
-	event, err := eventMapping(content)
+	reporter := &mbtest.CapturingReporterV2{}
+	err = eventMapping(reporter, content)
 	assert.NoError(t, err)
-	d := event["http"].(common.MapStr)["req_stats"].(common.MapStr)["uri"].(common.MapStr)["routez"]
 	assert.NoError(t, err)
-	assert.Equal(t, d, int64(10))
+	event := reporter.GetEvents()[0]
+	d, _ := event.MetricSetFields.GetValue("total_connections")
+	assert.Equal(t, d, int64(35))
 }
 
 func TestFetchEventContent(t *testing.T) {
-	absPath, err := filepath.Abs("../_meta/test/")
+	absPath, _ := filepath.Abs("../_meta/test/")
 
-	response, err := ioutil.ReadFile(absPath + "/statsmetrics.json")
+	response, _ := ioutil.ReadFile(absPath + "/statsmetrics.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")
@@ -57,11 +57,11 @@ func TestFetchEventContent(t *testing.T) {
 		"metricsets": []string{"stats"},
 		"hosts":      []string{server.URL},
 	}
-	f := mbtest.NewEventFetcher(t, config)
-	event, err := f.Fetch()
-	if err != nil {
-		t.Fatal(err)
-	}
+	reporter := &mbtest.CapturingReporterV2{}
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	metricSet := mbtest.NewReportingMetricSetV2(t, config)
+	metricSet.Fetch(reporter)
+
+	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
+	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
 }
