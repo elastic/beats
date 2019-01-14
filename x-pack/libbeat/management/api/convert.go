@@ -7,8 +7,6 @@ package api
 import (
 	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 type convertFunc func(map[string]interface{}) (map[string]interface{}, error)
@@ -19,7 +17,7 @@ var mapper = map[string]convertFunc{
 	"output":   convertSingle,
 }
 
-var errSubTypeNotFound = errors.New("'sub_type' key not found")
+var errSubTypeNotFound = fmt.Errorf("'%s' key not found", subTypeKey)
 
 var (
 	subTypeKey = "_sub_type"
