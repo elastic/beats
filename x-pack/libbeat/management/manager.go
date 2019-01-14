@@ -180,8 +180,17 @@ func (cm *ConfigManager) worker() {
 func (cm *ConfigManager) fetch() bool {
 	cm.logger.Debug("Retrieving new configurations from Kibana")
 	configs, err := cm.client.Configuration(cm.config.AccessToken, cm.beatUUID, cm.cache.ConfigOK)
+
+	if api.IsConfigurationNotFound(err) {
+		if cm.cache.HasConfig() {
+			cm.logger.Error("Disabling all running configuration because no configurations were found for this Beat, the endpoint returned a 404 or the beat is not enrolled with central management")
+			cm.cache.Configs = api.ConfigBlocks{}
+		}
+		return true
+	}
+
 	if err != nil {
-		cm.logger.Errorf("error retriving new configurations, will use cached ones: %s", err)
+		cm.logger.Errorf("error retrieving new configurations, will use cached ones: %s", err)
 		return false
 	}
 
