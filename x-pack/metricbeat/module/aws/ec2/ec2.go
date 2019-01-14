@@ -24,12 +24,14 @@ import (
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
 
+var metricsetName = "ec2"
+
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet(aws.ModuleName, "ec2", New,
+	mb.Registry.MustAddMetricSet(aws.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 	)
 }
@@ -180,10 +182,11 @@ func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 		logp.Error(err)
 	}
 
+	event.Service = metricsetName
 	event.RootFields = common.MapStr{}
 	mapOfRootFieldsResults := make(map[string]interface{})
-	mapOfRootFieldsResults["service.name"] = "ec2"
-	mapOfRootFieldsResults["cloud.provider"] = "ec2"
+	mapOfRootFieldsResults["service.name"] = metricsetName
+	mapOfRootFieldsResults["cloud.provider"] = metricsetName
 	mapOfRootFieldsResults["cloud.instance.id"] = instanceID
 	mapOfRootFieldsResults["cloud.machine.type"] = machineType
 	mapOfRootFieldsResults["cloud.availability_zone"] = *instanceOutput.Placement.AvailabilityZone
