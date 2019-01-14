@@ -376,7 +376,7 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 							ms.suppressPermissionWarnings = true
 						}
 
-						//continue
+						continue
 					}
 				}
 
