@@ -19,7 +19,7 @@ class Test(metricbeat.BaseTest):
             "metricsets": ["stats"],
             "hosts": self.get_hosts(),
             "period": "5s",
-            "stats_metrics_path": "/stats"
+            "stats.metrics_path": "/varz"
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)

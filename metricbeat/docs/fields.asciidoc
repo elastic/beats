@@ -17274,7 +17274,7 @@ The period the server is up (sec)
 --
 type: long
 
-he current memory usage of NATS process
+The current memory usage of NATS process
 
 
 --

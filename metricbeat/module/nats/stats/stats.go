@@ -35,7 +35,7 @@ var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
-		PathConfigKey: "stats_metrics_path",
+		PathConfigKey: "stats.metrics_path",
 	}.Build()
 )
 

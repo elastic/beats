@@ -521,7 +521,7 @@ metricbeat.modules:
   metricsets: ["stats"]
   period: 10s
   hosts: ["localhost:8222"]
-  #stats_metrics_path: "/varz"
+  #stats.metrics_path: "/varz"
 
 #-------------------------------- Nginx Module -------------------------------
 - module: nginx
