@@ -444,7 +444,14 @@ packetbeat.protocols:
 
   # Configure the ports where to listen for TLS traffic. You can disable
   # the TLS protocol by commenting out the list of ports.
-  ports: [443]
+  ports:
+    - 443   # HTTPS
+    - 993   # IMAPS
+    - 995   # POP3S
+    - 5223  # XMPP over SSL
+    - 8443
+    - 8883  # Secure MQTT
+    - 9243  # Elasticsearch
 
   # List of hash algorithms to use to calculate certificates' fingerprints.
   # Valid values are `sha1`, `sha256` and `md5`.
