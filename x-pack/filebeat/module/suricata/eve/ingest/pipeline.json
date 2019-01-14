@@ -171,7 +171,7 @@
     }
   , { "script":
       { "lang": "painless"
-      , "source": "long g(def map, def key) { if(map!=null && map[key]!=null) { return map[key]; } return 0; } def n=ctx['network']; if (n==null){n=new HashMap(); ctx['network']=n;}def s=ctx['source'], d=ctx['destination']; def sp=g(s,'packets'), sb=g(s,'bytes'), dp=g(d,'packets'), db=g(d,'bytes'); if(sb+db>0)n['bytes']=sb+db; if(sp+dp>0)n['packets']=sp+dp;"
+      , "source": "long getOrZero(def map, def key) { if(map!=null && map[key]!=null) { return map[key]; } return 0; } def network=ctx['network'], source=ctx['source'], dest=ctx['destination']; def sp=getOrZero(source,'packets'), sb=getOrZero(source,'bytes'), dp=getOrZero(dest,'packets'), db=getOrZero(dest,'bytes'); if(sb+db+sp+dp > 0){if (network==null){network=new HashMap(); ctx['network']=network; } if(sb+db>0) network['bytes'] = sb+db; if(sp+dp>0) network['packets'] = sp+dp; }"
       }
     }
   , {"date":
