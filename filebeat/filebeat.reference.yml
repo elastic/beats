@@ -43,8 +43,8 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#------------------------------- Apache2 Module -------------------------------
-#- module: apache2
+#-------------------------------- Apache Module --------------------------------
+#- module: apache
   # Access logs
   #access:
     #enabled: true
