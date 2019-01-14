@@ -90,7 +90,7 @@ func TestToEvent(t *testing.T) {
 	}
 	for _, test := range tests {
 		event := r.toEvent(&test.entry)
-		delete(event.Fields, "event.created")
+		event.Fields.Delete("event.created")
 		assert.True(t, reflect.DeepEqual(event.Fields, test.expectedFields))
 	}
 }
