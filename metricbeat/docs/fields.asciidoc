@@ -17269,12 +17269,12 @@ The period the server is up (sec)
 
 --
 
-*`nats.stats.mem`*::
+*`nats.stats.mem.bytes`*::
 +
 --
 type: long
 
-The current memory usage of NATS process
+he current memory usage of NATS process
 
 
 --

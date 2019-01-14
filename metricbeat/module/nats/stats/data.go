@@ -41,10 +41,12 @@ var (
 		"varz_uri":   c.Int("/varz"),
 	}
 	statsSchema = s.Schema{
-		"server_id":         c.Str("server_id"),
-		"now":               c.Str("now"),
-		"uptime":            c.Str("uptime"),
-		"mem":               c.Int("mem"),
+		"server_id": c.Str("server_id"),
+		"now":       c.Str("now"),
+		"uptime":    c.Str("uptime"),
+		"mem": s.Object{
+			"bytes": c.Int("mem"),
+		},
 		"cores":             c.Int("cores"),
 		"cpu":               c.Int("cpu"),
 		"total_connections": c.Int("total_connections"),

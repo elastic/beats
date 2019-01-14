@@ -15,10 +15,10 @@
       type: long
       description: >
         The period the server is up (sec)
-    - name: mem
+    - name: mem.bytes
       type: long
       description: >
-        The current memory usage of NATS process
+        he current memory usage of NATS process
     - name: cores
       type: integer
       description: >
