@@ -62,7 +62,7 @@ var (
 		sdjournal.SD_JOURNAL_FIELD_COMM:              fieldConversion{"process.name", false, false},
 		sdjournal.SD_JOURNAL_FIELD_EXE:               fieldConversion{"process.executable", false, false},
 		sdjournal.SD_JOURNAL_FIELD_GID:               fieldConversion{"process.uid", true, false},
-		sdjournal.SD_JOURNAL_FIELD_HOSTNAME:          fieldConversion{"host.name", false, false},
+		sdjournal.SD_JOURNAL_FIELD_HOSTNAME:          fieldConversion{"host.hostname", false, false},
 		sdjournal.SD_JOURNAL_FIELD_MACHINE_ID:        fieldConversion{"host.id", false, false},
 		sdjournal.SD_JOURNAL_FIELD_MESSAGE:           fieldConversion{"message", false, false},
 		sdjournal.SD_JOURNAL_FIELD_PID:               fieldConversion{"process.pid", true, false},
