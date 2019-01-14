@@ -48,7 +48,8 @@ type inputOutletConfig struct {
 	Processors           processors.PluginConfig `config:"processors"`
 
 	// implicit event fields
-	Type string `config:"type"` // input.type
+	Type        string `config:"type"`         // input.type
+	ServiceType string `config:"service.type"` // service.type
 
 	// hidden filebeat modules settings
 	Module  string `config:"_module_name"`  // hidden setting
@@ -57,7 +58,6 @@ type inputOutletConfig struct {
 	// Output meta data settings
 	Pipeline string `config:"pipeline"` // ES Ingest pipeline name
 
-	ServiceType string `config:"service.type"` // ES Ingest pipeline name
 }
 
 // NewOutletFactory creates a new outlet factory for
