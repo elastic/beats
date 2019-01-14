@@ -33,16 +33,10 @@
       ,"ignore_missing": true
       }
     }
-  , {"convert":
-      {"field": "suricata.eve.http.http_method"
-      ,"target_field": "http.request.method"
-      ,"type": "string"
-      ,"ignore_missing": true
-      }
-    }
-  , { "lowercase":
-      { "field": "http.request.method"
-      , "ignore_missing": true
+  , {"lowercase":
+       {"field": "suricata.eve.http.http_method"
+       ,"target_field": "http.request.method"
+       ,"ignore_missing": true
       }
     }
   , {"convert":
@@ -122,12 +116,8 @@
 
   , { "lowercase":
       { "field": "suricata.eve.event_type"
+      , "target_field": "event.type"
       , "ignore_missing": true
-      }
-    }
-  , { "set":
-      { "field": "event.type"
-      , "value": "{{suricata.eve.event_type}}"
       }
     }
   , {"convert":
@@ -203,27 +193,15 @@
       , "source": "Instant ins(def d){try{return Instant.parse(d);}catch(Exception e){return null;}}def ev=ctx['event'];if(ev!=null){def start=ins(ev['start']); def end=ins(ev['end']); if(start!=null && end!=null && !start.isAfter(end)) {ev['duration'] = Duration.between(start,end).toNanos();}}"
       }
     }
-  , {"convert":
-      {"field": "suricata.eve.proto"
-      ,"target_field": "network.transport"
-      ,"type": "string"
-      ,"ignore_missing": true
-      }
-    }
   , { "lowercase":
-      { "field": "network.transport"
+      { "field": "suricata.eve.proto"
+      , "target_field": "network.transport"
       , "ignore_missing": true
       }
     }
-  , {"convert":
-      {"field": "suricata.eve.app_proto"
-      ,"target_field": "network.protocol"
-      ,"type": "string"
-      ,"ignore_missing": true
-      }
-    }
   , { "lowercase":
-      { "field": "network.protocol"
+      { "field": "suricata.eve.app_proto"
+      , "target_field": "network.protocol"
       , "ignore_missing": true
       }
     }
