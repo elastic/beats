@@ -65,8 +65,6 @@ func ParseRedisLine(s string, delimiter string) []string {
 
 // FetchRedisInfo returns a map of requested stats.
 func FetchRedisInfo(stat string, c rd.Conn) (map[string]string, error) {
-	defer c.Close()
-
 	out, err := rd.String(c.Do("INFO", stat))
 	if err != nil {
 		logp.Err("Error retrieving INFO stats: %v", err)
