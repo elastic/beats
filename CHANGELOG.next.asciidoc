@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 
 - Allow beats to blacklist certain part of the configuration while using Central Management. {pull}9099[9099]
 - Filesets with multiple ingest pipelines added in {pull}8914[8914] only work with Elasticsearch >= 6.5.0 {pull}10001[10001]
+- Add grok pattern to support redis 5.0.3 log timestamp. {issue}9819[9819] {pull}10033[10033]
 
 *Heartbeat*
 
