@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename a few `logstash.*` fields to map to ECS, remove logstash.slowlog.message. {pull}9935[9935]
 - Rename a few `mysql.*` fields to map to ECS. {pull}10008[10008]
 - Rename a few `nginx.error.*` fields to map to ECS. {pull}10007[10007]
+- Filesets with multiple ingest pipelines added in {pull}8914[8914] only work with Elasticsearch >= 6.5.0 {pull}10001[10001]
 
 *Heartbeat*
 
@@ -125,6 +126,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `socket_summary` metricset to system defaults, removing experimental tag and supporting Windows {pull}9709[9709]
 - Add docker `event` metricset. {pull}9856[9856]
 - Add 'performance' metricset to x-pack mssql module {pull}9826[9826]
+- Add DeDot for kubernetes labels and annotations. {issue}9860[9860] {pull}9939[9939]
 
 *Packetbeat*
 

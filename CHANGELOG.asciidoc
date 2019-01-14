@@ -159,6 +159,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...v7.0.0-alpha2[Check the
 - Rename many `nginx.access.*` fields to map to ECS. {pull}9081[9081]
 - Rename many `system.auth.*` fields to map to ECS. {pull}9138[9138]
 - Rename many `apache2.access.*` fields to map to ECS. {pull}9245[9245]
+- Rename `apache2` module to `apache`. {pull}9402[9402]
 
 *Metricbeat*
 

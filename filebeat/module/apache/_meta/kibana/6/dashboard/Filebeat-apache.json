@@ -8,8 +8,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache2-access-logs", 
-                "title": "Unique IPs map [Filebeat Apache2]", 
+                "savedSearchId": "Apache-access-logs", 
+                "title": "Unique IPs map [Filebeat Apache]", 
                 "uiStateJSON": {
                     "mapCenter": [
                         14.944784875088372, 
@@ -68,11 +68,11 @@
                             "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
                         }
                     }, 
-                    "title": "Apache2 access unique IPs map", 
+                    "title": "Apache access unique IPs map", 
                     "type": "tile_map"
                 }
             }, 
-            "id": "Apache2-access-unique-IPs-map", 
+            "id": "Apache-access-unique-IPs-map", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -84,8 +84,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache2-access-logs", 
-                "title": "Top URLs by response code [Filebeat Apache2]", 
+                "savedSearchId": "Apache-access-logs", 
+                "title": "Top URLs by response code [Filebeat Apache]", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -139,11 +139,11 @@
                         "legendPosition": "right", 
                         "shareYAxis": true
                     }, 
-                    "title": "Apache2 response codes of top URLs", 
+                    "title": "Apache response codes of top URLs", 
                     "type": "pie"
                 }
             }, 
-            "id": "Apache2-response-codes-of-top-URLs", 
+            "id": "Apache-response-codes-of-top-URLs", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -155,8 +155,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache2-access-logs", 
-                "title": "Browsers breakdown [Filebeat Apache2]", 
+                "savedSearchId": "Apache-access-logs", 
+                "title": "Browsers breakdown [Filebeat Apache]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -203,11 +203,11 @@
                         "legendPosition": "bottom", 
                         "shareYAxis": true
                     }, 
-                    "title": "Apache2 browsers", 
+                    "title": "Apache browsers", 
                     "type": "pie"
                 }
             }, 
-            "id": "Apache2-browsers", 
+            "id": "Apache-browsers", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -219,8 +219,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache2-access-logs", 
-                "title": "Operating systems breakdown [Filebeat Apache2]", 
+                "savedSearchId": "Apache-access-logs", 
+                "title": "Operating systems breakdown [Filebeat Apache]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -267,11 +267,11 @@
                         "legendPosition": "bottom", 
                         "shareYAxis": true
                     }, 
-                    "title": "Apache2 operating systems", 
+                    "title": "Apache operating systems", 
                     "type": "pie"
                 }
             }, 
-            "id": "Apache2-operating-systems", 
+            "id": "Apache-operating-systems", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -283,8 +283,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache2-errors-log", 
-                "title": "Error logs over time [Filebeat Apache2]", 
+                "savedSearchId": "Apache-errors-log", 
+                "title": "Error logs over time [Filebeat Apache]", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -336,11 +336,11 @@
                         "times": [], 
                         "yAxis": {}
                     }, 
-                    "title": "Apache2 error logs over time", 
+                    "title": "Apache error logs over time", 
                     "type": "histogram"
                 }
             }, 
-            "id": "Apache2-error-logs-over-time", 
+            "id": "Apache-error-logs-over-time", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -352,8 +352,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache2-access-logs", 
-                "title": "Response codes over time [Filebeat Apache2]", 
+                "savedSearchId": "Apache-access-logs", 
+                "title": "Response codes over time [Filebeat Apache]", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -412,11 +412,11 @@
                         "times": [], 
                         "yAxis": {}
                     }, 
-                    "title": "Apache2 response codes over time", 
+                    "title": "Apache response codes over time", 
                     "type": "histogram"
                 }
             }, 
-            "id": "Apache2-response-codes-over-time", 
+            "id": "Apache-response-codes-over-time", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -459,10 +459,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Apache errors log [Filebeat Apache2]", 
+                "title": "Apache errors log [Filebeat Apache]", 
                 "version": 1
             }, 
-            "id": "Apache2-errors-log", 
+            "id": "Apache-errors-log", 
             "type": "search", 
             "version": 1
         }, 
@@ -505,16 +505,16 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Apache access logs [Filebeat Apache2]", 
+                "title": "Apache access logs [Filebeat Apache]", 
                 "version": 1
             }, 
-            "id": "Apache2-access-logs", 
+            "id": "Apache-access-logs", 
             "type": "search", 
             "version": 1
         }, 
         {
             "attributes": {
-                "description": "Filebeat Apache2 module dashboard", 
+                "description": "Filebeat Apache module dashboard", 
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
@@ -538,7 +538,7 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "Apache2-access-unique-IPs-map", 
+                        "id": "Apache-access-unique-IPs-map", 
                         "panelIndex": 1, 
                         "row": 1, 
                         "size_x": 12, 
@@ -547,7 +547,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "Apache2-response-codes-of-top-URLs", 
+                        "id": "Apache-response-codes-of-top-URLs", 
                         "panelIndex": 2, 
                         "row": 6, 
                         "size_x": 8, 
@@ -556,7 +556,7 @@
                     }, 
                     {
                         "col": 9, 
-                        "id": "Apache2-browsers", 
+                        "id": "Apache-browsers", 
                         "panelIndex": 3, 
                         "row": 6, 
                         "size_x": 4, 
@@ -565,7 +565,7 @@
                     }, 
                     {
                         "col": 11, 
-                        "id": "Apache2-operating-systems", 
+                        "id": "Apache-operating-systems", 
                         "panelIndex": 4, 
                         "row": 4, 
                         "size_x": 2, 
@@ -574,7 +574,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "Apache2-error-logs-over-time", 
+                        "id": "Apache-error-logs-over-time", 
                         "panelIndex": 5, 
                         "row": 9, 
                         "size_x": 12, 
@@ -583,7 +583,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "Apache2-response-codes-over-time", 
+                        "id": "Apache-response-codes-over-time", 
                         "panelIndex": 6, 
                         "row": 4, 
                         "size_x": 10, 
@@ -598,7 +598,7 @@
                             "apache2.error.module", 
                             "apache2.error.message"
                         ], 
-                        "id": "Apache2-errors-log", 
+                        "id": "Apache-errors-log", 
                         "panelIndex": 7, 
                         "row": 11, 
                         "size_x": 12, 
@@ -611,7 +611,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat Apache2] Access and error logs", 
+                "title": "[Filebeat Apache] Access and error logs", 
                 "uiStateJSON": {
                     "P-1": {
                         "mapBounds": {
@@ -644,7 +644,7 @@
                 }, 
                 "version": 1
             }, 
-            "id": "Filebeat-Apache2-Dashboard", 
+            "id": "Filebeat-Apache-Dashboard", 
             "type": "dashboard", 
             "version": 2
         }
