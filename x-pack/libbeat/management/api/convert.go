@@ -22,7 +22,7 @@ var mapper = map[string]convertFunc{
 var errSubTypeNotFound = errors.New("'sub_type' key not found")
 
 var (
-	subTypeKey = "sub_type"
+	subTypeKey = "_sub_type"
 	moduleKey  = "module"
 )
 

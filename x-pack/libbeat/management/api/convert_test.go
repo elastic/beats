@@ -21,11 +21,11 @@ func TestConvertAPI(t *testing.T) {
 		"output": {
 			t: "output",
 			config: map[string]interface{}{
-				"sub_type": "elasticsearch",
-				"username": "foobar",
+				"_sub_type": "elasticsearch",
+				"username":  "foobar",
 			},
 			expected: map[string]interface{}{
-				"elasticsearch": map[string]interface{}{
+				"_elasticsearch": map[string]interface{}{
 					"username": "foobar",
 				},
 			},
@@ -59,7 +59,7 @@ func TestConvertAPI(t *testing.T) {
 		"metricbeat modules": {
 			t: "metricbeat.modules",
 			config: map[string]interface{}{
-				"sub_type": "logstash",
+				"_sub_type": "logstash",
 			},
 			expected: map[string]interface{}{
 				"module": "logstash",
