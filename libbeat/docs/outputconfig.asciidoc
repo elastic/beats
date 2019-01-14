@@ -243,9 +243,6 @@ ifndef::no_dashboards[]
 If you are using the pre-built Kibana
 dashboards, you also need to set the `setup.dashboards.index` option (see
 <<configuration-dashboards>>).
-ifdef::deprecate_dashboard_loading[]
-deprecated[{deprecate_dashboard_loading}]
-endif::deprecate_dashboard_loading[]
 endif::no_dashboards[]
 
 You can set the index dynamically by using a format string to access any event

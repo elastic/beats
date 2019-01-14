@@ -60,7 +60,7 @@ endif::[]
 
 ifdef::deprecate_dashboard_loading[]
 {beatname_uc} provides a command-line interface for starting {beatname_uc} and
-performing common tasks, like testing configuration files and loading dashboards (deprecated).
+performing common tasks, like testing configuration files.
 endif::[]
 
 The command-line also supports <<global-flags,global flags>>
