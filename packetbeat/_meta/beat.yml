@@ -82,6 +82,11 @@ packetbeat.protocols:
   # the Redis protocol by commenting out the list of ports.
   ports: [6379]
 
+- type: orientdb
+  # Configure the ports where to listen for OrientDB traffic. You can disable
+  # the OrientDB protocol by commenting out the list of ports.
+  ports: [2424]
+
 - type: thrift
   # Configure the ports where to listen for Thrift-RPC traffic. You can disable
   # the Thrift-RPC protocol by commenting out the list of ports.

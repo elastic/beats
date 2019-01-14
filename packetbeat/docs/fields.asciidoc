@@ -30,6 +30,7 @@ grouped in the following categories:
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nfs>>
+* <<exported-fields-orientdb>>
 * <<exported-fields-pgsql>>
 * <<exported-fields-process>>
 * <<exported-fields-raw>>
@@ -6387,6 +6388,158 @@ NFS operation name, or main operation name, in case of COMPOUND calls.
 +
 --
 NFS operation reply status.
+
+--
+
+[[exported-fields-orientdb]]
+== OrientDB fields
+
+OrientDB-specific event fields. These fields mirror closely the fields for the OrientDB wire protocol. The higher level fields (for example, `query` and `resource`) apply to OrientDB events as well.
+
+
+
+
+*`orientdb.error`*::
++
+--
+If the OrientDB command has resulted in an error, this field contains the error message returned by the OrientDB server.
+
+
+--
+
+*`orientdb.clientName`*::
++
+--
+Client name of OrientDB client.
+
+
+--
+
+*`orientdb.clientID`*::
++
+--
+Client id of OrientDB client.
+
+
+--
+
+*`orientdb.clientVersion`*::
++
+--
+Client version of OrientDB client.
+
+
+--
+
+*`orientdb.serializationType`*::
++
+--
+Serialization type to use for OrientDB record based commands.
+
+
+--
+
+*`orientdb.database`*::
++
+--
+OrientDB Database name.
+
+
+--
+
+*`orientdb.clusterName`*::
++
+--
+OrientDB Cluster name.
+
+
+--
+
+*`orientdb.clusterID`*::
++
+--
+OrientDB Cluster id.
+
+
+--
+
+*`orientdb.clusterPosition`*::
++
+--
+OrientDB Cluster position.
+
+
+--
+
+*`orientdb.recordClass`*::
++
+--
+OrientDB Record Class name.
+
+
+--
+
+*`orientdb.recordType`*::
++
+--
+OrientDB Record Type.
+
+
+--
+
+*`orientdb.recordVersion`*::
++
+--
+OrientDB Record Version.
+
+
+--
+
+*`orientdb.query`*::
++
+--
+query for OrientDB Command.
+
+
+--
+
+*`orientdb.fetchPlan`*::
++
+--
+fetch plan for OrientDB Command.
+
+
+--
+
+*`orientdb.limit`*::
++
+--
+limit for OrientDB Command.
+
+
+--
+
+*`orientdb.modByte`*::
++
+--
+field in OrientDB Command.
+
+
+--
+
+*`orientdb.updateContent`*::
++
+--
+update Content flag.
+
+
+--
+
+*`orientdb.ignoreCache`*::
++
+--
+ignore cache flag.
+
 
 --
 

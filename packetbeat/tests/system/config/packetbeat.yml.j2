@@ -113,6 +113,11 @@ packetbeat.protocols:
 {% if redis_send_request %}  send_request: true{% endif %}
 {% if redis_send_response %}  send_response: true{% endif %}
 
+- type: orientdb
+  ports: [{{ orientdb_ports|default([2424])|join(", ") }}]
+{% if orientdb_send_request %}  send_request: true{% endif %}
+{% if orientdb_send_response %}  send_response: true{% endif %}
+
 - type: nfs
   ports: [{{ nfs_ports|default([2049])|join(", ") }}]
 

@@ -321,6 +321,14 @@ packetbeat.protocols:
   # the Redis protocol by commenting out the list of ports.
   ports: [6379]
 
+- type: orientdb
+  # Enable orientdb monitoring. Default: true
+  #enabled: true
+
+  # Configure the ports where to listen for OrientDB traffic. You can disable
+  # the OrientDB protocol by commenting out the list of ports.
+  ports: [2424]
+
   # If this option is enabled, the raw message of the request (`request` field)
   # is sent to Elasticsearch. The default is false.
   #send_request: false

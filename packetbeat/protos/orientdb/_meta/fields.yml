@@ -1,0 +1,66 @@
+- key: orientdb
+  title: "OrientDB"
+  description: >
+    OrientDB-specific event fields. These fields mirror closely
+    the fields for the OrientDB wire protocol. The higher level fields
+    (for example, `query` and `resource`) apply to OrientDB events as well.
+  fields:
+  - name: orientdb
+    type: group
+    fields:
+    - name: error
+      description: >
+        If the OrientDB command has resulted in an error, this field contains the
+        error message returned by the OrientDB server.
+    - name: clientName
+      description: >
+        Client name of OrientDB client.
+    - name: clientID
+      description: >
+        Client id of OrientDB client.
+    - name: clientVersion
+      description: >
+        Client version of OrientDB client.
+    - name: serializationType
+      description: >
+        Serialization type to use for OrientDB record based commands.
+    - name: database
+      description: >
+        OrientDB Database name.
+    - name: clusterName
+      description: >
+        OrientDB Cluster name.
+    - name: clusterID
+      description: >
+        OrientDB Cluster id.
+    - name: clusterPosition
+      description: >
+        OrientDB Cluster position.
+    - name: recordClass
+      description: >
+        OrientDB Record Class name.
+    - name: recordType
+      description: >
+        OrientDB Record Type.
+    - name: recordVersion
+      description: >
+        OrientDB Record Version.
+    - name: query
+      description: >
+        query for OrientDB Command.
+    - name: fetchPlan
+      description: >
+        fetch plan for OrientDB Command.
+    - name: limit
+      description: >
+        limit for OrientDB Command.
+    - name: modByte
+      description: >
+        field in OrientDB Command.
+    - name: updateContent
+      description: >
+        update Content flag.
+    - name: ignoreCache
+      description: >
+        ignore cache flag.
+
