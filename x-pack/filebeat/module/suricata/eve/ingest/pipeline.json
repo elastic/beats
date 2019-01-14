@@ -86,6 +86,13 @@
       }
     }
   , {"convert":
+      {"field": "suricata.eve.http.length"
+      ,"target_field": "http.response.body.bytes"
+      ,"type": "integer"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
       {"field": "suricata.eve.fileinfo.filename"
       ,"target_field": "file.path"
       ,"type": "string"
