@@ -25,7 +25,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"sync"
 	"syscall"
 	"time"
 
@@ -43,11 +42,12 @@ import (
 
 // Reader reads entries from journal(s).
 type Reader struct {
-	journal *sdjournal.Journal
-	config  Config
-	done    chan struct{}
-	logger  *logp.Logger
-	backoff backoff.Backoff
+	journal     *sdjournal.Journal
+	config      Config
+	done        chan struct{}
+	logger      *logp.Logger
+	backoff     backoff.Backoff
+	changesChan chan int
 }
 
 // New creates a new journal reader and moves the FP to the configured position.
@@ -97,15 +97,20 @@ func newReader(logger *logp.Logger, done chan struct{}, c Config, journal *sdjou
 	}
 
 	r := &Reader{
-		journal: journal,
-		config:  c,
-		done:    done,
-		logger:  logger,
-		backoff: backoff.NewExpBackoff(done, c.Backoff, c.MaxBackoff),
+		journal:     journal,
+		config:      c,
+		done:        done,
+		logger:      logger,
+		backoff:     backoff.NewExpBackoff(done, c.Backoff, c.MaxBackoff),
+		changesChan: make(chan int),
 	}
 	r.seek(state.Cursor)
 
 	instance.AddJournalToMonitor(c.Path, journal)
+
+	// waiting for journal changes are done in a separate gorountine
+	// when the reader is closed, it is stopped
+	go r.waitForChange()
 
 	return r, nil
 }
@@ -194,68 +199,54 @@ func (r *Reader) Next() (*beat.Event, error) {
 }
 
 func (r *Reader) waitUntilNewEventOrError() (*beat.Event, error) {
-	var wg sync.WaitGroup
-	defer wg.Wait()
-
-	changesChan := make(chan int)
-	defer close(changesChan)
-
 	for {
 		select {
 		case <-r.done:
 			return nil, nil
-		default:
-			for {
-				wg.Add(1)
-				go r.waitForChange(&wg, changesChan)
-
-				select {
-				case <-r.done:
-					return nil, nil
-				case c, ok := <-changesChan:
-					if !ok {
-						break
-					}
-
-					switch c {
-					// no changes
-					case sdjournal.SD_JOURNAL_NOP:
-					// new entries are added or the journal has changed (e.g. vacuum, rotate)
-					case sdjournal.SD_JOURNAL_APPEND, sdjournal.SD_JOURNAL_INVALIDATE:
-						event, err := r.readEvent()
-						if err != nil {
-							return nil, err
-						}
-
-						if event == nil {
-							r.backoff.Wait()
-							continue
-						}
-
-						r.backoff.Reset()
-						return event, nil
-					default:
-						if c < 0 {
-							return nil, fmt.Errorf("error while waiting for event: %+v", syscall.Errno(-c))
-						}
-
-						r.logger.Errorf("Unknown return code from Wait: %d\n", c)
-					}
+		case c := <-r.changesChan:
+			switch c {
+			// no changes
+			case sdjournal.SD_JOURNAL_NOP:
+			// new entries are added or the journal has changed (e.g. vacuum, rotate)
+			case sdjournal.SD_JOURNAL_APPEND, sdjournal.SD_JOURNAL_INVALIDATE:
+				event, err := r.readEvent()
+				if err != nil {
+					return nil, err
 				}
+
+				if event == nil {
+					r.backoff.Wait()
+					continue
+				}
+
+				r.backoff.Reset()
+				return event, nil
+			default:
+				if c < 0 {
+					return nil, fmt.Errorf("error while waiting for event: %+v", syscall.Errno(-c))
+				}
+
+				r.logger.Errorf("Unknown return code from Wait: %d\n", c)
 			}
 		}
 	}
 }
 
-func (r *Reader) waitForChange(wg *sync.WaitGroup, changesChan chan int) {
-	defer wg.Done()
+func (r *Reader) waitForChange() {
+	for {
+		// try to return before waiting for event
+		select {
+		case <-r.done:
+			return
+		default:
+		}
 
-	c := r.journal.Wait(100 * time.Millisecond)
-	select {
-	case <-r.done:
-		return
-	default:
-		changesChan <- c
+		c := r.journal.Wait(100 * time.Millisecond)
+		select {
+		case <-r.done:
+			return
+		case r.changesChan <- c:
+		}
 	}
 }
 
@@ -329,4 +320,5 @@ func (r *Reader) convertNamedField(fc fieldConversion, value string) interface{}
 func (r *Reader) Close() {
 	instance.StopMonitoringJournal(r.config.Path)
 	r.journal.Close()
+	close(r.changesChan)
 }
