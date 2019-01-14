@@ -140,8 +140,6 @@ func TestAddLabels(t *testing.T) {
 						"add_labels": config,
 					},
 				})
-
-				// processors[i], err = createAddLabels(config)
 				if err != nil {
 					t.Fatalf("Failed to create add_tags processor(%v): %+v", i, err)
 				}
