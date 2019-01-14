@@ -2,11 +2,19 @@
 
 We fetch the following data:
 
-* Page splits per instance: Cumulative per instance. Show diffs between periodic readings to identify periods of frequent page splits.
-* Page life expectancy in seconds: The expected time in seconds that a data page will remain in the buffer pool.
-*  Lock wait time in seconds: Cumulative per instance. Show diffs between periodic readings to identify periods of high lock contention.
-* Total number of user connections.
-* Cumulative (per instance) recompilations time in seconds: Show diffs between periodic readings to identify periods of high SQL re-compilations.
-* Compilations time in seconds: Cumulative per instance. Show diffs between periodic readings to identify periods of high SQL compilations.
-* Batch requests time in seconds: Cumulative per instance. Show diffs between periodic readings to identify periods of high request activity.
-* Buffer Cache hit: Percentage of data pages found in buffer cache without having to read from disk.
+* *Page splits per instance*: Cumulative per instance. Show diffs between periodic readings to identify periods of frequent page splits.
+* *Buffer page life expectancy* in seconds: The expected time in seconds that a data page will remain in the buffer pool.
+* *Lock wait time* in seconds: Cumulative per instance. Show diffs between periodic readings to identify periods of high lock contention.
+* Total number of *user connections*.
+* Total number of *transactions*.
+* *Active temp tables*: Number of temporary tables/table variables in use.
+* *Logins* per second: Total number of logins started per second. This does not include pooled connections.
+* *Logouts* per second: Total number of logout operations started per second.
+* *Connections reset*: Total number of logins started from the connection pool.
+* Cumulative (per instance) *recompilations* time in seconds: Show diffs between periodic readings to identify periods of high SQL re-compilations.
+* *Compilations* time in seconds: Cumulative per instance. Show diffs between periodic readings to identify periods of high SQL compilations.
+* *Batch requests time* in seconds: Cumulative per instance. Show diffs between periodic readings to identify periods of high request activity.
+* *Buffer Cache hit*: Percentage of data pages found in buffer cache without having to read from disk.
+* *Checkpoint pages*: Indicates the number of pages flushed to disk per second by a checkpoint or other operation that require all dirty pages to be flushed.
+* *Database pages*: Indicates the number of pages in the buffer pool with database content.
+* *Target pages*: Ideal number of pages in the buffer pool.
