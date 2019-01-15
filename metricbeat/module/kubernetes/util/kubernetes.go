@@ -158,6 +158,8 @@ func NewResourceMetadataEnricher(
 		},
 	)
 
+	// Configure the enricher for Pods, so pod specific metadata ends up in the right place when
+	// calling Enrich
 	if _, ok := res.(*kubernetes.Pod); ok {
 		enricher.isPod = true
 	}
