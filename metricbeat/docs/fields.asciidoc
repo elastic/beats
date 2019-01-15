@@ -2783,9 +2783,7 @@ Event status
 *`docker.event.id`*::
 +
 --
-type: alias
-
-alias to: event.id
+type: keyword
 
 Event id when available
 
@@ -2805,9 +2803,7 @@ Event source
 *`docker.event.type`*::
 +
 --
-type: alias
-
-alias to: event.kind
+type: keyword
 
 The type of object emitting the event
 
@@ -2817,9 +2813,7 @@ The type of object emitting the event
 *`docker.event.action`*::
 +
 --
-type: alias
-
-alias to: event.action
+type: keyword
 
 The type of event
 
@@ -2829,9 +2823,7 @@ The type of event
 *`docker.event.time`*::
 +
 --
-type: alias
-
-alias to: event.created
+type: date
 
 Timestamp of event
 
