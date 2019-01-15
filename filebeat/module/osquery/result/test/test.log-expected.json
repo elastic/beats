@@ -5,6 +5,8 @@
         "event.dataset": "osquery.result",
         "event.module": "osquery",
         "fileset.name": "result",
+        "host.hostname": "192-168-0-4.rdsnet.ro",
+        "host.id": "4AB2906D-5516-5794-AF54-86D1D7F533F3",
         "input.type": "log",
         "log.offset": 0,
         "osquery.result.action": "removed",
@@ -27,6 +29,7 @@
         "osquery.result.host_identifier": "192-168-0-4.rdsnet.ro",
         "osquery.result.name": "pack_it-compliance_mounts",
         "osquery.result.unix_time": "1514472008",
-        "service.type": "osquery"
+        "service.type": "osquery",
+        "user.name": "tsg"
     }
 ]

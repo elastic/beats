@@ -42,6 +42,31 @@
             "target_field": "osquery.result.calendar_time",
             "ignore_missing": true
         }
+    },
+
+    {
+        "convert": {
+            "field": "osquery.result.decorations.host_uuid",
+            "target_field": "host.id",
+            "type": "string",
+            "ignore_missing": true
+        }
+    },
+    {
+        "convert": {
+            "field": "osquery.result.host_identifier",
+            "target_field": "host.hostname",
+            "type": "string",
+            "ignore_missing": true
+        }
+    },
+    {
+        "convert": {
+            "field": "osquery.result.decorations.username",
+            "target_field": "user.name",
+            "type": "string",
+            "ignore_missing": true
+        }
     }
   ],
   "on_failure" : [{
