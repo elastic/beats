@@ -17,6 +17,27 @@
       "field": "message"
     }
   }, {
+    "script": {
+      "lang": "painless",
+      "source": "for (field in params.fields) { def v = ctx.mysql.slowlog.get(field); if (v != null) { ctx.mysql.slowlog.put(field, params.mapping.get(v)) } }",
+      "params": {
+         "mapping": {
+           "Yes": true,
+           "No": false
+         },
+         "fields": [
+           "query_cache_hit",
+           "tmp_table",
+           "tmp_table_on_disk",
+           "filesort",
+           "filesort_on_disk",
+           "priority_queue",
+           "full_scan",
+           "full_join"
+         ]
+      }
+    }
+  }, {
     "script":{
       "lang": "painless",
       "source": "ctx.event.duration = Math.round(ctx.mysql.slowlog.query_time.sec * 1000000) * 1000",

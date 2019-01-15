@@ -6491,7 +6491,7 @@ Current authenticated user, used to determine access privileges. Can differ from
 *`mysql.slowlog.query_cache_hit`*::
 +
 --
-type: keyword
+type: boolean
 
 Whether the query cache was hit.
 
@@ -6501,7 +6501,7 @@ Whether the query cache was hit.
 *`mysql.slowlog.tmp_table`*::
 +
 --
-type: keyword
+type: boolean
 
 Whether a temporary table was used to resolve the query.
 
@@ -6511,7 +6511,7 @@ Whether a temporary table was used to resolve the query.
 *`mysql.slowlog.tmp_table_on_disk`*::
 +
 --
-type: keyword
+type: boolean
 
 Whether the query needed temporary tables on disk.
 
@@ -6521,7 +6521,7 @@ Whether the query needed temporary tables on disk.
 *`mysql.slowlog.filesort`*::
 +
 --
-type: keyword
+type: boolean
 
 Whether filesort optimization was used.
 
@@ -6531,7 +6531,7 @@ Whether filesort optimization was used.
 *`mysql.slowlog.filesort_on_disk`*::
 +
 --
-type: keyword
+type: boolean
 
 Whether filesort optimization was used and it needed temporary tables on disk.
 
@@ -6541,7 +6541,7 @@ Whether filesort optimization was used and it needed temporary tables on disk.
 *`mysql.slowlog.priority_queue`*::
 +
 --
-type: keyword
+type: boolean
 
 Whether a priority queue was used for filesort.
 
@@ -6551,7 +6551,7 @@ Whether a priority queue was used for filesort.
 *`mysql.slowlog.full_scan`*::
 +
 --
-type: keyword
+type: boolean
 
 Whether a full table scan was needed for the slow query.
 
@@ -6561,7 +6561,7 @@ Whether a full table scan was needed for the slow query.
 *`mysql.slowlog.full_join`*::
 +
 --
-type: keyword
+type: boolean
 
 Whether a full join was needed for the slow query (no indexes were used for joins).
 
