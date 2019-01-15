@@ -14,6 +14,7 @@
         "log.offset": 0,
         "process.name": "haproxy",
         "process.pid": 24551,
+        "service.type": "haproxy",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.location.lat": 37.751,

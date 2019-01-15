@@ -30,6 +30,7 @@
         "log.offset": 0,
         "process.name": "haproxy",
         "process.pid": 19312,
+        "service.type": "haproxy",
         "source.ip": "127.0.0.1",
         "source.port": 35982
     },
@@ -64,6 +65,7 @@
         "log.offset": 186,
         "process.name": "haproxy",
         "process.pid": 29785,
+        "service.type": "haproxy",
         "source.ip": "127.0.0.1",
         "source.port": 43738
     },
@@ -102,6 +104,7 @@
         "log.offset": 394,
         "process.name": "haproxy",
         "process.pid": 7873,
+        "service.type": "haproxy",
         "source.ip": "127.0.0.1",
         "source.port": 44542
     }

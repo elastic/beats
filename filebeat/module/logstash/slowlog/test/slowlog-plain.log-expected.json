@@ -14,6 +14,7 @@
         "logstash.slowlog.plugin_name": "sleep",
         "logstash.slowlog.plugin_params": "{\"time\"=>3, \"id\"=>\"e4e12a4e3082615c5427079bf4250dbfa338ebac10f8ea9912d7b98a14f56b8c\"}",
         "logstash.slowlog.plugin_type": "filters",
-        "logstash.slowlog.took_in_millis": 3027
+        "logstash.slowlog.took_in_millis": 3027,
+        "service.type": "logstash"
     }
 ]

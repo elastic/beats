@@ -9,6 +9,7 @@
         "log.offset": 0,
         "message": "Synchronization with replica 10.114.208.18:6023 succeeded",
         "process.pid": 26571,
-        "redis.log.role": "master"
+        "redis.log.role": "master",
+        "service.type": "redis"
     }
 ]
