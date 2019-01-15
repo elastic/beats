@@ -133,6 +133,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add 'performance' metricset to x-pack mssql module {pull}9826[9826]
 - Add DeDot for kubernetes labels and annotations. {issue}9860[9860] {pull}9939[9939]
 - Add more meaningful metrics to 'performance' Metricset on 'MSSQL' module {pull}10011[10011]
+- Rename some fields in `performance` Metricset on MSSQL module to match the updated documentation from Microsoft {pull}10074[10074]
 
 *Packetbeat*
 
