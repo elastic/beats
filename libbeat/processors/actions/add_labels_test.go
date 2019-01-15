@@ -92,31 +92,62 @@ func TestAddLabels(t *testing.T) {
 				`{target: b, labels: {l2: b}}`,
 			),
 		},
+		"under root": {
+			event: common.MapStr{},
+			want: common.MapStr{
+				"a": common.MapStr{"b": "test"},
+			},
+			cfg: single(
+				`{target: "", labels: {a.b: test}}`,
+			),
+		},
+		"merge under root": {
+			event: common.MapStr{
+				"a": common.MapStr{"old": "value"},
+			},
+			want: common.MapStr{
+				"a": common.MapStr{"old": "value", "new": "test"},
+			},
+			cfg: single(
+				`{target: "", labels: {a.new: test}}`,
+			),
+		},
+		"overwrite existing under root": {
+			event: common.MapStr{
+				"a": common.MapStr{"keep": "value", "change": "a"},
+			},
+			want: common.MapStr{
+				"a": common.MapStr{"keep": "value", "change": "b"},
+			},
+			cfg: single(
+				`{target: "", labels: {a.change: b}}`,
+			),
+		},
 	}
 
 	for name, test := range cases {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			processors := make([]processors.Processor, len(test.cfg))
+			ps := make([]*processors.Processors, len(test.cfg))
 			for i := range test.cfg {
 				config, err := common.NewConfigWithYAML([]byte(test.cfg[i]), "test")
 				if err != nil {
 					t.Fatalf("Failed to create config(%v): %+v", i, err)
 				}
 
-				processors[i], err = createAddLabels(config)
+				ps[i], err = processors.New(processors.PluginConfig{
+					{
+						"add_labels": config,
+					},
+				})
 				if err != nil {
 					t.Fatalf("Failed to create add_tags processor(%v): %+v", i, err)
 				}
 			}
 
 			current := &beat.Event{Fields: test.event.Clone()}
-			for i, processor := range processors {
-				var err error
-				current, err = processor.Run(current)
-				if err != nil {
-					t.Fatalf("Unexpected error from add_tags processor(%v): %+v", i, err)
-				}
+			for i, processor := range ps {
+				current = processor.Run(current)
 				if current == nil {
 					t.Fatalf("Event dropped(%v)", i)
 				}

@@ -10,14 +10,6 @@
           description: Page splits in seconds
           type: long
 
-    - name: page_life_expectancy
-      type: group
-      description: The expected time in seconds that a data page will remain in the buffer pool
-      fields:
-        - name: sec
-          description: Page life expectancy in seconds
-          type: long
-
     - name: lock_waits
       type: group
       description: Cumulative per instance. Show diffs between periodic readings to identify periods of high lock contention.
@@ -29,6 +21,38 @@
     - name: user_connections
       description: Total number of user connections
       type: long
+
+    - name: transactions
+      description: Total number of transactions
+      type: long
+
+    - name: active_temp_tables
+      description: Number of temporary tables/table variables in use.
+      type: long
+
+    - name: connections_reset
+      description: Total number of logins started from the connection pool.
+      type: group
+      fields:
+        - name: sec
+          description: Connections reset per second
+          type: long
+
+    - name: logins
+      description: Total number of logins started per second. This does not include pooled connections.
+      type: group
+      fields:
+        - name: sec
+          description: Logins per second
+          type: long
+
+    - name: logouts
+      description: Total number of logout operations started per second.
+      type: group
+      fields:
+        - name: sec
+          description: Logouts per second
+          type: long
 
     - name: recompilations
       type: group
@@ -54,10 +78,39 @@
           description: Batch requests time in seconds
           type: long
 
-    - name: buffer_cache_hit
+    - name: buffer
       type: group
-      description: Indicates the percentage of pages found in the buffer cache without having to read from disk
       fields:
-        - name: pct
-          description: The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses
-          type: double
+        - name: cache_hit
+          type: group
+          description: Indicates the percentage of pages found in the buffer cache without having to read from disk
+          fields:
+            - name: pct
+              description: The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses
+              type: double
+
+        - name: page_life_expectancy
+          type: group
+          description: The expected time in seconds that a data page will remain in the buffer pool
+          fields:
+            - name: sec
+              description: Page life expectancy in seconds
+              type: long
+
+        - name: checkpoint_pages
+          type: group
+          description: Indicates the number of pages flushed to disk per second by a checkpoint or other operation that require all dirty pages to be flushed.
+          fields:
+            - name: sec
+              description: Checkpoint pages in seconds
+              type: long
+
+        - name: database_pages
+          description: Indicates the number of pages in the buffer pool with database content.
+          fields:
+          type: long
+
+        - name: target_pages
+          description: Ideal number of pages in the buffer pool.
+          fields:
+          type: long

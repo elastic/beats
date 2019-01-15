@@ -24,14 +24,14 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-func eventMapping(r mb.ReporterV2, keyspace uint, info map[string]interface{}) {
+func eventMapping(keyspace uint, info map[string]interface{}) mb.Event {
 	info["id"] = fmt.Sprintf("%d:%s", keyspace, info["name"])
-	r.Event(mb.Event{
+	return mb.Event{
 		MetricSetFields: info,
 		ModuleFields: common.MapStr{
 			"keyspace": common.MapStr{
 				"id": fmt.Sprintf("db%d", keyspace),
 			},
 		},
-	})
+	}
 }
