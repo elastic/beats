@@ -58,6 +58,28 @@
           description: >
             Indicator if monitor could validate the service to be available.
 
+        - name: check_group
+          type: keyword
+          description: >
+            A token unique to a simultaneously invoked group of checks as in the case where multiple IPs are checked for a single DNS entry.
+
+- key: summary
+  title: "Monitor summary"
+  description: "Present in the last event emitted during a check. If a monitor checks multiple endpoints, as is the case with `mode: all`."
+  fields:
+    - name: status
+      type: keyword
+      description: >
+        "up" when no failures, otherwise "down"
+    - name: up
+      type: short
+      description: >
+        The number of endpoints that succeeded
+    - name: down
+      type: short
+      description: >
+        The number of endpoints that failed
+
 - key: resolve
   title: "Host lookup"
   description:
