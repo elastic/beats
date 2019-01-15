@@ -87,7 +87,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Journalbeat*
 
 *Metricbeat*
+
 - Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
+- Fix pod UID metadata enrichment in Kubernetes module. {pull}10081[10081]
 
 *Packetbeat*
 
