@@ -6634,6 +6634,46 @@ List of TLS versions that the client is willing to use.
 
 --
 
+*`tls.client_hello.extensions.supported_groups`*::
++
+--
+type: keyword
+
+List of Elliptic Curve Cryptography (ECC) curve groups supported by the client.
+
+
+--
+
+*`tls.client_hello.extensions.signature_algorithms`*::
++
+--
+type: keyword
+
+List of signature algorithms that may be use in digital signatures.
+
+
+--
+
+*`tls.client_hello.extensions.ec_points_formats`*::
++
+--
+type: keyword
+
+List of Elliptic Curve (EC) point formats. Indicates the set of point formats that the client can parse.
+
+
+--
+
+*`tls.client_hello.extensions._unparsed_`*::
++
+--
+type: keyword
+
+List of extensions that were left unparsed by Packetbeat.
+
+
+--
+
 
 *`tls.server_hello.version`*::
 +
@@ -6661,6 +6701,16 @@ The cipher suite selected by the server from the list provided by in the client 
 type: keyword
 
 The compression method selected by the server from the list provided in the client hello.
+
+
+--
+
+*`tls.server_hello.session_id`*::
++
+--
+type: keyword
+
+Unique number to identify the session for the corresponding connection with the client.
 
 
 --
@@ -6696,6 +6746,26 @@ Used to announce that a session ticket will be provided by the server. Always an
 type: keyword
 
 Negotiated TLS version to be used.
+
+
+--
+
+*`tls.server_hello.extensions.ec_points_formats`*::
++
+--
+type: keyword
+
+List of Elliptic Curve (EC) point formats. Indicates the set of point formats that the server can parse.
+
+
+--
+
+*`tls.server_hello.extensions._unparsed_`*::
++
+--
+type: keyword
+
+List of extensions that were left unparsed by Packetbeat.
 
 
 --

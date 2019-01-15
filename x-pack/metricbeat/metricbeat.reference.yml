@@ -525,6 +525,13 @@ metricbeat.modules:
   # By setting raw to true, all raw fields from the status metricset will be added to the event.
   #raw: false
 
+#--------------------------------- Nats Module ---------------------------------
+- module: nats
+  metricsets: ["stats"]
+  period: 10s
+  hosts: ["localhost:8222"]
+  #stats.metrics_path: "/varz"
+
 #-------------------------------- Nginx Module --------------------------------
 - module: nginx
   metricsets: ["stubstatus"]
