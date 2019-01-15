@@ -1,0 +1,37 @@
+[
+    {
+        "@timestamp": "2018-10-04T10:53:53.000Z",
+        "ecs.version": "1.0.0-beta2",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 178306016000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 24,
+        "mysql.slowlog.current_user": "root",
+        "mysql.slowlog.filesort": "Yes",
+        "mysql.slowlog.filesort_on_disk": "No",
+        "mysql.slowlog.full_join": "No",
+        "mysql.slowlog.full_scan": "Yes",
+        "mysql.slowlog.lock_time.sec": 0.0,
+        "mysql.slowlog.merge_passes": "0",
+        "mysql.slowlog.priority_queue": "No",
+        "mysql.slowlog.query": "call PROC('blah');\n",
+        "mysql.slowlog.query_cache_hit": "No",
+        "mysql.slowlog.query_time.sec": 178.30602,
+        "mysql.slowlog.rows_affected": 3062,
+        "mysql.slowlog.rows_examined": 53022772,
+        "mysql.slowlog.rows_sent": 0,
+        "mysql.slowlog.schema": "blah",
+        "mysql.slowlog.thread_id": "25844",
+        "mysql.slowlog.timestamp": 1538650433,
+        "mysql.slowlog.tmp_table": "Yes",
+        "mysql.slowlog.tmp_table_on_disk": "No",
+        "service.type": "mysql",
+        "source.ip": "192.168.0.10",
+        "user.name": "root"
+    }
+]

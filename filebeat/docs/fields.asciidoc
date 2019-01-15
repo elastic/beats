@@ -28,7 +28,6 @@ grouped in the following categories:
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
 * <<exported-fields-logstash>>
-* <<exported-fields-mariadb>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
 * <<exported-fields-netflow>>
@@ -6255,237 +6254,6 @@ alias to: event.duration
 
 --
 
-[[exported-fields-mariadb]]
-== MariaDB fields
-
-Module for parsing the MariaDB log files.
-
-
-
-[float]
-== mariadb fields
-
-Fields from the MariaDB log files.
-
-
-
-[float]
-== error fields
-
-Contains fields from the MySQL error logs.
-
-
-
-*`mariadb.error.timestamp`*::
-+
---
-The timestamp from the log line.
-
-
---
-
-*`mariadb.error.thread_id`*::
-+
---
-type: long
-
-As of MySQL 5.7.2, this is the thread id. For MySQL versions prior to 5.7.2, this field contains the process id.
-
-
---
-
-*`mariadb.error.level`*::
-+
---
-example: Warning
-
-The log level.
-
---
-
-*`mariadb.error.message`*::
-+
---
-type: text
-
-The logged message.
-
-
---
-
-[float]
-== slowlog fields
-
-Contains fields from the MySQL slow logs.
-
-
-
-*`mariadb.slowlog.user`*::
-+
---
-The MySQL user that created the query.
-
-
---
-
-*`mariadb.slowlog.current_user`*::
-+
---
-The MySQL user that created the query.
-
-
---
-
-*`mariadb.slowlog.host`*::
-+
---
-The host from where the user that created the query logged in.
-
-
---
-
-*`mariadb.slowlog.client_host`*::
-+
---
-The host from where the user that created the query logged in.
-
-
---
-
-*`mariadb.slowlog.ip`*::
-+
---
-The IP address from where the user that created the query logged in.
-
-
---
-
-*`mariadb.slowlog.client_ip`*::
-+
---
-The IP address from where the user that created the query logged in.
-
-
---
-
-*`mariadb.slowlog.query_time.sec`*::
-+
---
-type: float
-
-The total time the query took, in seconds, as a floating point number.
-
-
---
-
-*`mariadb.slowlog.lock_time.sec`*::
-+
---
-type: float
-
-The amount of time the query waited for the lock to be available. The value is in seconds, as a floating point number.
-
-
---
-
-*`mariadb.slowlog.rows_sent`*::
-+
---
-type: long
-
-The number of rows returned by the query.
-
-
---
-
-*`mariadb.slowlog.rows_examined`*::
-+
---
-type: long
-
-The number of rows scanned by the query.
-
-
---
-
-*`mariadb.slowlog.timestamp`*::
-+
---
-type: long
-
-The unix timestamp taken from the `SET timestamp` query.
-
-
---
-
-*`mariadb.slowlog.query`*::
-+
---
-The slow query.
-
-
---
-
-*`mariadb.slowlog.id`*::
-+
---
-type: long
-
-The connection ID for the query.
-
-
---
-
-*`mariadb.slowlog.schema`*::
-+
---
-type: keyword
-
-The schema where the query was executed
-
-
---
-
-*`mariadb.slowlog.lock_time`*::
-+
---
-type: date
-
-Lock time
-
-
---
-
-*`mariadb.slowlog.time`*::
-+
---
-type: date
-
-Time where the query was executed
-
-
---
-
-*`mariadb.slowlog.query_cache_hit`*::
-+
---
-type: keyword
-
-If the query hit cache
-
-
---
-
-*`mariadb.slowlog.thread_id`*::
-+
---
-type: keyword
-
-Thread ID
-
-
---
-
 [[exported-fields-mongodb]]
 == mongodb fields
 
@@ -6652,6 +6420,16 @@ The number of rows scanned by the query.
 
 --
 
+*`mysql.slowlog.rows_affected`*::
++
+--
+type: long
+
+The number of rows modified by the query.
+
+
+--
+
 *`mysql.slowlog.timestamp`*::
 +
 --
@@ -6700,6 +6478,16 @@ The schema where the slow query was executed.
 
 --
 
+*`mysql.slowlog.current_user`*::
++
+--
+type: keyword
+
+Current authenticated user, used to determine access privileges. Can differ from the value for user.
+
+
+--
+
 *`mysql.slowlog.query_cache_hit`*::
 +
 --
@@ -6710,12 +6498,70 @@ Whether the query cache was hit.
 
 --
 
-*`mysql.slowlog.current_user`*::
+*`mysql.slowlog.tmp_table`*::
 +
 --
 type: keyword
 
-Current authenticated user, used to determine access privileges. Can differ from the value for user.
+Whether a temporary table was used to resolve the query.
+
+
+--
+
+*`mysql.slowlog.tmp_table_on_disk`*::
++
+--
+type: keyword
+
+Whether the query needed temporary tables on disk.
+
+
+--
+
+*`mysql.slowlog.filesort`*::
++
+--
+type: keyword
+
+Whether filesort optimization was used.
+
+
+--
+
+*`mysql.slowlog.filesort_on_disk`*::
++
+--
+type: keyword
+
+Whether filesort optimization was used and it needed temporary tables on disk.
+
+
+--
+
+*`mysql.slowlog.priority_queue`*::
++
+--
+type: keyword
+
+Whether a priority queue was used for filesort.
+
+--
+
+*`mysql.slowlog.full_scan`*::
++
+--
+type: keyword
+
+Whether a full table scan was needed for the slow query.
+
+--
+
+*`mysql.slowlog.merge_passes`*::
++
+--
+type: long
+
+Number of merge passes executed for the query.
 
 
 --
