@@ -6545,6 +6545,7 @@ type: keyword
 
 Whether a priority queue was used for filesort.
 
+
 --
 
 *`mysql.slowlog.full_scan`*::
@@ -6553,6 +6554,17 @@ Whether a priority queue was used for filesort.
 type: keyword
 
 Whether a full table scan was needed for the slow query.
+
+
+--
+
+*`mysql.slowlog.full_join`*::
++
+--
+type: keyword
+
+Whether a full join was needed for the slow query (no indexes were used for joins).
+
 
 --
 
