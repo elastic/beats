@@ -23,22 +23,16 @@
 :remove-command-short-desc: Removes the specified function from your serverless environment
 :run-command-short-desc: Runs {beatname_uc}. This command is used by default if you start {beatname_uc} without specifying a command
 
-ifndef::deprecate_dashboard_loading[]
-
 ifdef::has_ml_jobs[]
 :setup-command-short-desc: Sets up the initial environment, including the index template, {kib} dashboards (when available), and machine learning jobs (when available)
 endif::[]
 
-ifndef::has_ml_jobs[]
+ifdef::no_dashboards[]
+:setup-command-short-desc: Sets up the initial environment, including the ES index template.
+endif::no_dashboards[]
+
+ifndef::has_ml_jobs,no_dashboards[]
 :setup-command-short-desc: Sets up the initial environment, including the index template and {kib} dashboards (when available)
-endif::[]
-
-endif::[]
-
-ifdef::deprecate_dashboard_loading[]
-
-:setup-command-short-desc: Sets up the initial environment, including the ES index template and {kib} dashboards (deprecated).
-
 endif::[]
 
 :update-command-short-desc: Updates the specified function
@@ -53,12 +47,12 @@ endif::[]
 <titleabbrev>Command reference</titleabbrev>
 ++++
 
-ifndef::deprecate_dashboard_loading[]
+ifndef::no_dashboards[]
 {beatname_uc} provides a command-line interface for starting {beatname_uc} and
 performing common tasks, like testing configuration files and loading dashboards.
 endif::[]
 
-ifdef::deprecate_dashboard_loading[]
+ifdef::no_dashboards[]
 {beatname_uc} provides a command-line interface for starting {beatname_uc} and
 performing common tasks, like testing configuration files.
 endif::[]
@@ -581,21 +575,13 @@ Use this command if you want to set up the environment without actually running
 
 *FLAGS*
 
-ifndef::deprecate_dashboard_loading[]
+ifndef::no_dashboards[]
 *`--dashboards`*::
 Sets up the {kib} dashboards (when available). This option loads the dashboards
 from the {beatname_uc} package. For more options, such as loading customized
 dashboards, see {beatsdevguide}/import-dashboards.html[Importing Existing Beat
 Dashboards] in the _Beats Developer Guide_.
-endif::[]
-
-ifdef::deprecate_dashboard_loading[]
-*`--dashboards`*::
-
-deprecated[{deprecate_dashboard_loading}]
-+
-Sets up the {kib} dashboards only.
-endif::[]
+endif::no_dashboards[]
 
 *`-h, --help`*::
 Shows help for the `setup` command.
