@@ -3896,7 +3896,7 @@ Index id
 *`elasticsearch.shard.id`*::
 +
 --
-type: integer
+type: keyword
 
 example: 0
 
