@@ -58,31 +58,12 @@ func newHTTPMonitorHostJob(
 		return nil, err
 	}
 
-	hostname, port, err := splitHostnamePort(request)
-	if err != nil {
-		return nil, err
-	}
-
 	timeout := config.Timeout
 
-	return monitors.WithFields(
-		common.MapStr{
-			"monitor": common.MapStr{
-				"scheme": request.URL.Scheme,
-				"host":   hostname,
-			},
-			"http": common.MapStr{
-				"url": request.URL.String(),
-			},
-			"tcp": common.MapStr{
-				"port": port,
-			},
-		},
-		monitors.MakeSimpleJob(func(event *beat.Event) error {
-			_, _, err := execPing(event, client, request, body, timeout, validator)
-			return err
-		}),
-	), nil
+	return monitors.MakeSimpleJob(func(event *beat.Event) error {
+		_, _, err := execPing(event, client, request, body, timeout, validator)
+		return err
+	}), nil
 }
 
 func newHTTPMonitorIPsJob(
@@ -109,19 +90,7 @@ func newHTTPMonitorIPsJob(
 	pingFactory := createPingFactory(config, port, tls, req, body, validator)
 	job, err := monitors.MakeByHostJob(settings, pingFactory)
 
-	fields := common.MapStr{
-		"monitor": common.MapStr{
-			"scheme": req.URL.Scheme,
-		},
-		"http": common.MapStr{
-			"url": req.URL.String(),
-		},
-		"tcp": common.MapStr{
-			"port": port,
-		},
-	}
-
-	return monitors.WithFields(fields, job), err
+	return job, err
 }
 
 func createPingFactory(

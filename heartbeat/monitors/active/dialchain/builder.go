@@ -24,7 +24,6 @@ import (
 
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
 
@@ -154,13 +153,6 @@ func makeEndpointJobs(
 	fn func(*beat.Event, transport.Dialer, string) error,
 ) ([]monitors.Job, error) {
 
-	fields := common.MapStr{
-		"monitor": common.MapStr{
-			"host":   endpoint.Host,
-			"scheme": scheme,
-		},
-	}
-
 	// Check if SOCKS5 is configured, with relying on the socks5 proxy
 	// in resolving the actual IP.
 	// Create one job for every port number configured.
@@ -197,5 +189,5 @@ func makeEndpointJobs(
 	if err != nil {
 		return nil, err
 	}
-	return []monitors.Job{monitors.WithFields(fields, job)}, nil
+	return []monitors.Job{job}, nil
 }
