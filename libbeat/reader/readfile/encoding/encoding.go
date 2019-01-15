@@ -65,6 +65,21 @@ var encodings = map[string]EncodingFactory{
 	"iso8859-15": enc(charmap.ISO8859_15), // latin-9
 	"iso8859-16": enc(charmap.ISO8859_16), // latin-10
 
+	// ibm codepages
+	"cp437":       enc(charmap.CodePage437),
+	"cp850":       enc(charmap.CodePage850),
+	"cp852":       enc(charmap.CodePage852),
+	"cp855":       enc(charmap.CodePage855),
+	"cp858":       enc(charmap.CodePage858),
+	"cp860":       enc(charmap.CodePage860),
+	"cp862":       enc(charmap.CodePage862),
+	"cp863":       enc(charmap.CodePage863),
+	"cp865":       enc(charmap.CodePage865),
+	"cp866":       enc(charmap.CodePage866),
+	"ebcdic-037":  enc(charmap.CodePage037),
+	"ebcdic-1040": enc(charmap.CodePage1140),
+	"ebcdic-1047": enc(charmap.CodePage1047),
+
 	// cyrillic
 	"koi8r": enc(charmap.KOI8R),
 	"koi8u": enc(charmap.KOI8U),
