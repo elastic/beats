@@ -34,19 +34,18 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: docker
-  metricsets:
-    - "container"
-    - "cpu"
-    - "diskio"
-    - "event"
-    - "healthcheck"
-    - "info"
-    #- "image"
-    - "memory"
-    - "network"
-  hosts: ["unix:///var/run/docker.sock"]
+  #metricsets:
+  #  - container
+  #  - cpu
+  #  - diskio
+  #  - event
+  #  - healthcheck
+  #  - info
+  #  - image
+  #  - memory
+  #  - network
   period: 10s
-  enabled: true
+  hosts: ["unix:///var/run/docker.sock"]
 
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
