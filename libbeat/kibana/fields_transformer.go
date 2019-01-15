@@ -86,8 +86,8 @@ func (t *fieldsTransformer) transformFields(commonFields common.Fields, path str
 		} else {
 			if f.Type == "alias" {
 				if ff := t.fields.GetField(f.AliasPath); ff != nil {
-					ff.Name = f.Name
-					f = *ff
+					// TODO: copy more then just type
+					f.Type = ff.Type
 				}
 			}
 			t.add(f)
@@ -110,7 +110,7 @@ func (t *fieldsTransformer) update(target *common.MapStr, override common.Field)
 		target.Update(field)
 		if !override.Overwrite {
 			// compatible duplication
-			return fmt.Errorf("field <%s> is duplicated, remove it or set 'overwrite: true'", override.Path)
+			return fmt.Errorf("field <%s> is duplicated, remove it or set 'overwrite: true', %+v, %+v", override.Path, override, field)
 		}
 		return nil
 	}
