@@ -15,6 +15,7 @@
         "iis.access.win32_status": 2,
         "input.type": "log",
         "log.offset": 244,
+        "service.type": "iis",
         "source.address": "10.100.118.31",
         "source.ip": "10.100.118.31",
         "url.path": "/",

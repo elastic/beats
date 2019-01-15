@@ -16,7 +16,8 @@
         "event.module": "auditd",
         "fileset.name": "log",
         "input.type": "log",
-        "log.offset": 0
+        "log.offset": 0,
+        "service.type": "auditd"
     },
     {
         "@timestamp": "2017-01-31T20:17:14.891Z",
@@ -51,6 +52,7 @@
         "event.module": "auditd",
         "fileset.name": "log",
         "input.type": "log",
-        "log.offset": 174
+        "log.offset": 174,
+        "service.type": "auditd"
     }
 ]
