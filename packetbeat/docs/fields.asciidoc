@@ -508,11 +508,30 @@ alias to: agent.hostname
 Cassandra v4/3 specific event fields.
 
 
+*`no_request`*::
++
+--
+type: alias
+
+alias to: cassandra.no_request
+
+--
+
 [float]
 == cassandra fields
 
 Information about the Cassandra request and response.
 
+
+*`cassandra.no_request`*::
++
+--
+type: boolean
+
+Indicates that there is no request because this is a PUSH message.
+
+
+--
 
 [float]
 == request fields
