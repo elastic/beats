@@ -31,6 +31,22 @@
       type: long
       description: >
         The connection ID for the query.
+    - name: thread_id
+      type: long
+      description: >
+        ID of the thread executing this query.
+    - name: schema
+      type: keyword
+      description: >
+        The schema where the slow query was executed.
+    - name: query_cache_hit
+      type: keyword
+      description: >
+        Whether the query cache was hit.
+    - name: current_user
+      type: keyword
+      description: >
+        Current authenticated user, used to determine access privileges. Can differ from the value for user.
 
     - name: user
       type: alias

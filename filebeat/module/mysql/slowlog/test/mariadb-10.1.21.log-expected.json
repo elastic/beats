@@ -1,25 +1,28 @@
 [
     {
-        "@timestamp": "2018-06-13T14:04:36.000Z", 
-        "event.dataset": "slowlog", 
-        "event.module": "mariadb", 
-        "input.type": "log", 
+        "@timestamp": "2018-06-13T14:04:36.000Z",
+        "ecs.version": "1.0.0-beta2",
+        "event.dataset": "mysql.slowlog",
+        "event.duration": 2000652000,
+        "event.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
         "log.flags": [
             "multiline"
-        ], 
-        "log.offset": 0, 
-        "mariadb.slowlog.client_host": "localhost", 
-        "mariadb.slowlog.client_ip": "121.0.0.1", 
-        "mariadb.slowlog.current_user": "root", 
-        "mariadb.slowlog.lock_time": "0.000000", 
-        "mariadb.slowlog.query": "select sleep(2);\n", 
-        "mariadb.slowlog.query_cache_hit": "No", 
-        "mariadb.slowlog.query_time.sec": "2.000652", 
-        "mariadb.slowlog.rows_examined": "0", 
-        "mariadb.slowlog.rows_sent": "1", 
-        "mariadb.slowlog.thread_id": "5", 
-        "mariadb.slowlog.time": "180613 11:04:36", 
-        "mariadb.slowlog.timestamp": "1528898676", 
-        "mariadb.slowlog.user": "root"
+        ],
+        "log.offset": 24,
+        "mysql.slowlog.current_user": "root",
+        "mysql.slowlog.lock_time.sec": 0.0,
+        "mysql.slowlog.query": "select sleep(2);\n",
+        "mysql.slowlog.query_cache_hit": "No",
+        "mysql.slowlog.query_time.sec": 2.000652,
+        "mysql.slowlog.rows_examined": 0,
+        "mysql.slowlog.rows_sent": 1,
+        "mysql.slowlog.thread_id": "5",
+        "mysql.slowlog.timestamp": 1528898676,
+        "service.type": "mysql",
+        "source.domain": "localhost",
+        "source.ip": "121.0.0.1",
+        "user.name": "root"
     }
 ]

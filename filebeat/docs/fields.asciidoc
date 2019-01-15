@@ -6680,6 +6680,46 @@ The connection ID for the query.
 
 --
 
+*`mysql.slowlog.thread_id`*::
++
+--
+type: long
+
+ID of the thread executing this query.
+
+
+--
+
+*`mysql.slowlog.schema`*::
++
+--
+type: keyword
+
+The schema where the slow query was executed.
+
+
+--
+
+*`mysql.slowlog.query_cache_hit`*::
++
+--
+type: keyword
+
+Whether the query cache was hit.
+
+
+--
+
+*`mysql.slowlog.current_user`*::
++
+--
+type: keyword
+
+Current authenticated user, used to determine access privileges. Can differ from the value for user.
+
+
+--
+
 *`mysql.slowlog.user`*::
 +
 --
