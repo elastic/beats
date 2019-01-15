@@ -53,7 +53,7 @@ func main() {
 
 	u, err := url.Parse(*kibanaURL)
 	if err != nil {
-		log.Fatalf("Error parsing Kibana URL: %+v", err)
+		log.Fatalf("Error parsing Kibana URL: %v", err)
 	}
 
 	var user, pass string
@@ -70,7 +70,7 @@ func main() {
 		Timeout:  kibanaTimeout,
 	})
 	if err != nil {
-		log.Fatalf("Error while connecting to Kibana: %+v", err)
+		log.Fatalf("Error while connecting to Kibana: %v", err)
 	}
 
 	if len(*ymlFile) == 0 && len(*dashboard) == 0 {
@@ -81,7 +81,7 @@ func main() {
 	if len(*ymlFile) > 0 {
 		err = exportDashboardsFromYML(client, *ymlFile)
 		if err != nil {
-			log.Fatalf("Failed to export dashboards from YML file: %+v", err)
+			log.Fatalf("Failed to export dashboards from YML file: %v", err)
 		}
 		return
 	}
@@ -89,7 +89,7 @@ func main() {
 	if len(*dashboard) > 0 {
 		err = exportSingleDashboard(client, *dashboard, *fileOutput)
 		if err != nil {
-			log.Fatalf("Failed to export the dashboard: %+v", err)
+			log.Fatalf("Failed to export the dashboard: %v", err)
 		}
 		if !quiet {
 			log.Printf("The dashboard %s was exported under '%s'\n", *dashboard, *fileOutput)
