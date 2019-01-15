@@ -65,6 +65,24 @@ Error type.
 
 --
 
+*`beat.name`*::
++
+--
+type: alias
+
+alias to: host.name
+
+--
+
+*`beat.hostname`*::
++
+--
+type: alias
+
+alias to: agent.hostname
+
+--
+
 [[exported-fields-cloud]]
 == Cloud provider metadata fields
 
@@ -3573,24 +3591,6 @@ example: 4.4.0-112-generic
 
 Operating system kernel version as a raw string.
 
-
---
-
-*`beat.name`*::
-+
---
-type: alias
-
-alias to: agent.type
-
---
-
-*`beat.hostname`*::
-+
---
-type: alias
-
-alias to: agent.hostname
 
 --
 
