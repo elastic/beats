@@ -69,7 +69,12 @@ func New(beatVersion string, beatName string, esVersion common.Version, config T
 
 	event := &beat.Event{
 		Fields: common.MapStr{
+			// beat object was left in for backward compatibility reason for older configs.
 			"beat": common.MapStr{
+				"name":    beatName,
+				"version": bV.String(),
+			},
+			"agent": common.MapStr{
 				"name":    beatName,
 				"version": bV.String(),
 			},
