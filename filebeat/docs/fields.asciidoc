@@ -10054,6 +10054,8 @@ Unix timestamp of the event, in seconds since the epoch. Used for computing the 
 *`osquery.result.calendar_time`*::
 +
 --
+type: keyword
+
 String representation of the collection time, as formatted by osquery.
 
 

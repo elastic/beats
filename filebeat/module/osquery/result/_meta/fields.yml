@@ -22,6 +22,6 @@
       description: >
         Unix timestamp of the event, in seconds since the epoch. Used for computing the `@timestamp` column.
     - name: calendar_time
-      tupe: keyword
+      type: keyword
       description: >
         String representation of the collection time, as formatted by osquery.
