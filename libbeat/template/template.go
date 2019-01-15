@@ -78,6 +78,11 @@ func New(beatVersion string, beatName string, esVersion common.Version, config T
 				"name":    beatName,
 				"version": bV.String(),
 			},
+			// For the Beats that have an observer role
+			"observer": common.MapStr{
+				"name":    beatName,
+				"version": bV.String(),
+			},
 		},
 		Timestamp: time.Now(),
 	}

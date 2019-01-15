@@ -411,7 +411,7 @@ output.elasticsearch:
   # Optional index name. The default is "auditbeat" plus date
   # and generates [auditbeat-]YYYY.MM.DD keys.
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "auditbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
+  #index: "auditbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -988,7 +988,7 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Template name. By default the template name is "auditbeat-%{[beat.version]}"
+# Template name. By default the template name is "auditbeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
 #setup.template.name: "auditbeat-%{[beat.version]}"
 
@@ -1272,3 +1272,8 @@ logging.files:
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
 #seccomp.enabled: true
+
+#================================= Migration ==================================
+
+# This allows to enable migration aliases
+#migration.enabled: false
