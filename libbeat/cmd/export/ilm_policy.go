@@ -49,17 +49,18 @@ func GenGetILMPolicyCmd(settings instance.Settings, name, idxPrefix, beatVersion
 				os.Exit(1)
 			}
 
-			var indexCfgs index.IndexConfigs
-			if err := b.Config.Indices.Unpack(&indexCfgs); err != nil {
+			var indicesCfg index.Configs
+			if err := b.Config.Indices.Unpack(&indicesCfg); err != nil {
 				fmt.Fprintf(os.Stderr, "unpacking indices config fails: %v", err)
 				os.Exit(1)
 			}
 
-			if err := indexCfgs.LoadILMPolicies(nil, b.Info); err != nil {
-				fmt.Fprintf(os.Stderr, "error loading ILM policies: %v", err)
+			if _, err = indicesCfg.PrintILMPolicies(b.Info); err != nil {
+				fmt.Fprintf(os.Stderr, err.Error())
 				os.Exit(1)
 			}
-			logp.Info("loaded ILM policies")
+
+			logp.Info("Loaded ILM policies.")
 		},
 	}
 

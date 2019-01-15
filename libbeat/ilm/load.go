@@ -18,7 +18,6 @@
 package ilm
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
@@ -28,50 +27,51 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+//ESClient supporting methods necessary for ILM handling
 type ESClient interface {
 	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
 	GetVersion() common.Version
 }
 
+//Loader holds all the information necessary to load ilm policies and write aliases
 type Loader struct {
-	esClient   ESClient
-	cfg        ILMConfig
 	ilmEnabled bool
+	esClient   ESClient
+	beatInfo   beat.Info
 }
 
-//NewLoader creates a new ilm policy loader that writes to ES or the console
-func NewLoader(cfg ILMConfig, client ESClient, ilmEnabled bool, info beat.Info) (*Loader, error) {
-	//ilm.enabled=false
-	if cfg.EnabledFalse() {
-		return nil, nil
-	}
-
-	//setup is not qualified for ILM
-	if !ilmEnabled {
-		//ilm.enabled=true
-		if cfg.EnabledTrue() {
-			return nil, errors.New(fmt.Sprintf("ilm set to `true`, but %s", ilmNotSupported))
-		}
-		//ilm.enabled=auto
-		logp.Info(fmt.Sprintf("ilm set to `auto`, but %s", ilmNotSupported))
-		return nil, nil
-	}
-
-	cfg.replaceRegex(info)
+//NewESLoader creates a new ilm policy loader that writes to ES
+func NewESLoader(client ESClient, info beat.Info) (*Loader, error) {
 	return &Loader{
 		esClient:   client,
-		cfg:        cfg,
-		ilmEnabled: ilmEnabled,
+		ilmEnabled: EnabledFor(client),
+		beatInfo:   info,
 	}, nil
+}
 
+//NewStdoutLoader creates a new ilm policy loader that writes to the console
+func NewStdoutLoader(info beat.Info) (*Loader, error) {
+	return &Loader{
+		ilmEnabled: true,
+		beatInfo:   info,
+	}, nil
 }
 
 //LoadPolicy loads the configured ILM policy to the appropriate output,
 //either Elasticsearch or the Console.
-func (l *Loader) LoadPolicy() (bool, error) {
-	logp.Info("Starting to load policy %s", l.cfg.Policy.Name)
-	policy, err := newPolicy(l.cfg.Policy)
+func (l *Loader) LoadPolicy(cfg Config) (bool, error) {
+	logp.Info("Starting to load policy %s", cfg.Policy.Name)
+
+	if load, err := l.shouldLoad(cfg); load == false || err != nil {
+		return load, err
+	}
+
+	if err := cfg.prepare(l.beatInfo); err != nil {
+		return false, err
+	}
+
+	policy, err := newPolicy(cfg.Policy)
 	if err != nil {
 		logp.Err("Error creating policy: %s", err)
 		return false, err
@@ -81,14 +81,24 @@ func (l *Loader) LoadPolicy() (bool, error) {
 		logp.Err("Error loading policy: %s", err)
 		return false, err
 	}
+
 	logp.Info("Policy successfully loaded")
 	return true, nil
 }
 
 //LoadWriteAlias loads the configured rollover alias to the Elasticsearch output
-func (l *Loader) LoadWriteAlias() (bool, error) {
-	logp.Info("Starting to load write alias %s", l.cfg.RolloverAlias)
-	exists, err := l.checkAliasExists(l.cfg.RolloverAlias)
+func (l *Loader) LoadWriteAlias(cfg Config) (bool, error) {
+	logp.Info("Starting to load write alias %s", cfg.RolloverAlias)
+
+	if load, err := l.shouldLoad(cfg); load == false || err != nil {
+		return load, err
+	}
+
+	if err := cfg.prepare(l.beatInfo); err != nil {
+		return false, err
+	}
+
+	exists, err := l.checkAliasExists(cfg.RolloverAlias)
 	if err != nil {
 		logp.Err("Failed to check for alias: %s: ", err)
 		return false, err
@@ -98,13 +108,32 @@ func (l *Loader) LoadWriteAlias() (bool, error) {
 		return false, nil
 	}
 
-	return l.createAlias(l.cfg.RolloverAlias)
+	return l.createAlias(cfg.RolloverAlias)
+}
+
+func (l *Loader) shouldLoad(cfg Config) (bool, error) {
+	//ilm.enabled=false
+	if cfg.EnabledFalse() {
+		return false, nil
+	}
+	if l.ilmEnabled {
+		return true, nil
+	}
+
+	//setup is not qualified for ILM
+	if cfg.EnabledAuto() {
+		//ilm.enabled=auto
+		logp.Info(fmt.Sprintf("ilm for %s set to `auto`, but %s", cfg.RolloverAlias, ilmNotSupported))
+		return false, nil
+	}
+	//ilm.enabled=true
+	return false, fmt.Errorf("ilm set to `true`, but %s", ilmNotSupported)
 }
 
 func (l *Loader) checkAliasExists(alias string) (bool, error) {
 	status, b, err := l.esClient.Request("HEAD", "/_alias/"+alias, "", nil, nil)
 	if err != nil && status != 404 {
-		return false, errors.New(fmt.Sprintf("%s: %v", err.Error(), string(b)))
+		return false, fmt.Errorf("%s: %v", err.Error(), string(b))
 	}
 	if status == 200 {
 		return true, nil
@@ -113,6 +142,10 @@ func (l *Loader) checkAliasExists(alias string) (bool, error) {
 }
 
 func (l *Loader) createAlias(alias string) (bool, error) {
+	if l.esClient == nil {
+		logp.Info("No ES client configured for loading ILM write alias")
+		return false, nil
+	}
 	firstIndex := fmt.Sprintf("%s-%s", alias, defaultPattern)
 	body := common.MapStr{
 		"aliases": common.MapStr{
@@ -136,7 +169,7 @@ func (l *Loader) createAlias(alias string) (bool, error) {
 
 func (l *Loader) loadPolicy(p *policy) error {
 	if p == nil {
-		return errors.New("policy empty")
+		return fmt.Errorf("policy empty")
 	}
 	if l.esClient != nil {
 		if _, _, err := l.esClient.Request("PUT", "/_ilm/policy/"+p.name, "", nil, p.body); err != nil {
@@ -144,6 +177,10 @@ func (l *Loader) loadPolicy(p *policy) error {
 		}
 		return nil
 	}
+	if _, err := os.Stdout.WriteString(fmt.Sprintf("Register policy at `/_ilm/policy/%s`\n%v", p.name, p.body)); err != nil {
+		return fmt.Errorf("error writing ilm policy: %v", err)
+	}
+
 	_, err := os.Stdout.WriteString(fmt.Sprintf("%s: %s\n", p.name, p.body))
 	return err
 }

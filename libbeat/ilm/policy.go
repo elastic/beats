@@ -19,7 +19,6 @@ package ilm
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -42,7 +41,7 @@ func newPolicy(cfg policyCfg) (*policy, error) {
 				return &p, nil
 			}
 		}
-		return nil, errors.New(fmt.Sprintf("no ILM policy found with this name: %s", cfg.Name))
+		return nil, fmt.Errorf("no ILM policy found with this name: %s", cfg.Name)
 	}
 
 	path := paths.Resolve(paths.Config, cfg.Path)

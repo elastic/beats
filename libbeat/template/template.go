@@ -36,17 +36,18 @@ var (
 	defaultFields []string
 )
 
+//Template holds information about an ES template
 type Template struct {
 	sync.Mutex
 	name        string
 	pattern     string
 	beatVersion common.Version
 	esVersion   common.Version
-	config      TemplateConfig
+	config      Config
 }
 
 // New creates a new template instance
-func New(beatVersion string, beatName string, esVersion common.Version, config TemplateConfig) (*Template, error) {
+func New(beatVersion string, beatName string, esVersion common.Version, config Config) (*Template, error) {
 	bV, err := common.NewVersion(beatVersion)
 	if err != nil {
 		return nil, err

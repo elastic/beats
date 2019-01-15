@@ -30,74 +30,73 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-type ILMConfigs []ILMConfig
+//Configs holds a collection of Config entries
+type Configs []Config
 
-type ILMConfig struct {
+//Config holds all config options supported for ILM configurations
+type Config struct {
 	Enabled       string    `config:"enabled"`
 	RolloverAlias string    `config:"rollover_alias"`
 	Pattern       string    `config:"pattern"`
 	Policy        policyCfg `config:"policy"`
 }
+
 type policyCfg struct {
 	Name string `config:"name"`
 	Path string `config:"path"`
 }
 
-//Unpack sets the ILMConfig instance to the given values
-func (cfg *ILMConfig) Unpack(c *common.Config) error {
-	type tmpCfg ILMConfig
+//Unpack sets the Config instance to the given values
+func (cfg *Config) Unpack(c *common.Config) error {
+	type tmpCfg Config
 	var tmp = tmpCfg(*defaultILMConfig())
 	if err := c.Unpack(&tmp); err != nil {
 		return err
 	}
-	*cfg = ILMConfig(tmp)
+	*cfg = Config(tmp)
 	return nil
 }
 
 //Validate checks if the given configuration is valid
-func (cfg *ILMConfig) Validate() error {
-	if !cfg.EnabledTrue() && !cfg.EnabledFalse() && !cfg.EnabledAuto() {
+func (cfg *Config) Validate() error {
+	if _, err := strconv.ParseBool(cfg.Enabled); err != nil && !cfg.EnabledAuto() {
 		return fmt.Errorf("validation error for ilm config section: `ilm.enabled: %s` is invalid", cfg.Enabled)
 	}
 
 	if !cfg.EnabledFalse() && cfg.RolloverAlias == "" {
-		return errors.New("validation error for ilm config section: ilm.rollover_alias must be set when ilm is not disabled.")
+		return errors.New("validation error for ilm config section: ilm.rollover_alias must be set when ilm is not disabled")
 	}
 	return nil
 }
 
 //EnabledFalse indicates if ILM is disabled
-func (cfg *ILMConfig) EnabledFalse() bool {
+func (cfg *Config) EnabledFalse() bool {
 	if e, err := strconv.ParseBool(cfg.Enabled); err == nil {
 		return !e
 	}
 	return false
 }
 
-//EnabledFalse indicates if ILM is enabled
-func (cfg *ILMConfig) EnabledTrue() bool {
-	if e, err := strconv.ParseBool(cfg.Enabled); err == nil {
-		return e
-	}
-	return false
-}
-
-//EnabledFalse indicates if ILM is set to `auto`. If true,
+//EnabledAuto indicates if ILM is set to `auto`. If true,
 //ILM is enabled by default if the configured output can handle it.
-func (cfg *ILMConfig) EnabledAuto() bool {
+func (cfg *Config) EnabledAuto() bool {
 	return strings.ToLower(cfg.Enabled) == "auto"
 }
 
-func (cfg *ILMConfig) replaceRegex(info beat.Info) error {
+func (cfg *Config) prepare(info beat.Info) error {
 	alias := cfg.RolloverAlias
 	policyName := cfg.Policy.Name
 	if policyName == "" {
-		policyName = DefaultPolicyName
+		policyName = defaultPolicyName
 	}
 
 	event := &beat.Event{
 		Fields: common.MapStr{
-			"beat": common.MapStr{
+			"agent": common.MapStr{
+				"name":    info.Name,
+				"version": info.Version,
+			},
+			"observer": common.MapStr{
 				"name":    info.Name,
 				"version": info.Version,
 			},
@@ -128,14 +127,14 @@ func (cfg *ILMConfig) replaceRegex(info beat.Info) error {
 	return nil
 }
 
-func defaultILMConfig() *ILMConfig {
-	return &ILMConfig{
+func defaultILMConfig() *Config {
+	return &Config{
 		Enabled: "auto",
 		Pattern: defaultPattern,
-		Policy:  policyCfg{Name: DefaultPolicyName},
+		Policy:  policyCfg{Name: defaultPolicyName},
 	}
 }
 
 const defaultPattern = "000001"
 
-var DefaultPolicyName = "beatDefaultPolicy"
+var defaultPolicyName = "beatDefaultPolicy"

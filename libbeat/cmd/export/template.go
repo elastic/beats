@@ -21,11 +21,16 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/elastic/beats/libbeat/logp"
+
+	"github.com/spf13/cobra"
+
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/index"
-	"github.com/spf13/cobra"
 )
 
+//GenTemplateConfigCmd implements generating a template for the given settings and
+//prints it to stdout
 func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersion string) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "template",
@@ -50,24 +55,24 @@ func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersi
 				os.Exit(1)
 			}
 
-			var indexCfgs index.IndexConfigs
-			if b.Config.Indices != nil {
-				if err := b.Config.Indices.Unpack(&indexCfgs); err != nil {
-					fmt.Fprintf(os.Stderr, "unpacking indices config fails: %v", err)
-					os.Exit(1)
-				}
+			var indicesCfg index.Configs
+			if err := b.Config.Indices.Unpack(&indicesCfg); err != nil {
+				fmt.Fprintf(os.Stderr, "unpacking indices config fails: %v", err)
+				os.Exit(1)
 			}
-			if len(indexCfgs) == 0 {
-				indexCfgs, err = index.DeprecatedConfigs(b.Config.Template)
+			if len(indicesCfg) == 0 {
+				cfg, err := index.DeprecatedTemplateConfigs(b.Config.Template)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "unpacking template config fails: %v", err)
 					os.Exit(1)
 				}
+				indicesCfg = *cfg
 			}
-			if err = indexCfgs.LoadTemplates(nil, b.Info); err != nil {
+			if _, err = indicesCfg.PrintTemplates(b.Info); err != nil {
 				fmt.Fprintf(os.Stderr, err.Error())
 				os.Exit(1)
 			}
+			logp.Info("Loaded Elasticsearch templates.")
 		},
 	}
 

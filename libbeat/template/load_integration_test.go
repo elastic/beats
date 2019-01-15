@@ -70,7 +70,7 @@ func TestLoadTemplate(t *testing.T) {
 	fieldsPath := absPath + "/fields.yml"
 	index := "testbeat"
 
-	tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfigs{})
+	tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), Configs{})
 	assert.NoError(t, err)
 	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)
@@ -140,7 +140,7 @@ func TestLoadBeatsTemplate(t *testing.T) {
 		fieldsPath := absPath + "/fields.yml"
 		index := beat
 
-		tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfigs{})
+		tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), Configs{})
 		assert.NoError(t, err)
 		content, err := tmpl.LoadFile(fieldsPath)
 		assert.NoError(t, err)
@@ -178,7 +178,7 @@ func TestTemplateSettings(t *testing.T) {
 
 	fieldsPath := absPath + "/fields.yml"
 
-	settings := TemplateSettings{
+	settings := Settings{
 		Index: common.MapStr{
 			"number_of_shards": 1,
 		},
@@ -186,7 +186,7 @@ func TestTemplateSettings(t *testing.T) {
 			"enabled": false,
 		},
 	}
-	config := TemplateConfigs{
+	config := Configs{
 		Settings: settings,
 	}
 	tmpl, err := New(version.GetDefaultVersion(), "testbeat", client.GetVersion(), config)
@@ -236,7 +236,7 @@ func TestOverwrite(t *testing.T) {
 	client.Request("DELETE", "/_template/"+templateName, "", nil, nil)
 
 	// Load template
-	config := newConfigFrom(t, TemplateConfigs{
+	config := newConfigFrom(t, Configs{
 		Enabled: true,
 		Fields:  absPath + "/fields.yml",
 	})
@@ -246,10 +246,10 @@ func TestOverwrite(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Load template again, this time with custom settings
-	config = newConfigFrom(t, TemplateConfigs{
+	config = newConfigFrom(t, Configs{
 		Enabled: true,
 		Fields:  absPath + "/fields.yml",
-		Settings: TemplateSettings{
+		Settings: Settings{
 			Source: map[string]interface{}{
 				"enabled": false,
 			},
@@ -265,11 +265,11 @@ func TestOverwrite(t *testing.T) {
 	assert.Equal(t, true, templateJSON.SourceEnabled())
 
 	// Load template again, this time with custom settings AND overwrite: true
-	config = newConfigFrom(t, TemplateConfigs{
+	config = newConfigFrom(t, Configs{
 		Enabled:   true,
 		Overwrite: true,
 		Fields:    absPath + "/fields.yml",
-		Settings: TemplateSettings{
+		Settings: Settings{
 			Source: map[string]interface{}{
 				"enabled": false,
 			},
@@ -339,7 +339,7 @@ func TestTemplateWithData(t *testing.T) {
 	// Setup ES
 	client := estest.GetTestingElasticsearch(t)
 
-	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), TemplateConfigs{})
+	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), Configs{})
 	assert.NoError(t, err)
 	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)
