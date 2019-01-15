@@ -84,6 +84,12 @@ func (t *fieldsTransformer) transformFields(commonFields common.Fields, path str
 				t.transformFields(f.Fields, f.Path)
 			}
 		} else {
+			if f.Type == "alias" {
+				if ff := t.fields.GetField(f.AliasPath); ff != nil {
+					ff.Name = f.Name
+					f = *ff
+				}
+			}
 			t.add(f)
 
 			if f.MultiFields != nil {
