@@ -2,7 +2,7 @@
   type: group
   description: >
     Kibana stats and run-time metrics.
-  release: beta
+  release: ga
   fields:
     - name: uuid
       type: keyword
