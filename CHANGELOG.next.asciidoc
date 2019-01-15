@@ -28,6 +28,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Modify apache/error dataset to follow ECS. {pull}8963[8963]
 - Rename many `traefik.access.*` fields to map to ECS. {pull}9005[9005]
 - Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
+- Rename `read_timestamp` to `event.created` for Redis input. {pull}9924[9924]
 - Rename many `iis.error.*` fields to map to ECS. {pull}9955[9955]
 - Rename a few `logstash.*` fields to map to ECS, remove logstash.slowlog.message. {pull}9935[9935]
 - Rename a few `mysql.*` fields to map to ECS. {pull}10008[10008]

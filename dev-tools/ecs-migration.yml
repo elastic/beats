@@ -747,6 +747,11 @@
   to: http.version
   alias: true
 
+# Filebeat Redis Input
+
+- from: read_timestamp
+  to: event.created
+  alias: false
 
 # Auditbeat
 
