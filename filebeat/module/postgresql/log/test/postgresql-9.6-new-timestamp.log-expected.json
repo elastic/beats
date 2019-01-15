@@ -12,7 +12,8 @@
         "message": "autovacuum launcher started",
         "postgresql.log.core_id": 1,
         "postgresql.log.timestamp": "2017-07-31 13:36:43",
-        "process.pid": 835
+        "process.pid": 835,
+        "service.type": "postgresql"
     },
     {
         "@timestamp": "2017-07-31T13:36:44.000Z",
@@ -27,7 +28,8 @@
         "message": "checkpoints are occurring too frequently (25 seconds apart)",
         "postgresql.log.core_id": 1,
         "postgresql.log.timestamp": "2017-07-31 13:36:44",
-        "process.pid": 832
+        "process.pid": 832,
+        "service.type": "postgresql"
     },
     {
         "@timestamp": "2017-07-31T13:46:02.000Z",
@@ -42,7 +44,8 @@
         "message": "Consider increasing the configuration parameter \"max_wal_size\".",
         "postgresql.log.core_id": 2,
         "postgresql.log.timestamp": "2017-07-31 13:46:02",
-        "process.pid": 832
+        "process.pid": 832,
+        "service.type": "postgresql"
     },
     {
         "@timestamp": "2017-07-31T13:46:23.000Z",
@@ -59,6 +62,7 @@
         "postgresql.log.database": "postgres",
         "postgresql.log.timestamp": "2017-07-31 13:46:23",
         "process.pid": 768,
+        "service.type": "postgresql",
         "user.name": "postgres"
     },
     {
@@ -76,6 +80,7 @@
         "postgresql.log.database": "postgres",
         "postgresql.log.timestamp": "2017-07-31 13:46:55",
         "process.pid": 771,
+        "service.type": "postgresql",
         "user.name": "postgres"
     }
 ]

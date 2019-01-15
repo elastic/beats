@@ -23,6 +23,7 @@
         "iis.access.win32_status": 0,
         "input.type": "log",
         "log.offset": 331,
+        "service.type": "iis",
         "source.address": "::1%0",
         "source.ip": "::1",
         "url.path": "/",

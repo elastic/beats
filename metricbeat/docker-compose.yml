@@ -30,6 +30,7 @@ services:
       - ./module/mongodb/_meta/env
       - ./module/munin/_meta/env
       - ./module/mysql/_meta/env
+      - ./module/nats/_meta/env
       - ./module/nginx/_meta/env
       - ./module/php_fpm/_meta/env
       - ./module/postgresql/_meta/env
@@ -155,6 +156,9 @@ services:
 
   mysql:
     build: ./module/mysql/_meta
+
+  nats:
+    build: ./module/nats/_meta
 
   nginx:
     build: ./module/nginx/_meta

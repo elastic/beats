@@ -10,7 +10,7 @@
         "log.level": "WARN",
         "log.offset": 0,
         "message": "Deprecated field [template] used, replaced by [index_patterns]",
-        "service.name": "elasticsearch"
+        "service.type": "elasticsearch"
     },
     {
         "@timestamp": "2018-04-23T16:40:13.862Z",
@@ -23,7 +23,7 @@
         "log.level": "WARN",
         "log.offset": 137,
         "message": "Deprecated field [template] used, replaced by [index_patterns]",
-        "service.name": "elasticsearch"
+        "service.type": "elasticsearch"
     },
     {
         "@timestamp": "2018-04-23T16:40:14.792Z",
@@ -36,7 +36,7 @@
         "log.level": "WARN",
         "log.offset": 274,
         "message": "Deprecated field [template] used, replaced by [index_patterns]",
-        "service.name": "elasticsearch"
+        "service.type": "elasticsearch"
     },
     {
         "@timestamp": "2018-04-23T16:40:15.127Z",
@@ -49,6 +49,6 @@
         "log.level": "WARN",
         "log.offset": 411,
         "message": "Deprecated field [template] used, replaced by [index_patterns]",
-        "service.name": "elasticsearch"
+        "service.type": "elasticsearch"
     }
 ]

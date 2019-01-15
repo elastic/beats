@@ -33,3 +33,6 @@ packetbeat.protocols.mongodb:
 packetbeat.protocols.cassandra:
   ports: [9042]
 
+packetbeat.protocols.tls:
+  ports: [443, 993, 995, 5223, 8443, 8883, 9243]
+

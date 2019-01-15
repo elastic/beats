@@ -42,6 +42,7 @@ grouped in the following categories:
 * <<exported-fields-mongodb>>
 * <<exported-fields-munin>>
 * <<exported-fields-mysql>>
+* <<exported-fields-nats>>
 * <<exported-fields-nginx>>
 * <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
@@ -17213,6 +17214,292 @@ The number of SELECT queries since startup.
 type: long
 
 The number of UPDATE queries since startup.
+
+
+--
+
+[[exported-fields-nats]]
+== Nats fields
+
+nats Module
+
+
+
+[float]
+== nats fields
+
+`nats` contains statistics that were read from Nats
+
+
+
+[float]
+== stats fields
+
+Contains nats var related metrics
+
+
+
+*`nats.stats.server_id`*::
++
+--
+type: keyword
+
+The server ID
+
+
+--
+
+*`nats.stats.now`*::
++
+--
+type: date
+
+Server time of metric creation
+
+
+--
+
+*`nats.stats.uptime`*::
++
+--
+type: long
+
+The period the server is up (sec)
+
+
+--
+
+*`nats.stats.mem.bytes`*::
++
+--
+type: long
+
+The current memory usage of NATS process
+
+
+--
+
+*`nats.stats.cores`*::
++
+--
+type: integer
+
+The number of logical cores the NATS process runs on
+
+
+--
+
+*`nats.stats.cpu`*::
++
+--
+type: float
+
+The current cpu usage of NATs process
+
+
+--
+
+*`nats.stats.total_connections`*::
++
+--
+type: integer
+
+The number of totally created clients
+
+
+--
+
+*`nats.stats.remotes`*::
++
+--
+type: integer
+
+The number of registered remotes
+
+
+--
+
+[float]
+== in fields
+
+The amount of incoming data
+
+
+
+*`nats.stats.in.messages`*::
++
+--
+type: integer
+
+The amount of incoming messages
+
+
+--
+
+*`nats.stats.in.bytes`*::
++
+--
+type: integer
+
+The amount of incoming bytes
+
+
+--
+
+[float]
+== out fields
+
+The amount of outgoing data
+
+
+
+*`nats.stats.out.messages`*::
++
+--
+type: integer
+
+The amount of outgoing messages
+
+
+--
+
+*`nats.stats.out.bytes`*::
++
+--
+type: integer
+
+The amount of outgoing bytes
+
+
+--
+
+*`nats.stats.slow_consumers`*::
++
+--
+type: integer
+
+The number of slow consumers currently on NATS
+
+
+--
+
+*`nats.stats.http_req_stats.root_uri`*::
++
+--
+type: object
+
+The number of hits on root monitoring uri
+
+
+--
+
+*`nats.stats.http_req_stats.connz_uri`*::
++
+--
+type: object
+
+The number of hits on connz monitoring uri
+
+
+--
+
+*`nats.stats.http_req_stats.routez_uri`*::
++
+--
+type: object
+
+The number of hits on routez monitoring uri
+
+
+--
+
+*`nats.stats.http_req_stats.subsz_uri`*::
++
+--
+type: object
+
+The number of hits on subsz monitoring uri
+
+
+--
+
+*`nats.stats.http_req_stats.stats_uri`*::
++
+--
+type: object
+
+The number of hits on stats monitoring uri
+
+
+--
+
+[float]
+== http fields
+
+The http metrics of NATS server
+
+
+
+[float]
+== req_stats fields
+
+The requests statistics
+
+
+
+[float]
+== uri fields
+
+The request distribution on monitoring URIS
+
+
+
+*`nats.stats.http.req_stats.uri.routez`*::
++
+--
+type: integer
+
+The number of hits on routez monitoring uri
+
+
+--
+
+*`nats.stats.http.req_stats.uri.connz`*::
++
+--
+type: integer
+
+The number of hits on connz monitoring uri
+
+
+--
+
+*`nats.stats.http.req_stats.uri.varz`*::
++
+--
+type: integer
+
+The number of hits on varz monitoring uri
+
+
+--
+
+*`nats.stats.http.req_stats.uri.subsz`*::
++
+--
+type: integer
+
+The number of hits on subsz monitoring uri
+
+
+--
+
+*`nats.stats.http.req_stats.uri.root`*::
++
+--
+type: integer
+
+The number of hits on root monitoring uri
 
 
 --

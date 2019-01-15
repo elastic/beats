@@ -16,6 +16,7 @@
         "logstash.slowlog.plugin_params_object.id": "9746eeec777fcb4c7ea30366dab5445873a8560b7f1766ee1272e59b08d731fb",
         "logstash.slowlog.plugin_type": "filters",
         "logstash.slowlog.thread": "Ruby-0-Thread-6: :1",
-        "logstash.slowlog.took_in_millis": 5026
+        "logstash.slowlog.took_in_millis": 5026,
+        "service.type": "logstash"
     }
 ]

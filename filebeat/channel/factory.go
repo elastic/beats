@@ -48,7 +48,8 @@ type inputOutletConfig struct {
 	Processors           processors.PluginConfig `config:"processors"`
 
 	// implicit event fields
-	Type string `config:"type"` // input.type
+	Type        string `config:"type"`         // input.type
+	ServiceType string `config:"service.type"` // service.type
 
 	// hidden filebeat modules settings
 	Module  string `config:"_module_name"`  // hidden setting
@@ -112,10 +113,13 @@ func (f *OutletFactory) Create(p beat.Pipeline, cfg *common.Config, dynFields *c
 	if config.Fileset != "" {
 		fields.Put("fileset.name", config.Fileset)
 	}
+	if config.ServiceType != "" {
+		fields.Put("service.type", config.ServiceType)
+	} else {
+		fields.Put("service.type", config.Module)
+	}
 	if config.Type != "" {
-		fields["input"] = common.MapStr{
-			"type": config.Type,
-		}
+		fields.Put("input.type", config.Type)
 	}
 
 	client, err := p.ConnectWith(beat.ClientConfig{
