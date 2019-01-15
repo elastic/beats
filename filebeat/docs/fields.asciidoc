@@ -3965,17 +3965,6 @@ Where the request originated: rest (request originated from a REST API request),
 
 --
 
-*`elasticsearch.audit.principal`*::
-+
---
-type: keyword
-
-example: _anonymous
-
-The principal (username) that failed authentication
-
---
-
 *`elasticsearch.audit.action`*::
 +
 --
@@ -4031,6 +4020,15 @@ alias to: url.original
 type: alias
 
 alias to: http.request.body.content
+
+--
+
+*`elasticsearch.audit.principal`*::
++
+--
+type: alias
+
+alias to: user.name
 
 --
 
