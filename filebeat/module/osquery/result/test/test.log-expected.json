@@ -31,5 +31,32 @@
         "osquery.result.unix_time": "1514472008",
         "service.type": "osquery",
         "user.name": "tsg"
+    },
+    {
+        "@timestamp": "2017-12-28T14:40:18.000Z",
+        "ecs.version": "1.0.0-beta2",
+        "event.dataset": "osquery.result",
+        "event.module": "osquery",
+        "fileset.name": "result",
+        "input.type": "log",
+        "log.offset": 574,
+        "osquery.result.action": "removed",
+        "osquery.result.calendar_time": "Thu Dec 28 14:40:18 2017 UTC",
+        "osquery.result.columns.blocks": "122061322",
+        "osquery.result.columns.blocks_available": "75966945",
+        "osquery.result.columns.blocks_free": "121274885",
+        "osquery.result.columns.blocks_size": "4096",
+        "osquery.result.columns.device": "/dev/disk1s4",
+        "osquery.result.columns.device_alias": "/dev/disk1s4",
+        "osquery.result.columns.flags": "345018372",
+        "osquery.result.columns.inodes": "9223372036854775807",
+        "osquery.result.columns.inodes_free": "9223372036854775804",
+        "osquery.result.columns.path": "/private/var/vm",
+        "osquery.result.columns.type": "apfs",
+        "osquery.result.counter": "1",
+        "osquery.result.epoch": "0",
+        "osquery.result.name": "pack_it-compliance_mounts",
+        "osquery.result.unix_time": "1514472018",
+        "service.type": "osquery"
     }
 ]
