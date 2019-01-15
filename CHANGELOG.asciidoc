@@ -59,14 +59,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-- Minor improvements in slowlog Elasticsearch module, including field type change {pull}8416[8416]
-- Correctly parse `December` or `Dec` in the Syslog input. {pull}9349[9349]
-- Fix installation of haproxy dashboard. {issue}9307[9307] {pull}9313[9313]
-- Don't generate incomplete configurations when logs collection is disabled by hints. {pull}9305[9305]
-- Stop runners disabled by hints after previously being started. {pull}9305[9305]
-- Fix saved objects in filebeat haproxy dashboard. {pull}9417[9417]
-- Use `log.source.address` instead of `log.source.ip` for network input sources. {pull}9487[9487]
-
 *Heartbeat*
 
 - Made monitors.d configuration part of the default config. {pull}9004[9004]
