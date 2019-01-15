@@ -279,7 +279,7 @@ packetbeat.protocols:
 
   # Configure the ports where to listen for MySQL traffic. You can disable
   # the MySQL protocol by commenting out the list of ports.
-  ports: [3306]
+  ports: [3306,3307]
 
   # If this option is enabled, the raw message of the request (`request` field)
   # is sent to Elasticsearch. The default is false.

@@ -435,7 +435,7 @@ packetbeat.protocols:
   ports: [11211]
 
 - type: mysql
-  ports: [3306]
+  ports: [3306,3307]
 
 - type: redis
   ports: [6379]
@@ -899,22 +899,58 @@ The memcache protocol analyzer will wait for the number of milliseconds specifie
 `udptransactiontimeout` before publishing quiet messages. Non-quiet messages or
 quiet requests with an error response are published immediately.
 
-[[packetbeat-mysql-pgsql-options]]
-=== Capture MySQL and PgSQL traffic
+[[packetbeat-mysql-options]]
+=== Capture MySQL traffic
 
 ++++
-<titleabbrev>MySQL and PgSQL</titleabbrev>
+<titleabbrev>MySQL</titleabbrev>
 ++++
 
-The `mysql` and `pgsql` sections of the +{beatname_lc}.yml+ config file specify configuration options for the MySQL
-and PgSQL protocols.
+The `mysql` section of the +{beatname_lc}.yml+ config file specifies configuration
+options for the MySQL protocols.
 
 [source,yaml]
 ------------------------------------------------------------------------------
 packetbeat.protocols:
 
 - type: mysql
-  ports: [3306]
+  ports: [3306,3307]
+------------------------------------------------------------------------------
+
+==== Configuration options
+
+Also see <<common-protocol-options>>.
+
+===== `max_rows`
+
+The maximum number of rows from the SQL message to publish to Elasticsearch. The
+default is 10 rows.
+
+
+===== `max_row_length`
+
+The maximum length in bytes of a row from the SQL message to publish to
+Elasticsearch. The default is 1024 bytes.
+
+==== `statement_timeout`
+
+The duration for which prepared statements are cached after their last use.
+Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+The default is `1h`.
+
+[[packetbeat-pgsql-options]]
+=== Capture PgSQL traffic
+
+++++
+<titleabbrev>PgSQL</titleabbrev>
+++++
+
+The `pgsql` sections of the +{beatname_lc}.yml+ config file specifies configuration
+options for the PgSQL protocols.
+
+[source,yaml]
+------------------------------------------------------------------------------
+packetbeat.protocols:
 
 - type: pgsql
   ports: [5432]
