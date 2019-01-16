@@ -1,0 +1,122 @@
+- name: stats
+  type: group
+  description: >
+    Contains nats var related metrics
+  fields:
+    - name: server_id
+      type: keyword
+      description: >
+        The server ID
+    - name: now
+      type: date
+      description: >
+        Server time of metric creation
+    - name: uptime
+      type: long
+      description: >
+        The period the server is up (sec)
+    - name: mem.bytes
+      type: long
+      description: >
+        The current memory usage of NATS process
+    - name: cores
+      type: integer
+      description: >
+        The number of logical cores the NATS process runs on
+    - name: cpu
+      type: float
+      description: >
+        The current cpu usage of NATs process
+    - name: total_connections
+      type: integer
+      description: >
+        The number of totally created clients
+    - name: remotes
+      type: integer
+      description: >
+        The number of registered remotes
+    - name: in
+      type: group
+      description: >
+        The amount of incoming data
+      fields:
+        - name: messages
+          type: integer
+          description: >
+            The amount of incoming messages
+        - name: bytes
+          type: integer
+          description: >
+            The amount of incoming bytes
+    - name: out
+      type: group
+      description: >
+        The amount of outgoing data
+      fields:
+        - name: messages
+          type: integer
+          description: >
+            The amount of outgoing messages
+        - name: bytes
+          type: integer
+          description: >
+            The amount of outgoing bytes
+    - name: slow_consumers
+      type: integer
+      description: >
+        The number of slow consumers currently on NATS
+    - name: http_req_stats.root_uri
+      type: object
+      description: >
+         The number of hits on root monitoring uri
+    - name: http_req_stats.connz_uri
+      type: object
+      description: >
+        The number of hits on connz monitoring uri
+    - name: http_req_stats.routez_uri
+      type: object
+      description: >
+        The number of hits on routez monitoring uri
+    - name: http_req_stats.subsz_uri
+      type: object
+      description: >
+        The number of hits on subsz monitoring uri
+    - name: http_req_stats.stats_uri
+      type: object
+      description: >
+        The number of hits on stats monitoring uri
+    - name: http
+      type: group
+      description: >
+        The http metrics of NATS server
+      fields:
+        - name: req_stats
+          type: group
+          description: >
+            The requests statistics
+          fields:
+            - name: uri
+              type: group
+              description: >
+                The request distribution on monitoring URIS
+              fields:
+                - name: routez
+                  type: integer
+                  description: >
+                    The number of hits on routez monitoring uri
+                - name: connz
+                  type: integer
+                  description: >
+                    The number of hits on connz monitoring uri
+                - name: varz
+                  type: integer
+                  description: >
+                    The number of hits on varz monitoring uri
+                - name: subsz
+                  type: integer
+                  description: >
+                    The number of hits on subsz monitoring uri
+                - name: root
+                  type: integer
+                  description: >
+                    The number of hits on root monitoring uri
