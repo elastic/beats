@@ -8,6 +8,8 @@ package include
 
 import (
 	// Import packages that need to register themselves.
+	_ "github.com/elastic/beats/x-pack/metricbeat/module/aws"
+	_ "github.com/elastic/beats/x-pack/metricbeat/module/aws/ec2"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/mssql"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/mssql/db"
 	_ "github.com/elastic/beats/x-pack/metricbeat/module/mssql/performance"
