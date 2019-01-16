@@ -211,7 +211,7 @@ func createEvent(
 		"start":    common.Time(f.createTS),
 		"end":      common.Time(f.ts),
 		"duration": f.ts.Sub(f.createTS),
-		"type":     "flow",
+		"dataset":  "flow",
 	}
 	flow := common.MapStr{
 		"id":    common.NetString(f.id.Serialize()),
@@ -220,6 +220,7 @@ func createEvent(
 	fields := common.MapStr{
 		"event": event,
 		"flow":  flow,
+		"type":  "flow",
 	}
 	network := common.MapStr{}
 	source := common.MapStr{}
