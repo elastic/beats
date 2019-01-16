@@ -42,6 +42,7 @@ func MakeSimpleJob(f func(*beat.Event) error) Job {
 	}
 }
 
+// JobWrapper is used for functions that wrap other jobs transforming their behavior.
 type JobWrapper func(Job) Job
 
 // WrapAll wraps all jobs and their continuations with the given wrappers
