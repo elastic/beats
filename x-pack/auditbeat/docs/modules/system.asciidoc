@@ -127,17 +127,17 @@ auditbeat.modules:
 ----
 
 [float]
-=== Metricsets
+=== Datasets
 
-The following metricsets are available:
+The following datasets are available:
 
-* <<{beatname_lc}-metricset-system-host,host>>
+* <<{beatname_lc}-dataset-system-host,host>>
 
-* <<{beatname_lc}-metricset-system-process,process>>
+* <<{beatname_lc}-dataset-system-process,process>>
 
-* <<{beatname_lc}-metricset-system-socket,socket>>
+* <<{beatname_lc}-dataset-system-socket,socket>>
 
-* <<{beatname_lc}-metricset-system-user,user>>
+* <<{beatname_lc}-dataset-system-user,user>>
 
 include::system/host.asciidoc[]
 
