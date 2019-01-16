@@ -117,5 +117,22 @@
         "source.ip": "172.18.0.3",
         "url.original": "/_nodes?filter_path=nodes.*.version%2Cnodes.*.http.publish_address%2Cnodes.*.ip",
         "user.name": "elastic"
+    },
+    {
+        "@timestamp": "2019-01-08T14:15:02.011Z",
+        "ecs.version": "1.0.0-beta2",
+        "elasticsearch.audit.layer": "transport",
+        "elasticsearch.audit.origin_type": "transport",
+        "elasticsearch.node.name": "NodeName-0",
+        "event.dataset": "elasticsearch.audit",
+        "event.module": "elasticsearch",
+        "event.type": "access_granted",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 1210,
+        "message": "[2019-01-08T14:15:02,011] [NodeName-0] [transport] [access_granted]     origin_type=[transport], origin_address=[192.168.2.1], principal=[username], realm=[active_directory], roles=[kibana_user,my_custom_role_1,foo_reader], action=[indices:data/read/search[free_context]], indices=[foo-2019.01.04,foo-2019.01.03,foo-2019.01.06,foo-2019.01.05,foo-2019.01.08,servicelog-2019.01.07], request=[SearchFreeContextRequest]",
+        "service.type": "elasticsearch",
+        "source.ip": "192.168.2.1",
+        "user.name": "username"
     }
 ]
