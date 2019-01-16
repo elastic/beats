@@ -42,6 +42,12 @@ const (
 	// in the event under a key that is the module name.
 	ModuleDataKey string = "_module"
 
+	// DefaultDataKey is the key used in events when the event data is not
+	// of the type common.MapStr. This usually occurs when parsing through
+	// arrays (Strings, Floats, Integers, Arrays are all valid elements inside an array but
+	// not of type common.MapStr).
+	DefaultDataKey string = "_data"
+
 	// NamespaceKey is used to define a different namespace for the metricset
 	// This is useful for dynamic metricsets or metricsets which do not
 	// put the name under the same name as the package. This is for example

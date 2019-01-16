@@ -35,7 +35,7 @@ func main() {
 }
 
 func serveJSONArr(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, `[{"hello1":"world1"}, {"hello2": "world2"}]`)
+	fmt.Fprint(w, `[{"hello1":"world1"}, {"hello2": "world2"}, "hello3", "world3", 4, []]`)
 }
 
 func serveJSONObj(w http.ResponseWriter, r *http.Request) {

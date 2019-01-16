@@ -116,13 +116,26 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
+func makeValidMapStr(jsonBody interface{}) common.MapStr {
+	var event common.MapStr
+	// If jsonBody passed is not a JSONObject, assign it to the key mb.DefaultDataKey
+	_, ok := jsonBody.(common.MapStr)
+	if !ok {
+		event = common.MapStr{}
+		event[mb.DefaultDataKey] = jsonBody
+	} else {
+		event = jsonBody.(common.MapStr)
+	}
+	return event
+}
+
 func (m *MetricSet) processBody(response *http.Response, jsonBody interface{}) common.MapStr {
 	var event common.MapStr
 
 	if m.deDotEnabled {
-		event = common.DeDotJSON(jsonBody).(common.MapStr)
+		event = makeValidMapStr(common.DeDotJSON(jsonBody))
 	} else {
-		event = jsonBody.(common.MapStr)
+		event = makeValidMapStr(jsonBody)
 	}
 
 	if m.requestEnabled {
@@ -163,7 +176,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	defer response.Body.Close()
 
 	var jsonBody common.MapStr
-	var jsonBodyArr []common.MapStr
+	var jsonBodyArr []interface{}
 	var events []common.MapStr
 
 	body, err := ioutil.ReadAll(response.Body)
