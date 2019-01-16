@@ -11,6 +11,9 @@
             The return value of the Redis command in a human readable format.
 
         - name: error
+          type: alias
+          path: error.message
+          migration: true
           description: >
             If the Redis command has resulted in an error, this field contains the
             error message returned by the Redis server.

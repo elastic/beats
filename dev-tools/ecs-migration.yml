@@ -891,6 +891,10 @@
   to: network.forwarded_ip
   alias: false
 
+## Redis
+- from: redis.error
+  to: error.message
+  alias: true
 
 # Heartbeat
 
