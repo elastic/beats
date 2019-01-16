@@ -22,9 +22,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
-
 	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
