@@ -28,6 +28,8 @@ https://github.com/elastic/beats/compare/1035569addc4a3b29ffa14f8a08c27c1ace16ef
 
 *Functionbeat*
 
+- Correctly normalize Cloudformation resource name. {issue}10087[10087]
+
 ==== Bugfixes
 
 *Affecting all Beats*
