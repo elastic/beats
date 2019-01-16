@@ -281,6 +281,14 @@
 			"versionExact": "v2.0.0-preview.5"
 		},
 		{
+			"checksumSHA1": "68WRzWsZ8QEr807XtWrkR0Hs9/c=",
+			"path": "github.com/aws/aws-sdk-go-v2/private/protocol/ec2query",
+			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
+			"revisionTime": "2018-09-27T22:51:20Z",
+			"version": "v2.0.0-preview.5",
+			"versionExact": "v2.0.0-preview.5"
+		},
+		{
 			"checksumSHA1": "FdZh+IZa1ty76+RV7tXVfmtyIuo=",
 			"path": "github.com/aws/aws-sdk-go-v2/private/protocol/json",
 			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
@@ -370,7 +378,23 @@
 		},
 		{
 			"checksumSHA1": "TsYe4THK6mTAH52LC3xVkq9VE0Q=",
-			"path": "github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface/",
+			"path": "github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface",
+			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
+			"revisionTime": "2018-09-27T22:51:20Z",
+			"version": "v2.0.0-preview.5",
+			"versionExact": "v2.0.0-preview.5"
+		},
+		{
+			"checksumSHA1": "LLz9ZK1Im5l0Mevt7dkTutckQf0=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/cloudwatch",
+			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
+			"revisionTime": "2018-09-27T22:51:20Z",
+			"version": "v2.0.0-preview.5",
+			"versionExact": "v2.0.0-preview.5"
+		},
+		{
+			"checksumSHA1": "e63cO3N5n9IEzAu8zSPutIUvLtM=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface",
 			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
 			"revisionTime": "2018-09-27T22:51:20Z",
 			"version": "v2.0.0-preview.5",
@@ -379,6 +403,22 @@
 		{
 			"checksumSHA1": "wJrdYP7TyFYBwNPprzcA+ZdAjyo=",
 			"path": "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs",
+			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
+			"revisionTime": "2018-09-27T22:51:20Z",
+			"version": "v2.0.0-preview.5",
+			"versionExact": "v2.0.0-preview.5"
+		},
+		{
+			"checksumSHA1": "q+0D/GEmD7mmX2wAavaSUu54fHM=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/ec2",
+			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
+			"revisionTime": "2018-09-27T22:51:20Z",
+			"version": "v2.0.0-preview.5",
+			"versionExact": "v2.0.0-preview.5"
+		},
+		{
+			"checksumSHA1": "Ekddi7oRDhmQQzDvM0Z7itr9IKQ=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface",
 			"revision": "d52522b5f4b95591ff6528d7c54923951aadf099",
 			"revisionTime": "2018-09-27T22:51:20Z",
 			"version": "v2.0.0-preview.5",
