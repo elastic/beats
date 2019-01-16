@@ -1,0 +1,10 @@
+- key: nats
+  title: "Nats"
+  description: >
+    nats Module
+  fields:
+    - name: nats
+      type: group
+      description: >
+        `nats` contains statistics that were read from Nats
+      fields:

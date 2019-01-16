@@ -5324,6 +5324,69 @@ VLAN identifier from the 802.1q frame. In case of a multi-tagged frame this fiel
 
 --
 
+*`flow_id`*::
++
+--
+type: alias
+
+alias to: flow.id
+
+--
+
+*`final`*::
++
+--
+type: alias
+
+alias to: flow.final
+
+--
+
+*`vlan`*::
++
+--
+type: alias
+
+alias to: flow.vlan
+
+--
+
+*`source.stats.net_bytes_total`*::
++
+--
+type: alias
+
+alias to: source.bytes
+
+--
+
+*`source.stats.net_packets_total`*::
++
+--
+type: alias
+
+alias to: source.packets
+
+--
+
+*`dest.stats.net_bytes_total`*::
++
+--
+type: alias
+
+alias to: destination.bytes
+
+--
+
+*`dest.stats.net_packets_total`*::
++
+--
+type: alias
+
+alias to: destination.packets
+
+--
+
 [[exported-fields-host-processor]]
 == Host fields
 
@@ -5348,14 +5411,6 @@ Information about the HTTP request and response.
 HTTP request
 
 
-*`http.request.params`*::
-+
---
-The query parameters or form values. The query parameters are available in the Request-URI and the form values are set in the HTTP body when the content-type is set to `x-www-form-urlencoded`.
-
-
---
-
 *`http.request.headers`*::
 +
 --
@@ -5366,12 +5421,12 @@ A map containing the captured header fields from the request. Which headers to c
 
 --
 
-*`http.request.body`*::
+*`http.request.params`*::
 +
 --
-type: text
+type: alias
 
-The body of the HTTP request.
+alias to: url.query
 
 --
 
@@ -5381,19 +5436,10 @@ The body of the HTTP request.
 HTTP response
 
 
-*`http.response.code`*::
+*`http.response.status_phrase`*::
 +
 --
-example: 404
-
-The HTTP status code.
-
---
-
-*`http.response.phrase`*::
-+
---
-example: Not found.
+example: Not Found
 
 The HTTP status phrase.
 
@@ -5406,6 +5452,24 @@ type: object
 
 A map containing the captured header fields from the response. Which headers to capture is configurable. If headers with the same header name are present in the message, they will be separated by commas.
 
+
+--
+
+*`http.response.code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
+*`http.response.phrase`*::
++
+--
+type: alias
+
+alias to: http.response.status_phrase
 
 --
 
@@ -6634,6 +6698,46 @@ List of TLS versions that the client is willing to use.
 
 --
 
+*`tls.client_hello.extensions.supported_groups`*::
++
+--
+type: keyword
+
+List of Elliptic Curve Cryptography (ECC) curve groups supported by the client.
+
+
+--
+
+*`tls.client_hello.extensions.signature_algorithms`*::
++
+--
+type: keyword
+
+List of signature algorithms that may be use in digital signatures.
+
+
+--
+
+*`tls.client_hello.extensions.ec_points_formats`*::
++
+--
+type: keyword
+
+List of Elliptic Curve (EC) point formats. Indicates the set of point formats that the client can parse.
+
+
+--
+
+*`tls.client_hello.extensions._unparsed_`*::
++
+--
+type: keyword
+
+List of extensions that were left unparsed by Packetbeat.
+
+
+--
+
 
 *`tls.server_hello.version`*::
 +
@@ -6661,6 +6765,16 @@ The cipher suite selected by the server from the list provided by in the client 
 type: keyword
 
 The compression method selected by the server from the list provided in the client hello.
+
+
+--
+
+*`tls.server_hello.session_id`*::
++
+--
+type: keyword
+
+Unique number to identify the session for the corresponding connection with the client.
 
 
 --
@@ -6696,6 +6810,26 @@ Used to announce that a session ticket will be provided by the server. Always an
 type: keyword
 
 Negotiated TLS version to be used.
+
+
+--
+
+*`tls.server_hello.extensions.ec_points_formats`*::
++
+--
+type: keyword
+
+List of Elliptic Curve (EC) point formats. Indicates the set of point formats that the server can parse.
+
+
+--
+
+*`tls.server_hello.extensions._unparsed_`*::
++
+--
+type: keyword
+
+List of extensions that were left unparsed by Packetbeat.
 
 
 --

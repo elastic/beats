@@ -41,7 +41,7 @@ func TestFetch(t *testing.T) {
 				t.Fatalf("%v is not a float64, but %T", key, v)
 			}
 
-			assert.Truef(t, f(value), "Value '%d' on field '%s' wasn't higher than 0", value, key)
+			assert.Truef(t, f(value), "Value '%d' on field '%s' was not the expected value", value, key)
 		}
 	}
 
@@ -52,7 +52,7 @@ func TestFetch(t *testing.T) {
 				t.Fatalf("%v is not a int64, but %T", key, v)
 			}
 
-			assert.Truef(t, f(value), "Value '%d' on field '%s' wasn't higher than 0", value, key)
+			assert.Truef(t, f(value), "Value '%d' on field '%s' was not the expected value", value, key)
 		}
 	}
 
@@ -69,14 +69,22 @@ func TestFetch(t *testing.T) {
 	}
 
 	keys := []keyAssertion{
-		{key: "page_splits.sec", assertion: int64Assertion(int64HigherThanZero)},
-		{key: "page_life_expectancy.sec", assertion: int64Assertion(int64HigherThanZero)},
-		{key: "lock_waits.sec", assertion: int64Assertion(int64HigherThanZero)},
+		{key: "page_splits_per_sec", assertion: int64Assertion(int64HigherThanZero)},
+		{key: "buffer.page_life_expectancy.sec", assertion: int64Assertion(int64HigherThanZero)},
+		{key: "lock_waits_per_sec", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "user_connections", assertion: int64Assertion(int64HigherThanZero)},
-		{key: "recompilations.sec", assertion: int64Assertion(int64EqualZero)},
-		{key: "compilations.sec", assertion: int64Assertion(int64HigherThanZero)},
-		{key: "batch_requests.sec", assertion: int64Assertion(int64HigherThanZero)},
-		{key: "buffer_cache_hit.pct", assertion: float64Assertion(float64HigherThanZero)},
+		{key: "transactions", assertion: int64Assertion(int64EqualZero)},
+		{key: "active_temp_tables", assertion: int64Assertion(int64EqualZero)},
+		{key: "connections_reset_per_sec", assertion: int64Assertion(int64HigherThanZero)},
+		{key: "logouts_per_sec", assertion: int64Assertion(int64HigherThanZero)},
+		{key: "logins_per_sec", assertion: int64Assertion(int64HigherThanZero)},
+		{key: "recompilations_per_sec", assertion: int64Assertion(int64EqualZero)},
+		{key: "compilations_per_sec", assertion: int64Assertion(int64HigherThanZero)},
+		{key: "batch_requests_per_sec", assertion: int64Assertion(int64HigherThanZero)},
+		{key: "buffer.cache_hit.pct", assertion: float64Assertion(float64HigherThanZero)},
+		{key: "buffer.checkpoint_pages_per_sec", assertion: int64Assertion(int64HigherThanZero)},
+		{key: "buffer.database_pages", assertion: int64Assertion(int64HigherThanZero)},
+		{key: "buffer.target_pages", assertion: int64Assertion(int64HigherThanZero)},
 	}
 	for _, keyAssertion := range keys {
 		var found bool

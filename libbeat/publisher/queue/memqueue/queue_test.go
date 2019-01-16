@@ -54,9 +54,11 @@ func TestProduceConsumer(t *testing.T) {
 	testWith := func(factory queuetest.QueueFactory) func(t *testing.T) {
 		return func(t *testing.T) {
 			t.Run("single", func(t *testing.T) {
+				t.Parallel()
 				queuetest.TestSingleProducerConsumer(t, events, batchSize, factory)
 			})
 			t.Run("multi", func(t *testing.T) {
+				t.Parallel()
 				queuetest.TestMultiProducerConsumer(t, events, batchSize, factory)
 			})
 		}

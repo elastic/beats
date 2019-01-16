@@ -208,7 +208,7 @@ packetbeat.protocols:
   ports: [11211]
 
 - type: mysql
-  ports: [3306]
+  ports: [3306,3307]
 
 - type: pgsql
   ports: [5432]

@@ -1,0 +1,5 @@
+- module: nats
+  metricsets: ["stats"]
+  period: 10s
+  hosts: ["localhost:8222"]
+  #stats.metrics_path: "/varz"

@@ -8,7 +8,8 @@
         "input.type": "log",
         "log.level": "information",
         "log.offset": 0,
-        "message": "Icinga application loader (version: r2.6.3-1)"
+        "message": "Icinga application loader (version: r2.6.3-1)",
+        "service.type": "icinga"
     },
     {
         "ecs.version": "1.0.0-beta2",
@@ -19,6 +20,7 @@
         "input.type": "log",
         "log.level": "information",
         "log.offset": 63,
-        "message": "Loading configuration file(s)."
+        "message": "Loading configuration file(s).",
+        "service.type": "icinga"
     }
 ]

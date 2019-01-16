@@ -5,30 +5,30 @@
 experimental[]
 
 The `system` module collects various security related information about
-a system. All metricsets send both periodic state information (e.g. all currently
+a system. All datasets send both periodic state information (e.g. all currently
 running processes) and real-time changes (e.g. when a new process starts
 or stops).
 
-The module is fully implemented for Linux. Some metricsets are also available
+The module is fully implemented for Linux. Some datasets are also available
 for macOS (Darwin) and Windows.
 
 [float]
 === How it works
 
-Each metricset sends two kinds of information: state and events.
+Each dataset sends two kinds of information: state and events.
 
-State information is sent periodically and on startup (for some metricsets).
+State information is sent periodically and (for some datasets) on startup.
 A state update will consist of one event per object that is currently
 active on the system (e.g. a process). All events belonging to the same state
 update will share the same UUID in `event.id`.
 
-The frequency of state updates can be controlled for all metricsets using the
-`state.period` configuration option. Overrides are available per metricset.
+The frequency of state updates can be controlled for all datasets using the
+`state.period` configuration option. Overrides are available per dataset.
 The default is `12h`.
 
 Event information is sent as the events occur (e.g. a process starts or stops).
-All metricsets are currently using a poll model to retrieve their data.
-The frequency of these polls is controlled using the `period` configuration
+All datasets are currently using a poll model to retrieve their data.
+The frequency of these polls is controlled by the `period` configuration
 parameter.
 
 [float]
@@ -38,13 +38,13 @@ This module has some configuration options for controlling its behavior. The
 following example shows all configuration options with their default values for
 Linux.
 
-NOTE: It is recommended to configure some metricsets separately. See below for a
+NOTE: It is recommended to configure some datasets separately. See below for a
 sample suggested configuration.
 
 [source,yaml]
 ----
 - module: system
-  metricsets:
+  datasets:
     - host
     - process
     - socket
@@ -54,13 +54,13 @@ sample suggested configuration.
   user.detect_password_changes: true
 ----
 
-*`period`*:: The frequency at which the metricsets check for changes. For most
-metricsets - esp. `process` and `socket` - a shorter period is recommended.
+*`period`*:: The frequency at which the datasets check for changes. For most
+datasets - esp. `process` and `socket` - a shorter period is recommended.
 
-*`state.period`*:: The frequency at which the metricsets send full state information.
-This option can be overridden per metricset using `{metricset}.state.period`.
+*`state.period`*:: The frequency at which the datasets send full state information.
+This option can be overridden per dataset using `{dataset}.state.period`.
 
-*`user.detect_password_changes`*:: If the `user` metricset is configured and
+*`user.detect_password_changes`*:: If the `user` dataset is configured and
 this option is set to `true`, Auditbeat will read password information in `/etc/passwd`
 and `/etc/shadow` to detect password changes. A hash will be kept locally in
 the `beat.db` file to detect changes between Auditbeat restarts. The `beat.db` file
@@ -79,13 +79,14 @@ so a longer polling interval can be used.
 [source,yaml]
 ----
 - module: system
-  metricsets:
+  datasets:
     - host
     - user
   period: 1m
   user.detect_password_changes: true
 
 - module: system
+  datasets:
     - process
     - socket
   period: 1s

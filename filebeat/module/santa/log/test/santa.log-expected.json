@@ -24,6 +24,7 @@
         "santa.decision": "ALLOW",
         "santa.mode": "M",
         "santa.reason": "CERT",
+        "service.type": "santa",
         "user.id": "0",
         "user.name": "root"
     },
@@ -53,6 +54,7 @@
         "santa.decision": "ALLOW",
         "santa.mode": "M",
         "santa.reason": "CERT",
+        "service.type": "santa",
         "user.id": "0",
         "user.name": "root"
     },
@@ -81,6 +83,7 @@
         "santa.decision": "ALLOW",
         "santa.mode": "M",
         "santa.reason": "CERT",
+        "service.type": "santa",
         "user.id": "0",
         "user.name": "root"
     },
@@ -110,6 +113,7 @@
         "santa.decision": "ALLOW",
         "santa.mode": "M",
         "santa.reason": "CERT",
+        "service.type": "santa",
         "user.id": "0",
         "user.name": "root"
     },
@@ -138,6 +142,7 @@
         "santa.decision": "ALLOW",
         "santa.mode": "M",
         "santa.reason": "CERT",
+        "service.type": "santa",
         "user.id": "0",
         "user.name": "root"
     },
@@ -167,6 +172,7 @@
         "santa.decision": "ALLOW",
         "santa.mode": "M",
         "santa.reason": "CERT",
+        "service.type": "santa",
         "user.id": "0",
         "user.name": "root"
     },
@@ -195,6 +201,7 @@
         "santa.decision": "ALLOW",
         "santa.mode": "M",
         "santa.reason": "UNKNOWN",
+        "service.type": "santa",
         "user.id": "0",
         "user.name": "root"
     },
@@ -220,6 +227,7 @@
         "santa.decision": "ALLOW",
         "santa.mode": "M",
         "santa.reason": "CERT",
+        "service.type": "santa",
         "user.id": "501",
         "user.name": "akroh"
     },
@@ -259,6 +267,7 @@
         "santa.decision": "ALLOW",
         "santa.mode": "M",
         "santa.reason": "UNKNOWN",
+        "service.type": "santa",
         "user.id": "501",
         "user.name": "akroh"
     },
@@ -278,6 +287,7 @@
         "santa.disk.model": "APPLE SSD SM0512L",
         "santa.disk.mount": "/Volumes/Recovery",
         "santa.disk.serial": "C026495006UHCHH1Q",
-        "santa.disk.volume": "Recovery"
+        "santa.disk.volume": "Recovery",
+        "service.type": "santa"
     }
 ]
