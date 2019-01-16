@@ -53,6 +53,9 @@ type Fields struct {
 	SourceProcess      *ecs.Process `ecs:"source.process"`
 	DestinationProcess *ecs.Process `ecs:"destination.process"`
 	Process            *ecs.Process `ecs:"process"`
+
+	ICMPType uint8 // ICMP message type for use in computing network.community_id.
+	ICMPCode uint8 // ICMP message code for use in computing network.community_id.
 }
 
 // NewFields returns a new Fields value.
@@ -151,11 +154,11 @@ func (f *Fields) ComputeValues(localIPs []net.IP) error {
 		flow.Protocol = 6
 	case f.Network.Transport == "icmp":
 		flow.Protocol = 1
-		// TODO: Populate the ICMP type/code.
 	case f.Network.Transport == "ipv6-icmp":
 		flow.Protocol = 58
-		// TODO: Populate the ICMP type/code.
 	}
+	flow.ICMP.Type = f.ICMPType
+	flow.ICMP.Code = f.ICMPCode
 	if flow.Protocol > 0 && len(flow.SourceIP) > 0 && len(flow.DestinationIP) > 0 {
 		f.Network.CommunityID = flowhash.CommunityID.Hash(flow)
 	}
@@ -241,7 +244,7 @@ func (f *Fields) MarshalMapStr(m common.MapStr) error {
 		structField := typ.Field(i)
 		tag := structField.Tag.Get("ecs")
 		if tag == "" {
-			panic(errors.Errorf("missing tag on field %v", structField.Name))
+			continue
 		}
 
 		fieldValue := val.Field(i)
