@@ -1,0 +1,14 @@
+[
+    {
+        "event.dataset": "redis.log",
+        "fileset.module": "redis",
+        "fileset.name": "log",
+        "input.type": "log",
+        "offset": 0,
+        "prospector.type": "log",
+        "redis.log.level": "notice",
+        "redis.log.message": "Synchronization with replica 10.114.208.18:6023 succeeded",
+        "redis.log.pid": "26571",
+        "redis.log.role": "master"
+    }
+]

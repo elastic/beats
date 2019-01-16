@@ -5,12 +5,14 @@
             "grok": {
                 "field": "message",
                 "patterns": [
-                    "(%{POSINT:redis.log.pid:long}:%{CHAR:redis.log.role} )?%{REDISTIMESTAMP:redis.log.timestamp} %{REDISLEVEL:redis.log.level} %{GREEDYDATA:redis.log.message}",
+                    "(%{POSINT:redis.log.pid:long}:%{CHAR:redis.log.role} )?(%{REDISTIMESTAMP1:redis.log.timestamp}||%{REDISTIMESTAMP2:redis.log.timestamp}) %{REDISLEVEL:redis.log.level} %{GREEDYDATA:redis.log.message}",
                     "%{POSINT:redis.log.pid:long}:signal-handler \\(%{POSINT:redis.log.timestamp}\\) %{GREEDYDATA:redis.log.message}"
                 ],
                 "pattern_definitions": {
                     "CHAR": "[a-zA-Z]",
-                    "REDISLEVEL": "[.\\-*#]"
+                    "REDISLEVEL": "[.\\-*#]",
+                    "REDISTIMESTAMP1": "%{MONTHDAY} %{MONTH} %{TIME}",
+                    "REDISTIMESTAMP2": "%{MONTHDAY} %{MONTH} %{YEAR} %{TIME}"
                 }
             }
         },
@@ -62,6 +64,7 @@
                 "field": "redis.log.timestamp",
                 "target_field": "@timestamp",
                 "formats": [
+                    "dd MMM YYYY H:m:s.SSS",
                     "dd MMM H:m:s.SSS",
                     "dd MMM H:m:s",
                     "UNIX"
