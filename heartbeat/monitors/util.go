@@ -81,45 +81,43 @@ func (s IPSettings) Network() string {
 	return ""
 }
 
-// WithErrAsField wraps the given Job's execution such that any error returned
+// StatusWrapper wraps the given Job's execution such that any error returned
 // by the original Job will be set as a field. The original error will not be
 // passed through as a return value. Errors may still be present but only if there
 // is an actual error wrapping the error.
-func WithErrAsField(job Job) Job {
-	return AfterJob(job, func(event *beat.Event, jobs []Job, err error) ([]Job, error) {
-		if err != nil {
-			MergeEventFields(event, common.MapStr{
-				"error": look.Reason(err),
-			})
+func StatusWrapper(job Job) Job {
+	return AfterJob(job, func(event *beat.Event, cont []Job, err error) ([]Job, error) {
+		fields := common.MapStr{
+			"monitor": common.MapStr{"status": look.Status(err)},
 		}
+		if err != nil {
+			fields["error"] = look.Reason(err)
+		}
+		MergeEventFields(event, fields)
 
-		wrapped := WrapAll(jobs, WithErrAsField)
-		return wrapped, nil
+		return cont, nil
 	})
 }
 
-// TimeAndCheckJob executes the given Job, checking the duration of its run and setting
+// TimingWrapper executes the given Job, checking the duration of its run and setting
 // its status.
 // It adds the monitor.duration and monitor.status fields.
-func TimeAndCheckJob(job Job) Job {
+func TimingWrapper(job Job) Job {
 	return func(event *beat.Event) ([]Job, error) {
 		start := time.Now()
 
 		cont, err := job(event)
 
 		if event != nil {
-			status := look.Status(err)
 			MergeEventFields(event, common.MapStr{
 				"monitor": common.MapStr{
 					"duration": look.RTT(time.Since(start)),
-					"status":   status,
 				},
 			})
 			event.Timestamp = start
 		}
 
-		wrappedCont := WrapAll(cont, TimeAndCheckJob)
-		return wrappedCont, err
+		return cont, err
 	}
 }
 
@@ -300,7 +298,7 @@ func makeByHostAllIPJob(
 		for i, ip := range ips {
 			addr := &net.IPAddr{IP: ip}
 			ipFields := resolveIPEvent(ip.String(), resolveRTT)
-			cont[i] = TimeAndCheckJob(WithFields(ipFields, pingFactory(addr)))
+			cont[i] = TimingWrapper(WithFields(ipFields, pingFactory(addr)))
 		}
 		return cont, nil
 	}

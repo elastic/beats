@@ -108,7 +108,7 @@ func create(
 
 		// Assign any execution errors to the error field and
 		// assign the url field
-		jobs[i] = monitors.WithErrAsField(monitors.WithURLField(u, job))
+		jobs[i] = monitors.WithURLField(u, job)
 	}
 
 	return jobs, len(config.URLs), nil

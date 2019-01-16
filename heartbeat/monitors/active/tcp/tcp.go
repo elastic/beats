@@ -109,8 +109,7 @@ func create(
 		numHosts += len(hosts)
 	}
 
-	errWrappedJobs := monitors.WrapAll(jobs, monitors.WithErrAsField)
-	return errWrappedJobs, numHosts, nil
+	return jobs, numHosts, nil
 }
 
 func collectHosts(config *Config, defaultScheme string) (map[string][]dialchain.Endpoint, error) {

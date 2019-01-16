@@ -22,8 +22,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/heartbeat/look"
-
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/mapval"
@@ -113,21 +111,15 @@ func TestMonitor_wrapCommon(t *testing.T) {
 	}
 	simpleJobValidator := mapval.MustCompile(mapval.Map{"simple": "job"})
 
-	var softErroringJob Job = func(event *beat.Event) ([]Job, error) {
-		MergeEventFields(event, common.MapStr{"error": look.Reason(fmt.Errorf("something"))})
-		return nil, nil
-	}
-	softErrorJobValidator := mapval.MustCompile(
-		mapval.Map{
-			"error": mapval.Map{
-				"message": "something",
-				"type":    "io",
-			},
-		})
-
-	var erroringJob Job = func(event *beat.Event) ([]Job, error) {
+	var errorJob Job = func(event *beat.Event) ([]Job, error) {
 		return nil, fmt.Errorf("myerror")
 	}
+	errorJobValidator := mapval.MustCompile(mapval.Map{
+		"error": mapval.Map{
+			"message": "myerror",
+			"type":    "io",
+		},
+	})
 
 	type fields struct {
 		id   string
@@ -150,12 +142,10 @@ func TestMonitor_wrapCommon(t *testing.T) {
 	testFields := fields{"myid", "myname", "mytyp"}
 
 	tests := []struct {
-		name            string
-		fields          fields
-		jobs            []Job
-		want            []mapval.Validator
-		wantWrapErr     bool
-		wantCreationErr bool
+		name   string
+		fields fields
+		jobs   []Job
+		want   []mapval.Validator
 	}{
 		{
 			"simple",
@@ -167,29 +157,17 @@ func TestMonitor_wrapCommon(t *testing.T) {
 					commonFieldsValidator(testFields, "up"),
 				)),
 			},
-			false,
-			false,
 		},
 		{
-			"job soft error",
+			"job error",
 			testFields,
-			[]Job{softErroringJob},
+			[]Job{errorJob},
 			[]mapval.Validator{
 				mapval.Strict(mapval.Compose(
-					softErrorJobValidator,
+					errorJobValidator,
 					commonFieldsValidator(testFields, "down"),
 				)),
 			},
-			false,
-			false,
-		},
-		{
-			"job creation error",
-			testFields,
-			[]Job{erroringJob},
-			nil,
-			false,
-			true,
 		},
 	}
 	for _, tt := range tests {
@@ -200,24 +178,14 @@ func TestMonitor_wrapCommon(t *testing.T) {
 				typ:  tt.fields.typ,
 			}
 			wrapped, err := m.wrapCommon(tt.jobs)
-			if tt.wantWrapErr {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-			}
+			require.NoError(t, err)
 
 			defer m.freeID()
 			results, err := execJobsAndConts(t, wrapped)
-
-			if tt.wantCreationErr {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-			}
+			assert.NoError(t, err)
 
 			for idx, r := range results {
 				mapvaltest.Test(t, tt.want[idx], r.Fields)
-
 			}
 		})
 	}

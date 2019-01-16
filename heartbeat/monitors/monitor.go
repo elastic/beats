@@ -162,7 +162,7 @@ func (m *Monitor) wrapCommon(jobs []Job) ([]Job, error) {
 	if err != nil {
 		return nil, err
 	}
-	return WrapAll(jobs, metaWrapper, TimeAndCheckJob), nil
+	return WrapAll(jobs, StatusWrapper, TimingWrapper, metaWrapper), nil
 }
 
 func (m *Monitor) makeMetaWrapper() (JobWrapper, error) {

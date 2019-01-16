@@ -88,8 +88,7 @@ func create(
 		jobs = append(jobs, monitors.WithURLField(u, job))
 	}
 
-	errWrappedJobs := monitors.WrapAll(jobs, monitors.WithErrAsField)
-	return errWrappedJobs, len(config.Hosts), nil
+	return jobs, len(config.Hosts), nil
 }
 
 func createPingIPFactory(config *Config) func(*beat.Event, *net.IPAddr) error {
