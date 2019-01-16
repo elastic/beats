@@ -84,7 +84,7 @@ var encodings = map[string]EncodingFactory{
 	"koi8r": enc(charmap.KOI8R),
 	"koi8u": enc(charmap.KOI8U),
 
-	// machintosh
+	// macintosh
 	"macintosh":          enc(charmap.Macintosh),
 	"macintosh-cyrillic": enc(charmap.MacintoshCyrillic),
 
