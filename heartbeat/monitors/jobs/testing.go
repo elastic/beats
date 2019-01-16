@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 )
 
+// ExecJobsAndConts recursively executes multiple jobs.
 func ExecJobsAndConts(t *testing.T, jobs []Job) ([]*beat.Event, error) {
 	var results []*beat.Event
 	for _, j := range jobs {
@@ -38,7 +39,7 @@ func ExecJobsAndConts(t *testing.T, jobs []Job) ([]*beat.Event, error) {
 	return results, nil
 }
 
-// Helper to recursively execute a job and gather its results
+// ExecJobAndConts will recursively execute a job and gather its results
 func ExecJobAndConts(t *testing.T, j Job) ([]*beat.Event, error) {
 	var results []*beat.Event
 	event := &beat.Event{}
