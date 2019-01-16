@@ -54,7 +54,7 @@ func NewGenerator(indexName, beatName, fieldsYAMLFile, outputDir, beatVersion st
 	}, nil
 }
 
-// Create the Index-Pattern for Kibana.
+// Generate creates the Index-Pattern for Kibana.
 func (i *IndexPatternGenerator) Generate() (string, error) {
 	idxPattern, err := i.generate()
 	if err != nil {
