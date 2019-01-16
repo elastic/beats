@@ -211,7 +211,7 @@ func MakeByIPJob(
 		"monitor": common.MapStr{"ip": addr.String()},
 	}
 
-	return TimeAndCheckJob(WithFields(fields, pingFactory(addr))), nil
+	return WithFields(fields, pingFactory(addr)), nil
 }
 
 // MakeByHostJob creates a new Job including host lookup. The pingFactory will be used to
@@ -250,7 +250,7 @@ func makeByHostAnyIPJob(
 ) Job {
 	network := settings.IP.Network()
 
-	aj := func(event *beat.Event) ([]Job, error) {
+	return func(event *beat.Event) ([]Job, error) {
 		resolveStart := time.Now()
 		ip, err := net.ResolveIPAddr(network, host)
 		if err != nil {
@@ -263,8 +263,6 @@ func makeByHostAnyIPJob(
 		ipFields := resolveIPEvent(ip.String(), resolveRTT)
 		return WithFields(ipFields, pingFactory(ip))(event)
 	}
-
-	return TimeAndCheckJob(aj)
 }
 
 func makeByHostAllIPJob(

@@ -151,7 +151,7 @@ func newMonitor(
 		}
 	}
 
-	jobs = WrapAll(jobs, idWrapper)
+	jobs = WrapAll(WrapAll(jobs, idWrapper), TimeAndCheckJob)
 
 	m.endpoints = endpoints
 	if err != nil {
