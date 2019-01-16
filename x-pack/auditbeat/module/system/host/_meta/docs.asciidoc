@@ -2,6 +2,6 @@
 
 experimental[]
 
-This is the `host` metricset of the system module.
+This is the `host` dataset of the system module.
 
 It is implemented for Linux, macOS (Darwin), and Windows.
