@@ -1,12 +1,12 @@
 {{ if ne .GOOS "windows" -}}
 {{ if .Reference -}}
 # The system module collects security related information about a host.
-# All metricsets send both periodic state information (e.g. all currently
+# All datasets send both periodic state information (e.g. all currently
 # running processes) and real-time changes (e.g. when a new process starts
 # or stops).
 {{ end -}}
 - module: system
-  metricsets:
+  datasets:
     - host    # General host information, e.g. uptime, IPs
     {{ if false -}}
     - packages # Installed packages
@@ -17,12 +17,12 @@
     - user    # User information
     {{- end }}
 
-  # How often metricsets send state updates with the
+  # How often datasets send state updates with the
   # current state of the system (e.g. all currently
   # running processes, all open sockets).
   state.period: 12h
 {{ if .Reference }}
-  # The state.period can be overridden for any metricset.
+  # The state.period can be overridden for any dataset.
   # host.state.period: 12h
   # process.state.period: 12h
   # socket.state.period: 12h

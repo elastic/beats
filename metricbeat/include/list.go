@@ -123,6 +123,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/mysql"
 	_ "github.com/elastic/beats/metricbeat/module/mysql/galera_status"
 	_ "github.com/elastic/beats/metricbeat/module/mysql/status"
+	_ "github.com/elastic/beats/metricbeat/module/nats"
+	_ "github.com/elastic/beats/metricbeat/module/nats/stats"
 	_ "github.com/elastic/beats/metricbeat/module/nginx"
 	_ "github.com/elastic/beats/metricbeat/module/nginx/stubstatus"
 	_ "github.com/elastic/beats/metricbeat/module/php_fpm"

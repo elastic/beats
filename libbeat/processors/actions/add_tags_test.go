@@ -77,26 +77,26 @@ func TestAddTags(t *testing.T) {
 	for name, test := range cases {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			processors := make([]processors.Processor, len(test.cfg))
+			ps := make([]*processors.Processors, len(test.cfg))
 			for i := range test.cfg {
 				config, err := common.NewConfigWithYAML([]byte(test.cfg[i]), "test")
 				if err != nil {
 					t.Fatalf("Failed to create config(%v): %+v", i, err)
 				}
 
-				processors[i], err = createAddTags(config)
+				ps[i], err = processors.New(processors.PluginConfig{
+					{
+						"add_tags": config,
+					},
+				})
 				if err != nil {
 					t.Fatalf("Failed to create add_tags processor(%v): %+v", i, err)
 				}
 			}
 
 			current := &beat.Event{Fields: test.event.Clone()}
-			for i, processor := range processors {
-				var err error
-				current, err = processor.Run(current)
-				if err != nil {
-					t.Fatalf("Unexpected error from add_tags processor(%v): %+v", i, err)
-				}
+			for i, processor := range ps {
+				current = processor.Run(current)
 				if current == nil {
 					t.Fatalf("Event dropped(%v)", i)
 				}

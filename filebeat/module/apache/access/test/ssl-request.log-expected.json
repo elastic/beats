@@ -13,6 +13,7 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 0,
+        "service.type": "apache",
         "source.ip": "172.30.0.119",
         "url.original": "/nagiosxi/ajaxhelper.php?cmd=getxicoreajax&amp;opts=%7B%22func%22%3A%22get_admin_tasks_html%22%2C%22args%22%3A%22%22%7D&amp;nsp=b5c7d5d4b6f7d0cf0c92f9cbdf737f6a5c838218425e6ae21"
     }

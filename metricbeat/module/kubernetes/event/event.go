@@ -41,7 +41,16 @@ func init() {
 // MetricSet implements the mb.PushMetricSet interface, and therefore does not rely on polling.
 type MetricSet struct {
 	mb.BaseMetricSet
-	watcher kubernetes.Watcher
+	watcher      kubernetes.Watcher
+	watchOptions kubernetes.WatchOptions
+	dedotConfig  dedotConfig
+}
+
+// dedotConfig defines LabelsDedot and AnnotationsDedot.
+// Default to be false. If set to true, replace dots in labels with `_`.
+type dedotConfig struct {
+	LabelsDedot      bool `config:"labels.dedot"`
+	AnnotationsDedot bool `config:"annotations.dedot"`
 }
 
 // New create a new instance of the MetricSet
@@ -62,17 +71,26 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("fail to get kubernetes client: %s", err.Error())
 	}
 
-	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Event{}, kubernetes.WatchOptions{
+	watchOptions := kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
 		Namespace:   config.Namespace,
-	})
+	}
+
+	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Event{}, watchOptions)
 	if err != nil {
 		return nil, fmt.Errorf("fail to init kubernetes watcher: %s", err.Error())
 	}
 
+	dedotConfig := dedotConfig{
+		LabelsDedot:      config.LabelsDedot,
+		AnnotationsDedot: config.AnnotationsDedot,
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
+		dedotConfig:   dedotConfig,
 		watcher:       watcher,
+		watchOptions:  watchOptions,
 	}, nil
 }
 
@@ -81,10 +99,10 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 	now := time.Now()
 	handler := kubernetes.ResourceEventHandlerFuncs{
 		AddFunc: func(obj kubernetes.Resource) {
-			reporter.Event(generateMapStrFromEvent(obj.(*kubernetes.Event)))
+			reporter.Event(generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig))
 		},
 		UpdateFunc: func(obj kubernetes.Resource) {
-			reporter.Event(generateMapStrFromEvent(obj.(*kubernetes.Event)))
+			reporter.Event(generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig))
 		},
 		// ignore events that are deleted
 		DeleteFunc: nil,
@@ -107,7 +125,7 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 	return
 }
 
-func generateMapStrFromEvent(eve *kubernetes.Event) common.MapStr {
+func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig) common.MapStr {
 	eventMeta := common.MapStr{
 		"timestamp": common.MapStr{
 			"created": kubernetes.Time(eve.Metadata.CreationTimestamp).UTC(),
@@ -123,7 +141,12 @@ func generateMapStrFromEvent(eve *kubernetes.Event) common.MapStr {
 	if len(eve.Metadata.Labels) != 0 {
 		labels := make(common.MapStr, len(eve.Metadata.Labels))
 		for k, v := range eve.Metadata.Labels {
-			safemapstr.Put(labels, k, v)
+			if dedotConfig.LabelsDedot {
+				label := common.DeDot(k)
+				labels.Put(label, v)
+			} else {
+				safemapstr.Put(labels, k, v)
+			}
 		}
 
 		eventMeta["labels"] = labels
@@ -132,7 +155,12 @@ func generateMapStrFromEvent(eve *kubernetes.Event) common.MapStr {
 	if len(eve.Metadata.Annotations) != 0 {
 		annotations := make(common.MapStr, len(eve.Metadata.Annotations))
 		for k, v := range eve.Metadata.Annotations {
-			safemapstr.Put(annotations, k, v)
+			if dedotConfig.AnnotationsDedot {
+				annotation := common.DeDot(k)
+				annotations.Put(annotation, v)
+			} else {
+				safemapstr.Put(annotations, k, v)
+			}
 		}
 
 		eventMeta["annotations"] = annotations
