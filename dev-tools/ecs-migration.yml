@@ -835,6 +835,40 @@
   alias: false
   comment: Don't add an alias until all of Packetbeat stops using this field.
 
+## Flows
+- from: flow_id
+  to: flow.id
+  alias: true
+
+- from: final
+  to: flow.final
+  alias: true
+
+- from: start_time
+  to: event.start
+  alias: true
+
+- from: last_time
+  to: event.end
+  alias: true
+
+- from: source.stats.net_bytes_total
+  to: source.bytes
+  alias: true
+
+- from: source.stats.net_packets_total
+  to: source.packets
+  alias: true
+
+- from: dest.stats.net_bytes_total
+  to: destination.bytes
+  alias: true
+
+- from: dest.stats.net_packets_total
+  to: destination.packets
+  alias: true
+
+
 # Heartbeat
 
 - from: monitor.scheme

@@ -89,6 +89,41 @@
         this field will be an array with the outer tag's VLAN identifier listed
         first.
 
+    - name: flow_id
+      type: alias
+      path: flow.id
+      migration: true
+
+    - name: final
+      type: alias
+      path: flow.final
+      migration: true
+
+    - name: vlan
+      type: alias
+      path: flow.vlan
+      migration: true
+
+    - name: source.stats.net_bytes_total
+      type: alias
+      path: source.bytes
+      migration: true
+
+    - name: source.stats.net_packets_total
+      type: alias
+      path: source.packets
+      migration: true
+
+    - name: dest.stats.net_bytes_total
+      type: alias
+      path: destination.bytes
+      migration: true
+
+    - name: dest.stats.net_packets_total
+      type: alias
+      path: destination.packets
+      migration: true
+
 - key: trans_event
   title: "Transaction Event"
   description: >
