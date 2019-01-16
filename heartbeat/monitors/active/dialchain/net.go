@@ -19,11 +19,11 @@ package dialchain
 
 import (
 	"fmt"
-	"github.com/elastic/beats/heartbeat/eventext"
 	"net"
 	"strconv"
 	"time"
 
+	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"

@@ -19,9 +19,10 @@ package http
 
 import (
 	"bytes"
-	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"net/http"
 	"net/url"
+
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
 

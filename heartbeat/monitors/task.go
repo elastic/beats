@@ -19,6 +19,7 @@ package monitors
 
 import (
 	"fmt"
+
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
 
 	"github.com/pkg/errors"

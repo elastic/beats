@@ -21,14 +21,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"sync"
-
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
 
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/heartbeat/scheduler"
 	"github.com/elastic/beats/heartbeat/watcher"
 	"github.com/elastic/beats/libbeat/beat"

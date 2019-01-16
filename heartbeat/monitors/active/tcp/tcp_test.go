@@ -20,7 +20,6 @@ package tcp
 import (
 	"crypto/x509"
 	"fmt"
-	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -31,6 +30,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/hbtest"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/mapval"

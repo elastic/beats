@@ -20,7 +20,6 @@ package hbtest
 import (
 	"crypto/x509"
 	"fmt"
-	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -33,6 +32,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/libbeat/common/mapval"
 	"github.com/elastic/beats/libbeat/common/x509util"
 )

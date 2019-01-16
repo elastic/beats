@@ -18,9 +18,9 @@
 package tcp
 
 import (
-	"github.com/elastic/beats/heartbeat/eventext"
 	"time"
 
+	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/reason"
 	"github.com/elastic/beats/libbeat/beat"

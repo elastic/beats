@@ -20,10 +20,10 @@ package monitors
 import (
 	"errors"
 	"fmt"
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"sort"
 	"strings"
 
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/plugin"
