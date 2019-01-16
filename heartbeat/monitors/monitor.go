@@ -38,6 +38,7 @@ import (
 type Monitor struct {
 	id             string
 	name           string
+	typ            string
 	pluginName     string
 	config         *common.Config
 	registrar      *pluginsReg
@@ -111,6 +112,7 @@ func newMonitor(
 	m := &Monitor{
 		id:                mpi.ID,
 		name:              mpi.Name,
+		typ:               mpi.Type,
 		pluginName:        monitorPlugin.name,
 		scheduler:         scheduler,
 		configuredJobs:    []*configuredJob{},
@@ -121,44 +123,18 @@ func newMonitor(
 		stats:             monitorPlugin.stats,
 	}
 
-	jobs, endpoints, err := monitorPlugin.create(config)
-
-	// Set the correct monitor.id for all jobs
-	var idWrapper func(job Job) Job
-	if m.id != "" {
-		// Ensure we don't have duplicate IDs
-		if _, loaded := uniqueMonitorIDs.LoadOrStore(m.id, m); loaded {
-			return nil, ErrDuplicateMonitorID{m.id}
-		}
-
-		// If they have an explicit ID in the config set it to exactly that
-		idWrapper = func(job Job) Job {
-			return WithMonitorMeta(m.id, m.name, m.pluginName, job)
-		}
-	} else {
-		// If there's no explicit ID generate one
-		hash, err := m.configHash()
-		if err != nil {
-			return nil, err
-		}
-		idWrapper = func(job Job) Job {
-			return WithMonitorMeta(
-				fmt.Sprintf("auto-%s-%#X", mpi.Type, hash),
-				mpi.Name,
-				mpi.Type,
-				job,
-			)
-		}
+	rawJobs, endpoints, err := monitorPlugin.create(config)
+	wrappedJobs, err := m.wrapCommon(rawJobs)
+	if err != nil {
+		return nil, errors.Wrap(err, "wrapping monitor jobs failed")
 	}
-
-	jobs = WrapAll(WrapAll(jobs, idWrapper), TimeAndCheckJob)
-
 	m.endpoints = endpoints
+
 	if err != nil {
 		return nil, fmt.Errorf("job err %v", err)
 	}
 
-	m.configuredJobs, err = m.makeTasks(config, jobs)
+	m.configuredJobs, err = m.makeTasks(config, wrappedJobs)
 	if err != nil {
 		return nil, err
 	}
@@ -178,6 +154,44 @@ See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartb
 	}
 
 	return m, nil
+}
+
+func (m *Monitor) wrapCommon(jobs []Job) ([]Job, error) {
+	// Set the correct monitor.id for all jobs
+	metaWrapper, err := m.makeMetaWrapper()
+	if err != nil {
+		return nil, err
+	}
+	return WrapAll(jobs, metaWrapper, TimeAndCheckJob), nil
+}
+
+func (m *Monitor) makeMetaWrapper() (JobWrapper, error) {
+	if m.id != "" {
+		// Ensure we don't have duplicate IDs
+		if _, loaded := uniqueMonitorIDs.LoadOrStore(m.id, m); loaded {
+			return nil, ErrDuplicateMonitorID{m.id}
+		}
+
+		// If they have an explicit ID in the config set it to exactly that
+		return func(job Job) Job {
+			return WithMonitorMeta(m.id, m.name, m.typ, job)
+		}, nil
+	} else {
+		// If there's no explicit ID generate one
+		hash, err := m.configHash()
+		if err != nil {
+			return nil, err
+		}
+
+		return func(job Job) Job {
+			return WithMonitorMeta(
+				fmt.Sprintf("auto-%s-%#X", m.typ, hash),
+				m.name,
+				m.typ,
+				job,
+			)
+		}, nil
+	}
 }
 
 func (m *Monitor) configHash() (uint64, error) {
@@ -307,9 +321,7 @@ func (m *Monitor) Start() {
 func (m *Monitor) Stop() {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
-
-	// Free up the monitor ID for reuse
-	defer uniqueMonitorIDs.Delete(m.id)
+	defer m.freeID()
 
 	for _, t := range m.configuredJobs {
 		t.Stop()
@@ -320,6 +332,11 @@ func (m *Monitor) Stop() {
 	}
 
 	m.stats.stopMonitor(int64(m.endpoints))
+}
+
+func (m *Monitor) freeID() {
+	// Free up the monitor ID for reuse
+	uniqueMonitorIDs.Delete(m.id)
 }
 
 // WithMonitorMeta ensures that monitor.{id,name,type} are present.

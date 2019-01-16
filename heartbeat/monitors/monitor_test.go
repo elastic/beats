@@ -18,15 +18,21 @@
 package monitors
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/testing/mapvaltest"
+	"github.com/elastic/beats/heartbeat/look"
+
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/mapval"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/scheduler"
+	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
 func TestMonitor(t *testing.T) {
@@ -98,4 +104,121 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	m1.Stop()
 	_, m3Err := makeTestMon()
 	assert.NoError(t, m3Err)
+}
+
+func TestMonitor_wrapCommon(t *testing.T) {
+	var simpleJob Job = func(event *beat.Event) ([]Job, error) {
+		MergeEventFields(event, common.MapStr{"simple": "job"})
+		return nil, nil
+	}
+	simpleJobValidator := mapval.MustCompile(mapval.Map{"simple": "job"})
+
+	var softErroringJob Job = func(event *beat.Event) ([]Job, error) {
+		MergeEventFields(event, common.MapStr{"error": look.Reason(fmt.Errorf("something"))})
+		return nil, nil
+	}
+	softErrorJobValidator := mapval.MustCompile(
+		mapval.Map{
+			"error": mapval.Map{
+				"message": "something",
+				"type":    "io",
+			},
+		})
+
+	var erroringJob Job = func(event *beat.Event) ([]Job, error) {
+		return nil, fmt.Errorf("myerror")
+	}
+
+	type fields struct {
+		id   string
+		name string
+		typ  string
+	}
+
+	commonFieldsValidator := func(f fields, status string) mapval.Validator {
+		return mapval.MustCompile(mapval.Map{
+			"monitor": mapval.Map{
+				"duration.us": mapval.IsDuration,
+				"id":          f.id,
+				"name":        f.name,
+				"type":        f.typ,
+				"status":      status,
+			},
+		})
+	}
+
+	testFields := fields{"myid", "myname", "mytyp"}
+
+	tests := []struct {
+		name            string
+		fields          fields
+		jobs            []Job
+		want            []mapval.Validator
+		wantWrapErr     bool
+		wantCreationErr bool
+	}{
+		{
+			"simple",
+			testFields,
+			[]Job{simpleJob},
+			[]mapval.Validator{
+				mapval.Strict(mapval.Compose(
+					simpleJobValidator,
+					commonFieldsValidator(testFields, "up"),
+				)),
+			},
+			false,
+			false,
+		},
+		{
+			"job soft error",
+			testFields,
+			[]Job{softErroringJob},
+			[]mapval.Validator{
+				mapval.Strict(mapval.Compose(
+					softErrorJobValidator,
+					commonFieldsValidator(testFields, "down"),
+				)),
+			},
+			false,
+			false,
+		},
+		{
+			"job creation error",
+			testFields,
+			[]Job{erroringJob},
+			nil,
+			false,
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := &Monitor{
+				id:   tt.fields.id,
+				name: tt.fields.name,
+				typ:  tt.fields.typ,
+			}
+			wrapped, err := m.wrapCommon(tt.jobs)
+			if tt.wantWrapErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+
+			defer m.freeID()
+			results, err := execJobsAndConts(t, wrapped)
+
+			if tt.wantCreationErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+
+			for idx, r := range results {
+				mapvaltest.Test(t, tt.want[idx], r.Fields)
+
+			}
+		})
+	}
 }

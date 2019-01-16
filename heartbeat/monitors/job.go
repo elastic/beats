@@ -42,12 +42,24 @@ func MakeSimpleJob(f func(*beat.Event) error) Job {
 	}
 }
 
-// WrapAll takes a list of jobs and wraps them all with the provided Job wrapping
-// function.
-func WrapAll(jobs []Job, fn func(Job) Job) []Job {
+type JobWrapper func(Job) Job
+
+// WrapAll wraps all jobs and their continuations with the given wrappers
+func WrapAll(jobs []Job, wrappers ...JobWrapper) []Job {
 	var wrapped []Job
 	for _, j := range jobs {
-		wrapped = append(wrapped, fn(j))
+		for _, wrapper := range wrappers {
+			j = Wrap(j, wrapper)
+		}
+		wrapped = append(wrapped, j)
 	}
 	return wrapped
+}
+
+// Wrap wraps the given Job and also any continuations with the given JobWrapper.
+func Wrap(job Job, wrapper JobWrapper) Job {
+	return func(event *beat.Event) ([]Job, error) {
+		cont, err := wrapper(job)(event)
+		return WrapAll(cont, wrapper), err
+	}
 }
