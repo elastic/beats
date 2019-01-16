@@ -19,6 +19,8 @@ package monitors
 
 import (
 	"fmt"
+	"github.com/elastic/beats/heartbeat/eventext"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"regexp"
 	"sync"
 	"testing"
@@ -116,19 +118,19 @@ func mockEventCustomFields() map[string]interface{} {
 	return common.MapStr{"foo": "bar"}
 }
 
-func createMockJob(name string, cfg *common.Config) ([]Job, error) {
-	j := MakeSimpleJob(func(event *beat.Event) error {
-		MergeEventFields(event, mockEventCustomFields())
+func createMockJob(name string, cfg *common.Config) ([]jobs.Job, error) {
+	j := jobs.MakeSimpleJob(func(event *beat.Event) error {
+		eventext.MergeEventFields(event, mockEventCustomFields())
 		return nil
 	})
 
-	return []Job{j}, nil
+	return []jobs.Job{j}, nil
 }
 
 func mockPluginBuilder() pluginBuilder {
 	reg := monitoring.NewRegistry()
 
-	return pluginBuilder{"test", ActiveMonitor, func(s string, config *common.Config) ([]Job, int, error) {
+	return pluginBuilder{"test", ActiveMonitor, func(s string, config *common.Config) ([]jobs.Job, int, error) {
 		c := common.Config{}
 		j, err := createMockJob("test", &c)
 		return j, 1, err

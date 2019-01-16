@@ -19,6 +19,8 @@ package monitors
 
 import (
 	"fmt"
+	"github.com/elastic/beats/heartbeat/eventext"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"testing"
 	"time"
 
@@ -105,13 +107,13 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 }
 
 func TestMonitor_wrapCommon(t *testing.T) {
-	var simpleJob Job = func(event *beat.Event) ([]Job, error) {
-		MergeEventFields(event, common.MapStr{"simple": "job"})
+	var simpleJob jobs.Job = func(event *beat.Event) ([]jobs.Job, error) {
+		eventext.MergeEventFields(event, common.MapStr{"simple": "job"})
 		return nil, nil
 	}
 	simpleJobValidator := mapval.MustCompile(mapval.Map{"simple": "job"})
 
-	var errorJob Job = func(event *beat.Event) ([]Job, error) {
+	var errorJob jobs.Job = func(event *beat.Event) ([]jobs.Job, error) {
 		return nil, fmt.Errorf("myerror")
 	}
 	errorJobValidator := mapval.MustCompile(mapval.Map{
@@ -144,13 +146,13 @@ func TestMonitor_wrapCommon(t *testing.T) {
 	tests := []struct {
 		name   string
 		fields fields
-		jobs   []Job
+		jobs   []jobs.Job
 		want   []mapval.Validator
 	}{
 		{
 			"simple",
 			testFields,
-			[]Job{simpleJob},
+			[]jobs.Job{simpleJob},
 			[]mapval.Validator{
 				mapval.Strict(mapval.Compose(
 					simpleJobValidator,
@@ -161,7 +163,7 @@ func TestMonitor_wrapCommon(t *testing.T) {
 		{
 			"job error",
 			testFields,
-			[]Job{errorJob},
+			[]jobs.Job{errorJob},
 			[]mapval.Validator{
 				mapval.Strict(mapval.Compose(
 					errorJobValidator,
@@ -177,7 +179,7 @@ func TestMonitor_wrapCommon(t *testing.T) {
 				name: tt.fields.name,
 				typ:  tt.fields.typ,
 			}
-			wrapped := WrapCommon(tt.jobs, m.id, m.name, m.typ)
+			wrapped := jobs.WrapCommon(tt.jobs, m.id, m.name, m.typ)
 
 			defer m.freeID()
 			results, err := execJobsAndConts(t, wrapped)

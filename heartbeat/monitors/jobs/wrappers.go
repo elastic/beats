@@ -1,6 +1,7 @@
-package monitors
+package jobs
 
 import (
+	"github.com/elastic/beats/heartbeat/eventext"
 	"time"
 
 	"github.com/elastic/beats/heartbeat/look"
@@ -9,9 +10,9 @@ import (
 )
 
 // WrapCommon applies the common wrappers that all jobs get.
-func WrapCommon(jobs []Job, id string, name string, typ string) []Job {
+func WrapCommon(js []Job, id string, name string, typ string) []Job {
 	return WrapAll(
-		jobs,
+		js,
 		StatusWrapper,
 		TimingWrapper,
 		makeMetaWrapper(id, name, typ),
@@ -20,7 +21,16 @@ func WrapCommon(jobs []Job, id string, name string, typ string) []Job {
 
 func makeMetaWrapper(id string, name string, typ string) JobWrapper {
 	return func(job Job) Job {
-		return WithMonitorMeta(id, name, typ, job)
+		return WithFields(
+			common.MapStr{
+				"monitor": common.MapStr{
+					"id":   id,
+					"name": name,
+					"type": typ,
+				},
+			},
+			job,
+		)
 	}
 }
 
@@ -38,7 +48,7 @@ func StatusWrapper(job Job) Job {
 		if err != nil {
 			fields["error"] = look.Reason(err)
 		}
-		MergeEventFields(event, fields)
+		eventext.MergeEventFields(event, fields)
 
 		return cont, nil
 	})
@@ -54,7 +64,7 @@ func TimingWrapper(job Job) Job {
 		cont, err := job(event)
 
 		if event != nil {
-			MergeEventFields(event, common.MapStr{
+			eventext.MergeEventFields(event, common.MapStr{
 				"monitor": common.MapStr{
 					"duration": look.RTT(time.Since(start)),
 				},
@@ -64,4 +74,16 @@ func TimingWrapper(job Job) Job {
 
 		return cont, err
 	}
+}
+
+// WithFields wraps a TaskRunner, updating all events returned with the set of
+// fields configured.
+func WithFields(fields common.MapStr, job Job) Job {
+	return AfterJob(job, func(event *beat.Event, cont []Job, err error) ([]Job, error) {
+		eventext.MergeEventFields(event, fields)
+
+		return WrapAll(cont, func(job Job) Job {
+			return WithFields(fields, job)
+		}), err
+	})
 }

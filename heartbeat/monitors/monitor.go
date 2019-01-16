@@ -23,6 +23,8 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
+
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
 
@@ -138,7 +140,7 @@ func newMonitor(
 	}
 
 	rawJobs, endpoints, err := monitorPlugin.create(config)
-	wrappedJobs := WrapCommon(rawJobs, m.id, m.name, m.typ)
+	wrappedJobs := jobs.WrapCommon(rawJobs, m.id, m.name, m.typ)
 	m.endpoints = endpoints
 
 	if err != nil {
@@ -181,7 +183,7 @@ func (m *Monitor) configHash() (uint64, error) {
 	return hash, nil
 }
 
-func (m *Monitor) makeTasks(config *common.Config, jobs []Job) ([]*configuredJob, error) {
+func (m *Monitor) makeTasks(config *common.Config, jobs []jobs.Job) ([]*configuredJob, error) {
 	mtConf := jobConfig{}
 	if err := config.Unpack(&mtConf); err != nil {
 		return nil, errors.Wrap(err, "invalid config, could not unpack monitor config")
@@ -310,18 +312,4 @@ func (m *Monitor) Stop() {
 func (m *Monitor) freeID() {
 	// Free up the monitor ID for reuse
 	uniqueMonitorIDs.Delete(m.id)
-}
-
-// WithMonitorMeta ensures that monitor.{id,name,type} are present.
-func WithMonitorMeta(id string, name string, typ string, origJob Job) Job {
-	return WithFields(
-		common.MapStr{
-			"monitor": common.MapStr{
-				"id":   id,
-				"name": name,
-				"type": typ,
-			},
-		},
-		origJob,
-	)
 }

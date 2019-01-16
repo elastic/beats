@@ -19,6 +19,8 @@ package icmp
 
 import (
 	"fmt"
+	"github.com/elastic/beats/heartbeat/eventext"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"net"
 	"net/url"
 
@@ -38,7 +40,7 @@ var debugf = logp.MakeDebug("icmp")
 func create(
 	name string,
 	cfg *common.Config,
-) (jobs []monitors.Job, endpoints int, err error) {
+) (jobs []jobs.Job, endpoints int, err error) {
 	config := DefaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, 0, err
@@ -101,7 +103,7 @@ func createPingIPFactory(config *Config) func(*beat.Event, *net.IPAddr) error {
 		icmpFields := common.MapStr{"requests": n}
 		if err == nil {
 			icmpFields["rtt"] = look.RTT(rtt)
-			monitors.MergeEventFields(event, icmpFields)
+			eventext.MergeEventFields(event, icmpFields)
 		}
 
 		return nil

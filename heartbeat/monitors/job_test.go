@@ -18,7 +18,10 @@
 package monitors
 
 import (
+	"github.com/elastic/beats/heartbeat/eventext"
 	"testing"
+
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 
 	"github.com/stretchr/testify/require"
 
@@ -31,30 +34,30 @@ import (
 
 func TestWrapAll(t *testing.T) {
 	type args struct {
-		jobs []Job
-		fns  []JobWrapper
+		jobs []jobs.Job
+		fns  []jobs.JobWrapper
 	}
 
-	var basicJob Job = func(event *beat.Event) (jobs []Job, err error) {
-		MergeEventFields(event, common.MapStr{"basic": "job"})
+	var basicJob jobs.Job = func(event *beat.Event) (jobs []jobs.Job, err error) {
+		eventext.MergeEventFields(event, common.MapStr{"basic": "job"})
 		return nil, nil
 	}
 
-	var contJob Job = func(event *beat.Event) (jobs []Job, e error) {
-		MergeEventFields(event, common.MapStr{"cont": "job"})
-		return []Job{basicJob}, nil
+	var contJob jobs.Job = func(event *beat.Event) (js []jobs.Job, e error) {
+		eventext.MergeEventFields(event, common.MapStr{"cont": "job"})
+		return []jobs.Job{basicJob}, nil
 	}
 
-	addFoo := func(job Job) Job {
-		return AfterJob(job, func(event *beat.Event, cont []Job, err error) ([]Job, error) {
-			MergeEventFields(event, common.MapStr{"foo": "bar"})
+	addFoo := func(job jobs.Job) jobs.Job {
+		return jobs.AfterJob(job, func(event *beat.Event, cont []jobs.Job, err error) ([]jobs.Job, error) {
+			eventext.MergeEventFields(event, common.MapStr{"foo": "bar"})
 			return cont, err
 		})
 	}
 
-	addBaz := func(job Job) Job {
-		return AfterJob(job, func(event *beat.Event, cont []Job, err error) ([]Job, error) {
-			MergeEventFields(event, common.MapStr{"baz": "bot"})
+	addBaz := func(job jobs.Job) jobs.Job {
+		return jobs.AfterJob(job, func(event *beat.Event, cont []jobs.Job, err error) ([]jobs.Job, error) {
+			eventext.MergeEventFields(event, common.MapStr{"baz": "bot"})
 			return cont, err
 		})
 	}
@@ -67,16 +70,16 @@ func TestWrapAll(t *testing.T) {
 		{
 			"simple",
 			args{
-				[]Job{basicJob},
-				[]JobWrapper{addFoo},
+				[]jobs.Job{basicJob},
+				[]jobs.JobWrapper{addFoo},
 			},
 			[]mapval.Map{{"basic": "job", "foo": "bar"}},
 		},
 		{
 			"multijob",
 			args{
-				[]Job{basicJob, basicJob},
-				[]JobWrapper{addFoo},
+				[]jobs.Job{basicJob, basicJob},
+				[]jobs.JobWrapper{addFoo},
 			},
 			[]mapval.Map{
 				{"basic": "job", "foo": "bar"},
@@ -86,8 +89,8 @@ func TestWrapAll(t *testing.T) {
 		{
 			"continuations",
 			args{
-				[]Job{contJob},
-				[]JobWrapper{addFoo},
+				[]jobs.Job{contJob},
+				[]jobs.JobWrapper{addFoo},
 			},
 			[]mapval.Map{
 				{"cont": "job", "foo": "bar"},
@@ -97,8 +100,8 @@ func TestWrapAll(t *testing.T) {
 		{
 			"continuations multi-wrap",
 			args{
-				[]Job{contJob},
-				[]JobWrapper{addFoo, addBaz},
+				[]jobs.Job{contJob},
+				[]jobs.JobWrapper{addFoo, addBaz},
 			},
 			[]mapval.Map{
 				{"cont": "job", "foo": "bar", "baz": "bot"},
@@ -108,7 +111,7 @@ func TestWrapAll(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			results, err := execJobsAndConts(t, WrapAll(tt.args.jobs, tt.args.fns...))
+			results, err := execJobsAndConts(t, jobs.WrapAll(tt.args.jobs, tt.args.fns...))
 			require.NoError(t, err)
 
 			for idx, rf := range tt.resultFields {
@@ -121,7 +124,7 @@ func TestWrapAll(t *testing.T) {
 	}
 }
 
-func execJobsAndConts(t *testing.T, jobs []Job) ([]*beat.Event, error) {
+func execJobsAndConts(t *testing.T, jobs []jobs.Job) ([]*beat.Event, error) {
 	var results []*beat.Event
 	for _, j := range jobs {
 		resultEvents, err := execJobAndConts(t, j)
@@ -137,7 +140,7 @@ func execJobsAndConts(t *testing.T, jobs []Job) ([]*beat.Event, error) {
 }
 
 // Helper to recursively execute a job and gather its results
-func execJobAndConts(t *testing.T, j Job) ([]*beat.Event, error) {
+func execJobAndConts(t *testing.T, j jobs.Job) ([]*beat.Event, error) {
 	var results []*beat.Event
 	event := &beat.Event{}
 	results = append(results, event)

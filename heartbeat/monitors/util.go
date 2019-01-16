@@ -25,10 +25,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/elastic/beats/heartbeat/look"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-
-	"github.com/elastic/beats/heartbeat/look"
 )
 
 // IPSettings provides common configuration settings for IP resolution and ping
@@ -83,8 +83,8 @@ func (s IPSettings) Network() string {
 
 // MakeSimpleCont wraps a function that produces an event and error
 // into an executable Job.
-func MakeSimpleCont(f func(*beat.Event) error) Job {
-	return func(event *beat.Event) ([]Job, error) {
+func MakeSimpleCont(f func(*beat.Event) error) jobs.Job {
+	return func(event *beat.Event) ([]jobs.Job, error) {
 		err := f(event)
 		return nil, err
 	}
@@ -93,8 +93,8 @@ func MakeSimpleCont(f func(*beat.Event) error) Job {
 // MakePingIPFactory creates a jobFactory for building a Task from a new IP address.
 func MakePingIPFactory(
 	f func(*beat.Event, *net.IPAddr) error,
-) func(*net.IPAddr) Job {
-	return func(ip *net.IPAddr) Job {
+) func(*net.IPAddr) jobs.Job {
+	return func(ip *net.IPAddr) jobs.Job {
 		return MakeSimpleCont(func(event *beat.Event) error {
 			return f(event, ip)
 		})
@@ -104,8 +104,8 @@ func MakePingIPFactory(
 // MakePingAllIPFactory wraps a function for building a recursive Task Runner from function callbacks.
 func MakePingAllIPFactory(
 	f func(*net.IPAddr) []func(*beat.Event) error,
-) func(*net.IPAddr) Job {
-	return func(ip *net.IPAddr) Job {
+) func(*net.IPAddr) jobs.Job {
+	return func(ip *net.IPAddr) jobs.Job {
 		cont := f(ip)
 		switch len(cont) {
 		case 0:
@@ -114,11 +114,11 @@ func MakePingAllIPFactory(
 			return MakeSimpleCont(cont[0])
 		}
 
-		tasks := make([]Job, len(cont))
+		tasks := make([]jobs.Job, len(cont))
 		for i, c := range cont {
 			tasks[i] = MakeSimpleCont(c)
 		}
-		return func(event *beat.Event) ([]Job, error) {
+		return func(event *beat.Event) ([]jobs.Job, error) {
 			return tasks, nil
 		}
 	}
@@ -129,7 +129,7 @@ func MakePingAllIPFactory(
 func MakePingAllIPPortFactory(
 	ports []uint16,
 	f func(*beat.Event, *net.IPAddr, uint16) error,
-) func(*net.IPAddr) Job {
+) func(*net.IPAddr) jobs.Job {
 	if len(ports) == 1 {
 		port := ports[0]
 		return MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) error {
@@ -156,8 +156,8 @@ func MakePingAllIPPortFactory(
 // MakePingAllIPFactory or MakePingAllIPPortFactory.
 func MakeByIPJob(
 	ip net.IP,
-	pingFactory func(ip *net.IPAddr) Job,
-) (Job, error) {
+	pingFactory func(ip *net.IPAddr) jobs.Job,
+) (jobs.Job, error) {
 	// use ResolveIPAddr to parse the ip into net.IPAddr adding a zone info
 	// if ipv6 is used.
 	addr, err := net.ResolveIPAddr("ip", ip.String())
@@ -169,7 +169,7 @@ func MakeByIPJob(
 		"monitor": common.MapStr{"ip": addr.String()},
 	}
 
-	return WithFields(fields, pingFactory(addr)), nil
+	return jobs.WithFields(fields, pingFactory(addr)), nil
 }
 
 // MakeByHostJob creates a new Job including host lookup. The pingFactory will be used to
@@ -179,8 +179,8 @@ func MakeByIPJob(
 // MakePingAllIPFactory or MakePingAllIPPortFactory.
 func MakeByHostJob(
 	settings HostJobSettings,
-	pingFactory func(ip *net.IPAddr) Job,
-) (Job, error) {
+	pingFactory func(ip *net.IPAddr) jobs.Job,
+) (jobs.Job, error) {
 	host := settings.Host
 
 	if ip := net.ParseIP(host); ip != nil {
@@ -204,11 +204,11 @@ func MakeByHostJob(
 func makeByHostAnyIPJob(
 	settings HostJobSettings,
 	host string,
-	pingFactory func(ip *net.IPAddr) Job,
-) Job {
+	pingFactory func(ip *net.IPAddr) jobs.Job,
+) jobs.Job {
 	network := settings.IP.Network()
 
-	return func(event *beat.Event) ([]Job, error) {
+	return func(event *beat.Event) ([]jobs.Job, error) {
 		resolveStart := time.Now()
 		ip, err := net.ResolveIPAddr(network, host)
 		if err != nil {
@@ -219,19 +219,19 @@ func makeByHostAnyIPJob(
 		resolveRTT := resolveEnd.Sub(resolveStart)
 
 		ipFields := resolveIPEvent(ip.String(), resolveRTT)
-		return WithFields(ipFields, pingFactory(ip))(event)
+		return jobs.WithFields(ipFields, pingFactory(ip))(event)
 	}
 }
 
 func makeByHostAllIPJob(
 	settings HostJobSettings,
 	host string,
-	pingFactory func(ip *net.IPAddr) Job,
-) Job {
+	pingFactory func(ip *net.IPAddr) jobs.Job,
+) jobs.Job {
 	network := settings.IP.Network()
 	filter := makeIPFilter(network)
 
-	return func(event *beat.Event) ([]Job, error) {
+	return func(event *beat.Event) ([]jobs.Job, error) {
 		// TODO: check for better DNS IP lookup support:
 		//         - The net.LookupIP drops ipv6 zone index
 		//
@@ -254,11 +254,11 @@ func makeByHostAllIPJob(
 		}
 
 		// create ip ping tasks
-		cont := make([]Job, len(ips))
+		cont := make([]jobs.Job, len(ips))
 		for i, ip := range ips {
 			addr := &net.IPAddr{IP: ip}
 			ipFields := resolveIPEvent(ip.String(), resolveRTT)
-			cont[i] = TimingWrapper(WithFields(ipFields, pingFactory(addr)))
+			cont[i] = jobs.TimingWrapper(jobs.WithFields(ipFields, pingFactory(addr)))
 		}
 		return cont, nil
 	}
@@ -274,18 +274,6 @@ func resolveIPEvent(ip string, rtt time.Duration) common.MapStr {
 			"rtt": look.RTT(rtt),
 		},
 	}
-}
-
-// WithFields wraps a TaskRunner, updating all events returned with the set of
-// fields configured.
-func WithFields(fields common.MapStr, job Job) Job {
-	return AfterJob(job, func(event *beat.Event, cont []Job, err error) ([]Job, error) {
-		MergeEventFields(event, fields)
-
-		return WrapAll(cont, func(job Job) Job {
-			return WithFields(fields, job)
-		}), err
-	})
 }
 
 // Unpack sets PingMode from a constant string. Unpack will be called by common.Unpack when
@@ -353,18 +341,9 @@ func addFields(to *common.MapStr, m common.MapStr) {
 	fields.DeepUpdate(m)
 }
 
-// MergeEventFields merges the given common.MapStr into the given Event's Fields.
-func MergeEventFields(e *beat.Event, merge common.MapStr) {
-	if e.Fields != nil {
-		e.Fields.DeepUpdate(merge)
-	} else {
-		e.Fields = merge
-	}
-}
-
 // WithURLField wraps a job setting the "url" field appropriately using URLFields.
-func WithURLField(u *url.URL, job Job) Job {
-	return WithFields(common.MapStr{"url": URLFields(u)}, job)
+func WithURLField(u *url.URL, job jobs.Job) jobs.Job {
+	return jobs.WithFields(common.MapStr{"url": URLFields(u)}, job)
 }
 
 // URLFields generates ECS compatible URL.* fields from a given url. It also sanitizes

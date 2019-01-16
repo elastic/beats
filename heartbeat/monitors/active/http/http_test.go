@@ -21,6 +21,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	jobs2 "github.com/elastic/beats/heartbeat/monitors/jobs"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -65,7 +66,7 @@ func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interfa
 	jobs, endpoints, err := create("tls", config)
 	require.NoError(t, err)
 
-	job := monitors.WrapCommon(jobs, "tls", "", "http")[0]
+	job := jobs2.WrapCommon(jobs, "tls", "", "http")[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -241,7 +242,7 @@ func TestLargeResponse(t *testing.T) {
 	jobs, _, err := create("largeresp", config)
 	require.NoError(t, err)
 
-	job := monitors.WrapCommon(jobs, "test", "", "http")[0]
+	job := jobs2.WrapCommon(jobs, "test", "", "http")[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

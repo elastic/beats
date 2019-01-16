@@ -18,9 +18,8 @@
 package tcp
 
 import (
+	"github.com/elastic/beats/heartbeat/eventext"
 	"time"
-
-	"github.com/elastic/beats/heartbeat/monitors"
 
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/reason"
@@ -63,7 +62,7 @@ func pingHost(
 	}
 
 	end := time.Now()
-	monitors.MergeEventFields(event, common.MapStr{
+	eventext.MergeEventFields(event, common.MapStr{
 		"tcp": common.MapStr{
 			"rtt": common.MapStr{
 				"validate": look.RTT(end.Sub(validateStart)),

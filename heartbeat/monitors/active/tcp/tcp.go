@@ -19,6 +19,8 @@ package tcp
 
 import (
 	"fmt"
+	"github.com/elastic/beats/heartbeat/eventext"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"net/url"
 	"strconv"
 	"strings"
@@ -47,7 +49,7 @@ type connURL struct {
 func create(
 	name string,
 	cfg *common.Config,
-) (jobs []monitors.Job, endpoints int, err error) {
+) (jobs []jobs.Job, endpoints int, err error) {
 	config := DefaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, 0, err
@@ -93,7 +95,7 @@ func create(
 					return err
 				}
 
-				monitors.MergeEventFields(event, common.MapStr{"url": monitors.URLFields(u)})
+				eventext.MergeEventFields(event, common.MapStr{"url": monitors.URLFields(u)})
 
 				return pingHost(event, dialer, addr, timeout, validator)
 			})
