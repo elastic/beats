@@ -177,8 +177,7 @@ func TestMonitor_wrapCommon(t *testing.T) {
 				name: tt.fields.name,
 				typ:  tt.fields.typ,
 			}
-			wrapped, err := m.wrapCommon(tt.jobs)
-			require.NoError(t, err)
+			wrapped := WrapCommon(tt.jobs, m.id, m.name, m.typ)
 
 			defer m.freeID()
 			results, err := execJobsAndConts(t, wrapped)

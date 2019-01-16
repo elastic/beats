@@ -123,11 +123,22 @@ func newMonitor(
 		stats:             monitorPlugin.stats,
 	}
 
-	rawJobs, endpoints, err := monitorPlugin.create(config)
-	wrappedJobs, err := m.wrapCommon(rawJobs)
-	if err != nil {
-		return nil, errors.Wrap(err, "wrapping monitor jobs failed")
+	if m.id != "" {
+		// Ensure we don't have duplicate IDs
+		if _, loaded := uniqueMonitorIDs.LoadOrStore(m.id, m); loaded {
+			return nil, ErrDuplicateMonitorID{m.id}
+		}
+	} else {
+		// If there's no explicit ID generate one
+		hash, err := m.configHash()
+		if err != nil {
+			return nil, err
+		}
+		m.id = fmt.Sprintf("auto-%s-%#X", m.typ, hash)
 	}
+
+	rawJobs, endpoints, err := monitorPlugin.create(config)
+	wrappedJobs := WrapCommon(rawJobs, m.id, m.name, m.typ)
 	m.endpoints = endpoints
 
 	if err != nil {
@@ -154,44 +165,6 @@ See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartb
 	}
 
 	return m, nil
-}
-
-func (m *Monitor) wrapCommon(jobs []Job) ([]Job, error) {
-	// Set the correct monitor.id for all jobs
-	metaWrapper, err := m.makeMetaWrapper()
-	if err != nil {
-		return nil, err
-	}
-	return WrapAll(jobs, StatusWrapper, TimingWrapper, metaWrapper), nil
-}
-
-func (m *Monitor) makeMetaWrapper() (JobWrapper, error) {
-	if m.id != "" {
-		// Ensure we don't have duplicate IDs
-		if _, loaded := uniqueMonitorIDs.LoadOrStore(m.id, m); loaded {
-			return nil, ErrDuplicateMonitorID{m.id}
-		}
-
-		// If they have an explicit ID in the config set it to exactly that
-		return func(job Job) Job {
-			return WithMonitorMeta(m.id, m.name, m.typ, job)
-		}, nil
-	} else {
-		// If there's no explicit ID generate one
-		hash, err := m.configHash()
-		if err != nil {
-			return nil, err
-		}
-
-		return func(job Job) Job {
-			return WithMonitorMeta(
-				fmt.Sprintf("auto-%s-%#X", m.typ, hash),
-				m.name,
-				m.typ,
-				job,
-			)
-		}, nil
-	}
 }
 
 func (m *Monitor) configHash() (uint64, error) {

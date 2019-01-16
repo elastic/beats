@@ -27,6 +27,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/elastic/beats/heartbeat/monitors"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/hbtest"
@@ -48,7 +50,7 @@ func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
 	jobs, endpoints, err := create("tcp", config)
 	require.NoError(t, err)
 
-	job := jobs[0]
+	job := monitors.WrapCommon(jobs, "test", "", "tcp")[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -71,7 +73,7 @@ func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string
 	jobs, endpoints, err := create("tcp", config)
 	require.NoError(t, err)
 
-	job := jobs[0]
+	job := monitors.WrapCommon(jobs, "test", "", "tcp")[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -92,7 +94,7 @@ func setupServer(t *testing.T, serverCreator func(http.Handler) *httptest.Server
 }
 
 func tcpMonitorChecks(host string, ip string, port uint16, status string) mapval.Validator {
-	return hbtest.BaseChecks(ip, status)
+	return hbtest.BaseChecks(ip, status, "tcp")
 }
 
 func TestUpEndpointJob(t *testing.T) {
@@ -104,7 +106,7 @@ func TestUpEndpointJob(t *testing.T) {
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			hbtest.BaseChecks("127.0.0.1", "up"),
+			hbtest.BaseChecks("127.0.0.1", "up", "tcp"),
 			hbtest.SimpleURLChecks(t, "tcp", "localhost", port),
 			hbtest.RespondingTCPChecks(),
 			mapval.MustCompile(mapval.Map{
@@ -148,7 +150,7 @@ func TestTLSConnection(t *testing.T) {
 		mapval.Strict(mapval.Compose(
 			hbtest.TLSChecks(0, 0, cert),
 			hbtest.RespondingTCPChecks(),
-			hbtest.BaseChecks(ip, "up"),
+			hbtest.BaseChecks(ip, "up", "tcp"),
 			hbtest.SimpleURLChecks(t, "ssl", serverURL.Hostname(), port),
 		)),
 		event.Fields,
