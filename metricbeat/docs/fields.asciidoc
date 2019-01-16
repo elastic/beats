@@ -2820,16 +2820,6 @@ The type of event
 
 --
 
-*`docker.event.time`*::
-+
---
-type: date
-
-Timestamp of event
-
-
---
-
 [float]
 == actor fields
 

@@ -126,7 +126,6 @@ func (m *MetricSet) reportEvent(reporter mb.PushReporterV2, event events.Message
 			"id":     event.ID,
 			"type":   event.Type,
 			"action": event.Action,
-			"time":   event.Time,
 			"status": event.Status,
 			"from":   event.From,
 			"actor": common.MapStr{
