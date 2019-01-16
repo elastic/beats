@@ -87,7 +87,7 @@ func (s *SQS) Template() *cloudformation.Template {
 	template := cloudformation.NewTemplate()
 
 	prefix := func(suffix string) string {
-		return "fnb" + s.config.Name + suffix
+		return normalizeResourceName("fnb" + s.config.Name + suffix)
 	}
 
 	for _, trigger := range s.config.Triggers {
