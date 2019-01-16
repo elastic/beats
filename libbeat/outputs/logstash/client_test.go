@@ -63,10 +63,12 @@ type testDriverCommand struct {
 
 const testMaxWindowSize = 64
 
+const testConnectTimeout = 10 * time.Second
+
 func testSendZero(t *testing.T, factory clientFactory) {
 	enableLogging([]string{"*"})
 
-	server := transptest.NewMockServerTCP(t, 1*time.Second, "", nil)
+	server := transptest.NewMockServerTCP(t, testConnectTimeout, "", nil)
 	defer server.Close()
 
 	sock, transp, err := server.ConnectPair()
@@ -92,7 +94,7 @@ func testSendZero(t *testing.T, factory clientFactory) {
 
 func testSimpleEvent(t *testing.T, factory clientFactory) {
 	enableLogging([]string{"*"})
-	mock := transptest.NewMockServerTCP(t, 1*time.Second, "", nil)
+	mock := transptest.NewMockServerTCP(t, testConnectTimeout, "", nil)
 	server, _ := v2.NewWithListener(mock.Listener)
 	defer server.Close()
 
@@ -126,7 +128,7 @@ func testSimpleEvent(t *testing.T, factory clientFactory) {
 
 func testSimpleEventWithTTL(t *testing.T, factory clientFactory) {
 	enableLogging([]string{"*"})
-	mock := transptest.NewMockServerTCP(t, 1*time.Second, "", nil)
+	mock := transptest.NewMockServerTCP(t, testConnectTimeout, "", nil)
 	server, _ := v2.NewWithListener(mock.Listener)
 	defer server.Close()
 
@@ -178,7 +180,7 @@ func testSimpleEventWithTTL(t *testing.T, factory clientFactory) {
 
 func testStructuredEvent(t *testing.T, factory clientFactory) {
 	enableLogging([]string{"*"})
-	mock := transptest.NewMockServerTCP(t, 1*time.Second, "", nil)
+	mock := transptest.NewMockServerTCP(t, testConnectTimeout, "", nil)
 	server, _ := v2.NewWithListener(mock.Listener)
 	defer server.Close()
 

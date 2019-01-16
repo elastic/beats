@@ -41,13 +41,13 @@ const (
 func TestLogstashTCP(t *testing.T) {
 	enableLogging([]string{"*"})
 
-	timeout := 2 * time.Second
+	timeout := testConnectTimeout
 	server := transptest.NewMockServerTCP(t, timeout, "", nil)
 
 	config := map[string]interface{}{
 		"hosts":   []string{server.Addr()},
 		"index":   testLogstashIndex("logstash-conn-tcp"),
-		"timeout": "2s",
+		"timeout": timeout.String(),
 	}
 	testConnectionType(t, server, testOutputerFactory(t, "", config))
 }
@@ -58,7 +58,7 @@ func TestLogstashTLS(t *testing.T) {
 	certName := "ca_test"
 	ip := "127.0.0.1"
 
-	timeout := 2 * time.Second
+	timeout := testConnectTimeout
 	transptest.GenCertForTestingPurpose(t, ip, certName, "")
 	server := transptest.NewMockServerTLS(t, timeout, certName, nil)
 
@@ -66,7 +66,7 @@ func TestLogstashTLS(t *testing.T) {
 	config := map[string]interface{}{
 		"hosts":                       []string{server.Addr()},
 		"index":                       testLogstashIndex("logstash-conn-tls"),
-		"timeout":                     "2s",
+		"timeout":                     timeout.String(),
 		"ssl.certificate_authorities": []string{certName + ".pem"},
 	}
 	testConnectionType(t, server, testOutputerFactory(t, "", config))
@@ -76,14 +76,14 @@ func TestLogstashInvalidTLSInsecure(t *testing.T) {
 	certName := "ca_invalid_test"
 	ip := "1.2.3.4"
 
-	timeout := 2 * time.Second
+	timeout := testConnectTimeout
 	transptest.GenCertForTestingPurpose(t, ip, certName, "")
 	server := transptest.NewMockServerTLS(t, timeout, certName, nil)
 
 	config := map[string]interface{}{
 		"hosts":                       []string{server.Addr()},
 		"index":                       testLogstashIndex("logstash-conn-tls-invalid"),
-		"timeout":                     2,
+		"timeout":                     timeout.String(),
 		"max_retries":                 1,
 		"ssl.verification_mode":       "none",
 		"ssl.certificate_authorities": []string{certName + ".pem"},
