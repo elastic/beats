@@ -121,7 +121,7 @@
                     "type": "histogram"
                 }
             }, 
-            "id": "Number of Kafka stracktraces by class", 
+            "id": "number-of-kafka-stracktraces-by-class",
             "type": "visualization", 
             "version": 2
         }, 
@@ -389,7 +389,7 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "Number of Kafka stracktraces by class", 
+                        "id": "number-of-kafka-stracktraces-by-class",
                         "panelIndex": 1, 
                         "row": 1, 
                         "size_x": 6, 
