@@ -79,7 +79,7 @@ type CounterValueItem struct {
 	Value PdhCounterValue
 }
 
-// Creates a new query.
+// PdhOpenQuery creates a new query.
 func PdhOpenQuery(dataSource string, userData uintptr) (PdhQueryHandle, error) {
 	var dataSourcePtr *uint16
 	if dataSource != "" {
@@ -98,7 +98,7 @@ func PdhOpenQuery(dataSource string, userData uintptr) (PdhQueryHandle, error) {
 	return handle, nil
 }
 
-// Adds the specified counter to the query.
+// PdhAddCounter adds the specified counter to the query.
 func PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr) (PdhCounterHandle, error) {
 	var handle PdhCounterHandle
 	if err := _PdhAddCounter(query, counterPath, userData, &handle); err != nil {
@@ -108,7 +108,7 @@ func PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr) (
 	return handle, nil
 }
 
-// Collects the current raw data value for all counters in the specified query.
+// PdhCollectQueryData collects the current raw data value for all counters in the specified query.
 func PdhCollectQueryData(query PdhQueryHandle) error {
 	if err := _PdhCollectQueryData(query); err != nil {
 		return PdhErrno(err.(syscall.Errno))
@@ -117,7 +117,7 @@ func PdhCollectQueryData(query PdhQueryHandle) error {
 	return nil
 }
 
-// Computes a displayable value for the specified counter.
+// PdhGetFormattedCounterValue computes a displayable value for the specified counter.
 func PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterFormat) (uint32, *PdhCounterValue, error) {
 	var counterType uint32
 	var value PdhCounterValue
@@ -128,7 +128,7 @@ func PdhGetFormattedCounterValue(counter PdhCounterHandle, format PdhCounterForm
 	return counterType, &value, nil
 }
 
-// Returns an array of formatted counter values.
+// PdhGetFormattedCounterArray returns an array of formatted counter values.
 func PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterFormat) ([]CounterValueItem, error) {
 	var bufferSize uint32
 	var bufferCount uint32
@@ -169,7 +169,7 @@ func PdhGetFormattedCounterArray(counter PdhCounterHandle, format PdhCounterForm
 	return nil, nil
 }
 
-// Returns the current raw value of the counter.
+// PdhGetRawCounterValue returns the current raw value of the counter.
 func PdhGetRawCounterValue(counter PdhCounterHandle) (uint32, *PdhRawCounter, error) {
 	var counterType uint32
 	var value PdhRawCounter
@@ -180,7 +180,7 @@ func PdhGetRawCounterValue(counter PdhCounterHandle) (uint32, *PdhRawCounter, er
 	return counterType, &value, nil
 }
 
-// Calculates the displayable value of two raw counter values.
+// PdhCalculateCounterFromRawValue calculates the displayable value of two raw counter values.
 func PdhCalculateCounterFromRawValue(counter PdhCounterHandle, format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter) (*PdhCounterValue, error) {
 	var value PdhCounterValue
 	if err := _PdhCalculateCounterFromRawValue(counter, format, rawValue1, rawValue2, &value); err != nil {
@@ -190,7 +190,7 @@ func PdhCalculateCounterFromRawValue(counter PdhCounterHandle, format PdhCounter
 	return &value, nil
 }
 
-// Computes a displayable value for the given raw counter values.
+// PdhFormatFromRawValue computes a displayable value for the given raw counter values.
 func PdhFormatFromRawValue(format PdhCounterFormat, rawValue1 *PdhRawCounter, rawValue2 *PdhRawCounter) (*PdhCounterValue, error) {
 	var counterType uint32
 	var value PdhCounterValue
@@ -202,7 +202,7 @@ func PdhFormatFromRawValue(format PdhCounterFormat, rawValue1 *PdhRawCounter, ra
 	return &value, nil
 }
 
-// Returns counter paths that match the given counter path.
+// PdhExpandWildCardPath returns counter paths that match the given counter path.
 func PdhExpandWildCardPath(wildCardPath string) ([]string, error) {
 	if wildCardPath == "" {
 		return nil, errors.New("no wildcardpath given")
@@ -243,7 +243,7 @@ func PdhExpandWildCardPath(wildCardPath string) ([]string, error) {
 	return nil, nil
 }
 
-// Closes all counters contained in the specified query.
+// PdhCloseQuery closes all counters contained in the specified query.
 func PdhCloseQuery(query PdhQueryHandle) error {
 	if err := _PdhCloseQuery(query); err != nil {
 		return PdhErrno(err.(syscall.Errno))
@@ -272,7 +272,7 @@ const (
 	LongFormat
 )
 
-// Creates a new query.
+// NewQuery creates a new query.
 func NewQuery(dataSource string) (*Query, error) {
 	h, err := PdhOpenQuery(dataSource, 0)
 	if err != nil {
@@ -285,7 +285,7 @@ func NewQuery(dataSource string) (*Query, error) {
 	}, nil
 }
 
-// Adds the specified counter to the query.
+// AddCounter adds the specified counter to the query.
 func (q *Query) AddCounter(counterPath string, format Format, instanceName string, wildcard bool) error {
 	if _, found := q.counters[counterPath]; found {
 		return errors.New("counter already added")
@@ -328,7 +328,7 @@ func matchInstanceName(counterPath string) (string, error) {
 	return "", errors.New("query doesn't contain an instance name. In this case you have to define 'instance_name'")
 }
 
-// Collects the value for all counters in the query.
+// Execute collects the value for all counters in the query.
 func (q *Query) Execute() error {
 	return PdhCollectQueryData(q.handle)
 }
@@ -339,7 +339,7 @@ type Value struct {
 	Err         error
 }
 
-// Returns an array of formatted values for a query.
+// Values returns an array of formatted values for a query.
 func (q *Query) Values() (map[string][]Value, error) {
 	rtn := make(map[string][]Value, len(q.counters))
 
@@ -362,7 +362,7 @@ func (q *Query) Values() (map[string][]Value, error) {
 	return rtn, nil
 }
 
-// Closes the query and all of its counters.
+// Close closes the query and all of its counters.
 func (q *Query) Close() error {
 	return PdhCloseQuery(q.handle)
 }
@@ -430,7 +430,7 @@ func NewPerfmonReader(config Config) (*PerfmonReader, error) {
 	return r, nil
 }
 
-// Executes a query and returns those values in an event.
+// Read executes a query and returns those values in an event.
 func (r *PerfmonReader) Read() ([]mb.Event, error) {
 	if err := r.query.Execute(); err != nil {
 		return nil, errors.Wrap(err, "failed querying counter values")
