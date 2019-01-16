@@ -395,7 +395,7 @@ func getTemplate(t *testing.T, client ESClient, templateName string) testTemplat
 }
 
 func (tt *testTemplate) SourceEnabled() bool {
-	key := fmt.Sprintf("mappings._doc._source.enabled")
+	key := fmt.Sprintf("mappings._source.enabled")
 
 	// _source.enabled is true if it's missing (default)
 	b, _ := tt.HasKey(key)
