@@ -96,10 +96,18 @@ func makeFieldsProcessor(target string, fields common.MapStr, shared bool) proce
 // NewAddLabels creates a new processor adding the given object to events. Set
 // `shared` true if there is the chance of labels being changed/modified by
 // subsequent processors.
+// If labels contains nested objects, NewAddLabels will flatten keys into labels by
+// by joining names with a dot ('.') .
+// The labels will be inserted into the 'labels' field.
 func NewAddLabels(labels common.MapStr, shared bool) processors.Processor {
-	return NewAddFields(labels.Flatten(), shared)
+	return NewAddFields(common.MapStr{
+		LabelsKey: labels.Flatten(),
+	}, shared)
 }
 
+// NewAddFields creates a new processor adding the given fields to events.
+// Set `shared` true if there is the chance of labels being changed/modified by
+// subsequent processors.
 func NewAddFields(fields common.MapStr, shared bool) processors.Processor {
 	return &addFields{fields: fields, shared: shared}
 }
