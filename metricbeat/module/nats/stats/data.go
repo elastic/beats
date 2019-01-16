@@ -45,7 +45,7 @@ var (
 		"varz_uri":   c.Int("/varz"),
 	}
 	statsSchema = s.Schema{
-		"uptime":    c.Str("uptime"),
+		"uptime": c.Str("uptime"),
 		"mem": s.Object{
 			"bytes": c.Int("mem"),
 		},
