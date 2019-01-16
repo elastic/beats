@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/protos"
 )
 
@@ -36,6 +37,18 @@ type eventStore struct {
 }
 
 func (e *eventStore) publish(event beat.Event) {
+	pbf, err := pb.GetFields(event.Fields)
+	if err != nil || pbf == nil {
+		panic("_packetbeat not found")
+	}
+	delete(event.Fields, pb.FieldsKey)
+	if err = pbf.ComputeValues(nil); err != nil {
+		panic(err)
+	}
+	if err = pbf.MarshalMapStr(event.Fields); err != nil {
+		panic(err)
+	}
+
 	e.events = append(e.events, event)
 }
 

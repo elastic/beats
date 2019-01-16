@@ -23,7 +23,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/url"
-	"os"
 	"path/filepath"
 	"time"
 
@@ -54,17 +53,24 @@ func main() {
 
 	u, err := url.Parse(*kibanaURL)
 	if err != nil {
-		log.Fatalf("Error parsing Kibana URL: %+v", err)
+		log.Fatalf("Error parsing Kibana URL: %v", err)
 	}
 
+	var user, pass string
+	if u.User != nil {
+		user = u.User.Username()
+		pass, _ = u.User.Password()
+	}
 	client, err := kibana.NewClientWithConfig(&kibana.ClientConfig{
 		Protocol: u.Scheme,
 		Host:     u.Host,
+		Username: user,
+		Password: pass,
 		SpaceID:  *spaceID,
 		Timeout:  kibanaTimeout,
 	})
 	if err != nil {
-		log.Fatalf("Error while connecting to Kibana: %+v", err)
+		log.Fatalf("Error while connecting to Kibana: %v", err)
 	}
 
 	if len(*ymlFile) == 0 && len(*dashboard) == 0 {
@@ -75,24 +81,28 @@ func main() {
 	if len(*ymlFile) > 0 {
 		err = exportDashboardsFromYML(client, *ymlFile)
 		if err != nil {
-			log.Fatalf("Failed to export dashboards from YML file: %+v", err)
+			log.Fatalf("Failed to export dashboards from YML file: %v", err)
 		}
-		os.Exit(0)
+		return
 	}
 
 	if len(*dashboard) > 0 {
 		err = exportSingleDashboard(client, *dashboard, *fileOutput)
 		if err != nil {
-			log.Fatalf("Failed to export the dashboard: %+v", err)
+			log.Fatalf("Failed to export the dashboard: %v", err)
 		}
 		if !quiet {
 			log.Printf("The dashboard %s was exported under '%s'\n", *dashboard, *fileOutput)
 		}
+		return
 	}
 }
 
 func exportDashboardsFromYML(client *kibana.Client, ymlFile string) error {
 	results, info, err := dashboards.ExportAllFromYml(client, ymlFile)
+	if err != nil {
+		return err
+	}
 	for i, r := range results {
 		log.Printf("id=%s, name=%s\n", info.Dashboards[i].ID, info.Dashboards[i].File)
 		r = dashboards.DecodeExported(r)
