@@ -19,6 +19,7 @@ package http
 
 import (
 	"bytes"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"net/http"
 	"net/url"
 
@@ -110,7 +111,7 @@ func create(
 
 		// Assign any execution errors to the error field and
 		// assign the url field
-		js[i] = jobs.WithURLField(u, job)
+		js[i] = wrappers.WithURLField(u, job)
 	}
 
 	return js, len(config.URLs), nil

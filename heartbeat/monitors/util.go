@@ -23,6 +23,8 @@ import (
 	"net"
 	"time"
 
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
+
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/libbeat/beat"
@@ -167,7 +169,7 @@ func MakeByIPJob(
 		"monitor": common.MapStr{"ip": addr.String()},
 	}
 
-	return jobs.WithFields(fields, pingFactory(addr)), nil
+	return wrappers.WithFields(fields, pingFactory(addr)), nil
 }
 
 // MakeByHostJob creates a new Job including host lookup. The pingFactory will be used to
@@ -217,7 +219,7 @@ func makeByHostAnyIPJob(
 		resolveRTT := resolveEnd.Sub(resolveStart)
 
 		ipFields := resolveIPEvent(ip.String(), resolveRTT)
-		return jobs.WithFields(ipFields, pingFactory(ip))(event)
+		return wrappers.WithFields(ipFields, pingFactory(ip))(event)
 	}
 }
 
@@ -256,7 +258,7 @@ func makeByHostAllIPJob(
 		for i, ip := range ips {
 			addr := &net.IPAddr{IP: ip}
 			ipFields := resolveIPEvent(ip.String(), resolveRTT)
-			cont[i] = jobs.TimingWrapper(jobs.WithFields(ipFields, pingFactory(addr)))
+			cont[i] = wrappers.WithFields(ipFields, pingFactory(addr))
 		}
 		return cont, nil
 	}

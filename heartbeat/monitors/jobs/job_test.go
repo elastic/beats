@@ -29,17 +29,19 @@ func TestWrapAll(t *testing.T) {
 	}
 
 	addFoo := func(job Job) Job {
-		return AfterJob(job, func(event *beat.Event, cont []Job, err error) ([]Job, error) {
+		return func(event *beat.Event) ([]Job, error) {
+			cont, err := job(event)
 			eventext.MergeEventFields(event, common.MapStr{"foo": "bar"})
 			return cont, err
-		})
+		}
 	}
 
 	addBaz := func(job Job) Job {
-		return AfterJob(job, func(event *beat.Event, cont []Job, err error) ([]Job, error) {
+		return func(event *beat.Event) ([]Job, error) {
+			cont, err := job(event)
 			eventext.MergeEventFields(event, common.MapStr{"baz": "bot"})
 			return cont, err
-		})
+		}
 	}
 
 	tests := []struct {

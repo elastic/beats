@@ -21,7 +21,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	jobs2 "github.com/elastic/beats/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -65,7 +65,7 @@ func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interfa
 	jobs, endpoints, err := create("tls", config)
 	require.NoError(t, err)
 
-	job := jobs2.WrapCommon(jobs, "tls", "", "http")[0]
+	job := wrappers.WrapCommon(jobs, "tls", "", "http")[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -89,7 +89,7 @@ func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, 
 func httpBaseChecks(urlStr string) mapval.Validator {
 	u, _ := url.Parse(urlStr)
 	return mapval.MustCompile(mapval.Map{
-		"url": jobs2.URLFields(u),
+		"url": wrappers.URLFields(u),
 	})
 }
 
@@ -241,7 +241,7 @@ func TestLargeResponse(t *testing.T) {
 	jobs, _, err := create("largeresp", config)
 	require.NoError(t, err)
 
-	job := jobs2.WrapCommon(jobs, "test", "", "http")[0]
+	job := wrappers.WrapCommon(jobs, "test", "", "http")[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

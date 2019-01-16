@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"sync"
 
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
@@ -140,7 +141,7 @@ func newMonitor(
 	}
 
 	rawJobs, endpoints, err := monitorPlugin.create(config)
-	wrappedJobs := jobs.WrapCommon(rawJobs, m.id, m.name, m.typ)
+	wrappedJobs := wrappers.WrapCommon(rawJobs, m.id, m.name, m.typ)
 	m.endpoints = endpoints
 
 	if err != nil {

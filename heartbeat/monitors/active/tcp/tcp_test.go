@@ -20,7 +20,7 @@ package tcp
 import (
 	"crypto/x509"
 	"fmt"
-	jobs2 "github.com/elastic/beats/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -49,7 +49,7 @@ func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
 	jobs, endpoints, err := create("tcp", config)
 	require.NoError(t, err)
 
-	job := jobs2.WrapCommon(jobs, "test", "", "tcp")[0]
+	job := wrappers.WrapCommon(jobs, "test", "", "tcp")[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -72,7 +72,7 @@ func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string
 	jobs, endpoints, err := create("tcp", config)
 	require.NoError(t, err)
 
-	job := jobs2.WrapCommon(jobs, "test", "", "tcp")[0]
+	job := wrappers.WrapCommon(jobs, "test", "", "tcp")[0]
 
 	event := &beat.Event{}
 	_, err = job(event)

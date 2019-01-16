@@ -15,10 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package monitors
+package wrappers
 
 import (
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"net/url"
 	"testing"
 
@@ -81,7 +80,7 @@ func TestURLFields(t *testing.T) {
 			parsed, err := url.Parse(tt.u)
 			require.NoError(t, err)
 
-			got := jobs.URLFields(parsed)
+			got := URLFields(parsed)
 			mapvaltest.Test(t, mapval.MustCompile(mapval.Map(tt.want)), got)
 		})
 	}

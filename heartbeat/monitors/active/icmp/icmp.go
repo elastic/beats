@@ -19,10 +19,12 @@ package icmp
 
 import (
 	"fmt"
-	"github.com/elastic/beats/heartbeat/eventext"
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"net"
 	"net/url"
+
+	"github.com/elastic/beats/heartbeat/eventext"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/monitors"
@@ -87,7 +89,7 @@ func create(
 			return nil, 0, err
 		}
 
-		jobs = append(jobs, jobs.WithURLField(u, job))
+		jobs = append(jobs, wrappers.WithURLField(u, job))
 	}
 
 	return jobs, len(config.Hosts), nil

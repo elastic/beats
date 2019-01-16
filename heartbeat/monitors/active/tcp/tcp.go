@@ -19,11 +19,13 @@ package tcp
 
 import (
 	"fmt"
-	"github.com/elastic/beats/heartbeat/eventext"
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/elastic/beats/heartbeat/eventext"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
@@ -95,7 +97,7 @@ func create(
 					return err
 				}
 
-				eventext.MergeEventFields(event, common.MapStr{"url": jobs.URLFields(u)})
+				eventext.MergeEventFields(event, common.MapStr{"url": wrappers.URLFields(u)})
 
 				return pingHost(event, dialer, addr, timeout, validator)
 			})

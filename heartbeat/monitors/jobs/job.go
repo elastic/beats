@@ -5,15 +5,6 @@ import "github.com/elastic/beats/libbeat/beat"
 // A Job represents a unit of execution, and may return multiple continuation jobs.
 type Job func(event *beat.Event) ([]Job, error)
 
-// AfterJob creates a wrapped version of the given Job that runs additional
-// code after the original Job, possibly altering return values.
-func AfterJob(j Job, after func(*beat.Event, []Job, error) ([]Job, error)) Job {
-	return func(event *beat.Event) ([]Job, error) {
-		next, err := j(event)
-		return after(event, next, err)
-	}
-}
-
 // MakeSimpleJob creates a new Job from a callback function. The callback should
 // return an valid event and can not create any sub-tasks to be executed after
 // completion.
