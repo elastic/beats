@@ -19,10 +19,11 @@ package monitors
 
 import (
 	"fmt"
-	"github.com/elastic/beats/heartbeat/eventext"
-	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/heartbeat/eventext"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -182,7 +183,7 @@ func TestMonitor_wrapCommon(t *testing.T) {
 			wrapped := jobs.WrapCommon(tt.jobs, m.id, m.name, m.typ)
 
 			defer m.freeID()
-			results, err := execJobsAndConts(t, wrapped)
+			results, err := jobs.ExecJobsAndConts(t, wrapped)
 			assert.NoError(t, err)
 
 			for idx, r := range results {

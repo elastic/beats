@@ -33,7 +33,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/hbtest"
-	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/file"
@@ -90,7 +89,7 @@ func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, 
 func httpBaseChecks(urlStr string) mapval.Validator {
 	u, _ := url.Parse(urlStr)
 	return mapval.MustCompile(mapval.Map{
-		"url": monitors.URLFields(u),
+		"url": jobs2.URLFields(u),
 	})
 }
 

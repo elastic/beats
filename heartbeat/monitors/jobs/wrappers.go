@@ -2,6 +2,8 @@ package jobs
 
 import (
 	"github.com/elastic/beats/heartbeat/eventext"
+	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/elastic/beats/heartbeat/look"
@@ -86,4 +88,47 @@ func WithFields(fields common.MapStr, job Job) Job {
 			return WithFields(fields, job)
 		}), err
 	})
+}
+
+// WithURLField wraps a job setting the "url" field appropriately using URLFields.
+func WithURLField(u *url.URL, job Job) Job {
+	return WithFields(common.MapStr{"url": URLFields(u)}, job)
+}
+
+// URLFields generates ECS compatible URL.* fields from a given url. It also sanitizes
+// the password making sure that, if present, it is replaced with the string '<hidden>'.
+func URLFields(u *url.URL) common.MapStr {
+	fields := common.MapStr{
+		"scheme": u.Scheme,
+		"domain": u.Hostname(),
+	}
+
+	if u.Port() != "" {
+		fields["port"], _ = strconv.ParseUint(u.Port(), 10, 8)
+	}
+
+	if u.Path != "" {
+		fields["path"] = u.Path
+	}
+
+	if u.RawQuery != "" {
+		fields["query"] = u.RawQuery
+	}
+
+	if u.User != nil {
+		if u.User.Username() != "" {
+			fields["username"] = u.User.Username()
+		}
+		if _, ok := u.User.Password(); ok {
+			// Sanitize the password if present
+			hiddenPass := "<hidden>"
+			u.User = url.UserPassword(u.User.Username(), hiddenPass)
+			fields["password"] = hiddenPass
+		}
+	}
+
+	// This is called last to ensure that the password is sanitized
+	fields["full"] = u.String()
+
+	return fields
 }

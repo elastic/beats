@@ -87,7 +87,7 @@ func create(
 			return nil, 0, err
 		}
 
-		jobs = append(jobs, monitors.WithURLField(u, job))
+		jobs = append(jobs, jobs.WithURLField(u, job))
 	}
 
 	return jobs, len(config.Hosts), nil

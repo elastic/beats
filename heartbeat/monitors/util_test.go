@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"net/url"
 	"testing"
 
@@ -80,7 +81,7 @@ func TestURLFields(t *testing.T) {
 			parsed, err := url.Parse(tt.u)
 			require.NoError(t, err)
 
-			got := URLFields(parsed)
+			got := jobs.URLFields(parsed)
 			mapvaltest.Test(t, mapval.MustCompile(mapval.Map(tt.want)), got)
 		})
 	}

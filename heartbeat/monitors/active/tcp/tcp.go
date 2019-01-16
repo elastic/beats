@@ -95,7 +95,7 @@ func create(
 					return err
 				}
 
-				eventext.MergeEventFields(event, common.MapStr{"url": monitors.URLFields(u)})
+				eventext.MergeEventFields(event, common.MapStr{"url": jobs.URLFields(u)})
 
 				return pingHost(event, dialer, addr, timeout, validator)
 			})

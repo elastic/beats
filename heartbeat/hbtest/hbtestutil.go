@@ -20,6 +20,7 @@ package hbtest
 import (
 	"crypto/x509"
 	"fmt"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -32,7 +33,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/libbeat/common/mapval"
 	"github.com/elastic/beats/libbeat/common/x509util"
 )
@@ -123,7 +123,7 @@ func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) mapv
 	require.NoError(t, err)
 
 	return mapval.MustCompile(mapval.Map{
-		"url": monitors.URLFields(u),
+		"url": jobs.URLFields(u),
 	})
 }
 
