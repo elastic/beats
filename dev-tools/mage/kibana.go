@@ -31,6 +31,9 @@ import (
 func KibanaDashboards(moduleDirs ...string) error {
 	var kibanaBuildDir = "build/kibana"
 
+	if err := os.RemoveAll(kibanaBuildDir); err != nil {
+		return err
+	}
 	if err := os.MkdirAll(kibanaBuildDir, 0755); err != nil {
 		return err
 	}

@@ -58,6 +58,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Changed DNS protocol fields to align with ECS. {pull}9941[9941]
 - Removed trailing dot from domain names reported by the DNS protocol. {pull}9941[9941]
 - Changed TLS protocol fields to align with ECS. {pull}9980[9980]
+- Changed ICMP protocol fields to align with ECS. {pull}10062[10062]
 
 *Winlogbeat*
 
@@ -87,7 +88,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Journalbeat*
 
 *Metricbeat*
+
 - Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
+- Fix pod UID metadata enrichment in Kubernetes module. {pull}10081[10081]
 
 *Packetbeat*
 
@@ -105,6 +108,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `agent.id` and `agent.ephemeral_id` fields to all beats. {pull}9404[9404]
 - Add `name` config option to `add_host_metadata` processor. {pull}9943[9943]
 - Add `add_labels` and `add_tags` processors. {pull}9973[9973]
+- Add missing file encoding to readers. {pull}10080[10080]
 
 *Auditbeat*
 
@@ -140,6 +144,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Packetbeat*
 
 - Add `network.community_id` to Packetbeat flow events. {pull}10061[10061]
+- Add aliases for flow fields that were renamed. {issue}7968[7968] {pull}10063[10063]
 
 *Functionbeat*
 

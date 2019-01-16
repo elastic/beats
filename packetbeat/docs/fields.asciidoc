@@ -5324,6 +5324,69 @@ VLAN identifier from the 802.1q frame. In case of a multi-tagged frame this fiel
 
 --
 
+*`flow_id`*::
++
+--
+type: alias
+
+alias to: flow.id
+
+--
+
+*`final`*::
++
+--
+type: alias
+
+alias to: flow.final
+
+--
+
+*`vlan`*::
++
+--
+type: alias
+
+alias to: flow.vlan
+
+--
+
+*`source.stats.net_bytes_total`*::
++
+--
+type: alias
+
+alias to: source.bytes
+
+--
+
+*`source.stats.net_packets_total`*::
++
+--
+type: alias
+
+alias to: source.packets
+
+--
+
+*`dest.stats.net_bytes_total`*::
++
+--
+type: alias
+
+alias to: destination.bytes
+
+--
+
+*`dest.stats.net_packets_total`*::
++
+--
+type: alias
+
+alias to: destination.packets
+
+--
+
 [[exported-fields-host-processor]]
 == Host fields
 
