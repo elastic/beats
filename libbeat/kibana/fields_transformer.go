@@ -24,6 +24,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+var v640 = common.MustNewVersion("6.4.0")
+
 type fieldsTransformer struct {
 	fields                    common.Fields
 	transformedFields         []common.MapStr
@@ -85,9 +87,16 @@ func (t *fieldsTransformer) transformFields(commonFields common.Fields, path str
 			}
 		} else {
 			if f.Type == "alias" {
+				if t.version.LessThan(v640) {
+					continue
+				}
 				if ff := t.fields.GetField(f.AliasPath); ff != nil {
-					// TODO: copy more then just type
-					f.Type = ff.Type
+					// copy the field, keep
+					path := f.Path
+					name := f.Name
+					f = *ff
+					f.Path = path
+					f.Name = name
 				}
 			}
 			t.add(f)
