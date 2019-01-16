@@ -204,7 +204,7 @@ class Test(BaseTest):
             shutdown_timeout="1s",
             processors=[{
                 "drop_event": {
-                    "when": "not.equals.event.type: flow",
+                    "when": "not.equals.type: flow",
                 },
             }]
         )

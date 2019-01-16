@@ -11,7 +11,7 @@ from beat.beat import Proc
 TRANS_REQUIRED_FIELDS = ["@timestamp", "type", "status",
                          "agent.type", "agent.hostname", "agent.version"]
 
-FLOWS_REQUIRED_FIELDS = ["@timestamp", "event.type", "event.start",
+FLOWS_REQUIRED_FIELDS = ["@timestamp", "type", "event.dataset", "event.start",
                          "event.end", "event.duration", "flow.id",
                          "agent.type", "agent.hostname", "agent.version"]
 
