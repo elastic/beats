@@ -26,24 +26,42 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 )
 
-type addLabels struct {
-	labels common.MapStr
+type addFields struct {
+	fields common.MapStr
 	shared bool
 }
 
 // LabelsKey is the default target key for the add_labels processor.
 const LabelsKey = "labels"
+const FieldsKey = "fields"
 
 func init() {
 	processors.RegisterPlugin("add_labels",
 		configChecked(createAddLabels,
-			requireFields("labels"),
-			allowedFields("labels", "target", "when")))
+			requireFields(LabelsKey),
+			allowedFields(LabelsKey, "when")))
+
+	processors.RegisterPlugin("add_fields",
+		configChecked(createAddFields,
+			requireFields(FieldsKey),
+			allowedFields(FieldsKey, "target", "when")))
 }
 
 func createAddLabels(c *common.Config) (processors.Processor, error) {
 	config := struct {
 		Labels common.MapStr `config:"labels" validate:"required"`
+	}{}
+	err := c.Unpack(&config)
+	if err != nil {
+		return nil, fmt.Errorf("fail to unpack the add_fields configuration: %s", err)
+	}
+
+	return makeFieldsProcessor(LabelsKey, config.Labels.Flatten(), true), nil
+}
+
+func createAddFields(c *common.Config) (processors.Processor, error) {
+	config := struct {
+		Fields common.MapStr `config:"fields" validate:"required"`
 		Target *string       `config:"target"`
 	}{}
 	err := c.Unpack(&config)
@@ -51,41 +69,52 @@ func createAddLabels(c *common.Config) (processors.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the add_fields configuration: %s", err)
 	}
 
-	var target string
-	if config.Target == nil {
-		target = LabelsKey
-	} else {
-		target = *config.Target
-	}
+	return makeFieldsProcessor(
+		optTarget(config.Target, FieldsKey),
+		config.Fields,
+		true,
+	), nil
+}
 
-	labels := config.Labels
+func optTarget(opt *string, def string) string {
+	if opt == nil {
+		return def
+	}
+	return *opt
+}
+
+func makeFieldsProcessor(target string, fields common.MapStr, shared bool) processors.Processor {
 	if target != "" {
-		labels = common.MapStr{
-			target: labels,
+		fields = common.MapStr{
+			target: fields,
 		}
 	}
 
-	return NewAddLabels(labels, true), nil
+	return NewAddFields(fields, shared)
 }
 
 // NewAddLabels creates a new processor adding the given object to events. Set
 // `shared` true if there is the chance of labels being changed/modified by
 // subsequent processors.
 func NewAddLabels(labels common.MapStr, shared bool) processors.Processor {
-	return &addLabels{labels: labels, shared: shared}
+	return NewAddFields(labels.Flatten(), shared)
 }
 
-func (af *addLabels) Run(event *beat.Event) (*beat.Event, error) {
-	labels := af.labels
+func NewAddFields(fields common.MapStr, shared bool) processors.Processor {
+	return &addFields{fields: fields, shared: shared}
+}
+
+func (af *addFields) Run(event *beat.Event) (*beat.Event, error) {
+	fields := af.fields
 	if af.shared {
-		labels = labels.Clone()
+		fields = fields.Clone()
 	}
 
-	event.Fields.DeepUpdate(labels)
+	event.Fields.DeepUpdate(fields)
 	return event, nil
 }
 
-func (af *addLabels) String() string {
-	s, _ := json.Marshal(af.labels)
-	return fmt.Sprintf("add_labels=%s", s)
+func (af *addFields) String() string {
+	s, _ := json.Marshal(af.fields)
+	return fmt.Sprintf("add_fields=%s", s)
 }

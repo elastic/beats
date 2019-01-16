@@ -20,65 +20,55 @@ package actions
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors"
 )
 
-func TestAddLabels(t *testing.T) {
+func TestAddFields(t *testing.T) {
 	multi := func(strs ...string) []string { return strs }
 	single := func(str string) []string { return multi(str) }
 
-	cases := map[string]struct {
-		event common.MapStr
-		want  common.MapStr
-		cfg   []string
-	}{
-		"add label": {
+	testProcessors(t, map[string]testCase{
+		"add field": {
 			event: common.MapStr{},
 			want: common.MapStr{
-				"labels": common.MapStr{"label": "test"},
+				"fields": common.MapStr{"field": "test"},
 			},
-			cfg: single(`{labels: {label: test}}`),
+			cfg: single(`{add_fields: {fields: {field: test}}}`),
 		},
 		"custom target": {
 			event: common.MapStr{},
 			want: common.MapStr{
-				"my": common.MapStr{"label": "test"},
+				"my": common.MapStr{"field": "test"},
 			},
-			cfg: single(`{target: my, labels: {label: test}}`),
+			cfg: single(`{add_fields: {target: my, fields: {field: test}}}`),
 		},
-		"overwrite existing label": {
+		"overwrite existing field": {
 			event: common.MapStr{
-				"labels": common.MapStr{"label": "old"},
+				"fields": common.MapStr{"field": "old"},
+			},
+			want: common.MapStr{"fields": common.MapStr{"field": "test"}},
+			cfg:  single(`{add_fields: {fields: {field: test}}}`),
+		},
+		"merge with existing fields": {
+			event: common.MapStr{
+				"fields": common.MapStr{"existing": "a"},
 			},
 			want: common.MapStr{
-				"labels": common.MapStr{"label": "test"},
+				"fields": common.MapStr{"existing": "a", "field": "test"},
 			},
-			cfg: single(`{labels: {label: test}}`),
-		},
-		"merge with existing labels": {
-			event: common.MapStr{
-				"labels": common.MapStr{"existing": "a"},
-			},
-			want: common.MapStr{
-				"labels": common.MapStr{"existing": "a", "label": "test"},
-			},
-			cfg: single(`{labels: {label: test}}`),
+			cfg: single(`{add_fields: {fields: {field: test}}}`),
 		},
 		"combine 2 processors": {
 			event: common.MapStr{},
 			want: common.MapStr{
-				"labels": common.MapStr{
+				"fields": common.MapStr{
 					"l1": "a",
 					"l2": "b",
 				},
 			},
 			cfg: multi(
-				`{labels: {l1: a}}`,
-				`{labels: {l2: b}}`,
+				`{add_fields: {fields: {l1: a}}}`,
+				`{add_fields: {fields: {l2: b}}}`,
 			),
 		},
 		"different targets": {
@@ -88,8 +78,8 @@ func TestAddLabels(t *testing.T) {
 				"b": common.MapStr{"l2": "b"},
 			},
 			cfg: multi(
-				`{target: a, labels: {l1: a}}`,
-				`{target: b, labels: {l2: b}}`,
+				`{add_fields: {target: a, fields: {l1: a}}}`,
+				`{add_fields: {target: b, fields: {l2: b}}}`,
 			),
 		},
 		"under root": {
@@ -98,7 +88,7 @@ func TestAddLabels(t *testing.T) {
 				"a": common.MapStr{"b": "test"},
 			},
 			cfg: single(
-				`{target: "", labels: {a.b: test}}`,
+				`{add_fields: {target: "", fields: {a.b: test}}}`,
 			),
 		},
 		"merge under root": {
@@ -109,7 +99,7 @@ func TestAddLabels(t *testing.T) {
 				"a": common.MapStr{"old": "value", "new": "test"},
 			},
 			cfg: single(
-				`{target: "", labels: {a.new: test}}`,
+				`{add_fields: {target: "", fields: {a.new: test}}}`,
 			),
 		},
 		"overwrite existing under root": {
@@ -120,40 +110,47 @@ func TestAddLabels(t *testing.T) {
 				"a": common.MapStr{"keep": "value", "change": "b"},
 			},
 			cfg: single(
-				`{target: "", labels: {a.change: b}}`,
+				`{add_fields: {target: "", fields: {a.change: b}}}`,
 			),
 		},
-	}
+	})
+}
 
-	for name, test := range cases {
-		test := test
-		t.Run(name, func(t *testing.T) {
-			ps := make([]*processors.Processors, len(test.cfg))
-			for i := range test.cfg {
-				config, err := common.NewConfigWithYAML([]byte(test.cfg[i]), "test")
-				if err != nil {
-					t.Fatalf("Failed to create config(%v): %+v", i, err)
-				}
+func TestAddLabels(t *testing.T) {
+	multi := func(strs ...string) []string { return strs }
+	single := func(str string) []string { return multi(str) }
 
-				ps[i], err = processors.New(processors.PluginConfig{
-					{
-						"add_labels": config,
-					},
-				})
-				if err != nil {
-					t.Fatalf("Failed to create add_tags processor(%v): %+v", i, err)
-				}
-			}
-
-			current := &beat.Event{Fields: test.event.Clone()}
-			for i, processor := range ps {
-				current = processor.Run(current)
-				if current == nil {
-					t.Fatalf("Event dropped(%v)", i)
-				}
-			}
-
-			assert.Equal(t, test.want, current.Fields)
-		})
-	}
+	testProcessors(t, map[string]testCase{
+		"add label": {
+			event: common.MapStr{},
+			want: common.MapStr{
+				"labels": common.MapStr{"label": "test"},
+			},
+			cfg: single(`{add_labels: {labels: {label: test}}}`),
+		},
+		"add dotted label": {
+			event: common.MapStr{},
+			want: common.MapStr{
+				"labels": common.MapStr{"a.b": "test"},
+			},
+			cfg: single(`{add_labels: {labels: {a.b: test}}}`),
+		},
+		"add nested labels": {
+			event: common.MapStr{},
+			want: common.MapStr{
+				"labels": common.MapStr{"a.b": "test", "a.c": "test2"},
+			},
+			cfg: single(`{add_labels: {labels: {a: {b: test, c: test2}}}}`),
+		},
+		"merge labels": {
+			event: common.MapStr{},
+			want: common.MapStr{
+				"labels": common.MapStr{"l1": "a", "l2": "b", "lc": "b"},
+			},
+			cfg: multi(
+				`{add_labels.labels: {l1: a, lc: a}}`,
+				`{add_labels.labels: {l2: b, lc: b}}`,
+			),
+		},
+	})
 }
