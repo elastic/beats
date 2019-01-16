@@ -59,6 +59,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Removed trailing dot from domain names reported by the DNS protocol. {pull}9941[9941]
 - Changed TLS protocol fields to align with ECS. {pull}9980[9980]
 - Changed ICMP protocol fields to align with ECS. {pull}10062[10062]
+- Changed HTTP protocol fields to align with ECS. {pull}9976[9976]
 
 *Winlogbeat*
 
