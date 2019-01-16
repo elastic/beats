@@ -527,7 +527,7 @@ metricbeat.modules:
 
 #--------------------------------- Nats Module ---------------------------------
 - module: nats
-  metricsets: ["stats", "connections"]
+  metricsets: ["connections", "stats"]
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"

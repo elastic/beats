@@ -24,21 +24,22 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 )
 
 var (
-	statsSchema = s.Schema{
+	moduleSchema = s.Schema{
 		"server_id": c.Str("server_id"),
 		"now":       c.Str("now"),
-		"total":     c.Int("total"),
+	}
+	connectionsSchema = s.Schema{
+		"total": c.Int("total"),
 	}
 )
 
 func eventMapping(r mb.ReporterV2, content []byte) error {
-	var event common.MapStr
+	var event mb.Event
 	var inInterface map[string]interface{}
 
 	err := json.Unmarshal(content, &inInterface)
@@ -47,13 +48,19 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		r.Error(err)
 		return err
 	}
-	event, err = statsSchema.Apply(inInterface)
+	event.MetricSetFields, err = connectionsSchema.Apply(inInterface)
 	if err != nil {
-		err = errors.Wrap(err, "failure applying index schema")
+		err = errors.Wrap(err, "failure applying connections schema")
 		r.Error(err)
 		return err
 	}
 
-	r.Event(mb.Event{MetricSetFields: event})
+	event.ModuleFields, err = moduleSchema.Apply(inInterface)
+	if err != nil {
+		err = errors.Wrap(err, "failure applying module schema")
+		r.Error(err)
+		return err
+	}
+	r.Event(event)
 	return nil
 }

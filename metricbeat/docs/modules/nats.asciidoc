@@ -29,7 +29,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: nats
-  metricsets: ["stats", "connections"]
+  metricsets: ["connections", "stats"]
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"

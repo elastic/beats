@@ -3,14 +3,6 @@
   description: >
     Contains nats connection related metrics
   fields:
-    - name: server_id
-      type: string
-      description: >
-        The server ID
-    - name: now
-      type: date
-      description: >
-        Server time of metric creation
     - name: total
       type: integer
       description: >

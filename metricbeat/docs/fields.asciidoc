@@ -17232,14 +17232,7 @@ nats Module
 
 
 
-[float]
-== connections fields
-
-Contains nats connection related metrics
-
-
-
-*`nats.connections.server_id`*::
+*`nats.server_id`*::
 +
 --
 type: string
@@ -17249,7 +17242,7 @@ The server ID
 
 --
 
-*`nats.connections.now`*::
+*`nats.now`*::
 +
 --
 type: date
@@ -17258,6 +17251,13 @@ Server time of metric creation
 
 
 --
+
+[float]
+== connections fields
+
+Contains nats connection related metrics
+
+
 
 *`nats.connections.total`*::
 +
@@ -17275,26 +17275,6 @@ The number of currently active clients
 Contains nats var related metrics
 
 
-
-*`nats.stats.server_id`*::
-+
---
-type: keyword
-
-The server ID
-
-
---
-
-*`nats.stats.now`*::
-+
---
-type: date
-
-Server time of metric creation
-
-
---
 
 *`nats.stats.uptime`*::
 +

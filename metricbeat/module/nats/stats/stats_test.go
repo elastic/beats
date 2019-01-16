@@ -30,7 +30,7 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	content, err := ioutil.ReadFile("../_meta/test/statsmetrics.json")
+	content, err := ioutil.ReadFile("./_meta/test/statsmetrics.json")
 	assert.NoError(t, err)
 	reporter := &mbtest.CapturingReporterV2{}
 	err = eventMapping(reporter, content)
@@ -41,7 +41,7 @@ func TestEventMapping(t *testing.T) {
 }
 
 func TestFetchEventContent(t *testing.T) {
-	absPath, _ := filepath.Abs("../_meta/test/")
+	absPath, _ := filepath.Abs("./_meta/test/")
 
 	response, _ := ioutil.ReadFile(absPath + "/statsmetrics.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
