@@ -20,6 +20,7 @@
 package redis
 
 import (
+	"strings"
 	"testing"
 
 	rd "github.com/garyburd/redigo/redis"
@@ -31,6 +32,41 @@ import (
 )
 
 var host = GetRedisEnvHost() + ":" + GetRedisEnvPort()
+
+func TestFetchRedisInfo(t *testing.T) {
+	compose.EnsureUp(t, "redis")
+
+	conn, err := rd.Dial("tcp", host)
+	if err != nil {
+		t.Fatal("connect", err)
+	}
+	defer conn.Close()
+
+	t.Run("default info", func(t *testing.T) {
+		info, err := FetchRedisInfo("default", conn)
+		require.NoError(t, err)
+
+		_, ok := info["redis_version"]
+		assert.True(t, ok, "redis_version should be in redis info")
+	})
+
+	t.Run("keyspace info", func(t *testing.T) {
+		conn.Do("FLUSHALL")
+		conn.Do("SET", "foo", "bar")
+
+		info, err := FetchRedisInfo("keyspace", conn)
+		require.NoError(t, err)
+
+		dbFound := false
+		for k := range info {
+			if strings.HasPrefix(k, "db") {
+				dbFound = true
+				break
+			}
+		}
+		assert.True(t, dbFound, "there should be keyspaces in redis info")
+	})
+}
 
 func TestFetchKeys(t *testing.T) {
 	compose.EnsureUp(t, "redis")

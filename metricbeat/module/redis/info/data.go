@@ -18,9 +18,9 @@
 package info
 
 import (
-	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 var (
@@ -237,12 +237,14 @@ var (
 )
 
 // Map data to MapStr
-func eventMapping(info map[string]string) common.MapStr {
+func eventMapping(r mb.ReporterV2, info map[string]string) {
 	// Full mapping from info
 	source := map[string]interface{}{}
 	for key, val := range info {
 		source[key] = val
 	}
 	data, _ := schema.Apply(source)
-	return data
+	r.Event(mb.Event{
+		MetricSetFields: data,
+	})
 }
