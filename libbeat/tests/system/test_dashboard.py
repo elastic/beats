@@ -242,7 +242,8 @@ class Test(BaseTest):
         )
 
         beat.check_wait(exit_code=1)
-        assert self.log_contains("Error getting dashboards from yml: error opening the list of dashboards:") is True
+        assert self.log_contains("Error getting dashboards from yml")
+        assert self.log_contains("error opening the list of dashboards")
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')

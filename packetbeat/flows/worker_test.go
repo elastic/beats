@@ -96,8 +96,9 @@ func TestCreateEvent(t *testing.T) {
 			"start":    mapval.KeyPresent,
 			"end":      mapval.KeyPresent,
 			"duration": mapval.KeyPresent,
-			"type":     "flow",
+			"dataset":  "flow",
 		},
+		"type": "flow",
 	})
 
 	result := validate(event.Fields)

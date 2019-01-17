@@ -2214,18 +2214,6 @@
             description: >
               Operating system kernel version as a raw string.
 
-    # Temporary fix to get 7.0 dashboards working.
-    # This must go in the ecs.yml as otherwise tests don't work.
-    - name: beat.name
-      type: alias
-      path: agent.type
-      migration: true
-
-    - name: beat.hostname
-      type: alias
-      path: agent.hostname
-      migration: true
-
     # This is not in ECS.
     # TODO: https://github.com/elastic/ecs/issues/178
     - name: agent.hostname

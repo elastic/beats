@@ -3,14 +3,6 @@
   description: >
     Contains nats var related metrics
   fields:
-    - name: server_id
-      type: keyword
-      description: >
-        The server ID
-    - name: now
-      type: date
-      description: >
-        Server time of metric creation
     - name: uptime
       type: long
       description: >

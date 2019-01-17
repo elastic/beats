@@ -1,0 +1,67 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "aws": {
+        "ec2": {
+            "cpu": {
+                "total": {
+                    "pct": 3.34375
+                }
+            },
+            "diskio": {
+                "read": {
+                    "bytes": 0,
+                    "ops": 0
+                },
+                "write": {
+                    "bytes": 14036172.8,
+                    "ops": 1320.4
+                }
+            },
+            "network": {
+                "in": {
+                    "bytes": 112.8,
+                    "packets": 2
+                },
+                "out": {
+                    "bytes": 84.8,
+                    "packets": 2
+                }
+            },
+            "status": {
+                "check_failed": 0,
+                "check_failed_instance": 0,
+                "check_failed_system": 0
+            }
+        }
+    },
+    "cloud": {
+        "availability_zone": "eu-central-1b",
+        "image": {
+            "id": "ami-556ef13a"
+        },
+        "instance": {
+            "id": "i-08027f3dcddb9a976"
+        },
+        "machine": {
+            "type": "i3.4xlarge"
+        },
+        "provider": "ec2",
+        "region": "eu-central-1"
+    },
+    "event": {
+        "dataset": "aws.ec2",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "ec2"
+    },
+    "service": {
+        "name": "ec2",
+        "type": "ec2"
+    }
+}
