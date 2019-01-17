@@ -278,6 +278,28 @@
   to: process.thread.id
   alias: true
 
+## Elasticsearch module
+
+- from: elasticsearch.audit.event_type
+  to: event.type
+  alias: true
+
+- from: elasticsearch.audit.origin_address
+  to: source.ip
+  alias: true
+
+- from: elasticsearch.audit.principal
+  to: user.name
+  alias: true
+
+- from: elasticsearch.audit.request_body
+  to: http.request.body.content
+  alias: true
+
+- from: elasticsearch.audit.uri
+  to: url.original
+  alias: true
+
 ## IIS module
 
 - from: iis.access.server_ip
