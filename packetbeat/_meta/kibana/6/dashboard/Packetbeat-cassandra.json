@@ -175,7 +175,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -264,7 +263,7 @@
             ],
             "yAxis": {}
           },
-          "title": "Cassandra ResponseTime",
+          "title": "Cassandra ResponseTime [Packetbeat]",
           "type": "line"
         }
       },
