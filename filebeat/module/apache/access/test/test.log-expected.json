@@ -2,7 +2,6 @@
     {
         "@timestamp": "2016-12-26T14:16:29.000Z",
         "apache.access.body_sent.bytes": 209,
-        "apache.access.remote_ip": "::1",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "apache.access",
         "event.module": "apache",
@@ -13,6 +12,7 @@
         "input.type": "log",
         "log.offset": 0,
         "service.type": "apache",
+        "source.address": "::1",
         "source.ip": "::1",
         "url.original": "/favicon.ico",
         "user.name": "-"
@@ -20,7 +20,6 @@
     {
         "@timestamp": "2016-12-26T16:22:13.000Z",
         "apache.access.body_sent.bytes": 499,
-        "apache.access.remote_ip": "192.168.33.1",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "apache.access",
         "event.module": "apache",
@@ -32,6 +31,7 @@
         "input.type": "log",
         "log.offset": 73,
         "service.type": "apache",
+        "source.address": "192.168.33.1",
         "source.ip": "192.168.33.1",
         "url.original": "/hello",
         "user.name": "-",
@@ -47,7 +47,6 @@
     },
     {
         "@timestamp": "2016-12-26T14:16:48.000Z",
-        "apache.access.remote_ip": "::1",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "apache.access",
         "event.module": "apache",
@@ -56,13 +55,13 @@
         "input.type": "log",
         "log.offset": 238,
         "service.type": "apache",
+        "source.address": "::1",
         "source.ip": "::1",
         "user.name": "-"
     },
     {
         "@timestamp": "2017-05-29T19:02:48.000Z",
         "apache.access.body_sent.bytes": 612,
-        "apache.access.remote_ip": "172.17.0.1",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "apache.access",
         "event.module": "apache",
@@ -74,6 +73,7 @@
         "input.type": "log",
         "log.offset": 285,
         "service.type": "apache",
+        "source.address": "172.17.0.1",
         "source.ip": "172.17.0.1",
         "url.original": "/stringpatch",
         "user.name": "-",
@@ -89,7 +89,6 @@
     {
         "@timestamp": "2017-05-29T19:02:48.000Z",
         "apache.access.body_sent.bytes": 612,
-        "apache.access.remote_ip": "monitoring-server",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "apache.access",
         "event.module": "apache",
@@ -101,6 +100,7 @@
         "input.type": "log",
         "log.offset": 443,
         "service.type": "apache",
+        "source.address": "monitoring-server",
         "source.domain": "monitoring-server",
         "url.original": "/status",
         "user.name": "-",
