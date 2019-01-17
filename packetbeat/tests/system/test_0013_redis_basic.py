@@ -36,7 +36,7 @@ class Test(BaseTest):
 
         assert objs[2]["status"] == "Error"
         assert objs[2]["method"] == "LLEN"
-        assert objs[2]["error.message"] == "ERR Operation against a key " + \
+        assert objs[2]["redis.error"] == "ERR Operation against a key " + \
             "holding the wrong kind of value"
 
         # the rest should be successful

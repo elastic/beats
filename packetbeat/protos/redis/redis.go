@@ -301,7 +301,7 @@ func (redis *redisPlugin) newTransaction(requ, resp *redisMessage) beat.Event {
 
 	if resp.isError {
 		evt.PutValue("status", common.ERROR_STATUS)
-		evt.PutValue("error.message", resp.message)
+		evt.PutValue("redis.error", resp.message)
 	} else {
 		evt.PutValue("status", common.OK_STATUS)
 		evt.PutValue("redis.return_value", resp.message)
