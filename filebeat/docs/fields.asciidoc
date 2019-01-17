@@ -362,16 +362,6 @@ Contains fields for the Apache HTTP Server access logs.
 
 
 
-*`apache.access.remote_ip`*::
-+
---
-type: keyword
-
-Client IP address or hostname.
-
-
---
-
 *`apache.access.ssl.protocol`*::
 +
 --
@@ -401,6 +391,15 @@ format: bytes
 
 The number of bytes of the server response body.
 
+
+--
+
+*`apache.access.remote_ip`*::
++
+--
+type: alias
+
+alias to: source.address
 
 --
 
@@ -4710,9 +4709,9 @@ Information about the client doing the request
 *`haproxy.client.ip`*::
 +
 --
-IP address of the client which initiated the TCP connection to haproxy.
-If connection is via unix socket, socket path is in this field.
+type: alias
 
+alias to: source.address
 
 --
 
