@@ -15,52 +15,62 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package stats
+// +build integration
+
+package connections
 
 import (
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-	"path/filepath"
+	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
-func TestEventMapping(t *testing.T) {
-	content, err := ioutil.ReadFile("./_meta/test/statsmetrics.json")
-	assert.NoError(t, err)
-	reporter := &mbtest.CapturingReporterV2{}
-	err = eventMapping(reporter, content)
-	assert.NoError(t, err)
-	event := reporter.GetEvents()[0]
-	d, _ := event.MetricSetFields.GetValue("total_connections")
-	assert.Equal(t, d, int64(35))
+func TestData(t *testing.T) {
+	compose.EnsureUp(t, "nats")
+
+	metricSet := mbtest.NewReportingMetricSetV2(t, getConfig())
+	err := mbtest.WriteEventsReporterV2(metricSet, t, "./test_data.json")
+	if err != nil {
+		t.Fatal("write", err)
+	}
 }
 
-func TestFetchEventContent(t *testing.T) {
-	absPath, _ := filepath.Abs("./_meta/test/")
+func TestFetch(t *testing.T) {
+	compose.EnsureUp(t, "nats")
 
-	response, _ := ioutil.ReadFile(absPath + "/statsmetrics.json")
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-		w.Header().Set("Content-Type", "application/json;")
-		w.Write([]byte(response))
-	}))
-	defer server.Close()
-
-	config := map[string]interface{}{
-		"module":     "nats",
-		"metricsets": []string{"stats"},
-		"hosts":      []string{server.URL},
-	}
 	reporter := &mbtest.CapturingReporterV2{}
 
-	metricSet := mbtest.NewReportingMetricSetV2(t, config)
+	metricSet := mbtest.NewReportingMetricSetV2(t, getConfig())
 	metricSet.Fetch(reporter)
 
 	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
 	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
+}
+
+func getConfig() map[string]interface{} {
+	return map[string]interface{}{
+		"module":     "nats",
+		"metricsets": []string{"connections"},
+		"hosts":      []string{GetEnvHost() + ":" + GetEnvPort()},
+	}
+}
+
+func GetEnvHost() string {
+	host := os.Getenv("NATS_HOST")
+
+	if len(host) == 0 {
+		host = "127.0.0.1"
+	}
+	return host
+}
+
+func GetEnvPort() string {
+	port := os.Getenv("NATS_PORT")
+
+	if len(port) == 0 {
+		port = "8222"
+	}
+	return port
 }
