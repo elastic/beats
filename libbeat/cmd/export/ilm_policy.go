@@ -22,6 +22,7 @@ import (
 	"os"
 
 	"github.com/elastic/beats/libbeat/index"
+
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/libbeat/cmd/instance"
@@ -49,18 +50,17 @@ func GenGetILMPolicyCmd(settings instance.Settings, name, idxPrefix, beatVersion
 				os.Exit(1)
 			}
 
-			var indicesCfg index.Configs
-			if err := b.Config.Indices.Unpack(&indicesCfg); err != nil {
-				fmt.Fprintf(os.Stderr, "unpacking indices config fails: %v", err)
+			loader, err := index.NewStdoutLoader(b.Info)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "error initializing ilm loader: %s\n", err)
 				os.Exit(1)
 			}
-
-			if _, err = indicesCfg.PrintILMPolicies(b.Info); err != nil {
+			if _, _, _, err = loader.LoadILMPolicies(b.Config.Indices); err != nil {
 				fmt.Fprintf(os.Stderr, err.Error())
 				os.Exit(1)
 			}
 
-			logp.Info("Loaded ILM policies.")
+			logp.Info("Printed ILM policies.")
 		},
 	}
 

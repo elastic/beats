@@ -112,19 +112,6 @@ func (l *Loader) Load(config Config) (bool, error) {
 				return false, fmt.Errorf("error creating template from file %s: %v", fieldsPath, err)
 			}
 
-			// Load fields for modules
-		} else if config.Module != "" {
-			logp.Debug("template", "Load fields for %s", config.Module)
-
-			fields, err := asset.GetFieldsFor(l.beatInfo.Beat, config.Module)
-			if err != nil {
-				return false, err
-			}
-			template, err = tmpl.LoadBytes(fields)
-			if err != nil {
-				return false, fmt.Errorf("error creating template from module: %v", err)
-			}
-
 			// Load default fields
 		} else {
 			logp.Debug("template", "Load default fields.yml")

@@ -52,7 +52,7 @@ func TestCheckTemplate(t *testing.T) {
 	}
 
 	// Check for non existent template
-	assert.False(t, loader.CheckTemplate("libbeat-notexists"))
+	assert.False(t, loader.templateLoaded("libbeat-notexists"))
 }
 
 func TestLoadTemplate(t *testing.T) {
@@ -68,9 +68,9 @@ func TestLoadTemplate(t *testing.T) {
 	assert.Nil(t, err)
 
 	fieldsPath := absPath + "/fields.yml"
-	index := "testbeat"
+	beatName := "testbeat"
 
-	tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), Configs{})
+	tmpl, err := New(version.GetDefaultVersion(), beatName, client.GetVersion(), Config{})
 	assert.NoError(t, err)
 	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)
@@ -84,13 +84,13 @@ func TestLoadTemplate(t *testing.T) {
 	assert.Nil(t, err)
 
 	// Make sure template was loaded
-	assert.True(t, loader.CheckTemplate(tmpl.GetName()))
+	assert.True(t, loader.templateLoaded(tmpl.GetName()))
 
 	// Delete template again to clean up
 	client.Request("DELETE", "/_template/"+tmpl.GetName(), "", nil, nil)
 
 	// Make sure it was removed
-	assert.False(t, loader.CheckTemplate(tmpl.GetName()))
+	assert.False(t, loader.templateLoaded(tmpl.GetName()))
 }
 
 func TestLoadInvalidTemplate(t *testing.T) {
@@ -116,7 +116,7 @@ func TestLoadInvalidTemplate(t *testing.T) {
 	assert.Error(t, err)
 
 	// Make sure template was not loaded
-	assert.False(t, loader.CheckTemplate(templateName))
+	assert.False(t, loader.templateLoaded(templateName))
 }
 
 // Tests loading the templates for each beat
@@ -140,7 +140,7 @@ func TestLoadBeatsTemplate(t *testing.T) {
 		fieldsPath := absPath + "/fields.yml"
 		index := beat
 
-		tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), Configs{})
+		tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), Config{})
 		assert.NoError(t, err)
 		content, err := tmpl.LoadFile(fieldsPath)
 		assert.NoError(t, err)
@@ -154,13 +154,13 @@ func TestLoadBeatsTemplate(t *testing.T) {
 		assert.Nil(t, err)
 
 		// Make sure template was loaded
-		assert.True(t, loader.CheckTemplate(tmpl.GetName()))
+		assert.True(t, loader.templateLoaded(tmpl.GetName()))
 
 		// Delete template again to clean up
 		client.Request("DELETE", "/_template/"+tmpl.GetName(), "", nil, nil)
 
 		// Make sure it was removed
-		assert.False(t, loader.CheckTemplate(tmpl.GetName()))
+		assert.False(t, loader.templateLoaded(tmpl.GetName()))
 	}
 }
 
@@ -186,7 +186,7 @@ func TestTemplateSettings(t *testing.T) {
 			"enabled": false,
 		},
 	}
-	config := Configs{
+	config := Config{
 		Settings: settings,
 	}
 	tmpl, err := New(version.GetDefaultVersion(), "testbeat", client.GetVersion(), config)
@@ -211,7 +211,7 @@ func TestTemplateSettings(t *testing.T) {
 	client.Request("DELETE", "/_template/"+tmpl.GetName(), "", nil, nil)
 
 	// Make sure it was removed
-	assert.False(t, loader.CheckTemplate(tmpl.GetName()))
+	assert.False(t, loader.templateLoaded(tmpl.GetName()))
 }
 
 func TestOverwrite(t *testing.T) {
@@ -236,17 +236,18 @@ func TestOverwrite(t *testing.T) {
 	client.Request("DELETE", "/_template/"+templateName, "", nil, nil)
 
 	// Load template
-	config := newConfigFrom(t, Configs{
+	config := Config{
 		Enabled: true,
 		Fields:  absPath + "/fields.yml",
-	})
-	loader, err := NewLoader(config, client, beatInfo, nil)
+	}
+	loader, err := NewESLoader(client, beatInfo)
 	assert.NoError(t, err)
-	err = loader.Load()
+	loaded, err := loader.Load(config)
 	assert.NoError(t, err)
+	assert.True(t, loaded)
 
 	// Load template again, this time with custom settings
-	config = newConfigFrom(t, Configs{
+	config = Config{
 		Enabled: true,
 		Fields:  absPath + "/fields.yml",
 		Settings: Settings{
@@ -254,18 +255,19 @@ func TestOverwrite(t *testing.T) {
 				"enabled": false,
 			},
 		},
-	})
-	loader, err = NewLoader(config, client, beatInfo, nil)
+	}
+	loader, err = NewESLoader(client, beatInfo)
 	assert.NoError(t, err)
-	err = loader.Load()
+	loaded, err = loader.Load(config)
 	assert.NoError(t, err)
+	assert.False(t, loaded)
 
 	// Overwrite was not enabled, so the first version should still be there
 	templateJSON := getTemplate(t, client, templateName)
 	assert.Equal(t, true, templateJSON.SourceEnabled())
 
 	// Load template again, this time with custom settings AND overwrite: true
-	config = newConfigFrom(t, Configs{
+	config = Config{
 		Enabled:   true,
 		Overwrite: true,
 		Fields:    absPath + "/fields.yml",
@@ -274,11 +276,12 @@ func TestOverwrite(t *testing.T) {
 				"enabled": false,
 			},
 		},
-	})
-	loader, err = NewLoader(config, client, beatInfo, nil)
+	}
+	loader, err = NewESLoader(client, beatInfo)
 	assert.NoError(t, err)
-	err = loader.Load()
+	loaded, err = loader.Load(config)
 	assert.NoError(t, err)
+	assert.True(t, loaded)
 
 	// Overwrite was enabled, so the custom setting should be there
 	templateJSON = getTemplate(t, client, templateName)
@@ -339,7 +342,7 @@ func TestTemplateWithData(t *testing.T) {
 	// Setup ES
 	client := estest.GetTestingElasticsearch(t)
 
-	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), Configs{})
+	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), Config{})
 	assert.NoError(t, err)
 	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)
@@ -353,7 +356,7 @@ func TestTemplateWithData(t *testing.T) {
 	assert.Nil(t, err)
 
 	// Make sure template was loaded
-	assert.True(t, loader.CheckTemplate(tmpl.GetName()))
+	assert.True(t, loader.templateLoaded(tmpl.GetName()))
 
 	for _, test := range dataTests {
 		_, _, err = client.Index(tmpl.GetName(), "_doc", "", nil, test.data)
@@ -369,13 +372,7 @@ func TestTemplateWithData(t *testing.T) {
 	client.Request("DELETE", "/_template/"+tmpl.GetName(), "", nil, nil)
 
 	// Make sure it was removed
-	assert.False(t, loader.CheckTemplate(tmpl.GetName()))
-}
-
-func newConfigFrom(t *testing.T, from interface{}) *common.Config {
-	cfg, err := common.NewConfigFrom(from)
-	assert.NoError(t, err)
-	return cfg
+	assert.False(t, loader.templateLoaded(tmpl.GetName()))
 }
 
 func getTemplate(t *testing.T, client ESClient, templateName string) testTemplate {

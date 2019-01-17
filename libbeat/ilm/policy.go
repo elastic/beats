@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/paths"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -34,7 +35,7 @@ type policy struct {
 	body common.MapStr
 }
 
-func newPolicy(cfg policyCfg) (*policy, error) {
+func newPolicy(cfg PolicyCfg) (*policy, error) {
 	if cfg.Path == "" {
 		for _, p := range defaultPolicies {
 			if p.name == cfg.Name {
@@ -62,6 +63,14 @@ func newPolicy(cfg policyCfg) (*policy, error) {
 	}
 
 	return &p, nil
+}
+
+func (p *policy) String() (string, error) {
+	json, err := json.MarshalIndent(p.body, "", "  ")
+	if err != nil {
+		return "", errors.Wrapf(err, "Invalid json for %s", p.name)
+	}
+	return string(json), nil
 }
 
 var defaultPolicies = []policy{beatDefaultPolicy, deleteAfterTenDays, deleteAfterOneYear}

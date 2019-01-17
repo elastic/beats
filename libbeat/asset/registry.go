@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"compress/zlib"
 	"encoding/base64"
-	"fmt"
 	"io/ioutil"
 	"sort"
 )
@@ -54,8 +53,16 @@ func SetFields(beat, name string, p Priority, asset func() string) error {
 // GetFields returns a byte array containing all fields for the given beat
 func GetFields(beat string) ([]byte, error) {
 	var fields []byte
+
+	// Get all priorities and sort them
 	beatRegistry := FieldsRegistry[beat]
-	for _, priority := range getSortedPriorities(beatRegistry) {
+	priorities := make([]int, 0, len(beatRegistry))
+	for p := range beatRegistry {
+		priorities = append(priorities, p)
+	}
+	sort.Ints(priorities)
+
+	for _, priority := range priorities {
 
 		priorityRegistry := beatRegistry[priority]
 
@@ -77,37 +84,6 @@ func GetFields(beat string) ([]byte, error) {
 		}
 	}
 	return fields, nil
-}
-
-// GetFieldsFor returns a byte array containing all fields for the given beat
-// and given names
-func GetFieldsFor(beat string, name string) ([]byte, error) {
-	var fields []byte
-	beatRegistry := FieldsRegistry[beat]
-
-	for _, priority := range getSortedPriorities(beatRegistry) {
-		data, ok := beatRegistry[priority][name]
-		if !ok {
-			return nil, fmt.Errorf("No fields available for %s", name)
-		}
-
-		output, err := DecodeData(data)
-		if err != nil {
-			return nil, err
-		}
-
-		fields = append(fields, output...)
-	}
-	return fields, nil
-}
-
-func getSortedPriorities(registry map[int]map[string]string) []int {
-	priorities := make([]int, 0, len(registry))
-	for p := range registry {
-		priorities = append(priorities, p)
-	}
-	sort.Ints(priorities)
-	return priorities
 }
 
 // EncodeData compresses the data with zlib and base64 encodes it

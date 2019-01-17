@@ -19,9 +19,7 @@ package index
 
 import (
 	"errors"
-	"fmt"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/ilm"
 	"github.com/elastic/beats/libbeat/template"
@@ -32,10 +30,10 @@ type Configs []Config
 
 //Config supports the new configuration format around indices, templates and ILM
 type Config struct {
-	Name        string                 `config:"name"`
-	ILMCfg      ilm.Config             `config:"ilm"`
-	TemplateCfg template.Config        `config:"template"`
-	Condition   map[string]interface{} `config:"condition"`
+	Name      string                 `config:"name"`
+	ILM       ilm.Config             `config:"ilm"`
+	Template  template.Config        `config:"template"`
+	Condition map[string]interface{} `config:"condition"`
 }
 
 //CompatibleIndexCfg returns a configuration that is compatible with the deprecated output.elasticsearch.index format
@@ -47,8 +45,8 @@ func (i *Configs) CompatibleIndexCfg(client ESClient) (string, *common.Config, e
 	var cfgs []common.Config
 	for _, entry := range *i {
 		//set ilm.rollover_alias
-		if ilmEnabled && !entry.ILMCfg.EnabledFalse() {
-			idxName = entry.ILMCfg.RolloverAlias
+		if ilmEnabled && entry.ILM.Enabled != ilm.ModeDisabled {
+			idxName = entry.ILM.RolloverAlias
 		} else {
 			idxName = entry.Name
 		}
@@ -102,102 +100,11 @@ func (i *Configs) Validate() error {
 	return nil
 }
 
-//LoadTemplates takes care of loading all configured templates to Elasticsearch,
-//respecting ILM settings.
-func (i *Configs) LoadTemplates(info beat.Info, client ESClient) (bool, error) {
-	l, err := template.NewESLoader(client, info)
-	if err != nil {
-		return false, err
-	}
-	return i.loadTemplates(l, ilm.EnabledFor(client))
-}
-
-//PrintTemplates takes care of loading all configured templates to stdout,
-//respecting ILM settings.
-func (i *Configs) PrintTemplates(info beat.Info) (bool, error) {
-	l, err := template.NewStdoutLoader(info)
-	if err != nil {
-		return false, err
-	}
-	return i.loadTemplates(l, true)
-}
-
-func (i *Configs) loadTemplates(l *template.Loader, ilmEnabled bool) (bool, error) {
-	var loaded, loadedAny bool
-	var err error
-
-	for _, cfg := range *i {
-		if ilmEnabled && !cfg.ILMCfg.EnabledFalse() {
-			if updated := cfg.TemplateCfg.UpdateILM(cfg.ILMCfg); !updated {
-				return loadedAny, fmt.Errorf("setup failed for index %s, cannot use ILM and template.json settings together", cfg.Name)
-			}
-		}
-
-		if loaded, err = l.Load(cfg.TemplateCfg); err != nil {
-			loadedAny = loadedAny || loaded
-			return loadedAny, err
-		}
-		loadedAny = loadedAny || loaded
-	}
-	return loadedAny, nil
-}
-
-//LoadILMPolicies takes care of loading configured ILM policies to Elasticsearch
-func (i *Configs) LoadILMPolicies(info beat.Info, client ESClient) (bool, error) {
-	l, err := ilm.NewESLoader(client, info)
-	if err != nil {
-		return false, err
-	}
-
-	return i.loadILM(info, l.LoadPolicy)
-}
-
-//PrintILMPolicies prints configured ILM policies to stdout
-func (i *Configs) PrintILMPolicies(info beat.Info) (bool, error) {
-	l, err := ilm.NewStdoutLoader(info)
-	if err != nil {
-		return false, err
-	}
-
-	return i.loadILM(info, l.LoadPolicy)
-}
-
-//LoadILMWriteAliases takes care of loading configured ILM aliases to Elasticsearch
-func (i *Configs) LoadILMWriteAliases(info beat.Info, client ESClient) (bool, error) {
-	l, err := ilm.NewESLoader(client, info)
-	if err != nil {
-		return false, err
-	}
-
-	return i.loadILM(info, l.LoadWriteAlias)
-}
-
-func (i *Configs) loadILM(info beat.Info, f func(ilm.Config) (bool, error)) (bool, error) {
-	var loaded, loadedAny bool
-	var err error
-	for _, cfg := range *i {
-		if loaded, err = f(cfg.ILMCfg); err != nil {
-			loadedAny = loadedAny || loaded
-			return loadedAny, err
-		}
-		loadedAny = loadedAny || loaded
-	}
-	return loadedAny, nil
-}
-
 //DeprecatedTemplateConfigs creates a new Indices configuration out of the deprecated template configuration.
-func DeprecatedTemplateConfigs(templateCfg *common.Config) (*Configs, error) {
+func DeprecatedTemplateConfigs(templateCfg *common.Config) (Configs, error) {
 	var tmplCfg template.Config
 	if err := templateCfg.Unpack(&tmplCfg); err != nil {
 		return nil, err
 	}
-	return &Configs{{TemplateCfg: tmplCfg, ILMCfg: ilm.Config{Enabled: "false"}}}, nil
-}
-
-// ESClient is a subset of the Elasticsearch client API capable of
-// loading the templates and ILM related setup.
-type ESClient interface {
-	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
-	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
-	GetVersion() common.Version
+	return Configs{{Template: tmplCfg, ILM: ilm.Config{Enabled: ilm.ModeDisabled}}}, nil
 }

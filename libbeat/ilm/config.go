@@ -18,9 +18,7 @@
 package ilm
 
 import (
-	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -35,15 +33,41 @@ type Configs []Config
 
 //Config holds all config options supported for ILM configurations
 type Config struct {
-	Enabled       string    `config:"enabled"`
+	Enabled       Mode      `config:"enabled"`
 	RolloverAlias string    `config:"rollover_alias"`
 	Pattern       string    `config:"pattern"`
-	Policy        policyCfg `config:"policy"`
+	Policy        PolicyCfg `config:"policy"`
 }
 
-type policyCfg struct {
+//PolicyCfg holds config options for ILM policies
+type PolicyCfg struct {
 	Name string `config:"name"`
 	Path string `config:"path"`
+}
+
+//Mode is used for enumerating the ilm mode.
+type Mode uint8
+
+const (
+	ModeAuto Mode = iota
+	ModeEnabled
+	ModeDisabled
+)
+
+//Unpack creates enumeration value true, false or auto
+func (m *Mode) Unpack(in string) error {
+	switch strings.ToLower(in) {
+	case "auto", "Auto":
+		*m = ModeAuto
+	case "true", "True", "yes", "y", "Yes":
+		*m = ModeEnabled
+	case "false", "False", "no", "n", "No":
+		*m = ModeDisabled
+	default:
+		return fmt.Errorf("ilm.enabled mode '%v' is invalid (try auto, true, false)", in)
+	}
+
+	return nil
 }
 
 //Unpack sets the Config instance to the given values
@@ -55,32 +79,6 @@ func (cfg *Config) Unpack(c *common.Config) error {
 	}
 	*cfg = Config(tmp)
 	return nil
-}
-
-//Validate checks if the given configuration is valid
-func (cfg *Config) Validate() error {
-	if _, err := strconv.ParseBool(cfg.Enabled); err != nil && !cfg.EnabledAuto() {
-		return fmt.Errorf("validation error for ilm config section: `ilm.enabled: %s` is invalid", cfg.Enabled)
-	}
-
-	if !cfg.EnabledFalse() && cfg.RolloverAlias == "" {
-		return errors.New("validation error for ilm config section: ilm.rollover_alias must be set when ilm is not disabled")
-	}
-	return nil
-}
-
-//EnabledFalse indicates if ILM is disabled
-func (cfg *Config) EnabledFalse() bool {
-	if e, err := strconv.ParseBool(cfg.Enabled); err == nil {
-		return !e
-	}
-	return false
-}
-
-//EnabledAuto indicates if ILM is set to `auto`. If true,
-//ILM is enabled by default if the configured output can handle it.
-func (cfg *Config) EnabledAuto() bool {
-	return strings.ToLower(cfg.Enabled) == "auto"
 }
 
 func (cfg *Config) prepare(info beat.Info) error {
@@ -129,9 +127,9 @@ func (cfg *Config) prepare(info beat.Info) error {
 
 func defaultILMConfig() *Config {
 	return &Config{
-		Enabled: "auto",
+		Enabled: ModeAuto,
 		Pattern: defaultPattern,
-		Policy:  policyCfg{Name: defaultPolicyName},
+		Policy:  PolicyCfg{Name: defaultPolicyName},
 	}
 }
 

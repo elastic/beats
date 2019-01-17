@@ -113,7 +113,7 @@ func (l *Loader) LoadWriteAlias(cfg Config) (bool, error) {
 
 func (l *Loader) shouldLoad(cfg Config) (bool, error) {
 	//ilm.enabled=false
-	if cfg.EnabledFalse() {
+	if cfg.Enabled == ModeDisabled {
 		return false, nil
 	}
 	if l.ilmEnabled {
@@ -121,7 +121,7 @@ func (l *Loader) shouldLoad(cfg Config) (bool, error) {
 	}
 
 	//setup is not qualified for ILM
-	if cfg.EnabledAuto() {
+	if cfg.Enabled == ModeAuto {
 		//ilm.enabled=auto
 		logp.Info(fmt.Sprintf("ilm for %s set to `auto`, but %s", cfg.RolloverAlias, ilmNotSupported))
 		return false, nil
@@ -171,16 +171,23 @@ func (l *Loader) loadPolicy(p *policy) error {
 	if p == nil {
 		return fmt.Errorf("policy empty")
 	}
+
+	//write to ES
 	if l.esClient != nil {
 		if _, _, err := l.esClient.Request("PUT", "/_ilm/policy/"+p.name, "", nil, p.body); err != nil {
 			return err
 		}
 		return nil
 	}
-	if _, err := os.Stdout.WriteString(fmt.Sprintf("Register policy at `/_ilm/policy/%s`\n%v", p.name, p.body)); err != nil {
+
+	//write do stdout
+	body, err := p.String()
+	if err != nil {
+		return err
+	}
+	if _, err := os.Stdout.WriteString(fmt.Sprintf("Register policy at `/_ilm/policy/%s`\n%v", p.name, body)); err != nil {
 		return fmt.Errorf("error writing ilm policy: %v", err)
 	}
 
-	_, err := os.Stdout.WriteString(fmt.Sprintf("%s: %s\n", p.name, p.body))
-	return err
+	return nil
 }

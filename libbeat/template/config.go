@@ -36,7 +36,6 @@ type Config struct {
 	Name    string `config:"name"`
 	Pattern string `config:"pattern"`
 	Fields  string `config:"fields"`
-	Module  string `config:"module"`
 	JSON    struct {
 		Enabled bool   `config:"enabled"`
 		Path    string `config:"path"`

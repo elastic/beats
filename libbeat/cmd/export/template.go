@@ -55,24 +55,25 @@ func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersi
 				os.Exit(1)
 			}
 
-			var indicesCfg index.Configs
-			if err := b.Config.Indices.Unpack(&indicesCfg); err != nil {
-				fmt.Fprintf(os.Stderr, "unpacking indices config fails: %v", err)
-				os.Exit(1)
-			}
-			if len(indicesCfg) == 0 {
-				cfg, err := index.DeprecatedTemplateConfigs(b.Config.Template)
+			cfg := b.Config.Indices
+			if len(cfg) == 0 {
+				cfg, err = index.DeprecatedTemplateConfigs(b.Config.Template)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "unpacking template config fails: %v", err)
 					os.Exit(1)
 				}
-				indicesCfg = *cfg
 			}
-			if _, err = indicesCfg.PrintTemplates(b.Info); err != nil {
+
+			loader, err := index.NewStdoutLoader(b.Info)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "error initializing ilm loader: %s\n", err)
+				os.Exit(1)
+			}
+			if _, _, _, err = loader.LoadTemplates(b.Config.Indices); err != nil {
 				fmt.Fprintf(os.Stderr, err.Error())
 				os.Exit(1)
 			}
-			logp.Info("Loaded Elasticsearch templates.")
+			logp.Info("Printed Elasticsearch templates.")
 		},
 	}
 
