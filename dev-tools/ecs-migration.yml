@@ -448,6 +448,10 @@
   to: destination.port
   alias: true
 
+- from: haproxy.http.response.status_code
+  to: http.response.status_code
+  alias: true
+
 - from: haproxy.geoip.continent_name
   to: source.geo.continent_name
   alias: true
@@ -470,10 +474,6 @@
 
 - from: haproxy.geoip.region_iso_code
   to: source.geo.region_iso_code
-  alias: true
-
-- from: nginx.access.remote_ip_list
-  to: network.forwarded_ip
   alias: true
 
 ## Kafka module
@@ -642,6 +642,10 @@
 
 - from: nginx.error.message
   to: message
+  alias: true
+
+- from: nginx.access.remote_ip_list
+  to: network.forwarded_ip
   alias: true
 
 ## PostgreSQL module
