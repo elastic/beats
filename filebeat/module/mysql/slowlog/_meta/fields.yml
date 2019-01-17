@@ -34,11 +34,7 @@
     - name: id
       type: long
       description: >
-        The connection ID for the query.
-    - name: thread_id
-      type: long
-      description: >
-        ID of the thread executing this query.
+        The connection or thread ID for the query.
     - name: schema
       type: keyword
       description: >

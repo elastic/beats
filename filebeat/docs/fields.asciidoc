@@ -6453,17 +6453,7 @@ The slow query.
 --
 type: long
 
-The connection ID for the query.
-
-
---
-
-*`mysql.slowlog.thread_id`*::
-+
---
-type: long
-
-ID of the thread executing this query.
+The connection or thread ID for the query.
 
 
 --
