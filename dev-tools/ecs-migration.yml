@@ -216,6 +216,10 @@
 
 ## Apache module
 
+- from: apache2.access.remote_ip
+  to: source.address
+  alias: true
+
 - from: apache2.access.user_name
   to: user.name
   alias: true
@@ -423,6 +427,10 @@
   alias: true
 
 ## HAProxy module
+
+- from: haproxy.client.ip
+  to: source.address
+  alias: true
 
 - from: haproxy.client.port
   to: source.port
