@@ -193,7 +193,7 @@ func isStrCheck(path path, v interface{}) (str string, errorResults *Results) {
 }
 
 // IsString checks that the given value is a string.
-var IsString = Is("is a non-empty string", func(path path, v interface{}) *Results {
+var IsString = Is("is a string", func(path path, v interface{}) *Results {
 	_, errorResults := isStrCheck(path, v)
 	if errorResults != nil {
 		return errorResults
