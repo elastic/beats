@@ -4840,15 +4840,6 @@ Please add description
 Fields related to the HTTP response
 
 
-*`haproxy.http.response.status_code`*::
-+
---
-type: long
-
-HTTP status code returned to the client.
-
---
-
 *`haproxy.http.response.captured_cookie`*::
 +
 --
@@ -4864,6 +4855,15 @@ type: text
 
 List of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
 
+
+--
+
+*`haproxy.http.response.status_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
 
 --
 
