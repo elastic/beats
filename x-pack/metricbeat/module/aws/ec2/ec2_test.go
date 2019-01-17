@@ -9,6 +9,7 @@ package ec2
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
@@ -53,12 +54,21 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 	monitoringState := ec2.Monitoring{
 		State: ec2.MonitoringState(ec2.MonitoringStateDisabled),
 	}
+	currentTime := time.Now()
+	launchTime := currentTime.Add(-time.Minute * 60)
+
 	instance := ec2.Instance{
 		InstanceId:   awssdk.String("i-123"),
 		InstanceType: ec2.InstanceTypeT2Medium,
-		Placement:    &ec2.Placement{AvailabilityZone: awssdk.String("us-west-1a")},
-		ImageId:      awssdk.String("image-123"),
-		Monitoring:   &monitoringState,
+		Placement: &ec2.Placement{
+			AvailabilityZone: awssdk.String("us-west-1a"),
+		},
+		ImageId:    awssdk.String("image-123"),
+		Monitoring: &monitoringState,
+		State: &ec2.InstanceState{
+			Name: ec2.InstanceStateNameRunning,
+		},
+		LaunchTime: &launchTime,
 	}
 	return ec2.DescribeInstancesRequest{
 		Request: &awssdk.Request{
@@ -229,4 +239,15 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expectedEvent.RootFields, event.RootFields)
 	assert.Equal(t, expectedEvent.MetricSetFields["cpu"], event.MetricSetFields["cpu"])
+}
+
+func TestCheckInstanceStatus(t *testing.T) {
+	currentTime := time.Now()
+	launchTime1 := currentTime.Add(-time.Minute * 60)
+	checkPassed1 := checkInstanceStatus(ec2.InstanceStateNameRunning, &launchTime1, "i-123")
+	assert.Equal(t, true, checkPassed1)
+
+	launchTime2 := currentTime.Add(-time.Minute * 9)
+	checkPassed2 := checkInstanceStatus(ec2.InstanceStateNameRunning, &launchTime2, "i-123")
+	assert.Equal(t, false, checkPassed2)
 }
