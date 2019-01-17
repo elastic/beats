@@ -71,6 +71,13 @@
         },
 
         {
+            "script": {
+                "lang": "painless",
+                "source": "if (ctx.haproxy.http?.request?.time_active_ms != null) { ctx.event.duration = ctx.haproxy.http.request.time_active_ms * 1000 } else { if (ctx.haproxy.tcp?.processing_time_ms != null) { ctx.event.duration = ctx.haproxy.tcp.processing_time_ms * 1000 } }"
+            }
+        },
+
+        {
             "convert": {
                 "field": "haproxy.bytes_read",
                 "target_field": "http.response.bytes",
