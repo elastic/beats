@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2018-07-24T21:15:27.590Z", 
         "fileset.module": "icinga", 
         "fileset.name": "startup", 
         "icinga.startup.facility": "cli", 
@@ -11,7 +10,6 @@
         "prospector.type": "log"
     }, 
     {
-        "@timestamp": "2018-07-24T21:15:27.590Z", 
         "fileset.module": "icinga", 
         "fileset.name": "startup", 
         "icinga.startup.facility": "cli", 

@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2018-07-30T09:03:52.726Z", 
         "fileset.module": "haproxy", 
         "fileset.name": "log", 
         "haproxy.backend_name": "docs_microservice", 
