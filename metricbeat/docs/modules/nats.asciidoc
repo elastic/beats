@@ -29,10 +29,11 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: nats
-  metricsets: ["stats"]
+  metricsets: ["connections", "stats"]
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"
+  #connections.metrics_path: "/connz"
 ----
 
 [float]
@@ -40,7 +41,11 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-nats-connections,connections>>
+
 * <<metricbeat-metricset-nats-stats,stats>>
+
+include::nats/connections.asciidoc[]
 
 include::nats/stats.asciidoc[]
 

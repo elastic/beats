@@ -17232,24 +17232,17 @@ nats Module
 
 
 
-[float]
-== stats fields
-
-Contains nats var related metrics
-
-
-
-*`nats.stats.server_id`*::
+*`nats.server_id`*::
 +
 --
-type: keyword
+type: string
 
 The server ID
 
 
 --
 
-*`nats.stats.now`*::
+*`nats.now`*::
 +
 --
 type: date
@@ -17258,6 +17251,30 @@ Server time of metric creation
 
 
 --
+
+[float]
+== connections fields
+
+Contains nats connection related metrics
+
+
+
+*`nats.connections.total`*::
++
+--
+type: integer
+
+The number of currently active clients
+
+
+--
+
+[float]
+== stats fields
+
+Contains nats var related metrics
+
+
 
 *`nats.stats.uptime`*::
 +

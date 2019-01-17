@@ -33,6 +33,10 @@ import (
 )
 
 var (
+	moduleSchema = s.Schema{
+		"server_id": c.Str("server_id"),
+		"now":       c.Str("now"),
+	}
 	httpReqStatsSchema = s.Schema{
 		"root_uri":   c.Int("/"),
 		"connz_uri":  c.Int("/connz"),
@@ -41,9 +45,7 @@ var (
 		"varz_uri":   c.Int("/varz"),
 	}
 	statsSchema = s.Schema{
-		"server_id": c.Str("server_id"),
-		"now":       c.Str("now"),
-		"uptime":    c.Str("uptime"),
+		"uptime": c.Str("uptime"),
 		"mem": s.Object{
 			"bytes": c.Int("mem"),
 		},
@@ -139,7 +141,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	}
 	event, err = statsSchema.Apply(inInterface)
 	if err != nil {
-		err = errors.Wrap(err, "failure applying index schema")
+		err = errors.Wrap(err, "failure applying stats schema")
 		r.Error(err)
 		return err
 	}
@@ -192,6 +194,12 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 			},
 		},
 	}
-	r.Event(mb.Event{MetricSetFields: event})
+	moduleMetrics, err := moduleSchema.Apply(inInterface)
+	if err != nil {
+		err = errors.Wrap(err, "failure applying module schema")
+		r.Error(err)
+		return err
+	}
+	r.Event(mb.Event{MetricSetFields: event, ModuleFields: moduleMetrics})
 	return nil
 }

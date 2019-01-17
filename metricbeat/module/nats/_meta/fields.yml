@@ -8,3 +8,11 @@
       description: >
         `nats` contains statistics that were read from Nats
       fields:
+        - name: server_id
+          type: string
+          description: >
+            The server ID
+        - name: now
+          type: date
+          description: >
+            Server time of metric creation
