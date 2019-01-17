@@ -17270,6 +17270,23 @@ The number of currently active clients
 --
 
 [float]
+== routes fields
+
+Contains nats route related metrics
+
+
+
+*`nats.routes.total`*::
++
+--
+type: integer
+
+The number of registered routes
+
+
+--
+
+[float]
 == stats fields
 
 Contains nats var related metrics

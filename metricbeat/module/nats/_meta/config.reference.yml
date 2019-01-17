@@ -1,6 +1,7 @@
 - module: nats
-  metricsets: ["connections", "stats"]
+  metricsets: ["connections", "routes", "stats"]
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"
   #connections.metrics_path: "/connz"
+  #routes.metrics_path: "/routez"
