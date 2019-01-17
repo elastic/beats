@@ -1,10 +1,10 @@
 {
-  "description": "Pipeline for normalizing Zeek dns.log",
+  "description": "Pipeline for normalizing Zeek ssl.log",
   "processors": [
     {
       "script": {
         "lang": "painless",
-        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['dns']['ts'] * params.multiplier; ctx.zeek.dns.remove('ts');",
+        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['ssl']['ts'] * params.multiplier; ctx.zeek.ssl.remove('ts');",
         "params": {
           "multiplier": 1000
         }
@@ -13,7 +13,7 @@
     {
       "script": {
         "lang": "painless",
-        "source": "ctx.event.id = ctx.zeek.session_id + \"-dns\"",
+        "source": "ctx.event.id = ctx.zeek.session_id + \"-ssl\"",
         "ignore_failure": true
       }
     },

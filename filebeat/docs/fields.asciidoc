@@ -12813,3 +12813,430 @@ type: boolean
 
 --
 
+*`zeek.http.trans_depth`*::
++
+--
+type: integer
+
+--
+
+*`zeek.http.status_msg`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.info_code`*::
++
+--
+type: integer
+
+--
+
+*`zeek.http.info_msg`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.filename`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.tags`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.captured_password`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.http.proxied`*::
++
+--
+type: keyboard
+
+--
+
+*`zeek.http.range_request`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.http.client_header_names`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.server_header_names`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.orig_fuids`*::
++
+--
+type: keyboard
+
+--
+
+*`zeek.http.orig_mime_types`*::
++
+--
+type: keyboard
+
+--
+
+*`zeek.http.orig_filenames`*::
++
+--
+type: keyboard
+
+--
+
+*`zeek.http.resp_fuids`*::
++
+--
+type: keyboard
+
+--
+
+*`zeek.http.resp_mime_types`*::
++
+--
+type: keyboard
+
+--
+
+*`zeek.http.resp_filenames`*::
++
+--
+type: keyboard
+
+--
+
+*`zeek.http.orig_mime_depth`*::
++
+--
+type: integer
+
+--
+
+*`zeek.http.resp_mime_depth`*::
++
+--
+type: integer
+
+--
+
+*`zeek.files.fuid`*::
++
+--
+type: keyboard
+
+--
+
+*`zeek.files.tx_host`*::
++
+--
+type: ip
+
+--
+
+*`zeek.files.rx_host`*::
++
+--
+type: ip
+
+--
+
+*`zeek.files.session_ids`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.source`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.depth`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.analyzers`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.mime_type`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.filename`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.local_orig`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.files.is_orig`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.files.duration`*::
++
+--
+type: double
+
+--
+
+*`zeek.files.seen_bytes`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.total_bytes`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.missing_bytes`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.overflow_bytes`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.timedout`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.files.parent_fuid`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.md5`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.sha1`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.sha256`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.extracted`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.extracted_cutoff`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.files.extracted_size`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.entropy`*::
++
+--
+type: double
+
+--
+
+*`zeek.ssl.version`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.cipher`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.curve`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.server_name`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.resumed`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.ssl.next_protocol`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.established`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.ssl.cert_chain`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.cert_chain_fuids`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.client_cert_chain`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.client_cert_chain_fuids`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.issuer`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.client_issuer`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.validation_status`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.subject`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.client_subject`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.last_alert`*::
++
+--
+type: keyword
+
+--
+

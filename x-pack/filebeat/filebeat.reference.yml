@@ -403,6 +403,12 @@ filebeat.modules:
     enabled: true
   dns: 
     enabled: true
+  http:
+    enabled: true
+  files:
+    enabled: true
+  ssl:
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.

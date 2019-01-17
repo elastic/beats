@@ -4,7 +4,7 @@
     {
       "script": {
         "lang": "painless",
-        "source": "ctx.event.created = (long)ctx.event.created * params.multiplier",
+        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['connection']['ts'] * params.multiplier; ctx.zeek.connection.remove('ts');",
         "params": {
           "multiplier": 1000
         }
