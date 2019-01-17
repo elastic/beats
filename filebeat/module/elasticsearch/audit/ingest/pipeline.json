@@ -24,7 +24,7 @@
                     "ES_AUDIT_REQUEST_BODY": "(request_body\\=\\[%{DATA:http.request.body.content}\\])?"
                 },
                 "patterns": [
-                    "%{ES_TIMESTAMP}\\s*%{ES_NODE_NAME}\\s*%{ES_AUDIT_LAYER}\\s*%{ES_AUDIT_EVENT_TYPE}\\s*%{ES_AUDIT_ORIGIN_TYPE},?\\s*%{ES_AUDIT_ORIGIN_ADDRESS},?\\s*%{ES_AUDIT_PRINCIPAL},?\\s*%{ES_AUDIT_ACTION},?\\s*?%{ES_AUDIT_URI},?\\s*%{ES_AUDIT_REQUEST},?\\s*%{ES_AUDIT_REQUEST_BODY},?"
+                    "%{ES_TIMESTAMP}\\s*%{ES_NODE_NAME}\\s*%{ES_AUDIT_LAYER}\\s*%{ES_AUDIT_EVENT_TYPE}\\s*%{ES_AUDIT_ORIGIN_TYPE},?\\s*%{ES_AUDIT_ORIGIN_ADDRESS},?\\s*%{ES_AUDIT_PRINCIPAL},?\\s*%{ES_AUDIT_ACTION},?\\s*%{ES_AUDIT_URI},?\\s*%{ES_AUDIT_REQUEST},?\\s*%{ES_AUDIT_REQUEST_BODY},?"
                 ]
             }
         },
