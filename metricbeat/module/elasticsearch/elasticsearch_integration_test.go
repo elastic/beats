@@ -289,39 +289,37 @@ func checkSkip(t *testing.T, metricset string, host string) {
 		t.Fatal("getting elasticsearch version", err)
 	}
 
-	isCCRStatsAPIAvailable, err := elastic.IsFeatureAvailable(version, elasticsearch.CCRStatsAPIAvailableVersion)
-	if err != nil {
-		t.Fatal("checking if elasticsearch CCR stats API is available", err)
-	}
+	isCCRStatsAPIAvailable := elastic.IsFeatureAvailable(version, elasticsearch.CCRStatsAPIAvailableVersion)
 
 	if !isCCRStatsAPIAvailable {
-		t.Skip("elasticsearch CCR stats API is not available until " + elasticsearch.CCRStatsAPIAvailableVersion)
+		t.Skip("elasticsearch CCR stats API is not available until " + elasticsearch.CCRStatsAPIAvailableVersion.String())
 	}
 }
 
-func getElasticsearchVersion(elasticsearchHostPort string) (string, error) {
+func getElasticsearchVersion(elasticsearchHostPort string) (*common.Version, error) {
 	resp, err := http.Get("http://" + elasticsearchHostPort + "/")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	var data common.MapStr
 	err = json.Unmarshal(body, &data)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	version, err := data.GetValue("version.number")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return version.(string), nil
+
+	return common.NewVersion(version.(string))
 }
 
 func httpPutJSON(host, path string, body []byte) ([]byte, *http.Response, error) {

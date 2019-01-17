@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -77,11 +79,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	elasticsearchVersion := info.Version.Number
-
 	// CCR is only available in Trial or Platinum license of Elasticsearch. So we check
 	// the license first.
-	ccrUnavailableMessage, err := m.checkCCRAvailability(elasticsearchVersion)
+	ccrUnavailableMessage, err := m.checkCCRAvailability(info.Version.Number)
 	if err != nil {
 		err = errors.Wrap(err, "error determining if CCR is available")
 		elastic.ReportAndLogError(err, r, m.Log)
@@ -115,7 +115,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	}
 }
 
-func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion string) (message string, err error) {
+func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion *common.Version) (message string, err error) {
 	license, err := elasticsearch.GetLicense(m.HTTP, m.GetServiceURI())
 	if err != nil {
 		return "", errors.Wrap(err, "error determining Elasticsearch license")
@@ -128,16 +128,13 @@ func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion string) (me
 		return
 	}
 
-	isAvailable, err := elastic.IsFeatureAvailable(currentElasticsearchVersion, elasticsearch.CCRStatsAPIAvailableVersion)
-	if err != nil {
-		return "", errors.Wrap(err, "error determining if CCR is available in current Elasticsearch version")
-	}
+	isAvailable := elastic.IsFeatureAvailable(currentElasticsearchVersion, elasticsearch.CCRStatsAPIAvailableVersion)
 
 	if !isAvailable {
 		metricsetName := m.FullyQualifiedName()
 		message = "the " + metricsetName + " is only supported with Elasticsearch >= " +
-			elasticsearch.CCRStatsAPIAvailableVersion + ". " +
-			"You are currently running Elasticsearch " + currentElasticsearchVersion + "."
+			elasticsearch.CCRStatsAPIAvailableVersion.String() + ". " +
+			"You are currently running Elasticsearch " + currentElasticsearchVersion.String() + "."
 		return
 	}
 
