@@ -2,7 +2,7 @@
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "haproxy.log",
-        "event.duration": 1000,
+        "event.duration": 1000000,
         "event.module": "haproxy",
         "fileset.name": "log",
         "haproxy.backend_name": "app",
