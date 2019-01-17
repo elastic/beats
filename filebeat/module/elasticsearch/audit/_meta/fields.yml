@@ -14,6 +14,10 @@
       description: "The authentication realm"
       example": "active_directory"
       type: keyword
+    - name: roles
+      description: "Roles to which the principal belongs"
+      example: [ "kibana_user", "beats_admin" ]
+      type: array
     - name: action
       description: "The name of the action that was executed"
       example: "cluster:monitor/main"

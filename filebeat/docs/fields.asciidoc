@@ -4005,6 +4005,17 @@ The authentication realm
 
 --
 
+*`elasticsearch.audit.roles`*::
++
+--
+type: array
+
+example: ['kibana_user', 'beats_admin']
+
+Roles to which the principal belongs
+
+--
+
 *`elasticsearch.audit.action`*::
 +
 --
