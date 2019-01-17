@@ -913,3 +913,12 @@
 - from: tcp.port
   to: url.port
   alias: true
+
+# Journalbeat
+- from: host.name
+  to: host.hostname
+  alias: false
+
+- from: read_timestamp
+  to: event.created
+  alias: true
