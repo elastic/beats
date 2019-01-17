@@ -126,6 +126,10 @@ setup.template.settings.index.lifecycle.rollover_alias: "customname"
 setup.template.settings.index.lifecycle.name: "beats-default-policy"
 ----
 
+IMPORTANT: If you set the options manually as shown in this example, do *not*
+set `ilm.enabled`, or the settings specified in the configuration file will be
+overwritten.
+
 This configuration results in a managed index named something like
 +customname-{localdate}-000001+ and the following index settings:
 
@@ -139,11 +143,9 @@ This configuration results in a managed index named something like
 ...
   "index" : {
     "lifecycle" : {
-      "name" : "customname-policy",
+      "name" : "beats-default-policy",
       "rollover_alias" : "customname"
     },    
 ----
 
-IMPORTANT: If you set the options manually as shown in this example, do *not*
-set `ilm.enabled`, or the settings specified in the configuration file will be
-overwritten.
+
