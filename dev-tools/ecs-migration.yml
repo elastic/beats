@@ -472,10 +472,6 @@
   to: source.geo.region_iso_code
   alias: true
 
-- from: nginx.access.remote_ip_list
-  to: network.forwarded_ip
-  alias: true
-
 ## Kafka module
 
 - from: kafka.log.level
@@ -642,6 +638,10 @@
 
 - from: nginx.error.message
   to: message
+  alias: true
+
+- from: nginx.access.remote_ip_list
+  to: network.forwarded_ip
   alias: true
 
 ## PostgreSQL module
