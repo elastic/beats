@@ -278,6 +278,28 @@
   to: process.thread.id
   alias: true
 
+## Elasticsearch module
+
+- from: elasticsearch.audit.event_type
+  to: event.type
+  alias: true
+
+- from: elasticsearch.audit.origin_address
+  to: source.ip
+  alias: true
+
+- from: elasticsearch.audit.principal
+  to: user.name
+  alias: true
+
+- from: elasticsearch.audit.request_body
+  to: http.request.body.content
+  alias: true
+
+- from: elasticsearch.audit.uri
+  to: url.original
+  alias: true
+
 ## IIS module
 
 - from: iis.access.server_ip
@@ -426,6 +448,10 @@
   to: destination.port
   alias: true
 
+- from: haproxy.http.response.status_code
+  to: http.response.status_code
+  alias: true
+
 - from: haproxy.geoip.continent_name
   to: source.geo.continent_name
   alias: true
@@ -448,10 +474,6 @@
 
 - from: haproxy.geoip.region_iso_code
   to: source.geo.region_iso_code
-  alias: true
-
-- from: nginx.access.remote_ip_list
-  to: network.forwarded_ip
   alias: true
 
 ## Kafka module
@@ -620,6 +642,10 @@
 
 - from: nginx.error.message
   to: message
+  alias: true
+
+- from: nginx.access.remote_ip_list
+  to: network.forwarded_ip
   alias: true
 
 ## PostgreSQL module

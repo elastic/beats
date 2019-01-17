@@ -2,6 +2,7 @@
     {
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "haproxy.log",
+        "event.duration": 1000000,
         "event.module": "haproxy",
         "fileset.name": "log",
         "haproxy.backend_name": "app",
@@ -18,7 +19,7 @@
         "haproxy.server_name": "<NOSRV>",
         "haproxy.server_queue": 0,
         "haproxy.source": "127.0.0.1",
-        "haproxy.tcp.processing_time_ms": 0,
+        "haproxy.tcp.processing_time_ms": 1,
         "haproxy.termination_state": "SC",
         "haproxy.total_waiting_time_ms": -1,
         "input.type": "log",

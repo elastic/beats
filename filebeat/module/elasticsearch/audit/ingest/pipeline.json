@@ -11,7 +11,7 @@
           "grok": {
               "field": "message",
               "patterns": [
-                  "\\[%{TIMESTAMP_ISO8601:elasticsearch.audit.timestamp}\\]\\s*(\\[%{WORD:elasticsearch.node.name}\\])?\\s*\\[%{WORD:elasticsearch.audit.layer}\\]\\s*\\[%{WORD:elasticsearch.audit.event_type}\\]\\s*(origin_type\\=\\[%{WORD:elasticsearch.audit.origin_type}\\])?,?\\s*(origin_address\\=\\[%{IPORHOST:elasticsearch.audit.origin_address}\\])?,?\\s*(principal\\=\\[%{WORD:elasticsearch.audit.principal}\\])?,?\\s*(action\\=\\[%{DATA:elasticsearch.audit.action}\\])?,?\\s*?(uri=\\[%{DATA:elasticsearch.audit.uri}\\])?,?\\s*(request\\=\\[%{WORD:elasticsearch.audit.request}\\])?,?\\s*(request_body\\=\\[%{DATA:elasticsearch.audit.request_body}\\])?,?"
+                  "\\[%{TIMESTAMP_ISO8601:elasticsearch.audit.timestamp}\\]\\s*(\\[%{WORD:elasticsearch.node.name}\\])?\\s*\\[%{WORD:elasticsearch.audit.layer}\\]\\s*\\[%{WORD:event.type}\\]\\s*(origin_type\\=\\[%{WORD:elasticsearch.audit.origin_type}\\])?,?\\s*(origin_address\\=\\[%{IPORHOST:source.ip}\\])?,?\\s*(principal\\=\\[%{WORD:user.name}\\])?,?\\s*(action\\=\\[%{DATA:elasticsearch.audit.action}\\])?,?\\s*?(uri=\\[%{DATA:url.original}\\])?,?\\s*(request\\=\\[%{WORD:elasticsearch.audit.request}\\])?,?\\s*(request_body\\=\\[%{DATA:http.request.body.content}\\])?,?"
               ]
           }
       },
