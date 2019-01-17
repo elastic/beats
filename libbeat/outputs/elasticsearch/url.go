@@ -89,3 +89,21 @@ func parseProxyURL(raw string) (*url.URL, error) {
 	// see if that parses correctly.
 	return url.Parse("http://" + raw)
 }
+
+func mergeParams(a, b map[string]string) map[string]string {
+	if a == nil {
+		return b
+	}
+	if b == nil {
+		return a
+	}
+
+	tmp := make(map[string]string, len(a)+len(b))
+	for k, v := range a {
+		tmp[k] = v
+	}
+	for k, v := range b {
+		tmp[k] = v
+	}
+	return tmp
+}

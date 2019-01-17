@@ -49,9 +49,6 @@ type Client struct {
 	params   map[string]string
 	timeout  time.Duration
 
-	// buffered bulk requests
-	bulkRequ *bulkRequest
-
 	// buffered json response reader
 	json jsonReader
 
@@ -178,8 +175,9 @@ func NewClient(
 		tlsDialer = transport.StatsDialer(tlsDialer, st)
 	}
 
+	// check if we can create a valid bulkd request
 	params := s.Parameters
-	bulkRequ, err := newBulkRequest(s.URL, "", "", params, nil)
+	_, err = newBulkRequest(s.URL, "", "", params, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -216,8 +214,6 @@ func NewClient(
 		pipeline:  pipeline,
 		params:    params,
 		timeout:   s.Timeout,
-
-		bulkRequ: bulkRequ,
 
 		compressionLevel: compression,
 		proxyURL:         s.Proxy,
@@ -312,7 +308,15 @@ func (client *Client) publishEvents(
 		return nil, nil
 	}
 
-	requ := client.bulkRequ
+	params := mergeParams(client.params, VersionParams(client.GetVersion(), true))
+
+	// requ := client.bulkRequ
+	requ, err := newBulkRequest(client.URL, "", "", params, body)
+	if err != nil {
+		logp.Err("Failed to create bulkd request: %s", err)
+		return data, err
+	}
+
 	requ.Reset(body)
 	status, result, sendErr := client.sendBulkRequest(requ)
 	if sendErr != nil {
@@ -322,7 +326,7 @@ func (client *Client) publishEvents(
 
 	debugf("PublishEvents: %d events have been published to elasticsearch in %v.",
 		len(data),
-		time.Now().Sub(begin))
+		time.Since(begin))
 
 	// check response for transient errors
 	var failedEvents []publisher.Event
