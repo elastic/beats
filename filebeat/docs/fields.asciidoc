@@ -4025,6 +4025,17 @@ alias to: source.ip
 
 --
 
+*`elasticsearch.audit.indices`*::
++
+--
+type: array
+
+example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
+
+Indices accessed by action
+
+--
+
 *`elasticsearch.audit.uri`*::
 +
 --
