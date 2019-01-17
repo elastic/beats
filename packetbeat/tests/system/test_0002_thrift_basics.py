@@ -12,8 +12,6 @@ class Test(BaseTest):
         assert all([o["source.bytes"] > 0 for o in objs])
         assert all([o["destination.bytes"] > 0 for o in objs[0:14]])
         assert all([o["destination.bytes"] > 0 for o in objs[16:]])
-        #assert objs[14]["destination.bytes"] == 0
-        #assert objs[15]["destination.bytes"] == 0
 
         assert objs[0]["method"] == "ping"
         assert objs[0]["thrift.params"] == "()"
@@ -175,7 +173,6 @@ class Test(BaseTest):
         assert objs[17]["method"] == "testOneway"
         assert objs[17]["thrift.params"] == "(secondsToSleep: 1)"
         assert "thrift.return_value" not in objs[17]
-        #assert objs[17]["destination.bytes"] == 0
 
         assert objs[21]["method"] == "testString"
         assert objs[21]["thrift.params"] == "(thing: \"" + \
