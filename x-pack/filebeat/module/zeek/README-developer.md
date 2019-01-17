@@ -35,9 +35,17 @@ apt install broctl
 sudo broctl deploy
 ```
 
-## Download and install Filebeat
+## How to try the module from source
 
-Grab the filebeat binary from elastic.co, and install it by following the instructions.
+Clone and build Filebeat
+
+```
+git clone git@github.com:elastic/beats.git
+cd beats/x-pack/filebeat
+make mage
+mage clean update
+mage build
+```
 
 ## Configure Filebeat module and run
 
