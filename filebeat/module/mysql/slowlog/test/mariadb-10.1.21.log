@@ -4,4 +4,3 @@
 # Query_time: 2.000652  Lock_time: 0.000000  Rows_sent: 1  Rows_examined: 0
 SET timestamp=1528898676;
 select sleep(2);
-

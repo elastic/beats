@@ -14,7 +14,7 @@
         "mysql.slowlog.current_user": "root",
         "mysql.slowlog.id": "5",
         "mysql.slowlog.lock_time.sec": 0.0,
-        "mysql.slowlog.query": "select sleep(2);\n",
+        "mysql.slowlog.query": "select sleep(2);",
         "mysql.slowlog.query_cache_hit": false,
         "mysql.slowlog.query_time.sec": 2.000652,
         "mysql.slowlog.rows_examined": 0,
