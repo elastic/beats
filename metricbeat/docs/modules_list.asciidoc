@@ -102,7 +102,8 @@ This file is generated! See scripts/docs_collector.py
 .2+| .2+|  |<<metricbeat-metricset-mysql-galera_status,galera_status>> experimental[]  
 |<<metricbeat-metricset-mysql-status,status>>   
 |<<metricbeat-module-nats,Nats>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.2+| .2+|  |<<metricbeat-metricset-nats-connections,connections>> experimental[]  
+.3+| .3+|  |<<metricbeat-metricset-nats-connections,connections>> experimental[]  
+|<<metricbeat-metricset-nats-routes,routes>> experimental[]  
 |<<metricbeat-metricset-nats-stats,stats>> experimental[]  
 |<<metricbeat-module-nginx,Nginx>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-nginx-stubstatus,stubstatus>>   
