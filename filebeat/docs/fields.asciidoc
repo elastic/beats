@@ -3954,17 +3954,6 @@ The layer from which this event originated: rest, transport or ip_filter
 
 --
 
-*`elasticsearch.audit.event_type`*::
-+
---
-type: keyword
-
-example: access_granted
-
-The type of event that occurred: anonymous_access_denied, authentication_failed, access_denied, access_granted, connection_granted, connection_denied, tampered_request, run_as_granted, run_as_denied
-
---
-
 *`elasticsearch.audit.origin_type`*::
 +
 --
@@ -3973,28 +3962,6 @@ type: keyword
 example: local_node
 
 Where the request originated: rest (request originated from a REST API request), transport (request was received on the transport channel), local_node (the local node issued the request)
-
---
-
-*`elasticsearch.audit.origin_address`*::
-+
---
-type: ip
-
-example: 192.168.1.42
-
-The IP address from which the request originated
-
---
-
-*`elasticsearch.audit.principal`*::
-+
---
-type: keyword
-
-example: _anonymous
-
-The principal (username) that failed authentication
 
 --
 
@@ -4009,17 +3976,6 @@ The name of the action that was executed
 
 --
 
-*`elasticsearch.audit.uri`*::
-+
---
-type: keyword
-
-example: /_xpack/security/_authenticate
-
-The REST endpoint URI
-
---
-
 *`elasticsearch.audit.request`*::
 +
 --
@@ -4031,14 +3987,48 @@ The type of request that was executed
 
 --
 
+*`elasticsearch.audit.event_type`*::
++
+--
+type: alias
+
+alias to: event.type
+
+--
+
+*`elasticsearch.audit.origin_address`*::
++
+--
+type: alias
+
+alias to: source.ip
+
+--
+
+*`elasticsearch.audit.uri`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
 *`elasticsearch.audit.request_body`*::
 +
 --
-type: text
+type: alias
 
-example: body
+alias to: http.request.body.content
 
-The body of the request, if enabled
+--
+
+*`elasticsearch.audit.principal`*::
++
+--
+type: alias
+
+alias to: user.name
 
 --
 
