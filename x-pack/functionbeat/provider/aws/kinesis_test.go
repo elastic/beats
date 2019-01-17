@@ -162,7 +162,7 @@ func testKinesisConfig(t *testing.T) {
 					&KinesisTriggerConfig{
 						EventSourceArn:   "abc123",
 						BatchSize:        100,
-						StartingPosition: latestPos,
+						StartingPosition: trimHorizonPos,
 					},
 				},
 			},
