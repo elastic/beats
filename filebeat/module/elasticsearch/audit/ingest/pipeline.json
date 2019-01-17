@@ -20,7 +20,7 @@
                     "ES_AUDIT_PRINCIPAL": "(principal\\=\\[%{WORD:user.name}\\])?",
                     "ES_AUDIT_REALM": "(realm\\=\\[%{WORD:elasticsearch.audit.realm}\\])?",
                     "ES_AUDIT_ROLES": "(roles\\=\\[%{DATA:elasticsearch.audit.roles}\\])?",
-                    "ES_AUDIT_ACTION": "(action\\=\\[%{DATA:elasticsearch.audit.action}(\\[%{DATA:elasticsearch.audit.sub_action}%\\])?\\])?",
+                    "ES_AUDIT_ACTION": "(action\\=\\[%{DATA:elasticsearch.audit.action}(\\[%{DATA:elasticsearch.audit.sub_action}\\])?\\])?",
                     "ES_AUDIT_URI": "(uri=\\[%{DATA:url.original}\\])?",
                     "ES_AUDIT_INDICES": "(indices\\=\\[%{DATA:elasticsearch.audit.indices}\\])?",
                     "ES_AUDIT_REQUEST": "(request\\=\\[%{WORD:elasticsearch.audit.request}\\])?",
@@ -42,6 +42,18 @@
             "split": {
                 "field": "elasticsearch.audit.indices",
                 "separator": ",",
+                "ignore_missing": true
+            }
+        },
+        {
+            "script": {
+                "lang": "painless",
+                "source": "if (ctx.elasticsearch.audit.sub_action != null) { ctx.elasticsearch.audit.action += '[' + ctx.elasticsearch.audit.sub_action + ']' }"
+            }
+        },
+        {
+            "remove": {
+                "field": "elasticsearch.audit.sub_action",
                 "ignore_missing": true
             }
         },
