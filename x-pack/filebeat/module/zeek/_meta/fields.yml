@@ -120,7 +120,7 @@
       type: boolean
 
     - name: http.proxied
-      type: keyboard
+      type: keyword
 
     - name: http.range_request
       type: boolean
@@ -132,22 +132,22 @@
       type: keyword
 
     - name: http.orig_fuids
-      type: keyboard
+      type: keyword
 
     - name: http.orig_mime_types
-      type: keyboard
+      type: keyword
 
     - name: http.orig_filenames
-      type: keyboard
+      type: keyword
 
     - name: http.resp_fuids
-      type: keyboard
+      type: keyword
 
     - name: http.resp_mime_types
-      type: keyboard
+      type: keyword
 
     - name: http.resp_filenames
-      type: keyboard
+      type: keyword
 
     - name: http.orig_mime_depth
       type: integer
@@ -156,7 +156,7 @@
       type: integer
 
     - name: files.fuid
-      type: keyboard
+      type: keyword
 
     - name: files.tx_host
       type: ip

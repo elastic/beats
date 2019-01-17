@@ -12865,7 +12865,7 @@ type: boolean
 *`zeek.http.proxied`*::
 +
 --
-type: keyboard
+type: keyword
 
 --
 
@@ -12893,42 +12893,42 @@ type: keyword
 *`zeek.http.orig_fuids`*::
 +
 --
-type: keyboard
+type: keyword
 
 --
 
 *`zeek.http.orig_mime_types`*::
 +
 --
-type: keyboard
+type: keyword
 
 --
 
 *`zeek.http.orig_filenames`*::
 +
 --
-type: keyboard
+type: keyword
 
 --
 
 *`zeek.http.resp_fuids`*::
 +
 --
-type: keyboard
+type: keyword
 
 --
 
 *`zeek.http.resp_mime_types`*::
 +
 --
-type: keyboard
+type: keyword
 
 --
 
 *`zeek.http.resp_filenames`*::
 +
 --
-type: keyboard
+type: keyword
 
 --
 
@@ -12949,7 +12949,7 @@ type: integer
 *`zeek.files.fuid`*::
 +
 --
-type: keyboard
+type: keyword
 
 --
 
