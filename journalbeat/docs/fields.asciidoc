@@ -170,14 +170,6 @@ Contains common fields available in all event types.
 
 
 
-*`read_timestamp`*::
-+
---
-The time when Journalbeat read the journal entry.
-
-
---
-
 [float]
 == coredump fields
 
@@ -547,6 +539,15 @@ required: False
 
 Arbitrary fields coming from processes.
 
+
+--
+
+*`read_timestamp`*::
++
+--
+type: alias
+
+alias to: event.created
 
 --
 
