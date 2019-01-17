@@ -35,7 +35,7 @@
   alias: false
 
 - from: beat.name
-  to: agent.type
+  to: host.name
   alias6: true
   alias: true
 
