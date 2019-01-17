@@ -68,6 +68,15 @@
                 "separator": "\\|",
                 "ignore_failure": true
             }
+        },
+
+        {
+            "convert": {
+                "field": "haproxy.bytes_read",
+                "target_field": "http.response.bytes",
+                "type": "long",
+                "if": "ctx.containsKey('http')"
+            }
         }
     ],
     "on_failure": [
