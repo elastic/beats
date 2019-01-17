@@ -50,7 +50,7 @@ func testRequest(t *testing.T, testURL string) *beat.Event {
 func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interface{}) *beat.Event {
 	configSrc := map[string]interface{}{
 		"urls":    testURL,
-		"timeout": "1s",
+		"timeout": "2s",
 	}
 
 	if extraConfig != nil {
@@ -231,7 +231,7 @@ func TestLargeResponse(t *testing.T) {
 
 	configSrc := map[string]interface{}{
 		"urls":                server.URL,
-		"timeout":             "1s",
+		"timeout":             "2s",
 		"check.response.body": "x",
 	}
 

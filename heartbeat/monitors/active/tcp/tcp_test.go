@@ -41,7 +41,7 @@ func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
 	config, err := common.NewConfigFrom(common.MapStr{
 		"hosts":   host,
 		"ports":   port,
-		"timeout": "1s",
+		"timeout": "2s",
 	})
 	require.NoError(t, err)
 
@@ -64,7 +64,7 @@ func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string
 		"hosts":   host,
 		"ports":   int64(port),
 		"ssl":     common.MapStr{"certificate_authorities": certFileName},
-		"timeout": "1s",
+		"timeout": "2s",
 	})
 	require.NoError(t, err)
 
