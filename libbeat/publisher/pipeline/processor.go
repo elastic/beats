@@ -183,7 +183,7 @@ func (p *program) Run(event *beat.Event) (*beat.Event, error) {
 			//      We want processors having this kind of implicit behavior
 			//      on errors?
 
-			p.log.Debug("filter", "fail to apply processor %s: %s", p, err)
+			p.log.Debugf("Fail to apply processor %s: %s", p, err)
 		}
 
 		if event == nil {
@@ -295,7 +295,7 @@ func debugPrintProcessor(info beat.Info, monitors Monitors) *processorFn {
 			return event, nil
 		}
 
-		log.Debug("publish", "Publish event: %s", b)
+		log.Debugf("Publish event: %s", b)
 		return event, nil
 	})
 }
