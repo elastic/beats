@@ -1,0 +1,59 @@
+[
+    {
+        "@timestamp": "2019-01-17T16:04:03.000Z",
+        "event.dataset": "mysql.slowlog",
+        "fileset.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "mysql.slowlog.current_user": "root",
+        "mysql.slowlog.host": "localhost",
+        "mysql.slowlog.id": "8",
+        "mysql.slowlog.lock_time.sec": "0.000000",
+        "mysql.slowlog.query": "select sleep(2)\nAS foo;",
+        "mysql.slowlog.query_cache_hit": false,
+        "mysql.slowlog.query_time.sec": "2.000227",
+        "mysql.slowlog.rows_affected": "0",
+        "mysql.slowlog.rows_examined": "0",
+        "mysql.slowlog.rows_sent": "1",
+        "mysql.slowlog.timestamp": "1547741043",
+        "mysql.slowlog.user": "root",
+        "offset": 437,
+        "prospector.type": "log"
+    },
+    {
+        "@timestamp": "2019-01-17T16:04:18.000Z",
+        "event.dataset": "mysql.slowlog",
+        "fileset.module": "mysql",
+        "fileset.name": "slowlog",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "mysql.slowlog.current_user": "root",
+        "mysql.slowlog.filesort": true,
+        "mysql.slowlog.filesort_on_disk": false,
+        "mysql.slowlog.full_join": false,
+        "mysql.slowlog.full_scan": true,
+        "mysql.slowlog.id": "25844",
+        "mysql.slowlog.ip": "192.168.0.10",
+        "mysql.slowlog.lock_time.sec": "0.000000",
+        "mysql.slowlog.merge_passes": "0",
+        "mysql.slowlog.priority_queue": false,
+        "mysql.slowlog.query": "call PROC('blah');",
+        "mysql.slowlog.query_cache_hit": false,
+        "mysql.slowlog.query_time.sec": "178.306017",
+        "mysql.slowlog.rows_affected": "3062",
+        "mysql.slowlog.rows_examined": "53022772",
+        "mysql.slowlog.rows_sent": "0",
+        "mysql.slowlog.schema": "blah",
+        "mysql.slowlog.timestamp": "1547741058",
+        "mysql.slowlog.tmp_table": true,
+        "mysql.slowlog.tmp_table_on_disk": false,
+        "mysql.slowlog.user": "root",
+        "offset": 682,
+        "prospector.type": "log"
+    }
+]

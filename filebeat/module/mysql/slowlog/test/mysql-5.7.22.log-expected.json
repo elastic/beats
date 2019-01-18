@@ -8,6 +8,7 @@
         "log.flags": [
             "multiline"
         ],
+        "mysql.slowlog.current_user": "root",
         "mysql.slowlog.id": "7234",
         "mysql.slowlog.ip": "218.76.8.37",
         "mysql.slowlog.lock_time.sec": "0.000000",
@@ -29,6 +30,7 @@
         "log.flags": [
             "multiline"
         ],
+        "mysql.slowlog.current_user": "debian-sys-maint",
         "mysql.slowlog.host": "localhost",
         "mysql.slowlog.lock_time.sec": "0.000061",
         "mysql.slowlog.query": "SELECT count(*) FROM mysql.user WHERE user='root' and password='';",
@@ -49,6 +51,7 @@
         "log.flags": [
             "multiline"
         ],
+        "mysql.slowlog.current_user": "apphost",
         "mysql.slowlog.host": "apphost",
         "mysql.slowlog.id": "10997316",
         "mysql.slowlog.ip": "1.1.1.1",
@@ -71,6 +74,7 @@
         "log.flags": [
             "multiline"
         ],
+        "mysql.slowlog.current_user": "apphost",
         "mysql.slowlog.host": "apphost",
         "mysql.slowlog.id": "10999834",
         "mysql.slowlog.ip": "1.1.1.1",
