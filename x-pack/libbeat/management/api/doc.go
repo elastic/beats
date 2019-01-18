@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 /*
 The Kibana CM Api returns a configuration format which cannot be ingested directly by our
 configuration parser, it need to be transformed from the generic format into an adapted format
