@@ -25,7 +25,6 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 
@@ -55,7 +54,6 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The vsphere virtualmachine metricset is beta")
 
 	config := struct {
 		Username        string `config:"username"`

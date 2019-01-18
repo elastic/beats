@@ -22,7 +22,6 @@ import (
 	"net/url"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/vmware/govmomi"
@@ -43,8 +42,6 @@ type MetricSet struct {
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The vsphere datastore metricset is beta")
-
 	config := struct {
 		Username string `config:"username"`
 		Password string `config:"password"`
