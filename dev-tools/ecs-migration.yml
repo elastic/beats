@@ -918,6 +918,11 @@
   to: network.forwarded_ip
   alias: false
 
+## Cassandra
+- from: no_request
+  to: cassandra.no_request
+  alias: true
+
 
 # Heartbeat
 

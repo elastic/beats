@@ -70,6 +70,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Changed DHCPv4 protocol fields to align with ECS. {pull}10089[10089]
 - Changed AMQP protocol fields to align with ECS. {pull}10090[10090]
 - Changed HTTP protocol fields to align with ECS. {pull}9976[9976]
+- Changed Cassandra protocol fields to align with ECS. {pull}10093[10093]
 
 *Winlogbeat*
 
