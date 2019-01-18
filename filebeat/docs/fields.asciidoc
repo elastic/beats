@@ -4710,9 +4710,9 @@ Information about the client doing the request
 *`haproxy.client.ip`*::
 +
 --
-IP address of the client which initiated the TCP connection to haproxy.
-If connection is via unix socket, socket path is in this field.
+type: alias
 
+alias to: source.address
 
 --
 
