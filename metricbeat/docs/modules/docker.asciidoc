@@ -34,16 +34,16 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: docker
-  #metricsets:
-  #  - container
-  #  - cpu
-  #  - diskio
-  #  - event
-  #  - healthcheck
-  #  - info
+  metricsets:
+    - container
+    - cpu
+    - diskio
+    - event
+    - healthcheck
+    - info
   #  - image
-  #  - memory
-  #  - network
+    - memory
+    - network
   period: 10s
   hosts: ["unix:///var/run/docker.sock"]
 
