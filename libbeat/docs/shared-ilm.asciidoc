@@ -50,8 +50,8 @@ output.elasticsearch:
   ilm.pattern: "{now/d}-000001" <1>
 ----
 <1> Date math is supported here. For more information, see
-{ref}/indices-rollover-index.html#_using_date_math_with_the_rollover_api[the
-rollover docs].
+{ref}/indices-rollover-index.html#_using_date_math_with_the_rollover_api[Using
+date math with the rollover API].
 
 NOTE: If you modify the `rollover_alias` or `pattern` settings after loading the
 index template, you must overwrite the template to apply the changes.
@@ -70,8 +70,7 @@ To use the setup command, run:
 
 After loading the default policy, you can edit it in the *Index lifecycle policies*
 UI in {kib}. For more information about working with the UI, see
-{kibana-ref}/index-lifecycle-policies.html[Index lifecyle policies]
-in the _{kib} Reference_. 
+{kibana-ref}/index-lifecycle-policies.html[Index lifecyle policies]. 
 
 To modify the default policy before loading it, run +{beatname_lc} export
 ilm-policy+ to print the policy to stdout. Modify the policy then use the
@@ -95,7 +94,7 @@ Let's assume you have the index pattern `customname-%{event.module}` where
 a rollover index for `customname-system` and `customname-apache`. For details on
 how to do this, see
 {ref}/indices-rollover-index.html#_using_date_math_with_the_rollover_api[Rollover
-Index docs]. 
+Index]. 
 
 Next, set the index pattern in the {es} output. For example:
 
