@@ -30,6 +30,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
 - Rename `read_timestamp` to `event.created` for Redis input. {pull}9924[9924]
 - Rename a few `elasticsearch.audit.*` fields to map to ECS. {pull}9293[9293]
+- Rename `read_timestamp` to `event.created` for all Filebeat modules using it. {pull}10139[10139]
 - Rename many `iis.error.*` fields to map to ECS. {pull}9955[9955]
 - Adjust fileset `haproxy.log` to map to ECS. {pull}10143[10143]
 - Rename a few `logstash.*` fields to map to ECS, remove logstash.slowlog.message. {pull}9935[9935]
@@ -39,6 +40,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Filesets with multiple ingest pipelines added in {pull}8914[8914] only work with Elasticsearch >= 6.5.0 {pull}10001[10001]
 - Remove service.name from Elastcsearch module. Replace by service.type. {pull}10042[10042]
 - Add grok pattern to support redis 5.0.3 log timestamp. {issue}9819[9819] {pull}10033[10033]
+- Now save the 'first seen' timestamp in `event.created` (previously `read_timestamp`),
+  instead of saving the parsed date. Now aligned with `event.created` semantics elsewhere. {pull}10139[10139]
 
 *Heartbeat*
 
@@ -48,7 +51,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
-- Rename read_timestamp to event.created to align with ECS. {pull}10043[10043]
+- Rename read_timestamp to event.created to align with ECS. {pull}10043[10043], {pull}10139[10139]
 - Rename host.name to host.hostname to align with ECS. {pull}10043[10043]
 
 *Metricbeat*

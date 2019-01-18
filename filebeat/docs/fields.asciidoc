@@ -5937,14 +5937,6 @@ The input type from which the event was generated. This field is set to the valu
 
 --
 
-*`read_timestamp`*::
-+
---
-In case the ingest pipeline parses the timestamp from the log contents, it stores the original `@timestamp` (representing the time when the log line was read) in this field.
-
-
---
-
 *`syslog.facility`*::
 +
 --
@@ -6058,6 +6050,15 @@ The Filebeat fileset that generated this event.
 type: alias
 
 alias to: event.module
+
+--
+
+*`read_timestamp`*::
++
+--
+type: alias
+
+alias to: event.created
 
 --
 
