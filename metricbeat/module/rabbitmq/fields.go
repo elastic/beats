@@ -24,7 +24,7 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("metricbeat", "rabbitmq", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("metricbeat", "Rabbitmq", asset.ModuleFieldsPri, Asset); err != nil {
 		panic(err)
 	}
 }
