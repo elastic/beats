@@ -5,7 +5,7 @@
         "field": "message",
         "patterns": [
           "%{LOCALDATETIME:mysql.error.timestamp} (\\[%{DATA:log.level}\\] )?%{GREEDYDATA:message}",
-          "%{DATA:mysql.error.timestamp} %{NUMBER:process.thread.id:long} \\[%{DATA:log.level}\\] %{GREEDYDATA:message}",
+          "%{DATA:mysql.error.timestamp} %{NUMBER:mysql.thread_id:long} \\[%{DATA:log.level}\\] %{GREEDYDATA:message}",
           "%{GREEDYDATA:message}"
         ],
         "ignore_missing": true,
@@ -27,6 +27,11 @@
           "YYMMdd H:m:s"
         ],
         "ignore_failure": true
+      }
+    }, {
+      "remove":{
+        "field": "mysql.error.timestamp",
+        "ignore_missing": true
       }
     }],
   "on_failure" : [{
