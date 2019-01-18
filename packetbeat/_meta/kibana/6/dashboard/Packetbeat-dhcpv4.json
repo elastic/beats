@@ -104,7 +104,7 @@
       },
       "id": "8460fcd0-8baa-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2019-01-04T14:55:16.796Z",
+      "updated_at": "2019-01-15T18:40:16.104Z",
       "version": 1
     },
     {
@@ -167,7 +167,7 @@
       },
       "id": "4ad9db20-8bab-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2019-01-04T14:55:16.796Z",
+      "updated_at": "2019-01-15T18:40:16.104Z",
       "version": 1
     },
     {
@@ -249,7 +249,7 @@
       },
       "id": "418dfbe0-8bac-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2019-01-04T14:55:16.796Z",
+      "updated_at": "2019-01-15T18:40:16.104Z",
       "version": 1
     },
     {
@@ -258,7 +258,8 @@
           "dhcpv4.transaction_id",
           "dhcpv4.op_code",
           "dhcpv4.option.message_type",
-          "client_ip",
+          "source.ip",
+          "destination.ip",
           "dhcpv4.client_mac",
           "dhcpv4.option.hostname",
           "dhcpv4.option.class_identifier"
@@ -276,7 +277,7 @@
                   "alias": null,
                   "disabled": false,
                   "index": "packetbeat-*",
-                  "key": "type",
+                  "key": "event.dataset",
                   "negate": false,
                   "params": {
                     "query": "dhcpv4",
@@ -287,7 +288,7 @@
                 },
                 "query": {
                   "match": {
-                    "type": {
+                    "event.dataset": {
                       "query": "dhcpv4",
                       "type": "phrase"
                     }
@@ -313,8 +314,8 @@
       },
       "id": "b8992150-8ba8-11e8-9676-ef67484126fb",
       "type": "search",
-      "updated_at": "2019-01-04T14:55:16.796Z",
-      "version": 1
+      "updated_at": "2019-01-15T18:46:52.929Z",
+      "version": 4
     },
     {
       "attributes": {
@@ -379,7 +380,7 @@
       },
       "id": "d0120dc0-8bac-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2019-01-04T14:55:16.796Z",
+      "updated_at": "2019-01-15T18:40:16.104Z",
       "version": 1
     },
     {
@@ -445,7 +446,7 @@
       },
       "id": "11d33ea0-8bad-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2019-01-04T14:55:16.796Z",
+      "updated_at": "2019-01-15T18:40:16.104Z",
       "version": 1
     },
     {
@@ -471,7 +472,7 @@
               "id": "1",
               "params": {
                 "customLabel": "Requests",
-                "field": "bytes_in"
+                "field": "client.bytes"
               },
               "schema": "metric",
               "type": "sum"
@@ -481,7 +482,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Responses",
-                "field": "bytes_out"
+                "field": "server.bytes"
               },
               "schema": "metric",
               "type": "sum"
@@ -521,8 +522,8 @@
       },
       "id": "f43a8f20-8bb5-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2019-01-04T14:55:16.796Z",
-      "version": 1
+      "updated_at": "2019-01-15T18:45:46.912Z",
+      "version": 2
     },
     {
       "attributes": {
@@ -650,9 +651,9 @@
       },
       "id": "a7b35890-8baa-11e8-9676-ef67484126fb",
       "type": "dashboard",
-      "updated_at": "2019-01-04T15:03:10.809Z",
+      "updated_at": "2019-01-15T18:46:22.620Z",
       "version": 2
     }
   ],
-  "version": "6.6.0-SNAPSHOT"
+  "version": "7.0.0-SNAPSHOT"
 }
