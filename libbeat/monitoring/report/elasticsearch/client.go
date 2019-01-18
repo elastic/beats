@@ -135,6 +135,7 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 			continue
 		}
 
+		logp.Info("Sending monitoring data to %s cluster", format)
 		switch format {
 		case report.ReportingFormatProduction:
 			err = c.bulkToProduction(params, event, t)

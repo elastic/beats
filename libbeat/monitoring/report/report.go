@@ -87,6 +87,11 @@ func getReporterConfig(
 		return "", nil, err
 	}
 
+	format, err := monitoringConfig.String("_format", -1)
+	if err != nil {
+		return "", nil, err
+	}
+
 	// load reporter from `monitoring` section and optionally
 	// merge with output settings
 	if config.Reporter.IsSet() {
@@ -101,7 +106,7 @@ func getReporterConfig(
 			}{}
 			rc.Unpack(&hosts)
 
-			if len(hosts.Hosts) > 0 {
+			if format == ReportingFormatProduction && len(hosts.Hosts) > 0 {
 				pathMonHosts := rc.PathOf("hosts")
 				pathOutHost := outCfg.PathOf("hosts")
 				err := fmt.Errorf("'%v' and '%v' are configured", pathMonHosts, pathOutHost)
@@ -115,12 +120,7 @@ func getReporterConfig(
 			rc = merged
 		}
 
-		format, err := monitoringConfig.String("_format", -1)
-		if err != nil {
-			return "", nil, err
-		}
-		rc.SetString("format", -1, format)
-
+		rc.SetString("_format", -1, format)
 		return name, rc, nil
 	}
 
@@ -128,6 +128,8 @@ func getReporterConfig(
 	if outputs.IsSet() {
 		name := outputs.Name()
 		if reportFactories[name] != nil {
+			outCfg := outputs.Config()
+			outCfg.SetString("_format", -1, format)
 			return name, outputs.Config(), nil
 		}
 	}
