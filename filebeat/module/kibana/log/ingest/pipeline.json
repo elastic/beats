@@ -85,7 +85,7 @@
         {
             "rename": {
                 "field": "kibana.log.meta.res.contentLength",
-                "target_field": "http.response.content_length",
+                "target_field": "http.response.body.bytes",
                 "ignore_missing": true
             }
         },

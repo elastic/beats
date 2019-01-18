@@ -5,7 +5,7 @@
             "grok": {
                 "field": "traefik.access.message",
                 "patterns": [
-                    "(?:%{NUMBER:traefik.access.body_sent.bytes:long}|-)( (?:\"%{DATA:http.request.referrer}\"|-)?( (?:\"%{DATA:traefik.access.agent}\"|-)?)?( (?:%{NUMBER:traefik.access.request_count:long}|-)?)?( (?:\"%{DATA:traefik.access.frontend_name}\"|-)?)?( \"%{DATA:traefik.access.backend_url}\")?( %{NUMBER:traefik.access.duration:long}ms)?)?"
+                    "(?:%{NUMBER:http.response.body.bytes:long}|-)( (?:\"%{DATA:http.request.referrer}\"|-)?( (?:\"%{DATA:traefik.access.agent}\"|-)?)?( (?:%{NUMBER:traefik.access.request_count:long}|-)?)?( (?:\"%{DATA:traefik.access.frontend_name}\"|-)?)?( \"%{DATA:traefik.access.backend_url}\")?( %{NUMBER:traefik.access.duration:long}ms)?)?"
                 ],
                 "ignore_missing": true
             }
