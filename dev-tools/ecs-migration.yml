@@ -54,11 +54,6 @@
   alias6: true
   alias: true
 
-- from: read_timestamp
-  to: event.created
-  alias6: true
-  alias: true
-
 
 # Processor fields
 
@@ -247,6 +242,10 @@
 
 - from: apache2.access.agent
   to: user_agent.original
+  alias: true
+
+- from: read_timestamp
+  to: event.created
   alias: true
 
 # These expand all fields under geoip and user_agent
@@ -773,6 +772,12 @@
 - from: traefik.access.http_version
   to: http.version
   alias: true
+
+# Filebeat Redis Input
+
+- from: read_timestamp
+  to: event.created
+  alias: false
 
 # Auditbeat
 
