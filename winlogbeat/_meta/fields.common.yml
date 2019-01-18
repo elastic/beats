@@ -3,6 +3,7 @@
   description: >
     Contains common fields available in all event types.
   fields:
+    # Is this event.type?
     - name: type
       required: true
       description: >
@@ -31,7 +32,8 @@
         activity.
 
     - name: computer_name
-      type: keyword
+      type: alias
+      path: host.name
       required: true
       description: >
         The name of the computer that generated the record. When using Windows
@@ -49,7 +51,8 @@
         earlier versions of Windows.
 
     - name: event_id
-      type: long
+      type: alias
+      path: event.id
       required: true
       description: >
         The event identifier. The value is specific to the source of the event.
@@ -61,14 +64,17 @@
         The keywords are used to classify an event.
 
     - name: log_name
-      type: keyword
+      # This does not exist yet
+      path: log.name
+      type: alias
       required: true
       description: >
         The name of the event log from which this record was read. This value is
         one of the names from the `event_logs` collection in the configuration.
 
     - name: level
-      type: keyword
+      type: alias
+      path: log.level
       required: false
       description: >
         The level of the event. There are five levels of events that can be
@@ -76,7 +82,8 @@
         Failure.
 
     - name: message_error
-      type: keyword
+      type: alias
+      path: error.message
       required: false
       description: >
         The error that occurred while reading and formatting the message from
@@ -116,7 +123,8 @@
         the event.
 
     - name: process_id
-      type: long
+      type: alias
+      path: process.id
       required: false
       description: >
         The process_id identifies the process that generated the event.
@@ -138,7 +146,8 @@
         operating systems) is written to this field.
 
     - name: thread_id
-      type: long
+      type: alias
+      path: process.thread.id
       required: false
       description: >
         The thread_id identifies the thread that generated the event.
@@ -152,6 +161,7 @@
         `event_data`.
 
     - name: user.identifier
+      # Is this user.id?
       type: keyword
       required: false
       example: S-1-5-21-3541430928-2051711210-1391384369-1001

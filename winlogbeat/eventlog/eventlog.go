@@ -82,30 +82,30 @@ type Record struct {
 func (e Record) ToEvent() beat.Event {
 	m := common.MapStr{
 		"type":          e.API,
-		"log_name":      e.Channel,
-		"source_name":   e.Provider.Name,
-		"computer_name": e.Computer,
 		"record_number": strconv.FormatUint(e.RecordID, 10),
-		"event_id":      e.EventIdentifier.ID,
 	}
+	m.Put("event.id", e.EventIdentifier.ID)
+	m.Put("log.name", e.Channel)
+	m.Put("source.name", e.Channel)
+	m.Put("host.name", e.Computer)
 
 	addOptional(m, "xml", e.XML)
 	addOptional(m, "provider_guid", e.Provider.GUID)
 	addOptional(m, "version", e.Version)
-	addOptional(m, "level", e.Level)
+	addOptional(m, "log.level", e.Level)
 	addOptional(m, "task", e.Task)
 	addOptional(m, "opcode", e.Opcode)
 	addOptional(m, "keywords", e.Keywords)
 	addOptional(m, "message", sys.RemoveWindowsLineEndings(e.Message))
-	addOptional(m, "message_error", e.RenderErr)
+	addOptional(m, "error.message", e.RenderErr)
 
 	// Correlation
 	addOptional(m, "activity_id", e.Correlation.ActivityID)
 	addOptional(m, "related_activity_id", e.Correlation.RelatedActivityID)
 
 	// Execution
-	addOptional(m, "process_id", e.Execution.ProcessID)
-	addOptional(m, "thread_id", e.Execution.ThreadID)
+	addOptional(m, "process.id", e.Execution.ProcessID)
+	addOptional(m, "process.thread.id", e.Execution.ThreadID)
 	addOptional(m, "processor_id", e.Execution.ProcessorID)
 	addOptional(m, "session_id", e.Execution.SessionID)
 	addOptional(m, "kernel_time", e.Execution.KernelTime)
@@ -139,7 +139,7 @@ func (e Record) ToEvent() beat.Event {
 // MapStr.
 func addOptional(m common.MapStr, key string, v interface{}) {
 	if m != nil && !isZero(v) {
-		m[key] = v
+		m.Put(key) = v
 	}
 }
 
