@@ -37,6 +37,7 @@ func WrapCommon(js []jobs.Job, id string, name string, typ string) []jobs.Job {
 	)
 }
 
+// addMonitorMeta adds the id, name, and type fields to the monitor.
 func addMonitorMeta(id string, name string, typ string) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return WithFields(
@@ -72,9 +73,7 @@ func addMonitorStatus(origJob jobs.Job) jobs.Job {
 	}
 }
 
-// addMonitorDuration executes the given Job, checking the duration of its run and setting
-// its addMonitorStatus.
-// It adds the monitor.duration and monitor.addMonitorStatus fields.
+// addMonitorDuration executes the given Job, checking the duration of its run.
 func addMonitorDuration(job jobs.Job) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		start := time.Now()
