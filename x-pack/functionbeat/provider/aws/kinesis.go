@@ -89,19 +89,15 @@ func (cfg *KinesisConfig) Validate() error {
 
 // KinesisTriggerConfig configuration for the current trigger.
 type KinesisTriggerConfig struct {
-	EventSourceArn   string
-	BatchSize        int
-	StartingPosition startingPosition
+	EventSourceArn   string           `config:"event_source_arn" validate:"required"`
+	BatchSize        int              `config:"batch_size" validate:"min=100,max=10000"`
+	StartingPosition startingPosition `config:"starting_position"`
 }
 
 // Unpack unpacks the trigger and make sure the defaults settings are correctly sets.
 func (c *KinesisTriggerConfig) Unpack(cfg *common.Config) error {
-	// Create an anonymous struct so we don't go into a recursive unpack.
-	config := struct {
-		EventSourceArn   string           `config:"event_source_arn" validate:"required"`
-		BatchSize        int              `config:"batch_size" validate:"min=100,max=10000"`
-		StartingPosition startingPosition `config:"starting_position"`
-	}{
+	type tmpConfig KinesisTriggerConfig
+	config := tmpConfig{
 		BatchSize:        100,
 		StartingPosition: trimHorizonPos,
 	}
