@@ -31,13 +31,13 @@ import (
 func WrapCommon(js []jobs.Job, id string, name string, typ string) []jobs.Job {
 	return jobs.WrapAll(
 		js,
-		monStatus,
-		monTiming,
-		monMeta(id, name, typ),
+		addMonitorStatus,
+		addMonitorDuration,
+		addMonitorMeta(id, name, typ),
 	)
 }
 
-func monMeta(id string, name string, typ string) jobs.JobWrapper {
+func addMonitorMeta(id string, name string, typ string) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return WithFields(
 			common.MapStr{
@@ -52,11 +52,11 @@ func monMeta(id string, name string, typ string) jobs.JobWrapper {
 	}
 }
 
-// monStatus wraps the given Job's execution such that any error returned
+// addMonitorStatus wraps the given Job's execution such that any error returned
 // by the original Job will be set as a field. The original error will not be
 // passed through as a return value. Errors may still be present but only if there
 // is an actual error wrapping the error.
-func monStatus(origJob jobs.Job) jobs.Job {
+func addMonitorStatus(origJob jobs.Job) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		cont, err := origJob(event)
 		fields := common.MapStr{
@@ -72,10 +72,10 @@ func monStatus(origJob jobs.Job) jobs.Job {
 	}
 }
 
-// monTiming executes the given Job, checking the duration of its run and setting
-// its monStatus.
-// It adds the monitor.duration and monitor.monStatus fields.
-func monTiming(job jobs.Job) jobs.Job {
+// addMonitorDuration executes the given Job, checking the duration of its run and setting
+// its addMonitorStatus.
+// It adds the monitor.duration and monitor.addMonitorStatus fields.
+func addMonitorDuration(job jobs.Job) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		start := time.Now()
 
