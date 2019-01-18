@@ -29,7 +29,7 @@ class Test(BaseTest):
 
         # check transport layer always tcp
         assert all(o['type'] == 'memcache' for o in objs)
-        assert all(o['transport'] == 'tcp' for o in objs)
+        assert all(o['network.transport'] == 'tcp' for o in objs)
         assert all(o['memcache.protocol_type'] == 'binary' for o in objs)
 
     def test_store_load(self):
