@@ -144,6 +144,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Introduce `migration.enabled` configuration. {pull}9805[9805]
 - Add alias field support in Kibana index pattern. {pull}10075[10075]
 - Add `add_fields` processor. {pull}10119[10119]
+- Add Kibana field formatter to bytes fields. {pull}10184[10184]
 
 *Auditbeat*
 
