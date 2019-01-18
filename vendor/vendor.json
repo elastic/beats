@@ -9,6 +9,12 @@
 			"revisionTime": "2018-10-26T23:03:58Z"
 		},
 		{
+			"checksumSHA1": "eruIVA8JnsB23rVKjETHvqJ0sj8=",
+			"path": "github.com/DataDog/zstd",
+			"revision": "2bf71ec4836011b92dc78df3b9ace6b40e65f7df",
+			"revisionTime": "2016-07-06T22:07:25Z"
+		},
+		{
 			"checksumSHA1": "AzjRkOQtVBTwIw4RJLTygFhJs3s=",
 			"path": "github.com/Microsoft/go-winio",
 			"revision": "f533f7a102197536779ea3a8cb881d639e21ec5a",
@@ -21,14 +27,13 @@
 			"revisionTime": "2018-07-23T16:30:02Z"
 		},
 		{
-			"checksumSHA1": "8uhvsMSF1+QTzPYxASJGv548nBU=",
-			"origin": "github.com/urso/sarama",
+			"checksumSHA1": "6vi2DINjmqIqJSZfbkdpI8nNrVY=",
 			"path": "github.com/Shopify/sarama",
-			"revision": "0143592836b090a1b481def4d902cfb3c5c05ae5",
-			"revisionTime": "2016-11-23T00:27:23Z",
+			"revision": "03a43f93cd29dc549e6d9b11892795c206f9c38c",
+			"revisionTime": "2019-01-10T17:48:46Z",
 			"tree": true,
-			"version": "=v1.18.0/enh/offset-replica-id",
-			"versionExact": "v1.18.0/enh/offset-replica-id"
+			"version": "v1.20.1",
+			"versionExact": "v1.20.1"
 		},
 		{
 			"checksumSHA1": "DYv6Q1+VfnUVxMwvk5IshAClLvw=",
