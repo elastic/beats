@@ -6322,6 +6322,16 @@ Fields from the MySQL log files.
 
 
 
+*`mysql.thread_id`*::
++
+--
+type: long
+
+The connection or thread ID for the query.
+
+
+--
+
 [float]
 == error fields
 
@@ -6329,20 +6339,12 @@ Contains fields from the MySQL error logs.
 
 
 
-*`mysql.error.timestamp`*::
-+
---
-The timestamp from the log line.
-
-
---
-
 *`mysql.error.thread_id`*::
 +
 --
 type: alias
 
-alias to: process.thread.id
+alias to: mysql.thread_id
 
 --
 
@@ -6421,16 +6423,6 @@ The number of rows modified by the query.
 
 --
 
-*`mysql.slowlog.timestamp`*::
-+
---
-type: long
-
-The unix timestamp taken from the `SET timestamp` query.
-
-
---
-
 *`mysql.slowlog.query`*::
 +
 --
@@ -6442,10 +6434,9 @@ The slow query.
 *`mysql.slowlog.id`*::
 +
 --
-type: long
+type: alias
 
-The connection or thread ID for the query.
-
+alias to: mysql.thread_id
 
 --
 

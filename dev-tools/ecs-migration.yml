@@ -551,7 +551,7 @@
   alias: true
 
 - from: mysql.error.thread_id
-  to: process.thread.id
+  to: mysql.thread_id
   alias: true
 
 - from: mysql.slowlog.ip
@@ -564,6 +564,10 @@
 
 - from: mysql.slowlog.user
   to: user.name
+  alias: true
+
+- from: mysql.slowlog.id
+  to: mysql.thread_id
   alias: true
 
 ## NGINX module

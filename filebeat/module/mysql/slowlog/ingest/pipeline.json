@@ -4,7 +4,7 @@
     "grok": {
       "field": "message",
       "patterns":[
-        "^# User@Host: %{USER:user.name}(\\[%{USER:mysql.slowlog.current_user}\\])? @ %{HOSTNAME:source.domain}? \\[%{IP:source.ip}?\\](\\s*Id:\\s* %{NUMBER:mysql.slowlog.id:long})?\n(# Thread_id:%{SPACE}%{NUMBER:mysql.slowlog.id}%{METRICSPACE}Schema: %{WORD:mysql.slowlog.schema}?%{METRICSPACE}QC_hit: %{WORD:mysql.slowlog.query_cache_hit}\n)?%{METRICSPACE}Query_time: %{NUMBER:mysql.slowlog.query_time.sec:float}%{METRICSPACE}Lock_time: %{NUMBER:mysql.slowlog.lock_time.sec:float}%{METRICSPACE}Rows_sent: %{NUMBER:mysql.slowlog.rows_sent:long}%{METRICSPACE}Rows_examined: %{NUMBER:mysql.slowlog.rows_examined:long}%{METRICSPACE}(Rows_affected: %{NUMBER:mysql.slowlog.rows_affected:long}%{METRICSPACE})?(Full_scan: %{WORD:mysql.slowlog.full_scan}%{METRICSPACE})?(Full_join: %{WORD:mysql.slowlog.full_join}%{METRICSPACE})?(Tmp_table: %{WORD:mysql.slowlog.tmp_table}%{METRICSPACE})?(Tmp_table_on_disk: %{WORD:mysql.slowlog.tmp_table_on_disk}%{METRICSPACE})?(Filesort: %{WORD:mysql.slowlog.filesort}%{METRICSPACE})?(Filesort_on_disk: %{WORD:mysql.slowlog.filesort_on_disk}%{METRICSPACE})?(Merge_passes: %{NUMBER:mysql.slowlog.merge_passes}%{METRICSPACE})?(Priority_queue: %{WORD:mysql.slowlog.priority_queue}%{METRICSPACE})?%{EXPLAIN}?(use %{WORD:mysql.slowlog.schema};\n)?SET timestamp=%{NUMBER:mysql.slowlog.timestamp:long};\n%{GREEDYMULTILINE:mysql.slowlog.query}"
+        "^# User@Host: %{USER:user.name}(\\[%{USER:mysql.slowlog.current_user}\\])? @ %{HOSTNAME:source.domain}? \\[%{IP:source.ip}?\\](\\s*Id:\\s* %{NUMBER:mysql.thread_id:long})?\n(# Thread_id:%{SPACE}%{NUMBER:mysql.thread_id}%{METRICSPACE}Schema: %{WORD:mysql.slowlog.schema}?%{METRICSPACE}QC_hit: %{WORD:mysql.slowlog.query_cache_hit}\n)?%{METRICSPACE}Query_time: %{NUMBER:mysql.slowlog.query_time.sec:float}%{METRICSPACE}Lock_time: %{NUMBER:mysql.slowlog.lock_time.sec:float}%{METRICSPACE}Rows_sent: %{NUMBER:mysql.slowlog.rows_sent:long}%{METRICSPACE}Rows_examined: %{NUMBER:mysql.slowlog.rows_examined:long}%{METRICSPACE}(Rows_affected: %{NUMBER:mysql.slowlog.rows_affected:long}%{METRICSPACE})?(Full_scan: %{WORD:mysql.slowlog.full_scan}%{METRICSPACE})?(Full_join: %{WORD:mysql.slowlog.full_join}%{METRICSPACE})?(Tmp_table: %{WORD:mysql.slowlog.tmp_table}%{METRICSPACE})?(Tmp_table_on_disk: %{WORD:mysql.slowlog.tmp_table_on_disk}%{METRICSPACE})?(Filesort: %{WORD:mysql.slowlog.filesort}%{METRICSPACE})?(Filesort_on_disk: %{WORD:mysql.slowlog.filesort_on_disk}%{METRICSPACE})?(Merge_passes: %{NUMBER:mysql.slowlog.merge_passes}%{METRICSPACE})?(Priority_queue: %{WORD:mysql.slowlog.priority_queue}%{METRICSPACE})?%{EXPLAIN}?(use %{WORD:mysql.slowlog.schema};\n)?SET timestamp=%{NUMBER:mysql.slowlog.timestamp:long};\n%{GREEDYMULTILINE:mysql.slowlog.query}"
         ],
       "pattern_definitions" : {
         "GREEDYMULTILINE": "(.|\n)*",
@@ -50,6 +50,11 @@
       "target_field": "@timestamp",
       "formats": ["UNIX"],
       "ignore_failure": true
+    }
+  }, {
+    "remove":{
+      "field": "mysql.slowlog.timestamp",
+      "ignore_missing": true
     }
   }, {
     "gsub": {

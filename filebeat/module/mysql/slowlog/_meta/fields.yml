@@ -24,17 +24,13 @@
       type: long
       description: >
         The number of rows modified by the query.
-    - name: timestamp
-      type: long
-      description: >
-        The unix timestamp taken from the `SET timestamp` query.
     - name: query
       description: >
         The slow query.
     - name: id
-      type: long
-      description: >
-        The connection or thread ID for the query.
+      type: alias
+      path: mysql.thread_id
+      migration: true
     - name: schema
       type: keyword
       description: >
