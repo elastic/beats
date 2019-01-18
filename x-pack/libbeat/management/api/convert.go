@@ -9,9 +9,9 @@ import (
 	"strings"
 )
 
-type convertFunc func(map[string]interface{}) (map[string]interface{}, error)
+type converter func(map[string]interface{}) (map[string]interface{}, error)
 
-var mapper = map[string]convertFunc{
+var mapper = map[string]converter{
 	".inputs":  noopConvert,
 	".modules": convertMultiple,
 	"output":   convertSingle,
@@ -24,7 +24,7 @@ var (
 	moduleKey  = "module"
 )
 
-func selectConverter(t string) convertFunc {
+func selectConverter(t string) converter {
 	c := noopConvert
 	for k, v := range mapper {
 		if strings.Index(t, k) > -1 {

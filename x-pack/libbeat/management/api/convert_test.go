@@ -25,7 +25,7 @@ func TestConvertAPI(t *testing.T) {
 				"username":  "foobar",
 			},
 			expected: map[string]interface{}{
-				"_elasticsearch": map[string]interface{}{
+				"elasticsearch": map[string]interface{}{
 					"username": "foobar",
 				},
 			},
@@ -50,7 +50,7 @@ func TestConvertAPI(t *testing.T) {
 		"filebeat modules": {
 			t: "filebeat.modules",
 			config: map[string]interface{}{
-				"sub_type": "system",
+				"_sub_type": "system",
 			},
 			expected: map[string]interface{}{
 				"module": "system",
