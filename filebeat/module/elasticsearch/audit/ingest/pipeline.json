@@ -1,41 +1,56 @@
 {
-  "description": "Pipeline for parsing elasticsearch audit logs",
-  "processors": [
-      {
-          "rename": {
-              "field": "@timestamp",
-              "target_field": "event.created"
-          }
-      },
-      {
-          "grok": {
-              "field": "message",
-              "patterns": [
-                  "\\[%{TIMESTAMP_ISO8601:elasticsearch.audit.timestamp}\\]\\s*(\\[%{WORD:elasticsearch.node.name}\\])?\\s*\\[%{WORD:elasticsearch.audit.layer}\\]\\s*\\[%{WORD:event.type}\\]\\s*(origin_type\\=\\[%{WORD:elasticsearch.audit.origin_type}\\])?,?\\s*(origin_address\\=\\[%{IPORHOST:source.ip}\\])?,?\\s*(principal\\=\\[%{WORD:user.name}\\])?,?\\s*(action\\=\\[%{DATA:elasticsearch.audit.action}\\])?,?\\s*?(uri=\\[%{DATA:url.original}\\])?,?\\s*(request\\=\\[%{WORD:elasticsearch.audit.request}\\])?,?\\s*(request_body\\=\\[%{DATA:http.request.body.content}\\])?,?"
-              ]
-          }
-      },
-      {
-          "date": {
-              "field": "elasticsearch.audit.timestamp",
-              "target_field": "@timestamp",
-              "formats": [
-                "ISO8601"
-            ],
-            {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
-            "ignore_failure": true
-          }
-      },
-      {
-        "remove": {
-            "field": "elasticsearch.audit.timestamp"
-          }
-      }
+    "description": "Pipeline for parsing elasticsearch audit logs",
+    "processors": [
+        {
+            "rename": {
+                "field": "@timestamp",
+                "target_field": "event.created"
+            }
+        },
+        {
+            "grok": {
+                "field": "message",
+                "pattern_definitions": {
+                    "ES_TIMESTAMP": "\\[%{TIMESTAMP_ISO8601:elasticsearch.audit.timestamp}\\]",
+                    "ES_NODE_NAME": "(\\[%{DATA:elasticsearch.node.name}\\])?",
+                    "ES_AUDIT_LAYER": "\\[%{WORD:elasticsearch.audit.layer}\\]",
+                    "ES_AUDIT_EVENT_TYPE": "\\[%{WORD:event.type}\\]",
+                    "ES_AUDIT_ORIGIN_TYPE": "(origin_type\\=\\[%{WORD:elasticsearch.audit.origin_type}\\])?",
+                    "ES_AUDIT_ORIGIN_ADDRESS": "(origin_address\\=\\[%{IPORHOST:source.ip}\\])?",
+                    "ES_AUDIT_PRINCIPAL": "(principal\\=\\[%{WORD:user.name}\\])?",
+                    "ES_AUDIT_ACTION": "(action\\=\\[%{DATA:elasticsearch.audit.action}\\])?",
+                    "ES_AUDIT_URI": "(uri=\\[%{DATA:url.original}\\])?",
+                    "ES_AUDIT_REQUEST": "(request\\=\\[%{WORD:elasticsearch.audit.request}\\])?",
+                    "ES_AUDIT_REQUEST_BODY": "(request_body\\=\\[%{DATA:http.request.body.content}\\])?"
+                },
+                "patterns": [
+                    "%{ES_TIMESTAMP}\\s*%{ES_NODE_NAME}\\s*%{ES_AUDIT_LAYER}\\s*%{ES_AUDIT_EVENT_TYPE}\\s*%{ES_AUDIT_ORIGIN_TYPE},?\\s*%{ES_AUDIT_ORIGIN_ADDRESS},?\\s*%{ES_AUDIT_PRINCIPAL},?\\s*%{ES_AUDIT_ACTION},?\\s*%{ES_AUDIT_URI},?\\s*%{ES_AUDIT_REQUEST},?\\s*%{ES_AUDIT_REQUEST_BODY},?"
+                ]
+            }
+        },
+        {
+            "date": {
+                "field": "elasticsearch.audit.timestamp",
+                "target_field": "@timestamp",
+                "formats": [
+                    "ISO8601"
+                ],
+                {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
+                "ignore_failure": true
+            }
+        },
+        {
+            "remove": {
+                "field": "elasticsearch.audit.timestamp"
+            }
+        }
     ],
-  "on_failure" : [{
-    "set" : {
-      "field" : "error.message",
-      "value" : "{{ _ingest.on_failure_message }}"
-    }
-  }]
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ]
 }
