@@ -4,13 +4,25 @@
 
 package pkg
 
-// Config defines the package metricset's configuration options.
-type Config struct {
+import (
+	"time"
+)
+
+// config defines the package metricset's configuration options.
+type config struct {
+	StatePeriod        time.Duration `config:"state.period"`
+	PackageStatePeriod time.Duration `config:"package.state.period"`
 }
 
-// Validate validates the package metricset config.
-func (c *Config) Validate() error {
-	return nil
+func (c *config) effectiveStatePeriod() time.Duration {
+	if c.PackageStatePeriod != 0 {
+		return c.PackageStatePeriod
+	}
+	return c.StatePeriod
 }
 
-var defaultConfig = Config{}
+func defaultConfig() config {
+	return config{
+		StatePeriod: 12 * time.Hour,
+	}
+}

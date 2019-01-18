@@ -14,18 +14,18 @@ import (
 	"strings"
 	"time"
 
+	"github.com/OneOfOne/xxhash"
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/auditbeat/datastore"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/auditbeat/cache"
-	"github.com/elastic/go-sysinfo/types"
-
-	"github.com/OneOfOne/xxhash"
-
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
 )
 
 const (
@@ -36,7 +36,28 @@ const (
 	redhat = "redhat"
 	debian = "debian"
 	darwin = "darwin"
+
+	bucketName              = "package.v1"
+	bucketKeyUsers          = "packages"
+	bucketKeyStateTimestamp = "state_timestamp"
+
+	eventTypeState = "state"
 )
+
+type eventAction uint8
+
+const (
+	eventActionExistingPackage eventAction = iota
+)
+
+func (action eventAction) String() string {
+	switch action {
+	case eventActionExistingPackage:
+		return "existing_package"
+	default:
+		return ""
+	}
+}
 
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
@@ -45,13 +66,15 @@ func init() {
 	)
 }
 
-// MetricSet collects data about the host.
+// MetricSet collects data about the system's packages.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config   Config
-	osFamily string
-	cache    *cache.Cache
-	log      *logp.Logger
+	config    config
+	log       *logp.Logger
+	cache     *cache.Cache
+	bucket    datastore.Bucket
+	lastState time.Time
+	osFamily  string
 }
 
 // Package represents information for a package.
@@ -107,9 +130,14 @@ func getOS() (*types.OSInfo, error) {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The %v/%v dataset is experimental", moduleName, metricsetName)
 
-	config := defaultConfig
+	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
+	}
+
+	bucket, err := datastore.OpenBucket(bucketName)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to open persistent datastore")
 	}
 
 	ms := &MetricSet{
@@ -117,6 +145,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		config:        config,
 		log:           logp.NewLogger(metricsetName),
 		cache:         cache.New(),
+		bucket:        bucket,
 	}
 
 	if os, err := getOS(); err == nil {
@@ -130,19 +159,45 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	// Load from disk: Time when state was last sent
+	err = bucket.Load(bucketKeyStateTimestamp, func(blob []byte) error {
+		if len(blob) > 0 {
+			return ms.lastState.UnmarshalBinary(blob)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !ms.lastState.IsZero() {
+		ms.log.Debugf("Last state was sent at %v. Next state update by %v.", ms.lastState, ms.lastState.Add(ms.config.effectiveStatePeriod()))
+	} else {
+		ms.log.Debug("No state timestamp found")
+	}
+
 	return ms, nil
 }
 
 // Fetch collects data about the host. It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
-	packages, err := getPackages(ms.osFamily)
+	needsStateUpdate := time.Since(ms.lastState) > ms.config.effectiveStatePeriod()
+	if needsStateUpdate || ms.cache.IsEmpty() {
+		ms.log.Debugf("State update needed (needsStateUpdate=%v, cache.IsEmpty()=%v)", needsStateUpdate, ms.cache.IsEmpty())
+		err := ms.reportState(report)
+		if err != nil {
+			ms.log.Error(err)
+			report.Error(err)
+		}
+		ms.log.Debugf("Next state update by %v", ms.lastState.Add(ms.config.effectiveStatePeriod()))
+	}
+
+	/*err := ms.reportChanges(report)
 	if err != nil {
 		ms.log.Error(err)
 		report.Error(err)
-		return
-	}
+	}*/
 
-	if ms.cache != nil && !ms.cache.IsEmpty() {
+	/*if ms.cache != nil && !ms.cache.IsEmpty() {
 		installed, removed := ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
 
 		for _, pkgInfo := range installed {
@@ -187,7 +242,68 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 			// This will initialize the cache with the current packages
 			ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
 		}
+	}*/
+}
+
+// reportState reports all installed packages on the system.
+func (ms *MetricSet) reportState(report mb.ReporterV2) error {
+	ms.lastState = time.Now()
+
+	packages, err := getPackages(ms.osFamily)
+	if err != nil {
+		return errors.Wrap(err, "failed to get packages")
 	}
+	ms.log.Debugf("Found %v packages", len(packages))
+
+	stateID, err := uuid.NewV4()
+	if err != nil {
+		return errors.Wrap(err, "error generating state ID")
+	}
+	for _, pkg := range packages {
+		event := packageEvent(pkg, eventTypeState, eventActionExistingPackage)
+		event.RootFields.Put("event.id", stateID.String())
+		report.Event(event)
+	}
+
+	// This will initialize the cache with the current packages
+	ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
+
+	// Save time so we know when to send the state again (config.StatePeriod)
+	timeBytes, err := ms.lastState.MarshalBinary()
+	if err != nil {
+		return err
+	}
+	err = ms.bucket.Store(bucketKeyStateTimestamp, timeBytes)
+	if err != nil {
+		return errors.Wrap(err, "error writing state timestamp to disk")
+	}
+
+	return nil
+	//return ms.savePackagesToDisk(users)
+}
+
+func packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
+	return mb.Event{
+		RootFields: common.MapStr{
+			"event": common.MapStr{
+				"kind":   eventType,
+				"action": action.String(),
+			},
+			"message": packageMessage(pkg, action),
+		},
+		MetricSetFields: pkg.toMapStr(),
+	}
+}
+
+func packageMessage(pkg *Package, action eventAction) string {
+	var actionString string
+	switch action {
+	case eventActionExistingPackage:
+		actionString = "is already installed"
+	}
+
+	return fmt.Sprintf("Package %v (%v) %v",
+		pkg.Name, pkg.Version, actionString)
 }
 
 func convertToCacheable(packages []*Package) []cache.Cacheable {
