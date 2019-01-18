@@ -3965,6 +3965,26 @@ Where the request originated: rest (request originated from a REST API request),
 
 --
 
+*`elasticsearch.audit.realm`*::
++
+--
+type: keyword
+
+The authentication realm
+
+--
+
+*`elasticsearch.audit.roles`*::
++
+--
+type: array
+
+example: ['kibana_user', 'beats_admin']
+
+Roles to which the principal belongs
+
+--
+
 *`elasticsearch.audit.action`*::
 +
 --
@@ -3973,6 +3993,17 @@ type: keyword
 example: cluster:monitor/main
 
 The name of the action that was executed
+
+--
+
+*`elasticsearch.audit.indices`*::
++
+--
+type: array
+
+example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
+
+Indices accessed by action
 
 --
 

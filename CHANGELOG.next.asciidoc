@@ -141,6 +141,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for MariaDB in the `slowlog` fileset of `mysql` module. {pull}9731[9731]
 - Elasticsearch module's slowlog now populates `event.duration` (ECS). {pull}9293[9293]
 - HAProxy module now populates `event.duration` and `http.response.bytes` (ECS). {pull}10143[10143]
+- Teach elasticsearch/audit fileset to parse out some more fields. {issue}10134[10134] {pull}10137[10137]
 
 *Heartbeat*
 
