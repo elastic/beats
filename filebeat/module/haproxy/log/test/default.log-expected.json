@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2018-09-20T15:42:59.000Z", 
         "fileset.module": "haproxy", 
         "fileset.name": "log", 
         "haproxy.client.ip": "1.2.3.4", 
