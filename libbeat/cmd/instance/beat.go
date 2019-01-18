@@ -999,10 +999,10 @@ func initPaths(cfg *common.Config) error {
 func selectMonitoringConfig(beatCfg beatConfig) (*common.Config, error) {
 	switch {
 	case beatCfg.Monitoring.Enabled() && beatCfg.XPackMonitoring.Enabled():
-		const errMonitoringBothConfigEnabled = "both xpack.monitoring.* and monitoring.* cannot be set. Prefer to set monitoring.* and set monitoring.hosts to monitoring cluster hosts"
+		const errMonitoringBothConfigEnabled = "both xpack.monitoring.* and monitoring.* cannot be set. Prefer to set monitoring.* and set monitoring.elasticsearch.hosts to monitoring cluster hosts"
 		return nil, errors.New(errMonitoringBothConfigEnabled)
 	case beatCfg.XPackMonitoring.Enabled():
-		const warnMonitoringDeprecatedConfig = "xpack.monitoring.* settings are deprecated. Use monitoring.* instead, but set monitoring.hosts to monitoring cluster hosts"
+		const warnMonitoringDeprecatedConfig = "xpack.monitoring.* settings are deprecated. Use monitoring.* instead, but set monitoring.elasticsearch.hosts to monitoring cluster hosts"
 		cfgwarn.Deprecate("7.0", warnMonitoringDeprecatedConfig)
 		monitoringCfg := beatCfg.XPackMonitoring
 		monitoringCfg.SetString("_format", -1, report.ReportingFormatProduction)
