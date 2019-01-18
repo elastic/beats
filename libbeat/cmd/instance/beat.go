@@ -287,6 +287,11 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
+	err = b.registerClusterUUIDFetching()
+	if err != nil {
+		return nil, err
+	}
+
 	reg := monitoring.Default.GetRegistry("libbeat")
 	if reg == nil {
 		reg = monitoring.Default.NewRegistry("libbeat")
@@ -794,8 +799,19 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg common.ConfigNamespace) 
 	return outputs.Load(b.index, b.Info, stats, cfg.Name(), cfg.Config())
 }
 
+func (b *Beat) registerClusterUUIDFetching() error {
+	if b.Config.Output.Name() == "elasticsearch" {
+		callback, err := b.clusterUUIDFetchingCallback()
+		if err != nil {
+			return err
+		}
+		elasticsearch.RegisterConnectCallback(callback)
+	}
+	return nil
+}
+
 // Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
-func (b *Beat) clusterUUIDFetchingCalling() (elasticsearch.ConnectCallback, error) {
+func (b *Beat) clusterUUIDFetchingCallback() (elasticsearch.ConnectCallback, error) {
 	var response struct {
 		ClusterUUID string `json:"cluster_uuid"`
 	}
