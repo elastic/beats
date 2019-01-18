@@ -3,11 +3,6 @@
   description: >
     Contains fields for the Apache HTTP Server access logs.
   fields:
-    - name: remote_ip
-      type: keyword
-      description: >
-        Client IP address or hostname.
-
     - name: ssl.protocol
       type: keyword
       description: >
