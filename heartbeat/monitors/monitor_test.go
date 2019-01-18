@@ -21,12 +21,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/libbeat/testing/mapvaltest"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/scheduler"
+	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
 func TestMonitor(t *testing.T) {

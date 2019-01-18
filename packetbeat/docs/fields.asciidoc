@@ -484,17 +484,54 @@ Error type.
 
 --
 
+*`beat.name`*::
++
+--
+type: alias
+
+alias to: host.name
+
+--
+
+*`beat.hostname`*::
++
+--
+type: alias
+
+alias to: agent.hostname
+
+--
+
 [[exported-fields-cassandra]]
 == Cassandra fields
 
 Cassandra v4/3 specific event fields.
 
 
+*`no_request`*::
++
+--
+type: alias
+
+alias to: cassandra.no_request
+
+--
+
 [float]
 == cassandra fields
 
 Information about the Cassandra request and response.
 
+
+*`cassandra.no_request`*::
++
+--
+type: boolean
+
+Indicates that there is no request because this is a PUSH message.
+
+
+--
 
 [float]
 == request fields
@@ -5188,24 +5225,6 @@ example: 4.4.0-112-generic
 
 Operating system kernel version as a raw string.
 
-
---
-
-*`beat.name`*::
-+
---
-type: alias
-
-alias to: agent.type
-
---
-
-*`beat.hostname`*::
-+
---
-type: alias
-
-alias to: agent.hostname
 
 --
 

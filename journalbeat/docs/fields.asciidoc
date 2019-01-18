@@ -65,6 +65,24 @@ Error type.
 
 --
 
+*`beat.name`*::
++
+--
+type: alias
+
+alias to: host.name
+
+--
+
+*`beat.hostname`*::
++
+--
+type: alias
+
+alias to: agent.hostname
+
+--
+
 [[exported-fields-cloud]]
 == Cloud provider metadata fields
 
@@ -151,14 +169,6 @@ alias to: cloud.region
 Contains common fields available in all event types.
 
 
-
-*`read_timestamp`*::
-+
---
-The time when Journalbeat read the journal entry.
-
-
---
 
 [float]
 == coredump fields
@@ -529,6 +539,15 @@ required: False
 
 Arbitrary fields coming from processes.
 
+
+--
+
+*`read_timestamp`*::
++
+--
+type: alias
+
+alias to: event.created
 
 --
 
@@ -3573,24 +3592,6 @@ example: 4.4.0-112-generic
 
 Operating system kernel version as a raw string.
 
-
---
-
-*`beat.name`*::
-+
---
-type: alias
-
-alias to: agent.type
-
---
-
-*`beat.hostname`*::
-+
---
-type: alias
-
-alias to: agent.hostname
 
 --
 

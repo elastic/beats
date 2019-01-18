@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-kibana-stats]]
 === Kibana stats metricset
 
-beta[]
-
 include::../../../module/kibana/stats/_meta/docs.asciidoc[]
 
 
