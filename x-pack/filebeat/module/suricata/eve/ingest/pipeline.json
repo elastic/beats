@@ -181,11 +181,9 @@
       ,"ignore_failure": true
       }
     }
-  , {"date":
-      {"field": "suricata.eve.timestamp"
-      ,"target_field": "event.end"
-      , "formats": ["ISO8601"]
-      ,"ignore_failure": true
+  , {"set":
+      {"field": "event.end"
+      ,"value": "{{@timestamp}}"
       }
     }
   , { "script":
