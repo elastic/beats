@@ -47,6 +47,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/common/seccomp"
 	"github.com/elastic/beats/libbeat/dashboards"
+	"github.com/elastic/beats/libbeat/ilm"
 	"github.com/elastic/beats/libbeat/index"
 	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/libbeat/logp"
@@ -277,8 +278,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	logSystemInfo(b.Info)
 	logp.Info("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
 
-	err = b.registerIndexSetup()
-	if err != nil {
+	if err = b.registerIndexSetup(); err != nil {
 		return nil, err
 	}
 
@@ -441,8 +441,7 @@ func (b *Beat) Setup(bt beat.Creator, template, setupDashboards, machineLearning
 		b.InSetupCmd = true
 
 		// Create beater to give it the opportunity to set loading callbacks
-		_, err = b.createBeater(bt)
-		if err != nil {
+		if _, err = b.createBeater(bt); err != nil {
 			return err
 		}
 
@@ -633,6 +632,8 @@ func (b *Beat) configure(settings Settings) error {
 		runtime.GOMAXPROCS(maxProcs)
 	}
 
+	b.prepareIndices()
+
 	b.Beat.BeatConfig, err = b.BeatConfig()
 	if err != nil {
 		return err
@@ -741,13 +742,51 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	return nil
 }
 
-func (b *Beat) registerIndexSetup() error {
-	if b.InSetupCmd {
-		return nil
+func (b *Beat) prepareIndices() error {
+	//send deprecation warning for old index configuration
+	deprecatedIndexCfg, err := b.Config.Output.Config().String("index", -1)
+	if err == nil && deprecatedIndexCfg != "" {
+		cfgwarn.Deprecate("7.0", "config `output.elasticsearch.index` is deprecated. Use `indices` instead.")
+	}
+	deprecatedIndicesCfg, err := b.Config.Output.Config().Child("indices", -1)
+	if err == nil && deprecatedIndicesCfg != nil {
+		cfgwarn.Deprecate("7.0", "config `output.elasticsearch.indices` is deprecated. Use `indices` instead.")
 	}
 
 	if b.Config.Indices == nil {
-		b.Config.Indices = index.Configs{}
+		if b.Config.Template == nil && deprecatedIndexCfg == "" && deprecatedIndicesCfg == nil {
+			b.Config.Indices = index.Configs{index.DefaultConfig}
+		} else {
+			b.Config.Indices = index.Configs{}
+			if deprecatedIndexCfg == "" {
+				b.Config.Output.Config().SetString("index", -1, index.DefaultConfig.Index)
+			}
+			return nil
+		}
+	}
+
+	//esClient needs to be provided for ILM settings,
+	//other settings can still be retrieved if there is no esClient, so ignore error for creating ES client
+	esClient, err := b.esClient()
+	if err != nil {
+		esClient = &elasticsearch.Client{}
+	}
+
+	indexCfg, indicesCfg, err := b.Config.Indices.CompatibleIndexCfg(esClient)
+	if err != nil {
+		return err
+	}
+
+	b.Config.Output.Config().SetString("index", -1, indexCfg)
+	b.Config.Output.Config().SetChild("indices", -1, indicesCfg)
+
+	return nil
+}
+
+func (b *Beat) registerIndexSetup() error {
+
+	if b.InSetupCmd {
+		return nil
 	}
 
 	//register ILM loading
@@ -770,26 +809,6 @@ func (b *Beat) registerIndexSetup() error {
 		elasticsearch.RegisterConnectCallback(callback)
 	}
 
-	//update output config to new indices settings if available
-	if len(b.Config.Indices) == 0 {
-		return nil
-	}
-	if index, err := b.Config.Output.Config().String("index", -1); err == nil && index != "" {
-		cfgwarn.Deprecate("7.0", "config `output.elasticsearch.index` is deprecated. Use `indices` instead.")
-	}
-	if indices, err := b.Config.Output.Config().Child("indices", -1); err == nil && indices != nil {
-		cfgwarn.Deprecate("7.0", "config `output.elasticsearch.indices` is deprecated. Use `indices` instead.")
-	}
-	//esClient needs to be provided for ILM settings,
-	//other settings can still be retrieved if there is no esClient, so ignore error for creating ES client
-	esClient, _ := b.esClient()
-	index, indices, err := b.Config.Indices.CompatibleIndexCfg(esClient)
-	if err != nil {
-		return err
-	}
-	b.Config.Output.Config().SetString("index", -1, index)
-	b.Config.Output.Config().SetChild("indices", -1, indices)
-
 	return nil
 }
 
@@ -800,20 +819,20 @@ func (b *Beat) ilmSetupCallback() (func(esClient *elasticsearch.Client) error, b
 
 	callback := func(esClient *elasticsearch.Client) error {
 
-		loader, err := index.NewESLoader(esClient, b.Info)
+		loader, err := ilm.NewESLoader(esClient, b.Info)
 		if err != nil {
 			log.With(logp.Namespace("setting_up_loader")).Errorw(logMsg, "cause", err)
 			return err
 		}
 
-		loaded, noop, failed, err := loader.LoadILMPolicies(b.Config.Indices)
+		loaded, noop, failed, err := index.LoadILMPolicies(loader, b.Config.Indices)
 
 		log.With(logp.Namespace("loading_policies")).Infow(logMsg, "loaded", loaded, "not loaded", noop, "failed", failed)
 		if err != nil {
 			return err
 		}
 
-		loaded, noop, failed, err = loader.LoadILMWriteAliases(b.Config.Indices)
+		loaded, noop, failed, err = index.LoadILMWriteAliases(loader, b.Config.Indices)
 		log.With(logp.Namespace("loading_write_aliases")).Infow(logMsg, "loaded", loaded, "not loaded", noop, "failed", failed)
 
 		if err != nil {
@@ -836,13 +855,16 @@ func (b *Beat) templateLoadingCallback() (func(esClient *elasticsearch.Client) e
 		return nil, false, nil
 	}
 
-	indicesCfg := b.Config.Indices
-	if len(indicesCfg) == 0 && b.Config.Template != nil {
+	if b.Config.Template != nil {
+		cfgwarn.Deprecate("7.0", "config `setup.template` is deprecated. Use `indices` instead.")
+	}
+
+	if len(b.Config.Indices) == 0 && b.Config.Template != nil {
 		//use deprecated config options
 
-		var templateCfg template.Config
-		if err := b.Config.Template.Unpack(&templateCfg); err != nil {
-			return nil, false, fmt.Errorf("unpacking template config fails: %v", err)
+		//return if loading template is disabled.
+		if !b.Config.Template.Enabled() {
+			return nil, false, nil
 		}
 
 		//Get ES Index name for comparison
@@ -854,37 +876,28 @@ func (b *Beat) templateLoadingCallback() (func(esClient *elasticsearch.Client) e
 		}
 
 		//Return error when index is using custom values, but template is not properly configured.
-		if esCfg.Index != "" && templateCfg.Enabled && (templateCfg.Name == "" || templateCfg.Pattern == "") {
-			return nil, false, fmt.Errorf("setup.template.name and setup.template.pattern have to be set if index name is modified")
+		name, _ := b.Config.Template.String("name", -1)
+		if esCfg.Index != "" && esCfg.Index != index.DefaultConfig.Index && name == "" {
+			return nil, false, fmt.Errorf("setup.template.name has to be set if index name is modified")
 		}
 
-		//return if loading template is disabled.
-		if !templateCfg.Enabled {
-			return nil, false, nil
-		}
-
-		i, err := index.DeprecatedTemplateConfigs(b.Config.Template)
+		indicesCfg, err := index.DeprecatedTemplateConfigs(b.Config.Template)
 		if err != nil {
 			return nil, false, err
 		}
-		indicesCfg = i
 
-	}
-
-	if b.Config.Template != nil {
-		cfgwarn.Deprecate("7.0", "config `setup.template` is deprecated. Use `indices` instead.")
+		b.Config.Indices = indicesCfg
 	}
 
 	//create callback
 	callback := func(esClient *elasticsearch.Client) error {
 
-		loader, err := index.NewESLoader(esClient, b.Info)
+		loader, err := template.NewESLoader(esClient, b.Info)
 		if err != nil {
 			log.With(logp.Namespace("setting_up_loader")).Errorw(logMsg, "cause", err)
 			return err
 		}
-
-		loaded, noop, failed, err := loader.LoadTemplates(b.Config.Indices)
+		loaded, noop, failed, err := index.LoadTemplates(loader, b.Config.Indices)
 		log.With(logp.Namespace("loading")).Infow(logMsg, "loaded", loaded, "not loaded", noop, "failed", failed)
 		if err != nil {
 			log.Errorw(logMsg, "cause", err)

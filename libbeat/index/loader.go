@@ -21,74 +21,17 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
-	"github.com/elastic/beats/libbeat/beat"
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/ilm"
 	"github.com/elastic/beats/libbeat/template"
 )
 
-//Loader offers load methods needed in combination with the `indices` configuration
-type Loader struct {
-	esClient       ESClient
-	beatInfo       beat.Info
-	ilmEnabled     bool
-	templateLoader *template.Loader
-	ilmLoader      *ilm.Loader
-}
-
-//NewESLoader returns instance to load indices related data to ES
-func NewESLoader(client ESClient, info beat.Info) (*Loader, error) {
-	templateLoader, err := template.NewESLoader(client, info)
-	if err != nil {
-		return nil, err
-	}
-	ilmLoader, err := ilm.NewESLoader(client, info)
-	if err != nil {
-		return nil, err
-	}
-	return &Loader{
-		esClient:       client,
-		beatInfo:       info,
-		ilmEnabled:     ilm.EnabledFor(client),
-		templateLoader: templateLoader,
-		ilmLoader:      ilmLoader,
-	}, nil
-}
-
-//NewStdoutLoader returns instance to print indices related data to stdout
-func NewStdoutLoader(info beat.Info) (*Loader, error) {
-	templateLoader, err := template.NewStdoutLoader(info)
-	if err != nil {
-		return nil, err
-	}
-	ilmLoader, err := ilm.NewStdoutLoader(info)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Loader{
-		beatInfo:       info,
-		ilmEnabled:     true,
-		templateLoader: templateLoader,
-		ilmLoader:      ilmLoader,
-	}, nil
-}
-
 //LoadTemplates takes care of loading all configured templates to the configured output Elasticsearch or stdout
-func (l *Loader) LoadTemplates(cfg []Config) (loaded int, noop int, failures int, loadErrors error) {
+func LoadTemplates(loader template.Loader, configs []Config) (loaded int, noop int, failures int, loadErrors error) {
 	var err error
 	var errs []error
 	var success bool
-	for _, cfg := range cfg {
-		if l.ilmEnabled && cfg.ILM.Enabled != ilm.ModeDisabled {
-			if updated := cfg.Template.UpdateILM(cfg.ILM); !updated {
-				errs = append(errs, errors.Wrapf(err, "mixing template.json and ilm is not allowed for %s", cfg.Template.Name))
-				failures++
-				continue
-			}
-		}
-
-		success, err = l.templateLoader.Load(cfg.Template)
+	for _, cfg := range configs {
+		success, err = loader.Load(cfg.Template, cfg.ILM)
 		if err != nil {
 			errs = append(errs, errors.Wrapf(err, "failed to load template %s", cfg.Template.Name))
 			failures++
@@ -104,20 +47,21 @@ func (l *Loader) LoadTemplates(cfg []Config) (loaded int, noop int, failures int
 }
 
 //LoadILMPolicies takes care of loading configured ILM policies to the configured output Elasticsearch or stdout
-func (l *Loader) LoadILMPolicies(cfg []Config) (loaded int, noop int, failures int, loadErrors error) {
-	return l.loadILM(cfg, l.ilmLoader.LoadPolicy, func(cfg Config, err error) error {
+func LoadILMPolicies(loader ilm.Loader, configs []Config) (loaded int, noop int, failures int, loadErrors error) {
+
+	return loadILM(configs, loader.LoadPolicy, func(cfg Config, err error) error {
 		return errors.Wrapf(err, "failed to load ilm policy for %s", cfg.ILM.Policy.Name)
 	})
 }
 
 //LoadILMWriteAliases takes care of loading configured ILM aliases to Elasticsearch
-func (l *Loader) LoadILMWriteAliases(cfg []Config) (loaded int, noop int, failures int, loadErrors error) {
-	return l.loadILM(cfg, l.ilmLoader.LoadWriteAlias, func(cfg Config, err error) error {
+func LoadILMWriteAliases(loader ilm.Loader, configs []Config) (loaded int, noop int, failures int, loadErrors error) {
+	return loadILM(configs, loader.LoadWriteAlias, func(cfg Config, err error) error {
 		return errors.Wrapf(err, "failed to load ilm write alias for %s", cfg.ILM.RolloverAlias)
 	})
 }
 
-func (l *Loader) loadILM(
+func loadILM(
 	cfg []Config,
 	f func(ilm.Config) (bool, error),
 	errF func(cfg Config, err error) error) (loaded int, noop int, failures int, loadErrors error) {
@@ -138,12 +82,4 @@ func (l *Loader) loadILM(
 		loaded++
 	}
 	return loaded, noop, failures, multierr.Combine(errs...)
-}
-
-// ESClient is a subset of the Elasticsearch client API capable of
-// loading the templates and ILM related setup.
-type ESClient interface {
-	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
-	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
-	GetVersion() common.Version
 }

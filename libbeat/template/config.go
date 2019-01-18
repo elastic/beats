@@ -18,14 +18,11 @@
 package template
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/ilm"
 )
-
-//Configs holds a collection of Config entries
-type Configs []Config
 
 //Config holds all the information around templates that can be configured
 type Config struct {
@@ -36,33 +33,21 @@ type Config struct {
 	Name    string `config:"name"`
 	Pattern string `config:"pattern"`
 	Fields  string `config:"fields"`
-	JSON    struct {
-		Enabled bool   `config:"enabled"`
-		Path    string `config:"path"`
-		Name    string `config:"name"`
-	} `config:"json"`
+	JSON    JSON   `config:"json"`
 
 	Settings Settings `config:"settings"`
+}
+
+type JSON struct {
+	Enabled bool   `config:"enabled"`
+	Path    string `config:"path"`
+	Name    string `config:"name"`
 }
 
 //Settings holds information around index and _source for the template
 type Settings struct {
 	Index  map[string]interface{} `config:"index"`
 	Source map[string]interface{} `config:"_source"`
-}
-
-//UpdateILM fetches relevant information from ILM config and
-//adapts the template config accordingly.
-func (cfg *Config) UpdateILM(config ilm.Config) bool {
-	if cfg.JSON.Enabled {
-		return false
-	}
-	cfg.Pattern = fmt.Sprintf("%s*", config.RolloverAlias)
-	cfg.Settings.Index["lifecycle"] = map[string]interface{}{
-		"rollover_alias": config.RolloverAlias,
-		"name":           config.Policy.Name,
-	}
-	return true
 }
 
 var (
@@ -72,7 +57,7 @@ var (
 	defaultNumberOfRoutingShards = 30
 )
 
-func defaultTemplateCfg() Config {
+func DefaultTemplateCfg() Config {
 	return Config{
 		Enabled:   true,
 		Overwrite: false,
@@ -84,11 +69,21 @@ func defaultTemplateCfg() Config {
 func (cfg *Config) Unpack(c *common.Config) error {
 	type tmpConfig Config
 	var tmp tmpConfig
-	tmp = tmpConfig(defaultTemplateCfg())
+	tmp = tmpConfig(DefaultTemplateCfg())
 	if err := c.Unpack(&tmp); err != nil {
 		return err
 	}
+	if tmp.Pattern == "" {
+		tmp.Pattern = fmt.Sprintf("%s*", tmp.Name)
+	}
 
 	*cfg = Config(tmp)
+	return nil
+}
+
+func (cfg *Config) Validate() error {
+	if cfg.Name == "" {
+		return errors.New("template configuration requires a name")
+	}
 	return nil
 }

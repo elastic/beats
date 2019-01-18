@@ -22,6 +22,7 @@ import (
 	"os"
 
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/template"
 
 	"github.com/spf13/cobra"
 
@@ -64,12 +65,12 @@ func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersi
 				}
 			}
 
-			loader, err := index.NewStdoutLoader(b.Info)
+			loader, err := template.NewStdoutLoader(b.Info)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "error initializing ilm loader: %s\n", err)
 				os.Exit(1)
 			}
-			if _, _, _, err = loader.LoadTemplates(b.Config.Indices); err != nil {
+			if _, _, _, err = index.LoadTemplates(loader, cfg); err != nil {
 				fmt.Fprintf(os.Stderr, err.Error())
 				os.Exit(1)
 			}

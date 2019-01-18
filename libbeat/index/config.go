@@ -25,12 +25,20 @@ import (
 	"github.com/elastic/beats/libbeat/template"
 )
 
+// ESClient is a subset of the Elasticsearch client API capable of
+// loading the templates and ILM related setup.
+type ESClient interface {
+	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
+	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
+	GetVersion() common.Version
+}
+
 //Configs holds a collection of Config entries
 type Configs []Config
 
 //Config supports the new configuration format around indices, templates and ILM
 type Config struct {
-	Name      string                 `config:"name"`
+	Index     string                 `config:"index"`
 	ILM       ilm.Config             `config:"ilm"`
 	Template  template.Config        `config:"template"`
 	Condition map[string]interface{} `config:"condition"`
@@ -42,27 +50,26 @@ func (i *Configs) CompatibleIndexCfg(client ESClient) (string, *common.Config, e
 
 	var idxName string
 	var defaultIdxName string
-	var cfgs []common.Config
+	var cfgs []common.MapStr
 	for _, entry := range *i {
+
 		//set ilm.rollover_alias
 		if ilmEnabled && entry.ILM.Enabled != ilm.ModeDisabled {
 			idxName = entry.ILM.RolloverAlias
 		} else {
-			idxName = entry.Name
+			idxName = entry.Index
 		}
-		if entry.Condition != nil {
+		if entry.Condition == nil {
 			defaultIdxName = idxName
+			continue
 		}
 
 		cfg := map[string]interface{}{"index": idxName}
 		for k, v := range entry.Condition {
 			cfg[k] = v
 		}
-		c, err := common.NewConfigFrom(cfg)
-		if err != nil {
-			return "", nil, err
-		}
-		cfgs = append(cfgs, *c)
+
+		cfgs = append(cfgs, cfg)
 	}
 
 	indices, err := common.NewConfigFrom(cfgs)
@@ -93,17 +100,42 @@ func (i *Configs) Validate() error {
 		if cfg.Condition == nil {
 			defaultNames++
 		}
+		if cfg.ILM.Enabled != ilm.ModeEnabled && cfg.Index == "" {
+			return errors.New("indices entries must have set `index` when `ilm` is not disabled.")
+		}
 	}
 	if defaultNames != 1 {
-		return errors.New("exactly one indices option is requierd to be set without a condition")
+		return errors.New("exactly one indices option is required to be set without a condition")
 	}
 	return nil
 }
 
+//DefaultConfigs creates default configuration for `indices` setting
+//can be overwritten as it is a global variable
+var DefaultConfig = Config{
+	Index: "%{[agent.name]}-%{[agent.version]}-%{+yyyy.MM.dd}",
+	ILM: ilm.Config{
+		Enabled:       ilm.ModeAuto,
+		RolloverAlias: "%{[agent.name]}-%{[agent.version]}-000001",
+		Pattern:       "000001",
+		Policy:        ilm.PolicyCfg{Name: ilm.DefaultPolicyName}, //TODO: change when policy handling is changed
+	},
+	Template: template.Config{
+		Enabled: true,
+		Name:    "%{[agent.name]}-%{[agent.version]}",
+		Pattern: "%{[agent.name]}-%{[agent.version]}*",
+	},
+}
+
 //DeprecatedTemplateConfigs creates a new Indices configuration out of the deprecated template configuration.
-func DeprecatedTemplateConfigs(templateCfg *common.Config) (Configs, error) {
-	var tmplCfg template.Config
-	if err := templateCfg.Unpack(&tmplCfg); err != nil {
+func DeprecatedTemplateConfigs(cfg *common.Config) (Configs, error) {
+	var tmplCfg = DefaultConfig.Template
+	if name, err := cfg.String("name", -1); err != nil || name == "" {
+		if err := cfg.SetString("name", -1, DefaultConfig.Template.Name); err != nil {
+			return nil, err
+		}
+	}
+	if err := cfg.Unpack(&tmplCfg); err != nil {
 		return nil, err
 	}
 	return Configs{{Template: tmplCfg, ILM: ilm.Config{Enabled: ilm.ModeDisabled}}}, nil

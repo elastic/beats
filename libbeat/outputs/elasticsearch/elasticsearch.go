@@ -180,11 +180,6 @@ func buildSelectors(
 	beat beat.Info,
 	cfg *common.Config,
 ) (index outil.Selector, pipeline *outil.Selector, err error) {
-	if !cfg.HasField("index") {
-		pattern := fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", beat.IndexPrefix, beat.Version)
-		cfg.SetString("index", -1, pattern)
-	}
-
 	index, err = outil.BuildSelectorFromConfig(cfg, outil.Settings{
 		Key:              "index",
 		MultiKey:         "indices",

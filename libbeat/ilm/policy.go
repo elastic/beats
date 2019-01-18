@@ -47,13 +47,13 @@ func newPolicy(cfg PolicyCfg) (*policy, error) {
 
 	path := paths.Resolve(paths.Config, cfg.Path)
 	if _, err := os.Stat(path); err != nil {
-		return nil, fmt.Errorf("error checking for ilm policy %s at path %s: %s", cfg.Name, cfg.Path, err)
+		return nil, fmt.Errorf("error checking for ILM policy %s at path %s: %s", cfg.Name, cfg.Path, err)
 	}
 
-	logp.Info("Loading ilm policy %s from file", cfg.Name)
+	logp.Info("Loading ILM policy %s from file", cfg.Name)
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
-		return nil, fmt.Errorf("error reading ilm policy %s at path %s: %s", cfg.Name, cfg.Path, err)
+		return nil, fmt.Errorf("error reading ILM policy %s at path %s: %s", cfg.Name, cfg.Path, err)
 	}
 
 	var p policy

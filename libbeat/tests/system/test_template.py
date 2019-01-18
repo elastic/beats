@@ -14,14 +14,14 @@ class Test(BaseTest):
         Test that beat stops in case elasticsearch index is modified and pattern not
         """
         self.render_config_template(
-            elasticsearch={"index": "test"},
+            elasticsearch={"index": "test", "hosts": "localhost:9200"},
         )
 
         exit_code = self.run_beat()
 
         assert exit_code == 1
         assert self.log_contains(
-            "setup.template.name and setup.template.pattern have to be set if index name is modified") is True
+            "setup.template.name has to be set if index name is modified") is True
 
     def test_index_not_modified(self):
         """
@@ -37,40 +37,44 @@ class Test(BaseTest):
 
     def test_index_modified_no_pattern(self):
         """
-        Test that beat stops in case elasticsearch index is modified and pattern not
+        Test that beat starts running if elasticsearch output with modified index and name are set, as pattern is derived
         """
         self.render_config_template(
-            elasticsearch={"index": "test"},
+            elasticsearch={"index": "test", "hosts": "localhost:9200"},
             es_template_name="test",
         )
 
-        exit_code = self.run_beat()
-
-        assert exit_code == 1
+        proc = self.start_beat()
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
         assert self.log_contains(
-            "setup.template.name and setup.template.pattern have to be set if index name is modified") is True
+            "DEPRECATED: config `setup.template` is deprecated. Use `indices` instead.") is True
+
+        assert self.log_contains(
+            "DEPRECATED: config `output.elasticsearch.index` is deprecated. Use `indices` instead.") is True
+        proc.check_kill_and_wait()
 
     def test_index_modified_no_name(self):
         """
         Test that beat stops in case elasticsearch index is modified and name not
         """
         self.render_config_template(
-            elasticsearch={"index": "test"},
-            es_template_pattern="test",
+            elasticsearch={"index": "test", "hosts": "localhost:9200"},
+            es_template_pattern="test*",
         )
 
         exit_code = self.run_beat()
 
         assert exit_code == 1
         assert self.log_contains(
-            "setup.template.name and setup.template.pattern have to be set if index name is modified") is True
+            "setup.template.name has to be set if index name is modified") is True
+
 
     def test_index_with_pattern_name(self):
         """
         Test that beat starts running if elasticsearch output with modified index and pattern and name are set
         """
         self.render_config_template(
-            elasticsearch={"hosts": "localhost:9200"},
+            elasticsearch={"index": "test", "hosts": "localhost:9200"},
             es_template_name="test",
             es_template_pattern="test-*",
         )
@@ -102,7 +106,7 @@ class Test(BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         self.wait_until(lambda: self.log_contains("Loading json template from file"))
-        self.wait_until(lambda: self.log_contains("Elasticsearch template with name 'bla' loaded"))
+        self.wait_until(lambda: self.log_contains("Template bla successfully loaded."))
         proc.check_kill_and_wait()
 
         es = Elasticsearch([self.get_elasticsearch_url()])

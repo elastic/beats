@@ -28,9 +28,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
-//Configs holds a collection of Config entries
-type Configs []Config
-
 //Config holds all config options supported for ILM configurations
 type Config struct {
 	Enabled       Mode      `config:"enabled"`
@@ -44,6 +41,19 @@ type PolicyCfg struct {
 	Name string `config:"name"`
 	Path string `config:"path"`
 }
+
+//DefaultILMConfig sets default values
+func DefaultILMConfig() Config {
+	return Config{
+		Enabled: ModeAuto,
+		Pattern: DefaultPattern,
+		Policy:  PolicyCfg{Name: DefaultPolicyName},
+	}
+}
+
+const DefaultPattern = "000001"
+
+var DefaultPolicyName = "beatDefaultPolicy"
 
 //Mode is used for enumerating the ilm mode.
 type Mode uint8
@@ -59,21 +69,29 @@ func (m *Mode) Unpack(in string) error {
 	switch strings.ToLower(in) {
 	case "auto", "Auto":
 		*m = ModeAuto
-	case "true", "True", "yes", "y", "Yes":
+	case "true", "True":
 		*m = ModeEnabled
-	case "false", "False", "no", "n", "No":
+	case "false", "False":
 		*m = ModeDisabled
 	default:
-		return fmt.Errorf("ilm.enabled mode '%v' is invalid (try auto, true, false)", in)
+		return fmt.Errorf("ilm.enabled` mode '%v' is invalid (try auto, true, false)", in)
 	}
 
+	return nil
+}
+
+//Validate verifies that expected config options are given and valid
+func (cfg *Config) Validate() error {
+	if cfg.RolloverAlias == "" && cfg.Enabled != ModeDisabled {
+		return fmt.Errorf("rollover_alias must be set when ILM is not disabled")
+	}
 	return nil
 }
 
 //Unpack sets the Config instance to the given values
 func (cfg *Config) Unpack(c *common.Config) error {
 	type tmpCfg Config
-	var tmp = tmpCfg(*defaultILMConfig())
+	var tmp = tmpCfg(DefaultILMConfig())
 	if err := c.Unpack(&tmp); err != nil {
 		return err
 	}
@@ -85,11 +103,15 @@ func (cfg *Config) prepare(info beat.Info) error {
 	alias := cfg.RolloverAlias
 	policyName := cfg.Policy.Name
 	if policyName == "" {
-		policyName = defaultPolicyName
+		policyName = DefaultPolicyName
 	}
 
 	event := &beat.Event{
 		Fields: common.MapStr{
+			"beat": common.MapStr{
+				"name":    info.Name,
+				"version": info.Version,
+			},
 			"agent": common.MapStr{
 				"name":    info.Name,
 				"version": info.Version,
@@ -124,15 +146,3 @@ func (cfg *Config) prepare(info beat.Info) error {
 
 	return nil
 }
-
-func defaultILMConfig() *Config {
-	return &Config{
-		Enabled: ModeAuto,
-		Pattern: defaultPattern,
-		Policy:  PolicyCfg{Name: defaultPolicyName},
-	}
-}
-
-const defaultPattern = "000001"
-
-var defaultPolicyName = "beatDefaultPolicy"

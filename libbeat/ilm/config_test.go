@@ -17,25 +17,42 @@
 
 package ilm
 
-//func TestNewIlmPolicyCfg(t *testing.T) {
-//	beatInfo := beat.Info{
-//		Beat:        "testbeatilm",
-//		IndexPrefix: "testbeat",
-//		Version:     "1.2.3",
-//	}
-//	pName := "deleteAfter30days"
-//
-//	for _, data := range []struct{
-//		idx string
-//		cfg *ilmPolicyCfg
-//	}{
-//		{"", nil},
-//		{"testbeat", &ilmPolicyCfg{idxName: "testbeat", policyName: pName}},
-//		{"testbeat-%{[beat.version]}", &ilmPolicyCfg{idxName: "testbeat-1.2.3", policyName: pName}},
-//		{"testbeat-SNAPSHOT-%{[beat.version]}", &ilmPolicyCfg{idxName: "testbeat-snapshot-1.2.3", policyName: pName}},
-//		{"testbeat-%{[beat.version]}-%{+yyyy.MM.dd}", nil},
-//	}{
-//		cfg := newIlmPolicyCfg(data.idx, pName, beatInfo)
-//		assert.Equal(t, data.cfg, cfg)
-//	}
-//}
+import (
+	"testing"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+func TestConfig_Unpack(t *testing.T) {
+	testdata := []struct {
+		input common.MapStr
+		cfg   Config
+		err   string
+		name  string
+	}{
+		{name: "empty config", input: nil, cfg: Config{}, err: "rollover_alias must be set"},
+		{name: "ilm disabled", input: common.MapStr{"enabled": false}, cfg: Config{
+			Enabled: ModeDisabled, Pattern: DefaultPattern, Policy: PolicyCfg{Name: DefaultPolicyName}}},
+		{name: "default with rollover_alias", input: common.MapStr{"rollover_alias": "testbeat"}, cfg: Config{
+			Enabled: ModeAuto, RolloverAlias: "testbeat", Pattern: DefaultPattern, Policy: PolicyCfg{Name: DefaultPolicyName}}},
+		{name: "ilm enabled", input: common.MapStr{"rollover_alias": "testbeat", "enabled": "True", "pattern": ""}, cfg: Config{
+			Enabled: ModeEnabled, RolloverAlias: "testbeat", Pattern: "", Policy: PolicyCfg{Name: DefaultPolicyName}}},
+	}
+	for _, td := range testdata {
+		t.Run(td.name, func(t *testing.T) {
+			cfg, err := common.NewConfigFrom(td.input)
+			require.NoError(t, err)
+			var ilm Config
+			err = cfg.Unpack(&ilm)
+			if td.err == "" {
+				require.NoError(t, err)
+			} else if assert.Error(t, err) {
+				assert.Contains(t, err.Error(), td.err)
+			}
+			assert.Equal(t, td.cfg, ilm)
+
+		})
+	}
+}

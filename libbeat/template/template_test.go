@@ -15,16 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !integration
-
 package template
 
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNumberOfRoutingShards(t *testing.T) {
@@ -75,6 +73,56 @@ func TestNumberOfRoutingShardsOverwrite(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, 5, shards.(int))
+}
+
+func TestNew(t *testing.T) {
+	v, version, name, esVersion := "7.0.0", common.MustNewVersion("7.0.0"), "beatName", common.MustNewVersion("7.0.0-alpha1")
+	data := []struct {
+		name string
+		c    Config
+	}{
+		{
+			name: "test beat replacement",
+			c: Config{
+				Name:     "beat-%{[beat.version]}",
+				Pattern:  "beat-%{[beat.name]}",
+				Settings: Settings{Index: map[string]interface{}{}, Source: map[string]interface{}{}},
+			},
+		},
+		{
+
+			name: "test agent replacement",
+			c: Config{
+				Name:    "beat-%{[agent.version]}",
+				Pattern: "beat-%{[agent.name]}",
+				Settings: Settings{
+					Index:  map[string]interface{}{"lifecycle": map[string]interface{}{}},
+					Source: map[string]interface{}{}},
+			},
+		},
+		{
+			name: "test observer replacement",
+			c: Config{
+				Name:    "beat-%{[observer.version]}",
+				Pattern: "beat-%{[observer.name]}",
+				Settings: Settings{
+					Index: map[string]interface{}{"lifecycle": map[string]interface{}{
+						"rollover_alias": "beat-%{[observer.name]}",
+						"name":           "beat-%{[observer.name]}",
+					}},
+					Source: map[string]interface{}{}},
+			},
+		},
+	}
+	for _, d := range data {
+		t.Run(d.name, func(t *testing.T) {
+			template, err := New(v, name, *esVersion, d.c)
+			require.NoError(t, err)
+			expected := &Template{name: "beat-7.0.0", pattern: "beat-beatName", beatVersion: *version, esVersion: *esVersion, config: d.c}
+			assert.Equal(t, expected, template)
+		})
+	}
+
 }
 
 func TestAppendFields(t *testing.T) {

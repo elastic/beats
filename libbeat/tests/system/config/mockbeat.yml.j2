@@ -71,8 +71,13 @@ setup.template:
   settings:
     index.number_of_shards: 1
     index.codec: best_compression
+
+  {% if es_template_name %}
   name: {{ es_template_name }}
+  {%- endif %}
+  {% if es_template_pattern %}
   pattern: {{ es_template_pattern }}
+  {%- endif %}
   overwrite: {{ template_overwrite|default("false") }}
   json:
     enabled: {{ template_json_enabled|default("false") }}

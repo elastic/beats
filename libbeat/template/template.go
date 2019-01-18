@@ -53,59 +53,37 @@ func New(beatVersion string, beatName string, esVersion common.Version, config C
 		return nil, err
 	}
 
+	event := event(beatName, bV.String())
 	name := config.Name
-	if name == "" {
-		name = fmt.Sprintf("%s-%s", beatName, bV.String())
+	if config.JSON.Enabled {
+		name = config.JSON.Name
 	}
-
-	pattern := config.Pattern
-	if pattern == "" {
-		pattern = name + "-*"
-	}
-
-	event := &beat.Event{
-		Fields: common.MapStr{
-			// beat object was left in for backward compatibility reason for older configs.
-			"beat": common.MapStr{
-				"name":    beatName,
-				"version": bV.String(),
-			},
-			"agent": common.MapStr{
-				"name":    beatName,
-				"version": bV.String(),
-			},
-			// For the Beats that have an observer role
-			"observer": common.MapStr{
-				"name":    beatName,
-				"version": bV.String(),
-			},
-		},
-		Timestamp: time.Now(),
-	}
-
 	name, err = runFormatter(name, event)
 	if err != nil {
 		return nil, err
 	}
-	pattern, err = runFormatter(pattern, event)
+	pattern, err := runFormatter(config.Pattern, event)
 	if err != nil {
 		return nil, err
 	}
+
 	// update lifecycle entries
-	if lifecycle, ok := config.Settings.Index["lifecycle"].(map[string]interface{}); ok {
-		if alias, ok := lifecycle["rollover_alias"].(string); ok {
-			alias, err = runFormatter(alias, event)
-			if err != nil {
-				return nil, err
+	if config.Settings.Index != nil {
+		if lifecycle, ok := config.Settings.Index["lifecycle"].(map[string]interface{}); ok {
+			if alias, ok := lifecycle["rollover_alias"].(string); ok {
+				alias, err = runFormatter(alias, event)
+				if err != nil {
+					return nil, err
+				}
+				config.Settings.Index["lifecycle"].(map[string]interface{})["rollover_alias"] = alias
 			}
-			config.Settings.Index["lifecycle"].(map[string]interface{})["rollover_alias"] = alias
-		}
-		if name, ok := lifecycle["name"].(string); ok {
-			name, err = runFormatter(name, event)
-			if err != nil {
-				return nil, err
+			if name, ok := lifecycle["name"].(string); ok {
+				name, err = runFormatter(name, event)
+				if err != nil {
+					return nil, err
+				}
+				config.Settings.Index["lifecycle"].(map[string]interface{})["name"] = name
 			}
-			config.Settings.Index["lifecycle"].(map[string]interface{})["name"] = name
 		}
 	}
 
@@ -121,6 +99,28 @@ func New(beatVersion string, beatName string, esVersion common.Version, config C
 		esVersion:   esVersion,
 		config:      config,
 	}, nil
+}
+
+func event(name, version string) *beat.Event {
+	return &beat.Event{
+		Fields: common.MapStr{
+			// beat object was left in for backward compatibility reason for older configs.
+			"beat": common.MapStr{
+				"name":    name,
+				"version": version,
+			},
+			"agent": common.MapStr{
+				"name":    name,
+				"version": version,
+			},
+			// For the Beats that have an observer role
+			"observer": common.MapStr{
+				"name":    name,
+				"version": version,
+			},
+		},
+		Timestamp: time.Now(),
+	}
 }
 
 func (t *Template) load(fields common.Fields) (common.MapStr, error) {
@@ -164,14 +164,10 @@ func (t *Template) LoadFile(file string) (common.MapStr, error) {
 }
 
 // LoadBytes loads the the template from the given byte array
-func (t *Template) LoadBytes(data ...[]byte) (common.MapStr, error) {
-	var fields common.Fields
-	for _, d := range data {
-		f, err := loadYamlByte(d)
-		if err != nil {
-			return nil, err
-		}
-		fields = append(fields, f...)
+func (t *Template) LoadBytes(data []byte) (common.MapStr, error) {
+	fields, err := loadYamlByte(data)
+	if err != nil {
+		return nil, err
 	}
 
 	return t.load(fields)
