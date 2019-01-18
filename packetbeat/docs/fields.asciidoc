@@ -6292,16 +6292,6 @@ MySQL-specific event fields.
 
 
 
-*`mysql.iserror`*::
-+
---
-type: boolean
-
-If the MySQL query returns an error, this field is set to true.
-
-
---
-
 *`mysql.affected_rows`*::
 +
 --
