@@ -142,6 +142,7 @@ func (f Fields) HasKey(key string) bool {
 	return f.hasKey(keys)
 }
 
+// GetField returns the field in case it exists
 func (f Fields) GetField(key string) *Field {
 	keys := strings.Split(key, ".")
 	return f.getField(keys)
