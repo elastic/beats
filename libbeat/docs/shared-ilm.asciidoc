@@ -4,10 +4,6 @@
 
 beta[]
 
-// REVIEWERS: should we mention that this requires a basic license? I started to
-// add a note and then realized that most users will already have a basic license
-// so the note might be confusing.
-
 You can use the {ref}/getting-started-index-lifecycle-management.html[index
 lifecycle management] feature in {es} to manage your {beatname_uc} indices as
 they age. For example, instead of having {beatname_uc} create daily indices
@@ -42,7 +38,7 @@ you must overwrite the template by setting `setup.template.overwrite: true`.
 The rollover alias is set to +{beatname_lc}-\{beat.version\}+ by default. You
 can change the prefix used in the alias by setting `ilm.rollover_alias`, but you
 can't remove `{beat.version}` from the rollover alias name. The default pattern
-used for the rollover index is `%7Bnow%2Fd%7D-000001`. You can change the
+used for the rollover index is `%{now/d}-000001`. You can change the
 pattern by setting `ilm.pattern`. For example:
 
 ["source","yaml",subs="attributes"]
@@ -51,10 +47,9 @@ output.elasticsearch:
   hosts: ["localhost"]
   ilm.enabled: true
   ilm.rollover_alias: "{beatname_lc}"
-  ilm.pattern: "%7Bnow%2Fd%7D-000001" <1>
+  ilm.pattern: "{now/d}-000001" <1>
 ----
-<1> Date math is supported here, but special characters must be escaped. For
-more information, see
+<1> Date math is supported here. For more information, see
 {ref}/indices-rollover-index.html#_using_date_math_with_the_rollover_api[the
 rollover docs].
 
@@ -82,8 +77,6 @@ To modify the default policy before loading it, run +{beatname_lc} export
 ilm-policy+ to print the policy to stdout. Modify the policy then use the
 {ref}/ilm-put-lifecycle.html[Create lifecycle policy API] to load it into {es}. 
 
-// REVIEWERS: I had an example of the REST call here, but decided that users my
-// cut/paste without reading carefully, so I removed it.
 --
 
 [float]
