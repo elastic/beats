@@ -71,17 +71,45 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 }
 
 func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricDataInput) cloudwatch.GetMetricDataRequest {
-	id := "cpu1"
-	label := "CPUUtilization"
-	value := 0.25
+	id1 := "cpu1"
+	label1 := "CPUUtilization"
+	value1 := 0.25
+
+	id2 := "status1"
+	label2 := "StatusCheckFailed"
+	value2 := 0.0
+
+	id3 := "status2"
+	label3 := "StatusCheckFailed_System"
+	value3 := 0.0
+
+	id4 := "status3"
+	label4 := "StatusCheckFailed_Instance"
+	value4 := 0.0
+
 	return cloudwatch.GetMetricDataRequest{
 		Request: &awssdk.Request{
 			Data: &cloudwatch.GetMetricDataOutput{
 				MetricDataResults: []cloudwatch.MetricDataResult{
 					{
-						Id:     &id,
-						Label:  &label,
-						Values: []float64{value},
+						Id:     &id1,
+						Label:  &label1,
+						Values: []float64{value1},
+					},
+					{
+						Id:     &id2,
+						Label:  &label2,
+						Values: []float64{value2},
+					},
+					{
+						Id:     &id3,
+						Label:  &label3,
+						Values: []float64{value3},
+					},
+					{
+						Id:     &id4,
+						Label:  &label4,
+						Values: []float64{value4},
 					},
 				},
 			},
@@ -124,10 +152,22 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 		fmt.Println("failed getMetricDataPerRegion: ", err)
 		t.FailNow()
 	}
-	assert.Equal(t, 1, len(getMetricDataOutput.MetricDataResults))
+	assert.Equal(t, 4, len(getMetricDataOutput.MetricDataResults))
 	assert.Equal(t, "cpu1", *getMetricDataOutput.MetricDataResults[0].Id)
 	assert.Equal(t, "CPUUtilization", *getMetricDataOutput.MetricDataResults[0].Label)
 	assert.Equal(t, 0.25, getMetricDataOutput.MetricDataResults[0].Values[0])
+
+	assert.Equal(t, "status1", *getMetricDataOutput.MetricDataResults[1].Id)
+	assert.Equal(t, "StatusCheckFailed", *getMetricDataOutput.MetricDataResults[1].Label)
+	assert.Equal(t, 0.0, getMetricDataOutput.MetricDataResults[1].Values[0])
+
+	assert.Equal(t, "status2", *getMetricDataOutput.MetricDataResults[2].Id)
+	assert.Equal(t, "StatusCheckFailed_System", *getMetricDataOutput.MetricDataResults[2].Label)
+	assert.Equal(t, 0.0, getMetricDataOutput.MetricDataResults[2].Values[0])
+
+	assert.Equal(t, "status3", *getMetricDataOutput.MetricDataResults[3].Id)
+	assert.Equal(t, "StatusCheckFailed_Instance", *getMetricDataOutput.MetricDataResults[3].Label)
+	assert.Equal(t, 0.0, getMetricDataOutput.MetricDataResults[3].Values[0])
 }
 
 func TestConvertPeriodToDuration(t *testing.T) {
@@ -203,7 +243,7 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 
 	getMetricDataOutput, err := getMetricDataPerRegion(durationString, periodSec, instanceID, nil, svcCloudwatchMock)
 	assert.NoError(t, err)
-	assert.Equal(t, 1, len(getMetricDataOutput.MetricDataResults))
+	assert.Equal(t, 4, len(getMetricDataOutput.MetricDataResults))
 	assert.Equal(t, "cpu1", *getMetricDataOutput.MetricDataResults[0].Id)
 	assert.Equal(t, "CPUUtilization", *getMetricDataOutput.MetricDataResults[0].Label)
 	assert.Equal(t, 0.25, getMetricDataOutput.MetricDataResults[0].Values[0])
