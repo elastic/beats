@@ -34,6 +34,7 @@ func init() {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 // AssetKibana returns asset data.
 // This is the base64 encoded gzipped contents of module/kibana.
 func AssetKibana() string {
@@ -44,9 +45,10 @@ func Asset() string {
 >>>>>>> Introduce local fields generation
 	return "eJzMlEHO2yAQhfc+xejfhwN4UanKsuoZookZY2oM7jCoyu0rG6dyCGnaKIuf5Uz43stjxgcY6dLCaM/osQEQK45a+MiFjwZAU+zYzmKDb+FLAwDbr+F70MlRA9Bbcjq2a+8AHifaEZcjl5laMBzSvFUq1FvOnuWC+VOrwR4C8/mG/YgLBJz1FNWuWSruVQVNvGlcpUe6/Aqsi95fDKwmcmYuGGO9WeGqKhsFhd6ne0zM5CVjIfSbkbr2RIJV6XD+QZ0UrVw81c1V+XkolAtGLVKK6acaCDVxVEw9MXFVHp3F8i1mlKGFQWReMImiZMQ9Y7KGMecjnOifnX0+R9esUiQ+oCFfPskzc8vF03pRBbbGenRvC2sKQl+1Zor1tXnsKobEHSmsXn7VUOLyrz0Nh907U1k2LsVj0PVtfjpBcQ4+0oY5dfecV0xNJEMoPyH/NdJVQmnldwAAAP//jzOwrA=="
 =======
+=======
+>>>>>>> update fields.go files
 // AssetKibana returns asset data.
 // This is the base64 encoded gzipped contents of module/kibana.
 func AssetKibana() string {
-	return "eJyskEFuwyAQRfc+xVf2yQFYdNNl1TNUkzBGFMJYMFbl21cxboUt2lVm+T9674szAi8GwV8p0QCo18gGpxqcBsByuWU/qZdk8DIA2F7jXewceQBGz9EWs3ZnJLpzQ3ycLhMbuCzztCUd6p7TsqK436wH+xNY743GQA8Iok9cLk15NLZWJVd2xY868PIl2R66fwasI+qfRXHOJ7fCL11tUVJ+nvd1zpmTVixk3Ib03XdW6qrl+sk3PVQ1/NiP+w4AAP//OeSYZw=="
->>>>>>> Introduce local fields generation
+	return "eJzMlEHO2yAQhfc+xejfhwN4UanKsuoZookZY2oM7jCoyu0rG6dyCGnaKIuf5Uz43stjxgcY6dLCaM/osQEQK45a+MiFjwZAU+zYzmKDb+FLAwDbr+F70MlRA9Bbcjq2a+8AHifaEZcjl5laMBzSvFUq1FvOnuWC+VOrwR4C8/mG/YgLBJz1FNWuWSruVQVNvGlcpUe6/Aqsi95fDKwmcmYuGGO9WeGqKhsFhd6ne0zM5CVjIfSbkbr2RIJV6XD+QZ0UrVw81c1V+XkolAtGLVKK6acaCDVxVEw9MXFVHp3F8i1mlKGFQWReMImiZMQ9Y7KGMecjnOifnX0+R9esUiQ+oCFfPskzc8vF03pRBbbGenRvC2sKQl+1Zor1tXnsKobEHSmsXn7VUOLyrz0Nh907U1k2LsVj0PVtfjpBcQ4+0oY5dfecV0xNJEMoPyH/NdJVQmnldwAAAP//jzOwrA=="
 }

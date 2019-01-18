@@ -34,6 +34,7 @@ func init() {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 // AssetMysql returns asset data.
 // This is the base64 encoded gzipped contents of module/mysql.
 func AssetMysql() string {
@@ -50,4 +51,10 @@ func AssetMysql() string {
 	return "eJy0lcFu2zAMhu95CqLn1ocBw4AcBgzbChRYgQ0tsGOq2LQtRCZdUk6atx8op02WqtmStjpa0v9/pCnyAha4nkK31vswAYg+BpzC2fX65tePswlAhVqK76NnmsLnCQDANVdDQKhZoHeinhqILUK6AoEbqH1ALSYA2rLEWclU+2YKUQacANQeQ6XTJHUB5Drc2tuK6x6n0AgP/eZLhsHWZRKCWrh7CcDWrt+uJ4qwPH3N+R7wtvWVKTpPunHYB0n6hvNEkqPZJYq+Q42u6//aPchg67bF7dUthSUieMIi79UKumrmqz25MQuBqTkO4osC15vIPxafig/nEFuv4DXBjHbgqwIuWTbnlijqmRR68SwQeffmM4eUOSgfk26qvXCJqiabDTLgEsOeED64rk81/tsJeWrODgSazXVKrCnnTTtUdQ1m8xrxIR7/cwM3DVaPwsWzStbAq8DNO9ayORxVyoOiHB/oaGZ3IbYuQinoIlYJ5H5AWecz3rKekFW7Nca5alEwmRywfvwLnvIQ/oRXe/UTXFWJlfDbgaRDM2sIhWKZLcM6sDshY5GjC6nV7NBE5sU5eALFkqnSc3AKbrSw0dCzpwg0dHOUF14pl4t34XUdDxStL+0xr5y3lNoEGztlubDuM0dwS+eDmwcsTOGZ6tKFAa2nvSZe4ZXOFGk/olNbr4U6+lmopg6CcRDCCubrfz2eRGNN0RO+1TDIEGnp6P+AXpqCr4EZyD/szMjoFkjbHnd38/12u3t3CC5tHe+f+ucB2Tcbw2ZWMhGWdgKuvj0V+cb9TwAAAP//tXis5A=="
 >>>>>>> Introduce local fields generation
 >>>>>>> Introduce local fields generation
+=======
+// AssetMysql returns asset data.
+// This is the base64 encoded gzipped contents of module/mysql.
+func AssetMysql() string {
+	return "eJy0l8GO4zYMhu95CmJPLbCbB8ihl2kLFOgWKHaBHr2MRNtsZNEjycmkT19QTuJsYmcm2bEOc4iG/D9SIil/gg3tV9Ds47NbACROjlbw4fP+y99/flgAWIomcJtY/Ap+WQAAfBbbOYJSArQYIvsKUk2QTcBJBSU7issFQKwlpMKIL7laQQodLQBKJmfjKrv6BB4bGuR1pX1LK6iCdO3hlxEGXb9nR1AGaaYAdJ3rnWtSCBJOv47p3tDW9SQ+Ift4ULgEyf4V50QyRnNOlLihmLBpv9u9yaDra02D6UChiXDsaVAfF60DoS3YXvjt04GOMV7stJjqFbRBDMW47O2XV/YNVwF75MPBX2s72pK7U9dJtRyze4teQzFiRXcqjltN6R21opOdk2rGC6YKd92v547CvtCrsoxkRrNQOsH0wPWThC5fwsyXhSCJbD4Ce4hkxNv4ETAC9hLaNFphn8B3zZrCcvx+iNnMwouNdD6BlJfMO+RENve2vobMBpLAmgC3yA7Xjpbq4crrFl1HwPGH4g2yi0UkfxlRH6sTX90faq+noap3CJS64MnCej+EfYOGXrBhT+Pd4V2IokF/BxCWJZk0J1Ajlkt+E9FUx/4Rms7zy1k/T7ghP5T+ty+/fR12v92Cy1v36+e2csPtxKR4LFgj3pPR/4BccjpL4I9fTwV4gyOamhocZdnQfifhkvMtsWefsKsp9F1hSAbsMAK9kOkS2XEi04VAPhVdpPB+XE+9V8Au1eQTG9QOpRof9a/V/mQpUdA6BTQ6laENvGVHFcUlPKEHy2VJYbhGfbvSLKujV54I/dwwaGoqah5vTmsRR+jvC+2fmlJNZycNWSSnuuY0UXNNWyRtxO/PgZCoaSWgTi+VyCTHJAeK4rb0ak848hXiC8txM2e+PJFVuu+xI4geedyME+bnsYQZDvLoGaRN3PB/+YF0SuJtmvnSdZsK0Fvg9Fgq28ASOO2L5466WW7kUQGywkCttXsMbCKxnXOFTtc5sNT5oUZUInMdMnjs3a8Nksz3r/B8fOr8Nhn85AXYW3qhCDvt+qfkqnH8eRy9oVBR0WKMdPnN8Og0/Ov0CMnOoXd+mjhTE3EUb3IATX/k5DGg1g98VtUSx3vJtFyULhhaWmnw6vzfIsnjL65XBa/sLsX+DwAA///cNZmy"
+>>>>>>> update fields.go files
 }

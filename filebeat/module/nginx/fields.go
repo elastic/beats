@@ -34,6 +34,7 @@ func init() {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 // AssetNginx returns asset data.
 // This is the base64 encoded gzipped contents of module/nginx.
 func AssetNginx() string {
@@ -50,4 +51,10 @@ func AssetNginx() string {
 	return "eJysmMFymzAQhu9+ip2c0pmGB+DQS9rO9NBODrkzCiygRmjpanHit+8InMRhJCxsdMIY/f+32kWw3MEzHnKwjbavOwDRYjCHmz/+980OoEJXsu5Fk83h2w4A4DdVg0GoiaFX7LRtQFqEcQoYaqDWBl22A3AtsRQl2Vo3OQgPuAOoNZrK5aPUHVjV4Ye9H3LoMYeGaeiPZwIMfvwchaBm6mIAfpz6nXqqskTn3k+HjBfM/bgnK0pbd7QYV+QDZNL3PO8oIZxTpCeqDoVDK9nTQdB9uuaNz5BtZn/UxJ2SHEKTFvD9eGwR7NA9IQPVk4A/8FE45D0yMLqerMMR7iOQID9jR4KF7gujnQTxldFqztgraXOwKC/Ez1lN/KK4wqrQ/ezCTjesplCOxbTAsNLe0cAlZhd5Dg658IcrPf28LDAvxbNDaalaadiK9BnjvwGdZEGFpHDZrA2UTUasG23VfGqKoccu9shOk70k4vDUtGqaqr8oqVqb3eNiTwKZEyWDC+mkcdTIjHxNviMaKfaqQbv2fh5vinHi2tTH77E4x3zbhshWeypZ4V6X82wshxYML6qztLSnIJ36S/O0XMARk0nG0HYTjIhMKkavpGyvx4jJpGIE9uULKCIqqRAUMlmJQC6rB2NCD6h1KMVGdUru6lL1MNtUq4e5smDJxdZ2Pcu1SQrvtJewxJVW7dsNUuRd7JItuyQr2qKVa1b8+KrXIGVn9VIXvqTBCh8K7Sj0jL8I7axiKpyhcrzseqgFpVQYxkaT3Sh/y2LJydNy2KqgFqRWrtB2pXReMIb2hoTMn7bIjXvlUX5Vq2xwj+Eu5BkPL8TzvuZMH/xjAvCicItZk01IX6FkLbpU5ksWxOh1uAULdOlnCB6Yxu8FukIrutbIcPvw63vEVzbzfWwZVXViGzYsyVosZSyjrazv3zXP2nfonGrCHZjg67wnSPjqMZXcm+7/AAAA///B08Vj"
 >>>>>>> Introduce local fields generation
 >>>>>>> Introduce local fields generation
+=======
+// AssetNginx returns asset data.
+// This is the base64 encoded gzipped contents of module/nginx.
+func AssetNginx() string {
+	return "eJysl8F2ozoMhvd5Cp3uywOwuJuec3f3rmbPcUGAp8ZiJJFO3n4OJG1TxiY2iVcpRf//yRIGPcMbnkrwnfW/DwBq1WEJT//Pfz8dABqUmu2olnwJ/xwAAP6jZnIILTGMhsX6DrRHWELAUQetdSjFAUB6Yq1q8q3tSlCe8ADQWnSNlIvUM3gz4Jf9vPQ0Ygkd0zRergQY5vXvIgQt0xADmNe137WnqWsU+bwcMt4wn9cLeTXWy8Vi2ZEvkLP+zPOJEsK5Rnql5lQJei1eT4ry7Z4PPke+W/2jJR6MlhAK2sCf148ewU/DKzJQexaYf8xZCPIRGRhlJC+4wH0lEuRnHEixsmPlrGgQ3zhr1oyj0b4Ej/pO/Fa0xO+GG2wqO65uHGzH5pzKpZk2GDLthSausdjlOQlyNf/M9JzjikBciueA2lOTadirjgXjrwlFi6BCUrrschNlVxDbznqzDk0xnLGrI7JY8nsyDoemddO5+6uamtzqXjb7LFCIGp0kpJPG0SIz8j31jmik2JsOfe7zvDwUS2Bu6ePPWJxjfWxD5Ki9lmzwaOt1NbZTC6YX1dna2muQwfykdVl2cMRkkjGsfwhGRCYVYzRa9/djxGRSMQLn8g6KiEoqBIVMMhFIinZyLvSCykOpHtSnJHe36gzzmG6dYe5sWJLY3uaz3Fuk8Em7hyWulHVud0iRb7E9R3ZNXq1Hr/fs+OVTr0MqbuqlbnxNk1c+VVYo9I7fhXZTMRXOUb3cdj/UhlIqDGNnyT+ofttiycWzenpUQ21IZe7Q41rptmAM7QMJmb8dkQ+elRf5rFG5Ju+x1iWt8BQUGJRvDMMvn5pgG/RqW4t8Y+R1eMTcachRV4TiUr7Ex0i2cbeRqUaR4u/IFD/d7ac9o2mKXa4Dipgud+AKR639/gQAAP//qeS/3Q=="
+>>>>>>> update fields.go files
 }
