@@ -113,10 +113,6 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 			}
 		}
 
-		for k, v := range esout.VersionParams(c.es.GetVersion(), true) {
-			params[k] = v
-		}
-
 		action := common.MapStr{
 			"index": common.MapStr{
 				"_type":    t,

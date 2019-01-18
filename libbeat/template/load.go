@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/paths"
 )
 
@@ -43,6 +42,8 @@ type Loader struct {
 	beatInfo beat.Info
 	fields   []byte
 }
+
+var minIncludeTypesVersion = common.MustNewVersion("7.0.0")
 
 // NewLoader creates a new template loader
 func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info, fields []byte) (*Loader, error) {
@@ -155,8 +156,7 @@ func (l *Loader) CheckTemplate(templateName string) bool {
 }
 
 func loadJSONWithType(client ESClient, path string, json map[string]interface{}) ([]byte, error) {
-	params := elasticsearch.VersionParams(client.GetVersion(), true)
-
+	params := esVersionParams(client.GetVersion())
 	status, body, err := client.Request("PUT", path, "", params, json)
 	if err != nil {
 		return body, fmt.Errorf("couldn't load json. Error: %s", err)
@@ -166,4 +166,14 @@ func loadJSONWithType(client ESClient, path string, json map[string]interface{})
 	}
 
 	return body, nil
+}
+
+func esVersionParams(version common.Version) map[string]string {
+	if version.LessThan(minIncludeTypesVersion) {
+		return nil
+	}
+
+	return map[string]string{
+		"include_type_name": "true",
+	}
 }
