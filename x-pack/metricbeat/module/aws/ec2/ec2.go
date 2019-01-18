@@ -47,6 +47,7 @@ type MetricSet struct {
 	regionsList    []string
 	durationString string
 	periodInSec    int
+	ec2Logger      *logp.Logger
 }
 
 // metricIDNameMap is a translating map between createMetricDataQuery id
@@ -74,6 +75,7 @@ var metricIDNameMap = map[string][]string{
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The aws ec2 metricset is beta.")
+	ec2Logger := logp.NewLogger(aws.ModuleName)
 
 	moduleConfig := aws.Config{}
 	if err := base.Module().UnpackConfig(&moduleConfig); err != nil {
@@ -82,7 +84,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	if moduleConfig.Period == "" {
 		err := errors.New("period is not set in AWS module config")
-		logp.Error(err)
+		ec2Logger.Error(err)
 	}
 
 	metricSet, err := aws.NewMetricSet(base)
@@ -105,18 +107,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	awsConfig.Region = moduleConfig.DefaultRegion
-
 	svcEC2 := ec2.New(awsConfig)
 	regionsList, err := getRegions(svcEC2)
 	if err != nil {
 		err = errors.Wrap(err, "getRegions failed")
-		logp.NewLogger(aws.ModuleName).Errorf(err.Error())
+		ec2Logger.Errorf(err.Error())
 	}
 
 	//Calculate duration based on period
 	durationString, periodSec, err := convertPeriodToDuration(moduleConfig.Period)
 	if err != nil {
-		logp.NewLogger(aws.ModuleName).Errorf(err.Error())
+		ec2Logger.Errorf(err.Error())
 	}
 
 	return &MetricSet{
@@ -126,6 +127,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		regionsList:    regionsList,
 		durationString: durationString,
 		periodInSec:    periodSec,
+		ec2Logger:      ec2Logger,
 	}, nil
 }
 
@@ -139,7 +141,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2)
 		if err != nil {
 			err = errors.Wrap(err, "getInstancesPerRegion failed, skipping region "+regionName)
-			logp.NewLogger(aws.ModuleName).Errorf(err.Error())
+			m.ec2Logger.Errorf(err.Error())
 			report.Error(err)
 			continue
 		}
@@ -153,7 +155,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 				output, err := getMetricDataPerRegion(m.durationString, m.periodInSec, instanceID, getMetricDataOutput.NextToken, svcCloudwatch)
 				if err != nil {
 					err = errors.Wrap(err, "getMetricDataPerRegion failed, skipping region "+regionName+" for instance "+instanceID)
-					logp.Error(err)
+					m.ec2Logger.Errorf(err.Error())
 					report.Error(err)
 					continue
 				}
@@ -162,7 +164,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 
 			event, err := createCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], regionName)
 			if err != nil {
-				logp.NewLogger(aws.ModuleName).Errorf(err.Error())
+				m.ec2Logger.Errorf(err.Error())
 				report.Event(event)
 				continue
 			}
@@ -276,9 +278,7 @@ func convertPeriodToDuration(period string) (duration string, periodInSec int, e
 	duration = ""
 	periodInSec = 0
 	numberPeriod, err := strconv.Atoi(period[0 : len(period)-1])
-	errMsg := "Invaid period in config. Please reset period in config."
 	if err != nil {
-		logp.NewLogger(aws.ModuleName).Errorf(errMsg)
 		return
 	}
 
@@ -293,8 +293,7 @@ func convertPeriodToDuration(period string) (duration string, periodInSec int, e
 		periodInSec = numberPeriod * 60
 		return
 	default:
-		err = errors.New(errMsg)
-		logp.NewLogger(aws.ModuleName).Errorf(errMsg)
+		err = errors.New("invalid period in config. Please reset period in config.")
 		duration = "-" + strconv.Itoa(numberPeriod*2) + "s"
 		periodInSec = numberPeriod
 		return
