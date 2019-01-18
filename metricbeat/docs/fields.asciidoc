@@ -854,6 +854,24 @@ Error type.
 
 --
 
+*`beat.name`*::
++
+--
+type: alias
+
+alias to: host.name
+
+--
+
+*`beat.hostname`*::
++
+--
+type: alias
+
+alias to: agent.hostname
+
+--
+
 [[exported-fields-ceph]]
 == Ceph fields
 
@@ -6430,24 +6448,6 @@ example: 4.4.0-112-generic
 
 Operating system kernel version as a raw string.
 
-
---
-
-*`beat.name`*::
-+
---
-type: alias
-
-alias to: agent.type
-
---
-
-*`beat.hostname`*::
-+
---
-type: alias
-
-alias to: agent.hostname
 
 --
 
@@ -17232,24 +17232,17 @@ nats Module
 
 
 
-[float]
-== stats fields
-
-Contains nats var related metrics
-
-
-
-*`nats.stats.server_id`*::
+*`nats.server_id`*::
 +
 --
-type: keyword
+type: string
 
 The server ID
 
 
 --
 
-*`nats.stats.now`*::
+*`nats.now`*::
 +
 --
 type: date
@@ -17258,6 +17251,47 @@ Server time of metric creation
 
 
 --
+
+[float]
+== connections fields
+
+Contains nats connection related metrics
+
+
+
+*`nats.connections.total`*::
++
+--
+type: integer
+
+The number of currently active clients
+
+
+--
+
+[float]
+== routes fields
+
+Contains nats route related metrics
+
+
+
+*`nats.routes.total`*::
++
+--
+type: integer
+
+The number of registered routes
+
+
+--
+
+[float]
+== stats fields
+
+Contains nats var related metrics
+
+
 
 *`nats.stats.uptime`*::
 +
