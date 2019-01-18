@@ -1,0 +1,8 @@
+The System `package` dataset provides ... TODO.
+
+The dataset is implemented for Linux, macOS (Darwin), and Windows.
+
+[float]
+=== Configuration options
+
+TODO

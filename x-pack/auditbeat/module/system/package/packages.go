@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package packages
+package pkg
 
 import (
 	"bufio"
@@ -30,8 +30,8 @@ import (
 
 const (
 	moduleName    = "system"
-	metricsetName = "packages"
-	//namespace     = "system.audit.packages"
+	metricsetName = "package"
+	namespace     = "system.audit.package"
 
 	redhat = "redhat"
 	debian = "debian"
@@ -39,10 +39,10 @@ const (
 )
 
 func init() {
-	/*mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithNamespace(namespace),
-	)*/
+	)
 }
 
 // MetricSet collects data about the host.
