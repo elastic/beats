@@ -2,7 +2,7 @@
   type: group
   description: >
     node
-  release: beta
+  release: ga
   fields:
     - name: host
       type: keyword
