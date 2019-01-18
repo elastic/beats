@@ -201,8 +201,8 @@ def clean_keys(obj):
     # These keys are host dependent
     host_keys = ["host.name", "agent.hostname", "agent.type", "agent.ephemeral_id", "agent.id"]
     # The create timestamps area always new
-    time_keys = ["read_timestamp", "event.created"]
-    # source path and beat.version can be different for each run
+    time_keys = ["event.created"]
+    # source path and agent.version can be different for each run
     other_keys = ["log.file.path", "agent.version"]
 
     for key in host_keys + time_keys + other_keys:

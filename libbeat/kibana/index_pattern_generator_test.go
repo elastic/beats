@@ -59,20 +59,6 @@ func TestNewGenerator(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	v, _ = common.NewVersion("5.0.0")
-	// checks for fields.yml
-	generator, err = NewGenerator("beat-index", "mybeat.", fieldsYml, tmpDir, "7.0", *v)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	expectedDir = filepath.Join(tmpDir, "5/index-pattern")
-	assert.Equal(t, expectedDir, generator.targetDir)
-	_, err = os.Stat(generator.targetDir)
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	assert.Equal(t, "mybeat.json", generator.targetFilename)
 }
 
@@ -112,26 +98,6 @@ func TestGenerateFieldsYaml(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestDumpToFile5x(t *testing.T) {
-	tmpDir := tmpPath(t)
-	defer os.RemoveAll(tmpDir)
-
-	v, _ := common.NewVersion("5.0.0")
-	generator, err := NewGenerator("metricbeat-*", "metric beat ?!", fieldsYml, tmpDir, "7.0.0-alpha1", *v)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, err = generator.Generate()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	generator.targetDir = filepath.Join(tmpDir, "non-existing/something")
-	_, err = generator.Generate()
-	assert.Error(t, err)
-}
-
 func TestDumpToFileDefault(t *testing.T) {
 	tmpDir := tmpPath(t)
 	defer os.RemoveAll(tmpDir)
@@ -156,9 +122,8 @@ func TestGenerate(t *testing.T) {
 	tmpDir := tmpPath(t)
 	defer os.RemoveAll(tmpDir)
 
-	v5, _ := common.NewVersion("5.0.0")
 	v6, _ := common.NewVersion("6.0.0")
-	versions := []*common.Version{v5, v6}
+	versions := []*common.Version{v6}
 	for _, version := range versions {
 		generator, err := NewGenerator("beat-*", "b eat ?!", fieldsYml, tmpDir, "7.0.0-alpha1", *version)
 		if err != nil {
@@ -173,10 +138,6 @@ func TestGenerate(t *testing.T) {
 
 	tests := []map[string]string{
 		{
-			"existing": "testdata/beat-5.json",
-			"created":  filepath.Join(tmpDir, "5/index-pattern/beat.json"),
-		},
-		{
 			"existing": "testdata/beat-6.json",
 			"created":  filepath.Join(tmpDir, "6/index-pattern/beat.json"),
 		},
@@ -188,9 +149,8 @@ func TestGenerateExtensive(t *testing.T) {
 	tmpDir := tmpPath(t)
 	defer os.RemoveAll(tmpDir)
 
-	version5, _ := common.NewVersion("5.0.0")
 	version6, _ := common.NewVersion("6.0.0")
-	versions := []*common.Version{version5, version6}
+	versions := []*common.Version{version6}
 	for _, version := range versions {
 		generator, err := NewGenerator("metricbeat-*", "metric be at ?!", "testdata/extensive/fields.yml", tmpDir, "7.0.0-alpha1", *version)
 		if err != nil {
@@ -204,10 +164,6 @@ func TestGenerateExtensive(t *testing.T) {
 	}
 
 	tests := []map[string]string{
-		{
-			"existing": "testdata/extensive/metricbeat-5.json",
-			"created":  filepath.Join(tmpDir, "5/index-pattern/metricbeat.json"),
-		},
 		{
 			"existing": "testdata/extensive/metricbeat-6.json",
 			"created":  filepath.Join(tmpDir, "6/index-pattern/metricbeat.json"),

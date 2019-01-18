@@ -11,6 +11,8 @@
         "rtt":44269
     },
     "nats":{
+        "server_id":"bUAdpRFtMWddIBWw80Yd9D",
+        "now":"2018-12-28T12:33:53.026864929Z",
         "stats":{
             "cores":0,
             "cpu":0,
@@ -31,13 +33,11 @@
             "mem":{
                 "bytes": 806976
             },
-            "now":"2018-12-28T12:33:53.026864929Z",
             "out":{
                 "bytes":0,
                 "messages":0
             },
             "remotes":0,
-            "server_id":"bUAdpRFtMWddIBWw80Yd9D",
             "slow_consumers":0,
             "total_connections":35,
             "uptime":9702

@@ -1,0 +1,9 @@
+- name: routes
+  type: group
+  description: >
+    Contains nats route related metrics
+  fields:
+    - name: total
+      type: integer
+      description: >
+        The number of registered routes
