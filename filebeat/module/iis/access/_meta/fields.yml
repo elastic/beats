@@ -11,10 +11,6 @@
       type: long
       description: >
         The Windows status code.
-    - name: request_time_ms
-      type: long
-      description: >
-        The request time in milliseconds.
     - name: site_name
       type: keyword
       description: >

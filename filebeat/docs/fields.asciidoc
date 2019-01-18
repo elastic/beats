@@ -5126,16 +5126,6 @@ The Windows status code.
 
 --
 
-*`iis.access.request_time_ms`*::
-+
---
-type: long
-
-The request time in milliseconds.
-
-
---
-
 *`iis.access.site_name`*::
 +
 --
@@ -6005,16 +5995,6 @@ The name of the program.
 +
 --
 This field contains the flags of the event.
-
-
---
-
-*`http.response.elapsed_time`*::
-+
---
-type: long
-
-Elapsed time between request and response in milli seconds.
 
 
 --
@@ -12572,16 +12552,6 @@ Fields from the Traefik log files.
 Contains fields for the Traefik access logs.
 
 
-
-*`traefik.access.duration`*::
-+
---
-type: long
-
-Duration of the access entry.
-
-
---
 
 *`traefik.access.user_identifier`*::
 +

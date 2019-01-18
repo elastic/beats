@@ -3,10 +3,6 @@
   description: >
     Contains fields for the Traefik access logs.
   fields:
-    - name: duration
-      type: long
-      description: >
-        Duration of the access entry.
     - name: user_identifier
       type: keyword
       description: >

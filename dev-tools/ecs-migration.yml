@@ -402,6 +402,11 @@
   to: http.response.body.bytes
   alias: true
 
+- from: iis.access.request_time_ms
+  to: event.duration
+  alias: false
+  comment: scale is different
+
 - from: iis.error.method
   to: http.request.method
   alias: true
@@ -508,6 +513,14 @@
   to: http.response.body.bytes
   alias: true
   alias6: true
+  beat: filebeat
+  comment: >
+    Very general name that was only used by the Kibana module.
+
+- from: http.response.elapsed_time
+  to: event.duration
+  alias: false
+  alias6: false
   beat: filebeat
   comment: >
     Very general name that was only used by the Kibana module.
@@ -808,6 +821,11 @@
 - from: traefik.access.body_sent.bytes
   to: http.response.body.bytes
   alias: true
+
+- from: traefik.access.duration
+  to: event.duration
+  alias: false
+  comment: scale is different
 
 # Filebeat Redis Input
 
