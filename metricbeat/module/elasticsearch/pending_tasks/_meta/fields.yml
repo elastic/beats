@@ -2,7 +2,7 @@
   type: group
   description: >
     `cluster.pending_task` contains a pending task description.
-  release: beta
+  release: ga
   fields:
     - name: insert_order
       type: long
