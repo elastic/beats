@@ -4,6 +4,7 @@ This file is generated! See scripts/docs_collector.py
 
 [[filebeat-module-kibana]]
 :modulename: kibana
+:has-dashboards: false
 
 == Kibana module
 
@@ -33,7 +34,11 @@ include::../include/config-option-intro.asciidoc[]
 
 include::../include/var-paths.asciidoc[]
 
+:has-dashboards!:
+
 :fileset_ex!:
+
+:modulename!:
 
 
 [float]

@@ -508,7 +508,7 @@ func normalizeString(ctx context, opts *options, str string) (value, Error) {
 
 	switch p := varexp.(type) {
 	case constExp:
-		return newString(ctx, opts.meta, str), nil
+		return newString(ctx, opts.meta, string(p)), nil
 	case *reference:
 		return newRef(ctx, opts.meta, p), nil
 	}

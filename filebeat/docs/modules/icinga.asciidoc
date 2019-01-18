@@ -4,6 +4,7 @@ This file is generated! See scripts/docs_collector.py
 
 [[filebeat-module-icinga]]
 :modulename: icinga
+:has-dashboards: true
 
 == Icinga module
 
@@ -79,6 +80,12 @@ include::../include/var-paths.asciidoc[]
 ==== `startup` log fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
 
 
 [float]

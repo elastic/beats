@@ -1,4 +1,5 @@
 :modulename: postgresql
+:has-dashboards: true
 
 == PostgreSQL module
 
@@ -63,3 +64,9 @@ include::../include/config-option-intro.asciidoc[]
 
 include::../include/var-paths.asciidoc[]
 
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

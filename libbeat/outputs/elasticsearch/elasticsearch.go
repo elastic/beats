@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"sync"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -70,20 +70,24 @@ func newCallbacksRegistry() callbacksRegistry {
 // RegisterConnectCallback registers a callback for the elasticsearch output
 // The callback is called each time the client connects to elasticsearch.
 // It returns the key of the newly added callback, so it can be deregistered later.
-func RegisterConnectCallback(callback connectCallback) uuid.UUID {
+func RegisterConnectCallback(callback connectCallback) (uuid.UUID, error) {
 	connectCallbackRegistry.mutex.Lock()
 	defer connectCallbackRegistry.mutex.Unlock()
 
 	// find the next unique key
 	var key uuid.UUID
+	var err error
 	exists := true
 	for exists {
-		key = uuid.NewV4()
+		key, err = uuid.NewV4()
+		if err != nil {
+			return uuid.Nil, err
+		}
 		_, exists = connectCallbackRegistry.callbacks[key]
 	}
 
 	connectCallbackRegistry.callbacks[key] = callback
-	return key
+	return key, nil
 }
 
 // DeregisterConnectCallback deregisters a callback for the elasticsearch output
@@ -104,9 +108,9 @@ func makeES(
 		cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
 	}
 
-	if !cfg.HasField("index") {
-		pattern := fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", beat.IndexPrefix, beat.Version)
-		cfg.SetString("index", -1, pattern)
+	index, pipeline, err := buildSelectors(beat, cfg)
+	if err != nil {
+		return outputs.Fail(err)
 	}
 
 	config := defaultConfig
@@ -119,34 +123,9 @@ func makeES(
 		return outputs.Fail(err)
 	}
 
-	index, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
-		Key:              "index",
-		MultiKey:         "indices",
-		EnableSingleOnly: true,
-		FailEmpty:        true,
-	})
-	if err != nil {
-		return outputs.Fail(err)
-	}
-
 	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
 		return outputs.Fail(err)
-	}
-
-	pipelineSel, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
-		Key:              "pipeline",
-		MultiKey:         "pipelines",
-		EnableSingleOnly: true,
-		FailEmpty:        false,
-	})
-	if err != nil {
-		return outputs.Fail(err)
-	}
-
-	var pipeline *outil.Selector
-	if !pipelineSel.IsEmpty() {
-		pipeline = &pipelineSel
 	}
 
 	proxyURL, err := parseProxyURL(config.ProxyURL)
@@ -195,6 +174,42 @@ func makeES(
 	}
 
 	return outputs.SuccessNet(config.LoadBalance, config.BulkMaxSize, config.MaxRetries, clients)
+}
+
+func buildSelectors(
+	beat beat.Info,
+	cfg *common.Config,
+) (index outil.Selector, pipeline *outil.Selector, err error) {
+	if !cfg.HasField("index") {
+		pattern := fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", beat.IndexPrefix, beat.Version)
+		cfg.SetString("index", -1, pattern)
+	}
+
+	index, err = outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "index",
+		MultiKey:         "indices",
+		EnableSingleOnly: true,
+		FailEmpty:        true,
+	})
+	if err != nil {
+		return index, pipeline, err
+	}
+
+	pipelineSel, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "pipeline",
+		MultiKey:         "pipelines",
+		EnableSingleOnly: true,
+		FailEmpty:        false,
+	})
+	if err != nil {
+		return index, pipeline, err
+	}
+
+	if !pipelineSel.IsEmpty() {
+		pipeline = &pipelineSel
+	}
+
+	return index, pipeline, err
 }
 
 // NewConnectedClient creates a new Elasticsearch client based on the given config.

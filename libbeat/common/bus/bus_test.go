@@ -101,3 +101,19 @@ func TestListenerClose(t *testing.T) {
 	event = <-listener.Events()
 	assert.Equal(t, event, Event(nil))
 }
+
+func TestUnsubscribedBus(t *testing.T) {
+	bus := NewBusWithStore("name", 2)
+	bus.Publish(Event{"first": "event"})
+
+	listener := bus.Subscribe()
+	bus.Publish(Event{"second": "event"})
+	event := <-listener.Events()
+	event1 := <-listener.Events()
+	assert.Equal(t, event, Event{"first": "event"})
+	assert.Equal(t, event1, Event{"second": "event"})
+
+	bus.Publish(Event{"a": 1, "b": 2})
+	event2 := <-listener.Events()
+	assert.Equal(t, event2, Event{"a": 1, "b": 2})
+}

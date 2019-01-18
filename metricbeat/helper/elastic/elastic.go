@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 )
@@ -95,16 +97,12 @@ func MakeErrorForMissingField(field string, product Product) error {
 }
 
 // IsFeatureAvailable returns whether a feature is available in the current product version
-func IsFeatureAvailable(currentProductVersion, featureAvailableInProductVersion string) (bool, error) {
-	currentVersion, err := common.NewVersion(currentProductVersion)
-	if err != nil {
-		return false, err
-	}
+func IsFeatureAvailable(currentProductVersion, featureAvailableInProductVersion *common.Version) bool {
+	return !currentProductVersion.LessThan(featureAvailableInProductVersion)
+}
 
-	wantVersion, err := common.NewVersion(featureAvailableInProductVersion)
-	if err != nil {
-		return false, err
-	}
-
-	return !currentVersion.LessThan(wantVersion), nil
+// ReportAndLogError reports and logs the given error
+func ReportAndLogError(err error, r mb.ReporterV2, l *logp.Logger) {
+	r.Error(err)
+	l.Error(err)
 }

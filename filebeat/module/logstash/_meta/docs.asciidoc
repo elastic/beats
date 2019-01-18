@@ -1,4 +1,6 @@
 :modulename: logstash
+:has-dashboards: true
+
 == Logstash module
 
 The +{modulename}+ module parse logstash regular logs and the slow log, it will support the plain text format
@@ -86,3 +88,9 @@ include::../include/var-paths.asciidoc[]
 
 The configured Logstash log format. Possible values are: `json` or `plain`. The
 default is `plain`.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

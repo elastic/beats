@@ -120,14 +120,3 @@ func ResolverWrap(keystore Keystore) func(string) (string, error) {
 		return string(v), nil
 	}
 }
-
-// ConfigOpts returns ucfg config options with a resolver linked to the current keystore.
-// TODO: Refactor to allow insert into the config option array without having to redefine everything
-func ConfigOpts(keystore Keystore) []ucfg.Option {
-	return []ucfg.Option{
-		ucfg.PathSep("."),
-		ucfg.Resolve(ResolverWrap(keystore)),
-		ucfg.ResolveEnv,
-		ucfg.VarExp,
-	}
-}

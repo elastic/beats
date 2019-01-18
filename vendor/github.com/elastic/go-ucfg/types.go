@@ -24,8 +24,7 @@ import (
 	"strconv"
 	"strings"
 	"sync/atomic"
-
-	uuid "github.com/satori/go.uuid"
+	"time"
 
 	"github.com/elastic/go-ucfg/internal/parse"
 )
@@ -186,8 +185,10 @@ func newSplice(ctx context, m *Meta, s varEvaler) *cfgDynamic {
 }
 
 func newDyn(ctx context, m *Meta, val dynValue) *cfgDynamic {
-	id := string(atomic.AddInt32(&spliceSeq, 1)) + uuid.NewV4().String()
-	return &cfgDynamic{cfgPrimitive{ctx, m}, cacheID(id), val}
+	seq := atomic.AddInt32(&spliceSeq, 1)
+	dyn := &cfgDynamic{cfgPrimitive: cfgPrimitive{ctx, m}, dyn: val}
+	dyn.id = cacheID(fmt.Sprintf("%8X-%4X-%p", time.Now().Unix(), seq, dyn))
+	return dyn
 }
 
 func (p *cfgPrimitive) Context() context                { return p.ctx }

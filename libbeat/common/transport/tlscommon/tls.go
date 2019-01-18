@@ -48,19 +48,19 @@ func LoadCertificate(config *CertificateConfig) (*tls.Certificate, error) {
 
 	certPEM, err := ReadPEMFile(certificate, config.Passphrase)
 	if err != nil {
-		logp.Critical("Failed reading certificate file %v: %v", certificate, err)
+		logp.Critical("Failed reading certificate file %v: %+v", certificate, err)
 		return nil, fmt.Errorf("%v %v", err, certificate)
 	}
 
 	keyPEM, err := ReadPEMFile(key, config.Passphrase)
 	if err != nil {
-		logp.Critical("Failed reading key file %v: %v", key, err)
+		logp.Critical("Failed reading key file %v: %+v", key, err)
 		return nil, fmt.Errorf("%v %v", err, key)
 	}
 
 	cert, err := tls.X509KeyPair(certPEM, keyPEM)
 	if err != nil {
-		logp.Critical("Failed loading client certificate", err)
+		logp.Critical("Failed loading client certificate %+v", err)
 		return nil, err
 	}
 

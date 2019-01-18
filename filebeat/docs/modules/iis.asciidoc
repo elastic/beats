@@ -4,6 +4,7 @@ This file is generated! See scripts/docs_collector.py
 
 [[filebeat-module-iis]]
 :modulename: iis
+:has-dashboards: true
 
 == IIS module
 
@@ -19,7 +20,7 @@ This module requires the
 {elasticsearch-plugins}/ingest-user-agent.html[ingest-user-agent] and
 {elasticsearch-plugins}/ingest-geoip.html[ingest-geoip] Elasticsearch plugins.
 
-The IIS module was tested with logs from version 10.
+The IIS module was tested with logs from version 7.5 and version 10.
 
 include::../include/running-modules.asciidoc[]
 
@@ -69,6 +70,12 @@ include::../include/var-paths.asciidoc[]
 ==== `error` log fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
 
 
 [float]

@@ -24,12 +24,12 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("metricbeat", "http", Asset); err != nil {
+	if err := asset.SetFields("metricbeat", "http", asset.ModuleFieldsPri, Asset); err != nil {
 		panic(err)
 	}
 }
 
 // Asset returns asset data
 func Asset() string {
-	return "eJzMlDFv4zAMhXf/igfPF+CGTB5uvqnokK3ooFhMrMSWVJFO639fKK7d2FGKBm2KchTl7z2KNBfYU1egEvEZIEZqKpD/X63u8wzQxGUwXoyzBf5lABBTaJxua8qAQDUppgJblQFMIsZuucBDzlznf5BHcP6YARtDtebiyFjAqoZG1RjS+UgJrh1OEtpTyikp0FNLLON5CngROsSxtDcSjN240Kh48+TaXH9SDSlNYcbsbbj1jkqZpT70Aqwq6h31XAaTlaRwQ1I5nRTeU/fswjz3WeUejJZJJ4XXTnc3kPWqq53S04LfO83eWaZvaXWP+oW9DlSSOVx49tJpusGzsyhpOUWnF9X4uBiWf5dJR74Kiq/xNBLvnGDjWvtF0wkDPzSkZ50adHc8maarhzR+H//AYEqm03ma7twhLm1GpnCYTOrVRs4Io4E1ScrCawAAAP//d3yXhQ=="
+	return "eJzMlLFO8zAUhfc8xVHmv9I/dMrAzIQYuiEGNz5t3SZx8L0p5O1R2iY0wUUqBYk72s53Pl/HnmHHNsNGtU4AdVowQ3q/WDymCWApeXC1Ol9luEsAoJtC6W1TMAECCxphhrVJAKGqq9aS4SkVKdJ/SDtw+pwAK8fCSnZgzFCZkkNqV9rWHSX4ph+JZI8p56TAl4aiw3gMeBHa12FrJxJctfKhNN3Ks2XT/NFuaCyDTKBHD7/cMtfJ1JcywGLDo9IJDGGl0eSlt200dsf21Qf7zdzatIU3dpz70XGpfSX8kZYfUX+x54E53Z42mp57y1/ou6jRRmJ0vpmy7m7o/P88alRvgpFrnAbig1esfFPdKD0R6L22MjrSq/+U7nuU1OBy4fmZjh+gvi49E8KwZ7hF5BNhEFhSYwrvAQAA//9oZVy9"
 }

@@ -24,6 +24,9 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// FlagField fields used to keep information or errors when events are parsed.
+const FlagField = "log.flags"
+
 // Event is the common event format shared by all beats.
 // Every event must have a timestamp and provide encodable Fields in `Fields`.
 // The `Meta`-fields can be used to pass additional meta-data to the outputs.

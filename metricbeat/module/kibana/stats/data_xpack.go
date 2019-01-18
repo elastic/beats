@@ -21,6 +21,8 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
@@ -162,12 +164,12 @@ func eventMappingXPack(r mb.ReporterV2, intervalMs int64, now time.Time, content
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failure parsing Kibana API response")
 	}
 
 	t, clusterUUID, fields, err := dataParserFunc(r, data, now)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failure to parse data")
 	}
 
 	var event mb.Event

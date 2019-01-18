@@ -99,6 +99,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 					"per_sec": common.MapStr{
 						"bytes": extraMetrics.ReadBytesPerSec,
 					},
+					"await": extraMetrics.AvgReadAwaitTime,
 				},
 				"write": common.MapStr{
 					"request": common.MapStr{
@@ -108,6 +109,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 					"per_sec": common.MapStr{
 						"bytes": extraMetrics.WriteBytesPerSec,
 					},
+					"await": extraMetrics.AvgWriteAwaitTime,
 				},
 				"queue": common.MapStr{
 					"avg_size": extraMetrics.AvgQueueSize,

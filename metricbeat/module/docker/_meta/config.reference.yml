@@ -3,6 +3,7 @@
     - "container"
     - "cpu"
     - "diskio"
+    - "event"
     - "healthcheck"
     - "info"
     #- "image"
@@ -14,6 +15,9 @@
 
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
+
+  # If set to true, collects metrics per core.
+  #cpu.cores: true
 
   # To connect to Docker over TLS you must specify a client and CA certificate.
   #ssl:

@@ -429,8 +429,10 @@ func lexer(in string) (<-chan token, <-chan error) {
 					lex <- openToken
 					off++
 					varcount++
-				default: // escape any symbol
+				case '$', '}': // escape $} and $$
 					content = content[:idx] + content[off:]
+					continue
+				default:
 					continue
 				}
 			}

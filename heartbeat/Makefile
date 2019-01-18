@@ -1,7 +1,7 @@
 BEAT_NAME=heartbeat
 BEAT_TITLE=Heartbeat
 SYSTEM_TESTS=true
-TEST_ENVIRONMENT=false
+TEST_ENVIRONMENT?=true
 
 # Path to the libbeat Makefile
 -include ../libbeat/scripts/Makefile
@@ -15,11 +15,6 @@ collect: imports kibana
 imports: python-env
 	@mkdir -p include
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/script/generate_imports.py --out monitors/defaults/default.go ${BEAT_PATH}
-
-# Create a new monitor. Requires the parameter MONITOR
-.PHONY: create-monitor
-create-monitor:
-	go run scripts/generate_monitor/main.go -monitor=${MONITOR}
 
 # Collects all module dashboards
 .PHONY: kibana

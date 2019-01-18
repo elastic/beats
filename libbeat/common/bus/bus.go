@@ -49,6 +49,7 @@ type bus struct {
 	sync.RWMutex
 	name      string
 	listeners []*listener
+	store     chan Event
 }
 
 type listener struct {
@@ -65,11 +66,42 @@ func New(name string) Bus {
 	}
 }
 
+// NewBusWithStore allows to create a buffered bus when producers send data without
+// listeners being subscribed to them. size determines the size of the buffer.
+func NewBusWithStore(name string, size int) Bus {
+	return &bus{
+		name:      name,
+		listeners: make([]*listener, 0),
+		store:     make(chan Event, size),
+	}
+}
+
 func (b *bus) Publish(e Event) {
 	b.RLock()
 	defer b.RUnlock()
 
 	logp.Debug("bus", "%s: %+v", b.name, e)
+	if len(b.listeners) == 0 && b.store != nil {
+		b.store <- e
+		return
+	}
+
+	if b.store != nil && len(b.store) != 0 {
+		doBreak := false
+		for !doBreak {
+			select {
+			case eve := <-b.store:
+				for _, listener := range b.listeners {
+					if listener.interested(eve) {
+						listener.channel <- eve
+					}
+				}
+			default:
+				doBreak = true
+			}
+		}
+	}
+
 	for _, listener := range b.listeners {
 		if listener.interested(e) {
 			listener.channel <- e

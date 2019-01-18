@@ -77,3 +77,9 @@ data:
       period: 10s
       host: ${NODE_NAME}
       hosts: ["localhost:10255"]
+      # If using Red Hat OpenShift remove the previous hosts entry and 
+      # uncomment these settings:
+      #hosts: ["https://${HOSTNAME}:10250"]
+      #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      #ssl.certificate_authorities:
+        #- /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt

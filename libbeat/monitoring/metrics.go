@@ -124,6 +124,30 @@ func (v *Float) Add(delta float64) {
 	}
 }
 
+// Bool is a Bool variable satisfying the Var interface.
+type Bool struct{ f atomic.Bool }
+
+// NewBool creates and registers a new bool variable.
+//
+// Note: If the registry is configured to publish variables to expvar, the
+// variable will be available via expvars package as well, but can not be removed
+// anymore.
+func NewBool(r *Registry, name string, opts ...Option) *Bool {
+	if r == nil {
+		r = Default
+	}
+
+	v := &Bool{}
+	addVar(r, name, opts, v, makeExpvar(func() string {
+		return strconv.FormatBool(v.Get())
+	}))
+	return v
+}
+
+func (v *Bool) Get() bool                { return v.f.Load() }
+func (v *Bool) Set(value bool)           { v.f.Store(value) }
+func (v *Bool) Visit(_ Mode, vs Visitor) { vs.OnBool(v.Get()) }
+
 // String is a string variable satisfying the Var interface.
 type String struct {
 	mu sync.RWMutex

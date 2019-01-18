@@ -128,7 +128,7 @@ func NewInput(
 		Parse(data, ev)
 		var d *util.Data
 		if !ev.IsValid() {
-			log.Errorw("can't not parse event as syslog rfc3164", "message", string(data))
+			log.Errorw("can't parse event as syslog rfc3164", "message", string(data))
 			// On error revert to the raw bytes content, we need a better way to communicate this kind of
 			// error upstream this should be a global effort.
 			d = &util.Data{
@@ -203,7 +203,11 @@ func (p *Input) Wait() {
 func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) *beat.Event {
 	f := common.MapStr{
 		"message": strings.TrimRight(ev.Message(), "\n"),
-		"source":  metadata.RemoteAddr.String(),
+		"log": common.MapStr{
+			"source": common.MapStr{
+				"address": metadata.RemoteAddr.String(),
+			},
+		},
 	}
 
 	syslog := common.MapStr{}

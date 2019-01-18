@@ -1,4 +1,5 @@
 :modulename: system
+:has-dashboards: true
 
 == System module
 
@@ -76,4 +77,8 @@ include::../include/var-paths.asciidoc[]
 
 include::../include/var-convert-timezone.asciidoc[]
 
+:has-dashboards!:
 
+:fileset_ex!:
+
+:modulename!:

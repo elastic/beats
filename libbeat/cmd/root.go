@@ -23,13 +23,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/cmd/instance"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 )
 
 func init() {
@@ -114,7 +113,7 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	rootCmd.SetupCmd = genSetupCmd(name, indexPrefix, version, beatCreator)
 	rootCmd.VersionCmd = genVersionCmd(name, version)
 	rootCmd.CompletionCmd = genCompletionCmd(name, version, rootCmd)
-	rootCmd.ExportCmd = genExportCmd(name, indexPrefix, version)
+	rootCmd.ExportCmd = genExportCmd(settings, name, indexPrefix, version)
 	rootCmd.TestCmd = genTestCmd(name, version, beatCreator)
 	rootCmd.KeystoreCmd = genKeystoreCmd(name, indexPrefix, version, runFlags)
 

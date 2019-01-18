@@ -22,23 +22,18 @@ import (
 
 	"time"
 
+	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
 var (
-	sourceNodeXpack = s.Schema{
-		"host":              c.Str("host"),
-		"transport_address": c.Str("transport_address"),
-		"ip":                c.Str("ip"),
-		"name":              c.Str("name"),
-	}
-
 	schemaXpack = s.Schema{
 		"indices": c.Dict("indices", s.Schema{
 			"docs": c.Dict("docs", s.Schema{
@@ -89,9 +84,9 @@ var (
 		"os": c.Dict("os", s.Schema{
 			"cpu": c.Dict("cpu", s.Schema{
 				"load_average": c.Dict("load_average", s.Schema{
-					"1m":  c.Float("1m"),
-					"5m":  c.Float("5m"),
-					"15m": c.Float("15m"),
+					"1m":  c.Float("1m", s.Optional),
+					"5m":  c.Float("5m", s.Optional),
+					"15m": c.Float("15m", s.Optional),
 				}),
 			}),
 			"cgroup": c.Dict("cgroup", s.Schema{
@@ -115,7 +110,7 @@ var (
 					"limit_in_bytes": c.Str("limit_in_bytes"),
 					"usage_in_bytes": c.Str("usage_in_bytes"),
 				}),
-			}),
+			}, c.DictOptional),
 		}),
 		"process": c.Dict("process", s.Schema{
 			"open_file_descriptors": c.Int("open_file_descriptors"),
@@ -144,93 +139,74 @@ var (
 			}),
 		}),
 		"thread_pool": c.Dict("thread_pool", s.Schema{
-			"bulk": c.Dict("bulk", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"generic": c.Dict("generic", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"get": c.Dict("get", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"index": c.Dict("index", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"management": c.Dict("management", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"search": c.Dict("search", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
-			"watcher": c.Dict("watcher", s.Schema{
-				"threads":  c.Int("threads"),
-				"queue":    c.Int("queue"),
-				"rejected": c.Int("rejected"),
-			}),
+			"analyze":    c.Dict("analyze", threadPoolStatsSchema),
+			"write":      c.Dict("write", threadPoolStatsSchema),
+			"generic":    c.Dict("generic", threadPoolStatsSchema),
+			"get":        c.Dict("get", threadPoolStatsSchema),
+			"management": c.Dict("management", threadPoolStatsSchema),
+			"search":     c.Dict("search", threadPoolStatsSchema),
+			"watcher":    c.Dict("watcher", threadPoolStatsSchema, c.DictOptional),
 		}),
 		"fs": c.Dict("fs", s.Schema{
-			"summary": c.Dict("total", s.Schema{
+			"total": c.Dict("total", s.Schema{
 				"total_in_bytes":     c.Int("total_in_bytes"),
 				"free_in_bytes":      c.Int("free_in_bytes"),
 				"available_in_bytes": c.Int("available_in_bytes"),
 			}),
 		}),
 	}
+
+	threadPoolStatsSchema = s.Schema{
+		"threads":  c.Int("threads"),
+		"queue":    c.Int("queue"),
+		"rejected": c.Int("rejected"),
+	}
 )
 
-func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) {
+func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	nodesStruct := struct {
 		ClusterName string                            `json:"cluster_name"`
 		Nodes       map[string]map[string]interface{} `json:"nodes"`
 	}{}
 
-	json.Unmarshal(content, &nodesStruct)
+	err := json.Unmarshal(content, &nodesStruct)
+	if err != nil {
+		return errors.Wrap(err, "failure parsing Elasticsearch Node Stats API response")
+	}
 
 	// Normally the nodeStruct should only contain one node. But if _local is removed
 	// from the path and Metricbeat is not installed on the same machine as the node
 	// it will provid the data for multiple nodes. This will mean the detection of the
 	// master node will not be accurate anymore as often in these cases a proxy is in front
 	// of ES and it's not know if the request will be routed to the same node as before.
+	var errs multierror.Errors
 	for nodeID, node := range nodesStruct.Nodes {
-		clusterID, err := elasticsearch.GetClusterID(m.HTTP, m.HostData().SanitizedURI, nodeID)
+		isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HTTP.GetURI())
 		if err != nil {
-			logp.Err("could not fetch cluster id: %s", err)
+			errs = append(errs, errors.Wrap(err, "error determining if connected Elasticsearch node is master"))
 			continue
 		}
 
-		isMaster, _ := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI)
-
 		event := mb.Event{}
-		// Build source_node object
-		sourceNode, _ := sourceNodeXpack.Apply(node)
-		sourceNode["uuid"] = nodeID
 
-		nodeData, _ := schemaXpack.Apply(node)
+		nodeData, err := schemaXpack.Apply(node)
+		if err != nil {
+			errs = append(errs, errors.Wrap(err, "failure to apply node schema"))
+			continue
+		}
 		nodeData["node_master"] = isMaster
 		nodeData["node_id"] = nodeID
 
 		event.RootFields = common.MapStr{
 			"timestamp":    time.Now(),
-			"cluster_uuid": clusterID,
+			"cluster_uuid": info.ClusterID,
 			"interval_ms":  m.Module().Config().Period.Nanoseconds() / 1000 / 1000,
 			"type":         "node_stats",
-			"source_node":  sourceNode,
 			"node_stats":   nodeData,
 		}
 
 		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
 		r.Event(event)
 	}
+	return errs.Err()
 }

@@ -32,20 +32,24 @@ import (
 func TestFetch(t *testing.T) {
 	compose.EnsureUpWithTimeout(t, 600, "elasticsearch", "kibana")
 
-	f := mbtest.NewEventFetcher(t, mtest.GetConfig("status"))
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("status"))
+	events, errs := mbtest.ReportingFetchV2(f)
+
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
 		t.FailNow()
 	}
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("kibana", "status").Fields.StringToPrint())
 }
 
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "elasticsearch", "kibana")
 
-	f := mbtest.NewEventFetcher(t, mtest.GetConfig("status"))
-	err := mbtest.WriteEvent(f, t)
+	config := mtest.GetConfig("status")
+	f := mbtest.NewReportingMetricSetV2(t, config)
+	err := mbtest.WriteEventsReporterV2(f, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}

@@ -44,8 +44,7 @@ func eventMapping(content []byte) ([]common.MapStr, error) {
 					"name": node.NodeName,
 				},
 			},
-			"container":  syscontainer.Name,
-			"start_time": syscontainer.StartTime,
+			"container": syscontainer.Name,
 			"cpu": common.MapStr{
 				"usage": common.MapStr{
 					"nanocores": syscontainer.CPU.UsageNanoCores,
@@ -68,6 +67,11 @@ func eventMapping(content []byte) ([]common.MapStr, error) {
 				"majorpagefaults": syscontainer.Memory.MajorPageFaults,
 			},
 		}
+
+		if syscontainer.StartTime != "" {
+			containerEvent.Put("start_time", syscontainer.StartTime)
+		}
+
 		events = append(events, containerEvent)
 	}
 

@@ -1,3 +1,4 @@
+ifeval::["{has-dashboards}"=="true"]
 . Explore your data in {kib}:
 +
 .. Open your browser and navigate to the *Dashboard* overview in {kib}:
@@ -11,3 +12,4 @@ the visualizations for your parsed logs.
 +
 TIP: If you don’t see data in {kib}, try changing the date range to a larger
 range. By default, {kib} shows the last 15 minutes.
+endif::[]

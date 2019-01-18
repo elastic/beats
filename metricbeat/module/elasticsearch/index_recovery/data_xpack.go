@@ -19,7 +19,10 @@ package index_recovery
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
@@ -27,34 +30,34 @@ import (
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
 
-func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
+func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failure parsing Elasticsearch Recovery API response")
 	}
 
 	var results []map[string]interface{}
 	for indexName, indexData := range data {
 		indexData, ok := indexData.(map[string]interface{})
 		if !ok {
-			continue
+			return fmt.Errorf("%v is not a map", indexName)
 		}
 
 		shards, ok := indexData["shards"]
 		if !ok {
-			continue
+			return elastic.MakeErrorForMissingField(indexName+".shards", elastic.Elasticsearch)
 		}
 
 		shardsArr, ok := shards.([]interface{})
 		if !ok {
-			continue
+			return fmt.Errorf("%v.shards is not an array", indexName)
 		}
 
-		for _, shard := range shardsArr {
+		for shardIdx, shard := range shardsArr {
 			shard, ok := shard.(map[string]interface{})
 			if !ok {
-				continue
+				return fmt.Errorf("%v.shards[%v] is not a map", indexName, shardIdx)
 			}
 
 			shard["index_name"] = indexName
@@ -64,11 +67,6 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, content []byte) error {
 
 	indexRecovery := common.MapStr{}
 	indexRecovery["shards"] = results
-
-	info, err := elasticsearch.GetInfo(m.HTTP, m.HTTP.GetURI())
-	if err != nil {
-		return err
-	}
 
 	event := mb.Event{}
 	event.RootFields = common.MapStr{

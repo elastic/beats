@@ -27,12 +27,11 @@ import (
 	"runtime"
 	"strings"
 
-	ucfg "github.com/elastic/go-ucfg"
-	"github.com/elastic/go-ucfg/yaml"
-
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
+	ucfg "github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
+	"github.com/elastic/go-ucfg/yaml"
 )
 
 var flagStrictPerms = flag.Bool("strict.perms", true, "Strict permission checking on config files")
@@ -264,6 +263,7 @@ func (c *Config) PrintDebugf(msg string, params ...interface{}) {
 	}
 }
 
+// Enabled return the configured enabled value or true by default.
 func (c *Config) Enabled() bool {
 	testEnabled := struct {
 		Enabled bool `config:"enabled"`

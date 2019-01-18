@@ -18,10 +18,10 @@
 package cluster_stats
 
 import (
-	"fmt"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -44,7 +44,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The elasticsearch cluster_stats metricset is beta")
+	cfgwarn.Beta("the " + base.FullyQualifiedName() + " metricset is beta")
 
 	ms, err := elasticsearch.NewMetricSet(base, clusterStatsPath)
 	if err != nil {
@@ -57,25 +57,36 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.HostData().SanitizedURI+clusterStatsPath)
 	if err != nil {
-		r.Error(fmt.Errorf("Error fetching master info: %s", err))
+		err := errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		logp.Debug("elasticsearch", "Trying to fetch cluster stats from a non master node.")
+		m.Log.Debug("trying to fetch cluster stats from a non-master node")
 		return
 	}
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
+		return
+	}
+
+	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+clusterStatsPath)
+	if err != nil {
+		r.Error(errors.Wrap(err, "failed to get info from Elasticsearch"))
 		return
 	}
 
 	if m.MetricSet.XPack {
-		eventMappingXPack(r, m, content)
+		err = eventMappingXPack(r, m, *info, content)
 	} else {
-		eventMapping(r, content)
+		err = eventMapping(r, *info, content)
+	}
+
+	if err != nil {
+		m.Log.Error(err)
 	}
 }

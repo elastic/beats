@@ -75,12 +75,6 @@
         logged: Success, Information, Warning, Error, Audit Success, and Audit
         Failure.
 
-    - name: message
-      type: text
-      required: false
-      description: >
-        The message from the event log record.
-
     - name: message_error
       type: keyword
       required: false
@@ -170,12 +164,6 @@
         `user.domain`, and `user.type` fields will be omitted from the event.
         If you discover Winlogbeat not resolving SIDs, review the log for
         clues as to what the problem may be.
-
-    - name: user.name
-      type: keyword
-      required: false
-      description: >
-        The name of the account associated with this event.
 
     - name: user.domain
       type: keyword

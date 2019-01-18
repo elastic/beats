@@ -6,8 +6,8 @@ var:
       - /var/log/elasticsearch/gc.log.[0-9]*
       - /var/log/elasticsearch/gc.log
     os.darwin:
-      - /usr/local/elasticsearch/gc.log.[0-9]*
-      - /usr/local/elasticsearch/gc.log
+      - /usr/local/var/lib/elasticsearch/gc.log.[0-9]*
+      - /usr/local/var/lib/elasticsearch/gc.log
     os.windows:
       - c:/ProgramData/Elastic/Elasticsearch/logs/gc.log.*
       - c:/ProgramData/Elastic/Elasticsearch/logs/gc.log

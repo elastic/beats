@@ -20,6 +20,9 @@ package beater
 import (
 	"sync"
 
+	"github.com/elastic/beats/libbeat/common/reload"
+	"github.com/elastic/beats/libbeat/management"
+
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
@@ -27,11 +30,12 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
-	mbautodiscover "github.com/elastic/beats/metricbeat/autodiscover"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/module"
+
+	// Add autodiscover builders / appenders
+	_ "github.com/elastic/beats/metricbeat/autodiscover"
 
 	// Add metricbeat default processors
 	_ "github.com/elastic/beats/metricbeat/processor/add_kubernetes_metadata"
@@ -102,7 +106,7 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 		return nil, errors.Wrap(err, "error reading configuration file")
 	}
 
-	dynamicCfgEnabled := config.ConfigModules.Enabled() || config.Autodiscover != nil
+	dynamicCfgEnabled := config.ConfigModules.Enabled() || config.Autodiscover != nil || b.ConfigManager.Enabled()
 	if !dynamicCfgEnabled && len(config.Modules) == 0 {
 		return nil, mb.ErrEmptyConfig
 	}
@@ -130,12 +134,6 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 		}
 
 		failed := false
-
-		err := cfgwarn.CheckRemoved5xSettings(moduleCfg, "filters")
-		if err != nil {
-			errs = append(errs, err)
-			failed = true
-		}
 
 		connector, err := module.NewConnector(b.Publisher, moduleCfg, nil)
 		if err != nil {
@@ -169,7 +167,7 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 	if config.Autodiscover != nil {
 		var err error
 		factory := module.NewFactory(metricbeat.moduleOptions...)
-		adapter := mbautodiscover.NewAutodiscoverAdapter(factory)
+		adapter := autodiscover.NewFactoryAdapter(factory)
 		metricbeat.autodiscover, err = autodiscover.NewAutodiscover("metricbeat", b.Publisher, adapter, config.Autodiscover)
 		if err != nil {
 			return nil, err
@@ -187,6 +185,7 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 func (bt *Metricbeat) Run(b *beat.Beat) error {
 	var wg sync.WaitGroup
 
+	// Static modules (metricbeat.modules)
 	for _, m := range bt.modules {
 		client, err := m.connector.Connect()
 		if err != nil {
@@ -203,9 +202,20 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		}()
 	}
 
+	// Centrally managed modules
+	factory := module.NewFactory(bt.moduleOptions...)
+	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher)
+	reload.Register.MustRegisterList(b.Info.Beat+".modules", modules)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		<-bt.done
+		modules.Stop()
+	}()
+
+	// Dynamic file based modules (metricbeat.config.modules)
 	if bt.config.ConfigModules.Enabled() {
 		moduleReloader := cfgfile.NewReloader(b.Publisher, bt.config.ConfigModules)
-		factory := module.NewFactory(bt.moduleOptions...)
 
 		if err := moduleReloader.Check(factory); err != nil {
 			return err
@@ -220,6 +230,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		}()
 	}
 
+	// Autodiscover (metricbeat.autodiscover)
 	if bt.autodiscover != nil {
 		bt.autodiscover.Start()
 		wg.Add(1)

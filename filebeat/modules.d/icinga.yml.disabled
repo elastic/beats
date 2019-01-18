@@ -1,3 +1,6 @@
+# Module: icinga
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-icinga.html
+
 - module: icinga
   # Main logs
   main:

@@ -19,7 +19,6 @@ package fields
 
 import (
 	"io/ioutil"
-	"os"
 	"path/filepath"
 )
 
@@ -69,17 +68,14 @@ func CollectModuleFiles(modulesDir string) ([]*YmlFile, error) {
 
 // CollectFiles collects all files for the given module including filesets
 func CollectFiles(module string, modulesPath string) ([]*YmlFile, error) {
-
 	var files []*YmlFile
-	fieldsYmlPath := filepath.Join(modulesPath, module, "_meta/fields.yml")
-	if _, err := os.Stat(fieldsYmlPath); !os.IsNotExist(err) {
-		files = append(files, &YmlFile{
-			Path:   fieldsYmlPath,
-			Indent: 0,
-		})
-	} else if !os.IsNotExist(err) && err != nil {
+	var ymls []*YmlFile
+	var err error
+
+	if ymls, err = makeYml(0, filepath.Join(modulesPath, module, "_meta/fields.yml")); err != nil {
 		return nil, err
 	}
+	files = append(files, ymls...)
 
 	modulesRoot := filepath.Base(modulesPath)
 	sets, err := ioutil.ReadDir(filepath.Join(modulesPath, module))
@@ -91,15 +87,12 @@ func CollectFiles(module string, modulesPath string) ([]*YmlFile, error) {
 		if !s.IsDir() {
 			continue
 		}
-		fieldsYmlPath = filepath.Join(modulesPath, module, s.Name(), "_meta/fields.yml")
-		if _, err = os.Stat(fieldsYmlPath); !os.IsNotExist(err) {
-			files = append(files, &YmlFile{
-				Path:   fieldsYmlPath,
-				Indent: indentByModule[modulesRoot],
-			})
-		} else if !os.IsNotExist(err) && err != nil {
+
+		fieldsYmlPath := filepath.Join(modulesPath, module, s.Name(), "_meta/fields.yml")
+		if ymls, err = makeYml(indentByModule[modulesRoot], fieldsYmlPath); err != nil {
 			return nil, err
 		}
+		files = append(files, ymls...)
 	}
 	return files, nil
 }

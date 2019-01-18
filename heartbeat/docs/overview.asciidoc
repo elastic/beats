@@ -36,3 +36,5 @@ this monitor to verify that the service returns the expected response, such as a
 specific status code, response header, or content.
 
 The `tcp` and `http` monitors both support SSL/TLS and some proxy settings.
+
+include::{libbeat-dir}/docs/shared-libbeat-description.asciidoc[]

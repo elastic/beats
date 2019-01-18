@@ -20,10 +20,9 @@ package codec
 import (
 	"time"
 
-	"github.com/elastic/go-structform"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/dtfmt"
+	"github.com/elastic/go-structform"
 )
 
 func MakeTimestampEncoder() func(*time.Time, structform.ExtVisitor) error {

@@ -19,6 +19,7 @@ package hbtest
 
 import (
 	"crypto/x509"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -26,10 +27,12 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/libbeat/common/mapval"
 	"github.com/elastic/beats/libbeat/common/x509util"
 )
@@ -51,6 +54,23 @@ func HelloWorldHandler(status int) http.HandlerFunc {
 	)
 }
 
+// SizedResponseHandler responds with 200 to any request with a body
+// exactly the size of the `bytes` argument, where each byte is the
+// character 'x'
+func SizedResponseHandler(bytes int) http.HandlerFunc {
+	var body strings.Builder
+	for i := 0; i < bytes; i++ {
+		body.WriteString("x")
+	}
+
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(200)
+			io.WriteString(w, body.String())
+		},
+	)
+}
+
 // ServerPort takes an httptest.Server and returns its port as a uint16.
 func ServerPort(server *httptest.Server) (uint16, error) {
 	u, err := url.Parse(server.URL)
@@ -66,38 +86,45 @@ func ServerPort(server *httptest.Server) (uint16, error) {
 
 // TLSChecks validates the given x509 cert at the given position.
 func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) mapval.Validator {
-	certPEMString := x509util.CertToPEMString(certificate)
 	return mapval.MustCompile(mapval.Map{
 		"tls": mapval.Map{
 			"rtt.handshake.us":             mapval.IsDuration,
-			"certificates":                 mapval.Slice{certPEMString},
 			"certificate_not_valid_before": certificate.NotBefore,
 			"certificate_not_valid_after":  certificate.NotAfter,
 		},
 	})
 }
 
-// MonitorChecks creates a skima.Validator that represents the "monitor" field present
+// BaseChecks creates a skima.Validator that represents the "monitor" field present
 // in all heartbeat events.
-func MonitorChecks(id string, host string, ip string, scheme string, status string) mapval.Validator {
+func BaseChecks(ip string, status string, typ string) mapval.Validator {
 	return mapval.MustCompile(mapval.Map{
 		"monitor": mapval.Map{
-			// TODO: This is only optional because, for some reason, TCP returns
-			// this value, but HTTP does not. We should fix this
-			"host":        mapval.Optional(mapval.IsEqual(host)),
-			"duration.us": mapval.IsDuration,
-			"id":          id,
 			"ip":          ip,
-			"scheme":      scheme,
+			"duration.us": mapval.IsDuration,
 			"status":      status,
+			"id":          mapval.IsNonEmptyString,
+			"name":        mapval.IsString,
+			"type":        typ,
 		},
 	})
 }
 
-// TCPBaseChecks checks the minimum TCP response, which is only issued
-// without further fields when the endpoint does not respond.
-func TCPBaseChecks(port uint16) mapval.Validator {
-	return mapval.MustCompile(mapval.Map{"tcp.port": port})
+// SimpleURLChecks returns a check for a simple URL
+// with only a scheme, host, and port
+func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) mapval.Validator {
+
+	hostPort := host
+	if port != 0 {
+		hostPort = fmt.Sprintf("%s:%d", host, port)
+	}
+
+	u, err := url.Parse(fmt.Sprintf("%s://%s", scheme, hostPort))
+	require.NoError(t, err)
+
+	return mapval.MustCompile(mapval.Map{
+		"url": wrappers.URLFields(u),
+	})
 }
 
 // ErrorChecks checks the standard heartbeat error hierarchy, which should
@@ -114,11 +141,8 @@ func ErrorChecks(msgSubstr string, errType string) mapval.Validator {
 
 // RespondingTCPChecks creates a skima.Validator that represents the "tcp" field present
 // in all heartbeat events that use a Tcp connection as part of their DialChain
-func RespondingTCPChecks(port uint16) mapval.Validator {
-	return mapval.Compose(
-		TCPBaseChecks(port),
-		mapval.MustCompile(mapval.Map{"tcp.rtt.connect.us": mapval.IsDuration}),
-	)
+func RespondingTCPChecks() mapval.Validator {
+	return mapval.MustCompile(mapval.Map{"tcp.rtt.connect.us": mapval.IsDuration})
 }
 
 // CertToTempFile takes a certificate and returns an *os.File with a PEM encoded

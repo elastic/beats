@@ -1,4 +1,5 @@
 :modulename: haproxy
+:has-dashboards: true
 
 == haproxy module
 
@@ -47,3 +48,9 @@ include::../include/config-option-intro.asciidoc[]
 ==== `log` fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

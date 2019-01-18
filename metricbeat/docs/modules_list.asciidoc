@@ -14,7 +14,7 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-ceph-cluster_health,cluster_health>> beta[]  
 |<<metricbeat-metricset-ceph-cluster_status,cluster_status>> beta[]  
 |<<metricbeat-metricset-ceph-monitor_health,monitor_health>> beta[]  
-|<<metricbeat-metricset-ceph-osd_df,osd_df>> experimental[]  
+|<<metricbeat-metricset-ceph-osd_df,osd_df>> beta[]  
 |<<metricbeat-metricset-ceph-osd_tree,osd_tree>> beta[]  
 |<<metricbeat-metricset-ceph-pool_disk,pool_disk>> beta[]  
 |<<metricbeat-module-couchbase,Couchbase>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
@@ -22,9 +22,10 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-couchbase-cluster,cluster>> beta[]  
 |<<metricbeat-metricset-couchbase-node,node>> beta[]  
 |<<metricbeat-module-docker,Docker>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.8+| .8+|  |<<metricbeat-metricset-docker-container,container>>   
+.9+| .9+|  |<<metricbeat-metricset-docker-container,container>>   
 |<<metricbeat-metricset-docker-cpu,cpu>>   
 |<<metricbeat-metricset-docker-diskio,diskio>>   
+|<<metricbeat-metricset-docker-event,event>>   
 |<<metricbeat-metricset-docker-healthcheck,healthcheck>>   
 |<<metricbeat-metricset-docker-image,image>>   
 |<<metricbeat-metricset-docker-info,info>>   
@@ -62,9 +63,9 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-http-server,server>> beta[]  
 |<<metricbeat-module-jolokia,Jolokia>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-jolokia-jmx,jmx>>   
-|<<metricbeat-module-kafka,Kafka>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.2+| .2+|  |<<metricbeat-metricset-kafka-consumergroup,consumergroup>> beta[]  
-|<<metricbeat-metricset-kafka-partition,partition>> beta[]  
+|<<metricbeat-module-kafka,Kafka>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.2+| .2+|  |<<metricbeat-metricset-kafka-consumergroup,consumergroup>>   
+|<<metricbeat-metricset-kafka-partition,partition>>   
 |<<metricbeat-module-kibana,Kibana>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>> beta[]  
 |<<metricbeat-metricset-kibana-status,status>> beta[]  
@@ -100,10 +101,15 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-mysql,MySQL>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-mysql-galera_status,galera_status>> experimental[]  
 |<<metricbeat-metricset-mysql-status,status>>   
+|<<metricbeat-module-nats,Nats>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.3+| .3+|  |<<metricbeat-metricset-nats-connections,connections>> experimental[]  
+|<<metricbeat-metricset-nats-routes,routes>> experimental[]  
+|<<metricbeat-metricset-nats-stats,stats>> experimental[]  
 |<<metricbeat-module-nginx,Nginx>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-nginx-stubstatus,stubstatus>>   
 |<<metricbeat-module-php_fpm,PHP_FPM>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-php_fpm-pool,pool>> beta[]  
+.2+| .2+|  |<<metricbeat-metricset-php_fpm-pool,pool>> beta[]  
+|<<metricbeat-metricset-php_fpm-process,process>> beta[]  
 |<<metricbeat-module-postgresql,PostgreSQL>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .4+| .4+|  |<<metricbeat-metricset-postgresql-activity,activity>>   
 |<<metricbeat-metricset-postgresql-bgwriter,bgwriter>>   
@@ -118,7 +124,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-rabbitmq-node,node>> beta[]  
 |<<metricbeat-metricset-rabbitmq-queue,queue>> beta[]  
 |<<metricbeat-module-redis,Redis>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-redis-info,info>>   
+.3+| .3+|  |<<metricbeat-metricset-redis-info,info>>   
+|<<metricbeat-metricset-redis-key,key>>   
 |<<metricbeat-metricset-redis-keyspace,keyspace>>   
 |<<metricbeat-module-system,System>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .14+| .14+|  |<<metricbeat-metricset-system-core,core>>   
@@ -133,10 +140,10 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-system-process_summary,process_summary>>   
 |<<metricbeat-metricset-system-raid,raid>>   
 |<<metricbeat-metricset-system-socket,socket>>   
-|<<metricbeat-metricset-system-socket_summary,socket_summary>> experimental[]  
+|<<metricbeat-metricset-system-socket_summary,socket_summary>>   
 |<<metricbeat-metricset-system-uptime,uptime>>   
 |<<metricbeat-module-traefik,traefik>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-traefik-health,health>> experimental[]  
+.1+| .1+|  |<<metricbeat-metricset-traefik-health,health>> beta[]  
 |<<metricbeat-module-uwsgi,uwsgi>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-uwsgi-status,status>> beta[]  
 |<<metricbeat-module-vsphere,vSphere>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
@@ -175,6 +182,7 @@ include::modules/memcached.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/munin.asciidoc[]
 include::modules/mysql.asciidoc[]
+include::modules/nats.asciidoc[]
 include::modules/nginx.asciidoc[]
 include::modules/php_fpm.asciidoc[]
 include::modules/postgresql.asciidoc[]

@@ -1,4 +1,5 @@
 :modulename: mysql
+:has-dashboards: true
 
 == MySQL module
 
@@ -10,7 +11,8 @@ include::../include/what-happens.asciidoc[]
 [float]
 === Compatibility
 
-The  +{modulename}+ module was tested with logs from versions 5.5 and 5.7.
+The  +{modulename}+ module was tested with logs from MySQL 5.5 and 5.7 and
+MariaDB 10.1 and 10.2.
 
 On Windows, the module was tested with MySQL installed from the Chocolatey
 repository.
@@ -65,3 +67,9 @@ include::../include/var-paths.asciidoc[]
 ==== `slowlog` fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

@@ -24,9 +24,14 @@ import (
 )
 
 type Pipeline interface {
-	Connect() (Client, error)
-	ConnectWith(ClientConfig) (Client, error)
+	PipelineConnector
 	SetACKHandler(PipelineACKHandler) error
+}
+
+// PipelineConnector creates a publishing Client. This is typically backed by a Pipeline.
+type PipelineConnector interface {
+	ConnectWith(ClientConfig) (Client, error)
+	Connect() (Client, error)
 }
 
 // Client holds a connection to the beats publisher pipeline
@@ -70,6 +75,10 @@ type ClientConfig struct {
 	// By default events are normalized within processor pipeline,
 	// if the normalization step should be skipped set this to true.
 	SkipNormalization bool
+
+	// By default events are decorated with agent metadata.
+	// To skip adding that metadata set this to true.
+	SkipAgentMetadata bool
 
 	// ACK handler strategies.
 	// Note: ack handlers are run in another go-routine owned by the publisher pipeline.

@@ -26,11 +26,13 @@ import (
 	"github.com/elastic/beats/heartbeat/config"
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/heartbeat/scheduler"
+	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/management"
 )
 
 // Heartbeat represents the root datastructure of this beat.
@@ -40,12 +42,12 @@ type Heartbeat struct {
 	config          config.Config
 	scheduler       *scheduler.Scheduler
 	monitorReloader *cfgfile.Reloader
+	dynamicFactory  *monitors.RunnerFactory
+	autodiscover    *autodiscover.Autodiscover
 }
 
 // New creates a new heartbeat.
 func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
-	cfgwarn.Beta("Heartbeat is beta software")
-
 	parsedConfig := config.DefaultConfig
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
@@ -67,6 +69,8 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		done:      make(chan struct{}),
 		config:    parsedConfig,
 		scheduler: scheduler,
+		// dynamicFactory is the factory used for dynamic configs, e.g. autodiscover / reload
+		dynamicFactory: monitors.NewFactory(scheduler, false),
 	}
 	return bt, nil
 }
@@ -80,14 +84,28 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		return err
 	}
 
+	if b.ConfigManager.Enabled() {
+		bt.RunCentralMgmtMonitors(b)
+	}
+
 	if bt.config.ConfigMonitors.Enabled() {
 		bt.monitorReloader = cfgfile.NewReloader(b.Publisher, bt.config.ConfigMonitors)
 		defer bt.monitorReloader.Stop()
 
-		err := bt.RunDynamicMonitors(b)
+		err := bt.RunReloadableMonitors(b)
 		if err != nil {
 			return err
 		}
+	}
+
+	if bt.config.Autodiscover != nil {
+		bt.autodiscover, err = bt.makeAutodiscover(b)
+		if err != nil {
+			return err
+		}
+
+		bt.autodiscover.Start()
+		defer bt.autodiscover.Stop()
 	}
 
 	if err := bt.scheduler.Start(); err != nil {
@@ -115,19 +133,35 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
 	return nil
 }
 
-// RunDynamicMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
-func (bt *Heartbeat) RunDynamicMonitors(b *beat.Beat) (err error) {
-	factory := monitors.NewFactory(bt.scheduler, false)
+// RunCentralMgmtMonitors loads any central management configured configs.
+func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
+	monitors := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
+	reload.Register.MustRegisterList(b.Info.Beat+".monitors", monitors)
+}
 
+// RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
+func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 	// Check monitor configs
-	if err := bt.monitorReloader.Check(factory); err != nil {
-		return err
+	if err := bt.monitorReloader.Check(bt.dynamicFactory); err != nil {
+		logp.Error(errors.Wrap(err, "error loading reloadable monitors"))
 	}
 
 	// Execute the monitor
-	go bt.monitorReloader.Run(factory)
+	go bt.monitorReloader.Run(bt.dynamicFactory)
 
 	return nil
+}
+
+// makeAutodiscover creates an autodiscover object ready to be started.
+func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover, error) {
+	adapter := autodiscover.NewFactoryAdapter(bt.dynamicFactory)
+
+	ad, err := autodiscover.NewAutodiscover("heartbeat", b.Publisher, adapter, bt.config.Autodiscover)
+	if err != nil {
+		return nil, err
+	}
+
+	return ad, nil
 }
 
 // Stop stops the beat.

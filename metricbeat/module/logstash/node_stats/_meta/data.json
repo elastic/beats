@@ -1,6 +1,6 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
@@ -8,9 +8,9 @@
         "node": {
             "stats": {
                 "events": {
-                    "filtered": 0,
-                    "in": 0,
-                    "out": 0
+                    "filtered": 30750,
+                    "in": 1,
+                    "out": 30750
                 }
             }
         }
@@ -21,5 +21,8 @@
         "name": "node_stats",
         "namespace": "logstash.node.stats",
         "rtt": 115
+    },
+    "service": {
+        "name": "logstash"
     }
 }

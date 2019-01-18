@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 
 	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
@@ -59,27 +60,33 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 	var indicesStruct IndicesStruct
 	err := json.Unmarshal(content, &indicesStruct)
 	if err != nil {
+		err = errors.Wrap(err, "failure parsing Elasticsearch Stats API response")
 		r.Error(err)
 		return err
 	}
 
-	var errors multierror.Errors
+	var errs multierror.Errors
 	for name, index := range indicesStruct.Indices {
 		event := mb.Event{}
-		event.MetricSetFields, err = schema.Apply(index)
-		if err != nil {
-			r.Error(err)
-			errors = append(errors, err)
-		}
-		// Write name here as full name only available as key
-		event.MetricSetFields["name"] = name
+
 		event.RootFields = common.MapStr{}
-		event.RootFields.Put("service.name", "elasticsearch")
+		event.RootFields.Put("service.name", elasticsearch.ModuleName)
+
 		event.ModuleFields = common.MapStr{}
 		event.ModuleFields.Put("cluster.name", info.ClusterName)
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
+
+		event.MetricSetFields, err = schema.Apply(index)
+		if err != nil {
+			event.Error = errors.Wrap(err, "failure applying index schema")
+			r.Event(event)
+			errs = append(errs, event.Error)
+			continue
+		}
+		// Write name here as full name only available as key
+		event.MetricSetFields["name"] = name
 		r.Event(event)
 	}
 
-	return errors.Err()
+	return errs.Err()
 }

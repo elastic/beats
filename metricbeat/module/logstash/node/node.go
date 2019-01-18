@@ -18,17 +18,18 @@
 package node
 
 import (
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/elastic/beats/metricbeat/module/logstash"
 )
 
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.MustAddMetricSet("logstash", "node", New,
+	mb.Registry.MustAddMetricSet(logstash.ModuleName, "node", New,
 		mb.WithHostParser(hostParser),
 		mb.DefaultMetricSet(),
 	)
@@ -44,19 +45,26 @@ var (
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
-	mb.BaseMetricSet
+	*logstash.MetricSet
 	http *helper.HTTP
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The logstash node metricset is beta")
+	cfgwarn.Beta("The " + base.FullyQualifiedName() + " metricset is beta")
+
+	ms, err := logstash.NewMetricSet(base)
+	if err != nil {
+		return nil, err
+	}
+
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err
 	}
+
 	return &MetricSet{
-		base,
+		ms,
 		http,
 	}, nil
 }
@@ -64,12 +72,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
-	data, err := m.http.FetchJSON()
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
+	content, err := m.http.FetchContent()
 	if err != nil {
-		return nil, err
+		elastic.ReportAndLogError(err, r, m.Log)
+		return
 	}
 
-	event, _ := eventMapping(data)
-	return event, nil
+	err = eventMapping(r, content)
+	if err != nil {
+		m.Log.Error(err)
+		return
+	}
 }

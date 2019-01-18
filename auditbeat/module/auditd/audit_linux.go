@@ -568,7 +568,7 @@ func addProcess(p aucoalesce.Process, m common.MapStr) {
 		process["name"] = p.Name
 	}
 	if p.Exe != "" {
-		process["exe"] = p.Exe
+		process["executable"] = p.Exe
 	}
 	if p.CWD != "" {
 		process["cwd"] = p.CWD
@@ -622,7 +622,7 @@ func addAddress(addr *aucoalesce.Address, key string, m common.MapStr) {
 	address := common.MapStr{}
 	m.Put(key, address)
 	if addr.Hostname != "" {
-		address["hostname"] = addr.Hostname
+		address["domain"] = addr.Hostname
 	}
 	if addr.IP != "" {
 		address["ip"] = addr.IP

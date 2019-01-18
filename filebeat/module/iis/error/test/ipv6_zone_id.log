@@ -1,0 +1,5 @@
+#Software: Microsoft HTTP API 2.0
+#Version: 1.0
+#Date: 2018-12-30 13:48:36
+#Fields: date time c-ip c-port s-ip s-port cs-version cs-method cs-uri streamid sc-status s-siteid s-reason s-queuename
+2018-12-30 14:22:07 ::1%0 49958 ::1%0 80 - - - - - - Timer_ConnectionIdle -

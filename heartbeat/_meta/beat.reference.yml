@@ -9,6 +9,17 @@
 
 ############################# Heartbeat ######################################
 
+
+# Define a directory to load monitor definitions from. Definitions take the form
+# of individual yaml files.
+heartbeat.config.monitors:
+  # Directory + glob pattern to search for configuration files
+  path: ${path.config}/monitors.d/*.yml
+  # If enabled, heartbeat will periodically check the config.monitors path for changes
+  reload.enabled: false
+  # How often to check for changes
+  reload.period: 5s
+
 # Configure monitors
 heartbeat.monitors:
 - type: icmp # monitor type `icmp` (requires root) uses ICMP Echo Request to ping
@@ -62,6 +73,16 @@ heartbeat.monitors:
 
     # Interval between file file changed checks.
     #interval: 5s
+
+# Define a directory to load monitor definitions from. Definitions take the form
+# of individual yaml files.
+# heartbeat.config.monitors:
+  # Directory + glob pattern to search for configuration files
+  #path: /path/to/my/monitors.d/*.yml
+  # If enabled, heartbeat will periodically check the config.monitors path for changes
+  #reload.enabled: true
+  # How often to check for changes
+  #reload.period: 1s
 
 - type: tcp # monitor type `tcp`. Connect via TCP and optionally verify endpoint
             # by sending/receiving a custom payload
@@ -207,6 +228,14 @@ heartbeat.monitors:
 
     # Required response contents.
     #body:
+
+    # Parses the body as JSON, then checks against the given condition expression
+    #json:
+    #- description: Explanation of what the check does
+    #  condition:
+    #    equals:
+    #      myField: expectedValue
+
 
   # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
   # Configure file json file to be watched for changes to the monitor:

@@ -20,9 +20,13 @@ package status
 import (
 	"encoding/json"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/metricbeat/module/kibana"
 )
 
 var (
@@ -47,13 +51,28 @@ var (
 	}
 )
 
-type OverallMetrics struct {
-	Metrics map[string][][]uint64
-}
+func eventMapping(r mb.ReporterV2, content []byte) error {
+	var event mb.Event
+	event.RootFields = common.MapStr{}
+	event.RootFields.Put("service.name", kibana.ModuleName)
 
-func eventMapping(content []byte) common.MapStr {
 	var data map[string]interface{}
-	json.Unmarshal(content, &data)
-	event, _ := schema.Apply(data)
-	return event
+	err := json.Unmarshal(content, &data)
+	if err != nil {
+		event.Error = errors.Wrap(err, "failure parsing Kibana Status API response")
+		r.Event(event)
+		return event.Error
+	}
+
+	dataFields, err := schema.Apply(data)
+	if err != nil {
+		event.Error = errors.Wrap(err, "failure to apply status schema")
+		r.Event(event)
+		return event.Error
+	}
+
+	event.MetricSetFields = dataFields
+
+	r.Event(event)
+	return nil
 }

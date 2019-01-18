@@ -19,6 +19,7 @@ package node_stats
 
 import (
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 )
@@ -26,7 +27,7 @@ import (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.MustAddMetricSet("elasticsearch", "node_stats", New,
+	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "node_stats", New,
 		mb.WithHostParser(elasticsearch.HostParser),
 		mb.DefaultMetricSet(),
 		mb.WithNamespace("elasticsearch.node.stats"),
@@ -44,7 +45,7 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The elasticsearch node_stats metricset is beta")
+	cfgwarn.Beta("The " + base.FullyQualifiedName() + " metricset is beta")
 
 	// Get the stats from the local node
 	ms, err := elasticsearch.NewMetricSet(base, nodeStatsPath)
@@ -58,13 +59,27 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		r.Error(err)
+		elastic.ReportAndLogError(err, r, m.Log)
 		return
 	}
 
-	if m.MetricSet.XPack {
-		eventsMappingXPack(r, m, content)
+	info, err := elasticsearch.GetInfo(m.HTTP, m.GetServiceURI())
+	if err != nil {
+		elastic.ReportAndLogError(err, r, m.Log)
+		return
+	}
+
+	if m.XPack {
+		err = eventsMappingXPack(r, m, *info, content)
+		if err != nil {
+			m.Log.Error(err)
+			return
+		}
 	} else {
-		eventsMapping(r, content)
+		err = eventsMapping(r, *info, content)
+		if err != nil {
+			elastic.ReportAndLogError(err, r, m.Log)
+			return
+		}
 	}
 }

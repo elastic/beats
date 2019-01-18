@@ -1,0 +1,37 @@
+{
+    "@timestamp": "2018-09-25T16:47:04.998Z",
+    "metricset": {
+        "module": "php_fpm",
+        "host": "phpfpm:81",
+        "rtt": 24681267,
+        "name": "process"
+    },
+    "php_fpm": {
+        "pool": {
+            "name": "www"
+        },
+        "process": {
+            "last_request_cpu": 0,
+            "last_request_memory": 2097152,
+            "request_duration": 1404,
+            "script": "-",
+            "pid": 6,
+            "start_time": 1537974596,
+            "user": "-",
+            "state": "Idle",
+            "start_since": 3946,
+            "requests": 28,
+            "request_method": "GET",
+            "request_uri": "/status?json=",
+            "content_length": 0
+        }
+    },
+    "beat": {
+        "name": "host.example.com",
+        "hostname": "host.example.com",
+        "version": "7.0.0-alpha1"
+    },
+    "host": {
+        "name": "DESKTOP-RFOOE09"
+    }
+}
