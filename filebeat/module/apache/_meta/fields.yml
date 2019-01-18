@@ -14,7 +14,7 @@
           fields:
             - name: remote_ip
               type: alias
-              path: apache.access.remote_ip
+              path: source.address
               migration: true
             - name: ssl.protocol
               type: alias

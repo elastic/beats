@@ -62,7 +62,7 @@ Aliases for backward compatibility with old apache2 fields
 --
 type: alias
 
-alias to: apache.access.remote_ip
+alias to: source.address
 
 --
 
@@ -361,16 +361,6 @@ Apache fields.
 Contains fields for the Apache HTTP Server access logs.
 
 
-
-*`apache.access.remote_ip`*::
-+
---
-type: keyword
-
-Client IP address or hostname.
-
-
---
 
 *`apache.access.ssl.protocol`*::
 +
