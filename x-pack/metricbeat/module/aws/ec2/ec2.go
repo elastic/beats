@@ -42,9 +42,11 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	moduleConfig *aws.Config
-	awsConfig    *awssdk.Config
-	regionsList  []string
+	moduleConfig   *aws.Config
+	awsConfig      *awssdk.Config
+	regionsList    []string
+	durationString string
+	periodInSec    int
 }
 
 // metricIDNameMap is a translating map between createMetricDataQuery id
@@ -111,11 +113,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		logp.NewLogger(aws.ModuleName).Errorf(err.Error())
 	}
 
+	//Calculate duration based on period
+	durationString, periodSec, err := convertPeriodToDuration(moduleConfig.Period)
+	if err != nil {
+		logp.NewLogger(aws.ModuleName).Errorf(err.Error())
+	}
+
 	return &MetricSet{
-		MetricSet:    metricSet,
-		moduleConfig: &moduleConfig,
-		awsConfig:    &awsConfig,
-		regionsList:  regionsList,
+		MetricSet:      metricSet,
+		moduleConfig:   &moduleConfig,
+		awsConfig:      &awsConfig,
+		regionsList:    regionsList,
+		durationString: durationString,
+		periodInSec:    periodSec,
 	}, nil
 }
 
@@ -129,21 +139,18 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2)
 		if err != nil {
 			err = errors.Wrap(err, "getInstancesPerRegion failed, skipping region "+regionName)
-			logp.Error(err)
+			logp.NewLogger(aws.ModuleName).Errorf(err.Error())
 			report.Error(err)
 			continue
 		}
 
 		svcCloudwatch := cloudwatch.New(*m.awsConfig)
 		for _, instanceID := range instanceIDs {
-			//Calculate duration based on period
-			detailedMonitoring := instancesOutputs[instanceID].Monitoring.State
-			durationString, periodSec := convertPeriodToDuration(m.moduleConfig.Period, detailedMonitoring)
 			init := true
 			getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 			for init || getMetricDataOutput.NextToken != nil {
 				init = false
-				output, err := getMetricDataPerRegion(durationString, periodSec, instanceID, getMetricDataOutput.NextToken, svcCloudwatch)
+				output, err := getMetricDataPerRegion(m.durationString, m.periodInSec, instanceID, getMetricDataOutput.NextToken, svcCloudwatch)
 				if err != nil {
 					err = errors.Wrap(err, "getMetricDataPerRegion failed, skipping region "+regionName+" for instance "+instanceID)
 					logp.Error(err)
@@ -152,9 +159,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 				}
 				getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
 			}
+
 			event, err := createCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], regionName)
 			if err != nil {
-				report.Error(err)
+				logp.NewLogger(aws.ModuleName).Errorf(err.Error())
+				report.Event(event)
+				continue
 			}
 			report.Event(event)
 		}
@@ -197,7 +207,9 @@ func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 	if err != nil {
 		err = errors.Wrap(err, "Error trying to apply schema in AWS EC2 metricbeat module.")
 		logp.Error(err)
+		return
 	}
+	event.RootFields = resultRootFields
 
 	mapOfMetricSetFieldResults := make(map[string]interface{})
 	for _, output := range getMetricDataOutput.MetricDataResults {
@@ -208,12 +220,18 @@ func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 		mapOfMetricSetFieldResults[metricKey[0]] = fmt.Sprint(output.Values[0])
 	}
 
+	if len(mapOfMetricSetFieldResults) <= 3 {
+		errMsg := "Missing Cloudwatch data for instance " + instanceID + ". Please recheck the period setting in config."
+		err = errors.New(errMsg)
+		event.Error = err
+		return
+	}
+
 	resultMetricSetFields, err := eventMapping(mapOfMetricSetFieldResults, schemaMetricSetFields)
 	if err != nil {
 		err = errors.Wrap(err, "Error trying to apply schema in AWS EC2 metricbeat module.")
 		logp.Error(err)
 	}
-	event.RootFields = resultRootFields
 	event.MetricSetFields = resultMetricSetFields
 	return
 }
@@ -242,68 +260,44 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instances
 
 		for _, reservation := range output.Reservations {
 			for _, instance := range reservation.Instances {
-				instanceID := *instance.InstanceId
-				checkPassed := checkInstanceStatus(instance.State.Name, instance.LaunchTime, instanceID)
-				if !checkPassed {
-					continue
-				}
-				instanceIDs = append(instanceIDs, instanceID)
-				instancesOutputs[instanceID] = instance
+				instanceIDs = append(instanceIDs, *instance.InstanceId)
+				instancesOutputs[*instance.InstanceId] = instance
 			}
 		}
 	}
 	return
 }
 
-func convertPeriodToDuration(period string, detailedMonitoring ec2.MonitoringState) (string, int) {
+func convertPeriodToDuration(period string) (duration string, periodInSec int, err error) {
 	// Amazon EC2 sends metrics to Amazon CloudWatch with 5-minute default frequency.
 	// If detailed monitoring is enabled, then data will be available in 1-minute period.
 	// Set starttime double the default frequency earlier than the endtime in order to make sure
 	// GetMetricDataRequest gets the latest data point for each metric.
+	duration = ""
+	periodInSec = 0
 	numberPeriod, err := strconv.Atoi(period[0 : len(period)-1])
+	errMsg := "Invaid period in config. Please reset period in config."
 	if err != nil {
-		logp.Error(errors.Wrap(err, "Error converting string to int. Use default duration instead."))
-		// If failed converting string to int, then set default duration to "-600s" with basic monitoring and "-120s" with
-		// detailed monitoring.
-		numberPeriod = 300
-		if detailedMonitoring == ec2.MonitoringStateEnabled {
-			numberPeriod = 60
-		}
-		duration := "-" + strconv.Itoa(numberPeriod*2) + "s"
-		periodInSeconds := numberPeriod
-		return duration, periodInSeconds
+		logp.NewLogger(aws.ModuleName).Errorf(errMsg)
+		return
 	}
 
 	unitPeriod := period[len(period)-1:]
-	// if detailed monitoring is enabled, then period can be larger or equal than 1min.
-	// if detailed monitoring is disabled, then period can be larger or equal than 5min.
 	switch unitPeriod {
 	case "s":
-		if detailedMonitoring == ec2.MonitoringStateDisabled && numberPeriod < 300 {
-			logp.NewLogger(aws.ModuleName).Infof("Period in config cannot be less than 300s. Set period to 300s.")
-			numberPeriod = 300
-		} else if detailedMonitoring == ec2.MonitoringStateEnabled && numberPeriod < 60 {
-			logp.NewLogger(aws.ModuleName).Infof("Period in config cannot be less than 60s. Set period to 60s.")
-			numberPeriod = 60
-		}
-		return "-" + strconv.Itoa(numberPeriod*2) + unitPeriod, numberPeriod
+		duration = "-" + strconv.Itoa(numberPeriod*2) + unitPeriod
+		periodInSec = numberPeriod
+		return
 	case "m":
-		if detailedMonitoring == ec2.MonitoringStateDisabled && numberPeriod < 5 {
-			logp.NewLogger(aws.ModuleName).Infof("Period in config cannot be less than 5min. Set period to 5min.")
-			numberPeriod = 5
-		} else if detailedMonitoring == ec2.MonitoringStateEnabled && numberPeriod < 1 {
-			logp.NewLogger(aws.ModuleName).Infof("Period in config cannot be less than 1min. Set period to 1min.")
-			numberPeriod = 1
-		}
-		return "-" + strconv.Itoa(numberPeriod*2) + unitPeriod, numberPeriod * 60
+		duration = "-" + strconv.Itoa(numberPeriod*2) + unitPeriod
+		periodInSec = numberPeriod * 60
+		return
 	default:
-		logp.NewLogger(aws.ModuleName).Infof("Invaid period in config. Set period to 300s.")
-		numberPeriod = 300
-		if detailedMonitoring == ec2.MonitoringStateEnabled {
-			logp.NewLogger(aws.ModuleName).Infof("Invaid period in config. Set period to 60s.")
-			numberPeriod = 60
-		}
-		return "-" + strconv.Itoa(numberPeriod*2) + "s", numberPeriod
+		err = errors.New(errMsg)
+		logp.NewLogger(aws.ModuleName).Errorf(errMsg)
+		duration = "-" + strconv.Itoa(numberPeriod*2) + "s"
+		periodInSec = numberPeriod
+		return
 	}
 }
 
@@ -365,18 +359,4 @@ func createMetricDataQuery(id string, metricName string, periodInSec int, dimens
 		},
 	}
 	return
-}
-
-func checkInstanceStatus(instanceState ec2.InstanceStateName, launchTime *time.Time, instanceID string) bool {
-	if instanceState != ec2.InstanceStateNameRunning {
-		logp.NewLogger(aws.ModuleName).Infof("Instance %s is not in running state. Skip data collection for this EC2 instance.", instanceID)
-		return false
-	}
-	currentTime := time.Now()
-	diff := currentTime.Sub(*launchTime)
-	if diff.Minutes() < 10 {
-		logp.NewLogger(aws.ModuleName).Infof("Instance %s just started running less than 10 minutes. Skip data collection for this EC2 instance.", instanceID)
-		return false
-	}
-	return true
 }

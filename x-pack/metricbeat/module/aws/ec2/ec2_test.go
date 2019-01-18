@@ -9,17 +9,17 @@ package ec2
 import (
 	"fmt"
 	"testing"
-	"time"
-
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/metricbeat/mb"
+	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -51,24 +51,13 @@ func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) 
 }
 
 func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInput) ec2.DescribeInstancesRequest {
-	monitoringState := ec2.Monitoring{
-		State: ec2.MonitoringState(ec2.MonitoringStateDisabled),
-	}
-	currentTime := time.Now()
-	launchTime := currentTime.Add(-time.Minute * 60)
-
 	instance := ec2.Instance{
 		InstanceId:   awssdk.String("i-123"),
 		InstanceType: ec2.InstanceTypeT2Medium,
 		Placement: &ec2.Placement{
 			AvailabilityZone: awssdk.String("us-west-1a"),
 		},
-		ImageId:    awssdk.String("image-123"),
-		Monitoring: &monitoringState,
-		State: &ec2.InstanceState{
-			Name: ec2.InstanceStateNameRunning,
-		},
-		LaunchTime: &launchTime,
+		ImageId: awssdk.String("image-123"),
 	}
 	return ec2.DescribeInstancesRequest{
 		Request: &awssdk.Request{
@@ -141,53 +130,37 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 	assert.Equal(t, 0.25, getMetricDataOutput.MetricDataResults[0].Values[0])
 }
 
-func TestConvertPeriodToDurationWithDetailedMonitoring(t *testing.T) {
+func TestConvertPeriodToDuration(t *testing.T) {
 	period1 := "300s"
-	duration1, periodSec1 := convertPeriodToDuration(period1, "enabled")
+	duration1, periodSec1, err := convertPeriodToDuration(period1)
+	assert.NoError(t, nil, err)
 	assert.Equal(t, "-600s", duration1)
 	assert.Equal(t, 300, periodSec1)
 
 	period2 := "30ss"
-	duration2, periodSec2 := convertPeriodToDuration(period2, "enabled")
-	assert.Equal(t, "-120s", duration2)
-	assert.Equal(t, 60, periodSec2)
+	duration2, periodSec2, err := convertPeriodToDuration(period2)
+	expectedErr := errors.New("Invaid period in config. Please reset period in config.")
+	assert.Error(t, expectedErr, err)
+	assert.Equal(t, "", duration2)
+	assert.Equal(t, 0, periodSec2)
 
 	period3 := "10m"
-	duration3, periodSec3 := convertPeriodToDuration(period3, "enabled")
+	duration3, periodSec3, err := convertPeriodToDuration(period3)
+	assert.NoError(t, nil, err)
 	assert.Equal(t, "-20m", duration3)
 	assert.Equal(t, 600, periodSec3)
 
 	period4 := "30s"
-	duration4, periodSec4 := convertPeriodToDuration(period4, "enabled")
-	assert.Equal(t, "-120s", duration4)
-	assert.Equal(t, 60, periodSec4)
+	duration4, periodSec4, err := convertPeriodToDuration(period4)
+	assert.NoError(t, nil, err)
+	assert.Equal(t, "-60s", duration4)
+	assert.Equal(t, 30, periodSec4)
 
 	period5 := "60s"
-	duration5, periodSec5 := convertPeriodToDuration(period5, "enabled")
+	duration5, periodSec5, err := convertPeriodToDuration(period5)
+	assert.NoError(t, nil, err)
 	assert.Equal(t, "-120s", duration5)
 	assert.Equal(t, 60, periodSec5)
-}
-
-func TestConvertPeriodToDurationWithBasicMonitoring(t *testing.T) {
-	period1 := "300s"
-	duration1, periodSec1 := convertPeriodToDuration(period1, "disabled")
-	assert.Equal(t, "-600s", duration1)
-	assert.Equal(t, 300, periodSec1)
-
-	period2 := "30ss"
-	duration2, periodSec2 := convertPeriodToDuration(period2, "disabled")
-	assert.Equal(t, "-600s", duration2)
-	assert.Equal(t, 300, periodSec2)
-
-	period3 := "10m"
-	duration3, periodSec3 := convertPeriodToDuration(period3, "disabled")
-	assert.Equal(t, "-20m", duration3)
-	assert.Equal(t, 600, periodSec3)
-
-	period5 := "60s"
-	duration5, periodSec5 := convertPeriodToDuration(period5, "disabled")
-	assert.Equal(t, "-600s", duration5)
-	assert.Equal(t, 300, periodSec5)
 }
 
 func TestCreateCloudWatchEvents(t *testing.T) {
@@ -222,9 +195,9 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 	assert.Equal(t, "i-123", instanceID)
 
 	svcCloudwatchMock := &MockCloudWatchClient{}
-	detailedMonitoring := instancesOutputs[instanceID].Monitoring.State
 	//Calculate duration based on period
-	durationString, periodSec := convertPeriodToDuration(mockModuleConfig.Period, detailedMonitoring)
+	durationString, periodSec, err := convertPeriodToDuration(mockModuleConfig.Period)
+	assert.NoError(t, nil, err)
 	assert.Equal(t, "-600s", durationString)
 	assert.Equal(t, 300, periodSec)
 
@@ -239,15 +212,4 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expectedEvent.RootFields, event.RootFields)
 	assert.Equal(t, expectedEvent.MetricSetFields["cpu"], event.MetricSetFields["cpu"])
-}
-
-func TestCheckInstanceStatus(t *testing.T) {
-	currentTime := time.Now()
-	launchTime1 := currentTime.Add(-time.Minute * 60)
-	checkPassed1 := checkInstanceStatus(ec2.InstanceStateNameRunning, &launchTime1, "i-123")
-	assert.Equal(t, true, checkPassed1)
-
-	launchTime2 := currentTime.Add(-time.Minute * 9)
-	checkPassed2 := checkInstanceStatus(ec2.InstanceStateNameRunning, &launchTime2, "i-123")
-	assert.Equal(t, false, checkPassed2)
 }
