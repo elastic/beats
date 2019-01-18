@@ -32,7 +32,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/libbeat/common/mapval"
 	"github.com/elastic/beats/libbeat/common/x509util"
 )
@@ -97,13 +97,15 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) mapval.
 
 // BaseChecks creates a skima.Validator that represents the "monitor" field present
 // in all heartbeat events.
-func BaseChecks(ip string, status string) mapval.Validator {
-
+func BaseChecks(ip string, status string, typ string) mapval.Validator {
 	return mapval.MustCompile(mapval.Map{
 		"monitor": mapval.Map{
-			"duration.us": mapval.IsDuration,
 			"ip":          ip,
+			"duration.us": mapval.IsDuration,
 			"status":      status,
+			"id":          mapval.IsNonEmptyString,
+			"name":        mapval.IsString,
+			"type":        typ,
 		},
 	})
 }
@@ -121,7 +123,7 @@ func SimpleURLChecks(t *testing.T, scheme string, host string, port uint16) mapv
 	require.NoError(t, err)
 
 	return mapval.MustCompile(mapval.Map{
-		"url": monitors.URLFields(u),
+		"url": wrappers.URLFields(u),
 	})
 }
 
