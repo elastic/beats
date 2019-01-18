@@ -18,7 +18,6 @@
 package node_stats
 
 import (
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
@@ -45,8 +44,6 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The " + base.FullyQualifiedName() + " metricset is beta")
-
 	// Get the stats from the local node
 	ms, err := elasticsearch.NewMetricSet(base, nodeStatsPath)
 	if err != nil {

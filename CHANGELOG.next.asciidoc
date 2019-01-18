@@ -29,13 +29,21 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename many `traefik.access.*` fields to map to ECS. {pull}9005[9005]
 - Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
 - Rename `read_timestamp` to `event.created` for Redis input. {pull}9924[9924]
+- Rename a few `elasticsearch.audit.*` fields to map to ECS. {pull}9293[9293]
+- Rename `read_timestamp` to `event.created` for all Filebeat modules using it. {pull}10139[10139]
 - Rename many `iis.error.*` fields to map to ECS. {pull}9955[9955]
+- Adjust fileset `haproxy.log` to map to ECS. {pull}10143[10143]
 - Rename a few `logstash.*` fields to map to ECS, remove logstash.slowlog.message. {pull}9935[9935]
+- Rename a few `mongodb.*` fields to map to ECS. {pull}10009[10009]
 - Rename a few `mysql.*` fields to map to ECS. {pull}10008[10008]
 - Rename a few `nginx.error.*` fields to map to ECS. {pull}10007[10007]
 - Filesets with multiple ingest pipelines added in {pull}8914[8914] only work with Elasticsearch >= 6.5.0 {pull}10001[10001]
 - Remove service.name from Elastcsearch module. Replace by service.type. {pull}10042[10042]
 - Add grok pattern to support redis 5.0.3 log timestamp. {issue}9819[9819] {pull}10033[10033]
+- Now save the 'first seen' timestamp in `event.created` (previously `read_timestamp`),
+  instead of saving the parsed date. Now aligned with `event.created` semantics elsewhere. {pull}10139[10139]
+- Rename `mysql.error.thread_id` and `mysql.slowlog.id` to `mysql.thread_id`. {pull}10161[10161]
+- Remove `mysql.error.timestamp`  and `mysql.slowlog.timestamp`. {pull}10161[10161]
 
 *Heartbeat*
 
@@ -45,7 +53,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
-- Rename read_timestamp to event.created to align with ECS. {pull}10043[10043]
+- Rename read_timestamp to event.created to align with ECS. {pull}10043[10043], {pull}10139[10139]
 - Rename host.name to host.hostname to align with ECS. {pull}10043[10043]
 
 *Metricbeat*
@@ -61,8 +69,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Changed ICMP protocol fields to align with ECS. {pull}10062[10062]
 - Changed DHCPv4 protocol fields to align with ECS. {pull}10089[10089]
 - Changed AMQP protocol fields to align with ECS. {pull}10090[10090]
+- Changed Redis protocol fields to align with ECS. {pull}10126[10126]
 - Changed HTTP protocol fields to align with ECS. {pull}9976[9976]
 - Changed NFS protocol fields to align with ECS. {pull}10153[10153]
+- Changed Thrift protocol fields to align with ECS. {pull}10125[10125]
+- Changed Cassandra protocol fields to align with ECS. {pull}10093[10093]
 
 *Winlogbeat*
 
@@ -86,6 +97,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Support IPv6 addresses with zone id in IIS ingest pipeline.
   {issue}9836[9836] error log: {pull}9869[9869], access log: {pull}9955[9955].
 - Support haproxy log lines without captured headers. {issue}9463[9463] {pull}9958[9958]
+- Make elasticsearch/audit fileset be more lenient in parsing node name. {issue}10035[10035] {pull}10135[10135]
 
 *Heartbeat*
 
@@ -130,6 +142,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for ssl_request_log in apache2 module. {issue}8088[8088] {pull}9833[9833]
 - Add support for iis 7.5 log format. {issue}9753[9753] {pull}9967[9967]
 - Add service.type field to all Modules. By default the field is set with the module name. It can be overwritten with `service.type` config. {pull}10042[10042]
+- Add support for MariaDB in the `slowlog` fileset of `mysql` module. {pull}9731[9731]
+- Elasticsearch module's slowlog now populates `event.duration` (ECS). {pull}9293[9293]
+- HAProxy module now populates `event.duration` and `http.response.bytes` (ECS). {pull}10143[10143]
+- Teach elasticsearch/audit fileset to parse out some more fields. {issue}10134[10134] {pull}10137[10137]
 
 *Heartbeat*
 
@@ -147,6 +163,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add more meaningful metrics to 'performance' Metricset on 'MSSQL' module {pull}10011[10011]
 - Rename some fields in `performance` Metricset on MSSQL module to match the updated documentation from Microsoft {pull}10074[10074]
 - Add AWS EC2 module. {pull}9257[9257] {issue}9300[9300]
+- Release Elastic stack modules (Elasticsearch, Logstash, and Kibana) as GA. {pull}10094[10094]
 
 *Packetbeat*
 

@@ -22,12 +22,13 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
-
-	"github.com/elastic/beats/heartbeat/monitors"
 )
 
 func init() {
@@ -40,7 +41,7 @@ var debugf = logp.MakeDebug("http")
 func create(
 	name string,
 	cfg *common.Config,
-) (jobs []monitors.Job, endpoints int, err error) {
+) (js []jobs.Job, endpoints int, err error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, 0, err
@@ -78,23 +79,23 @@ func create(
 
 	// Determine whether we're using a proxy or not and then use that to figure out how to
 	// run the job
-	var makeJob func(string) (monitors.Job, error)
+	var makeJob func(string) (jobs.Job, error)
 	if config.ProxyURL != "" {
 		transport, err := newRoundTripper(&config, tls)
 		if err != nil {
 			return nil, 0, err
 		}
 
-		makeJob = func(urlStr string) (monitors.Job, error) {
+		makeJob = func(urlStr string) (jobs.Job, error) {
 			return newHTTPMonitorHostJob(urlStr, &config, transport, enc, body, validator)
 		}
 	} else {
-		makeJob = func(urlStr string) (monitors.Job, error) {
+		makeJob = func(urlStr string) (jobs.Job, error) {
 			return newHTTPMonitorIPsJob(&config, urlStr, tls, enc, body, validator)
 		}
 	}
 
-	jobs = make([]monitors.Job, len(config.URLs))
+	js = make([]jobs.Job, len(config.URLs))
 	for i, urlStr := range config.URLs {
 		u, _ := url.Parse(urlStr)
 		if err != nil {
@@ -108,10 +109,10 @@ func create(
 
 		// Assign any execution errors to the error field and
 		// assign the url field
-		jobs[i] = monitors.WithErrAsField(monitors.WithURLField(u, job))
+		js[i] = wrappers.WithURLField(u, job)
 	}
 
-	return jobs, len(config.URLs), nil
+	return js, len(config.URLs), nil
 }
 
 func newRoundTripper(config *Config, tls *transport.TLSConfig) (*http.Transport, error) {

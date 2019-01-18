@@ -3954,17 +3954,6 @@ The layer from which this event originated: rest, transport or ip_filter
 
 --
 
-*`elasticsearch.audit.event_type`*::
-+
---
-type: keyword
-
-example: access_granted
-
-The type of event that occurred: anonymous_access_denied, authentication_failed, access_denied, access_granted, connection_granted, connection_denied, tampered_request, run_as_granted, run_as_denied
-
---
-
 *`elasticsearch.audit.origin_type`*::
 +
 --
@@ -3976,25 +3965,23 @@ Where the request originated: rest (request originated from a REST API request),
 
 --
 
-*`elasticsearch.audit.origin_address`*::
-+
---
-type: ip
-
-example: 192.168.1.42
-
-The IP address from which the request originated
-
---
-
-*`elasticsearch.audit.principal`*::
+*`elasticsearch.audit.realm`*::
 +
 --
 type: keyword
 
-example: _anonymous
+The authentication realm
 
-The principal (username) that failed authentication
+--
+
+*`elasticsearch.audit.roles`*::
++
+--
+type: array
+
+example: ['kibana_user', 'beats_admin']
+
+Roles to which the principal belongs
 
 --
 
@@ -4009,14 +3996,14 @@ The name of the action that was executed
 
 --
 
-*`elasticsearch.audit.uri`*::
+*`elasticsearch.audit.indices`*::
 +
 --
-type: keyword
+type: array
 
-example: /_xpack/security/_authenticate
+example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
 
-The REST endpoint URI
+Indices accessed by action
 
 --
 
@@ -4031,14 +4018,48 @@ The type of request that was executed
 
 --
 
+*`elasticsearch.audit.event_type`*::
++
+--
+type: alias
+
+alias to: event.type
+
+--
+
+*`elasticsearch.audit.origin_address`*::
++
+--
+type: alias
+
+alias to: source.ip
+
+--
+
+*`elasticsearch.audit.uri`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
 *`elasticsearch.audit.request_body`*::
 +
 --
-type: text
+type: alias
 
-example: body
+alias to: http.request.body.content
 
-The body of the request, if enabled
+--
+
+*`elasticsearch.audit.principal`*::
++
+--
+type: alias
+
+alias to: user.name
 
 --
 
@@ -4850,15 +4871,6 @@ Please add description
 Fields related to the HTTP response
 
 
-*`haproxy.http.response.status_code`*::
-+
---
-type: long
-
-HTTP status code returned to the client.
-
---
-
 *`haproxy.http.response.captured_cookie`*::
 +
 --
@@ -4874,6 +4886,15 @@ type: text
 
 List of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
 
+
+--
+
+*`haproxy.http.response.status_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
 
 --
 
@@ -5947,14 +5968,6 @@ The input type from which the event was generated. This field is set to the valu
 
 --
 
-*`read_timestamp`*::
-+
---
-In case the ingest pipeline parses the timestamp from the log contents, it stores the original `@timestamp` (representing the time when the log line was read) in this field.
-
-
---
-
 *`syslog.facility`*::
 +
 --
@@ -6068,6 +6081,15 @@ The Filebeat fileset that generated this event.
 type: alias
 
 alias to: event.module
+
+--
+
+*`read_timestamp`*::
++
+--
+type: alias
+
+alias to: event.created
 
 --
 
@@ -6331,6 +6353,16 @@ Fields from the MySQL log files.
 
 
 
+*`mysql.thread_id`*::
++
+--
+type: long
+
+The connection or thread ID for the query.
+
+
+--
+
 [float]
 == error fields
 
@@ -6338,20 +6370,12 @@ Contains fields from the MySQL error logs.
 
 
 
-*`mysql.error.timestamp`*::
-+
---
-The timestamp from the log line.
-
-
---
-
 *`mysql.error.thread_id`*::
 +
 --
 type: alias
 
-alias to: process.thread.id
+alias to: mysql.thread_id
 
 --
 
@@ -6420,12 +6444,12 @@ The number of rows scanned by the query.
 
 --
 
-*`mysql.slowlog.timestamp`*::
+*`mysql.slowlog.rows_affected`*::
 +
 --
 type: long
 
-The unix timestamp taken from the `SET timestamp` query.
+The number of rows modified by the query.
 
 
 --
@@ -6441,9 +6465,118 @@ The slow query.
 *`mysql.slowlog.id`*::
 +
 --
+type: alias
+
+alias to: mysql.thread_id
+
+--
+
+*`mysql.slowlog.schema`*::
++
+--
+type: keyword
+
+The schema where the slow query was executed.
+
+
+--
+
+*`mysql.slowlog.current_user`*::
++
+--
+type: keyword
+
+Current authenticated user, used to determine access privileges. Can differ from the value for user.
+
+
+--
+
+*`mysql.slowlog.query_cache_hit`*::
++
+--
+type: boolean
+
+Whether the query cache was hit.
+
+
+--
+
+*`mysql.slowlog.tmp_table`*::
++
+--
+type: boolean
+
+Whether a temporary table was used to resolve the query.
+
+
+--
+
+*`mysql.slowlog.tmp_table_on_disk`*::
++
+--
+type: boolean
+
+Whether the query needed temporary tables on disk.
+
+
+--
+
+*`mysql.slowlog.filesort`*::
++
+--
+type: boolean
+
+Whether filesort optimization was used.
+
+
+--
+
+*`mysql.slowlog.filesort_on_disk`*::
++
+--
+type: boolean
+
+Whether filesort optimization was used and it needed temporary tables on disk.
+
+
+--
+
+*`mysql.slowlog.priority_queue`*::
++
+--
+type: boolean
+
+Whether a priority queue was used for filesort.
+
+
+--
+
+*`mysql.slowlog.full_scan`*::
++
+--
+type: boolean
+
+Whether a full table scan was needed for the slow query.
+
+
+--
+
+*`mysql.slowlog.full_join`*::
++
+--
+type: boolean
+
+Whether a full join was needed for the slow query (no indexes were used for joins).
+
+
+--
+
+*`mysql.slowlog.merge_passes`*::
++
+--
 type: long
 
-The connection ID for the query.
+Number of merge passes executed for the query.
 
 
 --
