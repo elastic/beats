@@ -8,7 +8,6 @@
         "haproxy.backend_name": "app",
         "haproxy.backend_queue": 0,
         "haproxy.bytes_read": 212,
-        "haproxy.client.ip": "127.0.0.1",
         "haproxy.connection_wait_time_ms": -1,
         "haproxy.connections.active": 1,
         "haproxy.connections.backend": 0,
@@ -27,6 +26,7 @@
         "process.name": "haproxy",
         "process.pid": 25457,
         "service.type": "haproxy",
+        "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "source.port": 40962
     }
