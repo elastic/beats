@@ -38,6 +38,7 @@ func WrapCommon(js []jobs.Job, id string, name string, typ string) []jobs.Job {
 		addMonitorStatus,
 		addMonitorDuration,
 		addMonitorMeta(id, name, typ),
+		makeAddSummary(id, uint16(len(js))),
 	)
 }
 
@@ -97,8 +98,8 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 	}
 }
 
-// genAddSummary summarizes the job, adding the `summary` field to the last event emitted.
-func genAddSummary(id string, js []jobs.Job) jobs.JobWrapper {
+// makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
+func makeAddSummary(id string, numJobs uint16) jobs.JobWrapper {
 	// This is a tricky method. The way this works is that we track the state across jobs in the
 	// state struct here.
 	state := struct {
@@ -114,7 +115,7 @@ func genAddSummary(id string, js []jobs.Job) jobs.JobWrapper {
 	}
 	// Note this is not threadsafe, must be called from a mutex
 	resetState := func() {
-		state.remaining = uint16(len(js))
+		state.remaining = numJobs
 		state.up = 0
 		state.down = 0
 		state.generation++
@@ -126,47 +127,43 @@ func genAddSummary(id string, js []jobs.Job) jobs.JobWrapper {
 	}
 	resetState()
 
-	// executed after each job to update the state
-	afterEach := func(event *beat.Event) {
-		eventStatus, _ := event.GetValue("monitor.status")
-		if eventStatus == "up" {
-			state.up++
-		} else {
-			state.down++
-		}
-		// No error check needed here
-		event.PutValue("monitor.check_group", state.checkGroup)
-		state.remaining--
-	}
-
-	// executed after the last job to create the finalizing
-	// continuation
-	afterLast := func(event *beat.Event) {
-		var statusStr string
-		if state.down == 0 {
-			statusStr = "up"
-		} else {
-			statusStr = "down"
-		}
-
-		eventext.MergeEventFields(event, common.MapStr{
-			"summary": common.MapStr{
-				"status": statusStr,
-				"up":     state.up,
-				"down":   state.down,
-			},
-		})
-	}
-
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, err := job(event)
 			state.mtx.Lock()
 			defer state.mtx.Unlock()
 
-			afterEach(event)
+			// After each job
+			eventStatus, _ := event.GetValue("monitor.status")
+			if eventStatus == "up" {
+				state.up++
+			} else {
+				state.down++
+			}
+			// No error check needed here
+			event.PutValue("monitor.check_group", state.checkGroup)
+
+			// Adjust the total remaining to account for new continuations
+			state.remaining += uint16(len(cont))
+			// Reduce total remaining to account for the just executed job
+			state.remaining--
+
+			// After last job
 			if state.remaining == 0 {
-				afterLast(event)
+				var statusStr string
+				if state.down == 0 {
+					statusStr = "up"
+				} else {
+					statusStr = "down"
+				}
+
+				eventext.MergeEventFields(event, common.MapStr{
+					"summary": common.MapStr{
+						"status": statusStr,
+						"up":     state.up,
+						"down":   state.down,
+					},
+				})
 				resetState()
 			}
 
