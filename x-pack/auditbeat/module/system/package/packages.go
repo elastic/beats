@@ -115,7 +115,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms := &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
-		log:           logp.NewLogger(moduleName),
+		log:           logp.NewLogger(metricsetName),
+		cache:         cache.New(),
 	}
 
 	if os, err := getOS(); err == nil {
@@ -127,10 +128,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}
 	} else if err != nil {
 		return nil, err
-	}
-
-	if config.ReportChanges {
-		ms.cache = cache.New()
 	}
 
 	return ms, nil

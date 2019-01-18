@@ -6,7 +6,6 @@ package pkg
 
 // Config defines the package metricset's configuration options.
 type Config struct {
-	ReportChanges bool `config:"packages.report_changes"`
 }
 
 // Validate validates the package metricset config.
@@ -14,6 +13,4 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-var defaultConfig = Config{
-	ReportChanges: true,
-}
+var defaultConfig = Config{}
