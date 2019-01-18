@@ -2511,7 +2511,7 @@ If `source.packets` and `destination.packets` are known, `network.packets` is th
 [float]
 == observer fields
 
-An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics. This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
+An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics. This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.  
 
 
 
@@ -3965,37 +3965,6 @@ Where the request originated: rest (request originated from a REST API request),
 
 --
 
-*`elasticsearch.audit.action`*::
-+
---
-type: keyword
-
-example: cluster:monitor/main
-
-The name of the action that was executed
-
---
-
-*`elasticsearch.audit.request`*::
-+
---
-type: keyword
-
-example: ClearScrollRequest
-
-The type of request that was executed
-
---
-
-*`elasticsearch.audit.event_type`*::
-+
---
-type: alias
-
-alias to: event.type
-
---
-
 *`elasticsearch.audit.realm`*::
 +
 --
@@ -4019,9 +3988,11 @@ Roles to which the principal belongs
 *`elasticsearch.audit.action`*::
 +
 --
-type: alias
+type: keyword
 
-alias to: source.ip
+example: cluster:monitor/main
+
+The name of the action that was executed
 
 --
 
@@ -4033,6 +4004,35 @@ type: array
 example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
 
 Indices accessed by action
+
+--
+
+*`elasticsearch.audit.request`*::
++
+--
+type: keyword
+
+example: ClearScrollRequest
+
+The type of request that was executed
+
+--
+
+*`elasticsearch.audit.event_type`*::
++
+--
+type: alias
+
+alias to: event.type
+
+--
+
+*`elasticsearch.audit.origin_address`*::
++
+--
+type: alias
+
+alias to: source.ip
 
 --
 
@@ -4174,7 +4174,7 @@ CPU time spent outside the kernel.
 --
 type: float
 
-CPU time spent inside the kernel.
+CPU time spent inside the kernel. 
 
 
 --
@@ -4344,7 +4344,7 @@ Young GC
 --
 type: long
 
-example:
+example: 
 
 
 
@@ -4355,7 +4355,7 @@ example:
 --
 type: long
 
-example:
+example: 
 
 
 
@@ -4427,7 +4427,7 @@ Time it took to execute the query
 --
 type: keyword
 
-example:
+example: 
 
 Types
 
@@ -4438,7 +4438,7 @@ Types
 --
 type: text
 
-example:
+example: 
 
 Statistics
 
@@ -4471,7 +4471,7 @@ Slow query
 --
 type: text
 
-example:
+example: 
 
 Extra source information
 
@@ -4526,7 +4526,7 @@ Routing
 --
 type: keyword
 
-example:
+example: 
 
 Id
 
