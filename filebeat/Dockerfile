@@ -1,4 +1,4 @@
-FROM golang:1.11.2
+FROM golang:1.11.4
 
 RUN \
     apt-get update \
@@ -7,6 +7,7 @@ RUN \
          python-pip \
          rsync \
          virtualenv \
+         libpcap-dev \
       && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip

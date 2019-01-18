@@ -155,5 +155,40 @@ func getConfigs(host string) []map[string]interface{} {
 				},
 			},
 		},
+		{
+			"module":      "jolokia",
+			"metricsets":  []string{"jmx"},
+			"hosts":       []string{host},
+			"namespace":   "testnamespace",
+			"http_method": "GET",
+			"jmx.mappings": []map[string]interface{}{
+				{
+					"mbean": "java.lang:type=GarbageCollector,name=ConcurrentMarkSweep",
+					"attributes": []map[string]string{
+						{
+							"attr":  "CollectionTime",
+							"field": "gc.cms_collection_time",
+						},
+						{
+							"attr":  "CollectionCount",
+							"field": "gc.cms_collection_count",
+						},
+					},
+				},
+				{
+					"mbean": "java.lang:type=Memory",
+					"attributes": []map[string]string{
+						{
+							"attr":  "HeapMemoryUsage",
+							"field": "memory.heap_usage",
+						},
+						{
+							"attr":  "NonHeapMemoryUsage",
+							"field": "memory.non_heap_usage",
+						},
+					},
+				},
+			},
+		},
 	}
 }

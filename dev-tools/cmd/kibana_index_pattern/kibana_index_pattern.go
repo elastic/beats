@@ -79,7 +79,7 @@ func main() {
 
 		file, err := indexPattern.Generate()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("ERROR: %s", err)
 		}
 
 		// Log output file location.

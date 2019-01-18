@@ -23,13 +23,16 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/heartbeat/eventext"
+	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/transport"
-
-	"github.com/elastic/beats/heartbeat/monitors"
-	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
 )
 
 func init() {
@@ -47,7 +50,7 @@ type connURL struct {
 func create(
 	name string,
 	cfg *common.Config,
-) (jobs []monitors.Job, endpoints int, err error) {
+) (jobs []jobs.Job, endpoints int, err error) {
 	config := DefaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, 0, err
@@ -68,7 +71,6 @@ func create(
 		return nil, 0, err
 	}
 
-	typ := config.Name
 	timeout := config.Timeout
 	validator := makeValidateConn(&config)
 
@@ -87,9 +89,16 @@ func create(
 			return nil, 0, err
 		}
 
-		epJobs, err := dialchain.MakeDialerJobs(db, typ, scheme, eps, config.Mode,
-			func(dialer transport.Dialer, addr string) (common.MapStr, error) {
-				return pingHost(dialer, addr, timeout, validator)
+		epJobs, err := dialchain.MakeDialerJobs(db, scheme, eps, config.Mode,
+			func(event *beat.Event, dialer transport.Dialer, addr string) error {
+				u, err := url.Parse(fmt.Sprintf("%s://%s", scheme, addr))
+				if err != nil {
+					return err
+				}
+
+				eventext.MergeEventFields(event, common.MapStr{"url": wrappers.URLFields(u)})
+
+				return pingHost(event, dialer, addr, timeout, validator)
 			})
 		if err != nil {
 			return nil, 0, err
@@ -102,6 +111,7 @@ func create(
 	for _, hosts := range schemeHosts {
 		numHosts += len(hosts)
 	}
+
 	return jobs, numHosts, nil
 }
 

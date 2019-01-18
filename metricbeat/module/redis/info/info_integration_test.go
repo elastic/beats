@@ -27,30 +27,25 @@ import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/redis/mtest"
 
-	rd "github.com/garyburd/redigo/redis"
 	"github.com/stretchr/testify/assert"
-)
-
-const (
-	password = "foobared"
 )
 
 func TestInfo(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"Fetch":     testFetch,
-		"Data":      testData,
-		"Passwords": testPasswords,
+		"Fetch": testFetch,
+		"Data":  testData,
 	})
 }
 
 func testFetch(t *testing.T, r compose.R) {
-	f := mbtest.NewEventFetcher(t, getConfig("", r.Host()))
-	event, err := f.Fetch()
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
+	events, err := mbtest.ReportingFetchV2(ms)
 	if err != nil {
 		t.Fatal("fetch", err)
 	}
+	event := events[0].MetricSetFields
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	t.Logf("%s/%s event: %+v", ms.Module().Name(), ms.Name(), event)
 
 	// Check fields
 	assert.Equal(t, 9, len(event))
@@ -59,94 +54,17 @@ func testFetch(t *testing.T, r compose.R) {
 }
 
 func testData(t *testing.T, r compose.R) {
-	f := mbtest.NewEventFetcher(t, getConfig("", r.Host()))
-
-	err := mbtest.WriteEvent(f, t)
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
+	err := mbtest.WriteEventsReporterV2(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}
 }
 
-func testPasswords(t *testing.T, r compose.R) {
-	// Add password and ensure it gets reset
-	defer func() {
-		err := resetPassword(r.Host(), password)
-		if err != nil {
-			t.Fatal("resetting password", err)
-		}
-	}()
-
-	err := addPassword(r.Host(), password)
-	if err != nil {
-		t.Fatal("adding password", err)
-	}
-
-	// Test Fetch metrics with missing password
-	f := mbtest.NewEventFetcher(t, getConfig("", r.Host()))
-	_, err = f.Fetch()
-	if assert.Error(t, err, "missing password") {
-		assert.Contains(t, err, "NOAUTH Authentication required.")
-	}
-
-	// Config redis and metricset with an invalid password
-	f = mbtest.NewEventFetcher(t, getConfig("blah", r.Host()))
-	_, err = f.Fetch()
-	if assert.Error(t, err, "invalid password") {
-		assert.Contains(t, err, "ERR invalid password")
-	}
-
-	// Config redis and metricset with a valid password
-	f = mbtest.NewEventFetcher(t, getConfig(password, r.Host()))
-	_, err = f.Fetch()
-	assert.NoError(t, err, "valid password")
-}
-
-// addPassword will add a password to redis.
-func addPassword(host, pass string) error {
-	c, err := rd.Dial("tcp", host)
-	if err != nil {
-		return err
-	}
-	defer c.Close()
-
-	_, err = c.Do("CONFIG", "SET", "requirepass", pass)
-	return err
-}
-
-// resetPassword changes the password to the redis DB.
-func resetPassword(host, currentPass string) error {
-	c, err := rd.Dial("tcp", host)
-	if err != nil {
-		return err
-	}
-	defer c.Close()
-
-	_, err = c.Do("AUTH", currentPass)
-	if err != nil {
-		return err
-	}
-
-	_, err = c.Do("CONFIG", "SET", "requirepass", "")
-	return err
-}
-
-// writeToRedis will write to the default DB 0.
-func writeToRedis(host string) error {
-	c, err := rd.Dial("tcp", host)
-	if err != nil {
-		return err
-	}
-	defer c.Close()
-
-	_, err = c.Do("SET", "foo", "bar")
-	return err
-}
-
-func getConfig(password, host string) map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "redis",
 		"metricsets": []string{"info"},
 		"hosts":      []string{host},
-		"password":   password,
 	}
 }

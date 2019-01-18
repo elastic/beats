@@ -21,7 +21,6 @@ package elasticsearch
 
 import (
 	"math/rand"
-	"strings"
 	"testing"
 	"time"
 
@@ -92,8 +91,8 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	client.Delete(index, "", "", nil)
 
 	// Check version
-	if strings.HasPrefix(client.Connection.version, "2.") {
-		t.Skip("Skipping tests as pipeline not available in 2.x releases")
+	if client.Connection.version.Major < 5 {
+		t.Skip("Skipping tests as pipeline not available in <5.x releases")
 	}
 
 	publish := func(event beat.Event) {
@@ -173,8 +172,8 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	})
 	client.Delete(index, "", "", nil)
 
-	if strings.HasPrefix(client.Connection.version, "2.") {
-		t.Skip("Skipping tests as pipeline not available in 2.x releases")
+	if client.Connection.version.Major < 5 {
+		t.Skip("Skipping tests as pipeline not available in <5.x releases")
 	}
 
 	publish := func(events ...beat.Event) {

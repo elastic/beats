@@ -133,6 +133,15 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if not hasattr(self, 'test_binary'):
             self.test_binary = os.path.abspath(self.beat_path + "/" + self.beat_name + ".test")
 
+        template_paths = [
+            self.beat_path,
+            os.path.abspath(os.path.join(self.beat_path, "../libbeat"))
+        ]
+        if not hasattr(self, 'template_paths'):
+            self.template_paths = template_paths
+        else:
+            self.template_paths.append(template_paths)
+
         # Create build path
         build_dir = self.beat_path + "/build"
         self.build_path = build_dir + "/system-tests/"
@@ -188,13 +197,16 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if output is None:
             output = self.beat_name + ".log"
 
-        args = [cmd,
-                "-systemTest",
+        args = [cmd, "-systemTest"]
+        if os.getenv("TEST_COVERAGE") == "true":
+            args += [
                 "-test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
-                "-path.home", os.path.normpath(self.working_dir),
-                "-c", os.path.join(self.working_dir, config),
-                ]
+            ]
+        args += [
+            "-path.home", os.path.normpath(self.working_dir),
+            "-c", os.path.join(self.working_dir, config),
+        ]
 
         if logging_args:
             args.extend(logging_args)
@@ -292,10 +304,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
     def setUp(self):
 
         self.template_env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader([
-                self.beat_path,
-                os.path.abspath(os.path.join(self.beat_path, "../libbeat"))
-            ])
+            loader=jinja2.FileSystemLoader(self.template_paths)
         )
 
         # create working dir
@@ -492,8 +501,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 if "name" not in field:
                     continue
 
-                # Chain together names
-                if name != "":
+                # Chain together names. Names in group `base` are top-level.
+                if name != "" and name != "base":
                     newName = name + "." + field["name"]
                 else:
                     newName = field["name"]

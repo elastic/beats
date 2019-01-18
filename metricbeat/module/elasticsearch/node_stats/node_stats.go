@@ -63,14 +63,20 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
+	info, err := elasticsearch.GetInfo(m.HTTP, m.GetServiceURI())
+	if err != nil {
+		elastic.ReportAndLogError(err, r, m.Log)
+		return
+	}
+
 	if m.XPack {
-		err = eventsMappingXPack(r, m, content)
+		err = eventsMappingXPack(r, m, *info, content)
 		if err != nil {
 			m.Log.Error(err)
 			return
 		}
 	} else {
-		err = eventsMapping(r, content)
+		err = eventsMapping(r, *info, content)
 		if err != nil {
 			elastic.ReportAndLogError(err, r, m.Log)
 			return

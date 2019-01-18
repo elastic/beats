@@ -80,6 +80,11 @@ func main() {
 		if err != nil {
 			log.Fatalf("Error fetching files for module %v: %v", module, err)
 		}
+		if len(files) == 0 {
+			// This can happen on moved modules
+			log.Printf("No fields files for module %v", module)
+			continue
+		}
 
 		data, err := fields.GenerateFieldsYml(files)
 		if err != nil {
@@ -93,11 +98,12 @@ func main() {
 
 		var buf bytes.Buffer
 		asset.Template.Execute(&buf, asset.Data{
-			License: license,
-			Beat:    beatName,
-			Name:    module,
-			Data:    encData,
-			Package: module,
+			License:  license,
+			Beat:     beatName,
+			Name:     module,
+			Data:     encData,
+			Priority: "asset.ModuleFieldsPri",
+			Package:  module,
 		})
 
 		bs, err := format.Source(buf.Bytes())

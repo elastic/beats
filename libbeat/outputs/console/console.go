@@ -70,7 +70,10 @@ func makeConsole(
 			return outputs.Fail(err)
 		}
 	} else {
-		enc = json.New(config.Pretty, true, beat.Version)
+		enc = json.New(beat.Version, json.Config{
+			Pretty:     config.Pretty,
+			EscapeHTML: false,
+		})
 	}
 
 	index := beat.Beat
@@ -129,6 +132,7 @@ func (c *console) publishEvent(event *publisher.Event) bool {
 		}
 
 		logp.Critical("Unable to encode event: %v", err)
+		logp.Debug("console", "Failed event: %v", event)
 		return false
 	}
 

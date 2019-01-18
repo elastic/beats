@@ -14,6 +14,6 @@ services:
     healthcheck:
       test:
       - "CMD-SHELL"
-      - "curl -f http://localhost:9200"
+      - "curl -f http://localhost:9200/_xpack/license"
       interval: 1s
       retries: 300

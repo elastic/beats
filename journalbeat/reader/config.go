@@ -30,6 +30,8 @@ type Config struct {
 	// Seek specifies the seeking stategy.
 	// Possible values: head, tail, cursor.
 	Seek config.SeekMode
+	// CursorSeekFallback sets where to seek if registry file is not available.
+	CursorSeekFallback config.SeekMode
 	// MaxBackoff is the limit of the backoff time.
 	MaxBackoff time.Duration
 	// Backoff is the current interval to wait before

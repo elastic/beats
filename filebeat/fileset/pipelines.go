@@ -22,6 +22,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/joeshaw/multierror"
+
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -33,7 +36,26 @@ type PipelineLoaderFactory func() (PipelineLoader, error)
 type PipelineLoader interface {
 	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
-	GetVersion() string
+	GetVersion() common.Version
+}
+
+// MultiplePipelineUnsupportedError is an error returned when a fileset uses multiple pipelines but is
+// running against a version of Elasticsearch that doesn't support this feature.
+type MultiplePipelineUnsupportedError struct {
+	module               string
+	fileset              string
+	esVersion            common.Version
+	minESVersionRequired common.Version
+}
+
+func (m MultiplePipelineUnsupportedError) Error() string {
+	return fmt.Sprintf(
+		"the %s/%s fileset has multiple pipelines, which are only supported with Elasticsearch >= %s. Currently running with Elasticsearch version %s",
+		m.module,
+		m.fileset,
+		m.minESVersionRequired.String(),
+		m.esVersion.String(),
+	)
 }
 
 // LoadPipelines loads the pipelines for each configured fileset.
@@ -50,13 +72,40 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 				}
 			}
 
-			pipelineID, content, err := fileset.GetPipeline(esClient.GetVersion())
+			pipelines, err := fileset.GetPipelines(esClient.GetVersion())
 			if err != nil {
 				return fmt.Errorf("Error getting pipeline for fileset %s/%s: %v", module, name, err)
 			}
-			err = loadPipeline(esClient, pipelineID, content, overwrite)
+
+			// Filesets with multiple pipelines can only be supported by Elasticsearch >= 6.5.0
+			esVersion := esClient.GetVersion()
+			minESVersionRequired := common.MustNewVersion("6.5.0")
+			if len(pipelines) > 1 && esVersion.LessThan(minESVersionRequired) {
+				return MultiplePipelineUnsupportedError{module, name, esVersion, *minESVersionRequired}
+			}
+
+			var pipelineIDsLoaded []string
+			for _, pipeline := range pipelines {
+				err = loadPipeline(esClient, pipeline.id, pipeline.contents, overwrite)
+				if err != nil {
+					err = fmt.Errorf("Error loading pipeline for fileset %s/%s: %v", module, name, err)
+					break
+				}
+				pipelineIDsLoaded = append(pipelineIDsLoaded, pipeline.id)
+			}
+
 			if err != nil {
-				return fmt.Errorf("Error loading pipeline for fileset %s/%s: %v", module, name, err)
+				// Rollback pipelines and return errors
+				// TODO: Instead of attempting to load all pipelines and then rolling back loaded ones when there's an
+				// error, validate all pipelines before loading any of them. This requires https://github.com/elastic/elasticsearch/issues/35495.
+				errs := multierror.Errors{err}
+				for _, pipelineID := range pipelineIDsLoaded {
+					err = deletePipeline(esClient, pipelineID)
+					if err != nil {
+						errs = append(errs, err)
+					}
+				}
+				return errs.Err()
 			}
 		}
 	}
@@ -64,7 +113,7 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 }
 
 func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string]interface{}, overwrite bool) error {
-	path := "/_ingest/pipeline/" + pipelineID
+	path := makeIngestPipelinePath(pipelineID)
 	if !overwrite {
 		status, _, _ := esClient.Request("GET", path, "", nil, nil)
 		if status == 200 {
@@ -78,6 +127,16 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 	}
 	logp.Info("Elasticsearch pipeline with ID '%s' loaded", pipelineID)
 	return nil
+}
+
+func deletePipeline(esClient PipelineLoader, pipelineID string) error {
+	path := makeIngestPipelinePath(pipelineID)
+	_, _, err := esClient.Request("DELETE", path, "", nil, nil)
+	return err
+}
+
+func makeIngestPipelinePath(pipelineID string) string {
+	return "/_ingest/pipeline/" + pipelineID
 }
 
 func interpretError(initialErr error, body []byte) error {

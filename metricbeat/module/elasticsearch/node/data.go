@@ -75,7 +75,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 	}
 
 	var errs multierror.Errors
-	for name, node := range nodesStruct.Nodes {
+	for id, node := range nodesStruct.Nodes {
 		event := mb.Event{}
 
 		event.RootFields = common.MapStr{}
@@ -93,8 +93,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 			continue
 		}
 
-		// Write name here as full name only available as key
-		event.MetricSetFields["name"] = name
+		event.MetricSetFields["id"] = id
 
 		r.Event(event)
 	}

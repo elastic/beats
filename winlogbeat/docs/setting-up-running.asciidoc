@@ -20,10 +20,10 @@ This section includes additional information on how to set up and run
 
 //MAINTAINERS: If you add a new file to this section, make sure you update the bulleted list ^^ too.
 
-include::../../libbeat/docs/shared-directory-layout.asciidoc[]
+include::{libbeat-dir}/docs/shared-directory-layout.asciidoc[]
 
-include::../../libbeat/docs/keystore.asciidoc[]
+include::{libbeat-dir}/docs/keystore.asciidoc[]
 
-include::../../libbeat/docs/command-reference.asciidoc[]
+include::{libbeat-dir}/docs/command-reference.asciidoc[]
 
-include::../../libbeat/docs/shared-shutdown.asciidoc[]
+include::{libbeat-dir}/docs/shared-shutdown.asciidoc[]

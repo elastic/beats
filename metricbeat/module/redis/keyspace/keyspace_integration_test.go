@@ -42,18 +42,18 @@ func testFetch(t *testing.T, r compose.R) {
 	addEntry(t, r.Host())
 
 	// Fetch data
-	f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
-	events, err := f.Fetch()
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
+	events, err := mbtest.ReportingFetchV2(ms)
 	if err != nil {
 		t.Fatal("fetch", err)
 	}
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events)
+	t.Logf("%s/%s event: %+v", ms.Module().Name(), ms.Name(), events)
 
 	// Make sure at least 1 db keyspace exists
 	assert.True(t, len(events) > 0)
 
-	keyspace := events[0]
+	keyspace := events[0].MetricSetFields
 
 	assert.True(t, keyspace["avg_ttl"].(int64) >= 0)
 	assert.True(t, keyspace["expires"].(int64) >= 0)
@@ -64,9 +64,8 @@ func testFetch(t *testing.T, r compose.R) {
 func testData(t *testing.T, r compose.R) {
 	addEntry(t, r.Host())
 
-	f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
-
-	err := mbtest.WriteEvents(f, t)
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
+	err := mbtest.WriteEventsReporterV2(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}

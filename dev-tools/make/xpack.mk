@@ -1,5 +1,6 @@
-# This Makefile is for x-pack Beats. Its only responsibility is to provide
-# compatibility with existing Jenkins and Travis setups.
+# This is a minimal Makefile for Beats that are built with Mage. Its only
+# responsibility is to provide compatibility with existing Jenkins and Travis
+# setups.
 
 #
 # Variables
@@ -33,9 +34,15 @@ help:
 	@echo Use mage rather than make. Here are the available mage targets:
 	@mage -l
 
+.PHONY: release
+release: mage
+	mage package
+
 .PHONY: testsuite
 testsuite: mage
-	mage update build unitTest integTest
+	-rm build/TEST-go-integration.out
+	mage update build unitTest integTest || ( cat build/TEST-go-integration.out && false )
+
 
 .PHONY: update
 update: mage

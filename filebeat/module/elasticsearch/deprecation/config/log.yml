@@ -9,7 +9,8 @@ multiline:
   negate: true
   match: after
 
-fields:
-  service.name: "elasticsearch"
+{{ if .convert_timezone }}
+processors:
+- add_locale: ~
+{{ end }}
 
-fields_under_root: true

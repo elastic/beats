@@ -35,7 +35,7 @@ var importAPI = "/api/kibana/dashboards/import"
 type KibanaLoader struct {
 	client       *kibana.Client
 	config       *Config
-	version      string
+	version      common.Version
 	hostname     string
 	msgOutputter MessageOutputter
 }
@@ -59,7 +59,8 @@ func NewKibanaLoader(ctx context.Context, cfg *common.Config, dashboardsConfig *
 		msgOutputter: msgOutputter,
 	}
 
-	loader.statusMsg("Initialize the Kibana %s loader", client.GetVersion())
+	version := client.GetVersion()
+	loader.statusMsg("Initialize the Kibana %s loader", version.String())
 
 	return &loader, nil
 }

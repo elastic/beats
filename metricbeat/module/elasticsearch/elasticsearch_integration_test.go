@@ -92,6 +92,9 @@ func testFetch(t *testing.T, r compose.R) {
 	err = createMLJob(host)
 	assert.NoError(t, err)
 
+	err = createCCRStats(host)
+	assert.NoError(t, err)
+
 	for _, metricSet := range metricSets {
 		t.Run(metricSet, func(t *testing.T) {
 			checkSkip(t, metricSet, host)
@@ -174,6 +177,14 @@ func enableTrialLicense(host string) error {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != 200 {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		return fmt.Errorf("could not enable trial license, response = %v", string(body))
+	}
+
 	return nil
 }
 
@@ -184,36 +195,71 @@ func createMLJob(host string) error {
 		return err
 	}
 
-	client := &http.Client{}
-
 	jobURL := "/_xpack/ml/anomaly_detectors/total-requests"
 
 	if checkExists("http://" + host + jobURL) {
 		return nil
 	}
 
-	req, err := http.NewRequest("PUT", "http://"+host+jobURL, bytes.NewReader(mlJob))
-	if err != nil {
-		return err
-	}
-	req.Header.Add("Content-Type", "application/json")
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
+	body, resp, err := httpPutJSON(host, jobURL, mlJob)
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("HTTP error loading ml job %d: %s, %s", resp.StatusCode, resp.Status, body)
+		return fmt.Errorf("HTTP error loading ml job %d: %s, %s", resp.StatusCode, resp.Status, string(body))
 	}
 
 	return nil
+}
+
+func createCCRStats(host string) error {
+	err := setupCCRRemote(host)
+	if err != nil {
+		return err
+	}
+
+	err = createCCRLeaderIndex(host)
+	if err != nil {
+		return err
+	}
+
+	err = createCCRFollowerIndex(host)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func setupCCRRemote(host string) error {
+	remoteSettings, err := ioutil.ReadFile("ccr/_meta/test/test_remote_settings.json")
+	if err != nil {
+		return err
+	}
+
+	settingsURL := "/_cluster/settings"
+	_, _, err = httpPutJSON(host, settingsURL, remoteSettings)
+	return err
+}
+
+func createCCRLeaderIndex(host string) error {
+	leaderIndex, err := ioutil.ReadFile("ccr/_meta/test/test_leader_index.json")
+	if err != nil {
+		return err
+	}
+
+	indexURL := "/pied_piper"
+	_, _, err = httpPutJSON(host, indexURL, leaderIndex)
+	return err
+}
+
+func createCCRFollowerIndex(host string) error {
+	followerIndex, err := ioutil.ReadFile("ccr/_meta/test/test_follower_index.json")
+	if err != nil {
+		return err
+	}
+
+	followURL := "/rats/_ccr/follow"
+	_, _, err = httpPutJSON(host, followURL, followerIndex)
+	return err
 }
 
 func checkExists(url string) bool {
@@ -240,37 +286,57 @@ func checkSkip(t *testing.T, metricset string, host string) {
 		t.Fatal("getting elasticsearch version", err)
 	}
 
-	isCCRStatsAPIAvailable, err := elastic.IsFeatureAvailable(version, elasticsearch.CCRStatsAPIAvailableVersion)
-	if err != nil {
-		t.Fatal("checking if elasticsearch CCR stats API is available", err)
-	}
+	isCCRStatsAPIAvailable := elastic.IsFeatureAvailable(version, elasticsearch.CCRStatsAPIAvailableVersion)
 
 	if !isCCRStatsAPIAvailable {
-		t.Skip("elasticsearch CCR stats API is not available until " + elasticsearch.CCRStatsAPIAvailableVersion)
+		t.Skip("elasticsearch CCR stats API is not available until " + elasticsearch.CCRStatsAPIAvailableVersion.String())
 	}
 }
 
-func getElasticsearchVersion(elasticsearchHostPort string) (string, error) {
+func getElasticsearchVersion(elasticsearchHostPort string) (*common.Version, error) {
 	resp, err := http.Get("http://" + elasticsearchHostPort + "/")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	var data common.MapStr
 	err = json.Unmarshal(body, &data)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	version, err := data.GetValue("version.number")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return version.(string), nil
+
+	return common.NewVersion(version.(string))
+}
+
+func httpPutJSON(host, path string, body []byte) ([]byte, *http.Response, error) {
+	req, err := http.NewRequest("PUT", "http://"+host+path, bytes.NewReader(body))
+	if err != nil {
+		return nil, nil, err
+	}
+	req.Header.Add("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return body, resp, nil
 }

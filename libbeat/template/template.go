@@ -51,7 +51,7 @@ type Template struct {
 }
 
 // New creates a new template instance
-func New(beatVersion string, beatName string, esVersion string, config TemplateConfig) (*Template, error) {
+func New(beatVersion string, beatName string, esVersion common.Version, config TemplateConfig) (*Template, error) {
 	bV, err := common.NewVersion(beatVersion)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,17 @@ func New(beatVersion string, beatName string, esVersion string, config TemplateC
 
 	event := &beat.Event{
 		Fields: common.MapStr{
+			// beat object was left in for backward compatibility reason for older configs.
 			"beat": common.MapStr{
+				"name":    beatName,
+				"version": bV.String(),
+			},
+			"agent": common.MapStr{
+				"name":    beatName,
+				"version": bV.String(),
+			},
+			// For the Beats that have an observer role
+			"observer": common.MapStr{
 				"name":    beatName,
 				"version": bV.String(),
 			},
@@ -96,20 +106,15 @@ func New(beatVersion string, beatName string, esVersion string, config TemplateC
 	}
 
 	// In case no esVersion is set, it is assumed the same as beat version
-	if esVersion == "" {
-		esVersion = beatVersion
-	}
-
-	esV, err := common.NewVersion(esVersion)
-	if err != nil {
-		return nil, err
+	if !esVersion.IsValid() {
+		esVersion = *bV
 	}
 
 	return &Template{
 		pattern:     pattern,
 		name:        name,
 		beatVersion: *bV,
-		esVersion:   *esV,
+		esVersion:   esVersion,
 		config:      config,
 	}, nil
 }
@@ -210,19 +215,17 @@ func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.
 		indexSettings.Put("number_of_routing_shards", defaultNumberOfRoutingShards)
 	}
 
-	if t.esVersion.IsMajor(7) {
+	mappingName := "_doc"
+	major := t.esVersion.Major
+	switch {
+	case major < 6:
+		mappingName = "_default_"
+	case major >= 7:
 		defaultFields = append(defaultFields, "fields.*")
 		indexSettings.Put("query.default_field", defaultFields)
 	}
 
 	indexSettings.DeepUpdate(t.config.Settings.Index)
-
-	var mappingName string
-	if t.esVersion.Major >= 6 {
-		mappingName = "doc"
-	} else {
-		mappingName = "_default_"
-	}
 
 	// Load basic structure
 	basicStructure := common.MapStr{

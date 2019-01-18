@@ -188,6 +188,9 @@ services:
     ports:
       - 3306
 
+  nats:
+    build: ./module/nats/_meta
+
   nginx:
     build: ./module/nginx/_meta
     ports:

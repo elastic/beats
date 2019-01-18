@@ -359,7 +359,7 @@ func (p *addCloudMetadata) Run(event *beat.Event) (*beat.Event, error) {
 
 	// This overwrites the meta.cloud if it exists. But the cloud key should be
 	// reserved for this processor so this should happen.
-	_, err := event.PutValue("meta.cloud", meta)
+	_, err := event.PutValue("cloud", meta)
 
 	return event, err
 }

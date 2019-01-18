@@ -568,7 +568,7 @@ func addProcess(p aucoalesce.Process, m common.MapStr) {
 		process["name"] = p.Name
 	}
 	if p.Exe != "" {
-		process["exe"] = p.Exe
+		process["executable"] = p.Exe
 	}
 	if p.CWD != "" {
 		process["cwd"] = p.CWD

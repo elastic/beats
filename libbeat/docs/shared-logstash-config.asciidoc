@@ -40,9 +40,16 @@ For this configuration, you must <<load-template-manually,load the index templat
 because the options for auto loading the template are only available for the Elasticsearch output.
 
 ifndef::win-only[]
+ifndef::apm-server[]
 
 include::../../libbeat/docs/step-test-config.asciidoc[]
 
+endif::apm-server[]
+ifdef::apm-server[]
+
+include::./step-test-config.asciidoc[]
+
+endif::apm-server[]
 endif::win-only[]
 
 ifdef::win-only[]
