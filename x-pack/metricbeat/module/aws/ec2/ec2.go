@@ -293,7 +293,7 @@ func convertPeriodToDuration(period string) (duration string, periodInSec int, e
 		periodInSec = numberPeriod * 60
 		return
 	default:
-		err = errors.New("invalid period in config. Please reset period in config.")
+		err = errors.New("invalid period in config. Please reset period in config")
 		duration = "-" + strconv.Itoa(numberPeriod*2) + "s"
 		periodInSec = numberPeriod
 		return
