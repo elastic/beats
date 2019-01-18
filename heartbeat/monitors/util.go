@@ -260,7 +260,7 @@ func MakeByHostJob(
 		return makeByHostAnyIPJob(settings, host, pingFactory), nil
 	}
 
-	return makeByHostAllIPJob(settings, host, pingFactory), nil
+	return TimeAndCheckJob(makeByHostAllIPJob(settings, host, pingFactory)), nil
 }
 
 func makeByHostAnyIPJob(
