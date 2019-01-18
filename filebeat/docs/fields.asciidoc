@@ -3965,6 +3965,26 @@ Where the request originated: rest (request originated from a REST API request),
 
 --
 
+*`elasticsearch.audit.realm`*::
++
+--
+type: keyword
+
+The authentication realm
+
+--
+
+*`elasticsearch.audit.roles`*::
++
+--
+type: array
+
+example: ['kibana_user', 'beats_admin']
+
+Roles to which the principal belongs
+
+--
+
 *`elasticsearch.audit.action`*::
 +
 --
@@ -3973,6 +3993,17 @@ type: keyword
 example: cluster:monitor/main
 
 The name of the action that was executed
+
+--
+
+*`elasticsearch.audit.indices`*::
++
+--
+type: array
+
+example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
+
+Indices accessed by action
 
 --
 
@@ -6322,6 +6353,16 @@ Fields from the MySQL log files.
 
 
 
+*`mysql.thread_id`*::
++
+--
+type: long
+
+The connection or thread ID for the query.
+
+
+--
+
 [float]
 == error fields
 
@@ -6329,20 +6370,12 @@ Contains fields from the MySQL error logs.
 
 
 
-*`mysql.error.timestamp`*::
-+
---
-The timestamp from the log line.
-
-
---
-
 *`mysql.error.thread_id`*::
 +
 --
 type: alias
 
-alias to: process.thread.id
+alias to: mysql.thread_id
 
 --
 
@@ -6411,12 +6444,12 @@ The number of rows scanned by the query.
 
 --
 
-*`mysql.slowlog.timestamp`*::
+*`mysql.slowlog.rows_affected`*::
 +
 --
 type: long
 
-The unix timestamp taken from the `SET timestamp` query.
+The number of rows modified by the query.
 
 
 --
@@ -6432,9 +6465,118 @@ The slow query.
 *`mysql.slowlog.id`*::
 +
 --
+type: alias
+
+alias to: mysql.thread_id
+
+--
+
+*`mysql.slowlog.schema`*::
++
+--
+type: keyword
+
+The schema where the slow query was executed.
+
+
+--
+
+*`mysql.slowlog.current_user`*::
++
+--
+type: keyword
+
+Current authenticated user, used to determine access privileges. Can differ from the value for user.
+
+
+--
+
+*`mysql.slowlog.query_cache_hit`*::
++
+--
+type: boolean
+
+Whether the query cache was hit.
+
+
+--
+
+*`mysql.slowlog.tmp_table`*::
++
+--
+type: boolean
+
+Whether a temporary table was used to resolve the query.
+
+
+--
+
+*`mysql.slowlog.tmp_table_on_disk`*::
++
+--
+type: boolean
+
+Whether the query needed temporary tables on disk.
+
+
+--
+
+*`mysql.slowlog.filesort`*::
++
+--
+type: boolean
+
+Whether filesort optimization was used.
+
+
+--
+
+*`mysql.slowlog.filesort_on_disk`*::
++
+--
+type: boolean
+
+Whether filesort optimization was used and it needed temporary tables on disk.
+
+
+--
+
+*`mysql.slowlog.priority_queue`*::
++
+--
+type: boolean
+
+Whether a priority queue was used for filesort.
+
+
+--
+
+*`mysql.slowlog.full_scan`*::
++
+--
+type: boolean
+
+Whether a full table scan was needed for the slow query.
+
+
+--
+
+*`mysql.slowlog.full_join`*::
++
+--
+type: boolean
+
+Whether a full join was needed for the slow query (no indexes were used for joins).
+
+
+--
+
+*`mysql.slowlog.merge_passes`*::
++
+--
 type: long
 
-The connection ID for the query.
+Number of merge passes executed for the query.
 
 
 --

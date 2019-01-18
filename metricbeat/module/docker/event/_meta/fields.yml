@@ -9,8 +9,7 @@
       description: >
         Event status
     - name: id
-      type: alias
-      path: event.id
+      type: keyword
       description: >
         Event id when available
     - name: from
@@ -18,20 +17,13 @@
       description: >
         Event source
     - name: type
-      type: alias
-      path: event.kind
+      type: keyword
       description: >
         The type of object emitting the event
     - name: action
-      type: alias
-      path: event.action
+      type: keyword
       description: >
         The type of event
-    - name: time
-      type: alias
-      path: event.created
-      description: >
-        Timestamp of event
     - name: actor
       type: group
       description: >
