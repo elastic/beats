@@ -778,6 +778,7 @@
 - from: read_timestamp
   to: event.created
   alias: false
+  beat: filebeat
 
 # Auditbeat
 
@@ -948,3 +949,4 @@
 - from: read_timestamp
   to: event.created
   alias: true
+  beat: journalbeat
