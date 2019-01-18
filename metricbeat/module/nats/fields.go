@@ -24,7 +24,11 @@ import (
 )
 
 func init() {
+<<<<<<< HEAD
 	if err := asset.SetFields("metricbeat", "nats", asset.ModuleFieldsPri, AssetNats); err != nil {
+=======
+	if err := asset.SetFields("metricbeat", "Nats", asset.ModuleFieldsPri, AssetNats); err != nil {
+>>>>>>> manage merge conflicts and update nats file
 		panic(err)
 	}
 }
@@ -32,5 +36,9 @@ func init() {
 // AssetNats returns asset data.
 // This is the base64 encoded gzipped contents of ../metricbeat/module/nats.
 func AssetNats() string {
+<<<<<<< HEAD
 	return "eJzUmM+S2zYMxu9+CkxO7SH7AD50ptNecugeuul5Q1OwzIlIKADojfP0HUqWLdGSLTdKtqujKeP76QP4B3wPn/GwhmBUVgDqtMI1vHs0Ku9WAAWKZVero7CG31YA0LwJf1ERK1wBMFZoBNdQmhXA1mFVyLp57z0E4/EUOT16qNObTLE+/jISPz2f0p8+gaWgxgUBUaNO1FkB3RmFF2QERlPAlsnD41miT9CnEOQ98oMrTiMdzmc8vBD3f5+ASs/HHR5DwYc/p0TUebyQKYziPI2nNn6KArQFj8rOgmU06e0LUUshoE1DciHat/qG6h+d101+z0FTho1iceToawxz3z15BvqsSmqqwUhH6oJiiZyNXeHtshGi3yAno2xkxqDVAYxVt0ewlcOgcuEYU1Rc0Kwm3tvxibF0oshY5E6c6liNLujP3vCi7sQ6m2FnxopCmQ1sib3RNRSRhxNotnU1sqMC9Dz3nUCs4RdB++sooUf/sDkMi2wW5NifZhAeSz/pEh8giimbtePx949PUDNZFBkFtcQTkAsUWkWls6ZqRRr7+jzAMQhk+Thx1XGUSqypsHjeVmR0wsIa2WLIR+8w0dZx4KBcdbCZqs/jizBcS/ldVjYq1aHdBbC4WNr6RIyepkpv4eVjRKmjcPlEG19EZsobTzFoknfBknehTBuqyUtgZNGAwbSUlNfcGriWphmAVyAnFTuksQl/k+faavF9vJcRO1CK+ZRaKKEUtaT/e0JPkG8koSfe6YRKRS9p3ZLokX/MqpUk4CTRO6BRaLaCUa6dal5P31VpKV537Djtie0+fme1MX55zo9GtxFnYHaojF8iivb7nbFimcDso0Z2o+O3QGfCZsBQOFF2m9g0DBTAU3BKnArwn78/PE3EuPYhkJ/Xv02+dmNu3flZcFHFO6fpnHLE6H/btMvD9uz12RuKe9H3hl+fPEHcCy5xI69P3lDci85E+T7788kTxBR43+NOZcFecRD27fTUxxuHKVP6x2JBvthBltlu29hANbadroALmaGVE51sGvbz+9U7O4YU+79xeaN294O41HkUMK1G6um3FEORDmNgBnzjLaqxO3wQ9238JmKRTktipSCojWOpgW5Er+DsnD7z8KYRfkrznES7ZIFhhA2mlYPTxMU9Hi9qb+FvTaCoD958XdZTb746Hz208dvTXwGbw1wgs88L7XipS3FT5WbP6X72yKbEKZ5/AwAA//9SJQAz"
+=======
+	return "eJzUl8FS4zgQhu95ii5Ouwd4gBy2amv3wmE4DMw5KHLH0YytNq1WqPD0U1Ji49hy4gRDZXzgEIn+P/9S/5Jv4Rdu52CVuBmAGClwDjcPStzNDCBDp9lUYsjO4Z8ZAMSZ8I0yX+AMYGWwyNw8jtyCVSU2tcIj2wrnkDP5av9LomJ4nsM/PYMmK8pYB06UGCdGO5C1EnhFRmBUGayYSnh4l2gTtCkc8gZ5YbJmpMZxwsbmrZ8HmMLztMZ9Jbj/v6dh6bVXPVOC42o/7uqKKRFoBSUKGw2aUYXZPTFN1qIOQ64n2nb4hOp/tcVxId+LAmOhBLM9R1uja3GbSkhUcTBSMxkrmCN3xo6Q1X5bXy6RgyXaM6OVYgtKi9kg6MKgFdfzhskLTmhLrHeNjjDmxgkyZt13bva9KJnQiY3iC33wVdjZSSMKOui/kS5UyIYykPeWNA58BX851H8nEUos75bbw53xUYr9ngy1ibfgncpj+z78+/QIFZNG55IwmngAZIJ9UVButCp2ItGiNg+wtw5amXLAVfkk1aogJZf7oyt/YI47ak5smkU64iY1KgoV213MYtZLlDYUY0lDm2fiXk4o1RTGJgG6HT1SXpXkrQR5YzWVxubhxFKduam+hoPGcmFpu9acsmcE4xHOQdGaKtXqn4vUV6xZyHd7Z6JlIy85/QHL1nBez7I1SMPL5gp6DTHkfIn8aZ0fVKBRaV1zyMbcTqKtRaoF48sinvB3TCQLzybJSMufqM8M7w7j2kg4MiDoQEnWCIVrM3QlB/BClL9NypfGizoX8MXb01cA7oQuIHR+6b4CMOpcwhf+fgVf0BnLN2Xmhnr1nbe54e1unmfmbmPaYMqlEEdg1qiMLx6dtL+bE3OHMNuo/fUcBzoStgMMmQlf40sfv0DJtpf5x/f7x4Eax14Eup+Fb4PTTh8xZ74ZfCAFUvwx3K4B/2TKpug3iq8CPnCcyx5D8RrgT6Zzij6c2dcAn7o7/A4AAP//3EU44A=="
+>>>>>>> manage merge conflicts and update nats file
 }
