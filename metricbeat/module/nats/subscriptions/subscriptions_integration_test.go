@@ -23,8 +23,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
@@ -32,8 +30,8 @@ import (
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "nats")
 
-	f := mbtest.NewEventFetcher(t, getConfig())
-	err := mbtest.WriteEvent(f, t)
+	metricSet := mbtest.NewReportingMetricSetV2(t, getConfig())
+	err := mbtest.WriteEventsReporterV2(metricSet, t, "./test_data.json")
 	if err != nil {
 		t.Fatal("write", err)
 	}
@@ -42,14 +40,13 @@ func TestData(t *testing.T) {
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "nats")
 
-	f := mbtest.NewEventFetcher(t, getConfig())
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+	reporter := &mbtest.CapturingReporterV2{}
 
-	assert.NotNil(t, event)
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	metricSet := mbtest.NewReportingMetricSetV2(t, getConfig())
+	metricSet.Fetch(reporter)
+
+	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
+	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
 }
 
 func getConfig() map[string]interface{} {
