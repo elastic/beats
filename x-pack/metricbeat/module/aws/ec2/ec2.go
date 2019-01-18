@@ -47,7 +47,7 @@ type MetricSet struct {
 	regionsList    []string
 	durationString string
 	periodInSec    int
-	ec2Logger      *logp.Logger
+	logger         *logp.Logger
 }
 
 // metricIDNameMap is a translating map between createMetricDataQuery id
@@ -127,7 +127,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		regionsList:    regionsList,
 		durationString: durationString,
 		periodInSec:    periodSec,
-		ec2Logger:      ec2Logger,
+		logger:         ec2Logger,
 	}, nil
 }
 
@@ -141,7 +141,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2)
 		if err != nil {
 			err = errors.Wrap(err, "getInstancesPerRegion failed, skipping region "+regionName)
-			m.ec2Logger.Errorf(err.Error())
+			m.logger.Errorf(err.Error())
 			report.Error(err)
 			continue
 		}
@@ -155,7 +155,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 				output, err := getMetricDataPerRegion(m.durationString, m.periodInSec, instanceID, getMetricDataOutput.NextToken, svcCloudwatch)
 				if err != nil {
 					err = errors.Wrap(err, "getMetricDataPerRegion failed, skipping region "+regionName+" for instance "+instanceID)
-					m.ec2Logger.Errorf(err.Error())
+					m.logger.Errorf(err.Error())
 					report.Error(err)
 					continue
 				}
@@ -164,7 +164,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 
 			event, err := createCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], regionName)
 			if err != nil {
-				m.ec2Logger.Errorf(err.Error())
+				m.logger.Errorf(err.Error())
 				report.Event(event)
 				continue
 			}
