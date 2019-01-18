@@ -518,12 +518,13 @@ metricbeat.modules:
 
 #-------------------------------- Nats Module --------------------------------
 - module: nats
-  metricsets: ["connections", "routes", "stats"]
+  metricsets: ["connections", "routes", "stats", "subscriptions"]
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"
   #connections.metrics_path: "/connz"
   #routes.metrics_path: "/routez"
+  #subscriptions.metrics_path: "/subsz"
 
 #-------------------------------- Nginx Module -------------------------------
 - module: nginx
