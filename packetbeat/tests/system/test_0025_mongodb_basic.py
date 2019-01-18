@@ -88,8 +88,8 @@ class Test(BaseTest):
         assert "request" in o
         assert "response" in o
         assert len(o["response"].splitlines()) == 1
-        assert o["bytes_in"] == 50
-        assert o["bytes_out"] == 514
+        assert o["source.bytes"] == 50
+        assert o["destination.bytes"] == 514
 
     def test_mongodb_send_response_more_rows(self):
         """
@@ -218,4 +218,4 @@ class Test(BaseTest):
         objs = self.read_output()
         o = objs[0]
         assert o["type"] == "mongodb"
-        assert o["responsetime"] >= 0
+        assert o["event.duration"] >= 0

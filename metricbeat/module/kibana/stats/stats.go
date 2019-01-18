@@ -60,8 +60,6 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The " + base.FullyQualifiedName() + " metricset is experimental")
-
 	ms, err := kibana.NewMetricSet(base)
 	if err != nil {
 		return nil, err

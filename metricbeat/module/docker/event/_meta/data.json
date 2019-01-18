@@ -6,23 +6,21 @@
     },
     "docker": {
         "event": {
+            "action": "pull",
             "actor": {
                 "attributes": {
-                    "image": "busybox",
-                    "name": "wizardly_knuth"
+                    "name": "busybox"
                 },
-                "id": "9d4c3af1d4a0268940205aad04a3c6bf434b32f45e0784dec5c283201ef299fc"
+                "id": "busybox:latest"
             },
-            "from": "busybox",
-            "status": "create"
+            "from": "",
+            "id": "busybox:latest",
+            "status": "pull",
+            "type": "image"
         }
     },
     "event": {
-        "action": "create",
-        "created": "2019-01-03T12:44:52+01:00",
         "dataset": "event",
-        "id": "9d4c3af1d4a0268940205aad04a3c6bf434b32f45e0784dec5c283201ef299fc",
-        "kind": "container",
         "module": "docker"
     },
     "service": {

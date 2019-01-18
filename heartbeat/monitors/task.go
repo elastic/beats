@@ -22,6 +22,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/heartbeat/scheduler"
 	"github.com/elastic/beats/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/libbeat/beat"
@@ -35,7 +36,7 @@ type taskCanceller func() error
 // configuredJob represents a job combined with its config and any
 // subsequent processors.
 type configuredJob struct {
-	job        Job
+	job        jobs.Job
 	config     jobConfig
 	monitor    *Monitor
 	processors *processors.Processors
@@ -43,7 +44,7 @@ type configuredJob struct {
 	client     beat.Client
 }
 
-func newConfiguredJob(job Job, config jobConfig, monitor *Monitor) (*configuredJob, error) {
+func newConfiguredJob(job jobs.Job, config jobConfig, monitor *Monitor) (*configuredJob, error) {
 	t := &configuredJob{
 		job:     job,
 		config:  config,
@@ -83,7 +84,7 @@ func (e ProcessorsError) Error() string {
 	return fmt.Sprintf("could not load monitor processors: %s", e.root)
 }
 
-func (t *configuredJob) prepareSchedulerJob(job Job) scheduler.TaskFunc {
+func (t *configuredJob) prepareSchedulerJob(job jobs.Job) scheduler.TaskFunc {
 	return func() []scheduler.TaskFunc {
 		event := &beat.Event{
 			Fields: common.MapStr{},
