@@ -51,7 +51,7 @@ include::{libbeat-dir}/docs/queueconfig.asciidoc[]
 
 include::{libbeat-dir}/docs/outputconfig.asciidoc[]
 
-include::{libbeat-dir}/libbeat/docs/shared-ilm.asciidoc[]
+include::{libbeat-dir}/docs/shared-ilm.asciidoc[]
 
 include::{libbeat-dir}/docs/shared-ssl-config.asciidoc[]
 
