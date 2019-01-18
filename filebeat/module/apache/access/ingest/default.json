@@ -4,9 +4,9 @@
     "grok": {
       "field": "message",
       "patterns":[
-        "%{IPORHOST:apache.access.remote_ip} - %{DATA:user.name} \\[%{HTTPDATE:apache.access.time}\\] \"%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}\" %{NUMBER:http.response.status_code:long} (?:%{NUMBER:apache.access.body_sent.bytes:long}|-)( \"%{DATA:http.request.referrer}\")?( \"%{DATA:apache.access.agent}\")?",
-        "%{IPORHOST:apache.access.remote_ip} - %{DATA:user.name} \\[%{HTTPDATE:apache.access.time}\\] \"-\" %{NUMBER:http.response.status_code:long} -",
-        "\\[%{HTTPDATE:apache.access.time}\\] %{IPORHOST:apache.access.remote_ip} %{DATA:apache.access.ssl.protocol} %{DATA:apache.access.ssl.cipher} \"%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}\" %{NUMBER:apache.access.body_sent.bytes}"
+        "%{IPORHOST:source.address} - %{DATA:user.name} \\[%{HTTPDATE:apache.access.time}\\] \"%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}\" %{NUMBER:http.response.status_code:long} (?:%{NUMBER:apache.access.body_sent.bytes:long}|-)( \"%{DATA:http.request.referrer}\")?( \"%{DATA:apache.access.agent}\")?",
+        "%{IPORHOST:source.address} - %{DATA:user.name} \\[%{HTTPDATE:apache.access.time}\\] \"-\" %{NUMBER:http.response.status_code:long} -",
+        "\\[%{HTTPDATE:apache.access.time}\\] %{IPORHOST:source.address} %{DATA:apache.access.ssl.protocol} %{DATA:apache.access.ssl.cipher} \"%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}\" %{NUMBER:apache.access.body_sent.bytes}"
         ],
       "ignore_missing": true
     }
@@ -16,7 +16,7 @@
     }
   }, {
     "grok": {
-      "field": "apache.access.remote_ip",
+      "field": "source.address",
       "ignore_missing": true,
       "patterns": [
         "^(%{IP:source.ip}|%{HOSTNAME:source.domain})$"

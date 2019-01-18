@@ -21,12 +21,14 @@ class Test(BaseTest):
         o = objs[0]
 
         assert o["type"] == "nfs"
+        assert o["event.dataset"] == "nfs"
         assert o["rpc.auth_flavor"] == "unix"
-        assert "rpc.time" in o
-        assert "rpc.time_str" in o
-        assert "rpc.call_size" in o
-        assert "rpc.reply_size" in o
+        assert "event.duration" in o
+        assert "source.bytes" in o
+        assert "destination.bytes" in o
 
+        assert o["network.transport"] == "tcp"
+        assert o["network.protocol"] == "nfsv3"
         assert o["nfs.version"] == 3
         assert o["nfs.opcode"] == "LOOKUP"
         assert o["nfs.status"] == "NFSERR_NOENT"
@@ -45,12 +47,14 @@ class Test(BaseTest):
         o = objs[0]
 
         assert o["type"] == "nfs"
+        assert o["event.dataset"] == "nfs"
         assert o["rpc.auth_flavor"] == "unix"
-        assert "rpc.time" in o
-        assert "rpc.time_str" in o
-        assert "rpc.call_size" in o
-        assert "rpc.reply_size" in o
+        assert "event.duration" in o
+        assert "source.bytes" in o
+        assert "destination.bytes" in o
 
+        assert o["network.transport"] == "tcp"
+        assert o["network.protocol"] == "nfsv4"
         assert o["nfs.version"] == 4
         assert o["nfs.minor_version"] == 1
         assert o["nfs.tag"] == "readdir"
