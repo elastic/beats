@@ -20,7 +20,7 @@ package event
 import (
 	"testing"
 
-	"github.com/ericchiang/k8s/apis/core/v1"
+	v1 "github.com/ericchiang/k8s/apis/core/v1"
 	k8s_io_apimachinery_pkg_apis_meta_v1 "github.com/ericchiang/k8s/apis/meta/v1"
 	"github.com/stretchr/testify/assert"
 
