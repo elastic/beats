@@ -244,10 +244,6 @@
   to: user_agent.original
   alias: true
 
-- from: read_timestamp
-  to: event.created
-  alias: true
-
 # These expand all fields under geoip and user_agent
 - from: apache2.access.geoip.*
   to: source.geo.*
@@ -778,6 +774,7 @@
 - from: read_timestamp
   to: event.created
   alias: false
+  beat: filebeat
 
 # Auditbeat
 
@@ -948,3 +945,4 @@
 - from: read_timestamp
   to: event.created
   alias: true
+  beat: journalbeat
