@@ -97,6 +97,7 @@ func defaultConfig(settings report.Settings) config {
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
 		},
+		Format: report.ReportingFormatProduction,
 	}
 
 	if settings.DefaultUsername != "" {
@@ -255,12 +256,12 @@ func (r *reporter) initLoop(c config) {
 	log.Info("Successfully connected to X-Pack Monitoring endpoint.")
 
 	// Start collector and send loop if monitoring endpoint has been found.
-	go r.snapshotLoop("state", "state", getClusterUUID(), c.StatePeriod)
+	go r.snapshotLoop("state", "state", c.StatePeriod, c.Format)
 	// For backward compatibility stats is named to metrics.
-	go r.snapshotLoop("stats", "metrics", getClusterUUID(), c.MetricsPeriod)
+	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod, c.Format)
 }
 
-func (r *reporter) snapshotLoop(namespace, prefix, clusterUUID string, period time.Duration) {
+func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, format string) {
 	ticker := time.NewTicker(period)
 	defer ticker.Stop()
 
@@ -297,8 +298,10 @@ func (r *reporter) snapshotLoop(namespace, prefix, clusterUUID string, period ti
 			"interval_ms": int64(period / time.Millisecond),
 			// Converting to seconds as interval only accepts `s` as unit
 			"params": map[string]string{"interval": strconv.Itoa(int(period/time.Second)) + "s"},
+			"format": format,
 		}
 
+		clusterUUID := getClusterUUID()
 		if clusterUUID != "" {
 			meta.Put("cluster_uuid", clusterUUID)
 		}
@@ -382,11 +385,11 @@ func getClusterUUID() string {
 		return ""
 	}
 
-	elasticsearchRegistry := outputsRegistry.GetRegistry("elasticearch")
+	elasticsearchRegistry := outputsRegistry.GetRegistry("elasticsearch")
 	if elasticsearchRegistry == nil {
 		return ""
 	}
 
-	// FIXME: this isn't going to work and probably needs to be accessed via a visitor
-	return monitoring.NewString(elasticsearchRegistry, "cluster_uuid").Get()
+	snapshot := monitoring.CollectFlatSnapshot(elasticsearchRegistry, monitoring.Full, false)
+	return snapshot.Strings["cluster_uuid"]
 }

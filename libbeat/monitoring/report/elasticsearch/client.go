@@ -40,11 +40,6 @@ func newPublishClient(
 	es *esout.Client,
 	params map[string]string,
 ) (*publishClient, error) {
-	format := params["_format"]
-	if format != report.ReportingFormatProduction && format != report.ReportingFormatMonitoring {
-		return nil, fmt.Errorf("unsupported reporting format: %v", format)
-	}
-
 	p := &publishClient{
 		es:     es,
 		params: params,
@@ -127,7 +122,20 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 			}
 		}
 
-		switch params["_format"] {
+		f, err := event.Content.Meta.GetValue("format")
+		if err != nil {
+			logp.Err("Format not available in monitoring reported. Please report this error: %s", err)
+			continue
+		}
+
+		event.Content.Meta.Delete("format")
+		format, ok := f.(string)
+		if !ok {
+			logp.Err("Format not available in monitoring reported. Please report this error: %s", err)
+			continue
+		}
+
+		switch format {
 		case report.ReportingFormatProduction:
 			err = c.bulkToProduction(params, event, t)
 		case report.ReportingFormatMonitoring:

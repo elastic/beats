@@ -43,6 +43,7 @@ type config struct {
 	BufferSize       int               `config:"buffer_size"`
 	Tags             []string          `config:"tags"`
 	Backoff          backoff           `config:"backoff"`
+	Format           string            `config:"format"`
 }
 
 type backoff struct {

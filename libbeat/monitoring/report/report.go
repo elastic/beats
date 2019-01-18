@@ -119,7 +119,7 @@ func getReporterConfig(
 		if err != nil {
 			return "", nil, err
 		}
-		rc.SetString("parameters._format", -1, format)
+		rc.SetString("format", -1, format)
 
 		return name, rc, nil
 	}
