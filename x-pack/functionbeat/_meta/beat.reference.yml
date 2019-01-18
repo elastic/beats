@@ -98,7 +98,7 @@ functionbeat.provider.aws.functions:
   # Create a function that accepts events from Kinesis streams.
   - name: kinesis
     enabled: false
-    type: sqs
+    type: kinesis
 
     # Description of the method to help identify them when you run multiples functions.
     description: "lambda function for Kinesis events"
