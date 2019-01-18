@@ -918,6 +918,28 @@
   to: network.forwarded_ip
   alias: false
 
+## NFS
+- from: rpc.time
+  to: event.duration
+  alias: false
+  comment: >
+    Cannot add alias at this time because the field is used by MongoDB which
+    has not been updated yet.
+
+- from: rpc.call_size
+  to: source.bytes
+  alias: false
+  comment: >
+    Cannot add alias at this time because the field is used by MongoDB which
+    has not been updated yet.
+
+- from: rpc.reply_size
+  to: destination.bytes
+  alias: false
+  comment: >
+    Cannot add alias at this time because the field is used by MongoDB which
+    has not been updated yet.
+
 ## Cassandra
 - from: no_request
   to: cassandra.no_request
