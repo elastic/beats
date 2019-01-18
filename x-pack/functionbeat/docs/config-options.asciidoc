@@ -135,7 +135,7 @@ The number of events to read from a Kinesis stream, the minimal values is 100 an
 10000. The default is 100.
 
 [float]
-[id="{beatname_lc}-batch-size"]
+[id="{beatname_lc}-starting-position"]
 ==== `starting_position`
 
 The starting position to read from a Kinesis stream, valids values are `trim_horizon` and `latest`.
