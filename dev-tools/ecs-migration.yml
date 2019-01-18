@@ -918,6 +918,14 @@
   to: network.forwarded_ip
   alias: false
 
+## MySQL
+- from: mysql.iserror
+  to: status
+  alias: false
+  comment: >
+    Status reflects whether or not an error occured. Its values are either
+    OK or Error.
+
 ## NFS
 - from: rpc.time
   to: event.duration
