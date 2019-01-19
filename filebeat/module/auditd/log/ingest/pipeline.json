@@ -53,6 +53,7 @@
                 "ignore_failure": true
             }
         },
+
         {
             "date": {
                 "field": "auditd.log.epoch",
@@ -69,6 +70,7 @@
                 "ignore_failure": true
             }
         },
+
         {
             "convert": {
                 "field": "auditd.log.sequence",
@@ -86,10 +88,54 @@
                 }
             }
         },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.arch", "target_field": "host.os.architecture" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.acct", "target_field": "user.name" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.gid", "target_field": "group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.uid", "target_field": "user.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.agid", "target_field": "user.audit.group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.auid", "target_field": "user.audit.user.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.fsgid", "target_field": "user.filesystem.group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.fsuid", "target_field": "user.filesystem.user.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.egid", "target_field": "user.effective.group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.euid", "target_field": "user.effective.user.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.sgid", "target_field": "user.saved.group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.suid", "target_field": "user.saved.user.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.ogid", "target_field": "user.owner.group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.ouid", "target_field": "user.owner.user.id" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.comm", "target_field": "process.name" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.exe", "target_field": "process.executable" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.pid", "target_field": "process.pid" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.ppid", "target_field": "process.ppid" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.terminal", "target_field": "process.terminal" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.tty", "target_field": "process.terminal" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.msg", "target_field": "message" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.res", "target_field": "event.outcome" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.record_type", "target_field": "event.action" } },
+        { "lowercase": { "ignore_failure": true, "field": "event.action" } },
+
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.src",  "target_field": "source.address" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.addr", "target_field": "source.address" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.dst", "target_field": "destination.address" } },
+
+        {
+            "grok": {
+                "field": "source.address",
+                "patterns": [ "^%{IP:source.ip}$" ],
+                "ignore_failure": true
+            }
+        },
         {
             "geoip": {
-                "field": "auditd.log.addr",
-                "target_field": "auditd.log.geoip",
+                "field": "source.ip",
+                "target_field": "source.geo",
                 "ignore_failure": true
             }
         }
