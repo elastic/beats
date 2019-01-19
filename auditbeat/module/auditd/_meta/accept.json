@@ -37,14 +37,18 @@
         "module": "auditd",
         "type": "syscall"
     },
+    "group": {
+        "id": "0",
+        "name": "root"
+    },
     "network": {
         "direction": "incoming"
     },
     "process": {
         "executable": "/usr/sbin/sshd",
         "name": "sshd",
-        "pid": "1663",
-        "ppid": "1",
+        "pid": 1663,
+        "ppid": 1,
         "title": "(sshd)"
     },
     "service": {
@@ -64,6 +68,8 @@
         "fsgid": "0",
         "fsuid": "0",
         "gid": "0",
+        "id": "0",
+        "name": "root",
         "name_map": {
             "egid": "root",
             "euid": "root",

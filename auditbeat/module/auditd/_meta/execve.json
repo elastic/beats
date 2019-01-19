@@ -66,17 +66,20 @@
         "path": "/bin/uname",
         "uid": "0"
     },
+    "group": {
+        "id": "1002"
+    },
     "process": {
         "args": [
             "uname",
             "-a"
         ],
-        "cwd": "/home/andrew_kroh",
         "executable": "/bin/uname",
         "name": "uname",
-        "pid": "10043",
-        "ppid": "10027",
-        "title": "uname -a"
+        "pid": 10043,
+        "ppid": 10027,
+        "title": "uname -a",
+        "working_directory": "/home/andrew_kroh"
     },
     "service": {
         "type": "auditd"
@@ -91,6 +94,7 @@
         "fsgid": "1002",
         "fsuid": "1001",
         "gid": "1002",
+        "id": "1001",
         "sgid": "1002",
         "suid": "1001",
         "uid": "1001"
