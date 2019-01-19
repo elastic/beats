@@ -149,6 +149,13 @@ func newProcessorPipeline(
 	return processors
 }
 
+func newProgram(title string, log *logp.Logger) *program {
+	return &program{
+		title: title,
+		log:   log,
+	}
+}
+
 func (p *program) add(processor processors.Processor) {
 	if processor != nil {
 		p.list = append(p.list, processor)
@@ -309,11 +316,9 @@ func makeClientProcessors(
 		return nil
 	}
 
-	return &program{
-		title: "client",
-		log:   monitors.Logger,
-		list:  procs.All(),
-	}
+	p := newProgram("client", monitors.Logger)
+	p.list = procs.All()
+	return p
 }
 
 func hasKey(m common.MapStr, key string) bool {

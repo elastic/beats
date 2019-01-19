@@ -165,6 +165,7 @@ func New(
 
 	annotations := settings.Annotations
 	processors := settings.Processors
+	log := monitors.Logger
 	disabledOutput := settings.Disabled
 	p := &Pipeline{
 		beatInfo:         beat,
@@ -172,7 +173,7 @@ func New(
 		observer:         nilObserver,
 		waitCloseMode:    settings.WaitCloseMode,
 		waitCloseTimeout: settings.WaitClose,
-		processors:       makePipelineProcessors(annotations, processors, disabledOutput),
+		processors:       makePipelineProcessors(log, annotations, processors, disabledOutput),
 	}
 	p.ackBuilder = &pipelineEmptyACK{p}
 	p.ackActive = atomic.MakeBool(true)
@@ -405,6 +406,7 @@ func (e *waitCloser) wait() {
 }
 
 func makePipelineProcessors(
+	log *logp.Logger,
 	annotations Annotations,
 	processors *processors.Processors,
 	disabled bool,
@@ -415,7 +417,7 @@ func makePipelineProcessors(
 
 	hasProcessors := processors != nil && len(processors.List) > 0
 	if hasProcessors {
-		tmp := &program{title: "global"}
+		tmp := newProgram("global", log)
 		for _, p := range processors.List {
 			tmp.add(p)
 		}
