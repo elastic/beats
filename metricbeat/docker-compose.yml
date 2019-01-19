@@ -190,6 +190,8 @@ services:
 
   nats:
     build: ./module/nats/_meta
+    ports:
+      - 8222
 
   nginx:
     build: ./module/nginx/_meta
