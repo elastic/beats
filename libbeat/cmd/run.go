@@ -47,11 +47,6 @@ func genRunCmd(settings instance.Settings, beatCreator beat.Creator, runFlags *p
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("cpuprofile"))
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("memprofile"))
 
-	// TODO deprecate in favor of subcommands (7.0):
-	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("configtest"))
-
-	runCmd.Flags().MarkDeprecated("configtest", "use test config subcommand")
-
 	if runFlags != nil {
 		runCmd.Flags().AddFlagSet(runFlags)
 	}

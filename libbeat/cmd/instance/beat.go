@@ -373,13 +373,6 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		defer reporter.Stop()
 	}
 
-	// If -configtest was specified, exit now prior to run.
-	if cfgfile.IsTestConfig() {
-		cfgwarn.Deprecate("6.0", "-configtest flag has been deprecated, use configtest subcommand")
-		fmt.Println("Config OK")
-		return beat.GracefulExit
-	}
-
 	ctx, cancel := context.WithCancel(context.Background())
 	svc.HandleSignals(beater.Stop, cancel)
 
