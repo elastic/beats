@@ -110,6 +110,8 @@
         { "rename": { "ignore_failure": true, "field": "auditd.log.exe", "target_field": "process.executable" } },
         { "rename": { "ignore_failure": true, "field": "auditd.log.pid", "target_field": "process.pid" } },
         { "rename": { "ignore_failure": true, "field": "auditd.log.ppid", "target_field": "process.ppid" } },
+        { "convert": { "ignore_missing": true, "field": "process.pid", "type": "long" } },
+        { "convert": { "ignore_missing": true, "field": "process.ppid", "type": "long" } },
 
         { "rename": { "ignore_failure": true, "field": "auditd.log.terminal", "target_field": "process.terminal" } },
         { "rename": { "ignore_failure": true, "field": "auditd.log.tty", "target_field": "process.terminal" } },
