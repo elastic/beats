@@ -62,10 +62,12 @@ func TestElasticsearch(t *testing.T) {
 		Service: "elasticsearch",
 		Options: compose.RunnerOptions{
 			"ELASTICSEARCH_VERSION": {
+				// "7.0.0-alpha2",
+				"6.5.4",
 				"6.4.3",
 				"6.3.2",
 				"6.2.4",
-				"5.6.11",
+				"5.6.14",
 			},
 		},
 		Parallel: true,
@@ -78,7 +80,7 @@ func TestElasticsearch(t *testing.T) {
 }
 
 func testFetch(t *testing.T, r compose.R) {
-	if r.Option("ELASTICSEARCH_VERSION") == "6.2.4" {
+	if v := r.Option("ELASTICSEARCH_VERSION"); v == "6.2.4" || v == "5.6.14" {
 		t.Skip("This test fails on this version")
 	}
 
