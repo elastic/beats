@@ -15,19 +15,24 @@ import (
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	mtest "github.com/elastic/beats/x-pack/metricbeat/module/mssql/testing"
+	"github.com/elastic/beats/x-pack/metricbeat/module/mssql/mtest"
 )
+
+func TestPerformance(t *testing.T) {
+	logp.TestingSetup()
+
+	mtest.Runner.Run(t, compose.Suite{
+		"Fetch": testFetch,
+	})
+}
 
 type keyAssertion struct {
 	key       string
 	assertion func(v interface{}, key string)
 }
 
-func TestFetch(t *testing.T) {
-	logp.TestingSetup()
-	compose.EnsureUp(t, "mssql")
-
-	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("performance"))
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig(r.Host(), "performance"))
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)

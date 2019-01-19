@@ -75,7 +75,7 @@ class Test(XPackTest):
         self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return [os.getenv('MSSQL_HOST', 'mssql')]
+        return [self.compose_host()]
 
     def get_username(self):
         return os.getenv('MSSQL_USERNAME', 'SA')

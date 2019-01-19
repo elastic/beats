@@ -8,10 +8,11 @@ services:
     volumes:
       - ${PWD}/../..:/go/src/github.com/elastic/beats/
       - /var/run/docker.sock:/var/run/docker.sock
+    network_mode: host
     command: make
-    env_file:
-      - ./module/mssql/_meta/env
 
   # Modules
   mssql:
     build: ./module/mssql/_meta
+    ports:
+      - 1433

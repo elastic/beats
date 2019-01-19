@@ -12,13 +12,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	mtest "github.com/elastic/beats/x-pack/metricbeat/module/mssql/testing"
+	"github.com/elastic/beats/x-pack/metricbeat/module/mssql/mtest"
 )
 
-func TestData(t *testing.T) {
+func testData(t *testing.T, r compose.R) {
 	t.Skip("Skipping `data.json` generation test")
-	_, config, err := getHostURI()
+	_, config, err := getHostURI(r.Host())
 	if err != nil {
 		t.Fatal("error getting config information", err.Error())
 	}
@@ -35,13 +36,8 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getHostURI() (string, map[string]interface{}, error) {
-	config := mtest.GetConfig("performance")
-
-	host, ok := config["hosts"].([]string)
-	if !ok {
-		return "", nil, errors.New("error getting host name information")
-	}
+func getHostURI(host string) (string, map[string]interface{}, error) {
+	config := mtest.GetConfig(host, "performance")
 
 	username, ok := config["username"].(string)
 	if !ok {
@@ -56,7 +52,7 @@ func getHostURI() (string, map[string]interface{}, error) {
 	u := &url.URL{
 		Scheme: "sqlserver",
 		User:   url.UserPassword(username, password),
-		Host:   host[0],
+		Host:   host,
 	}
 
 	return u.String(), config, nil

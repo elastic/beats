@@ -14,14 +14,20 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	mtest "github.com/elastic/beats/x-pack/metricbeat/module/mssql/testing"
+	"github.com/elastic/beats/x-pack/metricbeat/module/mssql/mtest"
 )
 
-func TestFetch(t *testing.T) {
+func TestDb(t *testing.T) {
 	logp.TestingSetup()
-	compose.EnsureUp(t, "mssql")
 
-	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("db"))
+	mtest.Runner.Run(t, compose.Suite{
+		"Fetch": testFetch,
+		"Data":  testData,
+	})
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig(r.Host(), "db"))
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)

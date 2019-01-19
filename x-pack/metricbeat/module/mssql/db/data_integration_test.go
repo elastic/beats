@@ -7,14 +7,15 @@ package db
 import (
 	"testing"
 
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	mtest "github.com/elastic/beats/x-pack/metricbeat/module/mssql/testing"
+	"github.com/elastic/beats/x-pack/metricbeat/module/mssql/mtest"
 )
 
-func TestData(t *testing.T) {
+func testData(t *testing.T, r compose.R) {
 	t.Skip("Skipping `data.json` generation test")
 
-	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("db"))
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig(r.Host(), "db"))
 
 	err := mbtest.WriteEventsReporterV2(f, t, "")
 	if err != nil {
