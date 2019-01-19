@@ -18,6 +18,8 @@ the data types used in the Elasticsearch index template.
 [frame="topbot",options="header"]
 |======================
 |Field|Old Type|New Type
+|`file.gid`     |number |string
+|`file.uid`     |number |string
 |`process.pid`  |string |number
 |`process.ppid` |string |number
 |======================
