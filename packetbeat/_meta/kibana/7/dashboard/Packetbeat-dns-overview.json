@@ -92,7 +92,7 @@
       },
       "id": "DNS-Query-Summary",
       "type": "visualization",
-      "updated_at": "2019-01-09T22:10:47.629Z",
+      "updated_at": "2019-01-18T23:49:24.089Z",
       "version": 1
     },
     {
@@ -138,7 +138,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -244,8 +243,8 @@
       },
       "id": "DNS-Request-Status-Over-Time",
       "type": "visualization",
-      "updated_at": "2019-01-09T22:18:13.875Z",
-      "version": 3
+      "updated_at": "2019-01-18T23:49:24.089Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -315,8 +314,8 @@
       },
       "id": "DNS-Question-Types",
       "type": "visualization",
-      "updated_at": "2019-01-09T22:12:06.971Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:24.089Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -428,8 +427,8 @@
       },
       "id": "DNS-Top-10-Questions",
       "type": "visualization",
-      "updated_at": "2019-01-09T22:18:59.448Z",
-      "version": 3
+      "updated_at": "2019-01-18T23:49:24.089Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -514,8 +513,8 @@
       },
       "id": "DNS-Response-Codes",
       "type": "visualization",
-      "updated_at": "2019-01-09T22:19:38.501Z",
-      "version": 3
+      "updated_at": "2019-01-18T23:49:24.089Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -553,7 +552,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -691,7 +689,7 @@
       },
       "id": "735d25c0-1459-11e9-9de0-f98d1808db8e",
       "type": "visualization",
-      "updated_at": "2019-01-09T22:10:47.629Z",
+      "updated_at": "2019-01-18T23:49:24.089Z",
       "version": 1
     },
     {
@@ -773,7 +771,7 @@
       },
       "id": "bacb6ed0-1459-11e9-9de0-f98d1808db8e",
       "type": "visualization",
-      "updated_at": "2019-01-09T22:10:47.629Z",
+      "updated_at": "2019-01-18T23:49:24.089Z",
       "version": 1
     },
     {
@@ -847,7 +845,7 @@
       },
       "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
       "type": "search",
-      "updated_at": "2019-01-09T22:11:22.033Z",
+      "updated_at": "2019-01-18T23:49:24.089Z",
       "version": 2
     },
     {
@@ -974,7 +972,7 @@
       },
       "id": "65120940-1454-11e9-9de0-f98d1808db8e",
       "type": "dashboard",
-      "updated_at": "2019-01-09T22:10:47.629Z",
+      "updated_at": "2019-01-18T23:49:24.089Z",
       "version": 1
     }
   ],

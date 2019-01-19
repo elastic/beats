@@ -17,23 +17,24 @@
             }
           }
         },
-        "title": "Navigation",
+        "title": "Navigation [Packetbeat]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [],
           "params": {
-            "fontSize": "10",
-            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Flows](#/dashboard/Packetbeat-Flows)\n\n[Web transactions](#/dashboard/Packetbeat-HTTP)\n\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\n\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\n\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\n\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\n\n[NFS transactions](#/dashboard/Packetbeat-NFS)\n\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)"
+            "fontSize": 10,
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
+            "openLinksInNewTab": false
           },
-          "title": "Navigation",
+          "title": "Navigation [Packetbeat]",
           "type": "markdown"
         }
       },
       "id": "Navigation",
       "type": "visualization",
-      "updated_at": "2019-01-16T20:34:33.171Z",
-      "version": 10
+      "updated_at": "2019-01-19T00:18:59.372Z",
+      "version": 11
     },
     {
       "attributes": {
@@ -87,8 +88,8 @@
       },
       "id": "Thrift-requests-per-minute",
       "type": "visualization",
-      "updated_at": "2019-01-16T20:46:38.534Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:32.418Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -144,8 +145,8 @@
       },
       "id": "Thrift-RPC-Errors",
       "type": "visualization",
-      "updated_at": "2019-01-16T20:46:53.791Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:32.418Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -217,8 +218,8 @@
       },
       "id": "Slowest-Thrift-RPC-methods",
       "type": "visualization",
-      "updated_at": "2019-01-16T20:45:59.836Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:32.418Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -262,7 +263,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -345,8 +345,8 @@
       },
       "id": "Thrift-response-times-percentiles",
       "type": "visualization",
-      "updated_at": "2019-01-16T20:45:38.120Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:32.418Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -399,8 +399,8 @@
       },
       "id": "Top-Thrift-RPC-methods",
       "type": "visualization",
-      "updated_at": "2019-01-16T20:47:08.544Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:32.418Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -446,8 +446,8 @@
       },
       "id": "Top-Thrift-RPC-calls-with-errors",
       "type": "visualization",
-      "updated_at": "2019-01-16T20:47:18.118Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:32.418Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -524,8 +524,8 @@
       },
       "id": "Thrift-transactions",
       "type": "search",
-      "updated_at": "2019-01-16T20:44:16.124Z",
-      "version": 3
+      "updated_at": "2019-01-18T23:49:32.418Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -628,8 +628,8 @@
       },
       "id": "Thrift-errors",
       "type": "search",
-      "updated_at": "2019-01-16T20:45:12.555Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:32.418Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -737,7 +737,7 @@
       },
       "id": "Packetbeat-Thrift-performance",
       "type": "dashboard",
-      "updated_at": "2019-01-16T20:34:32.145Z",
+      "updated_at": "2019-01-18T23:49:32.418Z",
       "version": 1
     }
   ],

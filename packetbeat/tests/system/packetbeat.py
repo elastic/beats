@@ -9,16 +9,20 @@ from beat.beat import TestCase
 from beat.beat import Proc
 
 TRANS_REQUIRED_FIELDS = ["@timestamp", "type", "status",
-                         "agent.type", "agent.hostname", "agent.version"]
+                         "agent.type", "agent.hostname", "agent.version",
+                         "event.dataset", "event.start",
+                         "source.ip", "destination.ip",
+                         "client.ip", "server.ip",
+                         "network.type", "network.transport", "network.community_id",
+                         ]
 
-TRANS_ECS_REQUIRED_FIELDS = ["source.ip", "destination.ip", "event.dataset",
-                             "event.start", "event.end", "event.duration",
-                             "network.type", "network.transport", "network.protocol",
-                             "network.community_id", "client.ip", "server.ip"] + TRANS_REQUIRED_FIELDS
-
-FLOWS_REQUIRED_FIELDS = ["@timestamp", "type", "event.dataset", "event.start",
-                         "event.end", "event.duration", "flow.id",
-                         "agent.type", "agent.hostname", "agent.version"]
+FLOWS_REQUIRED_FIELDS = ["@timestamp", "type",
+                         "agent.type", "agent.hostname", "agent.version",
+                         "event.dataset", "event.start", "event.end", "event.duration",
+                         "source.ip", "destination.ip",
+                         "flow.id",
+                         "network.type", "network.transport", "network.community_id",
+                         ]
 
 
 class BaseTest(TestCase):
