@@ -31,8 +31,8 @@ class Test(BaseTest):
         self.index_name = "test-filebeat-ml"
 
     @parameterized.expand([
-        (False),
-        (True),
+        (False,),
+        (True,),
     ])
     @unittest.skipIf(not INTEGRATION_TESTS,
                      "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
