@@ -31,7 +31,7 @@ type pulsarConfig struct {
     OperationTimeoutSeconds    time.Duration `config:"operation_timeout_seconds"`
     MessageListenerThreads     int           `config:"message_listener_threads"`
     ConcurrentLookupRequests   int           `config:"concurrent_lookup_requests"`
-    UseTls                     bool          `config:"use_tls"`
+    UseTLS                     bool          `config:"use_tls"`
     TLSTrustCertsFilePath      string        `config:"tls_trust_certs_file_path"`
     TLSAllowInsecureConnection bool          `config:"tls_allow_insecure_connection"`
     CertificatePath            string        `config:"certificate_path"`
@@ -74,7 +74,7 @@ func (c *pulsarConfig) Validate() error {
     if len(c.Topic) == 0 {
         return errors.New("no topic configured")
     }
-    if c.UseTls {
+    if c.UseTLS {
         if len(c.TLSTrustCertsFilePath) == 0 {
             return errors.New("no tls_trust_certs_file_path configured")
         }
@@ -101,7 +101,7 @@ func initOptions(
         URL:       config.URL,
         IOThreads: config.IOThreads,
     }
-    if config.UseTls {
+    if config.UseTLS {
         clientOptions.TLSTrustCertsFilePath = config.TLSTrustCertsFilePath
         if len(config.CertificatePath) > 0 {
             clientOptions.Authentication = pulsar.NewAuthenticationTLS(config.CertificatePath, config.PrivateKeyPath)

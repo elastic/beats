@@ -24,7 +24,7 @@ import (
 func Test_pulsarConfig_Validate(t *testing.T) {
     type fields struct {
         URL                   string
-        UseTls                bool
+        UseTLS                bool
         TLSTrustCertsFilePath string
         Topic                 string
     }
@@ -69,7 +69,7 @@ func Test_pulsarConfig_Validate(t *testing.T) {
         t.Run(tt.name, func(t *testing.T) {
             c := &pulsarConfig{
                 URL:                   tt.fields.URL,
-                UseTls:                tt.fields.UseTls,
+                UseTLS:                tt.fields.UseTLS,
                 TLSTrustCertsFilePath: tt.fields.TLSTrustCertsFilePath,
                 Topic:                 tt.fields.Topic,
             }
