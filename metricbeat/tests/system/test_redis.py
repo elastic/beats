@@ -95,9 +95,10 @@ class Test(metricbeat.BaseTest):
         """
 
         # At least one event must be inserted so db stats exist
+        host, port = self.compose_host().split(":")
         r = redis.StrictRedis(
-            host=self.compose_hosts()[0],
-            port=os.getenv('REDIS_PORT', '6379'),
+            host=host,
+            port=port,
             db=0)
         r.flushall()
         r.rpush('list-key', 'one', 'two', 'three')
