@@ -18,7 +18,7 @@
         "service.type": "auditd",
         "source.address": "192.168.2.0",
         "source.ip": "192.168.2.0",
-        "user.audit.user.id": "4294967295"
+        "user.audit.id": "4294967295"
     },
     {
         "@timestamp": "2017-01-31T20:17:14.891Z",
@@ -37,7 +37,6 @@
         "event.dataset": "auditd.log",
         "event.module": "auditd",
         "fileset.name": "log",
-        "group.id": "0",
         "host.os.architecture": "x86_64",
         "input.type": "log",
         "log.offset": 174,
@@ -47,13 +46,14 @@
         "process.ppid": 1240,
         "process.terminal": "(none)",
         "service.type": "auditd",
-        "user.audit.user.id": "4294967295",
+        "user.audit.id": "4294967295",
         "user.effective.group.id": "0",
-        "user.effective.user.id": "0",
+        "user.effective.id": "0",
         "user.filesystem.group.id": "0",
-        "user.filesystem.user.id": "0",
+        "user.filesystem.id": "0",
+        "user.group_.id": "0",
         "user.id": "0",
         "user.saved.group.id": "0",
-        "user.saved.user.id": "0"
+        "user.saved.id": "0"
     }
 ]

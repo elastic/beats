@@ -407,6 +407,16 @@ Module for parsing auditd logs.
 
 
 
+*`user.group_.id`*::
++
+--
+type: keyword
+
+User's group ID.
+
+
+--
+
 [float]
 == auditd fields
 

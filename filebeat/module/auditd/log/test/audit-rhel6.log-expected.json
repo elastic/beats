@@ -15,7 +15,7 @@
         "process.executable": "/usr/bin/sudo",
         "process.pid": 4121,
         "service.type": "auditd",
-        "user.audit.user.id": "700",
+        "user.audit.id": "700",
         "user.id": "0",
         "user.name": "root"
     },
@@ -35,7 +35,7 @@
         "process.executable": "/usr/bin/sudo",
         "process.pid": 4121,
         "service.type": "auditd",
-        "user.audit.user.id": "700",
+        "user.audit.id": "700",
         "user.id": "0",
         "user.name": "root"
     },
@@ -55,7 +55,7 @@
         "message": "cwd=\"/",
         "process.pid": 4151,
         "service.type": "auditd",
-        "user.audit.user.id": "700",
+        "user.audit.id": "700",
         "user.id": "497"
     },
     {
@@ -74,7 +74,7 @@
         "process.executable": "/usr/bin/sudo",
         "process.pid": 4151,
         "service.type": "auditd",
-        "user.audit.user.id": "700",
+        "user.audit.id": "700",
         "user.id": "0",
         "user.name": "root"
     },
@@ -94,7 +94,7 @@
         "process.executable": "/usr/bin/sudo",
         "process.pid": 4151,
         "service.type": "auditd",
-        "user.audit.user.id": "700",
+        "user.audit.id": "700",
         "user.id": "0",
         "user.name": "root"
     },
@@ -117,7 +117,7 @@
         "service.type": "auditd",
         "source.address": "10.100.0.0",
         "source.ip": "10.100.0.0",
-        "user.audit.user.id": "4294967295"
+        "user.audit.id": "4294967295"
     },
     {
         "@timestamp": "2017-03-14T19:23:02.529Z",
@@ -136,7 +136,6 @@
         "event.dataset": "auditd.log",
         "event.module": "auditd",
         "fileset.name": "log",
-        "group.id": "0",
         "host.os.architecture": "x86_64",
         "input.type": "log",
         "log.offset": 1162,
@@ -146,14 +145,15 @@
         "process.ppid": 1240,
         "process.terminal": "(none)",
         "service.type": "auditd",
-        "user.audit.user.id": "4294967295",
+        "user.audit.id": "4294967295",
         "user.effective.group.id": "0",
-        "user.effective.user.id": "0",
+        "user.effective.id": "0",
         "user.filesystem.group.id": "0",
-        "user.filesystem.user.id": "0",
+        "user.filesystem.id": "0",
+        "user.group_.id": "0",
         "user.id": "0",
         "user.saved.group.id": "0",
-        "user.saved.user.id": "0"
+        "user.saved.id": "0"
     },
     {
         "@timestamp": "2017-03-16T04:02:40.072Z",
@@ -204,9 +204,9 @@
         "source.geo.region_iso_code": "US-VA",
         "source.geo.region_name": "Virginia",
         "source.ip": "96.241.146.97",
-        "user.audit.user.id": "700",
+        "user.audit.id": "700",
         "user.id": "0",
-        "user.saved.user.id": "74"
+        "user.saved.id": "74"
     },
     {
         "@timestamp": "2017-03-16T04:02:40.072Z",
@@ -234,7 +234,7 @@
         "source.geo.region_iso_code": "US-VA",
         "source.geo.region_name": "Virginia",
         "source.ip": "96.241.146.97",
-        "user.audit.user.id": "700",
+        "user.audit.id": "700",
         "user.id": "0",
         "user.name": "admin"
     },
@@ -255,7 +255,7 @@
         "process.pid": 28395,
         "process.terminal": "pts/0",
         "service.type": "auditd",
-        "user.audit.user.id": "700",
+        "user.audit.id": "700",
         "user.id": "0",
         "user.name": "root"
     },
@@ -276,7 +276,7 @@
         "process.pid": 28395,
         "process.terminal": "pts/0",
         "service.type": "auditd",
-        "user.audit.user.id": "700",
+        "user.audit.id": "700",
         "user.id": "0",
         "user.name": "root"
     }
