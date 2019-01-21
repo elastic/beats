@@ -81,6 +81,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Changed NFS protocol fields to align with ECS. {pull}10153[10153]
 - Changed Thrift protocol fields to align with ECS. {pull}10125[10125]
 - Changed Cassandra protocol fields to align with ECS. {pull}10093[10093]
+- Changed Memcache protocol fields to align with ECS. {pull}10189[10189]
 
 *Winlogbeat*
 
