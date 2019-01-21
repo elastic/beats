@@ -26,11 +26,13 @@
       description: >
         Component type (0=frontend, 1=backend, 2=server, or 3=socket/listener).
 
+    # ECS?
     - name: process_id
       type: integer
       description: >
         Process ID (0 for first instance, 1 for second, and so on).
 
+    # ECS?
     - name: service_name
       type: keyword
       description: >

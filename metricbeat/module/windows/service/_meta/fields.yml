@@ -10,13 +10,13 @@
       description: >
         A unique ID for the service. It is a hash of the machine's GUID and the
         service name.
-
+    # ECS?
     - name: name
       type: keyword
       example: Wecsvc
       description: >
         The service name.
-
+    # ECS?
     - name: display_name
       type: keyword
       example: Windows Event Collector

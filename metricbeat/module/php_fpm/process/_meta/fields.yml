@@ -29,6 +29,7 @@
     type: integer
     description: >
       The duration in microseconds (1 million in a second) of the current request (my own definition)
+  # ECS?
   - name: request_method
     type: keyword
     description: >
@@ -41,6 +42,7 @@
     type: integer
     description: >
       The content length of the request (only with POST) (of the current request)
+  # ECS?
   - name: user
     type: keyword
     description: >

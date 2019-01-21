@@ -28,6 +28,7 @@
       type: long
       description: >
         Worker id
+    # ECS?
     - name: worker.pid
       type: long
       description: >

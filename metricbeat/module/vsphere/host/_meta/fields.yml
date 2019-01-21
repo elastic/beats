@@ -4,6 +4,7 @@
     host
   release: beta
   fields:
+    # ECS?
     - name: name
       type: keyword
       description: >
@@ -35,6 +36,7 @@
       description: >
         Free Memory in bytes
       format: bytes
+    # ECS?
     - name: network_names
       type: keyword
       description: >

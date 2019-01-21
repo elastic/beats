@@ -4,14 +4,17 @@
     connection
   release: ga
   fields:
+    # ECS?
     - name: name
       type: keyword
       description: >
         The name of the connection with non-ASCII characters escaped as in C.
+    # ECS?
     - name: vhost
       type: keyword
       description: >
         Virtual host name with non-ASCII characters escaped as in C.
+    # ECS?
     - name: user
       type: keyword
       description: >
@@ -37,6 +40,7 @@
       type: keyword
       description: >
         Type of the connection.
+    # ECS?
     - name: host
       type: keyword
       description: >

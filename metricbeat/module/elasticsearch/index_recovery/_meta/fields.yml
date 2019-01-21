@@ -25,6 +25,7 @@
       type: keyword
       description: >
         Target node id.
+    # ECS?
     - name: target.host
       type: ip
       description: >
@@ -38,6 +39,7 @@
       type: keyword
       description: >
         Source node id.
+    # ECS?
     - name: source.host
       type: ip
       description: >

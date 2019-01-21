@@ -4,10 +4,13 @@
     exchange
   release: ga
   fields:
+    # ECS?
+    # Additional: Seem to show up in different metricsets, one level up?
     - name: name
       type: keyword
       description: >
         The name of the queue with non-ASCII characters escaped as in C.
+    # ECS?
     - name: vhost
       type: keyword
       description: >
@@ -24,6 +27,7 @@
       type: boolean
       description: >
         Whether the exchange is internal, i.e. cannot be directly published to by a client.
+    # ECS?
     - name: user
       type: keyword
       description: >

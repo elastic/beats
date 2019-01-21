@@ -131,6 +131,7 @@
       type: keyword
       description: >
         Namespace name
+    # These 2 fields contain information about the service. I wonder if they should overwrite host info?
     - name: node.host
       type: keyword
       description: >

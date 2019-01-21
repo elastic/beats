@@ -4,10 +4,12 @@
     queue
   release: ga
   fields:
+    # ECS?
     - name: name
       type: keyword
       description: >
         The name of the queue with non-ASCII characters escaped as in C.
+    # ECS?
     - name: vhost
       type: keyword
       description: >
@@ -24,6 +26,7 @@
       type: boolean
       description: >
         Whether the queue is exclusive (i.e. has owner_pid).
+    # Shows up in different places, on the module level?
     - name: node
       type: keyword
       description: >

@@ -5,6 +5,7 @@
     command.
   release: ga
   fields:
+    # ECS?
     - name: hostname
       type: keyword
       description: >
@@ -49,10 +50,12 @@
       type: long
       description: >
         Number of outstanding requests that need to be processed by the cluster.
+    # ECS?
     - name: packets.received
       type: long
       description: >
         Number of ZooKeeper network packets received.
+    # ECS?
     - name: packets.sent
       type: long
       description: >
@@ -69,6 +72,7 @@
       type: long
       description: >
         Number of synced followers reported when a node server_state is leader.
+    # ECS? service.version?
     - name: version
       type: keyword
       description: >

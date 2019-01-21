@@ -4,10 +4,12 @@
     kubernetes pod metrics
   release: ga
   fields:
+    # ECS?
     - name: ip
       type: ip
       description: >
         Kubernetes pod IP
+    # ECS?
     - name: host_ip
       type: ip
       description: >

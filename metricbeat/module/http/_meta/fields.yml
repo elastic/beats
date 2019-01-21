@@ -5,6 +5,7 @@
   release: ga
   settings: ["ssl", "http"]
   fields:
+    # Is this all ECS compatible?
     - name: http
       type: group
       description: >

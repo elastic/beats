@@ -16,6 +16,7 @@
       type: keyword
       description: >
         Container status.
+    # IP address, should be ip anyway?
     - name: ip_addresses
       type: keyword
       description: >
