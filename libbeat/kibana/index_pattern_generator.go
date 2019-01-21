@@ -34,10 +34,11 @@ type IndexPatternGenerator struct {
 	version        common.Version
 	targetDir      string
 	targetFilename string
+	migration      bool
 }
 
 // Create an instance of the Kibana Index Pattern Generator
-func NewGenerator(indexName, beatName, fieldsYAMLFile, outputDir, beatVersion string, version common.Version) (*IndexPatternGenerator, error) {
+func NewGenerator(indexName, beatName, fieldsYAMLFile, outputDir, beatVersion string, version common.Version, migration bool) (*IndexPatternGenerator, error) {
 	beatName = clean(beatName)
 
 	if _, err := os.Stat(fieldsYAMLFile); err != nil {
@@ -51,6 +52,7 @@ func NewGenerator(indexName, beatName, fieldsYAMLFile, outputDir, beatVersion st
 		version:        version,
 		targetDir:      createTargetDir(outputDir, version),
 		targetFilename: beatName + ".json",
+		migration:      migration,
 	}, nil
 }
 
@@ -125,7 +127,7 @@ func (i *IndexPatternGenerator) addFieldsSpecific(indexPattern *common.MapStr) e
 	if err != nil {
 		return err
 	}
-	transformer, err := newFieldsTransformer(&i.version, fields)
+	transformer, err := newFieldsTransformer(&i.version, fields, i.migration)
 	if err != nil {
 		return err
 	}

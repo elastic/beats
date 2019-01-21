@@ -41,6 +41,7 @@ var (
 	indexPattern   string
 	fieldsYAMLFile string
 	outputDir      string
+	migration      bool
 )
 
 func init() {
@@ -49,6 +50,7 @@ func init() {
 	flag.StringVar(&indexPattern, "index", "", "Kibana index pattern. (Required)")
 	flag.StringVar(&fieldsYAMLFile, "fields", "fields.yml", "fields.yml file containing all fields used by the Beat.")
 	flag.StringVar(&outputDir, "out", "build/kibana", "Output dir.")
+	flag.BoolVar(&migration, "migration", false, "Enable migration fields in index pattern.")
 }
 
 func main() {
@@ -68,11 +70,11 @@ func main() {
 	}
 
 	versions := []string{
-		"6.0.0",
+		"7.0.0",
 	}
 	for _, version := range versions {
 		version, _ := common.NewVersion(version)
-		indexPattern, err := kibana.NewGenerator(indexPattern, beatName, fieldsYAMLFile, outputDir, beatVersion, *version)
+		indexPattern, err := kibana.NewGenerator(indexPattern, beatName, fieldsYAMLFile, outputDir, beatVersion, *version, migration)
 		if err != nil {
 			log.Fatal(err)
 		}
