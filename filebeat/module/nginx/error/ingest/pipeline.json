@@ -21,7 +21,9 @@
     "date": {
       "field": "nginx.error.time",
       "target_field": "@timestamp",
-      "formats": ["YYYY/MM/dd H:m:s"]
+      "formats": ["YYYY/MM/dd H:m:s"],
+      {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
+      "ignore_failure": true
     }
   }, {
     "remove": {
