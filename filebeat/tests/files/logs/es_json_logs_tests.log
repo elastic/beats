@@ -4,7 +4,6 @@
 {"type": "server", "timestamp": "2019-01-10T11:18:58,449+0100", "level": "DEBUG", "component": "test", "cluster.name": "elasticsearch", "node.name": "sample-name",  "message": "This is a debug message"  }
 {"type": "server", "timestamp": "2019-01-10T11:18:58,449+0100", "level": "TRACE", "component": "test", "cluster.name": "elasticsearch", "node.name": "sample-name",  "message": "This is a trace message"  }
 {"type": "server", "timestamp": "2019-01-10T11:18:58,489+0100", "level": "INFO", "component": "o.e.c.l.JsonLoggerTests", "cluster.name": "elasticsearch", "node.name": "sample-name",  "message": "after test"  }
-[2019-01-10T11:18:58,513][INFO ][o.e.c.l.JsonLoggerTests  ] [testJsonInStacktraceMessageIsSplitted] before test
 {"type": "server", "timestamp": "2019-01-10T11:18:58,523+0100", "level": "ERROR", "component": "test", "cluster.name": "elasticsearch", "node.name": "sample-name",  "message": "error message {\n  \"terms\" : {\n    \"user\" : [\n      \"u1\",\n      \"u2\",\n      \"u3\"\n    ],\n    \"boost\" : 1.0\n  }\n}" , 
 "stacktrace": ["java.lang.Exception: {",
 "  \"terms\" : {",
@@ -54,7 +53,6 @@
 "at com.carrotsearch.randomizedtesting.ThreadLeakControl$StatementRunner.run(ThreadLeakControl.java:368) [randomizedtesting-runner-2.7.1.jar:?]",
 "at java.lang.Thread.run(Thread.java:834) [?:?]"] }
 {"type": "server", "timestamp": "2019-01-10T11:18:58,537+0100", "level": "INFO", "component": "o.e.c.l.JsonLoggerTests", "cluster.name": "elasticsearch", "node.name": "sample-name",  "message": "after test"  }
-[2019-01-10T11:18:58,549][INFO ][o.e.c.l.JsonLoggerTests  ] [testStacktrace] before test
 {"type": "server", "timestamp": "2019-01-10T11:18:58,560+0100", "level": "ERROR", "component": "test", "cluster.name": "elasticsearch", "node.name": "sample-name",  "message": "error message" , 
 "stacktrace": ["java.lang.Exception: exception message",
 "at org.elasticsearch.common.logging.JsonLoggerTests.testStacktrace(JsonLoggerTests.java:125) [test/:?]",
@@ -97,7 +95,6 @@
 "Caused by: java.lang.RuntimeException: cause message",
 "... 37 more"] }
 {"type": "server", "timestamp": "2019-01-10T11:18:58,566+0100", "level": "INFO", "component": "o.e.c.l.JsonLoggerTests", "cluster.name": "elasticsearch", "node.name": "sample-name",  "message": "after test"  }
-[2019-01-10T11:18:58,579][INFO ][o.e.c.l.JsonLoggerTests  ] [testJsonInMessage] before test
 {"type": "server", "timestamp": "2019-01-10T11:18:58,593+0100", "level": "INFO", "component": "test", "cluster.name": "elasticsearch", "node.name": "sample-name",  "message": "{\n  \"terms\" : {\n    \"user\" : [\n      \"u1\",\n      \"u2\",\n      \"u3\"\n    ],\n    \"boost\" : 1.0\n  }\n}"  }
 {"type": "server", "timestamp": "2019-01-10T11:18:58,594+0100", "level": "INFO", "component": "o.e.c.l.JsonLoggerTests", "cluster.name": "elasticsearch", "node.name": "sample-name",  "message": "after test"  }
 
