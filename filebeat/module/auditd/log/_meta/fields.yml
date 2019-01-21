@@ -4,9 +4,6 @@
     Fields from the Linux audit log. Not all fields are documented here because
     they are dynamic and vary by audit event type.
   fields:
-    - name: record_type
-      description: >
-        The audit event type.
     - name: old_auid
       description: >
         For login events this is the old audit ID used for the user prior to
@@ -38,9 +35,6 @@
     - name: a0
       description: >
         The first argument to the system call.
-    - name: res
-      description: >
-        The result of the system call (success or failure).
 
     - name: acct
       type: alias
@@ -51,6 +45,12 @@
     - name: ppid
       type: alias
       path: process.ppid
+    - name: res
+      type: alias
+      path: event.outcome
+    - name: record_type
+      type: alias
+      path: event.action
     - name: geoip
       type: group
       fields:
@@ -72,3 +72,68 @@
         - name: region_iso_code
           type: alias
           path: source.geo.region_iso_code
+
+    # Fields below were not defined in 6.x but were still being populated.
+    - name: arch
+      type: alias
+      path: host.os.architecture
+    - name: gid
+      type: alias
+      path: user.group_.id
+    - name: uid
+      type: alias
+      path: user.id
+    - name: agid
+      type: alias
+      path: user.audit.group.id
+    - name: auid
+      type: alias
+      path: user.audit.id
+    - name: fsgid
+      type: alias
+      path: user.filesystem.group.id
+    - name: fsuid
+      type: alias
+      path: user.filesystem.id
+    - name: egid
+      type: alias
+      path: user.effective.group.id
+    - name: euid
+      type: alias
+      path: user.effective.id
+    - name: sgid
+      type: alias
+      path: user.saved.group.id
+    - name: suid
+      type: alias
+      path: user.saved.id
+    - name: ogid
+      type: alias
+      path: user.owner.group.id
+    - name: ouid
+      type: alias
+      path: user.owner.id
+    - name: comm
+      type: alias
+      path: process.name
+    - name: exe
+      type: alias
+      path: process.executable
+    - name: terminal
+      type: alias
+      path: process.terminal
+    - name: tty
+      type: alias
+      path: process.terminal
+    - name: msg
+      type: alias
+      path: message
+    - name: src
+      type: alias
+      path: source.address
+    - name: addr
+      type: alias
+      path: source.address
+    - name: dst
+      type: alias
+      path: destination.address

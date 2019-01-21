@@ -431,14 +431,6 @@ Fields from the Linux audit log. Not all fields are documented here because they
 
 
 
-*`auditd.log.record_type`*::
-+
---
-The audit event type.
-
-
---
-
 *`auditd.log.old_auid`*::
 +
 --
@@ -505,14 +497,6 @@ The first argument to the system call.
 
 --
 
-*`auditd.log.res`*::
-+
---
-The result of the system call (success or failure).
-
-
---
-
 *`auditd.log.acct`*::
 +
 --
@@ -537,6 +521,24 @@ alias to: process.pid
 type: alias
 
 alias to: process.ppid
+
+--
+
+*`auditd.log.res`*::
++
+--
+type: alias
+
+alias to: event.outcome
+
+--
+
+*`auditd.log.record_type`*::
++
+--
+type: alias
+
+alias to: event.action
 
 --
 
@@ -592,6 +594,195 @@ alias to: source.geo.city_name
 type: alias
 
 alias to: source.geo.region_iso_code
+
+--
+
+*`auditd.log.arch`*::
++
+--
+type: alias
+
+alias to: host.os.architecture
+
+--
+
+*`auditd.log.gid`*::
++
+--
+type: alias
+
+alias to: user.group_.id
+
+--
+
+*`auditd.log.uid`*::
++
+--
+type: alias
+
+alias to: user.id
+
+--
+
+*`auditd.log.agid`*::
++
+--
+type: alias
+
+alias to: user.audit.group.id
+
+--
+
+*`auditd.log.auid`*::
++
+--
+type: alias
+
+alias to: user.audit.id
+
+--
+
+*`auditd.log.fsgid`*::
++
+--
+type: alias
+
+alias to: user.filesystem.group.id
+
+--
+
+*`auditd.log.fsuid`*::
++
+--
+type: alias
+
+alias to: user.filesystem.id
+
+--
+
+*`auditd.log.egid`*::
++
+--
+type: alias
+
+alias to: user.effective.group.id
+
+--
+
+*`auditd.log.euid`*::
++
+--
+type: alias
+
+alias to: user.effective.id
+
+--
+
+*`auditd.log.sgid`*::
++
+--
+type: alias
+
+alias to: user.saved.group.id
+
+--
+
+*`auditd.log.suid`*::
++
+--
+type: alias
+
+alias to: user.saved.id
+
+--
+
+*`auditd.log.ogid`*::
++
+--
+type: alias
+
+alias to: user.owner.group.id
+
+--
+
+*`auditd.log.ouid`*::
++
+--
+type: alias
+
+alias to: user.owner.id
+
+--
+
+*`auditd.log.comm`*::
++
+--
+type: alias
+
+alias to: process.name
+
+--
+
+*`auditd.log.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
+
+--
+
+*`auditd.log.terminal`*::
++
+--
+type: alias
+
+alias to: process.terminal
+
+--
+
+*`auditd.log.tty`*::
++
+--
+type: alias
+
+alias to: process.terminal
+
+--
+
+*`auditd.log.msg`*::
++
+--
+type: alias
+
+alias to: message
+
+--
+
+*`auditd.log.src`*::
++
+--
+type: alias
+
+alias to: source.address
+
+--
+
+*`auditd.log.addr`*::
++
+--
+type: alias
+
+alias to: source.address
+
+--
+
+*`auditd.log.dst`*::
++
+--
+type: alias
+
+alias to: destination.address
 
 --
 
