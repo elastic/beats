@@ -142,6 +142,13 @@ func (f Fields) HasKey(key string) bool {
 	return f.hasKey(keys)
 }
 
+// GetField returns the field in case it exists
+func (f Fields) GetField(key string) *Field {
+	keys := strings.Split(key, ".")
+	return f.getField(keys)
+
+}
+
 // HasNode checks if inside fields the given node exists
 // In contrast to HasKey it not only compares the leaf nodes but
 // every single key it traverses.
@@ -214,6 +221,32 @@ func (f Fields) hasKey(keys []string) bool {
 		}
 	}
 	return false
+}
+
+func (f Fields) getField(keys []string) *Field {
+	// Nothing to compare anymore
+	if len(keys) == 0 {
+		return nil
+	}
+
+	key := keys[0]
+	keys = keys[1:]
+
+	for _, field := range f {
+		if field.Name == key {
+
+			if len(field.Fields) > 0 {
+				return field.Fields.getField(keys)
+			}
+			// Last entry in the tree but still more keys
+			if len(keys) > 0 {
+				return nil
+			}
+
+			return &field
+		}
+	}
+	return nil
 }
 
 // GetKeys returns a flat list of keys this Fields contains
