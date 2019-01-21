@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v6.5.4...6.5[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Fix config appender registration. {pull}9873[9873]
 - Gracefully handle TLS options when enrolling a Beat. {issue}9129[9129]
 - Allow to unenroll a Beat from the UI. {issue}9452[9452]
 
