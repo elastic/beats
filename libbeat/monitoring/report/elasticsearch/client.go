@@ -20,6 +20,9 @@ package elasticsearch
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/pkg/errors"
 
@@ -185,11 +188,10 @@ func (c *publishClient) bulkToProduction(params map[string]string, event publish
 	return err
 }
 
-// TODO: figure out why this isn't actually indexing anything!
 func (c *publishClient) bulkToMonitoring(event publisher.Event) error {
 	action := common.MapStr{
 		"index": common.MapStr{
-			"_index":   "monitoring-beats-6-1", // FIXME
+			"_index":   getMonitoringIndexName(),
 			"_routing": nil,
 		},
 	}
@@ -200,15 +202,48 @@ func (c *publishClient) bulkToMonitoring(event publisher.Event) error {
 		action.Put("index._type", "doc")
 	}
 
+	event.Content.Fields.Put("timestamp", event.Content.Timestamp)
+
+	t, err := event.Content.Meta.GetValue("type")
+	if err != nil {
+		return errors.Wrap(err, "could not determine type field")
+	}
+	tStr, ok := t.(string)
+	if !ok {
+		return fmt.Errorf("type is not string")
+	}
+	fields := common.MapStr{
+		"type": tStr,
+		tStr:   event.Content.Fields,
+	}
+
+	interval, err := event.Content.Meta.GetValue("interval_ms")
+	if err != nil {
+		return errors.Wrap(err, "could not determine interval_ms field")
+	}
+	fields.Put("interval_ms", interval)
+
+	clusterUUID, err := event.Content.Meta.GetValue("cluster_uuid")
+	if err != nil && err != common.ErrKeyNotFound {
+		return errors.Wrap(err, "could not determine cluster_uuid field")
+	}
+	fields.Put("cluster_uuid", clusterUUID)
+
 	document := report.Event{
 		Timestamp: event.Content.Timestamp,
-		Fields:    event.Content.Fields,
+		Fields:    fields,
 	}
 	bulk := [2]interface{}{action, document}
 
 	// Currently one request per event is sent. Reason is that each event can contain different
 	// interval params and X-Pack requires to send the interval param.
 	// FIXME: index name (first param below)
-	_, err := c.es.BulkWith("monitoring-beats-6-1", "doc", nil, nil, bulk[:])
+	_, err = c.es.BulkWith(getMonitoringIndexName(), "doc", nil, nil, bulk[:])
 	return err
+}
+
+func getMonitoringIndexName() string {
+	version := 6
+	date := time.Now().Format("2006.01.02")
+	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
 }
