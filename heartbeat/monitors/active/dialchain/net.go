@@ -23,8 +23,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/look"
-	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -105,7 +105,7 @@ func netDialer(timeout time.Duration) NetDialer {
 			}
 
 			end := time.Now()
-			monitors.MergeEventFields(event, common.MapStr{
+			eventext.MergeEventFields(event, common.MapStr{
 				namespace: common.MapStr{
 					"rtt": common.MapStr{
 						"connect": look.RTT(end.Sub(start)),

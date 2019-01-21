@@ -2,7 +2,7 @@
   type: group
   description: >
     Cross-cluster replication stats
-  release: beta
+  release: ga
   fields:
     - name: leader
       type: group

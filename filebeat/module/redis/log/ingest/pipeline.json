@@ -51,7 +51,7 @@
         {
             "rename": {
                 "field": "@timestamp",
-                "target_field": "read_timestamp"
+                "target_field": "event.created"
             }
         },
         {

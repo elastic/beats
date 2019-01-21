@@ -1,16 +1,12 @@
 - name: http
   description: Please add description
   type: group
-  fields: 
+  fields:
 
   - name: response
     description: Fields related to the HTTP response
     type: group
     fields:
-    - name: status_code
-      description: HTTP status code returned to the client.
-      type: long
-
     - name: captured_cookie
       description: >
         Optional "name=value" entry indicating that the client had this cookie in the response.
@@ -19,6 +15,11 @@
       description: >
         List of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
       type: text
+
+    - name: status_code
+      type: alias
+      path: http.response.status_code
+      migration: true
 
   - name: request
     description: Fields related to the HTTP request
@@ -36,7 +37,7 @@
     - name: raw_request_line
       description: Complete HTTP request line, including the method, request and HTTP version string.
       type: text
-      
+
     - name: time_active_ms
       description: Time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
       type: long

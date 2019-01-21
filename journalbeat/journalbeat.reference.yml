@@ -319,7 +319,7 @@ output.elasticsearch:
   # Optional index name. The default is "journalbeat" plus date
   # and generates [journalbeat-]YYYY.MM.DD keys.
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "journalbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
+  #index: "journalbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -896,14 +896,14 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Template name. By default the template name is "journalbeat-%{[beat.version]}"
+# Template name. By default the template name is "journalbeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.name: "journalbeat-%{[beat.version]}"
+#setup.template.name: "journalbeat-%{[agent.version]}"
 
-# Template pattern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
+# Template pattern. By default the template pattern is "-%{[agent.version]}-*" to apply to the default index settings.
 # The first part is the version of the beat and then -* is used to match all daily indices.
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.pattern: "journalbeat-%{[beat.version]}-*"
+#setup.template.pattern: "journalbeat-%{[agent.version]}-*"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
