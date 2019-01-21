@@ -17,10 +17,10 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-ceph-osd_df,osd_df>>   
 |<<metricbeat-metricset-ceph-osd_tree,osd_tree>>   
 |<<metricbeat-metricset-ceph-pool_disk,pool_disk>>   
-|<<metricbeat-module-couchbase,Couchbase>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.3+| .3+|  |<<metricbeat-metricset-couchbase-bucket,bucket>> beta[]  
-|<<metricbeat-metricset-couchbase-cluster,cluster>> beta[]  
-|<<metricbeat-metricset-couchbase-node,node>> beta[]  
+|<<metricbeat-module-couchbase,Couchbase>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.3+| .3+|  |<<metricbeat-metricset-couchbase-bucket,bucket>>   
+|<<metricbeat-metricset-couchbase-cluster,cluster>>   
+|<<metricbeat-metricset-couchbase-node,node>>   
 |<<metricbeat-module-docker,Docker>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .8+| .8+|  |<<metricbeat-metricset-docker-container,container>>   
 |<<metricbeat-metricset-docker-cpu,cpu>>   

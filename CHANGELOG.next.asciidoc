@@ -168,6 +168,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Release php_fpm module as GA. {pull}10198[10198]
 - Release Memcached module as GA. {pull}10199[10199]
 - Release etcd module as GA. {pull}10200[10200]
+- Release Couchbase module as GA. {pull}10201[10201]
 - Release aerospike module as GA. {pull}10203[10203]
 
 *Packetbeat*
