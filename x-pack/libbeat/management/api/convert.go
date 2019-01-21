@@ -25,14 +25,12 @@ var (
 )
 
 func selectConverter(t string) converter {
-	c := noopConvert
 	for k, v := range mapper {
 		if strings.Index(t, k) > -1 {
-			c = v
-			return c
+			return v
 		}
 	}
-	return c
+	return noopConvert
 }
 
 func convertSingle(m map[string]interface{}) (map[string]interface{}, error) {
