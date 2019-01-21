@@ -7,15 +7,23 @@ package pkg
 import (
 	"testing"
 
+	"github.com/elastic/beats/auditbeat/core"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err := mbtest.WriteEventsReporterV2(f, t, "")
-	if err != nil {
-		t.Fatal("write", err)
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("received error: %+v", errs[0])
 	}
+
+	if len(events) == 0 {
+		t.Fatal("no events were generated")
+	}
+
+	fullEvent := mbtest.StandardizeEvent(f, events[len(events)-1], core.AddDatasetToEvent)
+	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 
 func getConfig() map[string]interface{} {

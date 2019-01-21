@@ -109,17 +109,37 @@ func (pkg Package) Hash() uint64 {
 }
 
 func (pkg Package) toMapStr() common.MapStr {
-	return common.MapStr{
+	mapstr := common.MapStr{
 		"name":        pkg.Name,
 		"version":     pkg.Version,
-		"release":     pkg.Release,
-		"arch":        pkg.Arch,
-		"license":     pkg.License,
 		"installtime": pkg.InstallTime,
-		"size":        pkg.Size,
-		"summary":     pkg.Summary,
-		"url":         pkg.URL,
 	}
+
+	if pkg.Arch != "" {
+		mapstr.Put("arch", pkg.Arch)
+	}
+
+	if pkg.License != "" {
+		mapstr.Put("license", pkg.License)
+	}
+
+	if pkg.Release != "" {
+		mapstr.Put("release", pkg.Release)
+	}
+
+	if pkg.Size != 0 {
+		mapstr.Put("size", pkg.Size)
+	}
+
+	if pkg.Summary != "" {
+		mapstr.Put("summary", pkg.Summary)
+	}
+
+	if pkg.URL != "" {
+		mapstr.Put("url", pkg.URL)
+	}
+
+	return mapstr
 }
 
 func getOS() (*types.OSInfo, error) {
