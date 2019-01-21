@@ -17276,7 +17276,7 @@ nats Module
 *`nats.server.id`*::
 +
 --
-type: string
+type: keyword
 
 The server ID
 
