@@ -90,8 +90,8 @@
       },
       "id": "cf8aa0a0-18ca-11e9-9094-c50574723088",
       "type": "visualization",
-      "updated_at": "2019-01-21T11:25:49.634Z",
-      "version": 18
+      "updated_at": "2019-01-21T11:37:35.796Z",
+      "version": 21
     },
     {
       "attributes": {
@@ -200,8 +200,8 @@
       },
       "id": "9dd991a0-18cb-11e9-9094-c50574723088",
       "type": "visualization",
-      "updated_at": "2019-01-21T11:30:05.056Z",
-      "version": 21
+      "updated_at": "2019-01-21T11:37:35.796Z",
+      "version": 24
     },
     {
       "attributes": {
@@ -293,8 +293,8 @@
       },
       "id": "4d0485f0-18da-11e9-9094-c50574723088",
       "type": "visualization",
-      "updated_at": "2019-01-21T11:26:06.865Z",
-      "version": 18
+      "updated_at": "2019-01-21T11:37:35.796Z",
+      "version": 21
     },
     {
       "attributes": {
@@ -309,8 +309,8 @@
                 "meta": {
                   "alias": null,
                   "disabled": false,
-                  "index": "dfce2b60-18c7-11e9-9094-c50574723088",
-                  "key": "event.dataset.keyword",
+                  "index": "auditbeat-*",
+                  "key": "event.dataset",
                   "negate": false,
                   "params": {
                     "query": "host",
@@ -441,8 +441,8 @@
       },
       "id": "eea92ad0-18d7-11e9-9094-c50574723088",
       "type": "visualization",
-      "updated_at": "2019-01-21T11:25:14.806Z",
-      "version": 17
+      "updated_at": "2019-01-21T11:55:01.566Z",
+      "version": 21
     },
     {
       "attributes": {
@@ -603,8 +603,8 @@
       },
       "id": "91962a30-1901-11e9-9094-c50574723088",
       "type": "visualization",
-      "updated_at": "2019-01-21T11:28:30.876Z",
-      "version": 21
+      "updated_at": "2019-01-21T11:37:35.796Z",
+      "version": 24
     },
     {
       "attributes": {
@@ -702,8 +702,8 @@
       },
       "id": "dfe62590-18da-11e9-9094-c50574723088",
       "type": "dashboard",
-      "updated_at": "2019-01-21T11:22:53.676Z",
-      "version": 18
+      "updated_at": "2019-01-21T11:37:35.796Z",
+      "version": 24
     }
   ],
   "version": "7.0.0"
