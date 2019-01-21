@@ -184,22 +184,21 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	osInfo, err := getOS()
 	if err != nil {
 		return nil, errors.Wrap(err, "error determining operating system")
-	} else {
-		ms.osFamily = osInfo.Family
-		switch osInfo.Family {
-		case redhat:
-			return nil, fmt.Errorf("RPM support is not yet implemented")
-		case debian:
-			if _, err := os.Stat(dpkgStatusFile); err != nil {
-				return nil, errors.Wrapf(err, "error looking up %s", dpkgStatusFile)
-			}
-		case darwin:
-			if _, err := os.Stat(homebrewCellarPath); err != nil {
-				return nil, errors.Wrapf(err, "error looking up %s - is Homebrew installed?", homebrewCellarPath)
-			}
-		default:
-			return nil, fmt.Errorf("this metricset does not support OS family %v", osInfo.Family)
+	}
+	ms.osFamily = osInfo.Family
+	switch osInfo.Family {
+	case redhat:
+		return nil, fmt.Errorf("RPM support is not yet implemented")
+	case debian:
+		if _, err := os.Stat(dpkgStatusFile); err != nil {
+			return nil, errors.Wrapf(err, "error looking up %s", dpkgStatusFile)
 		}
+	case darwin:
+		if _, err := os.Stat(homebrewCellarPath); err != nil {
+			return nil, errors.Wrapf(err, "error looking up %s - is Homebrew installed?", homebrewCellarPath)
+		}
+	default:
+		return nil, fmt.Errorf("this metricset does not support OS family %v", osInfo.Family)
 	}
 
 	// Load from disk: Time when state was last sent
