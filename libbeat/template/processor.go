@@ -27,6 +27,7 @@ import (
 // Processor struct to process fields to template
 type Processor struct {
 	EsVersion common.Version
+	Migration bool
 }
 
 var (
@@ -264,9 +265,14 @@ func (p *Processor) alias(f *common.Field) common.MapStr {
 		return nil
 	}
 
+	// In case migration is disabled and it's a migration alias, field is not created
+	if !p.Migration && f.MigrationAlias {
+		return nil
+	}
 	properties := getDefaultProperties(f)
 	properties["type"] = "alias"
 	properties["path"] = f.AliasPath
+
 	return properties
 }
 

@@ -11860,6 +11860,65 @@ Memory usage as a percentage of the defined limit for the pod containers (or tot
 
 --
 
+
+*`kubernetes.pod.memory.available.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total memory available
+
+
+--
+
+
+*`kubernetes.pod.memory.workingSet.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total working set memory
+
+
+--
+
+
+*`kubernetes.pod.memory.rss.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total resident set size memory
+
+
+--
+
+*`kubernetes.pod.memory.pageFaults`*::
++
+--
+type: long
+
+Total page faults
+
+
+--
+
+*`kubernetes.pod.memory.majorPageFaults`*::
++
+--
+type: long
+
+Total major page faults
+
+
+--
+
 [float]
 == container fields
 
@@ -17214,7 +17273,7 @@ nats Module
 
 
 
-*`nats.server_id`*::
+*`nats.server.id`*::
 +
 --
 type: string
@@ -17224,7 +17283,7 @@ The server ID
 
 --
 
-*`nats.now`*::
+*`nats.server.time`*::
 +
 --
 type: date
@@ -17520,6 +17579,93 @@ The number of hits on root monitoring uri
 
 --
 
+[float]
+== subscriptions fields
+
+Contains nats subscriptions related metrics
+
+
+
+*`nats.subscriptions.total`*::
++
+--
+type: integer
+
+The number of active subscriptions
+
+
+--
+
+*`nats.subscriptions.inserts`*::
++
+--
+type: integer
+
+The number of insert operations in subscriptions list
+
+
+--
+
+*`nats.subscriptions.removes`*::
++
+--
+type: integer
+
+The number of remove operations in subscriptions list
+
+
+--
+
+*`nats.subscriptions.matches`*::
++
+--
+type: integer
+
+The number of times a match is found for a subscription
+
+
+--
+
+*`nats.subscriptions.cache.size`*::
++
+--
+type: integer
+
+The number of result sets in the cache
+
+
+--
+
+*`nats.subscriptions.cache.hit_rate`*::
++
+--
+type: integer
+
+The rate matches are being retrieved from cache
+
+
+--
+
+*`nats.subscriptions.cache.fanout.max`*::
++
+--
+type: integer
+
+The maximum fanout served by cache
+
+
+--
+
+*`nats.subscriptions.cache.fanout.avg`*::
++
+--
+type: integer
+
+The average fanout served by cache
+
+
+--
+
 [[exported-fields-nginx]]
 == Nginx fields
 
@@ -17644,7 +17790,6 @@ The current number of idle client connections waiting for a request.
 [[exported-fields-php_fpm]]
 == PHP_FPM fields
 
-beta[]
 PHP-FPM server status metrics collected from PHP-FPM.
 
 

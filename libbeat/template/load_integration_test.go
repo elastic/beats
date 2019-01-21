@@ -70,7 +70,7 @@ func TestLoadTemplate(t *testing.T) {
 	fieldsPath := absPath + "/fields.yml"
 	index := "testbeat"
 
-	tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{})
+	tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{}, false)
 	assert.NoError(t, err)
 	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)
@@ -140,7 +140,7 @@ func TestLoadBeatsTemplate(t *testing.T) {
 		fieldsPath := absPath + "/fields.yml"
 		index := beat
 
-		tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{})
+		tmpl, err := New(version.GetDefaultVersion(), index, client.GetVersion(), TemplateConfig{}, false)
 		assert.NoError(t, err)
 		content, err := tmpl.LoadFile(fieldsPath)
 		assert.NoError(t, err)
@@ -189,7 +189,7 @@ func TestTemplateSettings(t *testing.T) {
 	config := TemplateConfig{
 		Settings: settings,
 	}
-	tmpl, err := New(version.GetDefaultVersion(), "testbeat", client.GetVersion(), config)
+	tmpl, err := New(version.GetDefaultVersion(), "testbeat", client.GetVersion(), config, false)
 	assert.NoError(t, err)
 	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)
@@ -240,7 +240,7 @@ func TestOverwrite(t *testing.T) {
 		Enabled: true,
 		Fields:  absPath + "/fields.yml",
 	})
-	loader, err := NewLoader(config, client, beatInfo, nil)
+	loader, err := NewLoader(config, client, beatInfo, nil, false)
 	assert.NoError(t, err)
 	err = loader.Load()
 	assert.NoError(t, err)
@@ -255,7 +255,7 @@ func TestOverwrite(t *testing.T) {
 			},
 		},
 	})
-	loader, err = NewLoader(config, client, beatInfo, nil)
+	loader, err = NewLoader(config, client, beatInfo, nil, false)
 	assert.NoError(t, err)
 	err = loader.Load()
 	assert.NoError(t, err)
@@ -275,7 +275,7 @@ func TestOverwrite(t *testing.T) {
 			},
 		},
 	})
-	loader, err = NewLoader(config, client, beatInfo, nil)
+	loader, err = NewLoader(config, client, beatInfo, nil, false)
 	assert.NoError(t, err)
 	err = loader.Load()
 	assert.NoError(t, err)
@@ -339,7 +339,7 @@ func TestTemplateWithData(t *testing.T) {
 	// Setup ES
 	client := estest.GetTestingElasticsearch(t)
 
-	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), TemplateConfig{})
+	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), TemplateConfig{}, false)
 	assert.NoError(t, err)
 	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)

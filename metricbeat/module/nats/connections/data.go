@@ -30,8 +30,10 @@ import (
 
 var (
 	moduleSchema = s.Schema{
-		"server_id": c.Str("server_id"),
-		"now":       c.Str("now"),
+		"server": s.Object{
+			"id":   c.Str("server_id"),
+			"time": c.Str("now"),
+		},
 	}
 	connectionsSchema = s.Schema{
 		"total": c.Int("total"),
