@@ -15,28 +15,32 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package routes
+package subscriptions
 
 import (
 	"encoding/json"
-
-	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/pkg/errors"
 
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 var (
-	moduleSchema = s.Schema{
-		"server": s.Object{
-			"id":   c.Str("server_id"),
-			"time": c.Str("now"),
+	subscriptionsSchema = s.Schema{
+		"total": c.Int("num_subscriptions"),
+		"cache": s.Object{
+			"size":     c.Int("num_cache"),
+			"hit_rate": c.Int("cache_hit_rate"),
+			"fanout": s.Object{
+				"max": c.Int("max_fanout"),
+				"avg": c.Int("avg_fanout"),
+			},
 		},
-	}
-	routesSchema = s.Schema{
-		"total": c.Int("num_routes"),
+		"inserts": c.Int("num_inserts"),
+		"removes": c.Int("num_removes"),
+		"matches": c.Int("num_matches"),
 	}
 )
 
@@ -46,23 +50,17 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 
 	err := json.Unmarshal(content, &inInterface)
 	if err != nil {
-		err = errors.Wrap(err, "failure parsing Nats routes API response")
+		err = errors.Wrap(err, "failure parsing Nats subscriptions API response")
 		r.Error(err)
 		return err
 	}
-	event.MetricSetFields, err = routesSchema.Apply(inInterface)
+	event.MetricSetFields, err = subscriptionsSchema.Apply(inInterface)
 	if err != nil {
-		err = errors.Wrap(err, "failure applying routes schema")
+		err = errors.Wrap(err, "failure applying subscriptions schema")
 		r.Error(err)
 		return err
 	}
 
-	event.ModuleFields, err = moduleSchema.Apply(inInterface)
-	if err != nil {
-		err = errors.Wrap(err, "failure applying module schema")
-		r.Error(err)
-		return err
-	}
 	r.Event(event)
 	return nil
 }
