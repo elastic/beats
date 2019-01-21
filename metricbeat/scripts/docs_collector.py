@@ -163,7 +163,8 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 
             modules_list[module['name']]["metricsets"][metricset]["release"] = release
 
-            metricset_file += 'include::../../../module/' + module['name'] + '/' + metricset + '/_meta/docs.asciidoc[]' + "\n"
+            metricset_file += 'include::../../../module/' + \
+                module['name'] + '/' + metricset + '/_meta/docs.asciidoc[]' + "\n"
 
             # TODO: This should point directly to the exported fields of the metricset, not the whole module
             metricset_file += """
@@ -184,7 +185,8 @@ For a description of each field in the metricset, see the
 
                 metricset_file += "[source,json]\n"
                 metricset_file += "----\n"
-                metricset_file += "include::../../../module/" + module['name'] + "/" + metricset + "/_meta/data.json[]\n"
+                metricset_file += "include::../../../module/" + \
+                    module['name'] + "/" + metricset + "/_meta/data.json[]\n"
                 metricset_file += "----\n"
 
             # Write metricset docs
