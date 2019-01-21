@@ -129,6 +129,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `name` config option to `add_host_metadata` processor. {pull}9943[9943]
 - Add `add_labels` and `add_tags` processors. {pull}9973[9973]
 - Add missing file encoding to readers. {pull}10080[10080]
+- Add alias field support in Kibana index pattern. {pull}10075[10075]
 
 *Auditbeat*
 

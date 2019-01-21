@@ -192,6 +192,58 @@ func TestGetKeys(t *testing.T) {
 	}
 }
 
+func TestGetField(t *testing.T) {
+	tests := []struct {
+		fields Fields
+		key    string
+		field  *Field
+	}{
+		{
+			fields: Fields{
+				Field{
+					Name: "test", Fields: Fields{
+						Field{
+							Name: "find",
+						},
+					},
+				},
+			},
+			key:   "test.find",
+			field: &Field{Name: "find"},
+		},
+		{
+			fields: Fields{
+				Field{
+					Name: "test", Fields: Fields{
+						Field{
+							Name: "find",
+						},
+					},
+				},
+			},
+			key:   "test",
+			field: nil,
+		},
+		{
+			fields: Fields{
+				Field{
+					Name: "test", Fields: Fields{
+						Field{
+							Name: "find",
+						},
+					},
+				},
+			},
+			key:   "test.find.more",
+			field: nil,
+		},
+	}
+
+	for _, test := range tests {
+		assert.Equal(t, test.field, test.fields.GetField(test.key))
+	}
+}
+
 func TestFieldValidate(t *testing.T) {
 	tests := []struct {
 		cfg   MapStr

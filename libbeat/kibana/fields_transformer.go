@@ -24,6 +24,8 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+var v640 = common.MustNewVersion("6.4.0")
+
 type fieldsTransformer struct {
 	fields                    common.Fields
 	transformedFields         []common.MapStr
@@ -84,6 +86,19 @@ func (t *fieldsTransformer) transformFields(commonFields common.Fields, path str
 				t.transformFields(f.Fields, f.Path)
 			}
 		} else {
+			if f.Type == "alias" {
+				if t.version.LessThan(v640) {
+					continue
+				}
+				if ff := t.fields.GetField(f.AliasPath); ff != nil {
+					// copy the field, keep
+					path := f.Path
+					name := f.Name
+					f = *ff
+					f.Path = path
+					f.Name = name
+				}
+			}
 			t.add(f)
 
 			if f.MultiFields != nil {
@@ -104,7 +119,7 @@ func (t *fieldsTransformer) update(target *common.MapStr, override common.Field)
 		target.Update(field)
 		if !override.Overwrite {
 			// compatible duplication
-			return fmt.Errorf("field <%s> is duplicated, remove it or set 'overwrite: true'", override.Path)
+			return fmt.Errorf("field <%s> is duplicated, remove it or set 'overwrite: true', %+v, %+v", override.Path, override, field)
 		}
 		return nil
 	}
