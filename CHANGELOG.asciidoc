@@ -103,10 +103,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Add `key` metricset to the Redis module. {issue}9582[9582] {pull}9657[9657] {pull}9746[9746]
 - Add `socket_summary` metricset to system defaults, removing experimental tag and supporting Windows {pull}9709[9709]
-- Add `nats` module with `stats` metricset. {pull}9825[9825]
-- Add `connections` metricset to the `nats` module. {pull}10095[10095]
-- Add `routes` metricset to the `nats` module. {pull}10095[10095]
-- Add remaining memory metrics of pods in Kubernetes metricbeat module {pull}10157[10157]
 
 *Packetbeat*
 
