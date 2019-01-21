@@ -28,15 +28,6 @@
       type: long
       description: >
         The audit event sequence number.
-    - name: acct
-      description: >
-        The user account name associated with the event.
-    - name: pid
-      description: >
-        The ID of the process.
-    - name: ppid
-      description: >
-        The ID of the process.
     - name: items
       description: >
         The number of items in an event.
@@ -50,34 +41,34 @@
     - name: res
       description: >
         The result of the system call (success or failure).
+
+    - name: acct
+      type: alias
+      path: user.name
+    - name: pid
+      type: alias
+      path: process.pid
+    - name: ppid
+      type: alias
+      path: process.ppid
     - name: geoip
       type: group
-      description: >
-        Contains GeoIP information gathered based on the `auditd.log.addr`
-        field. Only present if the GeoIP Elasticsearch plugin is available and
-        used.
       fields:
         - name: continent_name
-          type: keyword
-          description: >
-            The name of the continent.
-        - name: city_name
-          type: keyword
-          description: >
-            The name of the city.
-        - name: region_name
-          type: keyword
-          description: >
-            The name of the region.
+          type: alias
+          path: source.geo.continent_name
         - name: country_iso_code
-          type: keyword
-          description: >
-            Country ISO code.
+          type: alias
+          path: source.geo.country_iso_code
         - name: location
-          type: geo_point
-          description: >
-            The longitude and latitude.
+          type: alias
+          path: source.geo.location
+        - name: region_name
+          type: alias
+          path: source.geo.region_name
+        - name: city_name
+          type: alias
+          path: source.geo.city_name
         - name: region_iso_code
-          type: keyword
-          description: >
-            Region ISO code.
+          type: alias
+          path: source.geo.region_iso_code
