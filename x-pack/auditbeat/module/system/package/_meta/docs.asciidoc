@@ -1,8 +1,8 @@
-The System `package` dataset provides ... TODO.
+[role="xpack"]
 
-The dataset is implemented for Linux, macOS (Darwin), and Windows.
+experimental[]
 
-[float]
-=== Configuration options
+This is the `package` dataset of the system module.
 
-TODO
+It is implemented for Linux distributions using dpkg as their package manager,
+and for Homebrew on macOS (Darwin).
