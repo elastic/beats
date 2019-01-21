@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-couchbase]]
 == Couchbase module
 
-beta[]
-
 This module periodically fetches metrics from https://www.couchbase.com/[Couchbase]
 servers. The default metricsets are `bucket`, `cluster`, `node`.
 

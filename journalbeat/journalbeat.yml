@@ -168,3 +168,8 @@ processors:
 # have the Elasticsearch output configured, you can simply uncomment the
 # following line.
 #xpack.monitoring.elasticsearch:
+
+#================================= Migration ==================================
+
+# This allows to enable migration aliases
+#migration.enabled: false

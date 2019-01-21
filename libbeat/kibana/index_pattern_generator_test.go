@@ -122,7 +122,7 @@ func TestGenerate(t *testing.T) {
 	tmpDir := tmpPath(t)
 	defer os.RemoveAll(tmpDir)
 
-	v6, _ := common.NewVersion("6.0.0")
+	v6, _ := common.NewVersion("6.4.0")
 	versions := []*common.Version{v6}
 	for _, version := range versions {
 		generator, err := NewGenerator("beat-*", "b eat ?!", fieldsYml, tmpDir, "7.0.0-alpha1", *version)
@@ -149,7 +149,7 @@ func TestGenerateExtensive(t *testing.T) {
 	tmpDir := tmpPath(t)
 	defer os.RemoveAll(tmpDir)
 
-	version6, _ := common.NewVersion("6.0.0")
+	version6, _ := common.NewVersion("6.4.0")
 	versions := []*common.Version{version6}
 	for _, version := range versions {
 		generator, err := NewGenerator("metricbeat-*", "metric be at ?!", "testdata/extensive/fields.yml", tmpDir, "7.0.0-alpha1", *version)
