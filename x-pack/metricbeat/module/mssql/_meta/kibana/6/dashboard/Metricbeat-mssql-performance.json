@@ -6,15 +6,19 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "8a0c0250-18b9-11e9-9836-f37dedd3b411",
+            "index": "metricbeat-*",
             "query": {
               "language": "lucene",
               "query": ""
             }
           }
         },
-        "title": "MSSQL - User Connections",
-        "uiStateJSON": {},
+        "title": "User Connections [MSSQL Performance]",
+        "uiStateJSON": {
+          "vis": {
+            "legendOpen": false
+          }
+        },
         "version": 1,
         "visState": {
           "aggs": [
@@ -22,7 +26,7 @@
               "enabled": true,
               "id": "1",
               "params": {
-                "customLabel": "User Connections",
+                "customLabel": "",
                 "field": "mssql.performance.user_connections"
               },
               "schema": "metric",
@@ -70,14 +74,15 @@
               "categoryLines": true,
               "style": {
                 "color": "#eee"
-              }
+              },
+              "valueAxis": "ValueAxis-1"
             },
             "legendPosition": "right",
             "seriesParams": [
               {
                 "data": {
                   "id": "1",
-                  "label": "User Connections"
+                  "label": "Average mssql.performance.user_connections"
                 },
                 "drawLinesBetweenPoints": true,
                 "interpolate": "linear",
@@ -108,20 +113,20 @@
                 "show": true,
                 "style": {},
                 "title": {
-                  "text": "User Connections"
+                  "text": ""
                 },
                 "type": "value"
               }
             ]
           },
-          "title": "MSSQL - User Connections",
+          "title": "User Connections [MSSQL Performance]",
           "type": "line"
         }
       },
       "id": "7784db10-18ba-11e9-9836-f37dedd3b411",
       "type": "visualization",
-      "updated_at": "2019-01-15T11:41:15.969Z",
-      "version": 1
+      "updated_at": "2019-01-18T14:48:55.430Z",
+      "version": 5
     },
     {
       "attributes": {
@@ -129,15 +134,19 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "8a0c0250-18b9-11e9-9836-f37dedd3b411",
+            "index": "metricbeat-*",
             "query": {
               "language": "lucene",
               "query": ""
             }
           }
         },
-        "title": "MSSQL - Transactions",
-        "uiStateJSON": {},
+        "title": "Transactions [MSSQL Performance]",
+        "uiStateJSON": {
+          "vis": {
+            "legendOpen": false
+          }
+        },
         "version": 1,
         "visState": {
           "aggs": [
@@ -145,7 +154,7 @@
               "enabled": true,
               "id": "1",
               "params": {
-                "customLabel": "Transactions",
+                "customLabel": "",
                 "field": "mssql.performance.transactions"
               },
               "schema": "metric",
@@ -193,14 +202,15 @@
               "categoryLines": true,
               "style": {
                 "color": "#eee"
-              }
+              },
+              "valueAxis": "ValueAxis-1"
             },
             "legendPosition": "right",
             "seriesParams": [
               {
                 "data": {
                   "id": "1",
-                  "label": "Transactions"
+                  "label": "Average mssql.performance.transactions"
                 },
                 "drawLinesBetweenPoints": true,
                 "interpolate": "linear",
@@ -231,20 +241,20 @@
                 "show": true,
                 "style": {},
                 "title": {
-                  "text": "Transactions"
+                  "text": ""
                 },
                 "type": "value"
               }
             ]
           },
-          "title": "MSSQL - Transactions",
+          "title": "Transactions [MSSQL Performance]",
           "type": "line"
         }
       },
       "id": "910f3f30-18ba-11e9-9836-f37dedd3b411",
       "type": "visualization",
-      "updated_at": "2019-01-15T11:41:58.819Z",
-      "version": 1
+      "updated_at": "2019-01-18T14:49:52.386Z",
+      "version": 5
     },
     {
       "attributes": {
@@ -252,15 +262,19 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "8a0c0250-18b9-11e9-9836-f37dedd3b411",
+            "index": "metricbeat-*",
             "query": {
               "language": "lucene",
               "query": ""
             }
           }
         },
-        "title": "MSSQL - Lock Waits/sec",
-        "uiStateJSON": {},
+        "title": "Lock Waits/sec [MSSQL Performance]",
+        "uiStateJSON": {
+          "vis": {
+            "legendOpen": false
+          }
+        },
         "version": 1,
         "visState": {
           "aggs": [
@@ -268,7 +282,7 @@
               "enabled": true,
               "id": "1",
               "params": {
-                "customLabel": "Lock Waits/sec",
+                "customLabel": "",
                 "field": "mssql.performance.lock_waits_per_sec"
               },
               "schema": "metric",
@@ -316,14 +330,15 @@
               "categoryLines": true,
               "style": {
                 "color": "#eee"
-              }
+              },
+              "valueAxis": "ValueAxis-1"
             },
             "legendPosition": "right",
             "seriesParams": [
               {
                 "data": {
                   "id": "1",
-                  "label": "Lock Waits/sec"
+                  "label": "Average mssql.performance.lock_waits_per_sec"
                 },
                 "drawLinesBetweenPoints": true,
                 "interpolate": "linear",
@@ -354,20 +369,20 @@
                 "show": true,
                 "style": {},
                 "title": {
-                  "text": "Lock Waits/sec"
+                  "text": ""
                 },
                 "type": "value"
               }
             ]
           },
-          "title": "MSSQL - Lock Waits/sec",
+          "title": "Lock Waits/sec [MSSQL Performance]",
           "type": "line"
         }
       },
       "id": "5bd5c230-18ba-11e9-9836-f37dedd3b411",
       "type": "visualization",
-      "updated_at": "2019-01-15T11:40:29.522Z",
-      "version": 1
+      "updated_at": "2019-01-18T14:49:11.638Z",
+      "version": 4
     },
     {
       "attributes": {
@@ -375,14 +390,14 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "8a0c0250-18b9-11e9-9836-f37dedd3b411",
+            "index": "metricbeat-*",
             "query": {
               "language": "lucene",
               "query": ""
             }
           }
         },
-        "title": "MSSQL - Batch Requests/sec",
+        "title": "Batch Requests/sec [MSSQL Performance]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -391,11 +406,37 @@
               "enabled": true,
               "id": "1",
               "params": {
-                "customLabel": "Batch Requests/sec",
-                "field": "mssql.performance.batch_requests_per_sec"
+                "customLabel": "",
+                "customMetric": {
+                  "enabled": true,
+                  "id": "1-metric",
+                  "params": {
+                    "field": "mssql.performance.batch_requests_per_sec"
+                  },
+                  "schema": {
+                    "aggFilter": [
+                      "!top_hits",
+                      "!percentiles",
+                      "!percentile_ranks",
+                      "!median",
+                      "!std_dev"
+                    ],
+                    "deprecate": false,
+                    "editor": false,
+                    "group": "none",
+                    "hideCustomLabel": true,
+                    "max": null,
+                    "min": 0,
+                    "name": "metricAgg",
+                    "params": [],
+                    "title": "Metric Agg"
+                  },
+                  "type": "avg"
+                },
+                "metricAgg": "custom"
               },
               "schema": "metric",
-              "type": "avg"
+              "type": "derivative"
             },
             {
               "enabled": true,
@@ -406,7 +447,7 @@
                 "extended_bounds": {},
                 "field": "@timestamp",
                 "interval": "auto",
-                "min_doc_count": 1,
+                "min_doc_count": 0,
                 "time_zone": "Europe/Madrid",
                 "useNormalizedEsInterval": true
               },
@@ -439,14 +480,15 @@
               "categoryLines": true,
               "style": {
                 "color": "#eee"
-              }
+              },
+              "valueAxis": "ValueAxis-1"
             },
             "legendPosition": "right",
             "seriesParams": [
               {
                 "data": {
                   "id": "1",
-                  "label": "Batch Requests/sec"
+                  "label": "Derivative of Average mssql.performance.batch_requests_per_sec"
                 },
                 "drawLinesBetweenPoints": true,
                 "interpolate": "linear",
@@ -477,20 +519,20 @@
                 "show": true,
                 "style": {},
                 "title": {
-                  "text": "Batch Requests/sec"
+                  "text": ""
                 },
                 "type": "value"
               }
             ]
           },
-          "title": "MSSQL - Batch Requests/sec",
+          "title": "Batch Requests/sec [MSSQL Performance]",
           "type": "line"
         }
       },
       "id": "b29a2160-18ba-11e9-9836-f37dedd3b411",
       "type": "visualization",
-      "updated_at": "2019-01-15T11:42:55.094Z",
-      "version": 1
+      "updated_at": "2019-01-18T14:49:03.748Z",
+      "version": 6
     },
     {
       "attributes": {
@@ -498,21 +540,17 @@
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
             "filter": [],
-            "index": "8a0c0250-18b9-11e9-9836-f37dedd3b411",
+            "index": "metricbeat-*",
             "query": {
               "language": "lucene",
               "query": ""
             }
           }
         },
-        "title": "MSSQL - Buffer cache hit ratio",
+        "title": "Buffer Cache Hit Ratio [MSSQL Performance]",
         "uiStateJSON": {
           "vis": {
-            "defaultColors": {
-              "0 - 50": "rgb(165,0,38)",
-              "50 - 75": "rgb(255,255,190)",
-              "75 - 100": "rgb(0,104,55)"
-            }
+            "legendOpen": false
           }
         },
         "version": 1,
@@ -522,11 +560,13 @@
               "enabled": true,
               "id": "1",
               "params": {
-                "customLabel": "Buffer cache hit ratio",
-                "field": "mssql.performance.buffer.cache_hit.pct"
+                "field": "mssql.performance.buffer.cache_hit.pct",
+                "percents": [
+                  50
+                ]
               },
               "schema": "metric",
-              "type": "avg"
+              "type": "median"
             },
             {
               "enabled": true,
@@ -537,76 +577,93 @@
                 "extended_bounds": {},
                 "field": "@timestamp",
                 "interval": "auto",
-                "min_doc_count": 1,
+                "min_doc_count": 0,
                 "time_zone": "Europe/Madrid",
                 "useNormalizedEsInterval": true
               },
-              "schema": "group",
+              "schema": "segment",
               "type": "date_histogram"
             }
           ],
           "params": {
             "addLegend": true,
+            "addTimeMarker": false,
             "addTooltip": true,
-            "gauge": {
-              "backStyle": "Full",
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 50
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
                 },
-                {
-                  "from": 50,
-                  "to": 75
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
                 },
-                {
-                  "from": 75,
-                  "to": 100
-                }
-              ],
-              "extendRange": true,
-              "gaugeColorMode": "Labels",
-              "gaugeStyle": "Full",
-              "gaugeType": "Arc",
-              "invertColors": true,
-              "labels": {
-                "color": "black",
-                "show": true
-              },
-              "orientation": "vertical",
-              "percentageMode": false,
-              "scale": {
-                "color": "#333",
-                "labels": false,
-                "show": true
-              },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "grid": {
+              "categoryLines": true,
               "style": {
-                "bgColor": false,
-                "bgFill": "#eee",
-                "bgMask": false,
-                "bgWidth": 0.9,
-                "fontSize": 60,
-                "labelColor": true,
-                "mask": false,
-                "maskBars": 50,
-                "subText": "",
-                "width": 0.9
+                "color": "#eee"
               },
-              "type": "meter",
-              "verticalSplit": false
+              "valueAxis": "ValueAxis-1"
             },
-            "isDisplayWarning": false,
-            "type": "gauge"
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Median mssql.performance.buffer.cache_hit.pct"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "mode": "normal",
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": ""
+                },
+                "type": "value"
+              }
+            ]
           },
-          "title": "MSSQL - Buffer cache hit ratio",
-          "type": "gauge"
+          "title": "Buffer Cache Hit Ratio [MSSQL Performance]",
+          "type": "line"
         }
       },
-      "id": "37f5aff0-18bb-11e9-9836-f37dedd3b411",
+      "id": "2e795230-1b2a-11e9-8b36-136038bb307a",
       "type": "visualization",
-      "updated_at": "2019-01-15T11:46:38.830Z",
-      "version": 1
+      "updated_at": "2019-01-18T14:47:24.998Z",
+      "version": 6
     },
     {
       "attributes": {
@@ -642,6 +699,7 @@
             },
             "id": "7784db10-18ba-11e9-9836-f37dedd3b411",
             "panelIndex": "1",
+            "title": "User Connections",
             "type": "visualization",
             "version": "7.0.0-alpha2"
           },
@@ -654,12 +712,13 @@
             "gridData": {
               "h": 15,
               "i": "2",
-              "w": 34,
-              "x": 14,
+              "w": 32,
+              "x": 16,
               "y": 15
             },
             "id": "910f3f30-18ba-11e9-9836-f37dedd3b411",
             "panelIndex": "2",
+            "title": "Transactions",
             "type": "visualization",
             "version": "7.0.0-alpha2"
           },
@@ -678,6 +737,7 @@
             },
             "id": "5bd5c230-18ba-11e9-9836-f37dedd3b411",
             "panelIndex": "3",
+            "title": "Lock Waits/sec",
             "type": "visualization",
             "version": "7.0.0-alpha2"
           },
@@ -696,6 +756,7 @@
             },
             "id": "b29a2160-18ba-11e9-9836-f37dedd3b411",
             "panelIndex": "4",
+            "title": "Batch Requests/sec",
             "type": "visualization",
             "version": "7.0.0-alpha2"
           },
@@ -704,24 +765,25 @@
             "gridData": {
               "h": 15,
               "i": "5",
-              "w": 14,
+              "w": 16,
               "x": 0,
               "y": 15
             },
-            "id": "37f5aff0-18bb-11e9-9836-f37dedd3b411",
+            "id": "2e795230-1b2a-11e9-8b36-136038bb307a",
             "panelIndex": "5",
+            "title": "Buffer Cache Hit Ratio",
             "type": "visualization",
             "version": "7.0.0-alpha2"
           }
         ],
         "timeRestore": false,
-        "title": "MSSQL Performance",
+        "title": "[Metricbeat MSSQL] Performance",
         "version": 1
       },
       "id": "a2ead240-18bb-11e9-9836-f37dedd3b411",
       "type": "dashboard",
-      "updated_at": "2019-01-15T11:49:38.276Z",
-      "version": 1
+      "updated_at": "2019-01-18T14:50:20.301Z",
+      "version": 9
     }
   ],
   "version": "7.0.0-alpha2"
