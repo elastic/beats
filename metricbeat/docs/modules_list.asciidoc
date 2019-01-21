@@ -9,14 +9,14 @@ This file is generated! See scripts/docs_collector.py
 .1+| .1+|  |<<metricbeat-metricset-aerospike-namespace,namespace>> beta[]  
 |<<metricbeat-module-apache,Apache>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-apache-status,status>>   
-|<<metricbeat-module-ceph,Ceph>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.7+| .7+|  |<<metricbeat-metricset-ceph-cluster_disk,cluster_disk>> beta[]  
-|<<metricbeat-metricset-ceph-cluster_health,cluster_health>> beta[]  
-|<<metricbeat-metricset-ceph-cluster_status,cluster_status>> beta[]  
-|<<metricbeat-metricset-ceph-monitor_health,monitor_health>> beta[]  
-|<<metricbeat-metricset-ceph-osd_df,osd_df>> beta[]  
-|<<metricbeat-metricset-ceph-osd_tree,osd_tree>> beta[]  
-|<<metricbeat-metricset-ceph-pool_disk,pool_disk>> beta[]  
+|<<metricbeat-module-ceph,Ceph>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.7+| .7+|  |<<metricbeat-metricset-ceph-cluster_disk,cluster_disk>>   
+|<<metricbeat-metricset-ceph-cluster_health,cluster_health>>   
+|<<metricbeat-metricset-ceph-cluster_status,cluster_status>>   
+|<<metricbeat-metricset-ceph-monitor_health,monitor_health>>   
+|<<metricbeat-metricset-ceph-osd_df,osd_df>>   
+|<<metricbeat-metricset-ceph-osd_tree,osd_tree>>   
+|<<metricbeat-metricset-ceph-pool_disk,pool_disk>>   
 |<<metricbeat-module-couchbase,Couchbase>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .3+| .3+|  |<<metricbeat-metricset-couchbase-bucket,bucket>> beta[]  
 |<<metricbeat-metricset-couchbase-cluster,cluster>> beta[]  
