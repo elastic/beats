@@ -75,6 +75,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Add `convert_timezone` option to Elasticsearch module to convert dates to UTC. {issue}9756[9756] {pull}9761[9761]
 - Support IPv6 addresses with zone id in IIS ingest pipeline. {issue}9836[9836] error log: {pull}9869[9869] access log: {pull}10029[10029]
 - Support haproxy log lines without captured headers. {issue}9463[9463] {pull}9958[9958]
+- Make elasticsearch/audit fileset be more lenient in parsing node name. {issue}10035[10035] {pull}10135[10135]
 
 *Heartbeat*
 
