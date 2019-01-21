@@ -2,7 +2,7 @@
   type: group
   description: >
     Contains etcd leader statistics.
-  release: beta
+  release: ga
   fields:
     - name: followers.counts
       type: group
