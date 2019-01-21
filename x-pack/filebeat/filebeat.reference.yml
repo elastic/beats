@@ -322,6 +322,7 @@ filebeat.modules:
     # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
     #var.convert_timezone: false
 
+#-------------------------------- Osquery Module --------------------------------
 - module: osquery
   result:
     enabled: true
