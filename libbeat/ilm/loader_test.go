@@ -115,7 +115,6 @@ func TestESLoader_LoadWriteAlias(t *testing.T) {
 			require.NoError(t, err)
 
 			loaded, err := loader.LoadWriteAlias(td.cfg)
-			fmt.Println(err)
 			assert.Equal(t, td.loaded, loaded)
 			if td.err == "" {
 				assert.NoError(t, err)

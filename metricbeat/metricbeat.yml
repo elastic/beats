@@ -19,13 +19,6 @@ metricbeat.config.modules:
   # Period on which files under path should be checked for changes
   #reload.period: 10s
 
-#==================== Elasticsearch template setting ==========================
-
-#setup.template.settings:
-#  index.number_of_shards: 1
-#  index.codec: best_compression
-  #_source.enabled: false
-
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group
@@ -60,16 +53,47 @@ metricbeat.config.modules:
 # This requires a Kibana endpoint configuration.
 setup.kibana:
 
-# Kibana Host
-# Scheme and port can be left out and will be set to the default (http and 5601)
-# In case you specify and additional path, the scheme is required: http://localhost:5601/path
-# IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
-#host: "localhost:5601"
+  # Kibana Host
+  # Scheme and port can be left out and will be set to the default (http and 5601)
+  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
+  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
+  #host: "localhost:5601"
 
-# Kibana Space ID
-# ID of the Kibana Space into which the dashboards should be loaded. By default,
-# the Default Space will be used.
-#space.id:
+  # Kibana Space ID
+  # ID of the Kibana Space into which the dashboards should be loaded. By default,
+  # the Default Space will be used.
+  #space.id:
+
+
+#============================== Indices =====================================
+
+# Index settings can define an index name, conditions which events should be sent to which index,
+# whether or not to use index lifecycle management for a specific index,
+# and several options to configure the Elasticsearch template for a specific index.
+indices:
+  - name: "%{[agent.type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
+
+    # Enable ilm to use index lifecycle management instead daily indices.
+    # ilm.enabled.true: The index `name` is ignored, instead the `ilm.rollover_alias` and `ilm.pattern` will be used.
+    # ilm.enabled.false: The index `name` configuration is used.
+    # ilm.enabled.auto: If the configured output is Elasticsearch and ILM is availbe in the Elasticsearch cluster, ilm will be enabled.
+    ilm:
+      enabled: auto
+      rollover_alias: "%{[agent.type]}-%{[agent.version]}"
+      pattern: "{now/d}-000001"
+
+    # A template is used to set the mapping in Elasticsearch
+    # By default template loading is enabled and the template is loaded.
+    # These settings can be adjusted to load your own template or overwrite existing ones per index.
+    template:
+      # Template name. By default the template name is "metricbeat-%{[beat.version]}"
+      # The template name and pattern has to be set in case the Elasticsearch index name is modified.
+      name: "%{[agent.type]}-%{[agent.version]}"
+
+      # Elasticsearch template settings
+      settings:
+        index.number_of_shards: 1
+        index.codec: best_compression
 
 #============================= Elastic Cloud ==================================
 
@@ -93,16 +117,13 @@ output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
-  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
-  #ilm.enabled: false
-
   # Optional protocol and basic auth credentials.
   #protocol: "https"
   #username: "elastic"
   #password: "changeme"
 
-  #----------------------------- Logstash output --------------------------------
-  #output.logstash:
+#----------------------------- Logstash output --------------------------------
+#output.logstash:
   # The Logstash hosts
   #hosts: ["localhost:5044"]
 
@@ -150,145 +171,6 @@ processors:
 # following line.
 #xpack.monitoring.elasticsearch:
 
-#============================== Indices =====================================
-
-# Indices settings can define an index name, conditions which events should be sent to which index,
-# whether or not to use index lifecycle management for a specific index,
-# and several options to configure the Elasticsearch template for a specific index.
-indices:
-  - name: "metricbeat-load-%{[agent.version]}-%{+yyyy.MM.dd}"
-
-    condition:
-      when.contains:
-        metricset.name: "load"
-
-    # Enable ilm to use index lifecycle management instead daily indices.
-    # ilm.enabled.true: The index `name` is ignored, instead the `ilm.rollover_alias` and `ilm.pattern` will be used.
-    # ilm.enabled.false: The index `name` configuration is used.
-    # ilm.enabled.auto: If the configured output is Elasticsearch and ILM is availbe in the Elasticsearch cluster, ilm will be enabled.
-    ilm:
-      enabled: auto
-      rollover_alias: "metricbeat-load-%{[agent.version]}"
-      pattern: "{now/d}-000001"
-
-    # A template is used to set the mapping in Elasticsearch
-    # By default template loading is enabled and the template is loaded.
-    # These settings can be adjusted to load your own template or overwrite existing ones per index.
-    template:
-
-      # Set to false to disable template loading.
-      enabled: true
-
-      # Overwrite existing template
-      overwrite: true
-
-      # Template name. By default the template name is "metricbeat-%{[beat.version]}"
-      # The template name and pattern has to be set in case the Elasticsearch index name is modified.
-      name: "metricbeat-load-%{[agent.version]}"
-
-      # Template pattern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
-      # The first part is the version of the beat and then -* is used to match all indices for this beat in this version.
-      # The template name and pattern has to be set in case the Elasticsearch index name is modified.
-      pattern: "metricbeat-load-%{[agent.version]}-*"
-
-      # Path to fields.yml file to generate the template
-      #fields: "${path.config}/fields.yml"
-
-      # A list of fields to be added to the template and Kibana index pattern. Also
-      # specify index.template.overwrite: true to overwrite the existing template.
-      # This setting is experimental.
-      #append_fields:
-      #- name: field_name
-      #  type: field_type
-
-      # Enable JSON template loading. If this is enabled, the fields.yml is ignored.
-      #json.enabled: false
-
-      # Path to the JSON template file
-      #json.path: "${path.config}/template.json"
-
-      # Name under which the template is stored in Elasticsearch
-      #json.name: ""
-
-      # Elasticsearch template settings
-      settings:
-
-        # A dictionary of settings to place into the settings.index dictionary
-        # of the Elasticsearch template. For more details, please check
-        # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
-        index:
-          number_of_shards: 1
-          codec: best_compression
-          number_of_routing_shards: 30
-
-      # A dictionary of settings for the _source field. For more details, please check
-      # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
-      #_source:
-  - name: "metricbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
-
-
-    # Enable ilm to use index lifecycle management instead daily indices.
-    # ilm.enabled.true: The index `name` is ignored, instead the `ilm.rollover_alias` and `ilm.pattern` will be used.
-    # ilm.enabled.false: The index `name` configuration is used.
-    # ilm.enabled.auto: If the configured output is Elasticsearch and ILM is availbe in the Elasticsearch cluster, ilm will be enabled.
-    ilm:
-      enabled: false
-      rollover_alias: "metricbeat-%{[agent.version]}"
-      pattern: "{now/d}-000001"
-
-    # A template is used to set the mapping in Elasticsearch
-    # By default template loading is enabled and the template is loaded.
-    # These settings can be adjusted to load your own template or overwrite existing ones per index.
-    template:
-
-      # Set to false to disable template loading.
-      enabled: true
-
-      # Overwrite existing template
-      overwrite: false
-
-      # Template name. By default the template name is "metricbeat-%{[beat.version]}"
-      # The template name and pattern has to be set in case the Elasticsearch index name is modified.
-      name: "metricbeat-%{[agent.version]}"
-
-      # Template pattern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
-      # The first part is the version of the beat and then -* is used to match all indices for this beat in this version.
-      # The template name and pattern has to be set in case the Elasticsearch index name is modified.
-      pattern: "metricbeat-%{[agent.version]}-*"
-
-      # Path to fields.yml file to generate the template
-      #fields: "${path.config}/fields.yml"
-
-      # A list of fields to be added to the template and Kibana index pattern. Also
-      # specify index.template.overwrite: true to overwrite the existing template.
-      # This setting is experimental.
-      #append_fields:
-      #- name: field_name
-      #  type: field_type
-
-      # Enable JSON template loading. If this is enabled, the fields.yml is ignored.
-      #json.enabled: false
-
-      # Path to the JSON template file
-      #json.path: "${path.config}/template.json"
-
-      # Name under which the template is stored in Elasticsearch
-      #json.name: ""
-
-      # Elasticsearch template settings
-      settings:
-
-        # A dictionary of settings to place into the settings.index dictionary
-        # of the Elasticsearch template. For more details, please check
-        # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html
-        index:
-          number_of_shards: 1
-          codec: best_compression
-          number_of_routing_shards: 30
-
-      # A dictionary of settings for the _source field. For more details, please check
-      # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
-      #_source:
 #================================= Migration ==================================
 
 # This allows to enable migration aliases

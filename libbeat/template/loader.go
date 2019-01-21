@@ -40,6 +40,7 @@ type ESClient interface {
 	GetVersion() common.Version
 }
 
+//Loader interface for loading templates
 type Loader interface {
 	Load(config Config, ilmConfig ilm.Config) (bool, error)
 }
@@ -59,7 +60,7 @@ type StdoutLoader struct {
 	migration bool
 }
 
-// NewESLoader creates a new template loader
+// NewESLoader creates a new template loader to ES
 func NewESLoader(client ESClient, beatInfo beat.Info, migration bool) (Loader, error) {
 	return &ESLoader{
 		client:     client,
@@ -70,6 +71,7 @@ func NewESLoader(client ESClient, beatInfo beat.Info, migration bool) (Loader, e
 	}, nil
 }
 
+//NewStdoutLoader creates a new template loader to stdout
 func NewStdoutLoader(beatInfo beat.Info, migration bool) (Loader, error) {
 	return &StdoutLoader{beatInfo: beatInfo, migration: migration}, nil
 }
@@ -80,6 +82,7 @@ func NewStdoutLoader(beatInfo beat.Info, migration bool) (Loader, error) {
 func (l *ESLoader) Load(config Config, ilmConfig ilm.Config) (bool, error) {
 	tmpl, err := template(l.beatInfo, l.esVersion, l.ilmEnabled, l.migration, config, ilmConfig)
 	if err != nil || tmpl == nil {
+		logp.Info("template not created")
 		return false, err
 	}
 

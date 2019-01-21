@@ -66,6 +66,7 @@ output:
   {%- endif %}
 
 #==================== Elasticsearch template setting ==========================
+{% if indices_deprecated %}
 setup.template:
   fields: {{ fields|default("fields.yml") }}
   settings:
@@ -83,6 +84,7 @@ setup.template:
     enabled: {{ template_json_enabled|default("false") }}
     path: {{ template_json_path }}
     name: {{ template_json_name }}
+{%- endif %}
 
 #================================ Logging =====================================
 
@@ -95,4 +97,13 @@ logging.metrics.period: {{ metrics_period }}
 keystore.path: {{keystore_path}}
 {% endif %}
 
-# vim: set ft=jinja:
+#================================ indices =====================================
+{% if indices %}
+indices:
+  {% for index in indices -%}
+  -
+    {% for k, v in index.items() -%}
+    {{ k }}: {{ v }}
+    {% endfor -%}
+  {% endfor -%}
+{% endif %}

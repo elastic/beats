@@ -9,7 +9,7 @@
         `nats` contains statistics that were read from Nats
       fields:
         - name: server.id
-          type: string
+          type: keyword
           description: >
             The server ID
         - name: server.time

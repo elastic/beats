@@ -20,6 +20,10 @@ package cmd
 import (
 	"flag"
 
+	"github.com/elastic/beats/libbeat/ilm"
+	"github.com/elastic/beats/libbeat/index"
+	"github.com/elastic/beats/libbeat/template"
+
 	"github.com/spf13/pflag"
 
 	cmd "github.com/elastic/beats/libbeat/cmd"
@@ -38,6 +42,20 @@ var Name = "metricbeat"
 var RootCmd *cmd.BeatsRootCmd
 
 func init() {
+	index.DefaultConfig = index.Config{
+		Index: "metricbeat-%{[agent.version]}-%{+yyyy.MM.dd}",
+		ILM: ilm.Config{
+			Enabled:       ilm.ModeAuto,
+			RolloverAlias: "%metricbeat-%{[agent.version]}-000001",
+			Pattern:       "000001",
+			Policy:        ilm.PolicyCfg{Name: ilm.DefaultPolicyName}, //TODO: change when policy handling is changed
+		},
+		Template: template.Config{
+			Enabled: true,
+			Name:    "%metricbeat-%{[agent.version]}",
+			Pattern: "%metricbeat-%{[agent.version]}*",
+		},
+	}
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
 

@@ -47,7 +47,7 @@ func LoadTemplates(loader template.Loader, configs []Config) (loaded int, noop i
 }
 
 //LoadILMPolicies takes care of loading configured ILM policies to the configured output Elasticsearch or stdout
-func LoadILMPolicies(loader ilm.Loader, configs []Config) (loaded int, noop int, failures int, loadErrors error) {
+func LoadILMPolicies(loader ilm.Loader, configs []Config) (int, int, int, error) {
 
 	return loadILM(configs, loader.LoadPolicy, func(cfg Config, err error) error {
 		return errors.Wrapf(err, "failed to load ilm policy for %s", cfg.ILM.Policy.Name)
@@ -55,7 +55,7 @@ func LoadILMPolicies(loader ilm.Loader, configs []Config) (loaded int, noop int,
 }
 
 //LoadILMWriteAliases takes care of loading configured ILM aliases to Elasticsearch
-func LoadILMWriteAliases(loader ilm.Loader, configs []Config) (loaded int, noop int, failures int, loadErrors error) {
+func LoadILMWriteAliases(loader ilm.Loader, configs []Config) (int, int, int, error) {
 	return loadILM(configs, loader.LoadWriteAlias, func(cfg Config, err error) error {
 		return errors.Wrapf(err, "failed to load ilm write alias for %s", cfg.ILM.RolloverAlias)
 	})

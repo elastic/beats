@@ -233,6 +233,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
         template = self.template_env.get_template(template_path)
 
         kargs["beat"] = self
+        if "deprecated_config" not in kargs or kargs["deprecated_config"]:
+            kargs["indices_deprecated"] = True
         output_str = template.render(**kargs)
 
         output_path = os.path.join(self.working_dir, output)

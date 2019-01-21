@@ -68,6 +68,37 @@ class TestCommands(BaseTest):
         assert len(self.es.cat.templates(name='mockbeat-*', h='name')) > 0
 
 
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_setup_ilm_policy(self):
+        """
+        Test setup -ilm-policy command
+        """
+        # Delete any existing policies
+        policies = self.es.transport.perform_request('GET', '/_ilm/policy')
+        for p in policies:
+            self.es.transport.perform_request('DELETE', "/_ilm/policy/" + p)
+
+        assert len(self.es.transport.perform_request('GET', '/_ilm/policy')) == 0
+
+        shutil.copy(self.beat_path + "/_meta/config.yml",
+                    os.path.join(self.working_dir, "libbeat.yml"))
+        shutil.copy(self.beat_path + "/fields.yml",
+                    os.path.join(self.working_dir, "fields.yml"))
+
+        exit_code = self.run_beat(
+            logging_args=["-v", "-d", "*"],
+            extra_args=["setup",
+                        "-ilm-policy",
+                        "-path.config", self.working_dir,
+                        "-E", "output.elasticsearch.hosts=['" + self.get_host() + "']"],
+            config="libbeat.yml")
+
+        assert exit_code == 0
+        # check for default policy to be loaded
+        assert len(self.es.transport.perform_request('GET', '/_ilm/policy')) == 1
+        policy = self.es.transport.perform_request('GET', "/_ilm/policy/")
+        assert "beatDefaultPolicy" in policy
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
@@ -153,15 +184,25 @@ class TestCommands(BaseTest):
         self.wait_until(lambda: self.log_contains("mockbeat-9.9.9"))
         assert self.log_contains('"codec": "best_compression"')
 
-    def test_export_ilm_policies(self):
+    def test_export_ilm_policy(self):
         """
-        Test export ilm policy works
+        Test export ilm-policy works
         """
+        self.render_config_template("mockbeat",
+                                    os.path.join(self.working_dir, "mockbeat.yml"),
+                                    fields=os.path.join(self.working_dir, "fields.yml"))
 
+        shutil.copy(self.beat_path + "/_meta/config.yml",
+                    os.path.join(self.working_dir, "mockbeat.yml"))
+        shutil.copy(self.beat_path + "/fields.yml",
+                    os.path.join(self.working_dir, "fields.yml"))
+        exit_code = self.run_beat(
+            logging_args=[],
+            extra_args=["export", "ilm-policy"],
+            config="mockbeat.yml")
 
         assert exit_code == 0
-        self.wait_until(lambda: self.log_contains("ilm policy loaded"))
-
+        assert self.log_contains('Register policy at `/_ilm/policy/beatDefaultPolicy`')
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')

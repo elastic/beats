@@ -37,8 +37,8 @@ func TestConfig_Unpack(t *testing.T) {
 			Enabled: ModeDisabled, Pattern: DefaultPattern, Policy: PolicyCfg{Name: DefaultPolicyName}}},
 		{name: "default with rollover_alias", input: common.MapStr{"rollover_alias": "testbeat"}, cfg: Config{
 			Enabled: ModeAuto, RolloverAlias: "testbeat", Pattern: DefaultPattern, Policy: PolicyCfg{Name: DefaultPolicyName}}},
-		{name: "ilm enabled", input: common.MapStr{"rollover_alias": "testbeat", "enabled": "True", "pattern": ""}, cfg: Config{
-			Enabled: ModeEnabled, RolloverAlias: "testbeat", Pattern: "", Policy: PolicyCfg{Name: DefaultPolicyName}}},
+		{name: "ilm enabled", input: common.MapStr{"rollover_alias": "testbeat", "enabled": "True", "pattern": "01"}, cfg: Config{
+			Enabled: ModeEnabled, RolloverAlias: "testbeat", Pattern: "01", Policy: PolicyCfg{Name: DefaultPolicyName}}},
 	}
 	for _, td := range testdata {
 		t.Run(td.name, func(t *testing.T) {

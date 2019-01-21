@@ -20,12 +20,14 @@ package ilm
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
+	"strings"
 
 	"github.com/elastic/beats/libbeat/beat"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	errw "github.com/pkg/errors"
 )
 
 //ESClient supporting methods necessary for ILM handling
@@ -35,6 +37,7 @@ type ESClient interface {
 	GetVersion() common.Version
 }
 
+//Loader interface for loading ilm policies and write aliases
 type Loader interface {
 	LoadPolicy(cfg Config) (bool, error)
 	LoadWriteAlias(cfg Config) (bool, error)
@@ -47,7 +50,7 @@ type ESLoader struct {
 	beatInfo   beat.Info
 }
 
-//NewStdoutLoader creates a new ilm policy loader for ES
+//NewESLoader creates a new ilm policy loader for ES
 func NewESLoader(client ESClient, info beat.Info) (Loader, error) {
 	return &ESLoader{
 		esClient:   client,
@@ -109,7 +112,7 @@ func (l *ESLoader) LoadWriteAlias(cfg Config) (bool, error) {
 		return false, nil
 	}
 
-	return l.createAlias(cfg.RolloverAlias)
+	return l.createAlias(cfg.RolloverAlias, cfg.Pattern)
 }
 
 func (l *ESLoader) shouldLoad(cfg Config) (bool, error) {
@@ -132,6 +135,7 @@ func (l *ESLoader) shouldLoad(cfg Config) (bool, error) {
 }
 
 func (l *ESLoader) checkAliasExists(alias string) (bool, error) {
+	return false, nil
 	status, b, err := l.esClient.Request("HEAD", "/_alias/"+alias, "", nil, nil)
 	if err != nil && status != 404 {
 		return false, fmt.Errorf("%s: %v", err.Error(), string(b))
@@ -142,8 +146,15 @@ func (l *ESLoader) checkAliasExists(alias string) (bool, error) {
 	return false, nil
 }
 
-func (l *ESLoader) createAlias(alias string) (bool, error) {
-	firstIndex := fmt.Sprintf("%s-%s", alias, DefaultPattern)
+func (l *ESLoader) createAlias(alias string, pattern string) (bool, error) {
+	firstIndex := fmt.Sprintf("<%s-%s>", alias, pattern)
+	//ensure data pattern is properly encoded
+	patternParsed, err := url.ParseQuery(firstIndex)
+	if err != nil {
+		return false, err
+	}
+	firstIndex = strings.TrimSuffix(patternParsed.Encode(), "=")
+
 	body := common.MapStr{
 		"aliases": common.MapStr{
 			alias: common.MapStr{
@@ -154,10 +165,13 @@ func (l *ESLoader) createAlias(alias string) (bool, error) {
 
 	code, res, err := l.esClient.Request("PUT", "/"+firstIndex, "", nil, body)
 	if code == 400 {
-		logp.Info("Error creating alias with write index. As return code is 400, assuming already exists: %s, %s", err, string(res))
-		return false, nil
-	} else if err != nil {
-		return false, err
+		if strings.Contains(err.Error(), "already exists") {
+			logp.Info("Write alias %s already exists", firstIndex)
+			return false, nil
+		}
+	}
+	if err != nil {
+		return false, errw.Wrapf(err, string(res))
 	}
 
 	logp.Info("Alias with write index successfully created: %s", firstIndex)
@@ -189,7 +203,7 @@ func NewStdoutLoader(info beat.Info) (Loader, error) {
 	return &StdoutLoader{beatInfo: info}, nil
 }
 
-//PrintPolicy prints the configured ILM policy to stdout
+//LoadPolicy loads the configured ILM policy to stdout
 func (l *StdoutLoader) LoadPolicy(cfg Config) (bool, error) {
 	logp.Info("Starting to print policy %s", cfg.Policy.Name)
 	if cfg.Enabled == ModeDisabled {
@@ -212,6 +226,8 @@ func (l *StdoutLoader) LoadPolicy(cfg Config) (bool, error) {
 
 	return true, nil
 }
+
+//LoadWriteAlias does nothing for stdout loader
 func (l *StdoutLoader) LoadWriteAlias(cfg Config) (bool, error) {
 	//not implemented as not needed yet.
 	return false, nil

@@ -38,6 +38,7 @@ type Config struct {
 	Settings Settings `config:"settings"`
 }
 
+//JSON holds information for loading template from json file
 type JSON struct {
 	Enabled bool   `config:"enabled"`
 	Path    string `config:"path"`
@@ -57,6 +58,7 @@ var (
 	defaultNumberOfRoutingShards = 30
 )
 
+//DefaultTemplateCfg to initialise templates with
 func DefaultTemplateCfg() Config {
 	return Config{
 		Enabled:   true,
@@ -81,8 +83,9 @@ func (cfg *Config) Unpack(c *common.Config) error {
 	return nil
 }
 
+//Validate returns and error if template config does not fulfil requirements
 func (cfg *Config) Validate() error {
-	if cfg.Name == "" {
+	if (!cfg.JSON.Enabled && cfg.Name == "") || (cfg.JSON.Enabled && cfg.JSON.Name == "") {
 		return errors.New("template configuration requires a name")
 	}
 	return nil

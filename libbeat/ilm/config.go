@@ -51,27 +51,32 @@ func DefaultILMConfig() Config {
 	}
 }
 
+//DefaultPattern used for ilm aliases
 const DefaultPattern = "000001"
 
+//DefaultPolicyName used for creating ilm aliases
 var DefaultPolicyName = "beatDefaultPolicy"
 
 //Mode is used for enumerating the ilm mode.
 type Mode uint8
 
 const (
+	//ModeAuto enum 'auto'
 	ModeAuto Mode = iota
+	//ModeEnabled enum 'true'
 	ModeEnabled
+	//ModeDisabled enum 'false'
 	ModeDisabled
 )
 
 //Unpack creates enumeration value true, false or auto
 func (m *Mode) Unpack(in string) error {
 	switch strings.ToLower(in) {
-	case "auto", "Auto":
+	case "auto":
 		*m = ModeAuto
-	case "true", "True":
+	case "true":
 		*m = ModeEnabled
-	case "false", "False":
+	case "false":
 		*m = ModeDisabled
 	default:
 		return fmt.Errorf("ilm.enabled` mode '%v' is invalid (try auto, true, false)", in)
@@ -109,16 +114,18 @@ func (cfg *Config) prepare(info beat.Info) error {
 	event := &beat.Event{
 		Fields: common.MapStr{
 			"beat": common.MapStr{
-				"name":    info.Name,
+				"name":    info.IndexPrefix,
+				"type":    info.IndexPrefix,
 				"version": info.Version,
 			},
 			"agent": common.MapStr{
-				"name":    info.Name,
-				"type":    info.Name,
+				"name":    info.IndexPrefix,
+				"type":    info.IndexPrefix,
 				"version": info.Version,
 			},
 			"observer": common.MapStr{
-				"name":    info.Name,
+				"name":    info.IndexPrefix,
+				"type":    info.IndexPrefix,
 				"version": info.Version,
 			},
 		},

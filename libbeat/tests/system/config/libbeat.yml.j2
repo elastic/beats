@@ -98,5 +98,10 @@ keystore.path: {{keystore_path}}
 #================================ indices =====================================
 {% if indices %}
 indices:
-  - index: {{indices_index1}}
+  {% for index in indices -%}
+  -
+    {% for k, v in index.items() -%}
+    {{ k }}: {{ v }}
+    {% endfor -%}
+  {% endfor -%}
 {% endif %}

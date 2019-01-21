@@ -101,7 +101,7 @@ func (i *Configs) Validate() error {
 			defaultNames++
 		}
 		if cfg.ILM.Enabled != ilm.ModeEnabled && cfg.Index == "" {
-			return errors.New("indices entries must have set `index` when `ilm` is not disabled.")
+			return errors.New("indices entries must have set `index` when `ilm` is not disabled")
 		}
 	}
 	if defaultNames != 1 {
@@ -110,20 +110,20 @@ func (i *Configs) Validate() error {
 	return nil
 }
 
-//DefaultConfigs creates default configuration for `indices` setting
+//DefaultConfig creates a default configuration for an `indices` setting
 //can be overwritten as it is a global variable
 var DefaultConfig = Config{
-	Index: "%{[agent.name]}-%{[agent.version]}-%{+yyyy.MM.dd}",
+	Index: "%{[agent.type]}-%{[agent.version]}-%{+yyyy.MM.dd}",
 	ILM: ilm.Config{
 		Enabled:       ilm.ModeAuto,
-		RolloverAlias: "%{[agent.name]}-%{[agent.version]}-000001",
+		RolloverAlias: "%{[agent.type]}-%{[agent.version]}-000001",
 		Pattern:       "000001",
 		Policy:        ilm.PolicyCfg{Name: ilm.DefaultPolicyName}, //TODO: change when policy handling is changed
 	},
 	Template: template.Config{
 		Enabled: true,
-		Name:    "%{[agent.name]}-%{[agent.version]}",
-		Pattern: "%{[agent.name]}-%{[agent.version]}*",
+		Name:    "%{[agent.type]}-%{[agent.version]}",
+		Pattern: "%{[agent.type]}-%{[agent.version]}*",
 	},
 }
 
