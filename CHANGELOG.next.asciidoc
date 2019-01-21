@@ -111,6 +111,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
 - Fix pod UID metadata enrichment in Kubernetes module. {pull}10081[10081]
+- Fix issue that would prevent collection of processes without command line on Windows. {pull}10196[10196]
 
 *Packetbeat*
 
@@ -171,6 +172,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release windows Metricbeat module as GA. {pull}10163[10163]
 - Release traefik Metricbeat module as GA. {pull}10166[10166]
 - Release Elastic stack modules (Elasticsearch, Logstash, and Kibana) as GA. {pull}10094[10094]
+- List filesystems on Windows that have an access path but not an assigned letter {issue}8916[8916] {pull}10196[10196]
 - Add `nats` module. {issue}10071[10071]
 - Release uswgi Metricbeat module GA. {pull}10164[10164]
 - Release php_fpm module as GA. {pull}10198[10198]
