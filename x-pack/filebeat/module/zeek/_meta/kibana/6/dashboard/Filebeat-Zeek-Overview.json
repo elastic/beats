@@ -1,0 +1,707 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "index": "7f83fe80-1947-11e9-84dc-b9c00e3e5a85",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Destination Geo [SIEM Zeek]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "autoPrecision": true,
+                "field": "destination.geo.location",
+                "isFilteredByCollar": true,
+                "mapCenter": [
+                  0,
+                  0
+                ],
+                "mapZoom": 2,
+                "precision": 2,
+                "useGeocentroid": true
+              },
+              "schema": "segment",
+              "type": "geohash_grid"
+            }
+          ],
+          "params": {
+            "addTooltip": true,
+            "colorSchema": "Yellow to Red",
+            "heatClusterSize": 1.5,
+            "isDesaturated": true,
+            "legendPosition": "bottomright",
+            "mapCenter": [
+              0,
+              0
+            ],
+            "mapType": "Scaled Circle Markers",
+            "mapZoom": 2,
+            "wms": {
+              "enabled": false,
+              "options": {
+                "format": "image/png",
+                "transparent": true
+              },
+              "selectedTmsLayer": {
+                "attribution": "\u003cp\u003e\u0026#169; \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors | \u003ca href=\"https://www.elastic.co/elastic-maps-service\"\u003eElastic Maps Service\u003c/a\u003e\u003c/p\u003e\u0026#10;",
+                "id": "road_map",
+                "maxZoom": 18,
+                "minZoom": 0,
+                "subdomains": [],
+                "url": "https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree\u0026my_app_name=kibana\u0026my_app_version=6.5.4\u0026license=decdfd78-7d5b-47b7-9627-603d9b789d29"
+              }
+            }
+          },
+          "title": "Destination Geo [SIEM Zeek]",
+          "type": "tile_map"
+        }
+      },
+      "id": "5d95a3e0-1a29-11e9-84b1-a12c578fa9e8",
+      "type": "visualization",
+      "updated_at": "2019-01-17T07:27:37.758Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "index": "7f83fe80-1947-11e9-84dc-b9c00e3e5a85",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Network Transport [SIEM Zeek]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "network.transport",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "Network Transport [SIEM Zeek]",
+          "type": "pie"
+        }
+      },
+      "id": "c337dbf0-1a29-11e9-84b1-a12c578fa9e8",
+      "type": "visualization",
+      "updated_at": "2019-01-17T07:30:28.271Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "index": "7f83fe80-1947-11e9-84dc-b9c00e3e5a85",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Network Application [SIEM Zeek]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "network.application",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "Network Application [SIEM Zeek]",
+          "type": "pie"
+        }
+      },
+      "id": "f054ee70-1a29-11e9-84b1-a12c578fa9e8",
+      "type": "visualization",
+      "updated_at": "2019-01-17T07:31:43.959Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "index": "7f83fe80-1947-11e9-84dc-b9c00e3e5a85",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Network Traffic Direction [SIEM Zeek]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "network.direction",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "Network Traffic Direction [SIEM Zeek]",
+          "type": "pie"
+        }
+      },
+      "id": "15922a40-1a2a-11e9-84b1-a12c578fa9e8",
+      "type": "visualization",
+      "updated_at": "2019-01-17T07:32:46.436Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "index": "7f83fe80-1947-11e9-84dc-b9c00e3e5a85",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Top DNS Domains [SIEM Zeek]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "zeek.dns.query",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 8
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "Top DNS Domains [SIEM Zeek]",
+          "type": "pie"
+        }
+      },
+      "id": "b3705f00-1a2c-11e9-84b1-a12c578fa9e8",
+      "type": "visualization",
+      "updated_at": "2019-01-17T07:51:30.288Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "index": "7f83fe80-1947-11e9-84dc-b9c00e3e5a85",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Top URL Domain [SIEM Zeek]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "url.domain",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 8
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "Top URL Domain [SIEM Zeek]",
+          "type": "pie"
+        }
+      },
+      "id": "ef0cfdc0-1a2c-11e9-84b1-a12c578fa9e8",
+      "type": "visualization",
+      "updated_at": "2019-01-17T07:53:10.300Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "index": "7f83fe80-1947-11e9-84dc-b9c00e3e5a85",
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Top SSL Server [SIEM Zeek]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "zeek.ssl.server_name",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 8
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": false,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "Top SSL Server [SIEM Zeek]",
+          "type": "pie"
+        }
+      },
+      "id": "13454cb0-1a2d-11e9-84b1-a12c578fa9e8",
+      "type": "visualization",
+      "updated_at": "2019-01-17T07:54:11.067Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Time Series Count [SIEM Zeek]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "3716ea90-1a2d-11e9-b2af-13b289f0bf65"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "3822dc50-1a2d-11e9-b2af-13b289f0bf65"
+              }
+            ],
+            "gauge_color_rules": [
+              {
+                "id": "4c1a3ff0-1a2d-11e9-b2af-13b289f0bf65"
+              }
+            ],
+            "gauge_inner_width": 10,
+            "gauge_style": "half",
+            "gauge_width": 10,
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "filebeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "filter": "tags:zeek",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "count"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "filter",
+                "stacked": "none"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 0,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Time Series Count [SIEM Zeek]",
+          "type": "metrics"
+        }
+      },
+      "id": "fad258c0-1078-11e9-b27a-69e6e8b80a25",
+      "type": "visualization",
+      "updated_at": "2019-01-17T07:56:26.486Z",
+      "version": 74
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false,
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {
+              "mapCenter": [
+                20.3034175184893,
+                -5.537109375000001
+              ],
+              "mapZoom": 2
+            },
+            "gridData": {
+              "h": 18,
+              "i": "1",
+              "w": 48,
+              "x": 0,
+              "y": 0
+            },
+            "id": "5d95a3e0-1a29-11e9-84b1-a12c578fa9e8",
+            "panelIndex": "1",
+            "type": "visualization",
+            "version": "6.5.4"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "legendOpen": true
+              }
+            },
+            "gridData": {
+              "h": 10,
+              "i": "2",
+              "w": 16,
+              "x": 0,
+              "y": 18
+            },
+            "id": "c337dbf0-1a29-11e9-84b1-a12c578fa9e8",
+            "panelIndex": "2",
+            "type": "visualization",
+            "version": "6.5.4"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "legendOpen": true
+              }
+            },
+            "gridData": {
+              "h": 10,
+              "i": "3",
+              "w": 17,
+              "x": 16,
+              "y": 18
+            },
+            "id": "f054ee70-1a29-11e9-84b1-a12c578fa9e8",
+            "panelIndex": "3",
+            "type": "visualization",
+            "version": "6.5.4"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "legendOpen": true
+              }
+            },
+            "gridData": {
+              "h": 10,
+              "i": "4",
+              "w": 15,
+              "x": 33,
+              "y": 18
+            },
+            "id": "15922a40-1a2a-11e9-84b1-a12c578fa9e8",
+            "panelIndex": "4",
+            "type": "visualization",
+            "version": "6.5.4"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 11,
+              "i": "5",
+              "w": 16,
+              "x": 0,
+              "y": 28
+            },
+            "id": "b3705f00-1a2c-11e9-84b1-a12c578fa9e8",
+            "panelIndex": "5",
+            "type": "visualization",
+            "version": "6.5.4"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 11,
+              "i": "6",
+              "w": 17,
+              "x": 16,
+              "y": 28
+            },
+            "id": "ef0cfdc0-1a2c-11e9-84b1-a12c578fa9e8",
+            "panelIndex": "6",
+            "type": "visualization",
+            "version": "6.5.4"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 11,
+              "i": "7",
+              "w": 15,
+              "x": 33,
+              "y": 28
+            },
+            "id": "13454cb0-1a2d-11e9-84b1-a12c578fa9e8",
+            "panelIndex": "7",
+            "type": "visualization",
+            "version": "6.5.4"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 9,
+              "i": "8",
+              "w": 48,
+              "x": 0,
+              "y": 39
+            },
+            "id": "fad258c0-1078-11e9-b27a-69e6e8b80a25",
+            "panelIndex": "8",
+            "type": "visualization",
+            "version": "6.5.4"
+          }
+        ],
+        "timeRestore": false,
+        "title": "Zeek Overview Dashboard [SIEM]",
+        "version": 1
+      },
+      "id": "87b0c430-1a2d-11e9-84b1-a12c578fa9e8",
+      "type": "dashboard",
+      "updated_at": "2019-01-17T07:57:50.613Z",
+      "version": 2
+    }
+  ],
+  "version": "6.5.4"
+}

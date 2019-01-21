@@ -25,11 +25,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
@@ -87,17 +87,18 @@ type mysqlMessage struct {
 }
 
 type mysqlTransaction struct {
-	tuple        common.TCPTuple
-	src          common.Endpoint
-	dst          common.Endpoint
-	responseTime int32
-	ts           time.Time
-	query        string
-	method       string
-	path         string // for mysql, Path refers to the mysql table queried
-	bytesOut     uint64
-	bytesIn      uint64
-	notes        []string
+	tuple    common.TCPTuple
+	src      common.Endpoint
+	dst      common.Endpoint
+	ts       time.Time
+	endTime  time.Time
+	query    string
+	method   string
+	path     string // for mysql, Path refers to the mysql table queried
+	bytesOut uint64
+	bytesIn  uint64
+	notes    []string
+	isError  bool
 
 	mysql common.MapStr
 
@@ -759,10 +760,12 @@ func (mysql *mysqlPlugin) receivedMysqlResponse(msg *mysqlMessage) {
 		"insert_id":     msg.insertID,
 		"num_rows":      msg.numberOfRows,
 		"num_fields":    msg.numberOfFields,
-		"iserror":       msg.isError,
-		"error_code":    msg.errorCode,
-		"error_message": msg.errorInfo,
 	})
+	trans.isError = msg.isError
+	if trans.isError {
+		trans.mysql["error_code"] = msg.errorCode
+		trans.mysql["error_message"] = msg.errorInfo
+	}
 	if msg.statementID != 0 {
 		// cache prepare statement response info
 		stmts := mysql.getStmtsMap(msg.tcpTuple.Hashable())
@@ -783,8 +786,7 @@ func (mysql *mysqlPlugin) receivedMysqlResponse(msg *mysqlMessage) {
 
 	trans.bytesOut = msg.size
 	trans.path = msg.tables
-
-	trans.responseTime = int32(msg.ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
+	trans.endTime = msg.ts
 
 	// save Raw message
 	if len(msg.raw) > 0 {
@@ -1152,41 +1154,49 @@ func (mysql *mysqlPlugin) publishTransaction(t *mysqlTransaction) {
 
 	logp.Debug("mysql", "mysql.results exists")
 
-	fields := common.MapStr{}
-	fields["type"] = "mysql"
+	evt, pbf := pb.NewBeatEvent(t.ts)
+	pbf.SetSource(&t.src)
+	pbf.SetDestination(&t.dst)
+	pbf.Source.Bytes = int64(t.bytesIn)
+	pbf.Destination.Bytes = int64(t.bytesOut)
+	pbf.Event.Dataset = "mysql"
+	pbf.Event.Start = t.ts
+	pbf.Event.End = t.endTime
+	pbf.Network.Transport = "tcp"
+	pbf.Network.Protocol = "mysql"
 
-	if t.mysql["iserror"].(bool) {
+	fields := evt.Fields
+	fields["type"] = pbf.Event.Dataset
+	fields["method"] = t.method
+	fields["query"] = t.query
+	fields["mysql"] = t.mysql
+	if len(t.path) > 0 {
+		fields["path"] = t.path
+	}
+	if len(t.params) > 0 {
+		fields["params"] = t.params
+	}
+
+	if t.isError {
 		fields["status"] = common.ERROR_STATUS
 	} else {
 		fields["status"] = common.OK_STATUS
 	}
 
-	fields["responsetime"] = t.responseTime
 	if mysql.sendRequest {
 		fields["request"] = t.requestRaw
 	}
 	if mysql.sendResponse {
 		fields["response"] = t.responseRaw
 	}
-	fields["method"] = t.method
-	fields["query"] = t.query
-	fields["params"] = t.params
-	fields["mysql"] = t.mysql
-	fields["path"] = t.path
-	fields["bytes_out"] = t.bytesOut
-	fields["bytes_in"] = t.bytesIn
 
-	if len(t.notes) > 0 {
-		fields["notes"] = t.notes
+	if len(t.notes) == 1 {
+		evt.PutValue("error.message", t.notes[0])
+	} else if len(t.notes) > 1 {
+		evt.PutValue("error.message", t.notes)
 	}
 
-	fields["src"] = &t.src
-	fields["dst"] = &t.dst
-
-	mysql.results(beat.Event{
-		Timestamp: t.ts,
-		Fields:    fields,
-	})
+	mysql.results(evt)
 }
 
 func readLstring(data []byte, offset int) ([]byte, int, bool, error) {

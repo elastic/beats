@@ -3,13 +3,9 @@
   description: >
     Contains fields from the MySQL error logs.
   fields:
-    - name: timestamp
-      description: >
-        The timestamp from the log line.
-
     - name: thread_id
       type: alias
-      path: process.thread.id
+      path: mysql.thread_id
       migration: true
     - name: level
       type: alias

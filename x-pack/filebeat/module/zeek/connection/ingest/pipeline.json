@@ -1,0 +1,61 @@
+{
+  "description": "Pipeline for normalizing Zeek conn.log",
+  "processors": [
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['connection']['ts'] * params.multiplier; ctx.zeek.connection.remove('ts');",
+        "params": {
+          "multiplier": 1000
+        }
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.duration = (long)ctx.event.duration * params.multiplier",
+        "params": {
+          "multiplier": 1000000000
+        },
+        "ignore_failure": true
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.id = ctx.zeek.session_id + \"-connection\"",
+        "ignore_failure": true
+      }
+    },
+    {
+      "set": {
+        "field": "source.ip",
+        "value": "{{source.address}}"
+      }
+    },
+    {
+      "set": {
+        "field": "destination.ip",
+        "value": "{{destination.address}}"
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "if (ctx.zeek.connection.local_orig == true && ctx.zeek.connection.local_resp == true) {ctx.network.direction = \"internal\"} else if (ctx.zeek.connection.local_orig == true && ctx.zeek.connection.local_resp == false) {ctx.network.direction = \"outbound\"} else if (ctx.zeek.connection.local_orig == false && ctx.zeek.connection.local_resp == true) {ctx.network.direction = \"inbound\"} else {ctx.network.direction = \"external\"}"
+      }
+    },
+    {
+      "geoip": {
+        "field": "destination.ip",
+        "target_field": "destination.geo"
+      }
+    },
+    {
+      "geoip": {
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    }
+  ]
+}

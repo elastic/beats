@@ -552,8 +552,9 @@ func Test_gap_in_response(t *testing.T) {
 	assert.Equal(t, true, drop)
 
 	trans := expectTransaction(t, store)
-	assert.NotNil(t, trans)
-	assert.Equal(t, []string{"Packet loss while capturing the response"}, trans["notes"])
+	if m, err := trans.GetValue("error.message"); assert.NoError(t, err) {
+		assert.Equal(t, m, "Packet loss while capturing the response")
+	}
 }
 
 // Test that loss of data during the request doesn't result in a
