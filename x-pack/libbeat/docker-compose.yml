@@ -40,7 +40,8 @@ services:
       - ELASTIC_PASSWORD=changeme
 
   kibana:
-    depends_on: elasticsearch
+    depends_on:
+      - elasticsearch
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: kibana
