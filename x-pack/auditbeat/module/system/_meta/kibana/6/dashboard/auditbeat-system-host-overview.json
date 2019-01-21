@@ -63,8 +63,8 @@
       },
       "id": "cf8aa0a0-18ca-11e9-9094-c50574723088",
       "type": "visualization",
-      "updated_at": "2019-01-17T13:02:07.570Z",
-      "version": 8
+      "updated_at": "2019-01-21T10:44:47.770Z",
+      "version": 15
     },
     {
       "attributes": {
@@ -109,6 +109,22 @@
               },
               "schema": "segment",
               "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "system.audit.host.os.version.keyword",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
             }
           ],
           "params": {
@@ -130,8 +146,8 @@
       },
       "id": "9dd991a0-18cb-11e9-9094-c50574723088",
       "type": "visualization",
-      "updated_at": "2019-01-17T13:02:07.570Z",
-      "version": 8
+      "updated_at": "2019-01-21T10:47:24.421Z",
+      "version": 17
     },
     {
       "attributes": {
@@ -223,8 +239,8 @@
       },
       "id": "4d0485f0-18da-11e9-9094-c50574723088",
       "type": "visualization",
-      "updated_at": "2019-01-17T13:02:07.570Z",
-      "version": 9
+      "updated_at": "2019-01-21T10:44:47.770Z",
+      "version": 16
     },
     {
       "attributes": {
@@ -371,8 +387,8 @@
       },
       "id": "eea92ad0-18d7-11e9-9094-c50574723088",
       "type": "visualization",
-      "updated_at": "2019-01-17T13:02:07.570Z",
-      "version": 8
+      "updated_at": "2019-01-21T10:44:47.770Z",
+      "version": 15
     },
     {
       "attributes": {
@@ -419,8 +435,8 @@
           "vis": {
             "params": {
               "sort": {
-                "columnIndex": null,
-                "direction": null
+                "columnIndex": 1,
+                "direction": "asc"
               }
             }
           }
@@ -533,8 +549,8 @@
       },
       "id": "91962a30-1901-11e9-9094-c50574723088",
       "type": "visualization",
-      "updated_at": "2019-01-17T13:02:07.570Z",
-      "version": 9
+      "updated_at": "2019-01-21T10:47:53.537Z",
+      "version": 18
     },
     {
       "attributes": {
@@ -632,8 +648,8 @@
       },
       "id": "dfe62590-18da-11e9-9094-c50574723088",
       "type": "dashboard",
-      "updated_at": "2019-01-17T13:02:07.570Z",
-      "version": 10
+      "updated_at": "2019-01-21T10:44:47.770Z",
+      "version": 17
     }
   ],
   "version": "7.0.0"
