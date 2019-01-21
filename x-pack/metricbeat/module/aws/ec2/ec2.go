@@ -120,6 +120,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		ec2Logger.Errorf(err.Error())
 	}
 
+	// Check if period is set to be multiple of 60s or 300s
+	remainder := periodSec % 60
+	if remainder != 0 {
+		err := errors.New("period is not set to be multiple of 60s or 300s. This will cause data missing " +
+			"and potentially extra costs. Please change the period setting in config.yml")
+		ec2Logger.Warn(err)
+	}
+
 	return &MetricSet{
 		MetricSet:      metricSet,
 		moduleConfig:   &moduleConfig,
@@ -223,7 +231,8 @@ func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 	}
 
 	if len(mapOfMetricSetFieldResults) <= 3 {
-		errMsg := "Missing Cloudwatch data for instance " + instanceID + ". Please recheck the period setting in config."
+		errMsg := "Missing Cloudwatch data for instance " + instanceID + ". If this is a new instance, this behavior is expected. " +
+			"If not, please recheck the period setting in config."
 		err = errors.New(errMsg)
 		event.Error = err
 		return
