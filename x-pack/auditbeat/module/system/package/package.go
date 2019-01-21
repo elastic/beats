@@ -6,7 +6,10 @@ package pkg
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/gob"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path"
@@ -38,22 +41,29 @@ const (
 	darwin = "darwin"
 
 	bucketName              = "package.v1"
-	bucketKeyUsers          = "packages"
+	bucketKeyPackages       = "packages"
 	bucketKeyStateTimestamp = "state_timestamp"
 
 	eventTypeState = "state"
+	eventTypeEvent = "event"
 )
 
 type eventAction uint8
 
 const (
 	eventActionExistingPackage eventAction = iota
+	eventActionPackageInstalled
+	eventActionPackageRemoved
 )
 
 func (action eventAction) String() string {
 	switch action {
 	case eventActionExistingPackage:
 		return "existing_package"
+	case eventActionPackageInstalled:
+		return "package_installed"
+	case eventActionPackageRemoved:
+		return "package_removed"
 	default:
 		return ""
 	}
@@ -175,7 +185,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		ms.log.Debug("No state timestamp found")
 	}
 
+	// Load from disk: Packages
+	packages, err := ms.restorePackagesFromDisk()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to restore packages from disk")
+	}
+	ms.log.Debugf("Restored %d packages from disk", len(packages))
+
+	ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
+
 	return ms, nil
+}
+
+// Close cleans up the MetricSet when it finishes.
+func (ms *MetricSet) Close() error {
+	if ms.bucket != nil {
+		return ms.bucket.Close()
+	}
+	return nil
 }
 
 // Fetch collects data about the host. It is invoked periodically.
@@ -191,58 +218,11 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 		ms.log.Debugf("Next state update by %v", ms.lastState.Add(ms.config.effectiveStatePeriod()))
 	}
 
-	/*err := ms.reportChanges(report)
+	err := ms.reportChanges(report)
 	if err != nil {
 		ms.log.Error(err)
 		report.Error(err)
-	}*/
-
-	/*if ms.cache != nil && !ms.cache.IsEmpty() {
-		installed, removed := ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
-
-		for _, pkgInfo := range installed {
-			pkgInfoMapStr := pkgInfo.(*Package).toMapStr()
-			pkgInfoMapStr.Put("status", "new")
-
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"package": pkgInfoMapStr,
-				},
-			})
-		}
-
-		for _, pkgInfo := range removed {
-			pkgInfoMapStr := pkgInfo.(*Package).toMapStr()
-			pkgInfoMapStr.Put("status", "removed")
-
-			report.Event(mb.Event{
-				MetricSetFields: common.MapStr{
-					"package": pkgInfoMapStr,
-				},
-			})
-		}
-	} else {
-		// Report all installed packages
-		var pkgInfos []common.MapStr
-
-		for _, pkgInfo := range packages {
-			pkgInfoMapStr := pkgInfo.toMapStr()
-			pkgInfoMapStr.Put("status", "installed")
-
-			pkgInfos = append(pkgInfos, pkgInfoMapStr)
-		}
-
-		report.Event(mb.Event{
-			MetricSetFields: common.MapStr{
-				"package": pkgInfos,
-			},
-		})
-
-		if ms.cache != nil {
-			// This will initialize the cache with the current packages
-			ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
-		}
-	}*/
+	}
 }
 
 // reportState reports all installed packages on the system.
@@ -278,8 +258,32 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 		return errors.Wrap(err, "error writing state timestamp to disk")
 	}
 
+	return ms.savePackagesToDisk(packages)
+}
+
+// reportChanges detects and reports any changes to installed packages on this system since the last call.
+func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
+	packages, err := getPackages(ms.osFamily)
+	if err != nil {
+		return errors.Wrap(err, "failed to get packages")
+	}
+	ms.log.Debugf("Found %v packages", len(packages))
+
+	installed, removed := ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
+
+	for _, cacheValue := range installed {
+		report.Event(packageEvent(cacheValue.(*Package), eventTypeEvent, eventActionPackageInstalled))
+	}
+
+	for _, cacheValue := range removed {
+		report.Event(packageEvent(cacheValue.(*Package), eventTypeEvent, eventActionPackageRemoved))
+	}
+
+	if len(installed) > 0 || len(removed) > 0 {
+		return ms.savePackagesToDisk(packages)
+	}
+
 	return nil
-	//return ms.savePackagesToDisk(users)
 }
 
 func packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
@@ -300,6 +304,10 @@ func packageMessage(pkg *Package, action eventAction) string {
 	switch action {
 	case eventActionExistingPackage:
 		actionString = "is already installed"
+	case eventActionPackageInstalled:
+		actionString = "installed"
+	case eventActionPackageRemoved:
+		actionString = "removed"
 	}
 
 	return fmt.Sprintf("Package %v (%v) %v",
@@ -314,6 +322,57 @@ func convertToCacheable(packages []*Package) []cache.Cacheable {
 	}
 
 	return c
+}
+
+// restorePackagesFromDisk loads the packages from disk.
+func (ms *MetricSet) restorePackagesFromDisk() (packages []*Package, err error) {
+	var decoder *gob.Decoder
+	err = ms.bucket.Load(bucketKeyPackages, func(blob []byte) error {
+		if len(blob) > 0 {
+			buf := bytes.NewBuffer(blob)
+			decoder = gob.NewDecoder(buf)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if decoder != nil {
+		for {
+			pkg := new(Package)
+			err = decoder.Decode(pkg)
+			if err == nil {
+				packages = append(packages, pkg)
+			} else if err == io.EOF {
+				// Read all packages
+				break
+			} else {
+				return nil, errors.Wrap(err, "error decoding packages")
+			}
+		}
+	}
+
+	return packages, nil
+}
+
+// Save packages to disk.
+func (ms *MetricSet) savePackagesToDisk(packages []*Package) error {
+	var buf bytes.Buffer
+	encoder := gob.NewEncoder(&buf)
+
+	for _, pkg := range packages {
+		err := encoder.Encode(*pkg)
+		if err != nil {
+			return errors.Wrap(err, "error encoding packages")
+		}
+	}
+
+	err := ms.bucket.Store(bucketKeyPackages, buf.Bytes())
+	if err != nil {
+		return errors.Wrap(err, "error writing packages to disk")
+	}
+	return nil
 }
 
 func getPackages(osFamily string) (packages []*Package, err error) {
@@ -332,7 +391,7 @@ func getPackages(osFamily string) (packages []*Package, err error) {
 			err = errors.Wrap(err, "error getting Homebrew packages")
 		}
 	default:
-		panic("unknown OS - this should not have happened")
+		err = errors.Errorf("unknown OS %v - this should not have happened", osFamily)
 	}
 
 	return
