@@ -15,14 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package common
+package backoff
 
-import "time"
+import (
+	"time"
+)
 
-// A Backoff waits on errors with exponential backoff (limited by maximum
-// backoff). Resetting Backoff will reset the next sleep timer to the initial
-// backoff duration.
-type Backoff struct {
+// ExpBackoff exponential backoff, will wait an initial time and exponentialy
+// increases the wait time up to a predefined maximun. Resetting Backoff will reset the next sleep
+// timer to the initial backoff duration.
+type ExpBackoff struct {
 	duration time.Duration
 	done     <-chan struct{}
 
@@ -32,8 +34,9 @@ type Backoff struct {
 	last time.Time
 }
 
-func NewBackoff(done <-chan struct{}, init, max time.Duration) *Backoff {
-	return &Backoff{
+// NewExpBackoff returns a new exponential backoff.
+func NewExpBackoff(done <-chan struct{}, init, max time.Duration) Backoff {
+	return &ExpBackoff{
 		duration: init,
 		done:     done,
 		init:     init,
@@ -41,11 +44,13 @@ func NewBackoff(done <-chan struct{}, init, max time.Duration) *Backoff {
 	}
 }
 
-func (b *Backoff) Reset() {
+// Reset resets the duration of the backoff.
+func (b *ExpBackoff) Reset() {
 	b.duration = b.init
 }
 
-func (b *Backoff) Wait() bool {
+// Wait block until either the timer is completed or channel is done.
+func (b *ExpBackoff) Wait() bool {
 	backoff := b.duration
 	b.duration *= 2
 	if b.duration > b.max {
@@ -59,25 +64,4 @@ func (b *Backoff) Wait() bool {
 		b.last = time.Now()
 		return true
 	}
-}
-
-func (b *Backoff) WaitOnError(err error) bool {
-	if err == nil {
-		b.Reset()
-		return true
-	}
-	return b.Wait()
-}
-
-func (b *Backoff) TryWaitOnError(failTS time.Time, err error) bool {
-	if err == nil {
-		b.Reset()
-		return true
-	}
-
-	if failTS.Before(b.last) {
-		return true
-	}
-
-	return b.Wait()
 }
