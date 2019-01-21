@@ -178,6 +178,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release Ceph module as GA. {pull}10202[10202]
 - Release aerospike module as GA. {pull}10203[10203]
 - Release Couchbase module as GA. {pull}10201[10201]
+- Making RabbitMQ Metricbeat module GA. {pull}10165[10165]
 
 *Packetbeat*
 
