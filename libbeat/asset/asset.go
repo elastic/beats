@@ -75,7 +75,7 @@ func (d *Data) SetName(name string) {
 	d.Name = goTypeName(name)
 }
 
-func CreateAsset(license string, beat string, name string, p string, data []byte, priority string) ([]byte, error) {
+func CreateAsset(license string, beat string, name string, pkg string, data []byte, priority string) ([]byte, error) {
 
 	// Depending on OS or tools configuration, files can contain carriages (\r),
 	// what leads to different results, remove them before encoding.
@@ -93,7 +93,7 @@ func CreateAsset(license string, beat string, name string, p string, data []byte
 		Name:     name,
 		Data:     encData,
 		Priority: priority,
-		Package:  p,
+		Package:  pkg,
 	})
 
 	bs, err := format.Source(buf.Bytes())
