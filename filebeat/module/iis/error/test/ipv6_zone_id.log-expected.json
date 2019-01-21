@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": "2018-12-30T14:22:07.000Z", 
-        "event.dataset": "iis.error", 
         "fileset.module": "iis", 
         "fileset.name": "error", 
         "iis.error.queue_name": "-", 
