@@ -1,0 +1,71 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{}"
+                }, 
+                "title": "Kubernetes API Server: Top clients by number of requests", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"params\": {\"bar_color_rules\": [{\"id\": \"61a13010-5794-11e8-8bd0-2180975e72dd\"}], \"time_field\": \"@timestamp\", \"series\": [{\"line_width\": 1, \"terms_field\": \"kubernetes.apiserver.request.client\", \"metrics\": [{\"field\": \"kubernetes.apiserver.request.count\", \"type\": \"sum\", \"id\": \"61ca57f2-469d-11e7-af02-69e470af7417\"}, {\"field\": \"61ca57f2-469d-11e7-af02-69e470af7417\", \"type\": \"derivative\", \"id\": \"0e6ff4a0-5792-11e8-8bd0-2180975e72dd\", \"unit\": \"\"}], \"terms_size\": \"10\", \"split_filters\": [{\"color\": \"#68BC00\", \"id\": \"9e4b8030-5792-11e8-8bd0-2180975e72dd\"}], \"color\": \"rgba(104,188,0,1)\", \"stacked\": \"stacked\", \"label\": \"Top clients by number of requests (5m)\", \"filter\": \"\", \"seperate_axis\": 0, \"split_mode\": \"terms\", \"chart_type\": \"line\", \"terms_order_by\": \"61ca57f2-469d-11e7-af02-69e470af7417\", \"point_size\": 1, \"axis_position\": \"right\", \"formatter\": \"number\", \"id\": \"61ca57f1-469d-11e7-af02-69e470af7417\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"5m\", \"id\": \"61ca57f0-469d-11e7-af02-69e470af7417\", \"show_legend\": 1, \"show_grid\": 1, \"index_pattern\": \"metricbeat-*\", \"type\": \"top_n\", \"axis_position\": \"left\"}, \"aggs\": [], \"title\": \"Kubernetes API Server: Top clients by number of requests\"}"
+            }, 
+            "id": "7cbeb750-5794-11e8-afa2-e9067ea62228", 
+            "type": "visualization", 
+            "updated_at": "2018-05-14T18:23:10.501Z", 
+            "version": 5
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{}"
+                }, 
+                "title": "Kubernetes API Server: Requests", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"params\": {\"time_field\": \"@timestamp\", \"series\": [{\"line_width\": 1, \"metrics\": [{\"field\": \"kubernetes.apiserver.request.latency.sum\", \"type\": \"sum\", \"id\": \"61ca57f2-469d-11e7-af02-69e470af7417\"}, {\"field\": \"kubernetes.apiserver.request.count\", \"type\": \"sum\", \"id\": \"a2185e50-57a0-11e8-af57-a1d645d2b569\"}, {\"variables\": [{\"field\": \"61ca57f2-469d-11e7-af02-69e470af7417\", \"id\": \"b27c8910-57a0-11e8-af57-a1d645d2b569\", \"name\": \"sum\"}, {\"field\": \"a2185e50-57a0-11e8-af57-a1d645d2b569\", \"id\": \"b5fc8810-57a0-11e8-af57-a1d645d2b569\", \"name\": \"count\"}], \"type\": \"calculation\", \"id\": \"b09133d0-57a0-11e8-af57-a1d645d2b569\", \"script\": \"params.sum / params.count\"}], \"color\": \"rgba(159,5,0,1)\", \"stacked\": \"none\", \"value_template\": \"{{value}} ms\", \"label\": \"Avg response time\", \"filter\": \"NOT (kubernetes.apiserver.request.verb: WATCH or kubernetes.apiserver.request.verb: CONNECT)\", \"seperate_axis\": 0, \"split_mode\": \"everything\", \"chart_type\": \"line\", \"point_size\": 1, \"axis_position\": \"right\", \"formatter\": \"us,ms,2\", \"id\": \"61ca57f1-469d-11e7-af02-69e470af7417\", \"fill\": \"0\"}, {\"line_width\": 1, \"point_size\": 1, \"color\": \"rgba(22,165,165,1)\", \"label\": \"Requests rate\", \"metrics\": [{\"field\": \"kubernetes.apiserver.request.count\", \"type\": \"sum\", \"id\": \"c001ba50-57a1-11e8-a049-ff54cef064a2\"}, {\"field\": \"c001ba50-57a1-11e8-a049-ff54cef064a2\", \"type\": \"derivative\", \"id\": \"dc83b390-57a1-11e8-a049-ff54cef064a2\", \"unit\": \"\"}], \"seperate_axis\": 1, \"split_mode\": \"everything\", \"chart_type\": \"line\", \"stacked\": \"none\", \"axis_position\": \"right\", \"formatter\": \"number\", \"id\": \"c0019340-57a1-11e8-a049-ff54cef064a2\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"id\": \"61ca57f0-469d-11e7-af02-69e470af7417\", \"show_legend\": 1, \"show_grid\": 1, \"index_pattern\": \"metricbeat-*\", \"type\": \"timeseries\", \"axis_position\": \"left\"}, \"aggs\": [], \"title\": \"Kubernetes API Server: Requests\"}"
+            }, 
+            "id": "ec360ff0-57a0-11e8-afa2-e9067ea62228", 
+            "type": "visualization", 
+            "updated_at": "2018-05-14T18:21:27.515Z", 
+            "version": 4
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{}"
+                }, 
+                "title": "Kubernetes API Server: Top clients by resource", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"params\": {\"bar_color_rules\": [{\"id\": \"61a13010-5794-11e8-8bd0-2180975e72dd\"}], \"time_field\": \"@timestamp\", \"series\": [{\"line_width\": 1, \"terms_field\": \"kubernetes.apiserver.request.resource\", \"metrics\": [{\"field\": \"kubernetes.apiserver.request.count\", \"type\": \"sum\", \"id\": \"61ca57f2-469d-11e7-af02-69e470af7417\"}, {\"field\": \"61ca57f2-469d-11e7-af02-69e470af7417\", \"type\": \"derivative\", \"id\": \"0e6ff4a0-5792-11e8-8bd0-2180975e72dd\", \"unit\": \"\"}], \"terms_order_by\": \"61ca57f2-469d-11e7-af02-69e470af7417\", \"split_filters\": [{\"color\": \"#68BC00\", \"id\": \"9e4b8030-5792-11e8-8bd0-2180975e72dd\"}], \"color\": \"rgba(104,188,0,1)\", \"stacked\": \"stacked\", \"terms_size\": \"10\", \"label\": \"Top clients by number of requests (5m)\", \"filter\": \"\", \"seperate_axis\": 0, \"override_index_pattern\": 0, \"chart_type\": \"line\", \"series_drop_last_bucket\": 1, \"point_size\": 1, \"axis_position\": \"right\", \"formatter\": \"number\", \"split_mode\": \"terms\", \"id\": \"61ca57f1-469d-11e7-af02-69e470af7417\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"5m\", \"id\": \"61ca57f0-469d-11e7-af02-69e470af7417\", \"show_legend\": 1, \"show_grid\": 1, \"index_pattern\": \"metricbeat-*\", \"type\": \"top_n\", \"axis_position\": \"left\"}, \"aggs\": [], \"title\": \"Kubernetes API Server: Top clients by resource\"}"
+            }, 
+            "id": "95a7f110-57a2-11e8-afa2-e9067ea62228", 
+            "type": "visualization", 
+            "updated_at": "2018-05-14T18:23:50.093Z", 
+            "version": 4
+        }, 
+        {
+            "attributes": {
+                "description": "Kubernetes API server metrics", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query\": \"\", \"language\": \"lucene\"}, \"version\": true, \"highlightAll\": true}"
+                }, 
+                "optionsJSON": "{\"useMargins\": false, \"darkTheme\": false, \"hidePanelTitles\": false}", 
+                "panelsJSON": "[{\"gridData\": {\"i\": \"1\", \"h\": 24, \"y\": 22, \"w\": 24, \"x\": 0}, \"embeddableConfig\": {}, \"panelIndex\": \"1\", \"version\": \"6.3.0\", \"type\": \"visualization\", \"id\": \"7cbeb750-5794-11e8-afa2-e9067ea62228\"}, {\"gridData\": {\"i\": \"3\", \"h\": 22, \"y\": 0, \"w\": 48, \"x\": 0}, \"embeddableConfig\": {}, \"panelIndex\": \"3\", \"version\": \"6.3.0\", \"type\": \"visualization\", \"id\": \"ec360ff0-57a0-11e8-afa2-e9067ea62228\"}, {\"gridData\": {\"i\": \"4\", \"h\": 24, \"y\": 22, \"w\": 24, \"x\": 24}, \"embeddableConfig\": {}, \"panelIndex\": \"4\", \"version\": \"6.3.0\", \"type\": \"visualization\", \"id\": \"95a7f110-57a2-11e8-afa2-e9067ea62228\"}]", 
+                "timeRestore": false, 
+                "title": "[Metricbeat Kubernetes] API server", 
+                "version": 1
+            }, 
+            "id": "af7225b0-5794-11e8-afa2-e9067ea62228", 
+            "type": "dashboard", 
+            "updated_at": "2018-05-14T18:23:55.202Z", 
+            "version": 5
+        }
+    ], 
+    "version": "6.3.0"
+}

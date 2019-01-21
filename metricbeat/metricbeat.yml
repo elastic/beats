@@ -289,3 +289,7 @@ indices:
       # A dictionary of settings for the _source field. For more details, please check
       # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
       #_source:
+#================================= Migration ==================================
+
+# This allows to enable migration aliases
+#migration.enabled: false

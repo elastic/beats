@@ -44,10 +44,11 @@ type Template struct {
 	beatVersion common.Version
 	esVersion   common.Version
 	config      Config
+	migration   bool
 }
 
 // New creates a new template instance
-func New(beatVersion string, beatName string, esVersion common.Version, config Config) (*Template, error) {
+func New(beatVersion string, beatName string, esVersion common.Version, config Config, migration bool) (*Template, error) {
 	bV, err := common.NewVersion(beatVersion)
 	if err != nil {
 		return nil, err
@@ -98,6 +99,7 @@ func New(beatVersion string, beatName string, esVersion common.Version, config C
 		beatVersion: *bV,
 		esVersion:   esVersion,
 		config:      config,
+		migration:   migration,
 	}, nil
 }
 
@@ -110,6 +112,7 @@ func event(name, version string) *beat.Event {
 				"version": version,
 			},
 			"agent": common.MapStr{
+				"type":    name,
 				"name":    name,
 				"version": version,
 			},
@@ -143,7 +146,7 @@ func (t *Template) load(fields common.Fields) (common.MapStr, error) {
 
 	// Start processing at the root
 	properties := common.MapStr{}
-	processor := Processor{EsVersion: t.esVersion}
+	processor := Processor{EsVersion: t.esVersion, Migration: t.migration}
 	if err := processor.Process(fields, "", properties); err != nil {
 		return nil, err
 	}

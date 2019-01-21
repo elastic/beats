@@ -1,0 +1,231 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query\": {\"query_string\": {\"query\": \"*\"}}, \"language\": \"lucene\"}}"
+                }, 
+                "title": "Available pods per deployment [Metricbeat Kubernetes]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"params\": {\"time_field\": \"@timestamp\", \"series\": [{\"line_width\": 1, \"terms_field\": \"kubernetes.deployment.name\", \"point_size\": 1, \"terms_size\": \"10000\", \"split_filters\": [{\"color\": \"#68BC00\", \"id\": \"53d35ad0-30df-11e7-8df8-6d3604a72912\"}], \"color\": \"rgba(104,188,0,1)\", \"label\": \"Available pods\", \"metrics\": [{\"field\": \"kubernetes.deployment.replicas.available\", \"type\": \"avg\", \"id\": \"64456841-30df-11e7-8df8-6d3604a72912\"}], \"seperate_axis\": 0, \"split_mode\": \"terms\", \"chart_type\": \"line\", \"stacked\": \"stacked\", \"axis_position\": \"right\", \"formatter\": \"number\", \"id\": \"64456840-30df-11e7-8df8-6d3604a72912\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"id\": \"117fadf0-30df-11e7-8df8-6d3604a72912\", \"filter\": \"metricset.module:kubernetes AND metricset.name:state_deployment\", \"show_legend\": 1, \"show_grid\": 1, \"index_pattern\": \"metricbeat-*\", \"type\": \"timeseries\", \"axis_position\": \"left\"}, \"aggs\": [], \"title\": \"Available pods per deployment [Metricbeat Kubernetes]\"}"
+            }, 
+            "id": "022a54c0-2bf5-11e7-859b-f78b612cde28", 
+            "type": "visualization", 
+            "updated_at": "2018-03-11T20:59:01.845Z", 
+            "version": 4
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query_string\": {\"query\": \"*\"}}}"
+                }, 
+                "title": "CPU usage by node  [Metricbeat Kubernetes]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"listeners\": {}, \"params\": {\"bar_color_rules\": [{\"id\": \"1373ddd0-2bf2-11e7-859b-f78b612cde28\"}], \"gauge_color_rules\": [{\"id\": \"140e4910-2bf2-11e7-859b-f78b612cde28\"}], \"background_color_rules\": [{\"id\": \"12c1f2f0-2bf2-11e7-859b-f78b612cde28\"}], \"index_pattern\": \"metricbeat-*\", \"gauge_inner_width\": 10, \"series\": [{\"line_width\": 1, \"terms_field\": \"kubernetes.node.name\", \"point_size\": 1, \"terms_size\": \"10000\", \"color\": \"#68BC00\", \"stacked\": \"none\", \"value_template\": \"{{value}} nanocores\", \"metrics\": [{\"field\": \"kubernetes.container.cpu.usage.nanocores\", \"type\": \"sum\", \"id\": \"0d5c9221-2bf2-11e7-859b-f78b612cde28\"}], \"seperate_axis\": 0, \"override_index_pattern\": 0, \"chart_type\": \"line\", \"terms_order_by\": \"0d5c9221-2bf2-11e7-859b-f78b612cde28\", \"series_time_field\": \"@timestamp\", \"axis_position\": \"right\", \"formatter\": \"0.0a\", \"split_mode\": \"terms\", \"id\": \"0d5c9220-2bf2-11e7-859b-f78b612cde28\", \"series_interval\": \"10s\", \"fill\": \"0.5\"}, {\"line_width\": 1, \"series_time_field\": \"@timestamp\", \"terms_field\": \"kubernetes.node.name\", \"metrics\": [{\"field\": \"kubernetes.node.cpu.capacity.cores\", \"type\": \"avg\", \"id\": \"22f65d41-31a7-11e7-84cc-096d2b38e6e5\"}, {\"variables\": [{\"field\": \"22f65d41-31a7-11e7-84cc-096d2b38e6e5\", \"id\": \"4cd32080-34d6-11e7-be88-cb6a123dc1bb\", \"name\": \"cores\"}], \"type\": \"calculation\", \"id\": \"4af4c390-34d6-11e7-be88-cb6a123dc1bb\", \"script\": \"params.cores * 1000000000\"}], \"terms_size\": \"10000\", \"color\": \"rgba(211,49,21,1)\", \"stacked\": \"none\", \"value_template\": \"{{value}} nanocores\", \"label\": \"\", \"hide_in_legend\": 1, \"seperate_axis\": 0, \"override_index_pattern\": 0, \"chart_type\": \"line\", \"terms_order_by\": \"22f65d41-31a7-11e7-84cc-096d2b38e6e5\", \"point_size\": \"0\", \"axis_position\": \"right\", \"formatter\": \"0.0a\", \"split_mode\": \"terms\", \"id\": \"22f65d40-31a7-11e7-84cc-096d2b38e6e5\", \"series_interval\": \"10s\", \"fill\": \"0\"}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"filter\": \"metricset.module:kubernetes AND (metricset.name:container OR metricset.name:state_node)\", \"time_field\": \"@timestamp\", \"show_legend\": 1, \"gauge_style\": \"half\", \"axis_position\": \"left\", \"gauge_width\": 10, \"type\": \"timeseries\", \"id\": \"0d5c6b10-2bf2-11e7-859b-f78b612cde28\"}, \"aggs\": [], \"title\": \"CPU usage by node  [Metricbeat Kubernetes]\"}"
+            }, 
+            "id": "44f12b40-2bf4-11e7-859b-f78b612cde28", 
+            "type": "visualization", 
+            "updated_at": "2018-03-01T18:58:07.906Z", 
+            "version": 3
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query_string\": {\"query\": \"*\"}}}"
+                }, 
+                "title": "Kubernetes - Deployments", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"listeners\": {}, \"params\": {\"bar_color_rules\": [{\"id\": \"68cdba10-30e0-11e7-8df8-6d3604a72912\"}], \"gauge_color_rules\": [{\"id\": \"69765620-30e0-11e7-8df8-6d3604a72912\"}], \"background_color_rules\": [{\"id\": \"67ee7da0-30e0-11e7-8df8-6d3604a72912\"}], \"index_pattern\": \"metricbeat-*\", \"gauge_inner_width\": 10, \"series\": [{\"line_width\": 1, \"terms_field\": \"kubernetes.deployment.name\", \"point_size\": 1, \"color\": \"#68BC00\", \"label\": \"Deployments\", \"metrics\": [{\"field\": \"kubernetes.deployment.name\", \"type\": \"cardinality\", \"id\": \"4c4690b2-30e0-11e7-8df8-6d3604a72912\"}], \"seperate_axis\": 0, \"split_mode\": \"everything\", \"chart_type\": \"line\", \"stacked\": \"none\", \"axis_position\": \"right\", \"formatter\": \"number\", \"id\": \"4c4690b1-30e0-11e7-8df8-6d3604a72912\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"filter\": \"metricset.module:kubernetes AND metricset.name:state_deployment\", \"time_field\": \"@timestamp\", \"show_legend\": 1, \"gauge_style\": \"half\", \"axis_position\": \"left\", \"gauge_width\": 10, \"type\": \"metric\", \"id\": \"4c4690b0-30e0-11e7-8df8-6d3604a72912\"}, \"aggs\": [], \"title\": \"Kubernetes - Deployments\"}"
+            }, 
+            "id": "cd059410-2bfb-11e7-859b-f78b612cde28", 
+            "type": "visualization", 
+            "updated_at": "2018-03-01T18:58:07.906Z", 
+            "version": 3
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query_string\": {\"query\": \"*\"}}}"
+                }, 
+                "title": "Kubernetes - Desired pods", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"listeners\": {}, \"params\": {\"bar_color_rules\": [{\"id\": \"674d83b0-30d5-11e7-8df8-6d3604a72912\"}], \"gauge_color_rules\": [{\"id\": \"50f9b980-30d5-11e7-8df8-6d3604a72912\"}], \"background_color_rules\": [{\"id\": \"508ffb30-30d5-11e7-8df8-6d3604a72912\"}], \"index_pattern\": \"metricbeat-*\", \"gauge_inner_width\": \"10\", \"series\": [{\"line_width\": 1, \"point_size\": 1, \"color\": \"#68BC00\", \"stacked\": \"none\", \"label\": \"Desired Pods\", \"metrics\": [{\"field\": \"kubernetes.deployment.replicas.desired\", \"type\": \"sum\", \"id\": \"54cf79a0-30d5-11e7-8df8-6d3604a72912\"}], \"seperate_axis\": 0, \"override_index_pattern\": 1, \"chart_type\": \"line\", \"series_time_field\": \"@timestamp\", \"axis_position\": \"right\", \"formatter\": \"number\", \"split_mode\": \"everything\", \"id\": \"2fe9d3b1-30d5-11e7-8df8-6d3604a72912\", \"series_interval\": \"10s\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"filter\": \"metricset.module:kubernetes AND metricset.name:state_deployment\", \"time_field\": \"@timestamp\", \"show_legend\": 1, \"gauge_style\": \"half\", \"axis_position\": \"left\", \"gauge_width\": \"10\", \"type\": \"metric\", \"id\": \"2fe9d3b0-30d5-11e7-8df8-6d3604a72912\", \"gauge_max\": \"5\"}, \"aggs\": [], \"title\": \"Kubernetes - Desired pods\"}"
+            }, 
+            "id": "e1018b90-2bfb-11e7-859b-f78b612cde28", 
+            "type": "visualization", 
+            "updated_at": "2018-03-01T18:58:07.906Z", 
+            "version": 3
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query\": {\"query_string\": {\"query\": \"*\"}}, \"language\": \"lucene\"}}"
+                }, 
+                "title": "Memory usage by node  [Metricbeat Kubernetes]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"params\": {\"bar_color_rules\": [{\"id\": \"1373ddd0-2bf2-11e7-859b-f78b612cde28\"}], \"gauge_color_rules\": [{\"id\": \"140e4910-2bf2-11e7-859b-f78b612cde28\"}], \"background_color_rules\": [{\"id\": \"12c1f2f0-2bf2-11e7-859b-f78b612cde28\"}], \"index_pattern\": \"metricbeat-*\", \"gauge_inner_width\": 10, \"series\": [{\"line_width\": 1, \"terms_field\": \"kubernetes.node.name\", \"point_size\": 1, \"terms_size\": \"10000\", \"color\": \"#68BC00\", \"metrics\": [{\"field\": \"kubernetes.container.memory.usage.bytes\", \"type\": \"sum\", \"id\": \"0d5c9221-2bf2-11e7-859b-f78b612cde28\"}, {\"field\": \"0d5c9221-2bf2-11e7-859b-f78b612cde28\", \"type\": \"cumulative_sum\", \"id\": \"9f0cf900-1ffb-11e8-81f2-43be86397500\"}, {\"field\": \"9f0cf900-1ffb-11e8-81f2-43be86397500\", \"type\": \"derivative\", \"id\": \"a926e130-1ffb-11e8-81f2-43be86397500\", \"unit\": \"10s\"}], \"seperate_axis\": 0, \"split_mode\": \"terms\", \"chart_type\": \"line\", \"terms_order_by\": \"0d5c9221-2bf2-11e7-859b-f78b612cde28\", \"stacked\": \"none\", \"axis_position\": \"right\", \"formatter\": \"bytes\", \"id\": \"0d5c9220-2bf2-11e7-859b-f78b612cde28\", \"fill\": 0.5}, {\"line_width\": 1, \"terms_field\": \"kubernetes.node.name\", \"metrics\": [{\"field\": \"kubernetes.node.memory.capacity.bytes\", \"type\": \"sum\", \"id\": \"8ba3b271-31a7-11e7-84cc-096d2b38e6e5\"}, {\"field\": \"8ba3b271-31a7-11e7-84cc-096d2b38e6e5\", \"type\": \"cumulative_sum\", \"id\": \"d1fb2670-1ffb-11e8-81f2-43be86397500\"}, {\"field\": \"d1fb2670-1ffb-11e8-81f2-43be86397500\", \"type\": \"derivative\", \"id\": \"dc8b01f0-1ffb-11e8-81f2-43be86397500\", \"unit\": \"10s\"}], \"terms_size\": \"10000\", \"color\": \"rgba(211,49,21,1)\", \"stacked\": \"none\", \"label\": \"Node capacity\", \"hide_in_legend\": 1, \"seperate_axis\": 0, \"split_mode\": \"terms\", \"chart_type\": \"line\", \"terms_order_by\": \"8ba3b271-31a7-11e7-84cc-096d2b38e6e5\", \"point_size\": \"0\", \"axis_position\": \"right\", \"formatter\": \"bytes\", \"id\": \"8ba3b270-31a7-11e7-84cc-096d2b38e6e5\", \"fill\": \"0\"}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"filter\": \"metricset.module:kubernetes AND (metricset.name:container OR metricset.name:state_node)\", \"time_field\": \"@timestamp\", \"show_legend\": 1, \"show_grid\": 1, \"gauge_style\": \"half\", \"axis_position\": \"left\", \"gauge_width\": 10, \"type\": \"timeseries\", \"id\": \"0d5c6b10-2bf2-11e7-859b-f78b612cde28\"}, \"aggs\": [], \"title\": \"Memory usage by node  [Metricbeat Kubernetes]\"}"
+            }, 
+            "id": "d6564360-2bfc-11e7-859b-f78b612cde28", 
+            "type": "visualization", 
+            "updated_at": "2018-03-04T23:15:29.035Z", 
+            "version": 4
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query_string\": {\"query\": \"*\"}}}"
+                }, 
+                "title": "Network in by node  [Metricbeat Kubernetes]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"listeners\": {}, \"params\": {\"bar_color_rules\": [{\"id\": \"1373ddd0-2bf2-11e7-859b-f78b612cde28\"}], \"gauge_color_rules\": [{\"id\": \"140e4910-2bf2-11e7-859b-f78b612cde28\"}], \"background_color_rules\": [{\"id\": \"12c1f2f0-2bf2-11e7-859b-f78b612cde28\"}], \"index_pattern\": \"metricbeat-*\", \"gauge_inner_width\": 10, \"series\": [{\"line_width\": 1, \"terms_field\": \"kubernetes.node.name\", \"point_size\": 1, \"terms_size\": \"100000\", \"color\": \"rgba(104,188,0,1)\", \"label\": \"\", \"metrics\": [{\"field\": \"kubernetes.pod.network.rx.bytes\", \"type\": \"sum\", \"id\": \"0d5c9221-2bf2-11e7-859b-f78b612cde28\"}, {\"field\": \"0d5c9221-2bf2-11e7-859b-f78b612cde28\", \"type\": \"derivative\", \"id\": \"494fc310-2bf7-11e7-859b-f78b612cde28\", \"unit\": \"\"}, {\"field\": \"494fc310-2bf7-11e7-859b-f78b612cde28\", \"type\": \"positive_only\", \"id\": \"37c72a70-3598-11e7-aa4a-8313a0c92a88\", \"unit\": \"\"}], \"seperate_axis\": 0, \"split_mode\": \"terms\", \"chart_type\": \"line\", \"terms_order_by\": \"0d5c9221-2bf2-11e7-859b-f78b612cde28\", \"stacked\": \"stacked\", \"axis_position\": \"right\", \"formatter\": \"bytes\", \"id\": \"0d5c9220-2bf2-11e7-859b-f78b612cde28\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"filter\": \"metricset.module:kubernetes AND metricset.name:pod\", \"time_field\": \"@timestamp\", \"show_legend\": 1, \"gauge_style\": \"half\", \"axis_position\": \"left\", \"gauge_width\": 10, \"type\": \"timeseries\", \"id\": \"0d5c6b10-2bf2-11e7-859b-f78b612cde28\"}, \"aggs\": [], \"title\": \"Network in by node  [Metricbeat Kubernetes]\"}"
+            }, 
+            "id": "16fa4470-2bfd-11e7-859b-f78b612cde28", 
+            "type": "visualization", 
+            "updated_at": "2018-03-01T18:58:07.906Z", 
+            "version": 3
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query_string\": {\"query\": \"*\"}}}"
+                }, 
+                "title": "Network out by node  [Metricbeat Kubernetes]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"listeners\": {}, \"params\": {\"bar_color_rules\": [{\"id\": \"1373ddd0-2bf2-11e7-859b-f78b612cde28\"}], \"gauge_color_rules\": [{\"id\": \"140e4910-2bf2-11e7-859b-f78b612cde28\"}], \"background_color_rules\": [{\"id\": \"12c1f2f0-2bf2-11e7-859b-f78b612cde28\"}], \"index_pattern\": \"metricbeat-*\", \"gauge_inner_width\": 10, \"series\": [{\"line_width\": 1, \"terms_field\": \"kubernetes.node.name\", \"point_size\": 1, \"terms_size\": \"10000\", \"color\": \"rgba(104,188,0,1)\", \"label\": \"\", \"metrics\": [{\"field\": \"kubernetes.pod.network.tx.bytes\", \"type\": \"sum\", \"id\": \"0d5c9221-2bf2-11e7-859b-f78b612cde28\"}, {\"field\": \"0d5c9221-2bf2-11e7-859b-f78b612cde28\", \"type\": \"derivative\", \"id\": \"494fc310-2bf7-11e7-859b-f78b612cde28\", \"unit\": \"\"}, {\"field\": \"494fc310-2bf7-11e7-859b-f78b612cde28\", \"type\": \"positive_only\", \"id\": \"244c70e0-3598-11e7-aa4a-8313a0c92a88\", \"unit\": \"\"}], \"seperate_axis\": 0, \"split_mode\": \"terms\", \"chart_type\": \"line\", \"terms_order_by\": \"0d5c9221-2bf2-11e7-859b-f78b612cde28\", \"stacked\": \"stacked\", \"axis_position\": \"right\", \"formatter\": \"bytes\", \"id\": \"0d5c9220-2bf2-11e7-859b-f78b612cde28\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"filter\": \"metricset.module:kubernetes AND metricset.name:pod\", \"time_field\": \"@timestamp\", \"show_legend\": 1, \"gauge_style\": \"half\", \"axis_position\": \"left\", \"gauge_width\": 10, \"type\": \"timeseries\", \"id\": \"0d5c6b10-2bf2-11e7-859b-f78b612cde28\"}, \"aggs\": [], \"title\": \"Network out by node  [Metricbeat Kubernetes]\"}"
+            }, 
+            "id": "294546b0-30d6-11e7-8df8-6d3604a72912", 
+            "type": "visualization", 
+            "updated_at": "2018-03-01T18:58:07.906Z", 
+            "version": 3
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query_string\": {\"query\": \"*\"}}}"
+                }, 
+                "title": "Kubernetes - Nodes", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"listeners\": {}, \"params\": {\"bar_color_rules\": [{\"id\": \"68cdba10-30e0-11e7-8df8-6d3604a72912\"}], \"gauge_color_rules\": [{\"id\": \"69765620-30e0-11e7-8df8-6d3604a72912\"}], \"background_color_rules\": [{\"id\": \"67ee7da0-30e0-11e7-8df8-6d3604a72912\"}], \"index_pattern\": \"metricbeat-*\", \"gauge_inner_width\": 10, \"series\": [{\"line_width\": 1, \"terms_field\": \"kubernetes.deployment.name\", \"point_size\": 1, \"color\": \"#68BC00\", \"label\": \"Nodes\", \"metrics\": [{\"field\": \"kubernetes.node.name\", \"type\": \"cardinality\", \"id\": \"4c4690b2-30e0-11e7-8df8-6d3604a72912\"}], \"seperate_axis\": 0, \"split_mode\": \"everything\", \"chart_type\": \"line\", \"stacked\": \"none\", \"axis_position\": \"right\", \"formatter\": \"number\", \"id\": \"4c4690b1-30e0-11e7-8df8-6d3604a72912\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"filter\": \"metricset.module:kubernetes AND metricset.name:state_node\", \"time_field\": \"@timestamp\", \"show_legend\": 1, \"gauge_style\": \"half\", \"axis_position\": \"left\", \"gauge_width\": 10, \"type\": \"metric\", \"id\": \"4c4690b0-30e0-11e7-8df8-6d3604a72912\"}, \"aggs\": [], \"title\": \"Kubernetes - Nodes\"}"
+            }, 
+            "id": "408fccf0-30d6-11e7-8df8-6d3604a72912", 
+            "type": "visualization", 
+            "updated_at": "2018-03-01T18:58:07.906Z", 
+            "version": 3
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query_string\": {\"query\": \"*\"}}}"
+                }, 
+                "title": "Top CPU intensive pods  [Metricbeat Kubernetes]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"listeners\": {}, \"params\": {\"bar_color_rules\": [{\"id\": \"802104d0-2bfc-11e7-859b-f78b612cde28\"}], \"time_field\": \"@timestamp\", \"series\": [{\"line_width\": 1, \"terms_field\": \"kubernetes.pod.name\", \"point_size\": 1, \"color\": \"#68BC00\", \"stacked\": \"none\", \"value_template\": \"{{value}} ns\", \"metrics\": [{\"field\": \"kubernetes.container.cpu.usage.core.ns\", \"type\": \"sum\", \"id\": \"5d3692a2-2bfc-11e7-859b-f78b612cde28\"}, {\"field\": \"5d3692a2-2bfc-11e7-859b-f78b612cde28\", \"type\": \"derivative\", \"id\": \"6c905240-2bfc-11e7-859b-f78b612cde28\", \"unit\": \"1s\"}, {\"field\": \"6c905240-2bfc-11e7-859b-f78b612cde28\", \"type\": \"positive_only\", \"id\": \"9a51f710-359d-11e7-aa4a-8313a0c92a88\", \"unit\": \"\"}], \"seperate_axis\": 0, \"override_index_pattern\": 0, \"chart_type\": \"line\", \"terms_order_by\": \"5d3692a2-2bfc-11e7-859b-f78b612cde28\", \"split_mode\": \"terms\", \"axis_position\": \"right\", \"formatter\": \"0.0 a\", \"offset_time\": \"\", \"id\": \"5d3692a1-2bfc-11e7-859b-f78b612cde28\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"id\": \"5d3692a0-2bfc-11e7-859b-f78b612cde28\", \"filter\": \"metricset.module:kubernetes AND metricset.name:container\", \"show_legend\": 1, \"index_pattern\": \"metricbeat-*\", \"type\": \"top_n\", \"axis_position\": \"left\"}, \"aggs\": [], \"title\": \"Top CPU intensive pods  [Metricbeat Kubernetes]\"}"
+            }, 
+            "id": "58e644f0-30d6-11e7-8df8-6d3604a72912", 
+            "type": "visualization", 
+            "updated_at": "2018-03-01T18:58:07.906Z", 
+            "version": 3
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query\": {\"query_string\": {\"query\": \"*\"}}, \"language\": \"lucene\"}}"
+                }, 
+                "title": "Top memory intensive pods  [Metricbeat Kubernetes]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"params\": {\"bar_color_rules\": [{\"id\": \"802104d0-2bfc-11e7-859b-f78b612cde28\"}], \"time_field\": \"@timestamp\", \"series\": [{\"line_width\": 1, \"terms_field\": \"kubernetes.pod.name\", \"point_size\": 1, \"terms_size\": \"10\", \"color\": \"#68BC00\", \"stacked\": \"none\", \"value_template\": \"\", \"metrics\": [{\"field\": \"kubernetes.container.memory.usage.bytes\", \"type\": \"sum\", \"id\": \"5d3692a2-2bfc-11e7-859b-f78b612cde28\"}, {\"field\": \"5d3692a2-2bfc-11e7-859b-f78b612cde28\", \"type\": \"cumulative_sum\", \"id\": \"3972e9f0-256f-11e8-84e6-87221f87ae3b\"}, {\"field\": \"3972e9f0-256f-11e8-84e6-87221f87ae3b\", \"type\": \"derivative\", \"id\": \"3e9fd5a0-256f-11e8-84e6-87221f87ae3b\", \"unit\": \"10s\"}], \"seperate_axis\": 0, \"override_index_pattern\": 0, \"chart_type\": \"line\", \"terms_order_by\": \"5d3692a2-2bfc-11e7-859b-f78b612cde28\", \"split_mode\": \"terms\", \"axis_position\": \"right\", \"formatter\": \"bytes\", \"offset_time\": \"\", \"id\": \"5d3692a1-2bfc-11e7-859b-f78b612cde28\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"id\": \"5d3692a0-2bfc-11e7-859b-f78b612cde28\", \"filter\": \"metricset.module:kubernetes AND metricset.name:container\", \"show_legend\": 1, \"show_grid\": 1, \"index_pattern\": \"metricbeat-*\", \"type\": \"top_n\", \"axis_position\": \"left\"}, \"aggs\": [], \"title\": \"Top memory intensive pods  [Metricbeat Kubernetes]\"}"
+            }, 
+            "id": "a4c9d360-30df-11e7-8df8-6d3604a72912", 
+            "type": "visualization", 
+            "updated_at": "2018-03-11T21:00:49.028Z", 
+            "version": 4
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query_string\": {\"query\": \"*\"}}}"
+                }, 
+                "title": "Kubernetes - Unavailable pods", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"listeners\": {}, \"params\": {\"bar_color_rules\": [{\"id\": \"674d83b0-30d5-11e7-8df8-6d3604a72912\"}], \"gauge_color_rules\": [{\"id\": \"50f9b980-30d5-11e7-8df8-6d3604a72912\"}], \"background_color_rules\": [{\"id\": \"508ffb30-30d5-11e7-8df8-6d3604a72912\"}], \"index_pattern\": \"metricbeat-*\", \"gauge_inner_width\": \"10\", \"series\": [{\"line_width\": 1, \"point_size\": 1, \"color\": \"#68BC00\", \"stacked\": \"none\", \"label\": \"Unavailable Pods\", \"metrics\": [{\"field\": \"kubernetes.deployment.replicas.unavailable\", \"type\": \"sum\", \"id\": \"54cf79a0-30d5-11e7-8df8-6d3604a72912\"}], \"seperate_axis\": 0, \"override_index_pattern\": 1, \"chart_type\": \"line\", \"split_mode\": \"everything\", \"axis_position\": \"right\", \"formatter\": \"number\", \"id\": \"2fe9d3b1-30d5-11e7-8df8-6d3604a72912\", \"series_interval\": \"10s\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"filter\": \"metricset.module:kubernetes AND metricset.name:state_deployment\", \"time_field\": \"@timestamp\", \"show_legend\": 1, \"gauge_style\": \"half\", \"axis_position\": \"left\", \"gauge_width\": \"10\", \"type\": \"metric\", \"id\": \"2fe9d3b0-30d5-11e7-8df8-6d3604a72912\", \"gauge_max\": \"\"}, \"aggs\": [], \"title\": \"Kubernetes - Unavailable pods\"}"
+            }, 
+            "id": "174a6ad0-30e0-11e7-8df8-6d3604a72912", 
+            "type": "visualization", 
+            "updated_at": "2018-03-01T18:58:07.906Z", 
+            "version": 3
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query\": {\"query_string\": {\"query\": \"*\"}}, \"language\": \"lucene\"}}"
+                }, 
+                "title": "Unavailable pods per deployment [Metricbeat Kubernetes]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"params\": {\"time_field\": \"@timestamp\", \"series\": [{\"line_width\": 1, \"terms_field\": \"kubernetes.deployment.name\", \"point_size\": 1, \"terms_size\": \"10000\", \"split_filters\": [{\"color\": \"#68BC00\", \"id\": \"53d35ad0-30df-11e7-8df8-6d3604a72912\"}], \"color\": \"rgba(254,146,0,1)\", \"label\": \"Unavailable pods\", \"metrics\": [{\"field\": \"kubernetes.deployment.replicas.unavailable\", \"type\": \"avg\", \"id\": \"64456841-30df-11e7-8df8-6d3604a72912\"}], \"seperate_axis\": 0, \"split_mode\": \"terms\", \"chart_type\": \"line\", \"stacked\": \"stacked\", \"axis_position\": \"right\", \"formatter\": \"number\", \"id\": \"64456840-30df-11e7-8df8-6d3604a72912\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"id\": \"117fadf0-30df-11e7-8df8-6d3604a72912\", \"filter\": \"metricset.module:kubernetes AND metricset.name:state_deployment\", \"show_legend\": 1, \"show_grid\": 1, \"index_pattern\": \"metricbeat-*\", \"type\": \"timeseries\", \"axis_position\": \"left\"}, \"aggs\": [], \"title\": \"Unavailable pods per deployment [Metricbeat Kubernetes]\"}"
+            }, 
+            "id": "7aac4fd0-30e0-11e7-8df8-6d3604a72912", 
+            "type": "visualization", 
+            "updated_at": "2018-03-11T20:59:18.668Z", 
+            "version": 4
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query_string\": {\"query\": \"*\"}}}"
+                }, 
+                "title": "Kubernetes - Available pods", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"listeners\": {}, \"params\": {\"bar_color_rules\": [{\"id\": \"674d83b0-30d5-11e7-8df8-6d3604a72912\"}], \"gauge_color_rules\": [{\"id\": \"50f9b980-30d5-11e7-8df8-6d3604a72912\"}], \"background_color_rules\": [{\"id\": \"508ffb30-30d5-11e7-8df8-6d3604a72912\"}], \"index_pattern\": \"metricbeat-*\", \"gauge_inner_width\": \"10\", \"series\": [{\"line_width\": 1, \"point_size\": 1, \"series_index_pattern\": \"*\", \"color\": \"#68BC00\", \"stacked\": \"none\", \"label\": \"Available Pods\", \"metrics\": [{\"field\": \"kubernetes.deployment.replicas.available\", \"type\": \"sum\", \"id\": \"54cf79a0-30d5-11e7-8df8-6d3604a72912\"}], \"seperate_axis\": 0, \"override_index_pattern\": 1, \"chart_type\": \"line\", \"series_time_field\": \"@timestamp\", \"axis_position\": \"right\", \"formatter\": \"number\", \"split_mode\": \"everything\", \"id\": \"2fe9d3b1-30d5-11e7-8df8-6d3604a72912\", \"series_interval\": \"10s\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"filter\": \"metricset.module:kubernetes AND metricset.name:state_deployment\", \"time_field\": \"@timestamp\", \"show_legend\": 1, \"gauge_style\": \"half\", \"axis_position\": \"left\", \"gauge_width\": \"10\", \"type\": \"metric\", \"id\": \"2fe9d3b0-30d5-11e7-8df8-6d3604a72912\", \"gauge_max\": \"5\"}, \"aggs\": [], \"title\": \"Kubernetes - Available pods\"}"
+            }, 
+            "id": "da1ff7c0-30ed-11e7-b9e5-2b5b07213ab3", 
+            "type": "visualization", 
+            "updated_at": "2018-03-01T18:58:07.906Z", 
+            "version": 3
+        }, 
+        {
+            "attributes": {
+                "description": "Overview of Kubernetes cluster metrics", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query\": {\"query_string\": {\"analyze_wildcard\": true, \"query\": \"*\"}}, \"language\": \"lucene\"}, \"version\": true, \"highlightAll\": true}"
+                }, 
+                "optionsJSON": "{\"darkTheme\": false, \"useMargins\": false}", 
+                "panelsJSON": "[{\"gridData\": {\"i\": \"1\", \"h\": 3, \"y\": 0, \"w\": 6, \"x\": 6}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"1\", \"id\": \"022a54c0-2bf5-11e7-859b-f78b612cde28\"}, {\"gridData\": {\"i\": \"2\", \"h\": 3, \"y\": 6, \"w\": 6, \"x\": 0}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"2\", \"id\": \"44f12b40-2bf4-11e7-859b-f78b612cde28\"}, {\"gridData\": {\"i\": \"5\", \"h\": 3, \"y\": 0, \"w\": 3, \"x\": 3}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"5\", \"id\": \"cd059410-2bfb-11e7-859b-f78b612cde28\"}, {\"gridData\": {\"i\": \"6\", \"h\": 3, \"y\": 3, \"w\": 2, \"x\": 0}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"6\", \"id\": \"e1018b90-2bfb-11e7-859b-f78b612cde28\"}, {\"gridData\": {\"i\": \"7\", \"h\": 3, \"y\": 6, \"w\": 6, \"x\": 6}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"7\", \"id\": \"d6564360-2bfc-11e7-859b-f78b612cde28\"}, {\"gridData\": {\"i\": \"8\", \"h\": 3, \"y\": 9, \"w\": 6, \"x\": 6}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"8\", \"id\": \"16fa4470-2bfd-11e7-859b-f78b612cde28\"}, {\"gridData\": {\"i\": \"9\", \"h\": 3, \"y\": 9, \"w\": 6, \"x\": 0}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"9\", \"id\": \"294546b0-30d6-11e7-8df8-6d3604a72912\"}, {\"gridData\": {\"i\": \"10\", \"h\": 3, \"y\": 0, \"w\": 3, \"x\": 0}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"10\", \"id\": \"408fccf0-30d6-11e7-8df8-6d3604a72912\"}, {\"gridData\": {\"i\": \"11\", \"h\": 3, \"y\": 12, \"w\": 6, \"x\": 0}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"11\", \"id\": \"58e644f0-30d6-11e7-8df8-6d3604a72912\"}, {\"gridData\": {\"i\": \"12\", \"h\": 3, \"y\": 12, \"w\": 6, \"x\": 6}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"12\", \"id\": \"a4c9d360-30df-11e7-8df8-6d3604a72912\"}, {\"gridData\": {\"i\": \"13\", \"h\": 3, \"y\": 3, \"w\": 2, \"x\": 4}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"13\", \"id\": \"174a6ad0-30e0-11e7-8df8-6d3604a72912\"}, {\"gridData\": {\"i\": \"14\", \"h\": 3, \"y\": 3, \"w\": 6, \"x\": 6}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"14\", \"id\": \"7aac4fd0-30e0-11e7-8df8-6d3604a72912\"}, {\"gridData\": {\"i\": \"15\", \"h\": 3, \"y\": 3, \"w\": 2, \"x\": 2}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"15\", \"id\": \"da1ff7c0-30ed-11e7-b9e5-2b5b07213ab3\"}]", 
+                "timeRestore": false, 
+                "title": "[Metricbeat Kubernetes] Overview", 
+                "version": 1
+            }, 
+            "id": "AV4RGUqo5NkDleZmzKuZ", 
+            "type": "dashboard", 
+            "updated_at": "2018-03-11T21:00:58.354Z", 
+            "version": 4
+        }
+    ], 
+    "version": "6.2.2"
+}

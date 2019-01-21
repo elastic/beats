@@ -33,7 +33,7 @@ func TestNumberOfRoutingShards(t *testing.T) {
 
 	// Test it exists in 6.1
 	ver := common.MustNewVersion("6.1.0")
-	template, err := New(beatVersion, beatName, *ver, config)
+	template, err := New(beatVersion, beatName, *ver, config, false)
 	assert.NoError(t, err)
 
 	data := template.Generate(nil, nil)
@@ -44,7 +44,7 @@ func TestNumberOfRoutingShards(t *testing.T) {
 
 	// Test it does not exist in 6.0
 	ver = common.MustNewVersion("6.0.0")
-	template, err = New(beatVersion, beatName, *ver, config)
+	template, err = New(beatVersion, beatName, *ver, config, false)
 	assert.NoError(t, err)
 
 	data = template.Generate(nil, nil)
@@ -65,7 +65,7 @@ func TestNumberOfRoutingShardsOverwrite(t *testing.T) {
 
 	// Test it exists in 6.1
 	ver := common.MustNewVersion("6.1.0")
-	template, err := New(beatVersion, beatName, *ver, config)
+	template, err := New(beatVersion, beatName, *ver, config, false)
 	assert.NoError(t, err)
 
 	data := template.Generate(nil, nil)
@@ -116,7 +116,7 @@ func TestNew(t *testing.T) {
 	}
 	for _, d := range data {
 		t.Run(d.name, func(t *testing.T) {
-			template, err := New(v, name, *esVersion, d.c)
+			template, err := New(v, name, *esVersion, d.c, false)
 			require.NoError(t, err)
 			expected := &Template{name: "beat-7.0.0", pattern: "beat-beatName", beatVersion: *version, esVersion: *esVersion, config: d.c}
 			assert.Equal(t, expected, template)

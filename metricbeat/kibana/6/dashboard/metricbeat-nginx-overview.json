@@ -1,0 +1,103 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{}"
+                }, 
+                "title": "Request Rate [Metricbeat Nginx]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"params\": {\"time_field\": \"@timestamp\", \"series\": [{\"line_width\": 1, \"point_size\": 1, \"color\": \"#68BC00\", \"label\": \"Request rate\", \"metrics\": [{\"field\": \"nginx.stubstatus.requests\", \"type\": \"avg\", \"id\": \"61ca57f2-469d-11e7-af02-69e470af7417\"}, {\"field\": \"61ca57f2-469d-11e7-af02-69e470af7417\", \"type\": \"derivative\", \"id\": \"396ec980-f1a1-11e7-95d0-8ddf041d42a2\", \"unit\": \"\"}], \"seperate_axis\": 0, \"split_mode\": \"everything\", \"chart_type\": \"line\", \"stacked\": \"none\", \"axis_position\": \"right\", \"formatter\": \"number\", \"id\": \"61ca57f1-469d-11e7-af02-69e470af7417\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"id\": \"61ca57f0-469d-11e7-af02-69e470af7417\", \"show_legend\": 1, \"show_grid\": 1, \"legend_position\": \"bottom\", \"index_pattern\": \"metricbeat-*\", \"type\": \"timeseries\", \"axis_position\": \"left\"}, \"aggs\": [], \"title\": \"Request Rate [Metricbeat Nginx]\"}"
+            }, 
+            "id": "555df8a0-f1a1-11e7-a9ef-93c69af7b129", 
+            "type": "visualization", 
+            "updated_at": "2018-01-04T22:48:58.542Z", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{}"
+                }, 
+                "title": "Accepts and Handled Rate [Metricbeat Nginx]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"params\": {\"time_field\": \"@timestamp\", \"series\": [{\"line_width\": 1, \"point_size\": 1, \"color\": \"#68BC00\", \"label\": \"Accepts rate\", \"metrics\": [{\"field\": \"nginx.stubstatus.accepts\", \"type\": \"avg\", \"id\": \"61ca57f2-469d-11e7-af02-69e470af7417\"}, {\"field\": \"61ca57f2-469d-11e7-af02-69e470af7417\", \"type\": \"derivative\", \"id\": \"396ec980-f1a1-11e7-95d0-8ddf041d42a2\", \"unit\": \"\"}], \"seperate_axis\": 0, \"split_mode\": \"everything\", \"chart_type\": \"line\", \"stacked\": \"none\", \"axis_position\": \"right\", \"formatter\": \"number\", \"id\": \"61ca57f1-469d-11e7-af02-69e470af7417\", \"split_color_mode\": \"gradient\", \"fill\": \"0.5\"}, {\"line_width\": 1, \"point_size\": \"3\", \"color\": \"rgba(0,156,224,1)\", \"label\": \"Handled rate\", \"metrics\": [{\"field\": \"nginx.stubstatus.handled\", \"type\": \"avg\", \"id\": \"56dd33b1-f1a3-11e7-95d0-8ddf041d42a2\"}, {\"field\": \"56dd33b1-f1a3-11e7-95d0-8ddf041d42a2\", \"type\": \"derivative\", \"id\": \"56dd33b2-f1a3-11e7-95d0-8ddf041d42a2\", \"unit\": \"\"}], \"seperate_axis\": 0, \"split_mode\": \"everything\", \"chart_type\": \"line\", \"stacked\": \"none\", \"axis_position\": \"right\", \"formatter\": \"number\", \"id\": \"56dd33b0-f1a3-11e7-95d0-8ddf041d42a2\", \"fill\": \"0.9\"}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"axis_position\": \"left\", \"id\": \"61ca57f0-469d-11e7-af02-69e470af7417\", \"show_legend\": 1, \"show_grid\": 1, \"legend_position\": \"bottom\", \"index_pattern\": \"metricbeat-*\", \"type\": \"timeseries\", \"annotations\": [{\"ignore_panel_filters\": 1, \"color\": \"#F00\", \"ignore_global_filters\": 1, \"time_field\": \"@timestamp\", \"index_pattern\": \"*\", \"id\": \"8644f980-f1a3-11e7-95d0-8ddf041d42a2\", \"icon\": \"fa-tag\"}]}, \"aggs\": [], \"title\": \"Accepts and Handled Rate [Metricbeat Nginx]\"}"
+            }, 
+            "id": "a1d92240-f1a1-11e7-a9ef-93c69af7b129", 
+            "type": "visualization", 
+            "updated_at": "2018-01-04T23:07:23.056Z", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{}"
+                }, 
+                "title": "Drops Rate [Metricbeat Nginx]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"params\": {\"time_field\": \"@timestamp\", \"series\": [{\"line_width\": 1, \"point_size\": 1, \"color\": \"rgba(188,0,65,1)\", \"label\": \"Drops rate\", \"metrics\": [{\"field\": \"nginx.stubstatus.dropped\", \"type\": \"avg\", \"id\": \"61ca57f2-469d-11e7-af02-69e470af7417\"}, {\"field\": \"61ca57f2-469d-11e7-af02-69e470af7417\", \"type\": \"derivative\", \"id\": \"396ec980-f1a1-11e7-95d0-8ddf041d42a2\", \"unit\": \"\"}], \"seperate_axis\": 0, \"split_mode\": \"everything\", \"chart_type\": \"line\", \"stacked\": \"none\", \"axis_position\": \"right\", \"formatter\": \"number\", \"id\": \"61ca57f1-469d-11e7-af02-69e470af7417\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"id\": \"61ca57f0-469d-11e7-af02-69e470af7417\", \"show_legend\": 1, \"show_grid\": 1, \"legend_position\": \"bottom\", \"index_pattern\": \"metricbeat-*\", \"type\": \"timeseries\", \"axis_position\": \"left\"}, \"aggs\": [], \"title\": \"Drops Rate [Metricbeat Nginx]\"}"
+            }, 
+            "id": "d763a570-f1a1-11e7-a9ef-93c69af7b129", 
+            "type": "visualization", 
+            "updated_at": "2018-01-04T22:51:46.375Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{}"
+                }, 
+                "title": "Active connections [Metricbeat Nginx]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"params\": {\"time_field\": \"@timestamp\", \"series\": [{\"line_width\": 1, \"point_size\": 1, \"color\": \"#68BC00\", \"metrics\": [{\"field\": \"nginx.stubstatus.active\", \"type\": \"avg\", \"id\": \"61ca57f2-469d-11e7-af02-69e470af7417\"}], \"seperate_axis\": 0, \"split_mode\": \"everything\", \"chart_type\": \"line\", \"stacked\": \"none\", \"axis_position\": \"right\", \"formatter\": \"number\", \"id\": \"61ca57f1-469d-11e7-af02-69e470af7417\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"id\": \"61ca57f0-469d-11e7-af02-69e470af7417\", \"show_legend\": 1, \"show_grid\": 1, \"legend_position\": \"bottom\", \"index_pattern\": \"metricbeat-*\", \"type\": \"timeseries\", \"axis_position\": \"left\"}, \"aggs\": [], \"title\": \"Active connections [Metricbeat Nginx]\"}"
+            }, 
+            "id": "47a8e0f0-f1a4-11e7-a9ef-93c69af7b129", 
+            "type": "visualization", 
+            "updated_at": "2018-01-04T23:09:55.944Z", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{}"
+                }, 
+                "title": "Reading / Writing / Waiting Rates [Metricbeat Nginx]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metrics\", \"params\": {\"time_field\": \"@timestamp\", \"series\": [{\"line_width\": 1, \"point_size\": 1, \"color\": \"#68BC00\", \"label\": \"Reading\", \"metrics\": [{\"field\": \"nginx.stubstatus.reading\", \"type\": \"avg\", \"id\": \"61ca57f2-469d-11e7-af02-69e470af7417\"}], \"seperate_axis\": 0, \"split_mode\": \"everything\", \"chart_type\": \"line\", \"stacked\": \"none\", \"axis_position\": \"right\", \"formatter\": \"number\", \"id\": \"61ca57f1-469d-11e7-af02-69e470af7417\", \"fill\": 0.5}, {\"line_width\": 1, \"point_size\": 1, \"color\": \"rgba(0,156,224,1)\", \"label\": \"Writing\", \"metrics\": [{\"field\": \"nginx.stubstatus.writing\", \"type\": \"avg\", \"id\": \"b1773681-f1a4-11e7-95d0-8ddf041d42a2\"}], \"seperate_axis\": 0, \"split_mode\": \"everything\", \"chart_type\": \"line\", \"stacked\": \"none\", \"axis_position\": \"right\", \"formatter\": \"number\", \"id\": \"b1773680-f1a4-11e7-95d0-8ddf041d42a2\", \"fill\": 0.5}, {\"line_width\": 1, \"point_size\": 1, \"color\": \"rgba(252,220,0,1)\", \"label\": \"Waiting\", \"metrics\": [{\"field\": \"nginx.stubstatus.waiting\", \"type\": \"avg\", \"id\": \"b68aa6c1-f1a4-11e7-95d0-8ddf041d42a2\"}], \"seperate_axis\": 0, \"split_mode\": \"everything\", \"chart_type\": \"line\", \"stacked\": \"none\", \"axis_position\": \"right\", \"formatter\": \"number\", \"id\": \"b68aa6c0-f1a4-11e7-95d0-8ddf041d42a2\", \"fill\": 0.5}], \"axis_formatter\": \"number\", \"interval\": \"auto\", \"id\": \"61ca57f0-469d-11e7-af02-69e470af7417\", \"show_legend\": 1, \"show_grid\": 1, \"legend_position\": \"bottom\", \"index_pattern\": \"metricbeat-*\", \"type\": \"timeseries\", \"axis_position\": \"left\"}, \"aggs\": [], \"title\": \"Reading / Writing / Waiting Rates [Metricbeat Nginx]\"}"
+            }, 
+            "id": "dcbffe30-f1a4-11e7-a9ef-93c69af7b129", 
+            "type": "visualization", 
+            "updated_at": "2018-01-04T23:13:23.859Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "Overview dashboard for the Nginx module in Metricbeat", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query\": \"\", \"language\": \"lucene\"}, \"version\": true, \"highlightAll\": true}"
+                }, 
+                "optionsJSON": "{\"useMargins\": true, \"darkTheme\": false, \"hidePanelTitles\": false}", 
+                "panelsJSON": "[{\"gridData\": {\"i\": \"1\", \"h\": 3, \"y\": 0, \"w\": 6, \"x\": 6}, \"type\": \"visualization\", \"version\": \"6.2.4\", \"panelIndex\": \"1\", \"id\": \"555df8a0-f1a1-11e7-a9ef-93c69af7b129\"}, {\"gridData\": {\"i\": \"2\", \"h\": 3, \"y\": 3, \"w\": 6, \"x\": 6}, \"type\": \"visualization\", \"version\": \"6.2.4\", \"panelIndex\": \"2\", \"id\": \"a1d92240-f1a1-11e7-a9ef-93c69af7b129\"}, {\"gridData\": {\"i\": \"3\", \"h\": 3, \"y\": 3, \"w\": 6, \"x\": 0}, \"type\": \"visualization\", \"version\": \"6.2.4\", \"panelIndex\": \"3\", \"id\": \"d763a570-f1a1-11e7-a9ef-93c69af7b129\"}, {\"gridData\": {\"i\": \"4\", \"h\": 3, \"y\": 0, \"w\": 6, \"x\": 0}, \"type\": \"visualization\", \"version\": \"6.2.4\", \"panelIndex\": \"4\", \"id\": \"47a8e0f0-f1a4-11e7-a9ef-93c69af7b129\"}, {\"gridData\": {\"i\": \"5\", \"h\": 3, \"y\": 6, \"w\": 12, \"x\": 0}, \"type\": \"visualization\", \"version\": \"6.2.4\", \"panelIndex\": \"5\", \"id\": \"dcbffe30-f1a4-11e7-a9ef-93c69af7b129\"}]", 
+                "timeRestore": false, 
+                "title": "[Metricbeat Nginx] Overview", 
+                "version": 1
+            }, 
+            "id": "023d2930-f1a5-11e7-a9ef-93c69af7b129", 
+            "type": "dashboard", 
+            "updated_at": "2018-01-04T23:14:26.755Z", 
+            "version": 1
+        }
+    ], 
+    "version": "6.2.4"
+}

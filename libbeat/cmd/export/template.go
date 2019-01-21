@@ -52,7 +52,8 @@ func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersi
 			}
 
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "error fetching version: %s\n", err)
+				fmt.Fprintf(os.Stderr, "Invalid Elasticsearch version: %s\n", err)
+
 				os.Exit(1)
 			}
 
@@ -65,7 +66,7 @@ func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersi
 				}
 			}
 
-			loader, err := template.NewStdoutLoader(b.Info)
+			loader, err := template.NewStdoutLoader(b.Info, b.Config.Migration.Enabled())
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "error initializing ilm loader: %s\n", err)
 				os.Exit(1)

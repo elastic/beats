@@ -1,0 +1,103 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query\": \"\", \"language\": \"kuery\"}}"
+                }, 
+                "title": "Keyspace selector [Redis]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"input_control_vis\", \"params\": {\"pinFilters\": false, \"useTimeFilter\": false, \"updateFiltersOnChange\": true, \"controls\": [{\"parent\": \"\", \"id\": \"1545388837304\", \"fieldName\": \"redis.keyspace.id\", \"indexPattern\": \"bc2e8280-0509-11e9-9c60-d582a238e2c5\", \"label\": \"Keyspace\", \"type\": \"list\", \"options\": {\"type\": \"terms\", \"size\": 5, \"multiselect\": true, \"dynamicOptions\": true, \"order\": \"desc\"}}]}, \"aggs\": [], \"title\": \"Keyspace selector [Redis]\"}"
+            }, 
+            "id": "00d39210-050d-11e9-9c60-d582a238e2c5", 
+            "type": "visualization", 
+            "updated_at": "2018-12-21T11:19:04.179Z", 
+            "version": 5
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [{\"query\": {\"match\": {\"redis.key.type\": {\"query\": \"list\", \"type\": \"phrase\"}}}, \"meta\": {\"index\": \"bc2e8280-0509-11e9-9c60-d582a238e2c5\", \"value\": \"list\", \"disabled\": false, \"alias\": null, \"params\": {\"query\": \"list\", \"type\": \"phrase\"}, \"key\": \"redis.key.type\", \"negate\": false, \"type\": \"phrase\"}, \"$state\": {\"store\": \"appState\"}}], \"index\": \"bc2e8280-0509-11e9-9c60-d582a238e2c5\", \"query\": {\"query\": \"\", \"language\": \"kuery\"}}"
+                }, 
+                "title": "Lists length [Redis]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"line\", \"params\": {\"seriesParams\": [{\"showCircles\": true, \"show\": \"true\", \"type\": \"line\", \"interpolate\": \"linear\", \"mode\": \"normal\", \"drawLinesBetweenPoints\": true, \"valueAxis\": \"ValueAxis-1\", \"data\": {\"id\": \"1\", \"label\": \"Number of elements\"}}], \"type\": \"line\", \"categoryAxes\": [{\"style\": {}, \"scale\": {\"type\": \"linear\"}, \"show\": true, \"title\": {}, \"labels\": {\"truncate\": 100, \"show\": true}, \"position\": \"bottom\", \"type\": \"category\", \"id\": \"CategoryAxis-1\"}], \"legendPosition\": \"right\", \"addTimeMarker\": false, \"addLegend\": true, \"grid\": {\"style\": {\"color\": \"#eee\"}, \"categoryLines\": false}, \"times\": [], \"addTooltip\": true, \"valueAxes\": [{\"style\": {}, \"scale\": {\"type\": \"linear\", \"mode\": \"normal\"}, \"name\": \"LeftAxis-1\", \"show\": true, \"title\": {\"text\": \"Number of elements\"}, \"labels\": {\"filter\": false, \"rotate\": 0, \"truncate\": 100, \"show\": true}, \"position\": \"left\", \"type\": \"value\", \"id\": \"ValueAxis-1\"}]}, \"aggs\": [{\"params\": {\"field\": \"redis.key.length\", \"customLabel\": \"Number of elements\"}, \"type\": \"max\", \"enabled\": true, \"id\": \"1\", \"schema\": \"metric\"}, {\"params\": {\"orderBy\": \"1\", \"missingBucket\": false, \"customLabel\": \"Keyspace\", \"missingBucketLabel\": \"Missing\", \"field\": \"redis.keyspace.id\", \"otherBucketLabel\": \"Other\", \"otherBucket\": false, \"order\": \"desc\", \"size\": 16}, \"type\": \"terms\", \"enabled\": true, \"id\": \"3\", \"schema\": \"group\"}, {\"params\": {\"orderBy\": \"1\", \"missingBucket\": false, \"customLabel\": \"Key name\", \"missingBucketLabel\": \"Missing\", \"field\": \"redis.key.name\", \"otherBucketLabel\": \"Other\", \"otherBucket\": true, \"order\": \"desc\", \"size\": 20}, \"type\": \"terms\", \"enabled\": true, \"id\": \"2\", \"schema\": \"group\"}, {\"params\": {\"timeRange\": {\"to\": \"now\", \"from\": \"now-15m\", \"mode\": \"quick\"}, \"extended_bounds\": {}, \"field\": \"@timestamp\", \"interval\": \"auto\", \"time_zone\": \"Europe/Berlin\", \"useNormalizedEsInterval\": true, \"drop_partials\": false, \"min_doc_count\": 1, \"customInterval\": \"2h\"}, \"type\": \"date_histogram\", \"enabled\": true, \"id\": \"4\", \"schema\": \"segment\"}], \"title\": \"Lists length [Redis]\"}"
+            }, 
+            "id": "7f4bc7d0-050c-11e9-9c60-d582a238e2c5", 
+            "type": "visualization", 
+            "updated_at": "2018-12-21T11:22:12.807Z", 
+            "version": 4
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"index\": \"bc2e8280-0509-11e9-9c60-d582a238e2c5\", \"query\": {\"query\": \"\", \"language\": \"kuery\"}}"
+                }, 
+                "title": "Keys by type [Redis]", 
+                "uiStateJSON": "{\"vis\": {\"legendOpen\": false}}", 
+                "version": 1, 
+                "visState": "{\"type\": \"line\", \"params\": {\"seriesParams\": [{\"showCircles\": true, \"show\": \"true\", \"data\": {\"id\": \"1\", \"label\": \"Number of keys\"}, \"mode\": \"normal\", \"drawLinesBetweenPoints\": true, \"valueAxis\": \"ValueAxis-1\", \"type\": \"line\"}], \"type\": \"line\", \"categoryAxes\": [{\"style\": {}, \"scale\": {\"type\": \"linear\"}, \"show\": true, \"title\": {}, \"labels\": {\"truncate\": 100, \"show\": true}, \"position\": \"bottom\", \"type\": \"category\", \"id\": \"CategoryAxis-1\"}], \"legendPosition\": \"right\", \"addTimeMarker\": false, \"addLegend\": true, \"grid\": {\"style\": {\"color\": \"#eee\"}, \"categoryLines\": false}, \"times\": [], \"addTooltip\": true, \"valueAxes\": [{\"style\": {}, \"scale\": {\"type\": \"linear\", \"mode\": \"normal\"}, \"name\": \"LeftAxis-1\", \"show\": true, \"title\": {\"text\": \"Number of keys\"}, \"labels\": {\"filter\": false, \"rotate\": 0, \"truncate\": 100, \"show\": true}, \"position\": \"left\", \"type\": \"value\", \"id\": \"ValueAxis-1\"}]}, \"aggs\": [{\"params\": {\"field\": \"redis.key.id\", \"customLabel\": \"Number of keys\"}, \"type\": \"cardinality\", \"enabled\": true, \"id\": \"1\", \"schema\": \"metric\"}, {\"params\": {\"orderBy\": \"1\", \"missingBucket\": false, \"customLabel\": \"Key type\", \"missingBucketLabel\": \"Missing\", \"field\": \"redis.key.type\", \"otherBucketLabel\": \"Other\", \"otherBucket\": false, \"order\": \"desc\", \"size\": 5}, \"type\": \"terms\", \"enabled\": true, \"id\": \"2\", \"schema\": \"group\"}, {\"params\": {\"timeRange\": {\"to\": \"now\", \"from\": \"now-15m\", \"mode\": \"quick\"}, \"min_doc_count\": 1, \"field\": \"@timestamp\", \"customLabel\": \"\", \"interval\": \"auto\", \"time_zone\": \"Europe/Berlin\", \"useNormalizedEsInterval\": true, \"drop_partials\": false, \"extended_bounds\": {}, \"customInterval\": \"2h\"}, \"type\": \"date_histogram\", \"enabled\": true, \"id\": \"3\", \"schema\": \"segment\"}], \"title\": \"Keys by type [Redis]\"}"
+            }, 
+            "id": "4435ac40-050e-11e9-9c60-d582a238e2c5", 
+            "type": "visualization", 
+            "updated_at": "2018-12-21T11:23:46.207Z", 
+            "version": 5
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [{\"query\": {\"match\": {\"redis.key.type\": {\"query\": \"string\", \"type\": \"phrase\"}}}, \"meta\": {\"index\": \"bc2e8280-0509-11e9-9c60-d582a238e2c5\", \"value\": \"string\", \"disabled\": false, \"alias\": null, \"params\": {\"query\": \"string\", \"type\": \"phrase\"}, \"key\": \"redis.key.type\", \"negate\": false, \"type\": \"phrase\"}, \"$state\": {\"store\": \"appState\"}}], \"index\": \"bc2e8280-0509-11e9-9c60-d582a238e2c5\", \"query\": {\"query\": \"\", \"language\": \"kuery\"}}"
+                }, 
+                "title": "Average string key size [Redis]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"line\", \"params\": {\"seriesParams\": [{\"showCircles\": true, \"show\": \"true\", \"data\": {\"id\": \"1\", \"label\": \"Average key size\"}, \"mode\": \"normal\", \"drawLinesBetweenPoints\": true, \"valueAxis\": \"ValueAxis-1\", \"type\": \"line\"}], \"type\": \"line\", \"categoryAxes\": [{\"style\": {}, \"scale\": {\"type\": \"linear\"}, \"show\": true, \"title\": {}, \"labels\": {\"truncate\": 100, \"show\": true}, \"position\": \"bottom\", \"type\": \"category\", \"id\": \"CategoryAxis-1\"}], \"legendPosition\": \"right\", \"addTimeMarker\": false, \"addLegend\": true, \"grid\": {\"style\": {\"color\": \"#eee\"}, \"categoryLines\": false}, \"times\": [], \"addTooltip\": true, \"valueAxes\": [{\"style\": {}, \"scale\": {\"type\": \"linear\", \"mode\": \"normal\"}, \"name\": \"LeftAxis-1\", \"show\": true, \"title\": {\"text\": \"Average key size\"}, \"labels\": {\"filter\": false, \"rotate\": 0, \"truncate\": 100, \"show\": true}, \"position\": \"left\", \"type\": \"value\", \"id\": \"ValueAxis-1\"}]}, \"aggs\": [{\"params\": {\"field\": \"redis.key.length\", \"customLabel\": \"Average key size\"}, \"type\": \"avg\", \"enabled\": true, \"id\": \"1\", \"schema\": \"metric\"}, {\"params\": {\"orderBy\": \"1\", \"missingBucket\": false, \"customLabel\": \"Keyspace\", \"missingBucketLabel\": \"Missing\", \"field\": \"redis.keyspace.id\", \"otherBucketLabel\": \"Other\", \"otherBucket\": false, \"order\": \"desc\", \"size\": 5}, \"type\": \"terms\", \"enabled\": true, \"id\": \"3\", \"schema\": \"group\"}, {\"params\": {\"timeRange\": {\"to\": \"now\", \"from\": \"now-15m\", \"mode\": \"quick\"}, \"extended_bounds\": {}, \"field\": \"@timestamp\", \"interval\": \"auto\", \"time_zone\": \"Europe/Berlin\", \"useNormalizedEsInterval\": true, \"drop_partials\": false, \"min_doc_count\": 1, \"customInterval\": \"2h\"}, \"type\": \"date_histogram\", \"enabled\": true, \"id\": \"2\", \"schema\": \"segment\"}], \"title\": \"Average string key size [Redis]\"}"
+            }, 
+            "id": "8541a4a0-0513-11e9-9c60-d582a238e2c5", 
+            "type": "visualization", 
+            "updated_at": "2018-12-21T11:28:20.970Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [{\"range\": {\"redis.key.expire.ttl\": {\"lt\": null, \"gte\": 0}}, \"meta\": {\"index\": \"bc2e8280-0509-11e9-9c60-d582a238e2c5\", \"value\": \"0 to +\\u221e\", \"disabled\": false, \"alias\": null, \"params\": {\"lt\": null, \"gte\": 0}, \"key\": \"redis.key.expire.ttl\", \"negate\": false, \"type\": \"range\"}, \"$state\": {\"store\": \"appState\"}}], \"index\": \"bc2e8280-0509-11e9-9c60-d582a238e2c5\", \"query\": {\"query\": \"\", \"language\": \"kuery\"}}"
+                }, 
+                "title": "Average keys TTL [Redis]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"line\", \"params\": {\"seriesParams\": [{\"showCircles\": true, \"show\": \"true\", \"data\": {\"id\": \"1\", \"label\": \"Average TTL\"}, \"mode\": \"normal\", \"drawLinesBetweenPoints\": true, \"valueAxis\": \"ValueAxis-1\", \"type\": \"line\"}], \"type\": \"line\", \"categoryAxes\": [{\"style\": {}, \"scale\": {\"type\": \"linear\"}, \"show\": true, \"title\": {}, \"labels\": {\"truncate\": 100, \"show\": true}, \"position\": \"bottom\", \"type\": \"category\", \"id\": \"CategoryAxis-1\"}], \"legendPosition\": \"right\", \"addTimeMarker\": false, \"addLegend\": true, \"grid\": {\"style\": {\"color\": \"#eee\"}, \"categoryLines\": false}, \"times\": [], \"addTooltip\": true, \"valueAxes\": [{\"style\": {}, \"scale\": {\"type\": \"linear\", \"mode\": \"normal\"}, \"name\": \"LeftAxis-1\", \"show\": true, \"title\": {\"text\": \"Average TTL\"}, \"labels\": {\"filter\": false, \"rotate\": 0, \"truncate\": 100, \"show\": true}, \"position\": \"left\", \"type\": \"value\", \"id\": \"ValueAxis-1\"}]}, \"aggs\": [{\"params\": {\"field\": \"redis.key.expire.ttl\", \"customLabel\": \"Average TTL\"}, \"type\": \"avg\", \"enabled\": true, \"id\": \"1\", \"schema\": \"metric\"}, {\"params\": {\"orderBy\": \"1\", \"missingBucket\": false, \"customLabel\": \"Keyspace\", \"missingBucketLabel\": \"Missing\", \"field\": \"redis.keyspace.id\", \"otherBucketLabel\": \"Other\", \"otherBucket\": false, \"order\": \"desc\", \"size\": 5}, \"type\": \"terms\", \"enabled\": true, \"id\": \"4\", \"schema\": \"group\"}, {\"params\": {\"orderBy\": \"1\", \"missingBucket\": false, \"customLabel\": \"Key type\", \"missingBucketLabel\": \"Missing\", \"field\": \"redis.key.type\", \"otherBucketLabel\": \"Other\", \"otherBucket\": false, \"order\": \"desc\", \"size\": 5}, \"type\": \"terms\", \"enabled\": true, \"id\": \"2\", \"schema\": \"group\"}, {\"params\": {\"timeRange\": {\"to\": \"now\", \"from\": \"now-15m\", \"mode\": \"quick\"}, \"extended_bounds\": {}, \"field\": \"@timestamp\", \"interval\": \"auto\", \"time_zone\": \"Europe/Berlin\", \"useNormalizedEsInterval\": true, \"drop_partials\": false, \"min_doc_count\": 1, \"customInterval\": \"2h\"}, \"type\": \"date_histogram\", \"enabled\": true, \"id\": \"3\", \"schema\": \"segment\"}], \"title\": \"Average keys TTL [Redis]\"}"
+            }, 
+            "id": "517a5fd0-0514-11e9-9c60-d582a238e2c5", 
+            "type": "visualization", 
+            "updated_at": "2018-12-21T11:34:03.597Z", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "Redis keys metrics", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [{\"query\": {\"bool\": {\"minimum_should_match\": 1, \"should\": [{\"match_phrase\": {\"redis.keyspace.id\": \"db0\"}}, {\"match_phrase\": {\"redis.keyspace.id\": \"db1\"}}]}}, \"meta\": {\"index\": \"bc2e8280-0509-11e9-9c60-d582a238e2c5\", \"controlledBy\": \"1545388837304\", \"value\": \"db0, db1\", \"disabled\": false, \"alias\": null, \"params\": [\"db0\", \"db1\"], \"key\": \"redis.keyspace.id\", \"negate\": false, \"type\": \"phrases\"}, \"$state\": {\"store\": \"appState\"}}], \"query\": {\"query\": \"\", \"language\": \"kuery\"}}"
+                }, 
+                "optionsJSON": "{\"useMargins\": true, \"darkTheme\": false, \"hidePanelTitles\": false}", 
+                "panelsJSON": "[{\"gridData\": {\"i\": \"1\", \"h\": 5, \"y\": 0, \"w\": 12, \"x\": 0}, \"title\": \"Keyspace selector\", \"panelIndex\": \"1\", \"embeddableConfig\": {}, \"version\": \"6.5.2\", \"type\": \"visualization\", \"id\": \"00d39210-050d-11e9-9c60-d582a238e2c5\"}, {\"gridData\": {\"i\": \"2\", \"h\": 15, \"y\": 0, \"w\": 36, \"x\": 12}, \"title\": \"Lists length\", \"panelIndex\": \"2\", \"embeddableConfig\": {}, \"version\": \"6.5.2\", \"type\": \"visualization\", \"id\": \"7f4bc7d0-050c-11e9-9c60-d582a238e2c5\"}, {\"gridData\": {\"i\": \"3\", \"h\": 10, \"y\": 5, \"w\": 12, \"x\": 0}, \"title\": \"Keys by type\", \"panelIndex\": \"3\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"version\": \"6.5.2\", \"type\": \"visualization\", \"id\": \"4435ac40-050e-11e9-9c60-d582a238e2c5\"}, {\"gridData\": {\"i\": \"4\", \"h\": 15, \"y\": 15, \"w\": 24, \"x\": 0}, \"title\": \"Average size of string keys\", \"panelIndex\": \"4\", \"embeddableConfig\": {}, \"version\": \"6.5.2\", \"type\": \"visualization\", \"id\": \"8541a4a0-0513-11e9-9c60-d582a238e2c5\"}, {\"gridData\": {\"i\": \"5\", \"h\": 15, \"y\": 15, \"w\": 24, \"x\": 24}, \"title\": \"Average keys TTL\", \"panelIndex\": \"5\", \"embeddableConfig\": {}, \"version\": \"6.5.2\", \"type\": \"visualization\", \"id\": \"517a5fd0-0514-11e9-9c60-d582a238e2c5\"}]", 
+                "timeRestore": false, 
+                "title": "[Metricbeat Redis] Keys", 
+                "version": 1
+            }, 
+            "id": "28969190-0511-11e9-9c60-d582a238e2c5", 
+            "type": "dashboard", 
+            "updated_at": "2018-12-21T11:39:13.143Z", 
+            "version": 4
+        }
+    ], 
+    "version": "6.5.2"
+}

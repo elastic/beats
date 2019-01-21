@@ -31,6 +31,7 @@ import (
 )
 
 type program struct {
+	log   *logp.Logger
 	title string
 	list  []beat.Processor
 }
@@ -59,16 +60,20 @@ type processorFn struct {
 // 10. (P) (if output disabled) dropEvent
 func newProcessorPipeline(
 	info beat.Info,
+	monitors Monitors,
 	global pipelineProcessors,
 	config beat.ClientConfig,
 ) beat.Processor {
 	var (
 		// pipeline processors
-		processors = &program{title: "processPipeline"}
+		processors = &program{
+			title: "processPipeline",
+			log:   monitors.Logger,
+		}
 
 		// client fields and metadata
 		clientMeta      = config.Meta
-		localProcessors = makeClientProcessors(config)
+		localProcessors = makeClientProcessors(monitors, config)
 	)
 
 	needsCopy := global.alwaysCopy || localProcessors != nil || global.processors != nil
@@ -133,7 +138,7 @@ func newProcessorPipeline(
 
 	// setup 9: debug print final event (P)
 	if logp.IsDebug("publish") {
-		processors.add(debugPrintProcessor(info))
+		processors.add(debugPrintProcessor(info, monitors))
 	}
 
 	// setup 10: drop all events if outputs are disabled (P)
@@ -142,6 +147,13 @@ func newProcessorPipeline(
 	}
 
 	return processors
+}
+
+func newProgram(title string, log *logp.Logger) *program {
+	return &program{
+		title: title,
+		log:   log,
+	}
 }
 
 func (p *program) add(processor processors.Processor) {
@@ -178,7 +190,7 @@ func (p *program) Run(event *beat.Event) (*beat.Event, error) {
 			//      We want processors having this kind of implicit behavior
 			//      on errors?
 
-			logp.Debug("filter", "fail to apply processor %s: %s", p, err)
+			p.log.Debugf("Fail to apply processor %s: %s", p, err)
 		}
 
 		if event == nil {
@@ -271,7 +283,7 @@ func createAgentFields(info beat.Info) common.MapStr {
 	return common.MapStr{"agent": metadata}
 }
 
-func debugPrintProcessor(info beat.Info) *processorFn {
+func debugPrintProcessor(info beat.Info, monitors Monitors) *processorFn {
 	// ensure only one go-routine is using the encoder (in case
 	// beat.Client is shared between multiple go-routines by accident)
 	var mux sync.Mutex
@@ -280,6 +292,7 @@ func debugPrintProcessor(info beat.Info) *processorFn {
 		Pretty:     true,
 		EscapeHTML: false,
 	})
+	log := monitors.Logger
 	return newProcessor("debugPrint", func(event *beat.Event) (*beat.Event, error) {
 		mux.Lock()
 		defer mux.Unlock()
@@ -289,21 +302,23 @@ func debugPrintProcessor(info beat.Info) *processorFn {
 			return event, nil
 		}
 
-		logp.Debug("publish", "Publish event: %s", b)
+		log.Debugf("Publish event: %s", b)
 		return event, nil
 	})
 }
 
-func makeClientProcessors(config beat.ClientConfig) processors.Processor {
+func makeClientProcessors(
+	monitors Monitors,
+	config beat.ClientConfig,
+) processors.Processor {
 	procs := config.Processor
 	if procs == nil || len(procs.All()) == 0 {
 		return nil
 	}
 
-	return &program{
-		title: "client",
-		list:  procs.All(),
-	}
+	p := newProgram("client", monitors.Logger)
+	p.list = procs.All()
+	return p
 }
 
 func hasKey(m common.MapStr, key string) bool {

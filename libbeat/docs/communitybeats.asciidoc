@@ -79,6 +79,7 @@ https://github.com/eBay/nvidiagpubeat[nvidiagpubeat]:: Uses nvidia-smi to grab m
 https://github.com/aristanetworks/openconfigbeat[openconfigbeat]:: Streams data from http://openconfig.net[OpenConfig]-enabled network devices
 https://github.com/joehillen/packagebeat[packagebeat]:: Collects information about system packages from package
 managers.
+https://github.com/WuerthIT/perfstatbeat[perfstatbeat]:: Collect performance metrics on the AIX operating system.
 https://github.com/kozlice/phpfpmbeat[phpfpmbeat]:: Reads status from PHP-FPM.
 https://github.com/joshuar/pingbeat[pingbeat]:: Sends ICMP pings to a list
 of targets and stores the round trip time (RTT) in Elasticsearch.

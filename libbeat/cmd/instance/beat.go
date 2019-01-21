@@ -64,7 +64,7 @@ import (
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/template"
 	"github.com/elastic/beats/libbeat/version"
-	"github.com/elastic/go-sysinfo"
+	sysinfo "github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 	"github.com/elastic/go-ucfg"
 )
@@ -105,6 +105,7 @@ type beatConfig struct {
 	// elastic stack 'setup' configurations
 	Dashboards *common.Config `config:"setup.dashboards"`
 	Kibana     *common.Config `config:"setup.kibana"`
+	Migration  *common.Config `config:"migration"`
 
 	//new config opt, holding information about index, ilm and template
 	Indices index.Configs `config:"indices"`
@@ -892,7 +893,7 @@ func (b *Beat) templateLoadingCallback() (func(esClient *elasticsearch.Client) e
 	//create callback
 	callback := func(esClient *elasticsearch.Client) error {
 
-		loader, err := template.NewESLoader(esClient, b.Info)
+		loader, err := template.NewESLoader(esClient, b.Info, b.Config.Migration.Enabled())
 		if err != nil {
 			log.With(logp.Namespace("setting_up_loader")).Errorw(logMsg, "cause", err)
 			return err

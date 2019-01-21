@@ -1,0 +1,23 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "HAProxy overview", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query\": \"\", \"language\": \"lucene\"}, \"version\": true, \"highlightAll\": true}"
+                }, 
+                "optionsJSON": "{\"useMargins\": true, \"darkTheme\": false, \"hidePanelTitles\": false}", 
+                "panelsJSON": "[{\"gridData\": {\"i\": \"2\", \"h\": 6, \"y\": 2, \"w\": 4, \"x\": 8}, \"title\": \"Servers\", \"panelIndex\": \"2\", \"version\": \"6.2.2\", \"type\": \"visualization\", \"id\": \"79350d50-47db-11e8-bc13-1397384faad3\"}, {\"gridData\": {\"i\": \"3\", \"h\": 6, \"y\": 2, \"w\": 4, \"x\": 4}, \"title\": \"Backends\", \"panelIndex\": \"3\", \"version\": \"6.2.2\", \"type\": \"visualization\", \"id\": \"8c8f0300-47dc-11e8-bc13-1397384faad3\"}, {\"gridData\": {\"i\": \"4\", \"h\": 6, \"y\": 2, \"w\": 4, \"x\": 0}, \"title\": \"Frontends\", \"panelIndex\": \"4\", \"version\": \"6.2.2\", \"type\": \"visualization\", \"id\": \"f1e27ed0-47dc-11e8-bc13-1397384faad3\"}, {\"gridData\": {\"i\": \"5\", \"h\": 2, \"y\": 0, \"w\": 12, \"x\": 0}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"5\", \"id\": \"a64b4fd0-471c-11e8-bc13-1397384faad3\"}]", 
+                "timeRestore": false, 
+                "title": "[Metricbeat HAProxy] Overview", 
+                "version": 1
+            }, 
+            "id": "4b555c30-47dd-11e8-bc13-1397384faad3", 
+            "type": "dashboard", 
+            "updated_at": "2018-04-24T18:31:56.356Z", 
+            "version": 3
+        }
+    ], 
+    "version": "6.2.2"
+}

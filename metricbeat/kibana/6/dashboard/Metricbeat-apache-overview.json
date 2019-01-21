@@ -1,0 +1,156 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": []}"
+                }, 
+                "savedSearchId": "Apache-HTTPD", 
+                "title": "CPU usage [Metricbeat Apache]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"line\", \"listeners\": {}, \"params\": {\"scale\": \"linear\", \"showCircles\": true, \"yAxis\": {}, \"smoothLines\": false, \"addTimeMarker\": false, \"interpolate\": \"linear\", \"addLegend\": true, \"shareYAxis\": true, \"radiusRatio\": 9, \"drawLinesBetweenPoints\": true, \"defaultYExtents\": false, \"setYExtents\": false, \"addTooltip\": true, \"times\": []}, \"aggs\": [{\"type\": \"avg\", \"params\": {\"field\": \"apache.status.cpu.load\", \"customLabel\": \"CPU load\"}, \"id\": \"1\", \"schema\": \"metric\"}, {\"type\": \"date_histogram\", \"params\": {\"customInterval\": \"2h\", \"field\": \"@timestamp\", \"interval\": \"auto\", \"min_doc_count\": 1, \"extended_bounds\": {}}, \"id\": \"2\", \"schema\": \"segment\"}, {\"type\": \"terms\", \"params\": {\"orderBy\": \"1\", \"field\": \"apache.status.hostname\", \"size\": 5, \"order\": \"desc\", \"row\": true}, \"id\": \"3\", \"schema\": \"split\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.cpu.user\", \"customLabel\": \"CPU user\"}, \"id\": \"4\", \"schema\": \"metric\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.cpu.system\", \"customLabel\": \"CPU system\"}, \"id\": \"5\", \"schema\": \"metric\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.cpu.children_user\", \"customLabel\": \"CPU children user\"}, \"id\": \"6\", \"schema\": \"metric\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.cpu.children_system\", \"customLabel\": \"CPU children system\"}, \"id\": \"7\", \"schema\": \"metric\"}], \"title\": \"Apache HTTPD - CPU\"}"
+            }, 
+            "id": "Apache-HTTPD-CPU", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": []}"
+                }, 
+                "savedSearchId": "Apache-HTTPD", 
+                "title": "Hostname list [Metricbeat Apache]", 
+                "uiStateJSON": "{\"vis\": {\"params\": {\"sort\": {\"columnIndex\": null, \"direction\": null}}}}", 
+                "version": 1, 
+                "visState": "{\"type\": \"table\", \"listeners\": {}, \"params\": {\"sort\": {\"columnIndex\": null, \"direction\": null}, \"perPage\": 10, \"showPartialRows\": false, \"showMeticsAtAllLevels\": false}, \"aggs\": [{\"type\": \"count\", \"params\": {\"customLabel\": \"Events count\"}, \"id\": \"1\", \"schema\": \"metric\"}, {\"type\": \"terms\", \"params\": {\"orderBy\": \"1\", \"field\": \"apache.status.hostname\", \"customLabel\": \"Apache HTTD Hostname\", \"order\": \"desc\", \"size\": 5}, \"id\": \"2\", \"schema\": \"bucket\"}], \"title\": \"Apache HTTPD - Hostname list\"}"
+            }, 
+            "id": "Apache-HTTPD-Hostname-list", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": []}"
+                }, 
+                "savedSearchId": "Apache-HTTPD", 
+                "title": "Load1/5/15 [Metricbeat Apache]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"line\", \"listeners\": {}, \"params\": {\"scale\": \"linear\", \"showCircles\": true, \"yAxis\": {}, \"smoothLines\": false, \"addTimeMarker\": false, \"interpolate\": \"linear\", \"addLegend\": true, \"shareYAxis\": true, \"radiusRatio\": 9, \"drawLinesBetweenPoints\": true, \"defaultYExtents\": false, \"setYExtents\": false, \"addTooltip\": true, \"times\": []}, \"aggs\": [{\"type\": \"avg\", \"params\": {\"field\": \"apache.status.load.5\", \"customLabel\": \"Load 5\"}, \"id\": \"1\", \"schema\": \"metric\"}, {\"type\": \"date_histogram\", \"params\": {\"customInterval\": \"2h\", \"field\": \"@timestamp\", \"interval\": \"auto\", \"min_doc_count\": 1, \"extended_bounds\": {}}, \"id\": \"2\", \"schema\": \"segment\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.load.1\", \"customLabel\": \"Load 1\"}, \"id\": \"3\", \"schema\": \"metric\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.load.15\", \"customLabel\": \"Load 15\"}, \"id\": \"4\", \"schema\": \"metric\"}, {\"type\": \"terms\", \"params\": {\"orderBy\": \"1\", \"customLabel\": \"Hostname\", \"field\": \"apache.status.hostname\", \"row\": true, \"order\": \"desc\", \"size\": 5}, \"id\": \"5\", \"schema\": \"split\"}], \"title\": \"Apache HTTPD - Load1/5/15\"}"
+            }, 
+            "id": "Apache-HTTPD-Load1-slash-5-slash-15", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": []}"
+                }, 
+                "savedSearchId": "Apache-HTTPD", 
+                "title": "Scoreboard [Metricbeat Apache]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"line\", \"listeners\": {}, \"params\": {\"scale\": \"linear\", \"showCircles\": true, \"yAxis\": {}, \"smoothLines\": false, \"addTimeMarker\": false, \"interpolate\": \"linear\", \"addLegend\": true, \"shareYAxis\": true, \"radiusRatio\": 9, \"drawLinesBetweenPoints\": true, \"defaultYExtents\": false, \"setYExtents\": false, \"addTooltip\": true, \"times\": []}, \"aggs\": [{\"type\": \"avg\", \"params\": {\"field\": \"apache.status.scoreboard.closing_connection\", \"customLabel\": \"Closing connection\"}, \"id\": \"1\", \"schema\": \"metric\"}, {\"type\": \"date_histogram\", \"params\": {\"customInterval\": \"2h\", \"field\": \"@timestamp\", \"interval\": \"auto\", \"min_doc_count\": 1, \"extended_bounds\": {}}, \"id\": \"2\", \"schema\": \"segment\"}, {\"type\": \"terms\", \"params\": {\"orderBy\": \"1\", \"customLabel\": \"Hostname\", \"field\": \"apache.status.hostname\", \"row\": true, \"order\": \"desc\", \"size\": 5}, \"id\": \"3\", \"schema\": \"split\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.scoreboard.dns_lookup\", \"customLabel\": \"DNS lookup\"}, \"id\": \"4\", \"schema\": \"metric\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.scoreboard.gracefully_finishing\", \"customLabel\": \"Gracefully finishing\"}, \"id\": \"5\", \"schema\": \"metric\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.scoreboard.idle_cleanup\", \"customLabel\": \"Idle cleanup\"}, \"id\": \"6\", \"schema\": \"metric\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.scoreboard.keepalive\", \"customLabel\": \"Keepalive\"}, \"id\": \"7\", \"schema\": \"metric\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.scoreboard.logging\", \"customLabel\": \"Logging\"}, \"id\": \"8\", \"schema\": \"metric\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.scoreboard.open_slot\", \"customLabel\": \"Open slot\"}, \"id\": \"9\", \"schema\": \"metric\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.scoreboard.reading_request\", \"customLabel\": \"Reading request\"}, \"id\": \"10\", \"schema\": \"metric\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.scoreboard.sending_reply\", \"customLabel\": \"Sending reply\"}, \"id\": \"11\", \"schema\": \"metric\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.scoreboard.starting_up\", \"customLabel\": \"Starting up\"}, \"id\": \"12\", \"schema\": \"metric\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.scoreboard.total\", \"customLabel\": \"Total\"}, \"id\": \"13\", \"schema\": \"metric\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.scoreboard.waiting_for_connection\", \"customLabel\": \"Waiting for connection\"}, \"id\": \"14\", \"schema\": \"metric\"}], \"title\": \"Apache HTTPD - Scoreboard\"}"
+            }, 
+            "id": "Apache-HTTPD-Scoreboard", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": []}"
+                }, 
+                "savedSearchId": "Apache-HTTPD", 
+                "title": "Total accesses and kbytes [Metricbeat Apache]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metric\", \"listeners\": {}, \"params\": {\"handleNoResults\": true, \"fontSize\": 60}, \"aggs\": [{\"type\": \"max\", \"params\": {\"field\": \"apache.status.total_kbytes\", \"customLabel\": \"Total kbytes\"}, \"id\": \"1\", \"schema\": \"metric\"}, {\"type\": \"max\", \"params\": {\"field\": \"apache.status.total_accesses\", \"customLabel\": \"Total accesses\"}, \"id\": \"2\", \"schema\": \"metric\"}], \"title\": \"Apache HTTPD - Total accesses and kbytes\"}"
+            }, 
+            "id": "Apache-HTTPD-Total-accesses-and-kbytes", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": []}"
+                }, 
+                "savedSearchId": "Apache-HTTPD", 
+                "title": "Uptime [Metricbeat Apache]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"metric\", \"listeners\": {}, \"params\": {\"handleNoResults\": true, \"fontSize\": 60}, \"aggs\": [{\"type\": \"max\", \"params\": {\"field\": \"apache.status.uptime.uptime\", \"customLabel\": \"Uptime\"}, \"id\": \"1\", \"schema\": \"metric\"}, {\"type\": \"max\", \"params\": {\"field\": \"apache.status.uptime.server_uptime\", \"customLabel\": \"Server uptime\"}, \"id\": \"2\", \"schema\": \"metric\"}], \"title\": \"Apache HTTPD - Uptime\"}"
+            }, 
+            "id": "Apache-HTTPD-Uptime", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "description": "", 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": []}"
+                }, 
+                "savedSearchId": "Apache-HTTPD", 
+                "title": "Workers [Metricbeat Apache]", 
+                "uiStateJSON": "{}", 
+                "version": 1, 
+                "visState": "{\"type\": \"line\", \"listeners\": {}, \"params\": {\"scale\": \"linear\", \"showCircles\": true, \"yAxis\": {}, \"smoothLines\": false, \"addTimeMarker\": false, \"interpolate\": \"linear\", \"addLegend\": true, \"shareYAxis\": true, \"radiusRatio\": 9, \"drawLinesBetweenPoints\": true, \"defaultYExtents\": false, \"setYExtents\": false, \"addTooltip\": true, \"times\": []}, \"aggs\": [{\"type\": \"avg\", \"params\": {\"field\": \"apache.status.workers.busy\", \"customLabel\": \"Busy workers\"}, \"id\": \"1\", \"schema\": \"metric\"}, {\"type\": \"date_histogram\", \"params\": {\"customInterval\": \"2h\", \"field\": \"@timestamp\", \"interval\": \"auto\", \"min_doc_count\": 1, \"extended_bounds\": {}}, \"id\": \"2\", \"schema\": \"segment\"}, {\"type\": \"terms\", \"params\": {\"orderBy\": \"1\", \"customLabel\": \"Hostname\", \"field\": \"apache.status.hostname\", \"row\": true, \"order\": \"desc\", \"size\": 5}, \"id\": \"3\", \"schema\": \"split\"}, {\"type\": \"avg\", \"params\": {\"field\": \"apache.status.workers.idle\", \"customLabel\": \"Idle workers\"}, \"id\": \"4\", \"schema\": \"metric\"}], \"title\": \"Apache HTTPD - Workers\"}"
+            }, 
+            "id": "Apache-HTTPD-Workers", 
+            "type": "visualization", 
+            "version": 2
+        }, 
+        {
+            "attributes": {
+                "columns": [
+                    "_source"
+                ], 
+                "description": "", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"highlight\": {\"fields\": {\"*\": {}}, \"post_tags\": [\"@/kibana-highlighted-field@\"], \"pre_tags\": [\"@kibana-highlighted-field@\"], \"require_field_match\": false, \"fragment_size\": 2147483647}, \"query\": {\"query_string\": {\"analyze_wildcard\": true, \"query\": \"metricset.module: apache\"}}, \"index\": \"metricbeat-*\"}"
+                }, 
+                "sort": [
+                    "@timestamp", 
+                    "desc"
+                ], 
+                "title": "Apache HTTPD", 
+                "version": 1
+            }, 
+            "id": "Apache-HTTPD", 
+            "type": "search", 
+            "version": 1
+        }, 
+        {
+            "attributes": {
+                "description": "Overview of Apache server status", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query\": {\"query_string\": {\"analyze_wildcard\": true, \"query\": \"*\"}}, \"language\": \"lucene\"}, \"version\": true, \"highlightAll\": true}"
+                }, 
+                "optionsJSON": "{\"darkTheme\": false}", 
+                "panelsJSON": "[{\"type\": \"visualization\", \"id\": \"Apache-HTTPD-CPU\", \"size_x\": 6, \"size_y\": 3, \"panelIndex\": 1, \"col\": 7, \"row\": 10}, {\"type\": \"visualization\", \"id\": \"Apache-HTTPD-Hostname-list\", \"size_x\": 3, \"size_y\": 3, \"panelIndex\": 2, \"col\": 1, \"row\": 1}, {\"type\": \"visualization\", \"id\": \"Apache-HTTPD-Load1-slash-5-slash-15\", \"size_x\": 6, \"size_y\": 3, \"panelIndex\": 3, \"col\": 1, \"row\": 10}, {\"type\": \"visualization\", \"id\": \"Apache-HTTPD-Scoreboard\", \"size_x\": 12, \"size_y\": 3, \"panelIndex\": 4, \"col\": 1, \"row\": 7}, {\"type\": \"visualization\", \"id\": \"Apache-HTTPD-Total-accesses-and-kbytes\", \"size_x\": 6, \"size_y\": 3, \"panelIndex\": 5, \"col\": 7, \"row\": 1}, {\"type\": \"visualization\", \"id\": \"Apache-HTTPD-Uptime\", \"size_x\": 3, \"size_y\": 3, \"panelIndex\": 6, \"col\": 4, \"row\": 1}, {\"type\": \"visualization\", \"id\": \"Apache-HTTPD-Workers\", \"size_x\": 12, \"size_y\": 3, \"panelIndex\": 7, \"col\": 1, \"row\": 4}]", 
+                "timeRestore": false, 
+                "title": "[Metricbeat Apache] Overview", 
+                "uiStateJSON": "{\"P-5\": {\"vis\": {\"defaultColors\": {\"0 - 100\": \"rgb(0,104,55)\"}}}, \"P-6\": {\"vis\": {\"defaultColors\": {\"0 - 100\": \"rgb(0,104,55)\"}}}, \"P-2\": {\"vis\": {\"params\": {\"sort\": {\"columnIndex\": null, \"direction\": null}}}}}", 
+                "version": 1
+            }, 
+            "id": "Metricbeat-Apache-HTTPD-server-status", 
+            "type": "dashboard", 
+            "version": 3
+        }
+    ], 
+    "version": "6.0.0-beta1-SNAPSHOT"
+}

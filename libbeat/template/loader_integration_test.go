@@ -467,7 +467,7 @@ func TestTemplateWithData(t *testing.T) {
 	// Setup ES
 	client := estest.GetTestingElasticsearch(t)
 
-	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), Config{Name: "testbeat"})
+	tmpl, err := New(version.GetDefaultVersion(), "testindex", client.GetVersion(), Config{Name: "testbeat"}, false)
 	assert.NoError(t, err)
 	content, err := tmpl.LoadFile(fieldsPath)
 	assert.NoError(t, err)

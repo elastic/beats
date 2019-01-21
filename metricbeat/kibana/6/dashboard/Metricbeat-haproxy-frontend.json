@@ -1,0 +1,23 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "HAProxy frontend metrics", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query\": \"\", \"language\": \"lucene\"}, \"version\": true, \"highlightAll\": true}"
+                }, 
+                "optionsJSON": "{\"useMargins\": true, \"darkTheme\": false, \"hidePanelTitles\": false}", 
+                "panelsJSON": "[{\"gridData\": {\"i\": \"2\", \"h\": 3, \"y\": 0, \"w\": 6, \"x\": 0}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"2\", \"id\": \"a64b4fd0-471c-11e8-bc13-1397384faad3\"}, {\"gridData\": {\"i\": \"3\", \"h\": 3, \"y\": 0, \"w\": 6, \"x\": 6}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"3\", \"id\": \"86159190-47c5-11e8-bc13-1397384faad3\"}]", 
+                "timeRestore": false, 
+                "title": "[Metricbeat HAProxy] Frontend", 
+                "version": 1
+            }, 
+            "id": "d5878d00-47c5-11e8-bc13-1397384faad3", 
+            "type": "dashboard", 
+            "updated_at": "2018-04-24T18:32:51.945Z", 
+            "version": 5
+        }
+    ], 
+    "version": "6.2.2"
+}

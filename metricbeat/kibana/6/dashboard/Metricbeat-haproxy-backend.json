@@ -1,0 +1,23 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "HAProxy backend metrics", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query\": \"\", \"language\": \"lucene\"}, \"version\": true, \"highlightAll\": true}"
+                }, 
+                "optionsJSON": "{\"useMargins\": true, \"darkTheme\": false, \"hidePanelTitles\": false}", 
+                "panelsJSON": "[{\"gridData\": {\"i\": \"1\", \"h\": 2, \"y\": 0, \"w\": 6, \"x\": 0}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"1\", \"id\": \"a64b4fd0-471c-11e8-bc13-1397384faad3\"}, {\"gridData\": {\"i\": \"2\", \"h\": 2, \"y\": 0, \"w\": 3, \"x\": 6}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"2\", \"id\": \"794b6cd0-471d-11e8-bc13-1397384faad3\"}, {\"gridData\": {\"i\": \"3\", \"h\": 4, \"y\": 2, \"w\": 6, \"x\": 6}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"3\", \"id\": \"bb0ab500-4735-11e8-bc13-1397384faad3\"}, {\"gridData\": {\"i\": \"4\", \"h\": 2, \"y\": 0, \"w\": 3, \"x\": 9}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"4\", \"id\": \"40bed190-473b-11e8-bc13-1397384faad3\"}, {\"gridData\": {\"i\": \"5\", \"h\": 2, \"y\": 2, \"w\": 6, \"x\": 0}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"5\", \"id\": \"0751ed00-479c-11e8-bc13-1397384faad3\"}, {\"gridData\": {\"i\": \"6\", \"h\": 2, \"y\": 4, \"w\": 6, \"x\": 0}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"6\", \"id\": \"b3463670-47a1-11e8-bc13-1397384faad3\"}]", 
+                "timeRestore": false, 
+                "title": "[Metricbeat HAProxy] Backend", 
+                "version": 1
+            }, 
+            "id": "9151c900-471d-11e8-bc13-1397384faad3", 
+            "type": "dashboard", 
+            "updated_at": "2018-04-24T18:31:25.838Z", 
+            "version": 15
+        }
+    ], 
+    "version": "6.2.2"
+}

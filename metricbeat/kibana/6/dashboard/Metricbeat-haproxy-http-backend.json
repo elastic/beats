@@ -1,0 +1,23 @@
+{
+    "objects": [
+        {
+            "attributes": {
+                "description": "HAProxy HTTP backend metrics", 
+                "hits": 0, 
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": "{\"filter\": [], \"query\": {\"query\": \"\", \"language\": \"lucene\"}, \"version\": true, \"highlightAll\": true}"
+                }, 
+                "optionsJSON": "{\"useMargins\": true, \"darkTheme\": false, \"hidePanelTitles\": false}", 
+                "panelsJSON": "[{\"gridData\": {\"i\": \"1\", \"h\": 2, \"y\": 5, \"w\": 4, \"x\": 0}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"1\", \"id\": \"a64b4fd0-471c-11e8-bc13-1397384faad3\"}, {\"gridData\": {\"i\": \"2\", \"h\": 2, \"y\": 0, \"w\": 3, \"x\": 9}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"2\", \"id\": \"794b6cd0-471d-11e8-bc13-1397384faad3\"}, {\"gridData\": {\"i\": \"3\", \"h\": 3, \"y\": 2, \"w\": 6, \"x\": 6}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"3\", \"id\": \"bb0ab500-4735-11e8-bc13-1397384faad3\"}, {\"gridData\": {\"i\": \"4\", \"h\": 2, \"y\": 0, \"w\": 3, \"x\": 6}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"4\", \"id\": \"40bed190-473b-11e8-bc13-1397384faad3\"}, {\"gridData\": {\"i\": \"5\", \"h\": 2, \"y\": 5, \"w\": 4, \"x\": 4}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"5\", \"id\": \"0751ed00-479c-11e8-bc13-1397384faad3\"}, {\"gridData\": {\"i\": \"6\", \"h\": 2, \"y\": 5, \"w\": 4, \"x\": 8}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"6\", \"id\": \"b3463670-47a1-11e8-bc13-1397384faad3\"}, {\"gridData\": {\"i\": \"7\", \"h\": 3, \"y\": 0, \"w\": 6, \"x\": 0}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"7\", \"id\": \"fcbdfa60-47bd-11e8-bc13-1397384faad3\"}, {\"gridData\": {\"i\": \"8\", \"h\": 2, \"y\": 3, \"w\": 6, \"x\": 0}, \"type\": \"visualization\", \"version\": \"6.2.2\", \"panelIndex\": \"8\", \"id\": \"981d1040-47be-11e8-bc13-1397384faad3\"}]", 
+                "timeRestore": false, 
+                "title": "[Metricbeat HAProxy] HTTP backend", 
+                "version": 1
+            }, 
+            "id": "0836a4b0-47bd-11e8-bc13-1397384faad3", 
+            "type": "dashboard", 
+            "updated_at": "2018-04-24T18:33:28.791Z", 
+            "version": 6
+        }
+    ], 
+    "version": "6.2.2"
+}

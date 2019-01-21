@@ -50,27 +50,35 @@ type ESLoader struct {
 	beatInfo   beat.Info
 	esVersion  common.Version
 	ilmEnabled bool
+	migration  bool
 }
 
 //StdoutLoader holds all information necessary to write given templates to the configured output.
 type StdoutLoader struct {
-	beatInfo beat.Info
+	beatInfo  beat.Info
+	migration bool
 }
 
 // NewESLoader creates a new template loader
-func NewESLoader(client ESClient, beatInfo beat.Info) (Loader, error) {
-	return &ESLoader{client: client, beatInfo: beatInfo, esVersion: client.GetVersion(), ilmEnabled: ilm.EnabledFor(client)}, nil
+func NewESLoader(client ESClient, beatInfo beat.Info, migration bool) (Loader, error) {
+	return &ESLoader{
+		client:     client,
+		beatInfo:   beatInfo,
+		esVersion:  client.GetVersion(),
+		ilmEnabled: ilm.EnabledFor(client),
+		migration:  migration,
+	}, nil
 }
 
-func NewStdoutLoader(beatInfo beat.Info) (Loader, error) {
-	return &StdoutLoader{beatInfo: beatInfo}, nil
+func NewStdoutLoader(beatInfo beat.Info, migration bool) (Loader, error) {
+	return &StdoutLoader{beatInfo: beatInfo, migration: migration}, nil
 }
 
 // Load checks if the index mapping template should be loaded
 // In case the template is not already loaded or overwriting is enabled, the
 // template is written to the configured ES output.
 func (l *ESLoader) Load(config Config, ilmConfig ilm.Config) (bool, error) {
-	tmpl, err := template(l.beatInfo, l.esVersion, l.ilmEnabled, config, ilmConfig)
+	tmpl, err := template(l.beatInfo, l.esVersion, l.ilmEnabled, l.migration, config, ilmConfig)
 	if err != nil || tmpl == nil {
 		return false, err
 	}
@@ -126,7 +134,7 @@ func (l *ESLoader) templateLoaded(templateName string) bool {
 //Load loads the configured templates to stdout
 func (l *StdoutLoader) Load(config Config, ilmConfig ilm.Config) (bool, error) {
 	//build template from config
-	tmpl, err := template(l.beatInfo, common.Version{}, true, config, ilmConfig)
+	tmpl, err := template(l.beatInfo, common.Version{}, true, l.migration, config, ilmConfig)
 	if err != nil || tmpl == nil {
 		return false, err
 	}
@@ -144,7 +152,7 @@ func (l *StdoutLoader) Load(config Config, ilmConfig ilm.Config) (bool, error) {
 	return true, nil
 }
 
-func template(info beat.Info, esVersion common.Version, ilmEnabled bool, config Config, ilmConfig ilm.Config) (*Template, error) {
+func template(info beat.Info, esVersion common.Version, ilmEnabled bool, migration bool, config Config, ilmConfig ilm.Config) (*Template, error) {
 	if !config.Enabled {
 		return nil, nil
 	}
@@ -156,7 +164,7 @@ func template(info beat.Info, esVersion common.Version, ilmEnabled bool, config 
 		return nil, err
 	}
 
-	tmpl, err := New(info.Version, info.IndexPrefix, esVersion, config)
+	tmpl, err := New(info.Version, info.IndexPrefix, esVersion, config, migration)
 	if err != nil {
 		return nil, fmt.Errorf("error creating template instance: %v", err)
 	}

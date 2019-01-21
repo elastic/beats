@@ -114,6 +114,7 @@ func (cfg *Config) prepare(info beat.Info) error {
 			},
 			"agent": common.MapStr{
 				"name":    info.Name,
+				"type":    info.Name,
 				"version": info.Version,
 			},
 			"observer": common.MapStr{
