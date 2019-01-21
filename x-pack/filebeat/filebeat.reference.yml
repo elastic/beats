@@ -304,6 +304,9 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
+    #var.convert_timezone: false
+
   # Error logs
   #error:
     #enabled: true
@@ -315,6 +318,9 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
+
+    # Convert the timestamp to UTC. Requires Elasticsearch >= 6.1.
+    #var.convert_timezone: false
 
 #-------------------------------- Osquery Module --------------------------------
 - module: osquery
