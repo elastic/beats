@@ -84,6 +84,31 @@ class Test(metricbeat.BaseTest):
 
         self.assert_fields_are_documented(evt)
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_subscriptions(self):
+        """
+        nats subscriptions test
+        """
+        self.render_config_template(modules=[{
+            "name": "nats",
+            "metricsets": ["subscriptions"],
+            "hosts": self.get_hosts(),
+            "period": "5s",
+            "subscriptions.metrics_path": "/subsz"
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        output = self.read_output_json()
+        self.assertEqual(len(output), 1)
+        evt = output[0]
+
+        self.assertItemsEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
+
+        self.assert_fields_are_documented(evt)
+
     def get_hosts(self):
         return ["{}:{}".format(
             os.getenv('NATS_HOST', 'localhost'),
