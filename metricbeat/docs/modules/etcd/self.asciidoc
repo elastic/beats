@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-etcd-self]]
 === Etcd self metricset
 
-beta[]
-
 include::../../../module/etcd/self/_meta/docs.asciidoc[]
 
 

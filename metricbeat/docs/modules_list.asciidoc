@@ -45,10 +45,10 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-elasticsearch-shard,shard>> beta[]  
 |<<metricbeat-module-envoyproxy,envoyproxy>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-envoyproxy-server,server>> experimental[]  
-|<<metricbeat-module-etcd,Etcd>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.3+| .3+|  |<<metricbeat-metricset-etcd-leader,leader>> beta[]  
-|<<metricbeat-metricset-etcd-self,self>> beta[]  
-|<<metricbeat-metricset-etcd-store,store>> beta[]  
+|<<metricbeat-module-etcd,Etcd>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.3+| .3+|  |<<metricbeat-metricset-etcd-leader,leader>>   
+|<<metricbeat-metricset-etcd-self,self>>   
+|<<metricbeat-metricset-etcd-store,store>>   
 |<<metricbeat-module-golang,Golang>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-golang-expvar,expvar>> beta[]  
 |<<metricbeat-metricset-golang-heap,heap>> beta[]  
