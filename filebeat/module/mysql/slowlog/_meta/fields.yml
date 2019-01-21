@@ -29,6 +29,10 @@
       type: long
       description: >
         The number of rows scanned by the query.
+    - name: rows_affected
+      type: long
+      description: >
+        The number of rows modified by the query.
     - name: timestamp
       type: long
       description: >
@@ -39,4 +43,49 @@
     - name: id
       type: long
       description: >
-        The connection ID for the query.
+        The connection or thread ID for the query.
+    - name: schema
+      type: keyword
+      description: >
+        The schema where the slow query was executed.
+    - name: current_user
+      type: keyword
+      description: >
+        Current authenticated user, used to determine access privileges. Can differ from the value for user.
+
+    - name: query_cache_hit
+      type: boolean
+      description: >
+        Whether the query cache was hit.
+    - name: tmp_table
+      type: boolean
+      description: >
+        Whether a temporary table was used to resolve the query.
+    - name: tmp_table_on_disk
+      type: boolean
+      description: >
+        Whether the query needed temporary tables on disk.
+    - name: filesort
+      type: boolean
+      description: >
+        Whether filesort optimization was used.
+    - name: filesort_on_disk
+      type: boolean
+      description: >
+        Whether filesort optimization was used and it needed temporary tables on disk.
+    - name: priority_queue
+      type: boolean
+      description: >
+        Whether a priority queue was used for filesort.
+    - name: full_scan
+      type: boolean
+      description: >
+        Whether a full table scan was needed for the slow query.
+    - name: full_join
+      type: boolean
+      description: >
+        Whether a full join was needed for the slow query (no indexes were used for joins).
+    - name: merge_passes
+      type: long
+      description: >
+        Number of merge passes executed for the query.
