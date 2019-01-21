@@ -45,10 +45,10 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-elasticsearch-shard,shard>> beta[]  
 |<<metricbeat-module-envoyproxy,envoyproxy>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-envoyproxy-server,server>> experimental[]  
-|<<metricbeat-module-etcd,Etcd>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.3+| .3+|  |<<metricbeat-metricset-etcd-leader,leader>> beta[]  
-|<<metricbeat-metricset-etcd-self,self>> beta[]  
-|<<metricbeat-metricset-etcd-store,store>> beta[]  
+|<<metricbeat-module-etcd,Etcd>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.3+| .3+|  |<<metricbeat-metricset-etcd-leader,leader>>   
+|<<metricbeat-metricset-etcd-self,self>>   
+|<<metricbeat-metricset-etcd-store,store>>   
 |<<metricbeat-module-golang,Golang>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-golang-expvar,expvar>> beta[]  
 |<<metricbeat-metricset-golang-heap,heap>> beta[]  
@@ -87,8 +87,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-logstash,Logstash>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-logstash-node,node>> beta[]  
 |<<metricbeat-metricset-logstash-node_stats,node_stats>> beta[]  
-|<<metricbeat-module-memcached,Memcached>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-memcached-stats,stats>> beta[]  
+|<<metricbeat-module-memcached,Memcached>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-memcached-stats,stats>>   
 |<<metricbeat-module-mongodb,MongoDB>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .5+| .5+|  |<<metricbeat-metricset-mongodb-collstats,collstats>>   
 |<<metricbeat-metricset-mongodb-dbstats,dbstats>>   
@@ -102,9 +102,9 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-mysql-status,status>>   
 |<<metricbeat-module-nginx,Nginx>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-nginx-stubstatus,stubstatus>>   
-|<<metricbeat-module-php_fpm,PHP_FPM>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.2+| .2+|  |<<metricbeat-metricset-php_fpm-pool,pool>> beta[]  
-|<<metricbeat-metricset-php_fpm-process,process>> beta[]  
+|<<metricbeat-module-php_fpm,PHP_FPM>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.2+| .2+|  |<<metricbeat-metricset-php_fpm-pool,pool>>   
+|<<metricbeat-metricset-php_fpm-process,process>>   
 |<<metricbeat-module-postgresql,PostgreSQL>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .4+| .4+|  |<<metricbeat-metricset-postgresql-activity,activity>>   
 |<<metricbeat-metricset-postgresql-bgwriter,bgwriter>>   
@@ -137,8 +137,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-system-socket,socket>>   
 |<<metricbeat-metricset-system-socket_summary,socket_summary>>   
 |<<metricbeat-metricset-system-uptime,uptime>>   
-|<<metricbeat-module-traefik,traefik>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-traefik-health,health>> beta[]  
+|<<metricbeat-module-traefik,traefik>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-traefik-health,health>>   
 |<<metricbeat-module-uwsgi,uwsgi>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-uwsgi-status,status>> beta[]  
 |<<metricbeat-module-vsphere,vSphere>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  

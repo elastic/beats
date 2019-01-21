@@ -14479,7 +14479,6 @@ The current number of idle client connections waiting for a request.
 [[exported-fields-php_fpm]]
 == PHP_FPM fields
 
-beta[]
 PHP-FPM server status metrics collected from PHP-FPM.
 
 
