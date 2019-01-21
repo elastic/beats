@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-elasticsearch-shard]]
 === Elasticsearch shard metricset
 
-beta[]
-
 include::../../../module/elasticsearch/shard/_meta/docs.asciidoc[]
 
 

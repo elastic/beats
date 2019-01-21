@@ -4,8 +4,6 @@ import sys
 import time
 import unittest
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../auditbeat/tests/system'))
-
 from auditbeat_xpack import *
 
 COMMON_FIELDS = ["@timestamp", "host.name", "event.module", "event.dataset"]
@@ -57,7 +55,6 @@ class Test(AuditbeatXPackTest):
         self.check_metricset("system", "socket", COMMON_FIELDS + fields, warnings_allowed=True)
 
     @unittest.skipUnless(sys.platform == "linux2", "Only implemented for Linux")
-    @unittest.skip("Test is failing in CI")  # https://github.com/elastic/beats/issues/9679
     def test_metricset_user(self):
         """
         user metricset collects information about users on a server.

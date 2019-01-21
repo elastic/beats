@@ -1,0 +1,594 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "AWS EC2 DiskIO Write Bytes",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "annotations": [],
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "23428b30-f7f2-11e8-bff8-21537b07dd44"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "2592bcc0-f7f2-11e8-bff8-21537b07dd44"
+              }
+            ],
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "5m",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(104,188,0,1)",
+                "fill": "0",
+                "filter": "",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "AWS EC2 DiskIO Write Bytes",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.ec2.diskio.write.bytes",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "series_drop_last_bucket": 1,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "steps": 0,
+                "terms_field": "cloud.instance.id",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "terms_size": "5"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "AWS EC2 DiskIO Write Bytes",
+          "type": "metrics"
+        }
+      },
+      "id": "fed59380-f7f8-11e8-af03-c999c9dea608",
+      "type": "visualization",
+      "updated_at": "2018-12-04T19:15:43.416Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "AWS EC2 Status Check Failed",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "d13f6b50-f7f6-11e8-bff8-21537b07dd44"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "ad6d62d0-f7f7-11e8-bff8-21537b07dd44"
+              }
+            ],
+            "gauge_color_rules": [
+              {
+                "id": "b0c5b590-f7f7-11e8-bff8-21537b07dd44"
+              }
+            ],
+            "gauge_inner_width": 10,
+            "gauge_style": "half",
+            "gauge_width": 10,
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "EC2 Status Check Failed",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.ec2.status.check_failed",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "sum"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "everything",
+                "stacked": "none",
+                "terms_field": "cloud.instance.id",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "metric"
+          },
+          "title": "AWS EC2 Status Check Failed",
+          "type": "metrics"
+        }
+      },
+      "id": "9e8c6030-f7f8-11e8-af03-c999c9dea608",
+      "type": "visualization",
+      "updated_at": "2018-12-04T19:13:01.875Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "AWS EC2 Network In Bytes",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "annotations": [],
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "23428b30-f7f2-11e8-bff8-21537b07dd44"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "2592bcc0-f7f2-11e8-bff8-21537b07dd44"
+              }
+            ],
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "5m",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(104,188,0,1)",
+                "fill": "0",
+                "filter": "",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "AWS EC2 Network In Bytes",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.ec2.network.in.bytes",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "series_drop_last_bucket": 1,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "steps": 0,
+                "terms_field": "cloud.instance.id",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "terms_size": "5"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "AWS EC2 Network In Bytes",
+          "type": "metrics"
+        }
+      },
+      "id": "15818fd0-f7f9-11e8-af03-c999c9dea608",
+      "type": "visualization",
+      "updated_at": "2018-12-04T19:16:21.453Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "AWS EC2 Network Out Bytes",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "annotations": [],
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "23428b30-f7f2-11e8-bff8-21537b07dd44"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "2592bcc0-f7f2-11e8-bff8-21537b07dd44"
+              }
+            ],
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "5m",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(104,188,0,1)",
+                "fill": "0",
+                "filter": "",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "AWS EC2 Network Out Bytes",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.ec2.network.out.bytes",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "series_drop_last_bucket": 1,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "steps": 0,
+                "terms_field": "cloud.instance.id",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "terms_size": "5"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "AWS EC2 Network Out Bytes",
+          "type": "metrics"
+        }
+      },
+      "id": "233b3400-f7f9-11e8-af03-c999c9dea608",
+      "type": "visualization",
+      "updated_at": "2018-12-04T19:16:44.480Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "AWS EC2 DiskIO Read Bytes",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "annotations": [],
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "23428b30-f7f2-11e8-bff8-21537b07dd44"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "2592bcc0-f7f2-11e8-bff8-21537b07dd44"
+              }
+            ],
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "5m",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(104,188,0,1)",
+                "fill": "0",
+                "filter": "",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "AWS EC2 DiskIO Read Bytes",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.ec2.diskio.read.bytes",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "series_drop_last_bucket": 1,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "steps": 0,
+                "terms_field": "cloud.instance.id",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "terms_size": "5"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "AWS EC2 DiskIO Read Bytes",
+          "type": "metrics"
+        }
+      },
+      "id": "f1db6ec0-f7f8-11e8-af03-c999c9dea608",
+      "type": "visualization",
+      "updated_at": "2018-12-04T19:15:21.644Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "AWS EC2 CPU Utilization",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "annotations": [],
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "23428b30-f7f2-11e8-bff8-21537b07dd44"
+              }
+            ],
+            "bar_color_rules": [
+              {
+                "id": "2592bcc0-f7f2-11e8-bff8-21537b07dd44"
+              }
+            ],
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "5m",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(104,188,0,1)",
+                "fill": "0",
+                "filter": "",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "AWS EC2 CPU Utilization",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "aws.ec2.cpu.total.pct",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "series_drop_last_bucket": 1,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "steps": 0,
+                "terms_field": "cloud.instance.id",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "terms_size": "5"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "AWS EC2 CPU Utilization",
+          "type": "metrics"
+        }
+      },
+      "id": "be8828d0-f7f6-11e8-af03-c999c9dea608",
+      "type": "visualization",
+      "updated_at": "2018-12-04T19:14:42.745Z",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false,
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "3",
+              "w": 24,
+              "x": 24,
+              "y": 15
+            },
+            "id": "fed59380-f7f8-11e8-af03-c999c9dea608",
+            "panelIndex": "3",
+            "type": "visualization",
+            "version": "6.5.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "5",
+              "w": 12,
+              "x": 36,
+              "y": 0
+            },
+            "id": "9e8c6030-f7f8-11e8-af03-c999c9dea608",
+            "panelIndex": "5",
+            "type": "visualization",
+            "version": "6.5.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "11",
+              "w": 24,
+              "x": 0,
+              "y": 30
+            },
+            "id": "15818fd0-f7f9-11e8-af03-c999c9dea608",
+            "panelIndex": "11",
+            "type": "visualization",
+            "version": "6.5.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "12",
+              "w": 24,
+              "x": 24,
+              "y": 30
+            },
+            "id": "233b3400-f7f9-11e8-af03-c999c9dea608",
+            "panelIndex": "12",
+            "type": "visualization",
+            "version": "6.5.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "15",
+              "w": 24,
+              "x": 0,
+              "y": 15
+            },
+            "id": "f1db6ec0-f7f8-11e8-af03-c999c9dea608",
+            "panelIndex": "15",
+            "type": "visualization",
+            "version": "6.5.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "17",
+              "w": 36,
+              "x": 0,
+              "y": 0
+            },
+            "id": "be8828d0-f7f6-11e8-af03-c999c9dea608",
+            "panelIndex": "17",
+            "type": "visualization",
+            "version": "6.5.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWS] EC2 Overview",
+        "version": 1
+      },
+      "id": "c5846400-f7fb-11e8-af03-c999c9dea608",
+      "type": "dashboard",
+      "updated_at": "2018-12-04T19:35:35.744Z",
+      "version": 1
+    }
+  ],
+  "version": "6.5.0"
+}

@@ -77,7 +77,7 @@ func TestAddProcessMetadata(t *testing.T) {
 				"process": common.MapStr{
 					"name":       "systemd",
 					"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
-					"exe":        "/usr/lib/systemd/systemd",
+					"executable": "/usr/lib/systemd/systemd",
 					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 					"pid":        1,
 					"ppid":       0,
@@ -155,7 +155,7 @@ func TestAddProcessMetadata(t *testing.T) {
 					"process": common.MapStr{
 						"name":       "systemd",
 						"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
-						"exe":        "/usr/lib/systemd/systemd",
+						"executable": "/usr/lib/systemd/systemd",
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 						"pid":        1,
 						"ppid":       0,
@@ -180,7 +180,7 @@ func TestAddProcessMetadata(t *testing.T) {
 					"process": common.MapStr{
 						"name":       "systemd",
 						"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
-						"exe":        "/usr/lib/systemd/systemd",
+						"executable": "/usr/lib/systemd/systemd",
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 						"pid":        1,
 						"ppid":       0,
@@ -212,7 +212,7 @@ func TestAddProcessMetadata(t *testing.T) {
 					"process": common.MapStr{
 						"name":       "systemd",
 						"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
-						"exe":        "/usr/lib/systemd/systemd",
+						"executable": "/usr/lib/systemd/systemd",
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 						"pid":        1,
 						"ppid":       0,

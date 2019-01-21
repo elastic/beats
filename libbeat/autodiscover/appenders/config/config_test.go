@@ -28,96 +28,87 @@ import (
 
 func TestGenerateAppender(t *testing.T) {
 	tests := []struct {
+		name        string
 		eventConfig common.MapStr
 		event       bus.Event
 		result      common.MapStr
 		config      string
 	}{
-		// Appender without a condition should apply the config regardless
 		{
+			name:  "Appender without a condition should apply the config regardless",
 			event: bus.Event{},
 			result: common.MapStr{
 				"test":  "bar",
 				"test1": "foo",
+			},
+			eventConfig: common.MapStr{
+				"test": "bar",
+			},
+			config: `
+config:
+  test1: foo`,
+		},
+		{
+			name: "Appender with a condition check that fails",
+			event: bus.Event{
+				"field": "notbar",
+			},
+			result: common.MapStr{
+				"test": "bar",
+			},
+			eventConfig: common.MapStr{
+				"test": "bar",
+			},
+			config: `
+config: 
+  test2: foo 
+condition.equals:
+  field: bar`,
+		},
+		{
+			name: "Appender with a condition check that passes. It should get appended",
+			event: bus.Event{
+				"field": "bar",
+			},
+			result: common.MapStr{
+				"test":  "bar",
 				"test2": "foo",
 			},
 			eventConfig: common.MapStr{
 				"test": "bar",
 			},
 			config: `
-- config: 
-    "test1": foo 
-- config: 
-    "test2": foo 
-`,
-		},
-		// Appender with a condition check that fails. Only appender with no condition should pass
-		{
-			event: bus.Event{
-				"foo": "bar",
-			},
-			result: common.MapStr{
-				"test":  "bar",
-				"test1": "foo",
-			},
-			eventConfig: common.MapStr{
-				"test": "bar",
-			},
-			config: `
-- config: 
-    "test1": foo 
-- config: 
-    "test2": foo 
-  condition.equals:
-    "foo": "bar1"
-`,
-		},
-		// Appender with a condition check that passes. It should get appended
-		{
-			event: bus.Event{
-				"foo": "bar",
-			},
-			result: common.MapStr{
-				"test":  "bar",
-				"test1": "foo",
-				"test2": "foo",
-			},
-			eventConfig: common.MapStr{
-				"test": "bar",
-			},
-			config: `
-- config: 
-    "test1": foo 
-- config: 
-    "test2": foo 
-  condition.equals:
-    "foo": "bar"
-`,
+config: 
+  test2: foo 
+condition.equals:
+  field: bar`,
 		},
 	}
 	for _, test := range tests {
-		config, err := common.NewConfigWithYAML([]byte(test.config), "")
-		if err != nil {
-			t.Fatal(err)
-		}
+		t.Run(test.name, func(t *testing.T) {
+			config, err := common.NewConfigWithYAML([]byte(test.config), "")
+			if err != nil {
+				t.Fatal(err)
+			}
 
-		appender, err := NewConfigAppender(config)
-		assert.Nil(t, err)
-		assert.NotNil(t, appender)
+			appender, err := NewConfigAppender(config)
+			assert.Nil(t, err)
+			assert.NotNil(t, appender)
 
-		eveConfig, err := common.NewConfigFrom(&test.eventConfig)
-		assert.Nil(t, err)
+			eveConfig, err := common.NewConfigFrom(&test.eventConfig)
+			assert.Nil(t, err)
 
-		test.event["config"] = []*common.Config{eveConfig}
-		appender.Append(test.event)
+			test.event["config"] = []*common.Config{eveConfig}
+			appender.Append(test.event)
 
-		cfgs, _ := test.event["config"].([]*common.Config)
-		assert.Equal(t, len(cfgs), 1)
+			cfgs, _ := test.event["config"].([]*common.Config)
+			assert.Equal(t, len(cfgs), 1)
 
-		out := common.MapStr{}
-		cfgs[0].Unpack(&out)
+			out := common.MapStr{}
+			cfgs[0].Unpack(&out)
 
-		assert.Equal(t, out, test.result)
+			assert.Equal(t, out, test.result)
+		})
 
 	}
 }

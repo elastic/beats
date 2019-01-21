@@ -24,7 +24,7 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("filebeat", "osquery", Asset); err != nil {
+	if err := asset.SetFields("filebeat", "osquery", asset.ModuleFieldsPri, Asset); err != nil {
 		panic(err)
 	}
 }

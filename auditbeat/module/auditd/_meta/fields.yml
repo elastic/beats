@@ -92,9 +92,6 @@
     type: group
     description: Process attributes.
     fields:
-    - name: exe
-      type: keyword
-      description: Absolute path of the executable.
     - name: cwd
       type: keyword
       description: The current working directory.

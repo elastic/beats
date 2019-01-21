@@ -180,7 +180,7 @@
                             "id": "1", 
                             "params": {
                                 "customLabel": "command", 
-                                "field": "mongodb.status.opcounters.command"
+                                "field": "mongodb.status.ops.counters.command"
                             }, 
                             "schema": "metric", 
                             "type": "avg"
@@ -203,7 +203,7 @@
                             "id": "3", 
                             "params": {
                                 "customLabel": "delete", 
-                                "field": "mongodb.status.opcounters.delete"
+                                "field": "mongodb.status.ops.counters.delete"
                             }, 
                             "schema": "metric", 
                             "type": "avg"
@@ -213,7 +213,7 @@
                             "id": "4", 
                             "params": {
                                 "customLabel": "getmore", 
-                                "field": "mongodb.status.opcounters.getmore"
+                                "field": "mongodb.status.ops.counters.getmore"
                             }, 
                             "schema": "metric", 
                             "type": "avg"
@@ -223,7 +223,7 @@
                             "id": "5", 
                             "params": {
                                 "customLabel": "insert", 
-                                "field": "mongodb.status.opcounters.insert"
+                                "field": "mongodb.status.ops.counters.insert"
                             }, 
                             "schema": "metric", 
                             "type": "avg"
@@ -233,7 +233,7 @@
                             "id": "6", 
                             "params": {
                                 "customLabel": "query", 
-                                "field": "mongodb.status.opcounters.query"
+                                "field": "mongodb.status.ops.counters.query"
                             }, 
                             "schema": "metric", 
                             "type": "avg"
@@ -243,7 +243,7 @@
                             "id": "7", 
                             "params": {
                                 "customLabel": "update", 
-                                "field": "mongodb.status.opcounters_replicated.update"
+                                "field": "mongodb.status.ops.replicated.update"
                             }, 
                             "schema": "metric", 
                             "type": "avg"

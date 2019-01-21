@@ -73,12 +73,12 @@
           type: keyword
           description: >
             Name of the agent.
-    
+
             This is a name that can be given to an agent. This can be helpful if
             for example two Filebeat instances are running on the same host
             but a human readable separation is needed on which Filebeat instance
             data is coming from.
-    
+
             If no name is given, the name is often left empty.
           example: foo
     
@@ -116,9 +116,22 @@
       title: Client
       group: 2
       description: >
-        A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records. For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjuction with server fields.  Client fields are generally not populated for packet-level events. 
+        A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records. For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields.  Client fields are generally not populated for packet-level events.
+    
+        Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
       type: group
       fields:
+    
+        - name: address
+          level: extended
+          type: keyword
+          description: >
+            Some event client addresses are defined ambiguously. The event will
+            sometimes list an IP, a domain or a unix socket.  You should always
+            store the raw address in the `.address` field.
+    
+            Then it should be duplicated to `.ip` or `.domain`, depending on which
+            one it is.
     
         - name: ip
           level: core
@@ -350,10 +363,21 @@
       title: Destination
       group: 2
       description: >
-        Destination fields describe details about the destination of a
-        packet/event. Destination fields are usually populated in conjunction with source fields.
+        Destination fields describe details about the destination of a packet/event.
+        Destination fields are usually populated in conjunction with source fields.
       type: group
       fields:
+    
+        - name: address
+          level: extended
+          type: keyword
+          description: >
+            Some event destination addresses are defined ambiguously. The event will
+            sometimes list an IP, a domain or a unix socket.  You should always
+            store the raw address in the `.address` field.
+    
+            Then it should be duplicated to `.ip` or `.domain`, depending on which
+            one it is.
     
         - name: ip
           level: core
@@ -485,8 +509,8 @@
             different ECS versions -- this field lets integrations adjust to the
             schema version of the events.
     
-            The current version is 1.0.0-beta1 .
-          example: 1.0.0-beta1
+            The current version is 1.0.0-beta2 .
+          example: 1.0.0-beta2
     
     - name: error
       title: Error
@@ -909,7 +933,14 @@
             type: keyword
             example: "Mac OS X"
             description: >
-              Operating system name.
+              Operating system name, without the version.
+          
+          - name: full
+            level: extended
+            type: keyword
+            example: "Mac OS Mojave"
+            description: >
+              Operating system name, including the version or code name.
 
           - name: family
             level: extended
@@ -921,7 +952,7 @@
           - name: version
             level: extended
             type: keyword
-            example: "10.12.6-rc2"
+            example: "10.14.1"
             description: >
               Operating system version as a raw string.
 
@@ -1015,7 +1046,17 @@
           type: keyword
           description: >
             Http request method.
-          example: GET, POST, PUT
+    
+            The field value must be normalized to lowercase for querying. See
+            "Lowercase Capitalization" in the "Implementing ECS"  section.
+          example: get, post, put
+    
+        - name: request.body.content
+          level: extended
+          type: keyword
+          description: >
+            The full http request body.
+          example: Hello world
     
         - name: request.referrer
           level: extended
@@ -1031,7 +1072,7 @@
             Http response status code.
           example: 404
     
-        - name: response.body
+        - name: response.body.content
           level: extended
           type: keyword
           description: >
@@ -1044,6 +1085,35 @@
           description: >
             Http version.
           example: 1.1
+    
+        # Metrics
+        - name: request.bytes
+          level: extended
+          type: long
+          description: >
+            Total size in bytes of the request (body and headers).
+          example: 1437
+    
+        - name: request.body.bytes
+          level: extended
+          type: long
+          description: >
+            Size in bytes of the request body.
+          example: 887
+    
+        - name: response.bytes
+          level: extended
+          type: long
+          description: >
+            Total size in bytes of the response (body and headers).
+          example: 1437
+    
+        - name: response.body.bytes
+          level: extended
+          type: long
+          description: >
+            Size in bytes of the response body.
+          example: 887
     
     - name: log
       title: Log
@@ -1099,8 +1169,11 @@
           level: core
           type: keyword
           description: >
-            In the OSI Model this would be the Network Layer. IPv4, IPv6, IPSec, PIM, etc
-          example: IPv4
+            In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
+    
+            The field value must be normalized to lowercase for querying. See
+            "Lowercase Capitalization" in the "Implementing ECS" section.
+          example: ipv4
     
         - name: iana_number
           level: extended
@@ -1116,8 +1189,11 @@
           type: keyword
           description: >
             Same as network.iana_number, but instead using the Keyword name of the
-            transport layer (UDP, TCP, IPv6-ICMP, etc.)
-          example: TCP
+            transport layer (udp, tcp, ipv6-icmp, etc.)
+    
+            The field value must be normalized to lowercase for querying. See
+            "Lowercase Capitalization" in the "Implementing ECS"  section.
+          example: tcp
     
         - name: application
           level: extended
@@ -1128,13 +1204,19 @@
             facebook, twitter. This would be used in situations where the vendor
             or service can be decoded such as from the source/dest IP owners,
             ports, or wire format.
-          example: AIM
+    
+            The field value must be normalized to lowercase for querying. See
+            "Lowercase Capitalization" in the "Implementing ECS" section.
+          example: aim
     
         - name: protocol
           level: core
           type: keyword
           description: >
-            L7 Network protocol name. ex. http, lumberjack, transport protocol
+            L7 Network protocol name. ex. http, lumberjack, transport protocol.
+    
+            The field value must be normalized to lowercase for querying. See
+            "Lowercase Capitalization" in the "Implementing ECS" section.
           example: http
     
         - name: direction
@@ -1267,7 +1349,14 @@
             type: keyword
             example: "Mac OS X"
             description: >
-              Operating system name.
+              Operating system name, without the version.
+          
+          - name: full
+            level: extended
+            type: keyword
+            example: "Mac OS Mojave"
+            description: >
+              Operating system name, including the version or code name.
 
           - name: family
             level: extended
@@ -1279,7 +1368,7 @@
           - name: version
             level: extended
             type: keyword
-            example: "10.12.6-rc2"
+            example: "10.14.1"
             description: >
               Operating system version as a raw string.
 
@@ -1407,7 +1496,14 @@
           type: keyword
           example: "Mac OS X"
           description: >
-            Operating system name.
+            Operating system name, without the version.
+    
+        - name: full
+          level: extended
+          type: keyword
+          example: "Mac OS Mojave"
+          description: >
+            Operating system name, including the version or code name.
     
         - name: family
           level: extended
@@ -1419,7 +1515,7 @@
         - name: version
           level: extended
           type: keyword
-          example: "10.12.6-rc2"
+          example: "10.14.1"
           description: >
             Operating system version as a raw string.
     
@@ -1532,8 +1628,21 @@
       group: 2
       description: >
         A Server is defined as the responder in a network connection for events regarding sessions, connections, or bidirectional flow records. For TCP events, the server is the receiver of the initial SYN packet(s) of the TCP connection. For other protocols, the server is generally the responder in the network transaction. Some systems actually use the term "responder" to refer the server in TCP connections. The server fields describe details about the system acting as the server in the network event. Server fields are usually populated in conjunction with client fields. Server fields are generally not populated for packet-level events.
+    
+        Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
       type: group
       fields:
+    
+        - name: address
+          level: extended
+          type: keyword
+          description: >
+            Some event server addresses are defined ambiguously. The event will
+            sometimes list an IP, a domain or a unix socket.  You should always
+            store the raw address in the `.address` field.
+    
+            Then it should be duplicated to `.ip` or `.domain`, depending on which
+            one it is.
     
         - name: ip
           level: core
@@ -1730,10 +1839,11 @@
       title: Source
       group: 2
       description: >
-        Source fields describe details about the source of a
-        packet/event. Source fields are usually populated in conjunction with destination fields.
+        Source fields describe details about the source of a packet/event.
+        Source fields are usually populated in conjunction with destination fields.
       type: group
       fields:
+    
         - name: address
           level: extended
           type: keyword
@@ -2024,7 +2134,6 @@
         - name: original
           level: extended
           type: keyword
-          index: false
           description: >
             Unparsed version of the user_agent.
           example: "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1"
@@ -2075,7 +2184,14 @@
             type: keyword
             example: "Mac OS X"
             description: >
-              Operating system name.
+              Operating system name, without the version.
+          
+          - name: full
+            level: extended
+            type: keyword
+            example: "Mac OS Mojave"
+            description: >
+              Operating system name, including the version or code name.
 
           - name: family
             level: extended
@@ -2087,7 +2203,7 @@
           - name: version
             level: extended
             type: keyword
-            example: "10.12.6-rc2"
+            example: "10.14.1"
             description: >
               Operating system version as a raw string.
 
@@ -2097,16 +2213,6 @@
             example: "4.4.0-112-generic"
             description: >
               Operating system kernel version as a raw string.
-
-    # Temporary fix to get 7.0 dashboards working.
-    # This must go in the ecs.yml as otherwise tests don't work.
-    - name: beat.name
-      type: alias
-      path: agent.type
-
-    - name: beat.hostname
-      type: alias
-      path: agent.hostname
 
     # This is not in ECS.
     # TODO: https://github.com/elastic/ecs/issues/178

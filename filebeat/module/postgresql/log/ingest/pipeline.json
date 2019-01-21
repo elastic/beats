@@ -20,7 +20,7 @@
         "field": "postgresql.log.timestamp",
         "target_field": "@timestamp",
         "formats": [
-          "yyyy-MM-dd HH:mm:ss.SSS"
+          "yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd HH:mm:ss"
         ],
         "ignore_failure": true
       }

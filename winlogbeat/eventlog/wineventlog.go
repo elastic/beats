@@ -126,6 +126,7 @@ func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 	if err != nil {
 		return nil
 	}
+	defer windows.CloseHandle(signalEvent)
 
 	debugf("%s using subscription query=%s", l.logPrefix, l.query)
 	subscriptionHandle, err := win.Subscribe(

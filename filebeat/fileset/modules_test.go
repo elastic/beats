@@ -126,6 +126,24 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 	assert.NotContains(t, reg.registry["nginx"], "error")
 }
 
+func TestMovedModule(t *testing.T) {
+	modulesPath, err := filepath.Abs("./test/moved_module")
+	assert.NoError(t, err)
+
+	configs := []*ModuleConfig{
+		&ModuleConfig{
+			Module: "old",
+			Filesets: map[string]*FilesetConfig{
+				"test": {},
+			},
+		},
+	}
+
+	reg, err := newModuleRegistry(modulesPath, configs, nil, "5.2.0")
+	assert.NoError(t, err)
+	assert.NotNil(t, reg)
+}
+
 func TestApplyOverrides(t *testing.T) {
 	falseVar := false
 	trueVar := true

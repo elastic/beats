@@ -1,0 +1,45 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "mssql.performance",
+        "duration": 115000,
+        "module": "mssql"
+    },
+    "metricset": {
+        "name": "performance"
+    },
+    "mssql": {
+        "performance": {
+            "active_temp_tables": 0,
+            "batch_requests_per_sec": 24249,
+            "buffer": {
+                "cache_hit": {
+                    "pct": 0.14
+                },
+                "checkpoint_pages_per_sec": 182,
+                "database_pages": 1892,
+                "page_life_expectancy": {
+                    "sec": 8201
+                },
+                "target_pages": 3194880
+            },
+            "compilations_per_sec": 7379,
+            "connections_reset_per_sec": 2179,
+            "lock_waits_per_sec": 3,
+            "logins_per_sec": 7346,
+            "logouts_per_sec": 7339,
+            "page_splits_per_sec": 45,
+            "recompilations_per_sec": 0,
+            "transactions": 0,
+            "user_connections": 7
+        }
+    },
+    "service": {
+        "address": "172.26.0.2",
+        "type": "mssql"
+    }
+}

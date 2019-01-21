@@ -6,8 +6,8 @@
   fields:
     - name: beat.timezone
       type: alias
-      migration: true
       path: event.timezone
+      migration: true
 
     - name: fields
       type: object
@@ -24,3 +24,13 @@
           type: keyword
           description: >
             Error type.
+
+    - name: beat.name
+      type: alias
+      path: host.name
+      migration: true
+
+    - name: beat.hostname
+      type: alias
+      path: agent.hostname
+      migration: true

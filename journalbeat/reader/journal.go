@@ -243,7 +243,7 @@ func (r *Reader) toEvent(entry *sdjournal.JournalEntry) *beat.Event {
 		MonotonicTimestamp: entry.MonotonicTimestamp,
 	}
 
-	fields["read_timestamp"] = time.Now()
+	fields.Put("event.created", time.Now())
 	receivedByJournal := time.Unix(0, int64(entry.RealtimeTimestamp)*1000)
 
 	event := beat.Event{

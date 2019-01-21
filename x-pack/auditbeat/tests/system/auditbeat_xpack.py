@@ -1,10 +1,13 @@
 import jinja2
 import os
+import sys
 
-from auditbeat import BaseTest as AuditbeatTest
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../metricbeat/tests/system')))
+
+from metricbeat import BaseTest as MetricbeatTest
 
 
-class AuditbeatXPackTest(AuditbeatTest):
+class AuditbeatXPackTest(MetricbeatTest):
 
     @classmethod
     def setUpClass(self):
@@ -12,10 +15,10 @@ class AuditbeatXPackTest(AuditbeatTest):
         self.beat_path = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "../../"))
 
-        super(AuditbeatTest, self).setUpClass()
+        super(MetricbeatTest, self).setUpClass()
 
     def setUp(self):
-        super(AuditbeatTest, self).setUp()
+        super(MetricbeatTest, self).setUp()
 
         # Hack to make jinja2 have the right paths
         self.template_env = jinja2.Environment(
@@ -32,7 +35,7 @@ class AuditbeatXPackTest(AuditbeatTest):
         """
         self.render_config_template(modules=[{
             "name": module,
-            "metricsets": [metricset],
+            "datasets": [metricset],
             "period": "10s",
         }])
         proc = self.start_beat()

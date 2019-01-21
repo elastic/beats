@@ -9,6 +9,7 @@
         The name of the module that generated the event.
       type: alias
       path: event.module
+      migration: true
 
     - name: metricset.name
       description: >
