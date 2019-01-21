@@ -175,6 +175,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release etcd module as GA. {pull}10200[10200]
 - Release Ceph module as GA. {pull}10202[10202]
 - Release aerospike module as GA. {pull}10203[10203]
+- Release Couchbase module as GA. {pull}10201[10201]
 
 *Packetbeat*
 
