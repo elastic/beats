@@ -222,7 +222,7 @@ func assertHasBinCatExecve(t *testing.T, events []mb.Event) {
 	t.Helper()
 
 	for _, e := range events {
-		v, err := e.RootFields.GetValue("process.exe")
+		v, err := e.RootFields.GetValue("process.executable")
 		if err == nil {
 			if exe, ok := v.(string); ok && exe == "/bin/cat" {
 				return
