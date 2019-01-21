@@ -1,0 +1,16 @@
+[
+    {
+        "@timestamp": "2018-12-30T14:22:07.000Z", 
+        "fileset.module": "iis", 
+        "fileset.name": "error", 
+        "iis.error.queue_name": "-", 
+        "iis.error.reason_phrase": "Timer_ConnectionIdle", 
+        "iis.error.remote_ip": "::1%0", 
+        "iis.error.remote_port": "49958", 
+        "iis.error.server_ip": "::1%0", 
+        "iis.error.server_port": "80", 
+        "input.type": "log", 
+        "offset": 195, 
+        "prospector.type": "log"
+    }
+]

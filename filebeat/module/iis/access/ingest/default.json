@@ -40,9 +40,23 @@
       "target_field": "iis.access.user_agent.original"
     }
   }, {
-    "geoip": {
+   "grok": {
       "field": "iis.access.remote_ip",
+      "patterns": [
+        "%{NOZONEIP:iis.access.remote_ip_geoip}"
+      ],
+      "pattern_definitions": {
+         "NOZONEIP": "[^%]*"
+      }
+    }
+  }, {
+    "geoip": {
+      "field": "iis.access.remote_ip_geoip",
       "target_field": "iis.access.geoip"
+    }
+  }, {
+    "remove": {
+      "field": "iis.access.remote_ip_geoip"
     }
   }],
   "on_failure" : [{
