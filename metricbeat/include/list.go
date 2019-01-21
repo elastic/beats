@@ -127,6 +127,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/nats/connections"
 	_ "github.com/elastic/beats/metricbeat/module/nats/routes"
 	_ "github.com/elastic/beats/metricbeat/module/nats/stats"
+	_ "github.com/elastic/beats/metricbeat/module/nats/subscriptions"
 	_ "github.com/elastic/beats/metricbeat/module/nginx"
 	_ "github.com/elastic/beats/metricbeat/module/nginx/stubstatus"
 	_ "github.com/elastic/beats/metricbeat/module/php_fpm"

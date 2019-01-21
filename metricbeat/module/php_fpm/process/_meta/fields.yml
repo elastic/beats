@@ -2,7 +2,7 @@
   type: group
   description: >
     process contains the metrics that were obtained from the PHP-FPM process.
-  release: beta
+  release: ga
   fields:
   - name: pid
     type: integer
