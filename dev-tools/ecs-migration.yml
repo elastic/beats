@@ -405,7 +405,7 @@
 - from: iis.access.request_time_ms
   to: event.duration
   alias: false
-  comment: scale is different
+  scale: 1000000
 
 - from: iis.error.method
   to: http.request.method
@@ -521,6 +521,7 @@
   to: event.duration
   alias: false
   alias6: false
+  scale: 1000000
   beat: filebeat
   comment: >
     Very general name that was only used by the Kibana module.
@@ -825,7 +826,7 @@
 - from: traefik.access.duration
   to: event.duration
   alias: false
-  comment: scale is different
+  scale: 1000000
 
 # Filebeat Redis Input
 
