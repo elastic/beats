@@ -78,41 +78,29 @@ func TestProcessEvent(t *testing.T) {
 	}
 
 	expectedRootFields := map[string]interface{}{
-		"event.kind":         "event",
-		"event.action":       "process_started",
-		"message":            "Process zsh (PID: 9086) by user elastic STARTED",
-		"user.id":            "1002",
-		"user.name":          "elastic",
-		"group.id":           "1002",
-		"group.name":         "elastic",
+		"event.kind":   "event",
+		"event.action": "process_started",
+		"message":      "Process zsh (PID: 9086) by user elastic STARTED",
+
 		"process.pid":        9086,
 		"process.ppid":       9085,
 		"process.name":       "zsh",
 		"process.executable": "/bin/zsh",
 		"process.args":       []string{"zsh"},
 		"process.start":      "2019-01-01 00:00:01 +0000 UTC",
+
+		"user.id":                 "1002",
+		"user.name":               "elastic",
+		"user.group.id":           "1002",
+		"user.group.name":         "elastic",
+		"user.effective.id":       "1002",
+		"user.effective.group.id": "1002",
+		"user.saved.id":           "1002",
+		"user.saved.group.id":     "1002",
 	}
 	for expFieldName, expFieldValue := range expectedRootFields {
 		value, err := event.RootFields.GetValue(expFieldName)
 		if assert.NoErrorf(t, err, "error for field %v (value: %v)", expFieldName, expFieldValue) {
-			switch v := value.(type) {
-			case time.Time:
-				assert.Equalf(t, expFieldValue, v.String(), "Unexpected value for field %v.", expFieldName)
-			default:
-				assert.Equalf(t, expFieldValue, value, "Unexpected value for field %v.", expFieldName)
-			}
-		}
-	}
-
-	expectedMetricSetFields := map[string]interface{}{
-		"euid": "1002",
-		"suid": "1002",
-		"egid": "1002",
-		"sgid": "1002",
-	}
-	for expFieldName, expFieldValue := range expectedMetricSetFields {
-		value, err := event.MetricSetFields.GetValue(expFieldName)
-		if assert.NoErrorf(t, err, "Error retrieving field %v.", expFieldName) {
 			switch v := value.(type) {
 			case time.Time:
 				assert.Equalf(t, expFieldValue, v.String(), "Unexpected value for field %v.", expFieldName)

@@ -277,13 +277,13 @@ func processEvent(process *Process, eventType string, action eventAction) mb.Eve
 
 	if process.UserInfo != nil {
 		putIfNotEmpty(&event.RootFields, "user.id", process.UserInfo.UID)
-		putIfNotEmpty(&event.RootFields, "group.id", process.UserInfo.GID)
+		putIfNotEmpty(&event.RootFields, "user.group.id", process.UserInfo.GID)
 
-		event.MetricSetFields = common.MapStr{}
-		putIfNotEmpty(&event.MetricSetFields, "euid", process.UserInfo.EUID)
-		putIfNotEmpty(&event.MetricSetFields, "suid", process.UserInfo.SUID)
-		putIfNotEmpty(&event.MetricSetFields, "egid", process.UserInfo.EGID)
-		putIfNotEmpty(&event.MetricSetFields, "sgid", process.UserInfo.SGID)
+		putIfNotEmpty(&event.RootFields, "user.effective.id", process.UserInfo.EUID)
+		putIfNotEmpty(&event.RootFields, "user.effective.group.id", process.UserInfo.EGID)
+
+		putIfNotEmpty(&event.RootFields, "user.saved.id", process.UserInfo.SUID)
+		putIfNotEmpty(&event.RootFields, "user.saved.group.id", process.UserInfo.SGID)
 	}
 
 	if process.User != nil {
@@ -291,7 +291,7 @@ func processEvent(process *Process, eventType string, action eventAction) mb.Eve
 	}
 
 	if process.Group != nil {
-		event.RootFields.Put("group.name", process.Group.Name)
+		event.RootFields.Put("user.group.name", process.Group.Name)
 	}
 
 	if process.Error != nil {

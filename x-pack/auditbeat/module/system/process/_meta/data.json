@@ -5,43 +5,44 @@
         "name": "host.example.com"
     },
     "event": {
-        "action": "existing_process",
+        "action": "process_started",
         "dataset": "process",
-        "id": "b48db7f4-83ca-4b50-8d3a-294979141952",
-        "kind": "state",
+        "kind": "event",
         "module": "system"
     },
-    "group": {
-        "id": "1000",
-        "name": "vagrant"
-    },
-    "message": "Process zsh (PID: 2530) by user vagrant is RUNNING",
+    "message": "Process zsh (PID: 12936) by user elastic STARTED",
     "process": {
         "args": [
-            "-zsh"
+            "zsh"
         ],
         "executable": "/bin/zsh",
         "name": "zsh",
-        "pid": 2530,
-        "ppid": 2529,
-        "start": "2019-01-10T13:43:54.53Z",
-        "working_directory": "/home/vagrant"
+        "pid": 12936,
+        "ppid": 3858,
+        "start": "2019-01-21T15:01:54.782288Z",
+        "working_directory": "/Users/elastic"
     },
     "service": {
         "type": "system"
     },
-    "system": {
-        "audit": {
-            "process": {
-                "egid": "1000",
-                "euid": "1000",
-                "sgid": "1000",
-                "suid": "1000"
-            }
-        }
-    },
     "user": {
+        "effective": {
+            "group": {
+                "id": "1000"
+            },
+            "id": "1000"
+        },
+        "group": {
+            "id": "1000",
+            "name": "elastic"
+        },
         "id": "1000",
-        "name": "vagrant"
+        "name": "elastic",
+        "saved": {
+            "group": {
+                "id": "1000"
+            },
+            "id": "1000"
+        }
     }
 }
