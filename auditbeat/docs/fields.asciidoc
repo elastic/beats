@@ -2671,6 +2671,96 @@ The object's SELinux level.
 
 --
 
+[float]
+== user fields
+
+User information.
+
+
+[float]
+== group fields
+
+Group information.
+
+
+*`user.group.id`*::
++
+--
+type: keyword
+
+Group ID.
+
+--
+
+*`user.group.name`*::
++
+--
+type: keyword
+
+Group name.
+
+--
+
+[float]
+== effective fields
+
+Effective user information.
+
+
+*`user.effective.id`*::
++
+--
+type: keyword
+
+Effective user ID.
+
+--
+
+[float]
+== group fields
+
+Effective group information.
+
+
+*`user.effective.group.id`*::
++
+--
+type: keyword
+
+Effective group ID.
+
+--
+
+[float]
+== saved fields
+
+Saved user information.
+
+
+*`user.saved.id`*::
++
+--
+type: keyword
+
+Saved user ID.
+
+--
+
+[float]
+== group fields
+
+Saved group information.
+
+
+*`user.saved.group.id`*::
++
+--
+type: keyword
+
+Saved group ID.
+
+--
+
 [[exported-fields-docker-processor]]
 == Docker fields
 
@@ -6275,53 +6365,6 @@ OS version.
 type: keyword
 
 The operating system's kernel version.
-
-
---
-
-[float]
-== process fields
-
-`process` contains additional process information.
-
-
-
-*`system.audit.process.euid`*::
-+
---
-type: keyword
-
-On Linux and macOS (Darwin), the effective user ID.
-
-
---
-
-*`system.audit.process.suid`*::
-+
---
-type: keyword
-
-On Linux and macOS (Darwin), the saved user ID.
-
-
---
-
-*`system.audit.process.egid`*::
-+
---
-type: keyword
-
-On Linux and macOS (Darwin), the effective group ID.
-
-
---
-
-*`system.audit.process.sgid`*::
-+
---
-type: keyword
-
-On Linux and macOS (Darwin), the saved group ID.
 
 
 --

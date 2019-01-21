@@ -38,11 +38,10 @@ class Test(AuditbeatXPackTest):
         """
 
         fields = ["process.pid", "process.ppid", "process.name", "process.executable", "process.args",
-                  "process.start", "process.working_directory", "user.id", "user.name", "group.id", "group.name"]
+                  "process.start", "process.working_directory", "user.id", "user.name", "user.group.id", "user.group.name"]
 
         if sys.platform != "win32":
-            fields.extend(["system.audit.process.euid", "system.audit.process.suid",
-                           "system.audit.process.egid", "system.audit.process.sgid"])
+            fields.extend(["user.effective.id", "user.saved.id", "user.effective.group.id", "user.saved.group.id"])
 
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "process", COMMON_FIELDS + fields, warnings_allowed=True)
