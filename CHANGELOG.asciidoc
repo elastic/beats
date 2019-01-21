@@ -106,6 +106,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `nats` module with `stats` metricset. {pull}9825[9825]
 - Add `connections` metricset to the `nats` module. {pull}10095[10095]
 - Add `routes` metricset to the `nats` module. {pull}10095[10095]
+- Add remaining memory metrics of pods in Kubernetes metricbeat module {pull}10157[10157]
 
 *Packetbeat*
 
