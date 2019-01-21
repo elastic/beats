@@ -216,7 +216,7 @@
                 "meta": {
                   "alias": null,
                   "disabled": false,
-                  "index": "dfce2b60-18c7-11e9-9094-c50574723088",
+                  "index": "auditbeat-*",
                   "key": "event.dataset",
                   "negate": false,
                   "params": {
@@ -293,8 +293,8 @@
       },
       "id": "4d0485f0-18da-11e9-9094-c50574723088",
       "type": "visualization",
-      "updated_at": "2019-01-21T11:37:35.796Z",
-      "version": 21
+      "updated_at": "2019-01-21T11:57:55.023Z",
+      "version": 23
     },
     {
       "attributes": {
@@ -457,7 +457,7 @@
                 "meta": {
                   "alias": null,
                   "disabled": false,
-                  "index": "dfce2b60-18c7-11e9-9094-c50574723088",
+                  "index": "auditbeat-*",
                   "key": "event.dataset",
                   "negate": false,
                   "params": {
@@ -603,8 +603,8 @@
       },
       "id": "91962a30-1901-11e9-9094-c50574723088",
       "type": "visualization",
-      "updated_at": "2019-01-21T11:37:35.796Z",
-      "version": 24
+      "updated_at": "2019-01-21T11:58:22.519Z",
+      "version": 25
     },
     {
       "attributes": {
