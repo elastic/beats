@@ -124,6 +124,9 @@ type Config struct {
 		// (defaults to hashing the message key). Similar to the `partitioner.class`
 		// setting for the JVM producer.
 		Partitioner PartitionerConstructor
+		// If enabled, the producer will ensure that exactly one copy of each message is
+		// written.
+		Idempotent bool
 
 		// Return specifies what channels will be populated. If they are set to true,
 		// you must read from the respective channels to prevent deadlock. If,
@@ -173,14 +176,55 @@ type Config struct {
 
 	// Consumer is the namespace for configuration related to consuming messages,
 	// used by the Consumer.
-	//
-	// Note that Sarama's Consumer type does not currently support automatic
-	// consumer-group rebalancing and offset tracking.  For Zookeeper-based
-	// tracking (Kafka 0.8.2 and earlier), the https://github.com/wvanbergen/kafka
-	// library builds on Sarama to add this support. For Kafka-based tracking
-	// (Kafka 0.9 and later), the https://github.com/bsm/sarama-cluster library
-	// builds on Sarama to add this support.
 	Consumer struct {
+
+		// Group is the namespace for configuring consumer group.
+		Group struct {
+			Session struct {
+				// The timeout used to detect consumer failures when using Kafka's group management facility.
+				// The consumer sends periodic heartbeats to indicate its liveness to the broker.
+				// If no heartbeats are received by the broker before the expiration of this session timeout,
+				// then the broker will remove this consumer from the group and initiate a rebalance.
+				// Note that the value must be in the allowable range as configured in the broker configuration
+				// by `group.min.session.timeout.ms` and `group.max.session.timeout.ms` (default 10s)
+				Timeout time.Duration
+			}
+			Heartbeat struct {
+				// The expected time between heartbeats to the consumer coordinator when using Kafka's group
+				// management facilities. Heartbeats are used to ensure that the consumer's session stays active and
+				// to facilitate rebalancing when new consumers join or leave the group.
+				// The value must be set lower than Consumer.Group.Session.Timeout, but typically should be set no
+				// higher than 1/3 of that value.
+				// It can be adjusted even lower to control the expected time for normal rebalances (default 3s)
+				Interval time.Duration
+			}
+			Rebalance struct {
+				// Strategy for allocating topic partitions to members (default BalanceStrategyRange)
+				Strategy BalanceStrategy
+				// The maximum allowed time for each worker to join the group once a rebalance has begun.
+				// This is basically a limit on the amount of time needed for all tasks to flush any pending
+				// data and commit offsets. If the timeout is exceeded, then the worker will be removed from
+				// the group, which will cause offset commit failures (default 60s).
+				Timeout time.Duration
+
+				Retry struct {
+					// When a new consumer joins a consumer group the set of consumers attempt to "rebalance"
+					// the load to assign partitions to each consumer. If the set of consumers changes while
+					// this assignment is taking place the rebalance will fail and retry. This setting controls
+					// the maximum number of attempts before giving up (default 4).
+					Max int
+					// Backoff time between retries during rebalance (default 2s)
+					Backoff time.Duration
+				}
+			}
+			Member struct {
+				// Custom metadata to include when joining the group. The user data for all joined members
+				// can be retrieved by sending a DescribeGroupRequest to the broker that is the
+				// coordinator for the group.
+				UserData []byte
+			}
+		}
+
 		Retry struct {
 			// How long to wait after a failing to read from a partition before
 			// trying again (default 2s).
@@ -331,6 +375,13 @@ func NewConfig() *Config {
 	c.Consumer.Offsets.Initial = OffsetNewest
 	c.Consumer.Offsets.Retry.Max = 3
 
+	c.Consumer.Group.Session.Timeout = 10 * time.Second
+	c.Consumer.Group.Heartbeat.Interval = 3 * time.Second
+	c.Consumer.Group.Rebalance.Strategy = BalanceStrategyRange
+	c.Consumer.Group.Rebalance.Timeout = 60 * time.Second
+	c.Consumer.Group.Rebalance.Retry.Max = 4
+	c.Consumer.Group.Rebalance.Retry.Backoff = 2 * time.Second
+
 	c.ClientID = defaultClientID
 	c.ChannelBufferSize = 256
 	c.Version = MinVersion
@@ -377,6 +428,15 @@ func (c *Config) Validate() error {
 	}
 	if c.Consumer.Offsets.Retention%time.Millisecond != 0 {
 		Logger.Println("Consumer.Offsets.Retention only supports millisecond precision; nanoseconds will be truncated.")
+	}
+	if c.Consumer.Group.Session.Timeout%time.Millisecond != 0 {
+		Logger.Println("Consumer.Group.Session.Timeout only supports millisecond precision; nanoseconds will be truncated.")
+	}
+	if c.Consumer.Group.Heartbeat.Interval%time.Millisecond != 0 {
+		Logger.Println("Consumer.Group.Heartbeat.Interval only supports millisecond precision; nanoseconds will be truncated.")
+	}
+	if c.Consumer.Group.Rebalance.Timeout%time.Millisecond != 0 {
+		Logger.Println("Consumer.Group.Rebalance.Timeout only supports millisecond precision; nanoseconds will be truncated.")
 	}
 	if c.ClientID == defaultClientID {
 		Logger.Println("ClientID is the default of 'sarama', you should consider setting it to something application-specific.")
@@ -454,6 +514,21 @@ func (c *Config) Validate() error {
 		}
 	}
 
+	if c.Producer.Idempotent {
+		if !c.Version.IsAtLeast(V0_11_0_0) {
+			return ConfigurationError("Idempotent producer requires Version >= V0_11_0_0")
+		}
+		if c.Producer.Retry.Max == 0 {
+			return ConfigurationError("Idempotent producer requires Producer.Retry.Max >= 1")
+		}
+		if c.Producer.RequiredAcks != WaitForAll {
+			return ConfigurationError("Idempotent producer requires Producer.RequiredAcks to be WaitForAll")
+		}
+		if c.Net.MaxOpenRequests > 1 {
+			return ConfigurationError("Idempotent producer requires Net.MaxOpenRequests to be 1")
+		}
+	}
+
 	// validate the Consumer values
 	switch {
 	case c.Consumer.Fetch.Min <= 0:
@@ -474,6 +549,24 @@ func (c *Config) Validate() error {
 		return ConfigurationError("Consumer.Offsets.Initial must be OffsetOldest or OffsetNewest")
 	case c.Consumer.Offsets.Retry.Max < 0:
 		return ConfigurationError("Consumer.Offsets.Retry.Max must be >= 0")
+	}
+
+	// validate the Consumer Group values
+	switch {
+	case c.Consumer.Group.Session.Timeout <= 2*time.Millisecond:
+		return ConfigurationError("Consumer.Group.Session.Timeout must be >= 2ms")
+	case c.Consumer.Group.Heartbeat.Interval < 1*time.Millisecond:
+		return ConfigurationError("Consumer.Group.Heartbeat.Interval must be >= 1ms")
+	case c.Consumer.Group.Heartbeat.Interval >= c.Consumer.Group.Session.Timeout:
+		return ConfigurationError("Consumer.Group.Heartbeat.Interval must be < Consumer.Group.Session.Timeout")
+	case c.Consumer.Group.Rebalance.Strategy == nil:
+		return ConfigurationError("Consumer.Group.Rebalance.Strategy must not be empty")
+	case c.Consumer.Group.Rebalance.Timeout <= time.Millisecond:
+		return ConfigurationError("Consumer.Group.Rebalance.Timeout must be >= 1ms")
+	case c.Consumer.Group.Rebalance.Retry.Max < 0:
+		return ConfigurationError("Consumer.Group.Rebalance.Retry.Max must be >= 0")
+	case c.Consumer.Group.Rebalance.Retry.Backoff < 0:
+		return ConfigurationError("Consumer.Group.Rebalance.Retry.Backoff must be >= 0")
 	}
 
 	// validate misc shared values
