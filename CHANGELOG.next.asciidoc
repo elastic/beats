@@ -169,6 +169,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add AWS EC2 module. {pull}9257[9257] {issue}9300[9300]
 - Release traefik Metricbeat module as GA. {pull}10166[10166]
 - Release Elastic stack modules (Elasticsearch, Logstash, and Kibana) as GA. {pull}10094[10094]
+- Release Memcached module as GA. {pull}10199[10199]
 - Release etcd module as GA. {pull}10200[10200]
 - Release Ceph module as GA. {pull}10202[10202]
 - Release aerospike module as GA. {pull}10203[10203]
