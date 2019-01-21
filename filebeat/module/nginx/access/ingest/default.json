@@ -66,7 +66,9 @@
                 "target_field": "@timestamp",
                 "formats": [
                     "dd/MMM/YYYY:H:m:s Z"
-                ]
+                ],
+                {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
+                "ignore_failure": true
             }
         },
         {

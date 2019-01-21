@@ -150,6 +150,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Elasticsearch module's slowlog now populates `event.duration` (ECS). {pull}9293[9293]
 - HAProxy module now populates `event.duration` and `http.response.bytes` (ECS). {pull}10143[10143]
 - Teach elasticsearch/audit fileset to parse out some more fields. {issue}10134[10134] {pull}10137[10137]
+- Add convert_timezone to nginx module. {issue}9839[9839] {pull}10148[10148]
 
 *Heartbeat*
 
@@ -169,6 +170,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add AWS EC2 module. {pull}9257[9257] {issue}9300[9300]
 - Release traefik Metricbeat module as GA. {pull}10166[10166]
 - Release Elastic stack modules (Elasticsearch, Logstash, and Kibana) as GA. {pull}10094[10094]
+- Add `nats` module. {issue}10071[10071]
 - Release uswgi Metricbeat module GA. {pull}10164[10164]
 - Release php_fpm module as GA. {pull}10198[10198]
 - Release Memcached module as GA. {pull}10199[10199]
@@ -176,6 +178,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release Ceph module as GA. {pull}10202[10202]
 - Release aerospike module as GA. {pull}10203[10203]
 - Release kubernetes apiserver and event metricsets as GA {pull}10212[10212]
+- Release Couchbase module as GA. {pull}10201[10201]
 
 *Packetbeat*
 

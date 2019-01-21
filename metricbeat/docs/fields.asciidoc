@@ -17273,7 +17273,7 @@ nats Module
 
 
 
-*`nats.server_id`*::
+*`nats.server.id`*::
 +
 --
 type: string
@@ -17283,7 +17283,7 @@ The server ID
 
 --
 
-*`nats.now`*::
+*`nats.server.time`*::
 +
 --
 type: date
@@ -17575,6 +17575,93 @@ The number of hits on subsz monitoring uri
 type: integer
 
 The number of hits on root monitoring uri
+
+
+--
+
+[float]
+== subscriptions fields
+
+Contains nats subscriptions related metrics
+
+
+
+*`nats.subscriptions.total`*::
++
+--
+type: integer
+
+The number of active subscriptions
+
+
+--
+
+*`nats.subscriptions.inserts`*::
++
+--
+type: integer
+
+The number of insert operations in subscriptions list
+
+
+--
+
+*`nats.subscriptions.removes`*::
++
+--
+type: integer
+
+The number of remove operations in subscriptions list
+
+
+--
+
+*`nats.subscriptions.matches`*::
++
+--
+type: integer
+
+The number of times a match is found for a subscription
+
+
+--
+
+*`nats.subscriptions.cache.size`*::
++
+--
+type: integer
+
+The number of result sets in the cache
+
+
+--
+
+*`nats.subscriptions.cache.hit_rate`*::
++
+--
+type: integer
+
+The rate matches are being retrieved from cache
+
+
+--
+
+*`nats.subscriptions.cache.fanout.max`*::
++
+--
+type: integer
+
+The maximum fanout served by cache
+
+
+--
+
+*`nats.subscriptions.cache.fanout.avg`*::
++
+--
+type: integer
+
+The average fanout served by cache
 
 
 --
