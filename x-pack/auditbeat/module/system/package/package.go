@@ -40,6 +40,9 @@ const (
 	debian = "debian"
 	darwin = "darwin"
 
+	dpkgStatusFile     = "/var/lib/dpkg/status"
+	homebrewCellarPath = "/usr/local/Cellar"
+
 	bucketName              = "package.v1"
 	bucketKeyPackages       = "packages"
 	bucketKeyStateTimestamp = "state_timestamp"
@@ -178,15 +181,25 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		bucket:        bucket,
 	}
 
-	if os, err := getOS(); err == nil {
-		switch os.Family {
-		case redhat, debian, darwin:
-			ms.osFamily = os.Family
+	osInfo, err := getOS()
+	if err != nil {
+		return nil, errors.Wrap(err, "error determining operating system")
+	} else {
+		ms.osFamily = osInfo.Family
+		switch osInfo.Family {
+		case redhat:
+			return nil, fmt.Errorf("RPM support is not yet implemented")
+		case debian:
+			if _, err := os.Stat(dpkgStatusFile); err != nil {
+				return nil, errors.Wrapf(err, "error looking up %s", dpkgStatusFile)
+			}
+		case darwin:
+			if _, err := os.Stat(homebrewCellarPath); err != nil {
+				return nil, errors.Wrapf(err, "error looking up %s - is Homebrew installed?", homebrewCellarPath)
+			}
 		default:
-			return nil, fmt.Errorf("this metricset does not support OS family %v", os.Family)
+			return nil, fmt.Errorf("this metricset does not support OS family %v", osInfo.Family)
 		}
-	} else if err != nil {
-		return nil, err
 	}
 
 	// Load from disk: Time when state was last sent
@@ -418,10 +431,9 @@ func getPackages(osFamily string) (packages []*Package, err error) {
 }
 
 func listDebPackages() ([]*Package, error) {
-	const statusFile = "/var/lib/dpkg/status"
-	file, err := os.Open(statusFile)
+	file, err := os.Open(dpkgStatusFile)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error opening '%s'", statusFile)
+		return nil, errors.Wrapf(err, "error opening %s", dpkgStatusFile)
 	}
 	defer file.Close()
 
@@ -470,13 +482,9 @@ func listDebPackages() ([]*Package, error) {
 }
 
 func listBrewPackages() ([]*Package, error) {
-	const cellarPath = "/usr/local/Cellar"
-
-	packageDirs, err := ioutil.ReadDir(cellarPath)
-	if os.IsNotExist(err) {
-		return nil, errors.Wrapf(err, "%s does not exist - is Homebrew installed?", cellarPath)
-	} else if err != nil {
-		return nil, errors.Wrapf(err, "error reading directory %s", cellarPath)
+	packageDirs, err := ioutil.ReadDir(homebrewCellarPath)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error reading directory %s", homebrewCellarPath)
 	}
 
 	var packages []*Package
@@ -484,7 +492,7 @@ func listBrewPackages() ([]*Package, error) {
 		if !packageDir.IsDir() {
 			continue
 		}
-		pkgPath := path.Join(cellarPath, packageDir.Name())
+		pkgPath := path.Join(homebrewCellarPath, packageDir.Name())
 		versions, err := ioutil.ReadDir(pkgPath)
 		if err != nil {
 			return nil, errors.Wrapf(err, "error reading directory: %s", pkgPath)
@@ -501,7 +509,7 @@ func listBrewPackages() ([]*Package, error) {
 			}
 
 			// read formula
-			formulaPath := path.Join(cellarPath, pkg.Name, pkg.Version, ".brew", pkg.Name+".rb")
+			formulaPath := path.Join(homebrewCellarPath, pkg.Name, pkg.Version, ".brew", pkg.Name+".rb")
 			file, err := os.Open(formulaPath)
 			if err != nil {
 				//fmt.Printf("WARNING: Can't get formula for package %s-%s\n", pkg.Name, pkg.Version)
