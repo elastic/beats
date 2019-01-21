@@ -167,6 +167,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add more meaningful metrics to 'performance' Metricset on 'MSSQL' module {pull}10011[10011]
 - Rename some fields in `performance` Metricset on MSSQL module to match the updated documentation from Microsoft {pull}10074[10074]
 - Add AWS EC2 module. {pull}9257[9257] {issue}9300[9300]
+- Release traefik Metricbeat module as GA. {pull}10166[10166]
 - Release Elastic stack modules (Elasticsearch, Logstash, and Kibana) as GA. {pull}10094[10094]
 
 *Packetbeat*
