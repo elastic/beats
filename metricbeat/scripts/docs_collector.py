@@ -238,23 +238,6 @@ For a description of each field in the metricset, see the
     with open(os.path.abspath("docs") + "/modules_list.asciidoc", 'w') as f:
         f.write(module_list_output)
 
-def collect2(beat_name):
-
-    base_dir = "module"
-    oss_path = os.path.abspath("module")
-    xpack_path = os.path.abspath("../x-pack/metricbeat/module")
-
-    generated_note = """////
-This file is generated! See scripts/docs_collector.py
-////
-
-"""
-
-    modules_path = [{'path': xpack_path + "/" + module, 'name': module, 'metricsets': sorted(os.listdir(xpack_path + "/" + module))} for module in filter(lambda module: os.path.isfile(xpack_path + "/" + module + "/_meta/docs.asciidoc"), os.listdir(xpack_path))]
-
-    # Iterate over all modules
-    for module in sorted(modules_path):
-        print(module)
 
 def get_release(fields):
     # Fetch release flag from fields. Default if not set is experimental
