@@ -9,4 +9,4 @@ RUN \
 
 RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools
-RUN pip install --upgrade docker-compose==1.21.0
+RUN pip install --upgrade docker-compose==1.23.2
