@@ -24,7 +24,7 @@ class Test(AuditbeatXPackTest):
 
     @unittest.skipIf(sys.platform == "win32", "Not implemented for Windows")
     @unittest.skipIf(sys.platform == "linux2" and platform.linux_distribution()[0] != "debian",
-                         "Only implemented for Debian")
+                     "Only implemented for Debian")
     def test_metricset_package(self):
         """
         package metricset collects information about installed packages on a system.
