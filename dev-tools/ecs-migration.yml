@@ -216,6 +216,10 @@
 
 ## Apache module
 
+- from: apache2.access.remote_ip
+  to: source.address
+  alias: true
+
 - from: apache2.access.user_name
   to: user.name
   alias: true
@@ -242,10 +246,6 @@
 
 - from: apache2.access.agent
   to: user_agent.original
-  alias: true
-
-- from: read_timestamp
-  to: event.created
   alias: true
 
 # These expand all fields under geoip and user_agent
@@ -428,6 +428,10 @@
 
 ## HAProxy module
 
+- from: haproxy.client.ip
+  to: source.address
+  alias: true
+
 - from: haproxy.client.port
   to: source.port
   alias: true
@@ -446,6 +450,10 @@
 
 - from: haproxy.destination.port
   to: destination.port
+  alias: true
+
+- from: haproxy.http.response.status_code
+  to: http.response.status_code
   alias: true
 
 - from: haproxy.geoip.continent_name
@@ -470,10 +478,6 @@
 
 - from: haproxy.geoip.region_iso_code
   to: source.geo.region_iso_code
-  alias: true
-
-- from: nginx.access.remote_ip_list
-  to: network.forwarded_ip
   alias: true
 
 ## Kafka module
@@ -555,7 +559,7 @@
   alias: true
 
 - from: mysql.error.thread_id
-  to: process.thread.id
+  to: mysql.thread_id
   alias: true
 
 - from: mysql.slowlog.ip
@@ -568,6 +572,10 @@
 
 - from: mysql.slowlog.user
   to: user.name
+  alias: true
+
+- from: mysql.slowlog.id
+  to: mysql.thread_id
   alias: true
 
 ## NGINX module
@@ -642,6 +650,10 @@
 
 - from: nginx.error.message
   to: message
+  alias: true
+
+- from: nginx.access.remote_ip_list
+  to: network.forwarded_ip
   alias: true
 
 ## PostgreSQL module
@@ -774,6 +786,7 @@
 - from: read_timestamp
   to: event.created
   alias: false
+  beat: filebeat
 
 # Auditbeat
 
@@ -913,6 +926,41 @@
   to: network.forwarded_ip
   alias: false
 
+## MySQL
+- from: mysql.iserror
+  to: status
+  alias: false
+  comment: >
+    Status reflects whether or not an error occured. Its values are either
+    OK or Error.
+
+## NFS
+- from: rpc.time
+  to: event.duration
+  alias: false
+  comment: >
+    Cannot add alias at this time because the field is used by MongoDB which
+    has not been updated yet.
+
+- from: rpc.call_size
+  to: source.bytes
+  alias: false
+  comment: >
+    Cannot add alias at this time because the field is used by MongoDB which
+    has not been updated yet.
+
+- from: rpc.reply_size
+  to: destination.bytes
+  alias: false
+  comment: >
+    Cannot add alias at this time because the field is used by MongoDB which
+    has not been updated yet.
+
+## Cassandra
+- from: no_request
+  to: cassandra.no_request
+  alias: true
+
 
 # Heartbeat
 
@@ -944,3 +992,4 @@
 - from: read_timestamp
   to: event.created
   alias: true
+  beat: journalbeat

@@ -32,7 +32,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/hbtest"
-	"github.com/elastic/beats/heartbeat/monitors"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/file"
@@ -65,7 +65,7 @@ func testTLSRequest(t *testing.T, testURL string, extraConfig map[string]interfa
 	jobs, endpoints, err := create("tls", config)
 	require.NoError(t, err)
 
-	job := jobs[0]
+	job := wrappers.WrapCommon(jobs, "tls", "", "http")[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -89,7 +89,7 @@ func checkServer(t *testing.T, handlerFunc http.HandlerFunc) (*httptest.Server, 
 func httpBaseChecks(urlStr string) mapval.Validator {
 	u, _ := url.Parse(urlStr)
 	return mapval.MustCompile(mapval.Map{
-		"url": monitors.URLFields(u),
+		"url": wrappers.URLFields(u),
 	})
 }
 
@@ -195,7 +195,7 @@ func TestUpStatuses(t *testing.T) {
 			mapvaltest.Test(
 				t,
 				mapval.Strict(mapval.Compose(
-					hbtest.BaseChecks("127.0.0.1", "up"),
+					hbtest.BaseChecks("127.0.0.1", "up", "http"),
 					hbtest.RespondingTCPChecks(),
 					respondingHTTPChecks(server.URL, status),
 				)),
@@ -214,7 +214,7 @@ func TestDownStatuses(t *testing.T) {
 			mapvaltest.Test(
 				t,
 				mapval.Strict(mapval.Compose(
-					hbtest.BaseChecks("127.0.0.1", "down"),
+					hbtest.BaseChecks("127.0.0.1", "down", "http"),
 					hbtest.RespondingTCPChecks(),
 					respondingHTTPChecks(server.URL, status),
 					hbtest.ErrorChecks(fmt.Sprintf("%d", status), "validate"),
@@ -241,7 +241,7 @@ func TestLargeResponse(t *testing.T) {
 	jobs, _, err := create("largeresp", config)
 	require.NoError(t, err)
 
-	job := jobs[0]
+	job := wrappers.WrapCommon(jobs, "test", "", "http")[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
@@ -250,7 +250,7 @@ func TestLargeResponse(t *testing.T) {
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			hbtest.BaseChecks("127.0.0.1", "up"),
+			hbtest.BaseChecks("127.0.0.1", "up", "http"),
 			hbtest.RespondingTCPChecks(),
 			respondingHTTPChecks(server.URL, 200),
 		)),
@@ -282,7 +282,7 @@ func runHTTPSServerCheck(
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			hbtest.BaseChecks("127.0.0.1", "up"),
+			hbtest.BaseChecks("127.0.0.1", "up", "http"),
 			hbtest.RespondingTCPChecks(),
 			hbtest.TLSChecks(0, 0, cert),
 			respondingHTTPChecks(server.URL, http.StatusOK),
@@ -347,7 +347,7 @@ func TestConnRefusedJob(t *testing.T) {
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			hbtest.BaseChecks(ip, "down"),
+			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.ErrorChecks(url, "io"),
 			httpBaseChecks(url),
 		)),
@@ -368,7 +368,7 @@ func TestUnreachableJob(t *testing.T) {
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			hbtest.BaseChecks(ip, "down"),
+			hbtest.BaseChecks(ip, "down", "http"),
 			hbtest.ErrorChecks(url, "io"),
 			httpBaseChecks(url),
 		)),

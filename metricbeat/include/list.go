@@ -125,6 +125,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/mysql/status"
 	_ "github.com/elastic/beats/metricbeat/module/nats"
 	_ "github.com/elastic/beats/metricbeat/module/nats/connections"
+	_ "github.com/elastic/beats/metricbeat/module/nats/routes"
 	_ "github.com/elastic/beats/metricbeat/module/nats/stats"
 	_ "github.com/elastic/beats/metricbeat/module/nginx"
 	_ "github.com/elastic/beats/metricbeat/module/nginx/stubstatus"

@@ -40,6 +40,7 @@ grouped in the following categories:
 * <<exported-fields-suricata>>
 * <<exported-fields-system>>
 * <<exported-fields-traefik>>
+* <<exported-fields-zeek>>
 
 --
 [[exported-fields-apache]]
@@ -62,7 +63,7 @@ Aliases for backward compatibility with old apache2 fields
 --
 type: alias
 
-alias to: apache.access.remote_ip
+alias to: source.address
 
 --
 
@@ -361,16 +362,6 @@ Apache fields.
 Contains fields for the Apache HTTP Server access logs.
 
 
-
-*`apache.access.remote_ip`*::
-+
---
-type: keyword
-
-Client IP address or hostname.
-
-
---
 
 *`apache.access.ssl.protocol`*::
 +
@@ -3965,6 +3956,26 @@ Where the request originated: rest (request originated from a REST API request),
 
 --
 
+*`elasticsearch.audit.realm`*::
++
+--
+type: keyword
+
+The authentication realm
+
+--
+
+*`elasticsearch.audit.roles`*::
++
+--
+type: array
+
+example: ['kibana_user', 'beats_admin']
+
+Roles to which the principal belongs
+
+--
+
 *`elasticsearch.audit.action`*::
 +
 --
@@ -3973,6 +3984,17 @@ type: keyword
 example: cluster:monitor/main
 
 The name of the action that was executed
+
+--
+
+*`elasticsearch.audit.indices`*::
++
+--
+type: array
+
+example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
+
+Indices accessed by action
 
 --
 
@@ -4710,9 +4732,9 @@ Information about the client doing the request
 *`haproxy.client.ip`*::
 +
 --
-IP address of the client which initiated the TCP connection to haproxy.
-If connection is via unix socket, socket path is in this field.
+type: alias
 
+alias to: source.address
 
 --
 
@@ -4840,15 +4862,6 @@ Please add description
 Fields related to the HTTP response
 
 
-*`haproxy.http.response.status_code`*::
-+
---
-type: long
-
-HTTP status code returned to the client.
-
---
-
 *`haproxy.http.response.captured_cookie`*::
 +
 --
@@ -4864,6 +4877,15 @@ type: text
 
 List of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
 
+
+--
+
+*`haproxy.http.response.status_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
 
 --
 
@@ -5937,14 +5959,6 @@ The input type from which the event was generated. This field is set to the valu
 
 --
 
-*`read_timestamp`*::
-+
---
-In case the ingest pipeline parses the timestamp from the log contents, it stores the original `@timestamp` (representing the time when the log line was read) in this field.
-
-
---
-
 *`syslog.facility`*::
 +
 --
@@ -6058,6 +6072,15 @@ The Filebeat fileset that generated this event.
 type: alias
 
 alias to: event.module
+
+--
+
+*`read_timestamp`*::
++
+--
+type: alias
+
+alias to: event.created
 
 --
 
@@ -6321,6 +6344,16 @@ Fields from the MySQL log files.
 
 
 
+*`mysql.thread_id`*::
++
+--
+type: long
+
+The connection or thread ID for the query.
+
+
+--
+
 [float]
 == error fields
 
@@ -6328,20 +6361,12 @@ Contains fields from the MySQL error logs.
 
 
 
-*`mysql.error.timestamp`*::
-+
---
-The timestamp from the log line.
-
-
---
-
 *`mysql.error.thread_id`*::
 +
 --
 type: alias
 
-alias to: process.thread.id
+alias to: mysql.thread_id
 
 --
 
@@ -6410,12 +6435,12 @@ The number of rows scanned by the query.
 
 --
 
-*`mysql.slowlog.timestamp`*::
+*`mysql.slowlog.rows_affected`*::
 +
 --
 type: long
 
-The unix timestamp taken from the `SET timestamp` query.
+The number of rows modified by the query.
 
 
 --
@@ -6431,9 +6456,118 @@ The slow query.
 *`mysql.slowlog.id`*::
 +
 --
+type: alias
+
+alias to: mysql.thread_id
+
+--
+
+*`mysql.slowlog.schema`*::
++
+--
+type: keyword
+
+The schema where the slow query was executed.
+
+
+--
+
+*`mysql.slowlog.current_user`*::
++
+--
+type: keyword
+
+Current authenticated user, used to determine access privileges. Can differ from the value for user.
+
+
+--
+
+*`mysql.slowlog.query_cache_hit`*::
++
+--
+type: boolean
+
+Whether the query cache was hit.
+
+
+--
+
+*`mysql.slowlog.tmp_table`*::
++
+--
+type: boolean
+
+Whether a temporary table was used to resolve the query.
+
+
+--
+
+*`mysql.slowlog.tmp_table_on_disk`*::
++
+--
+type: boolean
+
+Whether the query needed temporary tables on disk.
+
+
+--
+
+*`mysql.slowlog.filesort`*::
++
+--
+type: boolean
+
+Whether filesort optimization was used.
+
+
+--
+
+*`mysql.slowlog.filesort_on_disk`*::
++
+--
+type: boolean
+
+Whether filesort optimization was used and it needed temporary tables on disk.
+
+
+--
+
+*`mysql.slowlog.priority_queue`*::
++
+--
+type: boolean
+
+Whether a priority queue was used for filesort.
+
+
+--
+
+*`mysql.slowlog.full_scan`*::
++
+--
+type: boolean
+
+Whether a full table scan was needed for the slow query.
+
+
+--
+
+*`mysql.slowlog.full_join`*::
++
+--
+type: boolean
+
+Whether a full join was needed for the slow query (no indexes were used for joins).
+
+
+--
+
+*`mysql.slowlog.merge_passes`*::
++
+--
 type: long
 
-The connection ID for the query.
+Number of merge passes executed for the query.
 
 
 --
@@ -12575,6 +12709,657 @@ alias to: source.geo.city_name
 type: alias
 
 alias to: source.geo.region_iso_code
+
+--
+
+[[exported-fields-zeek]]
+== Zeek fields
+
+Module for handling logs produced by Zeek/Bro
+
+
+
+[float]
+== zeek fields
+
+Fields from Zeek/Bro logs after normalization
+
+
+
+*`zeek.session_id`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.connection.local_orig`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.connection.local_resp`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.connection.missed_bytes`*::
++
+--
+type: long
+
+--
+
+*`zeek.connection.state`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.connection.history`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.connection.orig_l2_addr`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.resp_l2_addr`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.vlan`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.inner_vlan`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.trans_id`*::
++
+--
+type: integer
+
+--
+
+*`zeek.dns.rtt`*::
++
+--
+type: double
+
+--
+
+*`zeek.dns.query`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.qclass`*::
++
+--
+type: long
+
+--
+
+*`zeek.dns.qclass_name`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.qtype`*::
++
+--
+type: long
+
+--
+
+*`zeek.dns.qtype_name`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.rcode`*::
++
+--
+type: long
+
+--
+
+*`zeek.dns.rcode_name`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.AA`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.dns.TC`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.dns.RD`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.dns.RA`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.dns.answers`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.TTLs`*::
++
+--
+type: double
+
+--
+
+*`zeek.dns.rejected`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.dns.total_answers`*::
++
+--
+type: integer
+
+--
+
+*`zeek.dns.total_replies`*::
++
+--
+type: integer
+
+--
+
+*`zeek.dns.saw_query`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.dns.saw_reply`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.http.trans_depth`*::
++
+--
+type: integer
+
+--
+
+*`zeek.http.status_msg`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.info_code`*::
++
+--
+type: integer
+
+--
+
+*`zeek.http.info_msg`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.filename`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.tags`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.captured_password`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.http.proxied`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.range_request`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.http.client_header_names`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.server_header_names`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.orig_fuids`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.orig_mime_types`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.orig_filenames`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.resp_fuids`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.resp_mime_types`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.resp_filenames`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.orig_mime_depth`*::
++
+--
+type: integer
+
+--
+
+*`zeek.http.resp_mime_depth`*::
++
+--
+type: integer
+
+--
+
+*`zeek.files.fuid`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.tx_host`*::
++
+--
+type: ip
+
+--
+
+*`zeek.files.rx_host`*::
++
+--
+type: ip
+
+--
+
+*`zeek.files.session_ids`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.source`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.depth`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.analyzers`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.mime_type`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.filename`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.local_orig`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.files.is_orig`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.files.duration`*::
++
+--
+type: double
+
+--
+
+*`zeek.files.seen_bytes`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.total_bytes`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.missing_bytes`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.overflow_bytes`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.timedout`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.files.parent_fuid`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.md5`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.sha1`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.sha256`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.extracted`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.extracted_cutoff`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.files.extracted_size`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.entropy`*::
++
+--
+type: double
+
+--
+
+*`zeek.ssl.version`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.cipher`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.curve`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.server_name`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.resumed`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.ssl.next_protocol`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.established`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.ssl.cert_chain`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.cert_chain_fuids`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.client_cert_chain`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.client_cert_chain_fuids`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.issuer`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.client_issuer`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.validation_status`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.subject`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.client_subject`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.last_alert`*::
++
+--
+type: keyword
 
 --
 
