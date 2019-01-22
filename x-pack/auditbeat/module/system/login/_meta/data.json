@@ -9,11 +9,11 @@
         "dataset": "login",
         "module": "system",
         "origin": "/var/log/wtmp.1",
-        "summary": "Login by user vagrant (UID: 1000) on pts/0 (PID: 9355) from 10.0.2.2 (IP: 10.0.2.2).",
         "type": "event"
     },
+    "message": "Login by user vagrant (UID: 1000) on pts/1 (PID: 17559) from 10.0.2.2 (IP: 10.0.2.2).",
     "process": {
-        "pid": 9355
+        "pid": 17559
     },
     "service": {
         "type": "system"
@@ -22,8 +22,10 @@
         "ip": "10.0.2.2"
     },
     "system": {
-        "login": {
-            "tty": "pts/0"
+        "audit": {
+            "user": {
+                "tty": "pts/1"
+            }
         }
     },
     "user": {

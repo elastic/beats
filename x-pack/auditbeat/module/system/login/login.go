@@ -23,8 +23,9 @@ import (
 const (
 	moduleName    = "system"
 	metricsetName = "login"
+	namespace     = "system.audit.user"
 
-	bucketName = "auditbeat.login.v1"
+	bucketName = "login.v1"
 
 	eventTypeEvent = "event"
 )
@@ -85,6 +86,7 @@ func (login LoginRecord) toMapStr() common.MapStr {
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
+		mb.WithNamespace(namespace),
 	)
 }
 

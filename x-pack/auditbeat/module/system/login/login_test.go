@@ -24,15 +24,14 @@ func TestData(t *testing.T) {
 		t.Fatal("no events were generated")
 	}
 
-	// We use event[1], because the first event is usually a boring system boot.
 	// TODO: Add sample wtmp file for testing.
-	fullEvent := mbtest.StandardizeEvent(f, events[1], core.AddDatasetToEvent)
+	fullEvent := mbtest.StandardizeEvent(f, events[0], core.AddDatasetToEvent)
 	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "system",
-		"metricsets": []string{"login"},
+		"module":   "system",
+		"datasets": []string{"login"},
 	}
 }
