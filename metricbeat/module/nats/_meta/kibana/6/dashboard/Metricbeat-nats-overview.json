@@ -1,1387 +1,1421 @@
 {
-  "objects": [
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "index": "metricbeat-*",
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "title": "Nats Slow Consumers Gauge",
-        "uiStateJSON": {
-          "vis": {
-            "defaultColors": {
-              "0 - 50": "rgb(0,104,55)",
-              "50 - 75": "rgb(255,255,190)",
-              "75 - 100": "rgb(165,0,38)"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Avg Slow_Consumers",
-                "field": "nats.stats.slow_consumers"
-              },
-              "schema": "metric",
-              "type": "avg"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "gauge": {
-              "backStyle": "Full",
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 50
+    "objects": [
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "index": "metricbeat-*",
+                        "query": {
+                            "language": "lucene",
+                            "query": ""
+                        }
+                    }
                 },
-                {
-                  "from": 50,
-                  "to": 75
+                "title": "Nats Subscriptions",
+                "uiStateJSON": {
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
                 },
-                {
-                  "from": 75,
-                  "to": 100
+                "version": 1,
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true,
+                            "id": "1",
+                            "params": {
+                                "customLabel": "Cache Fanout Avg",
+                                "field": "nats.subscriptions.cache.fanout.avg"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "2",
+                            "params": {
+                                "customLabel": "Cache Fanout Max",
+                                "field": "nats.subscriptions.cache.fanout.max"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "3",
+                            "params": {
+                                "customLabel": "Cache Hit Rate",
+                                "field": "nats.subscriptions.cache.hit_rate"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "4",
+                            "params": {
+                                "customLabel": "Cache Size",
+                                "field": "nats.subscriptions.cache.size"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "5",
+                            "params": {
+                                "customLabel": "Inserts",
+                                "field": "nats.subscriptions.inserts"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "6",
+                            "params": {
+                                "customLabel": "Matches",
+                                "field": "nats.subscriptions.matches"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "7",
+                            "params": {
+                                "customLabel": "Removes",
+                                "field": "nats.subscriptions.removes"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "8",
+                            "params": {
+                                "customLabel": "Total",
+                                "field": "nats.subscriptions.total"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        }
+                    ],
+                    "params": {
+                        "perPage": 10,
+                        "showMetricsAtAllLevels": false,
+                        "showPartialRows": false,
+                        "showTotal": false,
+                        "sort": {
+                            "columnIndex": null,
+                            "direction": null
+                        },
+                        "totalFunc": "sum"
+                    },
+                    "title": "Nats Subscriptions",
+                    "type": "table"
                 }
-              ],
-              "extendRange": true,
-              "gaugeColorMode": "Labels",
-              "gaugeStyle": "Full",
-              "gaugeType": "Arc",
-              "invertColors": false,
-              "labels": {
-                "color": "black",
-                "show": true
-              },
-              "orientation": "vertical",
-              "percentageMode": false,
-              "scale": {
-                "color": "#333",
-                "labels": false,
-                "show": true
-              },
-              "style": {
-                "bgColor": false,
-                "bgFill": "#eee",
-                "bgMask": false,
-                "bgWidth": 0.9,
-                "fontSize": 60,
-                "labelColor": true,
-                "mask": false,
-                "maskBars": 50,
-                "subText": "",
-                "width": 0.9
-              },
-              "type": "meter",
-              "verticalSplit": false
-            },
-            "isDisplayWarning": false,
-            "type": "gauge"
-          },
-          "title": "Nats Slow Consumers Gauge",
-          "type": "gauge"
-        }
-      },
-      "id": "85d2af10-1e43-11e9-a1b4-79a7ae42ab61",
-      "type": "visualization",
-      "updated_at": "2019-01-22T12:45:10.698Z",
-      "version": 2
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "index": "metricbeat-*",
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "title": "Nats In Bytes",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Nats In Bytes",
-                "field": "nats.stats.in.bytes"
-              },
-              "schema": "metric",
-              "type": "avg"
-            }
-          ],
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "metric": {
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 10000
-                }
-              ],
-              "invertColors": false,
-              "labels": {
-                "show": true
-              },
-              "metricColorMode": "None",
-              "percentageMode": false,
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": 60,
-                "labelColor": false,
-                "subText": ""
-              },
-              "useRanges": false
-            },
-            "type": "metric"
-          },
-          "title": "Nats In Bytes",
-          "type": "metric"
-        }
-      },
-      "id": "b2ef7370-1e43-11e9-a1b4-79a7ae42ab61",
-      "type": "visualization",
-      "updated_at": "2019-01-22T12:46:12.519Z",
-      "version": 1
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "index": "metricbeat-*",
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "title": "Nats In Messages",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Nats In Messages",
-                "field": "nats.stats.in.messages"
-              },
-              "schema": "metric",
-              "type": "avg"
-            }
-          ],
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "metric": {
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 10000
-                }
-              ],
-              "invertColors": false,
-              "labels": {
-                "show": true
-              },
-              "metricColorMode": "None",
-              "percentageMode": false,
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": 60,
-                "labelColor": false,
-                "subText": ""
-              },
-              "useRanges": false
-            },
-            "type": "metric"
-          },
-          "title": "Nats In Messages",
-          "type": "metric"
-        }
-      },
-      "id": "c39a9240-1e43-11e9-a1b4-79a7ae42ab61",
-      "type": "visualization",
-      "updated_at": "2019-01-22T12:46:40.484Z",
-      "version": 1
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "index": "metricbeat-*",
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "title": "Nats Out Bytes",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Nats Out Bytes",
-                "field": "nats.stats.out.bytes"
-              },
-              "schema": "metric",
-              "type": "avg"
-            }
-          ],
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "metric": {
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 10000
-                }
-              ],
-              "invertColors": false,
-              "labels": {
-                "show": true
-              },
-              "metricColorMode": "None",
-              "percentageMode": false,
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": 60,
-                "labelColor": false,
-                "subText": ""
-              },
-              "useRanges": false
-            },
-            "type": "metric"
-          },
-          "title": "Nats Out Bytes",
-          "type": "metric"
-        }
-      },
-      "id": "d7ed5c50-1e43-11e9-a1b4-79a7ae42ab61",
-      "type": "visualization",
-      "updated_at": "2019-01-22T12:47:14.581Z",
-      "version": 1
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "index": "metricbeat-*",
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "title": "Nats Out Messages",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Nats Out Messages",
-                "field": "nats.stats.out.messages"
-              },
-              "schema": "metric",
-              "type": "avg"
-            }
-          ],
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "metric": {
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 10000
-                }
-              ],
-              "invertColors": false,
-              "labels": {
-                "show": true
-              },
-              "metricColorMode": "None",
-              "percentageMode": false,
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": 60,
-                "labelColor": false,
-                "subText": ""
-              },
-              "useRanges": false
-            },
-            "type": "metric"
-          },
-          "title": "Nats Out Messages",
-          "type": "metric"
-        }
-      },
-      "id": "e276cf30-1e43-11e9-a1b4-79a7ae42ab61",
-      "type": "visualization",
-      "updated_at": "2019-01-22T12:47:32.259Z",
-      "version": 1
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "index": "metricbeat-*",
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "title": "Nats Subscriptions",
-        "uiStateJSON": {
-          "vis": {
-            "params": {
-              "sort": {
-                "columnIndex": null,
-                "direction": null
-              }
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Cache Fanout Avg",
-                "field": "nats.subscriptions.cache.fanout.avg"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Cache Fanout Max",
-                "field": "nats.subscriptions.cache.fanout.max"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "customLabel": "Cache Hit Rate",
-                "field": "nats.subscriptions.cache.hit_rate"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "4",
-              "params": {
-                "customLabel": "Cache Size",
-                "field": "nats.subscriptions.cache.size"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "5",
-              "params": {
-                "customLabel": "Inserts",
-                "field": "nats.subscriptions.inserts"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "6",
-              "params": {
-                "customLabel": "Matches",
-                "field": "nats.subscriptions.matches"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "7",
-              "params": {
-                "customLabel": "Removes",
-                "field": "nats.subscriptions.removes"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "8",
-              "params": {
-                "customLabel": "Total",
-                "field": "nats.subscriptions.total"
-              },
-              "schema": "metric",
-              "type": "avg"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showTotal": false,
-            "sort": {
-              "columnIndex": null,
-              "direction": null
-            },
-            "totalFunc": "sum"
-          },
-          "title": "Nats Subscriptions",
-          "type": "table"
-        }
-      },
-      "id": "b129b220-1e44-11e9-a1b4-79a7ae42ab61",
-      "type": "visualization",
-      "updated_at": "2019-01-22T12:53:19.042Z",
-      "version": 1
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "index": "metricbeat-*",
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "title": "Nats Memory",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Nats Memory",
-                "field": "nats.stats.mem.bytes"
-              },
-              "schema": "metric",
-              "type": "avg"
-            }
-          ],
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "metric": {
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 10000
-                }
-              ],
-              "invertColors": false,
-              "labels": {
-                "show": true
-              },
-              "metricColorMode": "None",
-              "percentageMode": false,
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": 60,
-                "labelColor": false,
-                "subText": ""
-              },
-              "useRanges": false
-            },
-            "type": "metric"
-          },
-          "title": "Nats Memory",
-          "type": "metric"
-        }
-      },
-      "id": "30a61c00-1e45-11e9-a1b4-79a7ae42ab61",
-      "type": "visualization",
-      "updated_at": "2019-01-22T12:56:52.927Z",
-      "version": 1
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "index": "metricbeat-*",
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "title": "Nats Uptime",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Nats Uptime",
-                "field": "nats.stats.uptime"
-              },
-              "schema": "metric",
-              "type": "avg"
-            }
-          ],
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "metric": {
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 10000
-                }
-              ],
-              "invertColors": false,
-              "labels": {
-                "show": true
-              },
-              "metricColorMode": "None",
-              "percentageMode": false,
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": 60,
-                "labelColor": false,
-                "subText": ""
-              },
-              "useRanges": false
-            },
-            "type": "metric"
-          },
-          "title": "Nats Uptime",
-          "type": "metric"
-        }
-      },
-      "id": "206f1bc0-1e45-11e9-a1b4-79a7ae42ab61",
-      "type": "visualization",
-      "updated_at": "2019-01-22T12:56:25.724Z",
-      "version": 1
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "index": "metricbeat-*",
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "title": "Nats Total Connections",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Nats Total Connections",
-                "field": "nats.stats.total_connections"
-              },
-              "schema": "metric",
-              "type": "avg"
-            }
-          ],
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "metric": {
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 10000
-                }
-              ],
-              "invertColors": false,
-              "labels": {
-                "show": true
-              },
-              "metricColorMode": "None",
-              "percentageMode": false,
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": 60,
-                "labelColor": false,
-                "subText": ""
-              },
-              "useRanges": false
-            },
-            "type": "metric"
-          },
-          "title": "Nats Total Connections",
-          "type": "metric"
-        }
-      },
-      "id": "4c380ff0-1e45-11e9-a1b4-79a7ae42ab61",
-      "type": "visualization",
-      "updated_at": "2019-01-22T12:57:39.183Z",
-      "version": 1
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "index": "metricbeat-*",
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "title": "Nats CPU Usage",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Nats CPU Usage",
-                "field": "nats.stats.cpu"
-              },
-              "schema": "metric",
-              "type": "avg"
-            }
-          ],
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "metric": {
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 10000
-                }
-              ],
-              "invertColors": false,
-              "labels": {
-                "show": true
-              },
-              "metricColorMode": "None",
-              "percentageMode": false,
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": 60,
-                "labelColor": false,
-                "subText": ""
-              },
-              "useRanges": false
-            },
-            "type": "metric"
-          },
-          "title": "Nats CPU Usage",
-          "type": "metric"
-        }
-      },
-      "id": "0b89d5b0-1e45-11e9-a1b4-79a7ae42ab61",
-      "type": "visualization",
-      "updated_at": "2019-01-22T13:00:26.726Z",
-      "version": 2
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "index": "metricbeat-*",
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "title": "Remotes-Subsz-Connz-Connz Timeline",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Connections",
-                "field": "nats.connections.total"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customInterval": "2h",
-                "drop_partials": false,
-                "extended_bounds": {},
-                "field": "@timestamp",
-                "interval": "auto",
-                "min_doc_count": 1,
-                "time_zone": "Europe/Helsinki",
-                "useNormalizedEsInterval": true
-              },
-              "schema": "segment",
-              "type": "date_histogram"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "customLabel": "Routes",
-                "field": "nats.routes.total"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "4",
-              "params": {
-                "customLabel": "Remotes",
-                "field": "nats.stats.remotes"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "5",
-              "params": {
-                "customLabel": "Subscriptions",
-                "field": "nats.subscriptions.total"
-              },
-              "schema": "metric",
-              "type": "avg"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
-              {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "show": true,
-                  "truncate": 100
-                },
-                "position": "bottom",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
-              }
-            ],
-            "grid": {
-              "categoryLines": false,
-              "style": {
-                "color": "#eee"
-              }
-            },
-            "legendPosition": "right",
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Connections"
-                },
-                "drawLinesBetweenPoints": true,
-                "interpolate": "linear",
-                "mode": "stacked",
-                "show": "true",
-                "showCircles": true,
-                "type": "area",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "3",
-                  "label": "Routes"
-                },
-                "drawLinesBetweenPoints": true,
-                "interpolate": "linear",
-                "mode": "stacked",
-                "show": true,
-                "showCircles": true,
-                "type": "area",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "4",
-                  "label": "Remotes"
-                },
-                "drawLinesBetweenPoints": true,
-                "interpolate": "linear",
-                "mode": "stacked",
-                "show": true,
-                "showCircles": true,
-                "type": "area",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "5",
-                  "label": "Subscriptions"
-                },
-                "drawLinesBetweenPoints": true,
-                "interpolate": "linear",
-                "mode": "stacked",
-                "show": true,
-                "showCircles": true,
-                "type": "area",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "times": [],
-            "type": "area",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "left",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Connections"
-                },
-                "type": "value"
-              }
-            ]
-          },
-          "title": "Remotes-Subsz-Connz-Connz Timeline",
-          "type": "area"
-        }
-      },
-      "id": "199d3d30-1e46-11e9-a1b4-79a7ae42ab61",
-      "type": "visualization",
-      "updated_at": "2019-01-22T13:03:23.779Z",
-      "version": 1
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "index": "metricbeat-*",
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "title": "Subscription Stats Timeline",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Cache Fanout Avg",
-                "field": "nats.subscriptions.cache.fanout.avg"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customInterval": "2h",
-                "drop_partials": false,
-                "extended_bounds": {},
-                "field": "@timestamp",
-                "interval": "auto",
-                "min_doc_count": 1,
-                "timeRange": {
-                  "from": "now-15m",
-                  "mode": "quick",
-                  "to": "now"
-                },
-                "time_zone": "Europe/Helsinki",
-                "useNormalizedEsInterval": true
-              },
-              "schema": "segment",
-              "type": "date_histogram"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "customLabel": "Cache Fanout Max",
-                "field": "nats.subscriptions.cache.fanout.max"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "4",
-              "params": {
-                "customLabel": "Cache Hit Rate",
-                "field": "nats.subscriptions.cache.hit_rate"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "5",
-              "params": {
-                "customLabel": "Inserts",
-                "field": "nats.subscriptions.inserts"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "6",
-              "params": {
-                "customLabel": "Removes",
-                "field": "nats.subscriptions.removes"
-              },
-              "schema": "metric",
-              "type": "avg"
-            },
-            {
-              "enabled": true,
-              "id": "7",
-              "params": {
-                "customLabel": "Matches",
-                "field": "nats.subscriptions.matches"
-              },
-              "schema": "metric",
-              "type": "avg"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
-              {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "show": true,
-                  "truncate": 100
-                },
-                "position": "bottom",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
-              }
-            ],
-            "grid": {
-              "categoryLines": false,
-              "style": {
-                "color": "#eee"
-              }
-            },
-            "legendPosition": "right",
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Cache Fanout Avg"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "normal",
-                "show": "true",
-                "showCircles": true,
-                "type": "line",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "3",
-                  "label": "Cache Fanout Max"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "normal",
-                "show": true,
-                "showCircles": true,
-                "type": "line",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "4",
-                  "label": "Cache Hit Rate"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "normal",
-                "show": true,
-                "showCircles": true,
-                "type": "line",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "5",
-                  "label": "Inserts"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "normal",
-                "show": true,
-                "showCircles": true,
-                "type": "line",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "6",
-                  "label": "Removes"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "normal",
-                "show": true,
-                "showCircles": true,
-                "type": "line",
-                "valueAxis": "ValueAxis-1"
-              },
-              {
-                "data": {
-                  "id": "7",
-                  "label": "Matches"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "normal",
-                "show": true,
-                "showCircles": true,
-                "type": "line",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "times": [],
-            "type": "line",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "left",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Cache Fanout Avg"
-                },
-                "type": "value"
-              }
-            ]
-          },
-          "title": "Subscription Stats Timeline",
-          "type": "line"
-        }
-      },
-      "id": "754215c0-1e46-11e9-a1b4-79a7ae42ab61",
-      "type": "visualization",
-      "updated_at": "2019-01-22T13:06:06.201Z",
-      "version": 2
-    },
-    {
-      "attributes": {
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "optionsJSON": {
-          "darkTheme": false,
-          "hidePanelTitles": false,
-          "useMargins": true
-        },
-        "panelsJSON": [
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 16,
-              "i": "1",
-              "w": 17,
-              "x": 0,
-              "y": 0
-            },
-            "id": "85d2af10-1e43-11e9-a1b4-79a7ae42ab61",
-            "panelIndex": "1",
-            "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 7,
-              "i": "2",
-              "w": 14,
-              "x": 31,
-              "y": 16
-            },
-            "id": "b2ef7370-1e43-11e9-a1b4-79a7ae42ab61",
-            "panelIndex": "2",
-            "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 7,
-              "i": "3",
-              "w": 24,
-              "x": 0,
-              "y": 38
-            },
-            "id": "c39a9240-1e43-11e9-a1b4-79a7ae42ab61",
-            "panelIndex": "3",
-            "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 7,
-              "i": "4",
-              "w": 18,
-              "x": 24,
-              "y": 23
-            },
-            "id": "d7ed5c50-1e43-11e9-a1b4-79a7ae42ab61",
-            "panelIndex": "4",
-            "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 7,
-              "i": "5",
-              "w": 24,
-              "x": 24,
-              "y": 37
-            },
-            "id": "e276cf30-1e43-11e9-a1b4-79a7ae42ab61",
-            "panelIndex": "5",
-            "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 7,
-              "i": "6",
-              "w": 24,
-              "x": 0,
-              "y": 31
             },
             "id": "b129b220-1e44-11e9-a1b4-79a7ae42ab61",
-            "panelIndex": "6",
             "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 7,
-              "i": "7",
-              "w": 23,
-              "x": 24,
-              "y": 30
+            "updated_at": "2019-01-22T22:43:50.725Z",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "index": "metricbeat-*",
+                        "query": {
+                            "language": "lucene",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Nats Memory",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true,
+                            "id": "1",
+                            "params": {
+                                "customLabel": "Nats Memory",
+                                "field": "nats.stats.mem.bytes"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        }
+                    ],
+                    "params": {
+                        "addLegend": false,
+                        "addTooltip": true,
+                        "metric": {
+                            "colorSchema": "Green to Red",
+                            "colorsRange": [
+                                {
+                                    "from": 0,
+                                    "to": 10000
+                                }
+                            ],
+                            "invertColors": false,
+                            "labels": {
+                                "show": true
+                            },
+                            "metricColorMode": "None",
+                            "percentageMode": false,
+                            "style": {
+                                "bgColor": false,
+                                "bgFill": "#000",
+                                "fontSize": 60,
+                                "labelColor": false,
+                                "subText": ""
+                            },
+                            "useRanges": false
+                        },
+                        "type": "metric"
+                    },
+                    "title": "Nats Memory",
+                    "type": "metric"
+                }
             },
             "id": "30a61c00-1e45-11e9-a1b4-79a7ae42ab61",
-            "panelIndex": "7",
             "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 7,
-              "i": "8",
-              "w": 7,
-              "x": 24,
-              "y": 16
+            "updated_at": "2019-01-22T22:43:50.725Z",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "index": "metricbeat-*",
+                        "query": {
+                            "language": "lucene",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Nats Uptime",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true,
+                            "id": "1",
+                            "params": {
+                                "customLabel": "Nats Uptime",
+                                "field": "nats.stats.uptime"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        }
+                    ],
+                    "params": {
+                        "addLegend": false,
+                        "addTooltip": true,
+                        "metric": {
+                            "colorSchema": "Green to Red",
+                            "colorsRange": [
+                                {
+                                    "from": 0,
+                                    "to": 10000
+                                }
+                            ],
+                            "invertColors": false,
+                            "labels": {
+                                "show": true
+                            },
+                            "metricColorMode": "None",
+                            "percentageMode": false,
+                            "style": {
+                                "bgColor": false,
+                                "bgFill": "#000",
+                                "fontSize": 60,
+                                "labelColor": false,
+                                "subText": ""
+                            },
+                            "useRanges": false
+                        },
+                        "type": "metric"
+                    },
+                    "title": "Nats Uptime",
+                    "type": "metric"
+                }
             },
             "id": "206f1bc0-1e45-11e9-a1b4-79a7ae42ab61",
-            "panelIndex": "8",
             "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 8,
-              "i": "9",
-              "w": 8,
-              "x": 40,
-              "y": 0
+            "updated_at": "2019-01-22T22:43:50.725Z",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "index": "metricbeat-*",
+                        "query": {
+                            "language": "lucene",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Nats Total Connections",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true,
+                            "id": "1",
+                            "params": {
+                                "customLabel": "Nats Total Connections",
+                                "field": "nats.stats.total_connections"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        }
+                    ],
+                    "params": {
+                        "addLegend": false,
+                        "addTooltip": true,
+                        "metric": {
+                            "colorSchema": "Green to Red",
+                            "colorsRange": [
+                                {
+                                    "from": 0,
+                                    "to": 10000
+                                }
+                            ],
+                            "invertColors": false,
+                            "labels": {
+                                "show": true
+                            },
+                            "metricColorMode": "None",
+                            "percentageMode": false,
+                            "style": {
+                                "bgColor": false,
+                                "bgFill": "#000",
+                                "fontSize": 60,
+                                "labelColor": false,
+                                "subText": ""
+                            },
+                            "useRanges": false
+                        },
+                        "type": "metric"
+                    },
+                    "title": "Nats Total Connections",
+                    "type": "metric"
+                }
             },
             "id": "4c380ff0-1e45-11e9-a1b4-79a7ae42ab61",
-            "panelIndex": "9",
             "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 8,
-              "i": "10",
-              "w": 8,
-              "x": 40,
-              "y": 8
-            },
-            "id": "0b89d5b0-1e45-11e9-a1b4-79a7ae42ab61",
-            "panelIndex": "10",
-            "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 15,
-              "i": "11",
-              "w": 24,
-              "x": 0,
-              "y": 16
+            "updated_at": "2019-01-22T22:43:50.725Z",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "index": "metricbeat-*",
+                        "query": {
+                            "language": "lucene",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Remotes-Subsz-Connz-Connz Timeline",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true,
+                            "id": "1",
+                            "params": {
+                                "customLabel": "Connections",
+                                "field": "nats.connections.total"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "2",
+                            "params": {
+                                "customInterval": "2h",
+                                "drop_partials": false,
+                                "extended_bounds": {},
+                                "field": "@timestamp",
+                                "interval": "auto",
+                                "min_doc_count": 1,
+                                "time_zone": "Europe/Helsinki",
+                                "useNormalizedEsInterval": true
+                            },
+                            "schema": "segment",
+                            "type": "date_histogram"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "3",
+                            "params": {
+                                "customLabel": "Routes",
+                                "field": "nats.routes.total"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "4",
+                            "params": {
+                                "customLabel": "Remotes",
+                                "field": "nats.stats.remotes"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "5",
+                            "params": {
+                                "customLabel": "Subscriptions",
+                                "field": "nats.subscriptions.total"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        }
+                    ],
+                    "params": {
+                        "addLegend": true,
+                        "addTimeMarker": false,
+                        "addTooltip": true,
+                        "categoryAxes": [
+                            {
+                                "id": "CategoryAxis-1",
+                                "labels": {
+                                    "show": true,
+                                    "truncate": 100
+                                },
+                                "position": "bottom",
+                                "scale": {
+                                    "type": "linear"
+                                },
+                                "show": true,
+                                "style": {},
+                                "title": {},
+                                "type": "category"
+                            }
+                        ],
+                        "grid": {
+                            "categoryLines": false,
+                            "style": {
+                                "color": "#eee"
+                            }
+                        },
+                        "legendPosition": "right",
+                        "seriesParams": [
+                            {
+                                "data": {
+                                    "id": "1",
+                                    "label": "Connections"
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "interpolate": "linear",
+                                "mode": "stacked",
+                                "show": "true",
+                                "showCircles": true,
+                                "type": "area",
+                                "valueAxis": "ValueAxis-1"
+                            },
+                            {
+                                "data": {
+                                    "id": "3",
+                                    "label": "Routes"
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "interpolate": "linear",
+                                "mode": "stacked",
+                                "show": true,
+                                "showCircles": true,
+                                "type": "area",
+                                "valueAxis": "ValueAxis-1"
+                            },
+                            {
+                                "data": {
+                                    "id": "4",
+                                    "label": "Remotes"
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "interpolate": "linear",
+                                "mode": "stacked",
+                                "show": true,
+                                "showCircles": true,
+                                "type": "area",
+                                "valueAxis": "ValueAxis-1"
+                            },
+                            {
+                                "data": {
+                                    "id": "5",
+                                    "label": "Subscriptions"
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "interpolate": "linear",
+                                "mode": "stacked",
+                                "show": true,
+                                "showCircles": true,
+                                "type": "area",
+                                "valueAxis": "ValueAxis-1"
+                            }
+                        ],
+                        "times": [],
+                        "type": "area",
+                        "valueAxes": [
+                            {
+                                "id": "ValueAxis-1",
+                                "labels": {
+                                    "filter": false,
+                                    "rotate": 0,
+                                    "show": true,
+                                    "truncate": 100
+                                },
+                                "name": "LeftAxis-1",
+                                "position": "left",
+                                "scale": {
+                                    "mode": "normal",
+                                    "type": "linear"
+                                },
+                                "show": true,
+                                "style": {},
+                                "title": {
+                                    "text": "Connections"
+                                },
+                                "type": "value"
+                            }
+                        ]
+                    },
+                    "title": "Remotes-Subsz-Connz-Connz Timeline",
+                    "type": "area"
+                }
             },
             "id": "199d3d30-1e46-11e9-a1b4-79a7ae42ab61",
-            "panelIndex": "11",
             "type": "visualization",
-            "version": "6.5.4"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 16,
-              "i": "12",
-              "w": 23,
-              "x": 17,
-              "y": 0
+            "updated_at": "2019-01-22T22:43:50.725Z",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "index": "metricbeat-*",
+                        "query": {
+                            "language": "lucene",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Subscription Stats Timeline",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true,
+                            "id": "1",
+                            "params": {
+                                "customLabel": "Cache Fanout Avg",
+                                "field": "nats.subscriptions.cache.fanout.avg"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "2",
+                            "params": {
+                                "customInterval": "2h",
+                                "drop_partials": false,
+                                "extended_bounds": {},
+                                "field": "@timestamp",
+                                "interval": "auto",
+                                "min_doc_count": 1,
+                                "timeRange": {
+                                    "from": "now-15m",
+                                    "mode": "quick",
+                                    "to": "now"
+                                },
+                                "time_zone": "Europe/Helsinki",
+                                "useNormalizedEsInterval": true
+                            },
+                            "schema": "segment",
+                            "type": "date_histogram"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "3",
+                            "params": {
+                                "customLabel": "Cache Fanout Max",
+                                "field": "nats.subscriptions.cache.fanout.max"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "4",
+                            "params": {
+                                "customLabel": "Cache Hit Rate",
+                                "field": "nats.subscriptions.cache.hit_rate"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "5",
+                            "params": {
+                                "customLabel": "Inserts",
+                                "field": "nats.subscriptions.inserts"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "6",
+                            "params": {
+                                "customLabel": "Removes",
+                                "field": "nats.subscriptions.removes"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "7",
+                            "params": {
+                                "customLabel": "Matches",
+                                "field": "nats.subscriptions.matches"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        }
+                    ],
+                    "params": {
+                        "addLegend": true,
+                        "addTimeMarker": false,
+                        "addTooltip": true,
+                        "categoryAxes": [
+                            {
+                                "id": "CategoryAxis-1",
+                                "labels": {
+                                    "show": true,
+                                    "truncate": 100
+                                },
+                                "position": "bottom",
+                                "scale": {
+                                    "type": "linear"
+                                },
+                                "show": true,
+                                "style": {},
+                                "title": {},
+                                "type": "category"
+                            }
+                        ],
+                        "grid": {
+                            "categoryLines": false,
+                            "style": {
+                                "color": "#eee"
+                            }
+                        },
+                        "legendPosition": "right",
+                        "seriesParams": [
+                            {
+                                "data": {
+                                    "id": "1",
+                                    "label": "Cache Fanout Avg"
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "mode": "normal",
+                                "show": "true",
+                                "showCircles": true,
+                                "type": "line",
+                                "valueAxis": "ValueAxis-1"
+                            },
+                            {
+                                "data": {
+                                    "id": "3",
+                                    "label": "Cache Fanout Max"
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "mode": "normal",
+                                "show": true,
+                                "showCircles": true,
+                                "type": "line",
+                                "valueAxis": "ValueAxis-1"
+                            },
+                            {
+                                "data": {
+                                    "id": "4",
+                                    "label": "Cache Hit Rate"
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "mode": "normal",
+                                "show": true,
+                                "showCircles": true,
+                                "type": "line",
+                                "valueAxis": "ValueAxis-1"
+                            },
+                            {
+                                "data": {
+                                    "id": "5",
+                                    "label": "Inserts"
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "mode": "normal",
+                                "show": true,
+                                "showCircles": true,
+                                "type": "line",
+                                "valueAxis": "ValueAxis-1"
+                            },
+                            {
+                                "data": {
+                                    "id": "6",
+                                    "label": "Removes"
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "mode": "normal",
+                                "show": true,
+                                "showCircles": true,
+                                "type": "line",
+                                "valueAxis": "ValueAxis-1"
+                            },
+                            {
+                                "data": {
+                                    "id": "7",
+                                    "label": "Matches"
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "mode": "normal",
+                                "show": true,
+                                "showCircles": true,
+                                "type": "line",
+                                "valueAxis": "ValueAxis-1"
+                            }
+                        ],
+                        "times": [],
+                        "type": "line",
+                        "valueAxes": [
+                            {
+                                "id": "ValueAxis-1",
+                                "labels": {
+                                    "filter": false,
+                                    "rotate": 0,
+                                    "show": true,
+                                    "truncate": 100
+                                },
+                                "name": "LeftAxis-1",
+                                "position": "left",
+                                "scale": {
+                                    "mode": "normal",
+                                    "type": "linear"
+                                },
+                                "show": true,
+                                "style": {},
+                                "title": {
+                                    "text": "Cache Fanout Avg"
+                                },
+                                "type": "value"
+                            }
+                        ]
+                    },
+                    "title": "Subscription Stats Timeline",
+                    "type": "line"
+                }
             },
             "id": "754215c0-1e46-11e9-a1b4-79a7ae42ab61",
-            "panelIndex": "12",
             "type": "visualization",
-            "version": "6.5.4"
-          }
-        ],
-        "timeRestore": false,
-        "title": "[Metricbeat Nats] Overview",
-        "version": 1
-      },
-      "id": "Metricbeat-Nats-Dashboard",
-      "type": "dashboard",
-      "updated_at": "2019-01-22T13:08:28.464Z",
-      "version": 3
-    }
-  ],
-  "version": "6.5.4"
+            "updated_at": "2019-01-22T22:43:50.725Z",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "index": "metricbeat-*",
+                        "query": {
+                            "language": "lucene",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Slow Consumers Timeline",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true,
+                            "id": "1",
+                            "params": {
+                                "customLabel": "Slow Consumers",
+                                "field": "nats.stats.slow_consumers"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "2",
+                            "params": {
+                                "customInterval": "2h",
+                                "drop_partials": false,
+                                "extended_bounds": {},
+                                "field": "@timestamp",
+                                "interval": "auto",
+                                "min_doc_count": 1,
+                                "time_zone": "Europe/Helsinki",
+                                "useNormalizedEsInterval": true
+                            },
+                            "schema": "segment",
+                            "type": "date_histogram"
+                        }
+                    ],
+                    "params": {
+                        "addLegend": true,
+                        "addTimeMarker": false,
+                        "addTooltip": true,
+                        "categoryAxes": [
+                            {
+                                "id": "CategoryAxis-1",
+                                "labels": {
+                                    "show": true,
+                                    "truncate": 100
+                                },
+                                "position": "bottom",
+                                "scale": {
+                                    "type": "linear"
+                                },
+                                "show": true,
+                                "style": {},
+                                "title": {},
+                                "type": "category"
+                            }
+                        ],
+                        "grid": {
+                            "categoryLines": false,
+                            "style": {
+                                "color": "#eee"
+                            }
+                        },
+                        "legendPosition": "right",
+                        "seriesParams": [
+                            {
+                                "data": {
+                                    "id": "1",
+                                    "label": "Slow Consumers"
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "mode": "normal",
+                                "show": "true",
+                                "showCircles": true,
+                                "type": "line",
+                                "valueAxis": "ValueAxis-1"
+                            }
+                        ],
+                        "times": [],
+                        "type": "line",
+                        "valueAxes": [
+                            {
+                                "id": "ValueAxis-1",
+                                "labels": {
+                                    "filter": false,
+                                    "rotate": 0,
+                                    "show": true,
+                                    "truncate": 100
+                                },
+                                "name": "LeftAxis-1",
+                                "position": "left",
+                                "scale": {
+                                    "mode": "normal",
+                                    "type": "linear"
+                                },
+                                "show": true,
+                                "style": {},
+                                "title": {
+                                    "text": "Slow Consumers"
+                                },
+                                "type": "value"
+                            }
+                        ]
+                    },
+                    "title": "Slow Consumers Timeline",
+                    "type": "line"
+                }
+            },
+            "id": "94534190-1e97-11e9-b9e7-93b3bd2eec90",
+            "type": "visualization",
+            "updated_at": "2019-01-22T22:46:38.889Z",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "index": "metricbeat-*",
+                        "query": {
+                            "language": "lucene",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Nats IO Stats",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true,
+                            "id": "1",
+                            "params": {
+                                "customLabel": "In bytes",
+                                "field": "nats.stats.in.bytes"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "2",
+                            "params": {
+                                "customLabel": "Out Bytes",
+                                "field": "nats.stats.out.bytes"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "3",
+                            "params": {
+                                "customInterval": "2h",
+                                "drop_partials": false,
+                                "extended_bounds": {},
+                                "field": "@timestamp",
+                                "interval": "auto",
+                                "min_doc_count": 1,
+                                "timeRange": {
+                                    "from": "now-15m",
+                                    "mode": "quick",
+                                    "to": "now"
+                                },
+                                "time_zone": "Europe/Helsinki",
+                                "useNormalizedEsInterval": true
+                            },
+                            "schema": "segment",
+                            "type": "date_histogram"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "4",
+                            "params": {
+                                "customLabel": "In Messages",
+                                "field": "nats.stats.in.messages"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "5",
+                            "params": {
+                                "customLabel": "Out Messages",
+                                "field": "nats.stats.out.messages"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        }
+                    ],
+                    "params": {
+                        "addLegend": true,
+                        "addTimeMarker": false,
+                        "addTooltip": true,
+                        "categoryAxes": [
+                            {
+                                "id": "CategoryAxis-1",
+                                "labels": {
+                                    "show": true,
+                                    "truncate": 100
+                                },
+                                "position": "bottom",
+                                "scale": {
+                                    "type": "linear"
+                                },
+                                "show": true,
+                                "style": {},
+                                "title": {},
+                                "type": "category"
+                            }
+                        ],
+                        "grid": {
+                            "categoryLines": false,
+                            "style": {
+                                "color": "#eee"
+                            }
+                        },
+                        "legendPosition": "right",
+                        "seriesParams": [
+                            {
+                                "data": {
+                                    "id": "1",
+                                    "label": "In bytes"
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "mode": "normal",
+                                "show": "true",
+                                "showCircles": true,
+                                "type": "line",
+                                "valueAxis": "ValueAxis-1"
+                            },
+                            {
+                                "data": {
+                                    "id": "2",
+                                    "label": "Out Bytes"
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "mode": "normal",
+                                "show": true,
+                                "showCircles": true,
+                                "type": "line",
+                                "valueAxis": "ValueAxis-1"
+                            },
+                            {
+                                "data": {
+                                    "id": "4",
+                                    "label": "In Messages"
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "mode": "normal",
+                                "show": true,
+                                "showCircles": true,
+                                "type": "line",
+                                "valueAxis": "ValueAxis-2"
+                            },
+                            {
+                                "data": {
+                                    "id": "5",
+                                    "label": "Out Messages"
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "mode": "normal",
+                                "show": true,
+                                "showCircles": true,
+                                "type": "line",
+                                "valueAxis": "ValueAxis-2"
+                            }
+                        ],
+                        "times": [],
+                        "type": "line",
+                        "valueAxes": [
+                            {
+                                "id": "ValueAxis-1",
+                                "labels": {
+                                    "filter": false,
+                                    "rotate": 0,
+                                    "show": true,
+                                    "truncate": 100
+                                },
+                                "name": "LeftAxis-1",
+                                "position": "left",
+                                "scale": {
+                                    "mode": "normal",
+                                    "type": "linear"
+                                },
+                                "show": true,
+                                "style": {},
+                                "title": {
+                                    "text": "Out Bytes"
+                                },
+                                "type": "value"
+                            },
+                            {
+                                "id": "ValueAxis-2",
+                                "labels": {
+                                    "filter": false,
+                                    "rotate": 0,
+                                    "show": true,
+                                    "truncate": 100
+                                },
+                                "name": "RightAxis-1",
+                                "position": "right",
+                                "scale": {
+                                    "mode": "normal",
+                                    "type": "linear"
+                                },
+                                "show": true,
+                                "style": {},
+                                "title": {
+                                    "text": "In Messages"
+                                },
+                                "type": "value"
+                            }
+                        ]
+                    },
+                    "title": "Nats IO Stats",
+                    "type": "line"
+                }
+            },
+            "id": "be1d8a20-1e98-11e9-b9e7-93b3bd2eec90",
+            "type": "visualization",
+            "updated_at": "2019-01-22T22:54:58.498Z",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "index": "metricbeat-*",
+                        "query": {
+                            "language": "lucene",
+                            "query": ""
+                        }
+                    }
+                },
+                "title": "Nats Utilization Timeline",
+                "uiStateJSON": {},
+                "version": 1,
+                "visState": {
+                    "aggs": [
+                        {
+                            "enabled": true,
+                            "id": "1",
+                            "params": {
+                                "customLabel": "CPU Avg",
+                                "field": "nats.stats.cpu"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "2",
+                            "params": {
+                                "customInterval": "2h",
+                                "drop_partials": false,
+                                "extended_bounds": {},
+                                "field": "@timestamp",
+                                "interval": "auto",
+                                "min_doc_count": 1,
+                                "timeRange": {
+                                    "from": "now-15m",
+                                    "mode": "quick",
+                                    "to": "now"
+                                },
+                                "time_zone": "Europe/Helsinki",
+                                "useNormalizedEsInterval": true
+                            },
+                            "schema": "segment",
+                            "type": "date_histogram"
+                        },
+                        {
+                            "enabled": true,
+                            "id": "3",
+                            "params": {
+                                "customLabel": "Memory",
+                                "field": "nats.stats.mem.bytes"
+                            },
+                            "schema": "metric",
+                            "type": "avg"
+                        }
+                    ],
+                    "params": {
+                        "addLegend": true,
+                        "addTimeMarker": false,
+                        "addTooltip": true,
+                        "categoryAxes": [
+                            {
+                                "id": "CategoryAxis-1",
+                                "labels": {
+                                    "show": true,
+                                    "truncate": 100
+                                },
+                                "position": "bottom",
+                                "scale": {
+                                    "type": "linear"
+                                },
+                                "show": true,
+                                "style": {},
+                                "title": {},
+                                "type": "category"
+                            }
+                        ],
+                        "grid": {
+                            "categoryLines": false,
+                            "style": {
+                                "color": "#eee"
+                            }
+                        },
+                        "legendPosition": "right",
+                        "seriesParams": [
+                            {
+                                "data": {
+                                    "id": "1",
+                                    "label": "CPU Avg"
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "mode": "normal",
+                                "show": "true",
+                                "showCircles": true,
+                                "type": "line",
+                                "valueAxis": "ValueAxis-1"
+                            },
+                            {
+                                "data": {
+                                    "id": "3",
+                                    "label": "Memory"
+                                },
+                                "drawLinesBetweenPoints": true,
+                                "mode": "normal",
+                                "show": true,
+                                "showCircles": true,
+                                "type": "line",
+                                "valueAxis": "ValueAxis-2"
+                            }
+                        ],
+                        "times": [],
+                        "type": "line",
+                        "valueAxes": [
+                            {
+                                "id": "ValueAxis-1",
+                                "labels": {
+                                    "filter": false,
+                                    "rotate": 0,
+                                    "show": true,
+                                    "truncate": 100
+                                },
+                                "name": "LeftAxis-1",
+                                "position": "left",
+                                "scale": {
+                                    "mode": "normal",
+                                    "type": "linear"
+                                },
+                                "show": true,
+                                "style": {},
+                                "title": {
+                                    "text": "CPU Avg"
+                                },
+                                "type": "value"
+                            },
+                            {
+                                "id": "ValueAxis-2",
+                                "labels": {
+                                    "filter": false,
+                                    "rotate": 0,
+                                    "show": true,
+                                    "truncate": 100
+                                },
+                                "name": "RightAxis-1",
+                                "position": "right",
+                                "scale": {
+                                    "mode": "normal",
+                                    "type": "linear"
+                                },
+                                "show": true,
+                                "style": {},
+                                "title": {
+                                    "text": "Memory"
+                                },
+                                "type": "value"
+                            }
+                        ]
+                    },
+                    "title": "Nats Utilization Timeline",
+                    "type": "line"
+                }
+            },
+            "id": "8204e820-1e99-11e9-b9e7-93b3bd2eec90",
+            "type": "visualization",
+            "updated_at": "2019-01-22T23:00:27.170Z",
+            "version": 1
+        },
+        {
+            "attributes": {
+                "description": "",
+                "hits": 0,
+                "kibanaSavedObjectMeta": {
+                    "searchSourceJSON": {
+                        "filter": [],
+                        "query": {
+                            "language": "lucene",
+                            "query": ""
+                        }
+                    }
+                },
+                "optionsJSON": {
+                    "darkTheme": false,
+                    "hidePanelTitles": false,
+                    "useMargins": true
+                },
+                "panelsJSON": [
+                    {
+                        "embeddableConfig": {},
+                        "gridData": {
+                            "h": 7,
+                            "i": "6",
+                            "w": 24,
+                            "x": 24,
+                            "y": 29
+                        },
+                        "id": "b129b220-1e44-11e9-a1b4-79a7ae42ab61",
+                        "panelIndex": "6",
+                        "type": "visualization",
+                        "version": "6.5.4"
+                    },
+                    {
+                        "embeddableConfig": {},
+                        "gridData": {
+                            "h": 7,
+                            "i": "7",
+                            "w": 13,
+                            "x": 24,
+                            "y": 22
+                        },
+                        "id": "30a61c00-1e45-11e9-a1b4-79a7ae42ab61",
+                        "panelIndex": "7",
+                        "type": "visualization",
+                        "version": "6.5.4"
+                    },
+                    {
+                        "embeddableConfig": {},
+                        "gridData": {
+                            "h": 7,
+                            "i": "8",
+                            "w": 11,
+                            "x": 37,
+                            "y": 22
+                        },
+                        "id": "206f1bc0-1e45-11e9-a1b4-79a7ae42ab61",
+                        "panelIndex": "8",
+                        "type": "visualization",
+                        "version": "6.5.4"
+                    },
+                    {
+                        "embeddableConfig": {},
+                        "gridData": {
+                            "h": 10,
+                            "i": "9",
+                            "w": 8,
+                            "x": 40,
+                            "y": 0
+                        },
+                        "id": "4c380ff0-1e45-11e9-a1b4-79a7ae42ab61",
+                        "panelIndex": "9",
+                        "type": "visualization",
+                        "version": "6.5.4"
+                    },
+                    {
+                        "embeddableConfig": {},
+                        "gridData": {
+                            "h": 11,
+                            "i": "11",
+                            "w": 24,
+                            "x": 0,
+                            "y": 10
+                        },
+                        "id": "199d3d30-1e46-11e9-a1b4-79a7ae42ab61",
+                        "panelIndex": "11",
+                        "type": "visualization",
+                        "version": "6.5.4"
+                    },
+                    {
+                        "embeddableConfig": {},
+                        "gridData": {
+                            "h": 10,
+                            "i": "12",
+                            "w": 23,
+                            "x": 17,
+                            "y": 0
+                        },
+                        "id": "754215c0-1e46-11e9-a1b4-79a7ae42ab61",
+                        "panelIndex": "12",
+                        "type": "visualization",
+                        "version": "6.5.4"
+                    },
+                    {
+                        "embeddableConfig": {},
+                        "gridData": {
+                            "h": 10,
+                            "i": "13",
+                            "w": 17,
+                            "x": 0,
+                            "y": 0
+                        },
+                        "id": "94534190-1e97-11e9-b9e7-93b3bd2eec90",
+                        "panelIndex": "13",
+                        "type": "visualization",
+                        "version": "6.5.4"
+                    },
+                    {
+                        "embeddableConfig": {},
+                        "gridData": {
+                            "h": 12,
+                            "i": "14",
+                            "w": 24,
+                            "x": 24,
+                            "y": 10
+                        },
+                        "id": "be1d8a20-1e98-11e9-b9e7-93b3bd2eec90",
+                        "panelIndex": "14",
+                        "type": "visualization",
+                        "version": "6.5.4"
+                    },
+                    {
+                        "embeddableConfig": {},
+                        "gridData": {
+                            "h": 15,
+                            "i": "15",
+                            "w": 24,
+                            "x": 0,
+                            "y": 21
+                        },
+                        "id": "8204e820-1e99-11e9-b9e7-93b3bd2eec90",
+                        "panelIndex": "15",
+                        "type": "visualization",
+                        "version": "6.5.4"
+                    }
+                ],
+                "timeRestore": false,
+                "title": "[Metricbeat Nats] Overview",
+                "version": 1
+            },
+            "id": "Metricbeat-Nats-Dashboard",
+            "type": "dashboard",
+            "updated_at": "2019-01-22T23:02:36.997Z",
+            "version": 3
+        }
+    ],
+    "version": "6.5.4"
 }
