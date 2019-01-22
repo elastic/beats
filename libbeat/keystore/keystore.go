@@ -64,7 +64,7 @@ type Keystore interface {
 	Save() error
 }
 
-// Packager defines a keystore that can be uploaded.
+// Packager defines a keystore that we can read the raw bytes and be packaged in an artifact.
 type Packager interface {
 	Package() ([]byte, error)
 }
