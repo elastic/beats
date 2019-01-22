@@ -19,7 +19,6 @@ package exchange
 
 import (
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/rabbitmq"
 )
@@ -38,8 +37,6 @@ type MetricSet struct {
 
 // New creates new instance of MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The rabbitmq exchange metricset is beta")
-
 	ms, err := rabbitmq.NewMetricSet(base, rabbitmq.ExchangesPath)
 	if err != nil {
 		return nil, err

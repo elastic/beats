@@ -113,11 +113,11 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-prometheus,Prometheus>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-prometheus-collector,collector>>   
 |<<metricbeat-metricset-prometheus-stats,stats>> beta[]  
-|<<metricbeat-module-rabbitmq,RabbitMQ>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.4+| .4+|  |<<metricbeat-metricset-rabbitmq-connection,connection>> beta[]  
-|<<metricbeat-metricset-rabbitmq-exchange,exchange>> beta[]  
-|<<metricbeat-metricset-rabbitmq-node,node>> beta[]  
-|<<metricbeat-metricset-rabbitmq-queue,queue>> beta[]  
+|<<metricbeat-module-rabbitmq,RabbitMQ>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.4+| .4+|  |<<metricbeat-metricset-rabbitmq-connection,connection>>   
+|<<metricbeat-metricset-rabbitmq-exchange,exchange>>   
+|<<metricbeat-metricset-rabbitmq-node,node>>   
+|<<metricbeat-metricset-rabbitmq-queue,queue>>   
 |<<metricbeat-module-redis,Redis>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-redis-info,info>>   
 |<<metricbeat-metricset-redis-key,key>>   
