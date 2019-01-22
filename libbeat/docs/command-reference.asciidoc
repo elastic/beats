@@ -546,6 +546,22 @@ the end of the file is reached. By default harvesters are closed after
 `close_inactive` is reached.
 endif::[]
 
+<<<<<<< HEAD
+=======
+*`--setup`*::
+ifdef::has_ml_jobs[]
+Loads the initial setup, including Elasticsearch template, {kib} index pattern,
+{kib} dashboards (when available), and Machine learning jobs.
+endif::has_ml_jobs[]
+ifdef::no_dashboards[]
+Loads the initial setup, including Elasticsearch template.
+endif::no_dashboards[]
+ifndef::has_ml_jobs,no_dashboards[]
+Loads the initial setup, including Elasticsearch template, {kib} index pattern, and {kib} dashboards (when available).
+endif::has_ml_jobs,no_dashboards[]
+If you want to use the command without running {beatname_uc}, use the <<setup-command,`setup`>> command instead.
+
+>>>>>>> docs: remove kib index pattern
 ifeval::["{beatname_lc}"=="metricbeat"]
 *`--system.hostfs MOUNT_POINT`*::
 
