@@ -115,7 +115,7 @@ This file is generated! See scripts/docs_collector.py
 .4+| .4+|  |<<metricbeat-metricset-postgresql-activity,activity>>   
 |<<metricbeat-metricset-postgresql-bgwriter,bgwriter>>   
 |<<metricbeat-metricset-postgresql-database,database>>   
-|<<metricbeat-metricset-postgresql-statement,statement>> beta[]  
+|<<metricbeat-metricset-postgresql-statement,statement>>   
 |<<metricbeat-module-prometheus,Prometheus>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-prometheus-collector,collector>>   
 |<<metricbeat-metricset-prometheus-stats,stats>> beta[]  
