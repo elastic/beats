@@ -1,5 +1,6 @@
 - name: replstatus
   type: group
+  release: ga
   description: >
     replstatus provides an overview of replica set status.
   fields:
