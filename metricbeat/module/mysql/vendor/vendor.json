@@ -11,7 +11,7 @@
 			"path": "github.com/go-sql-driver/mysql",
 			"revision": "72cd26f257d44c1114970e19afddcd812016007e",
 			"revisionTime": "2018-11-14T12:08:49Z",
-			"version": "v1.4",
+			"version": "v1.4.1",
 			"versionExact": "v1.4.1"
 		},
 		{
