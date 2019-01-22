@@ -54,13 +54,13 @@ class Test(BaseTest):
 
         args.extend(["test", "config"])
 
-        output="packetbeat.log"
+        output = "packetbeat.log"
 
         with open(os.path.join(self.working_dir, output), "wb") as outfile:
             proc = subprocess.Popen(args,
-                stdout=outfile,
-                stderr=subprocess.STDOUT
-            )
+                                    stdout=outfile,
+                                    stderr=subprocess.STDOUT
+                                    )
             actual_exit_code = proc.wait()
 
         if actual_exit_code != exit_code:
@@ -71,4 +71,3 @@ class Test(BaseTest):
         assert actual_exit_code == exit_code, "Expected exit code to be %d, but it was %d" % (
             exit_code, actual_exit_code)
         return actual_exit_code
-
