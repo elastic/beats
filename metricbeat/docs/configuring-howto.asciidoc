@@ -26,6 +26,7 @@ The following topics describe how to configure {beatname_uc}:
 * <<metricbeat-configuration-reloading>>
 * <<configuring-internal-queue>>
 * <<configuring-output>>
+* <<ilm>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
@@ -52,6 +53,8 @@ include::./reload-configuration.asciidoc[]
 include::{libbeat-dir}/docs/queueconfig.asciidoc[]
 
 include::{libbeat-dir}/docs/outputconfig.asciidoc[]
+
+include::{libbeat-dir}/docs/shared-ilm.asciidoc[]
 
 include::{libbeat-dir}/docs/shared-ssl-config.asciidoc[]
 

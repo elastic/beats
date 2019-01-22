@@ -20,89 +20,49 @@ package actions
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors"
 )
 
 func TestAddTags(t *testing.T) {
 	multi := func(strs ...string) []string { return strs }
 	single := func(str string) []string { return multi(str) }
 
-	cases := map[string]struct {
-		event common.MapStr
-		want  common.MapStr
-		cfg   []string
-	}{
+	testProcessors(t, map[string]testCase{
 		"create tags": {
 			event: common.MapStr{},
 			want:  common.MapStr{"tags": []string{"t1", "t2"}},
-			cfg:   single(`{tags: [t1, t2]}`),
+			cfg:   single(`{add_tags: {tags: [t1, t2]}}`),
 		},
 		"append to tags": {
 			event: common.MapStr{"tags": []string{"t1"}},
 			want:  common.MapStr{"tags": []string{"t1", "t2", "t3"}},
-			cfg:   single(`{tags: [t2, t3]}`),
+			cfg:   single(`{add_tags: {tags: [t2, t3]}}`),
 		},
 		"combine from 2 processors": {
 			event: common.MapStr{},
 			want:  common.MapStr{"tags": []string{"t1", "t2", "t3", "t4"}},
 			cfg: multi(
-				`{tags: [t1, t2]}`,
-				`{tags: [t3, t4]}`,
+				`{add_tags: {tags: [t1, t2]}}`,
+				`{add_tags: {tags: [t3, t4]}}`,
 			),
 		},
 		"with custom target": {
 			event: common.MapStr{},
 			want:  common.MapStr{"custom": []string{"t1", "t2"}},
-			cfg:   single(`{tags: [t1, t2], target: custom}`),
+			cfg:   single(`{add_tags: {tags: [t1, t2], target: custom}}`),
 		},
 		"different targets": {
 			event: common.MapStr{},
 			want:  common.MapStr{"tags1": []string{"t1"}, "tags2": []string{"t2"}},
 			cfg: multi(
-				`{target: tags1, tags: [t1]}`,
-				`{target: tags2, tags: [t2]}`,
+				`{add_tags: {target: tags1, tags: [t1]}}`,
+				`{add_tags: {target: tags2, tags: [t2]}}`,
 			),
 		},
 		"single tag config without array notation": {
 			event: common.MapStr{},
 			want:  common.MapStr{"tags": []string{"t1"}},
-			cfg:   single(`{tags: t1}`),
+			cfg:   single(`{add_tags: {tags: t1}}`),
 		},
-	}
-
-	for name, test := range cases {
-		test := test
-		t.Run(name, func(t *testing.T) {
-			ps := make([]*processors.Processors, len(test.cfg))
-			for i := range test.cfg {
-				config, err := common.NewConfigWithYAML([]byte(test.cfg[i]), "test")
-				if err != nil {
-					t.Fatalf("Failed to create config(%v): %+v", i, err)
-				}
-
-				ps[i], err = processors.New(processors.PluginConfig{
-					{
-						"add_tags": config,
-					},
-				})
-				if err != nil {
-					t.Fatalf("Failed to create add_tags processor(%v): %+v", i, err)
-				}
-			}
-
-			current := &beat.Event{Fields: test.event.Clone()}
-			for i, processor := range ps {
-				current = processor.Run(current)
-				if current == nil {
-					t.Fatalf("Event dropped(%v)", i)
-				}
-			}
-
-			assert.Equal(t, test.want, current.Fields)
-		})
-	}
+	})
 }

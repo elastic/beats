@@ -109,7 +109,7 @@ func newProcessorPipeline(
 		// With dynamic fields potentially changing at any time, we need to copy,
 		// so we do not change shared structures be accident.
 		fieldsNeedsCopy := needsCopy || config.DynamicFields != nil || fields["agent"] != nil
-		processors.add(actions.NewAddLabels(fields, fieldsNeedsCopy))
+		processors.add(actions.NewAddFields(fields, fieldsNeedsCopy))
 	}
 
 	if config.DynamicFields != nil {
@@ -124,13 +124,13 @@ func newProcessorPipeline(
 
 	// setup 6: add beats and host metadata
 	if meta := global.builtinMeta; len(meta) > 0 {
-		processors.add(actions.NewAddLabels(meta, needsCopy))
+		processors.add(actions.NewAddFields(meta, needsCopy))
 	}
 
 	// setup 7: add agent metadata
 	if !config.SkipAgentMetadata {
 		needsCopy := global.alwaysCopy || global.processors != nil
-		processors.add(actions.NewAddLabels(createAgentFields(info), needsCopy))
+		processors.add(actions.NewAddFields(createAgentFields(info), needsCopy))
 	}
 
 	// setup 8: pipeline processors list
