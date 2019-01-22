@@ -14,6 +14,7 @@ grouped in the following categories:
 
 * <<exported-fields-aerospike>>
 * <<exported-fields-apache>>
+* <<exported-fields-aws>>
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
@@ -40,6 +41,7 @@ grouped in the following categories:
 * <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
+* <<exported-fields-mssql>>
 * <<exported-fields-munin>>
 * <<exported-fields-mysql>>
 * <<exported-fields-nats>>
@@ -807,6 +809,186 @@ Waiting for connections.
 type: long
 
 Total.
+
+
+--
+
+[[exported-fields-aws]]
+== aws fields
+
+`aws` module collects AWS monitoring metrics from AWS Cloudwatch.
+
+
+
+[float]
+== aws fields
+
+
+
+
+[float]
+== ec2 fields
+
+`ec2` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EC2.
+
+
+
+*`aws.ec2.cpu.total.pct`*::
++
+--
+type: scaled_float
+
+The percentage of allocated EC2 compute units that are currently in use on the instance.
+
+
+--
+
+*`aws.ec2.cpu.credit_usage`*::
++
+--
+type: scaled_float
+
+The number of CPU credits spent by the instance for CPU utilization.
+
+
+--
+
+*`aws.ec2.cpu.credit_balance`*::
++
+--
+type: scaled_float
+
+The number of earned CPU credits that an instance has accrued since it was launched or started.
+
+
+--
+
+*`aws.ec2.cpu.surplus_credit_balance`*::
++
+--
+type: scaled_float
+
+The number of surplus credits that have been spent by an unlimited instance when its CPUCreditBalance value is zero.
+
+
+--
+
+*`aws.ec2.cpu.surplus_credits_charged`*::
++
+--
+type: scaled_float
+
+The number of spent surplus credits that are not paid down by earned CPU credits, and which thus incur an additional charge.
+
+
+--
+
+*`aws.ec2.network.in.packets`*::
++
+--
+type: scaled_float
+
+The number of packets received on all network interfaces by the instance.
+
+
+--
+
+*`aws.ec2.network.out.packets`*::
++
+--
+type: scaled_float
+
+The number of packets sent out on all network interfaces by the instance.
+
+
+--
+
+*`aws.ec2.network.in.bytes`*::
++
+--
+type: scaled_float
+
+The number of bytes received on all network interfaces by the instance.
+
+
+--
+
+*`aws.ec2.network.out.bytes`*::
++
+--
+type: scaled_float
+
+The number of bytes sent out on all network interfaces by the instance.
+
+
+--
+
+*`aws.ec2.diskio.read.bytes`*::
++
+--
+type: scaled_float
+
+Bytes read from all instance store volumes available to the instance.
+
+
+--
+
+*`aws.ec2.diskio.write.bytes`*::
++
+--
+type: scaled_float
+
+Bytes written to all instance store volumes available to the instance.
+
+
+--
+
+*`aws.ec2.diskio.read.ops`*::
++
+--
+type: scaled_float
+
+Completed read operations from all instance store volumes available to the instance in a specified period of time.
+
+
+--
+
+*`aws.ec2.diskio.write.ops`*::
++
+--
+type: scaled_float
+
+Completed write operations to all instance store volumes available to the instance in a specified period of time.
+
+
+--
+
+*`aws.ec2.status.check_failed`*::
++
+--
+type: long
+
+Reports whether the instance has passed both the instance status check and the system status check in the last minute.
+
+
+--
+
+*`aws.ec2.status.check_failed_system`*::
++
+--
+type: long
+
+Reports whether the instance has passed the system status check in the last minute.
+
+
+--
+
+*`aws.ec2.status.check_failed_instance`*::
++
+--
+type: long
+
+Reports whether the instance has passed the instance status check in the last minute.
 
 
 --
@@ -16417,6 +16599,262 @@ type: long
 
 The amount of time spent for commits that occurred while a write lock was held.
 
+
+--
+
+[[exported-fields-mssql]]
+== mssql fields
+
+MS SQL module
+
+
+[float]
+== mssql fields
+
+
+
+
+[float]
+== db fields
+
+db metricset will fetch information about each db from a sql server
+
+
+[float]
+== database fields
+
+Database where the metrics have been fetched from
+
+
+*`mssql.db.database.id`*::
++
+--
+type: keyword
+
+The database ID
+
+--
+
+[float]
+== log_space_usage fields
+
+Space usage information for the transaction log
+
+
+[float]
+== total fields
+
+Total space usage
+
+
+*`mssql.db.log_space_usage.total.bytes`*::
++
+--
+type: long
+
+The size of the log
+
+--
+
+[float]
+== used fields
+
+The occupied size of the log
+
+
+*`mssql.db.log_space_usage.used.bytes`*::
++
+--
+type: long
+
+The occupied size of the log in bytes
+
+--
+
+*`mssql.db.log_space_usage.used.pct`*::
++
+--
+type: float
+
+A percentaje of the occupied size of the log as a percent of the total log size
+
+--
+
+[float]
+== since_last_backup fields
+
+The amount of space used since the last log backup
+
+
+*`mssql.db.log_space_usage.since_last_backup.bytes`*::
++
+--
+type: long
+
+The amount of space used since the last log backup in bytes
+
+--
+
+[float]
+== performance fields
+
+performance metricset fetches information about the Performance Counters
+
+
+*`mssql.performance.page_splits_per_sec`*::
++
+--
+type: long
+
+Number of page splits per second that occur as the result of overflowing index pages.
+
+--
+
+*`mssql.performance.lock_waits_per_sec`*::
++
+--
+type: long
+
+Number of lock requests per second that required the caller to wait.
+
+--
+
+*`mssql.performance.user_connections`*::
++
+--
+type: long
+
+Total number of user connections
+
+--
+
+*`mssql.performance.transactions`*::
++
+--
+type: long
+
+Total number of transactions
+
+--
+
+*`mssql.performance.active_temp_tables`*::
++
+--
+type: long
+
+Number of temporary tables/table variables in use.
+
+--
+
+*`mssql.performance.connections_reset_per_sec`*::
++
+--
+type: long
+
+Total number of logins started from the connection pool.
+
+--
+
+*`mssql.performance.logins_per_sec`*::
++
+--
+type: long
+
+Total number of logins started per second. This does not include pooled connections.
+
+--
+
+*`mssql.performance.logouts_per_sec`*::
++
+--
+type: long
+
+Total number of logout operations started per second.
+
+--
+
+*`mssql.performance.recompilations_per_sec`*::
++
+--
+type: long
+
+Number of statement recompiles per second. Counts the number of times statement recompiles are triggered. Generally, you want the recompiles to be low.
+
+--
+
+*`mssql.performance.compilations_per_sec`*::
++
+--
+type: long
+
+Number of SQL compilations per second. Indicates the number of times the compile code path is entered. Includes compiles caused by statement-level recompilations in SQL Server. After SQL Server user activity is stable, this value reaches a steady state.
+
+--
+
+*`mssql.performance.batch_requests_per_sec`*::
++
+--
+type: long
+
+Number of Transact-SQL command batches received per second. This statistic is affected by all constraints (such as I/O, number of users, cache size, complexity of requests, and so on). High batch requests mean good throughput.
+
+--
+
+
+[float]
+== cache_hit fields
+
+Indicates the percentage of pages found in the buffer cache without having to read from disk.
+
+
+*`mssql.performance.buffer.cache_hit.pct`*::
++
+--
+type: double
+
+The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses. After a long period of time, the ratio moves very little. Because reading from the cache is much less expensive than reading from disk, you want this ratio to be high
+
+--
+
+[float]
+== page_life_expectancy fields
+
+Indicates the number of seconds a page will stay in the buffer pool without references.
+
+
+*`mssql.performance.buffer.page_life_expectancy.sec`*::
++
+--
+type: long
+
+Indicates the number of seconds a page will stay in the buffer pool without references (in seconds).
+
+--
+
+*`mssql.performance.buffer.checkpoint_pages_per_sec`*::
++
+--
+type: long
+
+Indicates the number of pages flushed to disk per second by a checkpoint or other operation that require all dirty pages to be flushed.
+
+--
+
+*`mssql.performance.buffer.database_pages`*::
++
+--
+type: long
+
+Indicates the number of pages in the buffer pool with database content.
+
+--
+
+*`mssql.performance.buffer.target_pages`*::
++
+--
+type: long
+
+Ideal number of pages in the buffer pool.
 
 --
 
