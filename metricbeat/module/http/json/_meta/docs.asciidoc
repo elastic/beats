@@ -48,7 +48,7 @@ It is required to set a namespace in the general module config section.
 [float]
 ==== json.is_array
 With this configuration enabled the `json` metricset expects the JSON structure returned by the HTTP endpoint to be an array. Further,
-it creates separate events for each element in the array. If each *element* in the array is not a valid `json object` by itself (like a string), the event created for this will have the *element* assigned to the key `data` like this: `{ "_data": "<element>" }`.
+it creates separate events for each element in the array. If each *element* in the array is not a valid `json object` by itself (like a string), the event created for this will have the *array* assigned to the key `_data` like this: `{ "_data": ["element1", "element2" ..]" }`.
 
 [float]
 ==== request.enabled
