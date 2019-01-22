@@ -25,6 +25,7 @@ import (
 
 func main() {
 	http.HandleFunc("/jsonarr", serveJSONArr)
+	http.HandleFunc("/jsonarrgeneric", serveJSONArrGeneric)
 	http.HandleFunc("/jsonobj", serveJSONObj)
 	http.HandleFunc("/", serveJSONObj)
 
@@ -35,7 +36,11 @@ func main() {
 }
 
 func serveJSONArr(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, `[{"hello1":"world1"}, {"hello2": "world2"}, "hello3", "world3", 4, []]`)
+	fmt.Fprint(w, `[{"hello1":"world1"}, {"hello2": "world2"}]`)
+}
+
+func serveJSONArrGeneric(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, `["hello", "world", "hello2", "world2"]`)
 }
 
 func serveJSONObj(w http.ResponseWriter, r *http.Request) {

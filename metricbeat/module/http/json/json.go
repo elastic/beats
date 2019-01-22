@@ -133,9 +133,9 @@ func (m *MetricSet) processBody(response *http.Response, jsonBody interface{}) c
 	var event common.MapStr
 
 	if m.deDotEnabled {
-		event = makeValidMapStr(common.DeDotJSON(jsonBody))
+		event = common.DeDotJSON(jsonBody).(common.MapStr)
 	} else {
-		event = makeValidMapStr(jsonBody)
+		event = jsonBody.(common.MapStr)
 	}
 
 	if m.requestEnabled {
@@ -176,7 +176,8 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	defer response.Body.Close()
 
 	var jsonBody common.MapStr
-	var jsonBodyArr []interface{}
+	var jsonBodyArr []common.MapStr
+	var jsonBodyArrGeneric []interface{}
 	var events []common.MapStr
 
 	body, err := ioutil.ReadAll(response.Body)
@@ -186,13 +187,20 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	if m.jsonIsArray {
 		err = json.Unmarshal(body, &jsonBodyArr)
-		if err != nil {
-			return nil, err
-		}
 
-		for _, obj := range jsonBodyArr {
-			event := m.processBody(response, obj)
+		// The array does not contain all common.MapStr elements
+		if err != nil {
+			err = json.Unmarshal(body, &jsonBodyArrGeneric)
+			if err != nil {
+				return nil, err
+			}
+			event := m.processBody(response, makeValidMapStr(jsonBodyArrGeneric))
 			events = append(events, event)
+		} else {
+			for _, obj := range jsonBodyArr {
+				event := m.processBody(response, obj)
+				events = append(events, event)
+			}
 		}
 	} else {
 		err = json.Unmarshal(body, &jsonBody)

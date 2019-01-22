@@ -52,6 +52,19 @@ func TestFetchArray(t *testing.T) {
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 }
+
+func TestFetchArrayGeneric(t *testing.T) {
+	compose.EnsureUp(t, "http")
+
+	f := mbtest.NewEventsFetcher(t, getConfig("array_generic"))
+	event, err := f.Fetch()
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+}
+
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "http")
 
@@ -72,6 +85,9 @@ func getConfig(jsonType string) map[string]interface{} {
 		responseIsArray = false
 	case "array":
 		path = "/jsonarr"
+		responseIsArray = true
+	case "array_generic":
+		path = "/jsonarrgeneric"
 		responseIsArray = true
 	}
 
