@@ -4,8 +4,6 @@
     The Go program heap information exposed by expvar.
   release: beta
   fields:
-
-    # Should this be mapped?
     - name: cmdline
       type: keyword
       description: >
