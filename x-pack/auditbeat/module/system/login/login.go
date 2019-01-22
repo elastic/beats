@@ -91,7 +91,7 @@ func init() {
 // MetricSet collects login records from /var/log/wtmp.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config     Config
+	config     config
 	log        *logp.Logger
 	utmpReader *UtmpFileReader
 }
@@ -100,7 +100,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The %v/%v dataset is experimental", moduleName, metricsetName)
 
-	config := defaultConfig
+	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, errors.Wrapf(err, "failed to unpack the %v/%v config", moduleName, metricsetName)
 	}
