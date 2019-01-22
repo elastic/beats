@@ -176,7 +176,7 @@ services:
     build:
       context: ./module/mysql/_meta
       args:
-        MYSQL_IMAGE: percona:8.0.13
+        MYSQL_IMAGE: percona:8.0.13-4
 
   mariadb_10_2:
     build:
