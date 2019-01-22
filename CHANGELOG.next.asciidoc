@@ -192,6 +192,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release kubernetes apiserver and event metricsets as GA {pull}10212[10212]
 - Release Couchbase module as GA. {pull}10201[10201]
 - Making RabbitMQ Metricbeat module GA. {pull}10165[10165]
+- Release mongodb.metrics and mongodb.replstatus as GA. {pull}[]
 
 *Packetbeat*
 
