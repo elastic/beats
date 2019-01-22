@@ -6,15 +6,10 @@
 
 package login
 
-// #include <utmp.h>
-// #include <stdlib.h>
-import "C"
-
 import (
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
-	"fmt"
 	"io"
 	"net"
 	"os"
@@ -24,8 +19,6 @@ import (
 	"sort"
 	"strconv"
 	"syscall"
-	"time"
-	"unsafe"
 
 	"github.com/pkg/errors"
 
@@ -46,30 +39,6 @@ type FileRecord struct {
 	Inode    Inode
 	Size     int64
 	LastUtmp Utmp
-}
-
-// Utmp contains data from the C utmp struct.
-type Utmp struct {
-	UtType   int
-	UtPid    int
-	UtLine   string
-	UtUser   string
-	UtHost   string
-	UtTv     time.Time
-	UtAddrV6 [4]uint32
-}
-
-func newUtmp(utmpC *C.struct_utmp) Utmp {
-	// See utmp(5) for the utmp struct fields.
-	return Utmp{
-		UtType:   int(utmpC.ut_type),
-		UtPid:    int(utmpC.ut_pid),
-		UtLine:   C.GoString(&utmpC.ut_line[0]),
-		UtUser:   C.GoString(&utmpC.ut_user[0]),
-		UtHost:   C.GoString(&utmpC.ut_host[0]),
-		UtTv:     time.Unix(int64(utmpC.ut_tv.tv_sec), int64(utmpC.ut_tv.tv_usec)*1000),
-		UtAddrV6: [4]uint32{uint32(utmpC.ut_addr_v6[0]), uint32(utmpC.ut_addr_v6[1]), uint32(utmpC.ut_addr_v6[2]), uint32(utmpC.ut_addr_v6[3])},
-	}
 }
 
 // UtmpFileReader can read a UTMP formatted file (usually /var/log/wtmp).
@@ -233,36 +202,25 @@ func (r *UtmpFileReader) updateFileRecord(inode Inode, size int64, utmpRecords *
 // and returns the records after the provided last known record.
 // If record is nil, it returns all records in the file.
 func (r *UtmpFileReader) readAfter(path string, lastKnownRecord *Utmp) ([]Utmp, error) {
-	cs := C.CString(path)
-	defer C.free(unsafe.Pointer(cs))
-
-	success, err := C.utmpname(cs)
+	f, err := os.Open(path)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error selecting UTMP file %v", path)
+		return nil, errors.Wrapf(err, "error opening %v", path)
 	}
-	if success != 0 {
-		return nil, fmt.Errorf("selecting UTMP file %v failed", path)
-	}
-
-	C.setutent()
-	defer C.endutent()
 
 	reachedNewRecords := (lastKnownRecord == nil)
 	var utmpRecords []Utmp
 	for {
-		utmpC, err := C.getutent()
+		utmp, err := ReadNextUtmp(f)
 		if err != nil && err != io.EOF {
-			return nil, errors.Wrapf(err, "error getting entry in UTMP file %v", path)
+			return nil, errors.Wrapf(err, "error reading entry in UTMP file %v", path)
 		}
 
-		if utmpC != nil {
-			utmp := newUtmp(utmpC)
-
+		if utmp != nil {
 			if reachedNewRecords {
 				r.log.Debugf("utmp: (ut_type=%d, ut_pid=%d, ut_line=%v, ut_user=%v, ut_host=%v, ut_tv.tv_sec=%v, ut_addr_v6=%v)",
 					utmp.UtType, utmp.UtPid, utmp.UtLine, utmp.UtUser, utmp.UtHost, utmp.UtTv, utmp.UtAddrV6)
 
-				utmpRecords = append(utmpRecords, utmp)
+				utmpRecords = append(utmpRecords, *utmp)
 			}
 
 			if !reachedNewRecords && lastKnownRecord != nil && reflect.DeepEqual(utmp, *lastKnownRecord) {
@@ -306,7 +264,7 @@ func (r *UtmpFileReader) processLoginRecord(utmp Utmp) *LoginRecord {
 
 	switch utmp.UtType {
 	// See utmp(5) for C constants.
-	case C.RUN_LVL: // 1
+	case RUN_LVL:
 		// The runlevel - though a number - is stored as
 		// the ASCII character of that number.
 		runlevel := string(rune(utmp.UtPid))
@@ -323,7 +281,7 @@ func (r *UtmpFileReader) processLoginRecord(utmp Utmp) *LoginRecord {
 			// Ignore runlevel changes that are not halt or reboot.
 			return nil
 		}
-	case C.BOOT_TIME: // 2
+	case BOOT_TIME:
 		if utmp.UtLine == "~" && utmp.UtUser == "reboot" {
 			record.Type = bootRecord
 
@@ -335,7 +293,7 @@ func (r *UtmpFileReader) processLoginRecord(utmp Utmp) *LoginRecord {
 			// Ignore unknown record
 			return nil
 		}
-	case C.USER_PROCESS: // 7
+	case USER_PROCESS:
 		record.Type = userLoginRecord
 
 		record.Username = utmp.UtUser
@@ -347,7 +305,7 @@ func (r *UtmpFileReader) processLoginRecord(utmp Utmp) *LoginRecord {
 		// Store TTY from user login record for enrichment when user logout
 		// record comes along (which, alas, does not contain the username).
 		r.loginSessions[record.TTY] = record
-	case C.DEAD_PROCESS: // 8
+	case DEAD_PROCESS:
 		savedRecord, found := r.loginSessions[record.TTY]
 		if found {
 			record.Type = userLogoutRecord
