@@ -527,8 +527,8 @@ func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
 	}())
 }
 
-// handleFlags parses the command line flags. It handles the '-version' flag
-// and invokes the HandleFlags callback if implemented by the Beat.
+// handleFlags parses the command line flags. It invokes the HandleFlags
+// callback if implemented by the Beat.
 func (b *Beat) handleFlags() error {
 	flag.Parse()
 	return cfgfile.HandleFlags()
