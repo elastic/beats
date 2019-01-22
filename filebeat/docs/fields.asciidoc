@@ -12,7 +12,7 @@ This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 This document describes the fields that are exported by Filebeat. They are
 grouped in the following categories:
 
-* <<exported-fields-apache2>>
+* <<exported-fields-apache>>
 * <<exported-fields-auditd>>
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
@@ -34,73 +34,63 @@ grouped in the following categories:
 * <<exported-fields-nginx>>
 * <<exported-fields-osquery>>
 * <<exported-fields-postgresql>>
+* <<exported-fields-process>>
 * <<exported-fields-redis>>
 * <<exported-fields-santa>>
 * <<exported-fields-suricata>>
 * <<exported-fields-system>>
 * <<exported-fields-traefik>>
+* <<exported-fields-zeek>>
 
 --
-[[exported-fields-apache2]]
-== Apache2 fields
+[[exported-fields-apache]]
+== Apache fields
 
-Apache2 Module
+Apache Module
 
 
 
 [float]
 == apache2 fields
 
-Apache2 fields.
+Aliases for backward compatibility with old apache2 fields
 
-
-
-[float]
-== access fields
-
-Contains fields for the Apache2 HTTPD access logs.
 
 
 
 *`apache2.access.remote_ip`*::
 +
 --
-type: keyword
+type: alias
 
-Client IP address or hostname.
-
+alias to: source.address
 
 --
 
 *`apache2.access.ssl.protocol`*::
 +
 --
-type: keyword
+type: alias
 
-SSL protocol version.
-
+alias to: apache.access.ssl.protocol
 
 --
 
 *`apache2.access.ssl.cipher`*::
 +
 --
-type: keyword
+type: alias
 
-SSL cipher name.
-
+alias to: apache.access.ssl.cipher
 
 --
 
 *`apache2.access.body_sent.bytes`*::
 +
 --
-type: long
+type: alias
 
-format: bytes
-
-The number of bytes of the server response body.
-
+alias to: apache.access.body_sent.bytes
 
 --
 
@@ -313,12 +303,6 @@ alias to: source.geo.region_iso_code
 
 --
 
-[float]
-== error fields
-
-Fields from the Apache error logs.
-
-
 
 *`apache2.error.level`*::
 +
@@ -326,19 +310,6 @@ Fields from the Apache error logs.
 type: alias
 
 alias to: log.level
-
-The severity level of the message.
-
-
---
-
-*`apache2.error.client`*::
-+
---
-type: keyword
-
-The IP address of the client that generated the error.
-
 
 --
 
@@ -349,9 +320,6 @@ type: alias
 
 alias to: message
 
-The logged message.
-
-
 --
 
 *`apache2.error.pid`*::
@@ -360,9 +328,6 @@ The logged message.
 type: alias
 
 alias to: process.pid
-
-The process ID.
-
 
 --
 
@@ -373,12 +338,71 @@ type: alias
 
 alias to: process.thread.id
 
-The thread ID.
+--
+
+*`apache2.error.module`*::
++
+--
+type: alias
+
+alias to: apache.error.module
+
+--
+
+[float]
+== apache fields
+
+Apache fields.
+
+
+
+[float]
+== access fields
+
+Contains fields for the Apache HTTP Server access logs.
+
+
+
+*`apache.access.ssl.protocol`*::
++
+--
+type: keyword
+
+SSL protocol version.
 
 
 --
 
-*`apache2.error.module`*::
+*`apache.access.ssl.cipher`*::
++
+--
+type: keyword
+
+SSL cipher name.
+
+
+--
+
+*`apache.access.body_sent.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+The number of bytes of the server response body.
+
+
+--
+
+[float]
+== error fields
+
+Fields from the Apache error logs.
+
+
+
+*`apache.error.module`*::
 +
 --
 type: keyword
@@ -622,6 +646,24 @@ type: keyword
 
 Error type.
 
+
+--
+
+*`beat.name`*::
++
+--
+type: alias
+
+alias to: host.name
+
+--
+
+*`beat.hostname`*::
++
+--
+type: alias
+
+alias to: agent.hostname
 
 --
 
@@ -3749,24 +3791,6 @@ Operating system kernel version as a raw string.
 
 --
 
-*`beat.name`*::
-+
---
-type: alias
-
-alias to: agent.type
-
---
-
-*`beat.hostname`*::
-+
---
-type: alias
-
-alias to: agent.hostname
-
---
-
 *`agent.hostname`*::
 +
 --
@@ -3921,17 +3945,6 @@ The layer from which this event originated: rest, transport or ip_filter
 
 --
 
-*`elasticsearch.audit.event_type`*::
-+
---
-type: keyword
-
-example: access_granted
-
-The type of event that occurred: anonymous_access_denied, authentication_failed, access_denied, access_granted, connection_granted, connection_denied, tampered_request, run_as_granted, run_as_denied
-
---
-
 *`elasticsearch.audit.origin_type`*::
 +
 --
@@ -3943,25 +3956,23 @@ Where the request originated: rest (request originated from a REST API request),
 
 --
 
-*`elasticsearch.audit.origin_address`*::
-+
---
-type: ip
-
-example: 192.168.1.42
-
-The IP address from which the request originated
-
---
-
-*`elasticsearch.audit.principal`*::
+*`elasticsearch.audit.realm`*::
 +
 --
 type: keyword
 
-example: _anonymous
+The authentication realm
 
-The principal (username) that failed authentication
+--
+
+*`elasticsearch.audit.roles`*::
++
+--
+type: array
+
+example: ['kibana_user', 'beats_admin']
+
+Roles to which the principal belongs
 
 --
 
@@ -3976,14 +3987,14 @@ The name of the action that was executed
 
 --
 
-*`elasticsearch.audit.uri`*::
+*`elasticsearch.audit.indices`*::
 +
 --
-type: keyword
+type: array
 
-example: /_xpack/security/_authenticate
+example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
 
-The REST endpoint URI
+Indices accessed by action
 
 --
 
@@ -3998,14 +4009,48 @@ The type of request that was executed
 
 --
 
+*`elasticsearch.audit.event_type`*::
++
+--
+type: alias
+
+alias to: event.type
+
+--
+
+*`elasticsearch.audit.origin_address`*::
++
+--
+type: alias
+
+alias to: source.ip
+
+--
+
+*`elasticsearch.audit.uri`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
 *`elasticsearch.audit.request_body`*::
 +
 --
-type: text
+type: alias
 
-example: body
+alias to: http.request.body.content
 
-The body of the request, if enabled
+--
+
+*`elasticsearch.audit.principal`*::
++
+--
+type: alias
+
+alias to: user.name
 
 --
 
@@ -4687,9 +4732,9 @@ Information about the client doing the request
 *`haproxy.client.ip`*::
 +
 --
-IP address of the client which initiated the TCP connection to haproxy.
-If connection is via unix socket, socket path is in this field.
+type: alias
 
+alias to: source.address
 
 --
 
@@ -4817,15 +4862,6 @@ Please add description
 Fields related to the HTTP response
 
 
-*`haproxy.http.response.status_code`*::
-+
---
-type: long
-
-HTTP status code returned to the client.
-
---
-
 *`haproxy.http.response.captured_cookie`*::
 +
 --
@@ -4841,6 +4877,15 @@ type: text
 
 List of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
 
+
+--
+
+*`haproxy.http.response.status_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
 
 --
 
@@ -5162,7 +5207,7 @@ The number of bytes of the server request body.
 --
 type: alias
 
-alias to: destination.ip
+alias to: destination.address
 
 --
 
@@ -5216,7 +5261,7 @@ alias to: user.name
 --
 type: alias
 
-alias to: source.ip
+alias to: source.address
 
 --
 
@@ -5409,88 +5454,6 @@ Contains fields for IIS error logs.
 
 
 
-*`iis.error.remote_ip`*::
-+
---
-type: keyword
-
-The client IP address.
-
-
---
-
-*`iis.error.remote_port`*::
-+
---
-type: long
-
-The client port number.
-
-
---
-
-*`iis.error.server_ip`*::
-+
---
-type: keyword
-
-The server IP address.
-
-
---
-
-*`iis.error.server_port`*::
-+
---
-type: long
-
-The server port number.
-
-
---
-
-*`iis.error.http_version`*::
-+
---
-type: keyword
-
-The HTTP version.
-
-
---
-
-*`iis.error.method`*::
-+
---
-type: keyword
-
-example: GET
-
-The request HTTP method.
-
-
---
-
-*`iis.error.url`*::
-+
---
-type: keyword
-
-The request HTTP URL.
-
-
---
-
-*`iis.error.response_code`*::
-+
---
-type: long
-
-The HTTP response code.
-
-
---
-
 *`iis.error.reason_phrase`*::
 +
 --
@@ -5511,70 +5474,130 @@ The IIS application pool name.
 
 --
 
-[float]
-== geoip fields
+*`iis.error.remote_ip`*::
++
+--
+type: alias
 
-Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+alias to: source.address
 
+--
+
+*`iis.error.remote_port`*::
++
+--
+type: alias
+
+alias to: source.port
+
+--
+
+*`iis.error.server_ip`*::
++
+--
+type: alias
+
+alias to: destination.address
+
+--
+
+*`iis.error.server_port`*::
++
+--
+type: alias
+
+alias to: destination.port
+
+--
+
+*`iis.error.http_version`*::
++
+--
+type: alias
+
+alias to: http.version
+
+--
+
+*`iis.error.method`*::
++
+--
+type: alias
+
+alias to: http.request.method
+
+--
+
+*`iis.error.url`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`iis.error.response_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
 
 
 *`iis.error.geoip.continent_name`*::
 +
 --
-type: keyword
+type: alias
 
-The name of the continent.
-
+alias to: source.geo.continent_name
 
 --
 
 *`iis.error.geoip.country_iso_code`*::
 +
 --
-type: keyword
+type: alias
 
-Country ISO code.
-
+alias to: source.geo.country_iso_code
 
 --
 
 *`iis.error.geoip.location`*::
 +
 --
-type: geo_point
+type: alias
 
-The longitude and latitude.
-
+alias to: source.geo.location
 
 --
 
 *`iis.error.geoip.region_name`*::
 +
 --
-type: keyword
+type: alias
 
-The region name.
-
+alias to: source.geo.region_name
 
 --
 
 *`iis.error.geoip.city_name`*::
 +
 --
-type: keyword
+type: alias
 
-The city name.
-
+alias to: source.geo.city_name
 
 --
 
 *`iis.error.geoip.region_iso_code`*::
 +
 --
-type: keyword
+type: alias
 
-Region ISO code.
-
+alias to: source.geo.region_iso_code
 
 --
 
@@ -5717,6 +5740,69 @@ Current state of Kibana.
 +
 --
 type: object
+
+--
+
+*`kibana.log.kibana.log.meta.req.headers.referer`*::
++
+--
+type: alias
+
+alias to: http.request.referrer
+
+--
+
+*`kibana.log.kibana.log.meta.req.referer`*::
++
+--
+type: alias
+
+alias to: http.request.referrer
+
+--
+
+*`kibana.log.kibana.log.meta.req.headers.user-agent`*::
++
+--
+type: alias
+
+alias to: user_agent.original
+
+--
+
+*`kibana.log.kibana.log.meta.req.remoteAddress`*::
++
+--
+type: alias
+
+alias to: source.address
+
+--
+
+*`kibana.log.kibana.log.meta.req.url`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`kibana.log.kibana.log.meta.statusCode`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
+*`kibana.log.kibana.log.meta.method`*::
++
+--
+type: alias
+
+alias to: http.request.method
 
 --
 
@@ -5873,14 +5959,6 @@ The input type from which the event was generated. This field is set to the valu
 
 --
 
-*`read_timestamp`*::
-+
---
-In case the ingest pipeline parses the timestamp from the log contents, it stores the original `@timestamp` (representing the time when the log line was read) in this field.
-
-
---
-
 *`syslog.facility`*::
 +
 --
@@ -5981,9 +6059,10 @@ type: keyword
 *`fileset.name`*::
 +
 --
-type: alias
+type: keyword
 
-alias to: event.dataset
+The Filebeat fileset that generated this event.
+
 
 --
 
@@ -5993,6 +6072,15 @@ alias to: event.dataset
 type: alias
 
 alias to: event.module
+
+--
+
+*`read_timestamp`*::
++
+--
+type: alias
+
+alias to: event.created
 
 --
 
@@ -6015,26 +6103,6 @@ logstash Module
 Fields from the Logstash logs.
 
 
-
-*`logstash.log.message`*::
-+
---
-type: text
-
-Contains the un-parsed log message
-
-
---
-
-*`logstash.log.level`*::
-+
---
-type: keyword
-
-The log level of the message, this correspond to Log4j levels.
-
-
---
 
 *`logstash.log.module`*::
 +
@@ -6066,6 +6134,24 @@ key and value debugging information.
 
 --
 
+*`logstash.log.message`*::
++
+--
+type: alias
+
+alias to: message
+
+--
+
+*`logstash.log.level`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
 [float]
 == slowlog fields
 
@@ -6079,16 +6165,6 @@ slowlog
 type: text
 
 Contains the un-parsed log message
-
-
---
-
-*`logstash.slowlog.level`*::
-+
---
-type: keyword
-
-The log level of the message, this correspond to Log4j levels.
 
 
 --
@@ -6153,16 +6229,6 @@ Execution time for the plugin in milliseconds.
 
 --
 
-*`logstash.slowlog.took_in_nanos`*::
-+
---
-type: long
-
-Execution time for the plugin in nanoseconds.
-
-
---
-
 *`logstash.slowlog.plugin_params`*::
 +
 --
@@ -6180,6 +6246,24 @@ type: object
 
 key -> value of the configuration used by the plugin.
 
+
+--
+
+*`logstash.slowlog.level`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
+*`logstash.slowlog.took_in_nanos`*::
++
+--
+type: alias
+
+alias to: event.duration
 
 --
 
@@ -6203,18 +6287,6 @@ Fields from MongoDB logs.
 Contains fields from MongoDB logs.
 
 
-
-*`mongodb.log.severity`*::
-+
---
-type: keyword
-
-example: I
-
-Severity level of message
-
-
---
 
 *`mongodb.log.component`*::
 +
@@ -6240,13 +6312,21 @@ Context of message
 
 --
 
+*`mongodb.log.severity`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
 *`mongodb.log.message`*::
 +
 --
-type: text
+type: alias
 
-The message in the log line.
-
+alias to: message
 
 --
 
@@ -6264,6 +6344,16 @@ Fields from the MySQL log files.
 
 
 
+*`mysql.thread_id`*::
++
+--
+type: long
+
+The connection or thread ID for the query.
+
+
+--
+
 [float]
 == error fields
 
@@ -6271,40 +6361,30 @@ Contains fields from the MySQL error logs.
 
 
 
-*`mysql.error.timestamp`*::
-+
---
-The timestamp from the log line.
-
-
---
-
 *`mysql.error.thread_id`*::
 +
 --
-type: long
+type: alias
 
-As of MySQL 5.7.2, this is the thread id. For MySQL versions prior to 5.7.2, this field contains the process id.
-
+alias to: mysql.thread_id
 
 --
 
 *`mysql.error.level`*::
 +
 --
-example: Warning
+type: alias
 
-The log level.
+alias to: log.level
 
 --
 
 *`mysql.error.message`*::
 +
 --
-type: text
+type: alias
 
-The logged message.
-
+alias to: message
 
 --
 
@@ -6314,30 +6394,6 @@ The logged message.
 Contains fields from the MySQL slow logs.
 
 
-
-*`mysql.slowlog.user`*::
-+
---
-The MySQL user that created the query.
-
-
---
-
-*`mysql.slowlog.host`*::
-+
---
-The host from where the user that created the query logged in.
-
-
---
-
-*`mysql.slowlog.ip`*::
-+
---
-The IP address from where the user that created the query logged in.
-
-
---
 
 *`mysql.slowlog.query_time.sec`*::
 +
@@ -6379,12 +6435,12 @@ The number of rows scanned by the query.
 
 --
 
-*`mysql.slowlog.timestamp`*::
+*`mysql.slowlog.rows_affected`*::
 +
 --
 type: long
 
-The unix timestamp taken from the `SET timestamp` query.
+The number of rows modified by the query.
 
 
 --
@@ -6400,10 +6456,146 @@ The slow query.
 *`mysql.slowlog.id`*::
 +
 --
+type: alias
+
+alias to: mysql.thread_id
+
+--
+
+*`mysql.slowlog.schema`*::
++
+--
+type: keyword
+
+The schema where the slow query was executed.
+
+
+--
+
+*`mysql.slowlog.current_user`*::
++
+--
+type: keyword
+
+Current authenticated user, used to determine access privileges. Can differ from the value for user.
+
+
+--
+
+*`mysql.slowlog.query_cache_hit`*::
++
+--
+type: boolean
+
+Whether the query cache was hit.
+
+
+--
+
+*`mysql.slowlog.tmp_table`*::
++
+--
+type: boolean
+
+Whether a temporary table was used to resolve the query.
+
+
+--
+
+*`mysql.slowlog.tmp_table_on_disk`*::
++
+--
+type: boolean
+
+Whether the query needed temporary tables on disk.
+
+
+--
+
+*`mysql.slowlog.filesort`*::
++
+--
+type: boolean
+
+Whether filesort optimization was used.
+
+
+--
+
+*`mysql.slowlog.filesort_on_disk`*::
++
+--
+type: boolean
+
+Whether filesort optimization was used and it needed temporary tables on disk.
+
+
+--
+
+*`mysql.slowlog.priority_queue`*::
++
+--
+type: boolean
+
+Whether a priority queue was used for filesort.
+
+
+--
+
+*`mysql.slowlog.full_scan`*::
++
+--
+type: boolean
+
+Whether a full table scan was needed for the slow query.
+
+
+--
+
+*`mysql.slowlog.full_join`*::
++
+--
+type: boolean
+
+Whether a full join was needed for the slow query (no indexes were used for joins).
+
+
+--
+
+*`mysql.slowlog.merge_passes`*::
++
+--
 type: long
 
-The connection ID for the query.
+Number of merge passes executed for the query.
 
+
+--
+
+*`mysql.slowlog.user`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`mysql.slowlog.host`*::
++
+--
+type: alias
+
+alias to: source.domain
+
+--
+
+*`mysql.slowlog.ip`*::
++
+--
+type: alias
+
+alias to: source.ip
 
 --
 
@@ -9877,36 +10069,6 @@ Contains fields for the Nginx error logs.
 
 
 
-*`nginx.error.level`*::
-+
---
-type: keyword
-
-Error level (e.g. error, critical).
-
-
---
-
-*`nginx.error.pid`*::
-+
---
-type: long
-
-Process identifier (PID).
-
-
---
-
-*`nginx.error.tid`*::
-+
---
-type: long
-
-Thread identifier.
-
-
---
-
 *`nginx.error.connection_id`*::
 +
 --
@@ -9917,13 +10079,39 @@ Connection identifier.
 
 --
 
+*`nginx.error.level`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
+*`nginx.error.pid`*::
++
+--
+type: alias
+
+alias to: process.pid
+
+--
+
+*`nginx.error.tid`*::
++
+--
+type: alias
+
+alias to: process.thread.id
+
+--
+
 *`nginx.error.message`*::
 +
 --
-type: text
+type: alias
 
-The error message
-
+alias to: message
 
 --
 
@@ -10105,6 +10293,23 @@ alias to: log.level
 type: alias
 
 alias to: message
+
+--
+
+[[exported-fields-process]]
+== Process fields
+
+Process metadata fields
+
+
+
+
+*`process.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
 
 --
 
@@ -12504,6 +12709,657 @@ alias to: source.geo.city_name
 type: alias
 
 alias to: source.geo.region_iso_code
+
+--
+
+[[exported-fields-zeek]]
+== Zeek fields
+
+Module for handling logs produced by Zeek/Bro
+
+
+
+[float]
+== zeek fields
+
+Fields from Zeek/Bro logs after normalization
+
+
+
+*`zeek.session_id`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.connection.local_orig`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.connection.local_resp`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.connection.missed_bytes`*::
++
+--
+type: long
+
+--
+
+*`zeek.connection.state`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.connection.history`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.connection.orig_l2_addr`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.resp_l2_addr`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.vlan`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.inner_vlan`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.trans_id`*::
++
+--
+type: integer
+
+--
+
+*`zeek.dns.rtt`*::
++
+--
+type: double
+
+--
+
+*`zeek.dns.query`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.qclass`*::
++
+--
+type: long
+
+--
+
+*`zeek.dns.qclass_name`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.qtype`*::
++
+--
+type: long
+
+--
+
+*`zeek.dns.qtype_name`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.rcode`*::
++
+--
+type: long
+
+--
+
+*`zeek.dns.rcode_name`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.AA`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.dns.TC`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.dns.RD`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.dns.RA`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.dns.answers`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.dns.TTLs`*::
++
+--
+type: double
+
+--
+
+*`zeek.dns.rejected`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.dns.total_answers`*::
++
+--
+type: integer
+
+--
+
+*`zeek.dns.total_replies`*::
++
+--
+type: integer
+
+--
+
+*`zeek.dns.saw_query`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.dns.saw_reply`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.http.trans_depth`*::
++
+--
+type: integer
+
+--
+
+*`zeek.http.status_msg`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.info_code`*::
++
+--
+type: integer
+
+--
+
+*`zeek.http.info_msg`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.filename`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.tags`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.captured_password`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.http.proxied`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.range_request`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.http.client_header_names`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.server_header_names`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.orig_fuids`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.orig_mime_types`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.orig_filenames`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.resp_fuids`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.resp_mime_types`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.resp_filenames`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.http.orig_mime_depth`*::
++
+--
+type: integer
+
+--
+
+*`zeek.http.resp_mime_depth`*::
++
+--
+type: integer
+
+--
+
+*`zeek.files.fuid`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.tx_host`*::
++
+--
+type: ip
+
+--
+
+*`zeek.files.rx_host`*::
++
+--
+type: ip
+
+--
+
+*`zeek.files.session_ids`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.source`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.depth`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.analyzers`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.mime_type`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.filename`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.local_orig`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.files.is_orig`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.files.duration`*::
++
+--
+type: double
+
+--
+
+*`zeek.files.seen_bytes`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.total_bytes`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.missing_bytes`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.overflow_bytes`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.timedout`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.files.parent_fuid`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.md5`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.sha1`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.sha256`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.extracted`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.files.extracted_cutoff`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.files.extracted_size`*::
++
+--
+type: long
+
+--
+
+*`zeek.files.entropy`*::
++
+--
+type: double
+
+--
+
+*`zeek.ssl.version`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.cipher`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.curve`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.server_name`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.resumed`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.ssl.next_protocol`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.established`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.ssl.cert_chain`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.cert_chain_fuids`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.client_cert_chain`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.client_cert_chain_fuids`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.issuer`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.client_issuer`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.validation_status`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.subject`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.client_subject`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.ssl.last_alert`*::
++
+--
+type: keyword
 
 --
 

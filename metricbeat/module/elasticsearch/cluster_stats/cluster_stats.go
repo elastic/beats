@@ -20,7 +20,6 @@ package cluster_stats
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
@@ -44,8 +43,6 @@ type MetricSet struct {
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("the " + base.FullyQualifiedName() + " metricset is beta")
-
 	ms, err := elasticsearch.NewMetricSet(base, clusterStatsPath)
 	if err != nil {
 		return nil, err

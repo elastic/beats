@@ -20,7 +20,6 @@ package index_recovery
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
@@ -40,13 +39,10 @@ const (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*elasticsearch.MetricSet
-	recoveryPath string
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The " + base.FullyQualifiedName() + " metricset is beta")
-
 	config := struct {
 		ActiveOnly bool `config:"index_recovery.active_only"`
 		XPack      bool `config:"xpack.enabled"`
@@ -67,12 +63,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &MetricSet{MetricSet: ms, recoveryPath: localRecoveryPath}, nil
+	return &MetricSet{MetricSet: ms}, nil
 }
 
 // Fetch gathers stats for each index from the _stats API
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
-	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.getServiceURI())
+	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.GetServiceURI())
 	if err != nil {
 		err = errors.Wrap(err, "error determining if connected Elasticsearch node is master")
 		elastic.ReportAndLogError(err, r, m.Log)
@@ -85,7 +81,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	info, err := elasticsearch.GetInfo(m.HTTP, m.getServiceURI())
+	info, err := elasticsearch.GetInfo(m.HTTP, m.GetServiceURI())
 	if err != nil {
 		elastic.ReportAndLogError(err, r, m.Log)
 		return
@@ -107,9 +103,4 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		m.Log.Error(err)
 		return
 	}
-}
-
-func (m *MetricSet) getServiceURI() string {
-	return m.HostData().SanitizedURI + m.recoveryPath
-
 }

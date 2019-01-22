@@ -21,6 +21,7 @@ grouped in the following categories:
 * <<exported-fields-http>>
 * <<exported-fields-icmp>>
 * <<exported-fields-kubernetes-processor>>
+* <<exported-fields-process>>
 * <<exported-fields-resolve>>
 * <<exported-fields-socks5>>
 * <<exported-fields-tcp>>
@@ -67,6 +68,24 @@ type: keyword
 
 Error type.
 
+
+--
+
+*`beat.name`*::
++
+--
+type: alias
+
+alias to: host.name
+
+--
+
+*`beat.hostname`*::
++
+--
+type: alias
+
+alias to: agent.hostname
 
 --
 
@@ -211,7 +230,9 @@ Duration in microseconds
 *`monitor.scheme`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: url.scheme
 
 Address url scheme. For example `tcp`, `tls`, `http`, and `https`.
 
@@ -221,7 +242,9 @@ Address url scheme. For example `tcp`, `tls`, `http`, and `https`.
 *`monitor.host`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: url.domain
 
 Hostname of service being monitored. Can be missing, if service is monitored by IP.
 
@@ -3294,24 +3317,6 @@ Operating system kernel version as a raw string.
 
 --
 
-*`beat.name`*::
-+
---
-type: alias
-
-alias to: agent.type
-
---
-
-*`beat.hostname`*::
-+
---
-type: alias
-
-alias to: agent.hostname
-
---
-
 *`agent.hostname`*::
 +
 --
@@ -3414,20 +3419,12 @@ HTTP related fields.
 *`http.url`*::
 +
 --
-type: text
+type: alias
+
+alias to: url.full
 
 Service url used by monitor.
 
-
-*`http.url.raw`*::
-+
---
-type: keyword
-
-The service url used by monitor. This is a non-analyzed field that is useful for aggregations.
-
-
---
 
 --
 
@@ -3667,6 +3664,23 @@ Kubernetes container image
 
 --
 
+[[exported-fields-process]]
+== Process fields
+
+Process metadata fields
+
+
+
+
+*`process.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
+
+--
+
 [[exported-fields-resolve]]
 == Host lookup fields
 
@@ -3683,7 +3697,9 @@ Host lookup fields.
 *`resolve.host`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: url.domain
 
 Hostname of service being monitored.
 
@@ -3767,7 +3783,9 @@ TCP network layer related fields.
 *`tcp.port`*::
 +
 --
-type: integer
+type: alias
+
+alias to: url.port
 
 Service port number.
 

@@ -329,6 +329,13 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 				continue
 			}
 
+			if runtime.GOOS == "windows" && (pid == 0 || os.IsPermission(err)) {
+				// On Windows, the call to Process() can fail if Auditbeat does not have
+				// the necessary access rights, while trying to open the System Process (PID: 0)
+				// will always fail.
+				continue
+			}
+
 			// Record what we can and continue
 			process = &Process{
 				Info: types.ProcessInfo{

@@ -32,12 +32,16 @@
               description: Duration in microseconds
 
         - name: scheme
-          type: keyword
+          type: alias
+          path: url.scheme
+          migration: true
           description: >
             Address url scheme. For example `tcp`, `tls`, `http`, and `https`.
 
         - name: host
-          type: keyword
+          type: alias
+          path: url.domain
+          migration: true
           description: >
             Hostname of service being monitored. Can be missing, if service is
             monitored by IP.
@@ -64,7 +68,9 @@
         Host lookup fields.
       fields:
         - name: host
-          type: keyword
+          type: alias
+          path: url.domain
+          migration: true
           description: >
             Hostname of service being monitored.
 

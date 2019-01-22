@@ -20,6 +20,8 @@
   # Enriching parameters:
   #add_metadata: true
   #in_cluster: true
+  #labels.dedot: false
+  #annotations.dedot: false
   # When used outside the cluster:
   #in_cluster: false
   #host: node_name

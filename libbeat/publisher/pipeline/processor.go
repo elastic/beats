@@ -27,9 +27,11 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/actions"
 )
 
 type program struct {
+	log   *logp.Logger
 	title string
 	list  []beat.Processor
 }
@@ -58,16 +60,20 @@ type processorFn struct {
 // 10. (P) (if output disabled) dropEvent
 func newProcessorPipeline(
 	info beat.Info,
+	monitors Monitors,
 	global pipelineProcessors,
 	config beat.ClientConfig,
 ) beat.Processor {
 	var (
 		// pipeline processors
-		processors = &program{title: "processPipeline"}
+		processors = &program{
+			title: "processPipeline",
+			log:   monitors.Logger,
+		}
 
 		// client fields and metadata
 		clientMeta      = config.Meta
-		localProcessors = makeClientProcessors(config)
+		localProcessors = makeClientProcessors(monitors, config)
 	)
 
 	needsCopy := global.alwaysCopy || localProcessors != nil || global.processors != nil
@@ -87,7 +93,7 @@ func newProcessorPipeline(
 	tags = append(tags, global.tags...)
 	tags = append(tags, config.EventMetadata.Tags...)
 	if len(tags) > 0 {
-		processors.add(makeAddTagsProcessor("tags", tags))
+		processors.add(actions.NewAddTags("tags", tags))
 	}
 
 	// setup 3, 4, 5: client config fields + pipeline fields + client fields + dyn metadata
@@ -98,17 +104,17 @@ func newProcessorPipeline(
 	}
 
 	if len(fields) > 0 {
-		// Enforce a copy of fields if dynamic fields are configured or beats
+		// Enforce a copy of fields if dynamic fields are configured or agent
 		// metadata will be merged into the fields.
 		// With dynamic fields potentially changing at any time, we need to copy,
 		// so we do not change shared structures be accident.
-		fieldsNeedsCopy := needsCopy || config.DynamicFields != nil || fields["beat"] != nil
-		processors.add(makeAddFieldsProcessor("fields", fields, fieldsNeedsCopy))
+		fieldsNeedsCopy := needsCopy || config.DynamicFields != nil || fields["agent"] != nil
+		processors.add(actions.NewAddLabels(fields, fieldsNeedsCopy))
 	}
 
 	if config.DynamicFields != nil {
 		checkCopy := func(m common.MapStr) bool {
-			return needsCopy || hasKey(m, "beat")
+			return needsCopy || hasKey(m, "agent")
 		}
 		processors.add(makeAddDynMetaProcessor("dynamicFields", config.DynamicFields, checkCopy))
 	}
@@ -118,15 +124,21 @@ func newProcessorPipeline(
 
 	// setup 6: add beats and host metadata
 	if meta := global.builtinMeta; len(meta) > 0 {
-		processors.add(makeAddFieldsProcessor("beatsMeta", meta, needsCopy))
+		processors.add(actions.NewAddLabels(meta, needsCopy))
 	}
 
-	// setup 7: pipeline processors list
+	// setup 7: add agent metadata
+	if !config.SkipAgentMetadata {
+		needsCopy := global.alwaysCopy || global.processors != nil
+		processors.add(actions.NewAddLabels(createAgentFields(info), needsCopy))
+	}
+
+	// setup 8: pipeline processors list
 	processors.add(global.processors)
 
 	// setup 9: debug print final event (P)
 	if logp.IsDebug("publish") {
-		processors.add(debugPrintProcessor(info))
+		processors.add(debugPrintProcessor(info, monitors))
 	}
 
 	// setup 10: drop all events if outputs are disabled (P)
@@ -135,6 +147,13 @@ func newProcessorPipeline(
 	}
 
 	return processors
+}
+
+func newProgram(title string, log *logp.Logger) *program {
+	return &program{
+		title: title,
+		log:   log,
+	}
 }
 
 func (p *program) add(processor processors.Processor) {
@@ -171,7 +190,7 @@ func (p *program) Run(event *beat.Event) (*beat.Event, error) {
 			//      We want processors having this kind of implicit behavior
 			//      on errors?
 
-			logp.Debug("filter", "fail to apply processor %s: %s", p, err)
+			p.log.Debugf("Fail to apply processor %s: %s", p, err)
 		}
 
 		if event == nil {
@@ -217,28 +236,6 @@ var dropDisabledProcessor = newProcessor("dropDisabled", func(event *beat.Event)
 	return nil, nil
 })
 
-func beatAnnotateProcessor(beatMeta common.MapStr) *processorFn {
-	const key = "beat"
-	return newAnnotateProcessor("annotateBeat", func(event *beat.Event) {
-		if orig, exists := event.Fields["beat"]; !exists {
-			event.Fields[key] = beatMeta.Clone()
-		} else if M, ok := orig.(common.MapStr); !ok {
-			event.Fields[key] = beatMeta.Clone()
-		} else {
-			event.Fields[key] = common.MapStrUnion(beatMeta, M)
-		}
-	})
-}
-
-func eventAnnotateProcessor(eventMeta common.EventMetadata) *processorFn {
-	return newAnnotateProcessor("annotateEvent", func(event *beat.Event) {
-		common.AddTags(event.Fields, eventMeta.Tags)
-		if fields := eventMeta.Fields; len(fields) > 0 {
-			common.MergeFields(event.Fields, fields.Clone(), eventMeta.FieldsUnderRoot)
-		}
-	})
-}
-
 func clientEventMeta(meta common.MapStr, needsCopy bool) *processorFn {
 	fn := func(event *beat.Event) { addMeta(event, meta) }
 	if needsCopy {
@@ -256,25 +253,6 @@ func addMeta(event *beat.Event, meta common.MapStr) {
 	}
 }
 
-func pipelineEventFields(fields common.MapStr, copy bool) *processorFn {
-	return makeAddFieldsProcessor("pipelineFields", fields, copy)
-}
-
-func makeAddTagsProcessor(name string, tags []string) *processorFn {
-	return newAnnotateProcessor(name, func(event *beat.Event) {
-		common.AddTags(event.Fields, tags)
-	})
-}
-
-func makeAddFieldsProcessor(name string, fields common.MapStr, copy bool) *processorFn {
-	fn := func(event *beat.Event) { event.Fields.DeepUpdate(fields) }
-	if copy {
-		fn = func(event *beat.Event) { event.Fields.DeepUpdate(fields.Clone()) }
-	}
-
-	return newAnnotateProcessor(name, fn)
-}
-
 func makeAddDynMetaProcessor(
 	name string,
 	meta *common.MapStrPointer,
@@ -290,12 +268,31 @@ func makeAddDynMetaProcessor(
 	})
 }
 
-func debugPrintProcessor(info beat.Info) *processorFn {
+func createAgentFields(info beat.Info) common.MapStr {
+	metadata := common.MapStr{
+		"type":         info.Beat,
+		"ephemeral_id": info.EphemeralID.String(),
+		"hostname":     info.Hostname,
+		"id":           info.ID.String(),
+		"version":      info.Version,
+	}
+	if info.Name != info.Hostname {
+		metadata.Put("name", info.Name)
+	}
+
+	return common.MapStr{"agent": metadata}
+}
+
+func debugPrintProcessor(info beat.Info, monitors Monitors) *processorFn {
 	// ensure only one go-routine is using the encoder (in case
 	// beat.Client is shared between multiple go-routines by accident)
 	var mux sync.Mutex
 
-	encoder := json.New(true, false, info.Version)
+	encoder := json.New(info.Version, json.Config{
+		Pretty:     true,
+		EscapeHTML: false,
+	})
+	log := monitors.Logger
 	return newProcessor("debugPrint", func(event *beat.Event) (*beat.Event, error) {
 		mux.Lock()
 		defer mux.Unlock()
@@ -305,21 +302,23 @@ func debugPrintProcessor(info beat.Info) *processorFn {
 			return event, nil
 		}
 
-		logp.Debug("publish", "Publish event: %s", b)
+		log.Debugf("Publish event: %s", b)
 		return event, nil
 	})
 }
 
-func makeClientProcessors(config beat.ClientConfig) processors.Processor {
+func makeClientProcessors(
+	monitors Monitors,
+	config beat.ClientConfig,
+) processors.Processor {
 	procs := config.Processor
 	if procs == nil || len(procs.All()) == 0 {
 		return nil
 	}
 
-	return &program{
-		title: "client",
-		list:  procs.All(),
-	}
+	p := newProgram("client", monitors.Logger)
+	p.list = procs.All()
+	return p
 }
 
 func hasKey(m common.MapStr, key string) bool {

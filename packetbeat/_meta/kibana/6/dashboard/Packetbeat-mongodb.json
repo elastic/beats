@@ -1,847 +1,1422 @@
 {
-    "objects": [
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [], 
-                        "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
-                        }
-                    }
-                }, 
-                "title": "Navigation", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [], 
-                    "params": {
-                        "fontSize": "10", 
-                        "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Flows](#/dashboard/Packetbeat-Flows)\n\n[Web transactions](#/dashboard/Packetbeat-HTTP)\n\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\n\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\n\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\n\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\n\n[NFS transactions](#/dashboard/Packetbeat-NFS)\n\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)"
-                    }, 
-                    "title": "Navigation", 
-                    "type": "markdown"
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": {
+                "query_string": {
+                  "analyze_wildcard": true,
+                  "query": "*"
                 }
-            }, 
-            "id": "Navigation", 
-            "type": "visualization", 
-            "version": 10
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": []
-                    }
-                }, 
-                "savedSearchId": "651fd6d0-88d0-11e7-ad9c-db80de0bf8d3", 
-                "title": "MongoDB errors", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }, 
-                        {
-                            "id": "2", 
-                            "params": {
-                                "customInterval": "2h", 
-                                "extended_bounds": {}, 
-                                "field": "@timestamp", 
-                                "interval": "auto", 
-                                "min_doc_count": 1
-                            }, 
-                            "schema": "segment", 
-                            "type": "date_histogram"
-                        }, 
-                        {
-                            "id": "3", 
-                            "params": {
-                                "field": "resource", 
-                                "order": "desc", 
-                                "orderBy": "1", 
-                                "row": true, 
-                                "size": 3
-                            }, 
-                            "schema": "split", 
-                            "type": "terms"
-                        }, 
-                        {
-                            "id": "4", 
-                            "params": {
-                                "field": "method", 
-                                "order": "desc", 
-                                "orderBy": "1", 
-                                "size": 5
-                            }, 
-                            "schema": "group", 
-                            "type": "terms"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "addLegend": true, 
-                        "addTimeMarker": false, 
-                        "addTooltip": true, 
-                        "defaultYExtents": false, 
-                        "drawLinesBetweenPoints": true, 
-                        "interpolate": "linear", 
-                        "radiusRatio": 9, 
-                        "scale": "linear", 
-                        "setYExtents": false, 
-                        "shareYAxis": true, 
-                        "showCircles": true, 
-                        "smoothLines": false, 
-                        "spyPerPage": 10, 
-                        "times": [], 
-                        "yAxis": {}
-                    }, 
-                    "title": "MongoDB errors", 
-                    "type": "line"
-                }
-            }, 
-            "id": "MongoDB-errors", 
-            "type": "visualization", 
-            "version": 2
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": []
-                    }
-                }, 
-                "savedSearchId": "MongoDB-transactions", 
-                "title": "MongoDB commands", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }, 
-                        {
-                            "id": "2", 
-                            "params": {
-                                "customInterval": "2h", 
-                                "extended_bounds": {}, 
-                                "field": "@timestamp", 
-                                "interval": "auto", 
-                                "min_doc_count": 1
-                            }, 
-                            "schema": "segment", 
-                            "type": "date_histogram"
-                        }, 
-                        {
-                            "id": "3", 
-                            "params": {
-                                "field": "method", 
-                                "order": "desc", 
-                                "orderBy": "1", 
-                                "size": 5
-                            }, 
-                            "schema": "group", 
-                            "type": "terms"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "addLegend": true, 
-                        "addTimeMarker": false, 
-                        "addTooltip": true, 
-                        "defaultYExtents": false, 
-                        "interpolate": "linear", 
-                        "mode": "silhouette", 
-                        "scale": "linear", 
-                        "setYExtents": false, 
-                        "shareYAxis": true, 
-                        "smoothLines": true, 
-                        "times": [], 
-                        "yAxis": {}
-                    }, 
-                    "title": "MongoDB commands", 
-                    "type": "area"
-                }
-            }, 
-            "id": "MongoDB-commands", 
-            "type": "visualization", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": []
-                    }
-                }, 
-                "savedSearchId": "651fd6d0-88d0-11e7-ad9c-db80de0bf8d3", 
-                "title": "MongoDB errors per collection", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }, 
-                        {
-                            "id": "2", 
-                            "params": {
-                                "customInterval": "2h", 
-                                "extended_bounds": {}, 
-                                "field": "@timestamp", 
-                                "interval": "auto", 
-                                "min_doc_count": 1
-                            }, 
-                            "schema": "segment", 
-                            "type": "date_histogram"
-                        }, 
-                        {
-                            "id": "3", 
-                            "params": {
-                                "field": "resource", 
-                                "order": "desc", 
-                                "orderBy": "1", 
-                                "size": 5
-                            }, 
-                            "schema": "group", 
-                            "type": "terms"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "addLegend": true, 
-                        "addTimeMarker": false, 
-                        "addTooltip": true, 
-                        "defaultYExtents": false, 
-                        "drawLinesBetweenPoints": true, 
-                        "interpolate": "linear", 
-                        "radiusRatio": 9, 
-                        "scale": "linear", 
-                        "setYExtents": false, 
-                        "shareYAxis": true, 
-                        "showCircles": true, 
-                        "smoothLines": false, 
-                        "spyPerPage": 10, 
-                        "times": [], 
-                        "yAxis": {}
-                    }, 
-                    "title": "MongoDB errors per collection", 
-                    "type": "line"
-                }
-            }, 
-            "id": "MongoDB-errors-per-collection", 
-            "type": "visualization", 
-            "version": 2
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": []
-                    }
-                }, 
-                "savedSearchId": "MongoDB-transactions", 
-                "title": "MongoDB in/out throughput", 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {
-                                "field": "bytes_in"
-                            }, 
-                            "schema": "metric", 
-                            "type": "sum"
-                        }, 
-                        {
-                            "id": "2", 
-                            "params": {
-                                "customInterval": "2h", 
-                                "extended_bounds": {}, 
-                                "field": "@timestamp", 
-                                "interval": "auto", 
-                                "min_doc_count": 1
-                            }, 
-                            "schema": "segment", 
-                            "type": "date_histogram"
-                        }, 
-                        {
-                            "id": "4", 
-                            "params": {
-                                "field": "bytes_out"
-                            }, 
-                            "schema": "metric", 
-                            "type": "sum"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "addLegend": true, 
-                        "addTimeMarker": false, 
-                        "addTooltip": true, 
-                        "defaultYExtents": false, 
-                        "drawLinesBetweenPoints": true, 
-                        "interpolate": "linear", 
-                        "radiusRatio": 9, 
-                        "scale": "linear", 
-                        "setYExtents": false, 
-                        "shareYAxis": true, 
-                        "showCircles": true, 
-                        "smoothLines": false, 
-                        "times": [], 
-                        "yAxis": {}
-                    }, 
-                    "type": "line"
-                }
-            }, 
-            "id": "MongoDB-in-slash-out-throughput", 
-            "type": "visualization", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": []
-                    }
-                }, 
-                "savedSearchId": "MongoDB-transactions", 
-                "title": "MongoDB response times by collection", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {
-                                "field": "responsetime", 
-                                "percents": [
-                                    99
-                                ]
-                            }, 
-                            "schema": "metric", 
-                            "type": "percentiles"
-                        }, 
-                        {
-                            "id": "2", 
-                            "params": {
-                                "customInterval": "2h", 
-                                "extended_bounds": {}, 
-                                "field": "@timestamp", 
-                                "interval": "auto", 
-                                "min_doc_count": 1
-                            }, 
-                            "schema": "segment", 
-                            "type": "date_histogram"
-                        }, 
-                        {
-                            "id": "3", 
-                            "params": {
-                                "field": "resource", 
-                                "order": "desc", 
-                                "orderBy": "1.99", 
-                                "size": 5
-                            }, 
-                            "schema": "group", 
-                            "type": "terms"
-                        }, 
-                        {
-                            "id": "4", 
-                            "params": {}, 
-                            "schema": "radius", 
-                            "type": "count"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "addLegend": true, 
-                        "addTimeMarker": false, 
-                        "addTooltip": true, 
-                        "defaultYExtents": false, 
-                        "drawLinesBetweenPoints": false, 
-                        "interpolate": "linear", 
-                        "radiusRatio": "9", 
-                        "scale": "linear", 
-                        "setYExtents": false, 
-                        "shareYAxis": true, 
-                        "showCircles": true, 
-                        "smoothLines": false, 
-                        "times": [], 
-                        "yAxis": {}
-                    }, 
-                    "title": "MongoDB response times by collection", 
-                    "type": "line"
-                }
-            }, 
-            "id": "MongoDB-response-times-by-collection", 
-            "type": "visualization", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": []
-                    }
-                }, 
-                "savedSearchId": "MongoDB-transactions", 
-                "title": "Top slowest MongoDB queries", 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {
-                                "field": "responsetime", 
-                                "percents": [
-                                    99
-                                ]
-                            }, 
-                            "schema": "metric", 
-                            "type": "percentiles"
-                        }, 
-                        {
-                            "id": "2", 
-                            "params": {
-                                "field": "query", 
-                                "order": "desc", 
-                                "orderBy": "1.99", 
-                                "size": 10
-                            }, 
-                            "schema": "bucket", 
-                            "type": "terms"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "perPage": 10, 
-                        "showMeticsAtAllLevels": false, 
-                        "showPartialRows": false
-                    }, 
-                    "type": "table"
-                }
-            }, 
-            "id": "Top-slowest-MongoDB-queries", 
-            "type": "visualization", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": []
-                    }
-                }, 
-                "savedSearchId": "MongoDB-transactions-with-write-concern-0", 
-                "title": "Number of MongoDB transactions with writeConcern w=0", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }, 
-                        {
-                            "id": "2", 
-                            "params": {
-                                "customInterval": "2h", 
-                                "extended_bounds": {}, 
-                                "field": "@timestamp", 
-                                "interval": "auto", 
-                                "min_doc_count": 1
-                            }, 
-                            "schema": "segment", 
-                            "type": "date_histogram"
-                        }, 
-                        {
-                            "id": "3", 
-                            "params": {}, 
-                            "schema": "radius", 
-                            "type": "count"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "addLegend": true, 
-                        "addTimeMarker": false, 
-                        "addTooltip": true, 
-                        "defaultYExtents": false, 
-                        "drawLinesBetweenPoints": true, 
-                        "interpolate": "linear", 
-                        "radiusRatio": 9, 
-                        "scale": "linear", 
-                        "setYExtents": false, 
-                        "shareYAxis": true, 
-                        "showCircles": true, 
-                        "smoothLines": false, 
-                        "times": [], 
-                        "yAxis": {}
-                    }, 
-                    "title": "Number of MongoDB transactions with writeConcern w=0", 
-                    "type": "line"
-                }
-            }, 
-            "id": "Number-of-MongoDB-transactions-with-writeConcern-w-equal-0", 
-            "type": "visualization", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "columns": [
-                    "_source"
-                ], 
-                "description": "", 
-                "hits": 0, 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [
-                            {
-                                "$state": {
-                                    "store": "appState"
-                                }, 
-                                "meta": {
-                                    "alias": null, 
-                                    "disabled": false, 
-                                    "index": "packetbeat-*", 
-                                    "key": "type", 
-                                    "negate": false, 
-                                    "params": {
-                                        "query": "mongodb", 
-                                        "type": "phrase"
-                                    }, 
-                                    "type": "phrase", 
-                                    "value": "mongodb"
-                                }, 
-                                "query": {
-                                    "match": {
-                                        "type": {
-                                            "query": "mongodb", 
-                                            "type": "phrase"
-                                        }
-                                    }
-                                }
-                            }, 
-                            {
-                                "$state": {
-                                    "store": "appState"
-                                }, 
-                                "meta": {
-                                    "alias": null, 
-                                    "disabled": false, 
-                                    "index": "packetbeat-*", 
-                                    "key": "status", 
-                                    "negate": true, 
-                                    "params": {
-                                        "query": "OK", 
-                                        "type": "phrase"
-                                    }, 
-                                    "type": "phrase", 
-                                    "value": "OK"
-                                }, 
-                                "query": {
-                                    "match": {
-                                        "status": {
-                                            "query": "OK", 
-                                            "type": "phrase"
-                                        }
-                                    }
-                                }
-                            }
-                        ], 
-                        "highlightAll": true, 
-                        "index": "packetbeat-*", 
-                        "query": {
-                            "language": "lucene", 
-                            "query": "*"
-                        }, 
-                        "version": true
-                    }
-                }, 
-                "sort": [
-                    "@timestamp", 
-                    "desc"
-                ], 
-                "title": "MongoDB errors [Packetbeat]", 
-                "version": 1
-            }, 
-            "id": "651fd6d0-88d0-11e7-ad9c-db80de0bf8d3", 
-            "type": "search", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "columns": [
-                    "method", 
-                    "type", 
-                    "path", 
-                    "responsetime", 
-                    "status", 
-                    "query"
-                ], 
-                "description": "", 
-                "hits": 0, 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [
-                            {
-                                "meta": {
-                                    "disabled": false, 
-                                    "index": "packetbeat-*", 
-                                    "key": "type", 
-                                    "negate": false, 
-                                    "value": "mongodb"
-                                }, 
-                                "query": {
-                                    "match": {
-                                        "type": {
-                                            "query": "mongodb", 
-                                            "type": "phrase"
-                                        }
-                                    }
-                                }
-                            }
-                        ], 
-                        "highlight": {
-                            "fields": {
-                                "*": {}
-                            }, 
-                            "fragment_size": 2147483647, 
-                            "post_tags": [
-                                "@/kibana-highlighted-field@"
-                            ], 
-                            "pre_tags": [
-                                "@kibana-highlighted-field@"
-                            ]
-                        }, 
-                        "index": "packetbeat-*", 
-                        "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
-                        }
-                    }
-                }, 
-                "sort": [
-                    "@timestamp", 
-                    "desc"
-                ], 
-                "title": "MongoDB transactions", 
-                "version": 1
-            }, 
-            "id": "MongoDB-transactions", 
-            "type": "search", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "columns": [
-                    "method", 
-                    "type", 
-                    "path", 
-                    "responsetime", 
-                    "status", 
-                    "query"
-                ], 
-                "description": "", 
-                "hits": 0, 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [
-                            {
-                                "meta": {
-                                    "disabled": false, 
-                                    "index": "packetbeat-*", 
-                                    "key": "type", 
-                                    "negate": false, 
-                                    "value": "mongodb"
-                                }, 
-                                "query": {
-                                    "match": {
-                                        "type": {
-                                            "query": "mongodb", 
-                                            "type": "phrase"
-                                        }
-                                    }
-                                }
-                            }
-                        ], 
-                        "highlight": {
-                            "fields": {
-                                "*": {}
-                            }, 
-                            "fragment_size": 2147483647, 
-                            "post_tags": [
-                                "@/kibana-highlighted-field@"
-                            ], 
-                            "pre_tags": [
-                                "@kibana-highlighted-field@"
-                            ]
-                        }, 
-                        "index": "packetbeat-*", 
-                        "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "request: \"writeConcern w 0\""
-                            }
-                        }
-                    }
-                }, 
-                "sort": [
-                    "@timestamp", 
-                    "desc"
-                ], 
-                "title": "MongoDB transactions with write concern 0", 
-                "version": 1
-            }, 
-            "id": "MongoDB-transactions-with-write-concern-0", 
-            "type": "search", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "hits": 0, 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [], 
-                        "highlightAll": true, 
-                        "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
-                        }, 
-                        "version": true
-                    }
-                }, 
-                "optionsJSON": {
-                    "darkTheme": false
-                }, 
-                "panelsJSON": [
-                    {
-                        "col": 1, 
-                        "id": "Navigation", 
-                        "panelIndex": 1, 
-                        "row": 1, 
-                        "size_x": 3, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 4, 
-                        "id": "MongoDB-errors", 
-                        "panelIndex": 2, 
-                        "row": 1, 
-                        "size_x": 5, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 9, 
-                        "id": "MongoDB-commands", 
-                        "panelIndex": 3, 
-                        "row": 1, 
-                        "size_x": 4, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 1, 
-                        "id": "MongoDB-errors-per-collection", 
-                        "panelIndex": 4, 
-                        "row": 5, 
-                        "size_x": 4, 
-                        "size_y": 3, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 5, 
-                        "id": "MongoDB-in-slash-out-throughput", 
-                        "panelIndex": 5, 
-                        "row": 5, 
-                        "size_x": 4, 
-                        "size_y": 3, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 1, 
-                        "id": "MongoDB-response-times-by-collection", 
-                        "panelIndex": 6, 
-                        "row": 8, 
-                        "size_x": 8, 
-                        "size_y": 5, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 9, 
-                        "id": "Top-slowest-MongoDB-queries", 
-                        "panelIndex": 7, 
-                        "row": 8, 
-                        "size_x": 4, 
-                        "size_y": 5, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 9, 
-                        "id": "Number-of-MongoDB-transactions-with-writeConcern-w-equal-0", 
-                        "panelIndex": 8, 
-                        "row": 5, 
-                        "size_x": 4, 
-                        "size_y": 3, 
-                        "type": "visualization"
-                    }
-                ], 
-                "timeRestore": false, 
-                "title": "[Packetbeat] MongoDB", 
-                "uiStateJSON": {
-                    "P-7": {
-                        "vis": {
-                            "params": {
-                                "sort": {
-                                    "columnIndex": null, 
-                                    "direction": null
-                                }
-                            }
-                        }
-                    }
-                }, 
-                "version": 1
-            }, 
-            "id": "Packetbeat-MongoDB-performance", 
-            "type": "dashboard", 
-            "version": 2
+              }
+            }
+          }
+        },
+        "title": "Navigation",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "fontSize": "10",
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Flows](#/dashboard/Packetbeat-Flows)\n\n[Web transactions](#/dashboard/Packetbeat-HTTP)\n\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\n\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\n\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\n\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\n\n[NFS transactions](#/dashboard/Packetbeat-NFS)\n\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)"
+          },
+          "title": "Navigation",
+          "type": "markdown"
         }
-    ], 
-    "version": "6.0.0-beta1-SNAPSHOT"
+      },
+      "id": "Navigation",
+      "type": "visualization",
+      "updated_at": "2019-01-17T23:31:49.005Z",
+      "version": 10
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "651fd6d0-88d0-11e7-ad9c-db80de0bf8d3",
+        "title": "MongoDB errors [Packetbeat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "time_zone": "America/New_York",
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "resource",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "row": true,
+                "size": 3
+              },
+              "schema": "split",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "field": "method",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "drawLinesBetweenPoints": true,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "interpolate": "linear",
+            "legendPosition": "right",
+            "radiusRatio": 9,
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "mode": "normal",
+                "radiusRatio": 9,
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "shareYAxis": true,
+            "showCircles": true,
+            "smoothLines": false,
+            "spyPerPage": 10,
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ],
+            "yAxis": {}
+          },
+          "title": "MongoDB errors [Packetbeat]",
+          "type": "line"
+        }
+      },
+      "id": "MongoDB-errors",
+      "type": "visualization",
+      "updated_at": "2019-01-18T05:00:42.098Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "MongoDB-transactions",
+        "title": "MongoDB Commands [Packetbeat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "time_zone": "America/New_York",
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "method",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "interpolate": "linear",
+            "legendPosition": "right",
+            "mode": "silhouette",
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "interpolate": "cardinal",
+                "mode": "stacked",
+                "show": "true",
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "shareYAxis": true,
+            "smoothLines": true,
+            "times": [],
+            "type": "area",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "silhouette",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ],
+            "yAxis": {}
+          },
+          "title": "MongoDB Commands [Packetbeat]",
+          "type": "area"
+        }
+      },
+      "id": "MongoDB-commands",
+      "type": "visualization",
+      "updated_at": "2019-01-18T05:01:02.453Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "651fd6d0-88d0-11e7-ad9c-db80de0bf8d3",
+        "title": "MongoDB errors per collection [Packetbeat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "time_zone": "America/New_York",
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "resource",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "drawLinesBetweenPoints": true,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "interpolate": "linear",
+            "legendPosition": "right",
+            "radiusRatio": 9,
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "mode": "normal",
+                "radiusRatio": 9,
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "shareYAxis": true,
+            "showCircles": true,
+            "smoothLines": false,
+            "spyPerPage": 10,
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ],
+            "yAxis": {}
+          },
+          "title": "MongoDB errors per collection [Packetbeat]",
+          "type": "line"
+        }
+      },
+      "id": "MongoDB-errors-per-collection",
+      "type": "visualization",
+      "updated_at": "2019-01-18T05:01:22.731Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "MongoDB-transactions",
+        "title": "MongoDB in/out throughput [Packetbeat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "field": "source.bytes"
+              },
+              "schema": "metric",
+              "type": "sum"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "time_zone": "America/New_York",
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {
+                "field": "destination.bytes"
+              },
+              "schema": "metric",
+              "type": "sum"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "drawLinesBetweenPoints": true,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "interpolate": "linear",
+            "legendPosition": "right",
+            "radiusRatio": 9,
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Sum of source.bytes"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "mode": "normal",
+                "radiusRatio": 9,
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              },
+              {
+                "data": {
+                  "id": "4",
+                  "label": "Sum of destination.bytes"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "mode": "normal",
+                "show": true,
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "shareYAxis": true,
+            "showCircles": true,
+            "smoothLines": false,
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ],
+            "yAxis": {}
+          },
+          "title": "MongoDB in/out throughput [Packetbeat]",
+          "type": "line"
+        }
+      },
+      "id": "MongoDB-in-slash-out-throughput",
+      "type": "visualization",
+      "updated_at": "2019-01-18T05:01:54.578Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "MongoDB-transactions",
+        "title": "MongoDB response times by collection [Packetbeat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "field": "event.duration",
+                "percents": [
+                  99
+                ]
+              },
+              "schema": "metric",
+              "type": "percentiles"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "time_zone": "America/New_York",
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "resource",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "_key",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            },
+            {
+              "enabled": true,
+              "id": "4",
+              "params": {},
+              "schema": "radius",
+              "type": "count"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "drawLinesBetweenPoints": false,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "interpolate": "linear",
+            "legendPosition": "right",
+            "radiusRatio": "9",
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Percentiles of event.duration"
+                },
+                "drawLinesBetweenPoints": false,
+                "interpolate": "linear",
+                "mode": "normal",
+                "radiusRatio": "9",
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "shareYAxis": true,
+            "showCircles": true,
+            "smoothLines": false,
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Percentiles of event.duration"
+                },
+                "type": "value"
+              }
+            ],
+            "yAxis": {}
+          },
+          "title": "MongoDB response times by collection [Packetbeat]",
+          "type": "line"
+        }
+      },
+      "id": "MongoDB-response-times-by-collection",
+      "type": "visualization",
+      "updated_at": "2019-01-18T05:02:48.572Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "MongoDB-transactions",
+        "title": "Top slowest MongoDB queries [Packetbeat]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "field": "event.duration",
+                "percents": [
+                  99
+                ]
+              },
+              "schema": "metric",
+              "type": "percentiles"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "query",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "_key",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 10,
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Top slowest MongoDB queries [Packetbeat]",
+          "type": "table"
+        }
+      },
+      "id": "Top-slowest-MongoDB-queries",
+      "type": "visualization",
+      "updated_at": "2019-01-18T05:03:11.642Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "MongoDB-transactions-with-write-concern-0",
+        "title": "Number of MongoDB transactions with writeConcern w=0 [Packetbeat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "time_zone": "America/New_York",
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {},
+              "schema": "radius",
+              "type": "count"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "drawLinesBetweenPoints": true,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "interpolate": "linear",
+            "legendPosition": "right",
+            "radiusRatio": 9,
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "mode": "normal",
+                "radiusRatio": 9,
+                "show": "true",
+                "showCircles": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "shareYAxis": true,
+            "showCircles": true,
+            "smoothLines": false,
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ],
+            "yAxis": {}
+          },
+          "title": "Number of MongoDB transactions with writeConcern w=0 [Packetbeat]",
+          "type": "line"
+        }
+      },
+      "id": "Number-of-MongoDB-transactions-with-writeConcern-w-equal-0",
+      "type": "visualization",
+      "updated_at": "2019-01-18T05:02:20.019Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "columns": [
+          "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "type",
+                  "negate": false,
+                  "params": {
+                    "query": "mongodb",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "mongodb"
+                },
+                "query": {
+                  "match": {
+                    "type": {
+                      "query": "mongodb",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "status",
+                  "negate": true,
+                  "params": {
+                    "query": "OK",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "OK"
+                },
+                "query": {
+                  "match": {
+                    "status": {
+                      "query": "OK",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "highlightAll": true,
+            "index": "packetbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": "*"
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "MongoDB errors [Packetbeat]",
+        "version": 1
+      },
+      "id": "651fd6d0-88d0-11e7-ad9c-db80de0bf8d3",
+      "type": "search",
+      "updated_at": "2019-01-17T23:31:42.852Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "method",
+          "type",
+          "path",
+          "event.duration",
+          "status",
+          "query"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "mongodb",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "mongodb"
+                },
+                "query": {
+                  "match": {
+                    "event.dataset": {
+                      "query": "mongodb",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "highlight": {
+              "fields": {
+                "*": {}
+              },
+              "fragment_size": 2147483647,
+              "post_tags": [
+                "@/kibana-highlighted-field@"
+              ],
+              "pre_tags": [
+                "@kibana-highlighted-field@"
+              ]
+            },
+            "highlightAll": true,
+            "index": "packetbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": {
+                "query_string": {
+                  "analyze_wildcard": true,
+                  "query": "*"
+                }
+              }
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "MongoDB Transaction Search [Packetbeat]",
+        "version": 1
+      },
+      "id": "MongoDB-transactions",
+      "type": "search",
+      "updated_at": "2019-01-18T04:59:30.718Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "columns": [
+          "method",
+          "type",
+          "path",
+          "responsetime",
+          "status",
+          "query"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "mongodb",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "mongodb"
+                },
+                "query": {
+                  "match": {
+                    "event.dataset": {
+                      "query": "mongodb",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "highlight": {
+              "fields": {
+                "*": {}
+              },
+              "fragment_size": 2147483647,
+              "post_tags": [
+                "@/kibana-highlighted-field@"
+              ],
+              "pre_tags": [
+                "@kibana-highlighted-field@"
+              ]
+            },
+            "highlightAll": true,
+            "index": "packetbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": {
+                "query_string": {
+                  "analyze_wildcard": true,
+                  "query": "request: \"writeConcern w 0\""
+                }
+              }
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "MongoDB transactions with write concern 0 [Packetbeat]",
+        "version": 1
+      },
+      "id": "MongoDB-transactions-with-write-concern-0",
+      "type": "search",
+      "updated_at": "2019-01-18T05:00:13.028Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "query": {
+              "language": "lucene",
+              "query": "*"
+            },
+            "version": true
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false
+        },
+        "panelsJSON": [
+          {
+            "gridData": {
+              "h": 20,
+              "i": "1",
+              "w": 12,
+              "x": 0,
+              "y": 0
+            },
+            "id": "Navigation",
+            "panelIndex": "1",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 20,
+              "i": "2",
+              "w": 20,
+              "x": 12,
+              "y": 0
+            },
+            "id": "MongoDB-errors",
+            "panelIndex": "2",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 20,
+              "i": "3",
+              "w": 16,
+              "x": 32,
+              "y": 0
+            },
+            "id": "MongoDB-commands",
+            "panelIndex": "3",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 15,
+              "i": "4",
+              "w": 16,
+              "x": 0,
+              "y": 20
+            },
+            "id": "MongoDB-errors-per-collection",
+            "panelIndex": "4",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 15,
+              "i": "5",
+              "w": 16,
+              "x": 16,
+              "y": 20
+            },
+            "id": "MongoDB-in-slash-out-throughput",
+            "panelIndex": "5",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 25,
+              "i": "6",
+              "w": 32,
+              "x": 0,
+              "y": 35
+            },
+            "id": "MongoDB-response-times-by-collection",
+            "panelIndex": "6",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "params": {
+                  "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                  }
+                }
+              }
+            },
+            "gridData": {
+              "h": 25,
+              "i": "7",
+              "w": 16,
+              "x": 32,
+              "y": 35
+            },
+            "id": "Top-slowest-MongoDB-queries",
+            "panelIndex": "7",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 15,
+              "i": "8",
+              "w": 16,
+              "x": 32,
+              "y": 20
+            },
+            "id": "Number-of-MongoDB-transactions-with-writeConcern-w-equal-0",
+            "panelIndex": "8",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Packetbeat] MongoDB",
+        "version": 1
+      },
+      "id": "Packetbeat-MongoDB-performance",
+      "type": "dashboard",
+      "updated_at": "2019-01-18T05:03:23.556Z",
+      "version": 2
+    }
+  ],
+  "version": "7.0.0-SNAPSHOT"
 }

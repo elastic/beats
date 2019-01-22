@@ -171,8 +171,10 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 
 	pipeline, err := pipeline.New(
 		beat,
-		pipeline.Monitors{},
-		monitoring,
+		pipeline.Monitors{
+			Metrics: monitoring,
+			Logger:  logp.NewLogger(selector),
+		},
 		queueFactory,
 		outputs.Group{
 			Clients:   []outputs.Client{outClient},

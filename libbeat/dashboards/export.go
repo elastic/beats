@@ -18,13 +18,12 @@
 package dashboards
 
 import (
-	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"strconv"
 
-	yaml "gopkg.in/yaml.v2"
+	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/filebeat/generator"
 	"github.com/elastic/beats/libbeat/common"
@@ -32,7 +31,8 @@ import (
 )
 
 const (
-	dashboardPerm = 0644
+	// OutputPermission is the permission of dashboard output files.
+	OutputPermission = 0644
 )
 
 // ListYML is the yaml file which contains list of available dashboards.
@@ -57,12 +57,12 @@ func Export(client *kibana.Client, id string) (common.MapStr, error) {
 func ExportAllFromYml(client *kibana.Client, ymlPath string) ([]common.MapStr, ListYML, error) {
 	b, err := ioutil.ReadFile(ymlPath)
 	if err != nil {
-		return nil, ListYML{}, fmt.Errorf("error opening the list of dashboards: %+v", err)
+		return nil, ListYML{}, errors.Wrap(err, "error opening the list of dashboards")
 	}
 	var list ListYML
 	err = yaml.Unmarshal(b, &list)
 	if err != nil {
-		return nil, ListYML{}, fmt.Errorf("error reading the list of dashboards: %+v", err)
+		return nil, ListYML{}, errors.Wrap(err, "error reading the list of dashboards")
 	}
 
 	results, err := ExportAll(client, list)
@@ -76,7 +76,7 @@ func ExportAll(client *kibana.Client, list ListYML) ([]common.MapStr, error) {
 	for _, e := range list.Dashboards {
 		result, err := Export(client, e.ID)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrapf(err, "failed exporting id=%v", e.ID)
 		}
 		results = append(results, result)
 	}
@@ -92,10 +92,6 @@ func SaveToFile(dashboard common.MapStr, filename, root string, version common.V
 	}
 
 	out := filepath.Join(root, dashboardsPath, filename)
-	bytes, err := json.Marshal(dashboard)
-	if err != nil {
-		return err
-	}
 
-	return ioutil.WriteFile(out, bytes, dashboardPerm)
+	return ioutil.WriteFile(out, []byte(dashboard.StringToPrint()), OutputPermission)
 }

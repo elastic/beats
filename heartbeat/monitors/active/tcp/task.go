@@ -20,8 +20,7 @@ package tcp
 import (
 	"time"
 
-	"github.com/elastic/beats/heartbeat/monitors"
-
+	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/reason"
 	"github.com/elastic/beats/libbeat/beat"
@@ -32,14 +31,14 @@ import (
 func pingHost(
 	event *beat.Event,
 	dialer transport.Dialer,
-	host string,
+	addr string,
 	timeout time.Duration,
 	validator ConnCheck,
 ) error {
 	start := time.Now()
 	deadline := start.Add(timeout)
 
-	conn, err := dialer.Dial("tcp", host)
+	conn, err := dialer.Dial("tcp", addr)
 	if err != nil {
 		debugf("dial failed with: %v", err)
 		return reason.IOFailed(err)
@@ -63,7 +62,7 @@ func pingHost(
 	}
 
 	end := time.Now()
-	monitors.MergeEventFields(event, common.MapStr{
+	eventext.MergeEventFields(event, common.MapStr{
 		"tcp": common.MapStr{
 			"rtt": common.MapStr{
 				"validate": look.RTT(end.Sub(validateStart)),

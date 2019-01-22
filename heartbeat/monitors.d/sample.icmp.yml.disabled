@@ -30,38 +30,18 @@
   # Waiting duration until another ICMP Echo Request is emitted.
   wait: 1s
 
-    # The tags of the monitors are included in their own field with each
-    # transaction published. Tags make it easy to group servers by different
-    # logical properties.
-    #tags: ["service-X", "web-tier"]
+  # The tags of the monitors are included in their own field with each
+  # transaction published. Tags make it easy to group servers by different
+  # logical properties.
+  #tags: ["service-X", "web-tier"]
 
-    # Optional fields that you can specify to add additional information to the
-    # monitor output. Fields can be scalar values, arrays, dictionaries, or any nested
-    # combination of these.
-    #fields:
-    #  env: staging
+  # Optional fields that you can specify to add additional information to the
+  # monitor output. Fields can be scalar values, arrays, dictionaries, or any nested
+  # combination of these.
+  #fields:
+  #  env: staging
 
-    # If this option is set to true, the custom fields are stored as top-level
-    # fields in the output document instead of being grouped under a fields
-    # sub-dictionary. Default is false.
-    #fields_under_root: false
-
-    # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
-    # Configure file json file to be watched for changes to the monitor:
-    #watch.poll_file:
-    # Path to check for updates.
-    #path:
-
-    # Interval between file file changed checks.
-  #interval: 5s
-
-  # Define a directory to load monitor definitions from. Definitions take the form
-  # of individual yaml files.
-  # heartbeat.config.monitors:
-  # Directory + glob pattern to search for configuration files
-  #path: /path/to/my/monitors.d/*.yml
-  # If enabled, heartbeat will periodically check the config.monitors path for changes
-  #reload.enabled: true
-  # How often to check for changes
-  #reload.period: 1s
-
+  # If this option is set to true, the custom fields are stored as top-level
+  # fields in the output document instead of being grouped under a fields
+  # sub-dictionary. Default is false.
+  #fields_under_root: false

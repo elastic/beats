@@ -18,7 +18,7 @@ to retrieve the metrics from (`/metrics` by default) can be configured with `met
   #password: "secret"
 
   # This can be used for service account based authorization:
-  #  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 -------------------------------------------------------------------------------------

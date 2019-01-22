@@ -2,8 +2,9 @@
     {
         "@timestamp": "2016-12-07T10:05:07.000Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "access",
+        "event.dataset": "nginx.access",
         "event.module": "nginx",
+        "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
         "http.response.status_code": 200,
@@ -16,6 +17,7 @@
             "127.0.0.1"
         ],
         "nginx.access.body_sent.bytes": 571,
+        "service.type": "nginx",
         "source.ip": "10.0.0.2",
         "url.original": "/ocelot",
         "user.name": "-",
@@ -32,8 +34,9 @@
     {
         "@timestamp": "2017-05-29T19:02:48.000Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "access",
+        "event.dataset": "nginx.access",
         "event.module": "nginx",
+        "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
         "http.response.status_code": 404,
@@ -44,6 +47,7 @@
             "172.17.0.1"
         ],
         "nginx.access.body_sent.bytes": 612,
+        "service.type": "nginx",
         "source.ip": "172.17.0.1",
         "url.original": "/stringpatch",
         "user.name": "-",
@@ -59,8 +63,9 @@
     {
         "@timestamp": "2016-12-07T10:05:07.000Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "access",
+        "event.dataset": "nginx.access",
         "event.module": "nginx",
+        "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
         "http.response.status_code": 200,
@@ -73,6 +78,7 @@
             "85.181.35.98"
         ],
         "nginx.access.body_sent.bytes": 571,
+        "service.type": "nginx",
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
@@ -96,8 +102,9 @@
     {
         "@timestamp": "2016-12-07T10:05:07.000Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "access",
+        "event.dataset": "nginx.access",
         "event.module": "nginx",
+        "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
         "http.response.status_code": 200,
@@ -108,6 +115,7 @@
             "85.181.35.98"
         ],
         "nginx.access.body_sent.bytes": 571,
+        "service.type": "nginx",
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
@@ -132,8 +140,9 @@
     {
         "@timestamp": "2016-01-22T13:18:29.000Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "access",
+        "event.dataset": "nginx.access",
         "event.module": "nginx",
+        "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
         "http.response.status_code": 200,
@@ -147,6 +156,7 @@
             "10.2.1.185"
         ],
         "nginx.access.body_sent.bytes": 25507,
+        "service.type": "nginx",
         "source.geo.city_name": "Springfield",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
@@ -166,8 +176,9 @@
     {
         "@timestamp": "2016-12-30T06:47:09.000Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "access",
+        "event.dataset": "nginx.access",
         "event.module": "nginx",
+        "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
         "http.response.status_code": 404,
@@ -180,6 +191,7 @@
             "10.2.2.121"
         ],
         "nginx.access.body_sent.bytes": 8571,
+        "service.type": "nginx",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "PT",
         "source.geo.location.lat": 39.5,
@@ -198,8 +210,9 @@
     {
         "@timestamp": "2018-04-12T07:48:40.000Z",
         "ecs.version": "1.0.0-beta2",
-        "event.dataset": "access",
+        "event.dataset": "nginx.access",
         "event.module": "nginx",
+        "fileset.name": "access",
         "http.request.referrer": "-",
         "http.response.status_code": 400,
         "input.type": "log",
@@ -208,6 +221,7 @@
             "127.0.0.1"
         ],
         "nginx.access.body_sent.bytes": 0,
+        "service.type": "nginx",
         "source.ip": "127.0.0.1",
         "user.name": "-",
         "user_agent.device": "Other",

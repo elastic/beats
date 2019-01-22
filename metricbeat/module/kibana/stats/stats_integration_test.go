@@ -45,7 +45,7 @@ func TestFetch(t *testing.T) {
 		t.Fatal("getting kibana version", err)
 	}
 
-	isStatsAPIAvailable, err := kibana.IsStatsAPIAvailable(version)
+	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(version)
 	if err != nil {
 		t.Fatal("checking if kibana stats API is available", err)
 	}
@@ -76,7 +76,7 @@ func TestData(t *testing.T) {
 		t.Fatal("getting kibana version", err)
 	}
 
-	isStatsAPIAvailable, err := kibana.IsStatsAPIAvailable(version)
+	isStatsAPIAvailable := kibana.IsStatsAPIAvailable(version)
 	if err != nil {
 		t.Fatal("checking if kibana stats API is available", err)
 	}
@@ -92,27 +92,28 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getKibanaVersion(kibanaHostPort string) (string, error) {
+func getKibanaVersion(kibanaHostPort string) (*common.Version, error) {
 	resp, err := http.Get("http://" + kibanaHostPort + "/api/status")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	var data common.MapStr
 	err = json.Unmarshal(body, &data)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	version, err := data.GetValue("version.number")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return version.(string), nil
+
+	return common.NewVersion(version.(string))
 }

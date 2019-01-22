@@ -31,12 +31,10 @@ import (
 func KibanaDashboards(moduleDirs ...string) error {
 	var kibanaBuildDir = "build/kibana"
 
-	if err := os.MkdirAll(kibanaBuildDir, 0755); err != nil {
+	if err := os.RemoveAll(kibanaBuildDir); err != nil {
 		return err
 	}
-
-	// Create symlink from old directory so `make beats-dashboards` works.
-	if err := os.Symlink(filepath.Join("..", kibanaBuildDir), "_meta/kibana.generated"); err != nil && !os.IsExist(err) && !os.IsNotExist(err) {
+	if err := os.MkdirAll(kibanaBuildDir, 0755); err != nil {
 		return err
 	}
 

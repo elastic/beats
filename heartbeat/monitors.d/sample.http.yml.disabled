@@ -23,46 +23,38 @@
   ipv6: true
   mode: any
 
-    # Configure file json file to be watched for changes to the monitor:
-    #watch.poll_file:
-    # Path to check for updates.
-    #path:
+  # Optional HTTP proxy url.
+  #proxy_url: ''
 
-    # Interval between file file changed checks.
-    #interval: 5s
+  # Total test connection and data exchange timeout
+  #timeout: 16s
 
-    # Optional HTTP proxy url.
-    #proxy_url: ''
+  # Optional Authentication Credentials
+  #username: ''
+  #password: ''
 
-    # Total test connection and data exchange timeout
-    #timeout: 16s
+  # TLS/SSL connection settings for use with HTTPS endpoint. If not configured
+  # system defaults will be used.
+  #ssl:
+  # Certificate Authorities
+  #certificate_authorities: ['']
 
-    # Optional Authentication Credentials
-    #username: ''
-    #password: ''
+  # Required TLS protocols
+  #supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
 
-    # TLS/SSL connection settings for use with HTTPS endpoint. If not configured
-    # system defaults will be used.
-    #ssl:
-    # Certificate Authorities
-    #certificate_authorities: ['']
+  # Request settings:
+  #check.request:
+  # Configure HTTP method to use. Only 'HEAD', 'GET' and 'POST' methods are allowed.
+  #method: "GET"
 
-    # Required TLS protocols
-    #supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
+  # Dictionary of additional HTTP headers to send:
+  #headers:
 
-    # Request settings:
-    #check.request:
-    # Configure HTTP method to use. Only 'HEAD', 'GET' and 'POST' methods are allowed.
-    #method: "GET"
+  # Optional request body content
+  #body:
 
-    # Dictionary of additional HTTP headers to send:
-    #headers:
-
-    # Optional request body content
-    #body:
-
-    # Expected response settings
-    #check.response:
+  # Expected response settings
+  #check.response:
     # Expected status code. If not configured or set to 0 any status code not
     # being 404 is accepted.
     #status: 0
@@ -80,12 +72,18 @@
     #    equals:
     #      myField: expectedValue
 
+  # The tags of the monitors are included in their own field with each
+  # transaction published. Tags make it easy to group servers by different
+  # logical properties.
+  #tags: ["service-X", "web-tier"]
 
-    # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
-    # Configure file json file to be watched for changes to the monitor:
-    #watch.poll_file:
-    # Path to check for updates.
-    #path:
+  # Optional fields that you can specify to add additional information to the
+  # monitor output. Fields can be scalar values, arrays, dictionaries, or any nested
+  # combination of these.
+  #fields:
+  #  env: staging
 
-    # Interval between file file changed checks.
-  #interval: 5s
+  # If this option is set to true, the custom fields are stored as top-level
+  # fields in the output document instead of being grouped under a fields
+  # sub-dictionary. Default is false.
+  #fields_under_root: false

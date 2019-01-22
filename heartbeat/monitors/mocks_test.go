@@ -19,13 +19,17 @@ package monitors
 
 import (
 	"fmt"
+	"regexp"
 	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/heartbeat/eventext"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/mapval"
 	"github.com/elastic/beats/libbeat/monitoring"
 )
 
@@ -89,21 +93,44 @@ func (pc *MockPipelineConnector) ConnectWith(beat.ClientConfig) (beat.Client, er
 	return c, nil
 }
 
-func createMockJob(name string, cfg *common.Config) ([]Job, error) {
-	j := MakeSimpleJob(func(event *beat.Event) error {
-		MergeEventFields(event, common.MapStr{
-			"foo": "bar",
-		})
+func mockEventMonitorValidator(id string) mapval.Validator {
+	var idMatcher mapval.IsDef
+	if id == "" {
+		idMatcher = mapval.IsStringMatching(regexp.MustCompile(`^auto-test-.*`))
+	} else {
+		idMatcher = mapval.IsEqual(id)
+	}
+	return mapval.Strict(mapval.Compose(
+		mapval.MustCompile(mapval.Map{
+			"monitor": mapval.Map{
+				"id":          idMatcher,
+				"name":        "",
+				"type":        "test",
+				"duration.us": mapval.IsDuration,
+				"status":      "up",
+			},
+		}),
+		mapval.MustCompile(mockEventCustomFields()),
+	))
+}
+
+func mockEventCustomFields() map[string]interface{} {
+	return common.MapStr{"foo": "bar"}
+}
+
+func createMockJob(name string, cfg *common.Config) ([]jobs.Job, error) {
+	j := jobs.MakeSimpleJob(func(event *beat.Event) error {
+		eventext.MergeEventFields(event, mockEventCustomFields())
 		return nil
 	})
 
-	return []Job{j}, nil
+	return []jobs.Job{j}, nil
 }
 
 func mockPluginBuilder() pluginBuilder {
 	reg := monitoring.NewRegistry()
 
-	return pluginBuilder{"test", ActiveMonitor, func(s string, config *common.Config) ([]Job, int, error) {
+	return pluginBuilder{"test", ActiveMonitor, func(s string, config *common.Config) ([]jobs.Job, int, error) {
 		c := common.Config{}
 		j, err := createMockJob("test", &c)
 		return j, 1, err
@@ -116,12 +143,18 @@ func mockPluginsReg() *pluginsReg {
 	return reg
 }
 
-func mockPluginConf(t *testing.T, schedule string, url string) *common.Config {
-	conf, err := common.NewConfigFrom(map[string]interface{}{
+func mockPluginConf(t *testing.T, id string, schedule string, url string) *common.Config {
+	confMap := map[string]interface{}{
 		"type":     "test",
 		"urls":     []string{url},
 		"schedule": schedule,
-	})
+	}
+
+	if id != "" {
+		confMap["id"] = id
+	}
+
+	conf, err := common.NewConfigFrom(confMap)
 	require.NoError(t, err)
 
 	return conf

@@ -8,34 +8,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/libbeat/common"
 )
 
-func TestConfigValidate(t *testing.T) {
-	tests := map[string]struct {
-		config *common.Config
-		err    bool
-	}{
-		"missing access_token": {
-			config: common.MustNewConfigFrom(map[string]interface{}{}),
-			err:    true,
-		},
-		"access_token is present": {
-			config: common.MustNewConfigFrom(map[string]interface{}{"access_token": "abc1234"}),
-			err:    false,
-		},
-	}
-
-	for name, test := range tests {
-		t.Run(name, func(t *testing.T) {
-			c := defaultConfig()
-			err := test.config.Unpack(c)
-			if test.err {
-				assert.Error(t, err)
-				return
-			}
-			assert.NoError(t, err)
-		})
-	}
+func EnsureBlacklistItems(t *testing.T) {
+	// NOTE: We do not permit to configure the console or the file output with CM for security reason.
+	c := defaultConfig()
+	v, _ := c.Blacklist.Patterns["output"]
+	assert.Equal(t, "console|file", v)
 }
