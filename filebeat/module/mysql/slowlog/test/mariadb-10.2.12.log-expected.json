@@ -42,7 +42,7 @@
         "mysql.slowlog.full_join": false,
         "mysql.slowlog.full_scan": true,
         "mysql.slowlog.lock_time.sec": 0.0,
-        "mysql.slowlog.merge_passes": "0",
+        "mysql.slowlog.merge_passes": 0,
         "mysql.slowlog.priority_queue": false,
         "mysql.slowlog.query": "call PROC('blah');",
         "mysql.slowlog.query_cache_hit": false,

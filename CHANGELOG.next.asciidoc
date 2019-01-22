@@ -22,6 +22,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Auditbeat*
 - Rename `process.exe` to `process.executable` in auditd module to align with ECS. {pull}9949[9949]
+- Rename `process.cwd` to `process.working_directory` in auditd module to align with ECS. {pull}10195[10195]
+- Change data type of `process.pid` and `process.ppid` to number in JSON output
+  of the auditd module. {pull}10195[10195]
+- Change data type of `file.uid` and `file.gid` to string in JSON output of the
+  FIM module. {pull}10195[10195]
 
 *Filebeat*
 
@@ -76,6 +81,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Changed NFS protocol fields to align with ECS. {pull}10153[10153]
 - Changed Thrift protocol fields to align with ECS. {pull}10125[10125]
 - Changed Cassandra protocol fields to align with ECS. {pull}10093[10093]
+- Changed Memcache protocol fields to align with ECS. {pull}10189[10189]
 
 *Winlogbeat*
 
@@ -90,6 +96,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Enforce validation for the Central Management access token. {issue}9621[9621]
 - Fix config appender registration. {pull}9873[9873]
 - Gracefully handle TLS options when enrolling a Beat. {issue}9129[9129]
+- The backing off now implements jitter to better distribute the load. {issue}10172[10172]
 
 *Auditbeat*
 
@@ -100,6 +107,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   {issue}9836[9836] error log: {pull}9869[9869], access log: {pull}9955[9955].
 - Support haproxy log lines without captured headers. {issue}9463[9463] {pull}9958[9958]
 - Make elasticsearch/audit fileset be more lenient in parsing node name. {issue}10035[10035] {pull}10135[10135]
+- Fix bad bytes count in `docker` input when filtering by stream. {pull}10211[10211]
 
 *Heartbeat*
 
@@ -111,6 +119,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
 - Fix pod UID metadata enrichment in Kubernetes module. {pull}10081[10081]
+- Fix issue that would prevent collection of processes without command line on Windows. {pull}10196[10196]
 
 *Packetbeat*
 
@@ -135,6 +144,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Auditbeat*
 
 - Add system module. {pull}9546[9546]
+- Add `user.id` (UID) and `user.name` for ECS. {pull}10195[10195]
+- Add `group.id` (GID) and `group.name` for ECS. {pull}10195[10195]
 
 *Filebeat*
 
@@ -151,6 +162,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - HAProxy module now populates `event.duration` and `http.response.bytes` (ECS). {pull}10143[10143]
 - Teach elasticsearch/audit fileset to parse out some more fields. {issue}10134[10134] {pull}10137[10137]
 - Add convert_timezone to nginx module. {issue}9839[9839] {pull}10148[10148]
+- Add support for Percona in the `slowlog` fileset of `mysql` module. {issue}6665[6665] {pull}10227[10227]
 
 *Heartbeat*
 
@@ -168,8 +180,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add more meaningful metrics to 'performance' Metricset on 'MSSQL' module {pull}10011[10011]
 - Rename some fields in `performance` Metricset on MSSQL module to match the updated documentation from Microsoft {pull}10074[10074]
 - Add AWS EC2 module. {pull}9257[9257] {issue}9300[9300]
+- Release windows Metricbeat module as GA. {pull}10163[10163]
 - Release traefik Metricbeat module as GA. {pull}10166[10166]
 - Release Elastic stack modules (Elasticsearch, Logstash, and Kibana) as GA. {pull}10094[10094]
+- List filesystems on Windows that have an access path but not an assigned letter {issue}8916[8916] {pull}10196[10196]
 - Add `nats` module. {issue}10071[10071]
 - Release uswgi Metricbeat module GA. {pull}10164[10164]
 - Release php_fpm module as GA. {pull}10198[10198]
@@ -177,7 +191,18 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release etcd module as GA. {pull}10200[10200]
 - Release Ceph module as GA. {pull}10202[10202]
 - Release aerospike module as GA. {pull}10203[10203]
+- Release kubernetes apiserver and event metricsets as GA {pull}10212[10212]
 - Release Couchbase module as GA. {pull}10201[10201]
+- Release RabbitMQ module GA. {pull}10165[10165]
+- Release envoyproxy module GA. {pull}10223[10223]
+- Making RabbitMQ Metricbeat module GA. {pull}10165[10165]
+- Release mongodb.metrics and mongodb.replstatus as GA. {pull}10242[10242]
+- Release mysql.galera_status as GA. {pull}10242[10242]
+- Release postgresql.statement as GA. {pull}10242[10242]
+- Release RabbitMQ Metricbeat module GA. {pull}10165[10165]
+- Release Dropwizard module as GA. {pull}10240[10240]
+- Release Graphite module as GA. {pull}10240[10240]
+- Release http.server metricset as GA. {pull}10240[10240]
 
 *Packetbeat*
 

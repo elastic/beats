@@ -9,6 +9,12 @@
 			"revisionTime": "2018-10-26T23:03:58Z"
 		},
 		{
+			"checksumSHA1": "eruIVA8JnsB23rVKjETHvqJ0sj8=",
+			"path": "github.com/DataDog/zstd",
+			"revision": "2bf71ec4836011b92dc78df3b9ace6b40e65f7df",
+			"revisionTime": "2016-07-06T22:07:25Z"
+		},
+		{
 			"checksumSHA1": "AzjRkOQtVBTwIw4RJLTygFhJs3s=",
 			"path": "github.com/Microsoft/go-winio",
 			"revision": "f533f7a102197536779ea3a8cb881d639e21ec5a",
@@ -21,14 +27,13 @@
 			"revisionTime": "2018-07-23T16:30:02Z"
 		},
 		{
-			"checksumSHA1": "8uhvsMSF1+QTzPYxASJGv548nBU=",
-			"origin": "github.com/urso/sarama",
+			"checksumSHA1": "6vi2DINjmqIqJSZfbkdpI8nNrVY=",
 			"path": "github.com/Shopify/sarama",
-			"revision": "0143592836b090a1b481def4d902cfb3c5c05ae5",
-			"revisionTime": "2016-11-23T00:27:23Z",
+			"revision": "03a43f93cd29dc549e6d9b11892795c206f9c38c",
+			"revisionTime": "2019-01-10T17:48:46Z",
 			"tree": true,
-			"version": "=v1.18.0/enh/offset-replica-id",
-			"versionExact": "v1.18.0/enh/offset-replica-id"
+			"version": "v1.20.1",
+			"versionExact": "v1.20.1"
 		},
 		{
 			"checksumSHA1": "DYv6Q1+VfnUVxMwvk5IshAClLvw=",
@@ -1134,44 +1139,44 @@
 			"revisionTime": "2018-08-31T13:10:45Z"
 		},
 		{
-			"checksumSHA1": "RPOLNUpw00QUUaA/U4YbPVf6WlA=",
+			"checksumSHA1": "ux0d5xvItes2abrOlpEyQWeJeqM=",
 			"path": "github.com/elastic/gosigar",
-			"revision": "237dff72b4ba95da2cd985f96a9c0ede4aefc760",
-			"revisionTime": "2018-03-16T16:52:25Z",
-			"version": "v0.9.0",
-			"versionExact": "v0.9.0"
+			"revision": "f2a90fc413720c43da9c4fe1a47513c73f45ac3d",
+			"revisionTime": "2019-01-18T12:09:37Z",
+			"version": "v0.10.0",
+			"versionExact": "v0.10.0"
 		},
 		{
 			"checksumSHA1": "TX9y4oPL5YmT4Gb/OU4GIPTdQB4=",
 			"path": "github.com/elastic/gosigar/cgroup",
-			"revision": "237dff72b4ba95da2cd985f96a9c0ede4aefc760",
-			"revisionTime": "2018-03-16T16:52:25Z",
-			"version": "v0.9.0",
-			"versionExact": "v0.9.0"
+			"revision": "f2a90fc413720c43da9c4fe1a47513c73f45ac3d",
+			"revisionTime": "2019-01-18T12:09:37Z",
+			"version": "v0.10.0",
+			"versionExact": "v0.10.0"
 		},
 		{
 			"checksumSHA1": "hPqGM3DENaGfipEODoyZ4mKogTQ=",
 			"path": "github.com/elastic/gosigar/sys",
-			"revision": "237dff72b4ba95da2cd985f96a9c0ede4aefc760",
-			"revisionTime": "2018-03-16T16:52:25Z",
-			"version": "v0.9.0",
-			"versionExact": "v0.9.0"
+			"revision": "f2a90fc413720c43da9c4fe1a47513c73f45ac3d",
+			"revisionTime": "2019-01-18T12:09:37Z",
+			"version": "v0.10.0",
+			"versionExact": "v0.10.0"
 		},
 		{
 			"checksumSHA1": "mLq5lOyD0ZU39ysXuf1ETOLJ+f0=",
 			"path": "github.com/elastic/gosigar/sys/linux",
-			"revision": "237dff72b4ba95da2cd985f96a9c0ede4aefc760",
-			"revisionTime": "2018-03-16T16:52:25Z",
-			"version": "v0.9.0",
-			"versionExact": "v0.9.0"
+			"revision": "f2a90fc413720c43da9c4fe1a47513c73f45ac3d",
+			"revisionTime": "2019-01-18T12:09:37Z",
+			"version": "v0.10.0",
+			"versionExact": "v0.10.0"
 		},
 		{
-			"checksumSHA1": "qDsgp2kAeI9nhj565HUScaUyjU4=",
+			"checksumSHA1": "Xx3lvjjqPwlFQ2aBjxtXSeDmD4c=",
 			"path": "github.com/elastic/gosigar/sys/windows",
-			"revision": "237dff72b4ba95da2cd985f96a9c0ede4aefc760",
-			"revisionTime": "2018-03-16T16:52:25Z",
-			"version": "v0.9.0",
-			"versionExact": "v0.9.0"
+			"revision": "f2a90fc413720c43da9c4fe1a47513c73f45ac3d",
+			"revisionTime": "2019-01-18T12:09:37Z",
+			"version": "v0.10.0",
+			"versionExact": "v0.10.0"
 		},
 		{
 			"checksumSHA1": "Klc34HULvwvY4cGA/D8HmqtXLqw=",

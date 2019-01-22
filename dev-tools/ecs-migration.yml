@@ -799,6 +799,10 @@
   to: process.executable
   alias: true
 
+- from: process.cwd
+  to: process.working_directory
+  alias: true
+
 
 # Metricbeat
 

@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 func TestProcessors(t *testing.T) {
@@ -380,6 +381,10 @@ func TestProcessors(t *testing.T) {
 	for _, test := range tests {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
+			monitors := Monitors{
+				Logger: logp.NewLogger("test processors"),
+			}
+
 			// create processor pipelines
 			programs := make([]beat.Processor, len(test.local))
 			info := defaultInfo
@@ -388,7 +393,7 @@ func TestProcessors(t *testing.T) {
 			}
 			for i, local := range test.local {
 				local.config.SkipAgentMetadata = !local.includeAgentMetadata
-				programs[i] = newProcessorPipeline(info, test.global, local.config)
+				programs[i] = newProcessorPipeline(info, monitors, test.global, local.config)
 			}
 
 			// run processor pipelines in parallel
