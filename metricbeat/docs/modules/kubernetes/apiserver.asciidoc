@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-kubernetes-apiserver]]
 === Kubernetes apiserver metricset
 
-beta[]
-
 include::../../../module/kubernetes/apiserver/_meta/docs.asciidoc[]
 
 

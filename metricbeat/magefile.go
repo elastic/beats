@@ -126,6 +126,20 @@ func ExportDashboard() error {
 	return mage.ExportDashboard()
 }
 
+// FieldsDocs generates docs/fields.asciidoc containing all fields
+// (including x-pack).
+func FieldsDocs() error {
+	inputs := []string{
+		mage.OSSBeatDir("module"),
+		mage.XPackBeatDir("module"),
+	}
+	output := mage.CreateDir("build/fields/fields.all.yml")
+	if err := mage.GenerateFieldsYAMLTo(output, inputs...); err != nil {
+		return err
+	}
+	return mage.Docs.FieldDocs(output)
+}
+
 // -----------------------------------------------------------------------------
 // Customizations specific to Metricbeat.
 // - Include modules.d directory in packages.
