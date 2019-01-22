@@ -1,8 +1,7 @@
-The System `login` metricset provides ... TODO.
+[role="xpack"]
 
-The module is implemented for Linux.
+experimental[]
 
-[float]
-=== Configuration options
+This is the `login` dataset of the system module.
 
-TODO
+It is implemented for Linux only.

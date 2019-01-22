@@ -41,6 +41,8 @@
   # detect any changes.
   user.detect_password_changes: true
   {{- end }}
+
   {{ if eq .GOOS "linux" -}}
+  # File pattern of the login record files.
   login.utmp_file_pattern: /var/log/wtmp*
   {{- end }}

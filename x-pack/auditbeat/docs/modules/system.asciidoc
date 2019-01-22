@@ -113,6 +113,7 @@ auditbeat.modules:
 - module: system
   datasets:
     - host    # General host information, e.g. uptime, IPs
+    - login   # User logins, logouts, and system boots.
     - package # Installed, updated, and removed packages
     - process # Started and stopped processes
     - socket  # Opened and closed sockets
@@ -127,6 +128,9 @@ auditbeat.modules:
   # /etc/passwd and /etc/shadow and store a hash locally to
   # detect any changes.
   user.detect_password_changes: true
+
+  # File pattern of the login record files.
+  login.utmp_file_pattern: /var/log/wtmp*
 ----
 
 [float]
@@ -135,6 +139,8 @@ auditbeat.modules:
 The following datasets are available:
 
 * <<{beatname_lc}-dataset-system-host,host>>
+
+* <<{beatname_lc}-dataset-system-login,login>>
 
 * <<{beatname_lc}-dataset-system-package,package>>
 
@@ -145,6 +151,8 @@ The following datasets are available:
 * <<{beatname_lc}-dataset-system-user,user>>
 
 include::system/host.asciidoc[]
+
+include::system/login.asciidoc[]
 
 include::system/package.asciidoc[]
 
