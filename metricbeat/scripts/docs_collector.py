@@ -1,16 +1,17 @@
-import os
 import argparse
-import yaml
+import os
 import six
+import yaml
+
 
 # Collects docs for all modules and metricset
 
 
 def collect(beat_name):
-
-    base_dir = "module"
-    oss_path = os.path.abspath("module")
-    xpack_path = os.path.abspath("../x-pack/metricbeat/module")
+    oss_base_dir = "module"
+    oss_path = os.path.abspath(oss_base_dir)
+    xpack_base_dir = "../x-pack/metricbeat/module"
+    xpack_path = os.path.abspath(xpack_base_dir)
 
     generated_note = """////
 This file is generated! See scripts/docs_collector.py
@@ -21,16 +22,20 @@ This file is generated! See scripts/docs_collector.py
     modules_list = {}
 
     modules_path = [{
+        'base_dir': oss_base_dir,
         'path': oss_path + "/" + module,
         'name': module,
         'metricsets': sorted(os.listdir(oss_path + "/" + module))
-    } for module in filter(lambda module: os.path.isfile(oss_path + "/" + module + "/_meta/docs.asciidoc"), os.listdir(base_dir))]
+    } for module in filter(lambda module: os.path.isfile(oss_path + "/" + module + "/_meta/docs.asciidoc"),
+                           os.listdir(oss_base_dir))]
 
     modules_path += [{
+        'base_dir': xpack_base_dir,
         'path': xpack_path + "/" + module,
         'name': module,
-        'metricsets': sorted(os.listdir(xpack_path + "/" + module))
-    } for module in filter(lambda module: os.path.isfile(xpack_path + "/" + module + "/_meta/docs.asciidoc"), os.listdir(xpack_path))]
+        'metricsets': sorted(os.listdir(xpack_path + "/" + module)),
+    } for module in filter(lambda module: os.path.isfile(xpack_path + "/" + module + "/_meta/docs.asciidoc"),
+                           os.listdir(xpack_path))]
 
     # Iterate over all modules
     for module in sorted(modules_path):
@@ -147,7 +152,6 @@ in <<configuration-metricbeat>>. Here is an example configuration:
             # Add reference to metricset file and include file
             metricset_file += reference + "\n"
 
-            metricset_fields = ""
             with open(metricset_fields_path) as f:
                 metricset_fields = yaml.load(f.read())
                 metricset_fields = metricset_fields[0]
@@ -163,8 +167,8 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 
             modules_list[module['name']]["metricsets"][metricset]["release"] = release
 
-            metricset_file += 'include::../../../module/' + \
-                module['name'] + '/' + metricset + '/_meta/docs.asciidoc[]' + "\n"
+            metricset_file += 'include::../../../' + module['base_dir'] + "/" + \
+                              module['name'] + '/' + metricset + '/_meta/docs.asciidoc[]' + "\n"
 
             # TODO: This should point directly to the exported fields of the metricset, not the whole module
             metricset_file += """
@@ -185,8 +189,8 @@ For a description of each field in the metricset, see the
 
                 metricset_file += "[source,json]\n"
                 metricset_file += "----\n"
-                metricset_file += "include::../../../module/" + \
-                    module['name'] + "/" + metricset + "/_meta/data.json[]\n"
+                metricset_file += 'include::../../../' + module['base_dir'] + "/" + \
+                                  module['name'] + "/" + metricset + "/_meta/data.json[]\n"
                 metricset_file += "----\n"
 
             # Write metricset docs
