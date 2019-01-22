@@ -16,6 +16,7 @@ The following topics describe how to configure {beatname_uc}:
 * <<configuration-general-options>>
 * <<configuring-internal-queue>>
 * <<configuring-output>>
+* <<ilm>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
@@ -40,6 +41,9 @@ include::{libbeat-dir}/docs/queueconfig.asciidoc[]
 
 [role="xpack"]
 include::{libbeat-dir}/docs/outputconfig.asciidoc[]
+
+[role="xpack"]
+include::{libbeat-dir}/docs/shared-ilm.asciidoc[]
 
 [role="xpack"]
 include::{libbeat-dir}/docs/shared-ssl-config.asciidoc[]

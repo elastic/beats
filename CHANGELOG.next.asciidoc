@@ -140,6 +140,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add missing file encoding to readers. {pull}10080[10080]
 - Introduce `migration.enabled` configuration. {pull}9805[9805]
 - Add alias field support in Kibana index pattern. {pull}10075[10075]
+- Add `add_fields` processor. {pull}10119[10119]
 
 *Auditbeat*
 
