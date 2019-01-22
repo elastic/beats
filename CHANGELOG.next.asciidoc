@@ -192,7 +192,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release aerospike module as GA. {pull}10203[10203]
 - Release kubernetes apiserver and event metricsets as GA {pull}10212[10212]
 - Release Couchbase module as GA. {pull}10201[10201]
-- Making RabbitMQ Metricbeat module GA. {pull}10165[10165]
+- Release RabbitMQ Metricbeat module GA. {pull}10165[10165]
+- Release Dropwizard module as GA. {pull}10240[10240]
+- Release Graphite module as GA. {pull}10240[10240]
+- Release http.server metricset as GA. {pull}10240[10240]
 
 *Packetbeat*
 
