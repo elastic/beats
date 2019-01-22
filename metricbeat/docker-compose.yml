@@ -188,7 +188,7 @@ services:
     build:
       context: ./module/mysql/_meta
       args:
-        MYSQL_IMAGE: mariadb:10.3
+        MYSQL_IMAGE: mariadb:10.3.12
 
   nats:
     build: ./module/nats/_meta
