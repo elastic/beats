@@ -72,11 +72,11 @@
       description: >
         "up" when no failures, otherwise "down"
     - name: up
-      type: short
+      type: integer
       description: >
         The number of endpoints that succeeded
     - name: down
-      type: short
+      type: integer
       description: >
         The number of endpoints that failed
 

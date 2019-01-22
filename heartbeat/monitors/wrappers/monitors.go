@@ -105,7 +105,6 @@ func makeAddSummary(id string, numJobs uint16) jobs.JobWrapper {
 	state := struct {
 		mtx        sync.Mutex
 		remaining  uint16
-		lastly     sync.Once
 		up         uint16
 		down       uint16
 		checkGroup string
