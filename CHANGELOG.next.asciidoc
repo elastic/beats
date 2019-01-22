@@ -192,6 +192,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release aerospike module as GA. {pull}10203[10203]
 - Release kubernetes apiserver and event metricsets as GA {pull}10212[10212]
 - Release Couchbase module as GA. {pull}10201[10201]
+- Release RabbitMQ module GA. {pull}10165[10165]
+- Release envoyproxy module GA. {pull}10223[10223]
 - Making RabbitMQ Metricbeat module GA. {pull}10165[10165]
 - Release mongodb.metrics and mongodb.replstatus as GA. {pull}10242[10242]
 - Release mysql.galera_status as GA. {pull}10242[10242]
