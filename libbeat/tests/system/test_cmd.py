@@ -67,7 +67,6 @@ class TestCommands(BaseTest):
         assert exit_code == 0
         assert len(self.es.cat.templates(name='mockbeat-*', h='name')) > 0
 
-
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_setup_ilm_policy(self):
@@ -99,6 +98,41 @@ class TestCommands(BaseTest):
         assert len(self.es.transport.perform_request('GET', '/_ilm/policy')) == 1
         policy = self.es.transport.perform_request('GET', "/_ilm/policy/")
         assert "beatDefaultPolicy" in policy
+
+        @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_setup_flag(self):
+        """
+        Test --setup flag on run command
+        """
+        # Delete any existing template
+        try:
+            self.es.indices.delete_template('mockbeat-*')
+        except:
+            pass
+
+        assert len(self.es.cat.templates(name='mockbeat-*', h='name')) == 0
+
+        shutil.copy(self.beat_path + "/_meta/config.yml",
+                    os.path.join(self.working_dir, "libbeat.yml"))
+        shutil.copy(self.beat_path + "/fields.yml",
+                    os.path.join(self.working_dir, "fields.yml"))
+
+        proc = self.start_beat(
+            extra_args=["--setup",
+                        "--path.config", self.working_dir,
+                        "-E", "setup.dashboards.file=" +
+                        os.path.join(self.beat_path, "tests", "files", "testbeat-dashboards.zip"),
+                        "-E", "setup.dashboards.beat=testbeat",
+                        "-E", "setup.kibana.protocol=http",
+                        "-E", "setup.kibana.host=" + self.get_kibana_host(),
+                        "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-E", "output.elasticsearch.hosts=['" + self.get_host() + "']"],
+            config="libbeat.yml")
+
+        self.wait_until(lambda: self.es.cat.templates(name='mockbeat-*', h='name') > 0)
+        self.wait_until(lambda: self.log_contains("Kibana dashboards successfully loaded"))
+        proc.check_kill_and_wait()
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')

@@ -23,9 +23,10 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/paths"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 )

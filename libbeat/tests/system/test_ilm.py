@@ -23,7 +23,6 @@ class Test(BaseTest):
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
-
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_enabled_false(self):
@@ -131,7 +130,6 @@ class Test(BaseTest):
 
         self.check_indices(rollover_alias, template_name, pattern=pattern, index=index)
 
-
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_policy(self):
@@ -160,7 +158,6 @@ class Test(BaseTest):
         if index == "":
             index = rollover_alias + "-" + pattern
 
-
         self.clean(rollover_alias)
 
         proc = self.start_beat()
@@ -185,7 +182,6 @@ class Test(BaseTest):
         # Check that policy is stored
         policies = self.es.transport.perform_request('GET', '/_ilm/policy')
         assert policy in policies
-
 
     def clean(self, alias_name):
         # Delete existing indices and aliases with it policy

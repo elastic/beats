@@ -148,7 +148,5 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	rootCmd.AddCommand(rootCmd.TestCmd)
 	rootCmd.AddCommand(rootCmd.KeystoreCmd)
 
-	rootCmd.ExportCmd.RemoveCommand()
-
 	return rootCmd
 }

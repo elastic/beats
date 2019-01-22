@@ -24,10 +24,11 @@ import (
 	"os"
 	"strings"
 
+	errw "github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	errw "github.com/pkg/errors"
 )
 
 //ESClient supporting methods necessary for ILM handling
@@ -135,7 +136,6 @@ func (l *ESLoader) shouldLoad(cfg Config) (bool, error) {
 }
 
 func (l *ESLoader) checkAliasExists(alias string) (bool, error) {
-	return false, nil
 	status, b, err := l.esClient.Request("HEAD", "/_alias/"+alias, "", nil, nil)
 	if err != nil && status != 404 {
 		return false, fmt.Errorf("%s: %v", err.Error(), string(b))

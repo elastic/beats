@@ -68,7 +68,6 @@ class Test(BaseTest):
         assert self.log_contains(
             "setup.template.name has to be set if index name is modified") is True
 
-
     def test_index_with_pattern_name(self):
         """
         Test that beat starts running if elasticsearch output with modified index and pattern and name are set
