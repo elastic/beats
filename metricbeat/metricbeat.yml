@@ -19,6 +19,13 @@ metricbeat.config.modules:
   # Period on which files under path should be checked for changes
   #reload.period: 10s
 
+#==================== Elasticsearch template setting ==========================
+
+setup.template.settings:
+  index.number_of_shards: 1
+  index.codec: best_compression
+  #_source.enabled: false
+
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group
@@ -63,37 +70,6 @@ setup.kibana:
   # ID of the Kibana Space into which the dashboards should be loaded. By default,
   # the Default Space will be used.
   #space.id:
-
-
-#============================== Indices =====================================
-
-# Index settings can define an index name, conditions which events should be sent to which index,
-# whether or not to use index lifecycle management for a specific index,
-# and several options to configure the Elasticsearch template for a specific index.
-indices:
-  - name: "%{[agent.type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
-
-    # Enable ilm to use index lifecycle management instead daily indices.
-    # ilm.enabled.true: The index `name` is ignored, instead the `ilm.rollover_alias` and `ilm.pattern` will be used.
-    # ilm.enabled.false: The index `name` configuration is used.
-    # ilm.enabled.auto: If the configured output is Elasticsearch and ILM is availbe in the Elasticsearch cluster, ilm will be enabled.
-    ilm:
-      enabled: auto
-      rollover_alias: "%{[agent.type]}-%{[agent.version]}"
-      pattern: "{now/d}-000001"
-
-    # A template is used to set the mapping in Elasticsearch
-    # By default template loading is enabled and the template is loaded.
-    # These settings can be adjusted to load your own template or overwrite existing ones per index.
-    template:
-      # Template name. By default the template name is "metricbeat-%{[beat.version]}"
-      # The template name and pattern has to be set in case the Elasticsearch index name is modified.
-      name: "%{[agent.type]}-%{[agent.version]}"
-
-      # Elasticsearch template settings
-      settings:
-        index.number_of_shards: 1
-        index.codec: best_compression
 
 #============================= Elastic Cloud ==================================
 
