@@ -26,6 +26,7 @@
         The number of rows modified by the query.
     - name: bytes_sent
       type: long
+      format: bytes
       description: >
         The size of the query result.
     - name: query
@@ -74,6 +75,7 @@
         Number of temporary tables created on disk for this query.
     - name: tmp_table_sizes
       type: long
+      format: bytes
       description: 
         Size of temporary tables created for this query.
     - name: filesort
@@ -127,6 +129,7 @@
             Number of page read operations.
         - name: io_r_bytes
           type: long
+          format: bytes
           description: >
             Bytes read during page read operations.
         - name: io_r_wait.sec

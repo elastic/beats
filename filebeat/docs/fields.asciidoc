@@ -6450,6 +6450,8 @@ The number of rows modified by the query.
 --
 type: long
 
+format: bytes
+
 The size of the query result.
 
 
@@ -6567,6 +6569,8 @@ Number of temporary tables created on disk for this query.
 --
 type: long
 
+format: bytes
+
 Size of temporary tables created for this query.
 
 --
@@ -6682,6 +6686,8 @@ Number of page read operations.
 +
 --
 type: long
+
+format: bytes
 
 Bytes read during page read operations.
 
