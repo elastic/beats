@@ -1,6 +1,6 @@
 # This should start the environment with the latest snapshots.
 
-version: '2.1'
+version: '2.3'
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.0.0-alpha1-SNAPSHOT
