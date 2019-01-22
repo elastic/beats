@@ -95,11 +95,7 @@ func TestPackages() error {
 
 // Update updates the generated files (aka make update).
 func Update() error {
-	err := sh.Run("make", "update")
-	if err != nil {
-		return err
-	}
-	return fieldDocs()
+	return sh.Run("make", "update")
 }
 
 // Fields generates a fields.yml for the Beat.
@@ -130,9 +126,9 @@ func ExportDashboard() error {
 	return mage.ExportDashboard()
 }
 
-// fieldDocs generates docs/fields.asciidoc containing all fields
+// FieldsDocs generates docs/fields.asciidoc containing all fields
 // (including x-pack).
-func fieldDocs() error {
+func FieldsDocs() error {
 	inputs := []string{
 		mage.OSSBeatDir("module"),
 		mage.XPackBeatDir("module"),
