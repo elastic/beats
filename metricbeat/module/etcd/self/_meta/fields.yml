@@ -16,7 +16,6 @@
     - name: leaderinfo.starttime
       type: keyword
 
-    # Seems decsription and keyword are not in sync
     - name: leaderinfo.uptime
       type: keyword
       description: >
@@ -53,7 +52,6 @@
       description: >
         number of requests per second this node is sending (leader only). This value is undefined on single member clusters.
 
-    # Check if this is correct
     - name: starttime
       type: keyword
       description: >
