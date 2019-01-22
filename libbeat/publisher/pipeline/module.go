@@ -100,7 +100,7 @@ func Load(
 		return nil, err
 	}
 
-	p, err := New(beatInfo, monitors, monitors.Metrics, queueBuilder, out, settings)
+	p, err := New(beatInfo, monitors, queueBuilder, out, settings)
 	if err != nil {
 		return nil, err
 	}

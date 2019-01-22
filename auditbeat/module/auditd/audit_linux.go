@@ -486,6 +486,7 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 
 	// Add root level fields.
 	addUser(auditEvent.User, out.RootFields)
+	addGroup(auditEvent.User, out.RootFields)
 	addProcess(auditEvent.Process, out.RootFields)
 	addFile(auditEvent.File, out.RootFields)
 	addAddress(auditEvent.Source, "source", out.RootFields)
@@ -546,6 +547,25 @@ func addUser(u aucoalesce.User, m common.MapStr) {
 			user["name_map"] = u.Names
 		}
 	}
+	if uid, found := u.IDs["uid"]; found {
+		user["id"] = uid
+	}
+	if uidName, found := u.Names["uid"]; found {
+		user["name"] = uidName
+	}
+}
+
+func addGroup(u aucoalesce.User, m common.MapStr) {
+	group := make(common.MapStr, 2)
+	if gid, found := u.IDs["gid"]; found {
+		group["id"] = gid
+	}
+	if gidName, found := u.Names["gid"]; found {
+		group["name"] = gidName
+	}
+	if len(group) > 0 {
+		m.Put("group", group)
+	}
 }
 
 func addProcess(p aucoalesce.Process, m common.MapStr) {
@@ -556,10 +576,14 @@ func addProcess(p aucoalesce.Process, m common.MapStr) {
 	process := common.MapStr{}
 	m.Put("process", process)
 	if p.PID != "" {
-		process["pid"] = p.PID
+		if pid, err := strconv.Atoi(p.PID); err == nil {
+			process["pid"] = pid
+		}
 	}
 	if p.PPID != "" {
-		process["ppid"] = p.PPID
+		if ppid, err := strconv.Atoi(p.PPID); err == nil {
+			process["ppid"] = ppid
+		}
 	}
 	if p.Title != "" {
 		process["title"] = p.Title
@@ -571,7 +595,7 @@ func addProcess(p aucoalesce.Process, m common.MapStr) {
 		process["executable"] = p.Exe
 	}
 	if p.CWD != "" {
-		process["cwd"] = p.CWD
+		process["working_directory"] = p.CWD
 	}
 	if len(p.Args) > 0 {
 		process["args"] = p.Args

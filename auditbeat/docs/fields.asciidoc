@@ -263,7 +263,9 @@ Process attributes.
 *`process.cwd`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: process.working_directory
 
 The current working directory.
 
