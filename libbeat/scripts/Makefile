@@ -354,7 +354,7 @@ endif
 		cp -pr $(PWD)/_meta/kibana/* $(PWD)/_meta/kibana.generated ; \
 	fi
 	@# Convert all dashboards to string
-	@python ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/6/dashboard/*.json"
+	@python ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/7/dashboard/*.json"
 	@go run ${ES_BEATS}/dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go \
 	  -index '${BEAT_INDEX_PREFIX}-*' -beat ${BEAT_NAME} -fields $(PWD)/fields.yml \
 	  -version ${BEAT_VERSION} -out _meta/kibana.generated
