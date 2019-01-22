@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/match"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/reader/multiline"
+	"github.com/elastic/beats/libbeat/reader/readcbor"
 	"github.com/elastic/beats/libbeat/reader/readjson"
 )
 
@@ -101,6 +102,7 @@ type config struct {
 	MaxBytes     int               `config:"max_bytes" validate:"min=0,nonzero"`
 	Multiline    *multiline.Config `config:"multiline"`
 	JSON         *readjson.Config  `config:"json"`
+	CBOR         *readcbor.Config  `config:"cbor"`
 
 	// Hidden on purpose, used by the docker input:
 	DockerJSON *struct {

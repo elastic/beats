@@ -53,6 +53,7 @@ import (
 	"github.com/elastic/beats/libbeat/reader"
 	"github.com/elastic/beats/libbeat/reader/debug"
 	"github.com/elastic/beats/libbeat/reader/multiline"
+	"github.com/elastic/beats/libbeat/reader/readcbor"
 	"github.com/elastic/beats/libbeat/reader/readfile"
 	"github.com/elastic/beats/libbeat/reader/readfile/encoding"
 	"github.com/elastic/beats/libbeat/reader/readjson"
@@ -318,8 +319,14 @@ func (h *Harvester) Run() error {
 
 			// Check if json fields exist
 			var jsonFields common.MapStr
+			var cborFields common.MapStr
+
 			if f, ok := fields["json"]; ok {
 				jsonFields = f.(common.MapStr)
+			}
+
+			if f, ok := fields["cbor"]; ok {
+				cborFields = f.(common.MapStr)
 			}
 
 			data.Event = beat.Event{
@@ -331,6 +338,11 @@ func (h *Harvester) Run() error {
 				if !ts.IsZero() {
 					// there was a `@timestamp` key in the event, so overwrite
 					// the resulting timestamp
+					data.Event.Timestamp = ts
+				}
+			} else if h.config.CBOR != nil && len(cborFields) > 0 {
+				ts := readcbor.MergeCBORFields(fields, cborFields, &text, *h.config.CBOR)
+				if !ts.IsZero() {
 					data.Event.Timestamp = ts
 				}
 			} else if &text != nil {
@@ -564,28 +576,35 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
-	r, err = readfile.NewEncodeReader(reader, h.encoding, h.config.BufferSize)
-	if err != nil {
-		return nil, err
+	if h.config.JSON != nil && h.config.CBOR != nil {
+		return nil, fmt.Errorf("Cannot specify both JSON and CBOR as input")
 	}
 
-	if h.config.DockerJSON != nil {
-		// Docker json-file format, add custom parsing to the pipeline
-		r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.ForceCRI, h.config.DockerJSON.CRIFlags)
-	}
-
-	if h.config.JSON != nil {
-		r = readjson.NewJSONReader(r, h.config.JSON)
-	}
-
-	r = readfile.NewStripNewline(r)
-
-	if h.config.Multiline != nil {
-		r, err = multiline.New(r, "\n", h.config.MaxBytes, h.config.Multiline)
+	if h.config.CBOR != nil {
+		r = readcbor.New(h.log, h.config.CBOR)
+	} else {
+		r, err = readfile.NewEncodeReader(reader, h.encoding, h.config.BufferSize)
 		if err != nil {
 			return nil, err
 		}
-	}
 
+		if h.config.DockerJSON != nil {
+			// Docker json-file format, add custom parsing to the pipeline
+			r = readjson.New(r, h.config.DockerJSON.Stream, h.config.DockerJSON.Partial, h.config.DockerJSON.ForceCRI, h.config.DockerJSON.CRIFlags)
+		}
+
+		if h.config.JSON != nil {
+			r = readjson.NewJSONReader(r, h.config.JSON)
+		}
+
+		r = readfile.NewStripNewline(r)
+
+		if h.config.Multiline != nil {
+			r, err = multiline.New(r, "\n", h.config.MaxBytes, h.config.Multiline)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
 	return readfile.NewLimitReader(r, h.config.MaxBytes), nil
 }

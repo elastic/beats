@@ -1938,6 +1938,12 @@
 			"revisionTime": "2016-08-17T18:24:57Z"
 		},
 		{
+			"checksumSHA1": "MAzQxLlGpnkO2tPOcQtZX9ciLRM=",
+			"path": "github.com/ugorji/go/codec",
+			"revision": "772ced7fd4c2f6322c07537a9a93b68d74551fa6",
+			"revisionTime": "2018-12-09T15:14:46Z"
+		},
+		{
 			"checksumSHA1": "H7tCgNt2ajKK4FBJIDNlevu9MAc=",
 			"path": "github.com/urso/go-bin",
 			"revision": "781c575c9f0eb3cb9dca94521bd7ad7d5aec7fd4",
