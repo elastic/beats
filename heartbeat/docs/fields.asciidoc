@@ -3797,7 +3797,7 @@ type: keyword
 *`up`*::
 +
 --
-type: short
+type: integer
 
 The number of endpoints that succeeded
 
@@ -3807,7 +3807,7 @@ The number of endpoints that succeeded
 *`down`*::
 +
 --
-type: short
+type: integer
 
 The number of endpoints that failed
 
