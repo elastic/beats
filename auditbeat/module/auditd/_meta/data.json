@@ -37,7 +37,7 @@
     },
     "process": {
         "executable": "/usr/sbin/sshd",
-        "pid": "12635"
+        "pid": 12635
     },
     "service": {
         "type": "auditd"
@@ -47,6 +47,8 @@
     },
     "user": {
         "auid": "unset",
+        "id": "0",
+        "name": "root",
         "name_map": {
             "uid": "root"
         },

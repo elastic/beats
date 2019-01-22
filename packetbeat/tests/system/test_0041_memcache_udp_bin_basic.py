@@ -30,7 +30,7 @@ class Test(BaseTest):
 
         # check transport layer always udp
         assert all(o['type'] == 'memcache' for o in objs)
-        assert all(o['transport'] == 'udp' for o in objs)
+        assert all(o['network.transport'] == 'udp' for o in objs)
         assert all(o['memcache.protocol_type'] == 'binary' for o in objs)
 
     def test_store(self):

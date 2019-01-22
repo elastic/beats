@@ -93,7 +93,9 @@
     description: Process attributes.
     fields:
     - name: cwd
-      type: keyword
+      type: alias
+      path: process.working_directory
+      migration: true
       description: The current working directory.
 
   - name: source
