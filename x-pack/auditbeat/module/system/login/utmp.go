@@ -140,12 +140,8 @@ func (r *UtmpFileReader) ReadNew() ([]LoginRecord, error) {
 			r.log.Debugf("Found new file: %v (size=%v)", path, fileInfo.Size())
 		}
 
-		var oldSize int64
-		if isKnownFile {
-			oldSize = fileRecord.Size
-		}
+		oldSize := fileRecord.Size
 		newSize := fileInfo.Size()
-
 		if newSize < oldSize {
 			// UTMP files are append-only and so this is weird. It might be a sign of
 			// a highly unlikely inode reuse - or of something more nefarious.
@@ -180,7 +176,8 @@ func (r *UtmpFileReader) ReadNew() ([]LoginRecord, error) {
 			if err != nil {
 				return nil, errors.Wrapf(err, "error reading file %v", path)
 			} else if len(utmpRecords) == 0 {
-				return nil, fmt.Errorf("unexpectedly, there are no new records in file %v", path)
+				return nil, errors.Errorf("unexpectedly, there are no new records in file %v (inode=%v, oldSize=%v, newSize=%v)",
+					path, inode, oldSize, newSize)
 			} else {
 				for _, utmp := range utmpRecords {
 					loginRecord := r.processLoginRecord(utmp)
@@ -254,7 +251,7 @@ func (r *UtmpFileReader) readAfter(path string, lastKnownRecord *Utmp) ([]Utmp, 
 	var utmpRecords []Utmp
 	for {
 		utmpC, err := C.getutent()
-		if err != nil {
+		if err != nil && err != io.EOF {
 			return nil, errors.Wrapf(err, "error getting entry in UTMP file %v", path)
 		}
 
