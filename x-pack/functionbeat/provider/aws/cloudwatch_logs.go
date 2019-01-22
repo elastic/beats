@@ -165,7 +165,7 @@ func (r *AWSLogsSubscriptionFilter) AWSCloudFormationType() string {
 // Template returns the cloudformation template for configuring the service with the specified triggers.
 func (c *CloudwatchLogs) Template() *cloudformation.Template {
 	prefix := func(suffix string) string {
-		return "fnb" + c.config.Name + suffix
+		return normalizeResourceName("fnb" + c.config.Name + suffix)
 	}
 
 	template := cloudformation.NewTemplate()
@@ -197,7 +197,7 @@ func (c *CloudwatchLogs) Template() *cloudformation.Template {
 		}
 
 		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-logs-subscriptionfilter.html
-		template.Resources[prefix("SubscriptionFilter"+normalizeResourceName(string(trigger.LogGroupName)))] = &AWSLogsSubscriptionFilter{
+		template.Resources[prefix("SF")+normalizeResourceName(string(trigger.LogGroupName))] = &AWSLogsSubscriptionFilter{
 			DestinationArn: cloudformation.GetAtt(prefix(""), "Arn"),
 			FilterPattern:  trigger.FilterPattern,
 			LogGroupName:   string(trigger.LogGroupName),

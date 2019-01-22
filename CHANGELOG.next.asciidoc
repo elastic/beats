@@ -41,6 +41,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 *Functionbeat*
 
 - The CLI will now log CloudFormation Stack events. {issue}8912[8912]
+- Correctly normalize Cloudformation resource name. {issue}10087[10087]
 
 ==== Bugfixes
 
@@ -75,6 +76,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Add `convert_timezone` option to Elasticsearch module to convert dates to UTC. {issue}9756[9756] {pull}9761[9761]
 - Support IPv6 addresses with zone id in IIS ingest pipeline. {issue}9836[9836] error log: {pull}9869[9869] access log: {pull}10029[10029]
 - Support haproxy log lines without captured headers. {issue}9463[9463] {pull}9958[9958]
+- Make elasticsearch/audit fileset be more lenient in parsing node name. {issue}10035[10035] {pull}10135[10135]
 
 *Heartbeat*
 
@@ -95,6 +97,8 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - The `node.name` field in the `elasticsearch/node` metricset now correctly reports the Elasticsarch node name. Previously this field was incorrectly reporting the node ID instead. {pull}9209[9209]
 - Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
 - Fix MongoDB dashboard that had some incorrect field names from `status` Metricset {pull}9795[9795] {issue}9715[9715]
+- Fix pod UID metadata enrichment in Kubernetes module. {pull}10081[10081]
+- Fix issue that would prevent collection of processes without command line on Windows. {pull}10196[10196]
 
 *Packetbeat*
 
@@ -134,6 +138,8 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Support mysql 5.7.22 slowlog starting with time information. {issue}7892[7892] {pull}9647[9647]
 - Add support for ssl_request_log in apache2 module. {issue}8088[8088] {pull}9833[9833]
 - Add support for iis 7.5 log format. {issue}9753[9753] {pull}9967[9967]
+- Add support for MariaDB in the `slowlog` fileset of `mysql` module. {pull}9731[9731]
+- Add convert_timezone to nginx module. {issue}9839[9839] {pull}10148[10148]
 
 *Heartbeat*
 - Made monitors.d configuration part of the default config. {pull}9004[9004]
@@ -160,6 +166,17 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Add `key` metricset to the Redis module. {issue}9582[9582] {pull}9657[9657]
 - Add DeDot for kubernetes labels and annotations. {issue}9860[9860] {pull}9939[9939]
 - Add docker `event` metricset. {pull}9856[9856]
+- Release Ceph module as GA. {pull}10202[10202]
+- Release windows Metricbeat module as GA. {pull}10163[10163]
+- Release traefik Metricbeat module as GA. {pull}10166[10166]
+- List filesystems on Windows that have an access path but not an assigned letter {issue}8916[8916] {pull}10196[10196]
+- Release uswgi Metricbeat module GA. {pull}10164[10164]
+- Release php_fpm module as GA. {pull}10198[10198]
+- Release Memcached module as GA. {pull}10199[10199]
+- Release etcd module as GA. {pull}10200[10200]
+- Release Couchbase module as GA. {pull}10201[10201]
+- Release aerospike module as GA. {pull}10203[10203]
+- Making RabbitMQ Metricbeat module GA. {pull}10165[10165]
 
 *Packetbeat*
 

@@ -2,7 +2,7 @@
   type: group
   description: >
     Couchbase node metrics.
-  release: beta
+  release: ga
   fields:
     - name: cmd_get
       type: long
