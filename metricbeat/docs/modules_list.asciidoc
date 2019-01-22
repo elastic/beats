@@ -22,9 +22,10 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-couchbase-cluster,cluster>>   
 |<<metricbeat-metricset-couchbase-node,node>>   
 |<<metricbeat-module-docker,Docker>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.8+| .8+|  |<<metricbeat-metricset-docker-container,container>>   
+.9+| .9+|  |<<metricbeat-metricset-docker-container,container>>   
 |<<metricbeat-metricset-docker-cpu,cpu>>   
 |<<metricbeat-metricset-docker-diskio,diskio>>   
+|<<metricbeat-metricset-docker-event,event>>   
 |<<metricbeat-metricset-docker-healthcheck,healthcheck>>   
 |<<metricbeat-metricset-docker-image,image>>   
 |<<metricbeat-metricset-docker-info,info>>   
