@@ -56,13 +56,6 @@
       "field": "mysql.slowlog.timestamp",
       "ignore_missing": true
     }
-  }, {
-    "gsub": {
-      "field": "mysql.slowlog.query",
-       "pattern": "\n# Time: [0-9]+ [0-9][0-9]:[0-9][0-9]:[0-9][0-9](\\.[0-9]+)?$",
-       "replacement": "",
-       "ignore_failure": true
-    }
   }],
   "on_failure" : [{
     "set" : {
