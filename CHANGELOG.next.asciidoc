@@ -41,6 +41,7 @@ https://github.com/elastic/beats/compare/v6.5.4...6.5[Check the HEAD diff]
 *Filebeat*
 
 - Support IPv6 addresses with zone id in IIS ingest pipeline. {issue}9836[9836] error log: {pull}9869[9869] access log: {pull}10030[10030]
+- Fix bad bytes count in `docker` input when filtering by stream. {pull}10211[10211]
 
 *Heartbeat*
 
