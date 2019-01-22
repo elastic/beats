@@ -10,6 +10,7 @@
         The period the server is up (sec)
     - name: mem.bytes
       type: long
+      format: bytes
       description: >
         The current memory usage of NATS process
     - name: cores

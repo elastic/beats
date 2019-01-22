@@ -17870,6 +17870,8 @@ The period the server is up (sec)
 --
 type: long
 
+format: bytes
+
 The current memory usage of NATS process
 
 

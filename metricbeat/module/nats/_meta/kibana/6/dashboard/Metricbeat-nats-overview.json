@@ -1377,7 +1377,7 @@
         "title": "[Metricbeat Nats] Overview",
         "version": 1
       },
-      "id": "c359a6c0-1e45-11e9-a1b4-79a7ae42ab61",
+      "id": "Metricbeat-Nats-Dashboard",
       "type": "dashboard",
       "updated_at": "2019-01-22T13:08:28.464Z",
       "version": 3
