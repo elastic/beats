@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/flowhash"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos/applayer"
 )
@@ -210,7 +211,7 @@ func createEvent(
 		"start":    common.Time(f.createTS),
 		"end":      common.Time(f.ts),
 		"duration": f.ts.Sub(f.createTS),
-		"type":     "flow",
+		"dataset":  "flow",
 	}
 	flow := common.MapStr{
 		"id":    common.NetString(f.id.Serialize()),
@@ -219,11 +220,13 @@ func createEvent(
 	fields := common.MapStr{
 		"event": event,
 		"flow":  flow,
+		"type":  "flow",
 	}
 	network := common.MapStr{}
 	source := common.MapStr{}
 	dest := common.MapStr{}
 	tuple := common.IPPortTuple{}
+	var communityID flowhash.Flow
 	var proto applayer.Transport
 
 	// add ethernet layer meta data
@@ -242,13 +245,6 @@ func createEvent(
 		putOrAppendUint64(flow, "vlan", vlanID)
 	}
 
-	// add icmp
-	if icmp := f.id.ICMPv4(); icmp != nil {
-		network["transport"] = "icmp"
-	} else if icmp := f.id.ICMPv6(); icmp != nil {
-		network["transport"] = "ipv6-icmp"
-	}
-
 	// ipv4 layer meta data
 	if src, dst, ok := f.id.OutterIPv4Addr(); ok {
 		srcIP, dstIP := net.IP(src), net.IP(dst)
@@ -258,6 +254,8 @@ func createEvent(
 		tuple.DstIP = dstIP
 		tuple.IPLength = 4
 		network["type"] = "ipv4"
+		communityID.SourceIP = srcIP
+		communityID.DestinationIP = dstIP
 	}
 	if src, dst, ok := f.id.IPv4Addr(); ok {
 		srcIP, dstIP := net.IP(src), net.IP(dst)
@@ -268,8 +266,10 @@ func createEvent(
 			tuple.SrcIP = srcIP
 			tuple.DstIP = dstIP
 			tuple.IPLength = 4
+			communityID.SourceIP = srcIP
+			communityID.DestinationIP = dstIP
+			network["type"] = "ipv4"
 		}
-		network["type"] = "ipv4"
 	}
 
 	// ipv6 layer meta data
@@ -281,6 +281,8 @@ func createEvent(
 		tuple.DstIP = dstIP
 		tuple.IPLength = 6
 		network["type"] = "ipv6"
+		communityID.SourceIP = srcIP
+		communityID.DestinationIP = dstIP
 	}
 	if src, dst, ok := f.id.IPv6Addr(); ok {
 		srcIP, dstIP := net.IP(src), net.IP(dst)
@@ -291,8 +293,10 @@ func createEvent(
 			tuple.SrcIP = srcIP
 			tuple.DstIP = dstIP
 			tuple.IPLength = 6
+			communityID.SourceIP = srcIP
+			communityID.DestinationIP = dstIP
+			network["type"] = "ipv6"
 		}
-		network["type"] = "ipv6"
 	}
 
 	// udp layer meta data
@@ -302,6 +306,9 @@ func createEvent(
 		source["port"], dest["port"] = tuple.SrcPort, tuple.DstPort
 		network["transport"] = "udp"
 		proto = applayer.TransportUDP
+		communityID.SourcePort = tuple.SrcPort
+		communityID.DestinationPort = tuple.DstPort
+		communityID.Protocol = 17
 	}
 
 	// tcp layer meta data
@@ -311,6 +318,9 @@ func createEvent(
 		source["port"], dest["port"] = tuple.SrcPort, tuple.DstPort
 		network["transport"] = "tcp"
 		proto = applayer.TransportTCP
+		communityID.SourcePort = tuple.SrcPort
+		communityID.DestinationPort = tuple.DstPort
+		communityID.Protocol = 6
 	}
 
 	var totalBytes, totalPackets uint64
@@ -318,7 +328,24 @@ func createEvent(
 		// Source stats.
 		stats := encodeStats(f.stats[0], intNames, uintNames, floatNames)
 		for k, v := range stats {
-			source[k] = v
+			switch k {
+			case "icmpV4TypeCode":
+				if typeCode, ok := v.(uint64); ok && typeCode > 0 {
+					network["transport"] = "icmp"
+					communityID.Protocol = 1
+					communityID.ICMP.Type = uint8(typeCode >> 8)
+					communityID.ICMP.Code = uint8(typeCode)
+				}
+			case "icmpV6TypeCode":
+				if typeCode, ok := v.(uint64); ok && typeCode > 0 {
+					network["transport"] = "ipv6-icmp"
+					communityID.Protocol = 58
+					communityID.ICMP.Type = uint8(typeCode >> 8)
+					communityID.ICMP.Code = uint8(typeCode)
+				}
+			default:
+				source[k] = v
+			}
 		}
 
 		if v, found := stats["bytes"]; found {
@@ -332,7 +359,11 @@ func createEvent(
 		// Destination stats.
 		stats := encodeStats(f.stats[1], intNames, uintNames, floatNames)
 		for k, v := range stats {
-			dest[k] = v
+			switch k {
+			case "icmpV4TypeCode", "icmpV6TypeCode":
+			default:
+				dest[k] = v
+			}
 		}
 
 		if v, found := stats["bytes"]; found {
@@ -341,6 +372,10 @@ func createEvent(
 		if v, found := stats["packets"]; found {
 			totalPackets += v.(uint64)
 		}
+	}
+	if communityID.Protocol > 0 && len(communityID.SourceIP) > 0 && len(communityID.DestinationIP) > 0 {
+		hash := flowhash.CommunityID.Hash(communityID)
+		network["community_id"] = hash
 	}
 	network["bytes"] = totalBytes
 	network["packets"] = totalPackets

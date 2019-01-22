@@ -11,16 +11,30 @@
     "processors": [
         {
             "rename": {
+                "field": "@timestamp",
+                "target_field": "event.created"
+            }
+        },
+
+        {
+            "rename": {
                 "field": "json",
                 "target_field": "kibana.log.meta"
             }
         },
         {
-            "rename": {
+            "date": {
                 "field": "kibana.log.meta.@timestamp",
-                "target_field": "read_timestamp"
+                "formats" : ["ISO8601"],
+                "target_field": "@timestamp"
             }
         },
+        {
+            "remove": {
+                "field": "kibana.log.meta.@timestamp"
+            }
+        },
+
         {
             "rename": {
                 "field": "kibana.log.meta.message",
@@ -138,13 +152,6 @@
             }
         },
 
-        {
-            "date": {
-                "field": "read_timestamp",
-                "formats" : ["ISO8601"],
-                "target_field": "@timestamp"
-            }
-        },
         {
             "append": {
                 "field": "service.name",

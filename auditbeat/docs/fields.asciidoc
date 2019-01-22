@@ -21,6 +21,7 @@ grouped in the following categories:
 * <<exported-fields-file_integrity>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-kubernetes-processor>>
+* <<exported-fields-process>>
 * <<exported-fields-system>>
 
 --
@@ -259,19 +260,12 @@ The actor's SELinux category or compartments.
 Process attributes.
 
 
-*`process.exe`*::
-+
---
-type: keyword
-
-Absolute path of the executable.
-
---
-
 *`process.cwd`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: process.working_directory
 
 The current working directory.
 
@@ -2477,6 +2471,24 @@ type: keyword
 
 Error type.
 
+
+--
+
+*`beat.name`*::
++
+--
+type: alias
+
+alias to: host.name
+
+--
+
+*`beat.hostname`*::
++
+--
+type: alias
+
+alias to: agent.hostname
 
 --
 
@@ -5703,24 +5715,6 @@ Operating system kernel version as a raw string.
 
 --
 
-*`beat.name`*::
-+
---
-type: alias
-
-alias to: agent.type
-
---
-
-*`beat.hostname`*::
-+
---
-type: alias
-
-alias to: agent.hostname
-
---
-
 *`agent.hostname`*::
 +
 --
@@ -6049,6 +6043,23 @@ type: keyword
 
 Kubernetes container image
 
+
+--
+
+[[exported-fields-process]]
+== Process fields
+
+Process metadata fields
+
+
+
+
+*`process.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
 
 --
 

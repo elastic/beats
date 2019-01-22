@@ -35,12 +35,6 @@
         The input type from which the event was generated. This field is set to the value specified
         for the `type` option in the input section of the Filebeat config file.
 
-    - name: read_timestamp
-      description: >
-        In case the ingest pipeline parses the timestamp from the log contents, it stores
-        the original `@timestamp` (representing the time when the log line was read) in this
-        field.
-
     - name: syslog.facility
       type: long
       required: false
@@ -102,4 +96,9 @@
     - name: fileset.module
       type: alias
       path: event.module
+      migration: true
+
+    - name: read_timestamp
+      type: alias
+      path: event.created
       migration: true

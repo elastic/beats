@@ -40,7 +40,7 @@
 
     - name: server_ip
       type: alias
-      path: destination.ip
+      path: destination.address
       migration: true
     - name: method
       type: alias
@@ -64,7 +64,7 @@
       migration: true
     - name: remote_ip
       type: alias
-      path: source.ip
+      path: source.address
       migration: true
     - name: referrer
       type: alias

@@ -22,7 +22,7 @@ auditbeat.config.modules:
   # Set to true to enable config reloading
   reload.enabled: false
 
-# Maximum amount of time to randomly delay the start of a metricset. Use 0 to
+# Maximum amount of time to randomly delay the start of a dataset. Use 0 to
 # disable startup delay.
 auditbeat.max_start_delay: 10s
 
@@ -111,22 +111,22 @@ auditbeat.modules:
   recursive: false
 
 # The system module collects security related information about a host.
-# All metricsets send both periodic state information (e.g. all currently
+# All datasets send both periodic state information (e.g. all currently
 # running processes) and real-time changes (e.g. when a new process starts
 # or stops).
 - module: system
-  metricsets:
+  datasets:
     - host    # General host information, e.g. uptime, IPs
     - process # Started and stopped processes
     - socket  # Opened and closed sockets
     - user    # User information
 
-  # How often metricsets send state updates with the
+  # How often datasets send state updates with the
   # current state of the system (e.g. all currently
   # running processes, all open sockets).
   state.period: 12h
 
-  # The state.period can be overridden for any metricset.
+  # The state.period can be overridden for any dataset.
   # host.state.period: 12h
   # process.state.period: 12h
   # socket.state.period: 12h
@@ -411,7 +411,7 @@ output.elasticsearch:
   # Optional index name. The default is "auditbeat" plus date
   # and generates [auditbeat-]YYYY.MM.DD keys.
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "auditbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
+  #index: "auditbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -988,14 +988,14 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Template name. By default the template name is "auditbeat-%{[beat.version]}"
+# Template name. By default the template name is "auditbeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.name: "auditbeat-%{[beat.version]}"
+#setup.template.name: "auditbeat-%{[agent.version]}"
 
-# Template pattern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
+# Template pattern. By default the template pattern is "-%{[agent.version]}-*" to apply to the default index settings.
 # The first part is the version of the beat and then -* is used to match all daily indices.
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.pattern: "auditbeat-%{[beat.version]}-*"
+#setup.template.pattern: "auditbeat-%{[agent.version]}-*"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
@@ -1272,3 +1272,8 @@ logging.files:
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
 #seccomp.enabled: true
+
+#================================= Migration ==================================
+
+# This allows to enable migration aliases
+#migration.enabled: false

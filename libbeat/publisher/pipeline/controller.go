@@ -21,7 +21,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/reload"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 )
@@ -33,7 +32,6 @@ import (
 type outputController struct {
 	beat     beat.Info
 	monitors Monitors
-	logger   *logp.Logger
 	observer outputObserver
 
 	queue queue.Queue
@@ -63,21 +61,19 @@ type outputWorker interface {
 func newOutputController(
 	beat beat.Info,
 	monitors Monitors,
-	log *logp.Logger,
 	observer outputObserver,
 	b queue.Queue,
 ) *outputController {
 	c := &outputController{
 		beat:     beat,
 		monitors: monitors,
-		logger:   log,
 		observer: observer,
 		queue:    b,
 	}
 
 	ctx := &batchContext{}
-	c.consumer = newEventConsumer(log, b, ctx)
-	c.retryer = newRetryer(log, observer, nil, c.consumer)
+	c.consumer = newEventConsumer(monitors.Logger, b, ctx)
+	c.retryer = newRetryer(monitors.Logger, observer, nil, c.consumer)
 	ctx.observer = observer
 	ctx.retryer = c.retryer
 

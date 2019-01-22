@@ -2,6 +2,7 @@ from packetbeat import (BaseTest, FLOWS_REQUIRED_FIELDS)
 from pprint import PrettyPrinter
 from datetime import datetime
 import six
+import os
 
 
 def pprint(x): return PrettyPrinter().pprint(x)
@@ -165,3 +166,54 @@ class Test(BaseTest):
             'network.bytes': 82,
             'network.packets': 1,
         })
+
+    def test_community_id_icmp(self):
+        objs = self.check_community_id("icmp.pcap")
+
+        assert len(objs) == 1
+        self.assertEqual(objs[0]["network.community_id"], "1:X0snYXpgwiv9TZtqg64sgzUn6Dk=")
+
+    def test_community_id_icmp6(self):
+        objs = self.check_community_id("icmp6.pcap")
+
+        assert len(objs) == 10
+        self.assertEqual(objs[0]["network.community_id"], "1:zavyT/cezQr1fmImYCwYnMXbgck=")
+        self.assertEqual(objs[1]["network.community_id"], "1:GpbEQrKqfWtsfsFiqg8fufoZe5Y=")
+        self.assertEqual(objs[2]["network.community_id"], "1:bnQKq8A2r//dWnkRW2EYcMhShjc=")
+        self.assertEqual(objs[3]["network.community_id"], "1:2ObVBgIn28oZvibYZhZMBgh7WdQ=")
+        self.assertEqual(objs[4]["network.community_id"], "1:hLZd0XGWojozrvxqE0dWB1iM6R0=")
+        self.assertEqual(objs[5]["network.community_id"], "1:+TW+HtLHvV1xnGhV1lv7XoJrqQg=")
+        self.assertEqual(objs[6]["network.community_id"], "1:hO+sN4H+MG5MY/8hIrXPqc4ZQz0=")
+        self.assertEqual(objs[7]["network.community_id"], "1:pkvHqCL88/tg1k4cPigmZXUtL00=")
+        self.assertEqual(objs[8]["network.community_id"], "1:jwuBy9UWZK1KUFqJV5cHdVpfrlY=")
+        self.assertEqual(objs[9]["network.community_id"], "1:MEixa66kuz0OMvlQqnAIzP3n2xg=")
+
+    def test_community_id_ipv4_tcp(self):
+        objs = self.check_community_id("tcp.pcap")
+
+        all([self.assertEqual(o["network.community_id"], "1:LQU9qZlK+B5F3KDmev6m5PMibrg=") for o in objs])
+
+    def test_community_id_ipv4_udp(self):
+        objs = self.check_community_id("udp.pcap")
+
+        all([self.assertEqual(o["network.community_id"], "1:d/FP5EW3wiY1vCndhwleRRKHowQ=") for o in objs])
+
+    def check_community_id(self, pcap):
+        self.render_config_template(
+            flows=True,
+            shutdown_timeout="1s",
+            processors=[{
+                "drop_event": {
+                    "when": "not.equals.type: flow",
+                },
+            }]
+        )
+        self.run_packetbeat(
+            pcap=os.path.join("../../../../libbeat/common/flowhash/testdata/pcap", pcap),
+            debug_selectors=["*"])
+
+        objs = self.read_output(
+            types=["flow"],
+            required_fields=FLOWS_REQUIRED_FIELDS)
+
+        return objs

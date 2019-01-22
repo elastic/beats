@@ -14,13 +14,14 @@
         "elasticsearch.slowlog.total_shards": 5,
         "elasticsearch.slowlog.types": "doc,doc2",
         "event.dataset": "elasticsearch.slowlog",
+        "event.duration": 0,
         "event.module": "elasticsearch",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "WARN",
         "log.offset": 0,
         "message": "[2018-09-24T15:30:37,246][WARN ][i.s.s.query              ] [elasticsearch] [a][0] took[105.5micros], took_millis[0], types[doc,doc2], stats[], search_type[QUERY_THEN_FETCH], total_shards[5], source[{}], ",
-        "service.name": "elasticsearch"
+        "service.type": "elasticsearch"
     },
     {
         "@timestamp": "2018-09-24T15:30:37.246Z",
@@ -37,13 +38,14 @@
         "elasticsearch.slowlog.total_shards": 5,
         "elasticsearch.slowlog.types": "doc,doc2",
         "event.dataset": "elasticsearch.slowlog",
+        "event.duration": 0,
         "event.module": "elasticsearch",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "WARN",
         "log.offset": 205,
         "message": "[2018-09-24T15:30:37,246][WARN ][i.s.s.query              ] [elasticsearch] [a][2] took[102.7micros], took_millis[0], types[doc,doc2], stats[], search_type[QUERY_THEN_FETCH], total_shards[5], source[{}], ",
-        "service.name": "elasticsearch"
+        "service.type": "elasticsearch"
     },
     {
         "@timestamp": "2018-09-24T15:30:37.246Z",
@@ -60,13 +62,14 @@
         "elasticsearch.slowlog.total_shards": 5,
         "elasticsearch.slowlog.types": "doc,doc2",
         "event.dataset": "elasticsearch.slowlog",
+        "event.duration": 0,
         "event.module": "elasticsearch",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "WARN",
         "log.offset": 410,
         "message": "[2018-09-24T15:30:37,246][WARN ][i.s.s.query              ] [elasticsearch] [a][1] took[102.5micros], took_millis[0], types[doc,doc2], stats[], search_type[QUERY_THEN_FETCH], total_shards[5], source[{}], ",
-        "service.name": "elasticsearch"
+        "service.type": "elasticsearch"
     },
     {
         "@timestamp": "2018-09-24T15:30:37.246Z",
@@ -83,13 +86,14 @@
         "elasticsearch.slowlog.total_shards": 5,
         "elasticsearch.slowlog.types": "doc,doc2",
         "event.dataset": "elasticsearch.slowlog",
+        "event.duration": 0,
         "event.module": "elasticsearch",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "WARN",
         "log.offset": 615,
         "message": "[2018-09-24T15:30:37,246][WARN ][i.s.s.query              ] [elasticsearch] [a][3] took[102.5micros], took_millis[0], types[doc,doc2], stats[], search_type[QUERY_THEN_FETCH], total_shards[5], source[{}], ",
-        "service.name": "elasticsearch"
+        "service.type": "elasticsearch"
     },
     {
         "@timestamp": "2018-09-24T15:30:37.246Z",
@@ -106,13 +110,14 @@
         "elasticsearch.slowlog.total_shards": 5,
         "elasticsearch.slowlog.types": "doc,doc2",
         "event.dataset": "elasticsearch.slowlog",
+        "event.duration": 0,
         "event.module": "elasticsearch",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "WARN",
         "log.offset": 820,
         "message": "[2018-09-24T15:30:37,246][WARN ][i.s.s.query              ] [elasticsearch] [a][4] took[145.6micros], took_millis[0], types[doc,doc2], stats[], search_type[QUERY_THEN_FETCH], total_shards[5], source[{}], ",
-        "service.name": "elasticsearch"
+        "service.type": "elasticsearch"
     },
     {
         "@timestamp": "2018-09-24T15:34:48.188Z",
@@ -129,13 +134,14 @@
         "elasticsearch.slowlog.total_shards": 5,
         "elasticsearch.slowlog.types": "doc,doc2",
         "event.dataset": "elasticsearch.slowlog",
+        "event.duration": 0,
         "event.module": "elasticsearch",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "WARN",
         "log.offset": 1025,
         "message": "[2018-09-24T15:34:48,188][WARN ][i.s.s.query              ] [elasticsearch] [a][1] took[244.5micros], took_millis[0], types[doc,doc2], stats[], search_type[QUERY_THEN_FETCH], total_shards[5], source[{\"query\":{\"match\":{\"a\":{\"query\":\"xyz\",\"operator\":\"OR\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":true,\"lenient\":false,\"zero_terms_query\":\"NONE\",\"boost\":1.0}}}}], ",
-        "service.name": "elasticsearch"
+        "service.type": "elasticsearch"
     },
     {
         "@timestamp": "2018-09-24T15:34:48.188Z",
@@ -152,13 +158,14 @@
         "elasticsearch.slowlog.total_shards": 5,
         "elasticsearch.slowlog.types": "doc,doc2",
         "event.dataset": "elasticsearch.slowlog",
+        "event.duration": 0,
         "event.module": "elasticsearch",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "WARN",
         "log.offset": 1405,
         "message": "[2018-09-24T15:34:48,188][WARN ][i.s.s.query              ] [elasticsearch] [a][3] took[223.2micros], took_millis[0], types[doc,doc2], stats[], search_type[QUERY_THEN_FETCH], total_shards[5], source[{\"query\":{\"match\":{\"a\":{\"query\":\"xyz\",\"operator\":\"OR\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":true,\"lenient\":false,\"zero_terms_query\":\"NONE\",\"boost\":1.0}}}}], ",
-        "service.name": "elasticsearch"
+        "service.type": "elasticsearch"
     },
     {
         "@timestamp": "2018-09-24T15:34:48.188Z",
@@ -175,13 +182,14 @@
         "elasticsearch.slowlog.total_shards": 5,
         "elasticsearch.slowlog.types": "doc,doc2",
         "event.dataset": "elasticsearch.slowlog",
+        "event.duration": 0,
         "event.module": "elasticsearch",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "WARN",
         "log.offset": 1785,
         "message": "[2018-09-24T15:34:48,188][WARN ][i.s.s.query              ] [elasticsearch] [a][2] took[223.9micros], took_millis[0], types[doc,doc2], stats[], search_type[QUERY_THEN_FETCH], total_shards[5], source[{\"query\":{\"match\":{\"a\":{\"query\":\"xyz\",\"operator\":\"OR\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":true,\"lenient\":false,\"zero_terms_query\":\"NONE\",\"boost\":1.0}}}}], ",
-        "service.name": "elasticsearch"
+        "service.type": "elasticsearch"
     },
     {
         "@timestamp": "2018-09-24T15:34:48.188Z",
@@ -198,13 +206,14 @@
         "elasticsearch.slowlog.total_shards": 5,
         "elasticsearch.slowlog.types": "doc,doc2",
         "event.dataset": "elasticsearch.slowlog",
+        "event.duration": 0,
         "event.module": "elasticsearch",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "WARN",
         "log.offset": 2165,
         "message": "[2018-09-24T15:34:48,188][WARN ][i.s.s.query              ] [elasticsearch] [a][4] took[263.5micros], took_millis[0], types[doc,doc2], stats[], search_type[QUERY_THEN_FETCH], total_shards[5], source[{\"query\":{\"match\":{\"a\":{\"query\":\"xyz\",\"operator\":\"OR\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":true,\"lenient\":false,\"zero_terms_query\":\"NONE\",\"boost\":1.0}}}}], ",
-        "service.name": "elasticsearch"
+        "service.type": "elasticsearch"
     },
     {
         "@timestamp": "2018-09-24T15:34:48.188Z",
@@ -221,12 +230,13 @@
         "elasticsearch.slowlog.total_shards": 5,
         "elasticsearch.slowlog.types": "doc,doc2",
         "event.dataset": "elasticsearch.slowlog",
+        "event.duration": 0,
         "event.module": "elasticsearch",
         "fileset.name": "slowlog",
         "input.type": "log",
         "log.level": "WARN",
         "log.offset": 2545,
         "message": "[2018-09-24T15:34:48,188][WARN ][i.s.s.query              ] [elasticsearch] [a][0] took[116.1micros], took_millis[0], types[doc,doc2], stats[], search_type[QUERY_THEN_FETCH], total_shards[5], source[{\"query\":{\"match\":{\"a\":{\"query\":\"xyz\",\"operator\":\"OR\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":true,\"lenient\":false,\"zero_terms_query\":\"NONE\",\"boost\":1.0}}}}], ",
-        "service.name": "elasticsearch"
+        "service.type": "elasticsearch"
     }
 ]

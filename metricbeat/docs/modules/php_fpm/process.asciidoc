@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-php_fpm-process]]
 === PHP_FPM process metricset
 
-beta[]
-
 include::../../../module/php_fpm/process/_meta/docs.asciidoc[]
 
 

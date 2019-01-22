@@ -66,7 +66,7 @@ func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersi
 				fmt.Fprintf(os.Stderr, "Invalid Elasticsearch version: %s\n", err)
 			}
 
-			tmpl, err := template.New(b.Info.Version, index, *esVersion, cfg)
+			tmpl, err := template.New(b.Info.Version, index, *esVersion, cfg, b.Config.Migration.Enabled())
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error generating template: %+v", err)
 				os.Exit(1)

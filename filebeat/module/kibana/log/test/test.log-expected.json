@@ -29,6 +29,7 @@
         "service.name": [
             "kibana"
         ],
+        "service.type": "kibana",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "url.original": "/ui/fonts/open_sans/open_sans_v15_latin_600.woff2",
@@ -52,7 +53,8 @@
         "process.pid": 69776,
         "service.name": [
             "kibana"
-        ]
+        ],
+        "service.type": "kibana"
     },
     {
         "@timestamp": "2018-05-09T10:59:12.000Z",
@@ -72,6 +74,7 @@
         "process.pid": 69776,
         "service.name": [
             "kibana"
-        ]
+        ],
+        "service.type": "kibana"
     }
 ]
