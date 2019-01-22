@@ -136,10 +136,16 @@ func (r *UtmpFileReader) ReadNew() ([]LoginRecord, error) {
 			// otherwise we will just keep trying to re-read very frequently forever.
 			defer r.updateFileRecord(inode, newSize, &utmpRecords)
 
+			f, err := os.Open(path)
+			if err != nil {
+				return nil, errors.Wrapf(err, "error opening %v", path)
+			}
+			defer f.Close()
+
 			if isKnownFile {
-				utmpRecords, err = r.readAfter(path, &fileRecord.LastUtmp)
+				utmpRecords, err = r.readAfter(f, &fileRecord.LastUtmp)
 			} else {
-				utmpRecords, err = r.readAfter(path, nil)
+				utmpRecords, err = r.readAfter(f, nil)
 			}
 
 			if err != nil {
@@ -201,18 +207,13 @@ func (r *UtmpFileReader) updateFileRecord(inode Inode, size int64, utmpRecords *
 // ReadAfter reads a UTMP formatted file (usually /var/log/wtmp*)
 // and returns the records after the provided last known record.
 // If record is nil, it returns all records in the file.
-func (r *UtmpFileReader) readAfter(path string, lastKnownRecord *Utmp) ([]Utmp, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, errors.Wrapf(err, "error opening %v", path)
-	}
-
+func (r *UtmpFileReader) readAfter(f *os.File, lastKnownRecord *Utmp) ([]Utmp, error) {
 	reachedNewRecords := (lastKnownRecord == nil)
 	var utmpRecords []Utmp
 	for {
 		utmp, err := ReadNextUtmp(f)
 		if err != nil && err != io.EOF {
-			return nil, errors.Wrapf(err, "error reading entry in UTMP file %v", path)
+			return nil, errors.Wrap(err, "error reading entry in UTMP file")
 		}
 
 		if utmp != nil {
@@ -234,10 +235,17 @@ func (r *UtmpFileReader) readAfter(path string, lastKnownRecord *Utmp) ([]Utmp, 
 				// This might be a sign of a highly unlikely inode reuse -
 				// or of something more nefarious. We go back to the beginning and
 				// read the whole file this time.
-				r.log.Warnf("Unexpectedly, the file %v did not contain the saved login record %v - reading whole file.",
-					path, *lastKnownRecord)
+				r.log.Warnf("Unexpectedly, the file did not contain the saved login record %v - reading whole file.",
+					*lastKnownRecord)
 
-				return r.readAfter(path, nil)
+				_, err = f.Seek(0, 0)
+				if err != nil {
+					return nil, errors.Wrap(err, "error reading file from beginning")
+				}
+				// So we don't land here again.
+				reachedNewRecords = true
+
+				continue
 			}
 
 			break
