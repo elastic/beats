@@ -64,6 +64,11 @@ type Keystore interface {
 	Save() error
 }
 
+// Packager defines a keystore that can be uploaded.
+type Packager interface {
+	Package() ([]byte, error)
+}
+
 // Factory Create the right keystore with the configured options.
 func Factory(cfg *common.Config, defaultPath string) (Keystore, error) {
 	config := defaultConfig
