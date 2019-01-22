@@ -98,6 +98,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
 - Fix MongoDB dashboard that had some incorrect field names from `status` Metricset {pull}9795[9795] {issue}9715[9715]
 - Fix pod UID metadata enrichment in Kubernetes module. {pull}10081[10081]
+- Fix issue that would prevent collection of processes without command line on Windows. {pull}10196[10196]
 
 *Packetbeat*
 
@@ -167,6 +168,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Release Ceph module as GA. {pull}10202[10202]
 - Release windows Metricbeat module as GA. {pull}10163[10163]
 - Release traefik Metricbeat module as GA. {pull}10166[10166]
+- List filesystems on Windows that have an access path but not an assigned letter {issue}8916[8916] {pull}10196[10196]
 - Release uswgi Metricbeat module GA. {pull}10164[10164]
 - Release php_fpm module as GA. {pull}10198[10198]
 - Release Memcached module as GA. {pull}10199[10199]
