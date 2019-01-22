@@ -53,6 +53,9 @@ type Fields struct {
 	SourceProcess      *ecs.Process `ecs:"source.process"`
 	DestinationProcess *ecs.Process `ecs:"destination.process"`
 	Process            *ecs.Process `ecs:"process"`
+
+	ICMPType uint8 // ICMP message type for use in computing network.community_id.
+	ICMPCode uint8 // ICMP message code for use in computing network.community_id.
 }
 
 // NewFields returns a new Fields value.
@@ -151,25 +154,29 @@ func (f *Fields) ComputeValues(localIPs []net.IP) error {
 		flow.Protocol = 6
 	case f.Network.Transport == "icmp":
 		flow.Protocol = 1
-		// TODO: Populate the ICMP type/code.
 	case f.Network.Transport == "ipv6-icmp":
-		flow.Protocol = 65
-		// TODO: Populate the ICMP type/code.
+		flow.Protocol = 58
 	}
-	f.Network.CommunityID = flowhash.CommunityID.Hash(flow)
+	flow.ICMP.Type = f.ICMPType
+	flow.ICMP.Code = f.ICMPCode
+	if flow.Protocol > 0 && len(flow.SourceIP) > 0 && len(flow.DestinationIP) > 0 {
+		f.Network.CommunityID = flowhash.CommunityID.Hash(flow)
+	}
 
 	// network.type
-	if len(flow.SourceIP) > 0 {
-		if flow.SourceIP.To4() != nil {
-			f.Network.Type = "ipv4"
-		} else {
-			f.Network.Type = "ipv6"
-		}
-	} else if len(flow.DestinationIP) > 0 {
-		if flow.DestinationIP.To4() != nil {
-			f.Network.Type = "ipv4"
-		} else {
-			f.Network.Type = "ipv6"
+	if f.Network.Type == "" {
+		if len(flow.SourceIP) > 0 {
+			if flow.SourceIP.To4() != nil {
+				f.Network.Type = "ipv4"
+			} else {
+				f.Network.Type = "ipv6"
+			}
+		} else if len(flow.DestinationIP) > 0 {
+			if flow.DestinationIP.To4() != nil {
+				f.Network.Type = "ipv4"
+			} else {
+				f.Network.Type = "ipv6"
+			}
 		}
 	}
 
@@ -237,7 +244,7 @@ func (f *Fields) MarshalMapStr(m common.MapStr) error {
 		structField := typ.Field(i)
 		tag := structField.Tag.Get("ecs")
 		if tag == "" {
-			panic(errors.Errorf("missing tag on field %v", structField.Name))
+			continue
 		}
 
 		fieldValue := val.Field(i)

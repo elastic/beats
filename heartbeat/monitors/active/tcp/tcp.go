@@ -23,8 +23,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -47,7 +50,7 @@ type connURL struct {
 func create(
 	name string,
 	cfg *common.Config,
-) (jobs []monitors.Job, endpoints int, err error) {
+) (jobs []jobs.Job, endpoints int, err error) {
 	config := DefaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, 0, err
@@ -93,7 +96,7 @@ func create(
 					return err
 				}
 
-				monitors.MergeEventFields(event, common.MapStr{"url": monitors.URLFields(u)})
+				eventext.MergeEventFields(event, common.MapStr{"url": wrappers.URLFields(u)})
 
 				return pingHost(event, dialer, addr, timeout, validator)
 			})
@@ -109,8 +112,7 @@ func create(
 		numHosts += len(hosts)
 	}
 
-	errWrappedJobs := monitors.WrapAll(jobs, monitors.WithErrAsField)
-	return errWrappedJobs, numHosts, nil
+	return jobs, numHosts, nil
 }
 
 func collectHosts(config *Config, defaultScheme string) (map[string][]dialchain.Endpoint, error) {

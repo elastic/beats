@@ -35,7 +35,7 @@
   alias: false
 
 - from: beat.name
-  to: agent.type
+  to: host.name
   alias6: true
   alias: true
 
@@ -114,6 +114,10 @@
   alias: true
   alias6: true
 
+# process processor
+- from: process.exe
+  to: process.executable
+  alias: true
 
 # Filebeat modules
 
@@ -212,6 +216,10 @@
 
 ## Apache module
 
+- from: apache2.access.remote_ip
+  to: source.address
+  alias: true
+
 - from: apache2.access.user_name
   to: user.name
   alias: true
@@ -238,10 +246,6 @@
 
 - from: apache2.access.agent
   to: user_agent.original
-  alias: true
-
-- from: read_timestamp
-  to: event.created
   alias: true
 
 # These expand all fields under geoip and user_agent
@@ -274,14 +278,36 @@
   to: process.thread.id
   alias: true
 
+## Elasticsearch module
+
+- from: elasticsearch.audit.event_type
+  to: event.type
+  alias: true
+
+- from: elasticsearch.audit.origin_address
+  to: source.ip
+  alias: true
+
+- from: elasticsearch.audit.principal
+  to: user.name
+  alias: true
+
+- from: elasticsearch.audit.request_body
+  to: http.request.body.content
+  alias: true
+
+- from: elasticsearch.audit.uri
+  to: url.original
+  alias: true
+
 ## IIS module
 
 - from: iis.access.server_ip
-  to: destination.ip
+  to: destination.address
   alias: true
 
 - from: iis.access.remote_ip
-  to: source.ip
+  to: source.address
   alias: true
 
 - from: iis.access.url
@@ -344,7 +370,67 @@
   to: http.request.referrer
   alias: true
 
+- from: iis.error.remote_ip
+  to: source.address
+  alias: true
+
+- from: iis.error.remote_port
+  to: source.port
+  alias: true
+
+- from: iis.error.server_ip
+  to: destination.address
+  alias: true
+
+- from: iis.error.server_port
+  to: destination.port
+  alias: true
+
+- from: iis.error.http_version
+  to: http.version
+  alias: true
+
+- from: iis.error.method
+  to: http.request.method
+  alias: true
+
+- from: iis.error.url
+  to: url.original
+  alias: true
+
+- from: iis.error.response_code
+  to: http.response.status_code
+  alias: true
+
+- from: iis.error.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+
+- from: iis.error.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+
+- from: iis.error.geoip.location
+  to: source.geo.location
+  alias: true
+
+- from: iis.error.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+
+- from: iis.error.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+
+- from: iis.error.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+
 ## HAProxy module
+
+- from: haproxy.client.ip
+  to: source.address
+  alias: true
 
 - from: haproxy.client.port
   to: source.port
@@ -364,6 +450,10 @@
 
 - from: haproxy.destination.port
   to: destination.port
+  alias: true
+
+- from: haproxy.http.response.status_code
+  to: http.response.status_code
   alias: true
 
 - from: haproxy.geoip.continent_name
@@ -388,10 +478,6 @@
 
 - from: haproxy.geoip.region_iso_code
   to: source.geo.region_iso_code
-  alias: true
-
-- from: nginx.access.remote_ip_list
-  to: network.forwarded_ip
   alias: true
 
 ## Kafka module
@@ -452,6 +538,46 @@
   to: event.duration
   alias: true
 
+## MongoDB module
+
+- from: mongodb.log.severity
+  to: log.level
+  alias: true
+
+- from: mongodb.log.message
+  to: message
+  alias: true
+
+## MySQL module
+
+- from: mysql.error.message
+  to: message
+  alias: true
+
+- from: mysql.error.level
+  to: log.level
+  alias: true
+
+- from: mysql.error.thread_id
+  to: mysql.thread_id
+  alias: true
+
+- from: mysql.slowlog.ip
+  to: source.ip
+  alias: true
+
+- from: mysql.slowlog.host
+  to: source.domain
+  alias: true
+
+- from: mysql.slowlog.user
+  to: user.name
+  alias: true
+
+- from: mysql.slowlog.id
+  to: mysql.thread_id
+  alias: true
+
 ## NGINX module
 
 - from: nginx.access.user_name
@@ -508,6 +634,26 @@
 
 - from: nginx.access.agent
   to: user_agent.original
+  alias: true
+
+- from: nginx.error.level
+  to: log.level
+  alias: true
+
+- from: nginx.error.pid
+  to: process.pid
+  alias: true
+
+- from: nginx.error.tid
+  to: process.thread.id
+  alias: true
+
+- from: nginx.error.message
+  to: message
+  alias: true
+
+- from: nginx.access.remote_ip_list
+  to: network.forwarded_ip
   alias: true
 
 ## PostgreSQL module
@@ -635,6 +781,12 @@
   to: http.version
   alias: true
 
+# Filebeat Redis Input
+
+- from: read_timestamp
+  to: event.created
+  alias: false
+  beat: filebeat
 
 # Auditbeat
 
@@ -643,18 +795,13 @@
   to: source.domain
   alias: true
 
+- from: process.exe
+  to: process.executable
+  alias: true
 
-# Packetbeat
-
-- from: http.request.body
-  to: http.request.body.content
-  alias6: false
-  alias: false
-
-- from: http.response.body
-  to: http.response.body.content
-  alias6: false
-  alias: false
+- from: process.cwd
+  to: process.working_directory
+  alias: true
 
 
 # Metricbeat
@@ -684,6 +831,7 @@
   to: event.dataset
   alias: false
   comment: No alias mapping as field did not always exist
+
 
 # Packetbeat
 
@@ -715,6 +863,109 @@
   alias: false
   comment: Don't add an alias until all of Packetbeat stops using this field.
 
+## Flows
+- from: flow_id
+  to: flow.id
+  alias: true
+
+- from: final
+  to: flow.final
+  alias: true
+
+- from: start_time
+  to: event.start
+  alias: true
+
+- from: last_time
+  to: event.end
+  alias: true
+
+- from: source.stats.net_bytes_total
+  to: source.bytes
+  alias: true
+
+- from: source.stats.net_packets_total
+  to: source.packets
+  alias: true
+
+- from: dest.stats.net_bytes_total
+  to: destination.bytes
+  alias: true
+
+- from: dest.stats.net_packets_total
+  to: destination.packets
+  alias: true
+
+## HTTP
+- from: http.request.body
+  to: http.request.body.content
+  alias: false
+
+- from: http.response.body
+  to: http.response.body.content
+  alias: false
+
+- from: http.response.code
+  to: http.response.status_code
+  alias: true
+
+- from: http.response.phrase
+  to: http.response.status_phrase
+  alias: true
+
+- from: http.request.params
+  to: url.query
+  alias: true
+
+- from: method
+  to: http.request.method
+  alias: false
+  comment: method is used by other protocols.
+
+- from: path
+  to: url.path
+  alias: false
+
+- from: real_ip
+  to: network.forwarded_ip
+  alias: false
+
+## MySQL
+- from: mysql.iserror
+  to: status
+  alias: false
+  comment: >
+    Status reflects whether or not an error occured. Its values are either
+    OK or Error.
+
+## NFS
+- from: rpc.time
+  to: event.duration
+  alias: false
+  comment: >
+    Cannot add alias at this time because the field is used by MongoDB which
+    has not been updated yet.
+
+- from: rpc.call_size
+  to: source.bytes
+  alias: false
+  comment: >
+    Cannot add alias at this time because the field is used by MongoDB which
+    has not been updated yet.
+
+- from: rpc.reply_size
+  to: destination.bytes
+  alias: false
+  comment: >
+    Cannot add alias at this time because the field is used by MongoDB which
+    has not been updated yet.
+
+## Cassandra
+- from: no_request
+  to: cassandra.no_request
+  alias: true
+
+
 # Heartbeat
 
 - from: monitor.scheme
@@ -736,3 +987,13 @@
 - from: tcp.port
   to: url.port
   alias: true
+
+# Journalbeat
+- from: host.name
+  to: host.hostname
+  alias: false
+
+- from: read_timestamp
+  to: event.created
+  alias: true
+  beat: journalbeat

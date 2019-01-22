@@ -14,28 +14,28 @@
     },
     "mssql": {
         "performance": {
-            "batch_requests": {
-                "sec": 109695
+            "active_temp_tables": 0,
+            "batch_requests_per_sec": 24249,
+            "buffer": {
+                "cache_hit": {
+                    "pct": 0.14
+                },
+                "checkpoint_pages_per_sec": 182,
+                "database_pages": 1892,
+                "page_life_expectancy": {
+                    "sec": 8201
+                },
+                "target_pages": 3194880
             },
-            "buffer_cache_hit": {
-                "pct": 0.54
-            },
-            "compilations": {
-                "sec": 28814
-            },
-            "lock_waits": {
-                "sec": 3
-            },
-            "page_life_expectancy": {
-                "sec": 31783
-            },
-            "page_splits": {
-                "sec": 166
-            },
-            "recompilations": {
-                "sec": 0
-            },
-            "user_connections": 3
+            "compilations_per_sec": 7379,
+            "connections_reset_per_sec": 2179,
+            "lock_waits_per_sec": 3,
+            "logins_per_sec": 7346,
+            "logouts_per_sec": 7339,
+            "page_splits_per_sec": 45,
+            "recompilations_per_sec": 0,
+            "transactions": 0,
+            "user_connections": 7
         }
     },
     "service": {

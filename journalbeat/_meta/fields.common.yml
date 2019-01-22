@@ -3,9 +3,6 @@
   description: >
     Contains common fields available in all event types.
   fields:
-    - name: read_timestamp
-      description: >
-          The time when Journalbeat read the journal entry.
     - name: coredump
       type: group
       description: >
@@ -314,3 +311,9 @@
       required: false
       description: >
         Arbitrary fields coming from processes.
+
+    - name: read_timestamp
+      type: alias
+      path: event.created
+      migration: true
+

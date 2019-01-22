@@ -42,9 +42,11 @@ grouped in the following categories:
 * <<exported-fields-mongodb>>
 * <<exported-fields-munin>>
 * <<exported-fields-mysql>>
+* <<exported-fields-nats>>
 * <<exported-fields-nginx>>
 * <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
+* <<exported-fields-process>>
 * <<exported-fields-prometheus>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
@@ -849,6 +851,24 @@ type: keyword
 
 Error type.
 
+
+--
+
+*`beat.name`*::
++
+--
+type: alias
+
+alias to: host.name
+
+--
+
+*`beat.hostname`*::
++
+--
+type: alias
+
+alias to: agent.hostname
 
 --
 
@@ -2782,9 +2802,7 @@ Event status
 *`docker.event.id`*::
 +
 --
-type: alias
-
-alias to: event.id
+type: keyword
 
 Event id when available
 
@@ -2804,9 +2822,7 @@ Event source
 *`docker.event.type`*::
 +
 --
-type: alias
-
-alias to: event.kind
+type: keyword
 
 The type of object emitting the event
 
@@ -2816,23 +2832,9 @@ The type of object emitting the event
 *`docker.event.action`*::
 +
 --
-type: alias
-
-alias to: event.action
+type: keyword
 
 The type of event
-
-
---
-
-*`docker.event.time`*::
-+
---
-type: alias
-
-alias to: event.created
-
-Timestamp of event
 
 
 --
@@ -6428,24 +6430,6 @@ example: 4.4.0-112-generic
 
 Operating system kernel version as a raw string.
 
-
---
-
-*`beat.name`*::
-+
---
-type: alias
-
-alias to: agent.type
-
---
-
-*`beat.hostname`*::
-+
---
-type: alias
-
-alias to: agent.hostname
 
 --
 
@@ -11876,6 +11860,65 @@ Memory usage as a percentage of the defined limit for the pod containers (or tot
 
 --
 
+
+*`kubernetes.pod.memory.available.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total memory available
+
+
+--
+
+
+*`kubernetes.pod.memory.workingSet.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total working set memory
+
+
+--
+
+
+*`kubernetes.pod.memory.rss.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total resident set size memory
+
+
+--
+
+*`kubernetes.pod.memory.pageFaults`*::
++
+--
+type: long
+
+Total page faults
+
+
+--
+
+*`kubernetes.pod.memory.majorPageFaults`*::
++
+--
+type: long
+
+Total major page faults
+
+
+--
+
 [float]
 == container fields
 
@@ -17216,6 +17259,413 @@ The number of UPDATE queries since startup.
 
 --
 
+[[exported-fields-nats]]
+== Nats fields
+
+nats Module
+
+
+
+[float]
+== nats fields
+
+`nats` contains statistics that were read from Nats
+
+
+
+*`nats.server.id`*::
++
+--
+type: string
+
+The server ID
+
+
+--
+
+*`nats.server.time`*::
++
+--
+type: date
+
+Server time of metric creation
+
+
+--
+
+[float]
+== connections fields
+
+Contains nats connection related metrics
+
+
+
+*`nats.connections.total`*::
++
+--
+type: integer
+
+The number of currently active clients
+
+
+--
+
+[float]
+== routes fields
+
+Contains nats route related metrics
+
+
+
+*`nats.routes.total`*::
++
+--
+type: integer
+
+The number of registered routes
+
+
+--
+
+[float]
+== stats fields
+
+Contains nats var related metrics
+
+
+
+*`nats.stats.uptime`*::
++
+--
+type: long
+
+The period the server is up (sec)
+
+
+--
+
+*`nats.stats.mem.bytes`*::
++
+--
+type: long
+
+The current memory usage of NATS process
+
+
+--
+
+*`nats.stats.cores`*::
++
+--
+type: integer
+
+The number of logical cores the NATS process runs on
+
+
+--
+
+*`nats.stats.cpu`*::
++
+--
+type: float
+
+The current cpu usage of NATs process
+
+
+--
+
+*`nats.stats.total_connections`*::
++
+--
+type: integer
+
+The number of totally created clients
+
+
+--
+
+*`nats.stats.remotes`*::
++
+--
+type: integer
+
+The number of registered remotes
+
+
+--
+
+[float]
+== in fields
+
+The amount of incoming data
+
+
+
+*`nats.stats.in.messages`*::
++
+--
+type: integer
+
+The amount of incoming messages
+
+
+--
+
+*`nats.stats.in.bytes`*::
++
+--
+type: integer
+
+The amount of incoming bytes
+
+
+--
+
+[float]
+== out fields
+
+The amount of outgoing data
+
+
+
+*`nats.stats.out.messages`*::
++
+--
+type: integer
+
+The amount of outgoing messages
+
+
+--
+
+*`nats.stats.out.bytes`*::
++
+--
+type: integer
+
+The amount of outgoing bytes
+
+
+--
+
+*`nats.stats.slow_consumers`*::
++
+--
+type: integer
+
+The number of slow consumers currently on NATS
+
+
+--
+
+*`nats.stats.http_req_stats.root_uri`*::
++
+--
+type: object
+
+The number of hits on root monitoring uri
+
+
+--
+
+*`nats.stats.http_req_stats.connz_uri`*::
++
+--
+type: object
+
+The number of hits on connz monitoring uri
+
+
+--
+
+*`nats.stats.http_req_stats.routez_uri`*::
++
+--
+type: object
+
+The number of hits on routez monitoring uri
+
+
+--
+
+*`nats.stats.http_req_stats.subsz_uri`*::
++
+--
+type: object
+
+The number of hits on subsz monitoring uri
+
+
+--
+
+*`nats.stats.http_req_stats.stats_uri`*::
++
+--
+type: object
+
+The number of hits on stats monitoring uri
+
+
+--
+
+[float]
+== http fields
+
+The http metrics of NATS server
+
+
+
+[float]
+== req_stats fields
+
+The requests statistics
+
+
+
+[float]
+== uri fields
+
+The request distribution on monitoring URIS
+
+
+
+*`nats.stats.http.req_stats.uri.routez`*::
++
+--
+type: integer
+
+The number of hits on routez monitoring uri
+
+
+--
+
+*`nats.stats.http.req_stats.uri.connz`*::
++
+--
+type: integer
+
+The number of hits on connz monitoring uri
+
+
+--
+
+*`nats.stats.http.req_stats.uri.varz`*::
++
+--
+type: integer
+
+The number of hits on varz monitoring uri
+
+
+--
+
+*`nats.stats.http.req_stats.uri.subsz`*::
++
+--
+type: integer
+
+The number of hits on subsz monitoring uri
+
+
+--
+
+*`nats.stats.http.req_stats.uri.root`*::
++
+--
+type: integer
+
+The number of hits on root monitoring uri
+
+
+--
+
+[float]
+== subscriptions fields
+
+Contains nats subscriptions related metrics
+
+
+
+*`nats.subscriptions.total`*::
++
+--
+type: integer
+
+The number of active subscriptions
+
+
+--
+
+*`nats.subscriptions.inserts`*::
++
+--
+type: integer
+
+The number of insert operations in subscriptions list
+
+
+--
+
+*`nats.subscriptions.removes`*::
++
+--
+type: integer
+
+The number of remove operations in subscriptions list
+
+
+--
+
+*`nats.subscriptions.matches`*::
++
+--
+type: integer
+
+The number of times a match is found for a subscription
+
+
+--
+
+*`nats.subscriptions.cache.size`*::
++
+--
+type: integer
+
+The number of result sets in the cache
+
+
+--
+
+*`nats.subscriptions.cache.hit_rate`*::
++
+--
+type: integer
+
+The rate matches are being retrieved from cache
+
+
+--
+
+*`nats.subscriptions.cache.fanout.max`*::
++
+--
+type: integer
+
+The maximum fanout served by cache
+
+
+--
+
+*`nats.subscriptions.cache.fanout.avg`*::
++
+--
+type: integer
+
+The average fanout served by cache
+
+
+--
+
 [[exported-fields-nginx]]
 == Nginx fields
 
@@ -17340,7 +17790,6 @@ The current number of idle client connections waiting for a request.
 [[exported-fields-php_fpm]]
 == PHP_FPM fields
 
-beta[]
 PHP-FPM server status metrics collected from PHP-FPM.
 
 
@@ -18366,6 +18815,23 @@ type: long
 
 Total number of temp block cache written by the query.
 
+
+--
+
+[[exported-fields-process]]
+== Process fields
+
+Process metadata fields
+
+
+
+
+*`process.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
 
 --
 
@@ -24057,7 +24523,7 @@ Network names
 [[exported-fields-windows]]
 == Windows fields
 
-beta[] Module for Windows
+Module for Windows
 
 
 

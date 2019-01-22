@@ -1,5 +1,75 @@
 # Changelog
 
+#### Version 1.20.1 (2019-01-10)
+
+New Features:
+- Add optional replica id in offset request
+  ([1100](https://github.com/Shopify/sarama/pull/1100)).
+
+Improvements:
+- Implement DescribeConfigs Request + Response v1 & v2
+  ([1230](https://github.com/Shopify/sarama/pull/1230)).
+- Reuse compression objects
+  ([1185](https://github.com/Shopify/sarama/pull/1185)).
+- Switch from png to svg for GoDoc link in README
+  ([1243](https://github.com/Shopify/sarama/pull/1243)).
+- Fix typo in deprecation notice for FetchResponseBlock.Records
+  ([1242](https://github.com/Shopify/sarama/pull/1242)).
+- Fix typos in consumer metadata response file
+  ([1244](https://github.com/Shopify/sarama/pull/1244)).
+
+Bug Fixes:
+- Revert to individual msg retries for non-idempotent
+  ([1203](https://github.com/Shopify/sarama/pull/1203)).
+- Respect MaxMessageBytes limit for uncompressed messages
+  ([1141](https://github.com/Shopify/sarama/pull/1141)).
+
+#### Version 1.20.0 (2018-12-10)
+
+New Features:
+ - Add support for zstd compression
+   ([#1170](https://github.com/Shopify/sarama/pull/1170)).
+ - Add support for Idempotent Producer
+   ([#1152](https://github.com/Shopify/sarama/pull/1152)).
+ - Add support support for Kafka 2.1.0
+   ([#1229](https://github.com/Shopify/sarama/pull/1229)).
+ - Add support support for OffsetCommit request/response pairs versions v1 to v5
+   ([#1201](https://github.com/Shopify/sarama/pull/1201)).
+ - Add support support for OffsetFetch request/response pair up to version v5
+   ([#1198](https://github.com/Shopify/sarama/pull/1198)).
+
+Improvements:
+ - Export broker's Rack setting
+   ([#1173](https://github.com/Shopify/sarama/pull/1173)).
+ - Always use latest patch version of Go on CI
+   ([#1202](https://github.com/Shopify/sarama/pull/1202)).
+ - Add error codes 61 to 72
+   ([#1195](https://github.com/Shopify/sarama/pull/1195)).
+
+Bug Fixes:
+ - Fix build without cgo
+   ([#1182](https://github.com/Shopify/sarama/pull/1182)).
+ - Fix go vet suggestion in consumer group file
+   ([#1209](https://github.com/Shopify/sarama/pull/1209)).
+ - Fix typos in code and comments
+   ([#1228](https://github.com/Shopify/sarama/pull/1228)).
+
+#### Version 1.19.0 (2018-09-27)
+
+New Features:
+ - Implement a higher-level consumer group
+   ([#1099](https://github.com/Shopify/sarama/pull/1099)).
+
+Improvements:
+ - Add support for Go 1.11
+   ([#1176](https://github.com/Shopify/sarama/pull/1176)).
+
+Bug Fixes:
+ - Fix encoding of `MetadataResponse` with version 2 and higher
+   ([#1174](https://github.com/Shopify/sarama/pull/1174)).
+ - Fix race condition in mock async producer
+   ([#1174](https://github.com/Shopify/sarama/pull/1174)).
+
 #### Version 1.18.0 (2018-09-07)
 
 New Features:

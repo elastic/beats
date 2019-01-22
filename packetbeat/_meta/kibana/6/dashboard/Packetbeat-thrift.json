@@ -1,597 +1,745 @@
 {
-    "objects": [
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [], 
-                        "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
-                        }
-                    }
-                }, 
-                "title": "Navigation", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [], 
-                    "params": {
-                        "fontSize": "10", 
-                        "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Flows](#/dashboard/Packetbeat-Flows)\n\n[Web transactions](#/dashboard/Packetbeat-HTTP)\n\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\n\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\n\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\n\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\n\n[NFS transactions](#/dashboard/Packetbeat-NFS)\n\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)"
-                    }, 
-                    "title": "Navigation", 
-                    "type": "markdown"
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": {
+                "query_string": {
+                  "analyze_wildcard": true,
+                  "query": "*"
                 }
-            }, 
-            "id": "Navigation", 
-            "type": "visualization", 
-            "version": 10
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": []
-                    }
-                }, 
-                "savedSearchId": "Thrift-transactions", 
-                "title": "Thrift requests per minute", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }, 
-                        {
-                            "id": "2", 
-                            "params": {
-                                "customInterval": "2h", 
-                                "extended_bounds": {}, 
-                                "field": "@timestamp", 
-                                "interval": "m", 
-                                "min_doc_count": 1
-                            }, 
-                            "schema": "segment", 
-                            "type": "date_histogram"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "addLegend": false, 
-                        "addTimeMarker": false, 
-                        "addTooltip": true, 
-                        "defaultYExtents": false, 
-                        "mode": "stacked", 
-                        "scale": "linear", 
-                        "setYExtents": false, 
-                        "shareYAxis": true, 
-                        "times": [], 
-                        "yAxis": {}
-                    }, 
-                    "title": "Thrift requests per minute", 
-                    "type": "histogram"
-                }
-            }, 
-            "id": "Thrift-requests-per-minute", 
-            "type": "visualization", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": []
-                    }
-                }, 
-                "savedSearchId": "Thrift-errors", 
-                "title": "Thrift RPC Errors", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }, 
-                        {
-                            "id": "2", 
-                            "params": {
-                                "customInterval": "2h", 
-                                "extended_bounds": {}, 
-                                "field": "@timestamp", 
-                                "interval": "auto", 
-                                "min_doc_count": 1
-                            }, 
-                            "schema": "segment", 
-                            "type": "date_histogram"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "addLegend": false, 
-                        "addTimeMarker": false, 
-                        "addTooltip": true, 
-                        "defaultYExtents": false, 
-                        "interpolate": "linear", 
-                        "mode": "stacked", 
-                        "scale": "linear", 
-                        "setYExtents": false, 
-                        "shareYAxis": true, 
-                        "smoothLines": false, 
-                        "times": [], 
-                        "yAxis": {}
-                    }, 
-                    "title": "Thrift RPC Errors", 
-                    "type": "area"
-                }
-            }, 
-            "id": "Thrift-RPC-Errors", 
-            "type": "visualization", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": []
-                    }
-                }, 
-                "savedSearchId": "Thrift-transactions", 
-                "title": "Slowest Thrift RPC methods", 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {
-                                "field": "responsetime"
-                            }, 
-                            "schema": "metric", 
-                            "type": "avg"
-                        }, 
-                        {
-                            "id": "2", 
-                            "params": {
-                                "field": "method", 
-                                "order": "desc", 
-                                "orderBy": "1", 
-                                "size": 10
-                            }, 
-                            "schema": "bucket", 
-                            "type": "terms"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "perPage": 10, 
-                        "showMeticsAtAllLevels": false, 
-                        "showPartialRows": false
-                    }, 
-                    "type": "table"
-                }
-            }, 
-            "id": "Slowest-Thrift-RPC-methods", 
-            "type": "visualization", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": []
-                    }
-                }, 
-                "savedSearchId": "Thrift-transactions", 
-                "title": "Thrift response times percentiles", 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {
-                                "field": "responsetime", 
-                                "percents": [
-                                    75, 
-                                    99, 
-                                    99.5
-                                ]
-                            }, 
-                            "schema": "metric", 
-                            "type": "percentiles"
-                        }, 
-                        {
-                            "id": "2", 
-                            "params": {
-                                "extended_bounds": {}, 
-                                "field": "@timestamp", 
-                                "interval": "auto", 
-                                "min_doc_count": 1
-                            }, 
-                            "schema": "segment", 
-                            "type": "date_histogram"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "addLegend": true, 
-                        "addTooltip": true, 
-                        "defaultYExtents": false, 
-                        "shareYAxis": true
-                    }, 
-                    "type": "line"
-                }
-            }, 
-            "id": "Thrift-response-times-percentiles", 
-            "type": "visualization", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": []
-                    }
-                }, 
-                "savedSearchId": "Thrift-transactions", 
-                "title": "Top Thrift-RPC methods", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }, 
-                        {
-                            "id": "2", 
-                            "params": {
-                                "field": "method", 
-                                "order": "desc", 
-                                "orderBy": "1", 
-                                "size": 5
-                            }, 
-                            "schema": "segment", 
-                            "type": "terms"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "addLegend": false, 
-                        "addTimeMarker": false, 
-                        "addTooltip": true, 
-                        "defaultYExtents": false, 
-                        "mode": "stacked", 
-                        "scale": "linear", 
-                        "setYExtents": false, 
-                        "shareYAxis": true, 
-                        "times": [], 
-                        "yAxis": {}
-                    }, 
-                    "title": "Top Thrift-RPC methods", 
-                    "type": "histogram"
-                }
-            }, 
-            "id": "Top-Thrift-RPC-methods", 
-            "type": "visualization", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": []
-                    }
-                }, 
-                "savedSearchId": "Thrift-errors", 
-                "title": "Top Thrift-RPC calls with errors", 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }, 
-                        {
-                            "id": "2", 
-                            "params": {
-                                "field": "method", 
-                                "order": "desc", 
-                                "orderBy": "1", 
-                                "size": 5
-                            }, 
-                            "schema": "segment", 
-                            "type": "terms"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "addLegend": false, 
-                        "addTooltip": true, 
-                        "defaultYExtents": false, 
-                        "mode": "stacked", 
-                        "shareYAxis": true
-                    }, 
-                    "type": "histogram"
-                }
-            }, 
-            "id": "Top-Thrift-RPC-calls-with-errors", 
-            "type": "visualization", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "columns": [
-                    "method", 
-                    "type", 
-                    "path", 
-                    "responsetime", 
-                    "status"
-                ], 
-                "description": "", 
-                "hits": 0, 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [
-                            {
-                                "meta": {
-                                    "disabled": false, 
-                                    "index": "packetbeat-*", 
-                                    "key": "type", 
-                                    "negate": false, 
-                                    "value": "thrift"
-                                }, 
-                                "query": {
-                                    "match": {
-                                        "type": {
-                                            "query": "thrift", 
-                                            "type": "phrase"
-                                        }
-                                    }
-                                }
-                            }
-                        ], 
-                        "highlight": {
-                            "fields": {
-                                "*": {}
-                            }, 
-                            "post_tags": [
-                                "@/kibana-highlighted-field@"
-                            ], 
-                            "pre_tags": [
-                                "@kibana-highlighted-field@"
-                            ]
-                        }, 
-                        "index": "packetbeat-*", 
-                        "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "type: thrift"
-                            }
-                        }
-                    }
-                }, 
-                "sort": [
-                    "@timestamp", 
-                    "desc"
-                ], 
-                "title": "Thrift transactions", 
-                "version": 1
-            }, 
-            "id": "Thrift-transactions", 
-            "type": "search", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "columns": [
-                    "method", 
-                    "type", 
-                    "path", 
-                    "responsetime", 
-                    "status"
-                ], 
-                "description": "", 
-                "hits": 0, 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [
-                            {
-                                "meta": {
-                                    "disabled": false, 
-                                    "index": "packetbeat-*", 
-                                    "key": "type", 
-                                    "negate": false, 
-                                    "value": "thrift"
-                                }, 
-                                "query": {
-                                    "match": {
-                                        "type": {
-                                            "query": "thrift", 
-                                            "type": "phrase"
-                                        }
-                                    }
-                                }
-                            }, 
-                            {
-                                "meta": {
-                                    "disabled": false, 
-                                    "index": "packetbeat-*", 
-                                    "key": "status", 
-                                    "negate": true, 
-                                    "value": "OK"
-                                }, 
-                                "query": {
-                                    "match": {
-                                        "status": {
-                                            "query": "OK", 
-                                            "type": "phrase"
-                                        }
-                                    }
-                                }
-                            }
-                        ], 
-                        "highlight": {
-                            "fields": {
-                                "*": {}
-                            }, 
-                            "post_tags": [
-                                "@/kibana-highlighted-field@"
-                            ], 
-                            "pre_tags": [
-                                "@kibana-highlighted-field@"
-                            ]
-                        }, 
-                        "index": "packetbeat-*", 
-                        "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "type: thrift"
-                            }
-                        }
-                    }
-                }, 
-                "sort": [
-                    "@timestamp", 
-                    "desc"
-                ], 
-                "title": "Thrift errors", 
-                "version": 1
-            }, 
-            "id": "Thrift-errors", 
-            "type": "search", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "hits": 0, 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [], 
-                        "highlightAll": true, 
-                        "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
-                        }, 
-                        "version": true
-                    }
-                }, 
-                "optionsJSON": {
-                    "darkTheme": false
-                }, 
-                "panelsJSON": [
-                    {
-                        "col": 1, 
-                        "id": "Navigation", 
-                        "panelIndex": 1, 
-                        "row": 1, 
-                        "size_x": 3, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 4, 
-                        "id": "Thrift-requests-per-minute", 
-                        "panelIndex": 2, 
-                        "row": 1, 
-                        "size_x": 5, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 9, 
-                        "id": "Thrift-RPC-Errors", 
-                        "panelIndex": 3, 
-                        "row": 1, 
-                        "size_x": 4, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 1, 
-                        "id": "Slowest-Thrift-RPC-methods", 
-                        "panelIndex": 4, 
-                        "row": 5, 
-                        "size_x": 6, 
-                        "size_y": 3, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 7, 
-                        "id": "Thrift-response-times-percentiles", 
-                        "panelIndex": 5, 
-                        "row": 5, 
-                        "size_x": 6, 
-                        "size_y": 3, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 1, 
-                        "id": "Top-Thrift-RPC-methods", 
-                        "panelIndex": 6, 
-                        "row": 8, 
-                        "size_x": 6, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 7, 
-                        "id": "Top-Thrift-RPC-calls-with-errors", 
-                        "panelIndex": 7, 
-                        "row": 8, 
-                        "size_x": 6, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }
-                ], 
-                "timeRestore": false, 
-                "title": "[Packetbeat] Thrift performance", 
-                "uiStateJSON": {
-                    "P-4": {
-                        "vis": {
-                            "params": {
-                                "sort": {
-                                    "columnIndex": null, 
-                                    "direction": null
-                                }
-                            }
-                        }
-                    }
-                }, 
-                "version": 1
-            }, 
-            "id": "Packetbeat-Thrift-performance", 
-            "type": "dashboard", 
-            "version": 2
+              }
+            }
+          }
+        },
+        "title": "Navigation",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "fontSize": "10",
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Flows](#/dashboard/Packetbeat-Flows)\n\n[Web transactions](#/dashboard/Packetbeat-HTTP)\n\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\n\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\n\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\n\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\n\n[NFS transactions](#/dashboard/Packetbeat-NFS)\n\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)"
+          },
+          "title": "Navigation",
+          "type": "markdown"
         }
-    ], 
-    "version": "6.0.0-beta1-SNAPSHOT"
+      },
+      "id": "Navigation",
+      "type": "visualization",
+      "updated_at": "2019-01-16T20:34:33.171Z",
+      "version": 10
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchId": "Thrift-transactions",
+        "title": "Thrift requests per minute [Packetbeat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "m",
+                "min_doc_count": 1
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "addLegend": false,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "defaultYExtents": false,
+            "mode": "stacked",
+            "scale": "linear",
+            "setYExtents": false,
+            "shareYAxis": true,
+            "times": [],
+            "yAxis": {}
+          },
+          "title": "Thrift requests per minute",
+          "type": "histogram"
+        }
+      },
+      "id": "Thrift-requests-per-minute",
+      "type": "visualization",
+      "updated_at": "2019-01-16T20:46:38.534Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchId": "Thrift-errors",
+        "title": "Thrift RPC Errors [Packetbeat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "addLegend": false,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "defaultYExtents": false,
+            "interpolate": "linear",
+            "mode": "stacked",
+            "scale": "linear",
+            "setYExtents": false,
+            "shareYAxis": true,
+            "smoothLines": false,
+            "times": [],
+            "yAxis": {}
+          },
+          "title": "Thrift RPC Errors",
+          "type": "area"
+        }
+      },
+      "id": "Thrift-RPC-Errors",
+      "type": "visualization",
+      "updated_at": "2019-01-16T20:46:53.791Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "Thrift-transactions",
+        "title": "Slowest Thrift RPC methods [Packetbeat]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "field": "event.duration"
+              },
+              "schema": "metric",
+              "type": "avg"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "method",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 10,
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Slowest Thrift RPC methods [Packetbeat]",
+          "type": "table"
+        }
+      },
+      "id": "Slowest-Thrift-RPC-methods",
+      "type": "visualization",
+      "updated_at": "2019-01-16T20:45:59.836Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "Thrift-transactions",
+        "title": "Thrift response times percentiles [Packetbeat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "field": "event.duration",
+                "percents": [
+                  75,
+                  99,
+                  99.5
+                ]
+              },
+              "schema": "metric",
+              "type": "percentiles"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "time_zone": "America/New_York",
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Percentiles of event.duration"
+                },
+                "mode": "normal",
+                "show": "true",
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "shareYAxis": true,
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Percentiles of event.duration"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "Thrift response times percentiles [Packetbeat]",
+          "type": "line"
+        }
+      },
+      "id": "Thrift-response-times-percentiles",
+      "type": "visualization",
+      "updated_at": "2019-01-16T20:45:38.120Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchId": "Thrift-transactions",
+        "title": "Top Thrift-RPC methods  [Packetbeat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "id": "2",
+              "params": {
+                "field": "method",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "addLegend": false,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "defaultYExtents": false,
+            "mode": "stacked",
+            "scale": "linear",
+            "setYExtents": false,
+            "shareYAxis": true,
+            "times": [],
+            "yAxis": {}
+          },
+          "title": "Top Thrift-RPC methods",
+          "type": "histogram"
+        }
+      },
+      "id": "Top-Thrift-RPC-methods",
+      "type": "visualization",
+      "updated_at": "2019-01-16T20:47:08.544Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": []
+          }
+        },
+        "savedSearchId": "Thrift-errors",
+        "title": "Top Thrift-RPC calls with errors [Packetbeat]",
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "id": "2",
+              "params": {
+                "field": "method",
+                "order": "desc",
+                "orderBy": "1",
+                "size": 5
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "listeners": {},
+          "params": {
+            "addLegend": false,
+            "addTooltip": true,
+            "defaultYExtents": false,
+            "mode": "stacked",
+            "shareYAxis": true
+          },
+          "type": "histogram"
+        }
+      },
+      "id": "Top-Thrift-RPC-calls-with-errors",
+      "type": "visualization",
+      "updated_at": "2019-01-16T20:47:18.118Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "columns": [
+          "method",
+          "type",
+          "path",
+          "event.duration",
+          "status"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "thrift",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "thrift"
+                },
+                "query": {
+                  "match": {
+                    "event.dataset": {
+                      "query": "thrift",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "highlight": {
+              "fields": {
+                "*": {}
+              },
+              "post_tags": [
+                "@/kibana-highlighted-field@"
+              ],
+              "pre_tags": [
+                "@kibana-highlighted-field@"
+              ]
+            },
+            "highlightAll": true,
+            "index": "packetbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": {
+                "query_string": {
+                  "analyze_wildcard": true,
+                  "query": "type: thrift"
+                }
+              }
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Thrift Transactions Search [Packetbeat]",
+        "version": 1
+      },
+      "id": "Thrift-transactions",
+      "type": "search",
+      "updated_at": "2019-01-16T20:44:16.124Z",
+      "version": 3
+    },
+    {
+      "attributes": {
+        "columns": [
+          "method",
+          "type",
+          "path",
+          "event.duration",
+          "status"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "status",
+                  "negate": true,
+                  "params": {
+                    "query": "OK",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "OK"
+                },
+                "query": {
+                  "match": {
+                    "status": {
+                      "query": "OK",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "thrift",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "thrift"
+                },
+                "query": {
+                  "match": {
+                    "event.dataset": {
+                      "query": "thrift",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "highlight": {
+              "fields": {
+                "*": {}
+              },
+              "post_tags": [
+                "@/kibana-highlighted-field@"
+              ],
+              "pre_tags": [
+                "@kibana-highlighted-field@"
+              ]
+            },
+            "highlightAll": true,
+            "index": "packetbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": {
+                "query_string": {
+                  "analyze_wildcard": true,
+                  "query": "type: thrift"
+                }
+              }
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "Thrift Errors [Packetbeat]",
+        "version": 1
+      },
+      "id": "Thrift-errors",
+      "type": "search",
+      "updated_at": "2019-01-16T20:45:12.555Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "query": {
+              "language": "lucene",
+              "query": {
+                "query_string": {
+                  "analyze_wildcard": true,
+                  "query": "*"
+                }
+              }
+            },
+            "version": true
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false
+        },
+        "panelsJSON": [
+          {
+            "col": 1,
+            "id": "Navigation",
+            "panelIndex": 1,
+            "row": 1,
+            "size_x": 3,
+            "size_y": 4,
+            "type": "visualization"
+          },
+          {
+            "col": 4,
+            "id": "Thrift-requests-per-minute",
+            "panelIndex": 2,
+            "row": 1,
+            "size_x": 5,
+            "size_y": 4,
+            "type": "visualization"
+          },
+          {
+            "col": 9,
+            "id": "Thrift-RPC-Errors",
+            "panelIndex": 3,
+            "row": 1,
+            "size_x": 4,
+            "size_y": 4,
+            "type": "visualization"
+          },
+          {
+            "col": 1,
+            "id": "Slowest-Thrift-RPC-methods",
+            "panelIndex": 4,
+            "row": 5,
+            "size_x": 6,
+            "size_y": 3,
+            "type": "visualization"
+          },
+          {
+            "col": 7,
+            "id": "Thrift-response-times-percentiles",
+            "panelIndex": 5,
+            "row": 5,
+            "size_x": 6,
+            "size_y": 3,
+            "type": "visualization"
+          },
+          {
+            "col": 1,
+            "id": "Top-Thrift-RPC-methods",
+            "panelIndex": 6,
+            "row": 8,
+            "size_x": 6,
+            "size_y": 4,
+            "type": "visualization"
+          },
+          {
+            "col": 7,
+            "id": "Top-Thrift-RPC-calls-with-errors",
+            "panelIndex": 7,
+            "row": 8,
+            "size_x": 6,
+            "size_y": 4,
+            "type": "visualization"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Packetbeat] Thrift performance",
+        "uiStateJSON": {
+          "P-4": {
+            "vis": {
+              "params": {
+                "sort": {
+                  "columnIndex": null,
+                  "direction": null
+                }
+              }
+            }
+          }
+        },
+        "version": 1
+      },
+      "id": "Packetbeat-Thrift-performance",
+      "type": "dashboard",
+      "updated_at": "2019-01-16T20:34:32.145Z",
+      "version": 1
+    }
+  ],
+  "version": "7.0.0-SNAPSHOT"
 }

@@ -103,10 +103,17 @@ func TestRegisteredIsEqual(t *testing.T) {
 	assertIsDefInvalid(t, id, now.Add(100))
 }
 
+func TestIsString(t *testing.T) {
+	assertIsDefValid(t, IsString, "abc")
+	assertIsDefValid(t, IsString, "a")
+	assertIsDefInvalid(t, IsString, 123)
+}
+
 func TestIsNonEmptyString(t *testing.T) {
 	assertIsDefValid(t, IsNonEmptyString, "abc")
 	assertIsDefValid(t, IsNonEmptyString, "a")
 	assertIsDefInvalid(t, IsNonEmptyString, "")
+	assertIsDefInvalid(t, IsString, 123)
 }
 
 func TestIsStringMatching(t *testing.T) {
@@ -114,6 +121,7 @@ func TestIsStringMatching(t *testing.T) {
 
 	assertIsDefValid(t, id, "fall")
 	assertIsDefInvalid(t, id, "potato")
+	assertIsDefInvalid(t, IsString, 123)
 }
 
 func TestIsStringContaining(t *testing.T) {
@@ -122,6 +130,7 @@ func TestIsStringContaining(t *testing.T) {
 	assertIsDefValid(t, id, "foo")
 	assertIsDefValid(t, id, "a foo b")
 	assertIsDefInvalid(t, id, "a bar b")
+	assertIsDefInvalid(t, IsString, 123)
 }
 
 func TestIsDuration(t *testing.T) {

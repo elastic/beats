@@ -84,7 +84,7 @@ class Test(BaseTest):
         assert o["http.request.headers"]["content-type"] == "application/x-www-form-urlencoded; charset=UTF-8"
         assert o["http.response.headers"]["content-type"] == "application/json; charset=UTF-8"
 
-        assert o["http.request.params"] == "%7B+%22query%22%3A+%7B+%22match_all%22%3A+%7B%7D%7D%7D%0A="
+        assert o["url.query"] == "%7B+%22query%22%3A+%7B+%22match_all%22%3A+%7B%7D%7D%7D%0A="
         assert len(o["http.request.body.content"]) > 0
         assert len(o["http.response.body.content"]) > 0
 

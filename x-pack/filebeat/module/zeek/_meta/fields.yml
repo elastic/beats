@@ -1,0 +1,287 @@
+- key: zeek
+  title: Zeek
+  description: >
+    Module for handling logs produced by Zeek/Bro
+  fields:
+  - name: zeek
+    type: group
+    description: >
+      Fields from Zeek/Bro logs after normalization
+    fields:
+    - name: session_id
+      type: keyword
+
+    - name: connection.local_orig
+      type: boolean
+
+    - name: connection.local_resp
+      type: boolean
+
+    - name: connection.missed_bytes
+      type: long
+
+    - name: connection.state
+      type: keyword
+
+    - name: connection.history
+      type: keyword
+
+    - name: connection.orig_l2_addr
+      type: keyword
+
+    - name: resp_l2_addr
+      type: keyword
+
+    - name: vlan
+      type: keyword
+
+    - name: inner_vlan
+      type: keyword
+
+    - name: dns.trans_id
+      type: integer
+
+    - name: dns.rtt
+      type: double
+
+    - name: dns.query
+      type: keyword
+
+    - name: dns.qclass
+      type: long
+
+    - name: dns.qclass_name
+      type: keyword
+
+    - name: dns.qtype
+      type: long
+
+    - name: dns.qtype_name
+      type: keyword
+
+    - name: dns.rcode
+      type: long
+
+    - name: dns.rcode_name
+      type: keyword
+
+    - name: dns.AA
+      type: boolean
+
+    - name: dns.TC
+      type: boolean
+
+    - name: dns.RD
+      type: boolean
+
+    - name: dns.RA
+      type: boolean
+
+    - name: dns.answers
+      type: keyword
+
+    - name: dns.TTLs
+      type: double
+
+    - name: dns.rejected
+      type: boolean
+    
+    - name: dns.total_answers
+      type: integer
+
+    - name: dns.total_replies
+      type: integer
+
+    - name: dns.saw_query
+      type: boolean
+
+    - name: dns.saw_reply
+      type: boolean
+
+    - name: http.trans_depth
+      type: integer
+    
+    - name: http.status_msg
+      type: keyword
+    
+    - name: http.info_code
+      type: integer
+    
+    - name: http.info_msg
+      type: keyword
+
+    - name: http.filename
+      type: keyword
+
+    - name: http.tags
+      type: keyword
+
+    - name: http.captured_password
+      type: boolean
+
+    - name: http.proxied
+      type: keyword
+
+    - name: http.range_request
+      type: boolean
+
+    - name: http.client_header_names
+      type: keyword
+
+    - name: http.server_header_names
+      type: keyword
+
+    - name: http.orig_fuids
+      type: keyword
+
+    - name: http.orig_mime_types
+      type: keyword
+
+    - name: http.orig_filenames
+      type: keyword
+
+    - name: http.resp_fuids
+      type: keyword
+
+    - name: http.resp_mime_types
+      type: keyword
+
+    - name: http.resp_filenames
+      type: keyword
+
+    - name: http.orig_mime_depth
+      type: integer
+
+    - name: http.resp_mime_depth
+      type: integer
+
+    - name: files.fuid
+      type: keyword
+
+    - name: files.tx_host
+      type: ip
+
+    - name: files.rx_host
+      type: ip
+
+    - name: files.session_ids
+      type: keyword
+
+    - name: files.source 
+      type: keyword
+
+    - name: files.depth
+      type: long
+
+    - names: files.direction
+      type: keyword
+
+    - name: files.analyzers
+      type: keyword
+
+    - name: files.mime_type
+      type: keyword
+
+    - name: files.filename
+      type: keyword
+
+    - name: files.local_orig
+      type: boolean
+
+    - name: files.is_orig
+      type: boolean
+
+    - name: files.duration
+      type: double
+
+    - name: files.seen_bytes
+      type: long
+
+    - name: files.total_bytes
+      type: long
+
+    - name: files.missing_bytes
+      type: long
+
+    - name: files.overflow_bytes
+      type: long
+
+    - name: files.timedout
+      type: boolean
+
+    - name: files.parent_fuid
+      type: keyword
+
+    - name: files.md5
+      type: keyword
+
+    - name: files.sha1
+      type: keyword
+
+    - name: files.sha256
+      type: keyword
+
+    - name: files.extracted
+      type: keyword
+
+    - name: files.extracted_cutoff
+      type: boolean
+
+    - name: files.extracted_size
+      type: long
+
+    - name: files.entropy
+      type: double
+
+    - name: ssl.version
+      type: keyword
+
+    - name: ssl.cipher
+      type: keyword
+
+    - name: ssl.curve
+      type: keyword
+
+    - name: ssl.server_name
+      type: keyword
+
+    - name: ssl.resumed
+      type: boolean
+
+    - name: ssl.next_protocol
+      type: keyword
+
+    - name: ssl.established
+      type: boolean
+
+    - name: ssl.cert_chain
+      type: keyword
+
+    - name: ssl.cert_chain_fuids
+      type: keyword
+
+    - name: ssl.client_cert_chain
+      type: keyword
+
+    - name: ssl.client_cert_chain_fuids
+      type: keyword
+
+    - name: ssl.issuer
+      type: keyword
+
+    - name: ssl.client_issuer
+      type: keyword
+
+    - name: ssl.validation_status
+      type: keyword
+
+    - name: ssl.subject
+      type: keyword
+
+    - name: ssl.client_subject
+      type: keyword
+
+    - name: ssl.last_alert
+      type: keyword
+
+

@@ -4,10 +4,10 @@
     "grok": {
       "field": "message",
       "patterns":[
-        "%{TIMESTAMP_ISO8601:iis.access.time} %{IPORHOST:destination.ip} %{WORD:http.request.method} %{URIPATH:url.path} %{NOTSPACE:url.query} %{NUMBER:destination.port:long} %{NOTSPACE:user.name} %{IPORHOST:source.ip} %{NOTSPACE:iis.access.agent} %{NOTSPACE:http.request.referrer} %{NUMBER:http.response.status_code:long} %{NUMBER:iis.access.sub_status:long} %{NUMBER:iis.access.win32_status:long} %{NUMBER:iis.access.request_time_ms:long}",
-        "%{TIMESTAMP_ISO8601:iis.access.time} %{NOTSPACE:iis.access.site_name} %{WORD:http.request.method} %{URIPATH:url.path} %{NOTSPACE:url.query} %{NUMBER:destination.port:long} %{NOTSPACE:user.name} %{IPORHOST:source.ip} %{NOTSPACE:iis.access.agent} %{NOTSPACE:iis.access.cookie} %{NOTSPACE:http.request.referrer} %{NOTSPACE:destination.domain} %{NUMBER:http.response.status_code:long} %{NUMBER:iis.access.sub_status:long} %{NUMBER:iis.access.win32_status:long} %{NUMBER:iis.access.body_sent.bytes:long} %{NUMBER:iis.access.body_received.bytes:long} %{NUMBER:iis.access.request_time_ms:long}",
-        "%{TIMESTAMP_ISO8601:iis.access.time} %{NOTSPACE:iis.access.site_name} %{NOTSPACE:iis.access.server_name} %{IPORHOST:destination.ip} %{WORD:http.request.method} %{URIPATH:url.path} %{NOTSPACE:url.query} %{NUMBER:destination.port:long} %{NOTSPACE:user.name} %{IPORHOST:source.ip} HTTP/%{NUMBER:http.version} %{NOTSPACE:iis.access.agent} %{NOTSPACE:iis.access.cookie} %{NOTSPACE:http.request.referrer} %{NOTSPACE:destination.domain} %{NUMBER:http.response.status_code:long} %{NUMBER:iis.access.sub_status:long} %{NUMBER:iis.access.win32_status:long} %{NUMBER:iis.access.body_sent.bytes:long} %{NUMBER:iis.access.body_received.bytes:long} %{NUMBER:iis.access.request_time_ms:long}",
-        "%{TIMESTAMP_ISO8601:iis.access.time} \\[%{IPORHOST:destination.ip}\\]\\(http://%{IPORHOST:destination.ip}\\) %{WORD:http.request.method} %{URIPATH:url.path} %{NOTSPACE:url.query} %{NUMBER:destination.port:long} %{NOTSPACE:user.name} \\[%{IPORHOST:source.ip}\\]\\(http://%{IPORHOST:source.ip}\\) %{NOTSPACE:iis.access.agent} %{NUMBER:http.response.status_code:long} %{NUMBER:iis.access.sub_status:long} %{NUMBER:iis.access.win32_status:long} %{NUMBER:iis.access.request_time_ms:long}"
+        "%{TIMESTAMP_ISO8601:iis.access.time} %{IPORHOST:destination.address} %{WORD:http.request.method} %{URIPATH:url.path} %{NOTSPACE:url.query} %{NUMBER:destination.port:long} %{NOTSPACE:user.name} %{IPORHOST:source.address} %{NOTSPACE:iis.access.agent} %{NOTSPACE:http.request.referrer} %{NUMBER:http.response.status_code:long} %{NUMBER:iis.access.sub_status:long} %{NUMBER:iis.access.win32_status:long} %{NUMBER:iis.access.request_time_ms:long}",
+        "%{TIMESTAMP_ISO8601:iis.access.time} %{NOTSPACE:iis.access.site_name} %{WORD:http.request.method} %{URIPATH:url.path} %{NOTSPACE:url.query} %{NUMBER:destination.port:long} %{NOTSPACE:user.name} %{IPORHOST:source.address} %{NOTSPACE:iis.access.agent} %{NOTSPACE:iis.access.cookie} %{NOTSPACE:http.request.referrer} %{NOTSPACE:destination.domain} %{NUMBER:http.response.status_code:long} %{NUMBER:iis.access.sub_status:long} %{NUMBER:iis.access.win32_status:long} %{NUMBER:iis.access.body_sent.bytes:long} %{NUMBER:iis.access.body_received.bytes:long} %{NUMBER:iis.access.request_time_ms:long}",
+        "%{TIMESTAMP_ISO8601:iis.access.time} %{NOTSPACE:iis.access.site_name} %{NOTSPACE:iis.access.server_name} %{IPORHOST:destination.address} %{WORD:http.request.method} %{URIPATH:url.path} %{NOTSPACE:url.query} %{NUMBER:destination.port:long} %{NOTSPACE:user.name} %{IPORHOST:source.address} HTTP/%{NUMBER:http.version} %{NOTSPACE:iis.access.agent} %{NOTSPACE:iis.access.cookie} %{NOTSPACE:http.request.referrer} %{NOTSPACE:destination.domain} %{NUMBER:http.response.status_code:long} %{NUMBER:iis.access.sub_status:long} %{NUMBER:iis.access.win32_status:long} %{NUMBER:iis.access.body_sent.bytes:long} %{NUMBER:iis.access.body_received.bytes:long} %{NUMBER:iis.access.request_time_ms:long}",
+        "%{TIMESTAMP_ISO8601:iis.access.time} \\[%{IPORHOST:destination.address}\\]\\(http://%{IPORHOST:destination.address}\\) %{WORD:http.request.method} %{URIPATH:url.path} %{NOTSPACE:url.query} %{NUMBER:destination.port:long} %{NOTSPACE:user.name} \\[%{IPORHOST:source.address}\\]\\(http://%{IPORHOST:source.address}\\) %{NOTSPACE:iis.access.agent} %{NUMBER:http.response.status_code:long} %{NUMBER:iis.access.sub_status:long} %{NUMBER:iis.access.win32_status:long} %{NUMBER:iis.access.request_time_ms:long}"
         ],
       "ignore_missing": true
     }
@@ -18,7 +18,7 @@
   }, {
     "rename": {
       "field": "@timestamp",
-      "target_field": "read_timestamp"
+      "target_field": "event.created"
     }
   }, {
     "date": {
@@ -74,9 +74,32 @@
       "target_field": "user_agent.original"
     }
   }, {
+    "grok": {
+      "field": "destination.address",
+      "ignore_failure": true,
+      "patterns": [
+        "%{NOZONEIP:destination.ip}"
+      ],
+      "pattern_definitions": {
+         "NOZONEIP": "[^%]*"
+      }
+    }
+  }, {
+    "grok": {
+      "field": "source.address",
+      "ignore_failure": true,
+      "patterns": [
+        "%{NOZONEIP:source.ip}"
+      ],
+      "pattern_definitions": {
+         "NOZONEIP": "[^%]*"
+      }
+    }
+  }, {
     "geoip": {
       "field": "source.ip",
-      "target_field": "source.geo"
+      "target_field": "source.geo",
+      "ignore_missing": true
     }
   }],
   "on_failure" : [{

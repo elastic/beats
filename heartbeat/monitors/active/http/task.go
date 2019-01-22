@@ -30,9 +30,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/heartbeat/monitors/active/dialchain"
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/heartbeat/reason"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -46,7 +48,7 @@ func newHTTPMonitorHostJob(
 	enc contentEncoder,
 	body []byte,
 	validator RespCheck,
-) (monitors.Job, error) {
+) (jobs.Job, error) {
 
 	client := &http.Client{
 		CheckRedirect: makeCheckRedirect(config.MaxRedirects),
@@ -60,7 +62,7 @@ func newHTTPMonitorHostJob(
 
 	timeout := config.Timeout
 
-	return monitors.MakeSimpleJob(func(event *beat.Event) error {
+	return jobs.MakeSimpleJob(func(event *beat.Event) error {
 		_, _, err := execPing(event, client, request, body, timeout, validator)
 		return err
 	}), nil
@@ -73,7 +75,7 @@ func newHTTPMonitorIPsJob(
 	enc contentEncoder,
 	body []byte,
 	validator RespCheck,
-) (monitors.Job, error) {
+) (jobs.Job, error) {
 
 	req, err := buildRequest(addr, config, enc)
 	if err != nil {
@@ -100,7 +102,7 @@ func createPingFactory(
 	request *http.Request,
 	body []byte,
 	validator RespCheck,
-) func(*net.IPAddr) monitors.Job {
+) func(*net.IPAddr) jobs.Job {
 	timeout := config.Timeout
 	isTLS := request.URL.Scheme == "https"
 	checkRedirect := makeCheckRedirect(config.MaxRedirects)
@@ -157,7 +159,7 @@ func createPingFactory(
 		defer cbMutex.Unlock()
 
 		if !readStart.IsZero() {
-			monitors.MergeEventFields(event, common.MapStr{
+			eventext.MergeEventFields(event, common.MapStr{
 				"http": common.MapStr{
 					"rtt": common.MapStr{
 						"write_request":   look.RTT(writeEnd.Sub(writeStart)),
@@ -217,7 +219,7 @@ func execPing(
 	start, end, resp, errReason := execRequest(client, req, validator)
 
 	if errReason == nil || errReason.Type() != "io" {
-		monitors.MergeEventFields(event, common.MapStr{"http": common.MapStr{
+		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
 			"rtt": common.MapStr{
 				"total": look.RTT(end.Sub(start)),
 			},
@@ -225,7 +227,7 @@ func execPing(
 	}
 
 	if resp != nil {
-		monitors.MergeEventFields(event, common.MapStr{"http": common.MapStr{
+		eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{
 			"response": common.MapStr{"status_code": resp.StatusCode},
 		}})
 	}
