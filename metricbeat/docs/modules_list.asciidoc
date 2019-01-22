@@ -145,9 +145,9 @@ This file is generated! See scripts/docs_collector.py
 .3+| .3+|  |<<metricbeat-metricset-vsphere-datastore,datastore>> beta[]  
 |<<metricbeat-metricset-vsphere-host,host>> beta[]  
 |<<metricbeat-metricset-vsphere-virtualmachine,virtualmachine>> beta[]  
-|<<metricbeat-module-windows,Windows>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+|<<metricbeat-module-windows,Windows>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-windows-perfmon,perfmon>> beta[]  
-|<<metricbeat-metricset-windows-service,service>> beta[]  
+|<<metricbeat-metricset-windows-service,service>>   
 |<<metricbeat-module-zookeeper,ZooKeeper>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-zookeeper-mntr,mntr>>   
 |================================

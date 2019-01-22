@@ -21195,7 +21195,7 @@ Network names
 [[exported-fields-windows]]
 == Windows fields
 
-beta[] Module for Windows
+Module for Windows
 
 
 
