@@ -13,7 +13,7 @@
             }
           }
         },
-        "title": "User Connections [MSSQL Performance]",
+        "title": "User Connections [Metricbeat MSSQL]",
         "uiStateJSON": {
           "vis": {
             "legendOpen": false
@@ -119,14 +119,14 @@
               }
             ]
           },
-          "title": "User Connections [MSSQL Performance]",
+          "title": "User Connections [Metricbeat MSSQL]",
           "type": "line"
         }
       },
       "id": "7784db10-18ba-11e9-9836-f37dedd3b411",
       "type": "visualization",
-      "updated_at": "2019-01-18T14:48:55.430Z",
-      "version": 5
+      "updated_at": "2019-01-22T13:04:43.827Z",
+      "version": 8
     },
     {
       "attributes": {
@@ -141,7 +141,7 @@
             }
           }
         },
-        "title": "Transactions [MSSQL Performance]",
+        "title": "Transactions [Metricbeat MSSQL]",
         "uiStateJSON": {
           "vis": {
             "legendOpen": false
@@ -247,14 +247,14 @@
               }
             ]
           },
-          "title": "Transactions [MSSQL Performance]",
+          "title": "Transactions [Metricbeat MSSQL]",
           "type": "line"
         }
       },
       "id": "910f3f30-18ba-11e9-9836-f37dedd3b411",
       "type": "visualization",
-      "updated_at": "2019-01-18T14:49:52.386Z",
-      "version": 5
+      "updated_at": "2019-01-22T13:04:34.757Z",
+      "version": 8
     },
     {
       "attributes": {
@@ -269,7 +269,7 @@
             }
           }
         },
-        "title": "Lock Waits/sec [MSSQL Performance]",
+        "title": "Lock Waits/sec [Metricbeat MSSQL]",
         "uiStateJSON": {
           "vis": {
             "legendOpen": false
@@ -375,14 +375,14 @@
               }
             ]
           },
-          "title": "Lock Waits/sec [MSSQL Performance]",
+          "title": "Lock Waits/sec [Metricbeat MSSQL]",
           "type": "line"
         }
       },
       "id": "5bd5c230-18ba-11e9-9836-f37dedd3b411",
       "type": "visualization",
-      "updated_at": "2019-01-18T14:49:11.638Z",
-      "version": 4
+      "updated_at": "2019-01-22T13:04:24.139Z",
+      "version": 7
     },
     {
       "attributes": {
@@ -397,7 +397,7 @@
             }
           }
         },
-        "title": "Batch Requests/sec [MSSQL Performance]",
+        "title": "Batch Requests/sec [Metricbeat MSSQL]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -413,24 +413,7 @@
                   "params": {
                     "field": "mssql.performance.batch_requests_per_sec"
                   },
-                  "schema": {
-                    "aggFilter": [
-                      "!top_hits",
-                      "!percentiles",
-                      "!percentile_ranks",
-                      "!median",
-                      "!std_dev"
-                    ],
-                    "deprecate": false,
-                    "editor": false,
-                    "group": "none",
-                    "hideCustomLabel": true,
-                    "max": null,
-                    "min": 0,
-                    "name": "metricAgg",
-                    "params": [],
-                    "title": "Metric Agg"
-                  },
+                  "schema": "metricAgg",
                   "type": "avg"
                 },
                 "metricAgg": "custom"
@@ -525,14 +508,14 @@
               }
             ]
           },
-          "title": "Batch Requests/sec [MSSQL Performance]",
+          "title": "Batch Requests/sec [Metricbeat MSSQL]",
           "type": "line"
         }
       },
       "id": "b29a2160-18ba-11e9-9836-f37dedd3b411",
       "type": "visualization",
-      "updated_at": "2019-01-18T14:49:03.748Z",
-      "version": 6
+      "updated_at": "2019-01-22T13:03:10.853Z",
+      "version": 9
     },
     {
       "attributes": {
@@ -547,7 +530,7 @@
             }
           }
         },
-        "title": "Buffer Cache Hit Ratio [MSSQL Performance]",
+        "title": "Buffer Cache Hit Ratio [Metricbeat MSSQL]",
         "uiStateJSON": {
           "vis": {
             "legendOpen": false
@@ -656,14 +639,14 @@
               }
             ]
           },
-          "title": "Buffer Cache Hit Ratio [MSSQL Performance]",
+          "title": "Buffer Cache Hit Ratio [Metricbeat MSSQL]",
           "type": "line"
         }
       },
       "id": "2e795230-1b2a-11e9-8b36-136038bb307a",
       "type": "visualization",
-      "updated_at": "2019-01-18T14:47:24.998Z",
-      "version": 6
+      "updated_at": "2019-01-22T13:04:16.184Z",
+      "version": 8
     },
     {
       "attributes": {
@@ -782,8 +765,8 @@
       },
       "id": "a2ead240-18bb-11e9-9836-f37dedd3b411",
       "type": "dashboard",
-      "updated_at": "2019-01-18T14:50:20.301Z",
-      "version": 9
+      "updated_at": "2019-01-22T12:55:59.857Z",
+      "version": 11
     }
   ],
   "version": "7.0.0-alpha2"
