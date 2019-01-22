@@ -31,5 +31,9 @@ func init() {
 
 // Asset returns asset data
 func Asset() string {
+<<<<<<< HEAD
 	return "eJzMlDFTwzAMhff8Cl1mesfQKQMzE8fQjWNw49fGbRIbSynk33NumtCkLkevlEOj5XzvyVI0oy3ajAoRlxCJkRIZpY+LxXOaEGlw7o0TY+uMHhIiopCiyuqmRELkUUIxMlqrhIghYuo1Z/SSMpfpHaUBnL4mRCuDUnO2Z8yoVhUG1RDSukDxtulPItpjyjHJ460By3AeA56F9rEv7UAiU6+sr1S4eXRtqj+qBkrD8wTa+bDLDXKZpL41Q7Qo0Fk6gIlRS1S5ghRWR4W3aN+tn+Z+qtyBqWHoqPDS6vYGsk61pVV6XPBXq9nZmvErve5Q/7HZHjnM7sy751bjBu/OoqThGB0fqnJhNczv51FHrvCKL/E0EJ+s0Mo29ZWmIwb+aEpPOtXrbng0ThdPafg+/ILe5IzjeRpv3T7O7UaG38FfY+SEMBhYQmIWPgMAAP//T4yYaw=="
+=======
+	return "eJzMlDFvwjAQhff8iqfMRerAlKFzp6oDW9XBxA8wJHHqu9Dm31cBQklqkCit1Btt53ufz7En2LDNsFKtE0CdFsyQPs5mz2kCWEoeXK3OVxkeEgDoplB62xRMgMCCRphhaRJAqOqqpWR4SUWK9A5pB05fE2DhWFjJdowJKlPymNqVtnVHCb7pRyLZQ8opKfCtoehxPAY8C+1rt7UDCa5a+FCabuXJsnH+YDc0lkFG0L2Hn6+Z62jqogwwW3GvdABDWGk0ee5tG43dsH33wf4wtzZt4Y0d5n51XGpfCX+l5XvUf+x5YE63pY2m597yD/ouarSRGJ0fpqy7Gzq9n0aN6lUwco3TkfjkFQvfVDdKjwR6r7UMjvTqP6X7HiU1uFx4eqbDB6ivc8+EMGwZbhH5Rrgs8BkAAP//p5Fb6Q=="
+>>>>>>> 4f826eda5... [Metricbeat] Release Dropwizard,Graphite module as GA (#10240)
 }
