@@ -4,7 +4,6 @@
     expvar
   release: beta
   fields:
-    # Should this be mapped to process?
     - name: cmdline
       type: keyword
       description: >
