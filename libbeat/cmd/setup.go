@@ -46,22 +46,39 @@ func genSetupCmd(name, idxPrefix, version string, beatCreator beat.Creator) *cob
 				os.Exit(1)
 			}
 
-			template, _ := cmd.Flags().GetBool("template")
-			dashboards, _ := cmd.Flags().GetBool("dashboards")
-			machineLearning, _ := cmd.Flags().GetBool("machine-learning")
-			pipelines, _ := cmd.Flags().GetBool("pipelines")
-			policy, _ := cmd.Flags().GetBool("ilm-policy")
-
-			// No flags: setup all
-			if !template && !dashboards && !machineLearning && !pipelines && !policy {
-				template = true
-				dashboards = true
-				machineLearning = true
-				pipelines = true
-				policy = false
+			//flags that are generally available
+			registeredFlags := map[string]bool{
+				instance.TemplateKey:        false,
+				instance.DashboardKey:       false,
+				instance.MachineLearningKey: false,
+				instance.PipelineKey:        false,
+				instance.ILMPolicyKey:       false,
 			}
 
-			if err = beat.Setup(beatCreator, template, dashboards, machineLearning, pipelines, policy); err != nil {
+			var setupAll = true
+			for k := range registeredFlags {
+				val, err := cmd.Flags().GetBool(k)
+				//if flag is not registered, an error is thrown
+				if err != nil {
+					delete(registeredFlags, k)
+					continue
+				}
+				registeredFlags[k] = val
+
+				//if any flag is set via cmd line then only this flag should be run
+				if val {
+					setupAll = false
+				}
+			}
+
+			//No flags set via cmd: setup all registered flags
+			if setupAll {
+				for k := range registeredFlags {
+					registeredFlags[k] = true
+				}
+			}
+
+			if err = beat.Setup(beatCreator, registeredFlags); err != nil {
 				os.Exit(1)
 			}
 		},
