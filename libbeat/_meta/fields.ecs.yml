@@ -2126,11 +2126,25 @@
             cannot be used.
     
         - name: group
-          level: extended
-          type: keyword
+          title: Group
+          group: 2
           description: >
-            Group the user is a part of. This field can contain a list of groups, if
-            necessary.
+            The group fields are meant to represent groups that are relevant to the
+            event.
+          type: group
+          fields:
+
+            - name: id
+              level: extended
+              type: keyword
+              description: >
+                Unique identifier for the group on the system/platform.
+
+            - name: name
+              level: extended
+              type: keyword
+              description: >
+                Name of the group.
     
     - name: user_agent
       title: User agent
