@@ -44,8 +44,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-elasticsearch-node_stats,node_stats>> beta[]  
 |<<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>> beta[]  
 |<<metricbeat-metricset-elasticsearch-shard,shard>> beta[]  
-|<<metricbeat-module-envoyproxy,envoyproxy>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-envoyproxy-server,server>> experimental[]  
+|<<metricbeat-module-envoyproxy,envoyproxy>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-envoyproxy-server,server>>   
 |<<metricbeat-module-etcd,Etcd>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .3+| .3+|  |<<metricbeat-metricset-etcd-leader,leader>>   
 |<<metricbeat-metricset-etcd-self,self>>   
