@@ -317,7 +317,6 @@
               type: long
             - name: deadlock.count.W
               type: long
-    # ECS?
     - name: network
       type: group
       description: >
