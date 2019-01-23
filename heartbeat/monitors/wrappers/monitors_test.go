@@ -71,12 +71,13 @@ func TestWrapCommon(t *testing.T) {
 		})
 	}
 
-	summaryValidator := func(status string, up int, down int) mapval.Validator {
+	// This duplicates hbtest.SummaryChecks to avoid an import cycle.
+	// It could be refactored out, but it just isn't worth it.
+	summaryValidator := func(up int, down int) mapval.Validator {
 		return mapval.MustCompile(mapval.Map{
 			"summary": mapval.Map{
-				"status": status,
-				"up":     uint16(up),
-				"down":   uint16(down),
+				"up":   uint16(up),
+				"down": uint16(down),
 			},
 		})
 	}
@@ -111,7 +112,7 @@ func TestWrapCommon(t *testing.T) {
 			[]mapval.Validator{
 				mapval.Compose(
 					simpleJobValidator,
-					summaryValidator("up", 1, 0),
+					summaryValidator(1, 0),
 				)},
 		},
 		{
@@ -121,7 +122,7 @@ func TestWrapCommon(t *testing.T) {
 			[]mapval.Validator{
 				mapval.Compose(
 					errorJobValidator,
-					summaryValidator("down", 0, 1),
+					summaryValidator(0, 1),
 				)},
 		},
 		{
@@ -132,7 +133,7 @@ func TestWrapCommon(t *testing.T) {
 				simpleJobValidator,
 				mapval.Compose(
 					simpleJobValidator,
-					summaryValidator("up", 2, 0),
+					summaryValidator(2, 0),
 				),
 			},
 		},
@@ -147,7 +148,7 @@ func TestWrapCommon(t *testing.T) {
 				mapval.Compose(
 					contJobValidator("2nd"),
 					commonFieldsValidator(testFields, "up"),
-					summaryValidator("up", 4, 0),
+					summaryValidator(4, 0),
 				),
 			},
 		},

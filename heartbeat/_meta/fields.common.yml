@@ -67,10 +67,6 @@
   title: "Monitor summary"
   description: "Present in the last event emitted during a check. If a monitor checks multiple endpoints, as is the case with `mode: all`."
   fields:
-    - name: status
-      type: keyword
-      description: >
-        "up" when no failures, otherwise "down"
     - name: up
       type: integer
       description: >

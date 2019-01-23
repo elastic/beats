@@ -149,18 +149,10 @@ func makeAddSummary(id string, numJobs uint16) jobs.JobWrapper {
 
 			// After last job
 			if state.remaining == 0 {
-				var statusStr string
-				if state.down == 0 {
-					statusStr = "up"
-				} else {
-					statusStr = "down"
-				}
-
 				eventext.MergeEventFields(event, common.MapStr{
 					"summary": common.MapStr{
-						"status": statusStr,
-						"up":     state.up,
-						"down":   state.down,
+						"up":   state.up,
+						"down": state.down,
 					},
 				})
 				resetState()
