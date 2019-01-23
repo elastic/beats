@@ -23,9 +23,10 @@ package diskio
 import (
 	"testing"
 
-	sigar "github.com/elastic/gosigar"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/stretchr/testify/assert"
+
+	sigar "github.com/elastic/gosigar"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/system"
