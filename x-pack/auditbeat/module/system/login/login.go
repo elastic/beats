@@ -38,6 +38,7 @@ const (
 	shutdownRecord
 	userLoginRecord
 	userLogoutRecord
+	userLoginFailedRecord
 )
 
 // String returns the string representation of a LoginRecordType.
@@ -47,8 +48,12 @@ func (t loginRecordType) string() string {
 		return "boot"
 	case shutdownRecord:
 		return "shutdown"
+
+	case userLoginFailedRecord:
+		fallthrough
 	case userLoginRecord:
 		return "user_login"
+
 	case userLogoutRecord:
 		return "user_logout"
 	default:
@@ -118,7 +123,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		log:           logp.NewLogger(metricsetName),
 	}
 
-	ms.utmpReader, err = NewUtmpFileReader(ms.log, bucket, config.UtmpFilePattern)
+	ms.utmpReader, err = NewUtmpFileReader(ms.log, bucket, config)
 	if err != nil {
 		return nil, err
 	}
@@ -158,20 +163,19 @@ func (ms *MetricSet) readAndEmit(report mb.ReporterV2) int {
 			if !ok {
 				return count
 			}
-			report.Event(ms.loginEvent(loginRecord))
+			report.Event(ms.loginEvent(&loginRecord))
 			count++
 		case err, ok := <-errorC:
 			if !ok {
 				return count
 			}
 			ms.log.Error(err)
-			report.Error(err)
 		}
 	}
 	return count
 }
 
-func (ms *MetricSet) loginEvent(loginRecord LoginRecord) mb.Event {
+func (ms *MetricSet) loginEvent(loginRecord *LoginRecord) mb.Event {
 	event := mb.Event{
 		Timestamp: loginRecord.Timestamp,
 		RootFields: common.MapStr{
@@ -180,6 +184,7 @@ func (ms *MetricSet) loginEvent(loginRecord LoginRecord) mb.Event {
 				"action": loginRecord.Type.string(),
 				"origin": loginRecord.Origin,
 			},
+			"message": loginMessage(loginRecord),
 		},
 		MetricSetFields: loginRecord.toMapStr(),
 	}
@@ -204,7 +209,22 @@ func (ms *MetricSet) loginEvent(loginRecord LoginRecord) mb.Event {
 		event.RootFields.Put("source.domain", loginRecord.Hostname)
 	}
 
+	switch loginRecord.Type {
+	case userLoginRecord:
+		event.RootFields.Put("event.outcome", "success")
+	case userLoginFailedRecord:
+		event.RootFields.Put("event.outcome", "failure")
+	}
+
+	return event
+}
+
+func loginMessage(loginRecord *LoginRecord) string {
 	var message string
+
+	userString := fmt.Sprintf("by user %v (UID: %d) on %v (PID: %d) from %v (IP: %v)",
+		loginRecord.Username, loginRecord.UID, loginRecord.TTY, loginRecord.PID,
+		loginRecord.Hostname, loginRecord.IP)
 
 	switch loginRecord.Type {
 	case bootRecord:
@@ -212,16 +232,12 @@ func (ms *MetricSet) loginEvent(loginRecord LoginRecord) mb.Event {
 	case shutdownRecord:
 		message = "System shutdown"
 	case userLoginRecord:
-		message = fmt.Sprintf("Login by user %v (UID: %d) on %v (PID: %d) from %v (IP: %v).",
-			loginRecord.Username, loginRecord.UID, loginRecord.TTY, loginRecord.PID,
-			loginRecord.Hostname, loginRecord.IP)
+		message = fmt.Sprintf("Login %v", userString)
+	case userLoginFailedRecord:
+		message = fmt.Sprintf("Failed login %v", userString)
 	case userLogoutRecord:
-		message = fmt.Sprintf("Logout by user %v (UID: %d) on %v (PID: %d) from %v (IP: %v).",
-			loginRecord.Username, loginRecord.UID, loginRecord.TTY, loginRecord.PID,
-			loginRecord.Hostname, loginRecord.IP)
+		message = fmt.Sprintf("Logout %v", userString)
 	}
 
-	event.RootFields.Put("message", message)
-
-	return event
+	return message
 }
