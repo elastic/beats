@@ -52,7 +52,7 @@ type Field struct {
 	CopyTo         string      `config:"copy_to"`
 	IgnoreAbove    int         `config:"ignore_above"`
 	AliasPath      string      `config:"path"`
-	MigrationAlias bool        `config:"migration_alias"`
+	MigrationAlias bool        `config:"migration"`
 
 	ObjectType            string          `config:"object_type"`
 	ObjectTypeMappingType string          `config:"object_type_mapping_type"`
