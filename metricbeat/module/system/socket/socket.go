@@ -107,6 +107,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return m, nil
 }
 
+// Fetch fetches list of sockets and reports it
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	// Refresh inode to process mapping (must be root).
 	if err := m.ptable.Refresh(); err != nil {
