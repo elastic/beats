@@ -58,7 +58,7 @@ func (t loginRecordType) string() string {
 
 // LoginRecord represents a login record.
 type LoginRecord struct {
-	Utmp      Utmp
+	Utmp      *Utmp
 	Type      loginRecordType
 	PID       int
 	TTY       string
@@ -133,27 +133,42 @@ func (ms *MetricSet) Close() error {
 
 // Fetch collects any new login records from /var/log/wtmp. It is invoked periodically.
 func (ms *MetricSet) Fetch(report mb.ReporterV2) {
-	loginRecords, err := ms.utmpReader.ReadNew()
-	if err != nil {
-		ms.log.Error(err)
-		report.Error(err)
-		return
-	}
-	ms.log.Debugf("%d new login records.", len(loginRecords))
+	count := ms.readAndEmit(report)
 
-	for _, loginRecord := range loginRecords {
-		report.Event(ms.loginEvent(loginRecord))
-	}
+	ms.log.Debugf("%d new login records.", count)
 
 	// Save new state to disk
-	if len(loginRecords) > 0 {
+	if count > 0 {
 		err := ms.utmpReader.saveStateToDisk()
 		if err != nil {
 			ms.log.Error(err)
 			report.Error(err)
-			return
 		}
 	}
+}
+
+// readAndEmit reads and emits login events and returns the number of events.
+func (ms *MetricSet) readAndEmit(report mb.ReporterV2) int {
+	loginRecordC, errorC := ms.utmpReader.ReadNew()
+
+	var count int
+	for {
+		select {
+		case loginRecord, ok := <-loginRecordC:
+			if !ok {
+				return count
+			}
+			report.Event(ms.loginEvent(loginRecord))
+			count++
+		case err, ok := <-errorC:
+			if !ok {
+				return count
+			}
+			ms.log.Error(err)
+			report.Error(err)
+		}
+	}
+	return count
 }
 
 func (ms *MetricSet) loginEvent(loginRecord LoginRecord) mb.Event {
