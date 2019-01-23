@@ -23,7 +23,7 @@ import (
 const (
 	moduleName    = "system"
 	metricsetName = "login"
-	namespace     = "system.audit.user"
+	namespace     = "system.audit.login"
 
 	bucketName = "login.v1"
 

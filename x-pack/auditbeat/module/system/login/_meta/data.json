@@ -23,7 +23,7 @@
     },
     "system": {
         "audit": {
-            "user": {
+            "login": {
                 "tty": "pts/1"
             }
         }
