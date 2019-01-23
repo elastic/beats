@@ -12,6 +12,4 @@ locations that you specify, collects log events, and forwards them to either to
 https://www.elastic.co/products/elasticsearch[Elasticsearch] or
 https://www.elastic.co/products/logstash[Logstash].
 
-{beatname_uc} is an Elastic https://www.elastic.co/products/beats[Beat]. It's
-based on the `libbeat` framework. For more information, see the
-{libbeat}/index.html[{libbeat-docs}]. 
+include::{libbeat-dir}/docs/shared-libbeat-description.asciidoc[]
