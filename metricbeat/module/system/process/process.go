@@ -25,7 +25,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/metric/system/process"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -98,10 +97,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches metrics for all processes. It iterates over each PID and
 // collects process metadata, CPU metrics, and memory metrics.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	procs, err := m.stats.Get()
 	if err != nil {
-		return nil, errors.Wrap(err, "process stats")
+		r.Error(errors.Wrap(err, "process stats"))
+		return
 	}
 
 	if m.cgroup != nil {
@@ -123,5 +123,10 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		}
 	}
 
-	return procs, err
+	for _, proc := range procs {
+		e := mb.Event{
+			MetricSetFields: proc,
+		}
+		r.Event(e)
+	}
 }
