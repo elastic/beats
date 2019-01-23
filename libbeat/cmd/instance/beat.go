@@ -74,7 +74,7 @@ const (
 	//DashboardKey used for registering dashboards in setup cmd
 	DashboardKey = "dashboards"
 	//MachineLearningKey used for registering ml jobs in setup cmd
-	MachineLearningKey = "machineLearning"
+	MachineLearningKey = "machine-learning"
 	//PipelineKey used for registering pipelines in setup cmd
 	PipelineKey = "pipelines"
 	//ILMPolicyKey used for registering ilm in setup cmd
