@@ -4,11 +4,9 @@
     Contains fields for the Nginx access logs.
   fields:
     - name: body_sent.bytes
-      type: long
-      format: bytes
-      description: >
-        The number of bytes of the server response body.
-
+      type: alias
+      path: http.response.body.bytes
+      migration: true
     - name: remote_ip_list
       type: alias
       path: network.forwarded_ip

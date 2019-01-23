@@ -50,6 +50,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   instead of saving the parsed date. Now aligned with `event.created` semantics elsewhere. {pull}10139[10139]
 - Rename `mysql.error.thread_id` and `mysql.slowlog.id` to `mysql.thread_id`. {pull}10161[10161]
 - Remove `mysql.error.timestamp`  and `mysql.slowlog.timestamp`. {pull}10161[10161]
+- Migrate multiple fields to `event.duration`, from modules "iis", "kibana" and "traefik",
+  including `http.response.elapsed_time` (ECS). {pull}10188[10188]
+- Rename multiple fields to `http.response.body.bytes`, from modules "apache", "iis",
+  "kibana", "nginx" and "traefik", including `http.response.content_length` (ECS). {pull}10188[10188]
 
 *Heartbeat*
 
