@@ -4755,7 +4755,6 @@ The node the shard was relocated from.
 [[exported-fields-envoyproxy]]
 == envoyproxy fields
 
-experimental[]
 envoyproxy module
 
 
