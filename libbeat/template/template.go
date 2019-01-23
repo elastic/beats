@@ -133,7 +133,7 @@ func (t *Template) load(fields common.Fields) (common.MapStr, error) {
 	var err error
 	if len(t.config.AppendFields) > 0 {
 		cfgwarn.Experimental("append_fields is used.")
-		fields, err = concatFields(fields, t.config.AppendFields)
+		fields, err = common.ConcatFields(fields, t.config.AppendFields)
 		if err != nil {
 			return nil, err
 		}
@@ -299,26 +299,6 @@ func buildIdxSettings(ver common.Version, userSettings common.MapStr) common.Map
 
 	indexSettings.DeepUpdate(userSettings)
 	return indexSettings
-}
-
-func concatFields(a, b common.Fields) (common.Fields, error) {
-	if len(b) == 0 {
-		return a, nil
-	}
-	if len(a) == 0 {
-		return b, nil
-	}
-
-	// check for duplicats
-	for _, k := range b.GetKeys() {
-		if a.HasNode(k) {
-			return nil, fmt.Errorf("append_fields contains an already existing key: %s", k)
-		}
-	}
-
-	// all fine, let's concat a+b into new array
-	fields := make(common.Fields, 0, len(a)+len(b))
-	return append(append(fields, a...), b...), nil
 }
 
 func loadYamlByte(data []byte) (common.Fields, error) {
