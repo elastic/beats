@@ -20,50 +20,54 @@ class TestCommands(BaseTest):
         super(BaseTest, self).setUp()
         shutil.copy(self.beat_path + "/_meta/config.yml",
                     os.path.join(self.working_dir, "libbeat.yml"))
+        self.fields_path = os.path.join(self.beat_path, "template/testdata/fields.yml")
 
     def test_migration_default(self):
         """
-        Tests that if no migration flag is set, no alias exists. By default migratin is off.
+        If no migration flag is set, no migration alias exists. By default migration is off.
         """
 
         exit_code = self.run_beat(
             extra_args=[
                 "export", "template",
-                "-E", "setup.template.fields=" + os.path.join(self.working_dir, "fields.yml"),
+                "-E", "setup.template.fields=" + self.fields_path,
             ],
             config="libbeat.yml")
 
         assert exit_code == 0
-        assert self.log_contains_count('"type": "alias"') == 0
+        assert self.log_contains('migration_alias_false')
+        assert not self.log_contains('migration_alias_true')
 
     def test_migration_false(self):
         """
-        If migration flag is set to false, no alias exist
+        If migration flag is set to false, no migration alias exist
         """
 
         exit_code = self.run_beat(
             extra_args=[
                 "export", "template",
-                "-E", "setup.template.fields=" + os.path.join(self.working_dir, "fields.yml"),
-                "-E", "migration.enabled=true",
-            ],
-            config="libbeat.yml")
-
-        assert exit_code == 0
-        assert self.log_contains('"type": "alias"')
-
-    def test_migration_true(self):
-        """
-        Test that if migration flag is set to true, some alias are loaded.
-        """
-
-        exit_code = self.run_beat(
-            extra_args=[
-                "export", "template",
-                "-E", "setup.template.fields=" + os.path.join(self.working_dir, "fields.yml"),
+                "-E", "setup.template.fields=" + self.fields_path,
                 "-E", "migration.enabled=false",
             ],
             config="libbeat.yml")
 
         assert exit_code == 0
-        assert self.log_contains_count('"type": "alias"') == 0
+        assert self.log_contains('migration_alias_false')
+        assert not self.log_contains('migration_alias_true')
+
+    def test_migration_true(self):
+        """
+        If migration flag is set to true, migration alias are loaded.
+        """
+
+        exit_code = self.run_beat(
+            extra_args=[
+                "export", "template",
+                "-E", "setup.template.fields=" + self.fields_path,
+                "-E", "migration.enabled=true",
+            ],
+            config="libbeat.yml")
+
+        assert exit_code == 0
+        assert self.log_contains('migration_alias_false')
+        assert self.log_contains('migration_alias_true')

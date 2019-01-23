@@ -33,4 +33,4 @@
     - name: migration_alias_false
       type: alias
       path: keyword
-      migration_alias: false
+      migration: false
