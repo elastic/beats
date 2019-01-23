@@ -450,6 +450,16 @@
 
 ## HAProxy module
 
+- from: haproxy.total_waiting_time_ms
+  to: event.duration
+  alias: false
+  scale: 1000000
+
+- from: haproxy.http.request.time_active_ms
+  to: event.duration
+  alias: false
+  scale: 1000000
+
 - from: haproxy.client.ip
   to: source.address
   alias: true

@@ -4899,15 +4899,6 @@ Complete HTTP request line, including the method, request and HTTP version strin
 
 --
 
-*`haproxy.http.request.time_active_ms`*::
-+
---
-type: long
-
-Time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
-
---
-
 *`haproxy.http.request.time_wait_without_data_ms`*::
 +
 --
@@ -4931,15 +4922,6 @@ Total time in milliseconds spent waiting for a full HTTP request from the client
 
 TCP log format
 
-
-*`haproxy.tcp.processing_time_ms`*::
-+
---
-type: long
-
-Total time in milliseconds elapsed between the accept and the last close
-
---
 
 *`haproxy.tcp.connection_waiting_time_ms`*::
 +
