@@ -107,6 +107,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return m, nil
 }
 
+// Fetch socket metrics from the system
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	// Refresh inode to process mapping (must be root).
 	if err := m.ptable.Refresh(); err != nil {
