@@ -36,10 +36,19 @@ import (
 // pages of type PageSize. Pages within the file are only accessible by page IDs
 // from within active transactions.
 type File struct {
-	path      string
-	readonly  bool
-	file      vfs.File
-	size      int64 // real file size
+	// Atomic fields.
+	// Do not move: Must be 64bit-word aligned on some architectures.
+	txids uint64
+
+	observer Observer
+
+	path     string
+	readonly bool
+	file     vfs.File
+
+	size         int64 // real file size (updated on mmap update only)
+	sizeEstimate int64 // estimated real file size based on last update and the total vs. used mmaped region
+
 	locks     lock
 	wg        sync.WaitGroup // local async workers wait group
 	writer    writer
@@ -53,7 +62,7 @@ type File struct {
 	meta       [2]*metaPage
 	metaActive int
 
-	txids uint64
+	stats FileStats
 }
 
 // internal contants
@@ -99,6 +108,8 @@ func Open(path string, mode os.FileMode, opts Options) (*File, error) {
 
 	tracef("open file: %p (%v)\n", f, path)
 	traceMetaPage(f.getMetaPage())
+
+	f.reportOpen()
 	return f, nil
 }
 
@@ -179,6 +190,7 @@ func newFile(
 			maxSize:  maxSize,
 			pageSize: pageSize,
 		},
+		observer: opts.Observer,
 	}
 	f.locks.init()
 
@@ -196,7 +208,7 @@ func newFile(
 		"page limit not configured on allocator")
 
 	// create asynchronous writer
-	f.writer.Init(file, f.allocator.pageSize)
+	f.writer.Init(file, f.allocator.pageSize, opts.Sync)
 	f.wg.Add(1)
 	go func() {
 		defer f.wg.Done()
@@ -224,6 +236,36 @@ func (f *File) init(metaActive int, opts Options) reason {
 	}
 
 	return nil
+}
+
+func (f *File) reportOpen() {
+	const numFileHeaders = 2
+
+	meta := f.getMetaPage()
+	fileEnd := uint(meta.dataEndMarker.Get())
+	if m := uint(meta.metaEndMarker.Get()); m > fileEnd {
+		fileEnd = m
+	}
+
+	metaArea := uint(meta.metaTotal.Get())
+	metaInUse := metaArea - f.allocator.meta.freelist.Avail()
+	dataInUse := fileEnd - numFileHeaders - metaArea - f.allocator.data.freelist.Avail()
+
+	f.stats = FileStats{
+		Version:       meta.version.Get(),
+		Size:          uint64(f.size),
+		MaxSize:       meta.maxSize.Get(),
+		PageSize:      meta.pageSize.Get(),
+		MetaArea:      metaArea,
+		DataAllocated: dataInUse,
+		MetaAllocated: metaInUse,
+	}
+
+	o := f.observer
+	if o == nil {
+		return
+	}
+	o.OnOpen(f.stats)
 }
 
 // Close closes the file, after all transactions have been quit. After closing
@@ -296,13 +338,25 @@ func (f *File) beginTx(settings TxOptions) (*Tx, reason) {
 	}
 
 	tracef("request new transaction (readonly: %v)\n", settings.Readonly)
+
+	// Acquire transaction log.
+	// Unlock on panic, so applications will not be blocked in case they try to
+	// defer some close operations on the file.
+	ok := false
 	lock := f.locks.TxLock(settings.Readonly)
 	lock.Lock()
-	tracef("init new transaction (readonly: %v)\n", settings.Readonly)
+	defer cleanup.IfNot(&ok, lock.Unlock)
 
 	txid := atomic.AddUint64(&f.txids, 1)
+
+	tracef("init new transaction (readonly: %v)\n", settings.Readonly)
+
 	tx := newTx(f, txid, lock, settings)
 	tracef("begin transaction: %p (readonly: %v)\n", tx, settings.Readonly)
+
+	tx.onBegin()
+
+	ok = true
 	return tx, nil
 }
 
@@ -383,6 +437,7 @@ func (f *File) mmap() reason {
 		return f.err(op).of(InvalidFileSize).report(msg)
 	}
 	f.size = fileSize
+	f.sizeEstimate = fileSize // reset estimate
 
 	maxSize := f.allocator.maxSize
 	if em := uint(f.allocator.meta.endMarker); maxSize > 0 && em > f.allocator.maxPages {
