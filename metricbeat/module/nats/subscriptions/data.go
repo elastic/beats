@@ -32,10 +32,10 @@ var (
 		"total": c.Int("num_subscriptions"),
 		"cache": s.Object{
 			"size":     c.Int("num_cache"),
-			"hit_rate": c.Int("cache_hit_rate"),
+			"hit_rate": c.Float("cache_hit_rate"),
 			"fanout": s.Object{
 				"max": c.Int("max_fanout"),
-				"avg": c.Int("avg_fanout"),
+				"avg": c.Float("avg_fanout"),
 			},
 		},
 		"inserts": c.Int("num_inserts"),
