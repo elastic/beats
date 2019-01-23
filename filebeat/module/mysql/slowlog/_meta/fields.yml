@@ -37,6 +37,11 @@
       type: long
       description: >
         The unix timestamp taken from the `SET timestamp` query.
+    - name: bytes_sent
+      type: long
+      format: bytes
+      description: >
+        The size of the query result.
     - name: query
       description: >
         The slow query.
@@ -52,6 +57,14 @@
       type: keyword
       description: >
         Current authenticated user, used to determine access privileges. Can differ from the value for user.
+    - name: last_errno
+      type: keyword
+      description: >
+        Last SQL error seen.
+    - name: killed
+      type: keyword
+      description: >
+        Code of the reason if the query was killed.
 
     - name: query_cache_hit
       type: boolean
@@ -65,6 +78,19 @@
       type: boolean
       description: >
         Whether the query needed temporary tables on disk.
+    - name: tmp_tables
+      type: long
+      description: > 
+        Number of temporary tables created for this query
+    - name: tmp_disk_tables
+      type: long
+      description: >
+        Number of temporary tables created on disk for this query.
+    - name: tmp_table_sizes
+      type: long
+      format: bytes
+      description: 
+        Size of temporary tables created for this query.
     - name: filesort
       type: boolean
       description: >
@@ -89,3 +115,50 @@
       type: long
       description: >
         Number of merge passes executed for the query.
+    - name: log_slow_rate_type
+      type: keyword
+      description: >
+        Type of slow log rate limit, it can be `session` if the rate limit
+        is applied per session, or `query` if it applies per query.
+    - name: log_slow_rate_limit
+      type: keyword
+      description: >
+        Slow log rate limit, a value of 100 means that one in a hundred queries
+        or sessions are being logged.
+
+    # https://www.percona.com/doc/percona-server/5.7/diagnostics/slow_extended.html
+    - name: innodb
+      type: group
+      description: >
+        Contains fields relative to InnoDB engine
+      fields:
+        - name: trx_id
+          type: keyword
+          description: >
+            Transaction ID
+        - name: io_r_ops
+          type: long
+          description: >
+            Number of page read operations.
+        - name: io_r_bytes
+          type: long
+          format: bytes
+          description: >
+            Bytes read during page read operations.
+        - name: io_r_wait.sec
+          type: long
+          description: >
+            How long it took to read all needed data from storage.
+        - name: rec_lock_wait.sec
+          type: long
+          description: >
+            How long the query waited for locks.
+        - name: queue_wait.sec
+          type: long
+          description: >
+            How long the query waited to enter the InnoDB queue and to be executed once
+            in the queue.
+        - name: pages_distinct
+          type: long
+          description: >
+            Approximated count of pages accessed to execute the query.
