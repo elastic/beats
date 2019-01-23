@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build !integration
 // +build linux
 
 package diskio
@@ -23,7 +24,6 @@ import (
 	"testing"
 
 	sigar "github.com/elastic/gosigar"
-
 	"github.com/shirou/gopsutil/disk"
 	"github.com/stretchr/testify/assert"
 
@@ -50,14 +50,9 @@ func TestDataNameFilter(t *testing.T) {
 		"diskio.include_devices": []string{"sda", "sda1", "sda2"},
 	}
 
-	f := mbtest.NewEventsFetcher(t, conf)
-
-	if err := mbtest.WriteEvents(f, t); err != nil {
-		t.Fatal("write", err)
-	}
-
-	data, err := f.Fetch()
-	assert.NoError(t, err)
+	f := mbtest.NewReportingMetricSetV2(t, conf)
+	data, errs := mbtest.ReportingFetchV2(f)
+	assert.Empty(t, errs)
 	assert.Equal(t, 3, len(data))
 }
 
@@ -74,14 +69,9 @@ func TestDataEmptyFilter(t *testing.T) {
 		"metricsets": []string{"diskio"},
 	}
 
-	f := mbtest.NewEventsFetcher(t, conf)
-
-	if err := mbtest.WriteEvents(f, t); err != nil {
-		t.Fatal("write", err)
-	}
-
-	data, err := f.Fetch()
-	assert.NoError(t, err)
+	f := mbtest.NewReportingMetricSetV2(t, conf)
+	data, errs := mbtest.ReportingFetchV2(f)
+	assert.Empty(t, errs)
 	assert.Equal(t, 10, len(data))
 }
 
