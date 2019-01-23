@@ -20,6 +20,7 @@ package logstash
 import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -49,6 +50,10 @@ func makeLogstash(
 	config := newConfig()
 	if err := cfg.Unpack(config); err != nil {
 		return outputs.Fail(err)
+	}
+
+	if cfg.HasField("port") {
+		cfgwarn.Deprecate("7.0.0", "The Logstash outputs port setting")
 	}
 
 	hosts, err := outputs.ReadHostList(cfg)

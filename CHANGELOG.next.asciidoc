@@ -13,6 +13,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Dissect syntax change, use * instead of ? when working with field reference. {issue}8054[8054]
 - Fix registry handle leak on Windows (https://github.com/elastic/go-sysinfo/pull/33). {pull}9920[9920]
 - Allow to unenroll a Beat from the UI. {issue}9452[9452]
+- Port settings have been deprecated in redis/logstash output and will be removed in 7.0. {pull}9915[9915]
 
 *Auditbeat*
 
