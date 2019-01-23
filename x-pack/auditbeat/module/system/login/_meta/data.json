@@ -9,9 +9,10 @@
         "dataset": "login",
         "module": "system",
         "origin": "/var/log/wtmp.1",
+        "outcome": "success",
         "type": "event"
     },
-    "message": "Login by user vagrant (UID: 1000) on pts/1 (PID: 17559) from 10.0.2.2 (IP: 10.0.2.2).",
+    "message": "Login by user vagrant (UID: 1000) on pts/1 (PID: 17559) from 10.0.2.2 (IP: 10.0.2.2)",
     "process": {
         "pid": 17559
     },

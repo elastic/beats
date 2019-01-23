@@ -28,15 +28,10 @@ class Test(AuditbeatXPackTest):
         login metricset collects information about logins (successful and failed) and system restarts.
         """
 
-        fields = ["system.audit.login.tty"]
+        fields = ["event.origin"]
 
         # Metricset is experimental and that generates a warning, TODO: remove later
-        # TODO: Remove try/catch once new field is in fields.ecs.yml
-        try:
-            self.check_metricset("system", "login", COMMON_FIELDS + fields, warnings_allowed=True)
-        except Exception as e:
-            if "event.origin" not in str(e):
-                raise
+        self.check_metricset("system", "login", COMMON_FIELDS + fields, warnings_allowed=True)
 
     @unittest.skipIf(sys.platform == "win32", "Not implemented for Windows")
     @unittest.skipIf(sys.platform == "linux2" and platform.linux_distribution()[0] != "debian",

@@ -75,19 +75,6 @@ type LoginRecord struct {
 	Origin    string
 }
 
-func (login LoginRecord) toMapStr() common.MapStr {
-	mapstr := common.MapStr{}
-
-	// Very useful for development
-	//mapstr.Put("utmp", fmt.Sprintf("%v", login.Utmp))
-
-	if login.TTY != "" {
-		mapstr.Put("tty", login.TTY)
-	}
-
-	return mapstr
-}
-
 func init() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
@@ -184,8 +171,9 @@ func (ms *MetricSet) loginEvent(loginRecord *LoginRecord) mb.Event {
 				"origin": loginRecord.Origin,
 			},
 			"message": loginMessage(loginRecord),
+			// Very useful for development
+			// "debug": fmt.Sprintf("%v", login.Utmp),
 		},
-		MetricSetFields: loginRecord.toMapStr(),
 	}
 
 	if loginRecord.Username != "" {
@@ -194,6 +182,10 @@ func (ms *MetricSet) loginEvent(loginRecord *LoginRecord) mb.Event {
 		if loginRecord.UID != -1 {
 			event.RootFields.Put("user.id", loginRecord.UID)
 		}
+	}
+
+	if loginRecord.TTY != "" {
+		event.RootFields.Put("user.terminal", loginRecord.TTY)
 	}
 
 	if loginRecord.PID != -1 {
