@@ -71,10 +71,6 @@ type Data struct {
 	Package  string
 }
 
-func (d *Data) SetName(name string) {
-	d.Name = goTypeName(name)
-}
-
 func CreateAsset(license string, beat string, name string, pkg string, data []byte, priority string) ([]byte, error) {
 
 	// Depending on OS or tools configuration, files can contain carriages (\r),
@@ -83,8 +79,6 @@ func CreateAsset(license string, beat string, name string, pkg string, data []by
 	if err != nil {
 		return nil, errors.Wrap(err, "error encoding the data")
 	}
-
-	name = goTypeName(name)
 
 	var buf bytes.Buffer
 	Template.Execute(&buf, Data{
@@ -102,29 +96,4 @@ func CreateAsset(license string, beat string, name string, pkg string, data []by
 	}
 
 	return bs, nil
-
-}
-
-// goTypeName removes special characters ('_', '.', '@') and returns a
-// camel-cased name.
-func goTypeName(name string) string {
-	var b strings.Builder
-	for _, w := range strings.FieldsFunc(name, isSeparator) {
-		b.WriteString(strings.Title(w))
-	}
-	return b.String()
-}
-
-// isSeparate returns true if the character is a field name separator. This is
-// used to detect the separators in fields like ephemeral_id or instance.name.
-func isSeparator(c rune) bool {
-	switch c {
-	case '.', '_':
-		return true
-	case '@':
-		// This effectively filters @ from field names.
-		return true
-	default:
-		return false
-	}
 }

@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("filebeat", "Suricata", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("filebeat", "suricata", asset.ModuleFieldsPri, Asset); err != nil {
 		panic(err)
 	}
 }

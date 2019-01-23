@@ -24,7 +24,7 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("packetbeat", "Dhcpv4", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("packetbeat", "dhcpv4", asset.ModuleFieldsPri, Asset); err != nil {
 		panic(err)
 	}
 }
