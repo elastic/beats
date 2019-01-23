@@ -9,6 +9,8 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/common"
@@ -87,12 +89,12 @@ func keystoreRaw() ([]byte, error) {
 
 	store, err := instance.LoadKeystore(cfg, "functionbeat")
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "cannot load the keystore for packaging")
 	}
 
 	packager, ok := store.(keystore.Packager)
 	if !ok {
-		return nil, fmt.Errorf("keystore cannot be packaged")
+		return nil, fmt.Errorf("the configured keystore cannot be packaged")
 	}
 
 	return packager.Package()
