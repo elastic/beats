@@ -2,7 +2,7 @@
 == Export GeoIP Information
 
 You can use Packetbeat along with the
-{plugins}/ingest-geoip.html[ingest geoIP processor plugin] in Elasticsearch
+{ref}/ingest-geoip.html[ingest geoIP processor plugin] in Elasticsearch
 to export geographic location information about source IPs for incoming HTTP
 requests. Then you can use this info to visualize the location of your
 clients on a map in Kibana.
@@ -22,12 +22,9 @@ Logstash.
 [[packetbeat-configuring-geoip]]
 === Configuring the ingest geoIP processor plugin
 
-To configure Packetbeat and the ingest geoIP processor plugin:
+To configure Packetbeat and the ingest geoIP processor:
 
-1. {plugins}/ingest-geoip.html[Install the ingest geoIP processor plugin].
-After installing the plugin, remember to restart the node.
-
-2. Define an ingest node pipeline that uses a `geoip` processor to add location
+1. Define an ingest node pipeline that uses a `geoip` processor to add location
 info to the event. For example, you can use the Console in Kibana to create the
 following pipeline:
 +
@@ -59,10 +56,10 @@ in Packetbeat that contains the IP address of the client. You set
 when it encounters an event that doesn't have a `client_ip` field.
 +
 See
-{plugins}/using-ingest-geoip.html[Using the Geoip Processor in a Pipeline]
+{ref}/using-ingest-geoip.html[Using the Geoip Processor in a Pipeline]
 for more options.
 
-3. In the Packetbeat config file, configure the Elasticsearch output to use the
+2. In the Packetbeat config file, configure the Elasticsearch output to use the
 pipeline. Specify the pipeline ID in the `pipeline` option under
 `output.elasticsearch`. For example:
 +
@@ -73,7 +70,7 @@ output.elasticsearch:
   pipeline: geoip-info
 -------------------------------------------------------------------------------
 
-4. Run Packetbeat, passing in the configuration file that you updated earlier.
+3. Run Packetbeat, passing in the configuration file that you updated earlier.
 +
 [source,shell]
 -------------------------------------------------------------------------------

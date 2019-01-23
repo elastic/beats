@@ -44,11 +44,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename a few `nginx.error.*` fields to map to ECS. {pull}10007[10007]
 - Filesets with multiple ingest pipelines added in {pull}8914[8914] only work with Elasticsearch >= 6.5.0 {pull}10001[10001]
 - Remove service.name from Elastcsearch module. Replace by service.type. {pull}10042[10042]
+- Remove numeric coercions for `user.id` and `group.id`. IDs should be `keyword`. {pull}10233[10233]
 - Add grok pattern to support redis 5.0.3 log timestamp. {issue}9819[9819] {pull}10033[10033]
 - Now save the 'first seen' timestamp in `event.created` (previously `read_timestamp`),
   instead of saving the parsed date. Now aligned with `event.created` semantics elsewhere. {pull}10139[10139]
 - Rename `mysql.error.thread_id` and `mysql.slowlog.id` to `mysql.thread_id`. {pull}10161[10161]
 - Remove `mysql.error.timestamp`  and `mysql.slowlog.timestamp`. {pull}10161[10161]
+- Migrate multiple fields to `event.duration`, from modules "iis", "kibana" and "traefik",
+  including `http.response.elapsed_time` (ECS). {pull}10188[10188]
+- Rename multiple fields to `http.response.body.bytes`, from modules "apache", "iis",
+  "kibana", "nginx" and "traefik", including `http.response.content_length` (ECS). {pull}10188[10188]
 
 *Heartbeat*
 
@@ -159,6 +164,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for iis 7.5 log format. {issue}9753[9753] {pull}9967[9967]
 - Add service.type field to all Modules. By default the field is set with the module name. It can be overwritten with `service.type` config. {pull}10042[10042]
 - Add support for MariaDB in the `slowlog` fileset of `mysql` module. {pull}9731[9731]
+- Apache module's error fileset now performs GeoIP lookup, like the access fileset. {pull}10273[10273]
 - Elasticsearch module's slowlog now populates `event.duration` (ECS). {pull}9293[9293]
 - HAProxy module now populates `event.duration` and `http.response.bytes` (ECS). {pull}10143[10143]
 - Teach elasticsearch/audit fileset to parse out some more fields. {issue}10134[10134] {pull}10137[10137]
@@ -196,7 +202,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release Couchbase module as GA. {pull}10201[10201]
 - Release RabbitMQ module GA. {pull}10165[10165]
 - Release envoyproxy module GA. {pull}10223[10223]
-- Making RabbitMQ Metricbeat module GA. {pull}10165[10165]
 - Release mongodb.metrics and mongodb.replstatus as GA. {pull}10242[10242]
 - Release mysql.galera_status as GA. {pull}10242[10242]
 - Release postgresql.statement as GA. {pull}10242[10242]
@@ -204,6 +209,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release Dropwizard module as GA. {pull}10240[10240]
 - Release Graphite module as GA. {pull}10240[10240]
 - Release http.server metricset as GA. {pull}10240[10240]
+- Release Nats module as GA. {pull}10281[10281]
+- Release use of xpack.enabled: true flag in Elasticsearch and Kibana modules as GA. {pull}10222[10222]
+- Rename 'db' Metricset to 'transaction_log' in MSSQL Metricbeat module {pull}10109[10109]
 
 *Packetbeat*
 

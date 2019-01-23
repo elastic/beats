@@ -4,9 +4,9 @@
     "grok": {
       "field": "message",
       "patterns":[
-        "%{IPORHOST:source.address} - %{DATA:user.name} \\[%{HTTPDATE:apache.access.time}\\] \"%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}\" %{NUMBER:http.response.status_code:long} (?:%{NUMBER:apache.access.body_sent.bytes:long}|-)( \"%{DATA:http.request.referrer}\")?( \"%{DATA:apache.access.agent}\")?",
+        "%{IPORHOST:source.address} - %{DATA:user.name} \\[%{HTTPDATE:apache.access.time}\\] \"%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}\" %{NUMBER:http.response.status_code:long} (?:%{NUMBER:http.response.body.bytes:long}|-)( \"%{DATA:http.request.referrer}\")?( \"%{DATA:apache.access.agent}\")?",
         "%{IPORHOST:source.address} - %{DATA:user.name} \\[%{HTTPDATE:apache.access.time}\\] \"-\" %{NUMBER:http.response.status_code:long} -",
-        "\\[%{HTTPDATE:apache.access.time}\\] %{IPORHOST:source.address} %{DATA:apache.access.ssl.protocol} %{DATA:apache.access.ssl.cipher} \"%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}\" %{NUMBER:apache.access.body_sent.bytes}"
+        "\\[%{HTTPDATE:apache.access.time}\\] %{IPORHOST:source.address} %{DATA:apache.access.ssl.protocol} %{DATA:apache.access.ssl.cipher} \"%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}\" %{NUMBER:http.response.body.bytes:long}"
         ],
       "ignore_missing": true
     }

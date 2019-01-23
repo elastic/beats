@@ -226,6 +226,10 @@ metricbeat.modules:
   # Set to false to fetch all entries
   #index_recovery.active_only: true
 
+  # Set to true to send data collected by module to X-Pack
+  # Monitoring instead of metricbeat-* indices.
+  #xpack.enabled: false
+
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
   metricsets: ["server"]
@@ -377,6 +381,10 @@ metricbeat.modules:
   basepath: ""
   enabled: true
 
+  # Set to true to send data collected by module to X-Pack
+  # Monitoring instead of metricbeat-* indices.
+  #xpack.enabled: false
+
 #------------------------------ Kubernetes Module ------------------------------
 # Node metrics, from kubelet:
 - module: kubernetes
@@ -499,7 +507,7 @@ metricbeat.modules:
 #-------------------------------- Mssql Module --------------------------------
 - module: mssql
   metricsets:
-    - "db"
+    - "transaction_log"
     - "performance"
   hosts: ["sqlserver://sa@localhost"]
   period: 10s

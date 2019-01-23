@@ -248,6 +248,10 @@
   to: user_agent.original
   alias: true
 
+- from: apache2.access.body_sent.bytes
+  to: http.response.body.bytes
+  alias: true
+
 # These expand all fields under geoip and user_agent
 - from: apache2.access.geoip.*
   to: source.geo.*
@@ -390,6 +394,19 @@
   to: http.version
   alias: true
 
+- from: iis.access.body_received.bytes
+  to: http.request.body.bytes
+  alias: true
+
+- from: iis.access.body_sent.bytes
+  to: http.response.body.bytes
+  alias: true
+
+- from: iis.access.request_time_ms
+  to: event.duration
+  alias: false
+  scale: 1000000
+
 - from: iis.error.method
   to: http.request.method
   alias: true
@@ -491,6 +508,23 @@
   alias: true
 
 ## Kibana module
+
+- from: http.response.content_length
+  to: http.response.body.bytes
+  alias: true
+  alias6: true
+  beat: filebeat
+  comment: >
+    Very general name that was only used by the Kibana module.
+
+- from: http.response.elapsed_time
+  to: event.duration
+  alias: false
+  alias6: false
+  scale: 1000000
+  beat: filebeat
+  comment: >
+    Very general name that was only used by the Kibana module.
 
 - from: kibana.log.meta.req.headers.referer
   to: http.request.referrer
@@ -606,6 +640,10 @@
 
 - from: nginx.access.http_version
   to: http.version
+  alias: true
+
+- from: nginx.access.body_sent.bytes
+  to: http.response.body.bytes
   alias: true
 
 - from: nginx.access.geoip.continent_name
@@ -780,6 +818,15 @@
 - from: traefik.access.http_version
   to: http.version
   alias: true
+
+- from: traefik.access.body_sent.bytes
+  to: http.response.body.bytes
+  alias: true
+
+- from: traefik.access.duration
+  to: event.duration
+  alias: false
+  scale: 1000000
 
 # Filebeat Redis Input
 
