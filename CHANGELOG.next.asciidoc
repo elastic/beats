@@ -177,7 +177,6 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Release aerospike module as GA. {pull}10203[10203]
 - Release RabbitMQ module GA. {pull}10165[10165]
 - Release envoyproxy module GA. {pull}10223[10223]
-- Making RabbitMQ Metricbeat module GA. {pull}10165[10165]
 
 *Packetbeat*
 
