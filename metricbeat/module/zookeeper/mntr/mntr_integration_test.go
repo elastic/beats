@@ -31,7 +31,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	//compose.EnsureUp(t, "zookeeper")
+	compose.EnsureUp(t, "zookeeper")
 
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2(f)
