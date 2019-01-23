@@ -711,6 +711,7 @@
 - from: kibana.log.meta.method
   to: http.request.method
   alias: true
+  beat: filebeat
 
 ## Logstash module
 
@@ -954,6 +955,7 @@
 - from: icinga.startup.severity
   to: log.level
   alias: true
+  beat: filebeat
 
 ## Traefik module
 
@@ -1040,6 +1042,7 @@
 - from: traefik.access.geoip.location
   to: source.geo.location
   alias: true
+  beat: filebeat
 
 - from: traefik.access.geoip.region_name
   to: source.geo.region_name
@@ -1069,6 +1072,7 @@
 - from: traefik.access.referrer
   to: http.request.referrer
   alias: true
+  beat: filebeat
 
 - from: traefik.access.http_version
   to: http.version
@@ -1080,7 +1084,6 @@
 - from: read_timestamp
   to: event.created
   alias: false
-  beat: filebeat
   beat: filebeat
 
 # Auditbeat
@@ -1183,6 +1186,7 @@
 - from: start_time
   to: event.start
   alias: true
+  beat: packetbeat
 
 - from: last_time
   to: event.end
