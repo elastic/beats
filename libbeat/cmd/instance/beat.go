@@ -48,6 +48,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/common/seccomp"
 	"github.com/elastic/beats/libbeat/dashboards"
+	"github.com/elastic/beats/libbeat/ilm"
 	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/logp/configure"
@@ -74,7 +75,9 @@ type Beat struct {
 
 	Config    beatConfig
 	RawConfig *common.Config // Raw config that can be unpacked to get Beat specific config data.
-	keystore  keystore.Keystore
+
+	keystore keystore.Keystore
+	ilm      ilm.ILMManager
 }
 
 type beatConfig struct {
@@ -107,8 +110,8 @@ type beatConfig struct {
 	Kibana     *common.Config `config:"setup.kibana"`
 	Migration  *common.Config `config:"migration"`
 
-	// ILM Config options
-	ILM *common.Config `config:"output.elasticsearch.ilm"`
+	// // ILM Config options
+	// ILM *common.Config `config:"output.elasticsearch.ilm"`
 }
 
 var debugf = logp.MakeDebug("beat")
@@ -446,9 +449,7 @@ func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
 				return fmt.Errorf("Template loading requested but the Elasticsearch output is not configured/enabled")
 			}
 
-			if b.Config.ILM.Enabled() {
-				cfgwarn.Beta("Index lifecycle management is enabled which is in beta.")
-
+			if b.ilm.Enabled() {
 				ilmCfg, err := getILMConfig(b)
 				if err != nil {
 					return err
@@ -614,6 +615,15 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	b.Beat.BeatConfig, err = b.BeatConfig()
+	if err != nil {
+		return err
+	}
+
+	ilmFactory := settings.ILM
+	if ilmFactory == nil {
+		ilmFactory = ilm.DefaultManager
+	}
+	b.ilm, err = ilmFactory(b.Beat.Info, b.RawConfig)
 	if err != nil {
 		return err
 	}
@@ -818,6 +828,7 @@ func (b *Beat) registerTemplateLoading() error {
 	return nil
 }
 
+/*
 func (b *Beat) prepareILMTemplate(ilmCfg *ilmConfig) error {
 	// In case no template settings are set, config must be created
 	if b.Config.Template == nil {
@@ -850,6 +861,7 @@ func (b *Beat) prepareILMTemplate(ilmCfg *ilmConfig) error {
 
 	return nil
 }
+*/
 
 // Build and return a callback to load index template into ES
 func (b *Beat) templateLoadingCallback() (func(esClient *elasticsearch.Client) error, error) {
