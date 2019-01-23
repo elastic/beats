@@ -369,9 +369,12 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
-	if monitoringCfg, err := selectMonitoringConfig(b.Config); err != nil {
+	monitoringCfg, err := selectMonitoringConfig(b.Config)
+	if err != nil {
 		return err
-	} else if monitoringCfg.Enabled() {
+	}
+
+	if monitoringCfg.Enabled() {
 		settings := report.Settings{
 			DefaultUsername: settings.Monitoring.DefaultUsername,
 		}
