@@ -18,7 +18,6 @@
 package elasticsearch
 
 import (
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -63,10 +62,6 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
-	}
-
-	if config.XPack {
-		cfgwarn.Experimental("The experimental xpack.enabled flag in " + base.FullyQualifiedName() + " metricset is enabled.")
 	}
 
 	ms := &MetricSet{

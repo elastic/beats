@@ -52,7 +52,7 @@ func TestNewGenerator(t *testing.T) {
 	assert.Equal(t, "beat-index", generator.indexName)
 
 	// creates file dir and sets name
-	expectedDir := filepath.Join(tmpDir, "6/index-pattern")
+	expectedDir := filepath.Join(tmpDir, "7/index-pattern")
 	assert.Equal(t, expectedDir, generator.targetDir)
 	_, err = os.Stat(generator.targetDir)
 	if err != nil {
@@ -139,7 +139,7 @@ func TestGenerate(t *testing.T) {
 	tests := []map[string]string{
 		{
 			"existing": "testdata/beat-6.json",
-			"created":  filepath.Join(tmpDir, "6/index-pattern/beat.json"),
+			"created":  filepath.Join(tmpDir, "7/index-pattern/beat.json"),
 		},
 	}
 	testGenerate(t, tests, true)
@@ -166,7 +166,7 @@ func TestGenerateExtensive(t *testing.T) {
 	tests := []map[string]string{
 		{
 			"existing": "testdata/extensive/metricbeat-6.json",
-			"created":  filepath.Join(tmpDir, "6/index-pattern/metricbeat.json"),
+			"created":  filepath.Join(tmpDir, "7/index-pattern/metricbeat.json"),
 		},
 	}
 	testGenerate(t, tests, false)

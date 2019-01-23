@@ -69,7 +69,7 @@ func KibanaDashboards(moduleDirs ...string) error {
 	// Convert 6.x dashboards to strings.
 	err = sh.Run("python",
 		filepath.Join(esBeatsDir, "libbeat/scripts/unpack_dashboards.py"),
-		"--glob="+filepath.Join(kibanaBuildDir, "6/dashboard/*.json"))
+		"--glob="+filepath.Join(kibanaBuildDir, "7/dashboard/*.json"))
 	if err != nil {
 		return err
 	}

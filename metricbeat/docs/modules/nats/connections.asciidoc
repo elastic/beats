@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-nats-connections]]
 === Nats connections metricset
 
-experimental[]
-
 include::../../../module/nats/connections/_meta/docs.asciidoc[]
 
 
