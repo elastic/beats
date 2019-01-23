@@ -2,7 +2,7 @@
 == Export GeoIP Information
 
 You can use Packetbeat along with the
-{ref}/geoip-processor.html.html[ingest geoIP processor plugin] in Elasticsearch
+{ref}/geoip-processor.html[ingest geoIP processor plugin] in Elasticsearch
 to export geographic location information about source IPs for incoming HTTP
 requests. Then you can use this info to visualize the location of your
 clients on a map in Kibana.
