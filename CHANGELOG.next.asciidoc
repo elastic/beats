@@ -197,7 +197,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release Couchbase module as GA. {pull}10201[10201]
 - Release RabbitMQ module GA. {pull}10165[10165]
 - Release envoyproxy module GA. {pull}10223[10223]
-- Making RabbitMQ Metricbeat module GA. {pull}10165[10165]
 - Release mongodb.metrics and mongodb.replstatus as GA. {pull}10242[10242]
 - Release mysql.galera_status as GA. {pull}10242[10242]
 - Release postgresql.statement as GA. {pull}10242[10242]
@@ -205,7 +204,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release Dropwizard module as GA. {pull}10240[10240]
 - Release Graphite module as GA. {pull}10240[10240]
 - Release http.server metricset as GA. {pull}10240[10240]
-- Making RabbitMQ Metricbeat module GA. {pull}10165[10165]
+- Release Nats module as GA. {pull}10281[10281]
 - Release use of xpack.enabled: true flag in Elasticsearch and Kibana modules as GA. {pull}10222[10222]
 
 *Packetbeat*
