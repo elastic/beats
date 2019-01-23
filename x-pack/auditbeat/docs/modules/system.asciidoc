@@ -87,6 +87,7 @@ so a longer polling interval can be used.
 - module: system
   datasets:
     - host
+    - login
     - package
     - user
   period: 1m
@@ -129,8 +130,9 @@ auditbeat.modules:
   # detect any changes.
   user.detect_password_changes: true
 
-  # File pattern of the login record files.
-  login.utmp_file_pattern: /var/log/wtmp*
+  # File patterns of the login record files.
+  login.wtmp_file_pattern: /var/log/wtmp*
+  login.btmp_file_pattern: /var/log/btmp*
 ----
 
 [float]
@@ -161,4 +163,3 @@ include::system/process.asciidoc[]
 include::system/socket.asciidoc[]
 
 include::system/user.asciidoc[]
-

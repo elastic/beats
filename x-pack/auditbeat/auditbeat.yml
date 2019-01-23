@@ -66,8 +66,9 @@ auditbeat.modules:
   # detect any changes.
   user.detect_password_changes: true
 
-  # File pattern of the login record files.
-  login.utmp_file_pattern: /var/log/wtmp*
+  # File patterns of the login record files.
+  login.wtmp_file_pattern: /var/log/wtmp*
+  login.btmp_file_pattern: /var/log/btmp*
 
 #==================== Elasticsearch template setting ==========================
 setup.template.settings:

@@ -43,6 +43,11 @@
   {{- end }}
 
   {{ if eq .GOOS "linux" -}}
-  # File pattern of the login record files.
-  login.utmp_file_pattern: /var/log/wtmp*
+  # File patterns of the login record files.
+{{- if .Reference }}
+  # wtmp: History of successful logins, logouts, and system shutdowns and boots.
+  # btmp: Failed login attempts.
+{{- end }}
+  login.wtmp_file_pattern: /var/log/wtmp*
+  login.btmp_file_pattern: /var/log/btmp*
   {{- end }}
