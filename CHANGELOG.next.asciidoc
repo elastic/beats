@@ -186,6 +186,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Release Dropwizard module as GA. {pull}10240[10240]
 - Release Graphite module as GA. {pull}10240[10240]
 - Release http.server metricset as GA. {pull}10240[10240]
+- Add support for MySQL 8.0 and tests also for Percona and MariaDB. {pull}10261[10261]
 
 *Packetbeat*
 

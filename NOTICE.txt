@@ -806,7 +806,8 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 
 --------------------------------------------------------------------
 Dependency: github.com/go-sql-driver/mysql
-Revision: 9dee4ca50b83acdf57a35fb9e6fb4be640afa2f3
+Version: v1.4.1
+Revision: 72cd26f257d44c1114970e19afddcd812016007e
 License type (autodetected): MPL-2.0
 ./metricbeat/module/mysql/vendor/github.com/go-sql-driver/mysql/LICENSE:
 --------------------------------------------------------------------
@@ -3053,6 +3054,15 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: google.golang.org/appengine
+Revision: e9657d882bb81064595ca3b56cbe2546bbabf7b1
+License type (autodetected): Apache-2.0
+./metricbeat/module/mysql/vendor/google.golang.org/appengine/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
 
 --------------------------------------------------------------------
 Dependency: gopkg.in/inf.v0
