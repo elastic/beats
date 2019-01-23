@@ -31,8 +31,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-docker-info,info>>   
 |<<metricbeat-metricset-docker-memory,memory>>   
 |<<metricbeat-metricset-docker-network,network>>   
-|<<metricbeat-module-dropwizard,Dropwizard>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-dropwizard-collector,collector>> beta[]  
+|<<metricbeat-module-dropwizard,Dropwizard>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-dropwizard-collector,collector>>   
 |<<metricbeat-module-elasticsearch,Elasticsearch>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .10+| .10+|  |<<metricbeat-metricset-elasticsearch-ccr,ccr>> beta[]  
 |<<metricbeat-metricset-elasticsearch-cluster_stats,cluster_stats>> beta[]  
@@ -54,13 +54,13 @@ This file is generated! See scripts/docs_collector.py
 .2+| .2+|  |<<metricbeat-metricset-golang-expvar,expvar>> beta[]  
 |<<metricbeat-metricset-golang-heap,heap>> beta[]  
 |<<metricbeat-module-graphite,Graphite>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-graphite-server,server>> beta[]  
+.1+| .1+|  |<<metricbeat-metricset-graphite-server,server>>   
 |<<metricbeat-module-haproxy,HAProxy>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-haproxy-info,info>>   
 |<<metricbeat-metricset-haproxy-stat,stat>>   
 |<<metricbeat-module-http,HTTP>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-http-json,json>>   
-|<<metricbeat-metricset-http-server,server>> beta[]  
+|<<metricbeat-metricset-http-server,server>>   
 |<<metricbeat-module-jolokia,Jolokia>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-jolokia-jmx,jmx>>   
 |<<metricbeat-module-kafka,Kafka>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  

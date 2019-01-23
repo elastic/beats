@@ -177,7 +177,10 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Release etcd module as GA. {pull}10200[10200]
 - Release Couchbase module as GA. {pull}10201[10201]
 - Release aerospike module as GA. {pull}10203[10203]
-- Making RabbitMQ Metricbeat module GA. {pull}10165[10165]
+- Release RabbitMQ Metricbeat module GA. {pull}10165[10165]
+- Release Dropwizard module as GA. {pull}10240[10240]
+- Release Graphite module as GA. {pull}10240[10240]
+- Release http.server metricset as GA. {pull}10240[10240]
 
 *Packetbeat*
 
