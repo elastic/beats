@@ -111,21 +111,21 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	regionsList, err := getRegions(svcEC2)
 	if err != nil {
 		err = errors.Wrap(err, "getRegions failed")
-		ec2Logger.Errorf(err.Error())
+		ec2Logger.Error(err.Error())
 	}
 
 	//Calculate duration based on period
 	durationString, periodSec, err := convertPeriodToDuration(moduleConfig.Period)
 	if err != nil {
-		ec2Logger.Errorf(err.Error())
+		ec2Logger.Error(err.Error())
 	}
 
 	// Check if period is set to be multiple of 60s or 300s
-	remainder := periodSec % 60
+	remainder := periodSec % 300
 	if remainder != 0 {
-		err := errors.New("period is not set to be multiple of 60s or 300s. This will cause data missing " +
-			"and potentially extra costs. Please change the period setting in config.yml")
-		ec2Logger.Warn(err)
+		err := errors.New("period is not set to be multiple of 300s. This might cause data missing " +
+			"and extra costs. Please change the period setting in config.yml")
+		ec2Logger.Info(err)
 	}
 
 	return &MetricSet{
@@ -163,16 +163,21 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 				output, err := getMetricDataPerRegion(m.durationString, m.periodInSec, instanceID, getMetricDataOutput.NextToken, svcCloudwatch)
 				if err != nil {
 					err = errors.Wrap(err, "getMetricDataPerRegion failed, skipping region "+regionName+" for instance "+instanceID)
-					m.logger.Errorf(err.Error())
+					m.logger.Error(err.Error())
 					report.Error(err)
 					continue
 				}
 				getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
 			}
 
-			event, err := createCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], regionName)
+			event, info, err := createCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], regionName)
+			if info != "" {
+				m.logger.Info(info)
+			}
+
 			if err != nil {
-				m.logger.Errorf(err.Error())
+				m.logger.Error(err.Error())
+				event.Error = err
 				report.Event(event)
 				continue
 			}
@@ -186,7 +191,7 @@ func getRegions(svc ec2iface.EC2API) (regionsList []string, err error) {
 	req := svc.DescribeRegionsRequest(input)
 	output, err := req.Send()
 	if err != nil {
-		logp.Error(errors.Wrap(err, "Failed DescribeRegions"))
+		err = errors.Wrap(err, "Failed DescribeRegions")
 		return
 	}
 	for _, region := range output.Regions {
@@ -195,28 +200,28 @@ func getRegions(svc ec2iface.EC2API) (regionsList []string, err error) {
 	return
 }
 
-func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput, instanceID string, instanceOutput ec2.Instance, regionName string) (event mb.Event, err error) {
-	machineType, err := instanceOutput.InstanceType.MarshalValue()
-	if err != nil {
-		err = errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
-		logp.Error(err)
-	}
-
+func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput, instanceID string, instanceOutput ec2.Instance, regionName string) (event mb.Event, info string, err error) {
 	event.Service = metricsetName
 	event.RootFields = common.MapStr{}
 	mapOfRootFieldsResults := make(map[string]interface{})
 	mapOfRootFieldsResults["service.name"] = metricsetName
 	mapOfRootFieldsResults["cloud.provider"] = metricsetName
 	mapOfRootFieldsResults["cloud.instance.id"] = instanceID
-	mapOfRootFieldsResults["cloud.machine.type"] = machineType
+
+	machineType, err := instanceOutput.InstanceType.MarshalValue()
+	if err != nil {
+		err = errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
+	} else {
+		mapOfRootFieldsResults["cloud.machine.type"] = machineType
+	}
+
 	mapOfRootFieldsResults["cloud.availability_zone"] = *instanceOutput.Placement.AvailabilityZone
 	mapOfRootFieldsResults["cloud.image.id"] = *instanceOutput.ImageId
 	mapOfRootFieldsResults["cloud.region"] = regionName
 
 	resultRootFields, err := eventMapping(mapOfRootFieldsResults, schemaRootFields)
 	if err != nil {
-		err = errors.Wrap(err, "Error trying to apply schema in AWS EC2 metricbeat module.")
-		logp.Error(err)
+		err = errors.Wrap(err, "Error trying to apply schema schemaRootFields in AWS EC2 metricbeat module.")
 		return
 	}
 	event.RootFields = resultRootFields
@@ -231,17 +236,15 @@ func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 	}
 
 	if len(mapOfMetricSetFieldResults) <= 3 {
-		errMsg := "Missing Cloudwatch data for instance " + instanceID + ". If this is a new instance, this behavior is expected. " +
+		info = "Missing Cloudwatch data for instance " + instanceID + ". It is expected if this is a new instance. " +
 			"If not, please recheck the period setting in config."
-		err = errors.New(errMsg)
-		event.Error = err
 		return
 	}
 
 	resultMetricSetFields, err := eventMapping(mapOfMetricSetFieldResults, schemaMetricSetFields)
 	if err != nil {
-		err = errors.Wrap(err, "Error trying to apply schema in AWS EC2 metricbeat module.")
-		logp.Error(err)
+		err = errors.Wrap(err, "Error trying to apply schema schemaMetricSetFields in AWS EC2 metricbeat module.")
+		return
 	}
 	event.MetricSetFields = resultMetricSetFields
 	return
@@ -265,7 +268,7 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instances
 		req := svc.DescribeInstancesRequest(describeInstanceInput)
 		output, err := req.Send()
 		if err != nil {
-			logp.Error(errors.Wrap(err, "Error DescribeInstances"))
+			err = errors.Wrap(err, "Error DescribeInstances")
 			return nil, nil, err
 		}
 

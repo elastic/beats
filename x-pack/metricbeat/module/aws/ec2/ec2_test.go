@@ -248,8 +248,9 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 	assert.Equal(t, "CPUUtilization", *getMetricDataOutput.MetricDataResults[0].Label)
 	assert.Equal(t, 0.25, getMetricDataOutput.MetricDataResults[0].Values[0])
 
-	event, err := createCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], mockModuleConfig.DefaultRegion)
+	event, info, err := createCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], mockModuleConfig.DefaultRegion)
 	assert.NoError(t, err)
+	assert.Equal(t, "", info)
 	assert.Equal(t, expectedEvent.RootFields, event.RootFields)
 	assert.Equal(t, expectedEvent.MetricSetFields["cpu"], event.MetricSetFields["cpu"])
 }
