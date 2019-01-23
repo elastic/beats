@@ -1,6 +1,8 @@
 package timeseries
 
 import (
+	"strings"
+
 	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/libbeat/asset"
@@ -11,6 +13,7 @@ import (
 
 type timeseriesProcessor struct {
 	dimensions map[string]interface{}
+	prefixes   map[string]interface{}
 }
 
 // NewTimeSeriesProcessor returns a processor to add timeseries info to events
@@ -29,9 +32,10 @@ func NewTimeSeriesProcessor(beatName string) (processors.Processor, error) {
 	}
 
 	dimensions := map[string]interface{}{}
-	populateDimensions("", dimensions, fields)
+	prefixes := map[string]interface{}{}
+	populateDimensions("", dimensions, prefixes, fields)
 
-	return &timeseriesProcessor{dimensions: dimensions}, nil
+	return &timeseriesProcessor{dimensions: dimensions, prefixes: prefixes}, nil
 }
 
 func (t *timeseriesProcessor) Run(event *beat.Event) (*beat.Event, error) {
@@ -59,13 +63,22 @@ func (t *timeseriesProcessor) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (t *timeseriesProcessor) isDimension(field string) bool {
-	// TODO what about objects (ie prometheus.labels)? check by prefix
-	_, ok := t.dimensions[field]
-	return ok
+	if _, ok := t.dimensions[field]; ok {
+		return true
+	}
+
+	// field matches any of the prefixes
+	for prefix := range t.prefixes {
+		if strings.HasPrefix(field, prefix) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // put all dimension fields in the given map for quick access
-func populateDimensions(prefix string, dimensions map[string]interface{}, fields common.Fields) {
+func populateDimensions(prefix string, dimensions map[string]interface{}, prefixes map[string]interface{}, fields common.Fields) {
 	for _, f := range fields {
 		name := f.Name
 		if prefix != "" {
@@ -73,20 +86,29 @@ func populateDimensions(prefix string, dimensions map[string]interface{}, fields
 		}
 
 		if len(f.Fields) > 0 {
-			populateDimensions(name, dimensions, f.Fields)
+			populateDimensions(name, dimensions, prefixes, f.Fields)
 			continue
 		}
 
-		if f.Dimension == nil {
-			// keywords are dimensions by default (disabled with dimension: false in fields.yml)
-			if f.Type == "keyword" {
+		if isDimension(f) {
+			if f.Type == "object" {
+				// everything with this prefix is a dimension
+				prefixes[prefix] = nil
+			} else {
 				dimensions[name] = nil
 			}
-		} else if *f.Dimension {
-			// user defined dimension (dimension: true in fields.yml)
-			dimensions[name] = nil
 		}
 	}
+}
+
+func isDimension(f common.Field) bool {
+	// keywords are dimensions by default (disabled with dimension: false in fields.yml)
+	if f.Dimension == nil {
+		return f.Type == "keyword" || (f.Type == "object" && f.ObjectType == "keyword")
+	}
+
+	// user defined dimension (dimension: true in fields.yml)
+	return *f.Dimension
 }
 
 func (t *timeseriesProcessor) String() string {
