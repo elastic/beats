@@ -20,8 +20,6 @@
       type: date
       description: >
         Timestamp of last occurrence of event
-
-  # Should this also be copied into message?
   - name: message
     type: keyword
     description: >
