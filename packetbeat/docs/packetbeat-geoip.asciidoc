@@ -2,7 +2,7 @@
 == Export GeoIP Information
 
 You can use Packetbeat along with the
-{ref}/ingest-geoip.html[ingest geoIP processor plugin] in Elasticsearch
+{ref}/geoip-processor.html.html[ingest geoIP processor plugin] in Elasticsearch
 to export geographic location information about source IPs for incoming HTTP
 requests. Then you can use this info to visualize the location of your
 clients on a map in Kibana.
@@ -56,7 +56,7 @@ in Packetbeat that contains the IP address of the client. You set
 when it encounters an event that doesn't have a `client_ip` field.
 +
 See
-{ref}/using-ingest-geoip.html[Using the Geoip Processor in a Pipeline]
+{ref}/geoip-processor.html[Using the Geoip Processor in a Pipeline]
 for more options.
 
 2. In the Packetbeat config file, configure the Elasticsearch output to use the
