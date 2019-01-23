@@ -91,7 +91,7 @@
       migration: true
     - name: gid
       type: alias
-      path: user.group_.id
+      path: user.group.id
       migration: true
     - name: uid
       type: alias

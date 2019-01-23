@@ -4,11 +4,6 @@
     Module for parsing auditd logs.
   short_config: true
   fields:
-    - name: user.group_.id
-      type: keyword
-      description: >
-        User's group ID.
-
     - name: auditd
       type: group
       description: >

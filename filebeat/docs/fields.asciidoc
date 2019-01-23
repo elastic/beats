@@ -407,16 +407,6 @@ Module for parsing auditd logs.
 
 
 
-*`user.group_.id`*::
-+
---
-type: keyword
-
-User's group ID.
-
-
---
-
 [float]
 == auditd fields
 
@@ -611,7 +601,7 @@ alias to: host.os.architecture
 --
 type: alias
 
-alias to: user.group_.id
+alias to: user.group.id
 
 --
 
