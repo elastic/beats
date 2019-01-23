@@ -7,6 +7,7 @@
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
+        "http.response.body.bytes": 571,
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
@@ -16,7 +17,6 @@
             "10.0.0.1",
             "127.0.0.1"
         ],
-        "nginx.access.body_sent.bytes": 571,
         "service.type": "nginx",
         "source.ip": "10.0.0.2",
         "url.original": "/ocelot",
@@ -39,6 +39,7 @@
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
+        "http.response.body.bytes": 612,
         "http.response.status_code": 404,
         "http.version": "1.1",
         "input.type": "log",
@@ -46,7 +47,6 @@
         "network.forwarded_ip": [
             "172.17.0.1"
         ],
-        "nginx.access.body_sent.bytes": 612,
         "service.type": "nginx",
         "source.ip": "172.17.0.1",
         "url.original": "/stringpatch",
@@ -68,6 +68,7 @@
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
+        "http.response.body.bytes": 571,
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
@@ -77,7 +78,6 @@
             "10.0.0.1",
             "85.181.35.98"
         ],
-        "nginx.access.body_sent.bytes": 571,
         "service.type": "nginx",
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
@@ -107,6 +107,7 @@
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
+        "http.response.body.bytes": 571,
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
@@ -114,7 +115,6 @@
         "network.forwarded_ip": [
             "85.181.35.98"
         ],
-        "nginx.access.body_sent.bytes": 571,
         "service.type": "nginx",
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
@@ -145,6 +145,7 @@
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
+        "http.response.body.bytes": 25507,
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
@@ -155,7 +156,6 @@
             "204.246.1.1",
             "10.2.1.185"
         ],
-        "nginx.access.body_sent.bytes": 25507,
         "service.type": "nginx",
         "source.geo.city_name": "Springfield",
         "source.geo.continent_name": "North America",
@@ -181,6 +181,7 @@
         "fileset.name": "access",
         "http.request.method": "GET",
         "http.request.referrer": "-",
+        "http.response.body.bytes": 8571,
         "http.response.status_code": 404,
         "http.version": "1.1",
         "input.type": "log",
@@ -190,7 +191,6 @@
             "10.225.192.17",
             "10.2.2.121"
         ],
-        "nginx.access.body_sent.bytes": 8571,
         "service.type": "nginx",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "PT",
@@ -214,13 +214,13 @@
         "event.module": "nginx",
         "fileset.name": "access",
         "http.request.referrer": "-",
+        "http.response.body.bytes": 0,
         "http.response.status_code": 400,
         "input.type": "log",
         "log.offset": 1124,
         "network.forwarded_ip": [
             "127.0.0.1"
         ],
-        "nginx.access.body_sent.bytes": 0,
         "service.type": "nginx",
         "source.ip": "127.0.0.1",
         "user.name": "-",

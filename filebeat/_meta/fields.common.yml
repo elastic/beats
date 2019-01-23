@@ -69,15 +69,10 @@
       description: >
         This field contains the flags of the event.
 
-    - name: http.response.elapsed_time
-      type: long
-      description: >
-        Elapsed time between request and response in milli seconds.
-
     - name: http.response.content_length
-      type: long
-      description: >
-        Content length of the HTTP response body.
+      type: alias
+      path: http.response.body.bytes
+      migration: true
 
     - name: user_agent
       type: group

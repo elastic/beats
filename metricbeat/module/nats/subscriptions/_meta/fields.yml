@@ -2,6 +2,7 @@
   type: group
   description: >
     Contains nats subscriptions related metrics
+  release: ga
   fields:
     - name: total
       type: integer

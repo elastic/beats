@@ -90,7 +90,7 @@ alias to: apache.access.ssl.cipher
 --
 type: alias
 
-alias to: apache.access.body_sent.bytes
+alias to: http.response.body.bytes
 
 --
 
@@ -379,18 +379,6 @@ SSL protocol version.
 type: keyword
 
 SSL cipher name.
-
-
---
-
-*`apache.access.body_sent.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
 
 
 --
@@ -5138,16 +5126,6 @@ The Windows status code.
 
 --
 
-*`iis.access.request_time_ms`*::
-+
---
-type: long
-
-The request time in milliseconds.
-
-
---
-
 *`iis.access.site_name`*::
 +
 --
@@ -5178,27 +5156,21 @@ The content of the cookie sent or received, if any.
 
 --
 
-*`iis.access.body_sent.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
-
-
---
-
 *`iis.access.body_received.bytes`*::
 +
 --
-type: long
+type: alias
 
-format: bytes
+alias to: http.request.body.bytes
 
-The number of bytes of the server request body.
+--
 
+*`iis.access.body_sent.bytes`*::
++
+--
+type: alias
+
+alias to: http.response.body.bytes
 
 --
 
@@ -6027,23 +5999,12 @@ This field contains the flags of the event.
 
 --
 
-*`http.response.elapsed_time`*::
-+
---
-type: long
-
-Elapsed time between request and response in milli seconds.
-
-
---
-
 *`http.response.content_length`*::
 +
 --
-type: long
+type: alias
 
-Content length of the HTTP response body.
-
+alias to: http.response.body.bytes
 
 --
 
@@ -9988,12 +9949,9 @@ Contains fields for the Nginx access logs.
 *`nginx.access.body_sent.bytes`*::
 +
 --
-type: long
+type: alias
 
-format: bytes
-
-The number of bytes of the server response body.
-
+alias to: http.response.body.bytes
 
 --
 
@@ -12595,34 +12553,12 @@ Contains fields for the Traefik access logs.
 
 
 
-*`traefik.access.duration`*::
-+
---
-type: long
-
-Duration of the access entry.
-
-
---
-
 *`traefik.access.user_identifier`*::
 +
 --
 type: keyword
 
 Is the RFC 1413 identity of the client
-
-
---
-
-*`traefik.access.body_sent.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
 
 
 --
@@ -12653,6 +12589,15 @@ The name of the frontend used
 type: text
 
 The url of the backend where request is forwarded
+
+--
+
+*`traefik.access.body_sent.bytes`*::
++
+--
+type: alias
+
+alias to: http.response.body.bytes
 
 --
 

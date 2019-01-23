@@ -27,6 +27,23 @@
         "field": "apache.error.timestamp",
         "ignore_failure": true
       }
+    },
+
+    {
+        "grok": {
+            "field": "source.address",
+            "ignore_missing": true,
+            "patterns": [
+                "^(%{IP:source.ip}|%{HOSTNAME:source.domain})$"
+            ]
+        }
+    },
+    {
+        "geoip": {
+            "field": "source.ip",
+            "target_field": "source.geo",
+            "ignore_missing": true
+        }
     }
   ],
   "on_failure" : [{
