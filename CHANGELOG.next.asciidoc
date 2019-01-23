@@ -205,7 +205,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release Dropwizard module as GA. {pull}10240[10240]
 - Release Graphite module as GA. {pull}10240[10240]
 - Release http.server metricset as GA. {pull}10240[10240]
-- Release Nats module as GA. {pull}[]
+- Release Nats module as GA. {pull}10281[10281]
 
 *Packetbeat*
 
