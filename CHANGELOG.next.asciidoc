@@ -37,6 +37,7 @@ https://github.com/elastic/beats/compare/1035569addc4a3b29ffa14f8a08c27c1ace16ef
 - Fix registry handle leak on Windows (https://github.com/elastic/go-sysinfo/pull/33). {pull}9920[9920]
 - Gracefully handle TLS options when enrolling a Beat. {issue}9129[9129]
 - Allow to unenroll a Beat from the UI. {issue}9452[9452]
+- Fix config appender registration. {pull}9873[9873]
 
 *Auditbeat*
 
