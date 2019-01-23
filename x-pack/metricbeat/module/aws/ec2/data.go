@@ -90,6 +90,37 @@ var (
 				"type": c.Str("cloud.machine.type", s.Optional),
 			},
 		},
+		"system": s.Object{
+			"cpu": s.Object{
+				"user": s.Object{
+					"pct": c.Float("cpu.total.pct", s.Optional),
+				},
+				"credit_usage":            c.Float("cpu.credit_usage", s.Optional),
+				"credit_balance":          c.Float("cpu.credit_balance", s.Optional),
+				"surplus_credit_balance":  c.Float("cpu.surplus_credit_balance", s.Optional),
+				"surplus_credits_charged": c.Float("cpu.surplus_credits_charged", s.Optional),
+			},
+			"diskio": s.Object{
+				"read": s.Object{
+					"bytes": c.Float("diskio.read.bytes", s.Optional),
+					"count": c.Float("diskio.read.count", s.Optional),
+				},
+				"write": s.Object{
+					"bytes": c.Float("diskio.write.bytes", s.Optional),
+					"count": c.Float("diskio.write.count", s.Optional),
+				},
+			},
+			"network": s.Object{
+				"in": s.Object{
+					"bytes":   c.Float("network.in.bytes", s.Optional),
+					"packets": c.Float("network.in.packets", s.Optional),
+				},
+				"out": s.Object{
+					"bytes":   c.Float("network.out.bytes", s.Optional),
+					"packets": c.Float("network.out.packets", s.Optional),
+				},
+			},
+		},
 	}
 )
 

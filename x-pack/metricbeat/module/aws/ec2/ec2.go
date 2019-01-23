@@ -6,9 +6,11 @@ package ec2
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/defaults"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -16,6 +18,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
@@ -39,7 +42,8 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	logger *logp.Logger
+	moduleConfig   *aws.Config
+	logger         *logp.Logger
 }
 
 // metricIDNameMap is a translating map between createMetricDataQuery id
@@ -94,8 +98,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		MetricSet: metricSet,
-		logger:    ec2Logger,
+		MetricSet:      metricSet,
+		logger:         ec2Logger,
 	}, nil
 }
 
@@ -120,7 +124,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 			getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 			for init || getMetricDataOutput.NextToken != nil {
 				init = false
-				output, err := getMetricDataPerRegion(m.MetricSet.DurationString, m.MetricSet.PeriodInSec, instanceID, getMetricDataOutput.NextToken, svcCloudwatch)
+				// Use hardcoded 300s period and -10m duration instead. Because in order to use use waffle map with
+				// aggregation 1m, aws ec2 collection period needs to change to 1m instead.
+				output, err := getMetricDataPerRegion("-10m", 300, instanceID, getMetricDataOutput.NextToken, svcCloudwatch)
+				// output, err := getMetricDataPerRegion(m.durationString, m.periodInSec, instanceID, getMetricDataOutput.NextToken, svcCloudwatch)
 				if err != nil {
 					err = errors.Wrap(err, "getMetricDataPerRegion failed, skipping region "+regionName+" for instance "+instanceID)
 					m.logger.Error(err.Error())
@@ -162,16 +169,20 @@ func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 		err = errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
 		return
 	}
+
 	mapOfRootFieldsResults["cloud.machine.type"] = machineType
+	mapOfRootFieldsResults["cloud.availability_zone"] = *instanceOutput.Placement.AvailabilityZone
+	mapOfRootFieldsResults["cloud.image.id"] = *instanceOutput.ImageId
+	mapOfRootFieldsResults["cloud.region"] = regionName
 
-	resultRootFields, err := eventMapping(mapOfRootFieldsResults, schemaRootFields)
-	if err != nil {
-		err = errors.Wrap(err, "Error trying to apply schema schemaRootFields in AWS EC2 metricbeat module.")
-		return
-	}
-	event.RootFields = resultRootFields
+	// Hardcode this to map to system.cpu.cores, system.cpu.user.pct and host.name
+	mapOfRootFieldsResults["cpu.cores"] = "1"
+	mapOfRootFieldsResults["cpu.user.pct"] = "0"
+	mapOfRootFieldsResults["host.name"] = instanceID
 
-	// AWS EC2 Metrics
+	// Hardcode system.network.name
+	mapOfRootFieldsResults["network.name"] = instanceID + "-network"
+
 	mapOfMetricSetFieldResults := make(map[string]interface{})
 	mapOfMetricSetFieldResults["instance.image.id"] = *instanceOutput.ImageId
 	instanceStateName, err := instanceOutput.State.Name.MarshalValue()
@@ -209,7 +220,18 @@ func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 		}
 		metricKey := metricIDNameMap[*output.Id]
 		mapOfMetricSetFieldResults[metricKey[0]] = fmt.Sprint(output.Values[0])
+		mapOfRootFieldsResults[metricKey[0]] = fmt.Sprint(output.Values[0])
+		if metricKey[0] == "cpu.total.pct" {
+			mapOfRootFieldsResults["cpu.system.pct"] = fmt.Sprint(output.Values[0]/100)
+		}
 	}
+
+	resultRootFields, err := eventMapping(mapOfRootFieldsResults, schemaRootFields)
+	if err != nil {
+		err = errors.Wrap(err, "Error trying to apply schema schemaRootFields in AWS EC2 metricbeat module.")
+		return
+	}
+	event.RootFields = resultRootFields
 
 	if len(mapOfMetricSetFieldResults) <= 11 {
 		info = "Missing Cloudwatch data for instance " + instanceID + ". This is expected for a new instance during the " +
@@ -256,6 +278,32 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instances
 		}
 	}
 	return
+}
+
+func convertPeriodToDuration(period string) (string, int, error) {
+	// Amazon EC2 sends metrics to Amazon CloudWatch with 5-minute default frequency.
+	// If detailed monitoring is enabled, then data will be available in 1-minute period.
+	// Set starttime double the default frequency earlier than the endtime in order to make sure
+	// GetMetricDataRequest gets the latest data point for each metric.
+	numberPeriod, err := strconv.Atoi(period[0 : len(period)-1])
+	if err != nil {
+		return "", 0, err
+	}
+
+	unitPeriod := period[len(period)-1:]
+	switch unitPeriod {
+	case "s":
+		duration := "-" + strconv.Itoa(numberPeriod*2) + unitPeriod
+		return duration, numberPeriod, nil
+	case "m":
+		duration := "-" + strconv.Itoa(numberPeriod*2) + unitPeriod
+		periodInSec := numberPeriod * 60
+		return duration, periodInSec, nil
+	default:
+		err = errors.New("invalid period in config. Please reset period in config")
+		duration := "-" + strconv.Itoa(numberPeriod*2) + "s"
+		return duration, numberPeriod, err
+	}
 }
 
 func getMetricDataPerRegion(durationString string, periodInSec int, instanceID string, nextToken *string, svc cloudwatchiface.CloudWatchAPI) (*cloudwatch.GetMetricDataOutput, error) {
