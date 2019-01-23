@@ -7,6 +7,9 @@ package mssql
 import (
 	"database/sql"
 
+	// Register driver.
+	_ "github.com/denisenkom/go-mssqldb"
+
 	"github.com/pkg/errors"
 )
 
