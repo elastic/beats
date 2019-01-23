@@ -114,17 +114,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		ec2Logger.Error(err.Error())
 	}
 
-	//Calculate duration based on period
+	// Calculate duration based on period
 	durationString, periodSec, err := convertPeriodToDuration(moduleConfig.Period)
 	if err != nil {
 		ec2Logger.Error(err.Error())
+		return nil, err
 	}
 
 	// Check if period is set to be multiple of 60s or 300s
-	remainder := periodSec % 300
-	if remainder != 0 {
-		err := errors.New("period is not set to be multiple of 300s. This might cause data missing " +
-			"and extra costs. Please change the period setting in config.yml")
+	remainder300 := periodSec % 300
+	remainder60 := periodSec % 60
+	if remainder300 != 0 || remainder60 != 0 {
+		err := errors.New("period needs to be set to 60s (or a multiple of 60s) if detailed monitoring is " +
+			"enabled for EC2 instances or set to 300s (or a multiple of 300s) if EC2 instances has basic monitoring. " +
+			"To avoid data missing or extra costs, please make sure period is set correctly in config.yml")
 		ec2Logger.Info(err)
 	}
 
@@ -211,6 +214,7 @@ func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 	machineType, err := instanceOutput.InstanceType.MarshalValue()
 	if err != nil {
 		err = errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
+		return
 	} else {
 		mapOfRootFieldsResults["cloud.machine.type"] = machineType
 	}
@@ -236,8 +240,8 @@ func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 	}
 
 	if len(mapOfMetricSetFieldResults) <= 3 {
-		info = "Missing Cloudwatch data for instance " + instanceID + ". It is expected if this is a new instance. " +
-			"If not, please recheck the period setting in config."
+		info = "Missing Cloudwatch data for instance " + instanceID + ". This is expected for a new instance during the " +
+			"first data collection. If this shows up multiple times, please recheck the period setting in config."
 		return
 	}
 
@@ -282,33 +286,29 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instances
 	return
 }
 
-func convertPeriodToDuration(period string) (duration string, periodInSec int, err error) {
+func convertPeriodToDuration(period string) (string, int, error) {
 	// Amazon EC2 sends metrics to Amazon CloudWatch with 5-minute default frequency.
 	// If detailed monitoring is enabled, then data will be available in 1-minute period.
 	// Set starttime double the default frequency earlier than the endtime in order to make sure
 	// GetMetricDataRequest gets the latest data point for each metric.
-	duration = ""
-	periodInSec = 0
 	numberPeriod, err := strconv.Atoi(period[0 : len(period)-1])
 	if err != nil {
-		return
+		return "", 0, err
 	}
 
 	unitPeriod := period[len(period)-1:]
 	switch unitPeriod {
 	case "s":
-		duration = "-" + strconv.Itoa(numberPeriod*2) + unitPeriod
-		periodInSec = numberPeriod
-		return
+		duration := "-" + strconv.Itoa(numberPeriod*2) + unitPeriod
+		return duration, numberPeriod, nil
 	case "m":
-		duration = "-" + strconv.Itoa(numberPeriod*2) + unitPeriod
-		periodInSec = numberPeriod * 60
-		return
+		duration := "-" + strconv.Itoa(numberPeriod*2) + unitPeriod
+		periodInSec := numberPeriod * 60
+		return duration, periodInSec, nil
 	default:
 		err = errors.New("invalid period in config. Please reset period in config")
-		duration = "-" + strconv.Itoa(numberPeriod*2) + "s"
-		periodInSec = numberPeriod
-		return
+		duration := "-" + strconv.Itoa(numberPeriod*2) + "s"
+		return duration, numberPeriod, err
 	}
 }
 
