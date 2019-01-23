@@ -29,13 +29,14 @@ This file is generated! See scripts/docs_collector.py
     } for module in filter(lambda module: os.path.isfile(oss_path + "/" + module + "/_meta/docs.asciidoc"),
                            os.listdir(oss_base_dir))]
 
-    modules_path += [{
-        'base_dir': xpack_base_dir,
-        'path': xpack_path + "/" + module,
-        'name': module,
-        'metricsets': sorted(os.listdir(xpack_path + "/" + module)),
-    } for module in filter(lambda module: os.path.isfile(xpack_path + "/" + module + "/_meta/docs.asciidoc"),
-                           os.listdir(xpack_path))]
+    if os.path.isdir(os.path.abspath(xpack_base_dir)):
+        modules_path += [{
+            'base_dir': xpack_base_dir,
+            'path': xpack_path + "/" + module,
+            'name': module,
+            'metricsets': sorted(os.listdir(xpack_path + "/" + module)),
+        } for module in filter(lambda module: os.path.isfile(xpack_path + "/" + module + "/_meta/docs.asciidoc"),
+                               os.listdir(xpack_path))]
 
     # Iterate over all modules
     for module in sorted(modules_path):
