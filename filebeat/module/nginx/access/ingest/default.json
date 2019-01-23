@@ -5,7 +5,7 @@
             "grok": {
                 "field": "message",
                 "patterns": [
-                    "\"?%{IP_LIST:network.forwarded_ip} - %{DATA:user.name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{GREEDYDATA:nginx.access.info}\" %{NUMBER:http.response.status_code:long} %{NUMBER:http.response.body.bytes:long} \"%{DATA:http.request.referrer}\" \"%{DATA:nginx.access.agent}\""
+                    "\"?%{IP_LIST:nginx.access.remote_ip_list} - %{DATA:user.name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{GREEDYDATA:nginx.access.info}\" %{NUMBER:http.response.status_code:long} %{NUMBER:http.response.body.bytes:long} \"%{DATA:http.request.referrer}\" \"%{DATA:nginx.access.agent}\""
                 ],
                 "pattern_definitions": {
                     "IP_LIST": "%{IP}(\"?,?\\s*%{IP})*"
@@ -30,7 +30,7 @@
         },
         {
             "split": {
-                "field": "network.forwarded_ip",
+                "field": "nginx.access.remote_ip_list",
                 "separator": "\"?,?\\s+"
             }
         },
@@ -43,7 +43,7 @@
         {
             "script": {
                 "lang": "painless",
-                "source": "boolean isPrivate(def dot, def ip) { try { StringTokenizer tok = new StringTokenizer(ip, dot); int firstByte = Integer.parseInt(tok.nextToken());       int secondByte = Integer.parseInt(tok.nextToken());       if (firstByte == 10) {         return true;       }       if (firstByte == 192 && secondByte == 168) {         return true;       }       if (firstByte == 172 && secondByte >= 16 && secondByte <= 31) {         return true;       }       if (firstByte == 127) {         return true;       }       return false;     } catch (Exception e) {       return false;     }   }   def found = false;   for (def item : ctx.network.forwarded_ip) {     if (!isPrivate(params.dot, item)) {       ctx.source.ip = item;       found = true;       break;     }   }   if (!found) {     ctx.source.ip = ctx.network.forwarded_ip[0];   }",
+                "source": "boolean isPrivate(def dot, def ip) { try { StringTokenizer tok = new StringTokenizer(ip, dot); int firstByte = Integer.parseInt(tok.nextToken());       int secondByte = Integer.parseInt(tok.nextToken());       if (firstByte == 10) {         return true;       }       if (firstByte == 192 && secondByte == 168) {         return true;       }       if (firstByte == 172 && secondByte >= 16 && secondByte <= 31) {         return true;       }       if (firstByte == 127) {         return true;       }       return false;     } catch (Exception e) {       return false;     }   }   def found = false;   for (def item : ctx.nginx.access.remote_ip_list) {     if (!isPrivate(params.dot, item)) {       ctx.source.ip = item;       found = true;       break;     }   }   if (!found) {     ctx.source.ip = ctx.nginx.access.remote_ip_list[0];   }",
                 "params": {
                     "dot": "."
                 }
