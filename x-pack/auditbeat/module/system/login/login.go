@@ -172,7 +172,6 @@ func (ms *MetricSet) readAndEmit(report mb.ReporterV2) int {
 			ms.log.Error(err)
 		}
 	}
-	return count
 }
 
 func (ms *MetricSet) loginEvent(loginRecord *LoginRecord) mb.Event {
