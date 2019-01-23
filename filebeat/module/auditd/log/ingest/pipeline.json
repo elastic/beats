@@ -89,7 +89,7 @@
             }
         },
 
-        { "rename": { "ignore_failure": true, "field": "auditd.log.arch", "target_field": "host.os.architecture" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.arch", "target_field": "host.architecture" } },
 
         { "rename": { "ignore_failure": true, "field": "auditd.log.acct", "target_field": "user.name" } },
 

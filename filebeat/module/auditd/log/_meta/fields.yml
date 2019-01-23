@@ -87,7 +87,7 @@
     # Fields below were not defined in 6.x but were still being populated.
     - name: arch
       type: alias
-      path: host.os.architecture
+      path: host.architecture
       migration: true
     - name: gid
       type: alias

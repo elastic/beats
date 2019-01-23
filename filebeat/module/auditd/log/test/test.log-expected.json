@@ -37,7 +37,7 @@
         "event.dataset": "auditd.log",
         "event.module": "auditd",
         "fileset.name": "log",
-        "host.os.architecture": "x86_64",
+        "host.architecture": "x86_64",
         "input.type": "log",
         "log.offset": 174,
         "process.executable": "/usr/libexec/strongswan/charon (deleted)",

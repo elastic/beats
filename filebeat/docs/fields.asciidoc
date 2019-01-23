@@ -592,7 +592,7 @@ alias to: source.geo.region_iso_code
 --
 type: alias
 
-alias to: host.os.architecture
+alias to: host.architecture
 
 --
 
