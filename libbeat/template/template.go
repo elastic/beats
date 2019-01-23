@@ -245,7 +245,7 @@ func buildMappings(
 		}
 	case major == 6:
 		mapping = common.MapStr{
-			"_doc": mapping,
+			"doc": mapping,
 		}
 	case major >= 7:
 		// keep typeless structure

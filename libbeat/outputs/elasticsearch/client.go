@@ -131,7 +131,7 @@ var (
 )
 
 const (
-	defaultEventType = "_doc"
+	defaultEventType = "doc"
 )
 
 // NewClient instantiates a new client.
