@@ -1,1 +1,0 @@
-`db` Metricset fetches a set of values from https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-log-space-usage-transact-sql?view=sql-server-2017[log space usage] which returns space usage information for the transaction log for each different database.

@@ -507,7 +507,7 @@ metricbeat.modules:
 #-------------------------------- Mssql Module --------------------------------
 - module: mssql
   metricsets:
-    - "db"
+    - "transaction_log"
     - "performance"
   hosts: ["sqlserver://sa@localhost"]
   period: 10s
