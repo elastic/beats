@@ -28,7 +28,7 @@ import (
 type ReportingFormat int
 
 const (
-	ReportingFormatUnknown ReportingFormat = iota
+	ReportingFormatUnknown ReportingFormat = iota // to protect against zero-value errors
 	ReportingFormatXPackMonitoringBulk
 	ReportingFormatBulk
 )

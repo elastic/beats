@@ -37,15 +37,18 @@ import (
 type publishClient struct {
 	es     *esout.Client
 	params map[string]string
+	format report.ReportingFormat
 }
 
 func newPublishClient(
 	es *esout.Client,
 	params map[string]string,
+	format report.ReportingFormat,
 ) (*publishClient, error) {
 	p := &publishClient{
 		es:     es,
 		params: params,
+		format: format,
 	}
 	return p, nil
 }
@@ -124,25 +127,11 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 			}
 		}
 
-		f, err := event.Content.Meta.GetValue("format")
-		if err != nil {
-			logp.Err("Format not available in monitoring reported. Please report this error: %s", err)
-			continue
-		}
-
-		event.Content.Meta.Delete("format")
-		format, ok := f.(report.ReportingFormat)
-		if !ok {
-			logp.Err("Format not available in monitoring reported. Please report this error: %s", err)
-			continue
-		}
-
-		logp.Info("Sending monitoring data to %s cluster", getClusterTypeForFormat(format))
-		switch format {
-		case report.ReportingFormatBulk:
-			err = c.bulkToProduction(params, event, t)
+		switch c.format {
 		case report.ReportingFormatXPackMonitoringBulk:
-			err = c.bulkToMonitoring(event)
+			err = c.publishWithXPackMonitoringBulk(params, event, t)
+		case report.ReportingFormatBulk:
+			err = c.publishWithBulk(event)
 		}
 
 		if err != nil {
@@ -167,7 +156,7 @@ func (c *publishClient) String() string {
 	return "publish(" + c.es.String() + ")"
 }
 
-func (c *publishClient) bulkToProduction(params map[string]string, event publisher.Event, docType interface{}) error {
+func (c *publishClient) publishWithXPackMonitoringBulk(params map[string]string, event publisher.Event, t interface{}) error {
 	meta := common.MapStr{
 		"_index":   "",
 		"_routing": nil,
@@ -187,7 +176,7 @@ func (c *publishClient) bulkToProduction(params map[string]string, event publish
 	return err
 }
 
-func (c *publishClient) bulkToMonitoring(event publisher.Event) error {
+func (c *publishClient) publishWithBulk(event publisher.Event) error {
 	action := common.MapStr{
 		"index": common.MapStr{
 			"_index":   getMonitoringIndexName(),
@@ -245,15 +234,4 @@ func getMonitoringIndexName() string {
 	version := 6
 	date := time.Now().Format("2006.01.02")
 	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
-}
-
-func getClusterTypeForFormat(format report.ReportingFormat) string {
-	switch format {
-	case report.ReportingFormatXPackMonitoringBulk:
-		return "monitoring"
-	case report.ReportingFormatBulk:
-		return "production"
-	default:
-		return "invalid"
-	}
 }

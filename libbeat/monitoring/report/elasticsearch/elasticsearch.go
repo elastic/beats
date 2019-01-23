@@ -19,6 +19,7 @@ package elasticsearch
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"math/rand"
 	"net/url"
@@ -256,12 +257,12 @@ func (r *reporter) initLoop(c config) {
 	log.Info("Successfully connected to X-Pack Monitoring endpoint.")
 
 	// Start collector and send loop if monitoring endpoint has been found.
-	go r.snapshotLoop("state", "state", c.StatePeriod, c.Format)
+	go r.snapshotLoop("state", "state", c.StatePeriod)
 	// For backward compatibility stats is named to metrics.
-	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod, c.Format)
+	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod)
 }
 
-func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, format report.ReportingFormat) {
+func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration) {
 	ticker := time.NewTicker(period)
 	defer ticker.Stop()
 
@@ -298,7 +299,6 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 			"interval_ms": int64(period / time.Millisecond),
 			// Converting to seconds as interval only accepts `s` as unit
 			"params": map[string]string{"interval": strconv.Itoa(int(period/time.Second)) + "s"},
-			"format": format,
 		}
 
 		clusterUUID := getClusterUUID()
@@ -343,7 +343,11 @@ func makeClient(
 		return nil, err
 	}
 
-	return newPublishClient(esClient, params)
+	if config.Format != report.ReportingFormatXPackMonitoringBulk && config.Format != report.ReportingFormatBulk {
+		return nil, fmt.Errorf("unknown reporting format: %v", config.Format)
+	}
+
+	return newPublishClient(esClient, params, config.Format)
 }
 
 func closing(log *logp.Logger, c io.Closer) {
