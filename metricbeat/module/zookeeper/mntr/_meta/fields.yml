@@ -50,12 +50,10 @@
       type: long
       description: >
         Number of outstanding requests that need to be processed by the cluster.
-    # ECS?
     - name: packets.received
       type: long
       description: >
         Number of ZooKeeper network packets received.
-    # ECS?
     - name: packets.sent
       type: long
       description: >
