@@ -5,7 +5,6 @@
     command.
   release: ga
   fields:
-    # ECS?
     - name: hostname
       type: keyword
       description: >
@@ -70,7 +69,6 @@
       type: long
       description: >
         Number of synced followers reported when a node server_state is leader.
-    # ECS? service.version?
     - name: version
       type: keyword
       description: >
