@@ -215,10 +215,9 @@ func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 	if err != nil {
 		err = errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
 		return
-	} else {
-		mapOfRootFieldsResults["cloud.machine.type"] = machineType
 	}
 
+	mapOfRootFieldsResults["cloud.machine.type"] = machineType
 	mapOfRootFieldsResults["cloud.availability_zone"] = *instanceOutput.Placement.AvailabilityZone
 	mapOfRootFieldsResults["cloud.image.id"] = *instanceOutput.ImageId
 	mapOfRootFieldsResults["cloud.region"] = regionName
