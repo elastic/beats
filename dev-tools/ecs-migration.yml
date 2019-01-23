@@ -304,6 +304,11 @@
   to: url.original
   alias: true
 
+- from: elasticsearch.slowlog.took_millis
+  to: event.duration
+  alias: false
+  scale: 1000000
+
 ## IIS module
 
 - from: iis.access.server_ip

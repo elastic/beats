@@ -31,10 +31,6 @@
     description: "Extra source information"
     example: ""
     type: text
-  - name: took_millis
-    description: "Time took in milliseconds"
-    example: 42
-    type: keyword
   - name: total_hits
     description: "Total hits"
     example: 42

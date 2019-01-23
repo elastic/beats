@@ -4456,17 +4456,6 @@ Extra source information
 
 --
 
-*`elasticsearch.slowlog.took_millis`*::
-+
---
-type: keyword
-
-example: 42
-
-Time took in milliseconds
-
---
-
 *`elasticsearch.slowlog.total_hits`*::
 +
 --
