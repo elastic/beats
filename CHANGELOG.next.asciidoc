@@ -160,6 +160,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for iis 7.5 log format. {issue}9753[9753] {pull}9967[9967]
 - Add service.type field to all Modules. By default the field is set with the module name. It can be overwritten with `service.type` config. {pull}10042[10042]
 - Add support for MariaDB in the `slowlog` fileset of `mysql` module. {pull}9731[9731]
+- Apache module's error fileset now performs GeoIP lookup, like the access fileset. {pull}10273[10273]
 - Elasticsearch module's slowlog now populates `event.duration` (ECS). {pull}9293[9293]
 - HAProxy module now populates `event.duration` and `http.response.bytes` (ECS). {pull}10143[10143]
 - Teach elasticsearch/audit fileset to parse out some more fields. {issue}10134[10134] {pull}10137[10137]
