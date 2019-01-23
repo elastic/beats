@@ -44,6 +44,10 @@ metricbeat.modules:
 
   # Set to false to fetch all entries
   #index_recovery.active_only: true
+
+  # Set to true to send data collected by module to X-Pack
+  # Monitoring instead of metricbeat-* indices.
+  #xpack.enabled: false
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
