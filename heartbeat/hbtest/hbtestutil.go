@@ -111,6 +111,7 @@ func BaseChecks(ip string, status string, typ string) mapval.Validator {
 	})
 }
 
+// SummaryChecks validates the "summary" field and its subfields.
 func SummaryChecks(up int, down int) mapval.Validator {
 	return mapval.MustCompile(mapval.Map{
 		"summary": mapval.Map{
