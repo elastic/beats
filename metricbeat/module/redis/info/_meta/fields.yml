@@ -466,7 +466,6 @@
           description:
             Total number of commands processed.
 
-        # ECS?
         - name: net.input.bytes
           type: long
           description:
