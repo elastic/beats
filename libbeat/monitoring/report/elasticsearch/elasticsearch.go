@@ -97,7 +97,7 @@ func defaultConfig(settings report.Settings) config {
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
 		},
-		Format: report.ReportingFormatProduction,
+		Format: report.ReportingFormatXPackMonitoringBulk,
 	}
 
 	if settings.DefaultUsername != "" {
@@ -261,7 +261,7 @@ func (r *reporter) initLoop(c config) {
 	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod, c.Format)
 }
 
-func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, format string) {
+func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, format report.ReportingFormat) {
 	ticker := time.NewTicker(period)
 	defer ticker.Stop()
 

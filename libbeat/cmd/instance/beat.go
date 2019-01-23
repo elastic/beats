@@ -1008,11 +1008,11 @@ func selectMonitoringConfig(beatCfg beatConfig) (*common.Config, error) {
 		const warnMonitoringDeprecatedConfig = "xpack.monitoring.* settings are deprecated. Use monitoring.* instead, but set monitoring.elasticsearch.hosts to monitoring cluster hosts"
 		cfgwarn.Deprecate("7.0", warnMonitoringDeprecatedConfig)
 		monitoringCfg := beatCfg.XPackMonitoring
-		monitoringCfg.SetString("_format", -1, report.ReportingFormatProduction)
+		monitoringCfg.SetInt("_format", -1, int64(report.ReportingFormatXPackMonitoringBulk))
 		return monitoringCfg, nil
 	case beatCfg.Monitoring.Enabled():
 		monitoringCfg := beatCfg.Monitoring
-		monitoringCfg.SetString("_format", -1, report.ReportingFormatMonitoring)
+		monitoringCfg.SetInt("_format", -1, int64(report.ReportingFormatBulk))
 		return monitoringCfg, nil
 	default:
 		return nil, nil

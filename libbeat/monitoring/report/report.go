@@ -25,9 +25,12 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+type ReportingFormat int
+
 const (
-	ReportingFormatProduction = "production"
-	ReportingFormatMonitoring = "monitoring"
+	ReportingFormatUnknown ReportingFormat = iota
+	ReportingFormatXPackMonitoringBulk
+	ReportingFormatBulk
 )
 
 type config struct {
@@ -87,10 +90,11 @@ func getReporterConfig(
 		return "", nil, err
 	}
 
-	format, err := monitoringConfig.String("_format", -1)
+	f, err := monitoringConfig.Int("_format", -1)
 	if err != nil {
 		return "", nil, err
 	}
+	format := ReportingFormat(f)
 
 	// load reporter from `monitoring` section and optionally
 	// merge with output settings
@@ -106,7 +110,7 @@ func getReporterConfig(
 			}{}
 			rc.Unpack(&hosts)
 
-			if format == ReportingFormatProduction && len(hosts.Hosts) > 0 {
+			if format == ReportingFormatBulk && len(hosts.Hosts) > 0 {
 				pathMonHosts := rc.PathOf("hosts")
 				pathOutHost := outCfg.PathOf("hosts")
 				err := fmt.Errorf("'%v' and '%v' are configured", pathMonHosts, pathOutHost)
@@ -120,7 +124,7 @@ func getReporterConfig(
 			rc = merged
 		}
 
-		rc.SetString("_format", -1, format)
+		rc.SetInt("_format", -1, int64(format))
 		return name, rc, nil
 	}
 
@@ -129,7 +133,7 @@ func getReporterConfig(
 		name := outputs.Name()
 		if reportFactories[name] != nil {
 			outCfg := outputs.Config()
-			outCfg.SetString("_format", -1, format)
+			outCfg.SetInt("_format", -1, int64(format))
 			return name, outputs.Config(), nil
 		}
 	}

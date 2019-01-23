@@ -131,17 +131,17 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 		}
 
 		event.Content.Meta.Delete("format")
-		format, ok := f.(string)
+		format, ok := f.(report.ReportingFormat)
 		if !ok {
 			logp.Err("Format not available in monitoring reported. Please report this error: %s", err)
 			continue
 		}
 
-		logp.Debug("Sending monitoring data to %s cluster", format)
+		logp.Info("Sending monitoring data to %s cluster", getClusterTypeForFormat(format))
 		switch format {
-		case report.ReportingFormatProduction:
+		case report.ReportingFormatBulk:
 			err = c.bulkToProduction(params, event, t)
-		case report.ReportingFormatMonitoring:
+		case report.ReportingFormatXPackMonitoringBulk:
 			err = c.bulkToMonitoring(event)
 		}
 
@@ -245,4 +245,15 @@ func getMonitoringIndexName() string {
 	version := 6
 	date := time.Now().Format("2006.01.02")
 	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
+}
+
+func getClusterTypeForFormat(format report.ReportingFormat) string {
+	switch format {
+	case report.ReportingFormatXPackMonitoringBulk:
+		return "monitoring"
+	case report.ReportingFormatBulk:
+		return "production"
+	default:
+		return "invalid"
+	}
 }
