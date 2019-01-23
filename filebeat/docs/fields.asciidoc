@@ -6327,16 +6327,6 @@ Contains fields from the MySQL slow logs.
 
 
 
-*`mysql.slowlog.query_time.sec`*::
-+
---
-type: float
-
-The total time the query took, in seconds, as a floating point number.
-
-
---
-
 *`mysql.slowlog.lock_time.sec`*::
 +
 --

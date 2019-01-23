@@ -627,6 +627,11 @@
   to: mysql.thread_id
   alias: true
 
+- from: mysql.slowlog.query_time.sec
+  to: event.duration
+  alias: false
+  scale: 1000000000
+
 ## NGINX module
 
 - from: nginx.access.user_name
