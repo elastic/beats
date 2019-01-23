@@ -15,7 +15,6 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
-	"reflect"
 	"sort"
 	"strconv"
 	"syscall"
@@ -36,9 +35,9 @@ type Inode uint64
 
 // FileRecord represents a UTMP file at a point in time.
 type FileRecord struct {
-	Inode    Inode
-	Size     int64
-	LastUtmp *Utmp
+	Inode  Inode
+	Size   int64
+	Offset int64
 }
 
 // UtmpFileReader can read a UTMP formatted file (usually /var/log/wtmp).
@@ -157,27 +156,48 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 
 	if !isKnownFile && size == 0 {
 		// Empty new file - save but don't read.
-		r.updateFileRecord(inode, size, nil)
+		err := r.updateFileRecord(inode, size, nil)
+		if err != nil {
+			errorC <- errors.Wrapf(err, "error updating file record for file %v (inode=%v, size=%v, oldSize=%v)", path, inode, size, oldSize)
+		}
 		return
 	}
 
 	if !isKnownFile || size != oldSize {
 		r.log.Debugf("Reading file %v (inode=%v, size=%v, oldSize=%v)", path, inode, size, oldSize)
 
-		lastKnownRecord := fileRecord.LastUtmp
-		newLastKnownRecordPointer := &fileRecord.LastUtmp
-		// Once we start reading a file, we update the file record even if something fails -
-		// otherwise we will just keep trying to re-read very frequently forever.
-		defer r.updateFileRecord(inode, size, newLastKnownRecordPointer)
-
 		f, err := os.Open(path)
 		if err != nil {
-			errorC <- errors.Wrapf(err, "error opening %v", path)
+			errorC <- errors.Wrapf(err, "error opening file %v (inode=%v, size=%v, oldSize=%v)", path)
 			return
 		}
-		defer f.Close()
+		defer func() {
+			// Once we start reading a file, we update the file record even if something fails -
+			// otherwise we will just keep trying to re-read very frequently forever.
+			r.updateFileRecord(inode, size, f)
+			if err != nil {
+				errorC <- errors.Wrapf(err, "error updating file record for file %v (inode=%v, size=%v, oldSize=%v)", path, inode, size, oldSize)
+			}
 
-		reachedNewRecords := !isKnownFile
+			f.Close()
+		}()
+
+		_, err = f.Seek(fileRecord.Offset, 0)
+		if err != nil {
+			errorC <- errors.Wrapf(err, "error setting offset for file %v (inode=%v, size=%v, oldSize=%v, offset=%v)",
+				path, inode, size, oldSize, fileRecord.Offset)
+
+			// Try one more time, this time resetting to the beginning of the file.
+			_, err = f.Seek(0, 0)
+			if err != nil {
+				errorC <- errors.Wrapf(err, "error setting offset for file %v (inode=%v, size=%v, oldSize=%v, offset=%v)",
+					path, inode, size, oldSize, fileRecord.Offset)
+
+				// Even that did not work, so return.
+				return
+			}
+		}
+
 		for {
 			utmp, err := ReadNextUtmp(f)
 			if err != nil && err != io.EOF {
@@ -186,63 +206,42 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 			}
 
 			if utmp != nil {
-				if reachedNewRecords {
-					r.log.Debugf("utmp: (ut_type=%d, ut_pid=%d, ut_line=%v, ut_user=%v, ut_host=%v, ut_tv.tv_sec=%v, ut_addr_v6=%v)",
-						utmp.UtType, utmp.UtPid, utmp.UtLine, utmp.UtUser, utmp.UtHost, utmp.UtTv, utmp.UtAddrV6)
+				r.log.Debugf("utmp: (ut_type=%d, ut_pid=%d, ut_line=%v, ut_user=%v, ut_host=%v, ut_tv.tv_sec=%v, ut_addr_v6=%v)",
+					utmp.UtType, utmp.UtPid, utmp.UtLine, utmp.UtUser, utmp.UtHost, utmp.UtTv, utmp.UtAddrV6)
 
-					*newLastKnownRecordPointer = utmp
+				loginRecord := r.processLoginRecord(utmp)
+				if loginRecord != nil {
+					loginRecord.Origin = path
 
-					loginRecord := r.processLoginRecord(utmp)
-					if loginRecord != nil {
-						loginRecord.Origin = path
-						loginRecordC <- *loginRecord
-					}
-				}
-
-				if !reachedNewRecords && lastKnownRecord != nil && reflect.DeepEqual(*utmp, *lastKnownRecord) {
-					reachedNewRecords = true
+					loginRecordC <- *loginRecord
 				}
 			} else {
 				// Eventually, we have read all UTMP records in the file.
-
-				if !reachedNewRecords && lastKnownRecord != nil {
-					// For some reason, this file did not contain the saved record.
-					// This might be a sign of a highly unlikely inode reuse -
-					// or of something more nefarious. We go back to the beginning and
-					// read the whole file this time.
-					r.log.Warnf("Unexpectedly, the file did not contain the saved login record %v - reading whole file.",
-						*lastKnownRecord)
-
-					_, err = f.Seek(0, 0)
-					if err != nil {
-						errorC <- errors.Wrap(err, "error reading file from beginning")
-						return
-					}
-					// So we don't land here again.
-					reachedNewRecords = true
-
-					continue
-				}
-
 				break
 			}
 		}
 	}
 }
 
-func (r *UtmpFileReader) updateFileRecord(inode Inode, size int64, lastUtmp **Utmp) {
-	r.log.Debugf("Updating file record (inode=%d, size=%d, lastUtmp=%v", inode, size, lastUtmp)
-
+func (r *UtmpFileReader) updateFileRecord(inode Inode, size int64, f *os.File) error {
 	fileRecord := FileRecord{
 		Inode: inode,
 		Size:  size,
 	}
 
-	if lastUtmp != nil {
-		fileRecord.LastUtmp = *lastUtmp
+	if f != nil {
+		offset, err := f.Seek(0, 1)
+		if err != nil {
+			return errors.Wrap(err, "error calling Seek")
+		}
+		fileRecord.Offset = offset
 	}
 
+	r.log.Debugf("Updating file record (fileRecord=%+v)", fileRecord)
+
 	r.fileRecords[inode] = fileRecord
+
+	return nil
 }
 
 // processLoginRecord receives UTMP login records in order and returns
