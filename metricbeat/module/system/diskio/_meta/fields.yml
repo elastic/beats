@@ -9,7 +9,7 @@
       example: sda1
       description: >
         The disk name.
-    # ECS device serial? :-)
+
     - name: serial_number
       type: keyword
       description: >
