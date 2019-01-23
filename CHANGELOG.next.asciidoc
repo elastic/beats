@@ -13,6 +13,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Dissect syntax change, use * instead of ? when working with field reference. {issue}8054[8054]
 - Fix registry handle leak on Windows (https://github.com/elastic/go-sysinfo/pull/33). {pull}9920[9920]
 - Allow to unenroll a Beat from the UI. {issue}9452[9452]
+- Port settings have been deprecated in redis/logstash output and will be removed in 7.0. {pull}9915[9915]
 
 *Auditbeat*
 
@@ -58,6 +59,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Update Golang to 1.10.7. {pull}9640[9640]
 - Fix config appender registration. {pull}9873[9873]
 - Gracefully handle TLS options when enrolling a Beat. {issue}9129[9129]
+- The backing off now implements jitter to better distribute the load. {issue}10172[10172]
 
 *Auditbeat*
 
@@ -178,6 +180,9 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Release Couchbase module as GA. {pull}10201[10201]
 - Release aerospike module as GA. {pull}10203[10203]
 - Release envoyproxy module GA. {pull}10223[10223]
+- Release mongodb.metrics and mongodb.replstatus as GA. {pull}10242[10242]
+- Release mysql.galera_status as Beta. {pull}10242[10242]
+- Release postgresql.statement as GA. {pull}10242[10242]
 - Release RabbitMQ Metricbeat module GA. {pull}10165[10165]
 - Release Dropwizard module as GA. {pull}10240[10240]
 - Release Graphite module as GA. {pull}10240[10240]

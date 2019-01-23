@@ -1425,10 +1425,6 @@ output.elasticsearch:
   # unreachable, the events are distributed to the reachable servers only.
   #hosts: ["localhost:6379"]
 
-  # The Redis port to use if hosts does not contain a port number. The default
-  # is 6379.
-  #port: 6379
-
   # The name of the Redis list or channel the events are published to. The
   # default is filebeat.
   #key: filebeat

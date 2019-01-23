@@ -93,13 +93,13 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-mongodb,MongoDB>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .5+| .5+|  |<<metricbeat-metricset-mongodb-collstats,collstats>>   
 |<<metricbeat-metricset-mongodb-dbstats,dbstats>>   
-|<<metricbeat-metricset-mongodb-metrics,metrics>> experimental[]  
-|<<metricbeat-metricset-mongodb-replstatus,replstatus>> experimental[]  
+|<<metricbeat-metricset-mongodb-metrics,metrics>>   
+|<<metricbeat-metricset-mongodb-replstatus,replstatus>>   
 |<<metricbeat-metricset-mongodb-status,status>>   
 |<<metricbeat-module-munin,Munin>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-munin-node,node>> beta[]  
 |<<metricbeat-module-mysql,MySQL>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-mysql-galera_status,galera_status>> experimental[]  
+.2+| .2+|  |<<metricbeat-metricset-mysql-galera_status,galera_status>> beta[]  
 |<<metricbeat-metricset-mysql-status,status>>   
 |<<metricbeat-module-nginx,Nginx>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-nginx-stubstatus,stubstatus>>   
@@ -110,7 +110,7 @@ This file is generated! See scripts/docs_collector.py
 .4+| .4+|  |<<metricbeat-metricset-postgresql-activity,activity>>   
 |<<metricbeat-metricset-postgresql-bgwriter,bgwriter>>   
 |<<metricbeat-metricset-postgresql-database,database>>   
-|<<metricbeat-metricset-postgresql-statement,statement>> beta[]  
+|<<metricbeat-metricset-postgresql-statement,statement>>   
 |<<metricbeat-module-prometheus,Prometheus>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-prometheus-collector,collector>>   
 |<<metricbeat-metricset-prometheus-stats,stats>> beta[]  
