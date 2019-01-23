@@ -39,7 +39,10 @@ type Inode uint64
 type UtmpType uint8
 
 const (
+	// Wtmp is the "normal" wtmp file that includes successful logins, logouts,
+	// and system boots.
 	Wtmp UtmpType = iota
+	// Btmp contains bad logins only.
 	Btmp
 )
 
