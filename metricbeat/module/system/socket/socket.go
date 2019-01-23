@@ -116,7 +116,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	sockets, err := m.netlink.GetSocketList()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed requesting socket dump")
+		r.Error(errors.Wrap(err, "failed requesting socket dump"))
+		return
 	}
 	debugf("netlink returned %d sockets", len(sockets))
 
