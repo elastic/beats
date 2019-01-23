@@ -701,6 +701,11 @@
 
 ## PostgreSQL module
 
+- from: postgresql.log.duration
+  to: event.duration
+  alias: false
+  scale: 1000000
+
 - from: postgresql.log.timezone
   to: event.timezone
   alias: true

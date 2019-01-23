@@ -10340,17 +10340,6 @@ Name of database
 
 --
 
-*`postgresql.log.duration`*::
-+
---
-type: float
-
-example: 30.0
-
-Duration of a query.
-
---
-
 *`postgresql.log.query`*::
 +
 --
