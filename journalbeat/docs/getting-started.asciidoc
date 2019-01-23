@@ -1,7 +1,7 @@
 [id="{beatname_lc}-getting-started"]
 == Getting started with {beatname_uc}
 
-include::../../libbeat/docs/shared-getting-started-intro.asciidoc[]
+include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 
 * <<{beatname_lc}-installation>>
 * <<{beatname_lc}-configuration>>
@@ -12,7 +12,7 @@ include::../../libbeat/docs/shared-getting-started-intro.asciidoc[]
 [id="{beatname_lc}-installation"]
 === Step 1: Install {beatname_uc}
 
-include::../../libbeat/docs/shared-download-and-install.asciidoc[]
+include::{libbeat-dir}/docs/shared-download-and-install.asciidoc[]
 
 [[deb]]
 *deb:*
@@ -78,7 +78,7 @@ Before running {beatname_uc}, you can specify the location of the systemd
 journal files and configure how you want the files to be read. If you accept the
 default configuration, {beatname_uc} reads from the local journal.
 
-include::../../libbeat/docs/shared-configuring.asciidoc[]
+include::{libbeat-dir}/docs/shared-configuring.asciidoc[]
 
 Here is a sample of the +{beatname_lc}+ section of the +{beatname_lc}.yml+ file.
 {beatname_uc} uses predefined default values for most configuration options.
@@ -128,21 +128,21 @@ Redis events from a Docker container tagged as `redis`, use:
     - "_COMM=redis"
 ----
 
-include::../../libbeat/docs/step-configure-output.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-output.asciidoc[]
 
-include::../../libbeat/docs/step-configure-kibana-endpoint.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-kibana-endpoint.asciidoc[]
 
-include::../../libbeat/docs/step-configure-credentials.asciidoc[]
+include::{libbeat-dir}/docs/step-configure-credentials.asciidoc[]
 
-include::../../libbeat/docs/step-test-config.asciidoc[]
+include::{libbeat-dir}/docs/step-test-config.asciidoc[]
 
-include::../../libbeat/docs/step-look-at-config.asciidoc[]
+include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
 
 
 [id="{beatname_lc}-template"]
 === Step 3: Load the index template in Elasticsearch
 
-include::../../libbeat/docs/shared-template-load.asciidoc[]
+include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 
 [id="{beatname_lc}-starting"]
 === Step 4: Start {beatname_uc}

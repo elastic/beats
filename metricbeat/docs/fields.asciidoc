@@ -2999,6 +2999,90 @@ Number of reads and writes per second
 --
 
 [float]
+== event fields
+
+Docker event
+
+
+
+*`docker.event.status`*::
++
+--
+type: keyword
+
+Event status
+
+
+--
+
+*`docker.event.id`*::
++
+--
+type: keyword
+
+Event id when available
+
+
+--
+
+*`docker.event.from`*::
++
+--
+type: keyword
+
+Event source
+
+
+--
+
+*`docker.event.type`*::
++
+--
+type: keyword
+
+The type of object emitting the event
+
+
+--
+
+*`docker.event.action`*::
++
+--
+type: keyword
+
+The type of event
+
+
+--
+
+[float]
+== actor fields
+
+Actor
+
+
+
+*`docker.event.actor.id`*::
++
+--
+type: keyword
+
+The ID of the object emitting the event
+
+
+--
+
+*`docker.event.actor.attributes`*::
++
+--
+type: object
+
+Various key/value attributes of the object, depending on its type
+
+
+--
+
+[float]
 == healthcheck fields
 
 Docker container metrics.

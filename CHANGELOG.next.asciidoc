@@ -140,6 +140,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Add support for iis 7.5 log format. {issue}9753[9753] {pull}9967[9967]
 - Add support for MariaDB in the `slowlog` fileset of `mysql` module. {pull}9731[9731]
 - Add convert_timezone to nginx module. {issue}9839[9839] {pull}10148[10148]
+- Add support for Percona in the `slowlog` fileset of `mysql` module. {issue}6665[6665] {pull}10227[10227]
 
 *Heartbeat*
 - Made monitors.d configuration part of the default config. {pull}9004[9004]
@@ -165,6 +166,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Remove experimental tag from ceph metricsets. {pull}9708[9708]
 - Add `key` metricset to the Redis module. {issue}9582[9582] {pull}9657[9657]
 - Add DeDot for kubernetes labels and annotations. {issue}9860[9860] {pull}9939[9939]
+- Add docker `event` metricset. {pull}9856[9856]
 - Release Ceph module as GA. {pull}10202[10202]
 - Release windows Metricbeat module as GA. {pull}10163[10163]
 - Release traefik Metricbeat module as GA. {pull}10166[10166]
@@ -175,8 +177,11 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Release etcd module as GA. {pull}10200[10200]
 - Release Couchbase module as GA. {pull}10201[10201]
 - Release aerospike module as GA. {pull}10203[10203]
-- Release RabbitMQ module GA. {pull}10165[10165]
 - Release envoyproxy module GA. {pull}10223[10223]
+- Release RabbitMQ Metricbeat module GA. {pull}10165[10165]
+- Release Dropwizard module as GA. {pull}10240[10240]
+- Release Graphite module as GA. {pull}10240[10240]
+- Release http.server metricset as GA. {pull}10240[10240]
 
 *Packetbeat*
 

@@ -4127,6 +4127,18 @@ The unix timestamp taken from the `SET timestamp` query.
 
 --
 
+*`mysql.slowlog.bytes_sent`*::
++
+--
+type: long
+
+format: bytes
+
+The size of the query result.
+
+
+--
+
 *`mysql.slowlog.query`*::
 +
 --
@@ -4165,6 +4177,26 @@ Current authenticated user, used to determine access privileges. Can differ from
 
 --
 
+*`mysql.slowlog.last_errno`*::
++
+--
+type: keyword
+
+Last SQL error seen.
+
+
+--
+
+*`mysql.slowlog.killed`*::
++
+--
+type: keyword
+
+Code of the reason if the query was killed.
+
+
+--
+
 *`mysql.slowlog.query_cache_hit`*::
 +
 --
@@ -4192,6 +4224,37 @@ type: boolean
 
 Whether the query needed temporary tables on disk.
 
+
+--
+
+*`mysql.slowlog.tmp_tables`*::
++
+--
+type: long
+
+Number of temporary tables created for this query
+
+
+--
+
+*`mysql.slowlog.tmp_disk_tables`*::
++
+--
+type: long
+
+Number of temporary tables created on disk for this query.
+
+
+--
+
+*`mysql.slowlog.tmp_table_sizes`*::
++
+--
+type: long
+
+format: bytes
+
+Size of temporary tables created for this query.
 
 --
 
@@ -4251,6 +4314,105 @@ Whether a full join was needed for the slow query (no indexes were used for join
 type: long
 
 Number of merge passes executed for the query.
+
+
+--
+
+*`mysql.slowlog.log_slow_rate_type`*::
++
+--
+type: keyword
+
+Type of slow log rate limit, it can be `session` if the rate limit is applied per session, or `query` if it applies per query.
+
+
+--
+
+*`mysql.slowlog.log_slow_rate_limit`*::
++
+--
+type: keyword
+
+Slow log rate limit, a value of 100 means that one in a hundred queries or sessions are being logged.
+
+
+--
+
+[float]
+== innodb fields
+
+Contains fields relative to InnoDB engine
+
+
+
+*`mysql.slowlog.innodb.trx_id`*::
++
+--
+type: keyword
+
+Transaction ID
+
+
+--
+
+*`mysql.slowlog.innodb.io_r_ops`*::
++
+--
+type: long
+
+Number of page read operations.
+
+
+--
+
+*`mysql.slowlog.innodb.io_r_bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Bytes read during page read operations.
+
+
+--
+
+*`mysql.slowlog.innodb.io_r_wait.sec`*::
++
+--
+type: long
+
+How long it took to read all needed data from storage.
+
+
+--
+
+*`mysql.slowlog.innodb.rec_lock_wait.sec`*::
++
+--
+type: long
+
+How long the query waited for locks.
+
+
+--
+
+*`mysql.slowlog.innodb.queue_wait.sec`*::
++
+--
+type: long
+
+How long the query waited to enter the InnoDB queue and to be executed once in the queue.
+
+
+--
+
+*`mysql.slowlog.innodb.pages_distinct`*::
++
+--
+type: long
+
+Approximated count of pages accessed to execute the query.
 
 
 --

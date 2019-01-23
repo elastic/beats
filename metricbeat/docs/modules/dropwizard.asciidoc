@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-dropwizard]]
 == Dropwizard module
 
-beta[]
-
 This is the http://dropwizard.io[Dropwizard] module. The default metricset is `collector`.
 
 [float]
