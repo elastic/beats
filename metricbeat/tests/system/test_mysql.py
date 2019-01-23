@@ -35,7 +35,10 @@ class Test(metricbeat.BaseTest):
         evt = output[0]
 
         self.assertItemsEqual(self.de_dot(MYSQL_FIELDS), evt.keys())
-        mysql_info = evt["mysql"]["status"]
+
+        status = evt["mysql"]["status"]
+        assert status["connections"] > 0
+        assert status["opened_tables"] > 0
 
         self.assert_fields_are_documented(evt)
 
