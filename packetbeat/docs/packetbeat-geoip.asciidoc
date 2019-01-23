@@ -2,25 +2,25 @@
 == Export GeoIP Information
 
 You can use Packetbeat along with the
-{ref}/ingest-geoip.html[ingest geoIP processor plugin] in Elasticsearch
+{ref}/geoip-processor.html[GeoIP Processor] in Elasticsearch
 to export geographic location information about source IPs for incoming HTTP
 requests. Then you can use this info to visualize the location of your
 clients on a map in Kibana.
 
-The geoIP processor plugin adds information about the geographical location of
+The geoIP processor module adds information about the geographical location of
 IP addresses, based on data from the Maxmind GeoLite2 City Database. Because the
-plugin uses a geoIP database that's installed on Elasticsearch, you don't need
+module uses a geoIP database that's installed on Elasticsearch, you don't need
 to install a geoIP database on the machines running Beats.
 
 NOTE: If your use case involves using Logstash, you can use the
 {logstash-ref}/plugins-filters-geoip.html[GeoIP filter] available in Logstash
-instead of using the ingest plugin. However, using the ingest plugin is the
+instead of using the ingest module. However, using the ingest module is the
 simplest approach when you don't require the additional processing power of
 Logstash.
 
 [float]
 [[packetbeat-configuring-geoip]]
-=== Configuring the ingest geoIP processor plugin
+=== Configuring the ingest geoIP processor module
 
 To configure Packetbeat and the ingest geoIP processor:
 
@@ -56,7 +56,7 @@ in Packetbeat that contains the IP address of the client. You set
 when it encounters an event that doesn't have a `client_ip` field.
 +
 See
-{ref}/using-ingest-geoip.html[Using the Geoip Processor in a Pipeline]
+{ref}/geoip-processor.html[Using the geoip Processor in a Pipeline]
 for more options.
 
 2. In the Packetbeat config file, configure the Elasticsearch output to use the
