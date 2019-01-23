@@ -1074,6 +1074,26 @@ The principal (username) that failed authentication
 
 --
 
+*`elasticsearch.audit.realm`*::
++
+--
+type: keyword
+
+The authentication realm
+
+--
+
+*`elasticsearch.audit.roles`*::
++
+--
+type: array
+
+example: ['kibana_user', 'beats_admin']
+
+Roles to which the principal belongs
+
+--
+
 *`elasticsearch.audit.action`*::
 +
 --
@@ -1093,6 +1113,17 @@ type: keyword
 example: /_xpack/security/_authenticate
 
 The REST endpoint URI
+
+--
+
+*`elasticsearch.audit.indices`*::
++
+--
+type: array
+
+example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
+
+Indices accessed by action
 
 --
 
@@ -1229,7 +1260,7 @@ CPU time spent outside the kernel.
 --
 type: float
 
-CPU time spent inside the kernel.
+CPU time spent inside the kernel. 
 
 
 --
@@ -1399,7 +1430,7 @@ Young GC
 --
 type: long
 
-example:
+example: 
 
 
 
@@ -1410,7 +1441,7 @@ example:
 --
 type: long
 
-example:
+example: 
 
 
 
@@ -1482,7 +1513,7 @@ Time it took to execute the query
 --
 type: keyword
 
-example:
+example: 
 
 Types
 
@@ -1493,7 +1524,7 @@ Types
 --
 type: text
 
-example:
+example: 
 
 Statistics
 
@@ -1526,7 +1557,7 @@ Slow query
 --
 type: text
 
-example:
+example: 
 
 Extra source information
 
@@ -1581,7 +1612,7 @@ Routing
 --
 type: keyword
 
-example:
+example: 
 
 Id
 
@@ -3663,27 +3694,7 @@ Major version of the operating system.
 
 --
 
-*`elasticsearch.audit.realm`*::
-+
---
-type: keyword
-
-The authentication realm
-
---
-
-*`elasticsearch.audit.roles`*::
-+
---
-type: array
-
-example: ['kibana_user', 'beats_admin']
-
-Roles to which the principal belongs
-
---
-
-*`elasticsearch.audit.action`*::
+*`user_agent.os.minor`*::
 +
 --
 type: long
@@ -3693,21 +3704,8 @@ Minor version of the operating system.
 
 --
 
-*`elasticsearch.audit.indices`*::
-+
---
-type: array
-
-example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
-
-Indices accessed by action
-
---
-
-*`elasticsearch.audit.request`*::
-+
---
-type: keyword
+[float]
+== url fields
 
 URL fields provide a complete URL, with scheme, host, and path. The URL object can be reused in other prefixes, such as `host.url.*` for example. Keep the structure consistent whenever you use URL fields.
 

@@ -114,7 +114,6 @@
     },
     {
         "@timestamp": "2019-01-08T14:15:02.011Z",
-        "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.action": "indices:data/read/search[free_context]",
         "elasticsearch.audit.indices": [
             "foo-2019.01.04",
