@@ -58,7 +58,7 @@ func URLFields(u *url.URL) common.MapStr {
 	}
 
 	if u.Port() != "" {
-		fields["port"], _ = strconv.ParseUint(u.Port(), 10, 8)
+		fields["port"], _ = strconv.ParseUint(u.Port(), 10, 16)
 	}
 
 	if u.Path != "" {
