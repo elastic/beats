@@ -10,7 +10,6 @@
       description: >
         The network interface name.
 
-    # ECS? (and below, no half matching ...)
     - name: out.bytes
       type: long
       format: bytes
