@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("metricbeat", "jolokia", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("metricbeat", "jolokia", asset.ModuleFieldsPri, AssetJolokia); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetJolokia returns asset data.
+// This is the base64 encoded gzipped contents of ../metricbeat/module/jolokia.
+func AssetJolokia() string {
 	return "eJxsj0FOBCEQRfec4oe1cwEWHsArGGMIVDPl0BShaoxze4NNTC/mLz/8l1cX3OgR8CVVbhwdYGyVAvzb0XgHZNI0uBtLC3h1ALBesUu+V3KAXmXYZ5K2cQnYYtXZDqoUlQLKRCuZcSsa8O5Vq3+Bv5p1/+GAjalmDX/wC1rc6Sw1Y48+QUPufTVPvI6sIZI0i9wUO9ngpKCfLkoZ3xz/P8VCzdb4bHGYnC/4DQAA//8Yw1wH"
 }

@@ -89,7 +89,7 @@ func main() {
 			log.Fatalf("error fetching files for package %v: %v", module, err)
 		}
 
-		bs, err := asset.CreateAsset(license, beatName, module, module, data, "asset.ModuleFieldsPri")
+		bs, err := asset.CreateAsset(license, beatName, module, module, data, "asset.ModuleFieldsPri", dir+"/"+module)
 		if err != nil {
 			log.Fatalf("Error creating golang file from template: %v", err)
 		}

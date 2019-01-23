@@ -90,7 +90,7 @@ func main() {
 		name = file
 	}
 
-	bs, err := asset.CreateAsset(licenseHeader, beatName, name, pkg, data, priority)
+	bs, err := asset.CreateAsset(licenseHeader, beatName, name, pkg, data, priority, file)
 	if err != nil {
 		panic(err)
 	}

@@ -50,28 +50,31 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("{{ .Beat }}", "{{ .Name }}", {{ .Priority }}, Asset); err != nil {
+	if err := asset.SetFields("{{ .Beat }}", "{{ .Name }}", {{ .Priority }}, Asset{{ .GoTypeName }}); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// Asset{{ .GoTypeName }} returns asset data.
+// This is the base64 encoded gzipped contents of {{ .Path }}.
+func Asset{{ .GoTypeName }}() string {
 	return "{{ .Data }}"
 }
 
 `))
 
 type Data struct {
-	License  string
-	Beat     string
-	Name     string
-	Priority string
-	Data     string
-	Package  string
+	License    string
+	Beat       string
+	Name       string
+	Priority   string
+	Data       string
+	Package    string
+	Path       string
+	GoTypeName string
 }
 
-func CreateAsset(license string, beat string, name string, pkg string, data []byte, priority string) ([]byte, error) {
+func CreateAsset(license string, beat string, name string, pkg string, data []byte, priority string, path string) ([]byte, error) {
 
 	// Depending on OS or tools configuration, files can contain carriages (\r),
 	// what leads to different results, remove them before encoding.
@@ -80,14 +83,17 @@ func CreateAsset(license string, beat string, name string, pkg string, data []by
 		return nil, errors.Wrap(err, "error encoding the data")
 	}
 
+	goTypeName := goTypeName(name)
 	var buf bytes.Buffer
 	Template.Execute(&buf, Data{
-		License:  license,
-		Beat:     beat,
-		Name:     name,
-		Data:     encData,
-		Priority: priority,
-		Package:  pkg,
+		License:    license,
+		Beat:       beat,
+		Name:       name,
+		Data:       encData,
+		Priority:   priority,
+		Package:    pkg,
+		Path:       path,
+		GoTypeName: goTypeName,
 	})
 
 	bs, err := format.Source(buf.Bytes())
@@ -96,4 +102,28 @@ func CreateAsset(license string, beat string, name string, pkg string, data []by
 	}
 
 	return bs, nil
+}
+
+// goTypeName removes special characters ('_', '.', '@') and returns a
+// camel-cased name.
+func goTypeName(name string) string {
+	var b strings.Builder
+	for _, w := range strings.FieldsFunc(name, isSeparator) {
+		b.WriteString(strings.Title(w))
+	}
+	return b.String()
+}
+
+// isSeparate returns true if the character is a field name separator. This is
+// used to detect the separators in fields like ephemeral_id or instance.name.
+func isSeparator(c rune) bool {
+	switch c {
+	case '.', '_', '/':
+		return true
+	case '@':
+		// This effectively filters @ from field names.
+		return true
+	default:
+		return false
+	}
 }
