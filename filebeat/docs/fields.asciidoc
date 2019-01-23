@@ -1086,7 +1086,7 @@ The authentication realm
 *`elasticsearch.audit.roles`*::
 +
 --
-type: array
+type: keyword
 
 example: ['kibana_user', 'beats_admin']
 
@@ -1119,7 +1119,7 @@ The REST endpoint URI
 *`elasticsearch.audit.indices`*::
 +
 --
-type: array
+type: keyword
 
 example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
 
