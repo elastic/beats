@@ -36,6 +36,6 @@ cleanup() {
 }
 trap cleanup EXIT
 
-rm -rf ${GOPATH}/pkg
+rm -rf "${GOPATH}/pkg"
 cd ${beat}
 RACE_DETECTOR=1 make clean check testsuite
