@@ -12,24 +12,15 @@
     "metricset": {
         "name": "network"
     },
+    "network": {
+        "bytes": 38507918632,
+        "direction": "inbound",
+        "dropped": 32,
+        "errors": 0,
+        "name": "wlp4s0",
+        "packets": 33035899
+    },
     "service": {
         "type": "system"
-    },
-    "system": {
-        "network": {
-            "in": {
-                "bytes": 37904869172,
-                "dropped": 32,
-                "errors": 0,
-                "packets": 32143403
-            },
-            "name": "wlp4s0",
-            "out": {
-                "bytes": 6299331926,
-                "dropped": 0,
-                "errors": 0,
-                "packets": 13362703
-            }
-        }
     }
 }

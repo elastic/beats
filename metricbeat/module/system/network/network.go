@@ -90,25 +90,37 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		}
 
 		r.Event(mb.Event{
-			MetricSetFields: ioCountersToMapStr(counters),
+			RootFields: ioInboundFields(counters),
+		})
+
+		r.Event(mb.Event{
+			RootFields: ioOutboundFields(counters),
 		})
 	}
 }
 
-func ioCountersToMapStr(counters net.IOCountersStat) common.MapStr {
+func ioInboundFields(counters net.IOCountersStat) common.MapStr {
 	return common.MapStr{
-		"name": counters.Name,
-		"in": common.MapStr{
-			"errors":  counters.Errin,
-			"dropped": counters.Dropin,
-			"bytes":   counters.BytesRecv,
-			"packets": counters.PacketsRecv,
+		"network": common.MapStr{
+			"name":      counters.Name,
+			"direction": "inbound",
+			"errors":    counters.Errin,
+			"dropped":   counters.Dropin,
+			"bytes":     counters.BytesRecv,
+			"packets":   counters.PacketsRecv,
 		},
-		"out": common.MapStr{
-			"errors":  counters.Errout,
-			"dropped": counters.Dropout,
-			"packets": counters.PacketsSent,
-			"bytes":   counters.BytesSent,
+	}
+}
+
+func ioOutboundFields(counters net.IOCountersStat) common.MapStr {
+	return common.MapStr{
+		"network": common.MapStr{
+			"name":      counters.Name,
+			"direction": "outbound",
+			"errors":    counters.Errout,
+			"dropped":   counters.Dropout,
+			"packets":   counters.PacketsSent,
+			"bytes":     counters.BytesSent,
 		},
 	}
 }
