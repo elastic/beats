@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/google/shlex"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -141,7 +140,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 			rootFields.Put("process.working_directory", cwd)
 		}
 
-		if args, ok := argsFromProc(proc); ok {
+		if args, ok := proc["args"]; ok {
 			rootFields.Put("process.args", args)
 		}
 
@@ -157,19 +156,4 @@ func getAndRemove(from common.MapStr, field string) interface{} {
 	v := from[field]
 	delete(from, field)
 	return v
-}
-
-func argsFromProc(proc common.MapStr) ([]string, bool) {
-	cmdline, ok := proc["cmdline"].(string)
-	if !ok {
-		return nil, false
-	}
-
-	args, err := shlex.Split(cmdline)
-	if err != nil {
-		debugf("failed to split args from command line '%v': %v", cmdline, err)
-		return nil, false
-	}
-
-	return args, true
 }

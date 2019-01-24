@@ -45,14 +45,15 @@ type ProcsMap map[int]*Process
 // Process is the structure which holds the information of a process running on the host.
 // It includes pid, gid and it interacts with gosigar to fetch process data from the host.
 type Process struct {
-	Pid             int    `json:"pid"`
-	Ppid            int    `json:"ppid"`
-	Pgid            int    `json:"pgid"`
-	Name            string `json:"name"`
-	Username        string `json:"username"`
-	State           string `json:"state"`
-	CmdLine         string `json:"cmdline"`
-	Cwd             string `json:"cwd"`
+	Pid             int      `json:"pid"`
+	Ppid            int      `json:"ppid"`
+	Pgid            int      `json:"pgid"`
+	Name            string   `json:"name"`
+	Username        string   `json:"username"`
+	State           string   `json:"state"`
+	Args            []string `json:"args"`
+	CmdLine         string   `json:"cmdline"`
+	Cwd             string   `json:"cwd"`
 	Mem             sigar.ProcMem
 	Cpu             sigar.ProcTime
 	SampleTime      time.Time
@@ -130,12 +131,16 @@ func (proc *Process) getDetails(envPredicate func(string) bool) error {
 		return fmt.Errorf("error getting process cpu time for pid=%d: %v", proc.Pid, err)
 	}
 
-	if proc.CmdLine == "" {
+	if len(proc.Args) == 0 {
 		args := sigar.ProcArgs{}
 		if err := args.Get(proc.Pid); err != nil && !sigar.IsNotImplemented(err) {
 			return fmt.Errorf("error getting process arguments for pid=%d: %v", proc.Pid, err)
 		}
-		proc.CmdLine = strings.Join(args.List, " ")
+		proc.Args = args.List
+	}
+
+	if proc.CmdLine == "" && len(proc.Args) > 0 {
+		proc.CmdLine = strings.Join(proc.Args, " ")
 	}
 
 	if fd, err := getProcFDUsage(proc.Pid); err != nil {
@@ -281,6 +286,10 @@ func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
 			},
 			"share": process.Mem.Share,
 		},
+	}
+
+	if len(process.Args) > 0 {
+		proc["args"] = process.Args
 	}
 
 	if process.CmdLine != "" {
