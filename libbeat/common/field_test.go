@@ -321,6 +321,47 @@ func TestFieldConcat(t *testing.T) {
 			b:    Fields{{Name: "a"}},
 			fail: true,
 		},
+		"nested with common prefix": {
+			a: Fields{{
+				Name:   "a",
+				Fields: Fields{{Name: "b"}},
+			}},
+			b: Fields{{
+				Name:   "a",
+				Fields: Fields{{Name: "c"}},
+			}},
+			want: Fields{
+				{Name: "a", Fields: Fields{{Name: "b"}}},
+				{Name: "a", Fields: Fields{{Name: "c"}}},
+			},
+		},
+		"nested duplicates fail": {
+			fail: true,
+			a: Fields{{
+				Name:   "a",
+				Fields: Fields{{Name: "b"}, {Name: "c"}},
+			}},
+			b: Fields{{
+				Name:   "a",
+				Fields: Fields{{Name: "c"}},
+			}},
+		},
+		"a is prefix of b": {
+			fail: true,
+			a:    Fields{{Name: "a"}},
+			b: Fields{{
+				Name:   "a",
+				Fields: Fields{{Name: "b"}},
+			}},
+		},
+		"b is prefix of a": {
+			fail: true,
+			a: Fields{{
+				Name:   "a",
+				Fields: Fields{{Name: "b"}},
+			}},
+			b: Fields{{Name: "a"}},
+		},
 	}
 
 	for name, test := range tests {
