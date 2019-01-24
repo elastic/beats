@@ -6,4 +6,4 @@ https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwa
 
 The aws ec2 metricset comes with a predefined dashboard. For example:
 
-image::../images/metricbeat-aws-ec2-overview.png[]
+image::./images/metricbeat-aws-ec2-overview.png[]

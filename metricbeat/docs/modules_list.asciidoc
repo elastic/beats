@@ -9,6 +9,8 @@ This file is generated! See scripts/docs_collector.py
 .1+| .1+|  |<<metricbeat-metricset-aerospike-namespace,namespace>>   
 |<<metricbeat-module-apache,Apache>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-apache-status,status>>   
+|<<metricbeat-module-aws,aws>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.1+| .1+|  |<<metricbeat-metricset-aws-ec2,ec2>> experimental[]  
 |<<metricbeat-module-ceph,Ceph>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .7+| .7+|  |<<metricbeat-metricset-ceph-cluster_disk,cluster_disk>>   
 |<<metricbeat-metricset-ceph-cluster_health,cluster_health>>   
@@ -96,6 +98,9 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-mongodb-metrics,metrics>>   
 |<<metricbeat-metricset-mongodb-replstatus,replstatus>>   
 |<<metricbeat-metricset-mongodb-status,status>>   
+|<<metricbeat-module-mssql,mssql>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.2+| .2+|  |<<metricbeat-metricset-mssql-performance,performance>> experimental[]  
+|<<metricbeat-metricset-mssql-transaction_log,transaction_log>> experimental[]  
 |<<metricbeat-module-munin,Munin>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-munin-node,node>> beta[]  
 |<<metricbeat-module-mysql,MySQL>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -162,6 +167,7 @@ This file is generated! See scripts/docs_collector.py
 
 include::modules/aerospike.asciidoc[]
 include::modules/apache.asciidoc[]
+include::modules/aws.asciidoc[]
 include::modules/ceph.asciidoc[]
 include::modules/couchbase.asciidoc[]
 include::modules/docker.asciidoc[]
@@ -181,6 +187,7 @@ include::modules/kvm.asciidoc[]
 include::modules/logstash.asciidoc[]
 include::modules/memcached.asciidoc[]
 include::modules/mongodb.asciidoc[]
+include::modules/mssql.asciidoc[]
 include::modules/munin.asciidoc[]
 include::modules/mysql.asciidoc[]
 include::modules/nats.asciidoc[]
