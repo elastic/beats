@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 import unittest
 from winlogbeat import BaseTest
