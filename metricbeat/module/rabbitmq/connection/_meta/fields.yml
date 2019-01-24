@@ -4,7 +4,6 @@
     connection
   release: ga
   fields:
-    # ECS?
     - name: name
       type: keyword
       description: >
