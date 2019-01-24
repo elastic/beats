@@ -174,7 +174,7 @@ ci:  ## @build Shortcut for continuous integration. This should always run befor
 # Preparation for tests
 .PHONY: prepare-tests
 prepare-tests:
-	mkdir -p ${COVERAGE_DIR}
+	mkdir -p "${COVERAGE_DIR}"
 	# gotestcover is needed to fetch coverage for multiple packages
 	go get ${COVERAGE_TOOL_REPO}
 	# testify is needed for unit and integration tests
@@ -184,7 +184,7 @@ prepare-tests:
 unit-tests: ## @testing Runs the unit tests with coverage.  Race is not enabled for unit tests because tests run much slower.
 unit-tests: prepare-tests
 	go test -i ${GOPACKAGES}
-	$(COVERAGE_TOOL) $(RACE) -coverprofile=${COVERAGE_DIR}/unit.cov  ${GOPACKAGES}
+	$(COVERAGE_TOOL) $(RACE) -coverprofile="${COVERAGE_DIR}/unit.cov"  ${GOPACKAGES}
 
 .PHONY: unit
 unit: ## @testing Runs the unit tests without coverage reports.
@@ -196,7 +196,7 @@ integration-tests: ## @testing Run integration tests. Unit tests are run as part
 integration-tests: prepare-tests
 	rm -f docker-compose.yml.lock
 	go test -i ${GOPACKAGES}
-	$(COVERAGE_TOOL) -tags=integration $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov ${GOPACKAGES}
+	$(COVERAGE_TOOL) -tags=integration $(RACE) -coverprofile="${COVERAGE_DIR}/integration.cov" ${GOPACKAGES}
 
 #
 .PHONY: integration-tests-environment
@@ -209,7 +209,7 @@ integration-tests-environment: prepare-tests build-image
 system-tests: ## @testing Runs the system tests
 system-tests: prepare-tests ${BEAT_NAME}.test python-env
 	. ${PYTHON_ENV}/bin/activate; INTEGRATION_TESTS=${INTEGRATION_TESTS} TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} nosetests ${PYTHON_TEST_FILES} ${NOSETESTS_OPTIONS}
-	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/system.cov ${BUILD_DIR}/system-tests/run
+	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o "${COVERAGE_DIR}/system.cov" ${BUILD_DIR}/system-tests/run
 
 # Runs the system tests
 .PHONY: system-tests-environment
@@ -303,11 +303,11 @@ testsuite: clean update
 # Generates a coverage report from the existing coverage files
 .PHONY: coverage-report
 coverage-report:
-	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o ${COVERAGE_DIR}/full.cov ${COVERAGE_DIR}
-	go tool cover -html=${COVERAGE_DIR}/full.cov -o ${COVERAGE_DIR}/full.html
-	test ! -s ${COVERAGE_DIR}/integration.cov   || go tool cover -html=${COVERAGE_DIR}/integration.cov   -o ${COVERAGE_DIR}/integration.html
-	test ! -s ${COVERAGE_DIR}/system.cov || go tool cover -html=${COVERAGE_DIR}/system.cov -o ${COVERAGE_DIR}/system.html
-	test ! -s ${COVERAGE_DIR}/unit.cov   || go tool cover -html=${COVERAGE_DIR}/unit.cov   -o ${COVERAGE_DIR}/unit.html
+	python ${ES_BEATS}/dev-tools/aggregate_coverage.py -o "${COVERAGE_DIR}/full.cov" "${COVERAGE_DIR}"
+	go tool cover -html=${COVERAGE_DIR}/full.cov -o "${COVERAGE_DIR}/full.html"
+	test ! -s "${COVERAGE_DIR}/integration.cov"   || go tool cover -html="${COVERAGE_DIR}/integration.cov"   -o "${COVERAGE_DIR}/integration.html"
+	test ! -s "${COVERAGE_DIR}/system.cov" || go tool cover -html="${COVERAGE_DIR}/system.cov" -o "${COVERAGE_DIR}/system.html"
+	test ! -s "${COVERAGE_DIR}/unit.cov"   || go tool cover -html="${COVERAGE_DIR}/unit.cov"   -o "${COVERAGE_DIR}/unit.html"
 
 
 .PHONY: fields
