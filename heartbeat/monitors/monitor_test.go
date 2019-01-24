@@ -38,7 +38,7 @@ func TestMonitor(t *testing.T) {
 	require.NoError(t, err)
 	defer sched.Stop()
 
-	mon, err := newMonitor(serverMonConf, reg, pipelineConnector, sched, false)
+	mon, err := newMonitor(serverMonConf, reg, pipelineConnector, sched, false, nil)
 	require.NoError(t, err)
 
 	mon.Start()
@@ -86,7 +86,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	defer sched.Stop()
 
 	makeTestMon := func() (*Monitor, error) {
-		return newMonitor(serverMonConf, reg, pipelineConnector, sched, false)
+		return newMonitor(serverMonConf, reg, pipelineConnector, sched, false, nil)
 	}
 
 	m1, m1Err := makeTestMon()
