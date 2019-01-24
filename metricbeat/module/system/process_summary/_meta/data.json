@@ -19,13 +19,13 @@
         "process": {
             "summary": {
                 "dead": 0,
-                "idle": 0,
-                "running": 308,
-                "sleeping": 0,
+                "idle": 112,
+                "running": 0,
+                "sleeping": 288,
                 "stopped": 0,
-                "total": 487,
-                "unknown": 179,
-                "zombie": 0
+                "total": 401,
+                "unknown": 0,
+                "zombie": 1
             }
         }
     }
