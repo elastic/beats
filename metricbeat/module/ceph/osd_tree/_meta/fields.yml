@@ -9,7 +9,7 @@
       description: >
         osd or bucket node id
     - name: name
-      type: text
+      type: keyword
       description: >
         osd or bucket node name
     - name: type
@@ -21,6 +21,7 @@
       description: >
         osd or bucket node typeID
     - name: children
+      # TODO: Would prefer keyword here but potentially send up a list of all of them?
       type: text
       description: >
         bucket children list, separated by comma.

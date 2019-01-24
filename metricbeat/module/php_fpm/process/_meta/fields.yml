@@ -56,7 +56,7 @@
     description: >
       The user (PHP_AUTH_USER) (or - if not set) (for the current request)
   - name: script
-    type: text
+    type: keyword
     description: >
       The main script called (or - if not set) (for the current request)
   - name: last_request_cpu
