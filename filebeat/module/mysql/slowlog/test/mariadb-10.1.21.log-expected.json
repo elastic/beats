@@ -15,7 +15,6 @@
         "mysql.slowlog.lock_time.sec": 0.0,
         "mysql.slowlog.query": "select sleep(2);",
         "mysql.slowlog.query_cache_hit": false,
-        "mysql.slowlog.query_time.sec": 2.000652,
         "mysql.slowlog.rows_examined": 0,
         "mysql.slowlog.rows_sent": 1,
         "mysql.thread_id": "5",
