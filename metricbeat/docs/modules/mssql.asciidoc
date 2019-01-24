@@ -1,0 +1,61 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-mssql]]
+== mssql module
+
+beta[]
+
+This is the https://www.microsoft.com/en-us/sql-server/sql-server-2017[Microsoft SQL 2017] Metricbeat module. It is still in beta and under active development to add new Metricsets and introduce enhancements.
+
+[float]
+== Compatibility
+
+The module is being tested with https://hub.docker.com/r/microsoft/mssql-server-linux/[2017 GA] version under Linux
+
+[float]
+== Metricsets
+
+The following Metricsets are already included:
+
+=== `transaction_log`
+
+`transaction_log` Metricset fetches information about the operation and transaction log of each MSSQL database in the monitored instance. All data is extracted from the https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/database-related-dynamic-management-views-transact-sql?view=sql-server-2017[Database Dynamic Management Views]
+
+=== `performance`
+
+`performance` Metricset fetches information from what's commonly known as https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-os-performance-counters-transact-sql?view=sql-server-2017[Performance Counters] in MSSQL.
+
+
+[float]
+=== Example configuration
+
+The mssql module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: mssql
+  metricsets:
+    - "transaction_log"
+    - "performance"
+  hosts: ["sqlserver://sa@localhost"]
+  period: 10s
+
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-mssql-performance,performance>>
+
+* <<metricbeat-metricset-mssql-transaction_log,transaction_log>>
+
+include::mssql/performance.asciidoc[]
+
+include::mssql/transaction_log.asciidoc[]
+
