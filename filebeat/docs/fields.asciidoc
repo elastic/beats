@@ -90,7 +90,7 @@ alias to: apache.access.ssl.cipher
 --
 type: alias
 
-alias to: apache.access.body_sent.bytes
+alias to: http.response.body.bytes
 
 --
 
@@ -379,18 +379,6 @@ SSL protocol version.
 type: keyword
 
 SSL cipher name.
-
-
---
-
-*`apache.access.body_sent.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
 
 
 --
@@ -3968,7 +3956,7 @@ The authentication realm
 *`elasticsearch.audit.roles`*::
 +
 --
-type: array
+type: keyword
 
 example: ['kibana_user', 'beats_admin']
 
@@ -3990,7 +3978,7 @@ The name of the action that was executed
 *`elasticsearch.audit.indices`*::
 +
 --
-type: array
+type: keyword
 
 example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
 
@@ -4468,17 +4456,6 @@ Extra source information
 
 --
 
-*`elasticsearch.slowlog.took_millis`*::
-+
---
-type: keyword
-
-example: 42
-
-Time took in milliseconds
-
---
-
 *`elasticsearch.slowlog.total_hits`*::
 +
 --
@@ -4922,15 +4899,6 @@ Complete HTTP request line, including the method, request and HTTP version strin
 
 --
 
-*`haproxy.http.request.time_active_ms`*::
-+
---
-type: long
-
-Time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
-
---
-
 *`haproxy.http.request.time_wait_without_data_ms`*::
 +
 --
@@ -4954,15 +4922,6 @@ Total time in milliseconds spent waiting for a full HTTP request from the client
 
 TCP log format
 
-
-*`haproxy.tcp.processing_time_ms`*::
-+
---
-type: long
-
-Total time in milliseconds elapsed between the accept and the last close
-
---
 
 *`haproxy.tcp.connection_waiting_time_ms`*::
 +
@@ -5138,16 +5097,6 @@ The Windows status code.
 
 --
 
-*`iis.access.request_time_ms`*::
-+
---
-type: long
-
-The request time in milliseconds.
-
-
---
-
 *`iis.access.site_name`*::
 +
 --
@@ -5178,27 +5127,21 @@ The content of the cookie sent or received, if any.
 
 --
 
-*`iis.access.body_sent.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
-
-
---
-
 *`iis.access.body_received.bytes`*::
 +
 --
-type: long
+type: alias
 
-format: bytes
+alias to: http.request.body.bytes
 
-The number of bytes of the server request body.
+--
 
+*`iis.access.body_sent.bytes`*::
++
+--
+type: alias
+
+alias to: http.response.body.bytes
 
 --
 
@@ -6027,23 +5970,12 @@ This field contains the flags of the event.
 
 --
 
-*`http.response.elapsed_time`*::
-+
---
-type: long
-
-Elapsed time between request and response in milli seconds.
-
-
---
-
 *`http.response.content_length`*::
 +
 --
-type: long
+type: alias
 
-Content length of the HTTP response body.
-
+alias to: http.response.body.bytes
 
 --
 
@@ -6394,16 +6326,6 @@ alias to: message
 Contains fields from the MySQL slow logs.
 
 
-
-*`mysql.slowlog.query_time.sec`*::
-+
---
-type: float
-
-The total time the query took, in seconds, as a floating point number.
-
-
---
 
 *`mysql.slowlog.lock_time.sec`*::
 +
@@ -9988,12 +9910,9 @@ Contains fields for the Nginx access logs.
 *`nginx.access.body_sent.bytes`*::
 +
 --
-type: long
+type: alias
 
-format: bytes
-
-The number of bytes of the server response body.
-
+alias to: http.response.body.bytes
 
 --
 
@@ -10390,17 +10309,6 @@ Core id
 example: mydb
 
 Name of database
-
---
-
-*`postgresql.log.duration`*::
-+
---
-type: float
-
-example: 30.0
-
-Duration of a query.
 
 --
 
@@ -12595,34 +12503,12 @@ Contains fields for the Traefik access logs.
 
 
 
-*`traefik.access.duration`*::
-+
---
-type: long
-
-Duration of the access entry.
-
-
---
-
 *`traefik.access.user_identifier`*::
 +
 --
 type: keyword
 
 Is the RFC 1413 identity of the client
-
-
---
-
-*`traefik.access.body_sent.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
 
 
 --
@@ -12653,6 +12539,15 @@ The name of the frontend used
 type: text
 
 The url of the backend where request is forwarded
+
+--
+
+*`traefik.access.body_sent.bytes`*::
++
+--
+type: alias
+
+alias to: http.response.body.bytes
 
 --
 

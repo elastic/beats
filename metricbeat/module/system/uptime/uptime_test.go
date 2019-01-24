@@ -22,19 +22,29 @@ package uptime
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	f := mbtest.NewEventFetcher(t, getConfig())
-
-	uptime, err := f.Fetch()
+	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	err := mbtest.WriteEventsReporterV2(f, t, ".")
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal("write", err)
 	}
+}
 
-	event := mbtest.CreateFullEvent(f, uptime)
-	mbtest.WriteEventToDataJSON(t, event, "")
+func TestFetch(t *testing.T) {
+	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2(f)
+
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
+		t.FailNow()
+	}
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("system", "uptime").Fields.StringToPrint())
 }
 
 func getConfig() map[string]interface{} {

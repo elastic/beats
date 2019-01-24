@@ -5,7 +5,7 @@
             "grok": {
                 "field": "message",
                 "patterns": [
-                    "\"?%{IP_LIST:network.forwarded_ip} - %{DATA:user.name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{GREEDYDATA:nginx.access.info}\" %{NUMBER:http.response.status_code:long} %{NUMBER:nginx.access.body_sent.bytes:long} \"%{DATA:http.request.referrer}\" \"%{DATA:nginx.access.agent}\""
+                    "\"?%{IP_LIST:network.forwarded_ip} - %{DATA:user.name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{GREEDYDATA:nginx.access.info}\" %{NUMBER:http.response.status_code:long} %{NUMBER:http.response.body.bytes:long} \"%{DATA:http.request.referrer}\" \"%{DATA:nginx.access.agent}\""
                 ],
                 "pattern_definitions": {
                     "IP_LIST": "%{IP}(\"?,?\\s*%{IP})*"

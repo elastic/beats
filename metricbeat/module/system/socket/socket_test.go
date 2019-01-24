@@ -30,6 +30,7 @@ import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestData(t *testing.T) {
@@ -39,9 +40,9 @@ func TestData(t *testing.T) {
 	}
 	defer ln.Close()
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
-
-	if err = mbtest.WriteEvents(f, t); err != nil {
+	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	err = mbtest.WriteEventsReporterV2(f, t, ".")
+	if err != nil {
 		t.Fatal("write", err)
 	}
 }
@@ -60,15 +61,25 @@ func TestFetch(t *testing.T) {
 		t.Fatal("failed to get port from addr", addr)
 	}
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	events, err := f.Fetch()
-	if err != nil {
-		t.Fatal("fetch", err)
+	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2(f)
+
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
+		t.FailNow()
 	}
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("system", "socket").Fields.StringToPrint())
 
 	var found bool
-	for _, evt := range events {
-		port, ok := getRequiredValue("local.port", evt, t).(int)
+	for _, event := range events {
+		s, err := event.BeatEvent("system", "socket").Fields.GetValue("system.socket")
+		require.NoError(t, err)
+
+		fields, ok := s.(common.MapStr)
+		require.True(t, ok)
+
+		port, ok := getRequiredValue(t, "local.port", fields).(int)
 		if !ok {
 			t.Fatal("local.port is not an int")
 		}
@@ -76,27 +87,27 @@ func TestFetch(t *testing.T) {
 			continue
 		}
 
-		pid, ok := getRequiredValue("process.pid", evt, t).(int)
+		pid, ok := getRequiredValue(t, "process.pid", fields).(int)
 		if !ok {
 			t.Fatal("process.pid is not a int")
 		}
 		assert.Equal(t, os.Getpid(), pid)
 
-		uid, ok := getRequiredValue("user.id", evt, t).(uint32)
+		uid, ok := getRequiredValue(t, "user.id", fields).(uint32)
 		if !ok {
 			t.Fatal("user.id is not an uint32")
 		}
 		assert.EqualValues(t, os.Geteuid(), uid)
 
-		dir, ok := getRequiredValue("direction", evt, t).(string)
+		dir, ok := getRequiredValue(t, "direction", fields).(string)
 		if !ok {
 			t.Fatal("direction is not a string")
 		}
 		assert.Equal(t, "listening", dir)
 
-		_ = getRequiredValue("process.cmdline", evt, t).(string)
-		_ = getRequiredValue("process.command", evt, t).(string)
-		_ = getRequiredValue("process.exe", evt, t).(string)
+		_ = getRequiredValue(t, "process.cmdline", fields).(string)
+		_ = getRequiredValue(t, "process.command", fields).(string)
+		_ = getRequiredValue(t, "process.exe", fields).(string)
 
 		found = true
 		break
@@ -105,7 +116,7 @@ func TestFetch(t *testing.T) {
 	assert.True(t, found, "listener not found")
 }
 
-func getRequiredValue(key string, m common.MapStr, t testing.TB) interface{} {
+func getRequiredValue(t testing.TB, key string, m common.MapStr) interface{} {
 	v, err := m.GetValue(key)
 	if err != nil {
 		t.Fatal(err)

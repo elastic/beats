@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/protos"
 )
 
@@ -39,6 +40,18 @@ type eventStore struct {
 }
 
 func (e *eventStore) publish(event beat.Event) {
+	pbf, err := pb.GetFields(event.Fields)
+	if err != nil || pbf == nil {
+		panic("_packetbeat not found")
+	}
+	delete(event.Fields, pb.FieldsKey)
+	if err = pbf.ComputeValues(nil); err != nil {
+		panic(err)
+	}
+	if err = pbf.MarshalMapStr(event.Fields); err != nil {
+		panic(err)
+	}
+
 	e.events = append(e.events, event)
 }
 
@@ -381,5 +394,7 @@ func Test_gap_in_response(t *testing.T) {
 
 	trans := expectTransaction(t, store)
 	assert.NotNil(t, trans)
-	assert.Equal(t, trans["notes"], []string{"Packet loss while capturing the response"})
+	if m, err := trans.GetValue("error.message"); assert.NoError(t, err) {
+		assert.Equal(t, m, "Packet loss while capturing the response")
+	}
 }

@@ -17,7 +17,6 @@
         "haproxy.frontend_name": "http-webservices",
         "haproxy.http.request.captured_cookie": "-",
         "haproxy.http.request.raw_request_line": "GET / HTTP/1.1",
-        "haproxy.http.request.time_active_ms": 0,
         "haproxy.http.request.time_wait_ms": 0,
         "haproxy.http.request.time_wait_without_data_ms": -1,
         "haproxy.http.response.captured_cookie": "-",
@@ -54,7 +53,6 @@
         "haproxy.frontend_name": "http-webservices",
         "haproxy.http.request.captured_cookie": "-",
         "haproxy.http.request.raw_request_line": "GET /foo HTTP/1.1",
-        "haproxy.http.request.time_active_ms": 0,
         "haproxy.http.request.time_wait_ms": 0,
         "haproxy.http.request.time_wait_without_data_ms": -1,
         "haproxy.http.response.captured_cookie": "-",
@@ -94,7 +92,6 @@
             "localhost:8888"
         ],
         "haproxy.http.request.raw_request_line": "GET /foo HTTP/1.1",
-        "haproxy.http.request.time_active_ms": 0,
         "haproxy.http.request.time_wait_ms": 0,
         "haproxy.http.request.time_wait_without_data_ms": -1,
         "haproxy.http.response.captured_cookie": "-",

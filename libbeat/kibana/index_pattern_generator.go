@@ -174,5 +174,5 @@ func createTargetDir(baseDir string, version common.Version) string {
 }
 
 func getVersionPath(version common.Version) string {
-	return "6"
+	return "7"
 }
