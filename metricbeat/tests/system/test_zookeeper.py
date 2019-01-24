@@ -5,7 +5,7 @@ from nose.plugins.attrib import attr
 
 ZK_FIELDS = metricbeat.COMMON_FIELDS + ["zookeeper"]
 
-MNTR_FIELDS = ["version", "latency.avg", "latency.max",
+MNTR_FIELDS = ["latency.avg", "latency.max",
                "latency.min", "packets.received", "packets.sent",
                "outstanding_requests", "server_state", "znode_count",
                "watch_count", "ephemerals_count",

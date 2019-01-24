@@ -43,11 +43,10 @@ type Client struct {
 	Connection
 	tlsConfig *transport.TLSConfig
 
-	index     outil.Selector
-	pipeline  *outil.Selector
-	params    map[string]string
-	timeout   time.Duration
-	eventType string
+	index    outil.Selector
+	pipeline *outil.Selector
+	params   map[string]string
+	timeout  time.Duration
 
 	// buffered bulk requests
 	bulkRequ *bulkRequest
@@ -104,7 +103,7 @@ type bulkCreateAction struct {
 
 type bulkEventMeta struct {
 	Index    string `json:"_index" struct:"_index"`
-	DocType  string `json:"_type" struct:"_type"`
+	DocType  string `json:"_type,omitempty" struct:"_type,omitempty"`
 	Pipeline string `json:"pipeline,omitempty" struct:"pipeline,omitempty"`
 	ID       string `json:"_id,omitempty" struct:"_id,omitempty"`
 }
@@ -132,7 +131,7 @@ var (
 )
 
 const (
-	defaultEventType = "_doc"
+	defaultEventType = "doc"
 )
 
 // NewClient instantiates a new client.
@@ -217,7 +216,6 @@ func NewClient(
 		pipeline:  pipeline,
 		params:    params,
 		timeout:   s.Timeout,
-		eventType: defaultEventType,
 
 		bulkRequ: bulkRequ,
 
@@ -304,8 +302,13 @@ func (client *Client) publishEvents(
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
 
+	eventType := ""
+	if client.GetVersion().Major < 7 {
+		eventType = defaultEventType
+	}
+
 	origCount := len(data)
-	data = bulkEncodePublishRequest(body, client.index, client.pipeline, client.eventType, data)
+	data = bulkEncodePublishRequest(body, client.index, client.pipeline, eventType, data)
 	newCount := len(data)
 	if st != nil && origCount > newCount {
 		st.Dropped(origCount - newCount)
@@ -684,13 +687,7 @@ func (client *Client) String() string {
 // the configured host, updates the known Elasticsearch version and calls
 // globally configured handlers.
 func (client *Client) Connect() error {
-	err := client.Connection.Connect()
-	if err != nil {
-		return err
-	}
-
-	client.eventType = defaultEventType
-	return nil
+	return client.Connection.Connect()
 }
 
 // Connect connects the client. It runs a GET request against the root URL of
