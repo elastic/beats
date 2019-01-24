@@ -65,16 +65,19 @@
 
 - key: summary
   title: "Monitor summary"
-  description: "Present in the last event emitted during a check. If a monitor checks multiple endpoints, as is the case with `mode: all`."
   fields:
-    - name: up
-      type: integer
-      description: >
-        The number of endpoints that succeeded
-    - name: down
-      type: integer
-      description: >
-        The number of endpoints that failed
+    - name: summary
+      type: group
+      description: "Present in the last event emitted during a check. If a monitor checks multiple endpoints, as is the case with `mode: all`."
+      fields:
+        - name: up
+          type: integer
+          description: >
+            The number of endpoints that succeeded
+        - name: down
+          type: integer
+          description: >
+            The number of endpoints that failed
 
 - key: resolve
   title: "Host lookup"
