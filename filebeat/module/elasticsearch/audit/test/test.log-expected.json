@@ -114,10 +114,26 @@
     },
     {
         "@timestamp": "2019-01-08T14:15:02.011Z",
+        "elasticsearch.audit.action": "indices:data/read/search[free_context]",
+        "elasticsearch.audit.indices": [
+            "foo-2019.01.04",
+            "foo-2019.01.03",
+            "foo-2019.01.06",
+            "foo-2019.01.05",
+            "foo-2019.01.08",
+            "servicelog-2019.01.07"
+        ],
         "elasticsearch.audit.layer": "transport",
         "elasticsearch.audit.origin_address": "192.168.2.1",
         "elasticsearch.audit.origin_type": "transport",
         "elasticsearch.audit.principal": "username",
+        "elasticsearch.audit.realm": "active_directory",
+        "elasticsearch.audit.request": "SearchFreeContextRequest",
+        "elasticsearch.audit.roles": [
+            "kibana_user",
+            "my_custom_role_1",
+            "foo_reader"
+        ],
         "elasticsearch.node.name": "NodeName-0",
         "event.dataset": "elasticsearch.audit",
         "event.type": "access_granted",

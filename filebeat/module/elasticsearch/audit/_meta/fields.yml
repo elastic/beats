@@ -22,6 +22,14 @@
       description: "The principal (username) that failed authentication"
       example: "_anonymous"
       type: keyword
+    - name: realm
+      description: "The authentication realm"
+      example": "active_directory"
+      type: keyword
+    - name: roles
+      description: "Roles to which the principal belongs"
+      example: [ "kibana_user", "beats_admin" ]
+      type: keyword
     - name: action
       description: "The name of the action that was executed"
       example: "cluster:monitor/main"
@@ -29,6 +37,10 @@
     - name: uri
       description: "The REST endpoint URI"
       example: /_xpack/security/_authenticate
+      type: keyword
+    - name: indices
+      description: "Indices accessed by action"
+      example: [ "foo-2019.01.04", "foo-2019.01.03", "foo-2019.01.06" ]
       type: keyword
     - name: request
       description: "The type of request that was executed"
