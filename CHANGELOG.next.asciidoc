@@ -19,6 +19,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove port settings from Logstash and Redis output. {pull}9934[9934]
 - Fix registry handle leak on Windows (https://github.com/elastic/go-sysinfo/pull/33). {pull}9920[9920]
 - Rename `process.exe` to `process.executable` in add_process_metadata to align with ECS. {pull}9949[9949]
+- Import ECS change https://github.com/elastic/ecs/pull/308[ecs#308]:
+  leaf field `user.group` is now the `group` field set. {pull}10275[10275]
 
 *Auditbeat*
 - Rename `process.exe` to `process.executable` in auditd module to align with ECS. {pull}9949[9949]

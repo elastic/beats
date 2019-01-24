@@ -39,8 +39,4 @@ type User struct {
 	// Useful if `user.id` or `user.name` contain confidential information and
 	// cannot be used.
 	Hash string `ecs:"hash"`
-
-	// Group the user is a part of. This field can contain a list of groups, if
-	// necessary.
-	Group string `ecs:"group"`
 }
