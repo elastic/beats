@@ -18,9 +18,11 @@
             "-H",
             "unix://"
         ],
+        "executable": "/usr/bin/dockerd-ce",
         "name": "dockerd",
         "pid": 2080,
-        "ppid": 1
+        "ppid": 1,
+        "working_directory": "/"
     },
     "service": {
         "type": "system"
@@ -37,8 +39,8 @@
                     "id": "docker.service",
                     "path": "/system.slice/docker.service",
                     "total": {
-                        "bytes": 843833237504,
-                        "ios": 54815978
+                        "bytes": 844351791104,
+                        "ios": 54852356
                     }
                 },
                 "cpu": {
@@ -73,21 +75,21 @@
                     "id": "docker.service",
                     "path": "/system.slice/docker.service",
                     "percpu": {
-                        "1": 7044901041326,
-                        "2": 7039983834233,
-                        "3": 7055631105655,
-                        "4": 7036508692063
+                        "1": 7054330260009,
+                        "2": 7049692566590,
+                        "3": 7065233675066,
+                        "4": 7046130392473
                     },
                     "stats": {
                         "system": {
-                            "ns": 7196600000000
+                            "ns": 7200940000000
                         },
                         "user": {
-                            "ns": 19525830000000
+                            "ns": 19559180000000
                         }
                     },
                     "total": {
-                        "ns": 28177024662532
+                        "ns": 28215386894138
                     }
                 },
                 "id": "docker.service",
@@ -99,7 +101,7 @@
                             "bytes": 9223372036854771712
                         },
                         "usage": {
-                            "bytes": 21131264,
+                            "bytes": 21143552,
                             "max": {
                                 "bytes": 480030720
                             }
@@ -123,7 +125,7 @@
                             "bytes": 9223372036854771712
                         },
                         "usage": {
-                            "bytes": 3202142208,
+                            "bytes": 3325169664,
                             "max": {
                                 "bytes": 5245300736
                             }
@@ -144,13 +146,13 @@
                     "path": "/system.slice/docker.service",
                     "stats": {
                         "active_anon": {
-                            "bytes": 778706944
+                            "bytes": 779210752
                         },
                         "active_file": {
-                            "bytes": 1593802752
+                            "bytes": 1714401280
                         },
                         "cache": {
-                            "bytes": 1993175040
+                            "bytes": 2115690496
                         },
                         "hierarchical_memory_limit": {
                             "bytes": 9223372036854771712
@@ -159,20 +161,20 @@
                             "bytes": 0
                         },
                         "inactive_anon": {
-                            "bytes": 409128960
+                            "bytes": 409124864
                         },
                         "inactive_file": {
-                            "bytes": 399372288
+                            "bytes": 401289216
                         },
                         "major_page_faults": 53164,
                         "mapped_file": {
                             "bytes": 7491584
                         },
-                        "page_faults": 21923471,
-                        "pages_in": 57219162,
-                        "pages_out": 56513066,
+                        "page_faults": 21923594,
+                        "pages_in": 57255269,
+                        "pages_out": 56519140,
                         "rss": {
-                            "bytes": 1187835904
+                            "bytes": 1188335616
                         },
                         "rss_huge": {
                             "bytes": 56623104
@@ -192,16 +194,23 @@
                 "start_time": "2019-01-08T17:06:39.000Z",
                 "total": {
                     "norm": {
-                        "pct": 0.0024
+                        "pct": 0.0047
                     },
-                    "pct": 0.0095,
-                    "value": 27773480
+                    "pct": 0.0189,
+                    "value": 27811840
                 }
+            },
+            "fd": {
+                "limit": {
+                    "hard": 1048576,
+                    "soft": 1048576
+                },
+                "open": 72
             },
             "memory": {
                 "rss": {
-                    "bytes": 1186021376,
-                    "pct": 0.0716
+                    "bytes": 1187368960,
+                    "pct": 0.0717
                 },
                 "share": 8253440,
                 "size": 4438523904

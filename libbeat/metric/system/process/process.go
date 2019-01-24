@@ -54,6 +54,7 @@ type Process struct {
 	Args            []string `json:"args"`
 	CmdLine         string   `json:"cmdline"`
 	Cwd             string   `json:"cwd"`
+	Executable      string   `json:"executable"`
 	Mem             sigar.ProcMem
 	Cpu             sigar.ProcTime
 	SampleTime      time.Time
@@ -99,15 +100,16 @@ func newProcess(pid int, cmdline string, env common.MapStr) (*Process, error) {
 	}
 
 	proc := Process{
-		Pid:      pid,
-		Ppid:     state.Ppid,
-		Pgid:     state.Pgid,
-		Name:     state.Name,
-		Username: state.Username,
-		State:    getProcState(byte(state.State)),
-		CmdLine:  cmdline,
-		Cwd:      exe.Cwd,
-		Env:      env,
+		Pid:        pid,
+		Ppid:       state.Ppid,
+		Pgid:       state.Pgid,
+		Name:       state.Name,
+		Username:   state.Username,
+		State:      getProcState(byte(state.State)),
+		CmdLine:    cmdline,
+		Cwd:        exe.Cwd,
+		Executable: exe.Name,
+		Env:        env,
 	}
 
 	return &proc, nil
@@ -298,6 +300,10 @@ func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
 
 	if process.Cwd != "" {
 		proc["cwd"] = process.Cwd
+	}
+
+	if process.Executable != "" {
+		proc["exe"] = process.Executable
 	}
 
 	if len(process.Env) > 0 {
