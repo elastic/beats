@@ -6407,24 +6407,6 @@ PostgreSQL-specific event fields.
 
 
 
-*`pgsql.query`*::
-+
---
-The row pgsql query as read from the transaction's request.
-
-
---
-
-*`pgsql.iserror`*::
-+
---
-type: boolean
-
-If the PgSQL query returns an error, this field is set to true.
-
-
---
-
 *`pgsql.error_code`*::
 +
 --
