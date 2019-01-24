@@ -136,7 +136,7 @@
         "event.dataset": "system.auth",
         "event.module": "system",
         "fileset.name": "auth",
-        "group.id": 48,
+        "group.id": "48",
         "group.name": "apache",
         "host.hostname": "localhost",
         "input.type": "log",
@@ -149,7 +149,7 @@
         "event.dataset": "system.auth",
         "event.module": "system",
         "fileset.name": "auth",
-        "group.id": 48,
+        "group.id": "48",
         "host.hostname": "localhost",
         "input.type": "log",
         "log.offset": 934,
@@ -157,7 +157,7 @@
         "service.type": "system",
         "system.auth.useradd.home": "/usr/share/httpd",
         "system.auth.useradd.shell": "/sbin/nologin",
-        "user.id": 48,
+        "user.id": "48",
         "user.name": "apache"
     }
 ]

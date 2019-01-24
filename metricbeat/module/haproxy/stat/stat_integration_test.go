@@ -22,10 +22,25 @@ package stat
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/haproxy"
 )
 
+func TestFetch(t *testing.T) {
+	compose.EnsureUp(t, "haproxy")
+
+	f := mbtest.NewEventsFetcher(t, getConfig())
+	event, err := f.Fetch()
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	assert.NotNil(t, event)
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+}
 func TestData(t *testing.T) {
 	f := mbtest.NewEventsFetcher(t, getConfig())
 	err := mbtest.WriteEvents(f, t)

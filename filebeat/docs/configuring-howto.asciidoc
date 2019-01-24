@@ -28,6 +28,7 @@ The following topics describe how to configure Filebeat:
 * <<filebeat-configuration-reloading>>
 * <<configuring-internal-queue>>
 * <<configuring-output>>
+* <<ilm>>
 * <<load-balancing>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
@@ -60,6 +61,8 @@ include::./reload-configuration.asciidoc[]
 include::{libbeat-dir}/docs/queueconfig.asciidoc[]
 
 include::{libbeat-dir}/docs/outputconfig.asciidoc[]
+
+include::../../libbeat/docs/shared-ilm.asciidoc[]
 
 include::./load-balancing.asciidoc[]
 

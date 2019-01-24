@@ -63,11 +63,12 @@ func TestURLFields(t *testing.T) {
 		},
 		{
 			"complex",
-			"tcp+ssl://myuser:mypass@elastic.co/foo/bar?q=dosomething&x=y",
+			"tcp+ssl://myuser:mypass@elastic.co:65500/foo/bar?q=dosomething&x=y",
 			common.MapStr{
-				"full":     "tcp+ssl://myuser:%3Chidden%3E@elastic.co/foo/bar?q=dosomething&x=y",
+				"full":     "tcp+ssl://myuser:%3Chidden%3E@elastic.co:65500/foo/bar?q=dosomething&x=y",
 				"scheme":   "tcp+ssl",
 				"domain":   "elastic.co",
+				"port":     uint64(65500),
 				"path":     "/foo/bar",
 				"query":    "q=dosomething&x=y",
 				"username": "myuser",

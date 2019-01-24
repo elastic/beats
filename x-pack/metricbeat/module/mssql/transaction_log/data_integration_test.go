@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package db
+package transaction_log
 
 import (
 	"testing"
@@ -14,7 +14,7 @@ import (
 func TestData(t *testing.T) {
 	t.Skip("Skipping `data.json` generation test")
 
-	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("db"))
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("transaction_log"))
 
 	err := mbtest.WriteEventsReporterV2(f, t, "")
 	if err != nil {

@@ -46,15 +46,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch fetches the uptime metric from the OS.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	var uptime sigar.Uptime
 	if err := uptime.Get(); err != nil {
-		return nil, errors.Wrap(err, "failed to get uptime")
+		r.Error(errors.Wrap(err, "failed to get uptime"))
+		return
 	}
 
-	return common.MapStr{
-		"duration": common.MapStr{
-			"ms": int64(uptime.Length * 1000),
+	r.Event(mb.Event{
+		MetricSetFields: common.MapStr{
+			"duration": common.MapStr{
+				"ms": int64(uptime.Length * 1000),
+			},
 		},
-	}, nil
+	})
 }

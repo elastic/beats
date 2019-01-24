@@ -101,7 +101,7 @@ func GenerateModuleFieldsGo(moduleDir string) error {
 		filepath.Join(beatsDir, moduleFieldsCmdPath),
 		"-beat", BeatName,
 		"-license", toLibbeatLicenseName(BeatLicense),
-		filepath.Join(CWD(), moduleDir),
+		filepath.Join(moduleDir),
 	)
 
 	return moduleFieldsCmd()
