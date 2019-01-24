@@ -22,15 +22,9 @@
     "source": {
         "ip": "10.0.2.2"
     },
-    "system": {
-        "audit": {
-            "login": {
-                "tty": "pts/1"
-            }
-        }
-    },
     "user": {
         "id": 1000,
-        "name": "vagrant"
+        "name": "vagrant",
+        "terminal": "pts/1"
     }
 }
