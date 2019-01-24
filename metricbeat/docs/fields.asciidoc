@@ -12824,7 +12824,6 @@ Total inodes
 [[exported-fields-kvm]]
 == kvm fields
 
-experimental[]
 kvm module
 
 
