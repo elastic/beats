@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("auditbeat", "file_integrity", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("auditbeat", "file_integrity", asset.ModuleFieldsPri, AssetFileIntegrity); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetFileIntegrity returns asset data.
+// This is the base64 encoded gzipped contents of module/file_integrity.
+func AssetFileIntegrity() string {
 	return "eJyUkkFvozAUhO/8ivkDyQonoIjDSqy2FVXbU3rIDZn4BVsxEGGnDf++wqJNIkXCPvI0fJ438xY40pDhoDSVqrVU98oOEWCV1ZThWWnCy81ckNn36mRV12b4kGQIvCdYSTgo0sKgppZ6bkmgGqb5LRtNJ86alhGmH7IIWKDlDWWQ3MgIAOxwogx1351P7vvu2b9uBBTcSDLoDr/PLEdL40bGueK67nplZePwBrwVTvrJ9ZmcZCKNQ0kXULvvBAkIVZOxk24ZOdXV7dVvpfmRWFWyJP0hOeNHGr66XkyzO/P/3vLXJ1YtWJK6de/sRw/pq806lL7arH3pScxC6UnM5uiNSHyp7/+TOZqRPPbFbYs89uAx5h3qtsgZm81zZPqfwcicvwAjeUD52yL36H1klmHbO70fNygBp/fiBqZQ+uYQcPyO63H5RvIwqjczsLUkZn/8enPsoOYce767y0Wm3pZ3u/SR2e8AAAD//7nP8bw="
 }

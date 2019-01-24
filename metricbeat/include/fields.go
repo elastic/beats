@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("metricbeat", "../metricbeat/_meta/fields.common.yml", asset.BeatFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("metricbeat", "../metricbeat/_meta/fields.common.yml", asset.BeatFieldsPri, AssetMetricbeatMetaFieldsCommonYml); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetMetricbeatMetaFieldsCommonYml returns asset data.
+// This is the base64 encoded gzipped contents of ../metricbeat/_meta/fields.common.yml.
+func AssetMetricbeatMetaFieldsCommonYml() string {
 	return "eJyUUktu2zAU3OsUg+yjA2hRoPAVcoEXchwS5Ucln6zq9gVpOqiN1kW04+ObD2f0ih88FpgcY04ToF4DF5xuZ8tqil/V57Tg2wQAp5xUfKoDhLNnsBVyER/kPRA+QUIAL0wKPVbWecJYW6bO8YokkQsitXhTqXPMdgvsl39Vbd+bY8chn6GOuGKgThQfTCyitP2ma88D2CwskOCljskq6paxdCcc/UeRq6yWjf8y285ftHrDPnF7J1ZZLt5wFmsLa32udsop0bQpxv6nrhjnE3EuOWJ33rgHO7u0IkOgUdoZb87XT9peGaIcSFnxTqyFtZW6O6bOY0XlngIhGwnheHhO62DwFv7cfKEdEV+H/CVxDX+G/J8nt4BtNlu8/WQzvoddjooecsaLzeZlnn4HAAD///yQ6RY="
 }

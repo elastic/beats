@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("metricbeat", "kvm", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("metricbeat", "kvm", asset.ModuleFieldsPri, AssetKvm); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetKvm returns asset data.
+// This is the base64 encoded gzipped contents of ../metricbeat/module/kvm.
+func AssetKvm() string {
 	return "eJyskLFuwyAQhnee4lf2vABDp659gqoDKtcIwXEWxm799lXcUCXOBXcogwcOfd/nOyLSYhFnNkANNZHFIc58MICn8b2EoQbJFk8GAOhroBKYcnXp9c2sd3FmsPgpkQE+AiU/2nVwRHZMDX4+dRnI4lRkGi43iuMWcg3ywkw8Vld/RxrzIfcy0ihb5a1487gn3tX/nBdiKYsO1luue85fZdyaIi2fUrz6YrdsU/fI1VJml6ZeS5J8+p8QzdQqwv3PdvS76mdhF/I9tbv//u7/6lzR3wEAAP//jl7YkQ=="
 }

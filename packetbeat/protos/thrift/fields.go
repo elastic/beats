@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("packetbeat", "thrift", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("packetbeat", "thrift", asset.ModuleFieldsPri, AssetThrift); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetThrift returns asset data.
+// This is the base64 encoded gzipped contents of protos/thrift.
+func AssetThrift() string {
 	return "eJyUUrGum0AQ7PmK0atjPoAiTV5jKVKiyH205obHKscduj148d9HHCTGzy6cq2A1Mzu7swf84qVB7pN2uQKyZs8GL6dSOPz4/uWlAhytTTpmjaHB5woArgDYyFY7bcGZIaNTemd1he2rKfgDggzcdVpevoxs8JbiNG6VPWVPGyXJYP/KDy39faeeWHwNzH10aMX7lc/MZNAAQT8NEpAoTs6e6GIaJNc4dsg9cXz9eqPYqadBEiGzqF8onwpwJzsZi1fDe8/AmQljNNOzZ30j9i33TO9qm8Tx1dClOJSfgWbyxtJqMrq6utuEMc3a8vlVLDTEdbB9aqsOxODYaaBbNrNNv078oHtinlL4OYuf/sNCgW9cOpwvH80sGdU49WpQA0Mb3epnS+pG8WNq9y75u2Ux8+TFbLGXS0m0yee1+1VnyUptPU+0MWTRYIV0xTzv908AAAD//0KDB+4="
 }
