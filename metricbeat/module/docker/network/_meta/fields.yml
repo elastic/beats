@@ -4,7 +4,6 @@
     Network metrics.
   release: ga
   fields:
-    # network.interface?
     - name: interface
       type: keyword
       description: >
