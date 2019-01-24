@@ -42,7 +42,7 @@ BUILD_DIR?=$(shell pwd)/build
 PKG_BUILD_DIR?=$(BUILD_DIR)/package${PKG_SUFFIX}
 PKG_UPLOAD_DIR?=$(BUILD_DIR)/upload
 COVERAGE_DIR?=${BUILD_DIR}/coverage
-COVERAGE_TOOL?=${BEAT_GOPATH}/bin/gotestcover
+COVERAGE_TOOL?="${BEAT_GOPATH}/bin/gotestcover"
 COVERAGE_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 TESTIFY_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/stretchr/testify/assert
 NOW=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
@@ -374,7 +374,7 @@ KIBANA_URL?=http://localhost:5601
 
 .PHONY: import-dashboards
 import-dashboards: update ${BEAT_NAME}
-	${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME} setup -E setup.dashboards.directory="${PWD}/_meta/kibana.generated" -E setup.kibana.host=${KIBANA_URL} --dashboards
+	"${BEAT_GOPATH}/src/${BEAT_PATH}/${BEAT_NAME}" setup -E setup.dashboards.directory="${PWD}/_meta/kibana.generated" -E setup.kibana.host=${KIBANA_URL} --dashboards
 
 ### CONTAINER ENVIRONMENT ####
 

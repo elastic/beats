@@ -23,7 +23,7 @@ copy-vendor:
 	ln -sf "${PWD}/vendor/github.com/elastic/beats/metricbeat/scripts/generate_imports_helper.py" "${PWD}/vendor/github.com/elastic/beats/script/generate_imports_helper.py"
 	rm -rf vendor/github.com/elastic/beats/.git vendor/github.com/elastic/beats/x-pack
 	mkdir -p vendor/github.com/magefile
-	cp -R ${BEAT_GOPATH}/src/github.com/elastic/beats/vendor/github.com/magefile/mage vendor/github.com/magefile
+	cp -R "${BEAT_GOPATH}/src/github.com/elastic/beats/vendor/github.com/magefile/mage" vendor/github.com/magefile
 
 .PHONY: git-init
 git-init:
