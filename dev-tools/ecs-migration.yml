@@ -1239,6 +1239,7 @@
 - from: responsetime
   to: event.duration
   alias: false
+  scale: 1000000
   comment: The units changed so no alias was added.
   beat: packetbeat
 
