@@ -22,7 +22,6 @@ package include
 import (
 	// Import packages that need to register themselves.
 	_ "github.com/elastic/beats/packetbeat/protos/amqp"
-	_ "github.com/elastic/beats/packetbeat/protos/applayer"
 	_ "github.com/elastic/beats/packetbeat/protos/cassandra"
 	_ "github.com/elastic/beats/packetbeat/protos/dhcpv4"
 	_ "github.com/elastic/beats/packetbeat/protos/dns"
@@ -37,5 +36,4 @@ import (
 	_ "github.com/elastic/beats/packetbeat/protos/tcp"
 	_ "github.com/elastic/beats/packetbeat/protos/thrift"
 	_ "github.com/elastic/beats/packetbeat/protos/tls"
-	_ "github.com/elastic/beats/packetbeat/protos/udp"
 )

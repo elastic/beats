@@ -37,9 +37,8 @@ PUT _ingest/pipeline/geoip-info
   "processors": [
     {
       "geoip": {
-        "field": "client_ip",
-        "target_field": "client_geoip",
-        "properties": ["location"],
+        "field": "client.ip",
+        "target_field": "client.geo",
         "ignore_failure": true
       }
     }
@@ -49,11 +48,11 @@ PUT _ingest/pipeline/geoip-info
 //CONSOLE
 --
 +
-This pipeline adds a `client_geoip.location` field of type `geo_point` to the
-event. The ID of the pipeline is `geoip-info`. `client_ip` is the output field
+This pipeline adds a `client.geo.location` field of type `geo_point` to the
+event. The ID of the pipeline is `geoip-info`. `client.ip` is the output field
 in Packetbeat that contains the IP address of the client. You set
 `ignore_failure` to `true` so that the pipeline will continue processing events
-when it encounters an event that doesn't have a `client_ip` field.
+when it encounters an event that doesn't have a `client.ip` field.
 +
 See
 {ref}/geoip-processor.html[Using the geoip Processor in a Pipeline]
@@ -78,7 +77,7 @@ sudo ./packetbeat -e -c packetbeat.yml
 -------------------------------------------------------------------------------
 +
 The event that's sent to Elasticsearch should now include a
-`client_geoip.location` field.
+`client.geo.location` field.
 
 [float]
 [[packetbeat-visualizing-location]]
@@ -87,13 +86,13 @@ The event that's sent to Elasticsearch should now include a
 To visualize the location of your Packetbeat clients, you can either
 <<load-kibana-dashboards,set up the example Kibana dashboards>> (if
 you haven't already), or create a new {kibana-ref}/tilemap.html[coordinate map]
-in Kibana and use the `client_geoip.location` field as the Geohash.
+in Kibana and use the `client.geo.location` field as the Geohash.
 
 [role="screenshot"]
 image:./images/kibana-update-map.png[Update Packetbeat client location map in Kibana]
 
 TIP: If the map in the dashboard reports "no results found", and you don't see
-`client_geoip.location` in the list of available Geohash fields, try refreshing
+`client.geo.location` in the list of available Geohash fields, try refreshing
 the field list in Kibana. On the Management tab, select the `packetbeat-*`
 index pattern, and refresh the field list to pick up any fields that were added
 by the ingest geoIP processor.

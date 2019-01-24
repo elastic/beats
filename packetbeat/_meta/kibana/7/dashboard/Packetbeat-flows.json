@@ -38,7 +38,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -145,8 +144,8 @@
       },
       "id": "Top-hosts-creating-traffic",
       "type": "visualization",
-      "updated_at": "2019-01-14T23:43:51.073Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:25.168Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -165,23 +164,24 @@
             }
           }
         },
-        "title": "Navigation",
+        "title": "Navigation [Packetbeat]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [],
           "params": {
-            "fontSize": "10",
-            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Flows](#/dashboard/Packetbeat-Flows)\n\n[Web transactions](#/dashboard/Packetbeat-HTTP)\n\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\n\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\n\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\n\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\n\n[NFS transactions](#/dashboard/Packetbeat-NFS)\n\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)"
+            "fontSize": 10,
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
+            "openLinksInNewTab": false
           },
-          "title": "Navigation",
+          "title": "Navigation [Packetbeat]",
           "type": "markdown"
         }
       },
       "id": "Navigation",
       "type": "visualization",
-      "updated_at": "2019-01-14T23:40:42.481Z",
-      "version": 10
+      "updated_at": "2019-01-19T00:18:59.372Z",
+      "version": 11
     },
     {
       "attributes": {
@@ -221,7 +221,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -311,8 +310,8 @@
       },
       "id": "Connections-over-time",
       "type": "visualization",
-      "updated_at": "2019-01-14T23:45:09.543Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:25.168Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -352,7 +351,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -459,8 +457,8 @@
       },
       "id": "Top-hosts-receiving-traffic",
       "type": "visualization",
-      "updated_at": "2019-01-14T23:44:37.550Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:25.168Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -561,8 +559,8 @@
       },
       "id": "Network-traffic-between-your-hosts",
       "type": "visualization",
-      "updated_at": "2019-01-14T23:43:03.495Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:25.168Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -618,8 +616,8 @@
       },
       "id": "Packetbeat-Flows-Search",
       "type": "search",
-      "updated_at": "2019-01-14T23:45:33.869Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:25.168Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -722,8 +720,8 @@
       },
       "id": "Packetbeat-Flows",
       "type": "dashboard",
-      "updated_at": "2019-01-14T23:46:04.524Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:25.168Z",
+      "version": 1
     }
   ],
   "version": "7.0.0-SNAPSHOT"
