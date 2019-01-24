@@ -470,6 +470,7 @@
             },
             "id": "e9654a40-1fb2-11e9-8a4d-eb34d2834f6b",
             "panelIndex": "1",
+            "title": "Recovery size of transaction log",
             "type": "visualization",
             "version": "7.0.0-alpha2"
           },
@@ -484,6 +485,7 @@
             },
             "id": "1757d530-1fb3-11e9-8a4d-eb34d2834f6b",
             "panelIndex": "2",
+            "title": "Transaction log size since last checkpoint",
             "type": "visualization",
             "version": "7.0.0-alpha2"
           },
@@ -498,6 +500,7 @@
             },
             "id": "a55bb000-1fb2-11e9-8a4d-eb34d2834f6b",
             "panelIndex": "3",
+            "title": "Percentage of used space of transaction log",
             "type": "visualization",
             "version": "7.0.0-alpha2"
           },
@@ -512,6 +515,7 @@
             },
             "id": "edb7a0c0-1f2b-11e9-8a4d-eb34d2834f6b",
             "panelIndex": "4",
+            "title": "Log space size since last backup",
             "type": "visualization",
             "version": "7.0.0-alpha2"
           },
@@ -526,6 +530,7 @@
             },
             "id": "c9ead180-1fb2-11e9-8a4d-eb34d2834f6b",
             "panelIndex": "5",
+            "title": "Active size of transaction log",
             "type": "visualization",
             "version": "7.0.0-alpha2"
           },
@@ -540,6 +545,7 @@
             },
             "id": "68fa61b0-1fb2-11e9-8a4d-eb34d2834f6b",
             "panelIndex": "6",
+            "title": "Used space of transaction log",
             "type": "visualization",
             "version": "7.0.0-alpha2"
           },
@@ -554,6 +560,7 @@
             },
             "id": "6710ff20-1f2c-11e9-8a4d-eb34d2834f6b",
             "panelIndex": "7",
+            "title": "Total log space usage",
             "type": "visualization",
             "version": "7.0.0-alpha2"
           }
@@ -564,8 +571,8 @@
       },
       "id": "18d66970-1fb4-11e9-8a4d-eb34d2834f6b",
       "type": "dashboard",
-      "updated_at": "2019-01-24T08:43:18.278Z",
-      "version": 1
+      "updated_at": "2019-01-24T09:40:34.632Z",
+      "version": 2
     }
   ],
   "version": "7.0.0-alpha2"
