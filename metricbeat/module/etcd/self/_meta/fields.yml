@@ -15,7 +15,6 @@
         id of the current leader member
     - name: leaderinfo.starttime
       type: keyword
-
     - name: leaderinfo.uptime
       type: keyword
       description: >
