@@ -18,17 +18,17 @@
     "system": {
         "network": {
             "in": {
-                "bytes": 579535592,
-                "dropped": 0,
+                "bytes": 37904869172,
+                "dropped": 32,
                 "errors": 0,
-                "packets": 3058624
+                "packets": 32143403
             },
-            "name": "lo0",
+            "name": "wlp4s0",
             "out": {
-                "bytes": 579535592,
+                "bytes": 6299331926,
                 "dropped": 0,
                 "errors": 0,
-                "packets": 3058624
+                "packets": 13362703
             }
         }
     }

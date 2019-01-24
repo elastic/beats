@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("metricbeat", "nats", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("metricbeat", "nats", asset.ModuleFieldsPri, AssetNats); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetNats returns asset data.
+// This is the base64 encoded gzipped contents of ../metricbeat/module/nats.
+func AssetNats() string {
 	return "eJzUmb1y4zYQx3s9xc5VSXF6ABWZySTNFXERX2odBK4o5Agsb7GQT376G4CiTFKgvkx7ZBYuRHj/P/0Xu/jQZ/iOuwU4JX4GIEYqXMCnByX+0wygQK/Z1GLILeCPGQCkkfAPFaHCGQBjhcrjAko1A1gbrAq/SOM+g1MWD5HjI7s6jmQK9f6TTPz4fIv/9A00OVHGefCixHgx2oNslMATMgKjKmDNZOHhRaJL0KXwyFvkuSkOb1qc77h7Iu5+PgIVn68b3IeCL3+PiYixeCRTKMHLNB6b+DEK0BosChsNmlHF0UeimpxDHV/5I9Gu1WdU/2q9Tvl9CRozrASLPUdXo5/79hlmoMsqJKrqvWlJjRMskQfvTvC22XDBrpCjUTowo5NqB0qL2SLoyqATf+QYUxCc0KwU7+P4xFgaL8hYDJ04zGNRMqE/W8WTuhPqQYW9MFbkyuu9qZENFSAvxW08hBp+86h/zyJYtPPVrj+LXkuxn78xNvEOgldlagAPf359hJpJo/dZGE08AjLBbKmoNFpVjUiyqMsDHJyHTlfqcdUhS7WuSMnt/ug69MzxJ81JpbTMN8lJjUpC1a5p1FgcdZ8uFKOlsckzcYVnlFoK47IAwzq/UF5ZCk6ivHGarHFlXPPUYGyurqFXWD6mdmjNOXsuYDzBOSraUuVK/W2RjhVbFgrD2pkobRSkpA+QtgPn/aTtgDSeNl/RU2xDPljkN6v8qAIHlc6WiFzq21m0jUi9ZPyxTOv+nIlkGdhkGWn1P+orm/eAcWMkLhkQdcCSM0IcvRtKjuDFVv48KV8eL+ncwJf2VO8B2AjdQOjDyr8HYNK5hS/+fQ++qHMp35Q9N8Zrd8KHHV6z87yy7x5MG+1yOcQLMFtUxh8BvXSP4JmxY5hd1ON8XgZ6IewAGArjhc0qpDMsuW6a//v3y+NIjFNfBIZHyOfRYeeXmCu/GbyiC+T4U3O7B/yzXTZHv1V8F/CR41r21BTvAf5sd87RxzX7HuBP7R26TrcqE95m9MJ+nFuf/Z3YmCndU6FHPlpQJuNowgPVyKqx0LiBp5XxMnps3r7lsTmGvw3NKtGbt0MTY9GDamTAeFhTcAWsiUH1EPMXMUpvcO7Nc/7SbBLrfKgEPEoyTTbYiJ7A2RhZcv9SfAKkGLFNBihGWGHsDxzLE7e4/8HgHNtaOQoyt+rntHRW/TQ2WGjiN1u+Ala7S4HUdniv+EogtUVWJY4B/QoAAP//tMDBng=="
 }

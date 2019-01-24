@@ -67,10 +67,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches filesystem metrics for all mounted filesystems and returns
 // a single event containing aggregated data.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	fss, err := filesystem.GetFileSystemList()
 	if err != nil {
-		return nil, errors.Wrap(err, "filesystem list")
+		r.Error(errors.Wrap(err, "filesystem list"))
+		return
 	}
 
 	if len(m.config.IgnoreTypes) > 0 {
@@ -94,13 +95,15 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 		totalSizeUsed += stat.Used
 	}
 
-	return common.MapStr{
-		"total_size": common.MapStr{
-			"free":  totalSizeFree,
-			"used":  totalSizeUsed,
-			"total": totalSize,
+	r.Event(mb.Event{
+		MetricSetFields: common.MapStr{
+			"total_size": common.MapStr{
+				"free":  totalSizeFree,
+				"used":  totalSizeUsed,
+				"total": totalSize,
+			},
+			"count":       len(fss),
+			"total_files": totalFiles,
 		},
-		"count":       len(fss),
-		"total_files": totalFiles,
-	}, nil
+	})
 }

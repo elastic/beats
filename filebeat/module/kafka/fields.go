@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("filebeat", "kafka", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("filebeat", "kafka", asset.ModuleFieldsPri, AssetKafka); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetKafka returns asset data.
+// This is the base64 encoded gzipped contents of module/kafka.
+func AssetKafka() string {
 	return "eJysk09uszAQxfec4in7cAAW3+bbteouFxiFgVgY27KHtLl9Zdz8c51ApM4OD37vx5thi4FPDQbqBqoAUaK5weY9Pm8qoOWw98qJsqbBvwoA5h5G206aK6BTrNvQzK0tDI18lYslJ8cNem8n93NS0LyXuZXStr+clcQeCqZKsNr20MpwqG+aueOdKx9Z33XO3qQVhazjSA4zaV26N6reU2ITP3HRb+QQqOcXHcu3HvkVjfd2dNawkaL1wKdP69us9yTuWP/PkpADz9GrEH2U6dF5O9ZlEE0h/8oEIfyV0y0QvNGRkuBLCOJpXx5BvnArGIBdlIMyF4a4gXX2YmkJl2LBwnxW0f1KSRLuk5ywuLB4NrSVWMBH0oYjL7Ddle4xTjfp/Lf7G5bdgWfxczz5NL8DAAD//1wZSZY="
 }

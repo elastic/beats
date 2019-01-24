@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("packetbeat", "pgsql", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("packetbeat", "pgsql", asset.ModuleFieldsPri, AssetPgsql); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetPgsql returns asset data.
+// This is the base64 encoded gzipped contents of protos/pgsql.
+func AssetPgsql() string {
 	return "eJzEkcFu6jAURPf5ihHrBx+QBRJCPAkJtRTYI0gmwapjB1+bKn9fhaTF0GbBqllF1z4zR9djvLNJUZdy1gnglddMMVpb8aXj9m01SoCckjlVe2VNimkCALcLY6mZqUJl4IXGo1DUuUwS9H/p9f4Y5lDxVtR+vqmZonQ21P0kJmKKzlm3z2zO76MHq92JkVMHoAUmEdEVamvKZKCiosihfK6lZyZDmcILnfLNU6FfUKxfWxF11NxfDjowWlPXudhsXjcPs/+z3Wz1MFvPXpbzn7ImVPtu/0Oi07ugZQF/IraL1WK+wznQNVAFJGQZRYqg/8GflHRvCiUQenh7hUyojnR3cbboXx+OPjjD/JeFto7OfvyZYdsd+30GAAD//yg57bo="
 }
