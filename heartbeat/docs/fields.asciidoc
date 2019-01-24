@@ -3779,12 +3779,14 @@ Duration in microseconds
 --
 
 [[exported-fields-summary]]
-== Monitor summary fields
+
+[float]
+== summary fields
 
 Present in the last event emitted during a check. If a monitor checks multiple endpoints, as is the case with `mode: all`.
 
 
-*`up`*::
+*`summary.up`*::
 +
 --
 type: integer
@@ -3794,7 +3796,7 @@ The number of endpoints that succeeded
 
 --
 
-*`down`*::
+*`summary.down`*::
 +
 --
 type: integer
