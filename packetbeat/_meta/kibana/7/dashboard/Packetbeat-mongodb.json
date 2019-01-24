@@ -17,23 +17,24 @@
             }
           }
         },
-        "title": "Navigation",
+        "title": "Navigation [Packetbeat]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [],
           "params": {
-            "fontSize": "10",
-            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Flows](#/dashboard/Packetbeat-Flows)\n\n[Web transactions](#/dashboard/Packetbeat-HTTP)\n\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\n\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\n\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\n\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\n\n[NFS transactions](#/dashboard/Packetbeat-NFS)\n\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)"
+            "fontSize": 10,
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
+            "openLinksInNewTab": false
           },
-          "title": "Navigation",
+          "title": "Navigation [Packetbeat]",
           "type": "markdown"
         }
       },
       "id": "Navigation",
       "type": "visualization",
-      "updated_at": "2019-01-17T23:31:49.005Z",
-      "version": 10
+      "updated_at": "2019-01-19T00:18:59.372Z",
+      "version": 11
     },
     {
       "attributes": {
@@ -70,7 +71,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -199,8 +199,8 @@
       },
       "id": "MongoDB-errors",
       "type": "visualization",
-      "updated_at": "2019-01-18T05:00:42.098Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:27.239Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -237,7 +237,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -343,8 +342,8 @@
       },
       "id": "MongoDB-commands",
       "type": "visualization",
-      "updated_at": "2019-01-18T05:01:02.453Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:27.239Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -381,7 +380,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -493,8 +491,8 @@
       },
       "id": "MongoDB-errors-per-collection",
       "type": "visualization",
-      "updated_at": "2019-01-18T05:01:22.731Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:27.239Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -533,7 +531,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -650,8 +647,8 @@
       },
       "id": "MongoDB-in-slash-out-throughput",
       "type": "visualization",
-      "updated_at": "2019-01-18T05:01:54.578Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:27.239Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -693,7 +690,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -811,8 +807,8 @@
       },
       "id": "MongoDB-response-times-by-collection",
       "type": "visualization",
-      "updated_at": "2019-01-18T05:02:48.572Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:27.239Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -887,8 +883,8 @@
       },
       "id": "Top-slowest-MongoDB-queries",
       "type": "visualization",
-      "updated_at": "2019-01-18T05:03:11.642Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:27.239Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -925,7 +921,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -1027,8 +1022,8 @@
       },
       "id": "Number-of-MongoDB-transactions-with-writeConcern-w-equal-0",
       "type": "visualization",
-      "updated_at": "2019-01-18T05:02:20.019Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:27.239Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -1111,7 +1106,7 @@
       },
       "id": "651fd6d0-88d0-11e7-ad9c-db80de0bf8d3",
       "type": "search",
-      "updated_at": "2019-01-17T23:31:42.852Z",
+      "updated_at": "2019-01-18T23:49:27.239Z",
       "version": 1
     },
     {
@@ -1191,8 +1186,8 @@
       },
       "id": "MongoDB-transactions",
       "type": "search",
-      "updated_at": "2019-01-18T04:59:30.718Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:27.239Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -1200,7 +1195,7 @@
           "method",
           "type",
           "path",
-          "responsetime",
+          "event.duration",
           "status",
           "query"
         ],
@@ -1271,8 +1266,8 @@
       },
       "id": "MongoDB-transactions-with-write-concern-0",
       "type": "search",
-      "updated_at": "2019-01-18T05:00:13.028Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:27.239Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -1414,8 +1409,8 @@
       },
       "id": "Packetbeat-MongoDB-performance",
       "type": "dashboard",
-      "updated_at": "2019-01-18T05:03:23.556Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:27.239Z",
+      "version": 1
     }
   ],
   "version": "7.0.0-SNAPSHOT"

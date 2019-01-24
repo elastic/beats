@@ -1,4 +1,4 @@
-from packetbeat import (BaseTest, TRANS_ECS_REQUIRED_FIELDS)
+from packetbeat import BaseTest
 
 
 class Test(BaseTest):
@@ -10,7 +10,7 @@ class Test(BaseTest):
         )
         self.run_packetbeat(pcap="pgsql_request_response.pcap")
 
-        objs = self.read_output(required_fields=TRANS_ECS_REQUIRED_FIELDS)
+        objs = self.read_output()
         assert len(objs) == 1
         o = objs[0]
         assert o["type"] == "pgsql"

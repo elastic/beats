@@ -49,14 +49,6 @@ packetbeat.protocols:
   # the DNS protocol by commenting out the list of ports.
   ports: [53]
 
-  # include_authorities controls whether or not the dns.authorities field
-  # (authority resource records) is added to messages.
-  include_authorities: true
-
-  # include_additionals controls whether or not the dns.additionals field
-  # (additional resource records) is added to messages.
-  include_additionals: true
-
 - type: http
   # Configure the ports where to listen for HTTP traffic. You can disable
   # the HTTP protocol by commenting out the list of ports.

@@ -67,8 +67,8 @@
       },
       "id": "Cassandra-ResponseKeyspace",
       "type": "visualization",
-      "updated_at": "2019-01-15T21:26:40.709Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:20.964Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -125,8 +125,8 @@
       },
       "id": "Cassandra-ResponseType",
       "type": "visualization",
-      "updated_at": "2019-01-15T21:27:07.580Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:20.964Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -269,8 +269,8 @@
       },
       "id": "Cassandra-ResponseTime",
       "type": "visualization",
-      "updated_at": "2019-01-15T21:30:43.841Z",
-      "version": 3
+      "updated_at": "2019-01-18T23:49:20.964Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -338,8 +338,8 @@
       },
       "id": "Cassandra-RequestCount",
       "type": "visualization",
-      "updated_at": "2019-01-15T21:27:52.480Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:20.964Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -408,8 +408,8 @@
       },
       "id": "Cassandra-Ops",
       "type": "visualization",
-      "updated_at": "2019-01-15T21:28:40.683Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:20.964Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -485,8 +485,8 @@
       },
       "id": "Cassandra-RequestCountStackByType",
       "type": "visualization",
-      "updated_at": "2019-01-15T21:29:10.865Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:20.964Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -562,8 +562,8 @@
       },
       "id": "Cassandra-ResponseCountStackByType",
       "type": "visualization",
-      "updated_at": "2019-01-15T21:29:30.006Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:20.964Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -650,8 +650,8 @@
       },
       "id": "Cassandra-RequestCountByType",
       "type": "visualization",
-      "updated_at": "2019-01-15T21:29:51.245Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:20.964Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -733,8 +733,8 @@
       },
       "id": "Cassandra-ResponseCountByType",
       "type": "visualization",
-      "updated_at": "2019-01-15T21:30:13.051Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:20.964Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -753,23 +753,24 @@
             }
           }
         },
-        "title": "Navigation",
+        "title": "Navigation [Packetbeat]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [],
           "params": {
-            "fontSize": "10",
-            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Flows](#/dashboard/Packetbeat-Flows)\n\n[Web transactions](#/dashboard/Packetbeat-HTTP)\n\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\n\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\n\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\n\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\n\n[NFS transactions](#/dashboard/Packetbeat-NFS)\n\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)"
+            "fontSize": 10,
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
+            "openLinksInNewTab": false
           },
-          "title": "Navigation",
+          "title": "Navigation [Packetbeat]",
           "type": "markdown"
         }
       },
       "id": "Navigation",
       "type": "visualization",
-      "updated_at": "2019-01-15T18:40:27.247Z",
-      "version": 10
+      "updated_at": "2019-01-19T00:18:59.372Z",
+      "version": 11
     },
     {
       "attributes": {
@@ -873,8 +874,8 @@
       },
       "id": "Cassandra-QueryView",
       "type": "search",
-      "updated_at": "2019-01-15T21:21:00.117Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:20.964Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -931,7 +932,7 @@
       },
       "id": "eaa83e60-190b-11e9-be0d-adde5066235e",
       "type": "search",
-      "updated_at": "2019-01-15T21:24:18.373Z",
+      "updated_at": "2019-01-18T23:49:20.964Z",
       "version": 1
     },
     {
@@ -1091,7 +1092,7 @@
       },
       "id": "Packetbeat-Cassandra",
       "type": "dashboard",
-      "updated_at": "2019-01-15T18:40:15.074Z",
+      "updated_at": "2019-01-18T23:49:20.964Z",
       "version": 1
     }
   ],

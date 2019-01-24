@@ -35,7 +35,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -125,8 +124,8 @@
       },
       "id": "MySQL-Errors",
       "type": "visualization",
-      "updated_at": "2019-01-18T03:59:44.898Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:28.266Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -163,7 +162,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -269,8 +267,8 @@
       },
       "id": "MySQL-Methods",
       "type": "visualization",
-      "updated_at": "2019-01-18T04:00:09.363Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:28.266Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -289,23 +287,24 @@
             }
           }
         },
-        "title": "Navigation",
+        "title": "Navigation [Packetbeat]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [],
           "params": {
-            "fontSize": "10",
-            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Flows](#/dashboard/Packetbeat-Flows)\n\n[Web transactions](#/dashboard/Packetbeat-HTTP)\n\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\n\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\n\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\n\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\n\n[NFS transactions](#/dashboard/Packetbeat-NFS)\n\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)"
+            "fontSize": 10,
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
+            "openLinksInNewTab": false
           },
-          "title": "Navigation",
+          "title": "Navigation [Packetbeat]",
           "type": "markdown"
         }
       },
       "id": "Navigation",
       "type": "visualization",
-      "updated_at": "2019-01-17T23:31:49.005Z",
-      "version": 10
+      "updated_at": "2019-01-19T00:18:59.372Z",
+      "version": 11
     },
     {
       "attributes": {
@@ -353,7 +352,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -446,8 +444,8 @@
       },
       "id": "MySQL-throughput",
       "type": "visualization",
-      "updated_at": "2019-01-18T04:02:04.959Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:28.266Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -493,7 +491,7 @@
       },
       "id": "Most-frequent-MySQL-queries",
       "type": "visualization",
-      "updated_at": "2019-01-17T23:31:43.873Z",
+      "updated_at": "2019-01-18T23:49:28.266Z",
       "version": 1
     },
     {
@@ -567,8 +565,8 @@
       },
       "id": "Slowest-MySQL-queries",
       "type": "visualization",
-      "updated_at": "2019-01-18T04:02:38.938Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:28.266Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -612,7 +610,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -695,8 +692,8 @@
       },
       "id": "Mysql-response-times-percentiles",
       "type": "visualization",
-      "updated_at": "2019-01-18T04:00:39.063Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:28.266Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -733,7 +730,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -850,8 +846,8 @@
       },
       "id": "MySQL-Reads-vs-Writes",
       "type": "visualization",
-      "updated_at": "2019-01-18T04:01:12.029Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:28.266Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -859,7 +855,7 @@
           "method",
           "type",
           "path",
-          "responsetime",
+          "event.duration",
           "status"
         ],
         "description": "",
@@ -954,8 +950,8 @@
       },
       "id": "MySQL-errors",
       "type": "search",
-      "updated_at": "2019-01-18T03:58:51.854Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:28.266Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -963,7 +959,7 @@
           "method",
           "type",
           "path",
-          "responsetime",
+          "event.duration",
           "status"
         ],
         "description": "",
@@ -1032,7 +1028,7 @@
       },
       "id": "MySQL-Transactions",
       "type": "search",
-      "updated_at": "2019-01-17T23:31:43.873Z",
+      "updated_at": "2019-01-18T23:49:28.266Z",
       "version": 1
     },
     {
@@ -1190,8 +1186,8 @@
       },
       "id": "Packetbeat-MySQL-performance",
       "type": "dashboard",
-      "updated_at": "2019-01-18T04:02:58.001Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:28.266Z",
+      "version": 1
     }
   ],
   "version": "7.0.0-SNAPSHOT"
