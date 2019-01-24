@@ -2687,7 +2687,7 @@ Size of the files that have been created or changed since creation.
 *`docker.container.tags`*::
 +
 --
-type: array
+type: keyword
 
 Image tags.
 
@@ -3206,7 +3206,7 @@ Image labels.
 *`docker.image.tags`*::
 +
 --
-type: array
+type: keyword
 
 Image tags.
 
@@ -10508,7 +10508,7 @@ Leader id (broker).
 *`kafka.partition.partition.isr`*::
 +
 --
-type: array
+type: keyword
 
 List of isr ids.
 
@@ -14859,7 +14859,7 @@ Optime of primary
 *`mongodb.replstatus.members.secondary.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of secondary hosts
 
@@ -14886,7 +14886,7 @@ type: long
 *`mongodb.replstatus.members.recovering.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of recovering members hosts
 
@@ -14906,7 +14906,7 @@ Count of members in the `recovering` state
 *`mongodb.replstatus.members.unknown.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of members' hosts in the `unknown` state
 
@@ -14926,7 +14926,7 @@ Count of members with `unknown` state
 *`mongodb.replstatus.members.startup2.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of initializing members hosts
 
@@ -14946,7 +14946,7 @@ Count of members in the `startup2` state
 *`mongodb.replstatus.members.arbiter.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of arbiters hosts
 
@@ -14966,7 +14966,7 @@ Count of arbiters
 *`mongodb.replstatus.members.down.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of `down` members hosts
 
@@ -14986,7 +14986,7 @@ Count of `down` members
 *`mongodb.replstatus.members.rollback.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of members in the `rollback` state
 
@@ -15006,7 +15006,7 @@ Count of members in the `rollback` state
 *`mongodb.replstatus.members.unhealthy.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of members' hosts with healthy = false
 
