@@ -88,7 +88,7 @@ jenkins_setup() {
   fi
 
   # Setup Go.
-  export GOPATH=${WORKSPACE}
+  export GOPATH="${WORKSPACE}"
   export PATH="${GOPATH}/bin:${PATH}"
   eval "$(gvm ${GO_VERSION})"
 
