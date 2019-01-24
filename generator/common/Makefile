@@ -10,7 +10,7 @@ PREPARE_COMMAND?=
 .PHONY: test
 test: prepare-test
 	. ${PYTHON_ENV}/bin/activate; \
-	export GOPATH=${PWD}/build ; \
+	export GOPATH="${PWD}/build" ; \
 	export PATH=$${GOPATH}/bin:${PATH}; \
 	cd ${BEAT_PATH} ; \
 	$(MAKE) copy-vendor || exit 1  ; \
@@ -32,12 +32,12 @@ prepare-test:: python-env
 	  --include=vendor/github.com/magefile/mage/build \
 	  --exclude=build/ \
 	  --exclude=.git/ \
-	  ${PWD}/../../* ${BUILD_DIR}/src/github.com/elastic/beats/
+	  "${PWD}/../../"* ${BUILD_DIR}/src/github.com/elastic/beats/
 
 	mkdir -p ${BEAT_PATH}
-	export GOPATH=${PWD}/build ; \
+	export GOPATH="${PWD}/build" ; \
 	. ${PYTHON_ENV}/bin/activate && \
-	  python ${PWD}/build/src/github.com/elastic/beats/script/generate.py \
+	  python "${PWD}/build/src/github.com/elastic/beats/script/generate.py" \
 	    --type=${BEAT_TYPE} \
 	    --project_name=Testbeat \
 	    --github_name=ruflin \
@@ -48,7 +48,7 @@ prepare-test:: python-env
 .PHONY: test-build
 test-build: test
 	# Copy dev tools
-	cp -r ${PWD}/../../../dev-tools ${BEAT_PATH}/vendor/github.com/elastic/beats/
+	cp -r "${PWD}/../../../dev-tools" ${BEAT_PATH}/vendor/github.com/elastic/beats/
 
 	cd ${BEAT_PATH}/dev-tools/packer ; \
 	$(MAKE) deps ; \
