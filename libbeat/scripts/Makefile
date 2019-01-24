@@ -351,7 +351,7 @@ endif
 	@mkdir -p "$(PWD)/_meta/kibana.generated"
 	@# Generate Kibana index pattern and copy dashboard files
 	if [ -d "$(PWD)/_meta/kibana" ]; then \
-		cp -pr "$(PWD)/_meta/kibana/*" "$(PWD)/_meta/kibana.generated" ; \
+		cp -pr "$(PWD)/_meta/kibana/"* "$(PWD)/_meta/kibana.generated" ; \
 	fi
 	@# Convert all dashboards to string
 	@python ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/7/dashboard/*.json"
