@@ -58,6 +58,7 @@
       formate: bytes
       description: >
         Total number of bytes received from the network by this server.
+
     - name: written.bytes
       type: long
       formate: bytes
