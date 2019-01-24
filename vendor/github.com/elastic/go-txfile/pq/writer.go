@@ -219,11 +219,13 @@ func (w *Writer) Flush() error {
 }
 
 func (w *Writer) flushBuffer() error {
+	activeEventCount := w.state.activeEventCount
+
 	start := time.Now()
 	pages, allocated, err := w.doFlush()
-	failed := err != nil
 
 	if o := w.observer; o != nil {
+		failed := err != nil
 		o.OnQueueFlush(w.hdrOffset, FlushStats{
 			Duration: time.Since(start),
 			Oldest:   w.state.tsOldest,
@@ -233,33 +235,35 @@ func (w *Writer) flushBuffer() error {
 				txerr.Is(txfile.NoDiskSpace, err)),
 			Pages:      pages,
 			Allocate:   allocated,
-			Events:     w.state.activeEventCount,
+			Events:     activeEventCount,
 			BytesTotal: w.state.activeEventBytes,
 			BytesMin:   w.state.minEventSize,
 			BytesMax:   w.state.maxEventSize,
 		})
 	}
 
-	// reset internal stats on success
 	if err != nil {
-		activeEventCount := w.state.activeEventCount
-		w.state.totalEventCount += activeEventCount
-		w.state.totalAllocPages += allocated
-
-		traceln("Write buffer flushed. Total events: %v, total pages allocated: %v",
-			w.state.totalEventCount,
-			w.state.totalAllocPages)
-
-		w.state.activeEventCount = 0
-		w.state.activeEventBytes = 0
-		w.state.minEventSize = 0
-		w.state.maxEventSize = 0
-		if w.flushCB != nil {
-			w.flushCB(activeEventCount)
-		}
+		return err
 	}
 
-	return err
+	// reset internal stats on success
+	w.state.totalEventCount += activeEventCount
+	w.state.totalAllocPages += allocated
+
+	traceln("Write buffer flushed. Total events: %v, total pages allocated: %v",
+		w.state.totalEventCount,
+		w.state.totalAllocPages)
+
+	w.state.activeEventCount = 0
+	w.state.activeEventBytes = 0
+	w.state.minEventSize = 0
+	w.state.maxEventSize = 0
+
+	if w.flushCB != nil {
+		w.flushCB(activeEventCount)
+	}
+
+	return nil
 }
 
 func (w *Writer) doFlush() (pages, allocated uint, err error) {

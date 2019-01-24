@@ -75,6 +75,17 @@ const (
 	minRequiredFileSize = initSize
 )
 
+var maxMmapSize uint
+
+func init() {
+	if math.MaxUint32 == maxUint {
+		maxMmapSize = 2 * sz1GB
+	} else {
+		tmp := uint64(0x1FFFFFFFFFFF)
+		maxMmapSize = uint(tmp)
+	}
+}
+
 // Open opens or creates a new transactional file.
 // Open tries to create the file, if the file does not exist yet.  Returns an
 // error if file access fails, file can not be locked or file meta pages are
@@ -642,14 +653,6 @@ func readMeta(f vfs.File, off int64) (metaPage, reason) {
 // That is, exponential grows with values of 64KB, 128KB, 512KB, 1024KB, and so on.
 // Once 1GB is reached, the mmaped area is always a multiple of 1GB.
 func computeMmapSize(minSize, maxSize, pageSize uint) (uint, reason) {
-	var maxMapSize uint
-	if math.MaxUint32 == maxUint {
-		maxMapSize = 2 * sz1GB
-	} else {
-		tmp := uint64(0x1FFFFFFFFFFF)
-		maxMapSize = uint(tmp)
-	}
-
 	if maxSize != 0 {
 		// return maxSize as multiple of pages. Round downwards in case maxSize
 		// is not multiple of pages
@@ -678,7 +681,7 @@ func computeMmapSize(minSize, maxSize, pageSize uint) (uint, reason) {
 
 	// allocate number of 1GB blocks to fulfill minSize
 	sz := ((minSize + (sz1GB - 1)) / sz1GB) * sz1GB
-	if sz > maxMapSize {
+	if sz > maxMmapSize {
 		return 0, raiseInvalidParamf("mmap size of %v bytes is too large", sz)
 	}
 
