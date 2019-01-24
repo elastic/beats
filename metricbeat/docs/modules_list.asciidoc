@@ -100,16 +100,11 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-mongodb-metrics,metrics>>   
 |<<metricbeat-metricset-mongodb-replstatus,replstatus>>   
 |<<metricbeat-metricset-mongodb-status,status>>   
-<<<<<<< HEAD
 |<<metricbeat-module-mssql,mssql>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-mssql-performance,performance>> experimental[]  
 |<<metricbeat-metricset-mssql-transaction_log,transaction_log>> experimental[]  
-|<<metricbeat-module-munin,Munin>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-munin-node,node>> beta[]  
-=======
 |<<metricbeat-module-munin,Munin>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-munin-node,node>>   
->>>>>>> [Metricbeat] Release munin as GA.
 |<<metricbeat-module-mysql,MySQL>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-mysql-galera_status,galera_status>> beta[]  
 |<<metricbeat-metricset-mysql-status,status>>   
