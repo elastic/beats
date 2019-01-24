@@ -383,7 +383,6 @@
               type: long
             - name: shutting_down
               type: boolean
-            # network.interface? Should this really be text?
             - name: network_interface
               type: text
         - name: apply
