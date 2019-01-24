@@ -24,8 +24,10 @@
   # The state.period can be overridden for any dataset.
   # host.state.period: 12h
   # process.state.period: 12h
+  {{ if eq .GOOS "linux" -}}
   # socket.state.period: 12h
   # user.state.period: 12h
+  {{- end }}
 {{ end }}
   {{ if eq .GOOS "linux" -}}
   # Enabled by default. Auditbeat will read password fields in
