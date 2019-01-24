@@ -103,6 +103,8 @@ def get_licenses(folder):
             licenses.append(filename)
         elif filename.startswith("APLv2"):  # gorhill/cronexpr
             licenses.append(filename)
+        elif filename.startswith("COPYING"): # github.com/google/shlex
+            licenses.append(filename)
     return licenses
 
 

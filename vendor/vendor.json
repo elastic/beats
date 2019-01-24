@@ -1528,6 +1528,12 @@
 			"revisionTime": "2017-09-25T18:44:58Z"
 		},
 		{
+			"checksumSHA1": "c0Z2sKLKi+IKRVzq0IzNvqvfCrQ=",
+			"path": "github.com/google/shlex",
+			"revision": "c34317bd91bf98fab745d77b03933cf8769299fe",
+			"revisionTime": "2018-11-06T13:46:48Z"
+		},
+		{
 			"checksumSHA1": "5DBIm/bJOKLR3CbQH6wIELQDLlQ=",
 			"path": "github.com/gorhill/cronexpr",
 			"revision": "d520615e531a6bf3fb69406b9eba718261285ec8",

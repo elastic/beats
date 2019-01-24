@@ -1503,6 +1503,15 @@ Apache License 2.0
 
 
 --------------------------------------------------------------------
+Dependency: github.com/google/shlex
+Revision: c34317bd91bf98fab745d77b03933cf8769299fe
+License type (autodetected): Apache-2.0
+./vendor/github.com/google/shlex/COPYING:
+--------------------------------------------------------------------
+Apache License 2.0
+
+
+--------------------------------------------------------------------
 Dependency: github.com/google/uuid
 Revision: 281f560d28af7174109514e936f94c2ab2cb2823
 License type (autodetected): BSD-3-Clause
