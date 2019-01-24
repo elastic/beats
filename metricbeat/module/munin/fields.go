@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("metricbeat", "munin", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("metricbeat", "munin", asset.ModuleFieldsPri, AssetMunin); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetMunin returns asset data.
+// This is the base64 encoded gzipped contents of ../metricbeat/module/munin.
+func AssetMunin() string {
 	return "eJxsjk2qhDAQhPc5ReHeC2TxbvAOEU2NNKOdkLQw3n4wBmaEqV3/FN834snDY9tV1AEmttJj+D/nwQGRdS6STZJ6/DkAaDdoisRGKzJX8JVTMRYHFK4MlR4TLTjgIVxj9a05QsPGD+2MHZkeS0l77psfyCuthjmpBdF6g1dGTAdC/2lyYaFar39bXCZ3z3cAAAD//xiKUG4="
 }
