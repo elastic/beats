@@ -22915,96 +22915,81 @@ Default size for huge pages.
 *`system.network.name`*::
 +
 --
-type: keyword
+type: alias
 
-example: eth0
-
-The network interface name.
-
+alias to: network.name
 
 --
 
 *`system.network.out.bytes`*::
 +
 --
-type: long
+type: alias
 
-format: bytes
-
-The number of bytes sent.
-
+alias to: network.bytes
 
 --
 
 *`system.network.in.bytes`*::
 +
 --
-type: long
+type: alias
 
-format: bytes
-
-The number of bytes received.
-
+alias to: network.bytes
 
 --
 
 *`system.network.out.packets`*::
 +
 --
-type: long
+type: alias
 
-The number of packets sent.
-
+alias to: network.bytes
 
 --
 
 *`system.network.in.packets`*::
 +
 --
-type: long
+type: alias
 
-The number or packets received.
-
+alias to: network.bytes
 
 --
 
 *`system.network.in.errors`*::
 +
 --
-type: long
+type: alias
 
-The number of errors while receiving.
-
+alias to: network.errors
 
 --
 
 *`system.network.out.errors`*::
 +
 --
-type: long
+type: alias
 
-The number of errors while sending.
-
+alias to: network.errors
 
 --
 
 *`system.network.in.dropped`*::
 +
 --
-type: long
+type: alias
 
-The number of incoming packets that were dropped.
-
+alias to: network.dropped
 
 --
 
 *`system.network.out.dropped`*::
 +
 --
-type: long
+type: alias
 
-The number of outgoing packets that were dropped. This value is always 0 on Darwin and BSD because it is not reported by the operating system.
-
+alias to: network.dropped
 
 --
 

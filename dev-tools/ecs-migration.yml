@@ -1211,6 +1211,62 @@
 
 ## Modules
 
+### System
+
+- from: network.name
+  type: alias
+  to: network.name
+  alias: true
+  beat: metricbeat
+
+- from: network.out.bytes
+  type: alias
+  to: network.bytes
+  alias: true
+  beat: metricbeat
+
+- from: network.in.bytes
+  type: alias
+  to: network.bytes
+  alias: true
+  beat: metricbeat
+
+- from: network.out.packets
+  type: alias
+  to: network.bytes
+  alias: true
+  beat: metricbeat
+
+- from: network.in.packets
+  type: alias
+  to: network.bytes
+  alias: true
+  beat: metricbeat
+
+- from: network.in.errors
+  type: alias
+  to: network.errors
+  alias: true
+  beat: metricbeat
+
+- from: network.out.errors
+  type: alias
+  to: network.errors
+  alias: true
+  beat: metricbeat
+
+- from: network.in.dropped
+  type: alias
+  to: network.dropped
+  alias: true
+  beat: metricbeat
+
+- from: network.out.dropped
+  type: alias
+  to: network.dropped
+  alias: true
+  beat: metricbeat
+
 ### Zookeeper
 
 - from: zookeeper.mntr.version

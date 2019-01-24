@@ -5,50 +5,46 @@
   release: ga
   fields:
     - name: name
-      type: keyword
-      example: eth0
-      description: >
-        The network interface name.
+      type: alias
+      path: network.name
+      migration: true
 
     - name: out.bytes
-      type: long
-      format: bytes
-      description: >
-        The number of bytes sent.
+      type: alias
+      path: network.bytes
+      migration: true
 
     - name: in.bytes
-      type: long
-      format: bytes
-      description: >
-        The number of bytes received.
+      type: alias
+      path: network.bytes
+      migration: true
 
     - name: out.packets
-      type: long
-      description: >
-        The number of packets sent.
+      type: alias
+      path: network.bytes
+      migration: true
 
     - name: in.packets
-      type: long
-      description: >
-        The number or packets received.
+      type: alias
+      path: network.bytes
+      migration: true
 
     - name: in.errors
-      type: long
-      description: >
-        The number of errors while receiving.
+      type: alias
+      path: network.errors
+      migration: true
 
     - name: out.errors
-      type: long
-      description: >
-        The number of errors while sending.
+      type: alias
+      path: network.errors
+      migration: true
 
     - name: in.dropped
-      type: long
-      description: >
-        The number of incoming packets that were dropped.
+      type: alias
+      path: network.dropped
+      migration: true
 
     - name: out.dropped
-      type: long
-      description: >
-        The number of outgoing packets that were dropped. This value is always
-        0 on Darwin and BSD because it is not reported by the operating system.
+      type: alias
+      path: network.dropped
+      migration: true
