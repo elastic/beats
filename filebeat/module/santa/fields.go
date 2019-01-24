@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("filebeat", "santa", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("filebeat", "santa", asset.ModuleFieldsPri, AssetSanta); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetSanta returns asset data.
+// This is the base64 encoded gzipped contents of module/santa.
+func AssetSanta() string {
 	return "eJyUlF9v2jAQwN/5FKfuZXsoWpnoAw+TMqBrNVARqbS9TSa+EIskZ/kuW/n2k50Uwp+swBPY59/vzr7jFja4HQGrUlQPQIzkOIKb70TrHCH2yzc9AI2cOGPFUDmCrz0AqPdgTrrKsQeQGsw1j8LWLZSqwD3Vf2RrcQRrR5VtVs4w95jm556lEh+4W34DbnD7l5xureOrKqwvYvprOm6tH+iimnZi0ZgYvtITzWbPP7tEkwYIkimpL0SDEG36p3KHiq9Tj6fLly7zMtAgJQeSoa+MQyZnxAVpvEY773I+W3RKTLkOSKC07pIzSm14c6Jsd8cJ+yF0Rqhn8hT/iBaLabRs2oL7rVPtTjzW/qG8KvBg60jzkmETFY60Um9zVhW/B/EV+jiwjoQSyjtQjM6o/CJaHQplVazQdWXG2n854u2eznPu+MtFum/x5H934J/4OO/9UCwWsynE8QTi+efh3WB2kTEgO3Tp8Y3vXMqe7J3HN++6MaWGj6nJkbcsWITu+9RZZVXKNXSrJGtYb4wEnZjUJEqwn1BRUPm79Ubnxu3AMA5HAgtSRwUkfrjYrEs/aW14t5YzNRjeX2qMH6PB8B4yxZkf4nd8HyCqtJEVKoGHpzkYhop9qGSG63Hc/Q2xL8JWzhJj/yBbL7syzccmP+soQWbAV0wqUasc+71/AQAA//8U7uy0"
 }

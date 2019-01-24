@@ -126,7 +126,7 @@ func IsDeepEqual(to interface{}) IsDef {
 		return SimpleResult(
 			path,
 			false,
-			fmt.Sprintf("objects not equal: actual(%v) != expected(%v)", v, to),
+			fmt.Sprintf("objects not equal: actual(%T(%v)) != expected(%T(%v))", v, v, to, to),
 		)
 	})
 }

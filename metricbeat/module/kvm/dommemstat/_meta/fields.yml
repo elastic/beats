@@ -2,6 +2,7 @@
   type: group
   description: >
     dommemstat
+  release: beta
   fields:
       - name: stat
         type: group

@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("metricbeat", "graphite", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("metricbeat", "graphite", asset.ModuleFieldsPri, AssetGraphite); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
-	return "eJx8jz0SwiAUhHtOsZM+F6Cwc6w8BMoamZDAAFFzeyc/ZkKMvvJ7vG+XEjV7iSoofzeJAkgmWUoUpxkVAtCM12B8Mq6VOAgAywXOTnd2OAy0VJESFyYlgJuh1VGOr0u0qmGWM0zq/Qhd52eyk5Sb1rbI8GBY8J7vp3OaL8PyiUqt6LbAugRfqvGW2e7TpGb/dEFvdn/6DHOchFOoeAcAAP//RydvYQ=="
+// AssetGraphite returns asset data.
+// This is the base64 encoded gzipped contents of ../metricbeat/module/graphite.
+func AssetGraphite() string {
+	return "eJx8j80OwiAcw+88RbP7XoCDN+PJhyBSJxkbBJi6tzf7zJjTHvunv5YSNXuJKij/MIkCSCZZShSX2SoEoBlvwfhkXCtxEgDWBK5Od3YIBlqqSIlKCeBuaHWU49sSrWqYtQxKvR9N1/nZOejJSVtaZHgyrPYR7ydz0hch/8Ki/YDtCL5V4y2z27KkZv9yQe9uf/YMOk/AqVR8AgAA///94G6N"
 }

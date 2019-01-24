@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("filebeat", "osquery", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("filebeat", "osquery", asset.ModuleFieldsPri, AssetOsquery); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetOsquery returns asset data.
+// This is the base64 encoded gzipped contents of module/osquery.
+func AssetOsquery() string {
 	return "eJyslMFu2z4Mxu95ig8+p3mAHP74AwMK7LIdtp4bVWJsIRLpSXQTv/0g2UmT1B2woTrkQJEfv19I+QEHGreQ/GugNK4A9Rpoi+b7FGlWgKNsk+/VC2/x3woAHj0Fl0GnXpKSw8sI7Qi7WWeHKG4ItAL2NXNbqx7AJtJ1t3J07GmLNsnQz5GFhrdC12KJ8hD0El7S+1BzOl8kRuG5wTumSR+RNHmbSTdXtfeern2V35uLs7MDjUdJ7u7uD/7K+dlRVYTsq6v6B0I7o2iJKZniWDufQa/ENybfLBlb5D/P1KMkeLaJIrGaAGfUrBFNOmQcO9KOUjVLrGnE0WQY5+i+CSAJiaK8ktvgq8IaxgtBuNI2taZZo5lzmnUpaDKbPneizTJrJ1mfvSNWv/eUPncSb7rYy8RY+kEYx87brkbmLYdpiRU+Iw3MntvNO8lvkqIJYbwIFYRlrIH96Vn9B6sVhNu/o3lif0LRy2pif96uukNreEYmK+wysmdL010vttvgKZOr8FZiP6jndvoC/H8R28FKGCIvg1gTiJ1JizDDP0/nh6ZiJVGfKJetLIlnLCshUH0DFXkNkwtCNDq/93lkm9XvAAAA//+BBnP8"
 }

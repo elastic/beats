@@ -2,6 +2,7 @@
   title: "Nats"
   description: >
     nats Module
+  release: ga
   fields:
     - name: nats
       type: group

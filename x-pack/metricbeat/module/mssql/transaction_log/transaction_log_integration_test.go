@@ -4,7 +4,7 @@
 
 // +build integration
 
-package db
+package transaction_log
 
 import (
 	"testing"
@@ -21,7 +21,7 @@ func TestFetch(t *testing.T) {
 	logp.TestingSetup()
 	compose.EnsureUp(t, "mssql")
 
-	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("db"))
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("transaction_log"))
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -29,7 +29,7 @@ func TestFetch(t *testing.T) {
 	assert.NotEmpty(t, events)
 
 	for _, event := range events {
-		const key = "log_space_usage.used.pct"
+		const key = "space_usage.used.pct"
 
 		usedPercent, err := event.MetricSetFields.GetValue(key)
 		if err != nil {

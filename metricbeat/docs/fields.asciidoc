@@ -2687,7 +2687,7 @@ Size of the files that have been created or changed since creation.
 *`docker.container.tags`*::
 +
 --
-type: array
+type: keyword
 
 Image tags.
 
@@ -3206,7 +3206,7 @@ Image labels.
 *`docker.image.tags`*::
 +
 --
-type: array
+type: keyword
 
 Image tags.
 
@@ -10508,7 +10508,7 @@ Leader id (broker).
 *`kafka.partition.partition.isr`*::
 +
 --
-type: array
+type: keyword
 
 List of isr ids.
 
@@ -12824,7 +12824,6 @@ Total inodes
 [[exported-fields-kvm]]
 == kvm fields
 
-experimental[]
 kvm module
 
 
@@ -14860,7 +14859,7 @@ Optime of primary
 *`mongodb.replstatus.members.secondary.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of secondary hosts
 
@@ -14887,7 +14886,7 @@ type: long
 *`mongodb.replstatus.members.recovering.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of recovering members hosts
 
@@ -14907,7 +14906,7 @@ Count of members in the `recovering` state
 *`mongodb.replstatus.members.unknown.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of members' hosts in the `unknown` state
 
@@ -14927,7 +14926,7 @@ Count of members with `unknown` state
 *`mongodb.replstatus.members.startup2.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of initializing members hosts
 
@@ -14947,7 +14946,7 @@ Count of members in the `startup2` state
 *`mongodb.replstatus.members.arbiter.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of arbiters hosts
 
@@ -14967,7 +14966,7 @@ Count of arbiters
 *`mongodb.replstatus.members.down.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of `down` members hosts
 
@@ -14987,7 +14986,7 @@ Count of `down` members
 *`mongodb.replstatus.members.rollback.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of members in the `rollback` state
 
@@ -15007,7 +15006,7 @@ Count of members in the `rollback` state
 *`mongodb.replstatus.members.unhealthy.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of members' hosts with healthy = false
 
@@ -16614,83 +16613,26 @@ MS SQL module
 
 
 [float]
-== db fields
-
-db metricset will fetch information about each db from a sql server
-
-
-[float]
 == database fields
 
-Database where the metrics have been fetched from
+The database that the metrics is being referred to
 
 
-*`mssql.db.database.id`*::
+*`mssql.database.id`*::
++
+--
+type: long
+
+Unique ID of the database inside MSSQL
+
+--
+
+*`mssql.database.name`*::
 +
 --
 type: keyword
 
-The database ID
-
---
-
-[float]
-== log_space_usage fields
-
-Space usage information for the transaction log
-
-
-[float]
-== total fields
-
-Total space usage
-
-
-*`mssql.db.log_space_usage.total.bytes`*::
-+
---
-type: long
-
-The size of the log
-
---
-
-[float]
-== used fields
-
-The occupied size of the log
-
-
-*`mssql.db.log_space_usage.used.bytes`*::
-+
---
-type: long
-
-The occupied size of the log in bytes
-
---
-
-*`mssql.db.log_space_usage.used.pct`*::
-+
---
-type: float
-
-A percentaje of the occupied size of the log as a percent of the total log size
-
---
-
-[float]
-== since_last_backup fields
-
-The amount of space used since the last log backup
-
-
-*`mssql.db.log_space_usage.since_last_backup.bytes`*::
-+
---
-type: long
-
-The amount of space used since the last log backup in bytes
+Name of the database
 
 --
 
@@ -16854,6 +16796,147 @@ Indicates the number of pages in the buffer pool with database content.
 type: long
 
 Ideal number of pages in the buffer pool.
+
+--
+
+[float]
+== transaction_log fields
+
+transaction_log metricset will fetch information about the operation and transaction log of each database from a MSSQL instance
+
+
+[float]
+== space_usage fields
+
+Space usage information for the transaction log
+
+
+[float]
+== since_last_backup fields
+
+The amount of space used since the last log backup
+
+
+*`mssql.transaction_log.space_usage.since_last_backup.bytes`*::
++
+--
+type: long
+
+The amount of space used since the last log backup in bytes
+
+--
+
+[float]
+== total fields
+
+The size of the log
+
+
+*`mssql.transaction_log.space_usage.total.bytes`*::
++
+--
+type: long
+
+The size of the log in bytes
+
+--
+
+[float]
+== used fields
+
+The occupied size of the log
+
+
+*`mssql.transaction_log.space_usage.used.bytes`*::
++
+--
+type: long
+
+The occupied size of the log in bytes
+
+--
+
+*`mssql.transaction_log.space_usage.used.pct`*::
++
+--
+type: float
+
+A percentage of the occupied size of the log as a percent of the total log size
+
+--
+
+[float]
+== stats fields
+
+Returns summary level attributes and information on transaction log files of databases. Use this information for monitoring and diagnostics of transaction log health.
+
+
+[float]
+== active_size fields
+
+Total active transaction log size.
+
+
+*`mssql.transaction_log.stats.active_size.bytes`*::
++
+--
+type: long
+
+Total active transaction log size in bytes
+
+--
+
+*`mssql.transaction_log.stats.backup_time`*::
++
+--
+type: date
+
+Last transaction log backup time.
+
+--
+
+[float]
+== recovery_size fields
+
+Log size since log recovery log sequence number (LSN).
+
+
+*`mssql.transaction_log.stats.recovery_size.bytes`*::
++
+--
+type: long
+
+Log size in bytes since log recovery log sequence number (LSN).
+
+--
+
+[float]
+== since_last_checkpoint fields
+
+Log size since last checkpoint log sequence number (LSN).
+
+
+*`mssql.transaction_log.stats.since_last_checkpoint.bytes`*::
++
+--
+type: long
+
+Log size in bytes since last checkpoint log sequence number (LSN).
+
+--
+
+[float]
+== total_size fields
+
+Total transaction log size.
+
+
+*`mssql.transaction_log.stats.total_size.bytes`*::
++
+--
+type: long
+
+Total transaction log size in bytes.
 
 --
 

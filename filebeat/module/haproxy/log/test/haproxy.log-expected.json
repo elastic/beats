@@ -20,7 +20,6 @@
             "docs.example.internal"
         ],
         "haproxy.http.request.raw_request_line": "GET /component---src-pages-index-js-4b15624544f97cf0bb8f.js HTTP/1.1",
-        "haproxy.http.request.time_active_ms": 2,
         "haproxy.http.request.time_wait_ms": 0,
         "haproxy.http.request.time_wait_without_data_ms": 0,
         "haproxy.http.response.captured_cookie": "-",

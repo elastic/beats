@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("metricbeat", "prometheus", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("metricbeat", "prometheus", asset.ModuleFieldsPri, AssetPrometheus); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetPrometheus returns asset data.
+// This is the base64 encoded gzipped contents of ../metricbeat/module/prometheus.
+func AssetPrometheus() string {
 	return "eJyUkUtu8zAMhPc+xUD/7keSA2jRK7RAl0URKPbYVqMXSAZBbl/kgdRBu2i1Ez+KMxqusefJo0nNtJkH7QCLlujhXu5F1wEDtZfYLNbi8dQBwKsFU2gvoXHAKDUj4OsVWIZWY7FNB+hcxbZ9LWOcPMaQlB0gTAxKjymce2gWy6Qeb041uRXcbNbceweMkWlQf9H9h2cZKIiKmFsVC8UwU7hCCjsmxTGmhBysnzFGUVvBZkKohiDEUA+7xMusNUrIXCawuc64UMBOjR5198HebqXrZXsle56OVYYb+iGk81lkkmkSeyw0vjv4pfTiFw9km0NrsUy3Nvff/dHdnawfFvQZAAD//w7rsGA="
 }

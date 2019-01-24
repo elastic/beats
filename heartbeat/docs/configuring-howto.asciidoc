@@ -25,6 +25,7 @@ The following topics describe how to configure Heartbeat:
 * <<configuration-general-options>>
 * <<configuring-internal-queue>>
 * <<configuring-output>>
+* <<ilm>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
@@ -49,6 +50,8 @@ include::./heartbeat-general-options.asciidoc[]
 include::{libbeat-dir}/docs/queueconfig.asciidoc[]
 
 include::{libbeat-dir}/docs/outputconfig.asciidoc[]
+
+include::{libbeat-dir}/docs/shared-ilm.asciidoc[]
 
 include::{libbeat-dir}/docs/shared-ssl-config.asciidoc[]
 

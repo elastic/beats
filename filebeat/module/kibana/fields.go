@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("filebeat", "kibana", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("filebeat", "kibana", asset.ModuleFieldsPri, AssetKibana); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetKibana returns asset data.
+// This is the base64 encoded gzipped contents of module/kibana.
+func AssetKibana() string {
 	return "eJzMlEHO2yAQhfc+xejfhwN4UanKsuoZookZY2oM7jCoyu0rG6dyCGnaKIuf5Uz43stjxgcY6dLCaM/osQEQK45a+MiFjwZAU+zYzmKDb+FLAwDbr+F70MlRA9Bbcjq2a+8AHifaEZcjl5laMBzSvFUq1FvOnuWC+VOrwR4C8/mG/YgLBJz1FNWuWSruVQVNvGlcpUe6/Aqsi95fDKwmcmYuGGO9WeGqKhsFhd6ne0zM5CVjIfSbkbr2RIJV6XD+QZ0UrVw81c1V+XkolAtGLVKK6acaCDVxVEw9MXFVHp3F8i1mlKGFQWReMImiZMQ9Y7KGMecjnOifnX0+R9esUiQ+oCFfPskzc8vF03pRBbbGenRvC2sKQl+1Zor1tXnsKobEHSmsXn7VUOLyrz0Nh907U1k2LsVj0PVtfjpBcQ4+0oY5dfecV0xNJEMoPyH/NdJVQmnldwAAAP//jzOwrA=="
 }
