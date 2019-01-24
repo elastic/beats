@@ -25334,7 +25334,9 @@ Number of synced followers reported when a node server_state is leader.
 *`zookeeper.mntr.version`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 ZooKeeper version and build string reported.
 
