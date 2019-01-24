@@ -1,0 +1,572 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Recovery size of transaction log [Metricbeat MSSQL]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "bytes",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Recovery size of transaction log",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "mssql.transaction_log.stats.recovery_size.bytes",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_filters": [
+                  {
+                    "color": "#68BC00",
+                    "id": "de4cb6c0-1fb2-11e9-9c8a-cb3f85dff2a3"
+                  }
+                ],
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "mssql.database.name"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Recovery size of transaction log [Metricbeat MSSQL]",
+          "type": "metrics"
+        }
+      },
+      "id": "e9654a40-1fb2-11e9-8a4d-eb34d2834f6b",
+      "type": "visualization",
+      "updated_at": "2019-01-24T08:34:49.188Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Transaction log size since last checkpoint [Metricbeat MSSQL]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "bytes",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Transaction log size since last checkpoint",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "mssql.transaction_log.stats.since_last_checkpoint.bytes",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "mssql.database.name"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Transaction log size since last checkpoint [Metricbeat MSSQL]",
+          "type": "metrics"
+        }
+      },
+      "id": "1757d530-1fb3-11e9-8a4d-eb34d2834f6b",
+      "type": "visualization",
+      "updated_at": "2019-01-24T08:36:06.275Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Percentage of used space of transaction log [Metricbeat MSSQL]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "percent",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Percentage of used space of transaction log",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "mssql.transaction_log.space_usage.used.pct",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "percent",
+                "terms_field": "mssql.database.name"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Percentage of used space of transaction log [Metricbeat MSSQL]",
+          "type": "metrics"
+        }
+      },
+      "id": "a55bb000-1fb2-11e9-8a4d-eb34d2834f6b",
+      "type": "visualization",
+      "updated_at": "2019-01-24T08:32:55.040Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Log space size since last backup [Metricbeat MSSQL]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "mssql.transaction_log.space_usage.since_last_backup.bytes",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "mssql.database.name"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Log space size since last backup [Metricbeat MSSQL]",
+          "type": "metrics"
+        }
+      },
+      "id": "edb7a0c0-1f2b-11e9-8a4d-eb34d2834f6b",
+      "type": "visualization",
+      "updated_at": "2019-01-23T16:28:34.380Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Active size of transaction log [Metricbeat MSSQL]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "bytes",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Active size of transaction log",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "mssql.transaction_log.stats.active_size.bytes",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "mssql.database.name"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Active size of transaction log [Metricbeat MSSQL]",
+          "type": "metrics"
+        }
+      },
+      "id": "c9ead180-1fb2-11e9-8a4d-eb34d2834f6b",
+      "type": "visualization",
+      "updated_at": "2019-01-24T08:33:56.376Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Used space of transaction log [Metricbeat MSSQL]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "bytes",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Used space of transaction log",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "mssql.transaction_log.space_usage.used.bytes",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "mssql.database.name"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Used space of transaction log [Metricbeat MSSQL]",
+          "type": "metrics"
+        }
+      },
+      "id": "68fa61b0-1fb2-11e9-8a4d-eb34d2834f6b",
+      "type": "visualization",
+      "updated_at": "2019-01-24T08:31:13.739Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Total log space usage [Metricbeat MSSQL]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "auto",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": 0.5,
+                "formatter": "bytes",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "Total log space usage",
+                "line_width": 1,
+                "metrics": [
+                  {
+                    "field": "mssql.transaction_log.space_usage.total.bytes",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 0,
+                "split_mode": "terms",
+                "stacked": "stacked",
+                "terms_field": "mssql.database.name"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "Total log space usage [Metricbeat MSSQL]",
+          "type": "metrics"
+        }
+      },
+      "id": "6710ff20-1f2c-11e9-8a4d-eb34d2834f6b",
+      "type": "visualization",
+      "updated_at": "2019-01-23T16:31:57.969Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "An overview of the transaction log of each database in a MSSQL instance",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false,
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "1",
+              "w": 24,
+              "x": 0,
+              "y": 15
+            },
+            "id": "e9654a40-1fb2-11e9-8a4d-eb34d2834f6b",
+            "panelIndex": "1",
+            "type": "visualization",
+            "version": "7.0.0-alpha2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "2",
+              "w": 24,
+              "x": 24,
+              "y": 30
+            },
+            "id": "1757d530-1fb3-11e9-8a4d-eb34d2834f6b",
+            "panelIndex": "2",
+            "type": "visualization",
+            "version": "7.0.0-alpha2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "3",
+              "w": 24,
+              "x": 24,
+              "y": 0
+            },
+            "id": "a55bb000-1fb2-11e9-8a4d-eb34d2834f6b",
+            "panelIndex": "3",
+            "type": "visualization",
+            "version": "7.0.0-alpha2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "4",
+              "w": 24,
+              "x": 0,
+              "y": 30
+            },
+            "id": "edb7a0c0-1f2b-11e9-8a4d-eb34d2834f6b",
+            "panelIndex": "4",
+            "type": "visualization",
+            "version": "7.0.0-alpha2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "5",
+              "w": 24,
+              "x": 0,
+              "y": 45
+            },
+            "id": "c9ead180-1fb2-11e9-8a4d-eb34d2834f6b",
+            "panelIndex": "5",
+            "type": "visualization",
+            "version": "7.0.0-alpha2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "6",
+              "w": 24,
+              "x": 24,
+              "y": 15
+            },
+            "id": "68fa61b0-1fb2-11e9-8a4d-eb34d2834f6b",
+            "panelIndex": "6",
+            "type": "visualization",
+            "version": "7.0.0-alpha2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "7",
+              "w": 24,
+              "x": 0,
+              "y": 0
+            },
+            "id": "6710ff20-1f2c-11e9-8a4d-eb34d2834f6b",
+            "panelIndex": "7",
+            "type": "visualization",
+            "version": "7.0.0-alpha2"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat MSSQL] Transaction log",
+        "version": 1
+      },
+      "id": "18d66970-1fb4-11e9-8a4d-eb34d2834f6b",
+      "type": "dashboard",
+      "updated_at": "2019-01-24T08:43:18.278Z",
+      "version": 1
+    }
+  ],
+  "version": "7.0.0-alpha2"
+}
