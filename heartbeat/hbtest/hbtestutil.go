@@ -106,6 +106,17 @@ func BaseChecks(ip string, status string, typ string) mapval.Validator {
 			"id":          mapval.IsNonEmptyString,
 			"name":        mapval.IsString,
 			"type":        typ,
+			"check_group": mapval.IsString,
+		},
+	})
+}
+
+// SummaryChecks validates the "summary" field and its subfields.
+func SummaryChecks(up int, down int) mapval.Validator {
+	return mapval.MustCompile(mapval.Map{
+		"summary": mapval.Map{
+			"up":   uint16(up),
+			"down": uint16(down),
 		},
 	})
 }
