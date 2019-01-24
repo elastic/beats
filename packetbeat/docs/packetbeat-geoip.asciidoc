@@ -24,7 +24,7 @@ Logstash.
 
 To configure Packetbeat and the ingest geoIP processor plugin:
 
-1. {plugins}/ingest-geoip.html[Install the ingest geoIP processor plugin].
+1. With Elasticsearch < 6.7, {plugins}/ingest-geoip.html[Install the ingest geoIP processor plugin].
 After installing the plugin, remember to restart the node.
 
 2. Define an ingest node pipeline that uses a `geoip` processor to add location
