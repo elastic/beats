@@ -10,7 +10,7 @@ BEAT_URL?=https://www.elastic.co/products/beats/${BEAT_NAME} ## @packaging Link 
 BEAT_DOC_URL?=https://www.elastic.co/guide/en/beats/${BEAT_NAME}/current/index.html ## @packaging Link to the user documentation of the application
 BEAT_LICENSE?=ASL 2.0 ## @packaging Software license of the application
 BEAT_VENDOR?=Elastic ## @packaging Name of the vendor of the application
-BEAT_GOPATH=$(firstword $(subst :, ,"${GOPATH}"))
+BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 BEAT_REF_YAML?=true
 ES_BEATS?=..## @community_beat Must be set to ./vendor/github.com/elastic/beats. It must always be a relative path.
 GOPACKAGES?=$(shell go list ${BEAT_PATH}/... | grep -v /vendor/ | grep -v /scripts/cmd/ )
@@ -42,7 +42,7 @@ BUILD_DIR?=$(shell pwd)/build
 PKG_BUILD_DIR?=$(BUILD_DIR)/package${PKG_SUFFIX}
 PKG_UPLOAD_DIR?=$(BUILD_DIR)/upload
 COVERAGE_DIR?=${BUILD_DIR}/coverage
-COVERAGE_TOOL?="${BEAT_GOPATH}/bin/gotestcover"
+COVERAGE_TOOL?=${BEAT_GOPATH}/bin/gotestcover
 COVERAGE_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/pierrre/gotestcover
 TESTIFY_TOOL_REPO?=github.com/elastic/beats/vendor/github.com/stretchr/testify/assert
 NOW=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
@@ -184,7 +184,7 @@ prepare-tests:
 unit-tests: ## @testing Runs the unit tests with coverage.  Race is not enabled for unit tests because tests run much slower.
 unit-tests: prepare-tests
 	go test -i ${GOPACKAGES}
-	$(COVERAGE_TOOL) $(RACE) -coverprofile="${COVERAGE_DIR}/unit.cov"  ${GOPACKAGES}
+	"$(COVERAGE_TOOL)" $(RACE) -coverprofile="${COVERAGE_DIR}/unit.cov"  ${GOPACKAGES}
 
 .PHONY: unit
 unit: ## @testing Runs the unit tests without coverage reports.
@@ -196,7 +196,7 @@ integration-tests: ## @testing Run integration tests. Unit tests are run as part
 integration-tests: prepare-tests
 	rm -f docker-compose.yml.lock
 	go test -i ${GOPACKAGES}
-	$(COVERAGE_TOOL) -tags=integration $(RACE) -coverprofile="${COVERAGE_DIR}/integration.cov" ${GOPACKAGES}
+	"$(COVERAGE_TOOL)" -tags=integration $(RACE) -coverprofile="${COVERAGE_DIR}/integration.cov" ${GOPACKAGES}
 
 #
 .PHONY: integration-tests-environment

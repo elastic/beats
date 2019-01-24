@@ -1,6 +1,6 @@
 BEAT_NAME={beat}
 BEAT_PATH={beat_path}
-BEAT_GOPATH=$(firstword $(subst :, ,"${GOPATH}"))
+BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
 ES_BEATS?=./vendor/github.com/elastic/beats
