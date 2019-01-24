@@ -104,7 +104,7 @@
       },
       "id": "8460fcd0-8baa-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2019-01-15T18:40:16.104Z",
+      "updated_at": "2019-01-18T23:49:22.006Z",
       "version": 1
     },
     {
@@ -167,7 +167,7 @@
       },
       "id": "4ad9db20-8bab-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2019-01-15T18:40:16.104Z",
+      "updated_at": "2019-01-18T23:49:22.006Z",
       "version": 1
     },
     {
@@ -249,7 +249,7 @@
       },
       "id": "418dfbe0-8bac-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2019-01-15T18:40:16.104Z",
+      "updated_at": "2019-01-18T23:49:22.006Z",
       "version": 1
     },
     {
@@ -314,8 +314,8 @@
       },
       "id": "b8992150-8ba8-11e8-9676-ef67484126fb",
       "type": "search",
-      "updated_at": "2019-01-15T18:46:52.929Z",
-      "version": 4
+      "updated_at": "2019-01-18T23:49:22.006Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -380,7 +380,7 @@
       },
       "id": "d0120dc0-8bac-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2019-01-15T18:40:16.104Z",
+      "updated_at": "2019-01-18T23:49:22.006Z",
       "version": 1
     },
     {
@@ -446,7 +446,7 @@
       },
       "id": "11d33ea0-8bad-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2019-01-15T18:40:16.104Z",
+      "updated_at": "2019-01-18T23:49:22.006Z",
       "version": 1
     },
     {
@@ -522,8 +522,8 @@
       },
       "id": "f43a8f20-8bb5-11e8-9676-ef67484126fb",
       "type": "visualization",
-      "updated_at": "2019-01-15T18:45:46.912Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:22.006Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -651,8 +651,8 @@
       },
       "id": "a7b35890-8baa-11e8-9676-ef67484126fb",
       "type": "dashboard",
-      "updated_at": "2019-01-15T18:46:22.620Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:22.006Z",
+      "version": 1
     }
   ],
   "version": "7.0.0-SNAPSHOT"

@@ -1,4 +1,7 @@
 packetbeat.interfaces.device: any
+packetbeat.interfaces.snaplen: 1514
+packetbeat.interfaces.type: af_packet
+packetbeat.interfaces.buffer_size_mb: 100
 
 packetbeat.flows:
   timeout: 30s
@@ -6,8 +9,6 @@ packetbeat.flows:
 
 packetbeat.protocols.dns:
   ports: [53]
-  include_authorities: true
-  include_additionals: true
 
 packetbeat.protocols.http:
   ports: [80, 5601, 9200, 8080, 8081, 5000, 8002]

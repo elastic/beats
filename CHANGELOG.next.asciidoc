@@ -19,6 +19,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove port settings from Logstash and Redis output. {pull}9934[9934]
 - Fix registry handle leak on Windows (https://github.com/elastic/go-sysinfo/pull/33). {pull}9920[9920]
 - Rename `process.exe` to `process.executable` in add_process_metadata to align with ECS. {pull}9949[9949]
+- Import ECS change https://github.com/elastic/ecs/pull/308[ecs#308]:
+  leaf field `user.group` is now the `group` field set. {pull}10275[10275]
 
 *Auditbeat*
 - Rename `process.exe` to `process.executable` in auditd module to align with ECS. {pull}9949[9949]
@@ -75,21 +77,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adjust Packetbeat `http` fields to ECS Beta 2 {pull}9645[9645]
   - `http.request.body` moves to `http.request.body.content`
   - `http.response.body` moves to `http.response.body.content`
-- Changed DNS protocol fields to align with ECS. {pull}9941[9941]
+- Changed Packetbeat fields to align with ECS. {issue}7968[7968]
 - Removed trailing dot from domain names reported by the DNS protocol. {pull}9941[9941]
-- Changed TLS protocol fields to align with ECS. {pull}9980[9980]
-- Changed ICMP protocol fields to align with ECS. {pull}10062[10062]
-- Changed DHCPv4 protocol fields to align with ECS. {pull}10089[10089]
-- Changed AMQP protocol fields to align with ECS. {pull}10090[10090]
-- Changed Redis protocol fields to align with ECS. {pull}10126[10126]
-- Changed pgsql protocol fields to align with ECS. {pull}10147[10147]
-- Changed HTTP protocol fields to align with ECS. {pull}9976[9976]
-- Changed MongoDB protocol fields to align with ECS. {pull}10158[10158]
-- Changed MySQL protocol fields to align with ECS. {pull}10155[10155]
-- Changed NFS protocol fields to align with ECS. {pull}10153[10153]
-- Changed Thrift protocol fields to align with ECS. {pull}10125[10125]
-- Changed Cassandra protocol fields to align with ECS. {pull}10093[10093]
-- Changed Memcache protocol fields to align with ECS. {pull}10189[10189]
 
 *Winlogbeat*
 
@@ -157,6 +146,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Introduce `migration.enabled` configuration. {pull}9805[9805]
 - Add alias field support in Kibana index pattern. {pull}10075[10075]
 - Add `add_fields` processor. {pull}10119[10119]
+- Add Kibana field formatter to bytes fields. {pull}10184[10184]
 
 *Auditbeat*
 

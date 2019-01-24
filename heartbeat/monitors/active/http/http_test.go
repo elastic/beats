@@ -197,6 +197,7 @@ func TestUpStatuses(t *testing.T) {
 				mapval.Strict(mapval.Compose(
 					hbtest.BaseChecks("127.0.0.1", "up", "http"),
 					hbtest.RespondingTCPChecks(),
+					hbtest.SummaryChecks(1, 0),
 					respondingHTTPChecks(server.URL, status),
 				)),
 				event.Fields,
@@ -216,6 +217,7 @@ func TestDownStatuses(t *testing.T) {
 				mapval.Strict(mapval.Compose(
 					hbtest.BaseChecks("127.0.0.1", "down", "http"),
 					hbtest.RespondingTCPChecks(),
+					hbtest.SummaryChecks(0, 1),
 					respondingHTTPChecks(server.URL, status),
 					hbtest.ErrorChecks(fmt.Sprintf("%d", status), "validate"),
 				)),
@@ -252,6 +254,7 @@ func TestLargeResponse(t *testing.T) {
 		mapval.Strict(mapval.Compose(
 			hbtest.BaseChecks("127.0.0.1", "up", "http"),
 			hbtest.RespondingTCPChecks(),
+			hbtest.SummaryChecks(1, 0),
 			respondingHTTPChecks(server.URL, 200),
 		)),
 		event.Fields,
@@ -285,6 +288,7 @@ func runHTTPSServerCheck(
 			hbtest.BaseChecks("127.0.0.1", "up", "http"),
 			hbtest.RespondingTCPChecks(),
 			hbtest.TLSChecks(0, 0, cert),
+			hbtest.SummaryChecks(1, 0),
 			respondingHTTPChecks(server.URL, http.StatusOK),
 		)),
 		event.Fields,
@@ -348,6 +352,7 @@ func TestConnRefusedJob(t *testing.T) {
 		t,
 		mapval.Strict(mapval.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
+			hbtest.SummaryChecks(0, 1),
 			hbtest.ErrorChecks(url, "io"),
 			httpBaseChecks(url),
 		)),
@@ -369,6 +374,7 @@ func TestUnreachableJob(t *testing.T) {
 		t,
 		mapval.Strict(mapval.Compose(
 			hbtest.BaseChecks(ip, "down", "http"),
+			hbtest.SummaryChecks(0, 1),
 			hbtest.ErrorChecks(url, "io"),
 			httpBaseChecks(url),
 		)),

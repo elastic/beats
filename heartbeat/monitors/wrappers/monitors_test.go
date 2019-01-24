@@ -36,23 +36,27 @@ func TestWrapCommon(t *testing.T) {
 		eventext.MergeEventFields(event, common.MapStr{"simple": "job"})
 		return nil, nil
 	}
-	simpleJobValidator := mapval.MustCompile(mapval.Map{"simple": "job"})
 
 	var errorJob jobs.Job = func(event *beat.Event) ([]jobs.Job, error) {
 		return nil, fmt.Errorf("myerror")
 	}
-	errorJobValidator := mapval.MustCompile(mapval.Map{
-		"error": mapval.Map{
-			"message": "myerror",
-			"type":    "io",
-		},
-	})
+
+	var contJob jobs.Job = func(event *beat.Event) ([]jobs.Job, error) {
+		eventext.MergeEventFields(event, common.MapStr{"cont": "1st"})
+		return []jobs.Job{
+			func(event *beat.Event) ([]jobs.Job, error) {
+				eventext.MergeEventFields(event, common.MapStr{"cont": "2nd"})
+				return nil, nil
+			},
+		}, nil
+	}
 
 	type fields struct {
 		id   string
 		name string
 		typ  string
 	}
+	testFields := fields{"myid", "myname", "mytyp"}
 
 	commonFieldsValidator := func(f fields, status string) mapval.Validator {
 		return mapval.MustCompile(mapval.Map{
@@ -62,11 +66,38 @@ func TestWrapCommon(t *testing.T) {
 				"name":        f.name,
 				"type":        f.typ,
 				"status":      status,
+				"check_group": mapval.IsString,
 			},
 		})
 	}
 
-	testFields := fields{"myid", "myname", "mytyp"}
+	// This duplicates hbtest.SummaryChecks to avoid an import cycle.
+	// It could be refactored out, but it just isn't worth it.
+	summaryValidator := func(up int, down int) mapval.Validator {
+		return mapval.MustCompile(mapval.Map{
+			"summary": mapval.Map{
+				"up":   uint16(up),
+				"down": uint16(down),
+			},
+		})
+	}
+
+	simpleJobValidator := mapval.Compose(
+		mapval.MustCompile(mapval.Map{"simple": "job"}),
+		commonFieldsValidator(testFields, "up"),
+	)
+
+	errorJobValidator := mapval.Compose(
+		mapval.MustCompile(mapval.Map{"error": mapval.Map{"message": "myerror", "type": "io"}}),
+		commonFieldsValidator(testFields, "down"),
+	)
+
+	contJobValidator := func(msg string) mapval.Validator {
+		return mapval.Compose(
+			mapval.MustCompile(mapval.Map{"cont": msg}),
+			commonFieldsValidator(testFields, "up"),
+		)
+	}
 
 	tests := []struct {
 		name   string
@@ -79,21 +110,46 @@ func TestWrapCommon(t *testing.T) {
 			testFields,
 			[]jobs.Job{simpleJob},
 			[]mapval.Validator{
-				mapval.Strict(mapval.Compose(
+				mapval.Compose(
 					simpleJobValidator,
-					commonFieldsValidator(testFields, "up"),
-				)),
-			},
+					summaryValidator(1, 0),
+				)},
 		},
 		{
 			"job error",
 			testFields,
 			[]jobs.Job{errorJob},
 			[]mapval.Validator{
-				mapval.Strict(mapval.Compose(
+				mapval.Compose(
 					errorJobValidator,
-					commonFieldsValidator(testFields, "down"),
-				)),
+					summaryValidator(0, 1),
+				)},
+		},
+		{
+			"multi-job",
+			testFields,
+			[]jobs.Job{simpleJob, simpleJob},
+			[]mapval.Validator{
+				simpleJobValidator,
+				mapval.Compose(
+					simpleJobValidator,
+					summaryValidator(2, 0),
+				),
+			},
+		},
+		{
+			"multi-job-continuations",
+			testFields,
+			[]jobs.Job{contJob, contJob},
+			[]mapval.Validator{
+				contJobValidator("1st"),
+				contJobValidator("2nd"),
+				contJobValidator("1st"),
+				mapval.Compose(
+					contJobValidator("2nd"),
+					commonFieldsValidator(testFields, "up"),
+					summaryValidator(4, 0),
+				),
 			},
 		},
 	}
@@ -105,7 +161,9 @@ func TestWrapCommon(t *testing.T) {
 			assert.NoError(t, err)
 
 			for idx, r := range results {
-				mapvaltest.Test(t, tt.want[idx], r.Fields)
+				t.Run(fmt.Sprintf("result at index %d", idx), func(t *testing.T) {
+					mapvaltest.Test(t, mapval.Strict(tt.want[idx]), r.Fields)
+				})
 			}
 		})
 	}

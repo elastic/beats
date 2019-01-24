@@ -298,10 +298,10 @@ Here’s an example of a flow information sent by Packetbeat. See
     "port": 80
   },
   "event": {
+    "dataset": "flow",
     "duration": 3000000000,
     "end": "2018-11-15T14:41:24.000Z",
-    "start": "2018-11-15T14:41:21.000Z",
-    "type": "flow"
+    "start": "2018-11-15T14:41:21.000Z"
   },
   "flow": {
     "final": true, <1>
@@ -310,6 +310,7 @@ Here’s an example of a flow information sent by Packetbeat. See
   },
   "network": {
     "bytes": 470,
+    "community_id": "1:t9T66/2c66NQyftAEsr4aMZv4Hc=",
     "packets": 3,
     "transport": "tcp",
     "type": "ipv4"
@@ -459,7 +460,9 @@ The following options are available for all protocols:
 [float]
 ==== `enabled`
 
-The enabled setting is a boolean setting to enable or disable protocols without having to comment out configuration sections. If set to false, the protocol is disabled.
+The enabled setting is a boolean setting to enable or disable protocols without
+having to comment out configuration sections. If set to false, the protocol is
+disabled.
 
 The default value is true.
 
@@ -579,7 +582,9 @@ If enabled Packetbeat will generate the following BPF filter: `"icmp or icmp6"`.
 <titleabbrev>DNS</titleabbrev>
 ++++
 
-The `dns` section of the +{beatname_lc}.yml+ config file specifies configuration options for the DNS protocol. The DNS protocol supports processing DNS messages on TCP and UDP. Here is a sample configuration section for DNS:
+The `dns` section of the +{beatname_lc}.yml+ config file specifies configuration
+options for the DNS protocol. The DNS protocol supports processing DNS messages
+on TCP and UDP. Here is a sample configuration section for DNS:
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -596,13 +601,13 @@ Also see <<common-protocol-options>>.
 
 ===== `include_authorities`
 
-If this option is enabled, dns.authority fields (authority resource records) are added to DNS events.
-The default is false.
+If this option is enabled, dns.authority fields (authority resource records) are
+added to DNS events. The default is false.
 
 ===== `include_additionals`
 
-If this option is enabled, dns.additionals fields (additional resource records) are added to DNS events.
-The default is false.
+If this option is enabled, dns.additionals fields (additional resource records)
+are added to DNS events. The default is false.
 
 [[packetbeat-http-options]]
 === Capture HTTP traffic
@@ -720,7 +725,7 @@ HTTP response might result in the following JSON:
     },
     "vary": "Cookie, Accept-Language"
   },
-  "phrase": "OK"
+  "status_phrase": "OK"
 }
 ------------------------------------------------------------------------------
 
@@ -730,10 +735,10 @@ The default is false.
 
 ===== `real_ip_header`
 
-The header field to extract the real IP from. This setting is useful when
-you want to capture traffic behind a reverse proxy, but you want to get the geo-location
-information. If this header is present and contains a valid IP addresses, the
-information is used for the `real_ip` field.
+The header field to extract the real IP from. This setting is useful when you
+want to capture traffic behind a reverse proxy, but you want to get the
+geo-location information. If this header is present and contains a valid IP
+addresses, the information is used for the `network.forwarded_ip` field.
 
 ===== `max_message_size`
 
@@ -997,7 +1002,7 @@ based on any of these fields. Packetbeat automatically fills in the `status`
 column with either `OK` or `Error`, so it's easy to find the problematic RPC calls.
 A transaction is put into the `Error` state if it returned an exception.
 
-Packetbeat also indexes the `responsetime` field so you can get performance
+Packetbeat also indexes the `event.duration` field so you can get performance
 analytics and find the slow RPC calls.
 
 Here is an example performance dashboard:
@@ -1337,15 +1342,15 @@ output SHA-1 fingerprints.
 This section of the +{beatname_lc}.yml+ config file is optional, but configuring
 the processes enables Packetbeat to show you not only the servers that the
 traffic is flowing between, but also the processes. Packetbeat can even show you
-the traffic between two processes running on the same host, which is particularly
-useful when you have many services running on the same server. By default,
-process matching is disabled.
+the traffic between two processes running on the same host, which is
+particularly useful when you have many services running on the same server. By
+default, process enrichment is disabled.
 
-When Packetbeat starts, and then periodically afterwards, it scans the process table for
-processes that match the configuration file. For each of these processes, it
-monitors which file descriptors it has opened. When a new packet is captured,
-it reads the list of active TCP and UDP connections and matches the corresponding one
-with the list of file descriptors.
+When Packetbeat starts, and then periodically afterwards, it scans the process
+table for processes that match the configuration file. For each of these
+processes, it monitors which file descriptors it has opened. When a new packet
+is captured, it reads the list of active TCP and UDP connections and matches the
+corresponding one with the list of file descriptors.
 
 All this information is available via system interfaces: The `/proc` file system
 in Linux and the IP Helper API (`iphlpapi.dll`) on Windows, so {beatname_uc}
@@ -1359,35 +1364,19 @@ Example configuration:
 
 [source,yaml]
 ------------------------------------------------------------------------------
-packetbeat.procs:
-  enabled: true
-  monitored:
-    - process: mysqld
-      cmdline_grep: mysqld
-
-    - process: pgsql
-      cmdline_grep: postgres
-
-    - process: nginx
-      cmdline_grep: nginx
-
-    - process: app
-      cmdline_grep: gunicorn
+packetbeat.procs.enabled: true
 ------------------------------------------------------------------------------
 
 When the process monitor is enabled, it will enrich all the events whose source
-or destination is a local process. The `cmdline` and/or `client_cmdline` fields
-will be added to an event, when the server side or client side of the connection
-belong to a local process, respectively. Additionally, you can specify a pattern
-using the `cmdline_grep` option, to also name those processes. This will cause
-the `proc` and `client_proc` fields to be added to an event, with the name of
-the matched process.
+or destination is a local process. The `source.process` and/or
+`destination.process` fields will be added to an event, when the server side or
+client side of the connection belong to a local process, respectively.
 
 [float]
 === Configuration options
 
-You can specify the following process monitoring options in the `monitored` section
-of the +{beatname_lc}.yml+ config file:
+You can specify the following process monitoring options in the `monitored`
+section of the +{beatname_lc}.yml+ config file to customize the name of process:
 
 [float]
 ==== `process`
