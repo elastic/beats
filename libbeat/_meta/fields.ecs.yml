@@ -163,6 +163,7 @@
         - name: bytes
           level: core
           type: long
+          format: bytes
           example: 184
           description: >
             Bytes sent from the client to the server.
@@ -409,6 +410,7 @@
         - name: bytes
           level: core
           type: long
+          format: bytes
           example: 184
           description: >
             Bytes sent from the destination to the source.
@@ -808,6 +810,7 @@
       - name: size
         level: extended
         type: long
+        format: bytes
         description: File size in bytes (field is only added when `type` is
             `file`).
     
@@ -1090,6 +1093,7 @@
         - name: request.bytes
           level: extended
           type: long
+          format: bytes
           description: >
             Total size in bytes of the request (body and headers).
           example: 1437
@@ -1097,6 +1101,7 @@
         - name: request.body.bytes
           level: extended
           type: long
+          format: bytes
           description: >
             Size in bytes of the request body.
           example: 887
@@ -1104,6 +1109,7 @@
         - name: response.bytes
           level: extended
           type: long
+          format: bytes
           description: >
             Total size in bytes of the response (body and headers).
           example: 1437
@@ -1111,6 +1117,7 @@
         - name: response.body.bytes
           level: extended
           type: long
+          format: bytes
           description: >
             Size in bytes of the response body.
           example: 887
@@ -1261,6 +1268,7 @@
         - name: bytes
           level: core
           type: long
+          format: bytes
           description: >
             Total bytes transferred in both directions.
     
@@ -1674,6 +1682,7 @@
         - name: bytes
           level: core
           type: long
+          format: bytes
           example: 184
           description: >
             Bytes sent from the server to the client.
@@ -1885,6 +1894,7 @@
         - name: bytes
           level: core
           type: long
+          format: bytes
           example: 184
           description: >
             Bytes sent from the source to the destination.
