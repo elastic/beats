@@ -6,7 +6,7 @@ This file is generated! See scripts/docs_collector.py
 == Prometheus module
 
 This module periodically scrapes metrics from
-https://prometheus.io/docs/[Prometheus].
+https://prometheus.io/docs/instrumenting/exporters/[Prometheus exporters].
 
 
 [float]
