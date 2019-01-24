@@ -144,7 +144,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 			rootFields.Put("process.executable", exe)
 		}
 
-		if args, ok := proc["args"]; ok {
+		if args := getAndRemove(proc, "args"); args != nil {
 			rootFields.Put("process.args", args)
 		}
 
