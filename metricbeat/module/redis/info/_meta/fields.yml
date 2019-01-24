@@ -381,7 +381,6 @@
       description: >
         Server info
       fields:
-        # Service.version?
         - name: version
           type: keyword
           description:
@@ -402,11 +401,10 @@
           type: keyword
           description:
 
-        # ECS?
         - name: os
           type: keyword
           description:
-        # ECS?
+
         - name: arch_bits
           type: keyword
           description:
@@ -418,7 +416,7 @@
         - name: gcc_version
           type: keyword
           description:
-        # ECS?
+
         - name: process_id
           type: long
           description:
