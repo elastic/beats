@@ -449,17 +449,17 @@ func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
 				return fmt.Errorf("Template loading requested but the Elasticsearch output is not configured/enabled")
 			}
 
-			if b.ilm.Enabled() {
-				ilmCfg, err := getILMConfig(b)
+			/*
+				var ilmSettings *ilm.TemplateSettings
+				enabled, err := b.ilm.Enabled()
 				if err != nil {
 					return err
 				}
-
-				err = b.prepareILMTemplate(ilmCfg)
-				if err != nil {
-					return err
+				if enabled {
+					settings := b.ilm.Template()
+					ilmSettings = &settings
 				}
-			}
+			*/
 
 			esConfig := outCfg.Config()
 			if tmplCfg := b.Config.Template; tmplCfg == nil || tmplCfg.Enabled() {
@@ -869,6 +869,8 @@ func (b *Beat) templateLoadingCallback() (func(esClient *elasticsearch.Client) e
 		if b.Config.Template == nil {
 			b.Config.Template = common.NewConfig()
 		}
+
+		panic("integrate ILM manager")
 
 		loader, err := template.NewLoader(b.Config.Template, esClient, b.Info, b.Fields, b.Config.Migration.Enabled())
 		if err != nil {

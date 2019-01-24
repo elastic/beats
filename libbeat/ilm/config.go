@@ -24,13 +24,15 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 )
 
 type Config struct {
-	Mode          Mode   `config:"enabled"`
-	RolloverAlias string `config:"rollover_alias"`
-	Pattern       string `config:"pattern"`
-	PolicyFile    string `config:"policy.file"`
+	Mode          Mode                     `config:"enabled"`
+	Name          fmtstr.EventFormatString `config:"name"`
+	RolloverAlias string                   `config:"rollover_alias"`
+	Pattern       string                   `config:"pattern"`
+	PolicyFile    string                   `config:"policy.file"`
 }
 
 //Mode is used for enumerating the ilm mode.
@@ -95,10 +97,13 @@ func (cfg *Config) Validate() error {
 }
 
 func defaultConfig(info beat.Info) Config {
-	alias := fmt.Sprintf("%s-%s", info.Beat, info.Version)
+	name := fmt.Sprintf("%s-%s", info.Beat, info.Version)
+	nameFmt := fmtstr.MustCompileEvent(name)
+
 	return Config{
 		Mode:          ModeAuto,
-		RolloverAlias: alias,
+		Name:          *nameFmt,
+		RolloverAlias: name,
 		Pattern:       ilmDefaultPattern,
 		PolicyFile:    "",
 	}

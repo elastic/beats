@@ -143,6 +143,7 @@ func getElasticsearchClient(b *Beat) (*elasticsearch.Client, error) {
 	return elasticsearch.NewConnectedClient(esConfig)
 }
 
+/*
 func loadConfigWithDefaults(config *ilmConfig, b *Beat) {
 	if config.RolloverAlias == "" {
 		config.RolloverAlias = fmt.Sprintf("%s-%s", b.Info.Beat, b.Info.Version)
@@ -152,6 +153,7 @@ func loadConfigWithDefaults(config *ilmConfig, b *Beat) {
 		config.Pattern = ILMDefaultPattern
 	}
 }
+*/
 
 func checkElasticsearchVersionIlm(client *elasticsearch.Client) error {
 	esV := client.GetVersion()
@@ -203,6 +205,7 @@ func checkILMFeatureEnabled(client *elasticsearch.Client) error {
 	return nil
 }
 
+/*
 func getILMConfig(b *Beat) (*ilmConfig, error) {
 	config := &ilmConfig{}
 	err := b.Config.Output.Config().Unpack(config)
@@ -214,3 +217,4 @@ func getILMConfig(b *Beat) (*ilmConfig, error) {
 
 	return config, nil
 }
+*/

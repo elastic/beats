@@ -21,22 +21,28 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"time"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/fmtstr"
 )
 
 type ILMManager interface {
-	Enabled() (bool, error)
-	TemplateInfo() Template
+	Enabled(ep APIHandler) (bool, error)
+	Template() TemplateSettings
 }
 
-type Template struct {
+type TemplateSettings struct {
 	Alias      string
 	Pattern    string
 	PolicyName string
+}
+
+type APIHandler interface {
+	HasILM(required bool) (bool, error)
 }
 
 type noopManager struct{}
@@ -78,26 +84,55 @@ func DefaultManager(info beat.Info, config *common.Config) (ILMManager, error) {
 		policy = ilmDefaultPolicy
 	}
 
-	// TODO: create policyName
+	name, err := applyStaticFmtstr(info, &cfg.ILM.Name)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to read ilm policy name")
+	}
 
 	return &singleManager{
-		cfg:    cfg.ILM,
-		policy: policy,
+		cfg:        cfg.ILM,
+		policyName: name,
+		policy:     policy,
 	}, errors.New("TODO")
 }
 
-func (*noopManager) Enabled() (bool, error) { return false, nil }
-func (*noopManager) TemplateInfo() Template { return Template{} }
+func (*noopManager) Enabled(_ APIHandler) (bool, error) { return false, nil }
+func (*noopManager) Template() TemplateSettings         { return TemplateSettings{} }
 
-func (m *singleManager) Enabled() (bool, error) {
-	return false, errors.New("TODO")
+func (m *singleManager) Enabled(client APIHandler) (bool, error) {
+	if m.cfg.Mode == ModeDisabled {
+		return false, nil
+	}
+	return client.HasILM()
 }
 
-func (m *singleManager) TemplateInfo() Template {
+func (m *singleManager) Template() TemplateSettings {
 	alias := m.cfg.RolloverAlias
-	return Template{
+	return TemplateSettings{
 		Alias:      alias,
 		Pattern:    fmt.Sprintf("%s-*", alias),
 		PolicyName: m.policyName,
 	}
+}
+
+func applyStaticFmtstr(info beat.Info, fmt *fmtstr.EventFormatString) (string, error) {
+	return fmt.Run(&beat.Event{
+		Fields: common.MapStr{
+			// beat object was left in for backward compatibility reason for older configs.
+			"beat": common.MapStr{
+				"name":    info.Beat,
+				"version": info.Version,
+			},
+			"agent": common.MapStr{
+				"name":    info.Beat,
+				"version": info.Version,
+			},
+			// For the Beats that have an observer role
+			"observer": common.MapStr{
+				"name":    info.Beat,
+				"version": info.Version,
+			},
+		},
+		Timestamp: time.Now(),
+	})
 }
