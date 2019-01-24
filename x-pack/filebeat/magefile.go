@@ -102,7 +102,7 @@ func fieldsYML() error {
 
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
-	return mage.KibanaDashboards(mage.OSSBeatDir("module"), "module")
+	return mage.KibanaDashboards(mage.OSSBeatDir("module"), "module", "input")
 }
 
 // ExportDashboard exports a dashboard and writes it into the correct directory.
