@@ -1209,6 +1209,15 @@
   comment: No alias mapping as field did not always exist
   beat: metricbeat
 
+## Modules
+
+### Zookeeper
+
+- from: zookeeper.mntr.version
+  to: service.version
+  alias: true
+  beat: metricbeat
+
 # Packetbeat
 
 ## Shared
