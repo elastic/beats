@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("filebeat", "iis", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("filebeat", "iis", asset.ModuleFieldsPri, AssetIis); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetIis returns asset data.
+// This is the base64 encoded gzipped contents of module/iis.
+func AssetIis() string {
 	return "eJzsmM9u4zYQxu95isGeuzq0Nx96KVA0hwIFNkCPAiON5WlkjjJDxdDbF6SsbOKlZOpPYCwQnQzJ/L4fydFoOF/hCbsdEOkdgCNX4w6+3N9/+3IHUKIWQo0jtjv4/Q4A4G8u2xphzwKNESVbwf39N6i5gj3VqNkdwJ6wLnUX/v8VrDnioO8v1zW4g0q4bc53Ijb++jPIwF74+KOHvwaf1xGDmSkKVH29HfOc8PXXH2ydIatnjzBfz9Are5RXirckbyUGGG0fc3XGtfru8QBVs60uHkxw+evhgPDXw8M/XrkXhoJLzKLuJ7K//bq9/79kSz4pXPVXcpj7n1HzJ+xOLOV8fy8bHMDYEsiqM7ZAsO3xEWWEBOUF5QNYAgbvwXmuYAJs4XSg4hDuDXELaJ10cDIKFVoU47CMoxbMT7QxZcHWoXUDaG8BGm4JCBZIL1j+ArQHY7vvXFHARy67fBiTPXYO48FlajKXTxrjDjs4ONdkgs8tqsu8XFTlSJWYflZOWhxn8fNYw6ENW8V1IOcAo2YmQonqyAb1zJSlvE9dqe5HdAe+jItZuxBVSLFupZ7p20qd+V8LzJ5blC5XJ/RD3kpxDcMX2DYsbsW+RoYnraxOZayJmSpKFhmX4il4ZIfzw1i5lQJXRLDgHkVQ1sTwiEaafZ8Ecv8xW5VF+o9iTCeFw2vlLyhKbJdgxIcmObO6BcHmh2UjY5OD3FRo4y/YZdUGI/XWW8kSX6i4ZJmeC7x7eXqebFRnal5vQY7mP74MxgUcYzLJGGQ3wRiRScVojCsuc/4CjDGZVIxInC6gGFFJheCYyUwE1mzf1nXsCzEPJd8oTllXh6qH2SZaPczKgGUdW9v5LGs3Sagiay4rrSUs40op6bpCHqkNlmRqfywhi9atWehz6VEhZ1f1Ute74NYf13JSjn3JF6FdVUyFq7kIf1sPNaGUCiNYEduN9m9aLHnzyHVbBdSE1MwV2i6UrguOoQ1IKPIuM27WIQvCsxpkgkbZ5s1BjG7c9Ahtsl4fev14w+W5xfYj2lShZdg0NfUvGTTMdbC80l+54RksGC847Z6tFx50b9s7Obvf5ox/u/PeT9cyGqlcfqbT/Wf1tBjts3q6yvNZPX1M9fR/AAAA//+NLFvk"
 }

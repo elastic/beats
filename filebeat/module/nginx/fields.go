@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("filebeat", "nginx", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("filebeat", "nginx", asset.ModuleFieldsPri, AssetNginx); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetNginx returns asset data.
+// This is the base64 encoded gzipped contents of module/nginx.
+func AssetNginx() string {
 	return "eJysl0FyrDgMhvd9ClX28QF6MZupmt3MFSjHCLcnxuLJInl9+1eQTtIhNrEBr7oB/f8nyxb4EZ7xeoZgXfh9AhAnHs/w8N/0/+EE0GI07AZxFM7w1wkA4F9qR4/QEcOgObpgQS4Icwh4stA5j1GdAOKFWBpDoXP2DMIjngA6h76N51nqEYLu8dN+GnId8AyWaRxuVxIM0/hnFoKOqc8BTOPe795TG4MxflxOGa+YT+NvCqJdiDeLeUY+Qd70J54PlBTOPdITtdcmYhD1dBWMX55559Pe6eWdQcvlDBeRQTHGgUJENWklZXpnWb+lc6vIdxDGngQbNzTeRankCCivxM+qI37V3GLbuGEPQ6V9pJENqk2eY0Rupp+VnlOcSsSVePYoF2q31frXiFFUUqEoXfa1ibJXxM66oJehJYYTdvOCHB2FLRmnQ8tW09u+aAy1tdX9urGiaBljSqeMo0Nm5D31zmiU2GuLoXY/z5tiDqwtfX6P5TmW/RcyPfNessUXZ5bVWE8tmV5WZ21q70F6/T8ty7KBIydTjOHCIRgZmVKMQYu57MfIyZRiJPryBoqMSikEpUwqESiqbvQ+9YKqQ2kOWqcUdy/VCeaY1TrB7FywFHNzW8+yt0jpTruFJa9U1bctUuZbbEvLNhTEBQyyZ8Zvn3oWSf2oVzrxhsYgfG1cpNQ7fhPaj4qlcJ7M/Nh+qBWlUhhG6ygcVL91seLiObketaBWpCpn6Lil9LNgDu0dCZm/tMiDD72zfNWZ11AIaGROK30K8hTs4sYK343xpgmuxSCuc8hqvb15fMHa05Anq1JxJV/iQybbvNvAZDBG9T2yxE82+8mFUbdqk2uPMWpbe+BKRy39/gQAAP//bhCyuA=="
 }

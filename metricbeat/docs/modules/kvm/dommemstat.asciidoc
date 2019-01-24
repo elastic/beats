@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-kvm-dommemstat]]
 === kvm dommemstat metricset
 
-experimental[]
+beta[]
 
 include::../../../module/kvm/dommemstat/_meta/docs.asciidoc[]
 

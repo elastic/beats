@@ -12,7 +12,6 @@ from base import BaseTest
 
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
-KIBANA_PASSWORD = 'changeme'
 TIMEOUT = 5 * 60
 
 
@@ -23,7 +22,7 @@ class TestManagement(BaseTest):
         # NOTES: Theses options are linked to the specific of the docker compose environment for
         # CM.
         self.es_host = os.getenv('ES_HOST', 'localhost') + ":" + os.getenv('ES_POST', '9200')
-        self.es_user = "elastic"
+        self.es_user = "myelastic"
         self.es_pass = "changeme"
         self.es = Elasticsearch([self.get_elasticsearch_url()], verify_certs=True)
 
@@ -41,7 +40,7 @@ class TestManagement(BaseTest):
 
         config_content = open(config_path, 'r').read()
 
-        exit_code = self.enroll(KIBANA_PASSWORD)
+        exit_code = self.enroll(self.es_user, self.es_pass)
 
         assert exit_code == 0
 
@@ -74,7 +73,7 @@ class TestManagement(BaseTest):
 
         config_content = open(config_path, 'r').read()
 
-        exit_code = self.enroll('wrong password')
+        exit_code = self.enroll("not", 'wrong password')
 
         assert exit_code == 1
 
@@ -95,7 +94,7 @@ class TestManagement(BaseTest):
         # Enroll the beat
         config_path = os.path.join(self.working_dir, "mockbeat.yml")
         self.render_config_template("mockbeat", config_path)
-        exit_code = self.enroll(KIBANA_PASSWORD)
+        exit_code = self.enroll(self.es_user, self.es_pass)
         assert exit_code == 0
 
         index = self.random_index()
@@ -162,7 +161,7 @@ class TestManagement(BaseTest):
         # Enroll the beat
         config_path = os.path.join(self.working_dir, "mockbeat.yml")
         self.render_config_template("mockbeat", config_path)
-        exit_code = self.enroll(KIBANA_PASSWORD)
+        exit_code = self.enroll(self.es_user, self.es_pass)
         assert exit_code == 0
 
         index = self.random_index()
@@ -209,10 +208,10 @@ class TestManagement(BaseTest):
         self.wait_documents(index, 1)
         proc.check_kill_and_wait()
 
-    def enroll(self, password):
+    def enroll(self, user, password):
         return self.run_beat(
             extra_args=["enroll", self.get_kibana_url(),
-                        "--password", "env:PASS", "--force"],
+                        "--password", "env:PASS", "--username", user, "--force"],
             logging_args=["-v", "-d", "*"],
             env={
                 'PASS': password,
@@ -227,7 +226,7 @@ class TestManagement(BaseTest):
         url = self.get_kibana_url() + "/api/status"
 
         r = requests.get(url, headers=headers,
-                         auth=('elastic', KIBANA_PASSWORD))
+                         auth=(self.es_user, self.es_pass))
         print(r.text)
 
     def create_and_assing_tag(self, blocks):
@@ -244,7 +243,7 @@ class TestManagement(BaseTest):
         }
 
         r = requests.put(url, json=data, headers=headers,
-                         auth=('elastic', KIBANA_PASSWORD))
+                         auth=(self.es_user, self.es_pass))
         assert r.status_code in (200, 201)
 
         # Retrieve beat ID
@@ -255,7 +254,7 @@ class TestManagement(BaseTest):
         data = {"assignments": [{"beatId": meta["uuid"], "tag": tag_name}]}
         url = self.get_kibana_url() + "/api/beats/agents_tags/assignments"
         r = requests.post(url, json=data, headers=headers,
-                          auth=('elastic', KIBANA_PASSWORD))
+                          auth=(self.es_user, self.es_pass))
         assert r.status_code == 200
 
     def get_elasticsearch_url(self):

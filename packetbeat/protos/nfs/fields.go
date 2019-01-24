@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("packetbeat", "nfs", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("packetbeat", "nfs", asset.ModuleFieldsPri, AssetNfs); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetNfs returns asset data.
+// This is the base64 encoded gzipped contents of protos/nfs.
+func AssetNfs() string {
 	return "eJykjzFP8zAQhnf/iledv+Yb6JSBBdSNFKliRsa5VCecO8t2IuXfo1RJG5RSBjxZ7/l53vMWnzSUkCYZIHP2VGJT7Y8bA9SUXOSQWaVEtT+i3/1/QArkuGEH6kkyGiZfp8JgupUGALYQ29LsHU8eApU4Re3ClCzfL5meYmKVSz6zXuW0CFfbhahZnfpZAOnaD4qFWTW0LBrf/9xz1vzelu1dXb/D0+Hl9fBWPUMDRTuORuiGSoPTmn6yPS4GOLuvvpH/B41oLcsqZ4GziaDNZZdvLme9Tzf2SdnmLt373bUpUvDDRBTGmK8AAAD//3Ajtg4="
 }

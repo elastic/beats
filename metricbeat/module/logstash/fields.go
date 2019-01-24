@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("metricbeat", "logstash", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("metricbeat", "logstash", asset.ModuleFieldsPri, AssetLogstash); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetLogstash returns asset data.
+// This is the base64 encoded gzipped contents of ../metricbeat/module/logstash.
+func AssetLogstash() string {
 	return "eJy0k8Fum0AQhu88xS/OtR+AQ2+t6qpVcvIliiIEY7zxsoN2Bkd++wgMFpAldmxnjjvi+7/ZHRbY0SGB5UI0lW0EqFFLCeJ/3VEcATlJ5k2lhl2CnxEA9G2UnNeWIsCTpVQoQZFGgJCqcYUkeIpFbPwD8Va1ip8jYGPI5pK0nAVcWtLIoCk9VA3Jc111JwGHMWlIc5zT6TBEmyUea/L9eLS+puFDgS2Ljhq9xI4Ob+zzSe8Tlab+sGgLDmbtyYthd7+409uuA+Q+9XVfBhOnt3xB3t/1f6zchieN0P2en/vc7Bf4NBUafRhemRD4GGzZFdelPg6ow11eiqYqt270S0tBSepNJsubFpz25EZG81YXzP6rpWE65ZzEUMTML8D177ByGZfGFd2YyLh2Sn45a8H19He/h8ZDrQV/RWNjrJKn71jN3x36g8t7AAAA//+4rIER"
 }
