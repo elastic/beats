@@ -797,6 +797,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the client to the server.
 
 
@@ -1143,6 +1145,8 @@ Destination domain.
 type: long
 
 example: 184
+
+format: bytes
 
 Bytes sent from the destination to the source.
 
@@ -1666,6 +1670,8 @@ Mode of the file in octal representation.
 --
 type: long
 
+format: bytes
+
 File size in bytes (field is only added when `type` is `file`).
 
 --
@@ -2070,6 +2076,8 @@ type: long
 
 example: 1437
 
+format: bytes
+
 Total size in bytes of the request (body and headers).
 
 
@@ -2081,6 +2089,8 @@ Total size in bytes of the request (body and headers).
 type: long
 
 example: 887
+
+format: bytes
 
 Size in bytes of the request body.
 
@@ -2094,6 +2104,8 @@ type: long
 
 example: 1437
 
+format: bytes
+
 Total size in bytes of the response (body and headers).
 
 
@@ -2105,6 +2117,8 @@ Total size in bytes of the response (body and headers).
 type: long
 
 example: 887
+
+format: bytes
 
 Size in bytes of the response body.
 
@@ -2283,6 +2297,8 @@ Learn more at https://github.com/corelight/community-id-spec.
 type: long
 
 example: 368
+
+format: bytes
 
 Total bytes transferred in both directions.
 If `source.bytes` and `destination.bytes` are known, `network.bytes` is their sum.
@@ -2869,6 +2885,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the server to the client.
 
 
@@ -3142,6 +3160,8 @@ Source domain.
 type: long
 
 example: 184
+
+format: bytes
 
 Bytes sent from the source to the destination.
 
