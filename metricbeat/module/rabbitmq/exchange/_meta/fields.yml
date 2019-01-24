@@ -4,7 +4,6 @@
     exchange
   release: ga
   fields:
-    # ECS?
     # Additional: Seem to show up in different metricsets, one level up?
     - name: name
       type: keyword
