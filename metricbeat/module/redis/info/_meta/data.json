@@ -12,6 +12,9 @@
     "metricset": {
         "name": "info"
     },
+    "os": {
+        "full": "Linux 4.9.125-linuxkit x86_64"
+    },
     "process": {
         "pid": 1
     },
@@ -30,9 +33,9 @@
             },
             "cpu": {
                 "used": {
-                    "sys": 2.28,
+                    "sys": 2.82,
                     "sys_children": 0,
-                    "user": 0.23,
+                    "user": 0.34,
                     "user_children": 0
                 }
             },
@@ -125,28 +128,27 @@
                 "git_dirty": "0",
                 "git_sha1": "00000000",
                 "hz": 10,
-                "lru_clock": 4836909,
+                "lru_clock": 4837195,
                 "mode": "standalone",
                 "multiplexing_api": "epoll",
-                "os": "Linux 4.9.125-linuxkit x86_64",
                 "run_id": "27e18a9e6da3285e4e7873467093db5d7ad93ce5",
                 "tcp_port": 6379,
-                "uptime": 1091
+                "uptime": 1377
             },
             "slowlog": {
                 "count": 0
             },
             "stats": {
                 "active_defrag": {},
-                "commands_processed": 16,
+                "commands_processed": 24,
                 "connections": {
-                    "received": 1019,
+                    "received": 1281,
                     "rejected": 0
                 },
                 "instantaneous": {
                     "input_kbps": 0.03,
                     "ops_per_sec": 1,
-                    "output_kbps": 1.27
+                    "output_kbps": 1.29
                 },
                 "keys": {
                     "evicted": 0,
@@ -160,10 +162,10 @@
                 "migrate_cached_sockets": 0,
                 "net": {
                     "input": {
-                        "bytes": 451
+                        "bytes": 663
                     },
                     "output": {
-                        "bytes": 16927
+                        "bytes": 25403
                     }
                 },
                 "pubsub": {
