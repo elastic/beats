@@ -60,6 +60,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Fix config appender registration. {pull}9873[9873]
 - Gracefully handle TLS options when enrolling a Beat. {issue}9129[9129]
 - The backing off now implements jitter to better distribute the load. {issue}10172[10172]
+- Fix TLS certificate DoS vulnerability. {pull}10303[10303]
 
 *Auditbeat*
 
