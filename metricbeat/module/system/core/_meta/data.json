@@ -17,14 +17,14 @@
     },
     "system": {
         "core": {
-            "id": 1,
+            "id": 0,
             "idle": {
-                "pct": 0.2157,
-                "ticks": 19266526
+                "pct": 0.84,
+                "ticks": 69564411
             },
             "iowait": {
                 "pct": 0,
-                "ticks": 0
+                "ticks": 419844
             },
             "irq": {
                 "pct": 0,
@@ -32,23 +32,23 @@
             },
             "nice": {
                 "pct": 0,
-                "ticks": 0
+                "ticks": 45632
             },
             "softirq": {
                 "pct": 0,
-                "ticks": 0
+                "ticks": 189966
             },
             "steal": {
                 "pct": 0,
                 "ticks": 0
             },
             "system": {
-                "pct": 0.3137,
-                "ticks": 781976
+                "pct": 0.08,
+                "ticks": 6211665
             },
             "user": {
-                "pct": 0.4706,
-                "ticks": 566036
+                "pct": 0.08,
+                "ticks": 18833962
             }
         }
     }
