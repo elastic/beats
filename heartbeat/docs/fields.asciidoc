@@ -24,6 +24,7 @@ grouped in the following categories:
 * <<exported-fields-process>>
 * <<exported-fields-resolve>>
 * <<exported-fields-socks5>>
+* <<exported-fields-summary>>
 * <<exported-fields-tcp>>
 * <<exported-fields-tls>>
 
@@ -269,6 +270,16 @@ type: keyword
 required: True
 
 Indicator if monitor could validate the service to be available.
+
+
+--
+
+*`monitor.check_group`*::
++
+--
+type: keyword
+
+A token unique to a simultaneously invoked group of checks as in the case where multiple IPs are checked for a single DNS entry.
 
 
 --
@@ -3764,6 +3775,34 @@ Time required to establish a connection via SOCKS5 to endpoint based on availabl
 type: long
 
 Duration in microseconds
+
+--
+
+[[exported-fields-summary]]
+
+[float]
+== summary fields
+
+Present in the last event emitted during a check. If a monitor checks multiple endpoints, as is the case with `mode: all`.
+
+
+*`summary.up`*::
++
+--
+type: integer
+
+The number of endpoints that succeeded
+
+
+--
+
+*`summary.down`*::
++
+--
+type: integer
+
+The number of endpoints that failed
+
 
 --
 
