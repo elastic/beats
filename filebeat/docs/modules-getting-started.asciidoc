@@ -28,7 +28,7 @@ Before running {beatname_uc} modules:
 <<filebeat-installation>>. After installing {beatname_uc}, return to this
 quick start page.
 
-* Install the Ingest Node GeoIP and User Agent plugins. These plugins are
+* With Elasticsearch < 6.7, install the Ingest Node GeoIP and User Agent plugins. These plugins are
 required to capture the geographical location and browser information used by
 some of the visualizations available in the sample dashboards. You can install
 these plugins by running the following commands in the {es} home path:
