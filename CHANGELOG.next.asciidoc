@@ -188,6 +188,8 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Release Graphite module as GA. {pull}10240[10240]
 - Release http.server metricset as GA. {pull}10240[10240]
 - Release use of xpack.enabled: true flag in Elasticsearch and Kibana modules as GA. {pull}10222[10222]
+- Making RabbitMQ Metricbeat module GA. {pull}10165[10165]
+- Release Elastic stack modules (Elasticsearch, Logstash, and Kibana) as GA. {pull}10094[10094]
 
 *Packetbeat*
 

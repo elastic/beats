@@ -33,17 +33,17 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-docker-network,network>>   
 |<<metricbeat-module-dropwizard,Dropwizard>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-dropwizard-collector,collector>>   
-|<<metricbeat-module-elasticsearch,Elasticsearch>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.10+| .10+|  |<<metricbeat-metricset-elasticsearch-ccr,ccr>> beta[]  
-|<<metricbeat-metricset-elasticsearch-cluster_stats,cluster_stats>> beta[]  
-|<<metricbeat-metricset-elasticsearch-index,index>> beta[]  
-|<<metricbeat-metricset-elasticsearch-index_recovery,index_recovery>> beta[]  
-|<<metricbeat-metricset-elasticsearch-index_summary,index_summary>> beta[]  
-|<<metricbeat-metricset-elasticsearch-ml_job,ml_job>> beta[]  
-|<<metricbeat-metricset-elasticsearch-node,node>> beta[]  
-|<<metricbeat-metricset-elasticsearch-node_stats,node_stats>> beta[]  
-|<<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>> beta[]  
-|<<metricbeat-metricset-elasticsearch-shard,shard>> beta[]  
+|<<metricbeat-module-elasticsearch,Elasticsearch>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.10+| .10+|  |<<metricbeat-metricset-elasticsearch-ccr,ccr>>   
+|<<metricbeat-metricset-elasticsearch-cluster_stats,cluster_stats>>   
+|<<metricbeat-metricset-elasticsearch-index,index>>   
+|<<metricbeat-metricset-elasticsearch-index_recovery,index_recovery>>   
+|<<metricbeat-metricset-elasticsearch-index_summary,index_summary>>   
+|<<metricbeat-metricset-elasticsearch-ml_job,ml_job>>   
+|<<metricbeat-metricset-elasticsearch-node,node>>   
+|<<metricbeat-metricset-elasticsearch-node_stats,node_stats>>   
+|<<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>>   
+|<<metricbeat-metricset-elasticsearch-shard,shard>>   
 |<<metricbeat-module-envoyproxy,envoyproxy>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-envoyproxy-server,server>>   
 |<<metricbeat-module-etcd,Etcd>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
@@ -66,9 +66,9 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-kafka,Kafka>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-kafka-consumergroup,consumergroup>>   
 |<<metricbeat-metricset-kafka-partition,partition>>   
-|<<metricbeat-module-kibana,Kibana>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>> beta[]  
-|<<metricbeat-metricset-kibana-status,status>> beta[]  
+|<<metricbeat-module-kibana,Kibana>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.2+| .2+|  |<<metricbeat-metricset-kibana-stats,stats>>   
+|<<metricbeat-metricset-kibana-status,status>>   
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .13+| .13+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>> beta[]  
 |<<metricbeat-metricset-kubernetes-container,container>>   
@@ -85,9 +85,9 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-kubernetes-volume,volume>>   
 |<<metricbeat-module-kvm,kvm>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-kvm-dommemstat,dommemstat>> experimental[]  
-|<<metricbeat-module-logstash,Logstash>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.2+| .2+|  |<<metricbeat-metricset-logstash-node,node>> beta[]  
-|<<metricbeat-metricset-logstash-node_stats,node_stats>> beta[]  
+|<<metricbeat-module-logstash,Logstash>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.2+| .2+|  |<<metricbeat-metricset-logstash-node,node>>   
+|<<metricbeat-metricset-logstash-node_stats,node_stats>>   
 |<<metricbeat-module-memcached,Memcached>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-memcached-stats,stats>>   
 |<<metricbeat-module-mongodb,MongoDB>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
