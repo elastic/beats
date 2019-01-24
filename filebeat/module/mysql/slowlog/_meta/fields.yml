@@ -3,10 +3,6 @@
   description: >
     Contains fields from the MySQL slow logs.
   fields:
-    - name: query_time.sec
-      type: float
-      description: >
-        The total time the query took, in seconds, as a floating point number.
     - name: lock_time.sec
       type: float
       description: >
@@ -67,7 +63,7 @@
         Whether the query needed temporary tables on disk.
     - name: tmp_tables
       type: long
-      description: > 
+      description: >
         Number of temporary tables created for this query
     - name: tmp_disk_tables
       type: long
@@ -76,7 +72,7 @@
     - name: tmp_table_sizes
       type: long
       format: bytes
-      description: 
+      description:
         Size of temporary tables created for this query.
     - name: filesort
       type: boolean

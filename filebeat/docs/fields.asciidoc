@@ -4456,17 +4456,6 @@ Extra source information
 
 --
 
-*`elasticsearch.slowlog.took_millis`*::
-+
---
-type: keyword
-
-example: 42
-
-Time took in milliseconds
-
---
-
 *`elasticsearch.slowlog.total_hits`*::
 +
 --
@@ -4910,15 +4899,6 @@ Complete HTTP request line, including the method, request and HTTP version strin
 
 --
 
-*`haproxy.http.request.time_active_ms`*::
-+
---
-type: long
-
-Time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
-
---
-
 *`haproxy.http.request.time_wait_without_data_ms`*::
 +
 --
@@ -4942,15 +4922,6 @@ Total time in milliseconds spent waiting for a full HTTP request from the client
 
 TCP log format
 
-
-*`haproxy.tcp.processing_time_ms`*::
-+
---
-type: long
-
-Total time in milliseconds elapsed between the accept and the last close
-
---
 
 *`haproxy.tcp.connection_waiting_time_ms`*::
 +
@@ -6355,16 +6326,6 @@ alias to: message
 Contains fields from the MySQL slow logs.
 
 
-
-*`mysql.slowlog.query_time.sec`*::
-+
---
-type: float
-
-The total time the query took, in seconds, as a floating point number.
-
-
---
 
 *`mysql.slowlog.lock_time.sec`*::
 +
@@ -10348,17 +10309,6 @@ Core id
 example: mydb
 
 Name of database
-
---
-
-*`postgresql.log.duration`*::
-+
---
-type: float
-
-example: 30.0
-
-Duration of a query.
 
 --
 

@@ -304,6 +304,11 @@
   to: url.original
   alias: true
 
+- from: elasticsearch.slowlog.took_millis
+  to: event.duration
+  alias: false
+  scale: 1000000
+
 ## IIS module
 
 - from: iis.access.server_ip
@@ -444,6 +449,16 @@
   alias: true
 
 ## HAProxy module
+
+- from: haproxy.total_waiting_time_ms
+  to: event.duration
+  alias: false
+  scale: 1000000
+
+- from: haproxy.http.request.time_active_ms
+  to: event.duration
+  alias: false
+  scale: 1000000
 
 - from: haproxy.client.ip
   to: source.address
@@ -612,6 +627,11 @@
   to: mysql.thread_id
   alias: true
 
+- from: mysql.slowlog.query_time.sec
+  to: event.duration
+  alias: false
+  scale: 1000000000
+
 ## NGINX module
 
 - from: nginx.access.user_name
@@ -695,6 +715,11 @@
   alias: true
 
 ## PostgreSQL module
+
+- from: postgresql.log.duration
+  to: event.duration
+  alias: false
+  scale: 1000000
 
 - from: postgresql.log.timezone
   to: event.timezone

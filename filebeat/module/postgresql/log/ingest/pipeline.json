@@ -6,7 +6,7 @@
         "field": "message",
         "ignore_missing": true,
         "patterns": [
-            "^%{LOCALDATETIME:postgresql.log.timestamp} %{WORD:event.timezone} \\[%{NUMBER:process.pid:long}(-%{BASE16FLOAT:postgresql.log.core_id:long})?\\] ((\\[%{USERNAME:user.name}\\]@\\[%{POSTGRESQL_DB_NAME:postgresql.log.database}\\]|%{USERNAME:user.name}@%{POSTGRESQL_DB_NAME:postgresql.log.database}) )?%{WORD:log.level}:  (duration: %{NUMBER:postgresql.log.duration:float} ms  statement: %{GREEDYDATA:postgresql.log.query}|%{GREEDYDATA:message})"
+            "^%{LOCALDATETIME:postgresql.log.timestamp} %{WORD:event.timezone} \\[%{NUMBER:process.pid:long}(-%{BASE16FLOAT:postgresql.log.core_id:long})?\\] ((\\[%{USERNAME:user.name}\\]@\\[%{POSTGRESQL_DB_NAME:postgresql.log.database}\\]|%{USERNAME:user.name}@%{POSTGRESQL_DB_NAME:postgresql.log.database}) )?%{WORD:log.level}:  (duration: %{NUMBER:temp.duration:float} ms  statement: %{GREEDYDATA:postgresql.log.query}|%{GREEDYDATA:message})"
         ],
         "pattern_definitions": {
           "LOCALDATETIME": "[-0-9]+ %{TIME}",
@@ -24,13 +24,17 @@
         ],
         "ignore_failure": true
       }
-    },
-    {
+    }, {
       "script": {
-          "lang": "painless",
-          "source": "ctx.event.duration = Math.round(ctx.postgresql.log.duration * params.scale)",
-          "params": { "scale": 1000000 },
-          "if": "ctx.postgresql.log.containsKey('duration')"
+        "lang": "painless",
+        "source": "ctx.event.duration = Math.round(ctx.temp.duration * params.scale)",
+        "params": { "scale": 1000000 },
+        "if": "ctx.temp?.duration != null"
+      }
+    }, {
+      "remove": {
+        "field": "temp.duration",
+        "ignore_missing": true
       }
     }
   ],
