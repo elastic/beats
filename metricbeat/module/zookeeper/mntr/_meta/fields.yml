@@ -5,7 +5,6 @@
     command.
   release: ga
   fields:
-    # TODO: Shoudl also be migrated?
     - name: hostname
       type: keyword
       description: >
