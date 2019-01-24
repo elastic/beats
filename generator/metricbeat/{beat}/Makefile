@@ -1,6 +1,6 @@
 BEAT_NAME={beat}
 BEAT_PATH={beat_path}
-BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
+BEAT_GOPATH=$(firstword $(subst :, ,"${GOPATH}"))
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
 ES_BEATS?=./vendor/github.com/elastic/beats
@@ -19,7 +19,7 @@ setup: copy-vendor git-init create-metricset collect git-add
 .PHONY: copy-vendor
 copy-vendor:
 	mkdir -p vendor/github.com/elastic
-	cp -R ${GOPATH}/src/github.com/elastic/beats vendor/github.com/elastic/
+	cp -R "${GOPATH}/src/github.com/elastic/beats" vendor/github.com/elastic/
 	ln -sf "${PWD}/vendor/github.com/elastic/beats/metricbeat/scripts/generate_imports_helper.py" "${PWD}/vendor/github.com/elastic/beats/script/generate_imports_helper.py"
 	rm -rf vendor/github.com/elastic/beats/.git vendor/github.com/elastic/beats/x-pack
 	mkdir -p vendor/github.com/magefile

@@ -3,7 +3,7 @@ PWD=$(shell pwd)
 PYTHON_ENV?=${BUILD_DIR}/python-env
 BEAT_TYPE?=beat
 BEAT_PATH=${BUILD_DIR}/src/beatpath/testbeat
-ES_BEATS=${GOPATH}/src/github.com/elastic/beats
+ES_BEATS="${GOPATH}/src/github.com/elastic/beats"
 PREPARE_COMMAND?=
 
 # Runs test build for mock beat
@@ -11,7 +11,7 @@ PREPARE_COMMAND?=
 test: prepare-test
 	. ${PYTHON_ENV}/bin/activate; \
 	export GOPATH="${PWD}/build" ; \
-	export PATH=$${GOPATH}/bin:${PATH}; \
+	export PATH="${GOPATH}/bin:${PATH}"; \
 	cd ${BEAT_PATH} ; \
 	$(MAKE) copy-vendor || exit 1  ; \
 	${PREPARE_COMMAND} \
