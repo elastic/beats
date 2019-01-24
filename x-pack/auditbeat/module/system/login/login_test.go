@@ -22,16 +22,19 @@ func TestData(t *testing.T) {
 
 	if len(events) == 0 {
 		t.Fatal("no events were generated")
+	} else if len(events) != 1 {
+		t.Fatal("only one event expected")
 	}
 
-	// TODO: Add sample wtmp file for testing.
 	fullEvent := mbtest.StandardizeEvent(f, events[0], core.AddDatasetToEvent)
 	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":   "system",
-		"datasets": []string{"login"},
+		"module":                  "system",
+		"datasets":                []string{"login"},
+		"login.wtmp_file_pattern": "../../../tests/files/wtmp",
+		"login.btmp_file_pattern": "",
 	}
 }

@@ -28,10 +28,16 @@ class Test(AuditbeatXPackTest):
         login metricset collects information about logins (successful and failed) and system restarts.
         """
 
-        fields = ["event.origin"]
+        fields = ["event.origin", "event.outcome", "message", "process.pid", "source.ip",
+                  "user.id", "user.name", "user.terminal"]
+
+        config = {
+            "login.wtmp_file_pattern": os.path.abspath(os.path.join(self.beat_path, "tests/files/wtmp")),
+            "login.btmp_file_pattern": "-1"
+        }
 
         # Metricset is experimental and that generates a warning, TODO: remove later
-        self.check_metricset("system", "login", COMMON_FIELDS + fields, warnings_allowed=True)
+        self.check_metricset("system", "login", COMMON_FIELDS + fields, config, warnings_allowed=True)
 
     @unittest.skipIf(sys.platform == "win32", "Not implemented for Windows")
     @unittest.skipIf(sys.platform == "linux2" and platform.linux_distribution()[0] != "debian",
