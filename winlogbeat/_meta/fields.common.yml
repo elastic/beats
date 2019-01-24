@@ -3,7 +3,6 @@
   description: >
     Contains common fields available in all event types.
   fields:
-    # Is this event.type?
     - name: type
       required: true
       description: >
@@ -33,11 +32,11 @@
 
     - name: computer_name
       type: alias
-      path: host.name
+      path: host.hostname
       required: true
       description: >
         The name of the computer that generated the record. When using Windows
-        event forwarding, this name can differ from the `beat.hostname`.
+        event forwarding, this name can differ from `agent.hostname`.
 
     - name: event_data
       type: object
@@ -51,8 +50,7 @@
         earlier versions of Windows.
 
     - name: event_id
-      type: alias
-      path: event.id
+      type: long
       required: true
       description: >
         The event identifier. The value is specific to the source of the event.
@@ -66,6 +64,7 @@
     - name: log_name
       # This does not exist yet
       path: log.name
+      # could map to `event.origin`? ;-)
       type: alias
       required: true
       description: >
@@ -124,13 +123,14 @@
 
     - name: process_id
       type: alias
-      path: process.id
+      path: process.pid
       required: false
       description: >
         The process_id identifies the process that generated the event.
 
     - name: source_name
-      type: keyword
+      type: alias
+      path: service.name
       required: true
       description: >
         The source of the event log record (the application or service that
@@ -161,8 +161,8 @@
         `event_data`.
 
     - name: user.identifier
-      # Is this user.id?
-      type: keyword
+      type: alias
+      path: user.id
       required: false
       example: S-1-5-21-3541430928-2051711210-1391384369-1001
       description: >

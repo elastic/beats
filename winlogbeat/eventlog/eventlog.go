@@ -85,9 +85,8 @@ func (e Record) ToEvent() beat.Event {
 		"record_number": strconv.FormatUint(e.RecordID, 10),
 	}
 	m.Put("event.id", e.EventIdentifier.ID)
-	m.Put("log.name", e.Channel)
-	m.Put("source.name", e.Channel)
-	m.Put("host.name", e.Computer)
+	m.Put("service.name", e.Channel)
+	m.Put("host.hostname", e.Computer)
 
 	addOptional(m, "xml", e.XML)
 	addOptional(m, "provider_guid", e.Provider.GUID)
@@ -104,7 +103,7 @@ func (e Record) ToEvent() beat.Event {
 	addOptional(m, "related_activity_id", e.Correlation.RelatedActivityID)
 
 	// Execution
-	addOptional(m, "process.id", e.Execution.ProcessID)
+	addOptional(m, "process.pid", e.Execution.ProcessID)
 	addOptional(m, "process.thread.id", e.Execution.ThreadID)
 	addOptional(m, "processor_id", e.Execution.ProcessorID)
 	addOptional(m, "session_id", e.Execution.SessionID)
@@ -114,7 +113,7 @@ func (e Record) ToEvent() beat.Event {
 
 	if e.User.Identifier != "" {
 		user := common.MapStr{
-			"identifier": e.User.Identifier,
+			"id": e.User.Identifier,
 		}
 		m["user"] = user
 
@@ -139,7 +138,7 @@ func (e Record) ToEvent() beat.Event {
 // MapStr.
 func addOptional(m common.MapStr, key string, v interface{}) {
 	if m != nil && !isZero(v) {
-		m.Put(key) = v
+		m.Put(key, v)
 	}
 }
 

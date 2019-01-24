@@ -3297,11 +3297,13 @@ A globally unique identifier that identifies the current activity. The events th
 *`computer_name`*::
 +
 --
-type: keyword
+type: alias
 
 required: True
 
-The name of the computer that generated the record. When using Windows event forwarding, this name can differ from the `beat.hostname`.
+alias to: host.hostname
+
+The name of the computer that generated the record. When using Windows event forwarding, this name can differ from `agent.hostname`.
 
 
 --
@@ -3345,9 +3347,11 @@ The keywords are used to classify an event.
 *`log_name`*::
 +
 --
-type: keyword
+type: alias
 
 required: True
+
+alias to: log.name
 
 The name of the event log from which this record was read. This value is one of the names from the `event_logs` collection in the configuration.
 
@@ -3357,9 +3361,11 @@ The name of the event log from which this record was read. This value is one of 
 *`level`*::
 +
 --
-type: keyword
+type: alias
 
 required: False
+
+alias to: log.level
 
 The level of the event. There are five levels of events that can be logged: Success, Information, Warning, Error, Audit Success, and Audit Failure.
 
@@ -3369,9 +3375,11 @@ The level of the event. There are five levels of events that can be logged: Succ
 *`message_error`*::
 +
 --
-type: keyword
+type: alias
 
 required: False
+
+alias to: error.message
 
 The error that occurred while reading and formatting the message from the log.
 
@@ -3429,9 +3437,11 @@ A globally unique identifier that identifies the provider that logged the event.
 *`process_id`*::
 +
 --
-type: long
+type: alias
 
 required: False
+
+alias to: process.pid
 
 The process_id identifies the process that generated the event.
 
@@ -3441,9 +3451,11 @@ The process_id identifies the process that generated the event.
 *`source_name`*::
 +
 --
-type: keyword
+type: alias
 
 required: True
+
+alias to: service.name
 
 The source of the event log record (the application or service that logged the record).
 
@@ -3465,9 +3477,11 @@ The task defined in the event. Task and opcode are typically used to identify th
 *`thread_id`*::
 +
 --
-type: long
+type: alias
 
 required: False
+
+alias to: process.thread.id
 
 The thread_id identifies the thread that generated the event.
 
@@ -3489,11 +3503,13 @@ The event specific data. This field is mutually exclusive with `event_data`.
 *`user.identifier`*::
 +
 --
-type: keyword
+type: alias
 
 example: S-1-5-21-3541430928-2051711210-1391384369-1001
 
 required: False
+
+alias to: user.id
 
 The Windows security identifier (SID) of the account associated with this event.
 
