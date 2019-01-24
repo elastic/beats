@@ -21,9 +21,9 @@
       path: process.ppid
       migration: true
     - name: pgid
-      type: alias
-      path: process.pgid
-      migration: true
+      type: long
+      description: >
+        The process group id.
     - name: cmdline
       type: keyword
       description: >

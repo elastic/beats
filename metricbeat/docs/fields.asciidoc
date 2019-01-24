@@ -23075,9 +23075,10 @@ alias to: process.ppid
 *`system.process.pgid`*::
 +
 --
-type: alias
+type: long
 
-alias to: process.pgid
+The process group id.
+
 
 --
 

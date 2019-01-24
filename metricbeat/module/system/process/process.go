@@ -129,7 +129,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		rootFields := common.MapStr{
 			"process": common.MapStr{
 				"name": getAndRemove(proc, "name"),
-				"pgid": getAndRemove(proc, "pgid"),
 				"pid":  getAndRemove(proc, "pid"),
 				"ppid": getAndRemove(proc, "ppid"),
 			},
