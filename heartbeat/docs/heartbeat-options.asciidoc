@@ -386,7 +386,7 @@ Example configuration:
 [[monitor-http-proxy-url]]
 ==== `proxy_url`
 
-The HTTP proxy URL. This setting is optional.
+The HTTP proxy URL. This setting is optional. Example `http://proxy.mydomain.com:3128`
 
 [float]
 [[monitor-http-username]]
