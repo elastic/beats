@@ -173,7 +173,7 @@ func (r *UtmpFileReader) deleteOldUtmpFiles(existingFiles *[]UtmpFile) {
 func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC chan<- error, utmpFile UtmpFile) {
 	savedUtmpFile, isKnownFile := r.savedUtmpFiles[utmpFile.Inode]
 	if !isKnownFile {
-		r.log.Debugf("Found new file: %v (utmpFile=%+v)", utmpFile)
+		r.log.Debugf("Found new file: %v (utmpFile=%+v)", utmpFile.Path, utmpFile)
 	}
 
 	size := utmpFile.Size
