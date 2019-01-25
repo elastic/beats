@@ -36,6 +36,8 @@ func ExportDashboard() error {
 		return fmt.Errorf("Dashboad ID must be specified")
 	}
 
+	kibanaURL := EnvOr("KIBANA_URL", "")
+
 	beatsDir, err := ElasticBeatsDir()
 	if err != nil {
 		return err
@@ -49,5 +51,9 @@ func ExportDashboard() error {
 		"-output", file, "-dashboard", id,
 	)
 
-	return dashboardCmd()
+	if kibanaURL != "" {
+		return dashboardCmd("-kibana", kibanaURL)
+	} else {
+		return dashboardCmd()
+	}
 }
