@@ -25363,7 +25363,7 @@ Max latency reached by the server
 --
 type: long
 
-Minimum latency that has been reached by the serverreached
+Minimum latency that has been reached by the server
 
 --
 
@@ -25412,17 +25412,7 @@ Requests sent by the server
 
 --
 
-
-*`zookeeper.server.version.id`*::
-+
---
-type: string
-
-Zookeeper version running
-
---
-
-*`zookeeper.server.version.date`*::
+*`zookeeper.server.version_date`*::
 +
 --
 type: date

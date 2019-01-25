@@ -17,7 +17,7 @@
           description: Max latency reached by the server
         - name: min
           type: long
-          description: Minimum latency that has been reached by the serverreached
+          description: Minimum latency that has been reached by the server
     - name: mode
       type: keyword
       description: Server mode
@@ -33,15 +33,9 @@
     - name: sent
       type: long
       description: Requests sent by the server
-    - name: version
-      type: group
-      fields:
-        - name: id
-          type: string
-          description: Zookeeper version running
-        - name: date
-          type: date
-          description: Date of the Zookeeper release in use
+    - name: version_date
+      type: date
+      description: Date of the Zookeeper release in use
     - name: zxid
       type: keyword
       description: Original value of the Zookeeper transaction ID
