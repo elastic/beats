@@ -17,6 +17,7 @@
 
 package node
 
+// Config is the configuration for munin
 type Config struct {
 	ServiceName string `config:"service.name"`
 	ServiceType string `config:"service.type"`
