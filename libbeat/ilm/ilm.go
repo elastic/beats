@@ -19,7 +19,6 @@ package ilm
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"time"
 
@@ -30,9 +29,26 @@ import (
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 )
 
-type ILMManager interface {
-	Enabled(ep APIHandler) (bool, error)
+type Supporter interface {
+	Mode() Mode
 	Template() TemplateSettings
+	Manager(h APIHandler) Manager
+}
+
+type Manager interface {
+	Enabled() (bool, error)
+	EnsureAlias() error
+	EnsurePolicy(overwrite bool) error
+}
+
+type APIHandler interface {
+	ILMEnabled(Mode) (bool, error)
+
+	HasAlias(name string) (bool, error)
+	CreateAlias(name, firstIndex string) error
+
+	HasILMPolicy(name string) (bool, error)
+	CreateILMPolicy(name string, policy common.MapStr) error
 }
 
 type TemplateSettings struct {
@@ -41,23 +57,7 @@ type TemplateSettings struct {
 	PolicyName string
 }
 
-type APIHandler interface {
-	HasILM(required bool) (bool, error)
-}
-
-type noopManager struct{}
-
-type singleManager struct {
-	cfg        Config
-	policyName string
-	policy     common.MapStr
-}
-
-func NoopManager(info beat.Info, config *common.Config) (ILMManager, error) {
-	return (*noopManager)(nil), nil
-}
-
-func DefaultManager(info beat.Info, config *common.Config) (ILMManager, error) {
+func DefaultSupport(info beat.Info, config *common.Config) (Supporter, error) {
 	cfg := struct {
 		ILM Config `config:"setup.ilm"` // read ILM settings from setup.ilm namespace
 	}{defaultConfig(info)}
@@ -66,7 +66,7 @@ func DefaultManager(info beat.Info, config *common.Config) (ILMManager, error) {
 	}
 
 	if cfg.ILM.Mode == ModeDisabled {
-		return NoopManager(info, config)
+		return NoopSupport(info, config)
 	}
 
 	var policy common.MapStr
@@ -89,30 +89,11 @@ func DefaultManager(info beat.Info, config *common.Config) (ILMManager, error) {
 		return nil, errors.Wrap(err, "failed to read ilm policy name")
 	}
 
-	return &singleManager{
+	return &ilmSupport{
 		cfg:        cfg.ILM,
 		policyName: name,
 		policy:     policy,
-	}, errors.New("TODO")
-}
-
-func (*noopManager) Enabled(_ APIHandler) (bool, error) { return false, nil }
-func (*noopManager) Template() TemplateSettings         { return TemplateSettings{} }
-
-func (m *singleManager) Enabled(client APIHandler) (bool, error) {
-	if m.cfg.Mode == ModeDisabled {
-		return false, nil
-	}
-	return client.HasILM()
-}
-
-func (m *singleManager) Template() TemplateSettings {
-	alias := m.cfg.RolloverAlias
-	return TemplateSettings{
-		Alias:      alias,
-		Pattern:    fmt.Sprintf("%s-*", alias),
-		PolicyName: m.policyName,
-	}
+	}, nil
 }
 
 func applyStaticFmtstr(info beat.Info, fmt *fmtstr.EventFormatString) (string, error) {

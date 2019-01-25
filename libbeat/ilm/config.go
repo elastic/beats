@@ -33,6 +33,14 @@ type Config struct {
 	RolloverAlias string                   `config:"rollover_alias"`
 	Pattern       string                   `config:"pattern"`
 	PolicyFile    string                   `config:"policy.file"`
+
+	// CheckExists can disable the check for an existing policy. Check required
+	// read_ilm privileges.  If check is disabled the policy will only be
+	// installed if Overwrite is enabled.
+	CheckExists bool `config:"check_exists"`
+
+	// Enable always overwrite policy mode. This required manage_ilm privileges.
+	Overwrite bool `config:"overwrite"`
 }
 
 //Mode is used for enumerating the ilm mode.

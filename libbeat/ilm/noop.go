@@ -15,28 +15,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package instance
+package ilm
 
 import (
-	"github.com/spf13/pflag"
-
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/ilm"
-	"github.com/elastic/beats/libbeat/monitoring/report"
 )
 
-// Settings contains basic settings for any beat to pass into GenRootCmd
-type Settings struct {
-	Name            string
-	IndexPrefix     string
-	Version         string
-	Monitoring      report.Settings
-	RunFlags        *pflag.FlagSet
-	ConfigOverrides *common.Config
+type noopSupport struct{}
+type noopManager struct{}
 
-	DisableConfigResolver bool
-
-	// load custom ILM manager. The config object will be the Beats root configuration.
-	ILM func(beat.Info, *common.Config) (ilm.Supporter, error)
+func NoopSupport(info beat.Info, config *common.Config) (Supporter, error) {
+	return (*noopSupport)(nil), nil
 }
+
+func (*noopSupport) Mode() Mode                   { return ModeDisabled }
+func (*noopSupport) Template() TemplateSettings   { return TemplateSettings{} }
+func (*noopSupport) Manager(_ APIHandler) Manager { return (*noopManager)(nil) }
+
+func (*noopManager) Enabled() (bool, error)    { return false, nil }
+func (*noopManager) EnsureAlias() error        { return errOf(ErrOpNotAvailable) }
+func (*noopManager) EnsurePolicy(_ bool) error { return errOf(ErrOpNotAvailable) }
