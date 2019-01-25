@@ -1,0 +1,72 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+// +build integration
+
+package server
+
+import (
+	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/metricbeat/module/zookeeper"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/tests/compose"
+	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+)
+
+func TestFetch(t *testing.T) {
+	logp.TestingSetup()
+
+	compose.EnsureUp(t, "zookeeper")
+
+	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+
+	for _, event := range events {
+		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+		metricsetFields := event.MetricSetFields
+
+		// Check values
+		version, ok := metricsetFields["version"].(common.MapStr)
+		if !ok {
+			t.Fatal("no version field found")
+		}
+		assert.Equal(t, "06/29/2018 04:05 GMT", version["date"])
+		assert.Equal(t, "3.4.13-2d71af4dbe22557fda74f9a9b4309b15a7487f03", version["id"])
+
+		received := metricsetFields["received"].(int64)
+		assert.True(t, received >= 0 )
+
+		nodeCount := metricsetFields["node_count"].(int64)
+		assert.True(t, nodeCount >= 1)
+	}
+}
+
+func getConfig() map[string]interface{} {
+	return map[string]interface{}{
+		"module":     "zookeeper",
+		"metricsets": []string{"server"},
+		"hosts":      []string{zookeeper.GetZookeeperEnvHost() + ":" + zookeeper.GetZookeeperEnvPort()},
+	}
+}
