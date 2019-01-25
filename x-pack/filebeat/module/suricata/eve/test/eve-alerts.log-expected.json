@@ -53,7 +53,6 @@
         "suricata.eve.flow.bytes_toserver": 347,
         "suricata.eve.flow.pkts_toclient": 3,
         "suricata.eve.flow.pkts_toserver": 4,
-        "suricata.eve.flow.start": "2018-10-03T14:42:44.613469+0000",
         "suricata.eve.flow_id": 2191386088856669,
         "suricata.eve.http.hostname": "example.net",
         "suricata.eve.http.http_content_type": "text/html",
@@ -67,7 +66,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 32858,
-        "suricata.eve.timestamp": "2018-10-03T14:42:44.836744+0000",
         "suricata.eve.tx_id": 0,
         "tags": [
             "suricata"
@@ -136,7 +134,6 @@
         "suricata.eve.flow.bytes_toserver": 347,
         "suricata.eve.flow.pkts_toclient": 3,
         "suricata.eve.flow.pkts_toserver": 4,
-        "suricata.eve.flow.start": "2018-10-03T16:16:26.467217+0000",
         "suricata.eve.flow_id": 678269478904081,
         "suricata.eve.http.hostname": "example.net",
         "suricata.eve.http.http_content_type": "text/html",
@@ -150,7 +147,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 32864,
-        "suricata.eve.timestamp": "2018-10-03T16:16:26.711841+0000",
         "suricata.eve.tx_id": 0,
         "tags": [
             "suricata"
@@ -219,7 +215,6 @@
         "suricata.eve.flow.bytes_toserver": 347,
         "suricata.eve.flow.pkts_toclient": 3,
         "suricata.eve.flow.pkts_toserver": 4,
-        "suricata.eve.flow.start": "2018-10-03T16:44:50.580866+0000",
         "suricata.eve.flow_id": 1170030461115650,
         "suricata.eve.http.hostname": "example.net",
         "suricata.eve.http.http_content_type": "text/html",
@@ -233,7 +228,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 32870,
-        "suricata.eve.timestamp": "2018-10-03T16:44:50.813100+0000",
         "suricata.eve.tx_id": 0,
         "tags": [
             "suricata"
@@ -302,7 +296,6 @@
         "suricata.eve.flow.bytes_toserver": 347,
         "suricata.eve.flow.pkts_toclient": 3,
         "suricata.eve.flow.pkts_toserver": 4,
-        "suricata.eve.flow.start": "2018-10-03T16:45:09.036620+0000",
         "suricata.eve.flow_id": 49628113637132,
         "suricata.eve.http.hostname": "example.org",
         "suricata.eve.http.http_content_type": "text/html",
@@ -316,7 +309,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 32872,
-        "suricata.eve.timestamp": "2018-10-03T16:45:09.267308+0000",
         "suricata.eve.tx_id": 0,
         "tags": [
             "suricata"
@@ -385,7 +377,6 @@
         "suricata.eve.flow.bytes_toserver": 347,
         "suricata.eve.flow.pkts_toclient": 3,
         "suricata.eve.flow.pkts_toserver": 4,
-        "suricata.eve.flow.start": "2018-10-03T16:45:34.252519+0000",
         "suricata.eve.flow_id": 116307482565223,
         "suricata.eve.http.hostname": "example.org",
         "suricata.eve.http.http_content_type": "text/html",
@@ -399,7 +390,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 32876,
-        "suricata.eve.timestamp": "2018-10-03T16:45:34.481113+0000",
         "suricata.eve.tx_id": 0,
         "tags": [
             "suricata"
@@ -468,7 +458,6 @@
         "suricata.eve.flow.bytes_toserver": 347,
         "suricata.eve.flow.pkts_toclient": 3,
         "suricata.eve.flow.pkts_toserver": 4,
-        "suricata.eve.flow.start": "2018-10-03T17:02:38.599426+0000",
         "suricata.eve.flow_id": 1205867738178946,
         "suricata.eve.http.hostname": "example.org",
         "suricata.eve.http.http_content_type": "text/html",
@@ -482,7 +471,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 32892,
-        "suricata.eve.timestamp": "2018-10-03T17:02:38.900976+0000",
         "suricata.eve.tx_id": 0,
         "tags": [
             "suricata"
@@ -551,7 +539,6 @@
         "suricata.eve.flow.bytes_toserver": 497,
         "suricata.eve.flow.pkts_toclient": 3,
         "suricata.eve.flow.pkts_toserver": 4,
-        "suricata.eve.flow.start": "2018-10-04T09:34:58.924536+0000",
         "suricata.eve.flow_id": 764842923400056,
         "suricata.eve.http.hostname": "security.ubuntu.com",
         "suricata.eve.http.http_method": "GET",
@@ -564,7 +551,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 37742,
-        "suricata.eve.timestamp": "2018-10-04T09:34:59.009897+0000",
         "suricata.eve.tx_id": 0,
         "tags": [
             "suricata"
@@ -632,7 +618,6 @@
         "suricata.eve.flow.bytes_toserver": 487,
         "suricata.eve.flow.pkts_toclient": 3,
         "suricata.eve.flow.pkts_toserver": 4,
-        "suricata.eve.flow.start": "2018-10-04T09:34:58.926006+0000",
         "suricata.eve.flow_id": 112424506237238,
         "suricata.eve.http.hostname": "archive.ubuntu.com",
         "suricata.eve.http.http_method": "GET",
@@ -645,7 +630,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 52340,
-        "suricata.eve.timestamp": "2018-10-04T09:34:59.168340+0000",
         "suricata.eve.tx_id": 0,
         "tags": [
             "suricata"
@@ -713,7 +697,6 @@
         "suricata.eve.flow.bytes_toserver": 842,
         "suricata.eve.flow.pkts_toclient": 5,
         "suricata.eve.flow.pkts_toserver": 6,
-        "suricata.eve.flow.start": "2018-10-04T09:34:58.926006+0000",
         "suricata.eve.flow_id": 112424506237238,
         "suricata.eve.http.hostname": "archive.ubuntu.com",
         "suricata.eve.http.http_method": "GET",
@@ -726,7 +709,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 52340,
-        "suricata.eve.timestamp": "2018-10-04T09:34:59.288862+0000",
         "suricata.eve.tx_id": 1,
         "tags": [
             "suricata"
@@ -794,7 +776,6 @@
         "suricata.eve.flow.bytes_toserver": 4810,
         "suricata.eve.flow.pkts_toclient": 62,
         "suricata.eve.flow.pkts_toserver": 64,
-        "suricata.eve.flow.start": "2018-10-04T09:34:58.924536+0000",
         "suricata.eve.flow_id": 764842923400056,
         "suricata.eve.http.hostname": "security.ubuntu.com",
         "suricata.eve.http.http_method": "GET",
@@ -807,7 +788,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 37742,
-        "suricata.eve.timestamp": "2018-10-04T09:34:59.289324+0000",
         "suricata.eve.tx_id": 1,
         "tags": [
             "suricata"
@@ -875,7 +855,6 @@
         "suricata.eve.flow.bytes_toserver": 6591,
         "suricata.eve.flow.pkts_toclient": 98,
         "suricata.eve.flow.pkts_toserver": 87,
-        "suricata.eve.flow.start": "2018-10-04T09:34:58.924536+0000",
         "suricata.eve.flow_id": 764842923400056,
         "suricata.eve.http.hostname": "security.ubuntu.com",
         "suricata.eve.http.http_method": "GET",
@@ -888,7 +867,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 37742,
-        "suricata.eve.timestamp": "2018-10-04T09:34:59.356132+0000",
         "suricata.eve.tx_id": 2,
         "tags": [
             "suricata"
@@ -956,7 +934,6 @@
         "suricata.eve.flow.bytes_toserver": 11460,
         "suricata.eve.flow.pkts_toclient": 221,
         "suricata.eve.flow.pkts_toserver": 156,
-        "suricata.eve.flow.start": "2018-10-04T09:34:58.924536+0000",
         "suricata.eve.flow_id": 764842923400056,
         "suricata.eve.http.hostname": "security.ubuntu.com",
         "suricata.eve.http.http_method": "GET",
@@ -969,7 +946,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 37742,
-        "suricata.eve.timestamp": "2018-10-04T09:34:59.456919+0000",
         "suricata.eve.tx_id": 3,
         "tags": [
             "suricata"
@@ -1037,7 +1013,6 @@
         "suricata.eve.flow.bytes_toserver": 4895,
         "suricata.eve.flow.pkts_toclient": 67,
         "suricata.eve.flow.pkts_toserver": 64,
-        "suricata.eve.flow.start": "2018-10-04T09:34:58.926006+0000",
         "suricata.eve.flow_id": 112424506237238,
         "suricata.eve.http.hostname": "archive.ubuntu.com",
         "suricata.eve.http.http_method": "GET",
@@ -1050,7 +1025,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 52340,
-        "suricata.eve.timestamp": "2018-10-04T09:34:59.747122+0000",
         "suricata.eve.tx_id": 2,
         "tags": [
             "suricata"
@@ -1118,7 +1092,6 @@
         "suricata.eve.flow.bytes_toserver": 6932,
         "suricata.eve.flow.pkts_toclient": 119,
         "suricata.eve.flow.pkts_toserver": 91,
-        "suricata.eve.flow.start": "2018-10-04T09:34:58.926006+0000",
         "suricata.eve.flow_id": 112424506237238,
         "suricata.eve.http.hostname": "archive.ubuntu.com",
         "suricata.eve.http.http_method": "GET",
@@ -1131,7 +1104,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 52340,
-        "suricata.eve.timestamp": "2018-10-04T09:34:59.953886+0000",
         "suricata.eve.tx_id": 3,
         "tags": [
             "suricata"
@@ -1199,7 +1171,6 @@
         "suricata.eve.flow.bytes_toserver": 11679,
         "suricata.eve.flow.pkts_toclient": 253,
         "suricata.eve.flow.pkts_toserver": 159,
-        "suricata.eve.flow.start": "2018-10-04T09:34:58.926006+0000",
         "suricata.eve.flow_id": 112424506237238,
         "suricata.eve.http.hostname": "archive.ubuntu.com",
         "suricata.eve.http.http_method": "GET",
@@ -1212,7 +1183,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 52340,
-        "suricata.eve.timestamp": "2018-10-04T09:35:00.250560+0000",
         "suricata.eve.tx_id": 4,
         "tags": [
             "suricata"
@@ -1280,7 +1250,6 @@
         "suricata.eve.flow.bytes_toserver": 13986,
         "suricata.eve.flow.pkts_toclient": 314,
         "suricata.eve.flow.pkts_toserver": 190,
-        "suricata.eve.flow.start": "2018-10-04T09:34:58.926006+0000",
         "suricata.eve.flow_id": 112424506237238,
         "suricata.eve.http.hostname": "archive.ubuntu.com",
         "suricata.eve.http.http_method": "GET",
@@ -1293,7 +1262,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 52340,
-        "suricata.eve.timestamp": "2018-10-04T09:35:00.401788+0000",
         "suricata.eve.tx_id": 5,
         "tags": [
             "suricata"
@@ -1361,7 +1329,6 @@
         "suricata.eve.flow.bytes_toserver": 23361,
         "suricata.eve.flow.pkts_toclient": 588,
         "suricata.eve.flow.pkts_toserver": 328,
-        "suricata.eve.flow.start": "2018-10-04T09:34:58.926006+0000",
         "suricata.eve.flow_id": 112424506237238,
         "suricata.eve.http.hostname": "archive.ubuntu.com",
         "suricata.eve.http.http_method": "GET",
@@ -1374,7 +1341,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 52340,
-        "suricata.eve.timestamp": "2018-10-04T09:35:00.776438+0000",
         "suricata.eve.tx_id": 6,
         "tags": [
             "suricata"
@@ -1442,7 +1408,6 @@
         "suricata.eve.flow.bytes_toserver": 23758,
         "suricata.eve.flow.pkts_toclient": 591,
         "suricata.eve.flow.pkts_toserver": 330,
-        "suricata.eve.flow.start": "2018-10-04T09:34:58.926006+0000",
         "suricata.eve.flow_id": 112424506237238,
         "suricata.eve.http.hostname": "archive.ubuntu.com",
         "suricata.eve.http.http_method": "GET",
@@ -1455,7 +1420,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 52340,
-        "suricata.eve.timestamp": "2018-10-04T09:35:00.897009+0000",
         "suricata.eve.tx_id": 7,
         "tags": [
             "suricata"
@@ -1522,7 +1486,6 @@
         "suricata.eve.flow.bytes_toserver": 36819,
         "suricata.eve.flow.pkts_toclient": 979,
         "suricata.eve.flow.pkts_toserver": 524,
-        "suricata.eve.flow.start": "2018-10-04T09:34:58.926006+0000",
         "suricata.eve.flow_id": 112424506237238,
         "suricata.eve.http.hostname": "archive.ubuntu.com",
         "suricata.eve.http.http_method": "GET",
@@ -1534,7 +1497,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 52340,
-        "suricata.eve.timestamp": "2018-10-04T09:35:01.362208+0000",
         "suricata.eve.tx_id": 8,
         "tags": [
             "suricata"
@@ -1601,7 +1563,6 @@
         "suricata.eve.flow.bytes_toserver": 40452,
         "suricata.eve.flow.pkts_toclient": 1079,
         "suricata.eve.flow.pkts_toserver": 575,
-        "suricata.eve.flow.start": "2018-10-04T09:34:58.926006+0000",
         "suricata.eve.flow_id": 112424506237238,
         "suricata.eve.http.hostname": "archive.ubuntu.com",
         "suricata.eve.http.http_method": "GET",
@@ -1613,7 +1574,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.1.146",
         "suricata.eve.src_port": 52340,
-        "suricata.eve.timestamp": "2018-10-04T09:35:01.575088+0000",
         "suricata.eve.tx_id": 9,
         "tags": [
             "suricata"
