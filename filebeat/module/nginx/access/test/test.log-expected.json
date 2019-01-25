@@ -12,7 +12,7 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 0,
-        "network.forwarded_ip": [
+        "nginx.access.remote_ip_list": [
             "10.0.0.2",
             "10.0.0.1",
             "127.0.0.1"
@@ -44,7 +44,7 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 183,
-        "network.forwarded_ip": [
+        "nginx.access.remote_ip_list": [
             "172.17.0.1"
         ],
         "service.type": "nginx",
@@ -73,7 +73,7 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 341,
-        "network.forwarded_ip": [
+        "nginx.access.remote_ip_list": [
             "10.0.0.2",
             "10.0.0.1",
             "85.181.35.98"
@@ -112,7 +112,7 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 527,
-        "network.forwarded_ip": [
+        "nginx.access.remote_ip_list": [
             "85.181.35.98"
         ],
         "service.type": "nginx",
@@ -150,7 +150,7 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 732,
-        "network.forwarded_ip": [
+        "nginx.access.remote_ip_list": [
             "10.5.102.222",
             "199.96.1.1",
             "204.246.1.1",
@@ -186,7 +186,7 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 884,
-        "network.forwarded_ip": [
+        "nginx.access.remote_ip_list": [
             "2a03:0000:10ff:f00f:0000:0000:0:8000",
             "10.225.192.17",
             "10.2.2.121"
@@ -218,7 +218,7 @@
         "http.response.status_code": 400,
         "input.type": "log",
         "log.offset": 1124,
-        "network.forwarded_ip": [
+        "nginx.access.remote_ip_list": [
             "127.0.0.1"
         ],
         "service.type": "nginx",

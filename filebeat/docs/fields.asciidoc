@@ -9946,21 +9946,22 @@ Contains fields for the Nginx access logs.
 
 
 
+*`nginx.access.remote_ip_list`*::
++
+--
+type: array
+
+An array of remote IP addresses. It is a list because it is common to include, besides the client IP address, IP addresses from headers like `X-Forwarded-For`. Real source IP is restored to `source.ip`.
+
+
+--
+
 *`nginx.access.body_sent.bytes`*::
 +
 --
 type: alias
 
 alias to: http.response.body.bytes
-
---
-
-*`nginx.access.remote_ip_list`*::
-+
---
-type: alias
-
-alias to: network.forwarded_ip
 
 --
 
