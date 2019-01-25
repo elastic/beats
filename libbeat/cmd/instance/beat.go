@@ -1013,7 +1013,7 @@ func LoadKeystore(cfg *common.Config, name string) (keystore.Keystore, error) {
 	defaultPathConfig = filepath.Join(defaultPathConfig, fmt.Sprintf("%s.keystore", name))
 	store, err := keystore.Factory(keystoreCfg, defaultPathConfig)
 	if err != nil {
-		return nil, fmt.Errorf("could not initialize the keystore: %v", err)
+		return nil, err
 	}
 	return store, nil
 }
