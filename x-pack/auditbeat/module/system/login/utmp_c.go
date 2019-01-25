@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build linux,cgo
+// +build linux
 
 // Pure Go reader for UTMP formatted files.
 // See utmp(5) and getutent(3) for the C structs and functions this is
