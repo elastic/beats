@@ -5749,6 +5749,16 @@ Process parent id.
 
 --
 
+*`process.pgid`*::
++
+--
+type: long
+
+Process group id.
+
+
+--
+
 *`process.args`*::
 +
 --
@@ -23092,10 +23102,9 @@ alias to: process.ppid
 *`system.process.pgid`*::
 +
 --
-type: long
+type: alias
 
-The process group id.
-
+alias to: process.pgid
 
 --
 

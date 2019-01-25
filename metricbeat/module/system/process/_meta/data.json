@@ -20,6 +20,7 @@
         ],
         "executable": "/usr/bin/dockerd-ce",
         "name": "dockerd",
+        "pgid": 2080,
         "pid": 2080,
         "ppid": 1,
         "working_directory": "/"
@@ -210,7 +211,6 @@
                 "share": 8253440,
                 "size": 4438523904
             },
-            "pgid": 2080,
             "state": "sleeping"
         }
     },

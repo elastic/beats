@@ -130,6 +130,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 				"name": getAndRemove(proc, "name"),
 				"pid":  getAndRemove(proc, "pid"),
 				"ppid": getAndRemove(proc, "ppid"),
+				"pgid": getAndRemove(proc, "pgid"),
 			},
 			"user": common.MapStr{
 				"name": getAndRemove(proc, "username"),

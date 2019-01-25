@@ -1566,6 +1566,12 @@
           type: long
           description: >
             Process parent id.
+
+        - name: pgid
+          level: extended
+          type: long
+          description: >
+            Process group id.
     
         - name: args
           level: extended
