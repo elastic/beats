@@ -72,6 +72,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Refactor Prometheus metric mappings {pull}9948[9948]
+- Removed Prometheus stats metricset in favor of just using Prometheus collector {pull}9948[9948]
+
 *Packetbeat*
 
 - Adjust Packetbeat `http` fields to ECS Beta 2 {pull}9645[9645]

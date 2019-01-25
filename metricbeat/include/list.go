@@ -140,7 +140,6 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/postgresql/statement"
 	_ "github.com/elastic/beats/metricbeat/module/prometheus"
 	_ "github.com/elastic/beats/metricbeat/module/prometheus/collector"
-	_ "github.com/elastic/beats/metricbeat/module/prometheus/stats"
 	_ "github.com/elastic/beats/metricbeat/module/rabbitmq"
 	_ "github.com/elastic/beats/metricbeat/module/rabbitmq/connection"
 	_ "github.com/elastic/beats/metricbeat/module/rabbitmq/exchange"
