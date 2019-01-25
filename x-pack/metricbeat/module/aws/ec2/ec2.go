@@ -63,8 +63,8 @@ var metricIDNameMap = map[string][]string{
 	"network4": {"network.out.bytes", "NetworkOut"},
 	"disk1":    {"diskio.read.bytes", "DiskReadBytes"},
 	"disk2":    {"diskio.write.bytes", "DiskWriteBytes"},
-	"disk3":    {"diskio.read.ops", "DiskReadOps"},
-	"disk4":    {"diskio.write.ops", "DiskWriteOps"},
+	"disk3":    {"diskio.read.count", "DiskReadOps"},
+	"disk4":    {"diskio.write.count", "DiskWriteOps"},
 	"status1":  {"status.check_failed", "StatusCheckFailed"},
 	"status2":  {"status.check_failed_system", "StatusCheckFailed_System"},
 	"status3":  {"status.check_failed_instance", "StatusCheckFailed_Instance"},
@@ -208,6 +208,34 @@ func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 	mapOfRootFieldsResults["service.name"] = metricsetName
 	mapOfRootFieldsResults["cloud.provider"] = metricsetName
 	mapOfRootFieldsResults["cloud.instance.id"] = instanceID
+	instanceStateName, err := instanceOutput.State.Name.MarshalValue()
+	if err != nil {
+		err = errors.Wrap(err, "instance.State.Name.MarshalValue failed")
+		return
+	}
+
+	monitoringState, err := instanceOutput.Monitoring.State.MarshalValue()
+	if err != nil {
+		err = errors.Wrap(err, "instance.Monitoring.State.MarshalValue failed")
+		return
+	}
+
+	mapOfRootFieldsResults["cloud.instance.state.name"] = instanceStateName
+	mapOfRootFieldsResults["cloud.instance.state.code"] = fmt.Sprint(*instanceOutput.State.Code)
+	mapOfRootFieldsResults["cloud.instance.monitoring.state"] = monitoringState
+	mapOfRootFieldsResults["cloud.instance.core.count"] = fmt.Sprint(*instanceOutput.CpuOptions.CoreCount)
+	mapOfRootFieldsResults["cloud.instance.threads_per_core"] = fmt.Sprint(*instanceOutput.CpuOptions.ThreadsPerCore)
+	publicIP := instanceOutput.PublicIpAddress
+	if publicIP != nil {
+		mapOfRootFieldsResults["cloud.instance.public.ip"] = *publicIP
+	}
+
+	mapOfRootFieldsResults["cloud.instance.public.dns_name"] = *instanceOutput.PublicDnsName
+	mapOfRootFieldsResults["cloud.instance.private.dns_name"] = *instanceOutput.PrivateDnsName
+	privateIP := instanceOutput.PrivateIpAddress
+	if privateIP != nil {
+		mapOfRootFieldsResults["cloud.instance.private.ip"] = *privateIP
+	}
 
 	machineType, err := instanceOutput.InstanceType.MarshalValue()
 	if err != nil {
