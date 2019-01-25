@@ -74,7 +74,7 @@ func GetEnvPort() string {
 	port := os.Getenv("GOLANG_PORT")
 
 	if len(port) == 0 {
-		port = "5066"
+		port = "6060"
 	}
 	return port
 }
