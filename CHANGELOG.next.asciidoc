@@ -118,6 +118,8 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 
 *Functionbeat*
 
+- Ensure that functionbeat is logging at info level not debug. {issue}10262[10262]
+
 ==== Added
 
 *Affecting all Beats*
