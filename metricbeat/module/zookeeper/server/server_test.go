@@ -19,9 +19,11 @@ package server
 
 import (
 	"bytes"
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 var srvrTestInput = `Zookeeper version: 3.4.13-2d71af4dbe22557fda74f9a9b4309b15a7487f03, built on 06/29/2018 04:05 GMT
@@ -62,4 +64,8 @@ func TestParser(t *testing.T) {
 	assert.Equal(t, int64(-3), proposalSizes["last"])
 	assert.Equal(t, int64(-999), proposalSizes["min"])
 	assert.Equal(t, int64(-1), proposalSizes["max"])
+
+	assert.Equal(t, "0x700601132", mapStr["zxid"])
+	assert.Equal(t, uint32(7), mapStr["epoch"])
+	assert.Equal(t, uint32(0x601132), mapStr["count"])
 }

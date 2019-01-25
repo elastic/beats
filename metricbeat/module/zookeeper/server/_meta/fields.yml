@@ -42,15 +42,12 @@
         - name: date
           type: date
           description: Date of the Zookeeper release in use
-    - name: xid
-      type: group
-      fields:
-        - name: original
-          type: keyword
-          description: Original value of the Zookeeper transaction ID
-        - name: count
-          type: long
-          description: Total transactions of the leader in epoch
-        - name: epoch
-          type: long
-          description: Epoch value of the Zookeeper transaction ID
+    - name: zxid
+      type: keyword
+      description: Original value of the Zookeeper transaction ID
+    - name: count
+      type: long
+      description: Total transactions of the leader in epoch
+    - name: epoch
+      type: long
+      description: Epoch value of the Zookeeper transaction ID

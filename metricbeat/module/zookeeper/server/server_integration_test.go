@@ -20,9 +20,10 @@
 package server
 
 import (
+	"testing"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/module/zookeeper"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 
@@ -56,7 +57,7 @@ func TestFetch(t *testing.T) {
 		assert.Equal(t, "3.4.13-2d71af4dbe22557fda74f9a9b4309b15a7487f03", version["id"])
 
 		received := metricsetFields["received"].(int64)
-		assert.True(t, received >= 0 )
+		assert.True(t, received >= 0)
 
 		nodeCount := metricsetFields["node_count"].(int64)
 		assert.True(t, nodeCount >= 1)

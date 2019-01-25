@@ -25431,8 +25431,7 @@ Date of the Zookeeper release in use
 
 --
 
-
-*`zookeeper.server.xid.original`*::
+*`zookeeper.server.zxid`*::
 +
 --
 type: keyword
@@ -25441,7 +25440,7 @@ Original value of the Zookeeper transaction ID
 
 --
 
-*`zookeeper.server.xid.count`*::
+*`zookeeper.server.count`*::
 +
 --
 type: long
@@ -25450,7 +25449,7 @@ Total transactions of the leader in epoch
 
 --
 
-*`zookeeper.server.xid.epoch`*::
+*`zookeeper.server.epoch`*::
 +
 --
 type: long

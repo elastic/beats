@@ -15,11 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build integration
+
 package server
 
 import (
-	"github.com/elastic/beats/metricbeat/module/zookeeper"
 	"testing"
+
+	"github.com/elastic/beats/metricbeat/module/zookeeper"
 
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/stretchr/testify/assert"
@@ -28,7 +31,7 @@ import (
 )
 
 func TestData(t *testing.T) {
-	t.Skip("Skipping `data.json` generation test")
+	//t.Skip("Skipping `data.json` generation test")
 
 	f := mbtest.NewReportingMetricSetV2(t, getDataConfig())
 	events, errs := mbtest.ReportingFetchV2(f)

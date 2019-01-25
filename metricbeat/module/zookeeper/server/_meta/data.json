@@ -19,6 +19,8 @@
     "zookeeper": {
         "server": {
             "connections": 1,
+            "count": 0,
+            "epoch": 0,
             "latency": {
                 "avg": 0,
                 "max": 0,
@@ -27,19 +29,13 @@
             "mode": "standalone",
             "node_count": 4,
             "outstanding": 0,
-            "received": 48,
-            "sent": 47,
+            "received": 16,
+            "sent": 15,
             "version": {
                 "date": "06/29/2018 04:05 GMT",
                 "id": "3.4.13-2d71af4dbe22557fda74f9a9b4309b15a7487f03"
             },
-            "xid": {
-                "zxid": {
-                    "count": 0,
-                    "epoch": 0,
-                    "original": "0x0"
-                }
-            }
+            "zxid": "0x0"
         }
     }
 }

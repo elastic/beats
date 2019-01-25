@@ -6,7 +6,7 @@ This file is generated! See scripts/docs_collector.py
 == ZooKeeper module
 
 The ZooKeeper module fetches statistics from the ZooKeeper service. The default
-metricset is `mntr`. You can also activate `server` metricset.
+metricset is `mntr` and `server`.
 
 [float]
 === Compatibility
