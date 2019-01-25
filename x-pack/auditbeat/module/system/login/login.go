@@ -211,24 +211,22 @@ func (ms *MetricSet) loginEvent(loginRecord *LoginRecord) mb.Event {
 }
 
 func loginMessage(loginRecord *LoginRecord) string {
-	var message string
-
-	userString := fmt.Sprintf("by user %v (UID: %d) on %v (PID: %d) from %v (IP: %v)",
-		loginRecord.Username, loginRecord.UID, loginRecord.TTY, loginRecord.PID,
-		loginRecord.Hostname, loginRecord.IP)
+	var actionString string
 
 	switch loginRecord.Type {
 	case bootRecord:
-		message = "System boot"
+		return "System boot"
 	case shutdownRecord:
-		message = "System shutdown"
+		return "System shutdown"
 	case userLoginRecord:
-		message = fmt.Sprintf("Login %v", userString)
+		actionString = "Login"
 	case userLoginFailedRecord:
-		message = fmt.Sprintf("Failed login %v", userString)
+		actionString = "Failed login"
 	case userLogoutRecord:
-		message = fmt.Sprintf("Logout %v", userString)
+		actionString = "Logout"
 	}
 
-	return message
+	return fmt.Sprintf("%v by user %v (UID: %d) on %v (PID: %d) from %v (IP: %v)",
+		actionString, loginRecord.Username, loginRecord.UID, loginRecord.TTY, loginRecord.PID,
+		loginRecord.Hostname, loginRecord.IP)
 }
