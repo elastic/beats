@@ -2678,30 +2678,6 @@ User information.
 
 
 [float]
-== group fields
-
-Group information.
-
-
-*`user.group.id`*::
-+
---
-type: keyword
-
-Group ID.
-
---
-
-*`user.group.name`*::
-+
---
-type: keyword
-
-Group name.
-
---
-
-[float]
 == effective fields
 
 Effective user information.

@@ -55,17 +55,6 @@
     description: User information.
     fields:
 
-    - name: group
-      type: group
-      description: Group information.
-      fields:
-      - name: id
-        type: keyword
-        description: Group ID.
-      - name: name
-        type: keyword
-        description: Group name.
-
     - name: effective
       type: group
       description: Effective user information.
