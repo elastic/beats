@@ -27,7 +27,6 @@
         "suricata.eve.ssh.client.software_version": "OpenSSH_7.6",
         "suricata.eve.ssh.server.proto_version": "2.0",
         "suricata.eve.ssh.server.software_version": "libssh_0.7.0",
-        "suricata.eve.timestamp": "2018-07-05T15:01:09.820360-0400",
         "tags": [
             "suricata"
         ]
@@ -75,13 +74,11 @@
         "suricata.eve.flow.bytes_toserver": 793,
         "suricata.eve.flow.pkts_toclient": 3,
         "suricata.eve.flow.pkts_toserver": 4,
-        "suricata.eve.flow.start": "2018-07-05T15:07:19.659593-0400",
         "suricata.eve.flow_id": 904992230150281,
         "suricata.eve.in_iface": "en0",
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.86.85",
         "suricata.eve.src_port": 55641,
-        "suricata.eve.timestamp": "2018-07-05T15:07:20.910626-0400",
         "suricata.eve.tls.session_resumed": true,
         "suricata.eve.tls.sni": "l2.io",
         "suricata.eve.tls.version": "TLS 1.2",
@@ -126,7 +123,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.86.85",
         "suricata.eve.src_port": 56119,
-        "suricata.eve.timestamp": "2018-07-05T15:43:47.690014-0400",
         "suricata.eve.tx_id": 0,
         "tags": [
             "suricata"
@@ -192,7 +188,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.86.28",
         "suricata.eve.src_port": 8008,
-        "suricata.eve.timestamp": "2018-07-05T15:44:33.222441-0400",
         "tags": [
             "suricata"
         ],
@@ -239,7 +234,6 @@
         "suricata.eve.proto": "UDP",
         "suricata.eve.src_ip": "192.168.86.1",
         "suricata.eve.src_port": 53,
-        "suricata.eve.timestamp": "2018-07-05T15:51:20.213418-0400",
         "tags": [
             "suricata"
         ]
@@ -372,7 +366,6 @@
         "suricata.eve.stats.tcp.syn": 1138,
         "suricata.eve.stats.tcp.synack": 656,
         "suricata.eve.stats.uptime": 5400,
-        "suricata.eve.timestamp": "2018-07-05T15:51:23.009510-0400",
         "tags": [
             "suricata"
         ]
@@ -405,7 +398,6 @@
         "suricata.eve.proto": "TCP",
         "suricata.eve.src_ip": "192.168.86.85",
         "suricata.eve.src_port": 56187,
-        "suricata.eve.timestamp": "2018-07-05T15:51:50.666597-0400",
         "suricata.eve.tls.fingerprint": "6a:ff:ac:a6:5f:8a:05:e7:a9:8c:76:29:b9:08:c7:69:ad:dc:72:47",
         "suricata.eve.tls.issuerdn": "CN=Apple IST CA 2 - G1/OU=Certification Authority/O=Apple Inc./C=US",
         "suricata.eve.tls.notafter": "2019-03-29T17:54:31",
@@ -451,17 +443,14 @@
         "suricata.eve.flow.alerted": false,
         "suricata.eve.flow.bytes_toclient": 0,
         "suricata.eve.flow.bytes_toserver": 110,
-        "suricata.eve.flow.end": "2018-07-05T15:51:23.453468-0400",
         "suricata.eve.flow.pkts_toclient": 0,
         "suricata.eve.flow.pkts_toserver": 1,
         "suricata.eve.flow.reason": "timeout",
-        "suricata.eve.flow.start": "2018-07-05T15:51:23.453468-0400",
         "suricata.eve.flow.state": "new",
         "suricata.eve.flow_id": 1828507008887644,
         "suricata.eve.proto": "UDP",
         "suricata.eve.src_ip": "fe80:0000:0000:0000:fada:0cff:fedc:87f1",
         "suricata.eve.src_port": 546,
-        "suricata.eve.timestamp": "2018-07-05T15:51:54.001329-0400",
         "tags": [
             "suricata"
         ]
