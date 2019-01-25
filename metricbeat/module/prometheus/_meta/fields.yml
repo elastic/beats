@@ -12,7 +12,7 @@
       object_type: keyword
       description: >
         Prometheus metric labels
-    - name: prometheus
+    - name: prometheus.metrics
       type: object
       object_type: double
       object_type_mapping_type: "*"

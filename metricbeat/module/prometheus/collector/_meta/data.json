@@ -13,14 +13,12 @@
         "name": "collector"
     },
     "prometheus": {
-        "http_request_duration_microseconds_count": 0,
-        "http_request_duration_microseconds_sum": 0,
-        "http_request_size_bytes_count": 0,
-        "http_request_size_bytes_sum": 0,
-        "http_response_size_bytes_count": 0,
-        "http_response_size_bytes_sum": 0,
         "labels": {
-            "handler": "drop_series"
+            "interval": "15s"
+        },
+        "metrics": {
+            "prometheus_target_interval_length_seconds_count": 1,
+            "prometheus_target_interval_length_seconds_sum": 15.000226176
         }
     },
     "service": {

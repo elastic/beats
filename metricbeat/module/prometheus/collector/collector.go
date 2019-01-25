@@ -87,7 +87,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 				}
 			}
 
-			eventList[labelsHash].Update(promEvent.data)
+			eventList[labelsHash].Update(common.MapStr{
+				"metrics": promEvent.data,
+			})
 		}
 	}
 

@@ -19372,7 +19372,7 @@ Prometheus metric labels
 
 --
 
-*`prometheus`*::
+*`prometheus.metrics`*::
 +
 --
 type: object
