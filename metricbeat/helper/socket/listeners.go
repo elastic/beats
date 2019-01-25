@@ -38,7 +38,6 @@ const (
 
 // Names for the direction of a connection
 const (
-	// XXX: Rephrase this to inbound/outbound to match ECS recommendations?
 	IncomingName  = "incoming"
 	OutgoingName  = "outgoing"
 	ListeningName = "listening"
