@@ -10545,16 +10545,6 @@ The HTTP headers sent
 
 --
 
-*`http.request.body`*::
-+
---
-type: keyword
-
-The HTTP payload sent
-
-
---
-
 [float]
 == response fields
 
