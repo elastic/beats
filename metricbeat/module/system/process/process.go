@@ -157,7 +157,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 }
 
 func getAndRemove(from common.MapStr, field string) interface{} {
-	v := from[field]
-	delete(from, field)
-	return v
+	if v, ok := from[field]; ok {
+		delete(from, field)
+		return v
+	}
+	return nil
 }
