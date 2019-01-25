@@ -42,6 +42,8 @@ package server
 import (
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/common"
+
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/metricbeat/mb"
@@ -79,13 +81,20 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-	metricsetFields, err := parseSrvr(outputReader)
+	metricsetFields, version, err := parseSrvr(outputReader)
 	if err != nil {
 		reporter.Error(err)
 		return
 	}
 
-	reporter.Event(mb.Event{
+	event := mb.Event{
 		MetricSetFields: metricsetFields,
-	})
+		RootFields: common.MapStr{
+			"service": common.MapStr{
+				"version": version,
+			},
+		},
+	}
+
+	reporter.Event(event)
 }

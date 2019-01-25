@@ -27,7 +27,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
@@ -49,12 +48,7 @@ func TestFetch(t *testing.T) {
 		metricsetFields := event.MetricSetFields
 
 		// Check values
-		version, ok := metricsetFields["version"].(common.MapStr)
-		if !ok {
-			t.Fatal("no version field found")
-		}
-		assert.Equal(t, "06/29/2018 04:05 GMT", version["date"])
-		assert.Equal(t, "3.4.13-2d71af4dbe22557fda74f9a9b4309b15a7487f03", version["id"])
+		assert.Equal(t, "06/29/2018 04:05 GMT", metricsetFields["version_date"])
 
 		received := metricsetFields["received"].(int64)
 		assert.True(t, received >= 0)

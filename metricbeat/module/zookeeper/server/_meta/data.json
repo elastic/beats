@@ -14,7 +14,8 @@
     },
     "service": {
         "address": "localhost:2181",
-        "type": "zookeeper"
+        "type": "zookeeper",
+        "version": "3.4.13-2d71af4dbe22557fda74f9a9b4309b15a7487f03"
     },
     "zookeeper": {
         "server": {
@@ -29,12 +30,9 @@
             "mode": "standalone",
             "node_count": 4,
             "outstanding": 0,
-            "received": 16,
-            "sent": 15,
-            "version": {
-                "date": "06/29/2018 04:05 GMT",
-                "id": "3.4.13-2d71af4dbe22557fda74f9a9b4309b15a7487f03"
-            },
+            "received": 38,
+            "sent": 37,
+            "version_date": "06/29/2018 04:05 GMT",
             "zxid": "0x0"
         }
     }

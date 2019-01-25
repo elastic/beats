@@ -39,14 +39,13 @@ Proposal sizes last/min/max: -3/-999/-1
 `
 
 func TestParser(t *testing.T) {
-	mapStr, err := parseSrvr(bytes.NewReader([]byte(srvrTestInput)))
+	mapStr, versionID, err := parseSrvr(bytes.NewReader([]byte(srvrTestInput)))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	version := mapStr["version"].(common.MapStr)
-	assert.Equal(t, "06/29/2018 04:05 GMT", version["date"])
-	assert.Equal(t, "3.4.13-2d71af4dbe22557fda74f9a9b4309b15a7487f03", version["id"])
+	assert.Equal(t, "06/29/2018 04:05 GMT", mapStr["version_date"])
+	assert.Equal(t, "3.4.13-2d71af4dbe22557fda74f9a9b4309b15a7487f03", versionID)
 
 	latency := mapStr["latency"].(common.MapStr)
 	assert.Equal(t, int64(1), latency["min"])

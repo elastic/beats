@@ -39,20 +39,20 @@ var fieldsCapturer = regexp.MustCompile(`^([a-zA-Z\s]+):\s(\d+)`)
 var versionCapturer = regexp.MustCompile(`:\s(.*),`)
 var dateCapturer = regexp.MustCompile(`built on (.*)`)
 
-func parseSrvr(i io.Reader) (common.MapStr, error) {
+func parseSrvr(i io.Reader) (common.MapStr, string, error) {
 	scanner := bufio.NewScanner(i)
 
 	//Get version
 	ok := scanner.Scan()
 
 	if !ok {
-		return nil, errors.New("no initial successful scan, aborting")
+		return nil, "", errors.New("no initial successful scan, aborting")
 	}
 
 	output := common.MapStr{}
 
-	output.Put("service.version", versionCapturer.FindStringSubmatch(scanner.Text())[1])
-	output.Put("version.date", dateCapturer.FindStringSubmatch(scanner.Text())[1])
+	version := versionCapturer.FindStringSubmatch(scanner.Text())[1]
+	output.Put("version_date", dateCapturer.FindStringSubmatch(scanner.Text())[1])
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -124,7 +124,7 @@ func parseSrvr(i io.Reader) (common.MapStr, error) {
 		}
 	}
 
-	return output, nil
+	return output, version, nil
 }
 
 func parseZxid(line string) (common.MapStr, error) {
