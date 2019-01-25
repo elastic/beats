@@ -3,13 +3,16 @@
   description: >
     Contains fields for the Nginx access logs.
   fields:
+    - name: remote_ip_list
+      type: array
+      description: >
+        An array of remote IP addresses. It is a list because it is common to include, besides the client
+        IP address, IP addresses from headers like `X-Forwarded-For`.
+        Real source IP is restored to `source.ip`.
+
     - name: body_sent.bytes
       type: alias
       path: http.response.body.bytes
-      migration: true
-    - name: remote_ip_list
-      type: alias
-      path: network.forwarded_ip
       migration: true
     - name: remote_ip
       type: alias

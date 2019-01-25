@@ -105,3 +105,8 @@ func (s *SQS) Template() *cloudformation.Template {
 func (s *SQS) LambdaConfig() *lambdaConfig {
 	return s.config.LambdaConfig
 }
+
+// Policies returns a slice of policy to add to the lambda.
+func (s *SQS) Policies() []cloudformation.AWSIAMRole_Policy {
+	return []cloudformation.AWSIAMRole_Policy{}
+}

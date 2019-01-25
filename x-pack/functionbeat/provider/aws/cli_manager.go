@@ -40,6 +40,7 @@ type AWSLambdaFunction struct {
 }
 
 type installer interface {
+	Policies() []cloudformation.AWSIAMRole_Policy
 	Template() *cloudformation.Template
 	LambdaConfig() *lambdaConfig
 }
@@ -84,6 +85,27 @@ func (c *CLIManager) template(function installer, name, codeLoc string) *cloudfo
 	// Documentation: https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/Welcome.html
 	// Intrinsic function reference: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html
 
+	// Default policies to writes logs from the Lambda.
+	policies := []cloudformation.AWSIAMRole_Policy{
+		cloudformation.AWSIAMRole_Policy{
+			PolicyName: cloudformation.Join("-", []string{"fnb", "lambda", name}),
+			PolicyDocument: map[string]interface{}{
+				"Statement": []map[string]interface{}{
+					map[string]interface{}{
+						"Action": []string{"logs:CreateLogStream", "Logs:PutLogEvents"},
+						"Effect": "Allow",
+						"Resource": []string{
+							cloudformation.Sub("arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/" + name + ":*"),
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// Merge any specific policies from the service.
+	policies = append(policies, function.Policies()...)
+
 	// Create the roles for the lambda.
 	template := cloudformation.NewTemplate()
 	// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
@@ -106,22 +128,7 @@ func (c *CLIManager) template(function installer, name, codeLoc string) *cloudfo
 		RoleName: "functionbeat-lambda-" + name,
 		// Allow the lambda to write log to cloudwatch logs.
 		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html
-		Policies: []cloudformation.AWSIAMRole_Policy{
-			cloudformation.AWSIAMRole_Policy{
-				PolicyName: cloudformation.Join("-", []string{"fnb", "lambda", name}),
-				PolicyDocument: map[string]interface{}{
-					"Statement": []map[string]interface{}{
-						map[string]interface{}{
-							"Action": []string{"logs:CreateLogStream", "Logs:PutLogEvents"},
-							"Effect": "Allow",
-							"Resource": []string{
-								cloudformation.Sub("arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/" + name + ":*"),
-							},
-						},
-					},
-				},
-			},
-		},
+		Policies: policies,
 	}
 
 	// Configure the Dead letter, any failed events will be send to the configured amazon resource name.

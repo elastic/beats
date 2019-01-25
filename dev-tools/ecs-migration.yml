@@ -934,11 +934,6 @@
   alias: true
   beat: filebeat
 
-- from: nginx.access.remote_ip_list
-  to: network.forwarded_ip
-  alias: true
-  beat: filebeat
-
 ## PostgreSQL module
 
 - from: postgresql.log.duration

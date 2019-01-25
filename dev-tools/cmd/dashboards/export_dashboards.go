@@ -66,6 +66,7 @@ func main() {
 		Host:     u.Host,
 		Username: user,
 		Password: pass,
+		Path:     u.Path,
 		SpaceID:  *spaceID,
 		Timeout:  kibanaTimeout,
 	})

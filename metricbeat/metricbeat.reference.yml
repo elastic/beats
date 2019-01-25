@@ -585,20 +585,11 @@ metricbeat.modules:
 
 #----------------------------- Prometheus Module -----------------------------
 - module: prometheus
-  metricsets: ["stats"]
-  enabled: true
   period: 10s
   hosts: ["localhost:9090"]
-  #metrics_path: /metrics
-  #namespace: example
-
-- module: prometheus
-  metricsets: ["collector"]
-  enabled: true
-  period: 10s
-  hosts: ["localhost:9090"]
-  #metrics_path: /metrics
-  #namespace: example
+  metrics_path: /metrics
+  #username: "user"
+  #password: "secret"
 
   # This can be used for service account based authorization:
   #  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
