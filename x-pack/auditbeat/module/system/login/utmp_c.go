@@ -15,7 +15,19 @@ import (
 	"encoding/binary"
 	"io"
 	"time"
+	"unsafe"
 )
+
+var byteOrder = getByteOrder()
+
+func getByteOrder() binary.ByteOrder {
+	var b [2]byte
+	*((*uint16)(unsafe.Pointer(&b[0]))) = 1
+	if b[0] == 1 {
+		return binary.LittleEndian
+	}
+	return binary.BigEndian
+}
 
 // UtType represents the ut_type field. See utmp(5).
 type UtType int16
@@ -79,7 +91,7 @@ type Utmp struct {
 func newUtmp(utmp *utmpC) *Utmp {
 	// See utmp(5) for the utmp struct fields.
 	return &Utmp{
-		UtType:   int(utmp.Type),
+		UtType:   utmp.Type,
 		UtPid:    int(utmp.Pid),
 		UtLine:   byteToString(utmp.Device[:]),
 		UtUser:   byteToString(utmp.Username[:]),
@@ -99,7 +111,7 @@ func byteToString(b []byte) string {
 func ReadNextUtmp(r io.Reader) (*Utmp, error) {
 	utmpC := new(utmpC)
 
-	err := binary.Read(r, binary.LittleEndian, utmpC)
+	err := binary.Read(r, byteOrder, utmpC)
 	if err != nil {
 		return nil, err
 	}

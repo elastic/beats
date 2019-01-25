@@ -8,7 +8,6 @@ package login
 
 import (
 	"bytes"
-	"encoding/binary"
 	"encoding/gob"
 	"io"
 	"net"
@@ -388,15 +387,15 @@ func newIP(utAddrV6 [4]uint32) *net.IP {
 	if utAddrV6[1] != 0 || utAddrV6[2] != 0 || utAddrV6[3] != 0 {
 		// IPv6
 		b := make([]byte, 16)
-		binary.LittleEndian.PutUint32(b[:4], utAddrV6[0])
-		binary.LittleEndian.PutUint32(b[4:8], utAddrV6[1])
-		binary.LittleEndian.PutUint32(b[8:12], utAddrV6[2])
-		binary.LittleEndian.PutUint32(b[12:], utAddrV6[3])
+		byteOrder.PutUint32(b[:4], utAddrV6[0])
+		byteOrder.PutUint32(b[4:8], utAddrV6[1])
+		byteOrder.PutUint32(b[8:12], utAddrV6[2])
+		byteOrder.PutUint32(b[12:], utAddrV6[3])
 		ip = net.IP(b)
 	} else {
 		// IPv4
 		b := make([]byte, 4)
-		binary.LittleEndian.PutUint32(b, utAddrV6[0])
+		byteOrder.PutUint32(b, utAddrV6[0])
 		ip = net.IP(b)
 	}
 
