@@ -56,6 +56,7 @@ import (
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/monitoring/report"
 	"github.com/elastic/beats/libbeat/monitoring/report/log"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/plugin"
@@ -311,7 +312,8 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 			Logger:    logp.L().Named("publisher"),
 		},
 		b.Config.Pipeline,
-		b.Config.Output)
+		b.makeOutputFactory(b.Config.Output),
+	)
 
 	if err != nil {
 		return nil, fmt.Errorf("error initializing publisher: %+v", err)
@@ -743,6 +745,22 @@ func (b *Beat) indexSetupCallback() func(esClient *elasticsearch.Client) error {
 	return func(esClient *elasticsearch.Client) error {
 		m := b.index.Manager(esClient, b.Fields, b.Config.Migration.Enabled())
 		return m.Load()
+	}
+}
+
+func (b *Beat) makeOutputFactory(
+	cfg common.ConfigNamespace,
+) func(outputs.Observer) (outputs.Group, error) {
+	if !cfg.IsSet() {
+		return nil
+	}
+
+	return func(outStats outputs.Observer) (string, outputs.Group, error) {
+		out, err := outputs.Load(b.Info, outStats, cfg.Name(), cfg.Config())
+		if err != nil {
+			return "", nil, err
+		}
+		return cfg.Name(), out, nil
 	}
 }
 

@@ -55,7 +55,7 @@ func Load(
 	beatInfo beat.Info,
 	monitors Monitors,
 	config Config,
-	outcfg common.ConfigNamespace,
+	makeOutput func(outputs.Observer) (string, outputs.Group, error),
 ) (*Pipeline, error) {
 	log := monitors.Logger
 	if log == nil {
@@ -95,7 +95,7 @@ func Load(
 		return nil, err
 	}
 
-	out, err := loadOutput(beatInfo, monitors, outcfg)
+	out, err := loadOutput(monitors, makeOutput)
 	if err != nil {
 		return nil, err
 	}
@@ -110,9 +110,8 @@ func Load(
 }
 
 func loadOutput(
-	beatInfo beat.Info,
 	monitors Monitors,
-	outcfg common.ConfigNamespace,
+	makeOutput func(outputs.Observer) (string, outputs.Group, error),
 ) (outputs.Group, error) {
 	log := monitors.Logger
 	if log == nil {
@@ -123,7 +122,7 @@ func loadOutput(
 		return outputs.Group{}, nil
 	}
 
-	if !outcfg.IsSet() {
+	if makeOutput == nil {
 		return outputs.Group{}, nil
 	}
 
@@ -141,13 +140,13 @@ func loadOutput(
 		outStats = outputs.NewStats(metrics)
 	}
 
-	out, err := outputs.Load(beatInfo, outStats, outcfg.Name(), outcfg.Config())
+	outName, out, err := makeOutput(outStats)
 	if err != nil {
 		return outputs.Fail(err)
 	}
 
 	if metrics != nil {
-		monitoring.NewString(metrics, "type").Set(outcfg.Name())
+		monitoring.NewString(metrics, "type").Set(outName)
 	}
 	if monitors.Telemetry != nil {
 		telemetry := monitors.Telemetry.GetRegistry("output")
@@ -156,7 +155,7 @@ func loadOutput(
 		} else {
 			telemetry = monitors.Telemetry.NewRegistry("output")
 		}
-		monitoring.NewString(telemetry, "name").Set(outcfg.Name())
+		monitoring.NewString(telemetry, "name").Set(outName)
 	}
 
 	return out, nil
