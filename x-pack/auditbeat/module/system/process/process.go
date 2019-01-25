@@ -287,7 +287,11 @@ func processEvent(process *Process, eventType string, action eventAction) mb.Eve
 	}
 
 	if process.User != nil {
-		event.RootFields.Put("user.name", process.User.Username)
+		if process.User.Username != "" {
+			event.RootFields.Put("user.name", process.User.Username)
+		} else if process.User.Name != "" {
+			event.RootFields.Put("user.name", process.User.Name)
+		}
 	}
 
 	if process.Group != nil {
