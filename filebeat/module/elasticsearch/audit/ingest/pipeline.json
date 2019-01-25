@@ -21,7 +21,7 @@
                     "ES_AUDIT_REALM": "(realm\\=\\[%{WORD:elasticsearch.audit.realm}\\])?",
                     "ES_AUDIT_ROLES": "(roles\\=\\[%{DATA:elasticsearch.audit.roles}\\])?",
                     "ES_AUDIT_ACTION": "(action\\=\\[%{DATA:elasticsearch.audit.action}(\\[%{DATA:elasticsearch.audit.sub_action}\\])?\\])?",
-                    "ES_AUDIT_URI": "(uri=\\[%{DATA:elasticsearch.audit.uri\\])?",
+                    "ES_AUDIT_URI": "(uri=\\[%{DATA:elasticsearch.audit.uri}\\])?",
                     "ES_AUDIT_INDICES": "(indices\\=\\[%{DATA:elasticsearch.audit.indices}\\])?",
                     "ES_AUDIT_REQUEST": "(request\\=\\[%{WORD:elasticsearch.audit.request}\\])?",
                     "ES_AUDIT_REQUEST_BODY": "(request_body\\=\\[%{DATA:elasticsearch.audit.request_body}\\])?"
