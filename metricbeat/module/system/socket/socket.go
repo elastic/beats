@@ -129,8 +129,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		c := newConnection(s)
 		m.enrichConnectionData(c)
 
+		root, metricSet := c.ToMapStr()
+
 		r.Event(mb.Event{
-			MetricSetFields: c.ToMapStr(),
+			RootFields:      root,
+			MetricSetFields: metricSet,
 		})
 	}
 
@@ -206,6 +209,7 @@ func (m *MetricSet) enrichConnectionData(c *connection) {
 		c.Exe = proc.Executable
 		c.Command = proc.Command
 		c.CmdLine = proc.CmdLine
+		c.Args = proc.Args
 	} else if m.euid == 0 {
 		if c.Inode == 0 {
 			c.ProcessError = fmt.Errorf("process has exited. inode=%v, tcp_state=%v",
@@ -232,12 +236,13 @@ type connection struct {
 	DestHostError       error // Resolver error.
 
 	// Process identifiers.
-	Inode        uint32 // Inode of the socket.
-	PID          int    // PID of the socket owner.
-	Exe          string // Absolute path to the executable.
-	Command      string // Command
-	CmdLine      string // Full command line with arguments.
-	ProcessError error  // Reason process info is unavailable.
+	Inode        uint32   // Inode of the socket.
+	PID          int      // PID of the socket owner.
+	Exe          string   // Absolute path to the executable.
+	Command      string   // Command
+	CmdLine      string   // Full command line with arguments.
+	Args         []string // Raw arguments
+	ProcessError error    // Reason process info is unavailable.
 
 	// User identifiers.
 	UID      uint32 // UID of the socket owner.
@@ -258,54 +263,107 @@ func newConnection(diag *linux.InetDiagMsg) *connection {
 	}
 }
 
-func (c *connection) ToMapStr() common.MapStr {
-	evt := common.MapStr{
-		"family": c.Family.String(),
-		"local": common.MapStr{
-			"ip":   c.LocalIP.String(),
-			"port": c.LocalPort,
+// Map helpers for conversion to event
+var (
+	ianaNumbersMap = map[string]string{
+		"ipv4": "4",
+		"ipv6": "41",
+	}
+
+	localHostInfoGroup = map[string]string{
+		sock.IncomingName:  "destination",
+		sock.OutgoingName:  "source",
+		sock.ListeningName: "server",
+	}
+
+	remoteHostInfoGroup = map[string]string{
+		sock.IncomingName: "source",
+		sock.OutgoingName: "destination",
+	}
+)
+
+func (c *connection) ToMapStr() (fields common.MapStr, metricSetFields common.MapStr) {
+	localGroup := "server"
+	if g, ok := localHostInfoGroup[c.Family.String()]; ok {
+		localGroup = g
+	}
+
+	fields = common.MapStr{
+		"network": common.MapStr{
+			"type":        c.Family.String(),
+			"iana_number": ianaNumbersMap[c.Family.String()],
+			"direction":   c.Direction.String(),
 		},
 		"user": common.MapStr{
 			"id": c.UID,
 		},
-		"direction": c.Direction.String(),
+		// Aliases for this are not going to be possible, keeping
+		// duplicated fields by now for backwards comatibility
+		localGroup: common.MapStr{
+			"ip":   c.LocalIP.String(),
+			"port": c.LocalPort,
+		},
+	}
+
+	metricSetFields = common.MapStr{
+		"local": common.MapStr{
+			"ip":   c.LocalIP.String(),
+			"port": c.LocalPort,
+		},
 	}
 
 	if c.Username != "" {
-		evt.Put("user.name", c.Username)
+		fields.Put("user.full_name", c.Username)
 	}
 
 	if c.ProcessError != nil {
-		evt.Put("process.error", c.ProcessError.Error())
+		// XXX, would this be the proper place for a process error code?
+		fields.Put("error.code", c.ProcessError.Error())
 	} else {
 		process := common.MapStr{"pid": c.PID}
-		evt["process"] = process
 
 		if c.PID > 0 {
-			addOptionalString(process, "exe", c.Exe)
-			addOptionalString(process, "command", c.Command)
-			addOptionalString(process, "cmdline", c.CmdLine)
+			addOptionalString(process, "executable", c.Exe)
+			addOptionalString(process, "name", c.Command)
+
+			if len(c.Args) >= 0 {
+				process["args"] = c.Args
+				metricSetFields["process"] = common.MapStr{
+					"cmdline": c.CmdLine,
+				}
+			}
 		} else if c.PID == 0 {
 			process["command"] = "kernel"
 		}
+
+		fields["process"] = process
 	}
 
 	if c.RemotePort != 0 {
+		// Aliases for this are not going to be possible, keeping
+		// duplicated fields by now for backwards comatibility
 		remote := common.MapStr{
 			"ip":   c.RemoteIP.String(),
 			"port": c.RemotePort,
 		}
-		evt["remote"] = remote
-
 		if c.DestHostError != nil {
 			remote["host_error"] = c.DestHostError.Error()
 		} else {
 			addOptionalString(remote, "host", c.DestHost)
 			addOptionalString(remote, "etld_plus_one", c.DestHostETLDPlusOne)
 		}
+		metricSetFields["remote"] = remote
+
+		remoteGroup, ok := remoteHostInfoGroup[c.Family.String()]
+		if ok {
+			fields[remoteGroup] = common.MapStr{
+				"ip":   c.RemoteIP.String(),
+				"port": c.RemotePort,
+			}
+		}
 	}
 
-	return evt
+	return fields, metricSetFields
 }
 
 func addOptionalString(m common.MapStr, key, value string) {

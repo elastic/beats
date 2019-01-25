@@ -1206,6 +1206,43 @@
 
 ## Modules
 
+### System
+
+- from: system.socket.direction
+  to: network.direction
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.family
+  to: network.type
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.process.command
+  to: process.name
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.process.exe
+  to: process.executable
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.process.pid
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.user.id
+  to: user.id
+  alias: true
+  beat: metricbeat
+
+- from: system.socket.user.name
+  to: user.name
+  alias: true
+  beat: metricbeat
+
 ### Zookeeper
 
 - from: zookeeper.mntr.version

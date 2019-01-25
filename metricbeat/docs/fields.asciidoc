@@ -24393,24 +24393,18 @@ TCP sockets that are active.
 *`system.socket.direction`*::
 +
 --
-type: keyword
+type: alias
 
-example: incoming
-
-How the socket was initiated. Possible values are incoming, outgoing, or listening.
-
+alias to: network.direction
 
 --
 
 *`system.socket.family`*::
 +
 --
-type: keyword
+type: alias
 
-example: ipv4
-
-Address family.
-
+alias to: network.type
 
 --
 
@@ -24499,20 +24493,18 @@ Error describing the cause of the reverse lookup failure.
 *`system.socket.process.pid`*::
 +
 --
-type: long
+type: alias
 
-ID of the process that opened the socket.
-
+alias to: process.pid
 
 --
 
 *`system.socket.process.command`*::
 +
 --
-type: keyword
+type: alias
 
-Name of the command (limited to 20 chars by the OS).
-
+alias to: process.name
 
 --
 
@@ -24521,6 +24513,7 @@ Name of the command (limited to 20 chars by the OS).
 --
 type: keyword
 
+Full command line
 
 
 --
@@ -24528,30 +24521,27 @@ type: keyword
 *`system.socket.process.exe`*::
 +
 --
-type: keyword
+type: alias
 
-Absolute path to the executable.
-
+alias to: process.executable
 
 --
 
 *`system.socket.user.id`*::
 +
 --
-type: long
+type: alias
 
-UID of the user running the process.
-
+alias to: user.id
 
 --
 
 *`system.socket.user.name`*::
 +
 --
-type: keyword
+type: alias
 
-Name of the user running the process.
-
+alias to: user.full_name
 
 --
 

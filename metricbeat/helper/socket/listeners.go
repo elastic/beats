@@ -36,10 +36,18 @@ const (
 	Listening
 )
 
+// Names for the direction of a connection
+const (
+	// XXX: Rephrase this to inbound/outbound to match ECS recommendations?
+	IncomingName  = "incoming"
+	OutgoingName  = "outgoing"
+	ListeningName = "listening"
+)
+
 var directionNames = map[Direction]string{
-	Incoming:  "incoming",
-	Outgoing:  "outgoing",
-	Listening: "listening",
+	Incoming:  IncomingName,
+	Outgoing:  OutgoingName,
+	Listening: ListeningName,
 }
 
 func (d Direction) String() string {
