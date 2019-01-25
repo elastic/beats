@@ -55,8 +55,8 @@ func NewMetaGenerator(cfg *common.Config) (MetaGenerator, error) {
 	// default settings:
 	generator := metaGenerator{
 		IncludeCreatorMetadata: true,
-		LabelsDedot:            false,
-		AnnotationsDedot:       false,
+		LabelsDedot:            true,
+		AnnotationsDedot:       true,
 	}
 
 	err := cfg.Unpack(&generator)
