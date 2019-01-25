@@ -77,13 +77,15 @@ func (h *esClientHandler) ILMEnabled(mode Mode) (bool, error) {
 
 func (h *esClientHandler) CreateILMPolicy(name string, policy common.MapStr) error {
 	client := h.access()
-	_, _, err := client.Request("PUT", "/_ilm/policy"+name, "", nil, policy)
+	_, _, err := client.Request("PUT", "/_ilm/policy/"+name, "", nil, policy)
 	return err
 }
 
 func (h *esClientHandler) HasILMPolicy(name string) (bool, error) {
 	client := h.access()
-	status, b, err := client.Request("HEAD", "/_ilm/policy/"+name, "", nil, nil)
+
+	// XXX: HEAD method does currently not work for checking if a policy exists
+	status, b, err := client.Request("GET", "/_ilm/policy/"+name, "", nil, nil)
 	if err != nil && status != 404 {
 		return false, wrapErrf(err, ErrRequestFailed,
 			"failed to check for policy name '%v': (status=%v) %s", name, status, b)

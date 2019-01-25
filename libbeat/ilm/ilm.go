@@ -32,6 +32,7 @@ import (
 type Supporter interface {
 	Mode() Mode
 	Template() TemplateSettings
+	Policy() common.MapStr
 	Manager(h APIHandler) Manager
 }
 
@@ -81,7 +82,7 @@ func DefaultSupport(info beat.Info, config *common.Config) (Supporter, error) {
 		}
 
 	} else {
-		policy = ilmDefaultPolicy
+		policy = DefaultPolicy
 	}
 
 	name, err := applyStaticFmtstr(info, &cfg.ILM.Name)

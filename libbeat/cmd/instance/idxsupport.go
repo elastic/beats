@@ -67,6 +67,7 @@ func newIndexSupport(
 
 	return &indexSupport{
 		ilm:         ilm,
+		info:        info,
 		templateCfg: tmplCfg,
 	}, nil
 }
@@ -84,6 +85,7 @@ func (s *indexSupport) Manager(
 	return indexManager{
 		support:   s,
 		ilm:       ilm,
+		client:    client,
 		fields:    fields,
 		migration: migration,
 	}
@@ -107,6 +109,7 @@ func (m *indexManager) load(forceTemplate, forcePolicy bool) error {
 		if err := m.ilm.EnsurePolicy(forcePolicy); err != nil {
 			return err
 		}
+		logp.Info("ILM policy successfully loaded.")
 	}
 
 	if m.support.templateCfg.Enabled {
@@ -140,6 +143,7 @@ func (m *indexManager) load(forceTemplate, forcePolicy bool) error {
 		if err := m.ilm.EnsureAlias(); err != nil {
 			return err
 		}
+		logp.Info("Write alias successfully generated.")
 	}
 
 	return nil

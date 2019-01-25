@@ -59,7 +59,7 @@ const (
 
 const ilmDefaultPattern = "{now/d}-000001"
 
-var ilmDefaultPolicy = common.MapStr{
+var DefaultPolicy = common.MapStr{
 	"policy": common.MapStr{
 		"phases": common.MapStr{
 			"hot": common.MapStr{
@@ -114,5 +114,6 @@ func defaultConfig(info beat.Info) Config {
 		RolloverAlias: name,
 		Pattern:       ilmDefaultPattern,
 		PolicyFile:    "",
+		CheckExists:   true,
 	}
 }

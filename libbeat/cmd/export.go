@@ -33,7 +33,7 @@ func genExportCmd(settings instance.Settings, name, idxPrefix, beatVersion strin
 	exportCmd.AddCommand(export.GenExportConfigCmd(settings, name, idxPrefix, beatVersion))
 	exportCmd.AddCommand(export.GenTemplateConfigCmd(settings, name, idxPrefix, beatVersion))
 	exportCmd.AddCommand(export.GenDashboardCmd(name, idxPrefix, beatVersion))
-	exportCmd.AddCommand(export.GenGetILMPolicyCmd())
+	exportCmd.AddCommand(export.GenGetILMPolicyCmd(settings, name, idxPrefix, beatVersion))
 
 	return exportCmd
 }

@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 type ilmSupport struct {
@@ -57,6 +58,10 @@ func (s *ilmSupport) Template() TemplateSettings {
 		Pattern:    fmt.Sprintf("%s-*", alias),
 		PolicyName: s.policyName,
 	}
+}
+
+func (s *ilmSupport) Policy() common.MapStr {
+	return s.policy
 }
 
 func (s *ilmSupport) Manager(h APIHandler) Manager {
@@ -116,6 +121,9 @@ func (m *singlePolicyManager) EnsurePolicy(overwrite bool) error {
 
 	if !exists || overwrite {
 		return m.client.CreateILMPolicy(m.policyName, m.policy)
+	} else {
+		logp.Info("do not generate ilm policy: exists=%v, overwrite=%v",
+			exists, overwrite)
 	}
 	return nil
 }
