@@ -65,7 +65,7 @@
       },
       "id": "Unique-FQDNs-per-eTLD 1",
       "type": "visualization",
-      "updated_at": "2019-01-08T00:15:10.701Z",
+      "updated_at": "2019-01-18T23:49:23.036Z",
       "version": 1
     },
     {
@@ -142,7 +142,7 @@
       },
       "id": "Unique-FQDNs-per-eTLD 1-Table",
       "type": "visualization",
-      "updated_at": "2019-01-08T00:15:10.701Z",
+      "updated_at": "2019-01-18T23:49:23.036Z",
       "version": 1
     },
     {
@@ -300,8 +300,8 @@
       },
       "id": "Bytes-Transferred-per-Domain",
       "type": "visualization",
-      "updated_at": "2019-01-08T00:22:51.148Z",
-      "version": 2
+      "updated_at": "2019-01-18T23:49:23.036Z",
+      "version": 1
     },
     {
       "attributes": {
@@ -390,13 +390,16 @@
       },
       "id": "dc743240-1665-11e7-a6de-cbac1a3d0a7d",
       "type": "visualization",
-      "updated_at": "2019-01-08T00:24:51.603Z",
-      "version": 3
+      "updated_at": "2019-01-18T23:49:23.036Z",
+      "version": 1
     },
     {
       "attributes": {
         "columns": [
-          "_source"
+          "server.ip",
+          "destination.ip",
+          "dns.question.name",
+          "status"
         ],
         "description": "",
         "hits": 0,
@@ -461,8 +464,8 @@
       },
       "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
       "type": "search",
-      "updated_at": "2019-01-08T00:20:16.879Z",
-      "version": 3
+      "updated_at": "2019-01-18T23:49:24.089Z",
+      "version": 2
     },
     {
       "attributes": {
@@ -583,8 +586,8 @@
       },
       "id": "DNS-Unique-Domains",
       "type": "dashboard",
-      "updated_at": "2019-01-08T00:27:14.608Z",
-      "version": 3
+      "updated_at": "2019-01-18T23:49:23.036Z",
+      "version": 1
     }
   ],
   "version": "7.0.0-SNAPSHOT"

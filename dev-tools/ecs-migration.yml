@@ -934,11 +934,6 @@
   alias: true
   beat: filebeat
 
-- from: nginx.access.remote_ip_list
-  to: network.forwarded_ip
-  alias: true
-  beat: filebeat
-
 ## PostgreSQL module
 
 - from: postgresql.log.duration
@@ -1209,39 +1204,48 @@
   comment: No alias mapping as field did not always exist
   beat: metricbeat
 
+## Modules
+
+### Zookeeper
+
+- from: zookeeper.mntr.version
+  to: service.version
+  alias: true
+  beat: metricbeat
+
 # Packetbeat
 
 ## Shared
 - from: bytes_in
   to: source.bytes
-  alias: false
-  comment: Don't add an alias until all of Packetbeat stops using this field.
+  alias: true
   beat: packetbeat
 
 - from: bytes_out
   to: destination.bytes
-  alias: false
-  comment: Don't add an alias until all of Packetbeat stops using this field.
+  alias: true
   beat: packetbeat
 
 - from: notes
   to: error.message
-  alias: false
-  comment: Don't add an alias until all of Packetbeat stops using this field.
+  alias: true
   beat: packetbeat
 
 - from: responsetime
   to: event.duration
   alias: false
-  comment: >
-    Units changed from usec to nsec. Don't add an alias until all of Packetbeat
-    stops using this field.
+  scale: 1000000
+  comment: The units changed so no alias was added.
   beat: packetbeat
 
 - from: transport
   to: network.transport
-  alias: false
-  comment: Don't add an alias until all of Packetbeat stops using this field.
+  alias: true
+  beat: packetbeat
+
+- from: real_ip
+  to: network.forwarded_ip
+  alias: true
   beat: packetbeat
 
 ## Flows
@@ -1314,7 +1318,7 @@
 - from: method
   to: http.request.method
   alias: false
-  comment: method is used by other protocols.
+  comment: Field is used by serveral protocols.
   beat: packetbeat
 
 - from: path
@@ -1325,6 +1329,7 @@
 - from: real_ip
   to: network.forwarded_ip
   alias: false
+  comment: Field is used by serveral protocols.
   beat: packetbeat
 
 ## MySQL

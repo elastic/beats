@@ -5,55 +5,124 @@
         "description": "",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
-            "filter": []
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
           }
         },
         "savedSearchId": "71908f00-88ca-11e7-ad9c-db80de0bf8d3",
-        "title": "Web Transactions [Packetbeat]",
+        "title": "HTTP Transactions [Packetbeat]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [
             {
+              "enabled": true,
               "id": "1",
               "params": {},
               "schema": "metric",
               "type": "count"
             },
             {
+              "enabled": true,
               "id": "2",
               "params": {
                 "customInterval": "2h",
+                "drop_partials": false,
                 "extended_bounds": {},
                 "field": "@timestamp",
                 "interval": "auto",
-                "min_doc_count": 1
+                "min_doc_count": 1,
+                "useNormalizedEsInterval": true
               },
               "schema": "segment",
               "type": "date_histogram"
             }
           ],
-          "listeners": {},
           "params": {
             "addLegend": false,
             "addTimeMarker": false,
             "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
             "defaultYExtents": false,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "legendPosition": "right",
             "mode": "stacked",
             "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "mode": "stacked",
+                "show": "true",
+                "type": "histogram",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
             "setYExtents": false,
             "shareYAxis": true,
             "times": [],
+            "type": "histogram",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ],
             "yAxis": {}
           },
-          "title": "Web transactions",
+          "title": "HTTP Transactions [Packetbeat]",
           "type": "histogram"
         }
       },
       "id": "Web-transactions",
       "type": "visualization",
-      "updated_at": "2019-01-09T19:09:57.656Z",
-      "version": 2
+      "updated_at": "2019-01-19T00:21:31.922Z",
+      "version": 3
     },
     {
       "attributes": {
@@ -223,7 +292,7 @@
       },
       "id": "HTTP-error-codes",
       "type": "visualization",
-      "updated_at": "2019-01-09T19:09:53.510Z",
+      "updated_at": "2019-01-18T23:49:26.207Z",
       "version": 1
     },
     {
@@ -323,7 +392,6 @@
                 "field": "@timestamp",
                 "interval": "auto",
                 "min_doc_count": 1,
-                "time_zone": "America/New_York",
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
@@ -435,7 +503,7 @@
       },
       "id": "HTTP-error-codes-evolution",
       "type": "visualization",
-      "updated_at": "2019-01-09T19:09:53.510Z",
+      "updated_at": "2019-01-18T23:49:26.207Z",
       "version": 1
     },
     {
@@ -455,24 +523,24 @@
             }
           }
         },
-        "title": "Navigation",
+        "title": "Navigation [Packetbeat]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [],
           "params": {
-            "fontSize": "10",
-            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Overview](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[Flows](#/dashboard/Packetbeat-Flows)\n\n[Web transactions](#/dashboard/Packetbeat-HTTP)\n\n[MySQL performance](#/dashboard/Packetbeat-MySQL-performance)\n\n[PostgreSQL performance](#/dashboard/Packetbeat-PgSQL-performance)\n\n[MongoDB performance](#/dashboard/Packetbeat-MongoDB-performance)\n\n[Thrift-RPC performance](#/dashboard/Packetbeat-Thrift-performance)\n\n[NFS transactions](#/dashboard/Packetbeat-NFS)\n\n[Cassandra performance](#/dashboard/Packetbeat-Cassandra)",
+            "fontSize": 10,
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
             "openLinksInNewTab": false
           },
-          "title": "Navigation",
+          "title": "Navigation [Packetbeat]",
           "type": "markdown"
         }
       },
       "id": "Navigation",
       "type": "visualization",
-      "updated_at": "2019-01-09T19:10:00.747Z",
-      "version": 10
+      "updated_at": "2019-01-19T00:18:59.372Z",
+      "version": 11
     },
     {
       "attributes": {
@@ -536,7 +604,7 @@
       },
       "id": "Total-number-of-HTTP-transactions",
       "type": "visualization",
-      "updated_at": "2019-01-09T19:09:53.510Z",
+      "updated_at": "2019-01-18T23:49:26.207Z",
       "version": 1
     },
     {
@@ -620,7 +688,7 @@
       },
       "id": "HTTP-codes-for-the-top-queries",
       "type": "visualization",
-      "updated_at": "2019-01-09T19:09:53.510Z",
+      "updated_at": "2019-01-18T23:49:26.207Z",
       "version": 1
     },
     {
@@ -691,7 +759,7 @@
       },
       "id": "Top-10-HTTP-requests",
       "type": "visualization",
-      "updated_at": "2019-01-09T19:09:53.510Z",
+      "updated_at": "2019-01-18T23:49:26.207Z",
       "version": 1
     },
     {
@@ -744,12 +812,12 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Web Transactions [Packetbeat]",
+        "title": "HTTP Transactions Search [Packetbeat]",
         "version": 1
       },
       "id": "71908f00-88ca-11e7-ad9c-db80de0bf8d3",
       "type": "search",
-      "updated_at": "2019-01-09T19:11:58.092Z",
+      "updated_at": "2019-01-19T00:21:43.886Z",
       "version": 3
     },
     {
@@ -891,7 +959,7 @@
       },
       "id": "Packetbeat-HTTP",
       "type": "dashboard",
-      "updated_at": "2019-01-09T19:09:53.510Z",
+      "updated_at": "2019-01-18T23:49:26.207Z",
       "version": 1
     }
   ],
