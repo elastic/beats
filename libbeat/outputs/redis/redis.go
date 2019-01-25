@@ -85,6 +85,8 @@ func makeRedis(
 		dataType = redisListType
 	case "channel":
 		dataType = redisChannelType
+	case "stream":
+		dataType = redisStreamType
 	default:
 		return outputs.Fail(errors.New("Bad Redis data type"))
 	}
