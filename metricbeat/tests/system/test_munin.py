@@ -18,7 +18,7 @@ class Test(metricbeat.BaseTest):
             "hosts": self.get_hosts(),
             "period": "1s",
             "extras": {
-                "node.namespace": namespace,
+                "service.name": namespace,
             },
         }])
         proc = self.start_beat()
@@ -31,7 +31,7 @@ class Test(metricbeat.BaseTest):
         evt = output[0]
         print(evt)
 
-        assert evt["service"]["type"] == namespace
+        assert evt["service"]["type"] == "munin"
         assert evt["service"]["name"] == namespace
         assert evt["munin"]["metrics"]["cpu"]["user"] > 0
 

@@ -69,6 +69,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Replace `namespace` option in munin module with `service.type` and `service.name` to override the ECS fields with the same names. {pull}10322[10322]
+- Add checks on valid field names and more strict mapping to munin module. {pull}10322[10322]
+
 *Packetbeat*
 
 - Adjust Packetbeat `http` fields to ECS Beta 2 {pull}9645[9645]

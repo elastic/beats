@@ -42,8 +42,9 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	namespace string
-	timeout   time.Duration
+	serviceName string
+	serviceType string
+	timeout     time.Duration
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -51,16 +52,15 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The munin node metricset is beta.")
 
-	config := struct {
-		Namespace string `config:"node.namespace" validate:"required"`
-	}{}
+	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		namespace:     config.Namespace,
+		serviceName:   config.ServiceName,
+		serviceType:   config.ServiceType,
 		timeout:       base.Module().Config().Timeout,
 	}, nil
 }
@@ -80,24 +80,25 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	event, err := node.Fetch(items...)
+	metrics, err := node.Fetch(items...)
 	if err != nil {
 		r.Error(err)
 	}
 
 	// Even if there was some error, keep sending succesfully collected metrics if any
-	if len(event) == 0 {
+	if len(metrics) == 0 {
 		return
 	}
-	r.Event(mb.Event{
-		Service: m.namespace,
+	event := mb.Event{
+		Service: m.serviceType,
 		RootFields: common.MapStr{
-			"service": common.MapStr{
-				"name": m.namespace,
-			},
 			"munin": common.MapStr{
-				"metrics": event,
+				"metrics": metrics,
 			},
 		},
-	})
+	}
+	if m.serviceName != "" {
+		event.RootFields.Put("service.name", m.serviceName)
+	}
+	r.Event(event)
 }
