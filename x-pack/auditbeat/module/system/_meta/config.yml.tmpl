@@ -8,7 +8,7 @@
   datasets:
     - host    # General host information, e.g. uptime, IPs
     {{ if ne .GOOS "windows" -}}
-    - package # Installed and removed packages
+    - package # Installed, updated, and removed packages
     {{- end }}
     - process # Started and stopped processes
     {{ if eq .GOOS "linux" -}}
@@ -23,6 +23,9 @@
 {{ if .Reference }}
   # The state.period can be overridden for any dataset.
   # host.state.period: 12h
+  {{ if ne .GOOS "windows" -}}
+  # package.state.period: 12h
+  {{- end }}
   # process.state.period: 12h
   {{ if eq .GOOS "linux" -}}
   # socket.state.period: 12h
