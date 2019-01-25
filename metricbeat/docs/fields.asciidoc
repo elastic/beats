@@ -19395,66 +19395,26 @@ alias to: process.executable
 [[exported-fields-prometheus]]
 == Prometheus fields
 
-Stats collected from Prometheus.
+Stats scraped from a Prometheus endpoint.
 
 
 
-[float]
-== prometheus fields
-
-
-
-
-[float]
-== stats fields
-
-Stats about the Prometheus server.
-
-
-
-[float]
-== notifications fields
-
-Notification stats.
-
-
-
-*`prometheus.stats.notifications.queue_length`*::
+*`prometheus.labels`*::
 +
 --
-type: long
+type: object
 
-Current queue length.
+Prometheus metric labels
 
 
 --
 
-*`prometheus.stats.notifications.dropped`*::
+*`prometheus.metrics`*::
 +
 --
-type: long
+type: object
 
-Number of dropped queue events.
-
-
---
-
-*`prometheus.stats.processes.open_fds`*::
-+
---
-type: long
-
-Number of open file descriptors.
-
-
---
-
-*`prometheus.stats.storage.chunks_to_persist`*::
-+
---
-type: long
-
-Number of memory chunks that are not yet persisted to disk.
+Prometheus metric - release: ga
 
 
 --
