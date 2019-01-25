@@ -88,6 +88,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 - Correctly normalize Cloudformation resource name. {issue}10087[10087]
+- Functionbeat can now deploy a function for Kinesis. {10116}10116[10116]
 
 ==== Bugfixes
 
