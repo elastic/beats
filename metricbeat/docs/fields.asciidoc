@@ -16947,15 +16947,23 @@ Munin node metrics exporter
 
 
 
-*`munin.*`*::
+*`munin.metrics.*.*`*::
 +
 --
 type: object
 
-munin contains metrics exposed by a munin node agent
+munin.metrics contains metrics exposed by a munin node agent
 
 
 --
+
+*`munin.metrics.*`*::
++
+--
+type: object
+
+--
+
 
 [[exported-fields-mysql]]
 == MySQL fields

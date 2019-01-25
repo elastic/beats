@@ -66,29 +66,38 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Fetch method implements the data gathering
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	node, err := munin.Connect(m.Host(), m.timeout)
 	if err != nil {
-		return nil, err
+		r.Error(err)
+		return
 	}
 	defer node.Close()
 
 	items, err := node.List()
 	if err != nil {
-		return nil, err
+		r.Error(err)
+		return
 	}
 
 	event, err := node.Fetch(items...)
 	if err != nil {
-		return nil, err
+		r.Error(err)
 	}
 
-	// Set dynamic namespace.
-	_, err = event.Put(mb.NamespaceKey, m.namespace)
-	if err != nil {
-		return nil, err
+	// Even if there was some error, keep sending succesfully collected metrics if any
+	if len(event) == 0 {
+		return
 	}
-
-	return event, nil
-
+	r.Event(mb.Event{
+		Service: m.namespace,
+		RootFields: common.MapStr{
+			"service": common.MapStr{
+				"name": m.namespace,
+			},
+			"munin": common.MapStr{
+				"metrics": event,
+			},
+		},
+	})
 }

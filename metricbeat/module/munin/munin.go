@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -34,6 +35,12 @@ import (
 
 const (
 	unknownValue = "U"
+)
+
+var (
+	// Field names must match with this expression
+	// http://guide.munin-monitoring.org/en/latest/reference/plugin.html#notes-on-fieldnames
+	nameRegexp = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9_]*$")
 )
 
 // Node connection
@@ -109,6 +116,11 @@ func (n *Node) Fetch(items ...string) (common.MapStr, error) {
 				break
 			}
 			value := scanner.Text()
+
+			if !nameRegexp.MatchString(name) {
+				errs = append(errs, fmt.Errorf("field name '%s' doesn't match expected format '%s'", name, nameRegexp.String()))
+				continue
+			}
 
 			key := fmt.Sprintf("%s.%s", item, name)
 

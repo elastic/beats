@@ -31,8 +31,12 @@ class Test(metricbeat.BaseTest):
         evt = output[0]
         print(evt)
 
-        assert evt["munin"][namespace]["cpu"]["user"] > 0
+        assert evt["service"]["type"] == namespace
+        assert evt["service"]["name"] == namespace
+        assert evt["munin"]["metrics"]["cpu"]["user"] > 0
+
+        self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return [os.getenv('MUNIN_HOST', 'localhost') + ':' +
+        return [self.compose_hosts()[0] + ':' +
                 os.getenv('MUNIN_PORT', '4949')]

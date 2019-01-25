@@ -4,10 +4,16 @@
     Munin node metrics exporter
   release: beta
   fields:
-    - name: munin.*
+    - name: munin.metrics.*.*
       type: object
       object_type: double
-      object_type_mapping_type: 'long'
+      object_type_mapping_type: '*'
       description: >
-          munin contains metrics exposed by a munin node agent
+          munin.metrics contains metrics exposed by a munin node agent
+    - name: munin.metrics.*
+      type: object
+      object_type: object
+      object_type_mapping_type: '*'
+    - name: munin
+      type: group
       fields:
