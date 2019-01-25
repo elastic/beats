@@ -17,18 +17,21 @@ import (
 	"time"
 )
 
-// Possible values for the ut_type field. See utmp(5).
+// UtType represents the ut_type field. See utmp(5).
+type UtType int16
+
+// Possible values for UtType.
 const (
-	EMPTY         = 0
-	RUN_LVL       = 1
-	BOOT_TIME     = 2
-	NEW_TIME      = 3
-	OLD_TIME      = 4
-	INIT_PROCESS  = 5
-	LOGIN_PROCESS = 6
-	USER_PROCESS  = 7
-	DEAD_PROCESS  = 8
-	ACCOUNTING    = 9
+	EMPTY         UtType = 0
+	RUN_LVL              = 1
+	BOOT_TIME            = 2
+	NEW_TIME             = 3
+	OLD_TIME             = 4
+	INIT_PROCESS         = 5
+	LOGIN_PROCESS        = 6
+	USER_PROCESS         = 7
+	DEAD_PROCESS         = 8
+	ACCOUNTING           = 9
 
 	UT_LINESIZE = 32
 	UT_NAMESIZE = 32
@@ -37,7 +40,7 @@ const (
 
 // utmpC is a Go representation of the C utmp struct that the UTMP files consist of.
 type utmpC struct {
-	Type int16
+	Type UtType
 
 	// Alignment
 	_ [2]byte
@@ -63,7 +66,7 @@ type utmpC struct {
 
 // Utmp contains a Go version of UtmpC.
 type Utmp struct {
-	UtType   int
+	UtType   UtType
 	UtPid    int
 	UtLine   string
 	UtUser   string
