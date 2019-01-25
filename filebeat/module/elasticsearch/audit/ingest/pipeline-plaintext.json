@@ -5,17 +5,17 @@
             "grok": {
                 "field": "message",
                 "pattern_definitions": {
-                    "ES_TIMESTAMP": "\\[%{TIMESTAMP_ISO8601:elasticsearch.audit.timestamp}\\]",
+                    "ES_TIMESTAMP": "\\[%{TIMESTAMP_ISO8601:elasticsearch.audit.@timestamp}\\]",
                     "ES_NODE_NAME": "(\\[%{DATA:elasticsearch.node.name}\\])?",
                     "ES_AUDIT_LAYER": "\\[%{WORD:elasticsearch.audit.layer}\\]",
-                    "ES_AUDIT_EVENT_TYPE": "\\[%{WORD:event.type}\\]",
+                    "ES_AUDIT_EVENT_TYPE": "\\[%{WORD:elasticsearch.audit.event_type}\\]",
                     "ES_AUDIT_ORIGIN_TYPE": "(origin_type\\=\\[%{WORD:elasticsearch.audit.origin_type}\\])?",
                     "ES_AUDIT_ORIGIN_ADDRESS": "(origin_address\\=\\[%{IPORHOST:elasticsearch.audit.origin_address}\\])?",
                     "ES_AUDIT_PRINCIPAL": "(principal\\=\\[%{WORD:elasticsearch.audit.principal}\\])?",
                     "ES_AUDIT_REALM": "(realm\\=\\[%{WORD:elasticsearch.audit.realm}\\])?",
                     "ES_AUDIT_ROLES": "(roles\\=\\[%{DATA:elasticsearch.audit.roles}\\])?",
                     "ES_AUDIT_ACTION": "(action\\=\\[%{DATA:elasticsearch.audit.action}(\\[%{DATA:elasticsearch.audit.sub_action}\\])?\\])?",
-                    "ES_AUDIT_URI": "(uri=\\[%{DATA:elasticsearch.audit.uri\\])?",
+                    "ES_AUDIT_URI": "(uri=\\[%{DATA:elasticsearch.audit.uri}\\])?",
                     "ES_AUDIT_INDICES": "(indices\\=\\[%{DATA:elasticsearch.audit.indices}\\])?",
                     "ES_AUDIT_REQUEST": "(request\\=\\[%{WORD:elasticsearch.audit.request}\\])?",
                     "ES_AUDIT_REQUEST_BODY": "(request_body\\=\\[%{DATA:elasticsearch.audit.request_body}\\])?"
@@ -46,215 +46,8 @@
             }
         },
         {
-            "json": {
-                "if": "ctx.first_char == '{'",
-                "field": "message",
-                "target_field": "elasticsearch.audit"
-            }
-        },
-        {
-            "dot_expander": {
-                "if": "ctx.first_char == '{'",
-                "field": "event.action",
-                "path": "elasticsearch.audit"
-            }
-        },
-        {
-            "rename": {
-                "if": "ctx.first_char == '{'",
-                "field": "elasticsearch.audit.event.action",
-                "target_field": "elasticsearch.audit.event_type"
-            }
-        },
-        {
-            "dot_expander": {
-                "if": "ctx.first_char == '{'",
-                "field": "event.type",
-                "path": "elasticsearch.audit"
-            }
-        },
-        {
-            "rename": {
-                "if": "ctx.first_char == '{'",
-                "field": "elasticsearch.audit.event.type",
-                "target_field": "elasticsearch.audit.layer"
-            }
-        },
-        {
-            "remove": {
-                "if": "ctx.first_char == '{'",
-                "field": "elasticsearch.audit.event"
-            }
-        },
-        {
-            "dot_expander": {
-                "if": "ctx.first_char == '{'",
-                "field": "origin.type",
-                "path": "elasticsearch.audit"
-            }
-        },
-        {
-            "rename": {
-                "if": "ctx.first_char == '{'",
-                "field": "elasticsearch.audit.origin.type",
-                "target_field": "elasticsearch.audit.origin_type"
-            }
-        },
-        {
-            "dot_expander": {
-                "if": "ctx.first_char == '{'",
-                "field": "origin.address",
-                "path": "elasticsearch.audit"
-            }
-        },
-        {
-            "grok": {
-                "if": "ctx.first_char == '{'",
-                "field": "elasticsearch.audit.origin.address",
-                "patterns": [
-                    "\\[%{IPORHOST:elasticsearch.audit.origin_address}\\]:%{INT:elasticsearch.audit.origin_port:int}",
-                    "%{IPORHOST:elasticsearch.audit.origin_address}:%{INT:elasticsearch.audit.origin_port:int}"
-                ]
-            }
-        },
-        {
-            "remove": {
-                "if": "ctx.first_char == '{'",
-                "field": "elasticsearch.audit.origin"
-            }
-        },
-        {
-            "dot_expander": {
-                "if": "ctx.first_char == '{'",
-                "field": "user.name",
-                "path": "elasticsearch.audit"
-            }
-        },
-        {
-            "rename": {
-                "if": "ctx.first_char == '{'",
-                "field": "elasticsearch.audit.user.name",
-                "target_field": "elasticsearch.audit.principal"
-            }
-        },
-        {
-            "dot_expander": {
-                "if": "ctx.first_char == '{'",
-                "field": "request.name",
-                "path": "elasticsearch.audit"
-            }
-        },
-        {
-            "set": {
-                "if": "ctx.first_char == '{'",
-                "value": "{{elasticsearch.audit.request.name}}",
-                "field": "elasticsearch.audit.request"
-            }
-        },
-        {
-            "remove": {
-                "if": "ctx.elasticsearch.audit.request == ''",
-                "field": "elasticsearch.audit.request"
-            }
-        },
-        {
-            "dot_expander": {
-                "if": "ctx.first_char == '{'",
-                "field": "url.path",
-                "path": "elasticsearch.audit"
-            }
-        },
-        {
-            "dot_expander": {
-                "if": "ctx.first_char == '{'",
-                "field": "url.query",
-                "path": "elasticsearch.audit"
-            }
-        },
-        {
-            "set": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.url?.path != null && ctx.elasticsearch.audit?.url?.query == null",
-                "field": "elasticsearch.audit.uri",
-                "value": "{{elasticsearch.audit.url.path}}"
-            }
-        },
-        {
-            "set": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.url?.path != null && ctx.elasticsearch.audit?.url?.query != null",
-                "field": "elasticsearch.audit.uri",
-                "value": "{{elasticsearch.audit.url.path}}?{{elasticsearch.audit.url.query}}"
-            }
-        },
-        {
             "remove": {
                 "field": "elasticsearch.audit.sub_action",
-                "ignore_missing": true
-            }
-        },
-        {
-            "remove": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.url?.path != null",
-                "field": "elasticsearch.audit.url.path"
-            }
-        },
-        {
-            "remove": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.url?.query != null",
-                "field": "elasticsearch.audit.url.query"
-            }
-        },
-        {
-            "dot_expander": {
-                "if": "ctx.first_char == '{'",
-                "field": "node.id",
-                "path": "elasticsearch.audit"
-            }
-        },
-        {
-            "dot_expander": {
-                "if": "ctx.first_char == '{'",
-                "field": "node.name",
-                "path": "elasticsearch.audit"
-            }
-        },
-        {
-            "rename": {
-                "if": "ctx.first_char == '{'",
-                "field": "elasticsearch.audit.node",
-                "target_field": "elasticsearch.node"
-            }
-        },
-        {
-            "dot_expander": {
-                "if": "ctx.first_char == '{'",
-                "field": "user.realm",
-                "path": "elasticsearch.audit"
-            }
-        },
-        {
-            "rename": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.user?.realm != null",
-                "field": "elasticsearch.audit.user.realm",
-                "target_field": "elasticsearch.audit.user_realm"
-            }
-        },
-        {
-            "dot_expander": {
-                "if": "ctx.first_char == '{'",
-                "field": "user.roles",
-                "path": "elasticsearch.audit"
-            }
-        },
-        {
-            "rename": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.user?.roles != null",
-                "field": "elasticsearch.audit.user.roles",
-                "target_field": "elasticsearch.audit.user_roles"
-            }
-        },
-        {
-            "remove": {
-                "field": "elasticsearch.audit.url",
                 "ignore_missing": true
             }
         }

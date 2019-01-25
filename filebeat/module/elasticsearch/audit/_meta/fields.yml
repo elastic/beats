@@ -54,10 +54,6 @@
       description: "The body of the request, if enabled"
       example: "body"
       type: text
-    - name: indices
-      description: "The indices affected by the action"
-      example: [ ".security-6" ]
-      type: array
     - name: user_realm
       description: "The name of the realm that authenticated the user"
       example: "__attach"

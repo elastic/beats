@@ -48,9 +48,6 @@
         "elasticsearch.audit.principal": "_xpack_security",
         "elasticsearch.audit.request": "ClearRealmCacheRequest",
         "elasticsearch.audit.user_realm": "__attach",
-        "elasticsearch.audit.user_roles": [
-            "superuser"
-        ],
         "elasticsearch.node.id": "DSiWcTyeThWtUXLB9J0BMw",
         "event.dataset": "elasticsearch.audit",
         "fileset.module": "elasticsearch",
@@ -72,9 +69,6 @@
         "elasticsearch.audit.principal": "_xpack_security",
         "elasticsearch.audit.request": "Node",
         "elasticsearch.audit.user_realm": "__attach",
-        "elasticsearch.audit.user_roles": [
-            "superuser"
-        ],
         "elasticsearch.node.id": "DSiWcTyeThWtUXLB9J0BMw",
         "event.dataset": "elasticsearch.audit",
         "fileset.module": "elasticsearch",
@@ -96,9 +90,6 @@
         "elasticsearch.audit.principal": "elastic",
         "elasticsearch.audit.request": "ChangePasswordRequest",
         "elasticsearch.audit.user_realm": "reserved",
-        "elasticsearch.audit.user_roles": [
-            "superuser"
-        ],
         "elasticsearch.node.id": "DSiWcTyeThWtUXLB9J0BMw",
         "event.dataset": "elasticsearch.audit",
         "fileset.module": "elasticsearch",
@@ -123,9 +114,6 @@
         "elasticsearch.audit.principal": "_xpack_security",
         "elasticsearch.audit.request": "CreateIndexRequest",
         "elasticsearch.audit.user_realm": "__attach",
-        "elasticsearch.audit.user_roles": [
-            "superuser"
-        ],
         "elasticsearch.node.id": "DSiWcTyeThWtUXLB9J0BMw",
         "event.dataset": "elasticsearch.audit",
         "fileset.module": "elasticsearch",

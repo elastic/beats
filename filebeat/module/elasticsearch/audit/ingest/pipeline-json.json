@@ -112,27 +112,27 @@
         },
         {
             "set": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.url?.path != null && ctx.elasticsearch.audit?.url?.query == null",
+                "if": "ctx.elasticsearch.audit?.url?.path != null && ctx.elasticsearch.audit?.url?.query == null",
                 "field": "elasticsearch.audit.uri",
                 "value": "{{elasticsearch.audit.url.path}}"
             }
         },
         {
             "set": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.url?.path != null && ctx.elasticsearch.audit?.url?.query != null",
+                "if": "ctx.elasticsearch.audit?.url?.path != null && ctx.elasticsearch.audit?.url?.query != null",
                 "field": "elasticsearch.audit.uri",
                 "value": "{{elasticsearch.audit.url.path}}?{{elasticsearch.audit.url.query}}"
             }
         },
         {
             "remove": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.url?.path != null",
+                "if": "ctx.elasticsearch.audit?.url?.path != null",
                 "field": "elasticsearch.audit.url.path"
             }
         },
         {
             "remove": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.url?.query != null",
+                "if": "ctx.elasticsearch.audit?.url?.query != null",
                 "field": "elasticsearch.audit.url.query"
             }
         },
@@ -162,7 +162,7 @@
         },
         {
             "rename": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.user?.realm != null",
+                "if": "ctx.elasticsearch.audit?.user?.realm != null",
                 "field": "elasticsearch.audit.user.realm",
                 "target_field": "elasticsearch.audit.user_realm"
             }
@@ -171,13 +171,6 @@
             "dot_expander": {
                 "field": "user.roles",
                 "path": "elasticsearch.audit"
-            }
-        },
-        {
-            "rename": {
-                "if": "ctx.first_char == '{' && ctx.elasticsearch.audit?.user?.roles != null",
-                "field": "elasticsearch.audit.user.roles",
-                "target_field": "elasticsearch.audit.user_roles"
             }
         },
         {

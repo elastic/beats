@@ -1171,17 +1171,6 @@ The body of the request, if enabled
 
 --
 
-*`elasticsearch.audit.indices`*::
-+
---
-type: array
-
-example: ['.security-6']
-
-The indices affected by the action
-
---
-
 *`elasticsearch.audit.user_realm`*::
 +
 --
@@ -1304,7 +1293,7 @@ CPU time spent outside the kernel.
 --
 type: float
 
-CPU time spent inside the kernel.
+CPU time spent inside the kernel. 
 
 
 --
@@ -1474,7 +1463,7 @@ Young GC
 --
 type: long
 
-example:
+example: 
 
 
 
@@ -1485,7 +1474,7 @@ example:
 --
 type: long
 
-example:
+example: 
 
 
 
@@ -1557,7 +1546,7 @@ Time it took to execute the query
 --
 type: keyword
 
-example:
+example: 
 
 Types
 
@@ -1568,7 +1557,7 @@ Types
 --
 type: text
 
-example:
+example: 
 
 Statistics
 
@@ -1601,7 +1590,7 @@ Slow query
 --
 type: text
 
-example:
+example: 
 
 Extra source information
 
@@ -1656,7 +1645,7 @@ Routing
 --
 type: keyword
 
-example:
+example: 
 
 Id
 
