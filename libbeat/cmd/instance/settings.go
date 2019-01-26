@@ -22,7 +22,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/ilm"
+	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/libbeat/monitoring/report"
 )
 

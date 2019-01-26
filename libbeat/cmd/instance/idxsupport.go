@@ -24,7 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/atomic"
-	"github.com/elastic/beats/libbeat/ilm"
+	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
