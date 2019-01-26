@@ -70,6 +70,7 @@ func kafkaMetricsRegistry() gometrics.Registry {
 }
 
 func makeKafka(
+	_ outputs.IndexManager,
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *common.Config,

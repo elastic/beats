@@ -23,9 +23,12 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/ilm"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
+	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/template"
 )
 
@@ -33,6 +36,12 @@ type indexSupport struct {
 	ilm         ilm.Supporter
 	info        beat.Info
 	templateCfg template.TemplateConfig
+
+	st indexState
+}
+
+type indexState struct {
+	withILM atomic.Bool
 }
 
 type indexManager struct {
@@ -42,6 +51,14 @@ type indexManager struct {
 	client    *elasticsearch.Client
 	fields    []byte
 	migration bool
+}
+
+type indexSelector outil.Selector
+
+type ilmIndexSelector struct {
+	index outil.Selector
+	alias outil.Selector
+	st    *indexState
 }
 
 func newIndexSupport(
@@ -91,6 +108,57 @@ func (s *indexSupport) Manager(
 	}
 }
 
+func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector, error) {
+	selCfg := common.NewConfig()
+	if cfg.HasField("index") {
+		s, err := cfg.String("index", -1)
+		if err != nil {
+			return nil, err
+		}
+		selCfg.SetString("index", -1, s)
+	}
+
+	if cfg.HasField("indices") {
+		sub, err := cfg.Child("indices", -1)
+		if err != nil {
+			return nil, err
+		}
+		selCfg.SetChild("indices", -1, sub)
+	}
+
+	mode := s.ilm.Mode()
+	alias := s.ilm.Template().Alias
+	if mode == ilm.ModeEnabled {
+		logp.Info("Set %v to '%s' as ILM is enabled.", cfg.PathOf("index"), alias)
+		selCfg.SetString("index", -1, alias)
+	}
+
+	buildSettings := outil.Settings{
+		Key:              "index",
+		MultiKey:         "indices",
+		EnableSingleOnly: true,
+		FailEmpty:        mode != ilm.ModeEnabled,
+	}
+
+	indexSel, err := outil.BuildSelectorFromConfig(cfg, buildSettings)
+	if err != nil {
+		return nil, err
+	}
+
+	if mode != ilm.ModeAuto {
+		return indexSelector(indexSel), nil
+	}
+
+	selCfg.SetString("index", -1, alias)
+	aliasSel, err := outil.BuildSelectorFromConfig(selCfg, buildSettings)
+	logp.Info("Create dynamic index selector")
+	return &ilmIndexSelector{
+		index: indexSel,
+		alias: aliasSel,
+		st:    &s.st,
+	}, nil
+}
+
 func (m *indexManager) Setup(template, policy bool) error {
 	return m.load(template, policy)
 }
@@ -100,11 +168,26 @@ func (m *indexManager) Load() error {
 }
 
 func (m *indexManager) load(forceTemplate, forcePolicy bool) error {
-	withILM, err := m.ilm.Enabled()
-	if err != nil {
-		return err
+	var err error
+
+	withILM := m.support.st.withILM.Load()
+	if !withILM {
+		withILM, err = m.ilm.Enabled()
+		if err != nil {
+			return err
+		}
+
+		if withILM {
+			logp.Info("Auto ILM enable success.")
+		}
 	}
 
+	// mark ILM as enabled in indexState if withILM is true
+	if withILM {
+		m.support.st.withILM.CAS(false, withILM)
+	}
+
+	// install ilm policy
 	if withILM {
 		if err := m.ilm.EnsurePolicy(forcePolicy); err != nil {
 			return err
@@ -112,6 +195,7 @@ func (m *indexManager) load(forceTemplate, forcePolicy bool) error {
 		logp.Info("ILM policy successfully loaded.")
 	}
 
+	// create and install template
 	if m.support.templateCfg.Enabled {
 		tmplCfg := m.support.templateCfg
 		if withILM {
@@ -139,6 +223,7 @@ func (m *indexManager) load(forceTemplate, forcePolicy bool) error {
 		logp.Info("Template successfully loaded.")
 	}
 
+	// create alias
 	if withILM {
 		if err := m.ilm.EnsureAlias(); err != nil {
 			return err
@@ -147,6 +232,53 @@ func (m *indexManager) load(forceTemplate, forcePolicy bool) error {
 	}
 
 	return nil
+}
+
+func (s *ilmIndexSelector) Select(evt *beat.Event) (string, error) {
+	if idx := getEventCustomIndex(evt); idx != "" {
+		logp.Info("Use event index: %v", idx)
+
+		return idx, nil
+	}
+
+	if s.st.withILM.Load() {
+		idx, err := s.alias.Select(evt)
+		logp.Info("Use alias index: %v", idx)
+		return idx, err
+	}
+
+	idx, err := s.index.Select(evt)
+	logp.Info("Use output index: %v", idx)
+	return idx, err
+}
+
+func (s indexSelector) Select(evt *beat.Event) (string, error) {
+	if idx := getEventCustomIndex(evt); idx != "" {
+		return idx, nil
+	}
+	return outil.Selector(s).Select(evt)
+}
+
+func getEventCustomIndex(evt *beat.Event) string {
+	if len(evt.Meta) == 0 {
+		return ""
+	}
+
+	if tmp := evt.Meta["alias"]; tmp != nil {
+		if alias, ok := tmp.(string); ok {
+			return alias
+		}
+	}
+
+	if tmp := evt.Meta["index"]; tmp != nil {
+		if idx, ok := tmp.(string); ok {
+			ts := evt.Timestamp.UTC()
+			return fmt.Sprintf("%s-%d.%02d.%02d",
+				idx, ts.Year(), ts.Month(), ts.Day())
+		}
+	}
+
+	return ""
 }
 
 func unpackTemplateConfig(cfg *common.Config) (template.TemplateConfig, error) {

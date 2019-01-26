@@ -146,7 +146,10 @@ func makeWorkQueue() workQueue {
 }
 
 // Reload the output
-func (c *outputController) Reload(cfg *reload.ConfigWithMeta) error {
+func (c *outputController) Reload(
+	cfg *reload.ConfigWithMeta,
+	outFactory func(outputs.Observer, common.ConfigNamespace) (outputs.Group, error),
+) error {
 	outCfg := common.ConfigNamespace{}
 	if cfg != nil {
 		if err := cfg.Config.Unpack(&outCfg); err != nil {
@@ -156,7 +159,7 @@ func (c *outputController) Reload(cfg *reload.ConfigWithMeta) error {
 
 	output, err := loadOutput(c.monitors, func(stats outputs.Observer) (string, outputs.Group, error) {
 		name := outCfg.Name()
-		out, err := outputs.Load(c.beat, stats, name, outCfg.Config())
+		out, err := outFactory(stats, outCfg)
 		return name, out, err
 	})
 	if err != nil {

@@ -45,6 +45,8 @@ type Monitors struct {
 	Logger    *logp.Logger
 }
 
+type OutputFactory func(outputs.Observer) (string, outputs.Group, error)
+
 func init() {
 	flag.BoolVar(&publishDisabled, "N", false, "Disable actual publishing for testing")
 }
@@ -111,7 +113,7 @@ func Load(
 
 func loadOutput(
 	monitors Monitors,
-	makeOutput func(outputs.Observer) (string, outputs.Group, error),
+	makeOutput OutputFactory,
 ) (outputs.Group, error) {
 	log := monitors.Logger
 	if log == nil {

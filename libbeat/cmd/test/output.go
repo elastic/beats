@@ -24,8 +24,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/testing"
 )
 
 func GenTestOutputCmd(name, beatVersion string) *cobra.Command {
@@ -45,22 +43,26 @@ func GenTestOutputCmd(name, beatVersion string) *cobra.Command {
 				os.Exit(1)
 			}
 
-			output, err := outputs.Load(b.Info, nil, b.Config.Output.Name(), b.Config.Output.Config())
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error initializing output: %s\n", err)
-				os.Exit(1)
-			}
+			panic("TODO")
 
-			for _, client := range output.Clients {
-				tClient, ok := client.(testing.Testable)
-				if !ok {
-					fmt.Printf("%s output doesn't support testing\n", b.Config.Output.Name())
+			/*
+				output, err := outputs.Load(b.Info, nil, b.Config.Output.Name(), b.Config.Output.Config())
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error initializing output: %s\n", err)
 					os.Exit(1)
 				}
 
-				// Perform test:
-				tClient.Test(testing.NewConsoleDriver(os.Stdout))
-			}
+				for _, client := range output.Clients {
+					tClient, ok := client.(testing.Testable)
+					if !ok {
+						fmt.Printf("%s output doesn't support testing\n", b.Config.Output.Name())
+						os.Exit(1)
+					}
+
+					// Perform test:
+					tClient.Test(testing.NewConsoleDriver(os.Stdout))
+				}
+			*/
 		},
 	}
 }

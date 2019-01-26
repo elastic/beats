@@ -131,6 +131,13 @@ const (
 	WaitOnClientClose
 )
 
+type OutputReloader interface {
+	Reload(
+		cfg *reload.ConfigWithMeta,
+		factory func(outputs.Observer, common.ConfigNamespace) (outputs.Group, error),
+	) error
+}
+
 type pipelineEventer struct {
 	mutex      sync.Mutex
 	modifyable bool
@@ -442,6 +449,6 @@ func makePipelineProcessors(
 }
 
 // OutputReloader returns a reloadable object for the output section of this pipeline
-func (p *Pipeline) OutputReloader() reload.Reloadable {
+func (p *Pipeline) OutputReloader() OutputReloader {
 	return p.output
 }

@@ -100,6 +100,7 @@ func DeregisterConnectCallback(key uuid.UUID) {
 }
 
 func makeES(
+	im outputs.IndexManager,
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *common.Config,
@@ -108,7 +109,7 @@ func makeES(
 		cfg.SetInt("bulk_max_size", -1, defaultBulkSize)
 	}
 
-	index, pipeline, err := buildSelectors(beat, cfg)
+	index, pipeline, err := buildSelectors(im, beat, cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -177,20 +178,16 @@ func makeES(
 }
 
 func buildSelectors(
+	im outputs.IndexManager,
 	beat beat.Info,
 	cfg *common.Config,
-) (index outil.Selector, pipeline *outil.Selector, err error) {
+) (index outputs.IndexSelector, pipeline *outil.Selector, err error) {
 	if !cfg.HasField("index") {
 		pattern := fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", beat.IndexPrefix, beat.Version)
 		cfg.SetString("index", -1, pattern)
 	}
 
-	index, err = outil.BuildSelectorFromConfig(cfg, outil.Settings{
-		Key:              "index",
-		MultiKey:         "indices",
-		EnableSingleOnly: true,
-		FailEmpty:        true,
-	})
+	index, err = im.BuildSelector(cfg)
 	if err != nil {
 		return index, pipeline, err
 	}

@@ -47,6 +47,8 @@ type Reloadable interface {
 	Reload(config *ConfigWithMeta) error
 }
 
+type ReloadableFunc func(config *ConfigWithMeta) error
+
 // Registry of reloadable objects and lists
 type Registry struct {
 	sync.RWMutex
@@ -151,4 +153,8 @@ func (r *Registry) nameTaken(name string) bool {
 	}
 
 	return false
+}
+
+func (fn ReloadableFunc) Reload(config *ConfigWithMeta) error {
+	return fn(config)
 }

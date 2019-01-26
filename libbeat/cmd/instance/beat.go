@@ -319,7 +319,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, fmt.Errorf("error initializing publisher: %+v", err)
 	}
 
-	reload.Register.MustRegister("output", pipeline.OutputReloader())
+	reload.Register.MustRegister("output", b.makeOutputReloader(pipeline.OutputReloader()))
 
 	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
 	//       but refine publisher to disconnect clients on stop automatically
@@ -748,20 +748,27 @@ func (b *Beat) indexSetupCallback() func(esClient *elasticsearch.Client) error {
 	}
 }
 
+func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Reloadable {
+	return reload.ReloadableFunc(func(config *reload.ConfigWithMeta) error {
+		return outReloader.Reload(config, b.createOutput)
+	})
+}
+
 func (b *Beat) makeOutputFactory(
 	cfg common.ConfigNamespace,
-) func(outputs.Observer) (outputs.Group, error) {
+) func(outputs.Observer) (string, outputs.Group, error) {
+	return func(outStats outputs.Observer) (string, outputs.Group, error) {
+		out, err := b.createOutput(outStats, cfg)
+		return cfg.Name(), out, err
+	}
+}
+
+func (b *Beat) createOutput(stats outputs.Observer, cfg common.ConfigNamespace) (outputs.Group, error) {
 	if !cfg.IsSet() {
-		return nil
+		return outputs.Group{}, nil
 	}
 
-	return func(outStats outputs.Observer) (string, outputs.Group, error) {
-		out, err := outputs.Load(b.Info, outStats, cfg.Name(), cfg.Config())
-		if err != nil {
-			return "", nil, err
-		}
-		return cfg.Name(), out, nil
-	}
+	return outputs.Load(b.index, b.Info, stats, cfg.Name(), cfg.Config())
 }
 
 // handleError handles the given error by logging it and then returning the
