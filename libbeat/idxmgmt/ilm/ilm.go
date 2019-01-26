@@ -62,8 +62,10 @@ type TemplateSettings struct {
 
 func DefaultSupport(info beat.Info, config *common.Config) (Supporter, error) {
 	cfg := defaultConfig(info)
-	if err := config.Unpack(&cfg); err != nil {
-		return nil, err
+	if config != nil {
+		if err := config.Unpack(&cfg); err != nil {
+			return nil, err
+		}
 	}
 
 	if cfg.Mode == ModeDisabled {
