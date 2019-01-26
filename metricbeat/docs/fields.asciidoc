@@ -7485,9 +7485,9 @@ Target node id.
 *`elasticsearch.index.recovery.target.host`*::
 +
 --
-type: ip
+type: keyword
 
-Target node host address.
+Target node host address (could be IP address or hostname).
 
 
 --
@@ -7515,9 +7515,9 @@ Source node id.
 *`elasticsearch.index.recovery.source.host`*::
 +
 --
-type: ip
+type: keyword
 
-Source node host address.
+Source node host address (could be IP address or hostname).
 
 
 --
@@ -11025,7 +11025,7 @@ Kibana stats and run-time metrics.
 
 
 
-*`kibana.stats.uuid`*::
+*`kibana.stats.service.id`*::
 +
 --
 type: keyword
@@ -11055,7 +11055,7 @@ Name of Kibana's internal index
 
 --
 
-*`kibana.stats.host.name`*::
+*`kibana.stats.service.address`*::
 +
 --
 type: keyword
@@ -11065,7 +11065,7 @@ Kibana instance hostname
 
 --
 
-*`kibana.stats.transport_address`*::
+*`kibana.stats.host.address`*::
 +
 --
 type: keyword
@@ -11256,7 +11256,7 @@ Kibana instance name.
 
 --
 
-*`kibana.status.uuid`*::
+*`kibana.status.service.id`*::
 +
 --
 type: keyword
@@ -13306,7 +13306,7 @@ node
 
 
 
-*`logstash.node.host`*::
+*`logstash.node.host.hostname`*::
 +
 --
 type: keyword
@@ -13316,7 +13316,7 @@ Host name
 
 --
 
-*`logstash.node.version`*::
+*`logstash.node.service.version`*::
 +
 --
 type: keyword
@@ -13343,12 +13343,12 @@ Version
 
 --
 
-*`logstash.node.jvm.pid`*::
+*`logstash.node.jvm.process.pid`*::
 +
 --
 type: long
 
-Pid
+Process ID
 
 
 --

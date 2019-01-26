@@ -4,11 +4,11 @@
     node
   release: ga
   fields:
-    - name: host
+    - name: host.hostname
       type: keyword
       description: >
         Host name
-    - name: version
+    - name: service.version
       type: keyword
       description: >
         Logstash Version
@@ -21,7 +21,7 @@
           type: keyword
           description: >
             Version
-        - name: pid
+        - name: process.pid
           type: long
           description: >
-            Pid
+            Process ID

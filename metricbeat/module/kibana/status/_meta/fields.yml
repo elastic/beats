@@ -8,7 +8,7 @@
       type: keyword
       description: >
         Kibana instance name.
-    - name: uuid
+    - name: service.id
       type: keyword
       description: >
         Kibana instance uuid.

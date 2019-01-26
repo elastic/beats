@@ -32,5 +32,5 @@ func init() {
 // AssetLogstash returns asset data.
 // This is the base64 encoded gzipped contents of ../metricbeat/module/logstash.
 func AssetLogstash() string {
-	return "eJy0k8Fum0AQhu88xS/OtR+AQ2+t6qpVcvIliiIEY7zxsoN2Bkd++wgMFpAldmxnjjvi+7/ZHRbY0SGB5UI0lW0EqFFLCeJ/3VEcATlJ5k2lhl2CnxEA9G2UnNeWIsCTpVQoQZFGgJCqcYUkeIpFbPwD8Va1ip8jYGPI5pK0nAVcWtLIoCk9VA3Jc111JwGHMWlIc5zT6TBEmyUea/L9eLS+puFDgS2Ljhq9xI4Ob+zzSe8Tlab+sGgLDmbtyYthd7+409uuA+Q+9XVfBhOnt3xB3t/1f6zchieN0P2en/vc7Bf4NBUafRhemRD4GGzZFdelPg6ow11eiqYqt270S0tBSepNJsubFpz25EZG81YXzP6rpWE65ZzEUMTML8D177ByGZfGFd2YyLh2Sn45a8H19He/h8ZDrQV/RWNjrJKn71jN3x36g8t7AAAA//+4rIER"
+	return "eJy0k8GOmzAQhu88xS/ODQ/Aoae2aqpW7SmXqqoQTIg3xoM8A6u8/YoEIiBmN5ts5hApNnz/N/awwp4OKSyXopnsIkCNWkoR/+yX4ggoSHJvajXsUnyOAGDYRsVFYykCPFnKhFKUWQQIqRpXSoq/sYiNPyHeqdbxvwjYGrKFpEfOCi6raGLQlR7qjuS5qfuVgMOUNKY5Lui8GKItEk81e3/a2lDz8LHAjkWT7qf7O3lisNnT4Zl9Mdt7xamr7yyKC+QQKuRbk1PSkhfD7uNiz5e9CZCH9Ke2CibOj/2KvB+bX1i7Lc82Qgc+Ngj3/VbvV/h0FWp9HF57zkkkqU0o4CRg2ZW3pf850bH+Epz1RDRTuXfi/x8pqEi9ySW56wOgltzEaNnqiiP4eqRh3uWSxFjELM/D7dexdjlXxpV9m8i5cUo+WbTgRh+g8bvRkt+jsTVWydMjJvRbj75weQkAAP//rimNWQ=="
 }
