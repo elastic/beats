@@ -5,4 +5,4 @@ The default metricset is `server`.
 [float]
 === Compatibility
 
-The Couchdb module is tested with Couchdb 2.
+The Couchdb module is tested with Couchdb 1.7.
