@@ -50,7 +50,7 @@ func GenGetILMPolicyCmd(settings instance.Settings, name, idxPrefix, version str
 				ilmFactory = ilm.DefaultSupport
 			}
 
-			ilm, err := ilmFactory(b.Info, b.RawConfig)
+			ilm, err := ilmFactory(nil, b.Info, b.RawConfig)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing ilm support: %s\n", err)
 			}

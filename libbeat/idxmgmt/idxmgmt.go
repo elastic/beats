@@ -21,10 +21,11 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 )
 
-type SupportFactory func(beat.Info, *common.Config) (Supporter, error)
+type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, error)
 
 type Supporter interface {
 	Enabled() bool
@@ -42,9 +43,9 @@ type Manager interface {
 	Setup(template, policy bool) error
 }
 
-func DefaultSupport(info beat.Info, configRoot *common.Config) (Supporter, error) {
+func DefaultSupport(log *logp.Logger, info beat.Info, configRoot *common.Config) (Supporter, error) {
 	factory := MakeDefaultSupport(nil)
-	return factory(info, configRoot)
+	return factory(log, info, configRoot)
 }
 
 func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
@@ -52,7 +53,7 @@ func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
 		ilmSupport = ilm.DefaultSupport
 	}
 
-	return func(info beat.Info, configRoot *common.Config) (Supporter, error) {
+	return func(log *logp.Logger, info beat.Info, configRoot *common.Config) (Supporter, error) {
 		cfg := struct {
 			ILM      *common.Config `config:"setup.ilm"`
 			Template *common.Config `common:"setup.template"`
@@ -63,6 +64,12 @@ func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
 			}
 		}
 
-		return newIndexSupport(info, ilmSupport, cfg.Template, cfg.ILM)
+		if log == nil {
+			log = logp.NewLogger("index-management")
+		} else {
+			log = log.Named("index-management")
+		}
+
+		return newIndexSupport(log, info, ilmSupport, cfg.Template, cfg.ILM)
 	}
 }

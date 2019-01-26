@@ -27,9 +27,10 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
-type SupportFactory func(beat.Info, *common.Config) (Supporter, error)
+type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, error)
 
 type Supporter interface {
 	Mode() Mode
@@ -60,7 +61,13 @@ type TemplateSettings struct {
 	PolicyName string
 }
 
-func DefaultSupport(info beat.Info, config *common.Config) (Supporter, error) {
+func DefaultSupport(log *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
+	if log == nil {
+		log = logp.NewLogger("ilm")
+	} else {
+		log = log.Named("ilm")
+	}
+
 	cfg := defaultConfig(info)
 	if config != nil {
 		if err := config.Unpack(&cfg); err != nil {
@@ -93,6 +100,7 @@ func DefaultSupport(info beat.Info, config *common.Config) (Supporter, error) {
 	}
 
 	return NewDefaultSupport(
+		log,
 		cfg.Mode,
 		cfg.RolloverAlias,
 		name,

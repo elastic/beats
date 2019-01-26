@@ -370,7 +370,7 @@ func TestBulkEncodeEvents(t *testing.T) {
 				Version:     version.GetDefaultVersion(),
 			}
 
-			im, err := idxmgmt.DefaultSupport(info, common.NewConfig())
+			im, err := idxmgmt.DefaultSupport(nil, info, common.NewConfig())
 			require.NoError(t, err)
 
 			index, pipeline, err := buildSelectors(im, info, cfg)

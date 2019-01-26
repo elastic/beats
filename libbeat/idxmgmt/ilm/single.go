@@ -27,6 +27,8 @@ import (
 )
 
 type ilmSupport struct {
+	log *logp.Logger
+
 	mode        Mode
 	overwrite   bool
 	checkExists bool
@@ -53,6 +55,7 @@ type infoCache struct {
 var defaultCacheDuration = 5 * time.Minute
 
 func NewDefaultSupport(
+	log *logp.Logger,
 	mode Mode,
 	alias string,
 	policyName string,
@@ -61,6 +64,7 @@ func NewDefaultSupport(
 ) Supporter {
 	pattern := fmt.Sprintf("%v-*", alias)
 	return &ilmSupport{
+		log:         log,
 		mode:        mode,
 		overwrite:   overwrite,
 		checkExists: checkExists,
@@ -131,6 +135,7 @@ func (m *singlePolicyManager) EnsureAlias() error {
 }
 
 func (m *singlePolicyManager) EnsurePolicy(overwrite bool) error {
+	log := m.log
 	overwrite = overwrite || m.overwrite
 
 	exists := true
@@ -145,7 +150,7 @@ func (m *singlePolicyManager) EnsurePolicy(overwrite bool) error {
 	if !exists || overwrite {
 		return m.client.CreateILMPolicy(m.policyName, m.policy)
 	} else {
-		logp.Info("do not generate ilm policy: exists=%v, overwrite=%v",
+		log.Infof("do not generate ilm policy: exists=%v, overwrite=%v",
 			exists, overwrite)
 	}
 	return nil

@@ -599,7 +599,7 @@ func (b *Beat) configure(settings Settings) error {
 	if imFactory == nil {
 		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM)
 	}
-	b.index, err = imFactory(b.Beat.Info, b.RawConfig)
+	b.index, err = imFactory(nil, b.Beat.Info, b.RawConfig)
 	return err
 }
 

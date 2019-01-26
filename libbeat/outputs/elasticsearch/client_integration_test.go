@@ -264,7 +264,7 @@ func connectTestEs(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
 	}
 
 	info := beat.Info{Beat: "libbeat"}
-	im, _ := idxmgmt.DefaultSupport(info, nil)
+	im, _ := idxmgmt.DefaultSupport(nil, info, nil)
 	output, err := makeES(im, info, outputs.NewNilObserver(), config)
 	if err != nil {
 		t.Fatal(err)
