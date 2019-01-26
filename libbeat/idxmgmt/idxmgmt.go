@@ -70,7 +70,7 @@ func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
 	return func(log *logp.Logger, info beat.Info, configRoot *common.Config) (Supporter, error) {
 		cfg := struct {
 			ILM      *common.Config `config:"setup.ilm"`
-			Template *common.Config `common:"setup.template"`
+			Template *common.Config `config:"setup.template"`
 		}{}
 		if configRoot != nil {
 			if err := configRoot.Unpack(&cfg); err != nil {
