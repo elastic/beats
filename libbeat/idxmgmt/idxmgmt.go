@@ -57,8 +57,10 @@ func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
 			ILM      *common.Config `config:"setup.ilm"`
 			Template *common.Config `common:"setup.template"`
 		}{}
-		if err := configRoot.Unpack(&cfg); err != nil {
-			return nil, err
+		if configRoot != nil {
+			if err := configRoot.Unpack(&cfg); err != nil {
+				return nil, err
+			}
 		}
 
 		return newIndexSupport(info, ilmSupport, cfg.Template, cfg.ILM)
