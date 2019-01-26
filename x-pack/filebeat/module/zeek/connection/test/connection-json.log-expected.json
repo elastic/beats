@@ -1,0 +1,36 @@
+[
+    {
+        "@timestamp": 1547188415000,
+        "destination.address": "192.168.86.1",
+        "destination.bytes": 206,
+        "destination.ip": "192.168.86.1",
+        "destination.packets": 1,
+        "destination.port": 53,
+        "ecs.version": "1.0.0-beta2",
+        "event.dataset": "zeek.connection",
+        "event.duration": 0.0,
+        "event.id": "CAcJw21BbVedgFnYH3-connection",
+        "event.module": "zeek",
+        "fileset.name": "connection",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.application": "dns",
+        "network.direction": "internal",
+        "network.transport": "udp",
+        "service.type": "zeek",
+        "source.address": "192.168.86.167",
+        "source.bytes": 103,
+        "source.ip": "192.168.86.167",
+        "source.packets": 1,
+        "source.port": 38339,
+        "tags": [
+            "zeek"
+        ],
+        "zeek.connection.history": "Dd",
+        "zeek.connection.local_orig": true,
+        "zeek.connection.local_resp": true,
+        "zeek.connection.missed_bytes": 0,
+        "zeek.connection.state": "SF",
+        "zeek.session_id": "CAcJw21BbVedgFnYH3"
+    }
+]

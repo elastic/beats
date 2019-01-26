@@ -27,6 +27,7 @@ import (
 // Processor struct to process fields to template
 type Processor struct {
 	EsVersion common.Version
+	Migration bool
 }
 
 var (
@@ -259,9 +260,19 @@ func (p *Processor) array(f *common.Field) common.MapStr {
 }
 
 func (p *Processor) alias(f *common.Field) common.MapStr {
+	// Aliases were introduced in Elasticsearch 6.4, ignore if unsupported
+	if p.EsVersion.LessThan(common.MustNewVersion("6.4.0")) {
+		return nil
+	}
+
+	// In case migration is disabled and it's a migration alias, field is not created
+	if !p.Migration && f.MigrationAlias {
+		return nil
+	}
 	properties := getDefaultProperties(f)
 	properties["type"] = "alias"
 	properties["path"] = f.AliasPath
+
 	return properties
 }
 

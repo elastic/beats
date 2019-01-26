@@ -14,7 +14,7 @@ import (
 
 	"github.com/gofrs/uuid"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/backoff"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -253,7 +253,7 @@ func (m *Manager) worker() {
 }
 
 func (m *Manager) update() {
-	backoff := common.NewBackoff(m.done, initBackoff, maxBackoff)
+	backoff := backoff.NewEqualJitterBackoff(m.done, initBackoff, maxBackoff)
 	startedAt := time.Now()
 	for {
 		select {

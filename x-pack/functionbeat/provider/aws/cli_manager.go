@@ -9,6 +9,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"regexp"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
@@ -26,19 +27,20 @@ const (
 	// AWS lambda currently support go 1.x as a runtime.
 	runtime     = "go1.x"
 	handlerName = "functionbeat"
-
-	// invalidChars for resource name
-	invalidChars = ":-/"
 )
 
-// AWSLambdaFunction add 'dependsOn' as a serializable parameters, for no good reason it's
-// not supported.
+// Chars for resource name anything else will be replaced.
+var validChars = regexp.MustCompile("[^a-zA-Z0-9]")
+
+// AWSLambdaFunction add 'dependsOn' as a serializable parameters,  goformation doesn't currently
+// serialize this field.
 type AWSLambdaFunction struct {
 	*cloudformation.AWSLambdaFunction
 	DependsOn []string
 }
 
 type installer interface {
+	Policies() []cloudformation.AWSIAMRole_Policy
 	Template() *cloudformation.Template
 	LambdaConfig() *lambdaConfig
 }
@@ -71,7 +73,7 @@ func (c *CLIManager) template(function installer, name, codeLoc string) *cloudfo
 	lambdaConfig := function.LambdaConfig()
 
 	prefix := func(s string) string {
-		return "fnb" + name + s
+		return normalizeResourceName("fnb" + name + s)
 	}
 
 	// AWS variables references:.
@@ -83,10 +85,31 @@ func (c *CLIManager) template(function installer, name, codeLoc string) *cloudfo
 	// Documentation: https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/Welcome.html
 	// Intrinsic function reference: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html
 
+	// Default policies to writes logs from the Lambda.
+	policies := []cloudformation.AWSIAMRole_Policy{
+		cloudformation.AWSIAMRole_Policy{
+			PolicyName: cloudformation.Join("-", []string{"fnb", "lambda", name}),
+			PolicyDocument: map[string]interface{}{
+				"Statement": []map[string]interface{}{
+					map[string]interface{}{
+						"Action": []string{"logs:CreateLogStream", "Logs:PutLogEvents"},
+						"Effect": "Allow",
+						"Resource": []string{
+							cloudformation.Sub("arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/" + name + ":*"),
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// Merge any specific policies from the service.
+	policies = append(policies, function.Policies()...)
+
 	// Create the roles for the lambda.
 	template := cloudformation.NewTemplate()
 	// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
-	template.Resources["IAMRoleLambdaExecution"] = &cloudformation.AWSIAMRole{
+	template.Resources[prefix("")+"IAMRoleLambdaExecution"] = &cloudformation.AWSIAMRole{
 		AssumeRolePolicyDocument: map[string]interface{}{
 			"Statement": []interface{}{
 				map[string]interface{}{
@@ -105,22 +128,7 @@ func (c *CLIManager) template(function installer, name, codeLoc string) *cloudfo
 		RoleName: "functionbeat-lambda-" + name,
 		// Allow the lambda to write log to cloudwatch logs.
 		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html
-		Policies: []cloudformation.AWSIAMRole_Policy{
-			cloudformation.AWSIAMRole_Policy{
-				PolicyName: cloudformation.Join("-", []string{"fnb", "lambda", name}),
-				PolicyDocument: map[string]interface{}{
-					"Statement": []map[string]interface{}{
-						map[string]interface{}{
-							"Action": []string{"logs:CreateLogStream", "Logs:PutLogEvents"},
-							"Effect": "Allow",
-							"Resource": []string{
-								cloudformation.Sub("arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/" + name + ":*"),
-							},
-						},
-					},
-				},
-			},
-		},
+		Policies: policies,
 	}
 
 	// Configure the Dead letter, any failed events will be send to the configured amazon resource name.
@@ -149,14 +157,14 @@ func (c *CLIManager) template(function installer, name, codeLoc string) *cloudfo
 			},
 			DeadLetterConfig:             dlc,
 			FunctionName:                 name,
-			Role:                         cloudformation.GetAtt("IAMRoleLambdaExecution", "Arn"),
+			Role:                         cloudformation.GetAtt(prefix("")+"IAMRoleLambdaExecution", "Arn"),
 			Runtime:                      runtime,
 			Handler:                      handlerName,
 			MemorySize:                   lambdaConfig.MemorySize.Megabytes(),
 			ReservedConcurrentExecutions: lambdaConfig.Concurrency,
 			Timeout:                      int(lambdaConfig.Timeout.Seconds()),
 		},
-		DependsOn: []string{"IAMRoleLambdaExecution"},
+		DependsOn: []string{prefix("") + "IAMRoleLambdaExecution"},
 	}
 
 	// Create the log group for the specific function lambda.
@@ -366,7 +374,7 @@ func mergeTemplate(to, from *cloudformation.Template) error {
 }
 
 func normalizeResourceName(s string) string {
-	return common.RemoveChars(s, invalidChars)
+	return validChars.ReplaceAllString(s, "")
 }
 
 func checksum(data []byte) string {

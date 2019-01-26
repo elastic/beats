@@ -59,6 +59,11 @@ func TestNormalize(t *testing.T) {
 			candidate: "hello",
 			expected:  "hello",
 		},
+		{
+			title:     "when the string contains underscore",
+			candidate: "/var/log-alpha/tmp:ok_moreok",
+			expected:  "varlogalphatmpokmoreok",
+		},
 	}
 
 	for _, test := range tests {

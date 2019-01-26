@@ -20,6 +20,7 @@ grouped in the following categories:
 * <<exported-fields-eventlog>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-kubernetes-processor>>
+* <<exported-fields-process>>
 
 --
 [[exported-fields-beat]]
@@ -62,6 +63,24 @@ type: keyword
 
 Error type.
 
+
+--
+
+*`beat.name`*::
++
+--
+type: alias
+
+alias to: host.name
+
+--
+
+*`beat.hostname`*::
++
+--
+type: alias
+
+alias to: agent.hostname
 
 --
 
@@ -408,6 +427,8 @@ Client domain.
 type: long
 
 example: 184
+
+format: bytes
 
 Bytes sent from the client to the server.
 
@@ -756,6 +777,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the destination to the source.
 
 
@@ -1090,6 +1113,8 @@ Hash (perhaps logstash fingerprint) of raw field to be able to demonstrate log i
 --
 type: long
 
+format: duration
+
 Duration of the event in nanoseconds.
 If event.start and event.end are known this value should be the difference between the end and start time.
 
@@ -1277,6 +1302,8 @@ Mode of the file in octal representation.
 +
 --
 type: long
+
+format: bytes
 
 File size in bytes (field is only added when `type` is `file`).
 
@@ -1682,6 +1709,8 @@ type: long
 
 example: 1437
 
+format: bytes
+
 Total size in bytes of the request (body and headers).
 
 
@@ -1693,6 +1722,8 @@ Total size in bytes of the request (body and headers).
 type: long
 
 example: 887
+
+format: bytes
 
 Size in bytes of the request body.
 
@@ -1706,6 +1737,8 @@ type: long
 
 example: 1437
 
+format: bytes
+
 Total size in bytes of the response (body and headers).
 
 
@@ -1717,6 +1750,8 @@ Total size in bytes of the response (body and headers).
 type: long
 
 example: 887
+
+format: bytes
 
 Size in bytes of the response body.
 
@@ -1896,6 +1931,8 @@ type: long
 
 example: 368
 
+format: bytes
+
 Total bytes transferred in both directions.
 If `source.bytes` and `destination.bytes` are known, `network.bytes` is their sum.
 
@@ -1918,7 +1955,7 @@ If `source.packets` and `destination.packets` are known, `network.packets` is th
 [float]
 == observer fields
 
-An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics. This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.  
+An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics. This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
 
 
 
@@ -2481,6 +2518,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the server to the client.
 
 
@@ -2754,6 +2793,8 @@ Source domain.
 type: long
 
 example: 184
+
+format: bytes
 
 Bytes sent from the source to the destination.
 
@@ -3063,12 +3104,29 @@ Useful if `user.id` or `user.name` contain confidential information and cannot b
 
 --
 
-*`user.group`*::
+[float]
+== group fields
+
+The group fields are meant to represent groups that are relevant to the event.
+
+
+
+*`user.group.id`*::
 +
 --
 type: keyword
 
-Group the user is a part of. This field can contain a list of groups, if necessary.
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
 
 
 --
@@ -3204,24 +3262,6 @@ example: 4.4.0-112-generic
 
 Operating system kernel version as a raw string.
 
-
---
-
-*`beat.name`*::
-+
---
-type: alias
-
-alias to: agent.type
-
---
-
-*`beat.hostname`*::
-+
---
-type: alias
-
-alias to: agent.hostname
 
 --
 
@@ -3672,6 +3712,23 @@ type: keyword
 
 Kubernetes container image
 
+
+--
+
+[[exported-fields-process]]
+== Process fields
+
+Process metadata fields
+
+
+
+
+*`process.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
 
 --
 

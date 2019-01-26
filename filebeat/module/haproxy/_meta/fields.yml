@@ -92,10 +92,9 @@
           type: group
           fields:
           - name: ip
-            description: >
-              IP address of the client which initiated the TCP connection to haproxy.
-
-              If connection is via unix socket, socket path is in this field.
+            type: alias
+            path: source.address
+            migration: true
           - name: port
             type: alias
             path: source.port

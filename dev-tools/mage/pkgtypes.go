@@ -106,6 +106,7 @@ type PackageFile struct {
 	Config   bool                    `yaml:"config"`              // Mark file as config in the package (deb and rpm only).
 	Modules  bool                    `yaml:"modules"`             // Mark directory as directory with modules.
 	Dep      func(PackageSpec) error `yaml:"-" hash:"-" json:"-"` // Dependency to invoke during Evaluate.
+	Owner    string                  `yaml:"owner,omitempty"`     // File Owner, for user and group name (rpm only).
 }
 
 // OSArchNames defines the names of architectures for use in packages.
@@ -665,12 +666,18 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 	if spec.URL != "" {
 		args = append(args, "--url", spec.URL)
 	}
+	if spec.localPreInstallScript != "" {
+		args = append(args, "--before-install", spec.localPreInstallScript)
+	}
 	if spec.localPostInstallScript != "" {
 		args = append(args, "--after-install", spec.localPostInstallScript)
 	}
 	for _, pf := range spec.Files {
 		if pf.Config {
 			args = append(args, "--config-files", pf.Target)
+		}
+		if pf.Owner != "" {
+			args = append(args, "--rpm-attr", fmt.Sprintf("%04o,%s,%s:%s", pf.Mode, pf.Owner, pf.Owner, pf.Target))
 		}
 	}
 	args = append(args,

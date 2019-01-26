@@ -396,7 +396,7 @@ func TestBulkEncodeEvents(t *testing.T) {
 		events  []common.MapStr
 	}{
 		"Beats 7.x event": {
-			docType: "_doc",
+			docType: "doc",
 			config:  common.MapStr{},
 			events:  []common.MapStr{{"message": "test"}},
 		},

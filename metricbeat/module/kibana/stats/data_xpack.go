@@ -45,6 +45,10 @@ var (
 				"used_in_bytes":  c.Int("used_bytes"),
 			}),
 			"uptime_in_millis": c.Int("uptime_ms"),
+			"distro":           c.Str("distro", s.Optional),
+			"distroRelease":    c.Str("distro_release", s.Optional),
+			"platform":         c.Str("platform", s.Optional),
+			"platformRelease":  c.Str("platform_release", s.Optional),
 		}),
 		"process": c.Dict("process", s.Schema{
 			"event_loop_delay": c.Float("event_loop_delay"),

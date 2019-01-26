@@ -26,13 +26,13 @@ import (
 )
 
 func TestProcessor(t *testing.T) {
-	esVersion2, err := common.NewVersion("2.0.0")
-	assert.NoError(t, err)
-
 	falseVar := false
 	trueVar := true
-	p := &Processor{}
-	pEsVersion2 := &Processor{EsVersion: *esVersion2}
+	p := &Processor{EsVersion: *common.MustNewVersion("7.0.0")}
+	migrationP := &Processor{EsVersion: *common.MustNewVersion("7.0.0"), Migration: true}
+	pEsVersion2 := &Processor{EsVersion: *common.MustNewVersion("2.0.0")}
+	pEsVersion64 := &Processor{EsVersion: *common.MustNewVersion("6.4.0")}
+	pEsVersion63 := &Processor{EsVersion: *common.MustNewVersion("6.3.6")}
 
 	tests := []struct {
 		output   common.MapStr
@@ -108,8 +108,13 @@ func TestProcessor(t *testing.T) {
 			expected: common.MapStr{"index": false, "type": "keyword"},
 		},
 		{
-			output:   p.alias(&common.Field{Type: "alias", AliasPath: "a.b"}),
+			output:   pEsVersion64.alias(&common.Field{Type: "alias", AliasPath: "a.b"}),
 			expected: common.MapStr{"path": "a.b", "type": "alias"},
+		},
+		{
+			// alias unsupported in ES < 6.4
+			output:   pEsVersion63.alias(&common.Field{Type: "alias", AliasPath: "a.b"}),
+			expected: nil,
 		},
 		{
 			output: p.object(&common.Field{Type: "object", Enabled: &falseVar}),
@@ -277,6 +282,22 @@ func TestProcessor(t *testing.T) {
 			expected: common.MapStr{
 				"type": "text", "doc_values": true,
 			},
+		},
+		{
+			output:   p.alias(&common.Field{Type: "alias", AliasPath: "a.c", MigrationAlias: false}),
+			expected: common.MapStr{"path": "a.c", "type": "alias"},
+		},
+		{
+			output:   p.alias(&common.Field{Type: "alias", AliasPath: "a.d", MigrationAlias: true}),
+			expected: nil,
+		},
+		{
+			output:   migrationP.alias(&common.Field{Type: "alias", AliasPath: "a.e", MigrationAlias: false}),
+			expected: common.MapStr{"path": "a.e", "type": "alias"},
+		},
+		{
+			output:   migrationP.alias(&common.Field{Type: "alias", AliasPath: "a.f", MigrationAlias: true}),
+			expected: common.MapStr{"path": "a.f", "type": "alias"},
 		},
 	}
 

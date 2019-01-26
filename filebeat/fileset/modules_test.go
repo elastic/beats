@@ -398,16 +398,6 @@ func TestInterpretError(t *testing.T) {
 		Output string
 	}{
 		{
-			Test:   "geoip not installed",
-			Input:  `{"error":{"root_cause":[{"type":"parse_exception","reason":"No processor type exists with name [geoip]","header":{"processor_type":"geoip"}}],"type":"parse_exception","reason":"No processor type exists with name [geoip]","header":{"processor_type":"geoip"}},"status":400}`,
-			Output: "This module requires the ingest-geoip plugin to be installed in Elasticsearch. You can install it using the following command in the Elasticsearch home directory:\n    sudo bin/elasticsearch-plugin install ingest-geoip",
-		},
-		{
-			Test:   "user-agent not installed",
-			Input:  `{"error":{"root_cause":[{"type":"parse_exception","reason":"No processor type exists with name [user_agent]","header":{"processor_type":"user_agent"}}],"type":"parse_exception","reason":"No processor type exists with name [user_agent]","header":{"processor_type":"user_agent"}},"status":400}`,
-			Output: "This module requires the ingest-user-agent plugin to be installed in Elasticsearch. You can install it using the following command in the Elasticsearch home directory:\n    sudo bin/elasticsearch-plugin install ingest-user-agent",
-		},
-		{
 			Test:  "other plugin not installed",
 			Input: `{"error":{"root_cause":[{"type":"parse_exception","reason":"No processor type exists with name [hello_test]","header":{"processor_type":"hello_test"}}],"type":"parse_exception","reason":"No processor type exists with name [hello_test]","header":{"processor_type":"hello_test"}},"status":400}`,
 			Output: "This module requires an Elasticsearch plugin that provides the hello_test processor. " +
