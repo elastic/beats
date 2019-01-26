@@ -58,11 +58,10 @@ func NewDefaultSupport(
 	log *logp.Logger,
 	mode Mode,
 	alias string,
-	policyName string,
+	policyName, pattern string,
 	policy common.MapStr,
 	overwrite, checkExists bool,
 ) Supporter {
-	pattern := fmt.Sprintf("%v-*", alias)
 	return &ilmSupport{
 		log:         log,
 		mode:        mode,
@@ -128,9 +127,8 @@ func (m *singlePolicyManager) EnsureAlias() error {
 	}
 
 	// Escaping because of date pattern
-	pattern := url.PathEscape(m.pattern)
 	// This always assume it's a date pattern by sourrounding it by <...>
-	firstIndex := fmt.Sprintf("%%3C%s-%s%%3E", alias, pattern)
+	firstIndex := url.PathEscape(fmt.Sprintf("<%s-%s>", alias, m.pattern))
 	return m.client.CreateAlias(alias, firstIndex)
 }
 

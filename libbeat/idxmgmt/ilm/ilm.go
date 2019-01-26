@@ -104,6 +104,7 @@ func DefaultSupport(log *logp.Logger, info beat.Info, config *common.Config) (Su
 		cfg.Mode,
 		cfg.RolloverAlias,
 		name,
+		cfg.Pattern,
 		policy,
 		cfg.Overwrite,
 		cfg.CheckExists,
