@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("filebeat", "system", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("filebeat", "system", asset.ModuleFieldsPri, AssetSystem); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetSystem returns asset data.
+// This is the base64 encoded gzipped contents of module/system.
+func AssetSystem() string {
 	return "eJzsmM9u4zYQxu9+ioEve1o/gA9FgQWKFug/ILn05GXIkTRYiiOQo3XUpy8oyY5iUw6luO0lOhmWZn4fP3HIET/DN+z2ELogWG8AhMTiHrYP/R/bDYDBoD01Quz28MMGAOA3Nq1FKNhDo3wgV44JwHIJBVkMuw1AqNjLQbMrqNyD+BY3AAWhNWHf5/kMTtU4ocdLugb3UHpum/GfhIJ4/dRngsJzDVJhUkK8psQpVbVSnf9McW+wU/xfybXPfVb29LeKIVHMWUdKy1SPUI1BVN28unsSpiypcHGnUVLt4dOP58hPFw/UVHo1aB/tv8ZWHCT+WkiNYbuZ2Bxs47n0ql5IbTxrDGG3FkpmJfA6ModXYwiqXGptOiqH1wb0C2ExZImdSW4IVRJ7WU0wUwJTx6TiS6tvluFwPVYIDw8/9+WHTkgP9Tek28EX5eAJgR0CF7BtVAhH9mYL7GHbtE+W9DfstrsZVYFKp6T1lyZlCjuHR3hcKrQldAIDOK7Ac2DjuWnQHOjSxZPDiRtZkkYFv/w5rF/ROs3OoY5hAaRSAioKbtCBcgaortGQErTdSdUuPSle1ON3dDIjPDUjT3Oyj9upXsvVI7fq4AU9a9gtbuDWa9wlYvOgDfs1wx2xyeisMnxRUCLPjjxVjHPlOM2p2Qk5dHJILBNvj/FqnCXyLiPnbctfC2yd+O5AgQ+azd0kZmTNF2l5WJLuI+5mtnxRHktid8f3+lbCBS+VpLvnhLuZbrFj951qOUmX7cet4ewN+Y39YmxzQ4OaCtIgPKzPAbRHJWjgqes3ta+R+hU017Vy5nJHu73to/d82bkA4LOqGzv2NfD7H49Arh8b+mtns7a9nnNqsGI2rQIOXw+t4ZN2KBRZvBrCuVGXbh398fEvOFboE0QKgM+oW5nHNseVfZFuvY+bvSGPWth37xCR6DAn78kzX29hWRpF+RJleNHCcKxIV0mB4UiiK3LlnMLx2ZVWjaCTDfCdVC9hpteZ2qJM+uPiX625Ebyy7CpOLIhTbTM2xTgo2Br0/SlAlOLwOHxMzPXQFVq7BmawUK2VIcEN3Aw3uei/3ZTNfRfl9oLt1QdjNjURmccsVzH7+bkEmqyAPsv/UgIn8soaWDk/BtfeMUH+o5c1OWOzXG4uWQvOu76wE0UujH6+OnizPD0C/DjySmI/jrzeeeT1TwAAAP//TwGvPg=="
 }

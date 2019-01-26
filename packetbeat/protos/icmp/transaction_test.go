@@ -21,7 +21,6 @@ package icmp
 
 import (
 	"testing"
-	"time"
 
 	"github.com/tsg/gopacket/layers"
 
@@ -64,24 +63,4 @@ func TestIcmpTransactionHasErrorICMPv6(t *testing.T) {
 
 	trans5 := icmpTransaction{tuple: tuple, request: &icmpMessage{Type: layers.ICMPv6TypeRedirect}, response: nil}
 	assert.False(t, trans5.HasError(), "non-transactional request without response")
-}
-
-func TestIcmpTransactionResponseTimeMillis(t *testing.T) {
-	reqTime := time.Now()
-	resTime := reqTime.Add(time.Duration(1) * time.Second)
-
-	trans1 := icmpTransaction{request: &icmpMessage{ts: reqTime}, response: &icmpMessage{ts: resTime}}
-	time1, hasTime1 := trans1.ResponseTimeMillis()
-	assert.Equal(t, int32(1000), time1, "request with response")
-	assert.True(t, hasTime1, "request with response")
-
-	trans2 := icmpTransaction{request: &icmpMessage{ts: reqTime}}
-	time2, hasTime2 := trans2.ResponseTimeMillis()
-	assert.Equal(t, int32(0), time2, "request without response")
-	assert.False(t, hasTime2, "request without response")
-
-	trans3 := icmpTransaction{response: &icmpMessage{ts: resTime}}
-	time3, hasTime3 := trans3.ResponseTimeMillis()
-	assert.Equal(t, int32(0), time3, "response without request")
-	assert.False(t, hasTime3, "response without request")
 }

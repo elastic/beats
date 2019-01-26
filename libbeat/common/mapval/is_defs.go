@@ -126,7 +126,7 @@ func IsDeepEqual(to interface{}) IsDef {
 		return SimpleResult(
 			path,
 			false,
-			fmt.Sprintf("objects not equal: actual(%v) != expected(%v)", v, to),
+			fmt.Sprintf("objects not equal: actual(%T(%v)) != expected(%T(%v))", v, v, to, to),
 		)
 	})
 }
@@ -191,6 +191,16 @@ func isStrCheck(path path, v interface{}) (str string, errorResults *Results) {
 
 	return strV, nil
 }
+
+// IsString checks that the given value is a string.
+var IsString = Is("is a string", func(path path, v interface{}) *Results {
+	_, errorResults := isStrCheck(path, v)
+	if errorResults != nil {
+		return errorResults
+	}
+
+	return ValidResult(path)
+})
 
 // IsNonEmptyString checks that the given value is a string and has a length > 1.
 var IsNonEmptyString = Is("is a non-empty string", func(path path, v interface{}) *Results {

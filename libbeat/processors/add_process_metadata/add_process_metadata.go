@@ -189,7 +189,7 @@ func (p *processMetadata) toMap() common.MapStr {
 		"process": common.MapStr{
 			"name":       p.name,
 			"title":      p.title,
-			"exe":        p.exe,
+			"executable": p.exe,
 			"args":       p.args,
 			"env":        p.env,
 			"pid":        p.pid,

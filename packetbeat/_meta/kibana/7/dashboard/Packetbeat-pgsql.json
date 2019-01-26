@@ -1,0 +1,1213 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": {
+                "query_string": {
+                  "analyze_wildcard": true,
+                  "query": "*"
+                }
+              }
+            }
+          }
+        },
+        "title": "Navigation [Packetbeat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "fontSize": 10,
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
+            "openLinksInNewTab": false
+          },
+          "title": "Navigation [Packetbeat]",
+          "type": "markdown"
+        }
+      },
+      "id": "Navigation",
+      "type": "visualization",
+      "updated_at": "2019-01-19T00:18:59.372Z",
+      "version": 11
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "PgSQL-errors",
+        "title": "PgSQL Errors [Packetbeat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "params": {
+            "addLegend": false,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "interpolate": "linear",
+            "legendPosition": "right",
+            "mode": "stacked",
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "interpolate": "linear",
+                "mode": "stacked",
+                "show": "true",
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "shareYAxis": true,
+            "smoothLines": false,
+            "times": [],
+            "type": "area",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ],
+            "yAxis": {}
+          },
+          "title": "PgSQL Errors [Packetbeat]",
+          "type": "area"
+        }
+      },
+      "id": "PgSQL-Errors",
+      "type": "visualization",
+      "updated_at": "2019-01-18T23:49:31.386Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "PgSQL-transactions",
+        "title": "PgSQL Methods [Packetbeat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "field": "method",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 5
+              },
+              "schema": "group",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "interpolate": "linear",
+            "legendPosition": "right",
+            "mode": "wiggle",
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "interpolate": "linear",
+                "mode": "stacked",
+                "show": "true",
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "shareYAxis": true,
+            "smoothLines": false,
+            "times": [],
+            "type": "area",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "wiggle",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ],
+            "yAxis": {}
+          },
+          "title": "PgSQL Methods [Packetbeat]",
+          "type": "area"
+        }
+      },
+      "id": "PgSQL-Methods",
+      "type": "visualization",
+      "updated_at": "2019-01-18T23:49:31.386Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "PgSQL-transactions",
+        "title": "PgSQL response times percentiles [Packetbeat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "field": "event.duration",
+                "percents": [
+                  75,
+                  99,
+                  99.5
+                ]
+              },
+              "schema": "metric",
+              "type": "percentiles"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Percentiles of event.duration"
+                },
+                "mode": "normal",
+                "show": "true",
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "shareYAxis": true,
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Percentiles of event.duration"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "PgSQL response times percentiles [Packetbeat]",
+          "type": "line"
+        }
+      },
+      "id": "PgSQL-response-times-percentiles",
+      "type": "visualization",
+      "updated_at": "2019-01-18T23:49:31.386Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "PgSQL-transactions",
+        "title": "PgSQL Throughput [Packetbeat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "field": "destination.bytes"
+              },
+              "schema": "metric",
+              "type": "sum"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "source.bytes"
+              },
+              "schema": "metric",
+              "type": "sum"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {},
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "legendPosition": "right",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Sum of destination.bytes"
+                },
+                "mode": "normal",
+                "show": "true",
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              },
+              {
+                "data": {
+                  "id": "2",
+                  "label": "Sum of source.bytes"
+                },
+                "mode": "normal",
+                "show": true,
+                "type": "line",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "shareYAxis": true,
+            "times": [],
+            "type": "line",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "defaultYExtents": false,
+                  "mode": "normal",
+                  "setYExtents": false,
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ]
+          },
+          "title": "PgSQL Throughput [Packetbeat]",
+          "type": "line"
+        }
+      },
+      "id": "PgSQL-throughput",
+      "type": "visualization",
+      "updated_at": "2019-01-18T23:49:31.386Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "PgSQL-transactions",
+        "title": "PgSQL Reads vs Writes [Packetbeat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "customInterval": "2h",
+                "drop_partials": false,
+                "extended_bounds": {},
+                "field": "@timestamp",
+                "interval": "auto",
+                "min_doc_count": 1,
+                "useNormalizedEsInterval": true
+              },
+              "schema": "segment",
+              "type": "date_histogram"
+            },
+            {
+              "enabled": true,
+              "id": "3",
+              "params": {
+                "filters": [
+                  {
+                    "input": {
+                      "query": {
+                        "query_string": {
+                          "analyze_wildcard": true,
+                          "query": "method: SELECT"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "input": {
+                      "query": "method: INSERT OR method: UPDATE OR method: DELETE"
+                    }
+                  }
+                ]
+              },
+              "schema": "group",
+              "type": "filters"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTimeMarker": false,
+            "addTooltip": true,
+            "categoryAxes": [
+              {
+                "id": "CategoryAxis-1",
+                "labels": {
+                  "show": true,
+                  "truncate": 100
+                },
+                "position": "bottom",
+                "scale": {
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "@timestamp per 30 seconds"
+                },
+                "type": "category"
+              }
+            ],
+            "defaultYExtents": false,
+            "grid": {
+              "categoryLines": false,
+              "style": {
+                "color": "#eee"
+              }
+            },
+            "interpolate": "linear",
+            "legendPosition": "right",
+            "mode": "stacked",
+            "scale": "linear",
+            "seriesParams": [
+              {
+                "data": {
+                  "id": "1",
+                  "label": "Count"
+                },
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "mode": "stacked",
+                "show": "true",
+                "showCircles": true,
+                "type": "area",
+                "valueAxis": "ValueAxis-1"
+              }
+            ],
+            "setYExtents": false,
+            "shareYAxis": true,
+            "smoothLines": false,
+            "times": [],
+            "type": "area",
+            "valueAxes": [
+              {
+                "id": "ValueAxis-1",
+                "labels": {
+                  "filter": false,
+                  "rotate": 0,
+                  "show": true,
+                  "truncate": 100
+                },
+                "name": "LeftAxis-1",
+                "position": "left",
+                "scale": {
+                  "mode": "normal",
+                  "type": "linear"
+                },
+                "show": true,
+                "style": {},
+                "title": {
+                  "text": "Count"
+                },
+                "type": "value"
+              }
+            ],
+            "yAxis": {}
+          },
+          "title": "PgSQL Reads vs Writes [Packetbeat]",
+          "type": "area"
+        }
+      },
+      "id": "PgSQL-Reads-vs-Writes",
+      "type": "visualization",
+      "updated_at": "2019-01-18T23:49:31.386Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "PgSQL-transactions",
+        "title": "Most frequent PgSQL queries [Packetbeat]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "query",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 10,
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Most frequent PgSQL queries [Packetbeat]",
+          "type": "table"
+        }
+      },
+      "id": "Most-frequent-PgSQL-queries",
+      "type": "visualization",
+      "updated_at": "2019-01-18T23:49:31.386Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchId": "PgSQL-transactions",
+        "title": "Slowest PgSQL Queries [Packetbeat]",
+        "uiStateJSON": {
+          "vis": {
+            "params": {
+              "sort": {
+                "columnIndex": null,
+                "direction": null
+              }
+            }
+          }
+        },
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Average Response Time (ns)",
+                "field": "event.duration"
+              },
+              "schema": "metric",
+              "type": "avg"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "query",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "bucket",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "perPage": 10,
+            "showMetricsAtAllLevels": false,
+            "showPartialRows": false,
+            "showTotal": false,
+            "sort": {
+              "columnIndex": null,
+              "direction": null
+            },
+            "totalFunc": "sum"
+          },
+          "title": "Slowest PgSQL Queries [Packetbeat]",
+          "type": "table"
+        }
+      },
+      "id": "Slowest-PgSQL-queries",
+      "type": "visualization",
+      "updated_at": "2019-01-18T23:49:31.386Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "method",
+          "type",
+          "path",
+          "event.duration",
+          "status"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "status",
+                  "negate": true,
+                  "params": {
+                    "query": "OK",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "OK"
+                },
+                "query": {
+                  "match": {
+                    "status": {
+                      "query": "OK",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              },
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "pgsql",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "pgsql"
+                },
+                "query": {
+                  "match": {
+                    "event.dataset": {
+                      "query": "pgsql",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "highlight": {
+              "fields": {
+                "*": {}
+              },
+              "post_tags": [
+                "@/kibana-highlighted-field@"
+              ],
+              "pre_tags": [
+                "@kibana-highlighted-field@"
+              ]
+            },
+            "highlightAll": true,
+            "index": "packetbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": "*"
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "PgSQL Errors Search [Packetbeat]",
+        "version": 1
+      },
+      "id": "PgSQL-errors",
+      "type": "search",
+      "updated_at": "2019-01-18T23:49:31.386Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "method",
+          "type",
+          "path",
+          "event.duration",
+          "status"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "index": "packetbeat-*",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "params": {
+                    "query": "pgsql",
+                    "type": "phrase"
+                  },
+                  "type": "phrase",
+                  "value": "pgsql"
+                },
+                "query": {
+                  "match": {
+                    "event.dataset": {
+                      "query": "pgsql",
+                      "type": "phrase"
+                    }
+                  }
+                }
+              }
+            ],
+            "highlight": {
+              "fields": {
+                "*": {}
+              },
+              "post_tags": [
+                "@/kibana-highlighted-field@"
+              ],
+              "pre_tags": [
+                "@kibana-highlighted-field@"
+              ]
+            },
+            "highlightAll": true,
+            "index": "packetbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": {
+                "query_string": {
+                  "analyze_wildcard": true,
+                  "query": "*"
+                }
+              }
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "@timestamp",
+          "desc"
+        ],
+        "title": "PgSQL Transactions [Packetbeat]",
+        "version": 1
+      },
+      "id": "PgSQL-transactions",
+      "type": "search",
+      "updated_at": "2019-01-18T23:49:31.386Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "Postgres database query performance.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "query": {
+              "language": "lucene",
+              "query": {
+                "query_string": {
+                  "analyze_wildcard": true,
+                  "query": "*"
+                }
+              }
+            },
+            "version": true
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false
+        },
+        "panelsJSON": [
+          {
+            "gridData": {
+              "h": 20,
+              "i": "1",
+              "w": 12,
+              "x": 0,
+              "y": 0
+            },
+            "id": "Navigation",
+            "panelIndex": "1",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 20,
+              "i": "2",
+              "w": 20,
+              "x": 12,
+              "y": 0
+            },
+            "id": "PgSQL-Errors",
+            "panelIndex": "2",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 20,
+              "i": "3",
+              "w": 16,
+              "x": 32,
+              "y": 0
+            },
+            "id": "PgSQL-Methods",
+            "panelIndex": "3",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 15,
+              "i": "4",
+              "w": 48,
+              "x": 0,
+              "y": 20
+            },
+            "id": "PgSQL-response-times-percentiles",
+            "panelIndex": "4",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 15,
+              "i": "5",
+              "w": 24,
+              "x": 24,
+              "y": 35
+            },
+            "id": "PgSQL-throughput",
+            "panelIndex": "5",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "gridData": {
+              "h": 15,
+              "i": "6",
+              "w": 24,
+              "x": 0,
+              "y": 35
+            },
+            "id": "PgSQL-Reads-vs-Writes",
+            "panelIndex": "6",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "params": {
+                  "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                  }
+                }
+              }
+            },
+            "gridData": {
+              "h": 30,
+              "i": "7",
+              "w": 24,
+              "x": 0,
+              "y": 50
+            },
+            "id": "Most-frequent-PgSQL-queries",
+            "panelIndex": "7",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          },
+          {
+            "embeddableConfig": {
+              "vis": {
+                "params": {
+                  "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                  }
+                }
+              }
+            },
+            "gridData": {
+              "h": 30,
+              "i": "8",
+              "w": 24,
+              "x": 24,
+              "y": 50
+            },
+            "id": "Slowest-PgSQL-queries",
+            "panelIndex": "8",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Packetbeat] PgSQL performance",
+        "version": 1
+      },
+      "id": "Packetbeat-PgSQL-performance",
+      "type": "dashboard",
+      "updated_at": "2019-01-18T23:49:31.386Z",
+      "version": 1
+    }
+  ],
+  "version": "7.0.0-SNAPSHOT"
+}

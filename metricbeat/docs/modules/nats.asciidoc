@@ -1,0 +1,59 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-nats]]
+== Nats module
+
+This is the nats module.
+
+This is the Nats Module. The Nats module uses http://localhost:8222 APIs to collect metrics.
+
+The default metricsets are `stats`.
+
+[float]
+=== Compatibility
+
+The nats module is tested with nats 1.3.0.
+
+
+[float]
+=== Example configuration
+
+The Nats module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: nats
+  metricsets: ["connections", "routes", "stats", "subscriptions"]
+  period: 10s
+  hosts: ["localhost:8222"]
+  #stats.metrics_path: "/varz"
+  #connections.metrics_path: "/connz"
+  #routes.metrics_path: "/routez"
+  #subscriptions.metrics_path: "/subsz"
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-nats-connections,connections>>
+
+* <<metricbeat-metricset-nats-routes,routes>>
+
+* <<metricbeat-metricset-nats-stats,stats>>
+
+* <<metricbeat-metricset-nats-subscriptions,subscriptions>>
+
+include::nats/connections.asciidoc[]
+
+include::nats/routes.asciidoc[]
+
+include::nats/stats.asciidoc[]
+
+include::nats/subscriptions.asciidoc[]
+

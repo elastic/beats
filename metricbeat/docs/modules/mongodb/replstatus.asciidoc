@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-mongodb-replstatus]]
 === MongoDB replstatus metricset
 
-experimental[]
-
 include::../../../module/mongodb/replstatus/_meta/docs.asciidoc[]
 
 

@@ -11,10 +11,6 @@
       type: long
       description: >
         The Windows status code.
-    - name: request_time_ms
-      type: long
-      description: >
-        The request time in milliseconds.
     - name: site_name
       type: keyword
       description: >
@@ -27,20 +23,18 @@
       type: keyword
       description: >
         The content of the cookie sent or received, if any.
-    - name: body_sent.bytes
-      type: long
-      format: bytes
-      description: >
-        The number of bytes of the server response body.
-    - name: body_received.bytes
-      type: long
-      format: bytes
-      description: >
-        The number of bytes of the server request body.
 
+    - name: body_received.bytes
+      type: alias
+      path: http.request.body.bytes
+      migration: true
+    - name: body_sent.bytes
+      type: alias
+      path: http.response.body.bytes
+      migration: true
     - name: server_ip
       type: alias
-      path: destination.ip
+      path: destination.address
       migration: true
     - name: method
       type: alias
@@ -64,7 +58,7 @@
       migration: true
     - name: remote_ip
       type: alias
-      path: source.ip
+      path: source.address
       migration: true
     - name: referrer
       type: alias

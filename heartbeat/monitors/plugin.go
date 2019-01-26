@@ -23,6 +23,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/plugin"
@@ -70,7 +71,7 @@ func init() {
 
 // PluginBuilder is the signature of functions used to build active
 // monitorStarts
-type PluginBuilder func(string, *common.Config) (jobs []Job, endpoints int, err error)
+type PluginBuilder func(string, *common.Config) (jobs []jobs.Job, endpoints int, err error)
 
 // Type represents whether a plugin is active or passive.
 type Type uint8
@@ -152,7 +153,7 @@ func (r *pluginsReg) monitorNames() []string {
 	return names
 }
 
-func (e *pluginBuilder) create(cfg *common.Config) (jobs []Job, endpoints int, err error) {
+func (e *pluginBuilder) create(cfg *common.Config) (jobs []jobs.Job, endpoints int, err error) {
 	return e.builder(e.name, cfg)
 }
 

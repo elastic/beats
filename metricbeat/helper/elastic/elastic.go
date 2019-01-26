@@ -97,18 +97,8 @@ func MakeErrorForMissingField(field string, product Product) error {
 }
 
 // IsFeatureAvailable returns whether a feature is available in the current product version
-func IsFeatureAvailable(currentProductVersion, featureAvailableInProductVersion string) (bool, error) {
-	currentVersion, err := common.NewVersion(currentProductVersion)
-	if err != nil {
-		return false, err
-	}
-
-	wantVersion, err := common.NewVersion(featureAvailableInProductVersion)
-	if err != nil {
-		return false, err
-	}
-
-	return !currentVersion.LessThan(wantVersion), nil
+func IsFeatureAvailable(currentProductVersion, featureAvailableInProductVersion *common.Version) bool {
+	return !currentProductVersion.LessThan(featureAvailableInProductVersion)
 }
 
 // ReportAndLogError reports and logs the given error

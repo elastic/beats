@@ -36,14 +36,19 @@
         "direction": "incoming"
     },
     "process": {
-        "exe": "/usr/sbin/sshd",
-        "pid": "12635"
+        "executable": "/usr/sbin/sshd",
+        "pid": 12635
+    },
+    "service": {
+        "type": "auditd"
     },
     "source": {
         "ip": "179.38.151.221"
     },
     "user": {
         "auid": "unset",
+        "id": "0",
+        "name": "root",
         "name_map": {
             "uid": "root"
         },

@@ -2,12 +2,9 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-prometheus.html
 
 - module: prometheus
-  #metricsets:
-  #  - stats
   period: 10s
   hosts: ["localhost:9090"]
   metrics_path: /metrics
-  #namespace: example
   #username: "user"
   #password: "secret"
 

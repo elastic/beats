@@ -25,7 +25,11 @@
         - min_version: 6.0.0
           value: "_a=(query:(language:lucene,query:'context.app.name:\"{{value}}\"'))"
 
-- key: with source filter 
+    - name: alias
+      type: alias
+      path: long
+
+- key: with source filter
   title: Test
   kibana:
     source_filters: 

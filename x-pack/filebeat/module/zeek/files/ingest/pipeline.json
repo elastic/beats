@@ -1,0 +1,42 @@
+{
+  "description": "Pipeline for normalizing Zeek files.log",
+  "processors": [
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['files']['ts'] * params.multiplier; ctx.zeek.files.remove('ts');",
+        "params": {
+          "multiplier": 1000
+        }
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.zeek.session_id = ctx.zeek.files.session_ids[0];",
+        "ignore_failure": true
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.zeek.files.rx_host = ctx.zeek.files.rx_hosts[0]; ctx.zeek.files.remove('rx_hosts');",
+        "ignore_failure": true
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.zeek.files.tx_host = ctx.zeek.files.tx_hosts[0]; ctx.zeek.files.remove('tx_hosts');",
+        "ignore_failure": true
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.id = ctx.zeek.session_id + \"-files\"",
+        "ignore_failure": true
+      }
+    }
+  ]
+}

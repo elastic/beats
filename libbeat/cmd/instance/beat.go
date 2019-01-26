@@ -63,7 +63,7 @@ import (
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/template"
 	"github.com/elastic/beats/libbeat/version"
-	"github.com/elastic/go-sysinfo"
+	sysinfo "github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 	ucfg "github.com/elastic/go-ucfg"
 )
@@ -105,6 +105,7 @@ type beatConfig struct {
 	Dashboards *common.Config `config:"setup.dashboards"`
 	Template   *common.Config `config:"setup.template"`
 	Kibana     *common.Config `config:"setup.kibana"`
+	Migration  *common.Config `config:"migration"`
 
 	// ILM Config options
 	ILM *common.Config `config:"output.elasticsearch.ilm"`
@@ -877,7 +878,7 @@ func (b *Beat) templateLoadingCallback() (func(esClient *elasticsearch.Client) e
 			b.Config.Template = common.NewConfig()
 		}
 
-		loader, err := template.NewLoader(b.Config.Template, esClient, b.Info, b.Fields)
+		loader, err := template.NewLoader(b.Config.Template, esClient, b.Info, b.Fields, b.Config.Migration.Enabled())
 		if err != nil {
 			return fmt.Errorf("Error creating Elasticsearch template loader: %v", err)
 		}

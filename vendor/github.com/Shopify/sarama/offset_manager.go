@@ -27,11 +27,14 @@ type offsetManager struct {
 	group  string
 	ticker *time.Ticker
 
+	memberID   string
+	generation int32
+
 	broker     *Broker
 	brokerLock sync.RWMutex
 
 	poms     map[string]map[int32]*partitionOffsetManager
-	pomsLock sync.Mutex
+	pomsLock sync.RWMutex
 
 	closeOnce sync.Once
 	closing   chan none
@@ -41,6 +44,10 @@ type offsetManager struct {
 // NewOffsetManagerFromClient creates a new OffsetManager from the given client.
 // It is still necessary to call Close() on the underlying client when finished with the partition manager.
 func NewOffsetManagerFromClient(group string, client Client) (OffsetManager, error) {
+	return newOffsetManagerFromClient(group, "", GroupGenerationUndefined, client)
+}
+
+func newOffsetManagerFromClient(group, memberID string, generation int32, client Client) (*offsetManager, error) {
 	// Check that we are not dealing with a closed Client before processing any other arguments
 	if client.Closed() {
 		return nil, ErrClosedClient
@@ -53,6 +60,9 @@ func NewOffsetManagerFromClient(group string, client Client) (OffsetManager, err
 		group:  group,
 		ticker: time.NewTicker(conf.Consumer.Offsets.CommitInterval),
 		poms:   make(map[string]map[int32]*partitionOffsetManager),
+
+		memberID:   memberID,
+		generation: generation,
 
 		closing: make(chan none),
 		closed:  make(chan none),
@@ -245,20 +255,22 @@ func (om *offsetManager) constructRequest() *OffsetCommitRequest {
 		r = &OffsetCommitRequest{
 			Version:                 1,
 			ConsumerGroup:           om.group,
-			ConsumerGroupGeneration: GroupGenerationUndefined,
+			ConsumerID:              om.memberID,
+			ConsumerGroupGeneration: om.generation,
 		}
 	} else {
 		r = &OffsetCommitRequest{
 			Version:                 2,
 			RetentionTime:           int64(om.conf.Consumer.Offsets.Retention / time.Millisecond),
 			ConsumerGroup:           om.group,
-			ConsumerGroupGeneration: GroupGenerationUndefined,
+			ConsumerID:              om.memberID,
+			ConsumerGroupGeneration: om.generation,
 		}
 
 	}
 
-	om.pomsLock.Lock()
-	defer om.pomsLock.Unlock()
+	om.pomsLock.RLock()
+	defer om.pomsLock.RUnlock()
 
 	for _, topicManagers := range om.poms {
 		for _, pom := range topicManagers {
@@ -278,8 +290,8 @@ func (om *offsetManager) constructRequest() *OffsetCommitRequest {
 }
 
 func (om *offsetManager) handleResponse(broker *Broker, req *OffsetCommitRequest, resp *OffsetCommitResponse) {
-	om.pomsLock.Lock()
-	defer om.pomsLock.Unlock()
+	om.pomsLock.RLock()
+	defer om.pomsLock.RUnlock()
 
 	for _, topicManagers := range om.poms {
 		for _, pom := range topicManagers {
@@ -329,8 +341,8 @@ func (om *offsetManager) handleResponse(broker *Broker, req *OffsetCommitRequest
 }
 
 func (om *offsetManager) handleError(err error) {
-	om.pomsLock.Lock()
-	defer om.pomsLock.Unlock()
+	om.pomsLock.RLock()
+	defer om.pomsLock.RUnlock()
 
 	for _, topicManagers := range om.poms {
 		for _, pom := range topicManagers {
@@ -340,8 +352,8 @@ func (om *offsetManager) handleError(err error) {
 }
 
 func (om *offsetManager) asyncClosePOMs() {
-	om.pomsLock.Lock()
-	defer om.pomsLock.Unlock()
+	om.pomsLock.RLock()
+	defer om.pomsLock.RUnlock()
 
 	for _, topicManagers := range om.poms {
 		for _, pom := range topicManagers {
@@ -373,6 +385,18 @@ func (om *offsetManager) releasePOMs(force bool) (remaining int) {
 		remaining += len(om.poms[topic])
 	}
 	return
+}
+
+func (om *offsetManager) findPOM(topic string, partition int32) *partitionOffsetManager {
+	om.pomsLock.RLock()
+	defer om.pomsLock.RUnlock()
+
+	if partitions, ok := om.poms[topic]; ok {
+		if pom, ok := partitions[partition]; ok {
+			return pom
+		}
+	}
+	return nil
 }
 
 // Partition Offset Manager

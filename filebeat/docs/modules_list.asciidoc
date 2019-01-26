@@ -3,7 +3,7 @@ This file is generated! See scripts/docs_collector.py
 ////
 
   * <<filebeat-modules-overview>>
-  * <<filebeat-module-apache2>>
+  * <<filebeat-module-apache>>
   * <<filebeat-module-auditd>>
   * <<filebeat-module-elasticsearch>>
   * <<filebeat-module-haproxy>>
@@ -22,12 +22,13 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-suricata>>
   * <<filebeat-module-system>>
   * <<filebeat-module-traefik>>
+  * <<filebeat-module-zeek>>
 
 
 --
 
 include::modules-overview.asciidoc[]
-include::modules/apache2.asciidoc[]
+include::modules/apache.asciidoc[]
 include::modules/auditd.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
 include::modules/haproxy.asciidoc[]
@@ -46,3 +47,4 @@ include::modules/santa.asciidoc[]
 include::modules/suricata.asciidoc[]
 include::modules/system.asciidoc[]
 include::modules/traefik.asciidoc[]
+include::modules/zeek.asciidoc[]

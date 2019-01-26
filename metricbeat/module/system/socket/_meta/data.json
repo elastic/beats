@@ -1,31 +1,37 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "event": {
+        "dataset": "system.socket",
+        "duration": 115000,
+        "module": "system"
+    },
     "metricset": {
-        "module": "system",
-        "name": "socket",
-        "rtt": 115
+        "name": "socket"
+    },
+    "service": {
+        "type": "system"
     },
     "system": {
         "socket": {
             "direction": "listening",
-            "family": "ipv4",
+            "family": "ipv6",
             "local": {
-                "ip": "127.0.0.11",
-                "port": 45723
+                "ip": "::",
+                "port": 44367
             },
             "process": {
-                "cmdline": "/tmp/go-build519327234/github.com/elastic/beats/metricbeat/module/system/socket/_test/socket.test -test.v=true -data",
+                "cmdline": "/tmp/go-build827888631/b001/socket.test -data",
                 "command": "socket.test",
-                "exe": "/tmp/go-build519327234/github.com/elastic/beats/metricbeat/module/system/socket/_test/socket.test",
-                "pid": 2025
+                "exe": "/tmp/go-build827888631/b001/socket.test",
+                "pid": 19047
             },
             "user": {
-                "id": 0,
-                "name": "root"
+                "id": 1000,
+                "name": "Jaime Soriano Pastor"
             }
         }
     }

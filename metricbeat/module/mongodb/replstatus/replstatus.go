@@ -18,10 +18,9 @@
 package replstatus
 
 import (
-	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
@@ -46,8 +45,6 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The mongodb replstatus metricset is experimental.")
-
 	ms, err := mongodb.NewMetricSet(base)
 	if err != nil {
 		return nil, err

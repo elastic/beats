@@ -3,19 +3,10 @@
   description: >
     Contains fields for the Traefik access logs.
   fields:
-    - name: duration
-      type: long
-      description: >
-        Duration of the access entry.
     - name: user_identifier
       type: keyword
       description: >
         Is the RFC 1413 identity of the client
-    - name: body_sent.bytes
-      type: long
-      format: bytes
-      description: >
-        The number of bytes of the server response body.
     - name: request_count
       type: long
       description: >
@@ -29,6 +20,10 @@
       description:
         The url of the backend where request is forwarded
 
+    - name: body_sent.bytes
+      type: alias
+      path: http.response.body.bytes
+      migration: true
     - name: remote_ip
       type: alias
       path: source.address
