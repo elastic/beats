@@ -83,6 +83,7 @@ func newIndexSupport(
 	}
 
 	return &indexSupport{
+		log:         log,
 		ilm:         ilm,
 		info:        info,
 		templateCfg: tmplCfg,
