@@ -94,7 +94,7 @@ func eventMapping(content []byte) (common.MapStr, error) {
 
 	event := common.MapStr{
 		"httpd": common.MapStr{
-			"viewReads":                  data.Httpd.ViewReads.Current,
+			"view_reads":                 data.Httpd.ViewReads.Current,
 			"bulk_requests":              data.Httpd.BulkRequests.Current,
 			"clients_requesting_changes": data.Httpd.ClientsRequestingChanges.Current,
 			"temporary_view_reads":       data.Httpd.TemporaryViewReads.Current,
