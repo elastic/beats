@@ -20,8 +20,8 @@ package instance
 import (
 	"github.com/spf13/pflag"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/idxmgmt"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/libbeat/monitoring/report"
 )
@@ -37,6 +37,7 @@ type Settings struct {
 
 	DisableConfigResolver bool
 
-	// load custom ILM manager. The config object will be the Beats root configuration.
-	ILM func(beat.Info, *common.Config) (ilm.Supporter, error)
+	// load custom index manager. The config object will be the Beats root configuration.
+	IndexManagement idxmgmt.SupportFactory
+	ILM             ilm.SupportFactory
 }

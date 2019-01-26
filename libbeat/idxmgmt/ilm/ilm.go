@@ -29,6 +29,8 @@ import (
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 )
 
+type SupportFactory func(beat.Info, *common.Config) (Supporter, error)
+
 type Supporter interface {
 	Mode() Mode
 	Template() TemplateSettings
@@ -59,19 +61,17 @@ type TemplateSettings struct {
 }
 
 func DefaultSupport(info beat.Info, config *common.Config) (Supporter, error) {
-	cfg := struct {
-		ILM Config `config:"setup.ilm"` // read ILM settings from setup.ilm namespace
-	}{defaultConfig(info)}
+	cfg := defaultConfig(info)
 	if err := config.Unpack(&cfg); err != nil {
 		return nil, err
 	}
 
-	if cfg.ILM.Mode == ModeDisabled {
+	if cfg.Mode == ModeDisabled {
 		return NoopSupport(info, config)
 	}
 
 	var policy common.MapStr
-	if path := cfg.ILM.PolicyFile; path != "" {
+	if path := cfg.PolicyFile; path != "" {
 		contents, err := ioutil.ReadFile(path)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to read policy file '%v'", path)
@@ -85,18 +85,18 @@ func DefaultSupport(info beat.Info, config *common.Config) (Supporter, error) {
 		policy = DefaultPolicy
 	}
 
-	name, err := applyStaticFmtstr(info, &cfg.ILM.Name)
+	name, err := applyStaticFmtstr(info, &cfg.Name)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read ilm policy name")
 	}
 
 	return NewDefaultSupport(
-		cfg.ILM.Mode,
-		cfg.ILM.RolloverAlias,
+		cfg.Mode,
+		cfg.RolloverAlias,
 		name,
 		policy,
-		cfg.ILM.Overwrite,
-		cfg.ILM.CheckExists,
+		cfg.Overwrite,
+		cfg.CheckExists,
 	), nil
 }
 

@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package instance
+package idxmgmt
 
 import (
 	"errors"
@@ -63,21 +63,20 @@ type ilmIndexSelector struct {
 
 func newIndexSupport(
 	info beat.Info,
-	settings Settings,
-	config *beatConfig,
-	configRoot *common.Config,
+	ilmFactory func(beat.Info, *common.Config) (ilm.Supporter, error),
+	tmplConfig *common.Config,
+	ilmConfig *common.Config,
 ) (*indexSupport, error) {
-	ilmFactory := settings.ILM
 	if ilmFactory == nil {
 		ilmFactory = ilm.DefaultSupport
 	}
 
-	ilm, err := ilmFactory(info, configRoot)
+	ilm, err := ilmFactory(info, ilmConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	tmplCfg, err := unpackTemplateConfig(config.Template)
+	tmplCfg, err := unpackTemplateConfig(tmplConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -93,13 +92,17 @@ func (s *indexSupport) Enabled() bool {
 	return s.templateCfg.Enabled || (s.ilm.Mode() != ilm.ModeDisabled)
 }
 
+func (s *indexSupport) ILM() ilm.Supporter {
+	return s.ilm
+}
+
 func (s *indexSupport) Manager(
 	client *elasticsearch.Client,
 	fields []byte,
 	migration bool,
-) indexManager {
+) Manager {
 	ilm := s.ilm.Manager(ilm.ESClientHandler(client))
-	return indexManager{
+	return &indexManager{
 		support:   s,
 		ilm:       ilm,
 		client:    client,

@@ -48,6 +48,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/common/seccomp"
 	"github.com/elastic/beats/libbeat/dashboards"
+	"github.com/elastic/beats/libbeat/idxmgmt"
 	"github.com/elastic/beats/libbeat/keystore"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/logp/configure"
@@ -77,7 +78,7 @@ type Beat struct {
 	RawConfig *common.Config // Raw config that can be unpacked to get Beat specific config data.
 
 	keystore keystore.Keystore
-	index    *indexSupport
+	index    idxmgmt.Supporter
 }
 
 type beatConfig struct {
@@ -594,12 +595,12 @@ func (b *Beat) configure(settings Settings) error {
 		return err
 	}
 
-	b.index, err = newIndexSupport(b.Beat.Info, settings, &b.Config, b.RawConfig)
-	if err != nil {
-		return err
+	imFactory := settings.IndexManagement
+	if imFactory == nil {
+		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM)
 	}
-
-	return nil
+	b.index, err = imFactory(b.Beat.Info, b.RawConfig)
+	return err
 }
 
 func (b *Beat) loadMeta() error {
@@ -744,7 +745,7 @@ func (b *Beat) registerESIndexManagement() error {
 func (b *Beat) indexSetupCallback() func(esClient *elasticsearch.Client) error {
 	return func(esClient *elasticsearch.Client) error {
 		m := b.index.Manager(esClient, b.Fields, b.Config.Migration.Enabled())
-		return m.Load()
+		return m.Setup(true, true)
 	}
 }
 
