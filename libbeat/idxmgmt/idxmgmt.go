@@ -22,7 +22,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 )
 
 type SupportFactory func(beat.Info, *common.Config) (Supporter, error)
@@ -30,8 +29,13 @@ type SupportFactory func(beat.Info, *common.Config) (Supporter, error)
 type Supporter interface {
 	Enabled() bool
 	ILM() ilm.Supporter
-	Manager(client *elasticsearch.Client, fields []byte, migration bool) Manager
+	Manager(client ESClient, fields []byte, migration bool) Manager
 	BuildSelector(cfg *common.Config) (outputs.IndexSelector, error)
+}
+
+type ESClient interface {
+	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
+	GetVersion() common.Version
 }
 
 type Manager interface {

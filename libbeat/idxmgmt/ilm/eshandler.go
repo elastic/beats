@@ -21,21 +21,32 @@ import (
 	"encoding/json"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 )
 
-type esClientHandler elasticsearch.Client
+type esClientHandler struct {
+	client ESClient
+}
 
 var (
 	esMinILMVersion       = common.MustNewVersion("6.6.0")
 	esMinDefaultILMVesion = common.MustNewVersion("7.0.0")
 )
 
-func ESClientHandler(client *elasticsearch.Client) APIHandler {
+func ESClientHandler(client ESClient) APIHandler {
 	if client == nil {
 		return nil
 	}
-	return (*esClientHandler)(client)
+	return &esClientHandler{client}
+}
+
+type ESClient interface {
+	GetVersion() common.Version
+	Request(
+		method, path string,
+		pipeline string,
+		params map[string]string,
+		body interface{},
+	) (int, []byte, error)
 }
 
 func (h *esClientHandler) ILMEnabled(mode Mode) (bool, error) {
@@ -76,16 +87,13 @@ func (h *esClientHandler) ILMEnabled(mode Mode) (bool, error) {
 }
 
 func (h *esClientHandler) CreateILMPolicy(name string, policy common.MapStr) error {
-	client := h.access()
-	_, _, err := client.Request("PUT", "/_ilm/policy/"+name, "", nil, policy)
+	_, _, err := h.client.Request("PUT", "/_ilm/policy/"+name, "", nil, policy)
 	return err
 }
 
 func (h *esClientHandler) HasILMPolicy(name string) (bool, error) {
-	client := h.access()
-
 	// XXX: HEAD method does currently not work for checking if a policy exists
-	status, b, err := client.Request("GET", "/_ilm/policy/"+name, "", nil, nil)
+	status, b, err := h.client.Request("GET", "/_ilm/policy/"+name, "", nil, nil)
 	if err != nil && status != 404 {
 		return false, wrapErrf(err, ErrRequestFailed,
 			"failed to check for policy name '%v': (status=%v) %s", name, status, b)
@@ -94,8 +102,7 @@ func (h *esClientHandler) HasILMPolicy(name string) (bool, error) {
 }
 
 func (h *esClientHandler) HasAlias(name string) (bool, error) {
-	client := h.access()
-	status, b, err := client.Request("HEAD", "/_alias/"+name, "", nil, nil)
+	status, b, err := h.client.Request("HEAD", "/_alias/"+name, "", nil, nil)
 	if err != nil && status != 404 {
 		return false, wrapErrf(err, ErrRequestFailed,
 			"failed to check for alias '%v': (status=%v) %s", name, status, b)
@@ -112,8 +119,7 @@ func (h *esClientHandler) CreateAlias(name, firstIndex string) error {
 		},
 	}
 
-	client := h.access()
-	status, res, err := client.Request("PUT", "/"+firstIndex, "", nil, body)
+	status, res, err := h.client.Request("PUT", "/"+firstIndex, "", nil, body)
 	if status == 400 {
 		return errOf(ErrAliasAlreadyExists)
 	} else if err != nil {
@@ -124,16 +130,13 @@ func (h *esClientHandler) CreateAlias(name, firstIndex string) error {
 }
 
 func (h *esClientHandler) raiseVersionNotSupported() error {
-	client := h.access()
-	ver := client.GetVersion()
+	ver := h.client.GetVersion()
 	return errf(ErrESVersionNotSupported,
 		"Elasticsearch %v does not support ILM", ver.String())
 }
 
 func (h *esClientHandler) checkILMVersion(mode Mode) (avail, probe bool) {
-	client := h.access()
-
-	ver := client.GetVersion()
+	ver := h.client.GetVersion()
 	avail = !ver.LessThan(esMinILMVersion)
 	if avail {
 		probe = (mode == ModeEnabled) ||
@@ -144,8 +147,7 @@ func (h *esClientHandler) checkILMVersion(mode Mode) (avail, probe bool) {
 }
 
 func (h *esClientHandler) requILMSupport() (avail, enbaled bool, err error) {
-	client := h.access()
-	code, body, err := client.Request("GET", "/_xpack", "", nil, nil)
+	code, body, err := h.client.Request("GET", "/_xpack", "", nil, nil)
 
 	// If we get a 400, it's assumed to be the OSS version of Elasticsearch
 	if code == 400 {
@@ -173,6 +175,6 @@ func (h *esClientHandler) requILMSupport() (avail, enbaled bool, err error) {
 	return avail, enbaled, nil
 }
 
-func (h *esClientHandler) access() *elasticsearch.Client {
-	return (*elasticsearch.Client)(h)
+func (h *esClientHandler) access() ESClient {
+	return h.client
 }

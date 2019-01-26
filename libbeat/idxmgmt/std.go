@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/template"
 )
@@ -48,7 +47,7 @@ type indexManager struct {
 	support *indexSupport
 	ilm     ilm.Manager
 
-	client    *elasticsearch.Client
+	client    ESClient
 	fields    []byte
 	migration bool
 }
@@ -97,7 +96,7 @@ func (s *indexSupport) ILM() ilm.Supporter {
 }
 
 func (s *indexSupport) Manager(
-	client *elasticsearch.Client,
+	client ESClient,
 	fields []byte,
 	migration bool,
 ) Manager {
