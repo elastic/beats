@@ -24,6 +24,9 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/libbeat/idxmgmt"
+	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/testing"
 )
 
 func GenTestOutputCmd(name, beatVersion string) *cobra.Command {
@@ -43,26 +46,23 @@ func GenTestOutputCmd(name, beatVersion string) *cobra.Command {
 				os.Exit(1)
 			}
 
-			panic("TODO")
+			im, _ := idxmgmt.DefaultSupport(b.Info, nil)
+			output, err := outputs.Load(im, b.Info, nil, b.Config.Output.Name(), b.Config.Output.Config())
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error initializing output: %s\n", err)
+				os.Exit(1)
+			}
 
-			/*
-				output, err := outputs.Load(b.Info, nil, b.Config.Output.Name(), b.Config.Output.Config())
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "Error initializing output: %s\n", err)
+			for _, client := range output.Clients {
+				tClient, ok := client.(testing.Testable)
+				if !ok {
+					fmt.Printf("%s output doesn't support testing\n", b.Config.Output.Name())
 					os.Exit(1)
 				}
 
-				for _, client := range output.Clients {
-					tClient, ok := client.(testing.Testable)
-					if !ok {
-						fmt.Printf("%s output doesn't support testing\n", b.Config.Output.Name())
-						os.Exit(1)
-					}
-
-					// Perform test:
-					tClient.Test(testing.NewConsoleDriver(os.Stdout))
-				}
-			*/
+				// Perform test:
+				tClient.Test(testing.NewConsoleDriver(os.Stdout))
+			}
 		},
 	}
 }
