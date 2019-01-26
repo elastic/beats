@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("packetbeat", "sip", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("packetbeat", "sip", asset.ModuleFieldsPri, AssetSip); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
+// AssetSip returns asset data.
+// This is the base64 encoded gzipped contents of protos/sip.
+func AssetSip() string {
 	return "eJys1d9v2jAQB/B3/opTnhfkpEtW0rVCWjcpmrahwvZUaXKTI/GaxMbndOW/nwwE0hrUrvx4iS7c1x8Mvvhwj8sESKgBgBGmwgS8aTrxBgA5UqaFMkI2CUzTiU8KMzEXGeADNgbmAquchgPYXCUDAAAfGl5jF2lfZqkwgULLtqv0P9/vqdGUMt+Wu9Z7XP6Vul9/Qrvq3QALhRtctEgGvj3Pw0deK/sd0++/0tlnB6DXjX6rxekUP2/SfQQSKillgeNNZZjJOolYzC6M5g0pqc1lmyvHSIablvxM5ugYK9kU/wMkJRtCsFnvNsHwLHjrDRk7ZFGl5uRq3rBja9DW4gRvNT++Opi5lvXxhi9a1lAiz1HDA6/avat7tx4JpW49+Gh/Rns9DtjQvoOrC8OLy/AsPpumEzXjBWOB52CNPJ46k6+CtqZzxhGLooiFUTgORuEwiM934CB+fz7qxEHoijNeVb44wen8ZIPS65ftewyEixMAprh4cfXg0Iy4k/nSMci7P5iZXnld+P0q4azEVSrIOZgSV8YaiXiBQ3DPnM6O3ALZ6gwhnQDPc41EwJsc7LzZuw+7P8pqOjmenMxxnmskIxpubx2F6kBtIx6NqLHhjXzyCOpNxwOcrhU4gW0n7PZ6t3QUxMFoFMcxC+IPUcwYG/wLAAD//2we7qA="
 }
