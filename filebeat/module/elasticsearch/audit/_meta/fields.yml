@@ -18,6 +18,10 @@
       description: "The IP address from which the request originated"
       example: "192.168.1.42"
       type: ip
+    - name: origin_port
+      description: "The TCP port from which the request originated"
+      example: 9300
+      type: integer
     - name: principal
       description: "The principal (username) that failed authentication"
       example: "_anonymous"
@@ -50,3 +54,7 @@
       description: "The body of the request, if enabled"
       example: "body"
       type: text
+    - name: user_realm
+      description: "The name of the realm that authenticated the user"
+      example: "__attach"
+      type: keyword

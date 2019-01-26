@@ -969,6 +969,17 @@ elasticsearch Module
 
 
 
+*`elasticsearch.node.id`*::
++
+--
+type: keyword
+
+example: DSiWcTyeThWtUXLB9J0BMw
+
+ID of the node
+
+--
+
 *`elasticsearch.node.name`*::
 +
 --
@@ -1063,6 +1074,17 @@ The IP address from which the request originated
 
 --
 
+*`elasticsearch.audit.origin_port`*::
++
+--
+type: integer
+
+example: 9300
+
+The TCP port from which the request originated
+
+--
+
 *`elasticsearch.audit.principal`*::
 +
 --
@@ -1146,6 +1168,17 @@ type: text
 example: body
 
 The body of the request, if enabled
+
+--
+
+*`elasticsearch.audit.user_realm`*::
++
+--
+type: keyword
+
+example: __attach
+
+The name of the realm that authenticated the user
 
 --
 
