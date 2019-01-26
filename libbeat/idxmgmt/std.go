@@ -227,7 +227,7 @@ func (m *indexManager) load(forceTemplate, forcePolicy bool) error {
 			return fmt.Errorf("Error loading Elasticsearch template: %v", err)
 		}
 
-		log.Info("Template successfully loaded.")
+		log.Info("Loaded index template.")
 	}
 
 	// create alias
