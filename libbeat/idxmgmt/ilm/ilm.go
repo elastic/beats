@@ -90,11 +90,14 @@ func DefaultSupport(info beat.Info, config *common.Config) (Supporter, error) {
 		return nil, errors.Wrap(err, "failed to read ilm policy name")
 	}
 
-	return &ilmSupport{
-		cfg:        cfg.ILM,
-		policyName: name,
-		policy:     policy,
-	}, nil
+	return NewDefaultSupport(
+		cfg.ILM.Mode,
+		cfg.ILM.RolloverAlias,
+		name,
+		policy,
+		cfg.ILM.Overwrite,
+		cfg.ILM.CheckExists,
+	), nil
 }
 
 func applyStaticFmtstr(info beat.Info, fmt *fmtstr.EventFormatString) (string, error) {

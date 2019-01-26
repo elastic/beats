@@ -27,7 +27,12 @@ import (
 )
 
 type ilmSupport struct {
-	cfg        Config
+	mode        Mode
+	overwrite   bool
+	checkExists bool
+
+	alias      string
+	pattern    string
 	policyName string
 	policy     common.MapStr
 }
@@ -47,15 +52,33 @@ type infoCache struct {
 
 var defaultCacheDuration = 5 * time.Minute
 
+func NewDefaultSupport(
+	mode Mode,
+	alias string,
+	policyName string,
+	policy common.MapStr,
+	overwrite, checkExists bool,
+) Supporter {
+	pattern := fmt.Sprintf("%v-*", alias)
+	return &ilmSupport{
+		mode:        mode,
+		overwrite:   overwrite,
+		checkExists: checkExists,
+		alias:       alias,
+		pattern:     pattern,
+		policyName:  policyName,
+		policy:      policy,
+	}
+}
+
 func (s *ilmSupport) Mode() Mode {
-	return s.cfg.Mode
+	return s.mode
 }
 
 func (s *ilmSupport) Template() TemplateSettings {
-	alias := s.cfg.RolloverAlias
 	return TemplateSettings{
-		Alias:      alias,
-		Pattern:    fmt.Sprintf("%s-*", alias),
+		Alias:      s.alias,
+		Pattern:    fmt.Sprintf("%s-*", s.alias),
 		PolicyName: s.policyName,
 	}
 }
@@ -72,7 +95,7 @@ func (s *ilmSupport) Manager(h APIHandler) Manager {
 }
 
 func (m *singlePolicyManager) Enabled() (bool, error) {
-	if m.cfg.Mode == ModeDisabled {
+	if m.mode == ModeDisabled {
 		return false, nil
 	}
 
@@ -80,7 +103,7 @@ func (m *singlePolicyManager) Enabled() (bool, error) {
 		return m.cache.Enabled, nil
 	}
 
-	enabled, err := m.client.ILMEnabled(m.cfg.Mode)
+	enabled, err := m.client.ILMEnabled(m.mode)
 	if err != nil {
 		return enabled, err
 	}
@@ -91,7 +114,7 @@ func (m *singlePolicyManager) Enabled() (bool, error) {
 }
 
 func (m *singlePolicyManager) EnsureAlias() error {
-	alias := m.cfg.RolloverAlias
+	alias := m.alias
 	b, err := m.client.HasAlias(alias)
 	if err != nil {
 		return err
@@ -101,17 +124,17 @@ func (m *singlePolicyManager) EnsureAlias() error {
 	}
 
 	// Escaping because of date pattern
-	pattern := url.PathEscape(m.cfg.Pattern)
+	pattern := url.PathEscape(m.pattern)
 	// This always assume it's a date pattern by sourrounding it by <...>
 	firstIndex := fmt.Sprintf("%%3C%s-%s%%3E", alias, pattern)
 	return m.client.CreateAlias(alias, firstIndex)
 }
 
 func (m *singlePolicyManager) EnsurePolicy(overwrite bool) error {
-	overwrite = overwrite || m.cfg.Overwrite
+	overwrite = overwrite || m.overwrite
 
 	exists := true
-	if m.cfg.CheckExists && !overwrite {
+	if m.checkExists && !overwrite {
 		b, err := m.client.HasILMPolicy(m.policyName)
 		if err != nil {
 			return err
