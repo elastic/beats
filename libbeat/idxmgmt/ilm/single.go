@@ -54,6 +54,7 @@ type infoCache struct {
 
 var defaultCacheDuration = 5 * time.Minute
 
+// NewDefaultSupport creates an instance of default ILM support implementation.
 func NewDefaultSupport(
 	log *logp.Logger,
 	mode Mode,
@@ -147,10 +148,10 @@ func (m *singlePolicyManager) EnsurePolicy(overwrite bool) error {
 
 	if !exists || overwrite {
 		return m.client.CreateILMPolicy(m.policyName, m.policy)
-	} else {
-		log.Infof("do not generate ilm policy: exists=%v, overwrite=%v",
-			exists, overwrite)
 	}
+
+	log.Infof("do not generate ilm policy: exists=%v, overwrite=%v",
+		exists, overwrite)
 	return nil
 }
 

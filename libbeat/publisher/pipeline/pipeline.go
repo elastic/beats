@@ -131,6 +131,8 @@ const (
 	WaitOnClientClose
 )
 
+// OutputReloader interface, that can be queried from an active publisher pipeline.
+// The output reloader can be used to change the active output.
 type OutputReloader interface {
 	Reload(
 		cfg *reload.ConfigWithMeta,

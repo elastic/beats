@@ -45,6 +45,9 @@ type Monitors struct {
 	Logger    *logp.Logger
 }
 
+// OutputFactory is used by the publisher pipeline to create an output instance.
+// If the group returned can be empty. The pipeline will accept events, but
+// eventually block.
 type OutputFactory func(outputs.Observer) (string, outputs.Group, error)
 
 func init() {

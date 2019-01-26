@@ -25,8 +25,15 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 )
 
+// SupportFactory is used to provide custom index management support to libbeat.
 type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, error)
 
+// Supporter provides index management and configuration related services
+// throughout libbeat.
+// The BuildSelector is used by the output to create an IndexSelector. The
+// index selector will report the per event index name to be used.
+// A manager instantiated via Supporter is responsible for instantiating/configuring
+// the index throughout the Elastic Stack.
 type Supporter interface {
 	Enabled() bool
 	ILM() ilm.Supporter
@@ -34,20 +41,27 @@ type Supporter interface {
 	BuildSelector(cfg *common.Config) (outputs.IndexSelector, error)
 }
 
+// ESClient defines the minimal interface required for the index manager to
+// prepare an index.
 type ESClient interface {
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
 	GetVersion() common.Version
 }
 
+// Manager is used to initialize indices, ILM policies, and aliases within the
+// Elastic Stack.
 type Manager interface {
 	Setup(template, policy bool) error
 }
 
+// DefaultSupport initializes the default index management support used by most Beats.
 func DefaultSupport(log *logp.Logger, info beat.Info, configRoot *common.Config) (Supporter, error) {
 	factory := MakeDefaultSupport(nil)
 	return factory(log, info, configRoot)
 }
 
+// MakeDefaultSupport creates some default index management support, with a
+// custom ILM support implementation.
 func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
 	if ilmSupport == nil {
 		ilmSupport = ilm.DefaultSupport

@@ -22,6 +22,8 @@ import (
 	"fmt"
 )
 
+// Error indicates an error + reason describing the last error.
+// The Reason() method returns a sentinal error value for comparison.
 type Error struct {
 	reason  error
 	cause   error
@@ -59,6 +61,7 @@ func wrapErrf(cause, reason error, msg string, vs ...interface{}) error {
 	}
 }
 
+// ErrReason calls Reason() if the error implements this method. Otherwise return nil.
 func ErrReason(err error) error {
 	if err == nil {
 		return nil
@@ -71,8 +74,13 @@ func ErrReason(err error) error {
 	return ifc.Reason()
 }
 
+// Cause returns the errors cause, if present.
+func (e *Error) Cause() error { return e.cause }
+
+// Reason returns a sentinal error value define within the ilm package.
 func (e *Error) Reason() error { return e.reason }
 
+// Error returns the formatted error string.
 func (e *Error) Error() string {
 	msg := e.message
 	if e.message == "" {
@@ -80,7 +88,7 @@ func (e *Error) Error() string {
 	}
 
 	if e.cause != nil {
-		return fmt.Sprintf("%v: %v", msg, e.cause.Error())
+		return fmt.Sprintf("%v: %+v", msg, e.cause)
 	}
 	return msg
 }

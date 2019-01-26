@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 )
 
+// Config is used for unpacking a common.Config.
 type Config struct {
 	Mode          Mode                     `config:"enabled"`
 	Name          fmtstr.EventFormatString `config:"name"`
@@ -59,6 +60,10 @@ const (
 
 const ilmDefaultPattern = "{now/d}-000001"
 
+// DefaultPolicy defines the default policy to be used if no custom policy is
+// configured.
+// By default the policy contains not warm, cold, or delete phase.
+// The index is configured to rollover every 50GB or after 30d.
 var DefaultPolicy = common.MapStr{
 	"policy": common.MapStr{
 		"phases": common.MapStr{

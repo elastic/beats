@@ -30,8 +30,11 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+// SupportFactory is used to define a policy type to be used.
 type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, error)
 
+// Supporter implements ILM support. For loading the policies and creating
+// write alias a manager instance must be generated.
 type Supporter interface {
 	Mode() Mode
 	Template() TemplateSettings
@@ -39,12 +42,14 @@ type Supporter interface {
 	Manager(h APIHandler) Manager
 }
 
+// Manager uses an APIHandler to install a policy.
 type Manager interface {
 	Enabled() (bool, error)
 	EnsureAlias() error
 	EnsurePolicy(overwrite bool) error
 }
 
+// APIHandler defines the interface between a remote service and the Manager.
 type APIHandler interface {
 	ILMEnabled(Mode) (bool, error)
 
@@ -55,12 +60,14 @@ type APIHandler interface {
 	CreateILMPolicy(name string, policy common.MapStr) error
 }
 
+// TemplateSettings lists the additional settings to be applied to an index template.
 type TemplateSettings struct {
 	Alias      string
 	Pattern    string
 	PolicyName string
 }
 
+// DefaultSupport configures a new default ILM support implementation.
 func DefaultSupport(log *logp.Logger, info beat.Info, config *common.Config) (Supporter, error) {
 	if log == nil {
 		log = logp.NewLogger("ilm")
@@ -99,6 +106,7 @@ func DefaultSupport(log *logp.Logger, info beat.Info, config *common.Config) (Su
 		return nil, errors.Wrap(err, "failed to read ilm policy name")
 	}
 
+	log.Infof("Policy name: %v", name)
 	return NewDefaultSupport(
 		log,
 		cfg.Mode,

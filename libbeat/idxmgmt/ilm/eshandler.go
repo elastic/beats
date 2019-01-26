@@ -32,6 +32,8 @@ var (
 	esMinDefaultILMVesion = common.MustNewVersion("7.0.0")
 )
 
+// ESClientHandler creates a new APIHandler executing ilm, and alias queries
+// against Elasticsearch.
 func ESClientHandler(client ESClient) APIHandler {
 	if client == nil {
 		return nil
@@ -39,6 +41,8 @@ func ESClientHandler(client ESClient) APIHandler {
 	return &esClientHandler{client}
 }
 
+// ESClient defines the minimal interface required for the ESClientHandler to
+// prepare a policy and write alias.
 type ESClient interface {
 	GetVersion() common.Version
 	Request(

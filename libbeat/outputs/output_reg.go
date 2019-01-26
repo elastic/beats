@@ -33,10 +33,14 @@ type Factory func(
 	stats Observer,
 	cfg *common.Config) (Group, error)
 
+// IndexManager provides additional index related services to the outputs.
 type IndexManager interface {
+	// BuildSelector can be used by an output to create an IndexSelector based on
+	// the outputs configuration.
 	BuildSelector(cfg *common.Config) (IndexSelector, error)
 }
 
+// IndexSelector is used to find the index name an event shall be indexed to.
 type IndexSelector interface {
 	Select(event *beat.Event) (string, error)
 }
