@@ -7,6 +7,7 @@ package aws
 import (
 	"context"
 	"errors"
+	"sort"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -101,12 +102,51 @@ func (s *SQS) Template() *cloudformation.Template {
 	return template
 }
 
+// Policies returns a slice of policies to add to the lambda role.
+func (s *SQS) Policies() []cloudformation.AWSIAMRole_Policy {
+	resources := make([]string, len(s.config.Triggers))
+	for idx, trigger := range s.config.Triggers {
+		resources[idx] = trigger.EventSourceArn
+	}
+
+	// Give us a chance to generate the same document indenpendant of the changes,
+	// to help with updates.
+	sort.Strings(resources)
+
+	// SQS Roles permissions:
+	// - lambda:CreateEventSourceMapping
+	// - lambda:ListEventSourceMappings
+	// - lambda:ListFunctions
+	//
+	// Lambda Role permission
+	// - sqs:ChangeMessageVisibility
+	// - sqs:DeleteMessage
+	// - sqs:GetQueueAttributes
+	// - sqs:ReceiveMessage
+	policies := []cloudformation.AWSIAMRole_Policy{
+		cloudformation.AWSIAMRole_Policy{
+			PolicyName: cloudformation.Join("-", []string{"fnb", "sqs", s.config.Name}),
+			PolicyDocument: map[string]interface{}{
+				"Statement": []map[string]interface{}{
+					map[string]interface{}{
+						"Action": []string{
+							"sqs:ChangeMessageVisibility",
+							"sqs:DeleteMessage",
+							"sqs:GetQueueAttributes",
+							"sqs:ReceiveMessage",
+						},
+						"Effect":   "Allow",
+						"Resource": resources,
+					},
+				},
+			},
+		},
+	}
+
+	return policies
+}
+
 // LambdaConfig returns the configuration to use when creating the lambda.
 func (s *SQS) LambdaConfig() *lambdaConfig {
 	return s.config.LambdaConfig
-}
-
-// Policies returns a slice of policy to add to the lambda.
-func (s *SQS) Policies() []cloudformation.AWSIAMRole_Policy {
-	return []cloudformation.AWSIAMRole_Policy{}
 }
