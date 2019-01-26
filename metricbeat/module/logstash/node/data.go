@@ -31,11 +31,17 @@ import (
 
 var (
 	schema = s.Schema{
-		"host":    c.Str("host"),
-		"version": c.Str("version"),
+		"host": s.Object{
+			"hostname": c.Str("host"),
+		},
+		"service": s.Object{
+			"version": c.Str("version"),
+		},
 		"jvm": c.Dict("jvm", s.Schema{
 			"version": c.Str("version"),
-			"pid":     c.Int("pid"),
+			"process": s.Object{
+				"pid": c.Int("pid"),
+			},
 		}),
 	}
 )
