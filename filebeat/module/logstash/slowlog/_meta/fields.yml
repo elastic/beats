@@ -7,10 +7,6 @@
       type: text
       description: >
         Contains the un-parsed log message
-    - name: level
-      type: keyword
-      description: >
-        The log level of the message, this correspond to Log4j levels.
     - name: module
       type: keyword
       description: >
@@ -35,10 +31,6 @@
       type: long
       description: >
         Execution time for the plugin in milliseconds.
-    - name: took_in_nanos
-      type: long
-      description: >
-        Execution time for the plugin in nanoseconds.
     - name: plugin_params
       type: text
       description: >
@@ -48,7 +40,11 @@
       description: >
         key -> value of the configuration used by the plugin.
 
-
-
-
-
+    - name: level
+      type: alias
+      path: log.level
+      migration: true
+    - name: took_in_nanos
+      type: alias
+      path: event.duration
+      migration: true

@@ -40,8 +40,8 @@
         "session": "11",
         "summary": {
             "actor": {
-                "primary": "ubuntu",
-                "secondary": "ubuntu"
+                "primary": "1001",
+                "secondary": "1001"
             },
             "how": "/bin/uname",
             "object": {
@@ -66,17 +66,23 @@
         "path": "/bin/uname",
         "uid": "0"
     },
+    "group": {
+        "id": "1002"
+    },
     "process": {
         "args": [
             "uname",
             "-a"
         ],
-        "cwd": "/home/andrew_kroh",
-        "exe": "/bin/uname",
+        "executable": "/bin/uname",
         "name": "uname",
-        "pid": "10043",
-        "ppid": "10027",
-        "title": "uname -a"
+        "pid": 10043,
+        "ppid": 10027,
+        "title": "uname -a",
+        "working_directory": "/home/andrew_kroh"
+    },
+    "service": {
+        "type": "auditd"
     },
     "tags": [
         "user_commands"
@@ -88,13 +94,7 @@
         "fsgid": "1002",
         "fsuid": "1001",
         "gid": "1002",
-        "name_map": {
-            "auid": "ubuntu",
-            "euid": "ubuntu",
-            "fsuid": "ubuntu",
-            "suid": "ubuntu",
-            "uid": "ubuntu"
-        },
+        "id": "1001",
         "sgid": "1002",
         "suid": "1001",
         "uid": "1001"

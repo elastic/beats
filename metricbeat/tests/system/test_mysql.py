@@ -35,9 +35,32 @@ class Test(metricbeat.BaseTest):
         evt = output[0]
 
         self.assertItemsEqual(self.de_dot(MYSQL_FIELDS), evt.keys())
-        mysql_info = evt["mysql"]["status"]
+
+        status = evt["mysql"]["status"]
+        assert status["connections"] > 0
+        assert status["opened_tables"] > 0
 
         self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return [os.getenv('MYSQL_DSN', 'root:test@tcp(localhost:3306)/')]
+        return ['root:test@tcp({}:3306)/'.format(self.compose_hosts()[0])]
+
+
+class TestMysql80(Test):
+    COMPOSE_SERVICES = ['mysql_8_0']
+
+
+class TestPercona57(Test):
+    COMPOSE_SERVICES = ['percona_5_7']
+
+
+class TestPercona80(Test):
+    COMPOSE_SERVICES = ['percona_8_0']
+
+
+class TestMariadb102(Test):
+    COMPOSE_SERVICES = ['mariadb_10_2']
+
+
+class TestMariadb103(Test):
+    COMPOSE_SERVICES = ['mariadb_10_3']

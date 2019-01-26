@@ -7,7 +7,7 @@
     "event": {
         "action": "existing_user",
         "dataset": "user",
-        "id": "b0bbc4e2-9540-4aaf-b74e-ef9de506e852",
+        "id": "11b3b49c-79a1-4983-aea9-3257a3073a71",
         "kind": "state",
         "module": "system"
     },
@@ -19,14 +19,14 @@
         "audit": {
             "user": {
                 "dir": "/home/elastic",
-                "gid": 1002,
+                "gid": "1002",
                 "group": [
                     {
-                        "gid": 1002,
+                        "gid": "1002",
                         "name": "elastic"
                     },
                     {
-                        "gid": 999,
+                        "gid": "999",
                         "name": "docker"
                     }
                 ],
@@ -36,13 +36,13 @@
                     "type": "shadow_password"
                 },
                 "shell": "/usr/bin/zsh",
-                "uid": 1002,
+                "uid": "1002",
                 "user_information": ",,,"
             }
         }
     },
     "user": {
-        "id": 1002,
+        "id": "1002",
         "name": "elastic"
     }
 }

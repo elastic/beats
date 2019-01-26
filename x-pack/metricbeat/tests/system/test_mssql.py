@@ -24,7 +24,36 @@ class Test(XPackTest):
         """
         self.render_config_template(modules=[{
             "name": "mssql",
-            "metricsets": ["db"],
+            "metricsets": ["transaction_log"],
+            "hosts": self.get_hosts(),
+            "username": self.get_username(),
+            "password": self.get_password(),
+            "period": "5s"
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        output = self.read_output_json()
+        self.assertEqual(len(output), 4)
+        evt = output[0]
+
+        self.assertItemsEqual(self.de_dot(MSSQL_FIELDS), evt.keys())
+        self.assertTrue(evt["mssql"]["transaction_log"]["space_usage"]["used"]["pct"] > 0)
+        self.assertTrue(evt["mssql"]["transaction_log"]["stats"]["active_size"]["bytes"] > 0)
+
+        self.assert_fields_are_documented(evt)
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_performance(self):
+        """
+        MSSQL module outputs an event.
+        """
+        self.render_config_template(modules=[{
+            "name": "mssql",
+            "metricsets": ["performance"],
             "hosts": self.get_hosts(),
             "username": self.get_username(),
             "password": self.get_password(),
@@ -40,8 +69,8 @@ class Test(XPackTest):
         evt = output[0]
 
         self.assertItemsEqual(self.de_dot(MSSQL_FIELDS), evt.keys())
-        self.assertTrue(evt["mssql"]["db"]["log_space_usage"]["used"]["pct"] > 0)
-        self.assertTrue(evt["mssql"]["db"]["log_space_usage"]["used"]["bytes"] > 0)
+        self.assertTrue(evt["mssql"]["performance"]["buffer"]["page_life_expectancy"]["sec"] > 0)
+        self.assertTrue(evt["mssql"]["performance"]["user_connections"] > 0)
 
         self.assert_fields_are_documented(evt)
 

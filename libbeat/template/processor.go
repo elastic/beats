@@ -27,12 +27,15 @@ import (
 // Processor struct to process fields to template
 type Processor struct {
 	EsVersion common.Version
+	Migration bool
 }
 
 var (
 	defaultScalingFactor = 1000
 	defaultIgnoreAbove   = 1024
 )
+
+const scalingFactorKey = "scalingFactor"
 
 // Process recursively processes the given fields and writes the template in the given output
 func (p *Processor) Process(fields common.Fields, path string, output common.MapStr) error {
@@ -119,20 +122,28 @@ func (p *Processor) integer(f *common.Field) common.MapStr {
 	return property
 }
 
-func (p *Processor) scaledFloat(f *common.Field) common.MapStr {
+func (p *Processor) scaledFloat(f *common.Field, params ...common.MapStr) common.MapStr {
 	property := getDefaultProperties(f)
 	property["type"] = "scaled_float"
 
 	if p.EsVersion.IsMajor(2) {
 		property["type"] = "float"
-	} else {
-		scalingFactor := f.ScalingFactor
-		// Set default scaling factor
-		if scalingFactor == 0 {
-			scalingFactor = defaultScalingFactor
-		}
-		property["scaling_factor"] = scalingFactor
+		return property
 	}
+
+	// Set scaling factor
+	scalingFactor := defaultScalingFactor
+	if f.ScalingFactor != 0 && len(f.ObjectTypeParams) == 0 {
+		scalingFactor = f.ScalingFactor
+	}
+
+	if len(params) > 0 {
+		if s, ok := params[0][scalingFactorKey].(int); ok && s != 0 {
+			scalingFactor = s
+		}
+	}
+
+	property["scaling_factor"] = scalingFactor
 	return property
 }
 
@@ -249,40 +260,60 @@ func (p *Processor) array(f *common.Field) common.MapStr {
 }
 
 func (p *Processor) alias(f *common.Field) common.MapStr {
+	// Aliases were introduced in Elasticsearch 6.4, ignore if unsupported
+	if p.EsVersion.LessThan(common.MustNewVersion("6.4.0")) {
+		return nil
+	}
+
+	// In case migration is disabled and it's a migration alias, field is not created
+	if !p.Migration && f.MigrationAlias {
+		return nil
+	}
 	properties := getDefaultProperties(f)
 	properties["type"] = "alias"
 	properties["path"] = f.AliasPath
+
 	return properties
 }
 
 func (p *Processor) object(f *common.Field) common.MapStr {
-	dynProperties := getDefaultProperties(f)
-
-	matchType := func(onlyType string) string {
-		if f.ObjectTypeMappingType != "" {
-			return f.ObjectTypeMappingType
+	matchType := func(onlyType string, mt string) string {
+		if mt != "" {
+			return mt
 		}
 		return onlyType
 	}
 
-	switch f.ObjectType {
-	case "scaled_float":
-		dynProperties = p.scaledFloat(f)
-		addDynamicTemplate(f, dynProperties, matchType("*"))
-	case "text":
-		dynProperties["type"] = "text"
+	var otParams []common.ObjectTypeCfg
+	if len(f.ObjectTypeParams) != 0 {
+		otParams = f.ObjectTypeParams
+	} else {
+		otParams = []common.ObjectTypeCfg{common.ObjectTypeCfg{
+			ObjectType: f.ObjectType, ObjectTypeMappingType: f.ObjectTypeMappingType, ScalingFactor: f.ScalingFactor}}
+	}
 
-		if p.EsVersion.IsMajor(2) {
-			dynProperties["type"] = "string"
-			dynProperties["index"] = "analyzed"
+	for _, otp := range otParams {
+		dynProperties := getDefaultProperties(f)
+
+		switch otp.ObjectType {
+		case "scaled_float":
+			dynProperties = p.scaledFloat(f, common.MapStr{scalingFactorKey: otp.ScalingFactor})
+			addDynamicTemplate(f, dynProperties, matchType("*", otp.ObjectTypeMappingType))
+		case "text":
+			dynProperties["type"] = "text"
+
+			if p.EsVersion.IsMajor(2) {
+				dynProperties["type"] = "string"
+				dynProperties["index"] = "analyzed"
+			}
+			addDynamicTemplate(f, dynProperties, matchType("string", otp.ObjectTypeMappingType))
+		case "keyword":
+			dynProperties["type"] = otp.ObjectType
+			addDynamicTemplate(f, dynProperties, matchType("string", otp.ObjectTypeMappingType))
+		case "byte", "double", "float", "long", "short", "boolean":
+			dynProperties["type"] = otp.ObjectType
+			addDynamicTemplate(f, dynProperties, matchType(otp.ObjectType, otp.ObjectTypeMappingType))
 		}
-		addDynamicTemplate(f, dynProperties, matchType("string"))
-	case "keyword":
-		dynProperties["type"] = f.ObjectType
-		addDynamicTemplate(f, dynProperties, matchType("string"))
-	case "byte", "double", "float", "long", "short":
-		dynProperties["type"] = f.ObjectType
-		addDynamicTemplate(f, dynProperties, matchType(f.ObjectType))
 	}
 
 	properties := getDefaultProperties(f)

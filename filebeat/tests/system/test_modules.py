@@ -122,6 +122,11 @@ class Test(BaseTest):
             "-M", "*.*.input.close_eof=true",
         ]
 
+        # Based on the convention that if a name contains -json the json format is needed. Currently used for LS.
+        if "-json" in test_file:
+            cmd.append("-M")
+            cmd.append("{module}.{fileset}.var.format=json".format(module=module, fileset=fileset))
+
         output_path = os.path.join(self.working_dir)
         output = open(os.path.join(output_path, "output.log"), "ab")
         output.write(" ".join(cmd) + "\n")
@@ -194,17 +199,17 @@ class Test(BaseTest):
 
 def clean_keys(obj):
     # These keys are host dependent
-    host_keys = ["host.name", "agent.hostname", "agent.type"]
+    host_keys = ["host.name", "agent.hostname", "agent.type", "agent.ephemeral_id", "agent.id"]
     # The create timestamps area always new
-    time_keys = ["read_timestamp", "event.created"]
-    # source path and beat.version can be different for each run
+    time_keys = ["event.created"]
+    # source path and agent.version can be different for each run
     other_keys = ["log.file.path", "agent.version"]
 
     for key in host_keys + time_keys + other_keys:
         delete_key(obj, key)
 
     # Remove timestamp for comparison where timestamp is not part of the log line
-    if obj["event.module"] == "icinga" and obj["event.dataset"] == "startup":
+    if (obj["event.dataset"] in ["icinga.startup", "redis.log", "haproxy.log", "system.auth", "system.syslog"]):
         delete_key(obj, "@timestamp")
 
 

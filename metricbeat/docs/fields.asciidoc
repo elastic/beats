@@ -14,6 +14,7 @@ grouped in the following categories:
 
 * <<exported-fields-aerospike>>
 * <<exported-fields-apache>>
+* <<exported-fields-aws>>
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
@@ -40,11 +41,14 @@ grouped in the following categories:
 * <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
 * <<exported-fields-mongodb>>
+* <<exported-fields-mssql>>
 * <<exported-fields-munin>>
 * <<exported-fields-mysql>>
+* <<exported-fields-nats>>
 * <<exported-fields-nginx>>
 * <<exported-fields-php_fpm>>
 * <<exported-fields-postgresql>>
+* <<exported-fields-process>>
 * <<exported-fields-prometheus>>
 * <<exported-fields-rabbitmq>>
 * <<exported-fields-redis>>
@@ -809,6 +813,186 @@ Total.
 
 --
 
+[[exported-fields-aws]]
+== aws fields
+
+`aws` module collects AWS monitoring metrics from AWS Cloudwatch.
+
+
+
+[float]
+== aws fields
+
+
+
+
+[float]
+== ec2 fields
+
+`ec2` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EC2.
+
+
+
+*`aws.ec2.cpu.total.pct`*::
++
+--
+type: scaled_float
+
+The percentage of allocated EC2 compute units that are currently in use on the instance.
+
+
+--
+
+*`aws.ec2.cpu.credit_usage`*::
++
+--
+type: scaled_float
+
+The number of CPU credits spent by the instance for CPU utilization.
+
+
+--
+
+*`aws.ec2.cpu.credit_balance`*::
++
+--
+type: scaled_float
+
+The number of earned CPU credits that an instance has accrued since it was launched or started.
+
+
+--
+
+*`aws.ec2.cpu.surplus_credit_balance`*::
++
+--
+type: scaled_float
+
+The number of surplus credits that have been spent by an unlimited instance when its CPUCreditBalance value is zero.
+
+
+--
+
+*`aws.ec2.cpu.surplus_credits_charged`*::
++
+--
+type: scaled_float
+
+The number of spent surplus credits that are not paid down by earned CPU credits, and which thus incur an additional charge.
+
+
+--
+
+*`aws.ec2.network.in.packets`*::
++
+--
+type: scaled_float
+
+The number of packets received on all network interfaces by the instance.
+
+
+--
+
+*`aws.ec2.network.out.packets`*::
++
+--
+type: scaled_float
+
+The number of packets sent out on all network interfaces by the instance.
+
+
+--
+
+*`aws.ec2.network.in.bytes`*::
++
+--
+type: scaled_float
+
+The number of bytes received on all network interfaces by the instance.
+
+
+--
+
+*`aws.ec2.network.out.bytes`*::
++
+--
+type: scaled_float
+
+The number of bytes sent out on all network interfaces by the instance.
+
+
+--
+
+*`aws.ec2.diskio.read.bytes`*::
++
+--
+type: scaled_float
+
+Bytes read from all instance store volumes available to the instance.
+
+
+--
+
+*`aws.ec2.diskio.write.bytes`*::
++
+--
+type: scaled_float
+
+Bytes written to all instance store volumes available to the instance.
+
+
+--
+
+*`aws.ec2.diskio.read.ops`*::
++
+--
+type: scaled_float
+
+Completed read operations from all instance store volumes available to the instance in a specified period of time.
+
+
+--
+
+*`aws.ec2.diskio.write.ops`*::
++
+--
+type: scaled_float
+
+Completed write operations to all instance store volumes available to the instance in a specified period of time.
+
+
+--
+
+*`aws.ec2.status.check_failed`*::
++
+--
+type: long
+
+Reports whether the instance has passed both the instance status check and the system status check in the last minute.
+
+
+--
+
+*`aws.ec2.status.check_failed_system`*::
++
+--
+type: long
+
+Reports whether the instance has passed the system status check in the last minute.
+
+
+--
+
+*`aws.ec2.status.check_failed_instance`*::
++
+--
+type: long
+
+Reports whether the instance has passed the instance status check in the last minute.
+
+
+--
+
 [[exported-fields-beat]]
 == Beat fields
 
@@ -849,6 +1033,24 @@ type: keyword
 
 Error type.
 
+
+--
+
+*`beat.name`*::
++
+--
+type: alias
+
+alias to: host.name
+
+--
+
+*`beat.hostname`*::
++
+--
+type: alias
+
+alias to: agent.hostname
 
 --
 
@@ -2485,7 +2687,7 @@ Size of the files that have been created or changed since creation.
 *`docker.container.tags`*::
 +
 --
-type: array
+type: keyword
 
 Image tags.
 
@@ -2763,6 +2965,90 @@ Number of reads and writes per second
 --
 
 [float]
+== event fields
+
+Docker event
+
+
+
+*`docker.event.status`*::
++
+--
+type: keyword
+
+Event status
+
+
+--
+
+*`docker.event.id`*::
++
+--
+type: keyword
+
+Event id when available
+
+
+--
+
+*`docker.event.from`*::
++
+--
+type: keyword
+
+Event source
+
+
+--
+
+*`docker.event.type`*::
++
+--
+type: keyword
+
+The type of object emitting the event
+
+
+--
+
+*`docker.event.action`*::
++
+--
+type: keyword
+
+The type of event
+
+
+--
+
+[float]
+== actor fields
+
+Actor
+
+
+
+*`docker.event.actor.id`*::
++
+--
+type: keyword
+
+The ID of the object emitting the event
+
+
+--
+
+*`docker.event.actor.attributes`*::
++
+--
+type: object
+
+Various key/value attributes of the object, depending on its type
+
+
+--
+
+[float]
 == healthcheck fields
 
 Docker container metrics.
@@ -2920,7 +3206,7 @@ Image labels.
 *`docker.image.tags`*::
 +
 --
-type: array
+type: keyword
 
 Image tags.
 
@@ -3531,6 +3817,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the client to the server.
 
 
@@ -3878,6 +4166,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the destination to the source.
 
 
@@ -4212,6 +4502,8 @@ Hash (perhaps logstash fingerprint) of raw field to be able to demonstrate log i
 --
 type: long
 
+format: duration
+
 Duration of the event in nanoseconds.
 If event.start and event.end are known this value should be the difference between the end and start time.
 
@@ -4400,6 +4692,8 @@ Mode of the file in octal representation.
 --
 type: long
 
+format: bytes
+
 File size in bytes (field is only added when `type` is `file`).
 
 --
@@ -4559,7 +4853,19 @@ type: keyword
 
 example: Mac OS X
 
-Operating system name.
+Operating system name, without the version.
+
+
+--
+
+*`host.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
 
 
 --
@@ -4581,7 +4887,7 @@ OS family (such as redhat, debian, freebsd, windows).
 --
 type: keyword
 
-example: 10.12.6-rc2
+example: 10.14.1
 
 Operating system version as a raw string.
 
@@ -4792,6 +5098,8 @@ type: long
 
 example: 1437
 
+format: bytes
+
 Total size in bytes of the request (body and headers).
 
 
@@ -4803,6 +5111,8 @@ Total size in bytes of the request (body and headers).
 type: long
 
 example: 887
+
+format: bytes
 
 Size in bytes of the request body.
 
@@ -4816,6 +5126,8 @@ type: long
 
 example: 1437
 
+format: bytes
+
 Total size in bytes of the response (body and headers).
 
 
@@ -4827,6 +5139,8 @@ Total size in bytes of the response (body and headers).
 type: long
 
 example: 887
+
+format: bytes
 
 Size in bytes of the response body.
 
@@ -5006,6 +5320,8 @@ type: long
 
 example: 368
 
+format: bytes
+
 Total bytes transferred in both directions.
 If `source.bytes` and `destination.bytes` are known, `network.bytes` is their sum.
 
@@ -5028,7 +5344,7 @@ If `source.packets` and `destination.packets` are known, `network.packets` is th
 [float]
 == observer fields
 
-An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics. This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.  
+An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics. This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
 
 
 
@@ -5131,7 +5447,19 @@ type: keyword
 
 example: Mac OS X
 
-Operating system name.
+Operating system name, without the version.
+
+
+--
+
+*`observer.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
 
 
 --
@@ -5153,7 +5481,7 @@ OS family (such as redhat, debian, freebsd, windows).
 --
 type: keyword
 
-example: 10.12.6-rc2
+example: 10.14.1
 
 Operating system version as a raw string.
 
@@ -5330,7 +5658,19 @@ type: keyword
 
 example: Mac OS X
 
-Operating system name.
+Operating system name, without the version.
+
+
+--
+
+*`os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
 
 
 --
@@ -5352,7 +5692,7 @@ OS family (such as redhat, debian, freebsd, windows).
 --
 type: keyword
 
-example: 10.12.6-rc2
+example: 10.14.1
 
 Operating system version as a raw string.
 
@@ -5566,6 +5906,8 @@ Server domain.
 type: long
 
 example: 184
+
+format: bytes
 
 Bytes sent from the server to the client.
 
@@ -5840,6 +6182,8 @@ Source domain.
 type: long
 
 example: 184
+
+format: bytes
 
 Bytes sent from the source to the destination.
 
@@ -6149,12 +6493,29 @@ Useful if `user.id` or `user.name` contain confidential information and cannot b
 
 --
 
-*`user.group`*::
+[float]
+== group fields
+
+The group fields are meant to represent groups that are relevant to the event.
+
+
+
+*`user.group.id`*::
 +
 --
 type: keyword
 
-Group the user is a part of. This field can contain a list of groups, if necessary.
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
 
 
 --
@@ -6240,7 +6601,19 @@ type: keyword
 
 example: Mac OS X
 
-Operating system name.
+Operating system name, without the version.
+
+
+--
+
+*`user_agent.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
 
 
 --
@@ -6262,7 +6635,7 @@ OS family (such as redhat, debian, freebsd, windows).
 --
 type: keyword
 
-example: 10.12.6-rc2
+example: 10.14.1
 
 Operating system version as a raw string.
 
@@ -6278,24 +6651,6 @@ example: 4.4.0-112-generic
 
 Operating system kernel version as a raw string.
 
-
---
-
-*`beat.name`*::
-+
---
-type: alias
-
-alias to: agent.type
-
---
-
-*`beat.hostname`*::
-+
---
-type: alias
-
-alias to: agent.hostname
 
 --
 
@@ -7484,7 +7839,6 @@ The node the shard was relocated from.
 [[exported-fields-envoyproxy]]
 == envoyproxy fields
 
-experimental[]
 envoyproxy module
 
 
@@ -10193,7 +10547,7 @@ Leader id (broker).
 *`kafka.partition.partition.isr`*::
 +
 --
-type: array
+type: keyword
 
 List of isr ids.
 
@@ -11726,6 +12080,65 @@ Memory usage as a percentage of the defined limit for the pod containers (or tot
 
 --
 
+
+*`kubernetes.pod.memory.available.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total memory available
+
+
+--
+
+
+*`kubernetes.pod.memory.workingSet.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total working set memory
+
+
+--
+
+
+*`kubernetes.pod.memory.rss.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total resident set size memory
+
+
+--
+
+*`kubernetes.pod.memory.pageFaults`*::
++
+--
+type: long
+
+Total page faults
+
+
+--
+
+*`kubernetes.pod.memory.majorPageFaults`*::
++
+--
+type: long
+
+Total major page faults
+
+
+--
+
 [float]
 == container fields
 
@@ -12450,7 +12863,6 @@ Total inodes
 [[exported-fields-kvm]]
 == kvm fields
 
-experimental[]
 kvm module
 
 
@@ -14486,7 +14898,7 @@ Optime of primary
 *`mongodb.replstatus.members.secondary.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of secondary hosts
 
@@ -14513,7 +14925,7 @@ type: long
 *`mongodb.replstatus.members.recovering.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of recovering members hosts
 
@@ -14533,7 +14945,7 @@ Count of members in the `recovering` state
 *`mongodb.replstatus.members.unknown.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of members' hosts in the `unknown` state
 
@@ -14553,7 +14965,7 @@ Count of members with `unknown` state
 *`mongodb.replstatus.members.startup2.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of initializing members hosts
 
@@ -14573,7 +14985,7 @@ Count of members in the `startup2` state
 *`mongodb.replstatus.members.arbiter.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of arbiters hosts
 
@@ -14593,7 +15005,7 @@ Count of arbiters
 *`mongodb.replstatus.members.down.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of `down` members hosts
 
@@ -14613,7 +15025,7 @@ Count of `down` members
 *`mongodb.replstatus.members.rollback.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of members in the `rollback` state
 
@@ -14633,7 +15045,7 @@ Count of members in the `rollback` state
 *`mongodb.replstatus.members.unhealthy.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of members' hosts with healthy = false
 
@@ -16227,6 +16639,346 @@ The amount of time spent for commits that occurred while a write lock was held.
 
 --
 
+[[exported-fields-mssql]]
+== mssql fields
+
+MS SQL module
+
+
+[float]
+== mssql fields
+
+
+
+
+[float]
+== database fields
+
+The database that the metrics is being referred to
+
+
+*`mssql.database.id`*::
++
+--
+type: long
+
+Unique ID of the database inside MSSQL
+
+--
+
+*`mssql.database.name`*::
++
+--
+type: keyword
+
+Name of the database
+
+--
+
+[float]
+== performance fields
+
+performance metricset fetches information about the Performance Counters
+
+
+*`mssql.performance.page_splits_per_sec`*::
++
+--
+type: long
+
+Number of page splits per second that occur as the result of overflowing index pages.
+
+--
+
+*`mssql.performance.lock_waits_per_sec`*::
++
+--
+type: long
+
+Number of lock requests per second that required the caller to wait.
+
+--
+
+*`mssql.performance.user_connections`*::
++
+--
+type: long
+
+Total number of user connections
+
+--
+
+*`mssql.performance.transactions`*::
++
+--
+type: long
+
+Total number of transactions
+
+--
+
+*`mssql.performance.active_temp_tables`*::
++
+--
+type: long
+
+Number of temporary tables/table variables in use.
+
+--
+
+*`mssql.performance.connections_reset_per_sec`*::
++
+--
+type: long
+
+Total number of logins started from the connection pool.
+
+--
+
+*`mssql.performance.logins_per_sec`*::
++
+--
+type: long
+
+Total number of logins started per second. This does not include pooled connections.
+
+--
+
+*`mssql.performance.logouts_per_sec`*::
++
+--
+type: long
+
+Total number of logout operations started per second.
+
+--
+
+*`mssql.performance.recompilations_per_sec`*::
++
+--
+type: long
+
+Number of statement recompiles per second. Counts the number of times statement recompiles are triggered. Generally, you want the recompiles to be low.
+
+--
+
+*`mssql.performance.compilations_per_sec`*::
++
+--
+type: long
+
+Number of SQL compilations per second. Indicates the number of times the compile code path is entered. Includes compiles caused by statement-level recompilations in SQL Server. After SQL Server user activity is stable, this value reaches a steady state.
+
+--
+
+*`mssql.performance.batch_requests_per_sec`*::
++
+--
+type: long
+
+Number of Transact-SQL command batches received per second. This statistic is affected by all constraints (such as I/O, number of users, cache size, complexity of requests, and so on). High batch requests mean good throughput.
+
+--
+
+
+[float]
+== cache_hit fields
+
+Indicates the percentage of pages found in the buffer cache without having to read from disk.
+
+
+*`mssql.performance.buffer.cache_hit.pct`*::
++
+--
+type: double
+
+The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses. After a long period of time, the ratio moves very little. Because reading from the cache is much less expensive than reading from disk, you want this ratio to be high
+
+--
+
+[float]
+== page_life_expectancy fields
+
+Indicates the number of seconds a page will stay in the buffer pool without references.
+
+
+*`mssql.performance.buffer.page_life_expectancy.sec`*::
++
+--
+type: long
+
+Indicates the number of seconds a page will stay in the buffer pool without references (in seconds).
+
+--
+
+*`mssql.performance.buffer.checkpoint_pages_per_sec`*::
++
+--
+type: long
+
+Indicates the number of pages flushed to disk per second by a checkpoint or other operation that require all dirty pages to be flushed.
+
+--
+
+*`mssql.performance.buffer.database_pages`*::
++
+--
+type: long
+
+Indicates the number of pages in the buffer pool with database content.
+
+--
+
+*`mssql.performance.buffer.target_pages`*::
++
+--
+type: long
+
+Ideal number of pages in the buffer pool.
+
+--
+
+[float]
+== transaction_log fields
+
+transaction_log metricset will fetch information about the operation and transaction log of each database from a MSSQL instance
+
+
+[float]
+== space_usage fields
+
+Space usage information for the transaction log
+
+
+[float]
+== since_last_backup fields
+
+The amount of space used since the last log backup
+
+
+*`mssql.transaction_log.space_usage.since_last_backup.bytes`*::
++
+--
+type: long
+
+The amount of space used since the last log backup in bytes
+
+--
+
+[float]
+== total fields
+
+The size of the log
+
+
+*`mssql.transaction_log.space_usage.total.bytes`*::
++
+--
+type: long
+
+The size of the log in bytes
+
+--
+
+[float]
+== used fields
+
+The occupied size of the log
+
+
+*`mssql.transaction_log.space_usage.used.bytes`*::
++
+--
+type: long
+
+The occupied size of the log in bytes
+
+--
+
+*`mssql.transaction_log.space_usage.used.pct`*::
++
+--
+type: float
+
+A percentage of the occupied size of the log as a percent of the total log size
+
+--
+
+[float]
+== stats fields
+
+Returns summary level attributes and information on transaction log files of databases. Use this information for monitoring and diagnostics of transaction log health.
+
+
+[float]
+== active_size fields
+
+Total active transaction log size.
+
+
+*`mssql.transaction_log.stats.active_size.bytes`*::
++
+--
+type: long
+
+Total active transaction log size in bytes
+
+--
+
+*`mssql.transaction_log.stats.backup_time`*::
++
+--
+type: date
+
+Last transaction log backup time.
+
+--
+
+[float]
+== recovery_size fields
+
+Log size since log recovery log sequence number (LSN).
+
+
+*`mssql.transaction_log.stats.recovery_size.bytes`*::
++
+--
+type: long
+
+Log size in bytes since log recovery log sequence number (LSN).
+
+--
+
+[float]
+== since_last_checkpoint fields
+
+Log size since last checkpoint log sequence number (LSN).
+
+
+*`mssql.transaction_log.stats.since_last_checkpoint.bytes`*::
++
+--
+type: long
+
+Log size in bytes since last checkpoint log sequence number (LSN).
+
+--
+
+[float]
+== total_size fields
+
+Total transaction log size.
+
+
+*`mssql.transaction_log.stats.total_size.bytes`*::
++
+--
+type: long
+
+Total transaction log size in bytes.
+
+--
+
 [[exported-fields-munin]]
 == Munin fields
 
@@ -17066,6 +17818,413 @@ The number of UPDATE queries since startup.
 
 --
 
+[[exported-fields-nats]]
+== Nats fields
+
+nats Module
+
+
+
+[float]
+== nats fields
+
+`nats` contains statistics that were read from Nats
+
+
+
+*`nats.server.id`*::
++
+--
+type: keyword
+
+The server ID
+
+
+--
+
+*`nats.server.time`*::
++
+--
+type: date
+
+Server time of metric creation
+
+
+--
+
+[float]
+== connections fields
+
+Contains nats connection related metrics
+
+
+
+*`nats.connections.total`*::
++
+--
+type: integer
+
+The number of currently active clients
+
+
+--
+
+[float]
+== routes fields
+
+Contains nats route related metrics
+
+
+
+*`nats.routes.total`*::
++
+--
+type: integer
+
+The number of registered routes
+
+
+--
+
+[float]
+== stats fields
+
+Contains nats var related metrics
+
+
+
+*`nats.stats.uptime`*::
++
+--
+type: long
+
+The period the server is up (sec)
+
+
+--
+
+*`nats.stats.mem.bytes`*::
++
+--
+type: long
+
+The current memory usage of NATS process
+
+
+--
+
+*`nats.stats.cores`*::
++
+--
+type: integer
+
+The number of logical cores the NATS process runs on
+
+
+--
+
+*`nats.stats.cpu`*::
++
+--
+type: float
+
+The current cpu usage of NATs process
+
+
+--
+
+*`nats.stats.total_connections`*::
++
+--
+type: integer
+
+The number of totally created clients
+
+
+--
+
+*`nats.stats.remotes`*::
++
+--
+type: integer
+
+The number of registered remotes
+
+
+--
+
+[float]
+== in fields
+
+The amount of incoming data
+
+
+
+*`nats.stats.in.messages`*::
++
+--
+type: integer
+
+The amount of incoming messages
+
+
+--
+
+*`nats.stats.in.bytes`*::
++
+--
+type: integer
+
+The amount of incoming bytes
+
+
+--
+
+[float]
+== out fields
+
+The amount of outgoing data
+
+
+
+*`nats.stats.out.messages`*::
++
+--
+type: integer
+
+The amount of outgoing messages
+
+
+--
+
+*`nats.stats.out.bytes`*::
++
+--
+type: integer
+
+The amount of outgoing bytes
+
+
+--
+
+*`nats.stats.slow_consumers`*::
++
+--
+type: integer
+
+The number of slow consumers currently on NATS
+
+
+--
+
+*`nats.stats.http_req_stats.root_uri`*::
++
+--
+type: object
+
+The number of hits on root monitoring uri
+
+
+--
+
+*`nats.stats.http_req_stats.connz_uri`*::
++
+--
+type: object
+
+The number of hits on connz monitoring uri
+
+
+--
+
+*`nats.stats.http_req_stats.routez_uri`*::
++
+--
+type: object
+
+The number of hits on routez monitoring uri
+
+
+--
+
+*`nats.stats.http_req_stats.subsz_uri`*::
++
+--
+type: object
+
+The number of hits on subsz monitoring uri
+
+
+--
+
+*`nats.stats.http_req_stats.stats_uri`*::
++
+--
+type: object
+
+The number of hits on stats monitoring uri
+
+
+--
+
+[float]
+== http fields
+
+The http metrics of NATS server
+
+
+
+[float]
+== req_stats fields
+
+The requests statistics
+
+
+
+[float]
+== uri fields
+
+The request distribution on monitoring URIS
+
+
+
+*`nats.stats.http.req_stats.uri.routez`*::
++
+--
+type: integer
+
+The number of hits on routez monitoring uri
+
+
+--
+
+*`nats.stats.http.req_stats.uri.connz`*::
++
+--
+type: integer
+
+The number of hits on connz monitoring uri
+
+
+--
+
+*`nats.stats.http.req_stats.uri.varz`*::
++
+--
+type: integer
+
+The number of hits on varz monitoring uri
+
+
+--
+
+*`nats.stats.http.req_stats.uri.subsz`*::
++
+--
+type: integer
+
+The number of hits on subsz monitoring uri
+
+
+--
+
+*`nats.stats.http.req_stats.uri.root`*::
++
+--
+type: integer
+
+The number of hits on root monitoring uri
+
+
+--
+
+[float]
+== subscriptions fields
+
+Contains nats subscriptions related metrics
+
+
+
+*`nats.subscriptions.total`*::
++
+--
+type: integer
+
+The number of active subscriptions
+
+
+--
+
+*`nats.subscriptions.inserts`*::
++
+--
+type: integer
+
+The number of insert operations in subscriptions list
+
+
+--
+
+*`nats.subscriptions.removes`*::
++
+--
+type: integer
+
+The number of remove operations in subscriptions list
+
+
+--
+
+*`nats.subscriptions.matches`*::
++
+--
+type: integer
+
+The number of times a match is found for a subscription
+
+
+--
+
+*`nats.subscriptions.cache.size`*::
++
+--
+type: integer
+
+The number of result sets in the cache
+
+
+--
+
+*`nats.subscriptions.cache.hit_rate`*::
++
+--
+type: integer
+
+The rate matches are being retrieved from cache
+
+
+--
+
+*`nats.subscriptions.cache.fanout.max`*::
++
+--
+type: integer
+
+The maximum fanout served by cache
+
+
+--
+
+*`nats.subscriptions.cache.fanout.avg`*::
++
+--
+type: integer
+
+The average fanout served by cache
+
+
+--
+
 [[exported-fields-nginx]]
 == Nginx fields
 
@@ -17190,7 +18349,6 @@ The current number of idle client connections waiting for a request.
 [[exported-fields-php_fpm]]
 == PHP_FPM fields
 
-beta[]
 PHP-FPM server status metrics collected from PHP-FPM.
 
 
@@ -18219,69 +19377,46 @@ Total number of temp block cache written by the query.
 
 --
 
+[[exported-fields-process]]
+== Process fields
+
+Process metadata fields
+
+
+
+
+*`process.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
+
+--
+
 [[exported-fields-prometheus]]
 == Prometheus fields
 
-Stats collected from Prometheus.
+Stats scraped from a Prometheus endpoint.
 
 
 
-[float]
-== prometheus fields
-
-
-
-
-[float]
-== stats fields
-
-Stats about the Prometheus server.
-
-
-
-[float]
-== notifications fields
-
-Notification stats.
-
-
-
-*`prometheus.stats.notifications.queue_length`*::
+*`prometheus.labels`*::
 +
 --
-type: long
+type: object
 
-Current queue length.
+Prometheus metric labels
 
 
 --
 
-*`prometheus.stats.notifications.dropped`*::
+*`prometheus.metrics`*::
 +
 --
-type: long
+type: object
 
-Number of dropped queue events.
-
-
---
-
-*`prometheus.stats.processes.open_fds`*::
-+
---
-type: long
-
-Number of open file descriptors.
-
-
---
-
-*`prometheus.stats.storage.chunks_to_persist`*::
-+
---
-type: long
-
-Number of memory chunks that are not yet persisted to disk.
+Prometheus metric - release: ga
 
 
 --
@@ -23907,7 +25042,7 @@ Network names
 [[exported-fields-windows]]
 == Windows fields
 
-beta[] Module for Windows
+Module for Windows
 
 
 
@@ -24198,7 +25333,9 @@ Number of synced followers reported when a node server_state is leader.
 *`zookeeper.mntr.version`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 ZooKeeper version and build string reported.
 

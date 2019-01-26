@@ -18,7 +18,7 @@ class Test(BaseTest):
         assert o["query"] == "select * from test"
         assert o["response"] == "a,b,c\nmea,meb,mec\nmea1," + \
             "meb1,mec1\nmea2,meb2,mec2\nmea3,meb3,mec3\n"
-        assert o["bytes_out"] == 202
+        assert o["destination.bytes"] == 202
 
     def test_insert(self):
         self.render_config_template(
@@ -31,8 +31,8 @@ class Test(BaseTest):
         o = objs[0]
         assert o["type"] == "pgsql"
         assert o["method"] == "INSERT"
-        assert o["bytes_out"] == 16
-        assert o["bytes_in"] == 63
+        assert o["destination.bytes"] == 16
+        assert o["source.bytes"] == 63
 
     def test_insert_error(self):
         self.render_config_template(
@@ -47,7 +47,6 @@ class Test(BaseTest):
         assert o["method"] == "INSERT"
         assert o["status"] == "Error"
         assert o["pgsql.error_code"] == "23505"
-        assert o["pgsql.iserror"] is True
 
     def test_login_rt(self):
         """
@@ -63,4 +62,4 @@ class Test(BaseTest):
         assert len(objs) == 1
         o = objs[0]
         assert o["method"] == "SELECT"
-        assert o["responsetime"] == 38
+        assert o["event.duration"] == 38800000

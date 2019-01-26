@@ -18,7 +18,6 @@
 package elasticsearch
 
 import (
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -42,6 +41,7 @@ var (
 // management plugin
 type MetricSet struct {
 	mb.BaseMetricSet
+	servicePath string
 	*helper.HTTP
 	XPack bool
 	Log   *logp.Logger
@@ -49,12 +49,11 @@ type MetricSet struct {
 
 // NewMetricSet creates an metric set that can be used to build other metric
 // sets that query RabbitMQ management plugin
-func NewMetricSet(base mb.BaseMetricSet, subPath string) (*MetricSet, error) {
+func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error) {
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err
 	}
-	http.SetURI(http.GetURI() + subPath)
 
 	config := struct {
 		XPack bool `config:"xpack.enabled"`
@@ -65,14 +64,26 @@ func NewMetricSet(base mb.BaseMetricSet, subPath string) (*MetricSet, error) {
 		return nil, err
 	}
 
-	if config.XPack {
-		cfgwarn.Experimental("The experimental xpack.enabled flag in " + base.FullyQualifiedName() + " metricset is enabled.")
-	}
-
-	return &MetricSet{
+	ms := &MetricSet{
 		base,
+		servicePath,
 		http,
 		config.XPack,
 		logp.NewLogger(ModuleName),
-	}, nil
+	}
+
+	ms.SetServiceURI(servicePath)
+
+	return ms, nil
+}
+
+// GetServiceURI returns the URI of the Elasticsearch service being monitored by this metricset
+func (m *MetricSet) GetServiceURI() string {
+	return m.HostData().SanitizedURI + m.servicePath
+}
+
+// SetServiceURI updates the URI of the Elasticsearch service being monitored by this metricset
+func (m *MetricSet) SetServiceURI(servicePath string) {
+	m.servicePath = servicePath
+	m.HTTP.SetURI(m.GetServiceURI())
 }

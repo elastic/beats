@@ -9,7 +9,7 @@ RUN set -x && \
 
 RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools
-RUN pip install --upgrade docker-compose==1.21.0
+RUN pip install --upgrade docker-compose==1.23.2
 
 # Setup work environment
 ENV HEARTBEAT_PATH /go/src/github.com/elastic/beats/heartbeat

@@ -33,7 +33,6 @@ class Test(AuditbeatXPackTest):
         self.check_metricset("system", "packages", COMMON_FIELDS + fields, warnings_allowed=True)
 
     @unittest.skipIf(sys.platform == "darwin" and os.geteuid != 0, "Requires root on macOS")
-    @unittest.skipIf(sys.platform == "win32", "Fails on Windows - https://github.com/elastic/beats/issues/9748")
     def test_metricset_process(self):
         """
         process metricset collects information about processes running on a system.
@@ -56,7 +55,6 @@ class Test(AuditbeatXPackTest):
         self.check_metricset("system", "socket", COMMON_FIELDS + fields, warnings_allowed=True)
 
     @unittest.skipUnless(sys.platform == "linux2", "Only implemented for Linux")
-    @unittest.skip("Test is failing in CI")  # https://github.com/elastic/beats/issues/9679
     def test_metricset_user(self):
         """
         user metricset collects information about users on a server.

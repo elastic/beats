@@ -31,12 +31,10 @@ import (
 func KibanaDashboards(moduleDirs ...string) error {
 	var kibanaBuildDir = "build/kibana"
 
-	if err := os.MkdirAll(kibanaBuildDir, 0755); err != nil {
+	if err := os.RemoveAll(kibanaBuildDir); err != nil {
 		return err
 	}
-
-	// Create symlink from old directory so `make beats-dashboards` works.
-	if err := os.Symlink(filepath.Join("..", kibanaBuildDir), "_meta/kibana.generated"); err != nil && !os.IsExist(err) && !os.IsNotExist(err) {
+	if err := os.MkdirAll(kibanaBuildDir, 0755); err != nil {
 		return err
 	}
 
@@ -71,7 +69,7 @@ func KibanaDashboards(moduleDirs ...string) error {
 	// Convert 6.x dashboards to strings.
 	err = sh.Run("python",
 		filepath.Join(esBeatsDir, "libbeat/scripts/unpack_dashboards.py"),
-		"--glob="+filepath.Join(kibanaBuildDir, "6/dashboard/*.json"))
+		"--glob="+filepath.Join(kibanaBuildDir, "7/dashboard/*.json"))
 	if err != nil {
 		return err
 	}

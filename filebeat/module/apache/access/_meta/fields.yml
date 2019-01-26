@@ -1,0 +1,14 @@
+- name: access
+  type: group
+  description: >
+    Contains fields for the Apache HTTP Server access logs.
+  fields:
+    - name: ssl.protocol
+      type: keyword
+      description: >
+        SSL protocol version.
+
+    - name: ssl.cipher
+      type: keyword
+      description: >
+        SSL cipher name.

@@ -11,7 +11,7 @@
     - name: severity
       type: alias
       path: log.level
-      migration: true.
+      migration: true
     - name: message
       type: alias
       path: message

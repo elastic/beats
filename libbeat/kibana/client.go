@@ -217,8 +217,8 @@ func (client *Client) readVersion() error {
 
 	code, result, err := client.Connection.Request("GET", "/api/status", nil, nil, nil)
 	if err != nil || code >= 400 {
-		return fmt.Errorf("HTTP GET request to /api/status fails: %v. Response: %s.",
-			err, truncateString(result))
+		return fmt.Errorf("HTTP GET request to %s/api/status fails: %v. Response: %s.",
+			client.Connection.URL, err, truncateString(result))
 	}
 
 	var versionString string
