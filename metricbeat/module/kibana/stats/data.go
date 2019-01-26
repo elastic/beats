@@ -32,13 +32,15 @@ import (
 
 var (
 	schema = s.Schema{
-		"uuid":  c.Str("kibana.uuid"),
+		"service": s.Object{
+			"id":      c.Str("kibana.uuid"),
+			"address": c.Str("kibana.host"),
+		},
 		"name":  c.Str("kibana.name"),
 		"index": c.Str("kibana.name"),
 		"host": s.Object{
-			"name": c.Str("kibana.host"),
+			"address": c.Str("kibana.transport_address"),
 		},
-		"transport_address":      c.Str("kibana.transport_address"),
 		"version":                c.Str("kibana.version"),
 		"snapshot":               c.Bool("kibana.snapshot"),
 		"status":                 c.Str("kibana.status"),

@@ -31,7 +31,9 @@ import (
 
 var (
 	schema = s.Schema{
-		"uuid": c.Str("uuid"),
+		"service": s.Object{
+			"id": c.Str("uuid"),
+		},
 		"name": c.Str("name"),
 		"version": c.Dict("version", s.Schema{
 			"number": c.Str("number"),
