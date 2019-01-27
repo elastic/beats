@@ -26,7 +26,7 @@
       description: "Indices accessed by action"
       example: [ "foo-2019.01.04", "foo-2019.01.03", "foo-2019.01.06" ]
       type: keyword
-    - name: request
+    - name: request.name
       description: "The type of request that was executed"
       example: "ClearScrollRequest"
       type: keyword

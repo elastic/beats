@@ -17,7 +17,7 @@
                     "ES_AUDIT_ACTION": "(action\\=\\[%{DATA:elasticsearch.audit.action}(\\[%{DATA:elasticsearch.audit.sub_action}\\])?\\])?",
                     "ES_AUDIT_URI": "(uri=\\[%{DATA:url.original}\\])?",
                     "ES_AUDIT_INDICES": "(indices\\=\\[%{DATA:elasticsearch.audit.indices}\\])?",
-                    "ES_AUDIT_REQUEST": "(request\\=\\[%{WORD:elasticsearch.audit.request}\\])?",
+                    "ES_AUDIT_REQUEST": "(request\\=\\[%{WORD:elasticsearch.audit.request.name}\\])?",
                     "ES_AUDIT_REQUEST_BODY": "(request_body\\=\\[%{DATA:http.request.body.content}\\])?"
                 },
                 "patterns": [
