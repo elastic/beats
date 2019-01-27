@@ -108,7 +108,7 @@ func (m *MetricSet) loadStatus(db *sql.DB) (map[string]string, error) {
 // Close closes the database connection and prevents future queries.
 func (m *MetricSet) Close() error {
 	if m.db == nil {
-		return errors.New("invalid database handle")
+		return nil
 	}
 	return errors.Wrap(m.db.Close(), "failed to close mysql database client")
 }
