@@ -4084,15 +4084,6 @@ alias to: url.original
 
 --
 
-*`elasticsearch.audit.principal`*::
-+
---
-type: alias
-
-alias to: user.name
-
---
-
 [float]
 == deprecation fields
 
@@ -4204,7 +4195,7 @@ CPU time spent outside the kernel.
 --
 type: float
 
-CPU time spent inside the kernel. 
+CPU time spent inside the kernel.
 
 
 --
@@ -4374,7 +4365,7 @@ Young GC
 --
 type: long
 
-example: 
+example:
 
 
 
@@ -4385,7 +4376,7 @@ example:
 --
 type: long
 
-example: 
+example:
 
 
 
@@ -4457,7 +4448,7 @@ Time it took to execute the query
 --
 type: keyword
 
-example: 
+example:
 
 Types
 
@@ -4468,7 +4459,7 @@ Types
 --
 type: text
 
-example: 
+example:
 
 Statistics
 
@@ -4501,7 +4492,7 @@ Slow query
 --
 type: text
 
-example: 
+example:
 
 Extra source information
 
@@ -4545,7 +4536,7 @@ Routing
 --
 type: keyword
 
-example: 
+example:
 
 Id
 
