@@ -118,12 +118,6 @@
                 "field": "elasticsearch.audit.user.name",
                 "target_field": "user.name"
             }
-        },
-        {
-            "dot_expander": {
-                "field": "audit.@timestamp",
-                "path": "elasticsearch"
-            }
         }
     ],
     "on_failure": [
