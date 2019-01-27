@@ -1,0 +1,40 @@
+[
+    {
+        "@timestamp": "2018-10-31T09:34:25.109Z",
+        "ecs.version": "1.0.0-beta2",
+        "elasticsearch.audit.layer": "rest",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.node.id": "DSiWcTyeThWtUXLB9J0BMw",
+        "event.action": "authentication_failed",
+        "event.dataset": "elasticsearch.audit",
+        "event.module": "elasticsearch",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "{\"@timestamp\":\"2018-10-31T09:34:25,109\", \"node.id\":\"DSiWcTyeThWtUXLB9J0BMw\", \"event.type\":\"rest\", \"event.action\":\"authentication_failed\", \"user.name\":\"elastic\", \"origin.type\":\"rest\", \"origin.address\":\"[::1]:61598\", \"url.path\":\"/_xpack/security/user/beats_system/_password\"}",
+        "service.type": "elasticsearch",
+        "source.ip": "::1",
+        "source.port": 61598,
+        "url.original": "/_xpack/security/user/beats_system/_password",
+        "user.name": "elastic"
+    },
+    {
+        "@timestamp": "2018-10-31T09:34:25.207Z",
+        "ecs.version": "1.0.0-beta2",
+        "elasticsearch.audit.layer": "rest",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.node.id": "DSiWcTyeThWtUXLB9J0BMw",
+        "event.action": "authentication_failed",
+        "event.dataset": "elasticsearch.audit",
+        "event.module": "elasticsearch",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "log.offset": 274,
+        "message": "{\"@timestamp\":\"2018-10-31T09:34:25,207\", \"node.id\":\"DSiWcTyeThWtUXLB9J0BMw\", \"event.type\":\"rest\", \"event.action\":\"authentication_failed\", \"user.name\":\"elastic\", \"origin.type\":\"rest\", \"origin.address\":\"[::1]:61599\", \"url.path\":\"/_xpack/security/user/remote_monitoring_user/_password\"}",
+        "service.type": "elasticsearch",
+        "source.ip": "::1",
+        "source.port": 61599,
+        "url.original": "/_xpack/security/user/remote_monitoring_user/_password",
+        "user.name": "elastic"
+    }
+]

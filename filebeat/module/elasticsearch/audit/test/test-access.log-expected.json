@@ -37,7 +37,7 @@
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.action": "indices:data/read/scroll/clear",
         "elasticsearch.audit.layer": "transport",
-        "elasticsearch.audit.origin_type": "local_node",
+        "elasticsearch.audit.origin.type": "local_node",
         "elasticsearch.audit.request": "ClearScrollRequest",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
@@ -87,7 +87,7 @@
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.action": "cluster:monitor/main",
         "elasticsearch.audit.layer": "transport",
-        "elasticsearch.audit.origin_type": "rest",
+        "elasticsearch.audit.origin.type": "rest",
         "elasticsearch.audit.request": "MainRequest",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
@@ -131,10 +131,10 @@
             "servicelog-2019.01.07"
         ],
         "elasticsearch.audit.layer": "transport",
-        "elasticsearch.audit.origin_type": "transport",
-        "elasticsearch.audit.realm": "active_directory",
+        "elasticsearch.audit.origin.type": "transport",
         "elasticsearch.audit.request": "SearchFreeContextRequest",
-        "elasticsearch.audit.roles": [
+        "elasticsearch.audit.user.realm": "active_directory",
+        "elasticsearch.audit.user.roles": [
             "kibana_user",
             "my_custom_role_1",
             "foo_reader"
