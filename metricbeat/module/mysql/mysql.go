@@ -106,3 +106,12 @@ func NewDB(dsn string) (*sql.DB, error) {
 	}
 	return db, nil
 }
+
+// CloseDB uses the database handle to close the connection and prevents future queries.
+func CloseDB(db *sql.DB) error {
+	err := db.Close()
+	if err != nil {
+		return errors.Wrap(err, "sql close failed")
+	}
+	return nil
+}
