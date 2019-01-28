@@ -11092,9 +11092,7 @@ type: keyword
 *`suricata.eve.alert.category`*::
 +
 --
-type: alias
-
-alias to: message
+type: keyword
 
 --
 

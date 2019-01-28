@@ -187,8 +187,7 @@
       type: group
       fields:
       - name: category
-        type: alias
-        path: message
+        type: keyword
 
       - name: severity
         type: alias

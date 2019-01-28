@@ -188,7 +188,7 @@
               "id": "3",
               "params": {
                 "customLabel": "Alert Category",
-                "field": "message",
+                "field": "suricata.eve.alert.category",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",

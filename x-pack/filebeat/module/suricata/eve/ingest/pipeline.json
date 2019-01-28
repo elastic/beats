@@ -311,7 +311,6 @@
             "remove": {
                 "field": [
                     "suricata.eve.alert.action",
-                    "suricata.eve.alert.category",
                     "suricata.eve.alert.severity",
                     "suricata.eve.app_proto",
                     "suricata.eve.dest_ip",
