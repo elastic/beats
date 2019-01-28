@@ -17,7 +17,11 @@
 
 package reader
 
-import "time"
+import (
+	"time"
+
+	"github.com/elastic/beats/journalbeat/config"
+)
 
 // Config stores the options of a reder.
 type Config struct {

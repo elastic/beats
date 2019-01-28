@@ -18,9 +18,9 @@
 package input
 
 import (
-	"fmt"
 	"time"
 
+	"github.com/elastic/beats/journalbeat/config"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
 )
@@ -56,19 +56,3 @@ var (
 		CursorSeekFallback: config.SeekHead,
 	}
 )
-
-// Validate check the configuration of the input.
-func (c *Config) Validate() error {
-	correctSeek := false
-	for _, s := range []string{"cursor", "head", "tail"} {
-		if c.Seek == s {
-			correctSeek = true
-		}
-	}
-
-	if !correctSeek {
-		return fmt.Errorf("incorrect value for seek: %s. possible values: cursor, head, tail", c.Seek)
-	}
-
-	return nil
-}

@@ -27,6 +27,9 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// SeekMode is specifies how a journal is read
+type SeekMode uint8
+
 // Config stores the configuration of Journalbeat
 type Config struct {
 	Inputs       []*common.Config `config:"inputs"`
