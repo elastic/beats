@@ -35,15 +35,15 @@ type UtType int16
 // Possible values for UtType.
 const (
 	EMPTY         UtType = 0
-	RUN_LVL              = 1
-	BOOT_TIME            = 2
-	NEW_TIME             = 3
-	OLD_TIME             = 4
-	INIT_PROCESS         = 5
-	LOGIN_PROCESS        = 6
-	USER_PROCESS         = 7
-	DEAD_PROCESS         = 8
-	ACCOUNTING           = 9
+	RUN_LVL       UtType = 1
+	BOOT_TIME     UtType = 2
+	NEW_TIME      UtType = 3
+	OLD_TIME      UtType = 4
+	INIT_PROCESS  UtType = 5
+	LOGIN_PROCESS UtType = 6
+	USER_PROCESS  UtType = 7
+	DEAD_PROCESS  UtType = 8
+	ACCOUNTING    UtType = 9
 
 	UT_LINESIZE = 32
 	UT_NAMESIZE = 32
