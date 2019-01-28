@@ -89,6 +89,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		return event.Error
 	}
 	event.RootFields.Put("process.pid", pid)
+	fields.Delete("jvm.pid")
 
 	event.MetricSetFields = fields
 

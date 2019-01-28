@@ -15,7 +15,6 @@
     "logstash": {
         "node": {
             "jvm": {
-                "pid": 39481,
                 "version": "1.8.0_191"
             }
         }
@@ -24,7 +23,7 @@
         "name": "node"
     },
     "process": {
-        "pid": 39481
+        "pid": 49800
     },
     "service": {
         "address": "127.0.0.1:9600",
