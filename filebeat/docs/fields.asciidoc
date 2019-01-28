@@ -4084,6 +4084,15 @@ alias to: url.original
 
 --
 
+*`elasticsearch.audit.principal`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
 [float]
 == deprecation fields
 
