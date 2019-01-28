@@ -33,7 +33,7 @@ type Config struct {
 	Name          fmtstr.EventFormatString `config:"name"`
 	RolloverAlias string                   `config:"rollover_alias"`
 	Pattern       string                   `config:"pattern"`
-	PolicyFile    string                   `config:"policy.file"`
+	PolicyFile    string                   `config:"policy_file"`
 
 	// CheckExists can disable the check for an existing policy. Check required
 	// read_ilm privileges.  If check is disabled the policy will only be
