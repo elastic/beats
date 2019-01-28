@@ -32,22 +32,29 @@ import (
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "haproxy")
 
-	f := mbtest.NewEventFetcher(t, getConfig())
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
+	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2(f)
+
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
 		t.FailNow()
 	}
 
-	assert.NotNil(t, event)
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("haproxy", "info").Fields.StringToPrint())
+
 }
 
 func TestData(t *testing.T) {
-	f := mbtest.NewEventFetcher(t, getConfig())
-	err := mbtest.WriteEvent(f, t)
+	compose.EnsureUp(t, "haproxy")
+
+	config := getConfig()
+	f := mbtest.NewReportingMetricSetV2(t, config)
+	err := mbtest.WriteEventsReporterV2(f, t, ".")
 	if err != nil {
 		t.Fatal("write", err)
 	}
+
 }
 
 func getConfig() map[string]interface{} {
