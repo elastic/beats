@@ -13,22 +13,16 @@
         "name": "socket"
     },
     "network": {
-        "direction": "listening",
+        "direction": "outbound",
         "iana_number": "41",
         "type": "ipv6"
     },
     "process": {
-        "args": [
-            "/tmp/go-build701928973/b001/socket.test",
-            "-data"
-        ],
-        "executable": "/tmp/go-build701928973/b001/socket.test",
-        "name": "socket.test",
-        "pid": 9578
+        "pid": -1
     },
     "server": {
-        "ip": "::",
-        "port": 42573
+        "ip": "::1",
+        "port": 37858
     },
     "service": {
         "type": "system"
@@ -36,16 +30,17 @@
     "system": {
         "socket": {
             "local": {
-                "ip": "::",
-                "port": 42573
+                "ip": "::1",
+                "port": 37858
             },
-            "process": {
-                "cmdline": "/tmp/go-build701928973/b001/socket.test -data"
+            "remote": {
+                "ip": "::1",
+                "port": 42573
             }
         }
     },
     "user": {
-        "full_name": "Jaime Soriano Pastor",
-        "id": "1000"
+        "full_name": "root",
+        "id": "0"
     }
 }

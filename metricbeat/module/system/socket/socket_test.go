@@ -20,6 +20,7 @@
 package socket
 
 import (
+	"fmt"
 	"net"
 	"os"
 	"strconv"
@@ -31,20 +32,48 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/common"
+	sock "github.com/elastic/beats/metricbeat/helper/socket"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
+	directionIs := func(direction string) func(e common.MapStr) bool {
+		return func(e common.MapStr) bool {
+			v, err := e.GetValue("network.direction")
+			return err == nil && v == direction
+		}
+	}
+
+	dataFiles := []struct {
+		direction string
+		path      string
+	}{
+		{sock.ListeningName, "."},
+		{sock.InboundName, "./_meta/data_inbound.json"},
+		{sock.OutboundName, "./_meta/data_outbound.json"},
+	}
+
+	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+
 	ln, err := net.Listen("tcp", ":0")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer ln.Close()
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err = mbtest.WriteEventsReporterV2(f, t, ".")
-	if err != nil {
-		t.Fatal("write", err)
+	for _, df := range dataFiles {
+		c, err := net.Dial("tcp", ln.Addr().String())
+		if err != nil {
+			t.Fatal(err)
+		}
+		c.Close()
+
+		t.Run(fmt.Sprintf("direction:%s", df.direction), func(t *testing.T) {
+			err = mbtest.WriteEventsReporterV2Cond(f, t, df.path, directionIs(df.direction))
+			if err != nil {
+				t.Fatal("write", err)
+			}
+		})
 	}
 }
 
