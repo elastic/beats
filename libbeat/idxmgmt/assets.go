@@ -21,6 +21,8 @@ type assets struct {
 	fields []byte
 }
 
+// BeatsAssets creates an asseter with a predefine set of fields that is always
+// reported.
 func BeatsAssets(fields []byte) Asseter {
 	return &assets{fields: fields}
 }
