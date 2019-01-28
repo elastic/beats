@@ -18,6 +18,7 @@
 package info
 
 import (
+	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -244,7 +245,22 @@ func eventMapping(r mb.ReporterV2, info map[string]string) {
 		source[key] = val
 	}
 	data, _ := schema.Apply(source)
+
+	rootFields := common.MapStr{}
+	if v, err := data.GetValue("server.version"); err == nil {
+		rootFields.Put("service.version", v)
+		data.Delete("server.version")
+	}
+	if v, err := data.GetValue("server.process_id"); err == nil {
+		rootFields.Put("process.pid", v)
+		data.Delete("server.process_id")
+	}
+	if v, err := data.GetValue("server.os"); err == nil {
+		rootFields.Put("os.full", v)
+		data.Delete("server.os")
+	}
 	r.Event(mb.Event{
 		MetricSetFields: data,
+		RootFields:      rootFields,
 	})
 }
