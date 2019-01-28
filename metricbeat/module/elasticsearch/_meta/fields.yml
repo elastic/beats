@@ -10,7 +10,6 @@
       type: group
       description: >
       fields:
-        # Is this the actual service name?
         - name: cluster.name
           type: keyword
           description: >
