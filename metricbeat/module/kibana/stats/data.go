@@ -32,10 +32,7 @@ import (
 
 var (
 	schema = s.Schema{
-		"service": s.Object{
-			"id":      c.Str("kibana.uuid"),
-			"address": c.Str("kibana.host"),
-		},
+		"uuid":  c.Str("kibana.uuid"),
 		"name":  c.Str("kibana.name"),
 		"index": c.Str("kibana.name"),
 		"host": s.Object{
@@ -127,6 +124,16 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		return event.Error
 	}
 	event.RootFields.Put("process.pid", int(pid))
+
+	// Set service ID
+	uuid, err := dataFields.GetValue("uuid")
+	if err != nil {
+		event.Error = elastic.MakeErrorForMissingField("kibana.uuid", elastic.Kibana)
+		r.Event(event)
+		return event.Error
+	}
+	event.RootFields.Put("service.id", uuid)
+	dataFields.Delete("uuid")
 
 	event.MetricSetFields = dataFields
 
