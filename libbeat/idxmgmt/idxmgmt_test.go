@@ -135,9 +135,9 @@ func TestDefaultSupport_TemplateConfig(t *testing.T) {
 				PolicyName: "test-9.9.9",
 			}),
 			want: cfgWith(template.DefaultConfig, map[string]interface{}{
-				"name":                                    "alias",
-				"pattern":                                 "alias-*",
-				"settings.index.lifecycle.name":           "test-9.9.9",
+				"name":                          "alias",
+				"pattern":                       "alias-*",
+				"settings.index.lifecycle.name": "test-9.9.9",
 				"settings.index.lifecycle.rollover_alias": "alias",
 			}),
 		},
