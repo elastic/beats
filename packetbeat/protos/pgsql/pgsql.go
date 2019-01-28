@@ -467,6 +467,7 @@ func (pgsql *pgsqlPlugin) publishTransaction(t *pgsqlTransaction) {
 	pbf.Event.Dataset = "pgsql"
 	pbf.Network.Transport = "tcp"
 	pbf.Network.Protocol = pbf.Event.Dataset
+	pbf.Error.Message = t.notes
 
 	fields := evt.Fields
 	fields["type"] = pbf.Event.Dataset
@@ -484,12 +485,6 @@ func (pgsql *pgsqlPlugin) publishTransaction(t *pgsqlTransaction) {
 	}
 	if pgsql.sendResponse {
 		fields["response"] = t.responseRaw
-	}
-
-	if len(t.notes) == 1 {
-		evt.PutValue("error.message", t.notes[0])
-	} else if len(t.notes) > 1 {
-		evt.PutValue("error.message", t.notes)
 	}
 
 	pgsql.results(evt)
