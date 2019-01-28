@@ -252,9 +252,13 @@ func (m *indexManager) load(forceTemplate, forcePolicy bool) error {
 	// create alias
 	if withILM {
 		if err := m.ilm.EnsureAlias(); err != nil {
-			return err
+			if ilm.ErrReason(err) != ilm.ErrAliasAlreadyExists {
+				return err
+			}
+			log.Info("Write alias exists already")
+		} else {
+			log.Info("Write alias successfully generated.")
 		}
-		log.Info("Write alias successfully generated.")
 	}
 
 	return nil
