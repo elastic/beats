@@ -559,6 +559,7 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 		if http.sendRequest {
 			fields["request"] = string(http.makeRawMessage(requ))
 		}
+		fields["method"] = httpFields.RequestMethod
 		fields["query"] = fmt.Sprintf("%s %s", requ.method, path)
 	}
 
