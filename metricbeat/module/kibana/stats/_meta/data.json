@@ -18,13 +18,14 @@
         "stats": {
             "concurrent_connections": 0,
             "host": {
-                "address": "localhost:5601"
+                "address": "localhost:5601",
+                "name": "localhost"
             },
             "index": "Shaunaks-MBP-2",
             "name": "Shaunaks-MBP-2",
             "process": {
                 "event_loop_delay": {
-                    "ms": 0.4612810015678406
+                    "ms": 0.32130200415849686
                 },
                 "memory": {
                     "heap": {
@@ -32,15 +33,15 @@
                             "bytes": 1526909922
                         },
                         "total": {
-                            "bytes": 282939392
+                            "bytes": 284512256
                         },
                         "used": {
-                            "bytes": 244498400
+                            "bytes": 237203704
                         }
                     }
                 },
                 "uptime": {
-                    "ms": 22459199
+                    "ms": 23859773
                 }
             },
             "request": {

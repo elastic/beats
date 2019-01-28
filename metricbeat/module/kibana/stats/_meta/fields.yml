@@ -19,15 +19,15 @@
       description: >
         Name of Kibana's internal index
     - name: host.name
-      type: alias
-      path: service.address
-      migration: true
+      type: keyword
       description: >
         Kibana instance hostname
-    - name: host.address
+    - name: transport_address
       type: keyword
       description: >
         Kibana server's hostname and port
+      path: host.address
+      migration: true
     - name: version
       type: keyword
       description: >

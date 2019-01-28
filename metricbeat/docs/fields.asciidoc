@@ -11060,19 +11060,19 @@ Name of Kibana's internal index
 *`kibana.stats.host.name`*::
 +
 --
-type: alias
-
-alias to: service.address
+type: keyword
 
 Kibana instance hostname
 
 
 --
 
-*`kibana.stats.host.address`*::
+*`kibana.stats.transport_address`*::
 +
 --
 type: keyword
+
+alias to: host.address
 
 Kibana server's hostname and port
 
