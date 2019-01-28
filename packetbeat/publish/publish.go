@@ -39,7 +39,6 @@ type TransactionPublisher struct {
 type transProcessor struct {
 	ignoreOutgoing bool
 	localIPs       []net.IP // TODO: Periodically update this list.
-	localIPStrings []string // Deprecated. Use localIPs.
 	name           string
 }
 
@@ -56,11 +55,9 @@ func NewTransactionPublisher(
 		return nil, err
 	}
 	var localIPs []net.IP
-	var localIPStrings []string
 	for _, addr := range addrs {
 		if !addr.IsLoopback() {
 			localIPs = append(localIPs, addr)
-			localIPStrings = append(localIPStrings, addr.String())
 		}
 	}
 
@@ -70,7 +67,6 @@ func NewTransactionPublisher(
 		canDrop:  canDrop,
 		processor: transProcessor{
 			localIPs:       localIPs,
-			localIPStrings: localIPStrings,
 			name:           name,
 			ignoreOutgoing: ignoreOutgoing,
 		},
@@ -146,13 +142,19 @@ func (p *transProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		return nil, nil
 	}
 
-	if !p.normalizeTransAddr(event.Fields) {
-		return nil, nil
-	}
-
-	if err := marshalPacketbeatFields(event, p.localIPs); err != nil {
+	fields, err := MarshalPacketbeatFields(event, p.localIPs)
+	if err != nil {
 		return nil, err
 	}
+
+	if fields != nil {
+		if p.ignoreOutgoing && fields.Network.Direction == "outbound" {
+			debugf("Ignore outbound transaction on: %s -> %s",
+				fields.Source.IP, fields.Destination.IP)
+			return nil, nil
+		}
+	}
+
 	return event, nil
 }
 
@@ -183,110 +185,22 @@ func validateEvent(event *beat.Event) error {
 	return nil
 }
 
-func (p *transProcessor) normalizeTransAddr(event common.MapStr) bool {
-	debugf("normalize address for: %v", event)
-
-	var srcServer, dstServer string
-	var process common.MapStr
-	src, ok := event["src"].(*common.Endpoint)
-	debugf("has src: %v", ok)
-	if ok {
-		delete(event, "src")
-
-		// Check if it's outgoing transaction (as client).
-		if p.IsPublisherIP(src.IP) {
-			if p.ignoreOutgoing {
-				// Duplicated transaction -> ignore it.
-				debugf("Ignore duplicated transaction on: %s -> %s", srcServer, dstServer)
-				return false
-			}
-
-			event.Put("network.direction", "outgoing")
-		}
-
-		var client common.MapStr
-		client, process = makeEndpoint(p.name, src)
-		event.DeepUpdate(common.MapStr{"client": client})
-	}
-
-	dst, ok := event["dst"].(*common.Endpoint)
-	debugf("has dst: %v", ok)
-	if ok {
-		delete(event, "dst")
-
-		var server common.MapStr
-		server, process = makeEndpoint(p.name, dst)
-		event.DeepUpdate(common.MapStr{"server": server})
-
-		// Check if it's incoming transaction (as server).
-		if p.IsPublisherIP(dst.IP) {
-			event.Put("network.direction", "incoming")
-		}
-	}
-
-	if len(process) > 0 {
-		event.Put("process", process)
-	}
-
-	return true
-}
-
-func (p *transProcessor) IsPublisherIP(ip string) bool {
-	for _, myip := range p.localIPStrings {
-		if myip == ip {
-			return true
-		}
-	}
-	return false
-}
-
-// makeEndpoint builds a map containing the endpoint information. As a
-// convenience it returns a reference to the process map that is contained in
-// the endpoint map (for use in populating the top-level process field).
-func makeEndpoint(shipperName string, endpoint *common.Endpoint) (m common.MapStr, process common.MapStr) {
-	// address
-	m = common.MapStr{
-		"ip":   endpoint.IP,
-		"port": endpoint.Port,
-	}
-	if endpoint.Domain != "" {
-		m["domain"] = endpoint.Domain
-	} else if shipperName != "" {
-		if isLocal, err := common.IsLoopback(endpoint.IP); err == nil && isLocal {
-			m["domain"] = shipperName
-		}
-	}
-
-	// process
-	if endpoint.PID > 0 {
-		process := common.MapStr{
-			"pid":        endpoint.PID,
-			"ppid":       endpoint.PPID,
-			"name":       endpoint.Name,
-			"args":       endpoint.Args,
-			"executable": endpoint.Exe,
-			"start":      endpoint.StartTime,
-		}
-		if endpoint.CWD != "" {
-			process["working_directory"] = endpoint.CWD
-		}
-		m["process"] = process
-	}
-
-	return m, process
-}
-
-func marshalPacketbeatFields(event *beat.Event, localIPs []net.IP) error {
+// MarshalPacketbeatFields marshals data contained in the _packetbeat field
+// into the event and removes the _packetbeat key.
+func MarshalPacketbeatFields(event *beat.Event, localIPs []net.IP) (*pb.Fields, error) {
 	defer delete(event.Fields, pb.FieldsKey)
 
 	fields, err := pb.GetFields(event.Fields)
 	if err != nil || fields == nil {
-		return err
+		return nil, err
 	}
 
-	if err := fields.ComputeValues(localIPs); err != nil {
-		return err
+	if err = fields.ComputeValues(localIPs); err != nil {
+		return nil, err
 	}
 
-	return fields.MarshalMapStr(event.Fields)
+	if err = fields.MarshalMapStr(event.Fields); err != nil {
+		return nil, err
+	}
+	return fields, nil
 }

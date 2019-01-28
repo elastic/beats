@@ -519,7 +519,6 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 	fields["status"] = status
 
 	var httpFields ProtocolFields
-	var notes []string
 	if requ != nil {
 		http.decodeBody(requ)
 		path, params, err := http.extractParameters(requ)
@@ -534,7 +533,7 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 		}
 		pbf.Event.Start = requ.ts
 		pbf.Network.ForwardedIP = string(requ.realIP)
-		notes = append(notes, requ.notes...)
+		pbf.Error.Message = requ.notes
 
 		// http
 		httpFields.Version = requ.version.String()
@@ -560,6 +559,7 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 		if http.sendRequest {
 			fields["request"] = string(http.makeRawMessage(requ))
 		}
+		fields["method"] = httpFields.RequestMethod
 		fields["query"] = fmt.Sprintf("%s %s", requ.method, path)
 	}
 
@@ -568,7 +568,7 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 
 		pbf.Destination.Bytes = int64(resp.size)
 		pbf.Event.End = resp.ts
-		notes = append(notes, resp.notes...)
+		pbf.Error.Message = append(pbf.Error.Message, resp.notes...)
 
 		// http
 		httpFields.ResponseStatusCode = int64(resp.statusCode)
@@ -585,12 +585,6 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 		if http.sendResponse {
 			fields["response"] = string(http.makeRawMessage(resp))
 		}
-	}
-
-	if len(notes) == 1 {
-		fields.Put("error.message", notes[0])
-	} else if len(notes) > 1 {
-		fields.Put("error.message", notes)
 	}
 
 	pb.MarshalStruct(evt.Fields, "http", httpFields)
