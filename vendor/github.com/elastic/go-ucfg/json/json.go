@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/go-ucfg"
 )
 
+// NewConfig creates a new configuration object from the JSON string passed via in.
 func NewConfig(in []byte, opts ...ucfg.Option) (*ucfg.Config, error) {
 	var m interface{}
 	if err := json.Unmarshal(in, &m); err != nil {
@@ -32,12 +33,15 @@ func NewConfig(in []byte, opts ...ucfg.Option) (*ucfg.Config, error) {
 	return ucfg.NewFrom(m, opts...)
 }
 
+// NewConfigWithFile loads a new configuration object from an external JSON file.
 func NewConfigWithFile(name string, opts ...ucfg.Option) (*ucfg.Config, error) {
 	input, err := ioutil.ReadFile(name)
 	if err != nil {
 		return nil, err
 	}
 
-	opts = append([]ucfg.Option{ucfg.MetaData(ucfg.Meta{name})}, opts...)
+	opts = append([]ucfg.Option{
+		ucfg.MetaData(ucfg.Meta{Source: name}),
+	}, opts...)
 	return NewConfig(input, opts...)
 }
