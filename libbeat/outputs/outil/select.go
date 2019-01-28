@@ -355,8 +355,9 @@ func (s *constSelector) sel(_ *beat.Event) (string, error) {
 func (s *fmtSelector) sel(evt *beat.Event) (string, error) {
 	n, err := s.f.Run(evt)
 	if err != nil {
-		// err will be set if not all keys present in event ->
-		// return empty selector result and ignore error
+		if s.otherwise == "" {
+			return "", err
+		}
 		return s.otherwise, nil
 	}
 

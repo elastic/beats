@@ -407,6 +407,9 @@ func parseEventPath(field string) (string, error) {
 func fieldString(event *beat.Event, field string) (string, error) {
 	v, err := event.GetValue(field)
 	if err != nil {
+		if err == common.ErrKeyNotFound {
+			err = fmt.Errorf("event field '%v' not found", field)
+		}
 		return "", err
 	}
 
