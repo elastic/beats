@@ -7,6 +7,7 @@
 package login
 
 import (
+	"encoding/binary"
 	"testing"
 
 	"github.com/elastic/beats/auditbeat/core"
@@ -14,6 +15,10 @@ import (
 )
 
 func TestData(t *testing.T) {
+	if byteOrder != binary.LittleEndian {
+		t.Skip("Test only works on little-endian systems - skipping.")
+	}
+
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
