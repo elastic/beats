@@ -4,7 +4,6 @@
     `process` contains process metadata, CPU metrics, and memory metrics.
   release: ga
   fields:
-    # Process metircset should be mapped to ECS?
     - name: name
       type: keyword
       description: >
