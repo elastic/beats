@@ -79,13 +79,12 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 
 	cassandra := common.MapStr{}
 	status := common.OK_STATUS
-	var notes []string
 
 	//requ can be null, if the message is a PUSHed message
 	if requ != nil {
 		pbf.Source.Bytes = int64(requ.Size)
 		pbf.Event.Start = requ.Ts
-		notes = append(notes, requ.Notes...)
+		pbf.Error.Message = requ.Notes
 
 		if pub.sendRequest {
 			if pub.sendRequestHeader {
@@ -107,7 +106,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 	if resp != nil {
 		pbf.Destination.Bytes = int64(resp.Size)
 		pbf.Event.End = resp.Ts
-		notes = append(notes, resp.Notes...)
+		pbf.Error.Message = append(pbf.Error.Message, resp.Notes...)
 
 		if resp.failed {
 			status = common.ERROR_STATUS
@@ -131,12 +130,6 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 
 	if len(cassandra) > 0 {
 		fields["cassandra"] = cassandra
-	}
-
-	if len(notes) == 1 {
-		fields.Put("error.message", notes[0])
-	} else if len(notes) > 1 {
-		fields.Put("error.message", notes)
 	}
 
 	return evt
