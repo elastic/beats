@@ -19,16 +19,16 @@
     },
     "process": {
         "args": [
-            "/tmp/go-build701928973/b001/socket.test",
+            "/tmp/go-build271696008/b001/socket.test",
             "-data"
         ],
-        "executable": "/tmp/go-build701928973/b001/socket.test",
+        "executable": "/tmp/go-build271696008/b001/socket.test",
         "name": "socket.test",
-        "pid": 9578
+        "pid": 7976
     },
     "server": {
         "ip": "::",
-        "port": 42573
+        "port": 35627
     },
     "service": {
         "type": "system"
@@ -37,10 +37,10 @@
         "socket": {
             "local": {
                 "ip": "::",
-                "port": 42573
+                "port": 35627
             },
             "process": {
-                "cmdline": "/tmp/go-build701928973/b001/socket.test -data"
+                "cmdline": "/tmp/go-build271696008/b001/socket.test -data"
             }
         }
     },

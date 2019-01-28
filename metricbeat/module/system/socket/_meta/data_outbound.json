@@ -4,6 +4,10 @@
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "destination": {
+        "ip": "::1",
+        "port": 35627
+    },
     "event": {
         "dataset": "system.socket",
         "duration": 115000,
@@ -17,25 +21,22 @@
         "iana_number": "41",
         "type": "ipv6"
     },
-    "process": {
-        "pid": -1
-    },
-    "server": {
-        "ip": "::1",
-        "port": 37858
-    },
     "service": {
         "type": "system"
+    },
+    "source": {
+        "ip": "::1",
+        "port": 50600
     },
     "system": {
         "socket": {
             "local": {
                 "ip": "::1",
-                "port": 37858
+                "port": 50600
             },
             "remote": {
                 "ip": "::1",
-                "port": 42573
+                "port": 35627
             }
         }
     },

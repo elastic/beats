@@ -285,7 +285,7 @@ var (
 
 func (c *connection) ToMapStr() (fields common.MapStr, metricSetFields common.MapStr) {
 	localGroup := "server"
-	if g, ok := localHostInfoGroup[c.Family.String()]; ok {
+	if g, ok := localHostInfoGroup[c.Direction.String()]; ok {
 		localGroup = g
 	}
 
@@ -337,7 +337,9 @@ func (c *connection) ToMapStr() (fields common.MapStr, metricSetFields common.Ma
 			process["command"] = "kernel"
 		}
 
-		fields["process"] = process
+		if c.PID >= 0 {
+			fields["process"] = process
+		}
 	}
 
 	if c.RemotePort != 0 {
@@ -355,7 +357,7 @@ func (c *connection) ToMapStr() (fields common.MapStr, metricSetFields common.Ma
 		}
 		metricSetFields["remote"] = remote
 
-		remoteGroup, ok := remoteHostInfoGroup[c.Family.String()]
+		remoteGroup, ok := remoteHostInfoGroup[c.Direction.String()]
 		if ok {
 			fields[remoteGroup] = common.MapStr{
 				"ip":   c.RemoteIP.String(),
