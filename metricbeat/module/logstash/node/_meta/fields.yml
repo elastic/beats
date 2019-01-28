@@ -4,12 +4,10 @@
     node
   release: ga
   fields:
-    # ECS?
     - name: host
       type: keyword
       description: >
         Host name
-    # Service.version?
     - name: version
       type: keyword
       description: >

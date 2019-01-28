@@ -4,7 +4,6 @@
     Kibana stats and run-time metrics.
   release: ga
   fields:
-    # Service.id?
     - name: uuid
       type: keyword
       description: >
@@ -17,13 +16,10 @@
       type: keyword
       description: >
         Name of Kibana's internal index
-
-    # What does this match to?
     - name: host.name
       type: keyword
       description: >
         Kibana instance hostname
-    # ECS?
     - name: transport_address
       type: keyword
       description: >
