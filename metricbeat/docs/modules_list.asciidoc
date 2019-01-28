@@ -150,7 +150,8 @@ This file is generated! See scripts/docs_collector.py
 .2+| .2+|  |<<metricbeat-metricset-windows-perfmon,perfmon>> beta[]  
 |<<metricbeat-metricset-windows-service,service>>   
 |<<metricbeat-module-zookeeper,ZooKeeper>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-zookeeper-mntr,mntr>>   
+.2+| .2+|  |<<metricbeat-metricset-zookeeper-mntr,mntr>>   
+|<<metricbeat-metricset-zookeeper-server,server>>   
 |================================
 
 --
