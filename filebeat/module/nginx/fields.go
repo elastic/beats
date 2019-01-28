@@ -24,12 +24,13 @@ import (
 )
 
 func init() {
-	if err := asset.SetFields("filebeat", "nginx", asset.ModuleFieldsPri, Asset); err != nil {
+	if err := asset.SetFields("filebeat", "nginx", asset.ModuleFieldsPri, AssetNginx); err != nil {
 		panic(err)
 	}
 }
 
-// Asset returns asset data
-func Asset() string {
-	return "eJysl8F2ozoMhvd5Cp3uywOwuJuec3f3rmbPcUGAp8ZiJJFO3n4OJG1TxiY2iVcpRf//yRIGPcMbnkrwnfW/DwBq1WEJT//Pfz8dABqUmu2olnwJ/xwAAP6jZnIILTGMhsX6DrRHWELAUQetdSjFAUB6Yq1q8q3tSlCe8ADQWnSNlIvUM3gz4Jf9vPQ0Ygkd0zRergQY5vXvIgQt0xADmNe137WnqWsU+bwcMt4wn9cLeTXWy8Vi2ZEvkLP+zPOJEsK5Rnql5lQJei1eT4ry7Z4PPke+W/2jJR6MlhAK2sCf148ewU/DKzJQexaYf8xZCPIRGRhlJC+4wH0lEuRnHEixsmPlrGgQ3zhr1oyj0b4Ej/pO/Fa0xO+GG2wqO65uHGzH5pzKpZk2GDLthSausdjlOQlyNf/M9JzjikBciueA2lOTadirjgXjrwlFi6BCUrrschNlVxDbznqzDk0xnLGrI7JY8nsyDoemddO5+6uamtzqXjb7LFCIGp0kpJPG0SIz8j31jmik2JsOfe7zvDwUS2Bu6ePPWJxjfWxD5Ki9lmzwaOt1NbZTC6YX1dna2muQwfykdVl2cMRkkjGsfwhGRCYVYzRa9/djxGRSMQLn8g6KiEoqBIVMMhFIinZyLvSCykOpHtSnJHe36gzzmG6dYe5sWJLY3uaz3Fuk8Em7hyWulHVud0iRb7E9R3ZNXq1Hr/fs+OVTr0MqbuqlbnxNk1c+VVYo9I7fhXZTMRXOUb3cdj/UhlIqDGNnyT+ofttiycWzenpUQ21IZe7Q41rptmAM7QMJmb8dkQ+elRf5rFG5Ju+x1iWt8BQUGJRvDMMvn5pgG/RqW4t8Y+R1eMTcachRV4TiUr7Ex0i2cbeRqUaR4u/IFD/d7ac9o2mKXa4Dipgud+AKR639/gQAAP//qeS/3Q=="
+// AssetNginx returns asset data.
+// This is the base64 encoded gzipped contents of module/nginx.
+func AssetNginx() string {
+	return "eJysl89u4zYQxu9+isGeN3oAHwoUCyywhxZFT70pDDmSp0tx1Bkqrd++oOzNOg4pU7J5ciTN9/3mTyjxCb7jcQ+hp/DfDiBS9LiHT7+nvz/tAByqFRojcdjDLzsAgN/YTR6hY4HRiFLoIR4Q5hDw3ENHHrXZAeiBJbaWQ0f9HqJMuAPoCL3T/Sz1BMEM+NM+rXgccQ+98DSer2QY0vo6C0EnPJQA0rr0u/Q01qLq2+Wc8YJ5Wl84RENBzxZzRX6CnPQTzxtKDucSSXDgiC2NrSeN7x75gWdEzPHqzgJiWr+GUxRwd3aAb3+AcU5QFbWBbxFIwUAyhRe0ZlIEmi9aHgYOEBkoWD85/AwvqORQ50ytJwzXoHAh//md1alXBzQORcHTd4Tnv56+svxrxKFLv56bD2p/ovGgPImdwUlBUCMLusT1fLrT0HgRmq3uC7tjqxhi83KMqPnyejLXd0YTD3s4xDg2gjpyUGySVlZmoF7MqRPneV9o80qEt0w3eE6K0qafKz1TXJOJq/EcMB7YbavzPxNqbLIKVemKX5uo+IaFegrmOrTGMGG3ryhKHLZknA+tm6bTTLaW3druvh9qjSZOmtOp4+hQBOWefhc0auxN/3Enqhnudg5c2/ry/1iZ4/rNAoW3waWkw1ey191YTi2bXlFnqbSXIIP5m6/bsoGjJFONQeEhGAWZWozRRHu4H6MkU4uR2Zc3UBRUaiE4Z7ISgbXpJu9zL6h1KO2D5pT17lFNMI+Z1gRz58Cylmq7nuXeJuV32i0sZaVV+3aPXPgW27JlWw6RAoZ4T8XPn3o9cnNTr7bwlqcQ5diScu4dvwntpmItnGc7P3Y/1IJSLYxgTxwe1L9lsermUTw+aqAWpFZW6HGjdFuwhPYDCUXebZEPPs7P8qtO85ZDQBvntPKnIM+hX3eW//KmCeQwROoI5ca51+Mrrj0Nee6bXFzNl/hYyLbsNgpbVG0+Rtb4xc1+8SBoXLPJdUBV0689cOWjrv3+DwAA///Lb/Q7"
 }

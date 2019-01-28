@@ -568,7 +568,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 --------------------------------------------------------------------
 Dependency: github.com/elastic/ecs
-Revision: 69de90eb6493e0804405321f48adfdfa488d6498
+Revision: 337ddd4674d6a28da97e6d19010c04c43db09e58
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/ecs/LICENSE.txt:
 --------------------------------------------------------------------
@@ -657,8 +657,8 @@ Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-txfile
-Version: v0.0.3
-Revision: 389b527ad365f6fc6cf5fa7e0ba5a2294ad2f3ed
+Version: v0.0.6
+Revision: fa3d87c14381c01aaa1c7901877fb5e483294964
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-txfile/LICENSE:
 --------------------------------------------------------------------
@@ -906,7 +906,8 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 
 --------------------------------------------------------------------
 Dependency: github.com/go-sql-driver/mysql
-Revision: 9dee4ca50b83acdf57a35fb9e6fb4be640afa2f3
+Version: v1.4.1
+Revision: 72cd26f257d44c1114970e19afddcd812016007e
 License type (autodetected): MPL-2.0
 ./metricbeat/module/mysql/vendor/github.com/go-sql-driver/mysql/LICENSE:
 --------------------------------------------------------------------
@@ -3154,6 +3155,15 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------
+Dependency: google.golang.org/appengine
+Revision: e9657d882bb81064595ca3b56cbe2546bbabf7b1
+License type (autodetected): Apache-2.0
+./metricbeat/module/mysql/vendor/google.golang.org/appengine/LICENSE:
+--------------------------------------------------------------------
+Apache License 2.0
+
 
 --------------------------------------------------------------------
 Dependency: gopkg.in/inf.v0

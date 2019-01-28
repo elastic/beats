@@ -161,6 +161,12 @@ metricbeat.modules:
   hosts: ["localhost:8091"]
   enabled: true
 
+#------------------------------- couchdb Module ------------------------------
+- module: couchdb
+  metricsets: ["server"]
+  period: 10s
+  hosts: ["localhost:5984"]
+
 #------------------------------- Docker Module -------------------------------
 - module: docker
   metricsets:
@@ -216,6 +222,10 @@ metricbeat.modules:
 
   # Set to false to fetch all entries
   #index_recovery.active_only: true
+
+  # Set to true to send data collected by module to X-Pack
+  # Monitoring instead of metricbeat-* indices.
+  #xpack.enabled: false
 
 #----------------------------- envoyproxy Module -----------------------------
 - module: envoyproxy
@@ -367,6 +377,10 @@ metricbeat.modules:
   hosts: ["localhost:5601"]
   basepath: ""
   enabled: true
+
+  # Set to true to send data collected by module to X-Pack
+  # Monitoring instead of metricbeat-* indices.
+  #xpack.enabled: false
 
 #----------------------------- Kubernetes Module -----------------------------
 # Node metrics, from kubelet:
@@ -577,20 +591,11 @@ metricbeat.modules:
 
 #----------------------------- Prometheus Module -----------------------------
 - module: prometheus
-  metricsets: ["stats"]
-  enabled: true
   period: 10s
   hosts: ["localhost:9090"]
-  #metrics_path: /metrics
-  #namespace: example
-
-- module: prometheus
-  metricsets: ["collector"]
-  enabled: true
-  period: 10s
-  hosts: ["localhost:9090"]
-  #metrics_path: /metrics
-  #namespace: example
+  metrics_path: /metrics
+  #username: "user"
+  #password: "secret"
 
   # This can be used for service account based authorization:
   #  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -690,7 +695,7 @@ metricbeat.modules:
 #------------------------------ ZooKeeper Module -----------------------------
 - module: zookeeper
   enabled: true
-  metricsets: ["mntr"]
+  metricsets: ["mntr", "server"]
   period: 10s
   hosts: ["localhost:2181"]
 

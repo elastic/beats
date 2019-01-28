@@ -23,6 +23,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/elastic/beats/heartbeat/hbtest"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/eventext"
@@ -108,8 +110,10 @@ func mockEventMonitorValidator(id string) mapval.Validator {
 				"type":        "test",
 				"duration.us": mapval.IsDuration,
 				"status":      "up",
+				"check_group": mapval.IsString,
 			},
 		}),
+		hbtest.SummaryChecks(1, 0),
 		mapval.MustCompile(mockEventCustomFields()),
 	))
 }

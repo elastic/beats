@@ -42,6 +42,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/couchbase/bucket"
 	_ "github.com/elastic/beats/metricbeat/module/couchbase/cluster"
 	_ "github.com/elastic/beats/metricbeat/module/couchbase/node"
+	_ "github.com/elastic/beats/metricbeat/module/couchdb"
+	_ "github.com/elastic/beats/metricbeat/module/couchdb/server"
 	_ "github.com/elastic/beats/metricbeat/module/docker"
 	_ "github.com/elastic/beats/metricbeat/module/docker/container"
 	_ "github.com/elastic/beats/metricbeat/module/docker/cpu"
@@ -140,7 +142,6 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/postgresql/statement"
 	_ "github.com/elastic/beats/metricbeat/module/prometheus"
 	_ "github.com/elastic/beats/metricbeat/module/prometheus/collector"
-	_ "github.com/elastic/beats/metricbeat/module/prometheus/stats"
 	_ "github.com/elastic/beats/metricbeat/module/rabbitmq"
 	_ "github.com/elastic/beats/metricbeat/module/rabbitmq/connection"
 	_ "github.com/elastic/beats/metricbeat/module/rabbitmq/exchange"
@@ -178,4 +179,5 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/windows/service"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper/mntr"
+	_ "github.com/elastic/beats/metricbeat/module/zookeeper/server"
 )

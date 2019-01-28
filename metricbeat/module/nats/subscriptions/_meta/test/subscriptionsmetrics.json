@@ -5,7 +5,7 @@
     "num_matches": 40,
     "cache": 10343,
     "num_cache": 10,
-    "cache_hit_rate": 10,
+    "cache_hit_rate": 10.0,
     "max_fanout": 10,
-    "avg_fanout": 10
+    "avg_fanout": 10.0
 }

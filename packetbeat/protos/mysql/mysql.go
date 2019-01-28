@@ -1164,6 +1164,7 @@ func (mysql *mysqlPlugin) publishTransaction(t *mysqlTransaction) {
 	pbf.Event.End = t.endTime
 	pbf.Network.Transport = "tcp"
 	pbf.Network.Protocol = "mysql"
+	pbf.Error.Message = t.notes
 
 	fields := evt.Fields
 	fields["type"] = pbf.Event.Dataset
@@ -1188,12 +1189,6 @@ func (mysql *mysqlPlugin) publishTransaction(t *mysqlTransaction) {
 	}
 	if mysql.sendResponse {
 		fields["response"] = t.responseRaw
-	}
-
-	if len(t.notes) == 1 {
-		evt.PutValue("error.message", t.notes[0])
-	} else if len(t.notes) > 1 {
-		evt.PutValue("error.message", t.notes)
 	}
 
 	mysql.results(evt)

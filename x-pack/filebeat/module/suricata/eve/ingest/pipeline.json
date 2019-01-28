@@ -113,7 +113,10 @@
       , "formats": ["ISO8601"]
       }
     }
-
+  , {"remove":
+      {"field": "suricata.eve.timestamp"
+      }
+    }
   , { "lowercase":
       { "field": "suricata.eve.event_type"
       , "target_field": "event.type"
@@ -179,6 +182,16 @@
       ,"target_field": "event.start"
       ,"formats": ["ISO8601"]
       ,"ignore_failure": true
+      }
+    }
+  , {"remove":
+      {"field": "suricata.eve.flow.start"
+      ,"ignore_missing": true
+      }
+    }
+  , {"remove":
+      {"field": "suricata.eve.flow.end"
+      ,"ignore_missing": true
       }
     }
   , {"set":

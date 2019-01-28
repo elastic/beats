@@ -14,11 +14,11 @@
         "subscriptions":{
             "total": 0,
             "cache": {
-                "hit_rate": 0,
+                "hit_rate": 0.0,
                 "size": 0,
                 "fanout": {
                     "max": 0,
-                    "avg": 0
+                    "avg": 0.0
                 }
             },
             "inserts": 0,

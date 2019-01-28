@@ -107,7 +107,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return m, nil
 }
 
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+// Fetch socket metrics from the system
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	// Refresh inode to process mapping (must be root).
 	if err := m.ptable.Refresh(); err != nil {
 		debugf("process table refresh had failures: %v", err)
@@ -115,7 +116,8 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	sockets, err := m.netlink.GetSocketList()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed requesting socket dump")
+		r.Error(errors.Wrap(err, "failed requesting socket dump"))
+		return
 	}
 	debugf("netlink returned %d sockets", len(sockets))
 
@@ -123,11 +125,13 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 	sockets = m.filterAndRememberSockets(sockets)
 
 	// Enrich sockets with direction/pid/process/user/hostname and convert to MapStr.
-	rtn := make([]common.MapStr, 0, len(sockets))
 	for _, s := range sockets {
 		c := newConnection(s)
 		m.enrichConnectionData(c)
-		rtn = append(rtn, c.ToMapStr())
+
+		r.Event(mb.Event{
+			MetricSetFields: c.ToMapStr(),
+		})
 	}
 
 	// Set the "previous" connections set to the "current" connections.
@@ -137,8 +141,6 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	// Reset the listeners for the next iteration.
 	m.listeners.Reset()
-
-	return rtn, nil
 }
 
 // filterAndRememberSockets filters sockets to remove sockets that were seen

@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-nats]]
 == Nats module
 
-experimental[]
-
 This is the nats module.
 
 This is the Nats Module. The Nats module uses http://localhost:8222 APIs to collect metrics.

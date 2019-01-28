@@ -20,6 +20,7 @@ grouped in the following categories:
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-couchbase>>
+* <<exported-fields-couchdb>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-docker>>
 * <<exported-fields-dropwizard>>
@@ -2551,6 +2552,364 @@ Number of items/documents that are replicas.
 
 --
 
+[[exported-fields-couchdb]]
+== couchdb fields
+
+couchdb module
+
+
+
+[float]
+== couchdb fields
+
+
+
+
+[float]
+== server fields
+
+Contains CouchDB server stats
+
+
+
+[float]
+== httpd fields
+
+HTTP statistics
+
+
+
+*`couchdb.server.httpd.view_reads`*::
++
+--
+type: long
+
+Number of view reads
+
+
+--
+
+*`couchdb.server.httpd.bulk_requests`*::
++
+--
+type: long
+
+Number of bulk requests
+
+
+--
+
+*`couchdb.server.httpd.clients_requesting_changes`*::
++
+--
+type: long
+
+Number of clients for continuous _changes
+
+
+--
+
+*`couchdb.server.httpd.temporary_view_reads`*::
++
+--
+type: long
+
+Number of temporary view reads
+
+
+--
+
+*`couchdb.server.httpd.requests`*::
++
+--
+type: long
+
+Number of HTTP requests
+
+
+--
+
+[float]
+== httpd_request_methods fields
+
+HTTP request methods
+
+
+
+*`couchdb.server.httpd_request_methods.COPY`*::
++
+--
+type: long
+
+Number of HTTP COPY requests
+
+
+--
+
+*`couchdb.server.httpd_request_methods.HEAD`*::
++
+--
+type: long
+
+Number of HTTP HEAD requests
+
+
+--
+
+*`couchdb.server.httpd_request_methods.POST`*::
++
+--
+type: long
+
+Number of HTTP POST requests
+
+
+--
+
+*`couchdb.server.httpd_request_methods.DELETE`*::
++
+--
+type: long
+
+Number of HTTP DELETE requests
+
+
+--
+
+*`couchdb.server.httpd_request_methods.GET`*::
++
+--
+type: long
+
+Number of HTTP GET requests
+
+
+--
+
+*`couchdb.server.httpd_request_methods.PUT`*::
++
+--
+type: long
+
+Number of HTTP PUT requests
+
+
+--
+
+[float]
+== httpd_status_codes fields
+
+HTTP status codes statistics
+
+
+
+*`couchdb.server.httpd_status_codes.200`*::
++
+--
+type: long
+
+Number of HTTP 200 OK responses
+
+
+--
+
+*`couchdb.server.httpd_status_codes.201`*::
++
+--
+type: long
+
+Number of HTTP 201 Created responses
+
+
+--
+
+*`couchdb.server.httpd_status_codes.202`*::
++
+--
+type: long
+
+Number of HTTP 202 Accepted responses
+
+
+--
+
+*`couchdb.server.httpd_status_codes.301`*::
++
+--
+type: long
+
+Number of HTTP 301 Moved Permanently responses
+
+
+--
+
+*`couchdb.server.httpd_status_codes.304`*::
++
+--
+type: long
+
+Number of HTTP 304 Not Modified responses
+
+
+--
+
+*`couchdb.server.httpd_status_codes.400`*::
++
+--
+type: long
+
+Number of HTTP 400 Bad Request responses
+
+
+--
+
+*`couchdb.server.httpd_status_codes.401`*::
++
+--
+type: long
+
+Number of HTTP 401 Unauthorized responses
+
+
+--
+
+*`couchdb.server.httpd_status_codes.403`*::
++
+--
+type: long
+
+Number of HTTP 403 Forbidden responses
+
+
+--
+
+*`couchdb.server.httpd_status_codes.404`*::
++
+--
+type: long
+
+Number of HTTP 404 Not Found responses
+
+
+--
+
+*`couchdb.server.httpd_status_codes.405`*::
++
+--
+type: long
+
+Number of HTTP 405 Method Not Allowed responses
+
+
+--
+
+*`couchdb.server.httpd_status_codes.409`*::
++
+--
+type: long
+
+Number of HTTP 409 Conflict responses
+
+
+--
+
+*`couchdb.server.httpd_status_codes.412`*::
++
+--
+type: long
+
+Number of HTTP 412 Precondition Failed responses
+
+
+--
+
+*`couchdb.server.httpd_status_codes.500`*::
++
+--
+type: long
+
+Number of HTTP 500 Internal Server Error responses
+
+
+--
+
+[float]
+== couchdb fields
+
+couchdb statistics
+
+
+
+*`couchdb.server.couchdb.database_writes`*::
++
+--
+type: long
+
+Number of times a database was changed
+
+
+--
+
+*`couchdb.server.couchdb.open_databases`*::
++
+--
+type: long
+
+Number of open databases
+
+
+--
+
+*`couchdb.server.couchdb.auth_cache_misses`*::
++
+--
+type: long
+
+Number of authentication cache misses
+
+
+--
+
+*`couchdb.server.couchdb.request_time`*::
++
+--
+type: long
+
+Length of a request inside CouchDB without MochiWeb
+
+
+--
+
+*`couchdb.server.couchdb.database_reads`*::
++
+--
+type: long
+
+Number of times a document was read from a database
+
+
+--
+
+*`couchdb.server.couchdb.auth_cache_hits`*::
++
+--
+type: long
+
+Number of authentication cache hits
+
+
+--
+
+*`couchdb.server.couchdb.open_os_files`*::
++
+--
+type: long
+
+Number of file descriptors CouchDB has open
+
+
+--
+
 [[exported-fields-docker-processor]]
 == Docker fields
 
@@ -2687,7 +3046,7 @@ Size of the files that have been created or changed since creation.
 *`docker.container.tags`*::
 +
 --
-type: array
+type: keyword
 
 Image tags.
 
@@ -3206,7 +3565,7 @@ Image labels.
 *`docker.image.tags`*::
 +
 --
-type: array
+type: keyword
 
 Image tags.
 
@@ -3817,6 +4176,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the client to the server.
 
 
@@ -4164,6 +4525,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the destination to the source.
 
 
@@ -4498,6 +4861,8 @@ Hash (perhaps logstash fingerprint) of raw field to be able to demonstrate log i
 --
 type: long
 
+format: duration
+
 Duration of the event in nanoseconds.
 If event.start and event.end are known this value should be the difference between the end and start time.
 
@@ -4685,6 +5050,8 @@ Mode of the file in octal representation.
 +
 --
 type: long
+
+format: bytes
 
 File size in bytes (field is only added when `type` is `file`).
 
@@ -5090,6 +5457,8 @@ type: long
 
 example: 1437
 
+format: bytes
+
 Total size in bytes of the request (body and headers).
 
 
@@ -5101,6 +5470,8 @@ Total size in bytes of the request (body and headers).
 type: long
 
 example: 887
+
+format: bytes
 
 Size in bytes of the request body.
 
@@ -5114,6 +5485,8 @@ type: long
 
 example: 1437
 
+format: bytes
+
 Total size in bytes of the response (body and headers).
 
 
@@ -5125,6 +5498,8 @@ Total size in bytes of the response (body and headers).
 type: long
 
 example: 887
+
+format: bytes
 
 Size in bytes of the response body.
 
@@ -5304,6 +5679,8 @@ type: long
 
 example: 368
 
+format: bytes
+
 Total bytes transferred in both directions.
 If `source.bytes` and `destination.bytes` are known, `network.bytes` is their sum.
 
@@ -5326,7 +5703,7 @@ If `source.packets` and `destination.packets` are known, `network.packets` is th
 [float]
 == observer fields
 
-An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics. This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.  
+An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics. This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
 
 
 
@@ -5889,6 +6266,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the server to the client.
 
 
@@ -6162,6 +6541,8 @@ Source domain.
 type: long
 
 example: 184
+
+format: bytes
 
 Bytes sent from the source to the destination.
 
@@ -6471,12 +6852,29 @@ Useful if `user.id` or `user.name` contain confidential information and cannot b
 
 --
 
-*`user.group`*::
+[float]
+== group fields
+
+The group fields are meant to represent groups that are relevant to the event.
+
+
+
+*`user.group.id`*::
 +
 --
 type: keyword
 
-Group the user is a part of. This field can contain a list of groups, if necessary.
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
 
 
 --
@@ -10147,16 +10545,6 @@ The HTTP headers sent
 
 --
 
-*`http.request.body`*::
-+
---
-type: keyword
-
-The HTTP payload sent
-
-
---
-
 [float]
 == response fields
 
@@ -10508,7 +10896,7 @@ Leader id (broker).
 *`kafka.partition.partition.isr`*::
 +
 --
-type: array
+type: keyword
 
 List of isr ids.
 
@@ -12824,7 +13212,6 @@ Total inodes
 [[exported-fields-kvm]]
 == kvm fields
 
-experimental[]
 kvm module
 
 
@@ -14860,7 +15247,7 @@ Optime of primary
 *`mongodb.replstatus.members.secondary.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of secondary hosts
 
@@ -14887,7 +15274,7 @@ type: long
 *`mongodb.replstatus.members.recovering.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of recovering members hosts
 
@@ -14907,7 +15294,7 @@ Count of members in the `recovering` state
 *`mongodb.replstatus.members.unknown.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of members' hosts in the `unknown` state
 
@@ -14927,7 +15314,7 @@ Count of members with `unknown` state
 *`mongodb.replstatus.members.startup2.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of initializing members hosts
 
@@ -14947,7 +15334,7 @@ Count of members in the `startup2` state
 *`mongodb.replstatus.members.arbiter.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of arbiters hosts
 
@@ -14967,7 +15354,7 @@ Count of arbiters
 *`mongodb.replstatus.members.down.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of `down` members hosts
 
@@ -14987,7 +15374,7 @@ Count of `down` members
 *`mongodb.replstatus.members.rollback.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of members in the `rollback` state
 
@@ -15007,7 +15394,7 @@ Count of members in the `rollback` state
 *`mongodb.replstatus.members.unhealthy.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of members' hosts with healthy = false
 
@@ -16614,83 +17001,26 @@ MS SQL module
 
 
 [float]
-== db fields
-
-db metricset will fetch information about each db from a sql server
-
-
-[float]
 == database fields
 
-Database where the metrics have been fetched from
+The database that the metrics is being referred to
 
 
-*`mssql.db.database.id`*::
+*`mssql.database.id`*::
++
+--
+type: long
+
+Unique ID of the database inside MSSQL
+
+--
+
+*`mssql.database.name`*::
 +
 --
 type: keyword
 
-The database ID
-
---
-
-[float]
-== log_space_usage fields
-
-Space usage information for the transaction log
-
-
-[float]
-== total fields
-
-Total space usage
-
-
-*`mssql.db.log_space_usage.total.bytes`*::
-+
---
-type: long
-
-The size of the log
-
---
-
-[float]
-== used fields
-
-The occupied size of the log
-
-
-*`mssql.db.log_space_usage.used.bytes`*::
-+
---
-type: long
-
-The occupied size of the log in bytes
-
---
-
-*`mssql.db.log_space_usage.used.pct`*::
-+
---
-type: float
-
-A percentaje of the occupied size of the log as a percent of the total log size
-
---
-
-[float]
-== since_last_backup fields
-
-The amount of space used since the last log backup
-
-
-*`mssql.db.log_space_usage.since_last_backup.bytes`*::
-+
---
-type: long
-
-The amount of space used since the last log backup in bytes
+Name of the database
 
 --
 
@@ -16854,6 +17184,147 @@ Indicates the number of pages in the buffer pool with database content.
 type: long
 
 Ideal number of pages in the buffer pool.
+
+--
+
+[float]
+== transaction_log fields
+
+transaction_log metricset will fetch information about the operation and transaction log of each database from a MSSQL instance
+
+
+[float]
+== space_usage fields
+
+Space usage information for the transaction log
+
+
+[float]
+== since_last_backup fields
+
+The amount of space used since the last log backup
+
+
+*`mssql.transaction_log.space_usage.since_last_backup.bytes`*::
++
+--
+type: long
+
+The amount of space used since the last log backup in bytes
+
+--
+
+[float]
+== total fields
+
+The size of the log
+
+
+*`mssql.transaction_log.space_usage.total.bytes`*::
++
+--
+type: long
+
+The size of the log in bytes
+
+--
+
+[float]
+== used fields
+
+The occupied size of the log
+
+
+*`mssql.transaction_log.space_usage.used.bytes`*::
++
+--
+type: long
+
+The occupied size of the log in bytes
+
+--
+
+*`mssql.transaction_log.space_usage.used.pct`*::
++
+--
+type: float
+
+A percentage of the occupied size of the log as a percent of the total log size
+
+--
+
+[float]
+== stats fields
+
+Returns summary level attributes and information on transaction log files of databases. Use this information for monitoring and diagnostics of transaction log health.
+
+
+[float]
+== active_size fields
+
+Total active transaction log size.
+
+
+*`mssql.transaction_log.stats.active_size.bytes`*::
++
+--
+type: long
+
+Total active transaction log size in bytes
+
+--
+
+*`mssql.transaction_log.stats.backup_time`*::
++
+--
+type: date
+
+Last transaction log backup time.
+
+--
+
+[float]
+== recovery_size fields
+
+Log size since log recovery log sequence number (LSN).
+
+
+*`mssql.transaction_log.stats.recovery_size.bytes`*::
++
+--
+type: long
+
+Log size in bytes since log recovery log sequence number (LSN).
+
+--
+
+[float]
+== since_last_checkpoint fields
+
+Log size since last checkpoint log sequence number (LSN).
+
+
+*`mssql.transaction_log.stats.since_last_checkpoint.bytes`*::
++
+--
+type: long
+
+Log size in bytes since last checkpoint log sequence number (LSN).
+
+--
+
+[float]
+== total_size fields
+
+Total transaction log size.
+
+
+*`mssql.transaction_log.stats.total_size.bytes`*::
++
+--
+type: long
+
+Total transaction log size in bytes.
 
 --
 
@@ -17776,6 +18247,8 @@ Contains nats var related metrics
 --
 type: long
 
+format: duration
+
 The period the server is up (sec)
 
 
@@ -17785,6 +18258,8 @@ The period the server is up (sec)
 +
 --
 type: long
+
+format: bytes
 
 The current memory usage of NATS process
 
@@ -17804,7 +18279,9 @@ The number of logical cores the NATS process runs on
 *`nats.stats.cpu`*::
 +
 --
-type: float
+type: scaled_float
+
+format: percent
 
 The current cpu usage of NATs process
 
@@ -17814,7 +18291,7 @@ The current cpu usage of NATs process
 *`nats.stats.total_connections`*::
 +
 --
-type: integer
+type: long
 
 The number of totally created clients
 
@@ -17841,7 +18318,7 @@ The amount of incoming data
 *`nats.stats.in.messages`*::
 +
 --
-type: integer
+type: long
 
 The amount of incoming messages
 
@@ -17851,7 +18328,9 @@ The amount of incoming messages
 *`nats.stats.in.bytes`*::
 +
 --
-type: integer
+type: long
+
+format: bytes
 
 The amount of incoming bytes
 
@@ -17868,7 +18347,7 @@ The amount of outgoing data
 *`nats.stats.out.messages`*::
 +
 --
-type: integer
+type: long
 
 The amount of outgoing messages
 
@@ -17878,7 +18357,9 @@ The amount of outgoing messages
 *`nats.stats.out.bytes`*::
 +
 --
-type: integer
+type: long
+
+format: bytes
 
 The amount of outgoing bytes
 
@@ -17888,59 +18369,9 @@ The amount of outgoing bytes
 *`nats.stats.slow_consumers`*::
 +
 --
-type: integer
+type: long
 
 The number of slow consumers currently on NATS
-
-
---
-
-*`nats.stats.http_req_stats.root_uri`*::
-+
---
-type: object
-
-The number of hits on root monitoring uri
-
-
---
-
-*`nats.stats.http_req_stats.connz_uri`*::
-+
---
-type: object
-
-The number of hits on connz monitoring uri
-
-
---
-
-*`nats.stats.http_req_stats.routez_uri`*::
-+
---
-type: object
-
-The number of hits on routez monitoring uri
-
-
---
-
-*`nats.stats.http_req_stats.subsz_uri`*::
-+
---
-type: object
-
-The number of hits on subsz monitoring uri
-
-
---
-
-*`nats.stats.http_req_stats.stats_uri`*::
-+
---
-type: object
-
-The number of hits on stats monitoring uri
 
 
 --
@@ -17969,7 +18400,7 @@ The request distribution on monitoring URIS
 *`nats.stats.http.req_stats.uri.routez`*::
 +
 --
-type: integer
+type: long
 
 The number of hits on routez monitoring uri
 
@@ -17979,7 +18410,7 @@ The number of hits on routez monitoring uri
 *`nats.stats.http.req_stats.uri.connz`*::
 +
 --
-type: integer
+type: long
 
 The number of hits on connz monitoring uri
 
@@ -17989,7 +18420,7 @@ The number of hits on connz monitoring uri
 *`nats.stats.http.req_stats.uri.varz`*::
 +
 --
-type: integer
+type: long
 
 The number of hits on varz monitoring uri
 
@@ -17999,7 +18430,7 @@ The number of hits on varz monitoring uri
 *`nats.stats.http.req_stats.uri.subsz`*::
 +
 --
-type: integer
+type: long
 
 The number of hits on subsz monitoring uri
 
@@ -18009,7 +18440,7 @@ The number of hits on subsz monitoring uri
 *`nats.stats.http.req_stats.uri.root`*::
 +
 --
-type: integer
+type: long
 
 The number of hits on root monitoring uri
 
@@ -18036,7 +18467,7 @@ The number of active subscriptions
 *`nats.subscriptions.inserts`*::
 +
 --
-type: integer
+type: long
 
 The number of insert operations in subscriptions list
 
@@ -18046,7 +18477,7 @@ The number of insert operations in subscriptions list
 *`nats.subscriptions.removes`*::
 +
 --
-type: integer
+type: long
 
 The number of remove operations in subscriptions list
 
@@ -18056,7 +18487,7 @@ The number of remove operations in subscriptions list
 *`nats.subscriptions.matches`*::
 +
 --
-type: integer
+type: long
 
 The number of times a match is found for a subscription
 
@@ -18076,7 +18507,9 @@ The number of result sets in the cache
 *`nats.subscriptions.cache.hit_rate`*::
 +
 --
-type: integer
+type: scaled_float
+
+format: percent
 
 The rate matches are being retrieved from cache
 
@@ -18096,7 +18529,7 @@ The maximum fanout served by cache
 *`nats.subscriptions.cache.fanout.avg`*::
 +
 --
-type: integer
+type: double
 
 The average fanout served by cache
 
@@ -19275,66 +19708,26 @@ alias to: process.executable
 [[exported-fields-prometheus]]
 == Prometheus fields
 
-Stats collected from Prometheus.
+Stats scraped from a Prometheus endpoint.
 
 
 
-[float]
-== prometheus fields
-
-
-
-
-[float]
-== stats fields
-
-Stats about the Prometheus server.
-
-
-
-[float]
-== notifications fields
-
-Notification stats.
-
-
-
-*`prometheus.stats.notifications.queue_length`*::
+*`prometheus.labels`*::
 +
 --
-type: long
+type: object
 
-Current queue length.
+Prometheus metric labels
 
 
 --
 
-*`prometheus.stats.notifications.dropped`*::
+*`prometheus.metrics`*::
 +
 --
-type: long
+type: object
 
-Number of dropped queue events.
-
-
---
-
-*`prometheus.stats.processes.open_fds`*::
-+
---
-type: long
-
-Number of open file descriptors.
-
-
---
-
-*`prometheus.stats.storage.chunks_to_persist`*::
-+
---
-type: long
-
-Number of memory chunks that are not yet persisted to disk.
+Prometheus metric - release: ga
 
 
 --
@@ -21066,7 +21459,9 @@ Server info
 *`redis.info.server.version`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 None
 
@@ -21111,7 +21506,9 @@ None
 *`redis.info.server.os`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: os.full
 
 None
 
@@ -21147,7 +21544,9 @@ None
 *`redis.info.server.process_id`*::
 +
 --
-type: long
+type: alias
+
+alias to: process.pid
 
 None
 
@@ -25251,7 +25650,9 @@ Number of synced followers reported when a node server_state is leader.
 *`zookeeper.mntr.version`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 ZooKeeper version and build string reported.
 
@@ -25275,6 +25676,130 @@ type: long
 
 Number of znodes reported by the local ZooKeeper process.
 
+
+--
+
+[float]
+== server fields
+
+server contains the metrics reported by the four-letter `srvr` command.
+
+
+*`zookeeper.server.connections`*::
++
+--
+type: long
+
+Connections established by the server
+
+--
+
+
+*`zookeeper.server.latency.avg`*::
++
+--
+type: long
+
+Average latency of the server
+
+--
+
+*`zookeeper.server.latency.max`*::
++
+--
+type: long
+
+Max latency reached by the server
+
+--
+
+*`zookeeper.server.latency.min`*::
++
+--
+type: long
+
+Minimum latency that has been reached by the server
+
+--
+
+*`zookeeper.server.mode`*::
++
+--
+type: keyword
+
+Server mode
+
+--
+
+*`zookeeper.server.node_count`*::
++
+--
+type: long
+
+Total number of nodes
+
+--
+
+*`zookeeper.server.outstanding`*::
++
+--
+type: long
+
+Outstanding
+
+--
+
+*`zookeeper.server.received`*::
++
+--
+type: long
+
+Received requests to the server
+
+--
+
+*`zookeeper.server.sent`*::
++
+--
+type: long
+
+Requests sent by the server
+
+--
+
+*`zookeeper.server.version_date`*::
++
+--
+type: date
+
+Date of the Zookeeper release in use
+
+--
+
+*`zookeeper.server.zxid`*::
++
+--
+type: keyword
+
+Original value of the Zookeeper transaction ID
+
+--
+
+*`zookeeper.server.count`*::
++
+--
+type: long
+
+Total transactions of the leader in epoch
+
+--
+
+*`zookeeper.server.epoch`*::
++
+--
+type: long
+
+Epoch value of the Zookeeper transaction ID
 
 --
 

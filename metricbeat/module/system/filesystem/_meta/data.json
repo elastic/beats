@@ -17,17 +17,17 @@
     },
     "system": {
         "filesystem": {
-            "available": 0,
-            "device_name": "devfs",
-            "files": 1188,
-            "free": 0,
+            "available": 53067177984,
+            "device_name": "/dev/dm-5",
+            "files": 0,
+            "free": 54342492160,
             "free_files": 0,
-            "mount_point": "/dev",
-            "total": 351232,
-            "type": "devfs",
+            "mount_point": "/var/lib/lxd/storage-pools/default",
+            "total": 86301999104,
+            "type": "btrfs",
             "used": {
-                "bytes": 351232,
-                "pct": 1
+                "bytes": 31959506944,
+                "pct": 0.3759
             }
         }
     }

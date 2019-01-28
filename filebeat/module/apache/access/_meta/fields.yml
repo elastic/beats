@@ -12,11 +12,3 @@
       type: keyword
       description: >
         SSL cipher name.
-
-
-    - name: body_sent.bytes
-      type: long
-      format: bytes
-      description: >
-        The number of bytes of the server response body.
-

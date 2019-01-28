@@ -90,7 +90,7 @@ alias to: apache.access.ssl.cipher
 --
 type: alias
 
-alias to: apache.access.body_sent.bytes
+alias to: http.response.body.bytes
 
 --
 
@@ -379,18 +379,6 @@ SSL protocol version.
 type: keyword
 
 SSL cipher name.
-
-
---
-
-*`apache.access.body_sent.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
 
 
 --
@@ -993,6 +981,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the client to the server.
 
 
@@ -1340,6 +1330,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the destination to the source.
 
 
@@ -1674,6 +1666,8 @@ Hash (perhaps logstash fingerprint) of raw field to be able to demonstrate log i
 --
 type: long
 
+format: duration
+
 Duration of the event in nanoseconds.
 If event.start and event.end are known this value should be the difference between the end and start time.
 
@@ -1861,6 +1855,8 @@ Mode of the file in octal representation.
 +
 --
 type: long
+
+format: bytes
 
 File size in bytes (field is only added when `type` is `file`).
 
@@ -2266,6 +2262,8 @@ type: long
 
 example: 1437
 
+format: bytes
+
 Total size in bytes of the request (body and headers).
 
 
@@ -2277,6 +2275,8 @@ Total size in bytes of the request (body and headers).
 type: long
 
 example: 887
+
+format: bytes
 
 Size in bytes of the request body.
 
@@ -2290,6 +2290,8 @@ type: long
 
 example: 1437
 
+format: bytes
+
 Total size in bytes of the response (body and headers).
 
 
@@ -2301,6 +2303,8 @@ Total size in bytes of the response (body and headers).
 type: long
 
 example: 887
+
+format: bytes
 
 Size in bytes of the response body.
 
@@ -2480,6 +2484,8 @@ type: long
 
 example: 368
 
+format: bytes
+
 Total bytes transferred in both directions.
 If `source.bytes` and `destination.bytes` are known, `network.bytes` is their sum.
 
@@ -2502,7 +2508,7 @@ If `source.packets` and `destination.packets` are known, `network.packets` is th
 [float]
 == observer fields
 
-An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics. This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.  
+An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics. This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
 
 
 
@@ -3065,6 +3071,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the server to the client.
 
 
@@ -3338,6 +3346,8 @@ Source domain.
 type: long
 
 example: 184
+
+format: bytes
 
 Bytes sent from the source to the destination.
 
@@ -3647,12 +3657,29 @@ Useful if `user.id` or `user.name` contain confidential information and cannot b
 
 --
 
-*`user.group`*::
+[float]
+== group fields
+
+The group fields are meant to represent groups that are relevant to the event.
+
+
+
+*`user.group.id`*::
 +
 --
 type: keyword
 
-Group the user is a part of. This field can contain a list of groups, if necessary.
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
 
 
 --
@@ -3968,7 +3995,7 @@ The authentication realm
 *`elasticsearch.audit.roles`*::
 +
 --
-type: array
+type: keyword
 
 example: ['kibana_user', 'beats_admin']
 
@@ -3990,7 +4017,7 @@ The name of the action that was executed
 *`elasticsearch.audit.indices`*::
 +
 --
-type: array
+type: keyword
 
 example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
 
@@ -4468,17 +4495,6 @@ Extra source information
 
 --
 
-*`elasticsearch.slowlog.took_millis`*::
-+
---
-type: keyword
-
-example: 42
-
-Time took in milliseconds
-
---
-
 *`elasticsearch.slowlog.total_hits`*::
 +
 --
@@ -4922,15 +4938,6 @@ Complete HTTP request line, including the method, request and HTTP version strin
 
 --
 
-*`haproxy.http.request.time_active_ms`*::
-+
---
-type: long
-
-Time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
-
---
-
 *`haproxy.http.request.time_wait_without_data_ms`*::
 +
 --
@@ -4954,15 +4961,6 @@ Total time in milliseconds spent waiting for a full HTTP request from the client
 
 TCP log format
 
-
-*`haproxy.tcp.processing_time_ms`*::
-+
---
-type: long
-
-Total time in milliseconds elapsed between the accept and the last close
-
---
 
 *`haproxy.tcp.connection_waiting_time_ms`*::
 +
@@ -5138,16 +5136,6 @@ The Windows status code.
 
 --
 
-*`iis.access.request_time_ms`*::
-+
---
-type: long
-
-The request time in milliseconds.
-
-
---
-
 *`iis.access.site_name`*::
 +
 --
@@ -5178,27 +5166,21 @@ The content of the cookie sent or received, if any.
 
 --
 
-*`iis.access.body_sent.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
-
-
---
-
 *`iis.access.body_received.bytes`*::
 +
 --
-type: long
+type: alias
 
-format: bytes
+alias to: http.request.body.bytes
 
-The number of bytes of the server request body.
+--
 
+*`iis.access.body_sent.bytes`*::
++
+--
+type: alias
+
+alias to: http.response.body.bytes
 
 --
 
@@ -6027,23 +6009,12 @@ This field contains the flags of the event.
 
 --
 
-*`http.response.elapsed_time`*::
-+
---
-type: long
-
-Elapsed time between request and response in milli seconds.
-
-
---
-
 *`http.response.content_length`*::
 +
 --
-type: long
+type: alias
 
-Content length of the HTTP response body.
-
+alias to: http.response.body.bytes
 
 --
 
@@ -6394,16 +6365,6 @@ alias to: message
 Contains fields from the MySQL slow logs.
 
 
-
-*`mysql.slowlog.query_time.sec`*::
-+
---
-type: float
-
-The total time the query took, in seconds, as a floating point number.
-
-
---
 
 *`mysql.slowlog.lock_time.sec`*::
 +
@@ -9985,24 +9946,22 @@ Contains fields for the Nginx access logs.
 
 
 
-*`nginx.access.body_sent.bytes`*::
+*`nginx.access.remote_ip_list`*::
 +
 --
-type: long
+type: array
 
-format: bytes
-
-The number of bytes of the server response body.
+An array of remote IP addresses. It is a list because it is common to include, besides the client IP address, IP addresses from headers like `X-Forwarded-For`. Real source IP is restored to `source.ip`.
 
 
 --
 
-*`nginx.access.remote_ip_list`*::
+*`nginx.access.body_sent.bytes`*::
 +
 --
 type: alias
 
-alias to: network.forwarded_ip
+alias to: http.response.body.bytes
 
 --
 
@@ -10390,17 +10349,6 @@ Core id
 example: mydb
 
 Name of database
-
---
-
-*`postgresql.log.duration`*::
-+
---
-type: float
-
-example: 30.0
-
-Duration of a query.
 
 --
 
@@ -12595,34 +12543,12 @@ Contains fields for the Traefik access logs.
 
 
 
-*`traefik.access.duration`*::
-+
---
-type: long
-
-Duration of the access entry.
-
-
---
-
 *`traefik.access.user_identifier`*::
 +
 --
 type: keyword
 
 Is the RFC 1413 identity of the client
-
-
---
-
-*`traefik.access.body_sent.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
 
 
 --
@@ -12653,6 +12579,15 @@ The name of the frontend used
 type: text
 
 The url of the backend where request is forwarded
+
+--
+
+*`traefik.access.body_sent.bytes`*::
++
+--
+type: alias
+
+alias to: http.response.body.bytes
 
 --
 
