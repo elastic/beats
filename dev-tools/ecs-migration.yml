@@ -1223,6 +1223,12 @@
   alias: true
   beat: metricbeat
 
+### HTTP
+- from: http.request.body
+  to: http.request.body.content
+  alias: false
+  beat: metricbeat
+
 ### Zookeeper
 
 - from: zookeeper.mntr.version
