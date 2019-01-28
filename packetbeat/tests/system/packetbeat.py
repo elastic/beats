@@ -10,7 +10,7 @@ from beat.beat import Proc
 
 TRANS_REQUIRED_FIELDS = ["@timestamp", "type", "status",
                          "agent.type", "agent.hostname", "agent.version",
-                         "event.dataset", "event.start",
+                         "event.kind", "event.category", "event.dataset", "event.start",
                          "source.ip", "destination.ip",
                          "client.ip", "server.ip",
                          "network.type", "network.transport", "network.community_id",
@@ -18,7 +18,7 @@ TRANS_REQUIRED_FIELDS = ["@timestamp", "type", "status",
 
 FLOWS_REQUIRED_FIELDS = ["@timestamp", "type",
                          "agent.type", "agent.hostname", "agent.version",
-                         "event.dataset", "event.start", "event.end", "event.duration",
+                         "event.kind", "event.category", "event.dataset", "event.action", "event.start", "event.end", "event.duration",
                          "source.ip", "destination.ip",
                          "flow.id",
                          "network.type", "network.transport", "network.community_id",
