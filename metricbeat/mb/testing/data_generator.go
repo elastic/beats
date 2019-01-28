@@ -77,22 +77,12 @@ func WriteEventsCond(f mb.EventsFetcher, t testing.TB, cond func(e common.MapStr
 		return fmt.Errorf("no events were generated")
 	}
 
-	var event *common.MapStr
-	if cond == nil {
-		event = &events[0]
-	} else {
-		for _, e := range events {
-			if cond(e) {
-				event = &e
-				break
-			}
-		}
-		if event == nil {
-			return fmt.Errorf("no events satisfied the condition")
-		}
+	event, err := SelectEvent(events, cond)
+	if err != nil {
+		return err
 	}
 
-	fullEvent := CreateFullEvent(f, *event)
+	fullEvent := CreateFullEvent(f, event)
 	WriteEventToDataJSON(t, fullEvent, "")
 	return nil
 }
@@ -100,6 +90,12 @@ func WriteEventsCond(f mb.EventsFetcher, t testing.TB, cond func(e common.MapStr
 // WriteEventsReporterV2 fetches events and writes the first event to a ./_meta/data.json
 // file.
 func WriteEventsReporterV2(f mb.ReportingMetricSetV2, t testing.TB, path string) error {
+	return WriteEventsReporterV2Cond(f, t, path, nil)
+}
+
+// WriteEventsReporterV2Cond fetches events and writes the first event that matches
+// the condition to a file.
+func WriteEventsReporterV2Cond(f mb.ReportingMetricSetV2, t testing.TB, path string, cond func(common.MapStr) bool) error {
 	if !*dataFlag {
 		t.Skip("skip data generation tests")
 	}
@@ -113,7 +109,12 @@ func WriteEventsReporterV2(f mb.ReportingMetricSetV2, t testing.TB, path string)
 		return fmt.Errorf("no events were generated")
 	}
 
-	e := StandardizeEvent(f, events[0], mb.AddMetricSetInfo)
+	match, err := SelectEventV2(f, events, cond)
+	if err != nil {
+		return err
+	}
+
+	e := StandardizeEvent(f, match, mb.AddMetricSetInfo)
 
 	WriteEventToDataJSON(t, e, path)
 	return nil
@@ -169,7 +170,11 @@ func WriteEventToDataJSON(t testing.TB, fullEvent beat.Event, postfixPath string
 		t.Fatal(err)
 	}
 
-	p = path.Join(p, postfixPath, "_meta", "data.json")
+	if stat, err := os.Stat(postfixPath); err == nil && stat.IsDir() {
+		p = path.Join(p, postfixPath, "_meta", "data.json")
+	} else {
+		p = postfixPath
+	}
 
 	fields := fullEvent.Fields
 	fields["@timestamp"] = fullEvent.Timestamp
@@ -182,4 +187,31 @@ func WriteEventToDataJSON(t testing.TB, fullEvent beat.Event, postfixPath string
 	if err = ioutil.WriteFile(p, output, 0644); err != nil {
 		t.Fatal(err)
 	}
+}
+
+// SelectEvent selects the first event that matches an specific condition
+func SelectEvent(events []common.MapStr, cond func(e common.MapStr) bool) (common.MapStr, error) {
+	if cond == nil && len(events) > 0 {
+		return events[0], nil
+	}
+	for _, e := range events {
+		if cond(e) {
+			return e, nil
+		}
+	}
+	return nil, fmt.Errorf("no events satisfied the condition")
+}
+
+// SelectEventV2 selects the first event that matches an specific condition
+func SelectEventV2(f mb.ReportingMetricSetV2, events []mb.Event, cond func(e common.MapStr) bool) (mb.Event, error) {
+	if cond == nil && len(events) > 0 {
+		return events[0], nil
+	}
+	for _, e := range events {
+		fields := StandardizeEvent(f, e, mb.AddMetricSetInfo).Fields
+		if cond(fields) {
+			return e, nil
+		}
+	}
+	return mb.Event{}, fmt.Errorf("no events satisfied the condition")
 }
