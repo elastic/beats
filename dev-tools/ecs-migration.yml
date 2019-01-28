@@ -419,11 +419,6 @@
 
 ## Elasticsearch module
 
-- from: elasticsearch.audit.request_body
-  to: http.request.body.content
-  alias: true
-  beat: filebeat
-
 - from: elasticsearch.slowlog.took_millis
   to: event.duration
   alias: false

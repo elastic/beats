@@ -4047,15 +4047,6 @@ The type of request that was executed
 
 --
 
-*`elasticsearch.audit.request_body`*::
-+
---
-type: alias
-
-alias to: http.request.body.content
-
---
-
 [float]
 == deprecation fields
 

@@ -30,7 +30,3 @@
       description: "The type of request that was executed"
       example: "ClearScrollRequest"
       type: keyword
-    - name: request_body
-      type: alias
-      path: http.request.body.content
-      migration: true
