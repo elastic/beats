@@ -11025,10 +11025,12 @@ Kibana stats and run-time metrics.
 
 
 
-*`kibana.stats.service.id`*::
+*`kibana.stats.uuid`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.id
 
 Kibana instance UUID
 
@@ -11055,10 +11057,12 @@ Name of Kibana's internal index
 
 --
 
-*`kibana.stats.service.address`*::
+*`kibana.stats.host.name`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.address
 
 Kibana instance hostname
 
@@ -11256,10 +11260,12 @@ Kibana instance name.
 
 --
 
-*`kibana.status.service.id`*::
+*`kibana.status.uuid`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.id
 
 Kibana instance uuid.
 
@@ -13306,20 +13312,24 @@ node
 
 
 
-*`logstash.node.host.hostname`*::
+*`logstash.node.host`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: host.hostname
 
 Host name
 
 
 --
 
-*`logstash.node.service.version`*::
+*`logstash.node.version`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 Logstash Version
 
@@ -13343,10 +13353,12 @@ Version
 
 --
 
-*`logstash.node.jvm.process.pid`*::
+*`logstash.node.jvm.pid`*::
 +
 --
-type: long
+type: alias
+
+alias to: process.pid
 
 Process ID
 

@@ -8,8 +8,10 @@
       type: keyword
       description: >
         Kibana instance name.
-    - name: service.id
-      type: keyword
+    - name: uuid
+      type: alias
+      path: service.id
+      migration: true
       description: >
         Kibana instance uuid.
     - name: version.number

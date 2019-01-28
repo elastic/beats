@@ -4,8 +4,10 @@
     Kibana stats and run-time metrics.
   release: ga
   fields:
-    - name: service.id
-      type: keyword
+    - name: uuid
+      type: alias
+      path: service.id
+      migration: true
       description: >
         Kibana instance UUID
     - name: name
@@ -16,8 +18,10 @@
       type: keyword
       description: >
         Name of Kibana's internal index
-    - name: service.address
-      type: keyword
+    - name: host.name
+      type: alias
+      path: service.address
+      migration: true
       description: >
         Kibana instance hostname
     - name: host.address
