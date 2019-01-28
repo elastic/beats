@@ -32,4 +32,4 @@ class Test(metricbeat.BaseTest):
 
     def get_hosts(self):
         return [os.getenv('COUCHDB_HOST', 'localhost') + ':' +
-                os.getenv('COUCHDB_PORT', '5894')]
+                os.getenv('COUCHDB_PORT', '5984')]
