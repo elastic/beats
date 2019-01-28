@@ -1580,11 +1580,6 @@
   alias: true
   beat: metricbeat
 
-- from: kibana.stats.transport_address
-  to: host.address
-  alias: true
-  beat: metricbeat
-
 - from: kibana.status.uuid
   to: service.id
   alias: true

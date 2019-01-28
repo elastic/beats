@@ -11070,9 +11070,7 @@ Kibana instance hostname
 *`kibana.stats.transport_address`*::
 +
 --
-type: alias
-
-alias to: host.address
+type: keyword
 
 Kibana server's hostname and port
 
@@ -11082,7 +11080,9 @@ Kibana server's hostname and port
 *`kibana.stats.version`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 Kibana version
 
@@ -11275,7 +11275,9 @@ Kibana instance uuid.
 *`kibana.status.version.number`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 Kibana version number.
 
