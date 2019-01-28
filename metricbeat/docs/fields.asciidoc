@@ -1712,7 +1712,7 @@ osd or bucket node typeID
 *`ceph.osd_tree.children`*::
 +
 --
-type: text
+type: keyword
 
 bucket children list, separated by comma.
 
