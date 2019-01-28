@@ -9,6 +9,16 @@
         "duration": 115000,
         "module": "php_fpm"
     },
+    "http": {
+        "request": {
+            "method": "GET"
+        },
+        "response": {
+            "body": {
+                "bytes": 0
+            }
+        }
+    },
     "metricset": {
         "name": "process"
     },
@@ -17,23 +27,27 @@
             "name": "www"
         },
         "process": {
-            "content_length": 0,
             "last_request_cpu": 0,
             "last_request_memory": 0,
-            "pid": 27,
-            "request_duration": 133,
-            "request_method": "GET",
-            "request_uri": "/status?full=\u0026json=",
-            "requests": 4,
+            "request_duration": 231,
+            "requests": 6,
             "script": "-",
-            "start_since": 59,
+            "start_since": 492,
             "start_time": 1548678234,
-            "state": "Running",
-            "user": "-"
+            "state": "Running"
         }
+    },
+    "process": {
+        "pid": 27
     },
     "service": {
         "address": "127.0.0.1:81",
         "type": "php_fpm"
+    },
+    "url": {
+        "original": "/status?full=\u0026json="
+    },
+    "user": {
+        "name": "-"
     }
 }

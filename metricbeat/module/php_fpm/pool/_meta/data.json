@@ -15,7 +15,7 @@
     "php_fpm": {
         "pool": {
             "connections": {
-                "accepted": 5,
+                "accepted": 10,
                 "listen_queue_len": 0,
                 "max_listen_queue": 0,
                 "queued": 0
@@ -30,7 +30,7 @@
                 "total": 2
             },
             "slow_requests": 0,
-            "start_since": 57,
+            "start_since": 491,
             "start_time": 1548678234
         }
     },
