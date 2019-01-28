@@ -75,12 +75,22 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	// Set service ID
 	uuid, err := dataFields.GetValue("uuid")
 	if err != nil {
-		event.Error = elastic.MakeErrorForMissingField("kibana.uuid", elastic.Kibana)
+		event.Error = elastic.MakeErrorForMissingField("uuid", elastic.Kibana)
 		r.Event(event)
 		return event.Error
 	}
 	event.RootFields.Put("service.id", uuid)
 	dataFields.Delete("uuid")
+
+	// Set service version
+	version, err := dataFields.GetValue("version.number")
+	if err != nil {
+		event.Error = elastic.MakeErrorForMissingField("version.number", elastic.Kibana)
+		r.Event(event)
+		return event.Error
+	}
+	event.RootFields.Put("service.version", version)
+	dataFields.Delete("version")
 
 	event.MetricSetFields = dataFields
 

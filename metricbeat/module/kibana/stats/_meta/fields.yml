@@ -29,9 +29,11 @@
       path: host.address
       migration: true
     - name: version
-      type: keyword
+      type: alias
       description: >
         Kibana version
+      path: service.version
+      migration: true
     - name: snapshot
       type: boolean
       description: >

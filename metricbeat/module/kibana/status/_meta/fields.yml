@@ -15,9 +15,11 @@
       description: >
         Kibana instance uuid.
     - name: version.number
-      type: keyword
+      type: alias
       description: >
         Kibana version number.
+      path: service.version
+      migration: true
     - name: status.overall.state
       type: keyword
       description: >

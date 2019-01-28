@@ -23,9 +23,6 @@
                 "overall": {
                     "state": "green"
                 }
-            },
-            "version": {
-                "number": "7.0.0"
             }
         }
     },
@@ -36,6 +33,7 @@
         "address": "127.0.0.1:5601",
         "id": "5b2de169-2785-441b-ae8c-186a1936b17d",
         "name": "kibana",
-        "type": "kibana"
+        "type": "kibana",
+        "version": "7.0.0"
     }
 }

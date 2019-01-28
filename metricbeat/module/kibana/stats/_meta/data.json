@@ -6,7 +6,7 @@
     },
     "elasticsearch": {
         "cluster": {
-            "id": "IrApQ7bcTWGQxDhkjx5qhQ"
+            "id": "j5trF9G8Td-R6EtPk_bh6w"
         }
     },
     "event": {
@@ -25,7 +25,7 @@
             "name": "Shaunaks-MBP-2",
             "process": {
                 "event_loop_delay": {
-                    "ms": 0.32130200415849686
+                    "ms": 0.09978199005126953
                 },
                 "memory": {
                     "heap": {
@@ -33,15 +33,15 @@
                             "bytes": 1526909922
                         },
                         "total": {
-                            "bytes": 284512256
+                            "bytes": 285036544
                         },
                         "used": {
-                            "bytes": 237203704
+                            "bytes": 231577240
                         }
                     }
                 },
                 "uptime": {
-                    "ms": 23859773
+                    "ms": 165845
                 }
             },
             "request": {
@@ -49,26 +49,28 @@
                 "total": 0
             },
             "response_time": {
-                "avg": {},
+                "avg": {
+                    "ms": 1091
+                },
                 "max": {
-                    "ms": 0
+                    "ms": 1091
                 }
             },
             "snapshot": false,
-            "status": "green",
-            "version": "7.0.0"
+            "status": "green"
         }
     },
     "metricset": {
         "name": "stats"
     },
     "process": {
-        "pid": 17273
+        "pid": 48981
     },
     "service": {
         "address": "127.0.0.1:5601",
         "id": "5b2de169-2785-441b-ae8c-186a1936b17d",
         "name": "kibana",
-        "type": "kibana"
+        "type": "kibana",
+        "version": "7.0.0"
     }
 }
