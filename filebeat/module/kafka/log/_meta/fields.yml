@@ -17,7 +17,8 @@
       description: >
         Component the log is coming from.
     - name: class
-      type: text
+      # Is there a reaons this would not be an exact search?
+      type: keyword
       description: >
         Java class the log is coming from.
     - name: trace
@@ -30,10 +31,12 @@
           description: >
             Java class the trace is coming from.
         - name: message
+          # Should this be mapped to `message` instead`? How is it different from the above message?
           type: text
           description: >
               Message part of the trace.
         - name: full
+          # Sounds like potentially worth as text, not sure where this fits
           type: text
           description: >
               The full trace in the log line.

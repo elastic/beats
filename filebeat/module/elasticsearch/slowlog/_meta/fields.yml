@@ -10,7 +10,8 @@
   - name: took
     description: "Time it took to execute the query"
     example: "300ms"
-    type: text
+    # Should we extrac that nicer?
+    type: keyword
   - name: types
     description: "Types"
     example: ""
@@ -18,6 +19,7 @@
   - name: stats
     description: "Statistics"
     example: ""
+    # What does this exactly contain, do we need text?
     type: text
   - name: search_type
     description: "Search type"
@@ -26,10 +28,12 @@
   - name: source_query
     description: "Slow query"
     example: "{\"query\":{\"match_all\":{\"boost\":1.0}}}"
+    # Do we need text?
     type: text
   - name: extra_source
     description: "Extra source information"
     example: ""
+    # Do we need text?
     type: text
   - name: total_hits
     description: "Total hits"

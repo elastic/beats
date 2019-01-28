@@ -12,10 +12,12 @@
       description: >
         The number of requests
     - name: frontend_name
+      # Keyword?
       type: text
       description: >
         The name of the frontend used
     - name: backend_url
+      # Keyword? Or map to url.original
       type: text
       description:
         The url of the backend where request is forwarded

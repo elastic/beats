@@ -4,6 +4,7 @@
     slowlog
   fields:
     - name: message
+      # This should go into log.original? Or is it `message`?
       type: text
       description: >
         Contains the un-parsed log message
@@ -12,10 +13,12 @@
       description: >
         The module or class where the event originate.
     - name: thread
+      # Keyword?
       type: text
       description: >
         Information about the running thread where the log originate.
     - name: event
+      # event.original? or log.original?
       type: text
       description: >
         Raw dump of the original event
@@ -32,6 +35,7 @@
       description: >
         Execution time for the plugin in milliseconds.
     - name: plugin_params
+      # Keyword?
       type: text
       description: >
         String value of the plugin configuration
