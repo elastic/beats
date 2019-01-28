@@ -123,6 +123,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
+- Do not stop collecting events when journal entries change. {pull}9994[9994]
+
 *Metricbeat*
 
 - Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
