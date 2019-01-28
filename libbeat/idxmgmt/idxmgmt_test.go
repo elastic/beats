@@ -18,7 +18,9 @@
 package idxmgmt
 
 import (
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -157,6 +159,124 @@ func TestDefaultSupport_TemplateConfig(t *testing.T) {
 				require.NoError(t, err)
 				assert.Equal(t, test.want, tmpl)
 			}
+		})
+	}
+}
+
+func TestDefaultSupport_BuildSelector(t *testing.T) {
+	type nameFunc func(time.Time) string
+
+	noILM := []onCall{onMode().Return(ilm.ModeDisabled)}
+	ilmTemplateSettings := func(s ilm.TemplateSettings) []onCall {
+		return []onCall{
+			onMode().Return(ilm.ModeEnabled),
+			onTemplate().Return(s),
+		}
+	}
+
+	stable := func(s string) nameFunc {
+		return func(_ time.Time) string { return s }
+	}
+	dateIdx := func(base string) nameFunc {
+		return func(ts time.Time) string {
+			ext := fmt.Sprintf("%d.%02d.%02d", ts.Year(), ts.Month(), ts.Day())
+			return fmt.Sprintf("%v-%v", base, ext)
+		}
+	}
+
+	cases := map[string]struct {
+		ilmCalls []onCall
+		imCfg    map[string]interface{}
+		cfg      map[string]interface{}
+		want     nameFunc
+		meta     common.MapStr
+	}{
+		"without ilm": {
+			ilmCalls: noILM,
+			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
+			want:     stable("test-9.9.9"),
+		},
+		"event alias without ilm": {
+			ilmCalls: noILM,
+			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
+			want:     stable("test"),
+			meta: common.MapStr{
+				"alias": "test",
+			},
+		},
+		"event index without ilm": {
+			ilmCalls: noILM,
+			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
+			want:     dateIdx("test"),
+			meta: common.MapStr{
+				"index": "test",
+			},
+		},
+		"with ilm": {
+			ilmCalls: ilmTemplateSettings(ilm.TemplateSettings{
+				Alias: "test-9.9.9",
+			}),
+			cfg:  map[string]interface{}{"index": "wrong-%{[agent.version]}"},
+			want: stable("test-9.9.9"),
+		},
+		"event alias wit ilm": {
+			ilmCalls: ilmTemplateSettings(ilm.TemplateSettings{
+				Alias: "test-9.9.9",
+			}),
+			cfg:  map[string]interface{}{"index": "test-%{[agent.version]}"},
+			want: stable("event-alias"),
+			meta: common.MapStr{
+				"alias": "event-alias",
+			},
+		},
+		"event index with ilm": {
+			ilmCalls: ilmTemplateSettings(ilm.TemplateSettings{
+				Alias: "test-9.9.9",
+			}),
+			cfg:  map[string]interface{}{"index": "test-%{[agent.version]}"},
+			want: dateIdx("event-index"),
+			meta: common.MapStr{
+				"index": "event-index",
+			},
+		},
+		"use indices": {
+			ilmCalls: ilmTemplateSettings(ilm.TemplateSettings{
+				Alias: "test-9.9.9",
+			}),
+			cfg: map[string]interface{}{
+				"index": "test-%{[agent.version]}",
+				"indices": []map[string]interface{}{
+					{"index": "myindex"},
+				},
+			},
+			want: stable("myindex"),
+		},
+	}
+	for name, test := range cases {
+		t.Run(name, func(t *testing.T) {
+			ts := time.Now()
+			info := beat.Info{Beat: "test", Version: "9.9.9"}
+
+			factory := MakeDefaultSupport(makeMockILMSupport(test.ilmCalls...))
+			im, err := factory(nil, info, common.MustNewConfigFrom(test.imCfg))
+			require.NoError(t, err)
+
+			sel, err := im.BuildSelector(common.MustNewConfigFrom(test.cfg))
+			require.NoError(t, err)
+
+			meta := test.meta
+			idx, err := sel.Select(&beat.Event{
+				Timestamp: ts,
+				Fields: common.MapStr{
+					"test": "value",
+					"agent": common.MapStr{
+						"version": "9.9.9",
+					},
+				},
+				Meta: meta,
+			})
+			require.NoError(t, err)
+			assert.Equal(t, test.want(ts), idx)
 		})
 	}
 }

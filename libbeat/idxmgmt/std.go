@@ -134,17 +134,10 @@ func (s *indexSupport) Manager(
 }
 
 func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector, error) {
+	var err error
 	log := s.log
 
 	selCfg := common.NewConfig()
-	if cfg.HasField("index") {
-		s, err := cfg.String("index", -1)
-		if err != nil {
-			return nil, err
-		}
-		selCfg.SetString("index", -1, s)
-	}
-
 	if cfg.HasField("indices") {
 		sub, err := cfg.Child("indices", -1)
 		if err != nil {
@@ -153,13 +146,25 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 		selCfg.SetChild("indices", -1, sub)
 	}
 
-	mode := s.ilm.Mode()
-	alias := s.ilm.Template().Alias
-	if mode == ilm.ModeEnabled {
-		log.Infof("Set %v to '%s' as ILM is enabled.", cfg.PathOf("index"), alias)
-		selCfg.SetString("index", -1, alias)
+	var indexName string
+	if cfg.HasField("index") {
+		indexName, err = cfg.String("index", -1)
+		if err != nil {
+			return nil, err
+		}
 	}
 
+	var alias string
+	mode := s.ilm.Mode()
+	if mode != ilm.ModeDisabled {
+		alias = s.ilm.Template().Alias
+		log.Infof("Set %v to '%s' as ILM is enabled.", cfg.PathOf("index"), alias)
+	}
+	if mode == ilm.ModeEnabled {
+		indexName = alias
+	}
+
+	selCfg.SetString("index", -1, indexName)
 	buildSettings := outil.Settings{
 		Key:              "index",
 		MultiKey:         "indices",
@@ -167,7 +172,7 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 		FailEmpty:        mode != ilm.ModeEnabled,
 	}
 
-	indexSel, err := outil.BuildSelectorFromConfig(cfg, buildSettings)
+	indexSel, err := outil.BuildSelectorFromConfig(selCfg, buildSettings)
 	if err != nil {
 		return nil, err
 	}
