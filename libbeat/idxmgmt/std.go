@@ -98,6 +98,24 @@ func (s *indexSupport) ILM() ilm.Supporter {
 	return s.ilm
 }
 
+func (s *indexSupport) TemplateConfig(withILM bool) (template.TemplateConfig, error) {
+	log := s.log
+
+	cfg := s.templateCfg
+	if mode := s.ilm.Mode(); mode == ilm.ModeDisabled {
+		withILM = false
+	} else if mode == ilm.ModeEnabled {
+		withILM = true
+	}
+
+	var err error
+	if withILM {
+		ilmSettings := s.ilm.Template()
+		cfg, err = applyILMSettings(log, cfg, ilmSettings)
+	}
+	return cfg, err
+}
+
 func (s *indexSupport) Manager(
 	client ESClient,
 	fields []byte,
@@ -314,10 +332,14 @@ func applyILMSettings(
 	}
 
 	tmpl.Name = alias
-	log.Infof("Set setup.template.name to '%s' as ILM is enabled.", alias)
+	if log != nil {
+		log.Infof("Set setup.template.name to '%s' as ILM is enabled.", alias)
+	}
 
 	tmpl.Pattern = fmt.Sprintf("%s-*", alias)
-	log.Infof("Set setup.template.pattern to '%s' as ILM is enabled.", tmpl.Pattern)
+	if log != nil {
+		log.Infof("Set setup.template.pattern to '%s' as ILM is enabled.", tmpl.Pattern)
+	}
 
 	// rollover_alias and lifecycle.name can't be configured and will be overwritten
 

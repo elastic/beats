@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
+	"github.com/elastic/beats/libbeat/template"
 )
 
 // SupportFactory is used to provide custom index management support to libbeat.
@@ -37,6 +38,7 @@ type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, er
 type Supporter interface {
 	Enabled() bool
 	ILM() ilm.Supporter
+	TemplateConfig(withILM bool) (template.TemplateConfig, error)
 	Manager(client ESClient, fields []byte, migration bool) Manager
 	BuildSelector(cfg *common.Config) (outputs.IndexSelector, error)
 }
