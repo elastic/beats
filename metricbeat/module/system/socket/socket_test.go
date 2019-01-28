@@ -96,11 +96,11 @@ func TestFetch(t *testing.T) {
 		}
 		assert.Equal(t, os.Getpid(), pid)
 
-		uid, ok := getRequiredValue(t, "user.id", root).(uint32)
+		uid, ok := getRequiredValue(t, "user.id", root).(string)
 		if !ok {
-			t.Fatal("user.id is not an uint32")
+			t.Fatal("user.id is not a string")
 		}
-		assert.EqualValues(t, os.Geteuid(), uid)
+		assert.EqualValues(t, strconv.Itoa(os.Geteuid()), uid)
 
 		dir, ok := getRequiredValue(t, "network.direction", root).(string)
 		if !ok {

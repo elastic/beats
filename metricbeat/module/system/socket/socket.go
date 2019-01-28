@@ -24,6 +24,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strconv"
 	"syscall"
 
 	"github.com/pkg/errors"
@@ -295,7 +296,7 @@ func (c *connection) ToMapStr() (fields common.MapStr, metricSetFields common.Ma
 			"direction":   c.Direction.String(),
 		},
 		"user": common.MapStr{
-			"id": c.UID,
+			"id": strconv.Itoa(int(c.UID)),
 		},
 		// Aliases for this are not going to be possible, keeping
 		// duplicated fields by now for backwards comatibility

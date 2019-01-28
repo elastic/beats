@@ -19,16 +19,16 @@
     },
     "process": {
         "args": [
-            "/tmp/go-build661675341/b001/socket.test",
+            "/tmp/go-build122914279/b001/socket.test",
             "-data"
         ],
-        "executable": "/tmp/go-build661675341/b001/socket.test",
+        "executable": "/tmp/go-build122914279/b001/socket.test",
         "name": "socket.test",
-        "pid": 9341
+        "pid": 20595
     },
     "server": {
         "ip": "::",
-        "port": 42925
+        "port": 32915
     },
     "service": {
         "type": "system"
@@ -37,15 +37,15 @@
         "socket": {
             "local": {
                 "ip": "::",
-                "port": 42925
+                "port": 32915
             },
             "process": {
-                "cmdline": "/tmp/go-build661675341/b001/socket.test -data"
+                "cmdline": "/tmp/go-build122914279/b001/socket.test -data"
             }
         }
     },
     "user": {
         "full_name": "Jaime Soriano Pastor",
-        "id": 1000
+        "id": "1000"
     }
 }
