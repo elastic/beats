@@ -23,7 +23,7 @@
       description: >
         Kibana instance hostname
     - name: transport_address
-      type: keyword
+      type: alias
       description: >
         Kibana server's hostname and port
       path: host.address

@@ -1573,6 +1573,40 @@
   alias: true
   beat: metricbeat
 
+### Kibana
+
+- from: kibana.stats.uuid
+  to: service.id
+  alias: true
+  beat: metricbeat
+
+- from: kibana.stats.transport_address
+  to: host.address
+  alias: true
+  beat: metricbeat
+
+- from: kibana.status.uuid
+  to: service.id
+  alias: true
+  beat: metricbeat
+
+### Logstash
+
+- from: logstash.node.host
+  to: host.hostname
+  alias: true
+  beat: metricbeat
+
+- from: logstash.node.version
+  to: service.version
+  alias: true
+  beat: metricbeat
+
+- from: logstash.node.jvm.pid
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
 ### Zookeeper
 
 - from: zookeeper.mntr.version

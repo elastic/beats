@@ -11070,7 +11070,7 @@ Kibana instance hostname
 *`kibana.stats.transport_address`*::
 +
 --
-type: keyword
+type: alias
 
 alias to: host.address
 
