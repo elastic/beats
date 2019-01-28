@@ -1138,6 +1138,17 @@ The REST endpoint URI
 
 --
 
+*`elasticsearch.audit.uri_params`*::
++
+--
+type: text
+
+example: {username=jacknich2}
+
+REST URI parameters
+
+--
+
 *`elasticsearch.audit.indices`*::
 +
 --
