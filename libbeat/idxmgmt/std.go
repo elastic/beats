@@ -104,10 +104,12 @@ func (s *indexSupport) TemplateConfig(withILM bool) (template.TemplateConfig, er
 	log := s.log
 
 	cfg := s.templateCfg
-	if mode := s.ilm.Mode(); mode == ilm.ModeDisabled {
-		withILM = false
-	} else if mode == ilm.ModeEnabled {
-		withILM = true
+	if withILM {
+		if mode := s.ilm.Mode(); mode == ilm.ModeDisabled {
+			withILM = false
+		} else if mode == ilm.ModeEnabled {
+			withILM = true
+		}
 	}
 
 	var err error
