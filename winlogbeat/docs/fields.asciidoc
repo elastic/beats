@@ -3610,7 +3610,7 @@ The version number of the event's definition.
 *`xml`*::
 +
 --
-type: text
+type: keyword
 
 required: False
 
