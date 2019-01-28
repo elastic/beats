@@ -112,6 +112,10 @@ func (m *singlePolicyManager) Enabled() (bool, error) {
 		return enabled, err
 	}
 
+	if !enabled && m.mode == ModeEnabled {
+		return false, errOf(ErrESILMDisabled)
+	}
+
 	m.cache.Enabled = enabled
 	m.cache.LastUpdate = time.Now()
 	return enabled, nil
