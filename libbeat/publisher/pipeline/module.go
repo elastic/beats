@@ -76,7 +76,8 @@ func Load(
 		return nil, fmt.Errorf("error initializing processors: %v", err)
 	}
 
-	name := beatInfo.Name
+	//name := beatInfo.Name
+	//name = "i-077bdaf7e5d81bba3"
 	settings := Settings{
 		WaitClose:     0,
 		WaitCloseMode: NoWaitOnClose,
@@ -85,9 +86,9 @@ func Load(
 		Annotations: Annotations{
 			Event: config.EventMetadata,
 			Builtin: common.MapStr{
-				"host": common.MapStr{
-					"name": name,
-				},
+				//"host": common.MapStr{
+				//	"name": name,
+				//},
 				"ecs": common.MapStr{
 					"version": "1.0.0-beta2",
 				},
@@ -110,7 +111,7 @@ func Load(
 		return nil, err
 	}
 
-	log.Infof("Beat name: %s", name)
+	//log.Infof("Beat name: %s", name)
 	return p, err
 }
 

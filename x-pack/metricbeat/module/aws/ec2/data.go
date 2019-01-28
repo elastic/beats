@@ -78,6 +78,10 @@ var (
 		"service": s.Object{
 			"name": c.Str("service.name", s.Optional),
 		},
+		"host": s.Object{
+			"name": c.Str("host.name", s.Optional),
+			"hostname": c.Str("host.hostname", s.Optional),
+		},
 		"cloud": s.Object{
 			"provider":          c.Str("cloud.provider", s.Optional),
 			"availability_zone": c.Str("cloud.availability_zone", s.Optional),
@@ -93,8 +97,12 @@ var (
 		"system": s.Object{
 			"cpu": s.Object{
 				"user": s.Object{
-					"pct": c.Float("cpu.total.pct", s.Optional),
+					"pct": c.Float("cpu.user.pct", s.Optional),
 				},
+				"system": s.Object{
+					"pct": c.Float("cpu.system.pct", s.Optional),
+				},
+				"cores":            c.Float("cpu.cores", s.Optional),
 				"credit_usage":            c.Float("cpu.credit_usage", s.Optional),
 				"credit_balance":          c.Float("cpu.credit_balance", s.Optional),
 				"surplus_credit_balance":  c.Float("cpu.surplus_credit_balance", s.Optional),
@@ -111,6 +119,7 @@ var (
 				},
 			},
 			"network": s.Object{
+				"name": c.Str("network.name", s.Optional),
 				"in": s.Object{
 					"bytes":   c.Float("network.in.bytes", s.Optional),
 					"packets": c.Float("network.in.packets", s.Optional),
