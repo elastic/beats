@@ -21469,7 +21469,9 @@ Server info
 *`redis.info.server.version`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 None
 
@@ -21514,7 +21516,9 @@ None
 *`redis.info.server.os`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: os.full
 
 None
 
@@ -21550,7 +21554,9 @@ None
 *`redis.info.server.process_id`*::
 +
 --
-type: long
+type: alias
+
+alias to: process.pid
 
 None
 
