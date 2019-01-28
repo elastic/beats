@@ -23,6 +23,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   leaf field `user.group` is now the `group` field set. {pull}10275[10275]
 
 *Auditbeat*
+
 - Rename `process.exe` to `process.executable` in auditd module to align with ECS. {pull}9949[9949]
 - Rename `process.cwd` to `process.working_directory` in auditd module to align with ECS. {pull}10195[10195]
 - Change data type of `process.pid` and `process.ppid` to number in JSON output
@@ -75,6 +76,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Refactor Prometheus metric mappings {pull}9948[9948]
 - Removed Prometheus stats metricset in favor of just using Prometheus collector {pull}9948[9948]
 - Migrate system process metricset fields to ECS. {pull}10339[10339]
+- Migrate system socket metricset fields to ECS. {pull}10339[10339]
+- Renamed direction values in sockets to ECS recommendations, from incoming/outcoming to inbound/outbound. {pull}10339[10339]
 
 *Packetbeat*
 
