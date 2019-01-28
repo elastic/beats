@@ -4,23 +4,32 @@
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "event": {
+        "dataset": "logstash.node",
+        "duration": 115000,
+        "module": "logstash"
+    },
+    "host": {
+        "hostname": "Shaunaks-MBP-2"
+    },
     "logstash": {
         "node": {
-            "host": "Shaunaks-MBP-2",
             "jvm": {
-                "pid": 3674,
-                "version": "1.8.0_171"
-            },
-            "version": "7.0.0-alpha1"
+                "pid": 39481,
+                "version": "1.8.0_191"
+            }
         }
     },
     "metricset": {
-        "host": "127.0.0.1:9600",
-        "module": "logstash",
-        "name": "node",
-        "rtt": 115
+        "name": "node"
+    },
+    "process": {
+        "pid": 39481
     },
     "service": {
-        "name": "logstash"
+        "address": "127.0.0.1:9600",
+        "name": "logstash",
+        "type": "logstash",
+        "version": "7.0.0"
     }
 }

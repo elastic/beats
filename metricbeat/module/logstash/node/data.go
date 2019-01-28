@@ -25,23 +25,18 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/logstash"
 )
 
 var (
 	schema = s.Schema{
-		"host": s.Object{
-			"hostname": c.Str("host"),
-		},
-		"service": s.Object{
-			"version": c.Str("version"),
-		},
+		"host":    c.Str("host"),
+		"version": c.Str("version"),
 		"jvm": c.Dict("jvm", s.Schema{
 			"version": c.Str("version"),
-			"process": s.Object{
-				"pid": c.Int("pid"),
-			},
+			"pid":     c.Int("pid"),
 		}),
 	}
 )
@@ -65,6 +60,35 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		r.Event(event)
 		return event.Error
 	}
+
+	// Set hostname
+	host, err := fields.GetValue("host")
+	if err != nil {
+		event.Error = elastic.MakeErrorForMissingField("host", elastic.Logstash)
+		r.Event(event)
+		return event.Error
+	}
+	event.RootFields.Put("host.hostname", host)
+	fields.Delete("host")
+
+	// Set service version
+	version, err := fields.GetValue("version")
+	if err != nil {
+		event.Error = elastic.MakeErrorForMissingField("version", elastic.Logstash)
+		r.Event(event)
+		return event.Error
+	}
+	event.RootFields.Put("service.version", version)
+	fields.Delete("version")
+
+	// Set PID
+	pid, err := fields.GetValue("jvm.pid")
+	if err != nil {
+		event.Error = elastic.MakeErrorForMissingField("jvm.pid", elastic.Logstash)
+		r.Event(event)
+		return event.Error
+	}
+	event.RootFields.Put("process.pid", pid)
 
 	event.MetricSetFields = fields
 
