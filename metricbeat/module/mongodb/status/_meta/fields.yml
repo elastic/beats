@@ -4,12 +4,10 @@
     MongoDB server status metrics.
   release: ga
   fields:
-    # Service.version?
     - name: version
       type: keyword
       description: >
         Instance version.
-    # Map to process.*?
     - name: process
       type: keyword
       description: >
