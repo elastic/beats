@@ -17898,6 +17898,8 @@ Contains nats var related metrics
 --
 type: long
 
+format: duration
+
 The period the server is up (sec)
 
 
@@ -17907,6 +17909,8 @@ The period the server is up (sec)
 +
 --
 type: long
+
+format: bytes
 
 The current memory usage of NATS process
 
@@ -17926,7 +17930,9 @@ The number of logical cores the NATS process runs on
 *`nats.stats.cpu`*::
 +
 --
-type: float
+type: scaled_float
+
+format: percent
 
 The current cpu usage of NATs process
 
@@ -17936,7 +17942,7 @@ The current cpu usage of NATs process
 *`nats.stats.total_connections`*::
 +
 --
-type: integer
+type: long
 
 The number of totally created clients
 
@@ -17963,7 +17969,7 @@ The amount of incoming data
 *`nats.stats.in.messages`*::
 +
 --
-type: integer
+type: long
 
 The amount of incoming messages
 
@@ -17973,7 +17979,9 @@ The amount of incoming messages
 *`nats.stats.in.bytes`*::
 +
 --
-type: integer
+type: long
+
+format: bytes
 
 The amount of incoming bytes
 
@@ -17990,7 +17998,7 @@ The amount of outgoing data
 *`nats.stats.out.messages`*::
 +
 --
-type: integer
+type: long
 
 The amount of outgoing messages
 
@@ -18000,7 +18008,9 @@ The amount of outgoing messages
 *`nats.stats.out.bytes`*::
 +
 --
-type: integer
+type: long
+
+format: bytes
 
 The amount of outgoing bytes
 
@@ -18010,59 +18020,9 @@ The amount of outgoing bytes
 *`nats.stats.slow_consumers`*::
 +
 --
-type: integer
+type: long
 
 The number of slow consumers currently on NATS
-
-
---
-
-*`nats.stats.http_req_stats.root_uri`*::
-+
---
-type: object
-
-The number of hits on root monitoring uri
-
-
---
-
-*`nats.stats.http_req_stats.connz_uri`*::
-+
---
-type: object
-
-The number of hits on connz monitoring uri
-
-
---
-
-*`nats.stats.http_req_stats.routez_uri`*::
-+
---
-type: object
-
-The number of hits on routez monitoring uri
-
-
---
-
-*`nats.stats.http_req_stats.subsz_uri`*::
-+
---
-type: object
-
-The number of hits on subsz monitoring uri
-
-
---
-
-*`nats.stats.http_req_stats.stats_uri`*::
-+
---
-type: object
-
-The number of hits on stats monitoring uri
 
 
 --
@@ -18091,7 +18051,7 @@ The request distribution on monitoring URIS
 *`nats.stats.http.req_stats.uri.routez`*::
 +
 --
-type: integer
+type: long
 
 The number of hits on routez monitoring uri
 
@@ -18101,7 +18061,7 @@ The number of hits on routez monitoring uri
 *`nats.stats.http.req_stats.uri.connz`*::
 +
 --
-type: integer
+type: long
 
 The number of hits on connz monitoring uri
 
@@ -18111,7 +18071,7 @@ The number of hits on connz monitoring uri
 *`nats.stats.http.req_stats.uri.varz`*::
 +
 --
-type: integer
+type: long
 
 The number of hits on varz monitoring uri
 
@@ -18121,7 +18081,7 @@ The number of hits on varz monitoring uri
 *`nats.stats.http.req_stats.uri.subsz`*::
 +
 --
-type: integer
+type: long
 
 The number of hits on subsz monitoring uri
 
@@ -18131,7 +18091,7 @@ The number of hits on subsz monitoring uri
 *`nats.stats.http.req_stats.uri.root`*::
 +
 --
-type: integer
+type: long
 
 The number of hits on root monitoring uri
 
@@ -18158,7 +18118,7 @@ The number of active subscriptions
 *`nats.subscriptions.inserts`*::
 +
 --
-type: integer
+type: long
 
 The number of insert operations in subscriptions list
 
@@ -18168,7 +18128,7 @@ The number of insert operations in subscriptions list
 *`nats.subscriptions.removes`*::
 +
 --
-type: integer
+type: long
 
 The number of remove operations in subscriptions list
 
@@ -18178,7 +18138,7 @@ The number of remove operations in subscriptions list
 *`nats.subscriptions.matches`*::
 +
 --
-type: integer
+type: long
 
 The number of times a match is found for a subscription
 
@@ -18198,7 +18158,9 @@ The number of result sets in the cache
 *`nats.subscriptions.cache.hit_rate`*::
 +
 --
-type: integer
+type: scaled_float
+
+format: percent
 
 The rate matches are being retrieved from cache
 
@@ -18218,7 +18180,7 @@ The maximum fanout served by cache
 *`nats.subscriptions.cache.fanout.avg`*::
 +
 --
-type: integer
+type: double
 
 The average fanout served by cache
 
