@@ -77,7 +77,6 @@ func Load(
 	}
 
 	//name := beatInfo.Name
-	//name = "i-077bdaf7e5d81bba3"
 	settings := Settings{
 		WaitClose:     0,
 		WaitCloseMode: NoWaitOnClose,
