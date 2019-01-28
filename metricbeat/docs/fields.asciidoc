@@ -3009,7 +3009,7 @@ Container status.
 *`docker.container.ip_addresses`*::
 +
 --
-type: keyword
+type: ip
 
 Container IP addresses.
 
