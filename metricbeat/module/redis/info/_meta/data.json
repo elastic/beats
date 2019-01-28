@@ -23,7 +23,7 @@
             "clients": {
                 "biggest_input_buf": 0,
                 "blocked": 0,
-                "connected": 3,
+                "connected": 5,
                 "longest_output_list": 0,
                 "max_input_buffer": 0,
                 "max_output_buffer": 0
@@ -33,10 +33,10 @@
             },
             "cpu": {
                 "used": {
-                    "sys": 2.82,
+                    "sys": 1.66,
                     "sys_children": 0,
-                    "user": 0.34,
-                    "user_children": 0
+                    "user": 0.39,
+                    "user_children": 0.01
                 }
             },
             "memory": {
@@ -47,7 +47,7 @@
                     "rss": {}
                 },
                 "fragmentation": {
-                    "ratio": 2.89
+                    "ratio": 2.71
                 },
                 "max": {
                     "policy": "noeviction",
@@ -55,9 +55,9 @@
                 },
                 "used": {
                     "lua": 37888,
-                    "peak": 925048,
-                    "rss": 2498560,
-                    "value": 864184
+                    "peak": 945016,
+                    "rss": 2453504,
+                    "value": 904992
                 }
             },
             "persistence": {
@@ -99,8 +99,8 @@
                     },
                     "copy_on_write": {},
                     "last_save": {
-                        "changes_since": 0,
-                        "time": 1548339690
+                        "changes_since": 35,
+                        "time": 1548663522
                     }
                 }
             },
@@ -128,44 +128,44 @@
                 "git_dirty": "0",
                 "git_sha1": "00000000",
                 "hz": 10,
-                "lru_clock": 4837195,
+                "lru_clock": 5159690,
                 "mode": "standalone",
                 "multiplexing_api": "epoll",
-                "run_id": "27e18a9e6da3285e4e7873467093db5d7ad93ce5",
+                "run_id": "0f681cb959aa47413ec40ff383715c923f9cbefd",
                 "tcp_port": 6379,
-                "uptime": 1377
+                "uptime": 707
             },
             "slowlog": {
                 "count": 0
             },
             "stats": {
                 "active_defrag": {},
-                "commands_processed": 24,
+                "commands_processed": 265,
                 "connections": {
-                    "received": 1281,
+                    "received": 848,
                     "rejected": 0
                 },
                 "instantaneous": {
-                    "input_kbps": 0.03,
-                    "ops_per_sec": 1,
-                    "output_kbps": 1.29
+                    "input_kbps": 0.18,
+                    "ops_per_sec": 6,
+                    "output_kbps": 1.39
                 },
                 "keys": {
                     "evicted": 0,
                     "expired": 0
                 },
                 "keyspace": {
-                    "hits": 0,
+                    "hits": 15,
                     "misses": 0
                 },
                 "latest_fork_usec": 0,
                 "migrate_cached_sockets": 0,
                 "net": {
                     "input": {
-                        "bytes": 663
+                        "bytes": 7300
                     },
                     "output": {
-                        "bytes": 25403
+                        "bytes": 219632
                     }
                 },
                 "pubsub": {
