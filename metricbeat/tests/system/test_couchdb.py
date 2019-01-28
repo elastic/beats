@@ -25,10 +25,12 @@ class Test(metricbeat.BaseTest):
 
         output = self.read_output_json()
         self.assertTrue(len(output) >= 1)
-        evt = output[0]
-        print(evt)
+        event = output[0]
+        print(event)
 
-        self.assert_fields_are_documented(evt)
+        self.assertNotIn("error", event)
+
+        self.assert_fields_are_documented(event)
 
     def get_hosts(self):
         return [os.getenv('COUCHDB_HOST', 'localhost') + ':' +
