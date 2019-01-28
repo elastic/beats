@@ -106,7 +106,7 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-mysql,MySQL>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-mysql-galera_status,galera_status>> beta[]  
 |<<metricbeat-metricset-mysql-status,status>>   
-|<<metricbeat-module-nats,Nats>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-nats,Nats>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .4+| .4+|  |<<metricbeat-metricset-nats-connections,connections>>   
 |<<metricbeat-metricset-nats-routes,routes>>   
 |<<metricbeat-metricset-nats-stats,stats>>   

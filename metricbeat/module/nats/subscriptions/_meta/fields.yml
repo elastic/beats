@@ -9,15 +9,15 @@
       description: >
         The number of active subscriptions
     - name: inserts
-      type: integer
+      type: long
       description: >
         The number of insert operations in subscriptions list
     - name: removes
-      type: integer
+      type: long
       description: >
         The number of remove operations in subscriptions list
     - name: matches
-      type: integer
+      type: long
       description: >
         The number of times a match is found for a subscription
     - name: cache.size
@@ -25,7 +25,8 @@
       description: >
         The number of result sets in the cache
     - name: cache.hit_rate
-      type: integer
+      type: scaled_float
+      format: percent
       description: >
         The rate matches are being retrieved from cache
     - name: cache.fanout.max
@@ -33,6 +34,6 @@
       description: >
         The maximum fanout served by cache
     - name: cache.fanout.avg
-      type: integer
+      type: double
       description: >
         The average fanout served by cache
