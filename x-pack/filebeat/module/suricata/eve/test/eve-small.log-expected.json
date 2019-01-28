@@ -53,6 +53,7 @@
         "source.ip": "192.168.86.85",
         "source.packets": 4,
         "source.port": 55641,
+        "suricata.eve.alert.category": "Potential Corporate Privacy Violation",
         "suricata.eve.alert.gid": 1,
         "suricata.eve.alert.rev": 3,
         "suricata.eve.alert.signature": "ET POLICY Observed IP Lookup Domain (l2 .io in TLS SNI)",
