@@ -6,8 +6,8 @@ var:
       - /var/log/elasticsearch/*_access.log
       - /var/log/elasticsearch/*_audit.log
     os.darwin:
-      - /usr/local/elasticsearch/*_access.log
-      - /usr/local/elasticsearch/*_audit.log
+      - /usr/local/var/lib/elasticsearch/*_access.log
+      - /usr/local/var/lib/elasticsearch/*_audit.log
     os.windows:
       - c:/ProgramData/Elastic/Elasticsearch/logs/*_access.log
       - c:/ProgramData/Elastic/Elasticsearch/logs/*_audit.log
