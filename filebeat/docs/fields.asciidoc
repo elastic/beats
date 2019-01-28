@@ -4047,6 +4047,51 @@ The type of request that was executed
 
 --
 
+*`elasticsearch.audit.request_body`*::
++
+--
+type: alias
+
+alias to: http.request.body.content
+
+--
+
+*`elasticsearch.audit.event_type`*::
++
+--
+type: alias
+
+alias to: event.type
+
+--
+
+*`elasticsearch.audit.origin_address`*::
++
+--
+type: alias
+
+alias to: source.ip
+
+--
+
+*`elasticsearch.audit.uri`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`elasticsearch.audit.principal`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
 [float]
 == deprecation fields
 
