@@ -92,10 +92,12 @@ output.elasticsearch:
 For more information about securing {beatname_uc}, see
 <<securing-{beatname_lc}>>.
 
+ifndef::no_ilm[]
 If you are indexing large amounts of time-series data, you might also want to
 configure {beatname_uc} to use index lifecycle management. For more information
 about configuring and using index lifecycle management with {beatname_uc}, see
 <<ilm>>.
+endif::no_ilm[]
 
 ==== Compatibility
 
@@ -339,6 +341,20 @@ This configuration results in indices named `sev1`, `sev2`, and `sev3`.
 The `mappings` setting simplifies the configuration, but is limited to string
 values. You cannot specify format strings within the mapping pairs.
 
+<<<<<<< HEAD
+=======
+//TODO: MOVE ILM OPTIONS TO APPEAR LOGICALLY BASED ON LOCATION IN THE YAML FILE.
+
+ifndef::no_ilm[]
+[[ilm-es]]
+===== `ilm`
+
+Configuration options for index lifecycle management. 
+
+See <<ilm>> for more information.
+endif::no_ilm[]
+
+>>>>>>> docs: add no_ilm attribute
 ifndef::no-pipeline[]
 [[pipeline-option-es]]
 ===== `pipeline`
