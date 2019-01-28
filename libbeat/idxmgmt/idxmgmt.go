@@ -39,8 +39,13 @@ type Supporter interface {
 	Enabled() bool
 	ILM() ilm.Supporter
 	TemplateConfig(withILM bool) (template.TemplateConfig, error)
-	Manager(client ESClient, fields []byte, migration bool) Manager
+	Manager(client ESClient, assets Asseter) Manager
 	BuildSelector(cfg *common.Config) (outputs.IndexSelector, error)
+}
+
+// Asseter provides access to beats assets required to load the template.
+type Asseter interface {
+	Fields(name string) []byte
 }
 
 // ESClient defines the minimal interface required for the index manager to
@@ -71,8 +76,9 @@ func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
 
 	return func(log *logp.Logger, info beat.Info, configRoot *common.Config) (Supporter, error) {
 		cfg := struct {
-			ILM      *common.Config `config:"setup.ilm"`
-			Template *common.Config `config:"setup.template"`
+			ILM       *common.Config `config:"setup.ilm"`
+			Template  *common.Config `config:"setup.template"`
+			Migration *common.Config `config:"migration"`
 		}{}
 		if configRoot != nil {
 			if err := configRoot.Unpack(&cfg); err != nil {
@@ -86,6 +92,6 @@ func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
 			log = log.Named("index-management")
 		}
 
-		return newIndexSupport(log, info, ilmSupport, cfg.Template, cfg.ILM)
+		return newIndexSupport(log, info, ilmSupport, cfg.Template, cfg.ILM, cfg.Migration.Enabled())
 	}
 }

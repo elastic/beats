@@ -35,6 +35,7 @@ type indexSupport struct {
 	log         *logp.Logger
 	ilm         ilm.Supporter
 	info        beat.Info
+	migration   bool
 	templateCfg template.TemplateConfig
 
 	st indexState
@@ -48,9 +49,8 @@ type indexManager struct {
 	support *indexSupport
 	ilm     ilm.Manager
 
-	client    ESClient
-	fields    []byte
-	migration bool
+	client ESClient
+	assets Asseter
 }
 
 type indexSelector outil.Selector
@@ -67,6 +67,7 @@ func newIndexSupport(
 	ilmFactory ilm.SupportFactory,
 	tmplConfig *common.Config,
 	ilmConfig *common.Config,
+	migration bool,
 ) (*indexSupport, error) {
 	if ilmFactory == nil {
 		ilmFactory = ilm.DefaultSupport
@@ -87,6 +88,7 @@ func newIndexSupport(
 		ilm:         ilm,
 		info:        info,
 		templateCfg: tmplCfg,
+		migration:   migration,
 	}, nil
 }
 
@@ -118,16 +120,14 @@ func (s *indexSupport) TemplateConfig(withILM bool) (template.TemplateConfig, er
 
 func (s *indexSupport) Manager(
 	client ESClient,
-	fields []byte,
-	migration bool,
+	assets Asseter,
 ) Manager {
 	ilm := s.ilm.Manager(ilm.ESClientHandler(client))
 	return &indexManager{
-		support:   s,
-		ilm:       ilm,
-		client:    client,
-		fields:    fields,
-		migration: migration,
+		support: s,
+		ilm:     ilm,
+		client:  client,
+		assets:  assets,
 	}
 }
 
@@ -235,7 +235,8 @@ func (m *indexManager) load(forceTemplate, forcePolicy bool) error {
 			tmplCfg.Overwrite = true
 		}
 
-		loader, err := template.NewLoader(tmplCfg, m.client, m.support.info, m.fields, m.migration)
+		fields := m.assets.Fields(m.support.info.Beat)
+		loader, err := template.NewLoader(tmplCfg, m.client, m.support.info, fields, m.support.migration)
 		if err != nil {
 			return fmt.Errorf("Error creating Elasticsearch template loader: %v", err)
 		}

@@ -457,7 +457,7 @@ func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
 
 				// prepare index by loading templates, lifecycle policies and write aliases
 
-				m := b.index.Manager(esClient, b.Fields, b.Config.Migration.Enabled())
+				m := b.index.Manager(esClient, idxmgmt.BeatsAssets(b.Fields))
 				err = m.Setup(template, policy)
 				if err != nil {
 					return err
@@ -744,7 +744,7 @@ func (b *Beat) registerESIndexManagement() error {
 // Build and return a callback to load index template into ES
 func (b *Beat) indexSetupCallback() func(esClient *elasticsearch.Client) error {
 	return func(esClient *elasticsearch.Client) error {
-		m := b.index.Manager(esClient, b.Fields, b.Config.Migration.Enabled())
+		m := b.index.Manager(esClient, idxmgmt.BeatsAssets(b.Fields))
 		return m.Setup(true, true)
 	}
 }
