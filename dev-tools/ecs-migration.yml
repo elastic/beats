@@ -1206,6 +1206,29 @@
 
 ## Modules
 
+### Redis
+
+- from: redis.info.server.version
+  to: service.version
+  alias: true
+  beat: metricbeat
+
+- from: redis.info.server.process_id
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
+- from: redis.info.server.os
+  to: os.full
+  alias: true
+  beat: metricbeat
+
+### HTTP
+- from: http.request.body
+  to: http.request.body.content
+  alias: false
+  beat: metricbeat
+
 ### Zookeeper
 
 - from: zookeeper.mntr.version

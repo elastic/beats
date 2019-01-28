@@ -29,8 +29,8 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/publish"
 )
 
 var _ protos.UDPPlugin = &dhcpv4Plugin{}
@@ -117,8 +117,10 @@ func TestParseDHCPRequest(t *testing.T) {
 				"port": 67,
 			},
 			"event": common.MapStr{
-				"dataset": "dhcpv4",
-				"start":   pkt.Ts,
+				"category": "network_traffic",
+				"dataset":  "dhcpv4",
+				"kind":     "event",
+				"start":    pkt.Ts,
 			},
 			"network": common.MapStr{
 				"type":         "ipv4",
@@ -150,8 +152,9 @@ func TestParseDHCPRequest(t *testing.T) {
 		},
 	}
 
-	actual := marshalPacketbeatFields(t, p.parseDHCPv4(pkt))
+	actual := p.parseDHCPv4(pkt)
 	if assert.NotNil(t, actual) {
+		publish.MarshalPacketbeatFields(actual, nil)
 		t.Logf("DHCP event: %+v", actual)
 		assertEqual(t, expected, *actual)
 	}
@@ -194,8 +197,10 @@ func TestParseDHCPACK(t *testing.T) {
 				"bytes": 300,
 			},
 			"event": common.MapStr{
-				"dataset": "dhcpv4",
-				"start":   pkt.Ts,
+				"category": "network_traffic",
+				"dataset":  "dhcpv4",
+				"kind":     "event",
+				"start":    pkt.Ts,
 			},
 			"network": common.MapStr{
 				"type":         "ipv4",
@@ -226,8 +231,9 @@ func TestParseDHCPACK(t *testing.T) {
 		},
 	}
 
-	actual := marshalPacketbeatFields(t, p.parseDHCPv4(pkt))
+	actual := p.parseDHCPv4(pkt)
 	if assert.NotNil(t, actual) {
+		publish.MarshalPacketbeatFields(actual, nil)
 		t.Logf("DHCP event: %+v", actual)
 		assertEqual(t, expected, *actual)
 	}
@@ -248,21 +254,4 @@ func normalizeEvent(t testing.TB, event beat.Event) interface{} {
 		t.Fatal(err)
 	}
 	return out
-}
-
-func marshalPacketbeatFields(t testing.TB, evt *beat.Event) *beat.Event {
-	pbf, err := pb.GetFields(evt.Fields)
-	if err != nil || pbf == nil {
-		t.Fatal("failed getting _packetbeat", err)
-	}
-	delete(evt.Fields, pb.FieldsKey)
-
-	if err = pbf.ComputeValues(nil); err != nil {
-		t.Fatal(err)
-	}
-
-	if err = pbf.MarshalMapStr(evt.Fields); err != nil {
-		t.Fatal(err)
-	}
-	return evt
 }
