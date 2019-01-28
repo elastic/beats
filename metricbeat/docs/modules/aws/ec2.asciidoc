@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-aws-ec2]]
 === aws ec2 metricset
 
-experimental[]
-
 include::../../../../x-pack/metricbeat/module/aws/ec2/_meta/docs.asciidoc[]
 
 
