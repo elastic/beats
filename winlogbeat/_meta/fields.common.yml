@@ -184,7 +184,6 @@
 
     - name: xml
       type: keyword
-      type: text
       required: false
       description: >
         The raw XML representation of the event obtained from Windows. This
