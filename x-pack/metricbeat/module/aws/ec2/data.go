@@ -80,7 +80,6 @@ var (
 		},
 		"host": s.Object{
 			"name": c.Str("host.name", s.Optional),
-			"hostname": c.Str("host.hostname", s.Optional),
 		},
 		"cloud": s.Object{
 			"provider":          c.Str("cloud.provider", s.Optional),
@@ -111,11 +110,11 @@ var (
 			"diskio": s.Object{
 				"read": s.Object{
 					"bytes": c.Float("diskio.read.bytes", s.Optional),
-					"count": c.Float("diskio.read.count", s.Optional),
+					"ops": c.Float("diskio.read.ops", s.Optional),
 				},
 				"write": s.Object{
 					"bytes": c.Float("diskio.write.bytes", s.Optional),
-					"count": c.Float("diskio.write.count", s.Optional),
+					"ops": c.Float("diskio.write.ops", s.Optional),
 				},
 			},
 			"network": s.Object{
