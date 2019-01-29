@@ -169,6 +169,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `user.id` (UID) and `user.name` for ECS. {pull}10195[10195]
 - Add `group.id` (GID) and `group.name` for ECS. {pull}10195[10195]
 - System module `process` dataset: Add user information to processes. {pull}9963[9963]
+- Add system `package` dataset. {pull}10225[10225]
 
 *Filebeat*
 

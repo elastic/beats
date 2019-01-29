@@ -1,5 +1,6 @@
 import jinja2
 import os
+import platform
 import sys
 import time
 import unittest
@@ -21,16 +22,18 @@ class Test(AuditbeatXPackTest):
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "host", COMMON_FIELDS + fields, warnings_allowed=True)
 
-    @unittest.skip("Packages metricset is disabled")
-    def test_metricset_packages(self):
+    @unittest.skipIf(sys.platform == "win32", "Not implemented for Windows")
+    @unittest.skipIf(sys.platform == "linux2" and platform.linux_distribution()[0] != "debian",
+                     "Only implemented for Debian")
+    def test_metricset_package(self):
         """
-        packages metricset collects information about installed packages on a system.
+        package metricset collects information about installed packages on a system.
         """
 
-        fields = ["system.audit.packages.package"]
+        fields = ["system.audit.package.name", "system.audit.package.version", "system.audit.package.installtime"]
 
         # Metricset is experimental and that generates a warning, TODO: remove later
-        self.check_metricset("system", "packages", COMMON_FIELDS + fields, warnings_allowed=True)
+        self.check_metricset("system", "package", COMMON_FIELDS + fields, warnings_allowed=True)
 
     def test_metricset_process(self):
         """
