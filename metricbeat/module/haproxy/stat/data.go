@@ -20,9 +20,9 @@ package stat
 import (
 	"reflect"
 
-	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
+	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/haproxy"
 )
 
@@ -126,9 +126,7 @@ var (
 )
 
 // Map data to MapStr.
-func eventMapping(info []*haproxy.Stat) []common.MapStr {
-	var events []common.MapStr
-
+func eventMapping(info []*haproxy.Stat, r mb.ReporterV2) {
 	for _, evt := range info {
 		st := reflect.ValueOf(evt).Elem()
 		typeOfT := st.Type()
@@ -137,12 +135,10 @@ func eventMapping(info []*haproxy.Stat) []common.MapStr {
 		for i := 0; i < st.NumField(); i++ {
 			f := st.Field(i)
 			source[typeOfT.Field(i).Name] = f.Interface()
-
 		}
 
-		data, _ := schema.Apply(source)
-		events = append(events, data)
+		event := mb.Event{}
+		event.MetricSetFields, _ = schema.Apply(source)
+		r.Event(event)
 	}
-
-	return events
 }

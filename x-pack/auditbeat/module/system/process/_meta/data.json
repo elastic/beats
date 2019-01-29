@@ -5,25 +5,44 @@
         "name": "host.example.com"
     },
     "event": {
-        "action": "existing_process",
+        "action": "process_started",
         "dataset": "process",
-        "id": "5795d53b-f7c2-463c-9c04-f316ae876d51",
-        "module": "system",
-        "kind": "state"
+        "kind": "event",
+        "module": "system"
     },
-    "message": "Process zsh (PID: 2363) is RUNNING",
+    "message": "Process zsh (PID: 12936) by user elastic STARTED",
     "process": {
         "args": [
-            "/usr/bin/zsh"
+            "zsh"
         ],
         "executable": "/bin/zsh",
         "name": "zsh",
-        "pid": 2363,
-        "ppid": 2362,
-        "start": "2018-12-10T16:36:25.21Z",
-        "working_directory": "/home/elastic"
+        "pid": 12936,
+        "ppid": 3858,
+        "start": "2019-01-21T15:01:54.782288Z",
+        "working_directory": "/Users/elastic"
     },
     "service": {
         "type": "system"
+    },
+    "user": {
+        "effective": {
+            "group": {
+                "id": "1000"
+            },
+            "id": "1000"
+        },
+        "group": {
+            "id": "1000",
+            "name": "elastic"
+        },
+        "id": "1000",
+        "name": "elastic",
+        "saved": {
+            "group": {
+                "id": "1000"
+            },
+            "id": "1000"
+        }
     }
 }

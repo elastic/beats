@@ -437,6 +437,7 @@ func (amqp *amqpPlugin) publishTransaction(t *amqpTransaction) {
 	pbf.Event.Dataset = "amqp"
 	pbf.Network.Protocol = pbf.Event.Dataset
 	pbf.Network.Transport = "tcp"
+	pbf.Error.Message = t.notes
 
 	fields := evt.Fields
 	fields["type"] = pbf.Event.Dataset
@@ -488,12 +489,6 @@ func (amqp *amqpPlugin) publishTransaction(t *amqpTransaction) {
 		} else {
 			fields["response"] = t.response
 		}
-	}
-
-	if len(t.notes) == 1 {
-		evt.PutValue("error.message", t.notes[0])
-	} else if len(t.notes) > 1 {
-		evt.PutValue("error.message", t.notes)
 	}
 
 	amqp.results(evt)

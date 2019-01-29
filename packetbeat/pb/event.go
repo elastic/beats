@@ -35,6 +35,13 @@ import (
 // event at publish time.
 const FieldsKey = "_packetbeat"
 
+// Network direction values.
+const (
+	Inbound  = "inbound"
+	Outbound = "outbound"
+	Internal = "internal"
+)
+
 // Fields contains common fields used in Packetbeat events. Protocol
 // implementations can publish a Fields pointer in a beat.Event and it will
 // be marshaled into the event following the ECS schema where applicable.
@@ -54,13 +61,23 @@ type Fields struct {
 	DestinationProcess *ecs.Process `ecs:"destination.process"`
 	Process            *ecs.Process `ecs:"process"`
 
+	Error struct {
+		Message []string
+	}
+
 	ICMPType uint8 // ICMP message type for use in computing network.community_id.
 	ICMPCode uint8 // ICMP message code for use in computing network.community_id.
 }
 
 // NewFields returns a new Fields value.
 func NewFields() *Fields {
-	return &Fields{Event: ecs.Event{Duration: -1}}
+	return &Fields{
+		Event: ecs.Event{
+			Duration: -1,
+			Kind:     "event",
+			Category: "network_traffic",
+		},
+	}
 }
 
 // NewBeatEvent creates a new beat.Event populated with a Fields value and
@@ -181,18 +198,23 @@ func (f *Fields) ComputeValues(localIPs []net.IP) error {
 	}
 
 	// network.direction
-	if len(localIPs) > 0 {
+	if len(localIPs) > 0 && f.Network.Direction == "" {
 		if flow.SourceIP != nil {
 			for _, ip := range localIPs {
 				if flow.SourceIP.Equal(ip) {
-					f.Network.Direction = "outbound"
+					f.Network.Direction = Outbound
 					break
 				}
 			}
-		} else if flow.DestinationIP != nil {
+		}
+		if flow.DestinationIP != nil {
 			for _, ip := range localIPs {
 				if flow.DestinationIP.Equal(ip) {
-					f.Network.Direction = "inbound"
+					if f.Network.Direction == Outbound {
+						f.Network.Direction = Internal
+					} else {
+						f.Network.Direction = Inbound
+					}
 					break
 				}
 			}
@@ -256,6 +278,13 @@ func (f *Fields) MarshalMapStr(m common.MapStr) error {
 			return err
 		}
 	}
+
+	if len(f.Error.Message) == 1 {
+		m.Put("error.message", f.Error.Message[0])
+	} else if len(f.Error.Message) > 1 {
+		m.Put("error.message", f.Error.Message)
+	}
+
 	return nil
 }
 

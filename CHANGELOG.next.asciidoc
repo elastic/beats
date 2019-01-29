@@ -78,6 +78,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Migrate system socket metricset fields to ECS. {pull}10339[10339]
 - Renamed direction values in sockets to ECS recommendations, from incoming/outcoming to inbound/outbound. {pull}10339[10339]
 - Adjust Redis.info metricset fields to ECS. {pull}10319[10319]
+- Change type of field docker.container.ip_addresses to `ip` instead of `keyword. {pull}10364[10364]
+- Rename http.request.body field to http.request.body.content. {pull}10315[10315]
 
 *Packetbeat*
 
@@ -126,6 +128,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
+- Do not stop collecting events when journal entries change. {pull}9994[9994]
+
 *Metricbeat*
 
 - Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
@@ -167,6 +171,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add system module. {pull}9546[9546]
 - Add `user.id` (UID) and `user.name` for ECS. {pull}10195[10195]
 - Add `group.id` (GID) and `group.name` for ECS. {pull}10195[10195]
+- System module `process` dataset: Add user information to processes. {pull}9963[9963]
 
 *Filebeat*
 
@@ -229,6 +234,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release use of xpack.enabled: true flag in Elasticsearch and Kibana modules as GA. {pull}10222[10222]
 - Add support for MySQL 8.0 and tests also for Percona and MariaDB. {pull}10261[10261]
 - Rename 'db' Metricset to 'transaction_log' in MSSQL Metricbeat module {pull}10109[10109]
+- Added 'server' Metricset to Zookeeper Metricbeat module {issue}8938[8938] {pull}10341[10341]
+- Release AWS module as GA. {pull}10345[10345]
 
 *Packetbeat*
 
