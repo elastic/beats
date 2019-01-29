@@ -11070,7 +11070,9 @@ Kibana instance hostname
 *`kibana.stats.transport_address`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.address
 
 Kibana server's hostname and port
 

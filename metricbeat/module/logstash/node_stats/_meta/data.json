@@ -9,9 +9,6 @@
         "duration": 115000,
         "module": "logstash"
     },
-    "host": {
-        "hostname": "Shaunaks-MBP-2"
-    },
     "logstash": {
         "node": {
             "stats": {
@@ -28,6 +25,7 @@
     },
     "service": {
         "address": "127.0.0.1:9600",
+        "hostname": "Shaunaks-MBP-2.attlocal.net",
         "id": "7565df20-c3aa-4261-81d5-3b0ab8d15c16",
         "name": "logstash",
         "type": "logstash",

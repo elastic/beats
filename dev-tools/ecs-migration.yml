@@ -1580,15 +1580,30 @@
   alias: true
   beat: metricbeat
 
+- from: kibana.stats.transport_address
+  to: service.address
+  alias: true
+  beat: metricbeat
+
+- from: kibana.stats.version
+  to: service.version
+  alias: true
+  beat: metricbeat
+
 - from: kibana.status.uuid
   to: service.id
+  alias: true
+  beat: metricbeat
+
+- from: kibana.status.version.number
+  to: service.version
   alias: true
   beat: metricbeat
 
 ### Logstash
 
 - from: logstash.node.host
-  to: host.hostname
+  to: service.hostname
   alias: true
   beat: metricbeat
 

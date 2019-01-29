@@ -72,14 +72,14 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	event.RootFields.Put("service.id", serviceID)
 	fields.Delete("id")
 
-	// Set hostname
+	// Set service hostname
 	host, err := fields.GetValue("host")
 	if err != nil {
 		event.Error = elastic.MakeErrorForMissingField("host", elastic.Logstash)
 		r.Event(event)
 		return event.Error
 	}
-	event.RootFields.Put("host.hostname", host)
+	event.RootFields.Put("service.hostname", host)
 	fields.Delete("host")
 
 	// Set service version

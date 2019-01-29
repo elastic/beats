@@ -6,7 +6,7 @@
     },
     "elasticsearch": {
         "cluster": {
-            "id": "j5trF9G8Td-R6EtPk_bh6w"
+            "id": "hyK0oDhoThywCtJd2DV8Bg"
         }
     },
     "event": {
@@ -16,15 +16,15 @@
     },
     "kibana": {
         "stats": {
-            "concurrent_connections": 0,
+            "concurrent_connections": 1,
             "host": {
                 "name": "localhost"
             },
-            "index": "Shaunaks-MBP-2",
-            "name": "Shaunaks-MBP-2",
+            "index": "Shaunaks-MBP-2.attlocal.net",
+            "name": "Shaunaks-MBP-2.attlocal.net",
             "process": {
                 "event_loop_delay": {
-                    "ms": 0.09038399159908295
+                    "ms": 0.45250000059604645
                 },
                 "memory": {
                     "heap": {
@@ -32,15 +32,15 @@
                             "bytes": 1526909922
                         },
                         "total": {
-                            "bytes": 259346432
+                            "bytes": 307593216
                         },
                         "used": {
-                            "bytes": 241863856
+                            "bytes": 226887112
                         }
                     }
                 },
                 "uptime": {
-                    "ms": 881070
+                    "ms": 124098
                 }
             },
             "request": {
@@ -54,15 +54,14 @@
                 }
             },
             "snapshot": false,
-            "status": "green",
-            "transport_address": "localhost:5601"
+            "status": "green"
         }
     },
     "metricset": {
         "name": "stats"
     },
     "process": {
-        "pid": 48981
+        "pid": 93807
     },
     "service": {
         "address": "127.0.0.1:5601",

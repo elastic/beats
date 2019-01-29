@@ -23,7 +23,9 @@
       description: >
         Kibana instance hostname
     - name: transport_address
-      type: keyword
+      type: alias
+      path: service.address
+      migration: true
       description: >
         Kibana server's hostname and port
     - name: version

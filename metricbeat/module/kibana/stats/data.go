@@ -146,6 +146,16 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	event.RootFields.Put("service.version", version)
 	dataFields.Delete("version")
 
+	// Set service address
+	serviceAddress, err := dataFields.GetValue("transport_address")
+	if err != nil {
+		event.Error = elastic.MakeErrorForMissingField("kibana.transport_address", elastic.Kibana)
+		r.Event(event)
+		return event.Error
+	}
+	event.RootFields.Put("service.address", serviceAddress)
+	dataFields.Delete("transport_address")
+
 	event.MetricSetFields = dataFields
 
 	r.Event(event)
