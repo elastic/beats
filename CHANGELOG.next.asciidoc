@@ -73,8 +73,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
-- Replace `namespace` option in munin module with `service.type` and `service.name` to override the ECS fields with the same names. {pull}10322[10322]
-- Add checks on valid field names and more strict mapping to munin module. {pull}10322[10322]
+- Refactor munin module to collect an event per plugin and to have more strict field mappings {pull}10322[10322]
 - Refactor Prometheus metric mappings {pull}9948[9948]
 - Removed Prometheus stats metricset in favor of just using Prometheus collector {pull}9948[9948]
 - Adjust Redis.info metricset fields to ECS. {pull}10319[10319]
