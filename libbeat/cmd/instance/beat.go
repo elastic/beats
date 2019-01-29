@@ -458,7 +458,7 @@ func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
 				// prepare index by loading templates, lifecycle policies and write aliases
 
 				m := b.index.Manager(esClient, idxmgmt.BeatsAssets(b.Fields))
-				err = m.Setup(template, policy)
+				err = m.Setup(settings.Template, settings.ILMPolicy)
 				if err != nil {
 					return err
 				}
