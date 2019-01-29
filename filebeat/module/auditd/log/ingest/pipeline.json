@@ -112,6 +112,8 @@
         { "rename": { "ignore_failure": true, "field": "auditd.log.ppid", "target_field": "process.ppid" } },
         { "convert": { "ignore_missing": true, "field": "process.pid", "type": "long" } },
         { "convert": { "ignore_missing": true, "field": "process.ppid", "type": "long" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.cmd", "target_field": "process.args" } },
+        { "split": { "ignore_failure": true, "field": "process.args", "separator": "\\s+" } },
 
         { "rename": { "ignore_failure": true, "field": "auditd.log.terminal", "target_field": "user.terminal" } },
         { "rename": { "ignore_failure": true, "field": "auditd.log.tty", "target_field": "user.terminal" } },
@@ -124,8 +126,13 @@
 
         { "rename": { "ignore_failure": true, "field": "auditd.log.src",  "target_field": "source.address" } },
         { "rename": { "ignore_failure": true, "field": "auditd.log.addr", "target_field": "source.address" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.rport", "target_field": "source.port" } },
+        { "convert": { "ignore_missing": true, "field": "source.port", "type": "long" } },
 
         { "rename": { "ignore_failure": true, "field": "auditd.log.dst", "target_field": "destination.address" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.laddr", "target_field": "destination.address" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.lport", "target_field": "destination.port" } },
+        { "convert": { "ignore_missing": true, "field": "destination.port", "type": "long" } },
 
         {
             "grok": {

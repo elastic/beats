@@ -231,6 +231,12 @@
   alias: true
   beat: filebeat
 
+- from: auditd.log.cmd
+  to: process.args
+  alias: false
+  beat: filebeat
+  comment: Was a cmdline string, whereas args is an array of keywords.
+
 - from: auditd.log.exe
   to: process.executable
   alias: true
@@ -251,8 +257,23 @@
   alias: true
   beat: filebeat
 
+- from: auditd.log.rport
+  to: source.port
+  alias: true
+  beat: filebeat
+
 - from: auditd.log.dst
   to: destination.address
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.laddr
+  to: destination.address
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.lport
+  to: destination.port
   alias: true
   beat: filebeat
 
