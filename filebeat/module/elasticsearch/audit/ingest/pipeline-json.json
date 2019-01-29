@@ -47,8 +47,9 @@
             }
         },
         {
-            "remove": {
-                "field": "elasticsearch.audit.origin.address"
+            "rename": {
+                "field": "elasticsearch.audit.origin.address",
+                "target_field": "source.address"
             }
         },
         {

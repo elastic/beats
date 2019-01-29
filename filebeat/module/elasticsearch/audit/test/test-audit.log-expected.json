@@ -13,6 +13,7 @@
         "log.offset": 0,
         "message": "{\"@timestamp\":\"2018-10-31T09:34:25,109\", \"node.id\":\"DSiWcTyeThWtUXLB9J0BMw\", \"event.type\":\"rest\", \"event.action\":\"authentication_failed\", \"user.name\":\"elastic\", \"origin.type\":\"rest\", \"origin.address\":\"[::1]:61598\", \"url.path\":\"/_xpack/security/user/beats_system/_password\"}",
         "service.type": "elasticsearch",
+        "source.address": "[::1]:61598",
         "source.ip": "::1",
         "source.port": 61598,
         "url.original": "/_xpack/security/user/beats_system/_password",
@@ -32,6 +33,7 @@
         "log.offset": 274,
         "message": "{\"@timestamp\":\"2018-10-31T09:34:25,207\", \"node.id\":\"DSiWcTyeThWtUXLB9J0BMw\", \"event.type\":\"rest\", \"event.action\":\"authentication_failed\", \"user.name\":\"elastic\", \"origin.type\":\"rest\", \"origin.address\":\"[::1]:61599\", \"url.path\":\"/_xpack/security/user/remote_monitoring_user/_password\"}",
         "service.type": "elasticsearch",
+        "source.address": "[::1]:61599",
         "source.ip": "::1",
         "source.port": 61599,
         "url.original": "/_xpack/security/user/remote_monitoring_user/_password",
@@ -57,6 +59,7 @@
         "log.offset": 558,
         "message": "{\"@timestamp\":\"2018-10-31T09:35:11,428\", \"node.id\":\"DSiWcTyeThWtUXLB9J0BMw\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"user.name\":\"_xpack_security\", \"user.realm\":\"__attach\", \"user.roles\":[\"superuser\"], \"origin.type\":\"local_node\", \"origin.address\":\"127.0.0.1:9300\", \"action\":\"cluster:admin/xpack/security/realm/cache/clear\", \"request.name\":\"ClearRealmCacheRequest\"}",
         "service.type": "elasticsearch",
+        "source.address": "127.0.0.1:9300",
         "source.ip": "127.0.0.1",
         "source.port": 9300,
         "user.name": "_xpack_security"
@@ -81,6 +84,7 @@
         "log.offset": 941,
         "message": "{\"@timestamp\":\"2018-10-31T09:35:11,430\", \"node.id\":\"DSiWcTyeThWtUXLB9J0BMw\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"user.name\":\"_xpack_security\", \"user.realm\":\"__attach\", \"user.roles\":[\"superuser\"], \"origin.type\":\"local_node\", \"origin.address\":\"127.0.0.1:9300\", \"action\":\"cluster:admin/xpack/security/realm/cache/clear[n]\", \"request.name\":\"Node\"}",
         "service.type": "elasticsearch",
+        "source.address": "127.0.0.1:9300",
         "source.ip": "127.0.0.1",
         "source.port": 9300,
         "user.name": "_xpack_security"
@@ -105,6 +109,7 @@
         "log.offset": 1309,
         "message": "{\"@timestamp\":\"2018-10-31T09:35:12,303\", \"node.id\":\"DSiWcTyeThWtUXLB9J0BMw\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"user.name\":\"elastic\", \"user.realm\":\"reserved\", \"user.roles\":[\"superuser\"], \"origin.type\":\"rest\",\"origin.address\":\"[::1]:61711\", \"action\":\"cluster:admin/xpack/security/user/change_password\", \"request.name\":\"ChangePasswordRequest\"}",
         "service.type": "elasticsearch",
+        "source.address": "[::1]:61711",
         "source.ip": "::1",
         "source.port": 61711,
         "user.name": "elastic"
@@ -132,6 +137,7 @@
         "log.offset": 1676,
         "message": "{\"@timestamp\":\"2018-10-31T09:35:12,314\", \"node.id\":\"DSiWcTyeThWtUXLB9J0BMw\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"user.name\":\"_xpack_security\", \"user.realm\":\"__attach\", \"user.roles\":[\"superuser\"], \"origin.type\":\"local_node\", \"origin.address\":\"127.0.0.1:9300\", \"action\":\"indices:admin/create\", \"request.name\":\"CreateIndexRequest\", \"indices\":[\".security-6\"]}",
         "service.type": "elasticsearch",
+        "source.address": "127.0.0.1:9300",
         "source.ip": "127.0.0.1",
         "source.port": 9300,
         "user.name": "_xpack_security"
