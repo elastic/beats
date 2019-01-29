@@ -197,7 +197,12 @@ integration-tests: prepare-tests
 .PHONY: integration-tests-environment
 integration-tests-environment:  ## @testing Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
 integration-tests-environment: prepare-tests build-image
-	${DOCKER_COMPOSE} run beat make integration-tests RACE_DETECTOR=$(RACE_DETECTOR) DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME} || ${DOCKER_COMPOSE} logs --tail 200
+	# If you want to get logs on CI when the `docker-compose` fails, you can
+	# add  `|| ${DOCKER_COMPOSE} logs --tail 200` after the command.
+	#
+	# This will make docker-compose command to display the logs on stdout on error, It's not enabled
+	# by default because it can create noise if the test inside the container fails.
+	${DOCKER_COMPOSE} run beat make integration-tests RACE_DETECTOR=$(RACE_DETECTOR) DOCKER_COMPOSE_PROJECT_NAME=${DOCKER_COMPOSE_PROJECT_NAME}
 
 # Runs the system tests
 .PHONY: system-tests
