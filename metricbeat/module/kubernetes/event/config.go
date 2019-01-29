@@ -39,8 +39,8 @@ func defaultKubernetesEventsConfig() kubeEventsConfig {
 	return kubeEventsConfig{
 		InCluster:        true,
 		SyncPeriod:       1 * time.Second,
-		LabelsDedot:      false,
-		AnnotationsDedot: false,
+		LabelsDedot:      true,
+		AnnotationsDedot: true,
 	}
 }
 
