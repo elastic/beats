@@ -32,7 +32,10 @@
       },
       {
           "remove": {
-              "field": "elasticsearch.slowlog.timestamp"
+              "field": [
+                    "elasticsearch.slowlog.took",
+                    "elasticsearch.slowlog.timestamp"
+              ]
           }
       },
 

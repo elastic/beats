@@ -7,10 +7,6 @@
     description: "Logger name"
     example: "index.search.slowlog.fetch"
     type: keyword
-  - name: took
-    description: "Time it took to execute the query"
-    example: "300ms"
-    type: text
   - name: types
     description: "Types"
     example: ""

@@ -4904,17 +4904,6 @@ Logger name
 
 --
 
-*`elasticsearch.slowlog.took`*::
-+
---
-type: text
-
-example: 300ms
-
-Time it took to execute the query
-
---
-
 *`elasticsearch.slowlog.types`*::
 +
 --
