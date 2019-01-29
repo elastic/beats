@@ -100,7 +100,6 @@
   to: process.executable
   alias: true
 
-
 ## Filebeat
 - from: offset
   to: log.offset
@@ -582,6 +581,7 @@
 - from: apache2.access.body_sent.bytes
   to: http.response.body.bytes
   alias: true
+  beat: filebeat
 
 - from: apache2.access.geoip.continent_name
   to: source.geo.continent_name
@@ -716,6 +716,7 @@
   to: event.duration
   alias: false
   scale: 1000000
+  beat: filebeat
 
 ## IIS module
 
@@ -873,15 +874,18 @@
 - from: iis.access.body_received.bytes
   to: http.request.body.bytes
   alias: true
+  beat: filebeat
 
 - from: iis.access.body_sent.bytes
   to: http.response.body.bytes
   alias: true
+  beat: filebeat
 
 - from: iis.access.request_time_ms
   to: event.duration
   alias: false
   scale: 1000000
+  beat: filebeat
 
 - from: iis.error.method
   to: http.request.method
@@ -934,11 +938,13 @@
   to: event.duration
   alias: false
   scale: 1000000
+  beat: filebeat
 
 - from: haproxy.http.request.time_active_ms
   to: event.duration
   alias: false
   scale: 1000000
+  beat: filebeat
 
 - from: haproxy.client.ip
   to: source.address
@@ -1146,6 +1152,7 @@
   to: event.duration
   alias: false
   scale: 1000000000
+  beat: filebeat
 
 ## NGINX module
 
@@ -1187,6 +1194,7 @@
 - from: nginx.access.body_sent.bytes
   to: http.response.body.bytes
   alias: true
+  beat: filebeat
 
 - from: nginx.access.geoip.continent_name
   to: source.geo.continent_name
@@ -1291,6 +1299,7 @@
   to: event.duration
   alias: false
   scale: 1000000
+  beat: filebeat
 
 - from: postgresql.log.timezone
   to: event.timezone
@@ -1487,11 +1496,13 @@
 - from: traefik.access.body_sent.bytes
   to: http.response.body.bytes
   alias: true
+  beat: filebeat
 
 - from: traefik.access.duration
   to: event.duration
   alias: false
   scale: 1000000
+  beat: filebeat
 
 # Filebeat Redis Input
 
