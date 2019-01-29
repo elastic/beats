@@ -18931,13 +18931,9 @@ The request method (GET, POST, etc) (of the current request)
 *`php_fpm.process.request_uri`*::
 +
 --
-<<<<<<< HEAD
 type: alias
 
 alias to: url.original
-=======
-type: keyword
->>>>>>> Change text fields to keyword
 
 The request URI with the query string (of the current request)
 
