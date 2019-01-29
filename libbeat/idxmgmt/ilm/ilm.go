@@ -37,8 +37,8 @@ type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, er
 // write alias a manager instance must be generated.
 type Supporter interface {
 	Mode() Mode
-	Template() TemplateSettings
-	Policy() common.MapStr
+	Alias() Alias
+	Policy() Policy
 	Manager(h APIHandler) Manager
 }
 
@@ -54,17 +54,23 @@ type APIHandler interface {
 	ILMEnabled(Mode) (bool, error)
 
 	HasAlias(name string) (bool, error)
-	CreateAlias(name, firstIndex string) error
+	CreateAlias(alias Alias) error
 
 	HasILMPolicy(name string) (bool, error)
-	CreateILMPolicy(name string, policy common.MapStr) error
+	CreateILMPolicy(policy Policy) error
 }
 
-// TemplateSettings lists the additional settings to be applied to an index template.
-type TemplateSettings struct {
-	Alias      string
-	Pattern    string
-	PolicyName string
+// Policy describes a policy to be loaded into Elasticsearch.
+// See: [Policy phases and actions documentation](https://www.elastic.co/guide/en/elasticsearch/reference/master/ilm-policy-definition.html).
+type Policy struct {
+	Name string
+	Body map[string]interface{}
+}
+
+// Alias describes the alias to be created in Elasticsearch.
+type Alias struct {
+	Name    string
+	Pattern string
 }
 
 // DefaultSupport configures a new default ILM support implementation.
@@ -86,37 +92,36 @@ func DefaultSupport(log *logp.Logger, info beat.Info, config *common.Config) (Su
 		return NoopSupport(info, config)
 	}
 
-	var policy common.MapStr
+	name, err := applyStaticFmtstr(info, &cfg.Name)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to read ilm policy name")
+	}
+
+	alias := Alias{
+		Name:    cfg.RolloverAlias,
+		Pattern: cfg.Pattern,
+	}
+
+	policy := Policy{
+		Name: name,
+		Body: DefaultPolicy,
+	}
 	if path := cfg.PolicyFile; path != "" {
 		contents, err := ioutil.ReadFile(path)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to read policy file '%v'", path)
 		}
 
-		if err := json.Unmarshal(contents, &policy); err != nil {
+		var body map[string]interface{}
+		if err := json.Unmarshal(contents, &body); err != nil {
 			return nil, errors.Wrapf(err, "failed to decode policy file '%v'", path)
 		}
 
-	} else {
-		policy = DefaultPolicy
-	}
-
-	name, err := applyStaticFmtstr(info, &cfg.Name)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to read ilm policy name")
+		policy.Body = body
 	}
 
 	log.Infof("Policy name: %v", name)
-	return NewDefaultSupport(
-		log,
-		cfg.Mode,
-		cfg.RolloverAlias,
-		name,
-		cfg.Pattern,
-		policy,
-		cfg.Overwrite,
-		cfg.CheckExists,
-	), nil
+	return NewDefaultSupport(log, cfg.Mode, alias, policy, cfg.Overwrite, cfg.CheckExists), nil
 }
 
 func applyStaticFmtstr(info beat.Info, fmt *fmtstr.EventFormatString) (string, error) {

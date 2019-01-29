@@ -70,12 +70,8 @@ func TestDefaultSupport_Init(t *testing.T) {
 		assert.Equal(true, s.overwrite)
 		assert.Equal(false, s.checkExists)
 		assert.Equal(ModeEnabled, s.Mode())
-		assert.Equal(s.Policy(), DefaultPolicy)
-		assert.Equal(TemplateSettings{
-			Alias:      "alias",
-			Pattern:    "alias-*",
-			PolicyName: "test-9.9.9",
-		}, s.Template())
+		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
+		assert.Equal(Alias{Name: "alias", Pattern: "01"}, s.Alias())
 	})
 
 	t.Run("load external policy", func(t *testing.T) {
@@ -85,7 +81,7 @@ func TestDefaultSupport_Init(t *testing.T) {
 			},
 		))
 		require.NoError(t, err)
-		assert.Equal(t, common.MapStr{"hello": "world"}, s.Policy())
+		assert.Equal(t, map[string]interface{}{"hello": "world"}, s.Policy().Body)
 	})
 }
 
@@ -162,6 +158,11 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 }
 
 func TestDefaultSupport_Manager_EnsureAlias(t *testing.T) {
+	alias := Alias{
+		Name:    "test-9.9.9",
+		Pattern: ilmDefaultPattern,
+	}
+
 	cases := map[string]struct {
 		calls []onCall
 		cfg   map[string]interface{}
@@ -169,19 +170,19 @@ func TestDefaultSupport_Manager_EnsureAlias(t *testing.T) {
 	}{
 		"create new alias": {
 			calls: []onCall{
-				onHasAlias("test-9.9.9").Return(false, nil),
-				onCreateAlias("test-9.9.9").Return(nil),
+				onHasAlias(alias.Name).Return(false, nil),
+				onCreateAlias(alias).Return(nil),
 			},
 		},
 		"alias already exists": {
 			calls: []onCall{
-				onHasAlias("test-9.9.9").Return(true, nil),
+				onHasAlias(alias.Name).Return(true, nil),
 			},
 		},
 		"fail": {
 			calls: []onCall{
-				onHasAlias("test-9.9.9").Return(false, nil),
-				onCreateAlias("test-9.9.9").Return(errOf(ErrRequestFailed)),
+				onHasAlias(alias.Name).Return(false, nil),
+				onCreateAlias(alias).Return(errOf(ErrRequestFailed)),
 			},
 			fail: ErrRequestFailed,
 		},
@@ -210,6 +211,11 @@ func TestDefaultSupport_Manager_EnsureAlias(t *testing.T) {
 }
 
 func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
+	testPolicy := Policy{
+		Name: "test-9.9.9",
+		Body: DefaultPolicy,
+	}
+
 	cases := map[string]struct {
 		calls     []onCall
 		overwrite bool
@@ -218,25 +224,25 @@ func TestDefaultSupport_Manager_EnsurePolicy(t *testing.T) {
 	}{
 		"create new policy": {
 			calls: []onCall{
-				onHasILMPolicy("test-9.9.9").Return(false, nil),
-				onCreateILMPolicy("test-9.9.9", DefaultPolicy).Return(nil),
+				onHasILMPolicy(testPolicy.Name).Return(false, nil),
+				onCreateILMPolicy(testPolicy).Return(nil),
 			},
 		},
 		"policy already exists": {
 			calls: []onCall{
-				onHasILMPolicy("test-9.9.9").Return(true, nil),
+				onHasILMPolicy(testPolicy.Name).Return(true, nil),
 			},
 		},
 		"overwrite existing": {
 			overwrite: true,
 			calls: []onCall{
-				onCreateILMPolicy("test-9.9.9", DefaultPolicy).Return(nil),
+				onCreateILMPolicy(testPolicy).Return(nil),
 			},
 		},
 		"fail": {
 			calls: []onCall{
-				onHasILMPolicy("test-9.9.9").Return(false, nil),
-				onCreateILMPolicy("test-9.9.9", DefaultPolicy).Return(errOf(ErrRequestFailed)),
+				onHasILMPolicy(testPolicy.Name).Return(false, nil),
+				onCreateILMPolicy(testPolicy).Return(errOf(ErrRequestFailed)),
 			},
 			fail: ErrRequestFailed,
 		},

@@ -114,8 +114,8 @@ func (s *indexSupport) TemplateConfig(withILM bool) (template.TemplateConfig, er
 
 	var err error
 	if withILM {
-		ilmSettings := s.ilm.Template()
-		cfg, err = applyILMSettings(log, cfg, ilmSettings)
+		// ilmSettings := s.ilm.Template()
+		cfg, err = applyILMSettings(log, cfg, s.ilm.Policy(), s.ilm.Alias())
 	}
 	return cfg, err
 }
@@ -157,7 +157,7 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 	var alias string
 	mode := s.ilm.Mode()
 	if mode != ilm.ModeDisabled {
-		alias = s.ilm.Template().Alias
+		alias = s.ilm.Alias().Name
 		log.Infof("Set %v to '%s' as ILM is enabled.", cfg.PathOf("index"), alias)
 	}
 	if mode == ilm.ModeEnabled {
@@ -231,8 +231,8 @@ func (m *indexManager) load(forceTemplate, forcePolicy bool) error {
 	if m.support.templateCfg.Enabled {
 		tmplCfg := m.support.templateCfg
 		if withILM {
-			ilmSettings := m.support.ilm.Template()
-			tmplCfg, err = applyILMSettings(log, tmplCfg, ilmSettings)
+			ilm := m.support.ilm
+			tmplCfg, err = applyILMSettings(log, tmplCfg, ilm.Policy(), ilm.Alias())
 			if err != nil {
 				return err
 			}
@@ -327,28 +327,27 @@ func unpackTemplateConfig(cfg *common.Config) (template.TemplateConfig, error) {
 func applyILMSettings(
 	log *logp.Logger,
 	tmpl template.TemplateConfig,
-	settings ilm.TemplateSettings,
+	policy ilm.Policy,
+	alias ilm.Alias,
 ) (template.TemplateConfig, error) {
 	if !tmpl.Enabled {
 		return tmpl, nil
 	}
 
-	alias := settings.Alias
-	if alias == "" {
+	if alias.Name == "" {
 		return tmpl, errors.New("no ilm rollover alias configured")
 	}
 
-	policy := settings.PolicyName
-	if policy == "" {
+	if policy.Name == "" {
 		return tmpl, errors.New("no ilm policy name configured")
 	}
 
-	tmpl.Name = alias
+	tmpl.Name = alias.Name
 	if log != nil {
 		log.Infof("Set setup.template.name to '%s' as ILM is enabled.", alias)
 	}
 
-	tmpl.Pattern = fmt.Sprintf("%s-*", alias)
+	tmpl.Pattern = fmt.Sprintf("%s-*", alias.Name)
 	if log != nil {
 		log.Infof("Set setup.template.pattern to '%s' as ILM is enabled.", tmpl.Pattern)
 	}
@@ -385,11 +384,11 @@ func applyILMSettings(
 	// add rollover_alias and name to index.lifecycle settings
 	if _, exists := lifecycle["rollover_alias"]; !exists {
 		log.Infof("Set settings.index.lifecycle.rollover_alias in template to %s as ILM is enabled.", alias)
-		lifecycle["rollover_alias"] = alias
+		lifecycle["rollover_alias"] = alias.Name
 	}
 	if _, exists := lifecycle["name"]; !exists {
 		log.Infof("Set settings.index.lifecycle.name in template to %s as ILM is enabled.", policy)
-		lifecycle["name"] = policy
+		lifecycle["name"] = policy.Name
 	}
 
 	return tmpl, nil

@@ -19,6 +19,8 @@ package ilm
 
 import (
 	"encoding/json"
+	"fmt"
+	"net/url"
 	"path"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -103,9 +105,9 @@ func (h *esClientHandler) ILMEnabled(mode Mode) (bool, error) {
 	return enabled, nil
 }
 
-func (h *esClientHandler) CreateILMPolicy(name string, policy common.MapStr) error {
-	path := path.Join(esILMPath, name)
-	_, _, err := h.client.Request("PUT", path, "", nil, policy)
+func (h *esClientHandler) CreateILMPolicy(policy Policy) error {
+	path := path.Join(esILMPath, policy.Name)
+	_, _, err := h.client.Request("PUT", path, "", nil, policy.Body)
 	return err
 }
 
@@ -130,10 +132,15 @@ func (h *esClientHandler) HasAlias(name string) (bool, error) {
 	return status == 200, nil
 }
 
-func (h *esClientHandler) CreateAlias(name, firstIndex string) error {
+func (h *esClientHandler) CreateAlias(alias Alias) error {
+	// Escaping because of date pattern
+	// This always assume it's a date pattern by sourrounding it by <...>
+	firstIndex := fmt.Sprintf("<%s-%s>", alias.Name, alias.Pattern)
+	firstIndex = url.PathEscape(firstIndex)
+
 	body := common.MapStr{
 		"aliases": common.MapStr{
-			name: common.MapStr{
+			alias.Name: common.MapStr{
 				"is_write_index": true,
 			},
 		},

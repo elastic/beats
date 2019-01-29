@@ -18,11 +18,8 @@
 package ilm
 
 import (
-	"fmt"
-	"net/url"
 	"time"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -33,10 +30,8 @@ type ilmSupport struct {
 	overwrite   bool
 	checkExists bool
 
-	alias      string
-	pattern    string
-	policyName string
-	policy     common.MapStr
+	alias  Alias
+	policy Policy
 }
 
 type singlePolicyManager struct {
@@ -58,9 +53,8 @@ var defaultCacheDuration = 5 * time.Minute
 func NewDefaultSupport(
 	log *logp.Logger,
 	mode Mode,
-	alias string,
-	policyName, pattern string,
-	policy common.MapStr,
+	alias Alias,
+	policy Policy,
 	overwrite, checkExists bool,
 ) Supporter {
 	return &ilmSupport{
@@ -69,27 +63,13 @@ func NewDefaultSupport(
 		overwrite:   overwrite,
 		checkExists: checkExists,
 		alias:       alias,
-		pattern:     pattern,
-		policyName:  policyName,
 		policy:      policy,
 	}
 }
 
-func (s *ilmSupport) Mode() Mode {
-	return s.mode
-}
-
-func (s *ilmSupport) Template() TemplateSettings {
-	return TemplateSettings{
-		Alias:      s.alias,
-		Pattern:    fmt.Sprintf("%s-*", s.alias),
-		PolicyName: s.policyName,
-	}
-}
-
-func (s *ilmSupport) Policy() common.MapStr {
-	return s.policy
-}
+func (s *ilmSupport) Mode() Mode     { return s.mode }
+func (s *ilmSupport) Alias() Alias   { return s.alias }
+func (s *ilmSupport) Policy() Policy { return s.policy }
 
 func (s *ilmSupport) Manager(h APIHandler) Manager {
 	return &singlePolicyManager{
@@ -122,8 +102,7 @@ func (m *singlePolicyManager) Enabled() (bool, error) {
 }
 
 func (m *singlePolicyManager) EnsureAlias() error {
-	alias := m.alias
-	b, err := m.client.HasAlias(alias)
+	b, err := m.client.HasAlias(m.alias.Name)
 	if err != nil {
 		return err
 	}
@@ -131,10 +110,8 @@ func (m *singlePolicyManager) EnsureAlias() error {
 		return nil
 	}
 
-	// Escaping because of date pattern
 	// This always assume it's a date pattern by sourrounding it by <...>
-	firstIndex := url.PathEscape(fmt.Sprintf("<%s-%s>", alias, m.pattern))
-	return m.client.CreateAlias(alias, firstIndex)
+	return m.client.CreateAlias(m.alias)
 }
 
 func (m *singlePolicyManager) EnsurePolicy(overwrite bool) error {
@@ -143,7 +120,7 @@ func (m *singlePolicyManager) EnsurePolicy(overwrite bool) error {
 
 	exists := true
 	if m.checkExists && !overwrite {
-		b, err := m.client.HasILMPolicy(m.policyName)
+		b, err := m.client.HasILMPolicy(m.policy.Name)
 		if err != nil {
 			return err
 		}
@@ -151,7 +128,7 @@ func (m *singlePolicyManager) EnsurePolicy(overwrite bool) error {
 	}
 
 	if !exists || overwrite {
-		return m.client.CreateILMPolicy(m.policyName, m.policy)
+		return m.client.CreateILMPolicy(m.policy)
 	}
 
 	log.Infof("do not generate ilm policy: exists=%v, overwrite=%v",

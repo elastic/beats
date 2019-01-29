@@ -24,6 +24,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/libbeat/cmd/instance"
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 )
 
@@ -54,7 +55,7 @@ func GenGetILMPolicyCmd(settings instance.Settings, name, idxPrefix, version str
 				fmt.Fprintf(os.Stderr, "Error initializing ILM support: %s\n", err)
 			}
 
-			fmt.Println(ilm.Policy().StringToPrint())
+			fmt.Println(common.MapStr(ilm.Policy().Body).StringToPrint())
 		},
 	}
 

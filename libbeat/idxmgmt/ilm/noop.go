@@ -32,8 +32,8 @@ func NoopSupport(info beat.Info, config *common.Config) (Supporter, error) {
 }
 
 func (*noopSupport) Mode() Mode                   { return ModeDisabled }
-func (*noopSupport) Template() TemplateSettings   { return TemplateSettings{} }
-func (*noopSupport) Policy() common.MapStr        { return nil }
+func (*noopSupport) Alias() Alias                 { return Alias{} }
+func (*noopSupport) Policy() Policy               { return Policy{} }
 func (*noopSupport) Manager(_ APIHandler) Manager { return (*noopManager)(nil) }
 
 func (*noopManager) Enabled() (bool, error)    { return false, nil }

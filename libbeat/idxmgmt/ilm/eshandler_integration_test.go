@@ -74,34 +74,47 @@ func TestESClientHandler_ILMPolicy(t *testing.T) {
 	})
 
 	t.Run("create new", func(t *testing.T) {
-		name := makeName("esch-policy-no")
+		policy := ilm.Policy{
+			Name: makeName("esch-policy-create"),
+			Body: ilm.DefaultPolicy,
+		}
 		h := newESClientHandler(t)
-		err := h.CreateILMPolicy(name, ilm.DefaultPolicy)
+		err := h.CreateILMPolicy(policy)
 		require.NoError(t, err)
 
-		b, err := h.HasILMPolicy(name)
+		b, err := h.HasILMPolicy(policy.Name)
 		assert.NoError(t, err)
 		assert.True(t, b)
 	})
 
 	t.Run("overwrite", func(t *testing.T) {
-		name := makeName("esch-policy-no")
+		policy := ilm.Policy{
+			Name: makeName("esch-policy-overwrite"),
+			Body: ilm.DefaultPolicy,
+		}
 		h := newESClientHandler(t)
 
-		err := h.CreateILMPolicy(name, ilm.DefaultPolicy)
+		err := h.CreateILMPolicy(policy)
 		require.NoError(t, err)
 
 		// check second 'create' does not throw (assuming race with other beat)
-		err = h.CreateILMPolicy(name, ilm.DefaultPolicy)
+		err = h.CreateILMPolicy(policy)
 		require.NoError(t, err)
 
-		b, err := h.HasILMPolicy(name)
+		b, err := h.HasILMPolicy(policy.Name)
 		assert.NoError(t, err)
 		assert.True(t, b)
 	})
 }
 
 func TestESClientHandler_Alias(t *testing.T) {
+	makeAlias := func(base string) ilm.Alias {
+		return ilm.Alias{
+			Name:    makeName(base),
+			Pattern: "{now/d}-000001",
+		}
+	}
+
 	t.Run("does not exist", func(t *testing.T) {
 		name := makeName("esch-alias-no")
 		h := newESClientHandler(t)
@@ -111,30 +124,28 @@ func TestESClientHandler_Alias(t *testing.T) {
 	})
 
 	t.Run("create new", func(t *testing.T) {
-		name := makeName("esch-alias-create")
-		first := fmt.Sprintf("%v-000001", name)
+		alias := makeAlias("esch-alias-create")
 		h := newESClientHandler(t)
-		err := h.CreateAlias(name, first)
+		err := h.CreateAlias(alias)
 		assert.NoError(t, err)
 
-		b, err := h.HasAlias(name)
+		b, err := h.HasAlias(alias.Name)
 		assert.NoError(t, err)
 		assert.True(t, b)
 	})
 
 	t.Run("second create", func(t *testing.T) {
-		name := makeName("esch-alias-2create")
-		first := fmt.Sprintf("%v-000001", name)
+		alias := makeAlias("esch-alias-2create")
 		h := newESClientHandler(t)
 
-		err := h.CreateAlias(name, first)
+		err := h.CreateAlias(alias)
 		assert.NoError(t, err)
 
-		err = h.CreateAlias(name, first)
+		err = h.CreateAlias(alias)
 		require.Error(t, err)
 		assert.Equal(t, ilm.ErrAliasAlreadyExists, ilm.ErrReason(err))
 
-		b, err := h.HasAlias(name)
+		b, err := h.HasAlias(alias.Name)
 		assert.NoError(t, err)
 		assert.True(t, b)
 	})
@@ -161,7 +172,10 @@ func newESClientHandler(t *testing.T) ilm.APIHandler {
 }
 
 func makeName(base string) string {
-	id := uuid.NewV4()
+	id, err := uuid.NewV4()
+	if err != nil {
+		panic(err)
+	}
 	return fmt.Sprintf("%v-%v", base, id.String())
 }
 

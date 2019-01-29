@@ -86,10 +86,11 @@ func TestDefaultSupport_Enabled(t *testing.T) {
 }
 
 func TestDefaultSupport_TemplateConfig(t *testing.T) {
-	ilmTemplateSettings := func(s ilm.TemplateSettings) []onCall {
+	ilmTemplateSettings := func(alias, policy string) []onCall {
 		return []onCall{
 			onMode().Return(ilm.ModeEnabled),
-			onTemplate().Return(s),
+			onAlias().Return(ilm.Alias{Name: alias}),
+			onPolicy().Return(ilm.Policy{Name: policy}),
 		}
 	}
 
@@ -131,11 +132,7 @@ func TestDefaultSupport_TemplateConfig(t *testing.T) {
 			want: template.DefaultConfig,
 		},
 		"default template with ilm": {
-			ilmCalls: ilmTemplateSettings(ilm.TemplateSettings{
-				Alias:      "alias",
-				Pattern:    "alias-*",
-				PolicyName: "test-9.9.9",
-			}),
+			ilmCalls: ilmTemplateSettings("alias", "test-9.9.9"),
 			want: cfgWith(template.DefaultConfig, map[string]interface{}{
 				"name":                          "alias",
 				"pattern":                       "alias-*",
@@ -167,10 +164,11 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 	type nameFunc func(time.Time) string
 
 	noILM := []onCall{onMode().Return(ilm.ModeDisabled)}
-	ilmTemplateSettings := func(s ilm.TemplateSettings) []onCall {
+	ilmTemplateSettings := func(alias, policy string) []onCall {
 		return []onCall{
 			onMode().Return(ilm.ModeEnabled),
-			onTemplate().Return(s),
+			onAlias().Return(ilm.Alias{Name: alias}),
+			onPolicy().Return(ilm.Policy{Name: policy}),
 		}
 	}
 
@@ -213,36 +211,28 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			},
 		},
 		"with ilm": {
-			ilmCalls: ilmTemplateSettings(ilm.TemplateSettings{
-				Alias: "test-9.9.9",
-			}),
-			cfg:  map[string]interface{}{"index": "wrong-%{[agent.version]}"},
-			want: stable("test-9.9.9"),
+			ilmCalls: ilmTemplateSettings("test-9.9.9", "test-9.9.9"),
+			cfg:      map[string]interface{}{"index": "wrong-%{[agent.version]}"},
+			want:     stable("test-9.9.9"),
 		},
 		"event alias wit ilm": {
-			ilmCalls: ilmTemplateSettings(ilm.TemplateSettings{
-				Alias: "test-9.9.9",
-			}),
-			cfg:  map[string]interface{}{"index": "test-%{[agent.version]}"},
-			want: stable("event-alias"),
+			ilmCalls: ilmTemplateSettings("test-9.9.9", "test-9.9.9"),
+			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
+			want:     stable("event-alias"),
 			meta: common.MapStr{
 				"alias": "event-alias",
 			},
 		},
 		"event index with ilm": {
-			ilmCalls: ilmTemplateSettings(ilm.TemplateSettings{
-				Alias: "test-9.9.9",
-			}),
-			cfg:  map[string]interface{}{"index": "test-%{[agent.version]}"},
-			want: dateIdx("event-index"),
+			ilmCalls: ilmTemplateSettings("test-9.9.9", "test-9.9.9"),
+			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
+			want:     dateIdx("event-index"),
 			meta: common.MapStr{
 				"index": "event-index",
 			},
 		},
 		"use indices": {
-			ilmCalls: ilmTemplateSettings(ilm.TemplateSettings{
-				Alias: "test-9.9.9",
-			}),
+			ilmCalls: ilmTemplateSettings("test-9.9.9", "test-9.9.9"),
 			cfg: map[string]interface{}{
 				"index": "test-%{[agent.version]}",
 				"indices": []map[string]interface{}{

@@ -57,16 +57,16 @@ func (m *mockILMSupport) Mode() ilm.Mode {
 	return args.Get(0).(ilm.Mode)
 }
 
-func onTemplate() onCall { return makeOnCall("Template") }
-func (m *mockILMSupport) Template() ilm.TemplateSettings {
+func onAlias() onCall { return makeOnCall("Alias") }
+func (m *mockILMSupport) Alias() ilm.Alias {
 	args := m.Called()
-	return args.Get(0).(ilm.TemplateSettings)
+	return args.Get(0).(ilm.Alias)
 }
 
 func onPolicy() onCall { return makeOnCall("Policy") }
-func (m *mockILMSupport) Policy() common.MapStr {
+func (m *mockILMSupport) Policy() ilm.Policy {
 	args := m.Called()
-	return args.Get(0).(common.MapStr)
+	return args.Get(0).(ilm.Policy)
 }
 
 func (m *mockILMSupport) Manager(_ ilm.APIHandler) ilm.Manager {

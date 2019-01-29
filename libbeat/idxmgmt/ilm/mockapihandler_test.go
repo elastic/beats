@@ -19,8 +19,6 @@ package ilm
 
 import (
 	"github.com/stretchr/testify/mock"
-
-	"github.com/elastic/beats/libbeat/common"
 )
 
 type mockHandler struct {
@@ -46,37 +44,34 @@ func newMockHandler(calls ...onCall) *mockHandler {
 	return m
 }
 
+func onILMEnabled(m Mode) onCall { return makeOnCall("ILMEnabled", m) }
 func (h *mockHandler) ILMEnabled(mode Mode) (bool, error) {
 	args := h.Called(mode)
 	return args.Bool(0), args.Error(1)
 }
 
+func onHasAlias(name string) onCall { return makeOnCall("HasAlias", name) }
 func (h *mockHandler) HasAlias(name string) (bool, error) {
 	args := h.Called(name)
 	return args.Bool(0), args.Error(1)
 }
 
-func (h *mockHandler) CreateAlias(name, firstIndex string) error {
-	args := h.Called(name)
+func onCreateAlias(alias Alias) onCall { return makeOnCall("CreateAlias", alias) }
+func (h *mockHandler) CreateAlias(alias Alias) error {
+	args := h.Called(alias)
 	return args.Error(0)
 }
 
+func onHasILMPolicy(name string) onCall { return makeOnCall("HasILMPolicy", name) }
 func (h *mockHandler) HasILMPolicy(name string) (bool, error) {
 	args := h.Called(name)
 	return args.Bool(0), args.Error(1)
 }
 
-func (h *mockHandler) CreateILMPolicy(name string, policy common.MapStr) error {
-	args := h.Called(name, policy)
+func onCreateILMPolicy(policy Policy) onCall { return makeOnCall("CreateILMPolicy", policy) }
+func (h *mockHandler) CreateILMPolicy(policy Policy) error {
+	args := h.Called(policy)
 	return args.Error(0)
-}
-
-func onILMEnabled(m Mode) onCall        { return makeOnCall("ILMEnabled", m) }
-func onHasAlias(name string) onCall     { return makeOnCall("HasAlias", name) }
-func onCreateAlias(name string) onCall  { return makeOnCall("CreateAlias", name) }
-func onHasILMPolicy(name string) onCall { return makeOnCall("HasILMPolicy", name) }
-func onCreateILMPolicy(name string, policy common.MapStr) onCall {
-	return makeOnCall("CreateILMPolicy", name, policy)
 }
 
 func makeOnCall(name string, args ...interface{}) onCall {
