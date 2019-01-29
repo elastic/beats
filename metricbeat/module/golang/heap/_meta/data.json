@@ -12,40 +12,40 @@
     "golang": {
         "heap": {
             "allocations": {
-                "active": 6209536,
-                "allocated": 4838864,
-                "frees": 31389,
-                "idle": 1294336,
-                "mallocs": 57485,
-                "objects": 26096,
-                "total": 12524096
+                "active": 16670720,
+                "allocated": 14115776,
+                "frees": 2830899,
+                "idle": 6496256,
+                "mallocs": 2921961,
+                "objects": 91062,
+                "total": 458114744
             },
-            "cmdline": "metricbeat --httpprof :5066",
+            "cmdline": "metricbeat --httpprof :6060 -e",
             "gc": {
-                "cpu_fraction": 0.00010733439610049068,
-                "next_gc_limit": 6956832,
+                "cpu_fraction": 0.0000798538053427137,
+                "next_gc_limit": 22896432,
                 "pause": {
                     "avg": {
-                        "ns": 220940
+                        "ns": 755847
                     },
-                    "count": 5,
+                    "count": 77,
                     "max": {
-                        "ns": 329300
+                        "ns": 7537934
                     },
                     "sum": {
-                        "ns": 1104700
+                        "ns": 58200246
                     }
                 },
-                "total_count": 5,
+                "total_count": 77,
                 "total_pause": {
-                    "ns": 1104700
+                    "ns": 58200246
                 }
             },
             "system": {
-                "obtained": 7503872,
+                "obtained": 23166976,
                 "released": 0,
-                "stack": 884736,
-                "total": 11671800
+                "stack": 950272,
+                "total": 27908344
             }
         }
     },
@@ -53,7 +53,7 @@
         "name": "heap"
     },
     "service": {
-        "address": "127.0.0.1:5066",
+        "address": "127.0.0.1:6060",
         "type": "golang"
     }
 }
