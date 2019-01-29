@@ -75,7 +75,7 @@ date information. You also need to configure the `setup.template.name` and
 +
 ["source","sh",subs="attributes,callouts"]
 -----
-output.elasticsearch.index: "customname-%{[beat.version]}-%{+yyyy.MM.dd}"
+output.elasticsearch.index: "customname-%{[agent.version]}-%{+yyyy.MM.dd}"
 setup.template.name: "customname"
 setup.template.pattern: "customname-*"
 -----

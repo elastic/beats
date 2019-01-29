@@ -12,11 +12,11 @@
       description: >
         The number of requests
     - name: frontend_name
-      type: text
+      type: keyword
       description: >
         The name of the frontend used
     - name: backend_url
-      type: text
+      type: keyword
       description:
         The url of the backend where request is forwarded
 

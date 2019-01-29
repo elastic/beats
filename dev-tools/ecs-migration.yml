@@ -171,6 +171,126 @@
   alias: true
   beat: filebeat
 
+- from: suricata.eve.alert.action
+  to: event.outcome
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.alert.severity
+  to: event.severity
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.app_proto
+  to: network.protocol
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.dest_ip
+  to: destination.ip
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.dest_port
+  to: destination.port
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.event_type
+  to: event.type
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.fileinfo.filename
+  to: file.path
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.fileinfo.size
+  to: file.size
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.flow.start
+  to: event.start
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.flow.bytes_toclient
+  to: destination.bytes
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.flow.bytes_toserver
+  to: source.bytes
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.flow.pkts_toclient
+  to: destination.packets
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.flow.pkts_toserver
+  to: source.packets
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.http.hostname
+  to: url.domain
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.http.http_method
+  to: http.request.method
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.http.http_refer
+  to: http.request.referrer
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.http.http_user_agent
+  to: user_agent.original
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.http.length
+  to: http.response.body.bytes
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.http.status
+  to: http.response.status_code
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.http.url
+  to: url.original
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.proto
+  to: network.transport
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.src_ip
+  to: source.ip
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.src_port
+  to: source.port
+  alias: true
+  beat: filebeat
+
+- from: suricata.eve.timestamp
+  to: '@timestamp'
+  alias: true
+  beat: filebeat
+
 ## System module
 
 - from: system.syslog.hostname
@@ -1205,6 +1325,45 @@
   beat: metricbeat
 
 ## Modules
+
+### Mongodb
+
+- from: mongodb.status.version
+  to: service.version
+  alias: true
+  beat: metricbeat
+
+- from: mongodb.status.process
+  to: process.name
+  alias: true
+  beat: metricbeat
+
+### Redis
+
+- from: php_fpm.status.pid
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
+- from: php_fpm.status.request_method
+  to: http.request.method
+  alias: true
+  beat: metricbeat
+
+- from: php_fpm.status.request_uri
+  to: url.original
+  alias: true
+  beat: metricbeat
+
+- from: php_fpm.status.content_length
+  to: http.response.body.bytes
+  alias: true
+  beat: metricbeat
+
+- from: php_fpm.status.user
+  to: http.response.user.name
+  alias: true
+  beat: metricbeat
 
 ### Redis
 

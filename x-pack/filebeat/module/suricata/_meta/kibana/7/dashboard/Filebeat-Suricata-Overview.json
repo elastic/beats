@@ -225,7 +225,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "suricata.eve.app_proto",
+                "field": "network.protocol",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -398,7 +398,7 @@
           "host.name",
           "event.type",
           "suricata.eve.flow_id",
-          "suricata.eve.proto",
+          "network.transport",
           "source.ip",
           "source.port",
           "destination.ip",
@@ -632,7 +632,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "suricata.eve.proto",
+                "field": "network.transport",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",

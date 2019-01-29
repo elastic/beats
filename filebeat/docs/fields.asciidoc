@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-host-processor>>
 * <<exported-fields-icinga>>
 * <<exported-fields-iis>>
+* <<exported-fields-iptables>>
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
@@ -3911,6 +3912,17 @@ elasticsearch Module
 
 
 
+*`elasticsearch.node.id`*::
++
+--
+type: keyword
+
+example: DSiWcTyeThWtUXLB9J0BMw
+
+ID of the node
+
+--
+
 *`elasticsearch.node.name`*::
 +
 --
@@ -3972,7 +3984,7 @@ The layer from which this event originated: rest, transport or ip_filter
 
 --
 
-*`elasticsearch.audit.origin_type`*::
+*`elasticsearch.audit.origin.type`*::
 +
 --
 type: keyword
@@ -3983,7 +3995,7 @@ Where the request originated: rest (request originated from a REST API request),
 
 --
 
-*`elasticsearch.audit.realm`*::
+*`elasticsearch.audit.user.realm`*::
 +
 --
 type: keyword
@@ -3992,7 +4004,7 @@ The authentication realm
 
 --
 
-*`elasticsearch.audit.roles`*::
+*`elasticsearch.audit.user.roles`*::
 +
 --
 type: keyword
@@ -4025,7 +4037,7 @@ Indices accessed by action
 
 --
 
-*`elasticsearch.audit.request`*::
+*`elasticsearch.audit.request.name`*::
 +
 --
 type: keyword
@@ -4033,6 +4045,15 @@ type: keyword
 example: ClearScrollRequest
 
 The type of request that was executed
+
+--
+
+*`elasticsearch.audit.request_body`*::
++
+--
+type: alias
+
+alias to: http.request.body.content
 
 --
 
@@ -4060,15 +4081,6 @@ alias to: source.ip
 type: alias
 
 alias to: url.original
-
---
-
-*`elasticsearch.audit.request_body`*::
-+
---
-type: alias
-
-alias to: http.request.body.content
 
 --
 
@@ -5580,6 +5592,326 @@ alias to: source.geo.city_name
 type: alias
 
 alias to: source.geo.region_iso_code
+
+--
+
+[[exported-fields-iptables]]
+== iptables fields
+
+Module for handling the iptables logs.
+
+
+
+[float]
+== iptables fields
+
+Fields from the iptables logs.
+
+
+
+*`iptables.ether_type`*::
++
+--
+type: long
+
+Value of the ethernet type field identifying the network layer protocol.
+
+
+--
+
+*`iptables.flow_label`*::
++
+--
+type: integer
+
+IPv6 flow label.
+
+
+--
+
+*`iptables.fragment_flags`*::
++
+--
+type: keyword
+
+IP fragment flags. A combination of CE, DF and MF.
+
+
+--
+
+*`iptables.fragment_offset`*::
++
+--
+type: long
+
+Offset of the current IP fragment.
+
+
+--
+
+[float]
+== icmp fields
+
+ICMP fields.
+
+
+
+*`iptables.icmp.code`*::
++
+--
+type: long
+
+ICMP code.
+
+
+--
+
+*`iptables.icmp.id`*::
++
+--
+type: long
+
+ICMP ID.
+
+
+--
+
+*`iptables.icmp.parameter`*::
++
+--
+type: long
+
+ICMP parameter.
+
+
+--
+
+*`iptables.icmp.redirect`*::
++
+--
+type: ip
+
+ICMP redirect address.
+
+
+--
+
+*`iptables.icmp.seq`*::
++
+--
+type: long
+
+ICMP sequence number.
+
+
+--
+
+*`iptables.icmp.type`*::
++
+--
+type: long
+
+ICMP type.
+
+
+--
+
+*`iptables.id`*::
++
+--
+type: long
+
+Packet identifier.
+
+
+--
+
+*`iptables.incomplete_bytes`*::
++
+--
+type: long
+
+Number of incomplete bytes.
+
+
+--
+
+*`iptables.input_device`*::
++
+--
+type: keyword
+
+Device that received the packet.
+
+
+--
+
+*`iptables.precedence_bits`*::
++
+--
+type: short
+
+IP precedence bits.
+
+
+--
+
+*`iptables.tos`*::
++
+--
+type: long
+
+IP Type of Service field.
+
+
+--
+
+*`iptables.length`*::
++
+--
+type: long
+
+Packet length.
+
+
+--
+
+*`iptables.output_device`*::
++
+--
+type: keyword
+
+Device that output the packet.
+
+
+--
+
+[float]
+== tcp fields
+
+TCP fields.
+
+
+
+*`iptables.tcp.flags`*::
++
+--
+type: keyword
+
+TCP flags.
+
+
+--
+
+*`iptables.tcp.reserved_bits`*::
++
+--
+type: short
+
+TCP reserved bits.
+
+
+--
+
+*`iptables.tcp.seq`*::
++
+--
+type: long
+
+TCP sequence number.
+
+
+--
+
+*`iptables.tcp.ack`*::
++
+--
+type: long
+
+TCP Acknowledgment number.
+
+
+--
+
+*`iptables.tcp.window`*::
++
+--
+type: long
+
+Advertised TCP window size.
+
+
+--
+
+*`iptables.ttl`*::
++
+--
+type: integer
+
+Time To Live field.
+
+
+--
+
+[float]
+== udp fields
+
+UDP fields.
+
+
+
+*`iptables.udp.length`*::
++
+--
+type: long
+
+Length of the UDP header and payload.
+
+
+--
+
+[float]
+== ubiquiti fields
+
+Fields for Ubiquiti network devices.
+
+
+
+*`iptables.ubiquiti.input_zone`*::
++
+--
+type: keyword
+
+Input zone.
+
+
+--
+
+*`iptables.ubiquiti.output_zone`*::
++
+--
+type: keyword
+
+Output zone.
+
+
+--
+
+*`iptables.ubiquiti.rule_number`*::
++
+--
+type: keyword
+
+The rule number within the rule set.
+
+--
+
+*`iptables.ubiquiti.rule_set`*::
++
+--
+type: keyword
+
+The rule set name.
 
 --
 
@@ -10706,7 +11038,9 @@ Fields exported by the EVE JSON logs
 *`suricata.eve.event_type`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: event.type
 
 --
 
@@ -10792,7 +11126,9 @@ type: keyword
 *`suricata.eve.fileinfo.filename`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: file.path
 
 --
 
@@ -10841,7 +11177,9 @@ type: keyword
 *`suricata.eve.fileinfo.size`*::
 +
 --
-type: long
+type: alias
+
+alias to: file.size
 
 --
 
@@ -10855,21 +11193,27 @@ type: long
 *`suricata.eve.dest_port`*::
 +
 --
-type: long
+type: alias
+
+alias to: destination.port
 
 --
 
 *`suricata.eve.src_port`*::
 +
 --
-type: long
+type: alias
+
+alias to: source.port
 
 --
 
 *`suricata.eve.proto`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: network.transport
 
 --
 
@@ -10883,7 +11227,9 @@ type: long
 *`suricata.eve.src_ip`*::
 +
 --
-type: ip
+type: alias
+
+alias to: source.ip
 
 --
 
@@ -10962,7 +11308,9 @@ type: keyword
 *`suricata.eve.dest_ip`*::
 +
 --
-type: ip
+type: alias
+
+alias to: destination.ip
 
 --
 
@@ -10977,7 +11325,9 @@ type: long
 *`suricata.eve.http.status`*::
 +
 --
-type: long
+type: alias
+
+alias to: http.response.status_code
 
 --
 
@@ -10991,7 +11341,9 @@ type: keyword
 *`suricata.eve.http.http_user_agent`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: user_agent.original
 
 --
 
@@ -11005,35 +11357,45 @@ type: keyword
 *`suricata.eve.http.http_refer`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: http.request.referrer
 
 --
 
 *`suricata.eve.http.url`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: url.original
 
 --
 
 *`suricata.eve.http.hostname`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: url.domain
 
 --
 
 *`suricata.eve.http.length`*::
 +
 --
-type: long
+type: alias
+
+alias to: http.response.body.bytes
 
 --
 
 *`suricata.eve.http.http_method`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: http.request.method
 
 --
 
@@ -11047,7 +11409,9 @@ type: keyword
 *`suricata.eve.timestamp`*::
 +
 --
-type: date
+type: alias
+
+alias to: @timestamp
 
 --
 
@@ -11069,7 +11433,9 @@ type: keyword
 *`suricata.eve.alert.severity`*::
 +
 --
-type: long
+type: alias
+
+alias to: event.severity
 
 --
 
@@ -11097,7 +11463,9 @@ type: keyword
 *`suricata.eve.alert.action`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: event.outcome
 
 --
 
@@ -12045,21 +12413,27 @@ type: keyword
 *`suricata.eve.flow.bytes_toclient`*::
 +
 --
-type: long
+type: alias
+
+alias to: destination.bytes
 
 --
 
 *`suricata.eve.flow.start`*::
 +
 --
-type: date
+type: alias
+
+alias to: event.start
 
 --
 
 *`suricata.eve.flow.pkts_toclient`*::
 +
 --
-type: long
+type: alias
+
+alias to: destination.packets
 
 --
 
@@ -12080,7 +12454,9 @@ type: keyword
 *`suricata.eve.flow.bytes_toserver`*::
 +
 --
-type: long
+type: alias
+
+alias to: source.bytes
 
 --
 
@@ -12094,7 +12470,9 @@ type: keyword
 *`suricata.eve.flow.pkts_toserver`*::
 +
 --
-type: long
+type: alias
+
+alias to: source.packets
 
 --
 
@@ -12115,7 +12493,9 @@ type: boolean
 *`suricata.eve.app_proto`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: network.protocol
 
 --
 
@@ -12566,7 +12946,7 @@ The number of requests
 *`traefik.access.frontend_name`*::
 +
 --
-type: text
+type: keyword
 
 The name of the frontend used
 
@@ -12576,7 +12956,7 @@ The name of the frontend used
 *`traefik.access.backend_url`*::
 +
 --
-type: text
+type: keyword
 
 The url of the backend where request is forwarded
 

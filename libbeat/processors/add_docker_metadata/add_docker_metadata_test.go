@@ -104,6 +104,7 @@ func TestMatchNoContainer(t *testing.T) {
 func TestMatchContainer(t *testing.T) {
 	testConfig, err := common.NewConfigFrom(map[string]interface{}{
 		"match_fields": []string{"foo"},
+		"labels.dedot": false,
 	})
 	assert.NoError(t, err)
 
@@ -152,7 +153,6 @@ func TestMatchContainer(t *testing.T) {
 func TestMatchContainerWithDedot(t *testing.T) {
 	testConfig, err := common.NewConfigFrom(map[string]interface{}{
 		"match_fields": []string{"foo"},
-		"labels.dedot": true,
 	})
 	assert.NoError(t, err)
 

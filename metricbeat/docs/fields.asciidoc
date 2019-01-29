@@ -3009,7 +3009,7 @@ Container status.
 *`docker.container.ip_addresses`*::
 +
 --
-type: keyword
+type: ip
 
 Container IP addresses.
 
@@ -15421,7 +15421,9 @@ MongoDB server status metrics.
 *`mongodb.status.version`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 Instance version.
 
@@ -15431,7 +15433,9 @@ Instance version.
 *`mongodb.status.process`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: process.name
 
 The current MongoDB process. Possible values are mongos or mongod.
 
@@ -18851,7 +18855,9 @@ process contains the metrics that were obtained from the PHP-FPM process.
 *`php_fpm.process.pid`*::
 +
 --
-type: integer
+type: alias
+
+alias to: process.pid
 
 The PID of the process
 
@@ -18913,7 +18919,9 @@ The duration in microseconds (1 million in a second) of the current request (my 
 *`php_fpm.process.request_method`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: http.request.method
 
 The request method (GET, POST, etc) (of the current request)
 
@@ -18923,7 +18931,9 @@ The request method (GET, POST, etc) (of the current request)
 *`php_fpm.process.request_uri`*::
 +
 --
-type: text
+type: alias
+
+alias to: url.original
 
 The request URI with the query string (of the current request)
 
@@ -18933,7 +18943,9 @@ The request URI with the query string (of the current request)
 *`php_fpm.process.content_length`*::
 +
 --
-type: integer
+type: alias
+
+alias to: http.response.body.bytes
 
 The content length of the request (only with POST) (of the current request)
 
@@ -18943,7 +18955,9 @@ The content length of the request (only with POST) (of the current request)
 *`php_fpm.process.user`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: user.name
 
 The user (PHP_AUTH_USER) (or - if not set) (for the current request)
 
