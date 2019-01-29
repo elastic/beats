@@ -136,8 +136,6 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 *Auditbeat*
 
 - Add system module. {pull}9546[9546]
-- Add `user.id` (UID) and `user.name` for ECS. {pull}10195[10195]
-- Add `group.id` (GID) and `group.name` for ECS. {pull}10195[10195]
 - System module `process` dataset: Add user information to processes. {pull}9963[9963]
 
 *Filebeat*
