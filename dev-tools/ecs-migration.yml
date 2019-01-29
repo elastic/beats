@@ -1220,6 +1220,33 @@
 
 ### Redis
 
+- from: php_fpm.status.pid
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
+- from: php_fpm.status.request_method
+  to: http.request.method
+  alias: true
+  beat: metricbeat
+
+- from: php_fpm.status.request_uri
+  to: url.original
+  alias: true
+  beat: metricbeat
+
+- from: php_fpm.status.content_length
+  to: http.response.body.bytes
+  alias: true
+  beat: metricbeat
+
+- from: php_fpm.status.user
+  to: http.response.user.name
+  alias: true
+  beat: metricbeat
+
+### Redis
+
 - from: redis.info.server.version
   to: service.version
   alias: true
