@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/munin"
 )
@@ -42,8 +43,9 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	serviceName string
 	serviceType string
+	plugins     []string
+	sanitize    bool
 	timeout     time.Duration
 }
 
@@ -59,8 +61,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		serviceName:   config.ServiceName,
-		serviceType:   config.ServiceType,
+		plugins:       config.Plugins,
+		sanitize:      config.Sanitize,
 		timeout:       base.Module().Config().Timeout,
 	}, nil
 }
@@ -74,31 +76,39 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	}
 	defer node.Close()
 
-	items, err := node.List()
-	if err != nil {
-		r.Error(err)
-		return
+	plugins := m.plugins
+	if len(plugins) == 0 {
+		plugins, err = node.List()
+		if err != nil {
+			r.Error(err)
+			return
+		}
 	}
 
-	metrics, err := node.Fetch(items...)
-	if err != nil {
-		r.Error(err)
-	}
+	for _, plugin := range plugins {
+		metrics, err := node.Fetch(plugin, m.sanitize)
+		if err != nil {
+			r.Error(err)
+		}
 
-	// Even if there was some error, keep sending succesfully collected metrics if any
-	if len(metrics) == 0 {
-		return
-	}
-	event := mb.Event{
-		Service: m.serviceType,
-		RootFields: common.MapStr{
-			"munin": common.MapStr{
-				"metrics": metrics,
+		// Even if there was some error, keep sending succesfully collected metrics if any
+		if len(metrics) == 0 {
+			continue
+		}
+		event := mb.Event{
+			Service: plugin,
+			RootFields: common.MapStr{
+				"munin": common.MapStr{
+					"plugin": common.MapStr{
+						"name": plugin,
+					},
+					"metrics": metrics,
+				},
 			},
-		},
+		}
+		if !r.Event(event) {
+			logp.Debug("munin", "Failed to report event, interrupting Fetch")
+			return
+		}
 	}
-	if m.serviceName != "" {
-		event.RootFields.Put("service.name", m.serviceName)
-	}
-	r.Event(event)
 }

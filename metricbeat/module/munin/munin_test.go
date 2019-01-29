@@ -76,61 +76,81 @@ func TestFetch(t *testing.T) {
 		title    string
 		response string
 		expected common.MapStr
-		errors   bool
 	}{
 		{
 			"normal case",
 			responseCPU,
 			common.MapStr{
-				"cpu": common.MapStr{
-					"user":    float64(4679836),
-					"nice":    float64(59278),
-					"system":  float64(1979168),
-					"idle":    float64(59957502),
-					"iowait":  float64(705373),
-					"irq":     float64(76),
-					"softirq": float64(36404),
-					"steal":   float64(0),
-					"guest":   float64(0),
-				},
+				"user":    float64(4679836),
+				"nice":    float64(59278),
+				"system":  float64(1979168),
+				"idle":    float64(59957502),
+				"iowait":  float64(705373),
+				"irq":     float64(76),
+				"softirq": float64(36404),
+				"steal":   float64(0),
+				"guest":   float64(0),
 			},
-			false,
 		},
 		{
 			"unknown values",
 			responseUnknown,
 			common.MapStr{
-				"cpu": common.MapStr{
-					"other": float64(42),
-				},
+				"other": float64(42),
 			},
-			true,
 		},
 		{
 			"wrong field names",
 			responseWithWrongFields,
 			common.MapStr{
-				"cpu": common.MapStr{
-					"user":   float64(4679836),
-					"nice":   float64(59278),
-					"system": float64(1979168),
-					"idle":   float64(59957502),
-				},
+				"user":   float64(4679836),
+				"nice":   float64(59278),
+				"system": float64(1979168),
+				"idle":   float64(59957502),
 			},
-			true,
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
 			n := dummyNode(c.response)
-			event, err := n.Fetch("cpu", "swap")
+			event, err := n.Fetch("cpu", true)
 			assert.Equal(t, c.expected, event)
-			if c.errors {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-			}
+			assert.NoError(t, err)
+		})
+	}
+}
+
+func TestSanitizeName(t *testing.T) {
+	cases := []struct {
+		name     string
+		expected string
+	}{
+		{
+			"if_eth0",
+			"if_eth0",
+		},
+		{
+			"/dev/sda1",
+			"_dev_sda1",
+		},
+		{
+			"eth0:100",
+			"eth0_100",
+		},
+		{
+			"user@host",
+			"user_host",
+		},
+		{
+			"404",
+			"_04",
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			assert.Equal(t, c.expected, sanitizeName(c.name))
 		})
 	}
 }

@@ -18,7 +18,7 @@ class Test(metricbeat.BaseTest):
             "hosts": self.get_hosts(),
             "period": "1s",
             "extras": {
-                "service.name": namespace,
+                "munin.plugins": ["cpu"],
             },
         }])
         proc = self.start_beat()
@@ -31,9 +31,9 @@ class Test(metricbeat.BaseTest):
         evt = output[0]
         print(evt)
 
-        assert evt["service"]["type"] == "munin"
-        assert evt["service"]["name"] == namespace
-        assert evt["munin"]["metrics"]["cpu"]["user"] > 0
+        assert evt["service"]["type"] == "cpu"
+        assert evt["munin"]["plugin"]["name"] == "cpu"
+        assert evt["munin"]["metrics"]["user"] > 0
 
         self.assert_fields_are_documented(evt)
 

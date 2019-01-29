@@ -16986,20 +16986,23 @@ Munin node metrics exporter
 
 
 
-*`munin.metrics.*.*`*::
-+
---
-type: object
-
-munin.metrics contains metrics exposed by a munin node agent
-
-
---
-
 *`munin.metrics.*`*::
 +
 --
 type: object
+
+Metrics exposed by a plugin of a munin node agent.
+
+
+--
+
+*`munin.plugin.name`*::
++
+--
+type: keyword
+
+Name of the plugin collecting this metrics.
+
 
 --
 
