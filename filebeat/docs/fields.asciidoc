@@ -720,6 +720,34 @@ The first argument to the system call.
 
 --
 
+*`auditd.log.addr`*::
++
+--
+type: ip
+
+--
+
+*`auditd.log.rport`*::
++
+--
+type: long
+
+--
+
+*`auditd.log.laddr`*::
++
+--
+type: ip
+
+--
+
+*`auditd.log.lport`*::
++
+--
+type: long
+
+--
+
 *`auditd.log.acct`*::
 +
 --
@@ -982,48 +1010,12 @@ alias to: source.address
 
 --
 
-*`auditd.log.addr`*::
-+
---
-type: alias
-
-alias to: source.address
-
---
-
-*`auditd.log.rport`*::
-+
---
-type: alias
-
-alias to: source.port
-
---
-
 *`auditd.log.dst`*::
 +
 --
 type: alias
 
 alias to: destination.address
-
---
-
-*`auditd.log.laddr`*::
-+
---
-type: alias
-
-alias to: destination.address
-
---
-
-*`auditd.log.lport`*::
-+
---
-type: alias
-
-alias to: destination.port
 
 --
 

@@ -247,28 +247,8 @@
   alias: true
   beat: filebeat
 
-- from: auditd.log.addr
-  to: source.address
-  alias: true
-  beat: filebeat
-
-- from: auditd.log.rport
-  to: source.port
-  alias: true
-  beat: filebeat
-
 - from: auditd.log.dst
   to: destination.address
-  alias: true
-  beat: filebeat
-
-- from: auditd.log.laddr
-  to: destination.address
-  alias: true
-  beat: filebeat
-
-- from: auditd.log.lport
-  to: destination.port
   alias: true
   beat: filebeat
 

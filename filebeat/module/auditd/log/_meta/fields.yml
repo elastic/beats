@@ -39,6 +39,22 @@
     - name: a0
       description: >
         The first argument to the system call.
+    - name: addr
+      type: ip
+      definition: >
+        Remote address that the user is connecting from.
+    - name: rport
+      type: long
+      definition: >
+        Remote port number.
+    - name: laddr
+      type: ip
+      definition: >
+        Local network address.
+    - name: lport
+      type: long
+      definition: >
+        Local port number.
 
     - name: acct
       type: alias
@@ -161,23 +177,7 @@
       type: alias
       path: source.address
       migration: true
-    - name: addr
-      type: alias
-      path: source.address
-      migration: true
-    - name: rport
-      type: alias
-      path: source.port
-      migration: true
     - name: dst
       type: alias
       path: destination.address
-      migration: true
-    - name: laddr
-      type: alias
-      path: destination.address
-      migration: true
-    - name: lport
-      type: alias
-      path: destination.port
       migration: true
