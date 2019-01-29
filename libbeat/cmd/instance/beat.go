@@ -434,8 +434,17 @@ func (b *Beat) TestConfig(bt beat.Creator) error {
 	}())
 }
 
+//SetupSettings holds settings necessary for beat setup
+type SetupSettings struct {
+	Template        bool
+	Dashboard       bool
+	MachineLearning bool
+	Pipeline        bool
+	ILMPolicy       bool
+}
+
 // Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
-func (b *Beat) Setup(bt beat.Creator, template, setupDashboards, machineLearning, pipelines, policy bool) error {
+func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
 	return handleError(func() error {
 		err := b.Init()
 		if err != nil {
@@ -451,7 +460,7 @@ func (b *Beat) Setup(bt beat.Creator, template, setupDashboards, machineLearning
 			return err
 		}
 
-		if template {
+		if settings.Template {
 			outCfg := b.Config.Output
 
 			if outCfg.Name() != "elasticsearch" {
@@ -494,7 +503,7 @@ func (b *Beat) Setup(bt beat.Creator, template, setupDashboards, machineLearning
 			fmt.Println("Loaded index template")
 		}
 
-		if setupDashboards {
+		if settings.Dashboard {
 			fmt.Println("Loading dashboards (Kibana must be running and reachable)")
 			err = b.loadDashboards(context.Background(), true)
 
@@ -510,7 +519,7 @@ func (b *Beat) Setup(bt beat.Creator, template, setupDashboards, machineLearning
 			}
 		}
 
-		if machineLearning && b.SetupMLCallback != nil {
+		if settings.MachineLearning && b.SetupMLCallback != nil {
 			err = b.SetupMLCallback(&b.Beat, b.Config.Kibana)
 			if err != nil {
 				return err
@@ -518,7 +527,7 @@ func (b *Beat) Setup(bt beat.Creator, template, setupDashboards, machineLearning
 			fmt.Println("Loaded machine learning job configurations")
 		}
 
-		if pipelines && b.OverwritePipelinesCallback != nil {
+		if settings.Pipeline && b.OverwritePipelinesCallback != nil {
 			esConfig := b.Config.Output.Config()
 			err = b.OverwritePipelinesCallback(esConfig)
 			if err != nil {
@@ -528,7 +537,7 @@ func (b *Beat) Setup(bt beat.Creator, template, setupDashboards, machineLearning
 			fmt.Println("Loaded Ingest pipelines")
 		}
 
-		if policy {
+		if settings.ILMPolicy {
 			if err := b.loadILMPolicy(); err != nil {
 				return err
 			}
