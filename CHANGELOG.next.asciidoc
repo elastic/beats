@@ -24,6 +24,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Docker and Kubernetes labels/annotations will be "dedoted" by default. {pull}10338[10338]
 
 *Auditbeat*
+
 - Rename `process.exe` to `process.executable` in auditd module to align with ECS. {pull}9949[9949]
 - Rename `process.cwd` to `process.working_directory` in auditd module to align with ECS. {pull}10195[10195]
 - Change data type of `process.pid` and `process.ppid` to number in JSON output
@@ -84,6 +85,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename http.request.body field to http.request.body.content. {pull}10315[10315]
 - Adjust php_fpm.process metricset fields to ECS. {pull}10366[10366]
 - Adjust mongodb.status metricset to to ECS. {pull}10368[10368]
+- Change the following fields from type text to keyword: {pull}10318[10318]
+  - ceph.osd_df.name
+  - ceph.osd_tree.name
+  - ceph.osd_tree.children
+  - kafka.consumergroup.meta
+  - kibana.stats.name
+  - mongodb.metrics.replication.executor.network_interface
+  - php_fpm.process.request_uri
+  - php_fpm.process.script
 
 *Packetbeat*
 

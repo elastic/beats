@@ -9,7 +9,7 @@
       description: >
         osd node id
     - name: name
-      type: text
+      type: keyword
       description: >
         osd node name
     - name: device_class

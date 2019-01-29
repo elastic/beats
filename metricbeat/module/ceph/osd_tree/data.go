@@ -86,7 +86,7 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 		nodeInfo := common.MapStr{}
 		if node.ID < 0 {
 			//bucket node
-			nodeInfo["children"] = childrenMap[node.Name]
+			nodeInfo["children"] = strings.Split(childrenMap[node.Name], ",")
 		} else {
 			//osd node
 			nodeInfo["crush_weight"] = node.CrushWeight
