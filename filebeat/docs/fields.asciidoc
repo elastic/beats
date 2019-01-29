@@ -11038,7 +11038,9 @@ Fields exported by the EVE JSON logs
 *`suricata.eve.event_type`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: event.type
 
 --
 
@@ -11124,7 +11126,9 @@ type: keyword
 *`suricata.eve.fileinfo.filename`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: file.path
 
 --
 
@@ -11173,7 +11177,9 @@ type: keyword
 *`suricata.eve.fileinfo.size`*::
 +
 --
-type: long
+type: alias
+
+alias to: file.size
 
 --
 
@@ -11187,21 +11193,27 @@ type: long
 *`suricata.eve.dest_port`*::
 +
 --
-type: long
+type: alias
+
+alias to: destination.port
 
 --
 
 *`suricata.eve.src_port`*::
 +
 --
-type: long
+type: alias
+
+alias to: source.port
 
 --
 
 *`suricata.eve.proto`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: network.transport
 
 --
 
@@ -11215,7 +11227,9 @@ type: long
 *`suricata.eve.src_ip`*::
 +
 --
-type: ip
+type: alias
+
+alias to: source.ip
 
 --
 
@@ -11294,7 +11308,9 @@ type: keyword
 *`suricata.eve.dest_ip`*::
 +
 --
-type: ip
+type: alias
+
+alias to: destination.ip
 
 --
 
@@ -11309,7 +11325,9 @@ type: long
 *`suricata.eve.http.status`*::
 +
 --
-type: long
+type: alias
+
+alias to: http.response.status_code
 
 --
 
@@ -11323,7 +11341,9 @@ type: keyword
 *`suricata.eve.http.http_user_agent`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: user_agent.original
 
 --
 
@@ -11337,35 +11357,45 @@ type: keyword
 *`suricata.eve.http.http_refer`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: http.request.referrer
 
 --
 
 *`suricata.eve.http.url`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: url.original
 
 --
 
 *`suricata.eve.http.hostname`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: url.domain
 
 --
 
 *`suricata.eve.http.length`*::
 +
 --
-type: long
+type: alias
+
+alias to: http.response.body.bytes
 
 --
 
 *`suricata.eve.http.http_method`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: http.request.method
 
 --
 
@@ -11379,7 +11409,9 @@ type: keyword
 *`suricata.eve.timestamp`*::
 +
 --
-type: date
+type: alias
+
+alias to: @timestamp
 
 --
 
@@ -11401,7 +11433,9 @@ type: keyword
 *`suricata.eve.alert.severity`*::
 +
 --
-type: long
+type: alias
+
+alias to: event.severity
 
 --
 
@@ -11429,7 +11463,9 @@ type: keyword
 *`suricata.eve.alert.action`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: event.outcome
 
 --
 
@@ -12377,21 +12413,27 @@ type: keyword
 *`suricata.eve.flow.bytes_toclient`*::
 +
 --
-type: long
+type: alias
+
+alias to: destination.bytes
 
 --
 
 *`suricata.eve.flow.start`*::
 +
 --
-type: date
+type: alias
+
+alias to: event.start
 
 --
 
 *`suricata.eve.flow.pkts_toclient`*::
 +
 --
-type: long
+type: alias
+
+alias to: destination.packets
 
 --
 
@@ -12412,7 +12454,9 @@ type: keyword
 *`suricata.eve.flow.bytes_toserver`*::
 +
 --
-type: long
+type: alias
+
+alias to: source.bytes
 
 --
 
@@ -12426,7 +12470,9 @@ type: keyword
 *`suricata.eve.flow.pkts_toserver`*::
 +
 --
-type: long
+type: alias
+
+alias to: source.packets
 
 --
 
@@ -12447,7 +12493,9 @@ type: boolean
 *`suricata.eve.app_proto`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: network.protocol
 
 --
 
