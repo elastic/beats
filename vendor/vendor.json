@@ -1812,16 +1812,16 @@
 			"revisionTime": "2018-03-10T14:15:09Z"
 		},
 		{
-			"checksumSHA1": "KAzbLjI9MzW2tjfcAsK75lVRp6I=",
+			"checksumSHA1": "LmajbO3+qtbE7JA0MQ29PXbmKNM=",
 			"path": "github.com/rcrowley/go-metrics",
-			"revision": "1f30fe9094a513ce4c700b9a54458bbb0c96996c",
-			"revisionTime": "2016-11-28T21:05:44Z"
+			"revision": "3113b8401b8a98917cde58f8bbd42a1b1c03b1fd",
+			"revisionTime": "2018-10-16T18:43:25Z"
 		},
 		{
 			"checksumSHA1": "q/d9nXRQYKEJ/EWn+5y6jL8rPGs=",
 			"path": "github.com/rcrowley/go-metrics/exp",
-			"revision": "1f30fe9094a513ce4c700b9a54458bbb0c96996c",
-			"revisionTime": "2016-11-28T21:05:44Z"
+			"revision": "3113b8401b8a98917cde58f8bbd42a1b1c03b1fd",
+			"revisionTime": "2018-10-16T18:43:25Z"
 		},
 		{
 			"checksumSHA1": "nP4adVqIbQB1KW4VHYTjZ4BGwDQ=",

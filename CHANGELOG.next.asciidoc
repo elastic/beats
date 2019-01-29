@@ -21,6 +21,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename `process.exe` to `process.executable` in add_process_metadata to align with ECS. {pull}9949[9949]
 - Import ECS change https://github.com/elastic/ecs/pull/308[ecs#308]:
   leaf field `user.group` is now the `group` field set. {pull}10275[10275]
+- Docker and Kubernetes labels/annotations will be "dedoted" by default. {pull}10338[10338]
 
 *Auditbeat*
 - Rename `process.exe` to `process.executable` in auditd module to align with ECS. {pull}9949[9949]
@@ -58,6 +59,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename multiple fields to `http.response.body.bytes`, from modules "apache", "iis",
   "kibana", "nginx" and "traefik", including `http.response.content_length` (ECS). {pull}10188[10188]
 - Change type of field backend_url and frontend_name in traefik.access metricset to type keyword. {pull}10401[10401]
+- Ingesting Elasticsearch audit logs is only supported with Elasticsearch 6.5.0 and above {pull}10352[10352]
+- Migrate Elasticsearch audit logs fields to ECS {pull}10352[10352]
 
 *Heartbeat*
 
@@ -76,7 +79,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Refactor Prometheus metric mappings {pull}9948[9948]
 - Removed Prometheus stats metricset in favor of just using Prometheus collector {pull}9948[9948]
 - Adjust Redis.info metricset fields to ECS. {pull}10319[10319]
+- Change type of field docker.container.ip_addresses to `ip` instead of `keyword. {pull}10364[10364]
 - Rename http.request.body field to http.request.body.content. {pull}10315[10315]
+- Adjust php_fpm.process metricset fields to ECS. {pull}10366[10366]
+- Adjust mongodb.status metricset to to ECS. {pull}10368[10368]
 
 *Packetbeat*
 
@@ -168,6 +174,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add system module. {pull}9546[9546]
 - Add `user.id` (UID) and `user.name` for ECS. {pull}10195[10195]
 - Add `group.id` (GID) and `group.name` for ECS. {pull}10195[10195]
+- System module `process` dataset: Add user information to processes. {pull}9963[9963]
+- Add system `package` dataset. {pull}10225[10225]
 
 *Filebeat*
 
@@ -186,6 +194,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Teach elasticsearch/audit fileset to parse out some more fields. {issue}10134[10134] {pull}10137[10137]
 - Add convert_timezone to nginx module. {issue}9839[9839] {pull}10148[10148]
 - Add support for Percona in the `slowlog` fileset of `mysql` module. {issue}6665[6665] {pull}10227[10227]
+- Added support for ingesting structured Elasticsearch audit logs {pull}10352[10352]
 
 *Heartbeat*
 

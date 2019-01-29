@@ -170,7 +170,7 @@ func WriteEventToDataJSON(t testing.TB, fullEvent beat.Event, postfixPath string
 		t.Fatal(err)
 	}
 
-	if stat, err := os.Stat(postfixPath); err == nil && stat.IsDir() {
+	if stat, err := os.Stat(postfixPath); postfixPath == "" || (err == nil && stat.IsDir()) {
 		p = path.Join(p, postfixPath, "_meta", "data.json")
 	} else {
 		p = postfixPath
