@@ -136,6 +136,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 *Auditbeat*
 
 - Add system module. {pull}9546[9546]
+- Add system `package` dataset. {pull}10225[10225]
 
 *Filebeat*
 
