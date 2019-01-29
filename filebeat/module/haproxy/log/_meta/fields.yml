@@ -14,7 +14,6 @@
     - name: captured_headers
       description: >
         List of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
-      # Do we need text?
       type: text
 
     - name: status_code
@@ -33,12 +32,10 @@
     - name: captured_headers
       description: >
         List of headers captured in the request due to the presence of the "capture request header" statement in the frontend.
-      # Do we need text? does this even have be be indexed?
       type: text
 
     - name: raw_request_line
       description: Complete HTTP request line, including the method, request and HTTP version string.
-      # keyword? sounds like a .original field but none is matching
       type: text
 
     - name: time_wait_without_data_ms
