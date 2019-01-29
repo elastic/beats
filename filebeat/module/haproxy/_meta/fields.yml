@@ -60,7 +60,7 @@
           description: Condition the session was in when the session ended.
 
         - name: mode
-          type: text
+          type: keyword
           description: mode that the frontend is operating (TCP or HTTP)
 
         - name: connections
