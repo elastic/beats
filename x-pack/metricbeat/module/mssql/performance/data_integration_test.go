@@ -18,6 +18,7 @@ import (
 
 func TestData(t *testing.T) {
 	t.Skip("Skipping `data.json` generation test")
+
 	_, config, err := getHostURI()
 	if err != nil {
 		t.Fatal("error getting config information", err.Error())

@@ -370,15 +370,11 @@ func (dns *dnsPlugin) publishTransaction(t *dnsTransaction) {
 	pbf.SetDestination(&t.dst)
 	pbf.Network.Transport = t.transport.String()
 	pbf.Network.Protocol = "dns"
+	pbf.Error.Message = t.notes
 
 	fields := evt.Fields
 	fields["type"] = "dns"
 	fields["status"] = common.ERROR_STATUS
-	if len(t.notes) == 1 {
-		fields.Put("error.message", t.notes[0])
-	} else if len(t.notes) > 1 {
-		fields.Put("error.message", t.notes)
-	}
 
 	dnsEvent := common.MapStr{}
 	fields["dns"] = dnsEvent

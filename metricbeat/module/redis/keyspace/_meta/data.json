@@ -1,21 +1,27 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "event": {
+        "dataset": "redis.keyspace",
+        "duration": 115000,
+        "module": "redis"
+    },
     "metricset": {
-        "host": "redis:6379",
-        "module": "redis",
-        "name": "keyspace",
-        "rtt": 115
+        "name": "keyspace"
     },
     "redis": {
         "keyspace": {
-            "avg_ttl": 0,
+            "avg_ttl": 359459,
             "expires": 0,
             "id": "db0",
             "keys": 1
         }
+    },
+    "service": {
+        "address": "127.0.0.1:6379",
+        "type": "redis"
     }
 }

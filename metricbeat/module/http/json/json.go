@@ -130,7 +130,9 @@ func (m *MetricSet) processBody(response *http.Response, jsonBody interface{}) c
 			"request": common.MapStr{
 				"headers": m.getHeaders(response.Request.Header),
 				"method":  response.Request.Method,
-				"body":    m.body,
+				"body": common.MapStr{
+					"content": m.body,
+				},
 			},
 		}
 	}

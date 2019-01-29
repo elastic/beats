@@ -21,6 +21,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename `process.exe` to `process.executable` in add_process_metadata to align with ECS. {pull}9949[9949]
 - Import ECS change https://github.com/elastic/ecs/pull/308[ecs#308]:
   leaf field `user.group` is now the `group` field set. {pull}10275[10275]
+- Docker and Kubernetes labels/annotations will be "dedoted" by default. {pull}10338[10338]
 
 *Auditbeat*
 - Rename `process.exe` to `process.executable` in auditd module to align with ECS. {pull}9949[9949]
@@ -76,6 +77,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add checks on valid field names and more strict mapping to munin module. {pull}10322[10322]
 - Refactor Prometheus metric mappings {pull}9948[9948]
 - Removed Prometheus stats metricset in favor of just using Prometheus collector {pull}9948[9948]
+- Adjust Redis.info metricset fields to ECS. {pull}10319[10319]
+- Change type of field docker.container.ip_addresses to `ip` instead of `keyword. {pull}10364[10364]
+- Rename http.request.body field to http.request.body.content. {pull}10315[10315]
+- Adjust php_fpm.process metricset fields to ECS. {pull}10366[10366]
+- Adjust mongodb.status metricset to to ECS. {pull}10368[10368]
 
 *Packetbeat*
 
@@ -90,6 +96,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 - Correctly normalize Cloudformation resource name. {issue}10087[10087]
+- Functionbeat can now deploy a function for Kinesis. {10116}10116[10116]
 
 ==== Bugfixes
 
@@ -99,8 +106,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix config appender registration. {pull}9873[9873]
 - Gracefully handle TLS options when enrolling a Beat. {issue}9129[9129]
 - The backing off now implements jitter to better distribute the load. {issue}10172[10172]
+- Fix TLS certificate DoS vulnerability. {pull}10302[10302]
+- Fix panic and file unlock in spool on atomic operation (arm, x86-32). File lock was not released when panic occurs, leading to the beat deadlocking on startup. {pull}10289[10289]
 
 *Auditbeat*
+
+- Enable System module config on Windows. {pull}10237[10237]
 
 *Filebeat*
 
@@ -119,6 +130,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
+- Do not stop collecting events when journal entries change. {pull}9994[9994]
+
 *Metricbeat*
 
 - Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
@@ -128,6 +141,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed data type for tags field in `docker/image` metricset {pull}10307[10307]
 - Fixed data type for isr field in `kafka/partition` metricset {pull}10307[10307]
 - Fixed data types for various hosts fields in `mongodb/replstatus` metricset {pull}10307[10307]
+- Added function to close sql database connection. {pull}10355[10355]
 
 *Packetbeat*
 
@@ -138,6 +152,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 - Ensure that functionbeat is logging at info level not debug. {issue}10262[10262]
+- Add the required permissions to the role when deployment SQS functions. {issue}9152[9152]
 
 ==== Added
 
@@ -158,6 +173,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add system module. {pull}9546[9546]
 - Add `user.id` (UID) and `user.name` for ECS. {pull}10195[10195]
 - Add `group.id` (GID) and `group.name` for ECS. {pull}10195[10195]
+- System module `process` dataset: Add user information to processes. {pull}9963[9963]
+- Add system `package` dataset. {pull}10225[10225]
 
 *Filebeat*
 
@@ -220,6 +237,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release use of xpack.enabled: true flag in Elasticsearch and Kibana modules as GA. {pull}10222[10222]
 - Add support for MySQL 8.0 and tests also for Percona and MariaDB. {pull}10261[10261]
 - Rename 'db' Metricset to 'transaction_log' in MSSQL Metricbeat module {pull}10109[10109]
+- Added 'server' Metricset to Zookeeper Metricbeat module {issue}8938[8938] {pull}10341[10341]
+- Release AWS module as GA. {pull}10345[10345]
 
 *Packetbeat*
 

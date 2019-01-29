@@ -52,7 +52,7 @@ var (
 			"bytes": c.Int("mem"),
 		},
 		"cores":             c.Int("cores"),
-		"cpu":               c.Int("cpu"),
+		"cpu":               c.Float("cpu"),
 		"total_connections": c.Int("total_connections"),
 		"remotes":           c.Int("remotes"),
 		"in": s.Object{
@@ -195,6 +195,24 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 				"varz":   httpStats["varz_uri"],
 			},
 		},
+	}
+	cpu, err := event.GetValue("cpu")
+	if err != nil {
+		err = errors.Wrap(err, "failure retrieving cpu key")
+		r.Error(err)
+		return err
+	}
+	cpuUtil, ok := cpu.(float64)
+	if !ok {
+		err = errors.Wrap(err, "failure casting cpu to float64")
+		r.Error(err)
+		return err
+	}
+	_, err = event.Put("cpu", cpuUtil/100.0)
+	if err != nil {
+		err = errors.Wrap(err, "failure updating cpu key")
+		r.Error(err)
+		return err
 	}
 	moduleMetrics, err := moduleSchema.Apply(inInterface)
 	if err != nil {
