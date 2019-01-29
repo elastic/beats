@@ -183,7 +183,6 @@
       description: The version number of the event's definition.
 
     - name: xml
-      type: keyword
       type: text
       required: false
       description: >
