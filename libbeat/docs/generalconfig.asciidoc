@@ -29,7 +29,7 @@ tags: ["service-X", "web-tier"]
 ==== `name`
 
 The name of the Beat. If this option is empty, the `hostname` of the server is
-used. The name is included as the `beat.name` field in each published transaction. You can
+used. The name is included as the `agent.name` field in each published transaction. You can
 use the name to group all transactions sent by a single Beat.
 
 Example:
