@@ -18905,9 +18905,7 @@ The number of requests the process has served
 *`php_fpm.process.request_duration`*::
 +
 --
-type: alias
-
-alias to: event.duration
+type: integer
 
 The duration in microseconds (1 million in a second) of the current request (my own definition)
 

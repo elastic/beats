@@ -77,15 +77,13 @@ func eventsMapping(r mb.ReporterV2, content []byte) {
 				"url": common.MapStr{
 					"original": process.RequestURI,
 				},
-				"event": common.MapStr{
-					"duration": process.RequestDuration * 1000,
-				},
 			},
 			MetricSetFields: common.MapStr{
 				"state":               process.State,
 				"start_time":          process.StartTime,
 				"start_since":         process.StartSince,
 				"requests":            process.Requests,
+				"request_duration":    process.RequestDuration,
 				"script":              process.Script,
 				"last_request_cpu":    process.LastRequestCPU,
 				"last_request_memory": process.LastRequestMemory,

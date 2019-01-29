@@ -1213,16 +1213,6 @@
   alias: true
   beat: metricbeat
 
-- from: php_fpm.status.request_duration
-  to: event.duration
-  alias: true
-  beat: metricbeat
-
-- from: php_fpm.status.request_duration
-  to: event.duration
-  alias: true
-  beat: metricbeat
-
 - from: php_fpm.status.request_method
   to: http.request.method
   alias: true

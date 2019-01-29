@@ -28,9 +28,7 @@
     description: >
       The number of requests the process has served
   - name: request_duration
-    type: alias
-    path: event.duration
-    migration: true
+    type: integer
     description: >
       The duration in microseconds (1 million in a second) of the current request (my own definition)
   - name: request_method

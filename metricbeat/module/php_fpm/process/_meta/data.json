@@ -28,16 +28,17 @@
         },
         "process": {
             "last_request_cpu": 0,
-            "last_request_memory": 0,
+            "last_request_memory": 2097152,
+            "request_duration": 204,
             "requests": 6,
             "script": "-",
-            "start_since": 600,
-            "start_time": 1548749474,
-            "state": "Running"
+            "start_since": 128,
+            "start_time": 1548769887,
+            "state": "Idle"
         }
     },
     "process": {
-        "pid": 27
+        "pid": 17
     },
     "service": {
         "address": "127.0.0.1:81",
