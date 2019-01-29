@@ -38,7 +38,8 @@ type EventAPIResponse struct {
 
 // EventResponse is the indiviual response for each event request.
 type EventResponse struct {
-	Success bool `json:"success"`
+	Success bool   `json:"success"`
+	Reason  string `json:"reason"`
 }
 
 // AuthClienter is the interface exposed by the auth client and is useful for testing without calling
@@ -99,9 +100,9 @@ func (c *AuthClient) SendEvents(requests []EventRequest) error {
 	// We could add logic later to retry them, currently if sending error fails it's probably because
 	// Kibana is not answering and the next fetch will probably fails.
 	var errors multierror.Errors
-	for i, response := range resp.Response {
+	for _, response := range resp.Response {
 		if !response.Success {
-			errors = append(errors, fmt.Errorf("error sending event %+v", requests[i]))
+			errors = append(errors, fmt.Errorf("error sending event %+v", response.Reason))
 		}
 	}
 
