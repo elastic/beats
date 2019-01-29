@@ -1240,6 +1240,11 @@
   alias: true
   beat: metricbeat
 
+- from: system.process.pgid
+  to: process.pgid
+  alias: true
+  beat: metricbeat
+
 - from: system.process.username
   to: user.name
   alias: true
