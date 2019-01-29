@@ -12898,7 +12898,7 @@ The number of requests
 *`traefik.access.frontend_name`*::
 +
 --
-type: text
+type: keyword
 
 The name of the frontend used
 
@@ -12908,7 +12908,7 @@ The name of the frontend used
 *`traefik.access.backend_url`*::
 +
 --
-type: text
+type: keyword
 
 The url of the backend where request is forwarded
 

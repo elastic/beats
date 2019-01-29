@@ -58,6 +58,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   including `http.response.elapsed_time` (ECS). {pull}10188[10188], {pull}10274[10274]
 - Rename multiple fields to `http.response.body.bytes`, from modules "apache", "iis",
   "kibana", "nginx" and "traefik", including `http.response.content_length` (ECS). {pull}10188[10188]
+- Change type of field backend_url and frontend_name in traefik.access metricset to type keyword. {pull}10401[10401]
 - Ingesting Elasticsearch audit logs is only supported with Elasticsearch 6.5.0 and above {pull}10352[10352]
 - Migrate Elasticsearch audit logs fields to ECS {pull}10352[10352]
 
