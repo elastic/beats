@@ -4940,7 +4940,7 @@ Search type
 *`elasticsearch.slowlog.source_query`*::
 +
 --
-type: text
+type: keyword
 
 example: {"query":{"match_all":{"boost":1.0}}}
 

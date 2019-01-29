@@ -22,7 +22,7 @@
   - name: source_query
     description: "Slow query"
     example: "{\"query\":{\"match_all\":{\"boost\":1.0}}}"
-    type: text
+    type: keyword
   - name: extra_source
     description: "Extra source information"
     example: ""
