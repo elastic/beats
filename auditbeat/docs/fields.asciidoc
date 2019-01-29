@@ -6368,7 +6368,6 @@ The operating system's kernel version.
 --
 
 [float]
-<<<<<<< HEAD
 == package fields
 
 `package` contains information about an installed or removed package.
@@ -6464,8 +6463,6 @@ Package URL.
 --
 
 [float]
-=======
->>>>>>> Config and docs.
 == user fields
 
 `user` contains information about the users on a system.

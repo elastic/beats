@@ -51,6 +51,7 @@ sample suggested configuration.
 - module: system
   datasets:
     - host
+    - login
     - package
     - process
     - socket
@@ -163,3 +164,4 @@ include::system/process.asciidoc[]
 include::system/socket.asciidoc[]
 
 include::system/user.asciidoc[]
+
