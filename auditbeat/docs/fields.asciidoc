@@ -2671,6 +2671,72 @@ The object's SELinux level.
 
 --
 
+[float]
+== user fields
+
+User information.
+
+
+[float]
+== effective fields
+
+Effective user information.
+
+
+*`user.effective.id`*::
++
+--
+type: keyword
+
+Effective user ID.
+
+--
+
+[float]
+== group fields
+
+Effective group information.
+
+
+*`user.effective.group.id`*::
++
+--
+type: keyword
+
+Effective group ID.
+
+--
+
+[float]
+== saved fields
+
+Saved user information.
+
+
+*`user.saved.id`*::
++
+--
+type: keyword
+
+Saved user ID.
+
+--
+
+[float]
+== group fields
+
+Saved group information.
+
+
+*`user.saved.group.id`*::
++
+--
+type: keyword
+
+Saved group ID.
+
+--
+
 [[exported-fields-docker-processor]]
 == Docker fields
 

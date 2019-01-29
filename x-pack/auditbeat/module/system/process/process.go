@@ -7,7 +7,7 @@ package process
 import (
 	"fmt"
 	"os"
-	"runtime"
+	"os/user"
 	"strconv"
 	"time"
 
@@ -19,7 +19,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/libbeat/metric/system/process"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/auditbeat/cache"
 	"github.com/elastic/go-sysinfo"
@@ -84,8 +83,11 @@ type MetricSet struct {
 
 // Process represents information about a process.
 type Process struct {
-	Info  types.ProcessInfo
-	Error error
+	Info     types.ProcessInfo
+	UserInfo *types.UserInfo
+	User     *user.User
+	Group    *user.Group
+	Error    error
 }
 
 // Hash creates a hash for Process.
@@ -273,11 +275,40 @@ func processEvent(process *Process, eventType string, action eventAction) mb.Eve
 		},
 	}
 
+	if process.UserInfo != nil {
+		putIfNotEmpty(&event.RootFields, "user.id", process.UserInfo.UID)
+		putIfNotEmpty(&event.RootFields, "user.group.id", process.UserInfo.GID)
+
+		putIfNotEmpty(&event.RootFields, "user.effective.id", process.UserInfo.EUID)
+		putIfNotEmpty(&event.RootFields, "user.effective.group.id", process.UserInfo.EGID)
+
+		putIfNotEmpty(&event.RootFields, "user.saved.id", process.UserInfo.SUID)
+		putIfNotEmpty(&event.RootFields, "user.saved.group.id", process.UserInfo.SGID)
+	}
+
+	if process.User != nil {
+		if process.User.Username != "" {
+			event.RootFields.Put("user.name", process.User.Username)
+		} else if process.User.Name != "" {
+			event.RootFields.Put("user.name", process.User.Name)
+		}
+	}
+
+	if process.Group != nil {
+		event.RootFields.Put("user.group.name", process.Group.Name)
+	}
+
 	if process.Error != nil {
 		event.RootFields.Put("error.message", process.Error.Error())
 	}
 
 	return event
+}
+
+func putIfNotEmpty(mapstr *common.MapStr, key string, value string) {
+	if value != "" {
+		mapstr.Put(key, value)
+	}
 }
 
 func processMessage(process *Process, action eventAction) string {
@@ -295,8 +326,13 @@ func processMessage(process *Process, action eventAction) string {
 		actionString = "is RUNNING"
 	}
 
-	return fmt.Sprintf("Process %v (PID: %d) %v",
-		process.Info.Name, process.Info.PID, actionString)
+	var userString string
+	if process.User != nil {
+		userString = fmt.Sprintf(" by user %v", process.User.Username)
+	}
+
+	return fmt.Sprintf("Process %v (PID: %d)%v %v",
+		process.Info.Name, process.Info.PID, userString, actionString)
 }
 
 func convertToCacheable(processes []*Process) []cache.Cacheable {
@@ -310,82 +346,66 @@ func convertToCacheable(processes []*Process) []cache.Cacheable {
 }
 
 func (ms *MetricSet) getProcesses() ([]*Process, error) {
-	// TODO: Implement Processes() in go-sysinfo
-	// e.g. https://github.com/elastic/go-sysinfo/blob/master/providers/darwin/process_darwin_amd64.go#L41
-	pids, err := process.Pids()
+	var processes []*Process
+
+	sysinfoProcs, err := sysinfo.Processes()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to fetch the list of PIDs")
+		return nil, errors.Wrap(err, "failed to fetch processes")
 	}
 
-	var processes []*Process
-	for _, pid := range pids {
+	for _, sysinfoProc := range sysinfoProcs {
 		var process *Process
 
-		sysinfoProc, err := sysinfo.Process(pid)
+		pInfo, err := sysinfoProc.Info()
 		if err != nil {
 			if os.IsNotExist(err) {
-				// Skip - process probably just terminated since our call
-				// to Pids()
+				// Skip - process probably just terminated since our call to Processes().
 				continue
 			}
 
-			if runtime.GOOS == "windows" && (pid == 0 || os.IsPermission(err)) {
-				// On Windows, the call to Process() can fail if Auditbeat does not have
-				// the necessary access rights, while trying to open the System Process (PID: 0)
-				// will always fail.
+			if os.Geteuid() != 0 && os.IsPermission(err) {
+				// Running as non-root, permission issues when trying to access
+				// other user's private process information are expected.
+
+				if !ms.suppressPermissionWarnings {
+					ms.log.Warnf("Failed to load process information for PID %d as non-root user. "+
+						"Will suppress further errors of this kind. Error: %v", sysinfoProc.PID(), err)
+
+					// Only warn once at the start of Auditbeat.
+					ms.suppressPermissionWarnings = true
+				}
+
 				continue
 			}
 
 			// Record what we can and continue
 			process = &Process{
-				Info: types.ProcessInfo{
-					PID: pid,
-				},
-				Error: errors.Wrapf(err, "failed to load process with PID %d", pid),
+				Info:  pInfo,
+				Error: errors.Wrapf(err, "failed to load process information for PID %d", sysinfoProc.PID()),
+			}
+			process.Info.PID = sysinfoProc.PID() // in case pInfo did not contain it
+		} else {
+			process = &Process{
+				Info: pInfo,
+			}
+		}
+
+		userInfo, err := sysinfoProc.User()
+		if err != nil {
+			if process.Error == nil {
+				process.Error = errors.Wrapf(err, "failed to load user for PID %d", sysinfoProc.PID())
 			}
 		} else {
-			pInfo, err := sysinfoProc.Info()
+			process.UserInfo = &userInfo
+
+			goUser, err := user.LookupId(userInfo.UID)
 			if err == nil {
-				process = &Process{
-					Info: pInfo,
-				}
-			} else {
-				if os.IsNotExist(err) {
-					// Skip - process probably just terminated since our call
-					// to Pids()
-					continue
-				}
+				process.User = goUser
+			}
 
-				if os.Geteuid() != 0 {
-					if os.IsPermission(err) || runtime.GOOS == "darwin" {
-						/*
-							Running as non-root, permission issues when trying to access other user's private
-							process information are expected.
-
-							Unfortunately, for darwin os.IsPermission() does not
-							work because it is a custom error created using errors.New() in
-							getProcTaskAllInfo() in go-sysinfo/providers/darwin/process_darwin_amd64.go
-
-							TODO: Fix go-sysinfo to have better error for darwin.
-						*/
-						if !ms.suppressPermissionWarnings {
-							ms.log.Warnf("Failed to load process information for PID %d as non-root user. "+
-								"Will suppress further errors of this kind. Error: %v", pid, err)
-
-							// Only warn once at the start of Auditbeat.
-							ms.suppressPermissionWarnings = true
-						}
-
-						//continue
-					}
-				}
-
-				// Record what we can and continue
-				process = &Process{
-					Info:  pInfo,
-					Error: errors.Wrapf(err, "failed to load process information for PID %d", pid),
-				}
-				process.Info.PID = pid // in case pInfo did not contain it
+			group, err := user.LookupGroupId(userInfo.GID)
+			if err == nil {
+				process.Group = group
 			}
 		}
 
