@@ -3911,6 +3911,17 @@ elasticsearch Module
 
 
 
+*`elasticsearch.node.id`*::
++
+--
+type: keyword
+
+example: DSiWcTyeThWtUXLB9J0BMw
+
+ID of the node
+
+--
+
 *`elasticsearch.node.name`*::
 +
 --
@@ -3972,7 +3983,7 @@ The layer from which this event originated: rest, transport or ip_filter
 
 --
 
-*`elasticsearch.audit.origin_type`*::
+*`elasticsearch.audit.origin.type`*::
 +
 --
 type: keyword
@@ -3983,7 +3994,7 @@ Where the request originated: rest (request originated from a REST API request),
 
 --
 
-*`elasticsearch.audit.realm`*::
+*`elasticsearch.audit.user.realm`*::
 +
 --
 type: keyword
@@ -3992,7 +4003,7 @@ The authentication realm
 
 --
 
-*`elasticsearch.audit.roles`*::
+*`elasticsearch.audit.user.roles`*::
 +
 --
 type: keyword
@@ -4025,7 +4036,7 @@ Indices accessed by action
 
 --
 
-*`elasticsearch.audit.request`*::
+*`elasticsearch.audit.request.name`*::
 +
 --
 type: keyword
@@ -4033,6 +4044,15 @@ type: keyword
 example: ClearScrollRequest
 
 The type of request that was executed
+
+--
+
+*`elasticsearch.audit.request_body`*::
++
+--
+type: alias
+
+alias to: http.request.body.content
 
 --
 
@@ -4060,15 +4080,6 @@ alias to: source.ip
 type: alias
 
 alias to: url.original
-
---
-
-*`elasticsearch.audit.request_body`*::
-+
---
-type: alias
-
-alias to: http.request.body.content
 
 --
 

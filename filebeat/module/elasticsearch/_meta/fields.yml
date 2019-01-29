@@ -7,6 +7,10 @@
       type: group
       description: >
       fields:
+        - name: node.id
+          description: "ID of the node"
+          example: "DSiWcTyeThWtUXLB9J0BMw"
+          type: keyword
         - name: node.name
           description: "Name of the node"
           example: "vWNJsZ3"
