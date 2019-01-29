@@ -78,6 +78,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adjust Redis.info metricset fields to ECS. {pull}10319[10319]
 - Change type of field docker.container.ip_addresses to `ip` instead of `keyword. {pull}10364[10364]
 - Rename http.request.body field to http.request.body.content. {pull}10315[10315]
+- Adjust mongodb.status metricset to to ECS. {pull}10368[10368]
 
 *Packetbeat*
 

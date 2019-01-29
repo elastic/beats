@@ -15421,7 +15421,9 @@ MongoDB server status metrics.
 *`mongodb.status.version`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 Instance version.
 
@@ -15431,7 +15433,9 @@ Instance version.
 *`mongodb.status.process`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: process.name
 
 The current MongoDB process. Possible values are mongos or mongod.
 
