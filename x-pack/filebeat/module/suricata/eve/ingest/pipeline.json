@@ -85,10 +85,9 @@
             }
         },
         {
-            "convert": {
+            "rename": {
                 "field": "suricata.eve.http.http_refer",
                 "target_field": "http.request.referrer",
-                "type": "string",
                 "ignore_missing": true
             }
         },
@@ -298,7 +297,6 @@
                     "suricata.eve.flow.end",
                     "suricata.eve.flow.start",
                     "suricata.eve.http.http_method",
-                    "suricata.eve.http.http_refer",
                     "suricata.eve.proto",
                     "suricata.eve.timestamp"
                 ],
