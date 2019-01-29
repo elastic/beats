@@ -30,7 +30,7 @@ class Test(AuditbeatXPackTest):
         """
 
         fields = ["event.origin", "event.outcome", "message", "process.pid", "source.ip",
-                  "user.id", "user.name", "user.terminal"]
+                  "user.name", "user.terminal"]
 
         config = {
             "login.wtmp_file_pattern": os.path.abspath(os.path.join(self.beat_path, "tests/files/wtmp")),
