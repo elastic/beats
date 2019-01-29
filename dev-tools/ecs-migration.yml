@@ -1206,6 +1206,18 @@
 
 ## Modules
 
+### Mongodb
+
+- from: mongodb.status.version
+  to: service.version
+  alias: true
+  beat: metricbeat
+
+- from: mongodb.status.process
+  to: process.name
+  alias: true
+  beat: metricbeat
+
 ### Redis
 
 - from: redis.info.server.version
