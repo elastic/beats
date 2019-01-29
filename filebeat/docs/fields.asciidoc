@@ -2915,16 +2915,6 @@ Process parent id.
 
 --
 
-*`process.pgid`*::
-+
---
-type: long
-
-Process group id.
-
-
---
-
 *`process.args`*::
 +
 --

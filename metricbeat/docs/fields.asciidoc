@@ -1976,6 +1976,16 @@ The name of the metricset that generated the event.
 
 --
 
+*`process.pgid`*::
++
+--
+type: long
+
+Process group id.
+
+
+--
+
 *`service.address`*::
 +
 --
@@ -5747,16 +5757,6 @@ Sometimes called program name or similar.
 type: long
 
 Process parent id.
-
-
---
-
-*`process.pgid`*::
-+
---
-type: long
-
-Process group id.
 
 
 --
