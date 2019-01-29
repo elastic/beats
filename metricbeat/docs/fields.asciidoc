@@ -1587,7 +1587,7 @@ osd node id
 *`ceph.osd_df.name`*::
 +
 --
-type: text
+type: keyword
 
 osd node name
 
@@ -1682,7 +1682,7 @@ osd or bucket node id
 *`ceph.osd_tree.name`*::
 +
 --
-type: text
+type: keyword
 
 osd or bucket node name
 
@@ -1712,7 +1712,7 @@ osd or bucket node typeID
 *`ceph.osd_tree.children`*::
 +
 --
-type: text
+type: keyword
 
 bucket children list, separated by comma.
 
@@ -10779,7 +10779,7 @@ consumer offset into partition being read
 *`kafka.consumergroup.meta`*::
 +
 --
-type: text
+type: keyword
 
 custom consumer meta data string
 
@@ -11028,7 +11028,7 @@ Kibana instance UUID
 *`kibana.stats.name`*::
 +
 --
-type: text
+type: keyword
 
 Kibana instance name
 
@@ -14736,7 +14736,7 @@ type: boolean
 *`mongodb.metrics.replication.executor.network_interface`*::
 +
 --
-type: text
+type: keyword
 
 --
 
@@ -18967,7 +18967,7 @@ The user (PHP_AUTH_USER) (or - if not set) (for the current request)
 *`php_fpm.process.script`*::
 +
 --
-type: text
+type: keyword
 
 The main script called (or - if not set) (for the current request)
 

@@ -384,7 +384,7 @@
             - name: shutting_down
               type: boolean
             - name: network_interface
-              type: text
+              type: keyword
         - name: apply
           type: group
           description: >
