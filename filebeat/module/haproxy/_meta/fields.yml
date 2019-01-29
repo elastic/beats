@@ -50,12 +50,9 @@
 
         - name: error_message
           description: Error message logged by HAProxy in case of error.
-          # Text needed?
-          # Should it map to ECS?
           type: text
 
         - name: source
-          # What kind of source is this?
           type: keyword
           description: The HAProxy source of the log
 
