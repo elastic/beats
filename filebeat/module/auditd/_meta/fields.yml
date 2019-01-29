@@ -1,15 +1,3 @@
-- key: auditd
-  title: "Auditd"
-  description: >
-    Module for parsing auditd logs.
-  short_config: true
-  fields:
-    - name: auditd
-      type: group
-      description: >
-        Fields from the auditd logs.
-      fields:
-
 - key: user
   title: "User"
   description: >
@@ -126,3 +114,15 @@
           type: keyword
           description: >
                 Name of the group.
+
+- key: auditd
+  title: "Auditd"
+  description: >
+    Module for parsing auditd logs.
+  short_config: true
+  fields:
+    - name: auditd
+      type: group
+      description: >
+        Fields from the auditd logs.
+      fields:
