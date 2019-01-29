@@ -10,7 +10,7 @@ filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("reg
 {% if ilm %}
 setup.ilm:
   enabled: {{ ilm.enabled | default("auto") }}
-  name: libbeat-test-default-policy
+  policy_name: libbeat-test-default-policy
   {% if ilm.pattern %}
   pattern: {{ ilm.pattern }}
   {% endif %}

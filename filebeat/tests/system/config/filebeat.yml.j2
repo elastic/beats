@@ -108,7 +108,7 @@ filebeat.config.{{ reload_type|default("inputs") }}:
 {% if ilm %}
 setup.ilm:
   enabled: {{ ilm.enabled | default("auto") }}
-  name: libbeat-test-default-policy
+  policy_name: libbeat-test-default-policy
   {% if ilm.pattern %}
   pattern: {{ ilm.pattern }}
   {% endif %}

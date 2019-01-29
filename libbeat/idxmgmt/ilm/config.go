@@ -30,10 +30,10 @@ import (
 // Config is used for unpacking a common.Config.
 type Config struct {
 	Mode          Mode                     `config:"enabled"`
-	Name          fmtstr.EventFormatString `config:"name"`
+	PolicyName    fmtstr.EventFormatString `config:"policy_name"`
+	PolicyFile    string                   `config:"policy_file"`
 	RolloverAlias string                   `config:"rollover_alias"`
 	Pattern       string                   `config:"pattern"`
-	PolicyFile    string                   `config:"policy_file"`
 
 	// CheckExists can disable the check for an existing policy. Check required
 	// read_ilm privileges.  If check is disabled the policy will only be
@@ -115,7 +115,7 @@ func defaultConfig(info beat.Info) Config {
 
 	return Config{
 		Mode:          ModeAuto,
-		Name:          *nameFmt,
+		PolicyName:    *nameFmt,
 		RolloverAlias: name,
 		Pattern:       ilmDefaultPattern,
 		PolicyFile:    "",

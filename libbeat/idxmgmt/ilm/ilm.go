@@ -92,7 +92,7 @@ func DefaultSupport(log *logp.Logger, info beat.Info, config *common.Config) (Su
 		return NoopSupport(info, config)
 	}
 
-	name, err := applyStaticFmtstr(info, &cfg.Name)
+	name, err := applyStaticFmtstr(info, &cfg.PolicyName)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read ilm policy name")
 	}

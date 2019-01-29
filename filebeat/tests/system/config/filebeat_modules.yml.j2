@@ -19,7 +19,7 @@ setup.dashboards.directory: {{ kibana_path }}
 {% if ilm %}
 setup.ilm:
   enabled: {{ ilm.enabled | default("auto") }}
-  name: libbeat-test-default-policy
+  policy_name: libbeat-test-default-policy
   {% if ilm.pattern %}
   pattern: {{ ilm.pattern }}
   {% endif %}
