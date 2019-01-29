@@ -323,7 +323,6 @@ func (c *connection) ToMapStr() (fields common.MapStr, metricSetFields common.Ma
 	}
 
 	if c.ProcessError != nil {
-		// XXX, would this be the proper place for a process error code?
 		fields.Put("error.code", c.ProcessError.Error())
 	} else {
 		process := common.MapStr{"pid": c.PID}
