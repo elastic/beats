@@ -47,6 +47,9 @@
         "elasticsearch.audit.origin_type": "local_node",
         "elasticsearch.audit.principal": "_xpack_security",
         "elasticsearch.audit.request": "ClearRealmCacheRequest",
+        "elasticsearch.audit.roles": [
+            "superuser"
+        ],
         "elasticsearch.audit.user_realm": "__attach",
         "elasticsearch.node.id": "DSiWcTyeThWtUXLB9J0BMw",
         "event.dataset": "elasticsearch.audit",
@@ -68,6 +71,9 @@
         "elasticsearch.audit.origin_type": "local_node",
         "elasticsearch.audit.principal": "_xpack_security",
         "elasticsearch.audit.request": "Node",
+        "elasticsearch.audit.roles": [
+            "superuser"
+        ],
         "elasticsearch.audit.user_realm": "__attach",
         "elasticsearch.node.id": "DSiWcTyeThWtUXLB9J0BMw",
         "event.dataset": "elasticsearch.audit",
@@ -89,6 +95,9 @@
         "elasticsearch.audit.origin_type": "rest",
         "elasticsearch.audit.principal": "elastic",
         "elasticsearch.audit.request": "ChangePasswordRequest",
+        "elasticsearch.audit.roles": [
+            "superuser"
+        ],
         "elasticsearch.audit.user_realm": "reserved",
         "elasticsearch.node.id": "DSiWcTyeThWtUXLB9J0BMw",
         "event.dataset": "elasticsearch.audit",
@@ -113,6 +122,9 @@
         "elasticsearch.audit.origin_type": "local_node",
         "elasticsearch.audit.principal": "_xpack_security",
         "elasticsearch.audit.request": "CreateIndexRequest",
+        "elasticsearch.audit.roles": [
+            "superuser"
+        ],
         "elasticsearch.audit.user_realm": "__attach",
         "elasticsearch.node.id": "DSiWcTyeThWtUXLB9J0BMw",
         "event.dataset": "elasticsearch.audit",
@@ -121,6 +133,30 @@
         "input.type": "log",
         "message": "{\"@timestamp\":\"2018-10-31T09:35:12,314\", \"node.id\":\"DSiWcTyeThWtUXLB9J0BMw\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"user.name\":\"_xpack_security\", \"user.realm\":\"__attach\", \"user.roles\":[\"superuser\"], \"origin.type\":\"local_node\", \"origin.address\":\"127.0.0.1:9300\", \"action\":\"indices:admin/create\", \"request.name\":\"CreateIndexRequest\", \"indices\":[\".security-6\"]}",
         "offset": 1676,
+        "prospector.type": "log",
+        "service.name": "elasticsearch"
+    },
+    {
+        "@timestamp": "2019-01-27T20:15:10.380Z",
+        "elasticsearch.audit.event_type": "authentication_success",
+        "elasticsearch.audit.layer": "rest",
+        "elasticsearch.audit.origin_address": "::1",
+        "elasticsearch.audit.origin_port": 58955,
+        "elasticsearch.audit.origin_type": "rest",
+        "elasticsearch.audit.principal": "elastic-admin",
+        "elasticsearch.audit.realm": "default_file",
+        "elasticsearch.audit.request_body": "\n{\n    \"query\" : {\n        \"term\" : { \"user\" : \"kimchy\" }\n    }\n}\n",
+        "elasticsearch.audit.request_id": "WzL_kb6VSvOhAq0twPvHOQ",
+        "elasticsearch.audit.request_method": "GET",
+        "elasticsearch.audit.uri": "/_search",
+        "elasticsearch.node.id": "y8fa3M5zSSGo1M_KJRMUXw",
+        "elasticsearch.node.name": "node-0",
+        "event.dataset": "elasticsearch.audit",
+        "fileset.module": "elasticsearch",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "message": "{\"@timestamp\":\"2019-01-27T20:15:10,380\", \"node.name\":\"node-0\", \"node.id\":\"y8fa3M5zSSGo1M_KJRMUXw\", \"event.type\":\"rest\", \"event.action\":\"authentication_success\", \"user.name\":\"elastic-admin\", \"origin.type\":\"rest\", \"origin.address\":\"[::1]:58955\", \"realm\":\"default_file\", \"url.path\":\"/_search\", \"request.method\":\"GET\", \"request.body\":\"\\n{\\n    \\\"query\\\" : {\\n        \\\"term\\\" : { \\\"user\\\" : \\\"kimchy\\\" }\\n    }\\n}\\n\", \"request.id\":\"WzL_kb6VSvOhAq0twPvHOQ\"}",
+        "offset": 2056,
         "prospector.type": "log",
         "service.name": "elasticsearch"
     }

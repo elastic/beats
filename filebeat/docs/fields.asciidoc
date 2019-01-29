@@ -1138,6 +1138,17 @@ The REST endpoint URI
 
 --
 
+*`elasticsearch.audit.uri_params`*::
++
+--
+type: text
+
+example: {username=jacknich2}
+
+REST URI parameters
+
+--
+
 *`elasticsearch.audit.indices`*::
 +
 --
@@ -1146,6 +1157,28 @@ type: keyword
 example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
 
 Indices accessed by action
+
+--
+
+*`elasticsearch.audit.request_id`*::
++
+--
+type: keyword
+
+example: WzL_kb6VSvOhAq0twPvHOQ
+
+Unique ID of request
+
+--
+
+*`elasticsearch.audit.request_method`*::
++
+--
+type: keyword
+
+example: GET
+
+Method of HTTP request
 
 --
 

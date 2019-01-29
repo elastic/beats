@@ -82,6 +82,45 @@
         },
         {
             "dot_expander": {
+                "field": "request.method",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "if": "ctx.elasticsearch.audit?.request?.method != null",
+                "field": "elasticsearch.audit.request.method",
+                "target_field": "elasticsearch.audit.request_method"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "request.id",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "if": "ctx.elasticsearch.audit?.request?.id != null",
+                "field": "elasticsearch.audit.request.id",
+                "target_field": "elasticsearch.audit.request_id"
+            }
+        },
+        {
+            "dot_expander": {
+                "field": "request.body",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "if": "ctx.elasticsearch.audit?.request?.body != null",
+                "field": "elasticsearch.audit.request.body",
+                "target_field": "elasticsearch.audit.request_body"
+            }
+        },
+        {
+            "dot_expander": {
                 "field": "request.name",
                 "path": "elasticsearch.audit"
             }
@@ -171,6 +210,13 @@
             "dot_expander": {
                 "field": "user.roles",
                 "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "if": "ctx.elasticsearch.audit?.user?.roles != null",
+                "field": "elasticsearch.audit.user.roles",
+                "target_field": "elasticsearch.audit.roles"
             }
         },
         {

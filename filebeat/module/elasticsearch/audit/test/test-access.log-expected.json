@@ -150,5 +150,25 @@
         "offset": 1210,
         "prospector.type": "log",
         "service.name": "elasticsearch"
+    },
+    {
+        "@timestamp": "2019-01-27T20:04:27.244Z",
+        "elasticsearch.audit.event_type": "authentication_success",
+        "elasticsearch.audit.layer": "rest",
+        "elasticsearch.audit.origin_address": "::1",
+        "elasticsearch.audit.principal": "elastic-admin",
+        "elasticsearch.audit.realm": "default_file",
+        "elasticsearch.audit.request_body": "{\"metadata\":{\"intelligence\":7},\"full_name\":\"Jack Nicholson\",\"roles\":[\"admin\",\"other_role1\"",
+        "elasticsearch.audit.uri": "/_xpack/security/user/jacknich2",
+        "elasticsearch.audit.uri_params": "{username=jacknich2}",
+        "elasticsearch.node.name": "node-0",
+        "event.dataset": "elasticsearch.audit",
+        "fileset.module": "elasticsearch",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "message": "[2019-01-27T20:04:27,244] [node-0] [rest] [authentication_success]    origin_address=[::1], principal=[elastic-admin], realm=[default_file], uri=[/_xpack/security/user/jacknich2], params=[{username=jacknich2}], request_body=[{\"metadata\":{\"intelligence\":7},\"full_name\":\"Jack Nicholson\",\"roles\":[\"admin\",\"other_role1\"],\"email\":\"jacknich@example.com\"}]",
+        "offset": 1626,
+        "prospector.type": "log",
+        "service.name": "elasticsearch"
     }
 ]
