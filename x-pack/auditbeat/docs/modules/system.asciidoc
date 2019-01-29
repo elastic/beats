@@ -51,6 +51,7 @@ sample suggested configuration.
 - module: system
   datasets:
     - host
+    - package
     - process
     - socket
     - user
@@ -86,6 +87,7 @@ so a longer polling interval can be used.
 - module: system
   datasets:
     - host
+    - package
     - user
   period: 1m
   user.detect_password_changes: true
@@ -111,6 +113,7 @@ auditbeat.modules:
 - module: system
   datasets:
     - host    # General host information, e.g. uptime, IPs
+    - package # Installed, updated, and removed packages
     - process # Started and stopped processes
     - socket  # Opened and closed sockets
     - user    # User information
@@ -133,6 +136,8 @@ The following datasets are available:
 
 * <<{beatname_lc}-dataset-system-host,host>>
 
+* <<{beatname_lc}-dataset-system-package,package>>
+
 * <<{beatname_lc}-dataset-system-process,process>>
 
 * <<{beatname_lc}-dataset-system-socket,socket>>
@@ -140,6 +145,8 @@ The following datasets are available:
 * <<{beatname_lc}-dataset-system-user,user>>
 
 include::system/host.asciidoc[]
+
+include::system/package.asciidoc[]
 
 include::system/process.asciidoc[]
 

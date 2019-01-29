@@ -1,0 +1,41 @@
+- name: package
+  type: group
+  description: >
+    `package` contains information about an installed or removed package.
+  release: experimental
+  fields:
+  - name: name
+    type: keyword
+    description: >
+      Package name.
+  - name: version
+    type: keyword
+    description: >
+      Package version.
+  - name: release
+    type: keyword
+    description: >
+      Package release.
+  - name: arch
+    type: keyword
+    description: >
+      Package architecture.
+  - name: license
+    type: keyword
+    description: >
+      Package license.
+  - name: installtime
+    type: date
+    description: >
+      Package install time.
+  - name: size
+    type: long
+    description: >
+      Package size.
+  - name: summary
+    description: >
+      Package summary.
+  - name: url
+    type: keyword
+    description: >
+      Package URL.

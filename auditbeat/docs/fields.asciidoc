@@ -3895,6 +3895,101 @@ The operating system's kernel version.
 --
 
 [float]
+== package fields
+
+`package` contains information about an installed or removed package.
+
+
+
+*`system.audit.package.name`*::
++
+--
+type: keyword
+
+Package name.
+
+
+--
+
+*`system.audit.package.version`*::
++
+--
+type: keyword
+
+Package version.
+
+
+--
+
+*`system.audit.package.release`*::
++
+--
+type: keyword
+
+Package release.
+
+
+--
+
+*`system.audit.package.arch`*::
++
+--
+type: keyword
+
+Package architecture.
+
+
+--
+
+*`system.audit.package.license`*::
++
+--
+type: keyword
+
+Package license.
+
+
+--
+
+*`system.audit.package.installtime`*::
++
+--
+type: date
+
+Package install time.
+
+
+--
+
+*`system.audit.package.size`*::
++
+--
+type: long
+
+Package size.
+
+
+--
+
+*`system.audit.package.summary`*::
++
+--
+Package summary.
+
+
+--
+
+*`system.audit.package.url`*::
++
+--
+type: keyword
+
+Package URL.
+
+
+--
+
+[float]
 == user fields
 
 `user` contains information about the users on a system.

@@ -112,6 +112,7 @@ auditbeat.modules:
 - module: system
   datasets:
     - host    # General host information, e.g. uptime, IPs
+    - package # Installed, updated, and removed packages
     - process # Started and stopped processes
     - socket  # Opened and closed sockets
     - user    # User information
@@ -123,6 +124,7 @@ auditbeat.modules:
 
   # The state.period can be overridden for any dataset.
   # host.state.period: 12h
+  # package.state.period: 12h
   # process.state.period: 12h
   # socket.state.period: 12h
   # user.state.period: 12h
