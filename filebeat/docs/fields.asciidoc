@@ -1160,6 +1160,28 @@ Indices accessed by action
 
 --
 
+*`elasticsearch.audit.request_id`*::
++
+--
+type: keyword
+
+example: WzL_kb6VSvOhAq0twPvHOQ
+
+Unique ID of request
+
+--
+
+*`elasticsearch.audit.request_method`*::
++
+--
+type: keyword
+
+example: GET
+
+Method of HTTP request
+
+--
+
 *`elasticsearch.audit.request`*::
 +
 --
