@@ -4694,7 +4694,7 @@ Condition the session was in when the session ended.
 *`haproxy.mode`*::
 +
 --
-type: text
+type: keyword
 
 mode that the frontend is operating (TCP or HTTP)
 
@@ -4901,7 +4901,7 @@ Optional "name=value" entry indicating that the client had this cookie in the re
 *`haproxy.http.response.captured_headers`*::
 +
 --
-type: text
+type: keyword
 
 List of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
 
@@ -4934,7 +4934,7 @@ Optional "name=value" entry indicating that the server has returned a cookie wit
 *`haproxy.http.request.captured_headers`*::
 +
 --
-type: text
+type: keyword
 
 List of headers captured in the request due to the presence of the "capture request header" statement in the frontend.
 
@@ -4944,7 +4944,7 @@ List of headers captured in the request due to the presence of the "capture requ
 *`haproxy.http.request.raw_request_line`*::
 +
 --
-type: text
+type: keyword
 
 Complete HTTP request line, including the method, request and HTTP version string.
 
