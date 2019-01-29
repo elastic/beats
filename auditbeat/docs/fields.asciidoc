@@ -3022,6 +3022,33 @@ Short name or login of the user.
 --
 
 [float]
+== group fields
+
+The group fields are meant to represent groups that are relevant to the event.
+
+
+
+*`user.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
+
+[float]
 == file fields
 
 File attributes.
