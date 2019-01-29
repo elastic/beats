@@ -41,7 +41,7 @@ func TestFetch(t *testing.T) {
 	}
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-		events[0].BeatEvent("haproxy", "info").Fields.StringToPrint())
+		events[0].BeatEvent("php_fpm", "process").Fields.StringToPrint())
 
 }
 

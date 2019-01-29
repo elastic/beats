@@ -76,6 +76,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Removed Prometheus stats metricset in favor of just using Prometheus collector {pull}9948[9948]
 - Adjust Redis.info metricset fields to ECS. {pull}10319[10319]
 - Rename http.request.body field to http.request.body.content. {pull}10315[10315]
+- Adjust php_fpm.process metricset fields to ECS. {pull}10366[10366]
 
 *Packetbeat*
 

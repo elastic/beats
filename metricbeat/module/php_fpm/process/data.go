@@ -19,6 +19,7 @@ package process
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/elastic/beats/metricbeat/mb"
 
@@ -59,7 +60,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) {
 			RootFields: common.MapStr{
 				"http": common.MapStr{
 					"request": common.MapStr{
-						"method": process.RequestMethod,
+						"method": strings.ToLower(process.RequestMethod),
 					},
 					"response": common.MapStr{
 						"body": common.MapStr{
@@ -76,13 +77,15 @@ func eventsMapping(r mb.ReporterV2, content []byte) {
 				"url": common.MapStr{
 					"original": process.RequestURI,
 				},
+				"event": common.MapStr{
+					"duration": process.RequestDuration * 1000,
+				},
 			},
 			MetricSetFields: common.MapStr{
 				"state":               process.State,
 				"start_time":          process.StartTime,
 				"start_since":         process.StartSince,
 				"requests":            process.Requests,
-				"request_duration":    process.RequestDuration,
 				"script":              process.Script,
 				"last_request_cpu":    process.LastRequestCPU,
 				"last_request_memory": process.LastRequestMemory,

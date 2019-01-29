@@ -11,7 +11,7 @@
     },
     "http": {
         "request": {
-            "method": "GET"
+            "method": "get"
         },
         "response": {
             "body": {
@@ -29,11 +29,10 @@
         "process": {
             "last_request_cpu": 0,
             "last_request_memory": 0,
-            "request_duration": 231,
             "requests": 6,
             "script": "-",
-            "start_since": 492,
-            "start_time": 1548678234,
+            "start_since": 600,
+            "start_time": 1548749474,
             "state": "Running"
         }
     },
