@@ -4918,11 +4918,11 @@ Types
 *`elasticsearch.slowlog.stats`*::
 +
 --
-type: text
+type: keyword
 
-example: 
+example: group1
 
-Statistics
+Stats groups
 
 --
 

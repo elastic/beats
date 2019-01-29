@@ -12,9 +12,9 @@
     example: ""
     type: keyword
   - name: stats
-    description: "Statistics"
-    example: ""
-    type: text
+    description: "Stats groups"
+    example: "group1"
+    type: keyword
   - name: search_type
     description: "Search type"
     example: "QUERY_THEN_FETCH"
