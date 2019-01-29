@@ -3,10 +3,6 @@
   description: >
     slowlog
   fields:
-    - name: message
-      type: text
-      description: >
-        Contains the un-parsed log message
     - name: module
       type: keyword
       description: >

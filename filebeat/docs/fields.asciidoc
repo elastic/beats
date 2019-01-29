@@ -6462,16 +6462,6 @@ slowlog
 
 
 
-*`logstash.slowlog.message`*::
-+
---
-type: text
-
-Contains the un-parsed log message
-
-
---
-
 *`logstash.slowlog.module`*::
 +
 --
