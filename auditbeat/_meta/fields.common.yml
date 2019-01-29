@@ -49,3 +49,38 @@
         type: keyword
         example: s0
         description: The object's SELinux level.
+
+  - name: user
+    type: group
+    description: User information.
+    fields:
+
+    - name: effective
+      type: group
+      description: Effective user information.
+      fields:
+      - name: id
+        type: keyword
+        description: Effective user ID.
+      - name: group
+        type: group
+        description: Effective group information.
+        fields:
+        - name: id
+          type: keyword
+          description: Effective group ID.
+
+    - name: saved
+      type: group
+      description: Saved user information.
+      fields:
+      - name: id
+        type: keyword
+        description: Saved user ID.
+      - name: group
+        type: group
+        description: Saved group information.
+        fields:
+        - name: id
+          type: keyword
+          description: Saved group ID.

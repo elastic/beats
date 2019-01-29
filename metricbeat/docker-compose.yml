@@ -15,6 +15,7 @@ services:
       - ./module/apache/_meta/env
       - ./module/ceph/_meta/env
       - ./module/couchbase/_meta/env
+      - ./module/couchdb/_meta/env
       - ./module/dropwizard/_meta/env
       - ./module/elasticsearch/_meta/env
       - ./module/envoyproxy/_meta/env
@@ -58,6 +59,9 @@ services:
 
   couchbase:
     build: ./module/couchbase/_meta
+
+  couchdb:
+    build: ./module/couchdb/_meta
 
   dropwizard:
     build: ./module/dropwizard/_meta

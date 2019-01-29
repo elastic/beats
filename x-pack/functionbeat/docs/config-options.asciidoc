@@ -78,6 +78,7 @@ are:
 
 `cloudwatch_logs`:: Collects events from CloudWatch logs.
 `sqs`:: Collects data from Amazon Simple Queue Service (SQS).
+`kinesis`:: Collects data from a Kinesis stream.
 
 [float]
 [id="{beatname_lc}-description"]
@@ -125,3 +126,17 @@ default is 128 MiB.
 
 The dead letter queue to use for messages that can't be processed successfully.
 Set this option to an ARN that points to an SQS queue.
+
+[float]
+[id="{beatname_lc}-batch-size"]
+==== `batch_size`
+
+The number of events to read from a Kinesis stream, the minimal values is 100 and the maximun is
+10000. The default is 100.
+
+[float]
+[id="{beatname_lc}-starting-position"]
+==== `starting_position`
+
+The starting position to read from a Kinesis stream, valids values are `trim_horizon` and `latest`.
+The default is trim_horizon.
