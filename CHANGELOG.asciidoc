@@ -121,6 +121,7 @@ https://github.com/elastic/beats/compare/v6.5.4...6.6[View commits]
 *Functionbeat*
 
 - The CLI will now log CloudFormation Stack events. {issue}8912[8912]
+- Correctly normalize Cloudformation resource name. {issue}10087[10087]
 
 ==== Bugfixes
 
@@ -133,11 +134,20 @@ https://github.com/elastic/beats/compare/v6.5.4...6.6[View commits]
 - Update Golang to 1.10.6. {pull}9563[9563]
 - Update Kibana index pattern attributes for objects that are disabled. {pull}9644[9644]
 - Enforce validation for the Central Management access token. {issue}9621[9621]
+- Fix registry handle leak on Windows (https://github.com/elastic/go-sysinfo/pull/33). {pull}9920[9920]
+- Gracefully handle TLS options when enrolling a Beat. {issue}9129[9129]
+- Allow to unenroll a Beat from the UI. {issue}9452[9452]
+- The backing off now implements jitter to better distribute the load. {issue}10172[10172]
+- Fix config appender registration. {pull}9873[9873]
+- Fix TLS certificate DoS vulnerability. {pull}10304[10304]
 
 *Filebeat*
+
 - Fix improperly set config for CRI Flag in Docker Input {pull}8899[8899]
 - Just enabling the `elasticsearch` fileset and starting Filebeat no longer causes an error. {pull}8891[8891]
 - Fix macOS default log path for elasticsearch module based on homebrew paths. {pul}8939[8939]
+- Support IPv6 addresses with zone id in IIS ingest pipeline. {issue}9836[9836] error log: {pull}9869[9869] access log: {pull}10030[10030]
+- Support haproxy log lines without captured headers. {issue}9463[9463] {pull}9958[9958]
 
 *Heartbeat*
 
@@ -148,10 +158,14 @@ https://github.com/elastic/beats/compare/v6.5.4...6.6[View commits]
 - Add missing namespace field in http server metricset {pull}7890[7890]
 - Fix issue with not collecting Elasticsearch cross-cluster replication stats correctly. {pull}9179[9179]
 - The `node.name` field in the `elasticsearch/node` metricset now correctly reports the Elasticsarch node name. Previously this field was incorrectly reporting the node ID instead. {pull}9209[9209]
+- Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
+- Fix pod UID metadata enrichment in Kubernetes module. {pull}10081[10081]
+
 
 *Packetbeat*
 
 - Fix issue with process monitor associating traffic to the wrong process. {issue}9151[9151] {pull}9443[9443]
+- Fix DHCPv4 dashboard that wouldn't load in Kibana. {issue}9850[9850]
 
 
 ==== Added
@@ -164,6 +178,7 @@ https://github.com/elastic/beats/compare/v6.5.4...6.6[View commits]
 - Add cache.ttl to add_host_metadata. {pull}9359[9359]
 - Add support for index lifecycle management (beta). {pull}7963[7963]
 - Always include Pod UID as part of Pod metadata. {pull]9517[9517]
+- Release Jolokia autodiscover as GA. {pull}9706[9706]
 
 *Auditbeat*
 

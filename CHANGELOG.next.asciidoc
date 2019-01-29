@@ -28,25 +28,14 @@ https://github.com/elastic/beats/compare/1035569addc4a3b29ffa14f8a08c27c1ace16ef
 
 *Functionbeat*
 
-- Correctly normalize Cloudformation resource name. {issue}10087[10087]
-
 ==== Bugfixes
 
 *Affecting all Beats*
-
-- Fix registry handle leak on Windows (https://github.com/elastic/go-sysinfo/pull/33). {pull}9920[9920]
-- Gracefully handle TLS options when enrolling a Beat. {issue}9129[9129]
-- Allow to unenroll a Beat from the UI. {issue}9452[9452]
-- The backing off now implements jitter to better distribute the load. {issue}10172[10172]
-- Fix config appender registration. {pull}9873[9873]
-- Fix TLS certificate DoS vulnerability. {pull}10304[10304]
 
 *Auditbeat*
 
 *Filebeat*
 
-- Support IPv6 addresses with zone id in IIS ingest pipeline. {issue}9836[9836] error log: {pull}9869[9869] access log: {pull}10030[10030]
-- Support haproxy log lines without captured headers. {issue}9463[9463] {pull}9958[9958]
 - Fix bad bytes count in `docker` input when filtering by stream. {pull}10211[10211]
 
 *Heartbeat*
@@ -55,12 +44,7 @@ https://github.com/elastic/beats/compare/1035569addc4a3b29ffa14f8a08c27c1ace16ef
 
 *Metricbeat*
 
-- Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
-- Fix pod UID metadata enrichment in Kubernetes module. {pull}10081[10081]
-
 *Packetbeat*
-
-- Fix DHCPv4 dashboard that wouldn't load in Kibana. {issue}9850[9850]
 
 *Winlogbeat*
 
@@ -71,8 +55,6 @@ https://github.com/elastic/beats/compare/1035569addc4a3b29ffa14f8a08c27c1ace16ef
 ==== Added
 
 *Affecting all Beats*
-
-- Release Jolokia autodiscover as GA. {pull}9706[9706]
 
 *Auditbeat*
 
