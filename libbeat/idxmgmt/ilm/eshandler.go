@@ -19,6 +19,7 @@ package ilm
 
 import (
 	"encoding/json"
+	"path"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -32,7 +33,17 @@ var (
 	esMinDefaultILMVesion = common.MustNewVersion("7.0.0")
 )
 
-// ESClientHandler creates a new APIHandler executing ilm, and alias queries
+const (
+	// esFeaturesPath is used to query Elasticsearch for availability of licensed
+	// features.
+	esFeaturesPath = "/_xpack"
+
+	esILMPath = "/_ilm/policy"
+
+	esAliasPath = "/_alias"
+)
+
+// ESClientHandler creates a new APIHandler executing ILM, and alias queries
 // against Elasticsearch.
 func ESClientHandler(client ESClient) APIHandler {
 	if client == nil {
@@ -61,7 +72,9 @@ func (h *esClientHandler) ILMEnabled(mode Mode) (bool, error) {
 	avail, probe := h.checkILMVersion(mode)
 	if !avail {
 		if mode == ModeEnabled {
-			return false, h.raiseVersionNotSupported()
+			ver := h.client.GetVersion()
+			return false, errf(ErrESVersionNotSupported,
+				"Elasticsearch %v does not support ILM", ver.String())
 		}
 		return false, nil
 	}
@@ -72,7 +85,7 @@ func (h *esClientHandler) ILMEnabled(mode Mode) (bool, error) {
 		return false, nil
 	}
 
-	avail, enbaled, err := h.requILMSupport()
+	avail, enabled, err := h.checkILMSupport()
 	if err != nil {
 		return false, err
 	}
@@ -84,20 +97,22 @@ func (h *esClientHandler) ILMEnabled(mode Mode) (bool, error) {
 		return false, nil
 	}
 
-	if !enbaled && mode == ModeEnabled {
+	if !enabled && mode == ModeEnabled {
 		return false, errOf(ErrESILMDisabled)
 	}
-	return enbaled, nil
+	return enabled, nil
 }
 
 func (h *esClientHandler) CreateILMPolicy(name string, policy common.MapStr) error {
-	_, _, err := h.client.Request("PUT", "/_ilm/policy/"+name, "", nil, policy)
+	path := path.Join(esILMPath, name)
+	_, _, err := h.client.Request("PUT", path, "", nil, policy)
 	return err
 }
 
 func (h *esClientHandler) HasILMPolicy(name string) (bool, error) {
 	// XXX: HEAD method does currently not work for checking if a policy exists
-	status, b, err := h.client.Request("GET", "/_ilm/policy/"+name, "", nil, nil)
+	path := path.Join(esILMPath, name)
+	status, b, err := h.client.Request("GET", path, "", nil, nil)
 	if err != nil && status != 404 {
 		return false, wrapErrf(err, ErrRequestFailed,
 			"failed to check for policy name '%v': (status=%v) %s", name, status, b)
@@ -106,7 +121,8 @@ func (h *esClientHandler) HasILMPolicy(name string) (bool, error) {
 }
 
 func (h *esClientHandler) HasAlias(name string) (bool, error) {
-	status, b, err := h.client.Request("HEAD", "/_alias/"+name, "", nil, nil)
+	path := path.Join(esAliasPath, name)
+	status, b, err := h.client.Request("HEAD", path, "", nil, nil)
 	if err != nil && status != 404 {
 		return false, wrapErrf(err, ErrRequestFailed,
 			"failed to check for alias '%v': (status=%v) %s", name, status, b)
@@ -123,6 +139,7 @@ func (h *esClientHandler) CreateAlias(name, firstIndex string) error {
 		},
 	}
 
+	// Note: actual aliases are accessible via the index
 	status, res, err := h.client.Request("PUT", "/"+firstIndex, "", nil, body)
 	if status == 400 {
 		return errOf(ErrAliasAlreadyExists)
@@ -131,12 +148,6 @@ func (h *esClientHandler) CreateAlias(name, firstIndex string) error {
 	}
 
 	return nil
-}
-
-func (h *esClientHandler) raiseVersionNotSupported() error {
-	ver := h.client.GetVersion()
-	return errf(ErrESVersionNotSupported,
-		"Elasticsearch %v does not support ILM", ver.String())
 }
 
 func (h *esClientHandler) checkILMVersion(mode Mode) (avail, probe bool) {
@@ -150,17 +161,7 @@ func (h *esClientHandler) checkILMVersion(mode Mode) (avail, probe bool) {
 	return avail, probe
 }
 
-func (h *esClientHandler) requILMSupport() (avail, enbaled bool, err error) {
-	code, body, err := h.client.Request("GET", "/_xpack", "", nil, nil)
-
-	// If we get a 400, it's assumed to be the OSS version of Elasticsearch
-	if code == 400 {
-		return false, false, nil
-	}
-	if err != nil {
-		return false, false, wrapErr(err, ErrILMCheckRequestFailed)
-	}
-
+func (h *esClientHandler) checkILMSupport() (avail, enbaled bool, err error) {
 	var response struct {
 		Features struct {
 			ILM struct {
@@ -169,14 +170,32 @@ func (h *esClientHandler) requILMSupport() (avail, enbaled bool, err error) {
 			} `json:"ilm"`
 		} `json:"features"`
 	}
-	err = json.Unmarshal(body, &response)
+	status, err := h.queryFeatures(&response)
+	if status == 400 {
+		// If we get a 400, it's assumed to be the OSS version of Elasticsearch
+		return false, false, nil
+	}
 	if err != nil {
-		return false, false, wrapErrf(err, ErrInvalidResponse, "failed to parse JSON response")
+		return false, false, wrapErr(err, ErrILMCheckRequestFailed)
 	}
 
 	avail = response.Features.ILM.Available
 	enbaled = response.Features.ILM.Enabled
 	return avail, enbaled, nil
+}
+
+func (h *esClientHandler) queryFeatures(to interface{}) (int, error) {
+	status, body, err := h.client.Request("GET", esFeaturesPath, "", nil, nil)
+	if status >= 400 || err != nil {
+		return status, err
+	}
+
+	if to != nil {
+		if err := json.Unmarshal(body, to); err != nil {
+			return status, wrapErrf(err, ErrInvalidResponse, "failed to parse JSON response")
+		}
+	}
+	return status, nil
 }
 
 func (h *esClientHandler) access() ESClient {

@@ -704,7 +704,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 }
 
 // registerESIndexManagement registers the loading of the template and ILM
-// policy as a callback with the elasticsearch output. It is important the the
+// policy as a callback with the elasticsearch output. It is important the
 // registration happens before the publisher is created.
 func (b *Beat) registerESIndexManagement() error {
 	if b.Config.Output.Name() != "elasticsearch" {

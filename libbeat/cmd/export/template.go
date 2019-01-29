@@ -100,7 +100,7 @@ func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersi
 
 	genTemplateConfigCmd.Flags().String("es.version", beatVersion, "Elasticsearch version")
 	genTemplateConfigCmd.Flags().String("index", idxPrefix, "Base index name")
-	genTemplateConfigCmd.Flags().Bool("noilm", false, "Generate template with ilm disabled")
+	genTemplateConfigCmd.Flags().Bool("noilm", false, "Generate template with ILM disabled")
 
 	return genTemplateConfigCmd
 }

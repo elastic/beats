@@ -33,7 +33,6 @@ func GenGetILMPolicyCmd(settings instance.Settings, name, idxPrefix, version str
 		Use:   "ilm-policy",
 		Short: "Export ILM policy",
 		Run: func(cmd *cobra.Command, args []string) {
-
 			b, err := instance.NewBeat(name, idxPrefix, version)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
@@ -52,7 +51,7 @@ func GenGetILMPolicyCmd(settings instance.Settings, name, idxPrefix, version str
 
 			ilm, err := ilmFactory(nil, b.Info, b.RawConfig)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error initializing ilm support: %s\n", err)
+				fmt.Fprintf(os.Stderr, "Error initializing ILM support: %s\n", err)
 			}
 
 			fmt.Println(ilm.Policy().StringToPrint())
