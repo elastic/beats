@@ -4951,7 +4951,7 @@ Slow query
 *`elasticsearch.slowlog.extra_source`*::
 +
 --
-type: text
+type: keyword
 
 example: 
 
