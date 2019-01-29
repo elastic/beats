@@ -6485,10 +6485,17 @@ Information about the running thread where the log originate.
 *`logstash.slowlog.event`*::
 +
 --
-type: text
+type: keyword
 
 Raw dump of the original event
 
+
+*`logstash.slowlog.event.text`*::
++
+--
+type: text
+
+--
 
 --
 
@@ -6525,10 +6532,17 @@ Execution time for the plugin in milliseconds.
 *`logstash.slowlog.plugin_params`*::
 +
 --
-type: text
+type: keyword
 
 String value of the plugin configuration
 
+
+*`logstash.slowlog.plugin_params.text`*::
++
+--
+type: text
+
+--
 
 --
 
