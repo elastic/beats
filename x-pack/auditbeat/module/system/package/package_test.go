@@ -2,27 +2,35 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package packages
+// +build !windows
+
+package pkg
 
 import (
 	"testing"
 
+	"github.com/elastic/beats/auditbeat/core"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	t.Skip("Packages metricset is disabled")
-
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err := mbtest.WriteEventsReporterV2(f, t, "")
-	if err != nil {
-		t.Fatal("write", err)
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("received error: %+v", errs[0])
 	}
+
+	if len(events) == 0 {
+		t.Fatal("no events were generated")
+	}
+
+	fullEvent := mbtest.StandardizeEvent(f, events[len(events)-1], core.AddDatasetToEvent)
+	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "system",
-		"metricsets": []string{"packages"},
+		"module":   "system",
+		"datasets": []string{"package"},
 	}
 }
