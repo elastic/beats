@@ -6420,10 +6420,17 @@ The module or class where the event originate.
 *`logstash.log.thread`*::
 +
 --
-type: text
+type: keyword
 
 Information about the running thread where the log originate.
 
+
+*`logstash.log.thread.text`*::
++
+--
+type: text
+
+--
 
 --
 
@@ -6475,10 +6482,17 @@ The module or class where the event originate.
 *`logstash.slowlog.thread`*::
 +
 --
-type: text
+type: keyword
 
 Information about the running thread where the log originate.
 
+
+*`logstash.slowlog.thread.text`*::
++
+--
+type: text
+
+--
 
 --
 

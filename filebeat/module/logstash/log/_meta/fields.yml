@@ -9,9 +9,12 @@
       description: >
         The module or class where the event originate.
     - name: thread
-      type: text
+      type: keyword
       description: >
         Information about the running thread where the log originate.
+      multi_fields:
+        - name: text
+          type: text
     - name: log_event
       type: object
       description: >
