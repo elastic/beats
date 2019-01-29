@@ -8,34 +8,30 @@
             }
         },
         {
-            "convert": {
+            "rename": {
                 "field": "suricata.eve.src_ip",
                 "target_field": "source.ip",
-                "type": "string",
                 "ignore_missing": true
             }
         },
         {
-            "convert": {
+            "rename": {
                 "field": "suricata.eve.src_port",
                 "target_field": "source.port",
-                "type": "integer",
                 "ignore_missing": true
             }
         },
         {
-            "convert": {
+            "rename": {
                 "field": "suricata.eve.dest_ip",
                 "target_field": "destination.ip",
-                "type": "string",
                 "ignore_missing": true
             }
         },
         {
-            "convert": {
+            "rename": {
                 "field": "suricata.eve.dest_port",
                 "target_field": "destination.port",
-                "type": "integer",
                 "ignore_missing": true
             }
         },
@@ -47,19 +43,24 @@
             }
         },
         {
-            "convert": {
+            "rename": {
                 "field": "suricata.eve.http.status",
                 "target_field": "http.response.status_code",
-                "type": "integer",
                 "ignore_missing": true
             }
         },
         {
-            "convert": {
+            "rename": {
                 "field": "suricata.eve.http.hostname",
-                "target_field": "url.domain",
-                "type": "string",
+                "target_field": "destination.domain",
                 "ignore_missing": true
+            }
+        },
+        {
+            "set": {
+                "field": "url.domain",
+                "value": "{{destination.domain}}",
+                "if": "ctx?.destination?.domain != null"
             }
         },
         {
@@ -78,14 +79,6 @@
         },
         {
             "convert": {
-                "field": "suricata.eve.http.hostname",
-                "target_field": "destination.domain",
-                "type": "string",
-                "ignore_missing": true
-            }
-        },
-        {
-            "convert": {
                 "field": "suricata.eve.http.http_refer",
                 "target_field": "http.request.referrer",
                 "type": "string",
@@ -93,34 +86,23 @@
             }
         },
         {
-            "convert": {
+            "rename": {
                 "field": "suricata.eve.http.length",
                 "target_field": "http.response.body.bytes",
-                "type": "integer",
                 "ignore_missing": true
             }
         },
         {
-            "convert": {
+            "rename": {
                 "field": "suricata.eve.fileinfo.filename",
                 "target_field": "file.path",
-                "type": "string",
                 "ignore_missing": true
             }
         },
         {
-            "convert": {
+            "rename": {
                 "field": "suricata.eve.fileinfo.size",
                 "target_field": "file.size",
-                "type": "integer",
-                "ignore_missing": true
-            }
-        },
-        {
-            "convert": {
-                "field": "suricata.eve.http.http_user_agent",
-                "target_field": "user_agent_original",
-                "type": "string",
                 "ignore_missing": true
             }
         },
@@ -149,50 +131,44 @@
             }
         },
         {
-            "convert": {
+            "rename": {
                 "field": "suricata.eve.alert.action",
                 "target_field": "event.outcome",
-                "type": "string",
                 "ignore_missing": true
             }
         },
         {
-            "convert": {
+            "rename": {
                 "field": "suricata.eve.alert.severity",
                 "target_field": "event.severity",
-                "type": "integer",
                 "ignore_missing": true
             }
         },
         {
-            "convert": {
+            "rename": {
                 "field": "suricata.eve.flow.pkts_toclient",
                 "target_field": "destination.packets",
-                "type": "integer",
                 "ignore_missing": true
             }
         },
         {
-            "convert": {
+            "rename": {
                 "field": "suricata.eve.flow.pkts_toserver",
                 "target_field": "source.packets",
-                "type": "integer",
                 "ignore_missing": true
             }
         },
         {
-            "convert": {
+            "rename": {
                 "field": "suricata.eve.flow.bytes_toclient",
                 "target_field": "destination.bytes",
-                "type": "integer",
                 "ignore_missing": true
             }
         },
         {
-            "convert": {
+            "rename": {
                 "field": "suricata.eve.flow.bytes_toserver",
                 "target_field": "source.bytes",
-                "type": "integer",
                 "ignore_missing": true
             }
         },
@@ -240,13 +216,13 @@
         },
         {
             "user_agent": {
-                "field": "user_agent_original",
+                "field": "suricata.eve.http.http_user_agent",
                 "ignore_missing": true
             }
         },
         {
             "rename": {
-                "field": "user_agent_original",
+                "field": "suricata.eve.http.http_user_agent",
                 "target_field": "user_agent.original",
                 "ignore_missing": true
             }
@@ -310,29 +286,13 @@
         {
             "remove": {
                 "field": [
-                    "suricata.eve.alert.action",
-                    "suricata.eve.alert.severity",
                     "suricata.eve.app_proto",
-                    "suricata.eve.dest_ip",
-                    "suricata.eve.dest_port",
                     "suricata.eve.event_type",
-                    "suricata.eve.fileinfo.filename",
-                    "suricata.eve.fileinfo.size",
                     "suricata.eve.flow.end",
                     "suricata.eve.flow.start",
-                    "suricata.eve.flow.bytes_toclient",
-                    "suricata.eve.flow.bytes_toserver",
-                    "suricata.eve.flow.pkts_toclient",
-                    "suricata.eve.flow.pkts_toserver",
-                    "suricata.eve.http.hostname",
                     "suricata.eve.http.http_method",
                     "suricata.eve.http.http_refer",
-                    "suricata.eve.http.http_user_agent",
-                    "suricata.eve.http.length",
-                    "suricata.eve.http.status",
                     "suricata.eve.proto",
-                    "suricata.eve.src_ip",
-                    "suricata.eve.src_port",
                     "suricata.eve.timestamp"
                 ],
                 "ignore_missing": true
