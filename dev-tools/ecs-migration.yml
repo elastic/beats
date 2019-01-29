@@ -266,6 +266,11 @@
   alias: true
   beat: filebeat
 
+- from: suricata.eve.http.url
+  to: url.original
+  alias: true
+  beat: filebeat
+
 - from: suricata.eve.proto
   to: network.transport
   alias: true

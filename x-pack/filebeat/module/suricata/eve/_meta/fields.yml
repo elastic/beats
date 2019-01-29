@@ -159,7 +159,8 @@
         path: http.request.referrer
 
       - name: url
-        type: keyword
+        type: alias
+        path: url.original
 
       - name: hostname
         type: alias

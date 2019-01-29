@@ -11034,7 +11034,9 @@ alias to: http.request.referrer
 *`suricata.eve.http.url`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: url.original
 
 --
 

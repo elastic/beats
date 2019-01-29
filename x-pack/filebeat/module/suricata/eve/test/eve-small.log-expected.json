@@ -91,13 +91,13 @@
         "suricata.eve.flow_id": 2115002772430095,
         "suricata.eve.http.http_content_type": "text/xml",
         "suricata.eve.http.protocol": "HTTP/1.1",
-        "suricata.eve.http.url": "/dd.xml",
         "suricata.eve.in_iface": "en0",
         "suricata.eve.tx_id": 0,
         "tags": [
             "suricata"
         ],
         "url.domain": "192.168.86.28",
+        "url.original": "/dd.xml",
         "url.path": "/dd.xml",
         "user_agent.device": "Other",
         "user_agent.major": "67",
@@ -143,12 +143,12 @@
         "suricata.eve.flow_id": 2211411903323127,
         "suricata.eve.http.http_content_type": "application/xml",
         "suricata.eve.http.protocol": "HTTP/1.1",
-        "suricata.eve.http.url": "/ssdp/device-desc.xml",
         "suricata.eve.in_iface": "en0",
         "tags": [
             "suricata"
         ],
         "url.domain": "192.168.86.28",
+        "url.original": "/ssdp/device-desc.xml",
         "url.path": "/ssdp/device-desc.xml",
         "user_agent.device": "Other",
         "user_agent.major": "67",

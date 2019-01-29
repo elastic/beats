@@ -78,6 +78,13 @@
             }
         },
         {
+            "rename": {
+                "field": "suricata.eve.http.url",
+                "target_field": "url.original",
+                "ignore_missing": true
+            }
+        },
+        {
             "convert": {
                 "field": "suricata.eve.http.http_refer",
                 "target_field": "http.request.referrer",
