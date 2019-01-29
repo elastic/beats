@@ -23409,10 +23409,9 @@ alias to: user.name
 *`system.process.cwd`*::
 +
 --
-type: keyword
+type: alias
 
-The current working directory of the process. This field is only available on Linux.
-
+alias to: process.working_directory
 
 --
 

@@ -35,10 +35,9 @@
       path: user.name
       migration: true
     - name: cwd
-      type: keyword
-      description: >
-        The current working directory of the process. This field is only
-        available on Linux.
+      type: alias
+      path: process.working_directory
+      migration: true
     - name: env
       type: object
       object_type: keyword
