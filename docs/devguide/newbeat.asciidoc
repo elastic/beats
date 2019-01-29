@@ -38,11 +38,10 @@ original Packetbeat authors.
 
 For general information about contributing to Beats, see <<beats-contributing>>.
 
-After you have https://golang.org/doc/install[installed Go] make sure you have set up the
-https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
-your preferred workspace location and that your Go bin directory is on your PATH.
-Once Go is configured clone the Beats repository in the correct location
-under `GOPATH`:
+After https://golang.org/doc/install[installing Go], set the
+https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to your
+workspace location, and make sure the Go `bin` directory is in your PATH. Then clone
+the Beats repository in the correct location under `GOPATH`.
 
 [source,shell]
 ----------------------------------------------------------------------
