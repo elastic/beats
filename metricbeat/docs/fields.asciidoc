@@ -17354,7 +17354,7 @@ Metrics exposed by a plugin of a munin node agent.
 --
 type: keyword
 
-Name of the plugin collecting this metrics.
+Name of the plugin collecting these metrics.
 
 
 --

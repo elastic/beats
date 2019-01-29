@@ -13,7 +13,7 @@
     - name: munin.plugin.name
       type: keyword
       description: >
-        Name of the plugin collecting this metrics.
+        Name of the plugin collecting these metrics.
     - name: munin
       type: group
       fields:
