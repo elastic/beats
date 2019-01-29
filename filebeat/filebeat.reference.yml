@@ -69,7 +69,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#--------------------------------- User Module ---------------------------------
+#-------------------------------- Auditd Module --------------------------------
 #- module: auditd
   #log:
     #enabled: true

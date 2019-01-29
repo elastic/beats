@@ -40,7 +40,6 @@ grouped in the following categories:
 * <<exported-fields-suricata>>
 * <<exported-fields-system>>
 * <<exported-fields-traefik>>
-* <<exported-fields-user>>
 * <<exported-fields-zeek>>
 
 --
@@ -407,6 +406,232 @@ The module producing the logged message.
 Module for parsing auditd logs.
 
 
+
+
+*`user.terminal`*::
++
+--
+type: keyword
+
+Terminal or tty device on which the user is performing the observed activity.
+
+
+--
+
+
+*`user.audit.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.audit.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
+
+
+--
+
+*`user.audit.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.audit.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
+
+
+*`user.effective.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.effective.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
+
+
+--
+
+*`user.effective.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.effective.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
+
+
+*`user.filesystem.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.filesystem.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
+
+
+--
+
+*`user.filesystem.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.filesystem.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
+
+
+*`user.owner.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.owner.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
+
+
+--
+
+*`user.owner.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.owner.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
+
+
+*`user.saved.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.saved.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
+
+
+--
+
+*`user.saved.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.saved.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
 
 [float]
 == auditd fields
@@ -13016,238 +13241,6 @@ alias to: source.geo.city_name
 type: alias
 
 alias to: source.geo.region_iso_code
-
---
-
-[[exported-fields-user]]
-== User fields
-
-Section about user details.
-
-
-
-*`terminal`*::
-+
---
-type: keyword
-
-Terminal or tty device on which the user is performing the observed activity.
-
-
---
-
-
-*`audit.id`*::
-+
---
-type: keyword
-
-One or multiple unique identifiers of the user.
-
-
---
-
-*`audit.name`*::
-+
---
-type: keyword
-
-example: albert
-
-Short name or login of the user.
-
-
---
-
-*`audit.group.id`*::
-+
---
-type: keyword
-
-Unique identifier for the group on the system/platform.
-
-
---
-
-*`audit.group.name`*::
-+
---
-type: keyword
-
-Name of the group.
-
-
---
-
-
-*`effective.id`*::
-+
---
-type: keyword
-
-One or multiple unique identifiers of the user.
-
-
---
-
-*`effective.name`*::
-+
---
-type: keyword
-
-example: albert
-
-Short name or login of the user.
-
-
---
-
-*`effective.group.id`*::
-+
---
-type: keyword
-
-Unique identifier for the group on the system/platform.
-
-
---
-
-*`effective.group.name`*::
-+
---
-type: keyword
-
-Name of the group.
-
-
---
-
-
-*`filesystem.id`*::
-+
---
-type: keyword
-
-One or multiple unique identifiers of the user.
-
-
---
-
-*`filesystem.name`*::
-+
---
-type: keyword
-
-example: albert
-
-Short name or login of the user.
-
-
---
-
-*`filesystem.group.id`*::
-+
---
-type: keyword
-
-Unique identifier for the group on the system/platform.
-
-
---
-
-*`filesystem.group.name`*::
-+
---
-type: keyword
-
-Name of the group.
-
-
---
-
-
-*`owner.id`*::
-+
---
-type: keyword
-
-One or multiple unique identifiers of the user.
-
-
---
-
-*`owner.name`*::
-+
---
-type: keyword
-
-example: albert
-
-Short name or login of the user.
-
-
---
-
-*`owner.group.id`*::
-+
---
-type: keyword
-
-Unique identifier for the group on the system/platform.
-
-
---
-
-*`owner.group.name`*::
-+
---
-type: keyword
-
-Name of the group.
-
-
---
-
-
-*`saved.id`*::
-+
---
-type: keyword
-
-One or multiple unique identifiers of the user.
-
-
---
-
-*`saved.name`*::
-+
---
-type: keyword
-
-example: albert
-
-Short name or login of the user.
-
-
---
-
-*`saved.group.id`*::
-+
---
-type: keyword
-
-Unique identifier for the group on the system/platform.
-
-
---
-
-*`saved.group.name`*::
-+
---
-type: keyword
-
-Name of the group.
-
 
 --
 
