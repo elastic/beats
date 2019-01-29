@@ -32,6 +32,7 @@ import (
 
 var (
 	schema = s.Schema{
+		"id":      c.Str("id"),
 		"host":    c.Str("host"),
 		"version": c.Str("version"),
 		"jvm": c.Dict("jvm", s.Schema{
@@ -60,6 +61,16 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		r.Event(event)
 		return event.Error
 	}
+
+	// Set service ID
+	serviceID, err := fields.GetValue("id")
+	if err != nil {
+		event.Error = elastic.MakeErrorForMissingField("id", elastic.Logstash)
+		r.Event(event)
+		return event.Error
+	}
+	event.RootFields.Put("service.id", serviceID)
+	fields.Delete("id")
 
 	// Set hostname
 	host, err := fields.GetValue("host")
