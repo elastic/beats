@@ -46,6 +46,6 @@ func defaultConfig() Config {
 		MatchSource: true,
 		SourceIndex: 4, // Use 4 to match the CID in /var/lib/docker/containers/<container_id>/*.log.
 		MatchPIDs:   []string{"process.pid", "process.ppid"},
-		DeDot:       false,
+		DeDot:       true,
 	}
 }
