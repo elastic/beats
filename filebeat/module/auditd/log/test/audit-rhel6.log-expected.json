@@ -135,6 +135,7 @@
         "auditd.log.ses": "4294967295",
         "auditd.log.success": "yes",
         "auditd.log.syscall": "44",
+        "auditd.log.tty": "(none)",
         "ecs.version": "1.0.0-beta2",
         "event.action": "syscall",
         "event.dataset": "auditd.log",
@@ -156,8 +157,7 @@
         "user.group.id": "0",
         "user.id": "0",
         "user.saved.group.id": "0",
-        "user.saved.id": "0",
-        "user.terminal": "(none)"
+        "user.saved.id": "0"
     },
     {
         "@timestamp": "2017-03-16T04:02:40.072Z",

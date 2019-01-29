@@ -116,7 +116,6 @@
         { "split": { "ignore_failure": true, "field": "process.args", "separator": "\\s+" } },
 
         { "rename": { "ignore_failure": true, "field": "auditd.log.terminal", "target_field": "user.terminal" } },
-        { "rename": { "ignore_failure": true, "field": "auditd.log.tty", "target_field": "user.terminal" } },
 
         { "rename": { "ignore_failure": true, "field": "auditd.log.msg", "target_field": "message" } },
         { "rename": { "ignore_failure": true, "field": "auditd.log.res", "target_field": "event.outcome" } },

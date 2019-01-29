@@ -705,6 +705,13 @@ The item field indicates which item out of the total number of items. This numbe
 
 --
 
+*`auditd.log.tty`*::
++
+--
+type: keyword
+
+--
+
 *`auditd.log.a0`*::
 +
 --
@@ -949,15 +956,6 @@ alias to: process.executable
 --
 
 *`auditd.log.terminal`*::
-+
---
-type: alias
-
-alias to: user.terminal
-
---
-
-*`auditd.log.tty`*::
 +
 --
 type: alias
