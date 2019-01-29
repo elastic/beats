@@ -206,8 +206,29 @@ func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 	event.RootFields = common.MapStr{}
 	mapOfRootFieldsResults := make(map[string]interface{})
 	mapOfRootFieldsResults["service.name"] = metricsetName
+
+	// Cloud fields in ECS
 	mapOfRootFieldsResults["cloud.provider"] = metricsetName
+	mapOfRootFieldsResults["cloud.availability_zone"] = *instanceOutput.Placement.AvailabilityZone
+	mapOfRootFieldsResults["cloud.region"] = regionName
 	mapOfRootFieldsResults["cloud.instance.id"] = instanceID
+	machineType, err := instanceOutput.InstanceType.MarshalValue()
+	if err != nil {
+		err = errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
+		return
+	}
+	mapOfRootFieldsResults["cloud.machine.type"] = machineType
+
+	resultRootFields, err := eventMapping(mapOfRootFieldsResults, schemaRootFields)
+	if err != nil {
+		err = errors.Wrap(err, "Error trying to apply schema schemaRootFields in AWS EC2 metricbeat module.")
+		return
+	}
+	event.RootFields = resultRootFields
+
+	// AWS EC2 Metrics
+	mapOfMetricSetFieldResults := make(map[string]interface{})
+	mapOfMetricSetFieldResults["instance.image.id"] = *instanceOutput.ImageId
 	instanceStateName, err := instanceOutput.State.Name.MarshalValue()
 	if err != nil {
 		err = errors.Wrap(err, "instance.State.Name.MarshalValue failed")
@@ -220,42 +241,23 @@ func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 		return
 	}
 
-	mapOfRootFieldsResults["cloud.instance.state.name"] = instanceStateName
-	mapOfRootFieldsResults["cloud.instance.state.code"] = fmt.Sprint(*instanceOutput.State.Code)
-	mapOfRootFieldsResults["cloud.instance.monitoring.state"] = monitoringState
-	mapOfRootFieldsResults["cloud.instance.core.count"] = fmt.Sprint(*instanceOutput.CpuOptions.CoreCount)
-	mapOfRootFieldsResults["cloud.instance.threads_per_core"] = fmt.Sprint(*instanceOutput.CpuOptions.ThreadsPerCore)
+	mapOfMetricSetFieldResults["instance.state.name"] = instanceStateName
+	mapOfMetricSetFieldResults["instance.state.code"] = fmt.Sprint(*instanceOutput.State.Code)
+	mapOfMetricSetFieldResults["instance.monitoring.state"] = monitoringState
+	mapOfMetricSetFieldResults["instance.core.count"] = fmt.Sprint(*instanceOutput.CpuOptions.CoreCount)
+	mapOfMetricSetFieldResults["instance.threads_per_core"] = fmt.Sprint(*instanceOutput.CpuOptions.ThreadsPerCore)
 	publicIP := instanceOutput.PublicIpAddress
 	if publicIP != nil {
-		mapOfRootFieldsResults["cloud.instance.public.ip"] = *publicIP
+		mapOfMetricSetFieldResults["instance.public.ip"] = *publicIP
 	}
 
-	mapOfRootFieldsResults["cloud.instance.public.dns_name"] = *instanceOutput.PublicDnsName
-	mapOfRootFieldsResults["cloud.instance.private.dns_name"] = *instanceOutput.PrivateDnsName
+	mapOfMetricSetFieldResults["instance.public.dns_name"] = *instanceOutput.PublicDnsName
+	mapOfMetricSetFieldResults["instance.private.dns_name"] = *instanceOutput.PrivateDnsName
 	privateIP := instanceOutput.PrivateIpAddress
 	if privateIP != nil {
-		mapOfRootFieldsResults["cloud.instance.private.ip"] = *privateIP
+		mapOfMetricSetFieldResults["instance.private.ip"] = *privateIP
 	}
 
-	machineType, err := instanceOutput.InstanceType.MarshalValue()
-	if err != nil {
-		err = errors.Wrap(err, "instance.InstanceType.MarshalValue failed")
-		return
-	}
-
-	mapOfRootFieldsResults["cloud.machine.type"] = machineType
-	mapOfRootFieldsResults["cloud.availability_zone"] = *instanceOutput.Placement.AvailabilityZone
-	mapOfRootFieldsResults["cloud.image.id"] = *instanceOutput.ImageId
-	mapOfRootFieldsResults["cloud.region"] = regionName
-
-	resultRootFields, err := eventMapping(mapOfRootFieldsResults, schemaRootFields)
-	if err != nil {
-		err = errors.Wrap(err, "Error trying to apply schema schemaRootFields in AWS EC2 metricbeat module.")
-		return
-	}
-	event.RootFields = resultRootFields
-
-	mapOfMetricSetFieldResults := make(map[string]interface{})
 	for _, output := range getMetricDataOutput.MetricDataResults {
 		if len(output.Values) == 0 {
 			continue
@@ -264,7 +266,7 @@ func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 		mapOfMetricSetFieldResults[metricKey[0]] = fmt.Sprint(output.Values[0])
 	}
 
-	if len(mapOfMetricSetFieldResults) <= 3 {
+	if len(mapOfMetricSetFieldResults) <= 11 {
 		info = "Missing Cloudwatch data for instance " + instanceID + ". This is expected for a new instance during the " +
 			"first data collection. If this shows up multiple times, please recheck the period setting in config."
 		return

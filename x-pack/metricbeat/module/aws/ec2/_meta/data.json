@@ -7,12 +7,12 @@
     "aws": {
         "ec2": {
             "cpu": {
-                "credit_balance": 172.95243,
-                "credit_usage": 0.001657,
+                "credit_balance": 169.089216,
+                "credit_usage": 0.002926,
                 "surplus_credit_balance": 0,
                 "surplus_credits_charged": 0,
                 "total": {
-                    "pct": 0.066120218579236
+                    "pct": 0.033333333333322
                 }
             },
             "diskio": {
@@ -25,14 +25,38 @@
                     "count": 0
                 }
             },
+            "instance": {
+                "core": {
+                    "count": 1
+                },
+                "image": {
+                    "id": "ami-01e24be29428c15b2"
+                },
+                "monitoring": {
+                    "state": "disabled"
+                },
+                "private": {
+                    "dns_name": "ip-172-31-26-12.us-west-2.compute.internal",
+                    "ip": "172.31.26.12"
+                },
+                "public": {
+                    "dns_name": "ec2-34-217-213-210.us-west-2.compute.amazonaws.com",
+                    "ip": "34.217.213.210"
+                },
+                "state": {
+                    "code": 16,
+                    "name": "running"
+                },
+                "threads_per_core": 1
+            },
             "network": {
                 "in": {
-                    "bytes": 325.6,
-                    "packets": 3.4
+                    "bytes": 296.6,
+                    "packets": 3
                 },
                 "out": {
-                    "bytes": 289.8,
-                    "packets": 4
+                    "bytes": 269,
+                    "packets": 3.6
                 }
             },
             "status": {
@@ -44,30 +68,8 @@
     },
     "cloud": {
         "availability_zone": "us-west-2a",
-        "image": {
-            "id": "ami-01e24be29428c15b2"
-        },
         "instance": {
-            "core": {
-                "count": 1
-            },
-            "id": "i-077bdaf7e5d81bba3",
-            "monitoring": {
-                "state": "disabled"
-            },
-            "private": {
-                "dns_name": "ip-172-31-26-12.us-west-2.compute.internal",
-                "ip": "172.31.26.12"
-            },
-            "public": {
-                "dns_name": "ec2-34-217-213-210.us-west-2.compute.amazonaws.com",
-                "ip": "34.217.213.210"
-            },
-            "state": {
-                "code": 16,
-                "name": "running"
-            },
-            "threads_per_core": 1
+            "id": "i-077bdaf7e5d81bba3"
         },
         "machine": {
             "type": "t2.micro"
