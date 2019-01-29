@@ -152,7 +152,7 @@
                 "chart_type": "line",
                 "color": "#68BC00",
                 "fill": 0.5,
-                "formatter": "number",
+                "formatter": "0,0.[00]",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
                 "label": "Alive connections",
                 "line_width": 1,
@@ -180,8 +180,8 @@
       },
       "id": "1c2f8930-231a-11e9-bb66-8baac426dfd4",
       "type": "visualization",
-      "updated_at": "2019-01-28T16:31:06.051Z",
-      "version": 1
+      "updated_at": "2019-01-29T22:09:56.499Z",
+      "version": 2
     },
     {
       "attributes": {
@@ -212,7 +212,7 @@
                 "axis_position": "right",
                 "chart_type": "line",
                 "color": "#68BC00",
-                "fill": 0.5,
+                "fill": "0.1",
                 "formatter": "percent",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
                 "label": "Used file descriptors",
@@ -252,6 +252,27 @@
                 "split_mode": "everything",
                 "stacked": "none",
                 "value_template": "{{value}}"
+              },
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "rgba(0,98,177,1)",
+                "fill": "0",
+                "formatter": "0,0.[00]",
+                "id": "dffaffe0-23cc-11e9-b1ff-37c851471450",
+                "label": "Open file descriptors",
+                "line_width": "1",
+                "metrics": [
+                  {
+                    "field": "zookeeper.mntr.open_file_descriptor_count",
+                    "id": "dffaffe1-23cc-11e9-b1ff-37c851471450",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": 1,
+                "separate_axis": 1,
+                "split_mode": "everything",
+                "stacked": "none"
               }
             ],
             "show_grid": 1,
@@ -265,8 +286,8 @@
       },
       "id": "ddb13c60-231b-11e9-bb66-8baac426dfd4",
       "type": "visualization",
-      "updated_at": "2019-01-28T16:43:40.198Z",
-      "version": 1
+      "updated_at": "2019-01-29T22:08:46.349Z",
+      "version": 4
     },
     {
       "attributes": {
@@ -298,7 +319,7 @@
                 "chart_type": "line",
                 "color": "#68BC00",
                 "fill": "0",
-                "formatter": "number",
+                "formatter": "0,0.[00]",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
                 "label": "Packets received",
                 "line_width": "2",
@@ -331,7 +352,7 @@
                 "chart_type": "line",
                 "color": "rgba(115,216,255,1)",
                 "fill": "0",
-                "formatter": "number",
+                "formatter": "0,0.[00]",
                 "id": "753b2e60-231c-11e9-9707-f128cdaa3bf2",
                 "label": "Packets sent",
                 "line_width": "2",
@@ -365,8 +386,8 @@
       },
       "id": "d2f52b50-231c-11e9-bb66-8baac426dfd4",
       "type": "visualization",
-      "updated_at": "2019-01-28T16:50:31.685Z",
-      "version": 1
+      "updated_at": "2019-01-29T22:09:33.967Z",
+      "version": 2
     },
     {
       "attributes": {
@@ -392,7 +413,7 @@
             "gridData": {
               "h": 15,
               "i": "1",
-              "w": 24,
+              "w": 15,
               "x": 0,
               "y": 15
             },
@@ -407,9 +428,9 @@
             "gridData": {
               "h": 15,
               "i": "2",
-              "w": 24,
-              "x": 24,
-              "y": 0
+              "w": 17,
+              "x": 15,
+              "y": 15
             },
             "id": "c0be43c0-2319-11e9-bb66-8baac426dfd4",
             "panelIndex": "2",
@@ -422,8 +443,8 @@
             "gridData": {
               "h": 15,
               "i": "3",
-              "w": 24,
-              "x": 24,
+              "w": 16,
+              "x": 32,
               "y": 15
             },
             "id": "1c2f8930-231a-11e9-bb66-8baac426dfd4",
@@ -437,9 +458,9 @@
             "gridData": {
               "h": 15,
               "i": "4",
-              "w": 24,
-              "x": 0,
-              "y": 30
+              "w": 25,
+              "x": 23,
+              "y": 0
             },
             "id": "ddb13c60-231b-11e9-bb66-8baac426dfd4",
             "panelIndex": "4",
@@ -452,7 +473,7 @@
             "gridData": {
               "h": 15,
               "i": "5",
-              "w": 24,
+              "w": 23,
               "x": 0,
               "y": 0
             },
@@ -469,8 +490,8 @@
       },
       "id": "467207a0-231e-11e9-bb66-8baac426dfd4",
       "type": "dashboard",
-      "updated_at": "2019-01-28T17:00:54.938Z",
-      "version": 1
+      "updated_at": "2019-01-29T22:10:14.531Z",
+      "version": 5
     }
   ],
   "version": "7.0.0-alpha2"
