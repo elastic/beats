@@ -1,9 +1,25 @@
 {
-    "@timestamp": "2018-09-25T16:47:04.998Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "php_fpm.process",
+        "duration": 115000,
+        "module": "php_fpm"
+    },
+    "http": {
+        "request": {
+            "method": "get"
+        },
+        "response": {
+            "body": {
+                "bytes": 0
+            }
+        }
+    },
     "metricset": {
-        "module": "php_fpm",
-        "host": "phpfpm:81",
-        "rtt": 24681267,
         "name": "process"
     },
     "php_fpm": {
@@ -13,25 +29,25 @@
         "process": {
             "last_request_cpu": 0,
             "last_request_memory": 2097152,
-            "request_duration": 1404,
+            "request_duration": 204,
+            "requests": 6,
             "script": "-",
-            "pid": 6,
-            "start_time": 1537974596,
-            "user": "-",
-            "state": "Idle",
-            "start_since": 3946,
-            "requests": 28,
-            "request_method": "GET",
-            "request_uri": "/status?json=",
-            "content_length": 0
+            "start_since": 128,
+            "start_time": 1548769887,
+            "state": "Idle"
         }
     },
-    "beat": {
-        "name": "host.example.com",
-        "hostname": "host.example.com",
-        "version": "7.0.0-alpha1"
+    "process": {
+        "pid": 17
     },
-    "host": {
-        "name": "DESKTOP-RFOOE09"
+    "service": {
+        "address": "127.0.0.1:81",
+        "type": "php_fpm"
+    },
+    "url": {
+        "original": "/status?full=\u0026json="
+    },
+    "user": {
+        "name": "-"
     }
 }
