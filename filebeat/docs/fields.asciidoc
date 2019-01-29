@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-host-processor>>
 * <<exported-fields-icinga>>
 * <<exported-fields-iis>>
+* <<exported-fields-iptables>>
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
@@ -5591,6 +5592,326 @@ alias to: source.geo.city_name
 type: alias
 
 alias to: source.geo.region_iso_code
+
+--
+
+[[exported-fields-iptables]]
+== iptables fields
+
+Module for handling the iptables logs.
+
+
+
+[float]
+== iptables fields
+
+Fields from the iptables logs.
+
+
+
+*`iptables.ether_type`*::
++
+--
+type: long
+
+Value of the ethernet type field identifying the network layer protocol.
+
+
+--
+
+*`iptables.flow_label`*::
++
+--
+type: integer
+
+IPv6 flow label.
+
+
+--
+
+*`iptables.fragment_flags`*::
++
+--
+type: keyword
+
+IP fragment flags. A combination of CE, DF and MF.
+
+
+--
+
+*`iptables.fragment_offset`*::
++
+--
+type: long
+
+Offset of the current IP fragment.
+
+
+--
+
+[float]
+== icmp fields
+
+ICMP fields.
+
+
+
+*`iptables.icmp.code`*::
++
+--
+type: long
+
+ICMP code.
+
+
+--
+
+*`iptables.icmp.id`*::
++
+--
+type: long
+
+ICMP ID.
+
+
+--
+
+*`iptables.icmp.parameter`*::
++
+--
+type: long
+
+ICMP parameter.
+
+
+--
+
+*`iptables.icmp.redirect`*::
++
+--
+type: ip
+
+ICMP redirect address.
+
+
+--
+
+*`iptables.icmp.seq`*::
++
+--
+type: long
+
+ICMP sequence number.
+
+
+--
+
+*`iptables.icmp.type`*::
++
+--
+type: long
+
+ICMP type.
+
+
+--
+
+*`iptables.id`*::
++
+--
+type: long
+
+Packet identifier.
+
+
+--
+
+*`iptables.incomplete_bytes`*::
++
+--
+type: long
+
+Number of incomplete bytes.
+
+
+--
+
+*`iptables.input_device`*::
++
+--
+type: keyword
+
+Device that received the packet.
+
+
+--
+
+*`iptables.precedence_bits`*::
++
+--
+type: short
+
+IP precedence bits.
+
+
+--
+
+*`iptables.tos`*::
++
+--
+type: long
+
+IP Type of Service field.
+
+
+--
+
+*`iptables.length`*::
++
+--
+type: long
+
+Packet length.
+
+
+--
+
+*`iptables.output_device`*::
++
+--
+type: keyword
+
+Device that output the packet.
+
+
+--
+
+[float]
+== tcp fields
+
+TCP fields.
+
+
+
+*`iptables.tcp.flags`*::
++
+--
+type: keyword
+
+TCP flags.
+
+
+--
+
+*`iptables.tcp.reserved_bits`*::
++
+--
+type: short
+
+TCP reserved bits.
+
+
+--
+
+*`iptables.tcp.seq`*::
++
+--
+type: long
+
+TCP sequence number.
+
+
+--
+
+*`iptables.tcp.ack`*::
++
+--
+type: long
+
+TCP Acknowledgment number.
+
+
+--
+
+*`iptables.tcp.window`*::
++
+--
+type: long
+
+Advertised TCP window size.
+
+
+--
+
+*`iptables.ttl`*::
++
+--
+type: integer
+
+Time To Live field.
+
+
+--
+
+[float]
+== udp fields
+
+UDP fields.
+
+
+
+*`iptables.udp.length`*::
++
+--
+type: long
+
+Length of the UDP header and payload.
+
+
+--
+
+[float]
+== ubiquiti fields
+
+Fields for Ubiquiti network devices.
+
+
+
+*`iptables.ubiquiti.input_zone`*::
++
+--
+type: keyword
+
+Input zone.
+
+
+--
+
+*`iptables.ubiquiti.output_zone`*::
++
+--
+type: keyword
+
+Output zone.
+
+
+--
+
+*`iptables.ubiquiti.rule_number`*::
++
+--
+type: keyword
+
+The rule number within the rule set.
+
+--
+
+*`iptables.ubiquiti.rule_set`*::
++
+--
+type: keyword
+
+The rule set name.
 
 --
 
