@@ -27,6 +27,19 @@ import (
 	"github.com/elastic/beats/libbeat/cmd/instance"
 )
 
+const (
+	//TemplateKey used for defining template in setup cmd
+	TemplateKey = "template"
+	//DashboardKey used for registering dashboards in setup cmd
+	DashboardKey = "dashboards"
+	//MachineLearningKey used for registering ml jobs in setup cmd
+	MachineLearningKey = "machine-learning"
+	//PipelineKey used for registering pipelines in setup cmd
+	PipelineKey = "pipelines"
+	//ILMPolicyKey used for registering ilm in setup cmd
+	ILMPolicyKey = "ilm-policy"
+)
+
 func genSetupCmd(name, idxPrefix, version string, beatCreator beat.Creator) *cobra.Command {
 	setup := cobra.Command{
 		Use:   "setup",
@@ -46,32 +59,61 @@ func genSetupCmd(name, idxPrefix, version string, beatCreator beat.Creator) *cob
 				os.Exit(1)
 			}
 
-			template, _ := cmd.Flags().GetBool("template")
-			dashboards, _ := cmd.Flags().GetBool("dashboards")
-			machineLearning, _ := cmd.Flags().GetBool("machine-learning")
-			pipelines, _ := cmd.Flags().GetBool("pipelines")
-			policy, _ := cmd.Flags().GetBool("ilm-policy")
+			var registeredFlags = map[string]bool{
+				TemplateKey:        false,
+				DashboardKey:       false,
+				MachineLearningKey: false,
+				PipelineKey:        false,
+				ILMPolicyKey:       false,
+			}
+			var setupAll = true
 
-			// No flags: setup all
-			if !template && !dashboards && !machineLearning && !pipelines && !policy {
-				template = true
-				dashboards = true
-				machineLearning = true
-				pipelines = true
-				policy = false
+			// create collection with registered flags and their values
+			for k := range registeredFlags {
+				val, err := cmd.Flags().GetBool(k)
+				//if flag is not registered, an error is thrown
+				if err != nil {
+					delete(registeredFlags, k)
+					continue
+				}
+				registeredFlags[k] = val
+
+				//if any flag is set via cmd line then only this flag should be run
+				if val {
+					setupAll = false
+				}
 			}
 
-			if err = beat.Setup(beatCreator, template, dashboards, machineLearning, pipelines, policy); err != nil {
+			//create the struct to pass on
+			var s = instance.SetupSettings{}
+			for k, v := range registeredFlags {
+				if setupAll || v {
+					switch k {
+					case TemplateKey:
+						s.Template = true
+					case DashboardKey:
+						s.Dashboard = true
+					case MachineLearningKey:
+						s.MachineLearning = true
+					case PipelineKey:
+						s.Pipeline = true
+					case ILMPolicyKey:
+						s.ILMPolicy = true
+					}
+				}
+			}
+
+			if err = beat.Setup(beatCreator, s); err != nil {
 				os.Exit(1)
 			}
 		},
 	}
 
-	setup.Flags().Bool("template", false, "Setup index template")
-	setup.Flags().Bool("dashboards", false, "Setup dashboards")
-	setup.Flags().Bool("machine-learning", false, "Setup machine learning job configurations")
-	setup.Flags().Bool("pipelines", false, "Setup Ingest pipelines")
-	setup.Flags().Bool("ilm-policy", false, "Setup ILM policy")
+	setup.Flags().Bool(TemplateKey, false, "Setup index template")
+	setup.Flags().Bool(DashboardKey, false, "Setup dashboards")
+	setup.Flags().Bool(MachineLearningKey, false, "Setup machine learning job configurations")
+	setup.Flags().Bool(PipelineKey, false, "Setup Ingest pipelines")
+	setup.Flags().Bool(ILMPolicyKey, false, "Setup ILM policy")
 
 	return &setup
 }

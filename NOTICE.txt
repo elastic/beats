@@ -2254,7 +2254,7 @@ SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
 Dependency: github.com/rcrowley/go-metrics
-Revision: 1f30fe9094a513ce4c700b9a54458bbb0c96996c
+Revision: 3113b8401b8a98917cde58f8bbd42a1b1c03b1fd
 License type (autodetected): BSD-2-Clause
 ./vendor/github.com/rcrowley/go-metrics/LICENSE:
 --------------------------------------------------------------------
