@@ -73,16 +73,16 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 		return
 	}
 
-	event := mb.Event{}
+	event := mb.Event{
+		RootFields: common.MapStr{},
+	}
 	event.MetricSetFields, _ = schema.Apply(result)
 
 	if v, err := event.MetricSetFields.GetValue("version"); err == nil {
-		event.RootFields = common.MapStr{}
 		event.RootFields.Put("service.version", v)
 		event.MetricSetFields.Delete("version")
 	}
 	if v, err := event.MetricSetFields.GetValue("process"); err == nil {
-		event.RootFields = common.MapStr{}
 		event.RootFields.Put("process.name", v)
 		event.MetricSetFields.Delete("process")
 	}
