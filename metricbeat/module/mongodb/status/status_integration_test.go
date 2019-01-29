@@ -41,18 +41,18 @@ func TestFetch(t *testing.T) {
 	}
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-		events[0].BeatEvent("haproxy", "status").Fields.StringToPrint())
+		events[0].BeatEvent("mongodb", "status").Fields.StringToPrint())
 
-	event := events[0].BeatEvent("haproxy", "status").Fields
+	event := events[0].BeatEvent("mongodb", "status").Fields
 
 	// Check event fields
-	current, _ := event.GetValue("haproxy.status.connections.current")
+	current, _ := event.GetValue("mongodb.status.connections.current")
 	assert.True(t, current.(int64) >= 0)
 
-	available, _ := event.GetValue("haproxy.status.connections.available")
+	available, _ := event.GetValue("mongodb.status.connections.available")
 	assert.True(t, available.(int64) > 0)
 
-	pageFaults, _ := event.GetValue("haproxy.status.extra_info.page_faults")
+	pageFaults, _ := event.GetValue("mongodb.status.extra_info.page_faults")
 	assert.True(t, pageFaults.(int64) >= 0)
 }
 
