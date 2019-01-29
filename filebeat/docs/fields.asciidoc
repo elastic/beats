@@ -12636,6 +12636,16 @@ Section about user details.
 
 
 
+*`terminal`*::
++
+--
+type: keyword
+
+Terminal or tty device on which the user is performing the observed activity.
+
+
+--
+
 
 *`audit.id`*::
 +
@@ -13164,7 +13174,7 @@ alias to: process.executable
 --
 type: alias
 
-alias to: process.terminal
+alias to: user.terminal
 
 --
 
@@ -13173,7 +13183,7 @@ alias to: process.terminal
 --
 type: alias
 
-alias to: process.terminal
+alias to: user.terminal
 
 --
 

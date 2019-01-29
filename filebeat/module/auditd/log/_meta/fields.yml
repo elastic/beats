@@ -147,11 +147,11 @@
       migration: true
     - name: terminal
       type: alias
-      path: process.terminal
+      path: user.terminal
       migration: true
     - name: tty
       type: alias
-      path: process.terminal
+      path: user.terminal
       migration: true
     - name: msg
       type: alias

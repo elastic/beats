@@ -16,6 +16,11 @@
     Section about user details.
   fields:
 
+    - name: terminal
+      type: keyword
+      description: >
+        Terminal or tty device on which the user is performing the observed activity.
+
     - name: audit
       type: group
       fields:

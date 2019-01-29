@@ -216,6 +216,16 @@
   alias: true
   beat: filebeat
 
+- from: auditd.log.terminal
+  to: user.terminal
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.tty
+  to: user.terminal
+  alias: true
+  beat: filebeat
+
 - from: auditd.log.comm
   to: process.name
   alias: true
@@ -223,16 +233,6 @@
 
 - from: auditd.log.exe
   to: process.executable
-  alias: true
-  beat: filebeat
-
-- from: auditd.log.terminal
-  to: process.terminal
-  alias: true
-  beat: filebeat
-
-- from: auditd.log.tty
-  to: process.terminal
   alias: true
   beat: filebeat
 
