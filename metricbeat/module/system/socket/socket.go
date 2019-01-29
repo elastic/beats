@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"os/user"
 	"path/filepath"
 	"strconv"
 	"syscall"
@@ -187,7 +188,7 @@ func (m *MetricSet) isNewSocket(diag *linux.InetDiagMsg) bool {
 // hostname of the remote IP (if enabled), eTLD + 1 of the hostname, and the
 // process owning the socket.
 func (m *MetricSet) enrichConnectionData(c *connection) {
-	c.Username = m.users.LookupUID(int(c.UID))
+	c.User = m.users.LookupUID(int(c.UID))
 
 	// Determine direction (incoming, outgoing, or listening).
 	c.Direction = m.listeners.Direction(uint8(syscall.IPPROTO_TCP),
@@ -246,8 +247,8 @@ type connection struct {
 	ProcessError error    // Reason process info is unavailable.
 
 	// User identifiers.
-	UID      uint32 // UID of the socket owner.
-	Username string // Username of the socket.
+	UID  uint32     // UID of the socket owner.
+	User *user.User // Owner of the socket.
 }
 
 func newConnection(diag *linux.InetDiagMsg) *connection {
@@ -313,8 +314,12 @@ func (c *connection) ToMapStr() (fields common.MapStr, metricSetFields common.Ma
 		},
 	}
 
-	if c.Username != "" {
-		fields.Put("user.full_name", c.Username)
+	if c.User.Username != "" {
+		fields.Put("user.name", c.User.Username)
+	}
+
+	if c.User.Name != "" {
+		fields.Put("user.full_name", c.User.Name)
 	}
 
 	if c.ProcessError != nil {
