@@ -57,8 +57,8 @@ class TestAutodiscover(BaseTest):
                     port = network_settings['Ports'].keys()[0].split("/")[0]
                     # Check metadata is added
                     expected = 'tcp-tcp@%s:%s' % (host, port)
-                    actual = output[0]['monitor']['id']
-                    if expected == actual:
+                    event = output[0]
+                    if event['monitor']['id'] == expected and event['docker']['container']['id'] is not None:
                         matched = True
 
         assert matched

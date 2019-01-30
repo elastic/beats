@@ -162,6 +162,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 
 *Heartbeat*
 - Made monitors.d configuration part of the default config. {pull}9004[9004]
+- Autodiscover metadata is now included in events by default. So, if you are using the docker provider for instance, you'll see the correct fields under the `docker` key. {pull}10258[10258]
 
 *Journalbeat*
 
