@@ -22,6 +22,13 @@
   description: >
     Contains data from a Windows event log record.
   fields:
+    # Candidate to add to ECS?
+    - name: event.code
+      type: keyword
+      required: false
+      description: >
+        The code for this log message (Windows event ID).
+
     - name: activity_id
       type: keyword
       required: false
@@ -61,11 +68,16 @@
       description: >
         The keywords are used to classify an event.
 
+    - name: channel
+
+    - name: provider_name
+
     - name: log_name
-      # This does not exist yet
-      path: log.name
-      # could map to `event.origin`? ;-)
-      type: alias
+      type: keyword
+      # # This does not exist yet
+      # path: log.name
+      # # could map to `event.origin`? ;-)
+      # type: alias
       required: true
       description: >
         The name of the event log from which this record was read. This value is
@@ -129,8 +141,7 @@
         The process_id identifies the process that generated the event.
 
     - name: source_name
-      type: alias
-      path: service.name
+      type: keyword
       required: true
       description: >
         The source of the event log record (the application or service that

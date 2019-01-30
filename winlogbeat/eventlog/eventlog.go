@@ -22,7 +22,9 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"syscall"
+	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -84,15 +86,25 @@ func (e Record) ToEvent() beat.Event {
 		"type":          e.API,
 		"record_number": strconv.FormatUint(e.RecordID, 10),
 	}
-	m.Put("event.id", e.EventIdentifier.ID)
-	m.Put("service.name", e.Channel)
+
+	m.Put("event.kind", "event")
+	m.Put("event.dataset", fmt.Sprintf("%v.%v", e.API, strings.ToLower(e.Channel)))
+	m.Put("log_name", e.Channel)
+	m.Put("source_name", e.Provider.Name)
+  // Why not keep the Windows naming for those?
+	m.Put("channel", e.Channel)
+	m.Put("provider_name", e.Provider.Name)
+	m.Put("event.code", e.EventIdentifier.ID)
+	addOptional(m, "event.action", e.Task)
+
 	m.Put("host.hostname", e.Computer)
+	m.Put("event.created", time.Now())
 
 	addOptional(m, "xml", e.XML)
 	addOptional(m, "provider_guid", e.Provider.GUID)
 	addOptional(m, "version", e.Version)
-	addOptional(m, "log.level", e.Level)
-	addOptional(m, "task", e.Task)
+	addOptional(m, "log.level", strings.ToLower(e.Level))
+ 	addOptional(m, "task", e.Task)
 	addOptional(m, "opcode", e.Opcode)
 	addOptional(m, "keywords", e.Keywords)
 	addOptional(m, "message", sys.RemoveWindowsLineEndings(e.Message))

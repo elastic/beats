@@ -3282,6 +3282,18 @@ Contains data from a Windows event log record.
 
 
 
+*`event.code`*::
++
+--
+type: keyword
+
+required: False
+
+The code for this log message (Windows event ID).
+
+
+--
+
 *`activity_id`*::
 +
 --
@@ -3344,14 +3356,22 @@ The keywords are used to classify an event.
 
 --
 
+*`channel`*::
++
+--
+--
+
+*`provider_name`*::
++
+--
+--
+
 *`log_name`*::
 +
 --
-type: alias
+type: keyword
 
 required: True
-
-alias to: log.name
 
 The name of the event log from which this record was read. This value is one of the names from the `event_logs` collection in the configuration.
 
@@ -3451,11 +3471,9 @@ The process_id identifies the process that generated the event.
 *`source_name`*::
 +
 --
-type: alias
+type: keyword
 
 required: True
-
-alias to: service.name
 
 The source of the event log record (the application or service that logged the record).
 
