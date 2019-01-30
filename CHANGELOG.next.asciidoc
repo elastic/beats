@@ -134,6 +134,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make elasticsearch/audit fileset be more lenient in parsing node name. {issue}10035[10035] {pull}10135[10135]
 - Fix bad bytes count in `docker` input when filtering by stream. {pull}10211[10211]
 - Fixed data types for roles and indices fields in `elasticsearch/audit` fileset {pull}10307[10307]
+- Ensure `source.address` is always populated by the nginx module (ECS). {pull}10418[10418]
 
 *Heartbeat*
 

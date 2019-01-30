@@ -50,6 +50,13 @@
             }
         },
         {
+            "convert": {
+                "field": "source.ip",
+                "target_field": "source.address",
+                "type": "string"
+            }
+        },
+        {
             "remove": {
                 "field": "message"
             }
