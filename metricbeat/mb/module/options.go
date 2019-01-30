@@ -60,6 +60,8 @@ func WithMetricSetInfo() Option {
 	return WithEventModifier(mb.AddMetricSetInfo)
 }
 
+// WithServiceName sets the `service.name` field of the event with the value
+// given to the `service.name` setting in the module configuration.
 func WithServiceName() Option {
 	return func(w *Wrapper) {
 		modifier := func(_, _ string, event *mb.Event) {

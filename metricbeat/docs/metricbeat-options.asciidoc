@@ -201,6 +201,13 @@ See <<filtering-and-enhancing-data>> for information about specifying
 processors in your config.
 
 [float]
+==== `service.name`
+
+A name given by the user to the service the data is collected from. It can be
+used for example to identify information collected from nodes of different
+clusters with the same `service.type`.
+
+[float]
 [[module-http-config-options]]
 === Standard HTTP config options
 
