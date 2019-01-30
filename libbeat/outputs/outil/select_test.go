@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -31,74 +32,63 @@ import (
 type node map[string]interface{}
 
 func TestSelector(t *testing.T) {
-	tests := []struct {
-		title    string
-		config   string
-		event    common.MapStr
-		expected string
+	tests := map[string]struct {
+		config string
+		event  common.MapStr
+		want   string
 	}{
-		{
-			"constant key",
+		"constant key": {
 			`key: value`,
 			common.MapStr{},
 			"value",
 		},
-		{
-			"format string key",
+		"format string key": {
 			`key: '%{[key]}'`,
 			common.MapStr{"key": "value"},
 			"value",
 		},
-		{
-			"key with empty keys",
+		"key with empty keys": {
 			`{key: value, keys: }`,
 			common.MapStr{},
 			"value",
 		},
-		{
-			"constant in multi key",
+		"constant in multi key": {
 			`keys: [key: 'value']`,
 			common.MapStr{},
 			"value",
 		},
-		{
-			"format string in multi key",
+		"format string in multi key": {
 			`keys: [key: '%{[key]}']`,
 			common.MapStr{"key": "value"},
 			"value",
 		},
-		{
-			"missing format string key with default in rule",
+		"missing format string key with default in rule": {
 			`keys:
 			        - key: '%{[key]}'
 			          default: value`,
 			common.MapStr{},
 			"value",
 		},
-		{
-			"empty format string key with default in rule",
+		"empty format string key with default in rule": {
 			`keys:
 						        - key: '%{[key]}'
 						          default: value`,
 			common.MapStr{"key": ""},
 			"value",
 		},
-		{
-			"missing format string key with constant in next rule",
+		"missing format string key with constant in next rule": {
 			`keys:
 						        - key: '%{[key]}'
 						        - key: value`,
 			common.MapStr{},
 			"value",
 		},
-		{
-			"missing format string key with constant in top-level rule",
+		"missing format string key with constant in top-level rule": {
 			`{ key: value, keys: [key: '%{[key]}']}`,
 			common.MapStr{},
 			"value",
 		},
-		{
-			"apply mapping",
+		"apply mapping": {
 			`keys:
 						       - key: '%{[key]}'
 						         mappings:
@@ -106,8 +96,7 @@ func TestSelector(t *testing.T) {
 			common.MapStr{"key": "v"},
 			"value",
 		},
-		{
-			"apply mapping with default on empty key",
+		"apply mapping with default on empty key": {
 			`keys:
 						       - key: '%{[key]}'
 						         default: value
@@ -116,8 +105,7 @@ func TestSelector(t *testing.T) {
 			common.MapStr{"key": ""},
 			"value",
 		},
-		{
-			"apply mapping with default on empty lookup",
+		"apply mapping with default on empty lookup": {
 			`keys:
 			       - key: '%{[key]}'
 			         default: value
@@ -126,8 +114,7 @@ func TestSelector(t *testing.T) {
 			common.MapStr{"key": "v"},
 			"value",
 		},
-		{
-			"apply mapping without match",
+		"apply mapping without match": {
 			`keys:
 						       - key: '%{[key]}'
 						         mappings:
@@ -136,8 +123,7 @@ func TestSelector(t *testing.T) {
 			common.MapStr{"key": "x"},
 			"value",
 		},
-		{
-			"mapping with constant key",
+		"mapping with constant key": {
 			`keys:
 						       - key: k
 						         mappings:
@@ -145,8 +131,7 @@ func TestSelector(t *testing.T) {
 			common.MapStr{},
 			"value",
 		},
-		{
-			"mapping with missing constant key",
+		"mapping with missing constant key": {
 			`keys:
 						       - key: unknown
 						         mappings: {k: wrong}
@@ -154,8 +139,7 @@ func TestSelector(t *testing.T) {
 			common.MapStr{},
 			"value",
 		},
-		{
-			"mapping with missing constant key, but default",
+		"mapping with missing constant key, but default": {
 			`keys:
 						       - key: unknown
 						         default: value
@@ -163,16 +147,14 @@ func TestSelector(t *testing.T) {
 			common.MapStr{},
 			"value",
 		},
-		{
-			"matching condition",
+		"matching condition": {
 			`keys:
 						       - key: value
 						         when.equals.test: test`,
 			common.MapStr{"test": "test"},
 			"value",
 		},
-		{
-			"failing condition",
+		"failing condition": {
 			`keys:
 						       - key: wrong
 						         when.equals.test: test
@@ -182,113 +164,93 @@ func TestSelector(t *testing.T) {
 		},
 	}
 
-	for i, test := range tests {
-		t.Logf("run (%v): %v", i, test.title)
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			yaml := strings.Replace(test.config, "\t", "  ", -1)
+			cfg, err := common.NewConfigWithYAML([]byte(yaml), "test")
+			if err != nil {
+				t.Fatalf("YAML parse error: %v\n%v", err, yaml)
+			}
 
-		yaml := strings.Replace(test.config, "\t", "  ", -1)
-		cfg, err := common.NewConfigWithYAML([]byte(yaml), "test")
-		if err != nil {
-			t.Errorf("YAML parse error: %v\n%v", err, yaml)
-			continue
-		}
+			sel, err := BuildSelectorFromConfig(cfg, Settings{
+				Key:              "key",
+				MultiKey:         "keys",
+				EnableSingleOnly: true,
+				FailEmpty:        true,
+			})
+			require.NoError(t, err)
 
-		sel, err := BuildSelectorFromConfig(cfg, Settings{
-			Key:              "key",
-			MultiKey:         "keys",
-			EnableSingleOnly: true,
-			FailEmpty:        true,
+			event := beat.Event{
+				Timestamp: time.Now(),
+				Fields:    test.event,
+			}
+			actual, err := sel.Select(&event)
+			require.NoError(t, err)
+
+			assert.Equal(t, test.want, actual)
 		})
-		if err != nil {
-			t.Error(err)
-			continue
-		}
-
-		event := beat.Event{
-			Timestamp: time.Now(),
-			Fields:    test.event,
-		}
-		actual, err := sel.Select(&event)
-		if err != nil {
-			t.Error(err)
-			continue
-		}
-
-		assert.Equal(t, test.expected, actual)
 	}
 }
 
 func TestSelectorInitFail(t *testing.T) {
-	tests := []struct {
-		title  string
+	tests := map[string]struct {
 		config string
 	}{
-		{
-			"keys missing",
+		"keys missing": {
 			`test: no key`,
 		},
-		{
-			"invalid keys type",
+		"invalid keys type": {
 			`keys: 5`,
 		},
-		{
-			"invaid keys element type",
+		"invaid keys element type": {
 			`keys: [5]`,
 		},
-		{
-			"invalid key type",
+		"invalid key type": {
 			`key: {}`,
 		},
-		{
-			"missing key in list",
+		"missing key in list": {
 			`keys: [default: value]`,
 		},
-		{
-			"invalid key type in list",
+		"invalid key type in list": {
 			`keys: [key: {}]`,
 		},
-		{
-			"fail on invalid format string",
+		"fail on invalid format string": {
 			`key: '%{[abc}'`,
 		},
-		{
-			"fail on invalid format string in list",
+		"fail on invalid format string in list": {
 			`keys: [key: '%{[abc}']`,
 		},
-		{
-			"default value type mismatch",
+		"default value type mismatch": {
 			`keys: [{key: ok, default: {}}]`,
 		},
-		{
-			"mappings type mismatch",
+		"mappings type mismatch": {
 			`keys:
        - key: '%{[k]}'
          mappings: {v: {}}`,
 		},
-		{
-			"condition empty",
+		"condition empty": {
 			`keys:
        - key: value
          when:`,
 		},
 	}
 
-	for i, test := range tests {
-		t.Logf("run (%v): %v", i, test.title)
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			cfg, err := common.NewConfigWithYAML([]byte(test.config), "test")
+			if err != nil {
+				t.Fatal(err)
+			}
 
-		cfg, err := common.NewConfigWithYAML([]byte(test.config), "test")
-		if err != nil {
-			t.Error(err)
-			continue
-		}
+			_, err = BuildSelectorFromConfig(cfg, Settings{
+				Key:              "key",
+				MultiKey:         "keys",
+				EnableSingleOnly: true,
+				FailEmpty:        true,
+			})
 
-		_, err = BuildSelectorFromConfig(cfg, Settings{
-			Key:              "key",
-			MultiKey:         "keys",
-			EnableSingleOnly: true,
-			FailEmpty:        true,
+			assert.Error(t, err)
+			t.Log(err)
 		})
-
-		assert.Error(t, err)
-		t.Log(err)
 	}
 }
