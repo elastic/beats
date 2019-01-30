@@ -37,7 +37,9 @@ type Factory func(
 type IndexManager interface {
 	// BuildSelector can be used by an output to create an IndexSelector based on
 	// the outputs configuration.
-	BuildSelector(cfg *common.Config) (IndexSelector, error)
+	// The defaultIndex is interpreted as format string and used as default fallback
+	// if no index is configured or all indices are guarded using conditionals.
+	BuildSelector(defaultIndex string, cfg *common.Config) (IndexSelector, error)
 }
 
 // IndexSelector is used to find the index name an event shall be indexed to.

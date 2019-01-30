@@ -114,7 +114,6 @@ func (s *indexSupport) TemplateConfig(withILM bool) (template.TemplateConfig, er
 
 	var err error
 	if withILM {
-		// ilmSettings := s.ilm.Template()
 		cfg, err = applyILMSettings(log, cfg, s.ilm.Policy(), s.ilm.Alias())
 	}
 	return cfg, err
@@ -133,10 +132,13 @@ func (s *indexSupport) Manager(
 	}
 }
 
-func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector, error) {
+func (s *indexSupport) BuildSelector(defaultIndex string, cfg *common.Config) (outputs.IndexSelector, error) {
 	var err error
 	log := s.log
 
+	// we construct our own configuration object based on the available settings
+	// in cfg and defaultIndex. The configuration object provided must not be
+	// modified.
 	selCfg := common.NewConfig()
 	if cfg.HasField("indices") {
 		sub, err := cfg.Child("indices", -1)
@@ -152,6 +154,9 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 		if err != nil {
 			return nil, err
 		}
+	}
+	if indexName == "" {
+		indexName = defaultIndex
 	}
 
 	var alias string
@@ -314,13 +319,11 @@ func getEventCustomIndex(evt *beat.Event) string {
 	return ""
 }
 
-func unpackTemplateConfig(cfg *common.Config) (template.TemplateConfig, error) {
-	if cfg == nil {
-		cfg = common.NewConfig()
+func unpackTemplateConfig(cfg *common.Config) (config template.TemplateConfig, err error) {
+	config = template.DefaultConfig()
+	if cfg != nil {
+		err = cfg.Unpack(&config)
 	}
-
-	config := template.DefaultConfig
-	err := cfg.Unpack(&config)
 	return config, err
 }
 

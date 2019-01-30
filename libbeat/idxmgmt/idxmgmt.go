@@ -18,6 +18,9 @@
 package idxmgmt
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
@@ -36,11 +39,25 @@ type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, er
 // A manager instantiated via Supporter is responsible for instantiating/configuring
 // the index throughout the Elastic Stack.
 type Supporter interface {
+	// Enalbed checks if index management is configured to configure templates,
+	// ILM, or aliases.
 	Enabled() bool
+
+	// ILM provides access to the configured ILM support.
 	ILM() ilm.Supporter
+
+	// TemplateConfig returns the template configuration used by the index supporter.
 	TemplateConfig(withILM bool) (template.TemplateConfig, error)
+
+	// BuildSelector create an index selector.
+	// The defaultIndex string is interpreted as format string. It is used
+	// as default index if the configuration provided does not define an index or
+	// has no default fallback if all indices are guarded by conditionals.
+	BuildSelector(defaultIndex string, cfg *common.Config) (outputs.IndexSelector, error)
+
+	// Manager creates a new manager that can be used to execute the required steps
+	// for initializing an index, ILM policies, and write aliases.
 	Manager(client ESClient, assets Asseter) Manager
-	BuildSelector(cfg *common.Config) (outputs.IndexSelector, error)
 }
 
 // Asseter provides access to beats assets required to load the template.
@@ -75,10 +92,13 @@ func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
 	}
 
 	return func(log *logp.Logger, info beat.Info, configRoot *common.Config) (Supporter, error) {
+		const logName = "index-management"
+
 		cfg := struct {
-			ILM       *common.Config `config:"setup.ilm"`
-			Template  *common.Config `config:"setup.template"`
-			Migration *common.Config `config:"migration"`
+			ILM       *common.Config         `config:"setup.ilm"`
+			Template  *common.Config         `config:"setup.template"`
+			Output    common.ConfigNamespace `config:"output"`
+			Migration *common.Config         `config:"migration"`
 		}{}
 		if configRoot != nil {
 			if err := configRoot.Unpack(&cfg); err != nil {
@@ -87,11 +107,56 @@ func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
 		}
 
 		if log == nil {
-			log = logp.NewLogger("index-management")
+			log = logp.NewLogger(logName)
 		} else {
-			log = log.Named("index-management")
+			log = log.Named(logName)
+		}
+
+		if err := checkTemplateESSettings(cfg.Template, cfg.Output); err != nil {
+			return nil, err
 		}
 
 		return newIndexSupport(log, info, ilmSupport, cfg.Template, cfg.ILM, cfg.Migration.Enabled())
 	}
+}
+
+// checkTemplateESSettings validates template settings and output.elasticsearch
+// settings to be consistent.
+// XXX: This is some legacy check that will not be active if the output is
+//      configured via Central Config Management.
+//      In the future we will have CM deal with index setup and providing a
+//      consistent output configuration.
+// TODO: check if it's safe to move this check to the elasticsearch output
+//       (Not doing so, so to not interfere with outputs being setup via Central
+//       Management for now).
+func checkTemplateESSettings(tmpl *common.Config, out common.ConfigNamespace) error {
+	if out.Name() != "elasticsearch" {
+		return nil
+	}
+
+	enabled := tmpl == nil || tmpl.Enabled()
+	if !enabled {
+		return nil
+	}
+
+	var tmplCfg template.TemplateConfig
+	if tmpl != nil {
+		if err := tmpl.Unpack(&tmplCfg); err != nil {
+			return fmt.Errorf("unpacking template config fails: %v", err)
+		}
+	}
+
+	esCfg := struct {
+		Index string `config:"index"`
+	}{}
+	if err := out.Config().Unpack(&esCfg); err != nil {
+		return err
+	}
+
+	tmplSet := tmplCfg.Name != "" && tmplCfg.Pattern != ""
+	if esCfg.Index != "" && !tmplSet {
+		return errors.New("setup.template.name and setup.template.pattern have to be set if index name is modified")
+	}
+
+	return nil
 }
