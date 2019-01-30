@@ -63,7 +63,6 @@ import (
 	"github.com/elastic/beats/libbeat/plugin"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
 	svc "github.com/elastic/beats/libbeat/service"
-	"github.com/elastic/beats/libbeat/template"
 	"github.com/elastic/beats/libbeat/version"
 	sysinfo "github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
@@ -107,9 +106,7 @@ type beatConfig struct {
 
 	// elastic stack 'setup' configurations
 	Dashboards *common.Config `config:"setup.dashboards"`
-	Template   *common.Config `config:"setup.template"`
 	Kibana     *common.Config `config:"setup.kibana"`
-	Migration  *common.Config `config:"migration"`
 }
 
 var debugf = logp.MakeDebug("beat")
@@ -707,36 +704,13 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 // policy as a callback with the elasticsearch output. It is important the
 // registration happens before the publisher is created.
 func (b *Beat) registerESIndexManagement() error {
-	if b.Config.Output.Name() != "elasticsearch" {
+	if b.Config.Output.Name() != "elasticsearch" || !b.index.Enabled() {
 		return nil
 	}
 
-	// 1. validate template setup settings
-	if b.Config.Template.Enabled() {
-		var templateCfg template.TemplateConfig
-		err := b.Config.Template.Unpack(&templateCfg)
-		if err != nil {
-			return fmt.Errorf("unpacking template config fails: %v", err)
-		}
-
-		esCfg := struct {
-			Index string `config:"index"`
-		}{}
-		err = b.Config.Output.Config().Unpack(&esCfg)
-		if err != nil {
-			return err
-		}
-
-		if esCfg.Index != "" &&
-			(templateCfg.Name == "" || templateCfg.Pattern == "") &&
-			(b.Config.Template == nil || b.Config.Template.Enabled()) {
-			return errors.New("setup.template.name and setup.template.pattern have to be set if index name is modified")
-		}
-	}
-
-	// 2. install callback
-	if b.index.Enabled() {
-		elasticsearch.RegisterConnectCallback(b.indexSetupCallback())
+	_, err := elasticsearch.RegisterConnectCallback(b.indexSetupCallback())
+	if err != nil {
+		return fmt.Errorf("failed to register index management with elasticsearch: %+v", err)
 	}
 	return nil
 }

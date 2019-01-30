@@ -66,23 +66,31 @@ func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersi
 				fatalf("Error initializing the index manager: %+v", err)
 			}
 
-			cfg := template.DefaultConfig
-			if b.Config.Template.Enabled() {
-				var err error
-				cfg, err = indexManager.TemplateConfig(!noILM)
-				if err != nil {
-					fatalf("Template error detected: %+v", err)
-				}
+			tmplCfg, err := indexManager.TemplateConfig(!noILM)
+			if err != nil {
+				fatalf("Template error detected: %+v", err)
+			}
+			if tmplCfg.Enabled == false {
+				tmplCfg = template.DefaultConfig()
 			}
 
-			tmpl, err := template.New(b.Info.Version, index, *esVersion, cfg, b.Config.Migration.Enabled())
+			var withMigration bool
+			if b.RawConfig.HasField("migration") {
+				sub, err := b.RawConfig.Child("migration", -1)
+				if err != nil {
+					fatalf("Failed to read migration setting: %+v", err)
+				}
+				withMigration = sub.Enabled()
+			}
+
+			tmpl, err := template.New(b.Info.Version, index, *esVersion, tmplCfg, withMigration)
 			if err != nil {
 				fatalf("Error generating template: %+v", err)
 			}
 
 			var templateString common.MapStr
-			if cfg.Fields != "" {
-				fieldsPath := paths.Resolve(paths.Config, cfg.Fields)
+			if tmplCfg.Fields != "" {
+				fieldsPath := paths.Resolve(paths.Config, tmplCfg.Fields)
 				templateString, err = tmpl.LoadFile(fieldsPath)
 			} else {
 				templateString, err = tmpl.LoadBytes(b.Fields)
