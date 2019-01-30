@@ -41,12 +41,12 @@ class Test(AuditbeatXPackTest):
         """
 
         fields = ["process.pid", "process.ppid", "process.name", "process.executable", "process.args",
-                  "process.start", "process.working_directory", "user.id", "user.group.id", "user.group.name"]
+                  "process.start", "process.working_directory", "user.id", "user.group.id"]
 
         # Windows does not have effective and saved IDs, and user.name is not always filled for system processes.
         if sys.platform != "win32":
             fields.extend(["user.effective.id", "user.saved.id", "user.effective.group.id", "user.saved.group.id",
-                           "user.name"])
+                           "user.name", "user.group.name"])
 
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "process", COMMON_FIELDS + fields, warnings_allowed=True)

@@ -14,7 +14,7 @@
     - name: captured_headers
       description: >
         List of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
-      type: text
+      type: keyword
 
     - name: status_code
       type: alias
@@ -32,11 +32,11 @@
     - name: captured_headers
       description: >
         List of headers captured in the request due to the presence of the "capture request header" statement in the frontend.
-      type: text
+      type: keyword
 
     - name: raw_request_line
       description: Complete HTTP request line, including the method, request and HTTP version string.
-      type: text
+      type: keyword
 
     - name: time_wait_without_data_ms
       description: Total time in milliseconds spent waiting for the server to send a full HTTP response, not counting data.

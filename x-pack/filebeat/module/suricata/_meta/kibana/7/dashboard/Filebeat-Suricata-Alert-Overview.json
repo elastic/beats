@@ -226,10 +226,10 @@
         "columns": [
           "host.name",
           "suricata.eve.flow_id",
-          "suricata.eve.src_ip",
-          "suricata.eve.src_port",
-          "suricata.eve.dest_ip",
-          "suricata.eve.dest_port",
+          "source.ip",
+          "source.port",
+          "destination.ip",
+          "destination.port",
           "source.geo.country_iso_code",
           "destination.geo.country_iso_code"
         ],

@@ -59,7 +59,7 @@ func TestFetchEventContents(t *testing.T) {
 	nodeInfo := events[0]
 	assert.EqualValues(t, "default", nodeInfo["name"])
 	assert.EqualValues(t, "root", nodeInfo["type"])
-	assert.EqualValues(t, "-3", nodeInfo["children"])
+	assert.EqualValues(t, []string{"-3"}, nodeInfo["children"])
 	assert.EqualValues(t, -1, nodeInfo["id"])
 	assert.EqualValues(t, 10, nodeInfo["type_id"])
 	assert.EqualValues(t, "", nodeInfo["father"])
@@ -68,7 +68,7 @@ func TestFetchEventContents(t *testing.T) {
 	nodeInfo = events[1]
 	assert.EqualValues(t, "ceph-mon1", nodeInfo["name"])
 	assert.EqualValues(t, "host", nodeInfo["type"])
-	assert.EqualValues(t, "1,0", nodeInfo["children"])
+	assert.EqualValues(t, []string{"1", "0"}, nodeInfo["children"])
 	assert.EqualValues(t, -3, nodeInfo["id"])
 	assert.EqualValues(t, 1, nodeInfo["type_id"])
 	assert.EqualValues(t, "default", nodeInfo["father"])

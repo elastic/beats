@@ -24,6 +24,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Docker and Kubernetes labels/annotations will be "dedoted" by default. {pull}10338[10338]
 
 *Auditbeat*
+
 - Rename `process.exe` to `process.executable` in auditd module to align with ECS. {pull}9949[9949]
 - Rename `process.cwd` to `process.working_directory` in auditd module to align with ECS. {pull}10195[10195]
 - Change data type of `process.pid` and `process.ppid` to number in JSON output
@@ -58,6 +59,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   including `http.response.elapsed_time` (ECS). {pull}10188[10188], {pull}10274[10274]
 - Rename multiple fields to `http.response.body.bytes`, from modules "apache", "iis",
   "kibana", "nginx" and "traefik", including `http.response.content_length` (ECS). {pull}10188[10188]
+- Change type from haproxy.log fileset fields from text to keyword: response.captured_headers, request.captured_headers, `raw_request_line`, `mode`. {pull}10397[10397]
+- Change type of field backend_url and frontend_name in traefik.access metricset to type keyword. {pull}10401[10401]
+- Ingesting Elasticsearch audit logs is only supported with Elasticsearch 6.5.0 and above {pull}10352[10352]
+- Migrate Elasticsearch audit logs fields to ECS {pull}10352[10352]
 
 *Heartbeat*
 
@@ -81,6 +86,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adjust php_fpm.process metricset fields to ECS. {pull}10366[10366]
 - Adjust mongodb.status metricset to to ECS. {pull}10368[10368]
 - Refactor munin module to collect an event per plugin and to have more strict field mappings. `namespace` option has been removed, and will be replaced by `service.name`. {pull}10322[10322]
+- Change the following fields from type text to keyword: {pull}10318[10318]
+  - ceph.osd_df.name
+  - ceph.osd_tree.name
+  - ceph.osd_tree.children
+  - kafka.consumergroup.meta
+  - kibana.stats.name
+  - mongodb.metrics.replication.executor.network_interface
+  - php_fpm.process.request_uri
+  - php_fpm.process.script
 
 *Packetbeat*
 
@@ -192,6 +206,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Teach elasticsearch/audit fileset to parse out some more fields. {issue}10134[10134] {pull}10137[10137]
 - Add convert_timezone to nginx module. {issue}9839[9839] {pull}10148[10148]
 - Add support for Percona in the `slowlog` fileset of `mysql` module. {issue}6665[6665] {pull}10227[10227]
+- Added support for ingesting structured Elasticsearch audit logs {pull}10352[10352]
 
 *Heartbeat*
 

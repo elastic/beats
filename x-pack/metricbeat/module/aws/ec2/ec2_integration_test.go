@@ -82,7 +82,7 @@ func TestFetch(t *testing.T) {
 			checkEventField("status.check_failed_instance", "int", event, t)
 		}
 
-		err := mbtest.WriteEventsReporterV2(awsMetricSet, t, "")
+		err := mbtest.WriteEventsReporterV2(awsMetricSet, t, "/")
 		if err != nil {
 			t.Fatal("write", err)
 		}
