@@ -28,7 +28,6 @@ import (
 	"math/big"
 	"math/rand"
 	"os"
-	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
@@ -1009,8 +1008,7 @@ func obfuscateConfigOpts() []ucfg.Option {
 // LoadKeystore returns the appropriate keystore based on the configuration.
 func LoadKeystore(cfg *common.Config, name string) (keystore.Keystore, error) {
 	keystoreCfg, _ := cfg.Child("keystore", -1)
-	defaultPathConfig, _ := cfg.String("path.config", -1)
-	defaultPathConfig = filepath.Join(defaultPathConfig, fmt.Sprintf("%s.keystore", name))
+	defaultPathConfig := paths.Resolve(paths.Data, fmt.Sprintf("%s.keystore", name))
 	store, err := keystore.Factory(keystoreCfg, defaultPathConfig)
 	if err != nil {
 		return nil, err
