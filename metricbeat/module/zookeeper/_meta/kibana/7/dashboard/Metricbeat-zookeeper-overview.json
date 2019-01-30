@@ -19,6 +19,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
@@ -58,8 +59,8 @@
       },
       "id": "8d3b7770-2319-11e9-bb66-8baac426dfd4",
       "type": "visualization",
-      "updated_at": "2019-01-28T16:27:06.215Z",
-      "version": 1
+      "updated_at": "2019-01-30T13:29:19.163Z",
+      "version": 2
     },
     {
       "attributes": {
@@ -80,6 +81,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
@@ -119,8 +121,8 @@
       },
       "id": "c0be43c0-2319-11e9-bb66-8baac426dfd4",
       "type": "visualization",
-      "updated_at": "2019-01-28T16:28:32.636Z",
-      "version": 1
+      "updated_at": "2019-01-30T13:29:05.974Z",
+      "version": 2
     },
     {
       "attributes": {
@@ -141,6 +143,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
@@ -180,8 +183,8 @@
       },
       "id": "1c2f8930-231a-11e9-bb66-8baac426dfd4",
       "type": "visualization",
-      "updated_at": "2019-01-29T22:09:56.499Z",
-      "version": 2
+      "updated_at": "2019-01-30T13:28:52.034Z",
+      "version": 3
     },
     {
       "attributes": {
@@ -209,7 +212,8 @@
             "interval": "auto",
             "series": [
               {
-                "axis_position": "right",
+                "axis_min": "0",
+                "axis_position": "left",
                 "chart_type": "line",
                 "color": "#68BC00",
                 "fill": "0.1",
@@ -248,12 +252,13 @@
                   }
                 ],
                 "point_size": 1,
-                "separate_axis": 0,
+                "separate_axis": 1,
                 "split_mode": "everything",
                 "stacked": "none",
                 "value_template": "{{value}}"
               },
               {
+                "axis_min": "0",
                 "axis_position": "right",
                 "chart_type": "line",
                 "color": "rgba(0,98,177,1)",
@@ -286,8 +291,8 @@
       },
       "id": "ddb13c60-231b-11e9-bb66-8baac426dfd4",
       "type": "visualization",
-      "updated_at": "2019-01-29T22:08:46.349Z",
-      "version": 4
+      "updated_at": "2019-01-30T13:28:22.583Z",
+      "version": 5
     },
     {
       "attributes": {
@@ -308,6 +313,7 @@
           "aggs": [],
           "params": {
             "axis_formatter": "number",
+            "axis_min": "0",
             "axis_position": "left",
             "axis_scale": "normal",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
@@ -386,8 +392,8 @@
       },
       "id": "d2f52b50-231c-11e9-bb66-8baac426dfd4",
       "type": "visualization",
-      "updated_at": "2019-01-29T22:09:33.967Z",
-      "version": 2
+      "updated_at": "2019-01-30T13:26:42.583Z",
+      "version": 3
     },
     {
       "attributes": {
@@ -490,8 +496,8 @@
       },
       "id": "467207a0-231e-11e9-bb66-8baac426dfd4",
       "type": "dashboard",
-      "updated_at": "2019-01-29T22:10:14.531Z",
-      "version": 5
+      "updated_at": "2019-01-30T13:34:01.235Z",
+      "version": 6
     }
   ],
   "version": "7.0.0-alpha2"
