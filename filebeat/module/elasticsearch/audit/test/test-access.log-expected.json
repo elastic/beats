@@ -156,7 +156,7 @@
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.realm": "default_file",
-        "elasticsearch.audit.url.params.text": "{username=jacknich2}",
+        "elasticsearch.audit.url.params": "{username=jacknich2}",
         "elasticsearch.node.name": "node-0",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",

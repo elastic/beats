@@ -4035,14 +4035,21 @@ The name of the action that was executed
 
 --
 
+*`elasticsearch.audit.url.params`*::
++
+--
+type: keyword
+
+example: {username=jacknich2}
+
+REST URI parameters
+
 *`elasticsearch.audit.url.params.text`*::
 +
 --
 type: text
 
-example: {username=jacknich2}
-
-REST URI parameters
+--
 
 --
 

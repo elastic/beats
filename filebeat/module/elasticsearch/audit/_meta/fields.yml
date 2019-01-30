@@ -26,10 +26,13 @@
       description: "The name of the action that was executed"
       example: "cluster:monitor/main"
       type: keyword
-    - name: url.params.text
+    - name: url.params
       description: "REST URI parameters"
       example: "{username=jacknich2}"
-      type: text
+      type: keyword
+      multi_fields:
+        - name: text
+          type: text
     - name: indices
       description: "Indices accessed by action"
       example: [ "foo-2019.01.04", "foo-2019.01.03", "foo-2019.01.06" ]
