@@ -183,10 +183,11 @@ func IsUnique() IsDef {
 	return ScopedIsUnique().IsUniqueTo("")
 }
 
-type uniqScopeTracker map[interface{}]string
+// UniqScopeTracker is represents the tracking data for invoking IsUniqueTo.
+type UniqScopeTracker map[interface{}]string
 
 // IsUniqueTo validates that the given value is only ever seen within a single namespace.
-func (ust uniqScopeTracker) IsUniqueTo(namespace string) IsDef {
+func (ust UniqScopeTracker) IsUniqueTo(namespace string) IsDef {
 	return Is("unique", func(path path, v interface{}) *Results {
 		for trackerK, trackerNs := range ust {
 			hasNamespace := len(namespace) > 0
@@ -200,8 +201,8 @@ func (ust uniqScopeTracker) IsUniqueTo(namespace string) IsDef {
 	})
 }
 
-func ScopedIsUnique() uniqScopeTracker {
-	return uniqScopeTracker{}
+func ScopedIsUnique() UniqScopeTracker {
+	return UniqScopeTracker{}
 }
 
 // isStrCheck is a helper for IsDefs that must assert that the value is a string first.

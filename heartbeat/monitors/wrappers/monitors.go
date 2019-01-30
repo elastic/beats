@@ -53,7 +53,7 @@ func addMonitorMeta(id string, name string, typ string, isMulti bool) jobs.JobWr
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, e := job(event)
-			thisId := id
+			thisID := id
 
 			if isMulti {
 				url, err := event.GetValue("url.full")
@@ -62,14 +62,14 @@ func addMonitorMeta(id string, name string, typ string, isMulti bool) jobs.JobWr
 					url = "n/a"
 				}
 				urlHash, _ := hashstructure.Hash(url, nil)
-				thisId = fmt.Sprintf("%s-%x", id, urlHash)
+				thisID = fmt.Sprintf("%s-%x", id, urlHash)
 			}
 
 			eventext.MergeEventFields(
 				event,
 				common.MapStr{
 					"monitor": common.MapStr{
-						"id":   thisId,
+						"id":   thisID,
 						"name": name,
 						"type": typ,
 					},

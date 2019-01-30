@@ -22,16 +22,14 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/mapval"
-	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
 type fields struct {
@@ -56,7 +54,7 @@ func testCommonWrap(t *testing.T, tt testDef) {
 
 		for idx, r := range results {
 			t.Run(fmt.Sprintf("result at index %d", idx), func(t *testing.T) {
-				mapvaltest.Test(t, mapval.Strict(tt.want[idx]), r.Fields)
+				mapval.Test(t, mapval.Strict(tt.want[idx]), r.Fields)
 			})
 		}
 	})
