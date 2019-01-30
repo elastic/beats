@@ -46,6 +46,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename a few `mongodb.*` fields to map to ECS. {pull}10009[10009]
 - Rename a few `mysql.*` fields to map to ECS. {pull}10008[10008]
 - Rename a few `nginx.error.*` fields to map to ECS. {pull}10007[10007]
+- Rename many `auditd.log.*` fields to map to ECS. {pull}10192[10192]
 - Filesets with multiple ingest pipelines added in {pull}8914[8914] only work with Elasticsearch >= 6.5.0 {pull}10001[10001]
 - Remove service.name from Elastcsearch module. Replace by service.type. {pull}10042[10042]
 - Remove numeric coercions for `user.id` and `group.id`. IDs should be `keyword`. {pull}10233[10233]
@@ -180,6 +181,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add alias field support in Kibana index pattern. {pull}10075[10075]
 - Add `add_fields` processor. {pull}10119[10119]
 - Add Kibana field formatter to bytes fields. {pull}10184[10184]
+- Document a few more `auditd.log.*` fields. {pull}10192[10192]
 
 *Auditbeat*
 
