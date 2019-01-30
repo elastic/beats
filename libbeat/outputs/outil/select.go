@@ -18,6 +18,7 @@
 package outil
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -43,6 +44,8 @@ type Settings struct {
 	// Fail building selector if `key` and `multiKey` are missing
 	FailEmpty bool
 }
+
+var errNoMatchFound = errors.New("no matching selector for event")
 
 type SelectorExpr interface {
 	sel(evt *beat.Event) (string, error)
@@ -327,18 +330,24 @@ func (s *emptySelector) sel(evt *beat.Event) (string, error) {
 }
 
 func (s *listSelector) sel(evt *beat.Event) (string, error) {
+	var err error
+
 	for _, sub := range s.selectors {
-		n, err := sub.sel(evt)
-		if err != nil { // TODO: try
-			return n, err
+		n, fail := sub.sel(evt)
+		if fail != nil { // TODO: try
+			err = fail
 		}
 
-		if n != "" {
+		if fail == nil && n != "" {
 			return n, nil
 		}
 	}
 
-	return "", nil
+	// no match found
+	if err != nil {
+		return "", err
+	}
+	return "", errNoMatchFound
 }
 
 func (s *condSelector) sel(evt *beat.Event) (string, error) {
