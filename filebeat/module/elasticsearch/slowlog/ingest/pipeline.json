@@ -41,7 +41,6 @@
       {
           "remove": {
               "field": [
-                    "elasticsearch.slowlog.took",
                     "elasticsearch.slowlog.timestamp"
               ]
           }
