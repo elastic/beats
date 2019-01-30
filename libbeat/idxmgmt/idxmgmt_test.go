@@ -129,11 +129,11 @@ func TestDefaultSupport_TemplateConfig(t *testing.T) {
 		fail     bool
 	}{
 		"default template config": {
-			want: template.DefaultConfig,
+			want: template.DefaultConfig(),
 		},
 		"default template with ilm": {
 			ilmCalls: ilmTemplateSettings("alias", "test-9.9.9"),
-			want: cfgWith(template.DefaultConfig, map[string]interface{}{
+			want: cfgWith(template.DefaultConfig(), map[string]interface{}{
 				"name":                          "alias",
 				"pattern":                       "alias-*",
 				"settings.index.lifecycle.name": "test-9.9.9",
@@ -251,7 +251,7 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			im, err := factory(nil, info, common.MustNewConfigFrom(test.imCfg))
 			require.NoError(t, err)
 
-			sel, err := im.BuildSelector(common.MustNewConfigFrom(test.cfg))
+			sel, err := im.BuildSelector("", common.MustNewConfigFrom(test.cfg))
 			require.NoError(t, err)
 
 			meta := test.meta
