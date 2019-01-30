@@ -104,7 +104,7 @@ func (e Record) ToEvent() beat.Event {
 	addOptional(m, "provider_guid", e.Provider.GUID)
 	addOptional(m, "version", e.Version)
 	addOptional(m, "log.level", strings.ToLower(e.Level))
- 	addOptional(m, "task", e.Task)
+	addOptional(m, "task", e.Task)
 	addOptional(m, "opcode", e.Opcode)
 	addOptional(m, "keywords", e.Keywords)
 	addOptional(m, "message", sys.RemoveWindowsLineEndings(e.Message))
@@ -122,6 +122,21 @@ func (e Record) ToEvent() beat.Event {
 	addOptional(m, "kernel_time", e.Execution.KernelTime)
 	addOptional(m, "user_time", e.Execution.UserTime)
 	addOptional(m, "processor_time", e.Execution.ProcessorTime)
+
+	// debugf("EventData field inspection %v", e.EventData.TargetUserName)
+	// debugf("EventData inspection full %v", e.EventData)
+	// addOptional(m, "user_dbg.name", e.EventData.TargetUserName)
+
+  // Additional mapping ideas
+  // user.id
+  // - event_data.TargetUserSid (S-1-5-21-3541430928-2051711210-1391384369-1001)
+  // - event_data.SubjectUserSid (S-1-5-18)
+  // user.name
+  // - event_data.TargetUserName (vagrant)
+  // - event_data.SubjectUserName (VAGRANT-2012-R2$, vagrant)
+  // source.ip: event_data.IpAddress
+  // source.port: event_data.IpPort
+  // process.executable: event_data.ProcessName
 
 	if e.User.Identifier != "" {
 		user := common.MapStr{

@@ -22,6 +22,10 @@
   description: >
     Contains data from a Windows event log record.
   fields:
+    - name: user_dbg
+      type: object
+      required: false
+
     # Candidate to add to ECS?
     - name: event.code
       type: keyword
