@@ -53,7 +53,7 @@ type Supporter interface {
 	// The defaultIndex string is interpreted as format string. It is used
 	// as default index if the configuration provided does not define an index or
 	// has no default fallback if all indices are guarded by conditionals.
-	BuildSelector(defaultIndex string, cfg *common.Config) (outputs.IndexSelector, error)
+	BuildSelector(cfg *common.Config) (outputs.IndexSelector, error)
 
 	// Manager creates a new manager that can be used to execute the required steps
 	// for initializing an index, ILM policies, and write aliases.

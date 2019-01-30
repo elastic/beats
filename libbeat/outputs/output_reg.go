@@ -39,7 +39,7 @@ type IndexManager interface {
 	// the outputs configuration.
 	// The defaultIndex is interpreted as format string and used as default fallback
 	// if no index is configured or all indices are guarded using conditionals.
-	BuildSelector(defaultIndex string, cfg *common.Config) (IndexSelector, error)
+	BuildSelector(cfg *common.Config) (IndexSelector, error)
 }
 
 // IndexSelector is used to find the index name an event shall be indexed to.

@@ -251,7 +251,7 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			im, err := factory(nil, info, common.MustNewConfigFrom(test.imCfg))
 			require.NoError(t, err)
 
-			sel, err := im.BuildSelector("", common.MustNewConfigFrom(test.cfg))
+			sel, err := im.BuildSelector(common.MustNewConfigFrom(test.cfg))
 			require.NoError(t, err)
 
 			meta := test.meta

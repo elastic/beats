@@ -32,11 +32,12 @@ import (
 )
 
 type indexSupport struct {
-	log         *logp.Logger
-	ilm         ilm.Supporter
-	info        beat.Info
-	migration   bool
-	templateCfg template.TemplateConfig
+	log          *logp.Logger
+	ilm          ilm.Supporter
+	info         beat.Info
+	migration    bool
+	templateCfg  template.TemplateConfig
+	defaultIndex string
 
 	st indexState
 }
@@ -84,11 +85,12 @@ func newIndexSupport(
 	}
 
 	return &indexSupport{
-		log:         log,
-		ilm:         ilm,
-		info:        info,
-		templateCfg: tmplCfg,
-		migration:   migration,
+		log:          log,
+		ilm:          ilm,
+		info:         info,
+		templateCfg:  tmplCfg,
+		migration:    migration,
+		defaultIndex: fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", info.IndexPrefix, info.Version),
 	}, nil
 }
 
@@ -132,7 +134,7 @@ func (s *indexSupport) Manager(
 	}
 }
 
-func (s *indexSupport) BuildSelector(defaultIndex string, cfg *common.Config) (outputs.IndexSelector, error) {
+func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector, error) {
 	var err error
 	log := s.log
 
@@ -155,9 +157,6 @@ func (s *indexSupport) BuildSelector(defaultIndex string, cfg *common.Config) (o
 			return nil, err
 		}
 	}
-	if indexName == "" {
-		indexName = defaultIndex
-	}
 
 	var alias string
 	mode := s.ilm.Mode()
@@ -167,6 +166,12 @@ func (s *indexSupport) BuildSelector(defaultIndex string, cfg *common.Config) (o
 	}
 	if mode == ilm.ModeEnabled {
 		indexName = alias
+	}
+
+	// no index name configuration found yet -> define default index name based on
+	// beat.Info provided to the indexSupport on during setup.
+	if indexName == "" {
+		indexName = s.defaultIndex
 	}
 
 	selCfg.SetString("index", -1, indexName)
