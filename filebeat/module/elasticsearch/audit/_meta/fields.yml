@@ -6,15 +6,15 @@
       description: "The layer from which this event originated: rest, transport or ip_filter"
       example: "rest"
       type: keyword
-    - name: origin_type
+    - name: origin.type
       description: "Where the request originated: rest (request originated from a REST API request), transport (request was received on the transport channel), local_node (the local node issued the request)"
       example: "local_node"
       type: keyword
-    - name: realm
+    - name: user.realm
       description: "The authentication realm"
       example": "active_directory"
       type: keyword
-    - name: roles
+    - name: user.roles
       description: "Roles to which the principal belongs"
       example: [ "kibana_user", "beats_admin" ]
       type: keyword
@@ -26,10 +26,14 @@
       description: "Indices accessed by action"
       example: [ "foo-2019.01.04", "foo-2019.01.03", "foo-2019.01.06" ]
       type: keyword
-    - name: request
+    - name: request.name
       description: "The type of request that was executed"
       example: "ClearScrollRequest"
       type: keyword
+    - name: request_body
+      type: alias
+      path: http.request.body.content
+      migration: true
     - name: event_type
       type: alias
       path: event.type
@@ -41,10 +45,6 @@
     - name: uri
       type: alias
       path: url.original
-      migration: true
-    - name: request_body
-      type: alias
-      path: http.request.body.content
       migration: true
     - name: principal
       type: alias

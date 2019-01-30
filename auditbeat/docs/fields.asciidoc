@@ -2671,6 +2671,72 @@ The object's SELinux level.
 
 --
 
+[float]
+== user fields
+
+User information.
+
+
+[float]
+== effective fields
+
+Effective user information.
+
+
+*`user.effective.id`*::
++
+--
+type: keyword
+
+Effective user ID.
+
+--
+
+[float]
+== group fields
+
+Effective group information.
+
+
+*`user.effective.group.id`*::
++
+--
+type: keyword
+
+Effective group ID.
+
+--
+
+[float]
+== saved fields
+
+Saved user information.
+
+
+*`user.saved.id`*::
++
+--
+type: keyword
+
+Saved user ID.
+
+--
+
+[float]
+== group fields
+
+Saved group information.
+
+
+*`user.saved.group.id`*::
++
+--
+type: keyword
+
+Saved group ID.
+
+--
+
 [[exported-fields-docker-processor]]
 == Docker fields
 
@@ -3602,6 +3668,8 @@ Hash (perhaps logstash fingerprint) of raw field to be able to demonstrate log i
 --
 type: long
 
+format: duration
+
 Duration of the event in nanoseconds.
 If event.start and event.end are known this value should be the difference between the end and start time.
 
@@ -4442,7 +4510,7 @@ If `source.packets` and `destination.packets` are known, `network.packets` is th
 [float]
 == observer fields
 
-An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics. This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.  
+An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics. This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
 
 
 
@@ -6273,6 +6341,101 @@ OS version.
 type: keyword
 
 The operating system's kernel version.
+
+
+--
+
+[float]
+== package fields
+
+`package` contains information about an installed or removed package.
+
+
+
+*`system.audit.package.name`*::
++
+--
+type: keyword
+
+Package name.
+
+
+--
+
+*`system.audit.package.version`*::
++
+--
+type: keyword
+
+Package version.
+
+
+--
+
+*`system.audit.package.release`*::
++
+--
+type: keyword
+
+Package release.
+
+
+--
+
+*`system.audit.package.arch`*::
++
+--
+type: keyword
+
+Package architecture.
+
+
+--
+
+*`system.audit.package.license`*::
++
+--
+type: keyword
+
+Package license.
+
+
+--
+
+*`system.audit.package.installtime`*::
++
+--
+type: date
+
+Package install time.
+
+
+--
+
+*`system.audit.package.size`*::
++
+--
+type: long
+
+Package size.
+
+
+--
+
+*`system.audit.package.summary`*::
++
+--
+Package summary.
+
+
+--
+
+*`system.audit.package.url`*::
++
+--
+type: keyword
+
+Package URL.
 
 
 --

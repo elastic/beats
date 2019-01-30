@@ -1137,11 +1137,8 @@ func (thrift *thriftPlugin) publishTransactions() {
 						t.reply.exceptions)
 				}
 			}
-			if len(t.reply.notes) == 1 {
-				evt.PutValue("error.message", t.reply.notes[0])
-			} else if len(t.reply.notes) > 1 {
-				evt.PutValue("error.message", t.reply.notes)
-			}
+
+			pbf.Error.Message = t.reply.notes
 		}
 
 		if thrift.results != nil {
