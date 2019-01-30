@@ -43,6 +43,9 @@ type Settings struct {
 
 	// Fail building selector if `key` and `multiKey` are missing
 	FailEmpty bool
+
+	// Allow selector to ignore errors and return an empty string
+	EmptyOnErr bool
 }
 
 var errNoMatchFound = errors.New("no matching selector for event")
@@ -181,6 +184,10 @@ func BuildSelectorFromConfig(
 
 		return Selector{}, fmt.Errorf("missing required '%v' in %v",
 			multiKey, cfg.Path())
+	}
+
+	if settings.EmptyOnErr && len(sel) > 0 {
+		sel = append(sel, ConstSelectorExpr(""))
 	}
 
 	return MakeSelector(sel...), nil
@@ -338,7 +345,7 @@ func (s *listSelector) sel(evt *beat.Event) (string, error) {
 			err = fail
 		}
 
-		if fail == nil && n != "" {
+		if fail == nil {
 			return n, nil
 		}
 	}

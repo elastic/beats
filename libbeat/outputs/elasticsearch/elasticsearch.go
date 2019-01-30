@@ -187,11 +187,16 @@ func buildSelectors(
 		return index, pipeline, err
 	}
 
-	pipelineSel, err := outil.BuildSelectorFromConfig(cfg, outil.Settings{
+	selCfg, err := createSelConfig(cfg, "pipeline", "pipelines", "")
+	if err != nil {
+		return index, pipeline, err
+	}
+	pipelineSel, err := outil.BuildSelectorFromConfig(selCfg, outil.Settings{
 		Key:              "pipeline",
 		MultiKey:         "pipelines",
 		EnableSingleOnly: true,
 		FailEmpty:        false,
+		EmptyOnErr:       true,
 	})
 	if err != nil {
 		return index, pipeline, err
@@ -202,6 +207,36 @@ func buildSelectors(
 	}
 
 	return index, pipeline, err
+}
+
+func createSelConfig(in *common.Config, key, multiKey, defaultValue string) (*common.Config, error) {
+	var (
+		value = defaultValue
+		multi *common.Config
+	)
+
+	if in.HasField(key) {
+		var err error
+		value, err = in.String(key, -1)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if in.HasField(multiKey) {
+		var err error
+		multi, err = in.Child(multiKey, -1)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	cfg := common.NewConfig()
+	cfg.SetString(key, -1, value)
+	if multi != nil {
+		cfg.SetChild(multiKey, -1, multi)
+	}
+	return cfg, nil
 }
 
 // NewConnectedClient creates a new Elasticsearch client based on the given config.
