@@ -31,7 +31,7 @@
     "date": {
       "field": "apache.access.time",
       "target_field": "@timestamp",
-      "formats": ["dd/MMM/YYYY:H:m:s Z"]
+      "formats": ["dd/MMM/yyyy:H:m:s Z"]
     }
   }, {
     "remove": {
