@@ -28,6 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/tests/compose"
 
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/kibana"
@@ -35,7 +36,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	// compose.EnsureUpWithTimeout(t, 600, "elasticsearch", "kibana")
+	compose.EnsureUpWithTimeout(t, 600, "elasticsearch", "kibana")
 
 	config := mtest.GetConfig("stats")
 	host := config["hosts"].([]string)[0]
@@ -66,7 +67,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	// compose.EnsureUp(t, "kibana")
+	compose.EnsureUp(t, "kibana")
 
 	config := mtest.GetConfig("stats")
 	host := config["hosts"].([]string)[0]

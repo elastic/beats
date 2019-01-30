@@ -24,6 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/logstash"
 	_ "github.com/elastic/beats/metricbeat/module/logstash/node"
@@ -36,7 +37,7 @@ var metricSets = []string{
 }
 
 func TestFetch(t *testing.T) {
-	// compose.EnsureUp(t, "logstash")
+	compose.EnsureUp(t, "logstash")
 
 	for _, metricSet := range metricSets {
 		f := mbtest.NewReportingMetricSetV2(t, logstash.GetConfig(metricSet))
@@ -53,7 +54,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	// compose.EnsureUp(t, "logstash")
+	compose.EnsureUp(t, "logstash")
 
 	for _, metricSet := range metricSets {
 		config := logstash.GetConfig(metricSet)
