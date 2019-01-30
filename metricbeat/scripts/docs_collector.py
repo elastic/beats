@@ -21,22 +21,10 @@ This file is generated! See scripts/docs_collector.py
 
     modules_list = {}
 
-    modules_path = [{
-        'base_dir': oss_base_dir,
-        'path': oss_path + "/" + module,
-        'name': module,
-        'metricsets': sorted(os.listdir(oss_path + "/" + module))
-    } for module in filter(lambda module: os.path.isfile(oss_path + "/" + module + "/_meta/docs.asciidoc"),
-                           os.listdir(oss_base_dir))]
+    modules_path = get_modules_path(oss_base_dir, oss_path)
 
     if os.path.isdir(os.path.abspath(xpack_base_dir)):
-        modules_path += [{
-            'base_dir': xpack_base_dir,
-            'path': xpack_path + "/" + module,
-            'name': module,
-            'metricsets': sorted(os.listdir(xpack_path + "/" + module)),
-        } for module in filter(lambda module: os.path.isfile(xpack_path + "/" + module + "/_meta/docs.asciidoc"),
-                               os.listdir(xpack_path))]
+        modules_path = get_modules_path(xpack_base_dir, xpack_path)
 
     # Iterate over all modules
     for module in sorted(modules_path):
@@ -245,6 +233,18 @@ For a description of each field in the metricset, see the
     with open(os.path.abspath("docs") + "/modules_list.asciidoc", 'w') as f:
         f.write(module_list_output)
 
+
+def get_modules_path(base_dir, path_name):
+    modules_path = [{
+        'base_dir': base_dir,
+        'path': os.path.join(path_name, module),
+        'name': module,
+        'metricsets': sorted(os.listdir(path_name + "/" + module))
+    } for module in filter(lambda module: os.path.isfile(path_name + "/" + module +
+                                                         "/_meta/docs.asciidoc"),
+                           os.listdir(base_dir))]
+
+    return modules_path
 
 def get_release(fields):
     # Fetch release flag from fields. Default if not set is experimental
