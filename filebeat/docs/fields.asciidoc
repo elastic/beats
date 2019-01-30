@@ -4258,6 +4258,8 @@ Name of the cluster
 *`elasticsearch.cluster.uuid`*::
 +
 --
+type: keyword
+
 example: GmvrbHlNTiSVYiPf8kxg9g
 
 UUID of the cluster
@@ -4267,6 +4269,8 @@ UUID of the cluster
 *`elasticsearch.cluster.name`*::
 +
 --
+type: keyword
+
 example: docker-cluster
 
 Name of the cluster
