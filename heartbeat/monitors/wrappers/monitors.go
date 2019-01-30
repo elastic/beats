@@ -44,7 +44,7 @@ func WrapCommon(js []jobs.Job, id string, name string, typ string) []jobs.Job {
 		), func() jobs.JobWrapper {
 			return addMonitorMeta(id, name, typ, len(js) > 1)
 		}, func() jobs.JobWrapper {
-			return makeAddSummary(uint16(len(js)))
+			return makeAddSummary()
 		})
 }
 
@@ -122,7 +122,7 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 }
 
 // makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
-func makeAddSummary(numJobs uint16) jobs.JobWrapper {
+func makeAddSummary() jobs.JobWrapper {
 	// This is a tricky method. The way this works is that we track the state across jobs in the
 	// state struct here.
 	state := struct {
@@ -137,7 +137,7 @@ func makeAddSummary(numJobs uint16) jobs.JobWrapper {
 	}
 	// Note this is not threadsafe, must be called from a mutex
 	resetState := func() {
-		state.remaining = numJobs
+		state.remaining = 1
 		state.up = 0
 		state.down = 0
 		state.generation++
