@@ -71,6 +71,8 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
+        self.assertItemsEqual(self.de_dot(ZK_FIELDS), evt.keys())
+
         zk_srvr = evt["zookeeper"]["server"]
 
         assert zk_srvr["connections"] >= 0

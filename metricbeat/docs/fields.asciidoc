@@ -21399,6 +21399,15 @@ ZooKeeper metrics collected by the four-letter monitoring commands.
 
 
 
+*`zookeeper.service.version`*::
++
+--
+type: keyword
+
+The version of the zookeeper node.
+
+--
+
 [float]
 == mntr fields
 
