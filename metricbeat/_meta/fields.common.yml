@@ -25,6 +25,10 @@
         Connection address of the machine from which the metricset was collected. This
         field may not be present when the data was collected locally.
 
+    - name: service.hostname
+      description: >
+        Connection host name of the machine from which the metricset was collected
+
     - name: type
       required: true
       example: metricsets

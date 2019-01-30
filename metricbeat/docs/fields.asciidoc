@@ -1995,6 +1995,14 @@ Connection address of the machine from which the metricset was collected. This f
 
 --
 
+*`service.hostname`*::
++
+--
+Connection host name of the machine from which the metricset was collected
+
+
+--
+
 *`type`*::
 +
 --
