@@ -478,7 +478,7 @@
     },
     {
       "attributes": {
-        "description": "",
+        "description": "Overview of AWS EC2 Metrics",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
