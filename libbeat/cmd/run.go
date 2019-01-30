@@ -46,14 +46,6 @@ func genRunCmd(settings instance.Settings, beatCreator beat.Creator, runFlags *p
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("httpprof"))
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("cpuprofile"))
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("memprofile"))
-	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("setup"))
-
-	// TODO deprecate in favor of subcommands (7.0):
-	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("configtest"))
-	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("version"))
-
-	runCmd.Flags().MarkDeprecated("version", "use version subcommand")
-	runCmd.Flags().MarkDeprecated("configtest", "use test config subcommand")
 
 	if runFlags != nil {
 		runCmd.Flags().AddFlagSet(runFlags)

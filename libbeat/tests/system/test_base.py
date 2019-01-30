@@ -65,25 +65,6 @@ class Test(BaseTest):
         assert exit_code == 1
         assert self.log_contains("error unpacking config data") is True
 
-    def test_config_test(self):
-        """
-        Checks if -configtest works as expected
-        """
-        shutil.copy(self.beat_path + "/_meta/config.yml",
-                    os.path.join(self.working_dir, "libbeat.yml"))
-        with open(self.working_dir + "/mockbeat.template.json", "w") as f:
-            f.write('{"template": true}')
-        with open(self.working_dir + "/mockbeat.template-es2x.json", "w") as f:
-            f.write('{"template": true}')
-
-        exit_code = self.run_beat(
-            config="libbeat.yml",
-            extra_args=["-configtest",
-                        "-path.config", self.working_dir])
-
-        assert exit_code == 0
-        assert self.log_contains("Config OK") is True
-
     # NOTE(ph): I've removed the code to crash with theses settings, but the test is still usefull if
     # more settings are added.
     # def test_invalid_config_with_removed_settings(self):
@@ -100,45 +81,6 @@ class Test(BaseTest):
     #     assert exit_code == 1
     #     assert self.log_contains("setting 'queue_size' has been removed")
     #     assert self.log_contains("setting 'bulk_queue_size' has been removed")
-
-    def test_version_simple(self):
-        """
-        Tests -version prints a version and exits.
-        """
-        self.start_beat(extra_args=["-version"]).check_wait()
-        assert self.log_contains("beat version") is True
-
-    def test_version(self):
-        """
-        Checks if version param works
-        """
-        args = [self.beat_path + "/libbeat.test"]
-
-        args.extend(["-version",
-                     "-e",
-                     "-systemTest",
-                     "-v",
-                     "-d", "*",
-                     ])
-        if os.getenv("TEST_COVERAGE") == "true":
-            args.extend([
-                "-test.coverprofile",
-                os.path.join(self.working_dir, "coverage.cov"),
-            ])
-
-        assert self.log_contains("error loading config file") is False
-
-        with open(os.path.join(self.working_dir, "mockbeat.log"), "wb")  \
-                as outputfile:
-            proc = subprocess.Popen(args,
-                                    stdout=outputfile,
-                                    stderr=subprocess.STDOUT)
-            exit_code = proc.wait()
-            assert exit_code == 0
-
-        assert self.log_contains("mockbeat") is True
-        assert self.log_contains("version") is True
-        assert self.log_contains("9.9.9") is True
 
     def test_console_output_timed_flush(self):
         """
