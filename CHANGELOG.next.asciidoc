@@ -65,6 +65,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change type of field backend_url and frontend_name in traefik.access metricset to type keyword. {pull}10401[10401]
 - Ingesting Elasticsearch audit logs is only supported with Elasticsearch 6.5.0 and above {pull}10352[10352]
 - Migrate Elasticsearch audit logs fields to ECS {pull}10352[10352]
+- Several text fields in the Logstash module are now indexed as `keyword` fields with `text` multi-fields (ECS). {pull}10417[10417]
 
 *Heartbeat*
 
