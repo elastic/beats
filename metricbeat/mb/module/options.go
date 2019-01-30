@@ -20,6 +20,7 @@ package module
 import (
 	"time"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -57,4 +58,26 @@ func WithEventModifier(modifier mb.EventModifier) Option {
 //     }
 func WithMetricSetInfo() Option {
 	return WithEventModifier(mb.AddMetricSetInfo)
+}
+
+func WithServiceName() Option {
+	return func(w *Wrapper) {
+		modifier := func(_, _ string, event *mb.Event) {
+			if event == nil {
+				return
+			}
+			serviceName := w.Module.Config().ServiceName
+			if serviceName == "" {
+				return
+			}
+			if event.RootFields == nil {
+				event.RootFields = common.MapStr{}
+			} else if current, err := event.RootFields.GetValue("service.name"); err == nil && current != "" {
+				// Already set by the metricset, don't overwrite
+				return
+			}
+			event.RootFields.Put("service.name", serviceName)
+		}
+		w.eventModifiers = append(w.eventModifiers, modifier)
+	}
 }
