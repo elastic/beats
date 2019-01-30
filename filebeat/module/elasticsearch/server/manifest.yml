@@ -16,5 +16,8 @@ var:
       version: 6.1.0
       value: false
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline:
+  - ingest/pipeline.json
+  - ingest/pipeline-plaintext.json
+  - ingest/pipeline-json.json
 input: config/log.yml

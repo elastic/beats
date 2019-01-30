@@ -4255,6 +4255,24 @@ Name of the cluster
 
 --
 
+*`elasticsearch.cluster.uuid`*::
++
+--
+example: GmvrbHlNTiSVYiPf8kxg9g
+
+UUID of the cluster
+
+--
+
+*`elasticsearch.cluster.name`*::
++
+--
+example: docker-cluster
+
+Name of the cluster
+
+--
+
 *`elasticsearch.node.id`*::
 +
 --
