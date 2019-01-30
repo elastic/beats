@@ -121,6 +121,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 *Functionbeat*
 
 - Ensure that functionbeat is logging at info level not debug. {issue}10262[10262]
+- Add the required permissions to the role when deployment SQS functions. {issue}9152[9152]
 
 ==== Added
 
