@@ -29,14 +29,17 @@ class AuditbeatXPackTest(MetricbeatTest):
         )
 
     # Adapted from metricbeat.py
-    def check_metricset(self, module, metricset, fields=[], errors_allowed=False, warnings_allowed=False):
+    def check_metricset(self, module, metricset, fields=[], extras={}, errors_allowed=False, warnings_allowed=False):
         """
         Method to test a metricset for its fields
         """
+        # Set to 1 hour so we only test one Fetch
+        extras["period"] = "1h"
+
         self.render_config_template(modules=[{
             "name": module,
             "datasets": [metricset],
-            "period": "10s",
+            "extras": extras,
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
