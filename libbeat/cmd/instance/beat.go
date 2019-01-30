@@ -1009,9 +1009,5 @@ func obfuscateConfigOpts() []ucfg.Option {
 func LoadKeystore(cfg *common.Config, name string) (keystore.Keystore, error) {
 	keystoreCfg, _ := cfg.Child("keystore", -1)
 	defaultPathConfig := paths.Resolve(paths.Data, fmt.Sprintf("%s.keystore", name))
-	store, err := keystore.Factory(keystoreCfg, defaultPathConfig)
-	if err != nil {
-		return nil, err
-	}
-	return store, nil
+	return keystore.Factory(keystoreCfg, defaultPathConfig)
 }
