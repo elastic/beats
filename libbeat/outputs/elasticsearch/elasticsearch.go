@@ -182,8 +182,7 @@ func buildSelectors(
 	beat beat.Info,
 	cfg *common.Config,
 ) (index outputs.IndexSelector, pipeline *outil.Selector, err error) {
-	defaultIndex := fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", beat.IndexPrefix, beat.Version)
-	index, err = im.BuildSelector(defaultIndex, cfg)
+	index, err = im.BuildSelector(cfg)
 	if err != nil {
 		return index, pipeline, err
 	}
