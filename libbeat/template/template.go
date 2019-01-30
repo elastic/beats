@@ -46,6 +46,7 @@ type Template struct {
 	name        string
 	pattern     string
 	beatVersion common.Version
+	beatName    string
 	esVersion   common.Version
 	config      TemplateConfig
 	migration   bool
@@ -116,6 +117,7 @@ func New(beatVersion string, beatName string, esVersion common.Version, config T
 		name:        name,
 		beatVersion: *bV,
 		esVersion:   esVersion,
+		beatName:    beatName,
 		config:      config,
 		migration:   migration,
 	}, nil
@@ -189,7 +191,7 @@ func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.
 		keyPattern: patterns,
 
 		"mappings": buildMappings(
-			t.beatVersion, t.esVersion,
+			t.beatVersion, t.esVersion, t.beatName,
 			properties,
 			append(dynamicTemplates, buildDynTmpl(t.esVersion)),
 			common.MapStr(t.config.Settings.Source),
@@ -215,6 +217,7 @@ func buildPatternSettings(ver common.Version, pattern string) (string, interface
 
 func buildMappings(
 	beatVersion, esVersion common.Version,
+	beatName string,
 	properties common.MapStr,
 	dynTmpls []common.MapStr,
 	source common.MapStr,
@@ -222,6 +225,7 @@ func buildMappings(
 	mapping := common.MapStr{
 		"_meta": common.MapStr{
 			"version": beatVersion.String(),
+			"beat":    beatName,
 		},
 		"date_detection":    defaultDateDetection,
 		"dynamic_templates": dynTmpls,
