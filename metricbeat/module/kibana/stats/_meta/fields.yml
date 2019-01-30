@@ -9,7 +9,7 @@
       description: >
         Kibana instance UUID
     - name: name
-      type: text
+      type: keyword
       description: >
         Kibana instance name
     - name: index

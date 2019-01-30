@@ -37,8 +37,8 @@
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.action": "indices:data/read/scroll/clear",
         "elasticsearch.audit.layer": "transport",
-        "elasticsearch.audit.origin_type": "local_node",
-        "elasticsearch.audit.request": "ClearScrollRequest",
+        "elasticsearch.audit.origin.type": "local_node",
+        "elasticsearch.audit.request.name": "ClearScrollRequest",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
         "event.type": "access_granted",
@@ -87,8 +87,8 @@
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.action": "cluster:monitor/main",
         "elasticsearch.audit.layer": "transport",
-        "elasticsearch.audit.origin_type": "rest",
-        "elasticsearch.audit.request": "MainRequest",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.name": "MainRequest",
         "event.dataset": "elasticsearch.audit",
         "event.module": "elasticsearch",
         "event.type": "access_denied",
@@ -131,10 +131,10 @@
             "servicelog-2019.01.07"
         ],
         "elasticsearch.audit.layer": "transport",
-        "elasticsearch.audit.origin_type": "transport",
-        "elasticsearch.audit.realm": "active_directory",
-        "elasticsearch.audit.request": "SearchFreeContextRequest",
-        "elasticsearch.audit.roles": [
+        "elasticsearch.audit.origin.type": "transport",
+        "elasticsearch.audit.request.name": "SearchFreeContextRequest",
+        "elasticsearch.audit.user.realm": "active_directory",
+        "elasticsearch.audit.user.roles": [
             "kibana_user",
             "my_custom_role_1",
             "foo_reader"
