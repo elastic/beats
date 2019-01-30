@@ -1990,7 +1990,7 @@ Process group id.
 *`service.address`*::
 +
 --
-Connection address of the machine from which the metricset was collected. This field may not be present when the data was collected locally.
+Address of the machine where the service is running. This field may not be present when the data was collected locally.
 
 
 --
@@ -1998,7 +1998,7 @@ Connection address of the machine from which the metricset was collected. This f
 *`service.hostname`*::
 +
 --
-Connection host name of the machine from which the metricset was collected
+Host name of the machine where the service is running.
 
 
 --
