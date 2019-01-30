@@ -112,6 +112,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Fixed data type for tags field in `docker/image` metricset {pull}10307[10307]
 - Fixed data type for isr field in `kafka/partition` metricset {pull}10307[10307]
 - Fixed data types for various hosts fields in `mongodb/replstatus` metricset {pull}10307[10307]
+- Added function to close sql database connection. {pull}10355[10355]
 
 *Packetbeat*
 
