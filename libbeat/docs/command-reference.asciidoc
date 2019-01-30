@@ -568,8 +568,8 @@ ifdef::has_ml_jobs[]
 necessary to analyze data for anomalies.
 endif::[]
 
-Use this command instead of `run --setup` when you want to set up the
-environment without actually running {beatname_uc} and ingesting data.
+Use this command if you want to set up the environment without actually running
+{beatname_uc} and ingesting data.
 
 *SYNOPSIS*
 
