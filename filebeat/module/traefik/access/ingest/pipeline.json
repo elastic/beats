@@ -3,9 +3,9 @@
     "processors": [
         {
             "grok": {
-                "field": "traefik.access.message",
+                "field": "message",
                 "patterns": [
-                    "(?:%{NUMBER:http.response.body.bytes:long}|-)( (?:\"%{DATA:http.request.referrer}\"|-)?( (?:\"%{DATA:traefik.access.agent}\"|-)?)?( (?:%{NUMBER:traefik.access.request_count:long}|-)?)?( (?:\"%{DATA:traefik.access.frontend_name}\"|-)?)?( \"%{DATA:traefik.access.backend_url}\")?( %{NUMBER:temp.duration:long}ms)?)?"
+                    "%{IPORHOST:source.address} %{GREEDYDATA:traefik.access.user_identifier} %{GREEDYDATA:user.name} \\[%{HTTPDATE:traefik.access.time}\\] \"%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}\" %{NUMBER:http.response.status_code:long} (?:%{NUMBER:http.response.body.bytes:long}|-)?( (?:\"%{DATA:http.request.referrer}\"|-)? (?:\"%{DATA:traefik.access.agent}\"|-)? (?:%{NUMBER:traefik.access.request_count:long}|-)? (?:\"%{DATA:traefik.access.frontend_name}\"|-)? (?:\"%{DATA:traefik.access.backend_url}\"|-)?( %{NUMBER:temp.duration:long}ms|-)?)?"
                 ],
                 "ignore_missing": true
             }
@@ -13,12 +13,6 @@
         {
             "remove": {
                 "field": "message",
-                "ignore_missing": true
-            }
-        },
-        {
-            "remove": {
-                "field": "traefik.access.message",
                 "ignore_missing": true
             }
         },
