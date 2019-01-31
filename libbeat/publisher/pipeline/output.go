@@ -36,7 +36,7 @@ type netClientWorker struct {
 	observer outputObserver
 	qu       workQueue
 	client   outputs.NetworkClient
-	closed   atomic.Bool
+	done     chan struct{}
 
 	batchSize  int
 	batchSizer func() int
@@ -44,7 +44,7 @@ type netClientWorker struct {
 
 func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Client) outputWorker {
 	if nc, ok := client.(outputs.NetworkClient); ok {
-		c := &netClientWorker{observer: observer, qu: qu, client: nc}
+		c := &netClientWorker{observer: observer, qu: qu, client: nc, done: make(chan struct{})}
 		go c.run()
 		return c
 	}
@@ -62,7 +62,6 @@ func (w *clientWorker) run() {
 	for !w.closed.Load() {
 		for batch := range w.qu {
 			w.observer.outBatchSend(len(batch.events))
-
 			if err := w.client.Publish(batch); err != nil {
 				return
 			}
@@ -71,56 +70,51 @@ func (w *clientWorker) run() {
 }
 
 func (w *netClientWorker) Close() error {
-	w.closed.Store(true)
+	close(w.done)
 	return w.client.Close()
 }
 
 func (w *netClientWorker) run() {
-	for !w.closed.Load() {
-		reconnectAttempts := 0
+	var (
+		connected         bool
+		reconnectAttempts int
+	)
 
-		// start initial connect loop from first batch, but return
-		// batch to pipeline for other outputs to catch up while we're trying to connect
-		for batch := range w.qu {
-			batch.Cancelled()
-
-			if w.closed.Load() {
-				logp.Info("Closed connection to %v", w.client)
-				return
-			}
-
-			if reconnectAttempts > 0 {
-				logp.Info("Attempting to reconnect to %v with %d reconnect attempt(s)", w.client, reconnectAttempts)
-			} else {
-				logp.Info("Connecting to %v", w.client)
-			}
-
-			err := w.client.Connect()
-			if err != nil {
-				logp.Err("Failed to connect to %v: %v", w.client, err)
-				reconnectAttempts++
+	for {
+		select {
+		case <-w.done:
+			logp.Info("Closed connection to %v", w.client)
+			return
+		case batch := <-w.qu:
+			if batch == nil {
 				continue
 			}
 
-			logp.Info("Connection to %v established", w.client)
-			reconnectAttempts = 0
-			break
-		}
+			if !connected {
+				batch.Cancelled()
 
-		// send loop
-		for batch := range w.qu {
-			if w.closed.Load() {
-				if batch != nil {
-					batch.Cancelled()
+				if reconnectAttempts > 0 {
+					logp.Info("Attempting to reconnect to %v with %d reconnect attempt(s)", w.client, reconnectAttempts)
+				} else {
+					logp.Info("Connecting to %v", w.client)
 				}
-				return
+
+				if err := w.client.Connect(); err != nil {
+					logp.Err("Failed to connect to %v: %v", w.client, err)
+					reconnectAttempts++
+				}
+
+				logp.Info("Connection to %v established", w.client)
+				connected = true
+				reconnectAttempts = 0
+				continue
 			}
 
 			err := w.client.Publish(batch)
 			if err != nil {
 				logp.Err("Failed to publish events: %v", err)
 				// on error return to connect loop
-				break
+				connected = false
 			}
 		}
 	}

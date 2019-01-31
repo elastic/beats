@@ -718,6 +718,8 @@ func (p *Input) Wait() {
 
 // Stop stops all harvesters and then stops the input
 func (p *Input) Stop() {
+	defer logp.Debug("input", "Log input stopped")
+
 	// Stop all harvesters
 	// In case the beatDone channel is closed, this will not wait for completion
 	// Otherwise Stop will wait until output is complete

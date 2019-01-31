@@ -727,6 +727,7 @@ func (conn *Connection) Ping() (string, error) {
 
 // Close closes a connection.
 func (conn *Connection) Close() error {
+	common.CloseIdleConnections(conn.http)
 	return nil
 }
 
