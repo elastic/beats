@@ -706,7 +706,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 
 	if b.Config.Dashboards.Enabled() {
 		err := dashboards.ImportDashboards(ctx, b.Info.Beat, b.Info.Hostname, paths.Resolve(paths.Home, ""),
-			b.Config.Kibana, b.Config.Dashboards, nil)
+			b.Config.Kibana, b.Config.Dashboards, nil, b.Config.Migration.Enabled())
 		if err != nil {
 			return errw.Wrap(err, "Error importing Kibana dashboards")
 		}

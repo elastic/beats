@@ -21,7 +21,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"path/filepath"
+
+	"github.com/elastic/beats/libbeat/kibana"
 
 	errw "github.com/pkg/errors"
 
@@ -33,7 +36,7 @@ func ImportDashboards(
 	ctx context.Context,
 	beatName, hostname, homePath string,
 	kibanaConfig, dashboardsConfig *common.Config,
-	msgOutputter MessageOutputter,
+	msgOutputter MessageOutputter, migration bool,
 ) error {
 	if dashboardsConfig == nil || !dashboardsConfig.Enabled() {
 		return nil
@@ -56,6 +59,29 @@ func ImportDashboards(
 	if !kibanaConfig.Enabled() {
 		return errors.New("kibana configuration missing for loading dashboards.")
 	}
+
+	return setupAndImportDashboardsViaKibana(ctx, hostname, kibanaConfig, &dashConfig, msgOutputter)
+
+	// Generate index pattern
+	version, _ := common.NewVersion("7.0.0") // TODO: dynamic version
+	//beatVersion, _ := common.NewVersion("7.0.0") // TODO: dynamic version
+	indexP, _ := esConfig.String("index", 0)
+	indexPattern, err := kibana.NewGenerator(indexP, beatName, "fields.yml", dashConfig.Dir, "7.0.0", *version, migration)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	file, err := indexPattern.Generate()
+	if err != nil {
+		log.Fatalf("ERROR: %s", err)
+	}
+
+	// Log output file location.
+	absFile, err := filepath.Abs(file)
+	if err != nil {
+		absFile = file
+	}
+	log.Printf(">> The index pattern was created under %v", absFile)
 
 	return setupAndImportDashboardsViaKibana(ctx, hostname, kibanaConfig, &dashConfig, msgOutputter)
 
