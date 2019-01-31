@@ -14,9 +14,9 @@
                         "UNSIGNED_INT": "[0-9]+",
                         "ETHTYPE": "(?:[A-Fa-f0-9]{2}):(?:[A-Fa-f0-9]{2})",
                         "ETHTYPE_DISCARD": "(?::[A-Fa-f0-9]{2})*",
-                        "NETFILTERMAC": "(?:%{MAC:destination.mac}:%{MAC:source.mac}:%{ETHTYPE:iptables.ether_type}?%{ETHTYPE_DISCARD}|%{MAC:destination.mac}%{ETHTYPE_DISCARD}:%{ETHTYPE:iptables.ether_type}?)",
+                        "NETFILTERMAC": "(?:%{MAC:destination.mac}:%{MAC:source_ecs.mac}:%{ETHTYPE:iptables.ether_type}?%{ETHTYPE_DISCARD}|%{MAC:destination.mac}%{ETHTYPE_DISCARD}:%{ETHTYPE:iptables.ether_type}?)",
                         "IPTABLES_ETHERNET": "IN=%{DATA:iptables.input_device} OUT=%{DATA:iptables.output_device}?(?: MAC=%{NETFILTERMAC})?",
-                        "IPTABLES_PORT_PAIR": "SPT=%{UNSIGNED_INT:source.port:int} DPT=%{UNSIGNED_INT:destination.port:int}",
+                        "IPTABLES_PORT_PAIR": "SPT=%{UNSIGNED_INT:source_ecs.port:int} DPT=%{UNSIGNED_INT:destination.port:int}",
                         "IPTABLES_TCP_FLAGS": "((?<= )(CWR|ECE|URG|ACK|PSH|RST|SYN|FIN))*",
                         "IPTABLES_TCP_SEQ": "SEQ=%{UNSIGNED_INT:iptables.tcp.seq:int} ACK=%{UNSIGNED_INT:iptables.tcp.ack:int}",
                         "IPTABLES_TCP_DETAILS": "(?:%{IPTABLES_TCP_SEQ} )?WINDOW=%{UNSIGNED_INT:iptables.tcp.window:int} RES=0x%{BASE16NUM:iptables.tcp_reserved_bits} %{IPTABLES_TCP_FLAGS:iptables.tcp.flags}",
@@ -30,9 +30,9 @@
                         "IPTABLES_PROTOCOL": "PROTO=(?<network.transport>[a-zA-Z0-9]+)",
                         "IPTABLES_IP_PAYLOAD": "%{IPTABLES_PROTOCOL}( %{IPTABLES_PORT_PAIR})?( (%{IPTABLES_TCP_DETAILS}|%{IPTABLES_UDP_DETAILS}|%{IPTABLES_ICMP_DETAILS}|%{IPTABLES_INCOMPLETE_PACKET}))?",
                         "IPTABLES_IP_FRAGFLAG": "((?<= )(CE|DF|MF))*",
-                        "IPTABLES_IP_START": "SRC=%{IPV4:source.ip} DST=%{IPV4:destination.ip} LEN=%{UNSIGNED_INT:iptables.length:int} TOS=0x%{BASE16NUM:iptables.tos} PREC=0x%{BASE16NUM:iptables.precedence_bits} TTL=%{UNSIGNED_INT:iptables.ttl:int} ID=%{UNSIGNED_INT:iptables.id:int}(?: %{IPTABLES_IP_FRAGFLAG:iptables.fragment_flags})?(?: FRAG: %{UNSIGNED_INT:iptables.fragment_offset:int})?",
+                        "IPTABLES_IP_START": "SRC=%{IPV4:source_ecs.ip} DST=%{IPV4:destination.ip} LEN=%{UNSIGNED_INT:iptables.length:int} TOS=0x%{BASE16NUM:iptables.tos} PREC=0x%{BASE16NUM:iptables.precedence_bits} TTL=%{UNSIGNED_INT:iptables.ttl:int} ID=%{UNSIGNED_INT:iptables.id:int}(?: %{IPTABLES_IP_FRAGFLAG:iptables.fragment_flags})?(?: FRAG: %{UNSIGNED_INT:iptables.fragment_offset:int})?",
                         "IPTABLES_IP": "%{IPTABLES_IP_START} %{IPTABLES_IP_PAYLOAD}",
-                        "IPTABLES_IPV6_START": "SRC=%{IPV6:source.ip} DST=%{IPV6:destination.ip} LEN=%{UNSIGNED_INT:iptables.length:int} TC=%{UNSIGNED_INT:iptables.tos} HOPLIMIT=%{UNSIGNED_INT:iptables.ttl:int} FLOWLBL=%{UNSIGNED_INT:iptables.flow_label:int}",
+                        "IPTABLES_IPV6_START": "SRC=%{IPV6:source_ecs.ip} DST=%{IPV6:destination.ip} LEN=%{UNSIGNED_INT:iptables.length:int} TC=%{UNSIGNED_INT:iptables.tos} HOPLIMIT=%{UNSIGNED_INT:iptables.ttl:int} FLOWLBL=%{UNSIGNED_INT:iptables.flow_label:int}",
                         "IPTABLES_IPV6": "%{IPTABLES_IPV6_START} %{IPTABLES_IP_PAYLOAD}",
                         "IPTABLES": "%{IPTABLES_ETHERNET} (:?%{IPTABLES_IP}|%{IPTABLES_IPV6})",
                         "UBIQUITI_FIELD": "[^-\\]]*",
@@ -86,8 +86,8 @@
             },
             {
                 "geoip": {
-                    "field": "source.ip",
-                    "target_field": "source.geo",
+                    "field": "source_ecs.ip",
+                    "target_field": "source_ecs.geo",
                     "ignore_missing": true
                 }
             },
