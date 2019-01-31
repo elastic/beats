@@ -18,6 +18,7 @@
         - name: cluster.name
           description: "Name of the cluster"
           example: "docker-cluster"
+          type: keyword
         - name: node.id
           description: "ID of the node"
           example: "DSiWcTyeThWtUXLB9J0BMw"
