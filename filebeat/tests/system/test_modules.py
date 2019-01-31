@@ -27,6 +27,8 @@ def load_fileset_test_cases():
     else:
         modules = os.listdir(modules_dir)
 
+    filesets_env = os.getenv("TESTING_FILEBEAT_FILESETS")
+
     test_cases = []
 
     for module in modules:
@@ -35,7 +37,12 @@ def load_fileset_test_cases():
         if not os.path.isdir(path):
             continue
 
-        for fileset in os.listdir(path):
+        if filesets_env:
+            filesets = filesets_env.split(",")
+        else:
+            filesets = os.listdir(path)
+
+        for fileset in filesets:
             if not os.path.isdir(os.path.join(path, fileset)):
                 continue
 
