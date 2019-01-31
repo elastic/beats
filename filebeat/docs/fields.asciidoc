@@ -4907,7 +4907,7 @@ Logger name
 *`elasticsearch.slowlog.took`*::
 +
 --
-type: text
+type: keyword
 
 example: 300ms
 
@@ -4929,11 +4929,11 @@ Types
 *`elasticsearch.slowlog.stats`*::
 +
 --
-type: text
+type: keyword
 
-example: 
+example: group1
 
-Statistics
+Stats groups
 
 --
 
@@ -4951,7 +4951,7 @@ Search type
 *`elasticsearch.slowlog.source_query`*::
 +
 --
-type: text
+type: keyword
 
 example: {"query":{"match_all":{"boost":1.0}}}
 
@@ -4962,7 +4962,7 @@ Slow query
 *`elasticsearch.slowlog.extra_source`*::
 +
 --
-type: text
+type: keyword
 
 example: 
 
