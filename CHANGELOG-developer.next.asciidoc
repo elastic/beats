@@ -20,7 +20,7 @@ The list below covers the major changes between 7.0.0-alpha2 and master only.
 
 ==== Breaking changes
 
-- Remove support for loading dashboards into Elastic Stack version 5.x
+- Remove support for loading dashboards into Elastic Stack version 5.x. {pull}10451[10451]
 
 ==== Bugfixes
 
