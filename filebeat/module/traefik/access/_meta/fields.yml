@@ -62,7 +62,7 @@
       fields:
         - name: device
           type: alias
-          path: user_agent.device
+          path: user_agent.device.name
         - name: major
           type: alias
           path: user_agent.major

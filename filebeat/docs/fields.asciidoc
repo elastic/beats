@@ -164,7 +164,7 @@ alias to: user_agent.original
 --
 type: alias
 
-alias to: user_agent.device
+alias to: user_agent.device.name
 
 --
 
@@ -4284,16 +4284,6 @@ Major version of the user agent.
 
 --
 
-*`user_agent.device`*::
-+
---
-type: keyword
-
-Name of the physical device.
-
-
---
-
 *`user_agent.os.major`*::
 +
 --
@@ -5754,7 +5744,7 @@ alias to: host.hostname
 --
 type: alias
 
-alias to: user_agent.device
+alias to: user_agent.device.name
 
 --
 
@@ -10846,7 +10836,7 @@ alias to: user_agent.original
 --
 type: alias
 
-alias to: user_agent.device
+alias to: user_agent.device.name
 
 --
 
@@ -13520,7 +13510,7 @@ alias to: user_agent.original
 --
 type: alias
 
-alias to: user_agent.device
+alias to: user_agent.device.name
 
 --
 
