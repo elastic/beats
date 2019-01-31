@@ -19,6 +19,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2..master[Check the HEAD di
 The list below covers the major changes between 7.0.0-alpha2 and master only.
 
 ==== Breaking changes
+- Outputs receive Index Manager as additional parameter. The index manager can
+  be used to create an index selector. {pull}10347[10347]
 
 ==== Bugfixes
 
@@ -27,3 +29,5 @@ The list below covers the major changes between 7.0.0-alpha2 and master only.
 - Allow multiple object type configurations per field. {pull}9772[9772]
 - Move agent metadata addition to a processor. {pull}9952[9952]
 - Add (*common.Config).Has and (*common.Config).Remove. {pull}10363[10363]
+- Introduce ILM and IndexManagment support to beat.Settings. {pull}10347[10347]
+- Introduce ILM and IndexManagement support to beat.Settings. {pull}10347[10347]

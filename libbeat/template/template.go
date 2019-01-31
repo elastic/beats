@@ -53,7 +53,13 @@ type Template struct {
 }
 
 // New creates a new template instance
-func New(beatVersion string, beatName string, esVersion common.Version, config TemplateConfig, migration bool) (*Template, error) {
+func New(
+	beatVersion string,
+	beatName string,
+	esVersion common.Version,
+	config TemplateConfig,
+	migration bool,
+) (*Template, error) {
 	bV, err := common.NewVersion(beatVersion)
 	if err != nil {
 		return nil, err
