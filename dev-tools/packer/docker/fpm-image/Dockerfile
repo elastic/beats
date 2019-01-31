@@ -8,4 +8,4 @@ RUN \
     apt-get install -y --no-install-recommends \
         autoconf build-essential libffi-dev ruby-dev rpm zip dos2unix libgmp3-dev
 
-RUN gem install fpm -v 1.9.2
+RUN gem install fpm -v 1.11.0
