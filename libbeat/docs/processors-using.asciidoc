@@ -806,7 +806,7 @@ by default.
 cannot be accurately detected, as when running {beatname_lc} in host network
 mode.
 `namespace`:: (Optional) Select the namespace from which to collect the
-metadata, if it is not set, the processor collects metadata from all namespaces.
+metadata. If it is not set, the processor collects metadata from all namespaces.
 It is unset by default.
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
 client.
