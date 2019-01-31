@@ -3343,6 +3343,17 @@ The pid of the process.
 
 --
 
+*`event.outcome`*::
++
+--
+type: keyword
+
+The outcome of the event.
+If the event describes an action, this fields contains the outcome of that action. Examples outcomes are `success` and `failure`. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+
+
+--
+
 *`event.severity`*::
 +
 --
@@ -3400,6 +3411,15 @@ type: keyword
 
 Log source path.
 
+
+--
+
+*`log.original`*::
++
+--
+type: keyword
+
+Field is not indexed.
 
 --
 
@@ -3473,6 +3493,16 @@ type: ip
 
 IP address of the source.
 Can be one or multiple IPv4 or IPv6 addresses.
+
+
+--
+
+*`source_ecs.mac`*::
++
+--
+type: keyword
+
+MAC address of the source.
 
 
 --
@@ -3561,6 +3591,16 @@ type: ip
 
 IP address of the destination.
 Can be one or multiple IPv4 or IPv6 addresses.
+
+
+--
+
+*`destination.mac`*::
++
+--
+type: keyword
+
+MAC address of the destination.
 
 
 --
@@ -3809,6 +3849,35 @@ Path to the file.
 type: long
 
 File size in bytes (field is only added when `type` is `file`).
+
+--
+
+[float]
+== network fields
+
+The network is defined as the communication path over which a host or network event happens. The network.* fields should be populated with details about the network activity associated with an event.
+
+
+
+*`network.transport`*::
++
+--
+type: keyword
+
+Same as network.iana_number, but instead using the Keyword name of the transport layer (udp, tcp, ipv6-icmp, etc.)
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS"  section.
+
+
+--
+
+*`network.type`*::
++
+--
+type: keyword
+
+In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS" section.
+
 
 --
 
