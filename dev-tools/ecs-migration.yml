@@ -1541,6 +1541,38 @@
   alias: false
   beat: metricbeat
 
+### System
+
+- from: system.process.name
+  to: process.name
+  alias: true
+  beat: metricbeat
+
+- from: system.process.pid
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
+- from: system.process.ppid
+  to: process.ppid
+  alias: true
+  beat: metricbeat
+
+- from: system.process.pgid
+  to: process.pgid
+  alias: true
+  beat: metricbeat
+
+- from: system.process.cwd
+  to: process.working_directory
+  alias: true
+  beat: metricbeat
+
+- from: system.process.username
+  to: user.name
+  alias: true
+  beat: metricbeat
+
 ### Zookeeper
 
 - from: zookeeper.mntr.version

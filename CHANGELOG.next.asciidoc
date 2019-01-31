@@ -84,6 +84,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Migrate system process metricset fields to ECS. {pull}10332[10332]
 - Refactor Prometheus metric mappings {pull}9948[9948]
 - Removed Prometheus stats metricset in favor of just using Prometheus collector {pull}9948[9948]
 - Adjust Redis.info metricset fields to ECS. {pull}10319[10319]
@@ -259,6 +260,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release use of xpack.enabled: true flag in Elasticsearch and Kibana modules as GA. {pull}10222[10222]
 - Add support for MySQL 8.0 and tests also for Percona and MariaDB. {pull}10261[10261]
 - Rename 'db' Metricset to 'transaction_log' in MSSQL Metricbeat module {pull}10109[10109]
+- Add process arguments and the path to its executable file in the system process metricset {pull}10332[10332]
 - Added 'server' Metricset to Zookeeper Metricbeat module {issue}8938[8938] {pull}10341[10341]
 - Release AWS module as GA. {pull}10345[10345]
 - Add overview dashboard to Zookeeper Metricbeat module {pull}10379[10379]
