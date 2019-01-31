@@ -236,17 +236,17 @@ func TestOverwrite(t *testing.T) {
 	client.Request("DELETE", "/_template/"+templateName, "", nil, nil)
 
 	// Load template
-	config := newConfigFrom(t, TemplateConfig{
+	config := TemplateConfig{
 		Enabled: true,
 		Fields:  absPath + "/fields.yml",
-	})
+	}
 	loader, err := NewLoader(config, client, beatInfo, nil, false)
 	assert.NoError(t, err)
 	err = loader.Load()
 	assert.NoError(t, err)
 
 	// Load template again, this time with custom settings
-	config = newConfigFrom(t, TemplateConfig{
+	config = TemplateConfig{
 		Enabled: true,
 		Fields:  absPath + "/fields.yml",
 		Settings: TemplateSettings{
@@ -254,7 +254,7 @@ func TestOverwrite(t *testing.T) {
 				"enabled": false,
 			},
 		},
-	})
+	}
 	loader, err = NewLoader(config, client, beatInfo, nil, false)
 	assert.NoError(t, err)
 	err = loader.Load()
@@ -265,7 +265,7 @@ func TestOverwrite(t *testing.T) {
 	assert.Equal(t, true, templateJSON.SourceEnabled())
 
 	// Load template again, this time with custom settings AND overwrite: true
-	config = newConfigFrom(t, TemplateConfig{
+	config = TemplateConfig{
 		Enabled:   true,
 		Overwrite: true,
 		Fields:    absPath + "/fields.yml",
@@ -274,7 +274,7 @@ func TestOverwrite(t *testing.T) {
 				"enabled": false,
 			},
 		},
-	})
+	}
 	loader, err = NewLoader(config, client, beatInfo, nil, false)
 	assert.NoError(t, err)
 	err = loader.Load()
@@ -370,12 +370,6 @@ func TestTemplateWithData(t *testing.T) {
 
 	// Make sure it was removed
 	assert.False(t, loader.CheckTemplate(tmpl.GetName()))
-}
-
-func newConfigFrom(t *testing.T, from interface{}) *common.Config {
-	cfg, err := common.NewConfigFrom(from)
-	assert.NoError(t, err)
-	return cfg
 }
 
 func getTemplate(t *testing.T, client ESClient, templateName string) testTemplate {

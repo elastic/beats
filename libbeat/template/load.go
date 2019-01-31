@@ -45,14 +45,13 @@ type Loader struct {
 }
 
 // NewLoader creates a new template loader
-func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info, fields []byte, migration bool) (*Loader, error) {
-	config := DefaultConfig
-
-	err := cfg.Unpack(&config)
-	if err != nil {
-		return nil, err
-	}
-
+func NewLoader(
+	config TemplateConfig,
+	client ESClient,
+	beatInfo beat.Info,
+	fields []byte,
+	migration bool,
+) (*Loader, error) {
 	return &Loader{
 		config:    config,
 		client:    client,

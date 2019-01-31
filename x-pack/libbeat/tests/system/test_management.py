@@ -85,8 +85,9 @@ class TestManagement(BaseTest):
         new_content = open(config_path, 'r').read()
         assert config_content == new_content
 
-    @unittest.skipIf(not INTEGRATION_TESTS,
-                     "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
+    # @unittest.skipIf(not INTEGRATION_TESTS,
+    #                  "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
+    @unittest.skip("Skipping because snapshot is not ready yet. see #10446")
     def test_fetch_configs(self):
         """
         Config is retrieved from Central Management and updates are applied
@@ -152,8 +153,9 @@ class TestManagement(BaseTest):
 
         proc.check_kill_and_wait()
 
-    @unittest.skipIf(not INTEGRATION_TESTS,
-                     "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
+    # @unittest.skipIf(not INTEGRATION_TESTS,
+    #                  "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
+    @unittest.skip("Skipping because snapshot is not ready yet. see #10446")
     def test_configs_cache(self):
         """
         Config cache is used if Kibana is not available
@@ -255,6 +257,7 @@ class TestManagement(BaseTest):
         url = self.get_kibana_url() + "/api/beats/agents_tags/assignments"
         r = requests.post(url, json=data, headers=headers,
                           auth=(self.es_user, self.es_pass))
+
         assert r.status_code == 200
 
     def get_elasticsearch_url(self):

@@ -31,21 +31,19 @@ class Test(BaseTest):
         self.index_name = "test-filebeat-ml"
 
     @parameterized.expand([
-        (True, False),
-        (True, True),
-        (False, False),
-        (False, True),
+        (False,),
+        (True,),
     ])
     @unittest.skipIf(not INTEGRATION_TESTS,
                      "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
     @unittest.skipIf(os.getenv("TESTING_ENVIRONMENT") == "2x",
                      "integration test not available on 2.x")
     @unittest.skipIf(os.name == "nt", "skipped on Windows")
-    def test_ml_setup(self, setup_flag, modules_flag):
+    def test_ml_setup(self, modules_flag):
         """ Test ML are installed in all possible ways """
-        self._run_ml_test(setup_flag, modules_flag)
+        self._run_ml_test(modules_flag)
 
-    def _run_ml_test(self, setup_flag, modules_flag):
+    def _run_ml_test(self, modules_flag):
         self.init()
 
         from elasticsearch import AuthorizationException
@@ -55,7 +53,7 @@ class Test(BaseTest):
         except AuthorizationException:
             print("License already enabled")
 
-        print("Test setup_flag: {}, modules_flag: {}".format(setup_flag, modules_flag))
+        print("Test modules_flag: {}".format(modules_flag))
 
         # Clean any previous state
         for df in self.es.transport.perform_request("GET", "/_xpack/ml/datafeeds/")["datafeeds"]:
@@ -93,14 +91,9 @@ class Test(BaseTest):
             "-c", cfgfile
         ]
 
-        # Skipping dashboard loading to speed up tests, unfortunately only works for setup and not --setup
+        # Skipping dashboard loading to speed up tests
         cmd += ["-E", "setup.dashboards.enabled=false"]
-
-        if setup_flag:
-            cmd += ["--setup"]
-        else:
-            cmd += ["setup", "--machine-learning"]
-
+        cmd += ["setup", "--machine-learning"]
         if modules_flag:
             cmd += ["--modules=nginx"]
 
