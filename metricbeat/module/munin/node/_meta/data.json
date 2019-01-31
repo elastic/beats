@@ -5,7 +5,7 @@
         "name": "host.example.com"
     },
     "event": {
-        "dataset": "munin.example",
+        "dataset": "munin.node",
         "duration": 115000,
         "module": "munin"
     },
@@ -13,195 +13,23 @@
         "name": "node"
     },
     "munin": {
-        "example": {
-            "cpu": {
-                "guest": 0,
-                "idle": 194286379,
-                "iowait": 75847,
-                "irq": 0,
-                "nice": 0,
-                "softirq": 64417,
-                "steal": 0,
-                "system": 4743011,
-                "user": 3686223
-            },
-            "df": {
-                "_dev": 0,
-                "_dev_sda1": 17.2858983372179,
-                "_proc_acpi": 0,
-                "_sys_firmware": 0,
-                "_sys_fs_cgroup": 0,
-                "overlay": 17.2858983372179,
-                "shm": 0
-            },
-            "df_inode": {
-                "_dev": 0.00252557938369549,
-                "_dev_sda1": 8.53179355837264,
-                "_proc_acpi": 0.000157848711480968,
-                "_sys_firmware": 0.000157848711480968,
-                "_sys_fs_cgroup": 0.00220988196073355,
-                "overlay": 8.53179355837264,
-                "shm": 0.000157848711480968
-            },
-            "entropy": {
-                "entropy": 3363
-            },
-            "forks": {
-                "forks": 29569079
-            },
-            "fw_conntrack": {
-                "assured": 14,
-                "established": 1,
-                "fin_wait": 0,
-                "nated": 0,
-                "syn_sent": 0,
-                "time_wait": 4,
-                "total": 14,
-                "udp": 0
-            },
-            "fw_forwarded_local": {
-                "forward": 0,
-                "local": 1
-            },
-            "fw_packets": {
-                "forwarded": 0,
-                "received": 823
-            },
-            "if_err_eth0": {
-                "collisions": 0,
-                "rcvd": 0,
-                "rxdrop": 0,
-                "trans": 0,
-                "txdrop": 0
-            },
-            "if_err_ip6tnl0": {
-                "collisions": 0,
-                "rcvd": 0,
-                "rxdrop": 0,
-                "trans": 0,
-                "txdrop": 0
-            },
-            "if_err_tunl0": {
-                "collisions": 0,
-                "rcvd": 0,
-                "rxdrop": 0,
-                "trans": 0,
-                "txdrop": 0
-            },
-            "if_eth0": {
-                "down": 29044,
-                "up": 29797
-            },
-            "if_ip6tnl0": {
-                "down": 0,
-                "up": 0
-            },
-            "if_tunl0": {
-                "down": 0,
-                "up": 0
-            },
-            "interrupts": {
-                "ctx": 2170557862,
-                "intr": 1118035320
-            },
-            "irqstats": {
-                "i0": 29,
-                "i24": 0,
-                "i25": 2163,
-                "i26": 5676056,
-                "i27": 2655,
-                "i28": 52,
-                "i29": 2005,
-                "i30": 0,
-                "i31": 1633298,
-                "i32": 1,
-                "i33": 0,
-                "i34": 18902840,
-                "i35": 24222591,
-                "i36": 0,
-                "i4": 668,
-                "i8": 1,
-                "i9": 0,
-                "iCAL": 127014653,
-                "iERR": 0,
-                "iIWI": 0,
-                "iLOC": 445614790,
-                "iMIS": 0,
-                "iNMI": 0,
-                "iPIN": 0,
-                "iPIW": 0,
-                "iPMI": 0,
-                "iRES": 494963671,
-                "iRTR": 0,
-                "iSPU": 0,
-                "iTLB": 113668705
-            },
-            "load": {
-                "load": 0.16
-            },
-            "memory": {
-                "active": 1087918080,
-                "apps": 328413184,
-                "buffers": 493154304,
-                "cached": 1458929664,
-                "committed": 958160896,
-                "free": 2490265600,
-                "inactive": 1149038592,
-                "mapped": 77598720,
-                "page_tables": 2609152,
-                "slab": 415215616,
-                "swap": 22421504,
-                "swap_cache": 1196032,
-                "vmalloc_used": 0
-            },
-            "open_files": {
-                "max": 524288,
-                "used": 576
-            },
-            "open_inodes": {
-                "max": 119134,
-                "used": 56297
-            },
-            "proc_pri": {
-                "high": 0,
-                "locked": 0,
-                "low": 0
-            },
-            "processes": {
-                "dead": 0,
-                "paging": 0,
-                "processes": 6,
-                "runnable": 2,
-                "sleeping": 4,
-                "stopped": 0,
-                "uninterruptible": 0,
-                "zombie": 0
-            },
-            "swap": {
-                "swap_in": 569,
-                "swap_out": 7814
-            },
-            "threads": {
-                "threads": 6
-            },
-            "uptime": {
-                "uptime": 5.98
-            },
-            "users": {
-                "X": 0,
-                "other": 0,
-                "pts": 0,
-                "pty": 0,
-                "tty": 0
-            },
-            "vmstat": {
-                "sleep": 0,
-                "wait": 0
-            }
+        "metrics": {
+            "guest": 0,
+            "idle": 6999219,
+            "iowait": 5441,
+            "irq": 0,
+            "nice": 0,
+            "softirq": 6419,
+            "steal": 0,
+            "system": 374903,
+            "user": 486780
+        },
+        "plugin": {
+            "name": "cpu"
         }
     },
     "service": {
         "address": "127.0.0.1:4949",
-        "type": "munin"
+        "type": "cpu"
     }
 }
