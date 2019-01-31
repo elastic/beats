@@ -87,7 +87,7 @@ class TestManagement(BaseTest):
 
     # @unittest.skipIf(not INTEGRATION_TESTS,
     #                  "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
-    @unittest.skip("Skipping because snapshot is not ready yet. see #xxx")
+    @unittest.skip("Skipping because snapshot is not ready yet. see #10446")
     def test_fetch_configs(self):
         """
         Config is retrieved from Central Management and updates are applied
@@ -155,7 +155,7 @@ class TestManagement(BaseTest):
 
     # @unittest.skipIf(not INTEGRATION_TESTS,
     #                  "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
-    @unittest.skip("Skipping because snapshot is not ready yet. see #xxx")
+    @unittest.skip("Skipping because snapshot is not ready yet. see #10446")
     def test_configs_cache(self):
         """
         Config cache is used if Kibana is not available
