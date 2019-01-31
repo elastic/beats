@@ -159,7 +159,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Country",
-                "field": "source.geo.country_iso_code",
+                "field": "source_ecs.geo.country_iso_code",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -228,7 +228,7 @@
               "id": "2",
               "params": {
                 "autoPrecision": true,
-                "field": "source.geo.location",
+                "field": "source_ecs.geo.location",
                 "isFilteredByCollar": true,
                 "mapCenter": [
                   0,

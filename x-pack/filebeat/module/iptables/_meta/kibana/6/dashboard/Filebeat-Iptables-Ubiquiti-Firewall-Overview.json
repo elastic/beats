@@ -186,7 +186,7 @@
               "id": "2",
               "params": {
                 "customLabel": "Source IP",
-                "field": "source.ip",
+                "field": "source_ecs.ip",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -249,7 +249,7 @@
               "id": "2",
               "params": {
                 "autoPrecision": true,
-                "field": "source.geo.location",
+                "field": "source_ecs.geo.location",
                 "isFilteredByCollar": true,
                 "mapCenter": [
                   0,
@@ -335,7 +335,7 @@
               "id": "2",
               "params": {
                 "autoPrecision": true,
-                "field": "source.geo.location",
+                "field": "source_ecs.geo.location",
                 "isFilteredByCollar": true,
                 "mapCenter": [
                   0,
