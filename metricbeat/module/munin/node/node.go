@@ -21,11 +21,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-<<<<<<< HEAD
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
-=======
->>>>>>> [Metricbeat] Release munin as GA.
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/munin"
 )
@@ -55,15 +51,8 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-<<<<<<< HEAD
-	cfgwarn.Beta("The munin node metricset is beta.")
 
 	config := defaultConfig
-=======
-	config := struct {
-		Namespace string `config:"node.namespace" validate:"required"`
-	}{}
->>>>>>> [Metricbeat] Release munin as GA.
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
