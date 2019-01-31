@@ -257,7 +257,7 @@ class TestManagement(BaseTest):
         url = self.get_kibana_url() + "/api/beats/agents_tags/assignments"
         r = requests.post(url, json=data, headers=headers,
                           auth=(self.es_user, self.es_pass))
-        print(r.text)
+
         assert r.status_code == 200
 
     def get_elasticsearch_url(self):
