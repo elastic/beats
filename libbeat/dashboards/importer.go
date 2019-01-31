@@ -53,18 +53,10 @@ type MessageOutputter func(msg string, a ...interface{})
 type Importer struct {
 	cfg     *Config
 	version common.Version
-
-	loader Loader
+	loader  *KibanaLoader
 }
 
-type Loader interface {
-	ImportIndex(file string) error
-	ImportDashboard(file string) error
-	statusMsg(msg string, a ...interface{})
-	Close() error
-}
-
-func NewImporter(version common.Version, cfg *Config, loader Loader) (*Importer, error) {
+func NewImporter(version common.Version, cfg *Config, loader *KibanaLoader) (*Importer, error) {
 
 	// Current max version is 7
 	if version.Major > 6 {
