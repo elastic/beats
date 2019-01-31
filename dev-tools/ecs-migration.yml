@@ -659,11 +659,6 @@
   alias: true
   beat: filebeat
 
-- from: apache2.access.user_agent.user_name
-  to: user.name
-  alias: true
-  beat: filebeat
-
 ### Error fileset
 - from: apache2.error.message
   to: message
@@ -1352,11 +1347,6 @@
 
 - from: traefik.access.user_agent.patch
   to: user_agent.patch
-  alias: true
-  beat: filebeat
-
-- from: traefik.access.user_agent.user_name
-  to: user.name
   alias: true
   beat: filebeat
 
