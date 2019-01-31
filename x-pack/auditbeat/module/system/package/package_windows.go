@@ -4,7 +4,7 @@
 
 // +build windows
 
-package socket
+package pkg
 
 import (
 	"fmt"
