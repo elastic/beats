@@ -23,38 +23,61 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/mitchellh/hashstructure"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/heartbeat/eventext"
 	"github.com/elastic/beats/heartbeat/look"
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
 func WrapCommon(js []jobs.Job, id string, name string, typ string) []jobs.Job {
-	return jobs.WrapAll(
-		js,
-		addMonitorStatus,
-		addMonitorDuration,
-		addMonitorMeta(id, name, typ),
-		makeAddSummary(id, uint16(len(js))),
-	)
+	return jobs.WrapAllSeparately(
+		jobs.WrapAll(
+			js,
+			addMonitorStatus,
+			addMonitorDuration,
+		), func() jobs.JobWrapper {
+			return addMonitorMeta(id, name, typ, len(js) > 1)
+		}, func() jobs.JobWrapper {
+			return makeAddSummary()
+		})
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
-func addMonitorMeta(id string, name string, typ string) jobs.JobWrapper {
+func addMonitorMeta(id string, name string, typ string, isMulti bool) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
-		return WithFields(
-			common.MapStr{
-				"monitor": common.MapStr{
-					"id":   id,
-					"name": name,
-					"type": typ,
+		return func(event *beat.Event) ([]jobs.Job, error) {
+			cont, e := job(event)
+			thisID := id
+
+			if isMulti {
+				url, err := event.GetValue("url.full")
+				if err != nil {
+					logp.Error(errors.Wrap(err, "Mandatory url.full key missing!"))
+					url = "n/a"
+				}
+				urlHash, _ := hashstructure.Hash(url, nil)
+				thisID = fmt.Sprintf("%s-%x", id, urlHash)
+			}
+
+			eventext.MergeEventFields(
+				event,
+				common.MapStr{
+					"monitor": common.MapStr{
+						"id":   thisID,
+						"name": name,
+						"type": typ,
+					},
 				},
-			},
-			job,
-		)
+			)
+
+			return cont, e
+		}
 	}
 }
 
@@ -99,7 +122,7 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 }
 
 // makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
-func makeAddSummary(id string, numJobs uint16) jobs.JobWrapper {
+func makeAddSummary() jobs.JobWrapper {
 	// This is a tricky method. The way this works is that we track the state across jobs in the
 	// state struct here.
 	state := struct {
@@ -114,7 +137,7 @@ func makeAddSummary(id string, numJobs uint16) jobs.JobWrapper {
 	}
 	// Note this is not threadsafe, must be called from a mutex
 	resetState := func() {
-		state.remaining = numJobs
+		state.remaining = 1
 		state.up = 0
 		state.down = 0
 		state.generation++
