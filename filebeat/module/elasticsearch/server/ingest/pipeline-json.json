@@ -1,5 +1,5 @@
 {
-    "description": "Pipeline for parsing the Elasticsearch server log file.",
+    "description": "Pipeline for parsing the Elasticsearch server log file in JSON format.",
     "on_failure": [
         {
             "set": {
