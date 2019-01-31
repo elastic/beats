@@ -58,7 +58,14 @@ func URLFields(u *url.URL) common.MapStr {
 	}
 
 	if u.Port() != "" {
-		fields["port"], _ = strconv.ParseUint(u.Port(), 10, 16)
+		val, _ := strconv.ParseUint(u.Port(), 10, 16)
+		fields["port"] = uint16(val) // Just use an int for simplicity
+	} else {
+		if u.Scheme == "http" {
+			fields["port"] = uint16(80)
+		} else if u.Scheme == "https" {
+			fields["port"] = uint16(443)
+		}
 	}
 
 	if u.Path != "" {
