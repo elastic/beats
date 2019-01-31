@@ -14,11 +14,8 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Fix registry handle leak on Windows (https://github.com/elastic/go-sysinfo/pull/33). {pull}9920[9920]
 - Allow to unenroll a Beat from the UI. {issue}9452[9452]
 - Port settings have been deprecated in redis/logstash output and will be removed in 7.0. {pull}9915[9915]
-- Rename `process.exe` to `process.executable` in add_process_metadata to align with ECS. {pull}9949[9949]
-- Import ECS change https://github.com/elastic/ecs/pull/308[ecs#308]:
-  leaf field `user.group` is now the `group` field set. {pull}10275[10275]
 - Update the code of Central Management to align with the new returned format. {pull}10019[10019]
-- Docker and Kubernetes labels/annotations will be "dedoted" by default. {pull}10338[10338]
+
 
 *Auditbeat*
 
