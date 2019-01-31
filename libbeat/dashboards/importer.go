@@ -98,7 +98,7 @@ func (imp Importer) ImportFile(fileType string, file string) error {
 	if fileType == "dashboard" {
 		return imp.loader.ImportDashboard(file)
 	} else if fileType == "index-pattern" {
-		return imp.loader.ImportIndex(file)
+		return imp.loader.ImportIndex()
 	}
 	return fmt.Errorf("Unexpected file type %s", fileType)
 }
@@ -304,7 +304,7 @@ func (imp Importer) ImportKibanaDir(dir string) error {
 
 	check := []string{}
 	if !imp.cfg.OnlyDashboards {
-		check = append(check, "index-pattern")
+		imp.loader.ImportIndex()
 	}
 	wantDashboards := false
 	if !imp.cfg.OnlyIndex {

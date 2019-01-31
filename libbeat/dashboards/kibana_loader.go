@@ -38,9 +38,10 @@ type KibanaLoader struct {
 	version      common.Version
 	hostname     string
 	msgOutputter MessageOutputter
+	fields       common.MapStr
 }
 
-func NewKibanaLoader(ctx context.Context, cfg *common.Config, dashboardsConfig *Config, hostname string, msgOutputter MessageOutputter) (*KibanaLoader, error) {
+func NewKibanaLoader(ctx context.Context, cfg *common.Config, dashboardsConfig *Config, hostname string, msgOutputter MessageOutputter, fields common.MapStr) (*KibanaLoader, error) {
 
 	if cfg == nil || !cfg.Enabled() {
 		return nil, fmt.Errorf("Kibana is not configured or enabled")
@@ -57,6 +58,7 @@ func NewKibanaLoader(ctx context.Context, cfg *common.Config, dashboardsConfig *
 		version:      client.GetVersion(),
 		hostname:     hostname,
 		msgOutputter: msgOutputter,
+		fields:       fields,
 	}
 
 	version := client.GetVersion()
@@ -81,24 +83,11 @@ func getKibanaClient(ctx context.Context, cfg *common.Config, retryCfg *Retry, r
 	return client, nil
 }
 
-func (loader KibanaLoader) ImportIndex(file string) error {
+func (loader KibanaLoader) ImportIndex() error {
 	params := url.Values{}
 	params.Set("force", "true") //overwrite the existing dashboards
 
-	// read json file
-	reader, err := ioutil.ReadFile(file)
-	if err != nil {
-		return fmt.Errorf("fail to read index-pattern from file %s: %v", file, err)
-	}
-
-	var indexContent common.MapStr
-	err = json.Unmarshal(reader, &indexContent)
-	if err != nil {
-		return fmt.Errorf("fail to unmarshal the index content from file %s: %v", file, err)
-	}
-
-	indexContent = ReplaceIndexInIndexPattern(loader.config.Index, indexContent)
-
+	indexContent := ReplaceIndexInIndexPattern(loader.config.Index, loader.fields)
 	return loader.client.ImportJSON(importAPI, params, indexContent)
 }
 

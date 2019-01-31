@@ -24,6 +24,8 @@ import (
 	"log"
 	"path/filepath"
 
+	"github.com/elastic/beats/libbeat/beat"
+
 	"github.com/elastic/beats/libbeat/kibana"
 
 	errw "github.com/pkg/errors"
@@ -34,7 +36,7 @@ import (
 // ImportDashboards tries to import the kibana dashboards.
 func ImportDashboards(
 	ctx context.Context,
-	beatName, hostname, homePath string,
+	beatInfo beat.Info, homePath string,
 	kibanaConfig, dashboardsConfig *common.Config,
 	msgOutputter MessageOutputter, migration bool, fields []byte,
 ) error {
@@ -44,7 +46,7 @@ func ImportDashboards(
 
 	// unpack dashboard config
 	dashConfig := defaultConfig
-	dashConfig.Beat = beatName
+	dashConfig.Beat = beatInfo.Beat
 	dashConfig.Dir = filepath.Join(homePath, defaultDirectory)
 	err := dashboardsConfig.Unpack(&dashConfig)
 	if err != nil {
@@ -60,37 +62,28 @@ func ImportDashboards(
 		return errors.New("kibana configuration missing for loading dashboards.")
 	}
 
-	return setupAndImportDashboardsViaKibana(ctx, hostname, kibanaConfig, &dashConfig, msgOutputter)
-
 	// Generate index pattern
 	version, _ := common.NewVersion("7.0.0") // TODO: dynamic version
-	//beatVersion, _ := common.NewVersion("7.0.0") // TODO: dynamic version
 	//indexP, _ := esConfig.String("index", 0)
-	indexPattern, err := kibana.NewGenerator("filebeat-*", beatName, fields, dashConfig.Dir, "7.0.0", *version, migration)
+	// TODO: What should we do about the index pattern. Kind of strange that ES configs are needed here.
+	indexPattern, err := kibana.NewGenerator(beatInfo.Beat+"-*", beatInfo.Beat, fields, dashConfig.Dir, beatInfo.Version, *version, migration)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	file, err := indexPattern.Generate()
+	pattern, err := indexPattern.Generate()
 	if err != nil {
 		log.Fatalf("ERROR: %s", err)
 	}
 
-	// Log output file location.
-	absFile, err := filepath.Abs(file)
-	if err != nil {
-		absFile = file
-	}
-	log.Printf(">> The index pattern was created under %v", absFile)
-
-	return setupAndImportDashboardsViaKibana(ctx, hostname, kibanaConfig, &dashConfig, msgOutputter)
+	return setupAndImportDashboardsViaKibana(ctx, beatInfo.Hostname, kibanaConfig, &dashConfig, msgOutputter, pattern)
 
 }
 
 func setupAndImportDashboardsViaKibana(ctx context.Context, hostname string, kibanaConfig *common.Config,
-	dashboardsConfig *Config, msgOutputter MessageOutputter) error {
+	dashboardsConfig *Config, msgOutputter MessageOutputter, fields common.MapStr) error {
 
-	kibanaLoader, err := NewKibanaLoader(ctx, kibanaConfig, dashboardsConfig, hostname, msgOutputter)
+	kibanaLoader, err := NewKibanaLoader(ctx, kibanaConfig, dashboardsConfig, hostname, msgOutputter, fields)
 	if err != nil {
 		return fmt.Errorf("fail to create the Kibana loader: %v", err)
 	}

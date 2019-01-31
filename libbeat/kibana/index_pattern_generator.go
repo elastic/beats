@@ -55,18 +55,13 @@ func NewGenerator(indexName, beatName string, fields []byte, outputDir, beatVers
 }
 
 // Generate creates the Index-Pattern for Kibana.
-func (i *IndexPatternGenerator) Generate() (string, error) {
+func (i *IndexPatternGenerator) Generate() (common.MapStr, error) {
 	idxPattern, err := i.generate()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	idxPattern = i.generatePattern(idxPattern)
-
-	file := filepath.Join(i.targetDir, i.targetFilename)
-	err = dumpToFile(file, idxPattern)
-
-	return file, err
+	return i.generatePattern(idxPattern), nil
 }
 
 func (i *IndexPatternGenerator) generate() (common.MapStr, error) {
