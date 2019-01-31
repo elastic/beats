@@ -341,8 +341,6 @@ This configuration results in indices named `sev1`, `sev2`, and `sev3`.
 The `mappings` setting simplifies the configuration, but is limited to string
 values. You cannot specify format strings within the mapping pairs.
 
-<<<<<<< HEAD
-=======
 //TODO: MOVE ILM OPTIONS TO APPEAR LOGICALLY BASED ON LOCATION IN THE YAML FILE.
 
 ifndef::no_ilm[]
@@ -354,7 +352,6 @@ Configuration options for index lifecycle management.
 See <<ilm>> for more information.
 endif::no_ilm[]
 
->>>>>>> docs: add no_ilm attribute
 ifndef::no-pipeline[]
 [[pipeline-option-es]]
 ===== `pipeline`
