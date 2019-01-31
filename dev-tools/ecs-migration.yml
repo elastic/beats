@@ -588,7 +588,6 @@
   to: http.response.body.bytes
   alias: true
 
-# These expand all fields under geoip and user_agent
 - from: apache2.access.geoip.continent_name
   to: source.geo.continent_name
   alias: true
