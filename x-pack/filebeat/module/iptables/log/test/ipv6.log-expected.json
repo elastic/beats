@@ -2,9 +2,8 @@
     {
         "@timestamp": "2019-01-22T09:05:05.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
         "event.dataset": "iptables.log",
-        "event.module": "iptables",
+        "fileset.module": "iptables",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.flow_label": 868225,
@@ -17,11 +16,11 @@
         "iptables.output_device": "lo",
         "iptables.tos": 0,
         "iptables.ttl": 64,
-        "log.offset": 0,
         "log.original": "Jan 22 09:05:05 ubuntu-bionic kernel: [16571.459614] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=1 ",
         "network.transport": "ipv6-icmp",
-        "service.type": "iptables",
-        "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
+        "offset": 0,
+        "prospector.type": "log",
+        "source_ecs.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
             "iptables"
         ]
@@ -29,9 +28,8 @@
     {
         "@timestamp": "2019-01-22T09:05:05.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
         "event.dataset": "iptables.log",
-        "event.module": "iptables",
+        "fileset.module": "iptables",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.flow_label": 770819,
@@ -44,11 +42,11 @@
         "iptables.output_device": "lo",
         "iptables.tos": 0,
         "iptables.ttl": 64,
-        "log.offset": 236,
         "log.original": "Jan 22 09:05:05 ubuntu-bionic kernel: [16571.459695] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=1 ",
         "network.transport": "ipv6-icmp",
-        "service.type": "iptables",
-        "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
+        "offset": 236,
+        "prospector.type": "log",
+        "source_ecs.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
             "iptables"
         ]
@@ -56,9 +54,8 @@
     {
         "@timestamp": "2019-01-22T09:05:06.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
         "event.dataset": "iptables.log",
-        "event.module": "iptables",
+        "fileset.module": "iptables",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.flow_label": 868225,
@@ -71,11 +68,11 @@
         "iptables.output_device": "lo",
         "iptables.tos": 0,
         "iptables.ttl": 64,
-        "log.offset": 472,
         "log.original": "Jan 22 09:05:06 ubuntu-bionic kernel: [16572.482458] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=2 ",
         "network.transport": "ipv6-icmp",
-        "service.type": "iptables",
-        "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
+        "offset": 472,
+        "prospector.type": "log",
+        "source_ecs.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
             "iptables"
         ]
@@ -83,9 +80,8 @@
     {
         "@timestamp": "2019-01-22T09:05:06.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
         "event.dataset": "iptables.log",
-        "event.module": "iptables",
+        "fileset.module": "iptables",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.flow_label": 770819,
@@ -98,11 +94,11 @@
         "iptables.output_device": "lo",
         "iptables.tos": 0,
         "iptables.ttl": 64,
-        "log.offset": 708,
         "log.original": "Jan 22 09:05:06 ubuntu-bionic kernel: [16572.482476] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=2 ",
         "network.transport": "ipv6-icmp",
-        "service.type": "iptables",
-        "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
+        "offset": 708,
+        "prospector.type": "log",
+        "source_ecs.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
             "iptables"
         ]
@@ -110,9 +106,8 @@
     {
         "@timestamp": "2019-01-22T09:05:07.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
         "event.dataset": "iptables.log",
-        "event.module": "iptables",
+        "fileset.module": "iptables",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.flow_label": 868225,
@@ -125,11 +120,11 @@
         "iptables.output_device": "lo",
         "iptables.tos": 0,
         "iptables.ttl": 64,
-        "log.offset": 944,
         "log.original": "Jan 22 09:05:07 ubuntu-bionic kernel: [16573.506336] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=3 ",
         "network.transport": "ipv6-icmp",
-        "service.type": "iptables",
-        "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
+        "offset": 944,
+        "prospector.type": "log",
+        "source_ecs.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
             "iptables"
         ]
@@ -137,9 +132,8 @@
     {
         "@timestamp": "2019-01-22T09:05:07.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
         "event.dataset": "iptables.log",
-        "event.module": "iptables",
+        "fileset.module": "iptables",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.flow_label": 770819,
@@ -152,11 +146,11 @@
         "iptables.output_device": "lo",
         "iptables.tos": 0,
         "iptables.ttl": 64,
-        "log.offset": 1180,
         "log.original": "Jan 22 09:05:07 ubuntu-bionic kernel: [16573.506356] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=3 ",
         "network.transport": "ipv6-icmp",
-        "service.type": "iptables",
-        "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
+        "offset": 1180,
+        "prospector.type": "log",
+        "source_ecs.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
             "iptables"
         ]
@@ -164,9 +158,8 @@
     {
         "@timestamp": "2019-01-22T09:05:08.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
         "event.dataset": "iptables.log",
-        "event.module": "iptables",
+        "fileset.module": "iptables",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.flow_label": 868225,
@@ -179,11 +172,11 @@
         "iptables.output_device": "lo",
         "iptables.tos": 0,
         "iptables.ttl": 64,
-        "log.offset": 1416,
         "log.original": "Jan 22 09:05:08 ubuntu-bionic kernel: [16574.533989] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=4 ",
         "network.transport": "ipv6-icmp",
-        "service.type": "iptables",
-        "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
+        "offset": 1416,
+        "prospector.type": "log",
+        "source_ecs.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
             "iptables"
         ]
@@ -191,9 +184,8 @@
     {
         "@timestamp": "2019-01-22T09:05:08.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
         "event.dataset": "iptables.log",
-        "event.module": "iptables",
+        "fileset.module": "iptables",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.flow_label": 770819,
@@ -206,11 +198,11 @@
         "iptables.output_device": "lo",
         "iptables.tos": 0,
         "iptables.ttl": 64,
-        "log.offset": 1652,
         "log.original": "Jan 22 09:05:08 ubuntu-bionic kernel: [16574.534007] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=4 ",
         "network.transport": "ipv6-icmp",
-        "service.type": "iptables",
-        "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
+        "offset": 1652,
+        "prospector.type": "log",
+        "source_ecs.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
             "iptables"
         ]
@@ -218,9 +210,8 @@
     {
         "@timestamp": "2019-01-22T09:05:09.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
         "event.dataset": "iptables.log",
-        "event.module": "iptables",
+        "fileset.module": "iptables",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.flow_label": 868225,
@@ -233,11 +224,11 @@
         "iptables.output_device": "lo",
         "iptables.tos": 0,
         "iptables.ttl": 64,
-        "log.offset": 1888,
         "log.original": "Jan 22 09:05:09 ubuntu-bionic kernel: [16575.553704] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=5 ",
         "network.transport": "ipv6-icmp",
-        "service.type": "iptables",
-        "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
+        "offset": 1888,
+        "prospector.type": "log",
+        "source_ecs.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
             "iptables"
         ]
@@ -245,9 +236,8 @@
     {
         "@timestamp": "2019-01-22T09:05:09.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
         "event.dataset": "iptables.log",
-        "event.module": "iptables",
+        "fileset.module": "iptables",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.flow_label": 770819,
@@ -260,11 +250,11 @@
         "iptables.output_device": "lo",
         "iptables.tos": 0,
         "iptables.ttl": 64,
-        "log.offset": 2124,
         "log.original": "Jan 22 09:05:09 ubuntu-bionic kernel: [16575.553722] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=5 ",
         "network.transport": "ipv6-icmp",
-        "service.type": "iptables",
-        "source.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
+        "offset": 2124,
+        "prospector.type": "log",
+        "source_ecs.ip": "2001:0db8:0000:0000:0000:0000:0000:0001",
         "tags": [
             "iptables"
         ]
@@ -273,9 +263,8 @@
         "@timestamp": "2019-01-22T10:52:34.000Z",
         "destination.ip": "ff02:0000:0000:0000:0000:0000:0000:0016",
         "destination.mac": "90:10:12:34:56:78",
-        "ecs.version": "1.0.0-beta2",
         "event.dataset": "iptables.log",
-        "event.module": "iptables",
+        "fileset.module": "iptables",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.ether_type": 34525,
@@ -287,13 +276,13 @@
         "iptables.output_device": "enp0s3",
         "iptables.tos": 0,
         "iptables.ttl": 1,
-        "log.offset": 2360,
         "log.original": "Jan 22 10:52:34 ubuntu-bionic kernel: [  307.757925] IN= OUT=enp0s3 MAC=90:10:12:34:56:78:90:10:aa:bb:cc:dd:86:dd:ff:ff SRC=fe80:0000:0000:0000:0084:88ff:feae:790a DST=ff02:0000:0000:0000:0000:0000:0000:0016 LEN=96 TC=0 HOPLIMIT=1 FLOWLBL=0 PROTO=ICMPv6 TYPE=143 CODE=0 MARK=0xd4",
         "network.transport": "ipv6-icmp",
         "network.type": "ipv6",
-        "service.type": "iptables",
-        "source.ip": "fe80:0000:0000:0000:0084:88ff:feae:790a",
-        "source.mac": "90:10:aa:bb:cc:dd",
+        "offset": 2360,
+        "prospector.type": "log",
+        "source_ecs.ip": "fe80:0000:0000:0000:0084:88ff:feae:790a",
+        "source_ecs.mac": "90:10:aa:bb:cc:dd",
         "tags": [
             "iptables"
         ]
