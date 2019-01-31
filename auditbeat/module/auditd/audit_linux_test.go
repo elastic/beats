@@ -110,7 +110,7 @@ func assertFieldsAreDocumented(t *testing.T, events []mb.Event) {
 
 	for _, e := range events {
 		beatEvent := e.BeatEvent(moduleName, metricsetName, core.AddDatasetToEvent)
-		for eventFieldName, _ := range beatEvent.Fields.Flatten() {
+		for eventFieldName := range beatEvent.Fields.Flatten() {
 			found := false
 			for _, documentedFieldName := range documentedFields {
 				// Have to use HasPrefix and not "==" since fields in auditd.paths.* get flattened
