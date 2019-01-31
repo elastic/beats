@@ -15,11 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package mapvaltest
-
-// skimatest is a separate package from skima since we don't want to import "testing"
-// into skima, since there is a good chance we'll use skima for running user-defined
-// tests in heartbeat at runtime.
+package mapval
 
 import (
 	"testing"
@@ -28,12 +24,11 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/mapval"
 )
 
 // Test takes the output from a Validator invocation and runs test assertions on the result.
 // If you are using this library for testing you will probably want to run Test(t, Compile(Map{...}), actual) as a pattern.
-func Test(t *testing.T, v mapval.Validator, m common.MapStr) *mapval.Results {
+func Test(t *testing.T, v Validator, m common.MapStr) *Results {
 	r := v(m)
 
 	if !r.Valid {
