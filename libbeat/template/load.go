@@ -43,8 +43,6 @@ type Loader struct {
 	fields   []byte
 }
 
-var minIncludeTypesVersion = common.MustNewVersion("7.0.0")
-
 // NewLoader creates a new template loader
 func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info, fields []byte) (*Loader, error) {
 	config := DefaultConfig
@@ -66,7 +64,6 @@ func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info, fields [
 // In case the template is not already loaded or overwriting is enabled, the
 // template is written to index
 func (l *Loader) Load() error {
-
 	tmpl, err := New(l.beatInfo.Version, l.beatInfo.IndexPrefix, l.client.GetVersion(), l.config)
 	if err != nil {
 		return fmt.Errorf("error creating template instance: %v", err)
@@ -140,7 +137,7 @@ func (l *Loader) Load() error {
 func (l *Loader) LoadTemplate(templateName string, template map[string]interface{}) error {
 	logp.Debug("template", "Try loading template with name: %s", templateName)
 	path := "/_template/" + templateName
-	body, err := loadJSONWithType(l.client, path, template)
+	body, err := loadJSON(l.client, path, template)
 	if err != nil {
 		return fmt.Errorf("couldn't load template: %v. Response body: %s", err, body)
 	}
@@ -155,9 +152,8 @@ func (l *Loader) CheckTemplate(templateName string) bool {
 	return status == 200
 }
 
-func loadJSONWithType(client ESClient, path string, json map[string]interface{}) ([]byte, error) {
-	params := esVersionParams(client.GetVersion())
-	status, body, err := client.Request("PUT", path, "", params, json)
+func loadJSON(client ESClient, path string, json map[string]interface{}) ([]byte, error) {
+	status, body, err := client.Request("PUT", path, "", nil, json)
 	if err != nil {
 		return body, fmt.Errorf("couldn't load json. Error: %s", err)
 	}
@@ -166,14 +162,4 @@ func loadJSONWithType(client ESClient, path string, json map[string]interface{})
 	}
 
 	return body, nil
-}
-
-func esVersionParams(version common.Version) map[string]string {
-	if version.LessThan(minIncludeTypesVersion) {
-		return nil
-	}
-
-	return map[string]string{
-		"include_type_name": "true",
-	}
 }

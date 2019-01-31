@@ -28,17 +28,17 @@ import (
 )
 
 func TestFieldsHasKey(t *testing.T) {
-	tests := []struct {
+	tests := map[string]struct {
 		key    string
 		fields Fields
 		result bool
 	}{
-		{
+		"empty fields": {
 			key:    "test.find",
 			fields: Fields{},
 			result: false,
 		},
-		{
+		"unknown nested key": {
 			key: "test.find",
 			fields: Fields{
 				Field{Name: "test"},
@@ -46,7 +46,7 @@ func TestFieldsHasKey(t *testing.T) {
 			},
 			result: false,
 		},
-		{
+		"has": {
 			key: "test.find",
 			fields: Fields{
 				Field{
@@ -59,7 +59,7 @@ func TestFieldsHasKey(t *testing.T) {
 			},
 			result: true,
 		},
-		{
+		"no leave node": {
 			key: "test",
 			fields: Fields{
 				Field{
@@ -74,45 +74,39 @@ func TestFieldsHasKey(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		assert.Equal(t, test.result, test.fields.HasKey(test.key))
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			assert.Equal(t, test.result, test.fields.HasKey(test.key))
+		})
 	}
 }
 
 func TestDynamicYaml(t *testing.T) {
-	tests := []struct {
+	tests := map[string]struct {
 		input  []byte
 		output Field
 		error  bool
 	}{
-		{
-			input: []byte(`
-name: test
-dynamic: true`),
+		"dynamic enabled": {
+			input: []byte(`{name: test, dynamic: true}`),
 			output: Field{
 				Name:    "test",
 				Dynamic: DynamicType{true},
 			},
 		},
-		{
-			input: []byte(`
-name: test
-dynamic: "true"`),
+		"dynamic enabled2": {
+			input: []byte(`{name: test, dynamic: "true"}`),
 			output: Field{
 				Name:    "test",
 				Dynamic: DynamicType{true},
 			},
 		},
-		{
-			input: []byte(`
-name: test
-dynamic: "blue"`),
+		"invalid setting": {
+			input: []byte(`{name: test, dynamic: "blue"}`),
 			error: true,
 		},
-		{
-			input: []byte(`
-name: test
-dynamic: "strict"`),
+		"strict mode": {
+			input: []byte(`{name: test, dynamic: "strict"}`),
 			output: Field{
 				Name:    "test",
 				Dynamic: DynamicType{"strict"},
@@ -120,18 +114,20 @@ dynamic: "strict"`),
 		},
 	}
 
-	for _, test := range tests {
-		keys := Field{}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			keys := Field{}
 
-		cfg, err := yaml.NewConfig(test.input)
-		assert.NoError(t, err)
-		err = cfg.Unpack(&keys)
+			cfg, err := yaml.NewConfig(test.input)
+			assert.NoError(t, err)
+			err = cfg.Unpack(&keys)
 
-		if err != nil {
-			assert.True(t, test.error)
-		} else {
-			assert.Equal(t, test.output.Dynamic, keys.Dynamic)
-		}
+			if err != nil {
+				assert.True(t, test.error)
+			} else {
+				assert.Equal(t, test.output.Dynamic, keys.Dynamic)
+			}
+		})
 	}
 }
 
@@ -193,46 +189,44 @@ func TestGetKeys(t *testing.T) {
 }
 
 func TestFieldValidate(t *testing.T) {
-	tests := []struct {
+	tests := map[string]struct {
 		cfg   MapStr
 		field Field
 		err   bool
-		name  string
 	}{
-		{
+		"top level object type config": {
 			cfg:   MapStr{"object_type": "scaled_float", "object_type_mapping_type": "float", "scaling_factor": 10},
 			field: Field{ObjectType: "scaled_float", ObjectTypeMappingType: "float", ScalingFactor: 10},
 			err:   false,
-			name:  "top level object type config",
-		}, {
+		},
+		"multiple object type configs": {
 			cfg: MapStr{"object_type_params": []MapStr{
 				{"object_type": "scaled_float", "object_type_mapping_type": "float", "scaling_factor": 100}}},
 			field: Field{ObjectTypeParams: []ObjectTypeCfg{{ObjectType: "scaled_float", ObjectTypeMappingType: "float", ScalingFactor: 100}}},
 			err:   false,
-			name:  "multiple object type configs",
-		}, {
+		},
+		"invalid config mixing object_type and object_type_params": {
 			cfg: MapStr{
 				"object_type":        "scaled_float",
 				"object_type_params": []MapStr{{"object_type": "scaled_float", "object_type_mapping_type": "float"}}},
-			err:  true,
-			name: "invalid config mixing object_type and object_type_params",
-		}, {
+			err: true,
+		},
+		"invalid config mixing object_type_mapping_type and object_type_params": {
 			cfg: MapStr{
 				"object_type_mapping_type": "float",
 				"object_type_params":       []MapStr{{"object_type": "scaled_float", "object_type_mapping_type": "float"}}},
-			err:  true,
-			name: "invalid config mixing object_type_mapping_type and object_type_params",
-		}, {
+			err: true,
+		},
+		"invalid config mixing scaling_factor and object_type_params": {
 			cfg: MapStr{
 				"scaling_factor":     100,
 				"object_type_params": []MapStr{{"object_type": "scaled_float", "object_type_mapping_type": "float"}}},
-			err:  true,
-			name: "invalid config mixing scaling_factor and object_type_params",
+			err: true,
 		},
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
 			cfg, err := NewConfigFrom(test.cfg)
 			require.NoError(t, err)
 			var f Field
@@ -245,5 +239,86 @@ func TestFieldValidate(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestFieldConcat(t *testing.T) {
+	tests := map[string]struct {
+		a, b Fields
+		want Fields
+		fail bool
+	}{
+		"empty lists": {},
+		"first list only": {
+			a:    Fields{{Name: "a"}},
+			want: Fields{{Name: "a"}},
+		},
+		"second list only": {
+			b:    Fields{{Name: "a"}},
+			want: Fields{{Name: "a"}},
+		},
+		"concat": {
+			a:    Fields{{Name: "a"}},
+			b:    Fields{{Name: "b"}},
+			want: Fields{{Name: "a"}, {Name: "b"}},
+		},
+		"duplicates fail": {
+			a:    Fields{{Name: "a"}},
+			b:    Fields{{Name: "a"}},
+			fail: true,
+		},
+		"nested with common prefix": {
+			a: Fields{{
+				Name:   "a",
+				Fields: Fields{{Name: "b"}},
+			}},
+			b: Fields{{
+				Name:   "a",
+				Fields: Fields{{Name: "c"}},
+			}},
+			want: Fields{
+				{Name: "a", Fields: Fields{{Name: "b"}}},
+				{Name: "a", Fields: Fields{{Name: "c"}}},
+			},
+		},
+		"nested duplicates fail": {
+			fail: true,
+			a: Fields{{
+				Name:   "a",
+				Fields: Fields{{Name: "b"}, {Name: "c"}},
+			}},
+			b: Fields{{
+				Name:   "a",
+				Fields: Fields{{Name: "c"}},
+			}},
+		},
+		"a is prefix of b": {
+			fail: true,
+			a:    Fields{{Name: "a"}},
+			b: Fields{{
+				Name:   "a",
+				Fields: Fields{{Name: "b"}},
+			}},
+		},
+		"b is prefix of a": {
+			fail: true,
+			a: Fields{{
+				Name:   "a",
+				Fields: Fields{{Name: "b"}},
+			}},
+			b: Fields{{Name: "a"}},
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			fs, err := ConcatFields(test.a, test.b)
+			if test.fail {
+				assert.Error(t, err)
+				return
+			}
+
+			assert.NoError(t, err)
+			assert.Equal(t, test.want, fs)
+		})
+	}
 }
