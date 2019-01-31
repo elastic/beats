@@ -129,6 +129,159 @@
 
 # Filebeat modules
 
+# Auditd module
+
+- from: auditd.log.acct
+  to: user.name
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.pid
+  to: process.pid
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.ppid
+  to: process.ppid
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.res
+  to: event.outcome
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.record_type
+  to: event.action
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.arch
+  to: host.architecture
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.gid
+  to: user.group.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.uid
+  to: user.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.agid
+  to: user.audit.group.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.auid
+  to: user.audit.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.fsgid
+  to: user.filesystem.group.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.egid
+  to: user.effective.group.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.euid
+  to: user.effective.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.sgid
+  to: user.saved.group.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.suid
+  to: user.saved.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.ogid
+  to: user.owner.group.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.ouid
+  to: user.owner.id
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.terminal
+  to: user.terminal
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.comm
+  to: process.name
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.cmd
+  to: process.args
+  alias: false
+  beat: filebeat
+  comment: Was a cmdline string, whereas args is an array of keywords.
+
+- from: auditd.log.exe
+  to: process.executable
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.msg
+  to: message
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.src
+  to: source.address
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.dst
+  to: destination.address
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.geoip.location
+  to: source.geo.location
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+  beat: filebeat
+
+- from: auditd.log.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+  beat: filebeat
+
 # Suricata module
 
 - from: source_ecs.ip
@@ -1386,6 +1539,82 @@
 - from: http.request.body
   to: http.request.body.content
   alias: false
+  beat: metricbeat
+
+### System
+
+- from: system.process.name
+  to: process.name
+  alias: true
+  beat: metricbeat
+
+- from: system.process.pid
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
+- from: system.process.ppid
+  to: process.ppid
+  alias: true
+  beat: metricbeat
+
+- from: system.process.pgid
+  to: process.pgid
+  alias: true
+  beat: metricbeat
+
+- from: system.process.cwd
+  to: process.working_directory
+  alias: true
+  beat: metricbeat
+
+- from: system.process.username
+  to: user.name
+  alias: true
+  beat: metricbeat
+
+### Kibana
+
+- from: kibana.stats.uuid
+  to: service.id
+  alias: true
+  beat: metricbeat
+
+- from: kibana.stats.transport_address
+  to: service.address
+  alias: true
+  beat: metricbeat
+
+- from: kibana.stats.version
+  to: service.version
+  alias: true
+  beat: metricbeat
+
+- from: kibana.status.uuid
+  to: service.id
+  alias: true
+  beat: metricbeat
+
+- from: kibana.status.version.number
+  to: service.version
+  alias: true
+  beat: metricbeat
+
+### Logstash
+
+- from: logstash.node.host
+  to: service.hostname
+  alias: true
+  beat: metricbeat
+
+- from: logstash.node.version
+  to: service.version
+  alias: true
+  beat: metricbeat
+
+- from: logstash.node.jvm.pid
+  to: process.pid
+  alias: true
   beat: metricbeat
 
 ### Zookeeper

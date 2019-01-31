@@ -32,7 +32,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/fmtstr"
+	"github.com/elastic/beats/libbeat/idxmgmt"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/outest"
 	"github.com/elastic/beats/libbeat/outputs/outil"
@@ -187,47 +187,6 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 	res, _ := bulkCollectPublishFails(reader, events)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, events, res)
-}
-
-func TestGetIndexStandard(t *testing.T) {
-	ts := time.Now().UTC()
-	extension := fmt.Sprintf("%d.%02d.%02d", ts.Year(), ts.Month(), ts.Day())
-	fields := common.MapStr{"field": 1}
-
-	pattern := "beatname-%{+yyyy.MM.dd}"
-	fmtstr := fmtstr.MustCompileEvent(pattern)
-	indexSel := outil.MakeSelector(outil.FmtSelectorExpr(fmtstr, ""))
-
-	event := &beat.Event{Timestamp: ts, Fields: fields}
-	index, _ := getIndex(event, indexSel)
-	assert.Equal(t, index, "beatname-"+extension)
-}
-
-func TestGetIndexOverwrite(t *testing.T) {
-	time := time.Now().UTC()
-	extension := fmt.Sprintf("%d.%02d.%02d", time.Year(), time.Month(), time.Day())
-
-	fields := common.MapStr{
-		"@timestamp": common.Time(time),
-		"field":      1,
-		"beat": common.MapStr{
-			"name": "testbeat",
-		},
-	}
-
-	pattern := "beatname-%%{+yyyy.MM.dd}"
-	fmtstr := fmtstr.MustCompileEvent(pattern)
-	indexSel := outil.MakeSelector(outil.FmtSelectorExpr(fmtstr, ""))
-
-	event := &beat.Event{
-		Timestamp: time,
-		Meta: map[string]interface{}{
-			"index": "dynamicindex",
-		},
-		Fields: fields}
-	index, _ := getIndex(event, indexSel)
-	expected := "dynamicindex-" + extension
-	assert.Equal(t, expected, index)
 }
 
 func BenchmarkCollectPublishFailsNone(b *testing.B) {
@@ -406,11 +365,15 @@ func TestBulkEncodeEvents(t *testing.T) {
 		test := test
 		t.Run(name, func(t *testing.T) {
 			cfg := common.MustNewConfigFrom(test.config)
-
-			index, pipeline, err := buildSelectors(beat.Info{
+			info := beat.Info{
 				IndexPrefix: "test",
 				Version:     version.GetDefaultVersion(),
-			}, cfg)
+			}
+
+			im, err := idxmgmt.DefaultSupport(nil, info, common.NewConfig())
+			require.NoError(t, err)
+
+			index, pipeline, err := buildSelectors(im, info, cfg)
 			require.NoError(t, err)
 
 			events := make([]publisher.Event, len(test.events))

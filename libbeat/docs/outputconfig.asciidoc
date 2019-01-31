@@ -60,7 +60,7 @@ Example configuration:
 
 output.elasticsearch:
   hosts: ["https://localhost:9200"]
-  index: "{beatname_lc}-%{[agent.version]}-%{+yyyy.MM.dd}"
+  index: "{beatname_lc}-%{[{beat_version_key}]}-%{+yyyy.MM.dd}"
   ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
   ssl.certificate: "/etc/pki/client/cert.pem"
   ssl.key: "/etc/pki/client/cert.key"
@@ -92,10 +92,12 @@ output.elasticsearch:
 For more information about securing {beatname_uc}, see
 <<securing-{beatname_lc}>>.
 
+ifndef::no_ilm[]
 If you are indexing large amounts of time-series data, you might also want to
 configure {beatname_uc} to use index lifecycle management. For more information
 about configuring and using index lifecycle management with {beatname_uc}, see
 <<ilm>>.
+endif::no_ilm[]
 
 ==== Compatibility
 
@@ -217,7 +219,7 @@ for more information about the environment variables.
 
 ifndef::apm-server[]
 The index name to write events to. The default is
-+"{beatname_lc}-%\{[agent.version]\}-%\{+yyyy.MM.dd\}"+ (for example,
++"{beatname_lc}-%\{[{beat_version_key}]\}-%\{+yyyy.MM.dd\}"+ (for example,
 +"{beatname_lc}-{version}-{localdate}"+). If you change this setting, you also
 need to configure the `setup.template.name` and `setup.template.pattern` options
 (see <<configuration-template>>).
@@ -225,7 +227,7 @@ endif::apm-server[]
 
 ifdef::apm-server[]
 The index name to write events to. The default is
-+"apm-%\{[agent.version]\}-{type\}-%\{+yyyy.MM.dd\}"+ (for example,
++"apm-%\{[{beat_version_key}]\}-{type\}-%\{+yyyy.MM.dd\}"+ (for example,
 +"apm-{version}-transaction-{localdate}"+). See
 <<exploring-es-data,Exploring data in Elasticsearch>> for more information on
 default index configuration.
@@ -235,7 +237,7 @@ you need to configure the `setup.template.name` and `setup.template.pattern` opt
 (see <<configuration-template>>). You also must set the default index configuration
 in the `apm-server.yml` file.
 
-NOTE: `agent.version` is a field managed by Beats that is added to every document.
+NOTE: +{beat_version_key}+ is a field managed by Beats that is added to every document.
 It holds the current version of APM Server.
 endif::apm-server[]
 
@@ -243,9 +245,6 @@ ifndef::no_dashboards[]
 If you are using the pre-built Kibana
 dashboards, you also need to set the `setup.dashboards.index` option (see
 <<configuration-dashboards>>).
-ifdef::deprecate_dashboard_loading[]
-deprecated[{deprecate_dashboard_loading}]
-endif::deprecate_dashboard_loading[]
 endif::no_dashboards[]
 
 You can set the index dynamically by using a format string to access any event
@@ -256,10 +255,10 @@ to set the index:
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
-  index: "%\{[fields.log_type]\}-%\{[agent.version]\}-%\{+yyyy.MM.dd}\" <1>
+  index: "%\{[fields.log_type]\}-%\{[{beat_version_key}]\}-%\{+yyyy.MM.dd}\" <1>
 ------------------------------------------------------------------------------
 
-<1> We recommend including `agent.version` in the name to avoid mapping issues
+<1> We recommend including +{beat_version_key}+ in the name to avoid mapping issues
 when you upgrade.
 
 With this configuration, all events with `log_type: normal` are sent to an 
@@ -303,15 +302,15 @@ endif::no-processors[]
 The following example sets the index based on whether the `message` field
 contains the specified string:
 
-["source","yaml"]
+["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["http://localhost:9200"]
   indices:
-    - index: "warning-%{[agent.version]}-%{+yyyy.MM.dd}"
+    - index: "warning-%{[{beat_version_key}]}-%{+yyyy.MM.dd}"
       when.contains:
         message: "WARN"
-    - index: "error-%{[agent.version]}-%{+yyyy.MM.dd}"
+    - index: "error-%{[{beat_version_key}]}-%{+yyyy.MM.dd}"
       when.contains:
         message: "ERR"
 ------------------------------------------------------------------------------
@@ -344,12 +343,14 @@ values. You cannot specify format strings within the mapping pairs.
 
 //TODO: MOVE ILM OPTIONS TO APPEAR LOGICALLY BASED ON LOCATION IN THE YAML FILE.
 
+ifndef::no_ilm[]
 [[ilm-es]]
 ===== `ilm`
 
 Configuration options for index lifecycle management. 
 
 See <<ilm>> for more information.
+endif::no_ilm[]
 
 ifndef::no-pipeline[]
 [[pipeline-option-es]]
@@ -816,7 +817,7 @@ NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be
 [[kafka-compatibility]]
 ==== Compatibility
 
-This output works with all Kafka versions in between 0.11 and 2.0.0. Older versions
+This output works with all Kafka versions in between 0.11 and 2.1.0. Older versions
 might work as well, but are not supported.
 
 ==== Configuration options

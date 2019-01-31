@@ -3,22 +3,24 @@
   description: >
     slowlog
   fields:
-    - name: message
-      type: text
-      description: >
-        Contains the un-parsed log message
     - name: module
       type: keyword
       description: >
         The module or class where the event originate.
     - name: thread
-      type: text
+      type: keyword
       description: >
         Information about the running thread where the log originate.
+      multi_fields:
+        - name: text
+          type: text
     - name: event
-      type: text
+      type: keyword
       description: >
         Raw dump of the original event
+      multi_fields:
+        - name: text
+          type: text
     - name: plugin_name
       type: keyword
       description: >
@@ -32,14 +34,16 @@
       description: >
         Execution time for the plugin in milliseconds.
     - name: plugin_params
-      type: text
+      type: keyword
       description: >
         String value of the plugin configuration
+      multi_fields:
+        - name: text
+          type: text
     - name: plugin_params_object
       type: object
       description: >
         key -> value of the configuration used by the plugin.
-
     - name: level
       type: alias
       path: log.level

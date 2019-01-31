@@ -188,6 +188,14 @@ func (c *Config) PathOf(field string) string {
 	return c.access().PathOf(field, ".")
 }
 
+func (c *Config) Remove(name string, idx int) (bool, error) {
+	return c.access().Remove(name, idx, configOpts...)
+}
+
+func (c *Config) Has(name string, idx int) (bool, error) {
+	return c.access().Has(name, idx, configOpts...)
+}
+
 func (c *Config) HasField(name string) bool {
 	return c.access().HasField(name)
 }
