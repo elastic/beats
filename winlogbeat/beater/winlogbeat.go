@@ -88,18 +88,20 @@ func (eb *Winlogbeat) init(b *beat.Beat) error {
 	// configuration.
 	eb.eventLogs = make([]*eventLogger, 0, len(config.EventLogs))
 	for _, config := range config.EventLogs {
-		eventLog, err := eventlog.New(config)
+		eventLogs, err := eventlog.New(config)
 		if err != nil {
 			return fmt.Errorf("Failed to create new event log. %v", err)
 		}
-		debugf("Initialized EventLog[%s]", eventLog.Name())
+		for _, eventLog := range eventLogs {
+			debugf("Initialized EventLog[%s]", eventLog.Name())
 
-		logger, err := newEventLogger(eventLog, config)
-		if err != nil {
-			return fmt.Errorf("Failed to create new event log. %v", err)
+			logger, err := newEventLogger(eventLog, config)
+			if err != nil {
+				return fmt.Errorf("Failed to create new event log. %v", err)
+			}
+
+			eb.eventLogs = append(eb.eventLogs, logger)
 		}
-
-		eb.eventLogs = append(eb.eventLogs, logger)
 	}
 
 	return nil

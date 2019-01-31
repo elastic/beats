@@ -22,78 +22,42 @@ package eventlog
 import (
 	"fmt"
 	"io"
+	"path/filepath"
 	"syscall"
-	"time"
-
-	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
-	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/elastic/beats/winlogbeat/sys"
 	win "github.com/elastic/beats/winlogbeat/sys/wineventlog"
+	"github.com/pkg/errors"
 )
 
 const (
-	// renderBufferSize is the size in bytes of the buffer used to render events.
-	renderBufferSize = 1 << 14
-
 	// winEventLogApiName is the name used to identify the Windows Event Log API
 	// as both an event type and an API.
-	winEventLogAPIName = "wineventlog"
+	winEventLogFileAPIName = "wineventlogfile"
 )
 
-var winEventLogConfigKeys = append(commonConfigKeys, "batch_read_size",
-	"ignore_older", "include_xml", "event_id", "forwarded", "level", "provider")
+var winEventLogFileConfigKeys = append(commonConfigKeys, "batch_read_size", "include_xml")
 
-type winEventLogConfig struct {
+type winEventLogFileConfig struct {
 	ConfigCommon  `config:",inline"`
-	BatchReadSize int   `config:"batch_read_size"` // Maximum number of events that Read will return.
-	IncludeXML    bool  `config:"include_xml"`
-	Forwarded     *bool `config:"forwarded"`
-	SimpleQuery   query `config:",inline"`
+	BatchReadSize int  `config:"batch_read_size"`
+	IncludeXML    bool `config:"include_xml"`
 }
 
 // defaultWinEventLogConfig is the default configuration for new wineventlog readers.
-var defaultWinEventLogConfig = winEventLogConfig{
+var defaultWinEventLogFileConfig = winEventLogFileConfig{
 	BatchReadSize: 100,
 }
 
-// query contains parameters used to customize the event log data that is
-// queried from the log.
-type query struct {
-	IgnoreOlder time.Duration `config:"ignore_older"` // Ignore records older than this period of time.
-	EventID     string        `config:"event_id"`     // White-list and black-list of events.
-	Level       string        `config:"level"`        // Severity level.
-	Provider    []string      `config:"provider"`     // Provider (source name).
-}
-
-// Validate validates the winEventLogConfig data and returns an error describing
-// any problems or nil.
-func (c *winEventLogConfig) Validate() error {
-	var errs multierror.Errors
-	if c.Name == "" {
-		errs = append(errs, fmt.Errorf("event log is missing a 'name'"))
-	}
-
-	return errs.Err()
-}
-
-// Validate that winEventLog implements the EventLog interface.
-var _ EventLog = &winEventLog{}
-
-// winEventLog implements the EventLog interface for reading from the Windows
-// Event Log API.
-type winEventLog struct {
-	config       winEventLogConfig
-	query        string
-	channelName  string                   // Name of the channel from which to read.
-	subscription win.EvtHandle            // Handle to the subscription.
-	maxRead      int                      // Maximum number returned in one Read.
-	lastRead     checkpoint.EventLogState // Record number of the last read event.
-
+type winEventFileLog struct {
+	config    winEventLogFileConfig
+	path      string
+	evtHandle win.EvtHandle                                  // Handle to the query.
+	maxRead   int                                            // Maximum number returned in one Read.
+	lastRead  checkpoint.EventLogState                       // Record number of the last read event.
 	render    func(event win.EvtHandle, out io.Writer) error // Function for rendering the event to XML.
 	renderBuf []byte                                         // Buffer used for rendering event.
 	outputBuf *sys.ByteBuffer                                // Buffer for receiving XML
@@ -102,60 +66,51 @@ type winEventLog struct {
 	logPrefix string // String to prefix on log messages.
 }
 
-// Name returns the name of the event log (i.e. Application, Security, etc.).
-func (l *winEventLog) Name() string {
-	return l.channelName
+// Name returns the file path of the event log (i.e. Application, Security, etc.).
+func (l *winEventFileLog) Name() string {
+	return l.path
 }
 
-func (l *winEventLog) Open(state checkpoint.EventLogState) error {
+func (l *winEventFileLog) Open(state checkpoint.EventLogState) error {
 	var bookmark win.EvtHandle
 	var err error
 	if len(state.Bookmark) > 0 {
 		bookmark, err = win.CreateBookmarkFromXML(state.Bookmark)
 	} else {
-		bookmark, err = win.CreateBookmarkFromRecordID(l.channelName, state.RecordNumber)
+		bookmark, err = win.CreateBookmarkFromRecordID(l.path, state.RecordNumber)
 	}
 	if err != nil {
 		return err
 	}
 	defer win.Close(bookmark)
 
-	// Using a pull subscription to receive events. See:
-	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
-	signalEvent, err := windows.CreateEvent(nil, 0, 0, nil)
-	if err != nil {
-		return nil
-	}
-	defer windows.CloseHandle(signalEvent)
+	debugf("%s using EvtQuery and EvtSeek to read from file %s", l.logPrefix, l.path)
 
-	debugf("%s using subscription query=%s", l.logPrefix, l.query)
-	subscriptionHandle, err := win.Subscribe(
-		0, // Session - nil for localhost
-		signalEvent,
-		"",       // Channel - empty b/c channel is in the query
-		l.query,  // Query - nil means all events
-		bookmark, // Bookmark - for resuming from a specific event
-		win.EvtSubscribeStartAfterBookmark)
+	queryHandle, err := win.EvtQuery(0, l.path, "", win.EvtQueryFilePath)
+	if err != nil {
+		return err
+	}
+	l.evtHandle = queryHandle
+	err = win.EvtSeek(l.evtHandle, 0, bookmark)
 	if err != nil {
 		return err
 	}
 
-	l.subscription = subscriptionHandle
 	return nil
 }
 
-func (l *winEventLog) Read() ([]Record, error) {
+func (l *winEventFileLog) Read() ([]Record, error) {
 	handles, _, err := l.eventHandles(l.maxRead)
 	if err != nil || len(handles) == 0 {
 		return nil, err
 	}
+
 	defer func() {
 		for _, h := range handles {
 			win.Close(h)
 		}
 	}()
 	detailf("%s EventHandles returned %d handles", l.logPrefix, len(handles))
-
 	var records []Record
 	for _, h := range handles {
 		l.outputBuf.Reset()
@@ -181,7 +136,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 		}
 
 		r.Offset = checkpoint.EventLogState{
-			Name:         l.channelName,
+			Name:         l.path,
 			RecordNumber: r.RecordID,
 			Timestamp:    r.TimeCreated.SystemTime,
 		}
@@ -194,15 +149,11 @@ func (l *winEventLog) Read() ([]Record, error) {
 
 	debugf("%s Read() is returning %d records", l.logPrefix, len(records))
 	return records, nil
+
 }
 
-func (l *winEventLog) Close() error {
-	debugf("%s Closing handle", l.logPrefix)
-	return win.Close(l.subscription)
-}
-
-func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
-	handles, err := win.EventHandles(l.subscription, maxRead, 0)
+func (l *winEventFileLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
+	handles, err := win.EventHandles(l.evtHandle, maxRead, 0)
 	switch err {
 	case nil:
 		if l.maxRead > maxRead {
@@ -229,7 +180,12 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 	}
 }
 
-func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, error) {
+func (l *winEventFileLog) Close() error {
+	debugf("%s Closing handle", l.logPrefix)
+	return win.Close(l.evtHandle)
+}
+
+func (l *winEventFileLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, error) {
 	e, err := sys.UnmarshalEventXML(x)
 	if err != nil {
 		return Record{}, fmt.Errorf("Failed to unmarshal XML='%s'. %v", x, err)
@@ -270,22 +226,9 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 	return r, nil
 }
 
-// newWinEventLog creates and returns a new EventLog for reading event logs
-// using the Windows Event Log.
-func newWinEventLog(options *common.Config) ([]EventLog, error) {
-	c := defaultWinEventLogConfig
-	if err := readConfig(options, &c, winEventLogConfigKeys); err != nil {
-		return nil, err
-	}
-
-	query, err := win.Query{
-		Log:         c.Name,
-		IgnoreOlder: c.SimpleQuery.IgnoreOlder,
-		Level:       c.SimpleQuery.Level,
-		EventID:     c.SimpleQuery.EventID,
-		Provider:    c.SimpleQuery.Provider,
-	}.Build()
-	if err != nil {
+func newWinEvetLogFile(options *common.Config) ([]EventLog, error) {
+	c := defaultWinEventLogFileConfig
+	if err := readConfig(options, &c, winEventLogFileConfigKeys); err != nil {
 		return nil, err
 	}
 
@@ -305,36 +248,32 @@ func newWinEventLog(options *common.Config) ([]EventLog, error) {
 		return win.Close(win.EvtHandle(handle))
 	}
 
-	l := &winEventLog{
-		config:      c,
-		query:       query,
-		channelName: c.Name,
-		maxRead:     c.BatchReadSize,
-		renderBuf:   make([]byte, renderBufferSize),
-		outputBuf:   sys.NewByteBuffer(renderBufferSize),
-		cache:       newMessageFilesCache(c.Name, eventMetadataHandle, freeHandle),
-		logPrefix:   fmt.Sprintf("WinEventLog[%s]", c.Name),
+	//c.Name must be a filepath, allow contains Go glob
+	matchFiles, err := filepath.Glob(c.Name)
+	if err != nil {
+		return nil, err
 	}
 
-	// Forwarded events should be rendered using RenderEventXML. It is more
-	// efficient and does not attempt to use local message files for rendering
-	// the event's message.
-	switch {
-	case c.Forwarded == nil && c.Name == "ForwardedEvents",
-		c.Forwarded != nil && *c.Forwarded == true:
-		l.render = func(event win.EvtHandle, out io.Writer) error {
-			return win.RenderEventXML(event, l.renderBuf, out)
+	retMe := make([]EventLog, 0)
+	for _, mf := range matchFiles {
+		l := &winEventFileLog{
+			config:    c,
+			path:      mf,
+			maxRead:   c.BatchReadSize,
+			renderBuf: make([]byte, renderBufferSize),
+			outputBuf: sys.NewByteBuffer(renderBufferSize),
+			cache:     newMessageFilesCache(c.Name, eventMetadataHandle, freeHandle),
+			logPrefix: fmt.Sprintf("WinEventLogFile[%s]", c.Name),
 		}
-	default:
 		l.render = func(event win.EvtHandle, out io.Writer) error {
 			return win.RenderEvent(event, 0, l.renderBuf, l.cache.get, out)
 		}
+		retMe = append(retMe, l)
 	}
-
-	return []EventLog{l}, nil
+	return retMe, nil
 }
 
-func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, error) {
+func (l *winEventFileLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, error) {
 	bmHandle, err := win.CreateBookmarkFromEvent(evtHandle)
 	if err != nil {
 		return "", err
@@ -349,6 +288,6 @@ func init() {
 	// Register wineventlog API if it is available.
 	available, _ := win.IsAvailable()
 	if available {
-		Register(winEventLogAPIName, 0, newWinEventLog, win.Channels)
+		Register(winEventLogFileAPIName, 2, newWinEvetLogFile, win.Channels)
 	}
 }
