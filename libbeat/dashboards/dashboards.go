@@ -36,7 +36,7 @@ func ImportDashboards(
 	ctx context.Context,
 	beatName, hostname, homePath string,
 	kibanaConfig, dashboardsConfig *common.Config,
-	msgOutputter MessageOutputter, migration bool,
+	msgOutputter MessageOutputter, migration bool, fields []byte,
 ) error {
 	if dashboardsConfig == nil || !dashboardsConfig.Enabled() {
 		return nil
@@ -65,8 +65,8 @@ func ImportDashboards(
 	// Generate index pattern
 	version, _ := common.NewVersion("7.0.0") // TODO: dynamic version
 	//beatVersion, _ := common.NewVersion("7.0.0") // TODO: dynamic version
-	indexP, _ := esConfig.String("index", 0)
-	indexPattern, err := kibana.NewGenerator(indexP, beatName, "fields.yml", dashConfig.Dir, "7.0.0", *version, migration)
+	//indexP, _ := esConfig.String("index", 0)
+	indexPattern, err := kibana.NewGenerator("filebeat-*", beatName, fields, dashConfig.Dir, "7.0.0", *version, migration)
 	if err != nil {
 		log.Fatal(err)
 	}

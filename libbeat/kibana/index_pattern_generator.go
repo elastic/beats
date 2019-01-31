@@ -24,13 +24,15 @@ import (
 	"path/filepath"
 	"regexp"
 
+	"github.com/elastic/go-ucfg/yaml"
+
 	"github.com/elastic/beats/libbeat/common"
 )
 
 type IndexPatternGenerator struct {
 	indexName      string
 	beatVersion    string
-	fieldsYaml     string
+	fields         []byte
 	version        common.Version
 	targetDir      string
 	targetFilename string
@@ -38,16 +40,12 @@ type IndexPatternGenerator struct {
 }
 
 // Create an instance of the Kibana Index Pattern Generator
-func NewGenerator(indexName, beatName, fieldsYAMLFile, outputDir, beatVersion string, version common.Version, migration bool) (*IndexPatternGenerator, error) {
+func NewGenerator(indexName, beatName string, fields []byte, outputDir, beatVersion string, version common.Version, migration bool) (*IndexPatternGenerator, error) {
 	beatName = clean(beatName)
-
-	if _, err := os.Stat(fieldsYAMLFile); err != nil {
-		return nil, err
-	}
 
 	return &IndexPatternGenerator{
 		indexName:      indexName,
-		fieldsYaml:     fieldsYAMLFile,
+		fields:         fields,
 		beatVersion:    beatVersion,
 		version:        version,
 		targetDir:      createTargetDir(outputDir, version),
@@ -107,7 +105,7 @@ func (i *IndexPatternGenerator) generatePattern(attrs common.MapStr) common.MapS
 }
 
 func (i *IndexPatternGenerator) addGeneral(indexPattern *common.MapStr) error {
-	kibanaEntries, err := loadKibanaEntriesFromYaml(i.fieldsYaml)
+	kibanaEntries, err := loadKibanaEntriesFromYaml(i.fields)
 	if err != nil {
 		return err
 	}
@@ -123,7 +121,7 @@ func (i *IndexPatternGenerator) addGeneral(indexPattern *common.MapStr) error {
 }
 
 func (i *IndexPatternGenerator) addFieldsSpecific(indexPattern *common.MapStr) error {
-	fields, err := common.LoadFieldsYaml(i.fieldsYaml)
+	fields, err := loadYamlByte(i.fields)
 	if err != nil {
 		return err
 	}
@@ -148,6 +146,25 @@ func (i *IndexPatternGenerator) addFieldsSpecific(indexPattern *common.MapStr) e
 	}
 	(*indexPattern)["fieldFormatMap"] = string(fieldFormatBytes)
 	return nil
+}
+
+func loadYamlByte(data []byte) (common.Fields, error) {
+	cfg, err := yaml.NewConfig(data)
+	if err != nil {
+		return nil, err
+	}
+
+	var keys []common.Field
+	err = cfg.Unpack(&keys)
+	if err != nil {
+		return nil, err
+	}
+
+	fields := common.Fields{}
+	for _, key := range keys {
+		fields = append(fields, key.Fields...)
+	}
+	return fields, nil
 }
 
 func clean(name string) string {
