@@ -705,13 +705,8 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	}
 
 	if b.Config.Dashboards.Enabled() {
-		var esConfig *common.Config
-
-		if b.Config.Output.Name() == "elasticsearch" {
-			esConfig = b.Config.Output.Config()
-		}
 		err := dashboards.ImportDashboards(ctx, b.Info.Beat, b.Info.Hostname, paths.Resolve(paths.Home, ""),
-			b.Config.Kibana, esConfig, b.Config.Dashboards, nil)
+			b.Config.Kibana, b.Config.Dashboards, nil)
 		if err != nil {
 			return errw.Wrap(err, "Error importing Kibana dashboards")
 		}
