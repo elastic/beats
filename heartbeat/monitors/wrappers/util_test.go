@@ -25,7 +25,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/mapval"
-	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
 func TestURLFields(t *testing.T) {
@@ -82,7 +81,7 @@ func TestURLFields(t *testing.T) {
 			require.NoError(t, err)
 
 			got := URLFields(parsed)
-			mapvaltest.Test(t, mapval.MustCompile(mapval.Map(tt.want)), got)
+			mapval.Test(t, mapval.MustCompile(mapval.Map(tt.want)), got)
 		})
 	}
 }
