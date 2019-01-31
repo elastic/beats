@@ -89,10 +89,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Refactor Prometheus metric mappings {pull}9948[9948]
 - Removed Prometheus stats metricset in favor of just using Prometheus collector {pull}9948[9948]
 - Adjust Redis.info metricset fields to ECS. {pull}10319[10319]
-- Change type of field docker.container.ip_addresses to `ip` instead of `keyword. {pull}10364[10364]
+- Change type of field docker.container.ip_addresses to `ip` instead of `keyword`. {pull}10364[10364]
 - Rename http.request.body field to http.request.body.content. {pull}10315[10315]
 - Adjust php_fpm.process metricset fields to ECS. {pull}10366[10366]
 - Adjust mongodb.status metricset to to ECS. {pull}10368[10368]
+- Refactor munin module to collect an event per plugin and to have more strict field mappings. `namespace` option has been removed, and will be replaced by `service.name`. {pull}10322[10322]
 - Change the following fields from type text to keyword: {pull}10318[10318]
   - ceph.osd_df.name
   - ceph.osd_tree.name

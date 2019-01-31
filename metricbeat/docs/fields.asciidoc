@@ -17373,11 +17373,25 @@ Munin node metrics exporter
 
 
 
-[float]
-== munin fields
+*`munin.metrics.*`*::
++
+--
+type: object
 
-munin contains metrics exposed by a munin node agent
+Metrics exposed by a plugin of a munin node agent.
 
+
+--
+
+*`munin.plugin.name`*::
++
+--
+type: keyword
+
+Name of the plugin collecting these metrics.
+
+
+--
 
 
 [[exported-fields-mysql]]
