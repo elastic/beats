@@ -51,8 +51,7 @@ type MetricSet struct {
 	logger         *logp.Logger
 }
 
-// metricIDNameMap is a translating map between createMetricDataQuery id
-// and aws s3 module metric name, cloudwatch s3 metric name.
+// metricIDNameMap is a translating map between aws s3 module metric name and cloudwatch s3 metric name.
 var metricIDNameMap = map[string][]string{
 	"BucketSizeBytes": {"bucket.size.bytes"},
 	"NumberOfObjects": {"object.count"},
@@ -137,21 +136,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	namespace := "AWS/S3"
 	// Get startTime and endTime
-	endTime := time.Now()
-	// Testing only
-	endTime = endTime.AddDate(0, 0, -3)
-	duration, err := time.ParseDuration(m.durationString)
+	startTime, endTime, err := getStartTimeEndTime(m.durationString)
 	if err != nil {
 		logp.Error(errors.Wrap(err, "Error ParseDuration"))
 		m.logger.Error(err.Error())
 		report.Error(err)
 		return
 	}
-	startTime := endTime.Add(duration)
 
 	// GetMetricData for AWS S3 from Cloudwatch
 	for _, regionName := range m.regionsList {
-		fmt.Println("regionName = ", regionName)
 		m.awsConfig.Region = regionName
 		svcCloudwatch := cloudwatch.New(*m.awsConfig)
 		listMetricsInput := &cloudwatch.ListMetricsInput{Namespace: &namespace}
@@ -171,6 +165,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 			continue
 		}
 
+		fmt.Println("listMetricsOutput.Metrics = ", listMetricsOutput.Metrics)
 		metricDataQueries := constructMetricQueries(listMetricsOutput.Metrics)
 
 		init := true
@@ -201,6 +196,16 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		}
 		report.Event(event)
 	}
+}
+
+func getStartTimeEndTime(durationString string) (startTime time.Time, endTime time.Time, err error) {
+	endTime = time.Now()
+	duration, err := time.ParseDuration(durationString)
+	if err != nil {
+		return
+	}
+	startTime = endTime.Add(duration)
+	return startTime, endTime, nil
 }
 
 func constructMetricQueries(listMetricsOutput []cloudwatch.Metric) []cloudwatch.MetricDataQuery {
