@@ -4420,12 +4420,21 @@ Where the request originated: rest (request originated from a REST API request),
 
 --
 
+*`elasticsearch.audit.realm`*::
++
+--
+type: keyword
+
+The authentication realm the authentication was validated against
+
+--
+
 *`elasticsearch.audit.user.realm`*::
 +
 --
 type: keyword
 
-The authentication realm
+The user's authentication realm, if authenticated
 
 --
 
@@ -4451,6 +4460,24 @@ The name of the action that was executed
 
 --
 
+*`elasticsearch.audit.url.params`*::
++
+--
+type: keyword
+
+example: {username=jacknich2}
+
+REST URI parameters
+
+*`elasticsearch.audit.url.params.text`*::
++
+--
+type: text
+
+--
+
+--
+
 *`elasticsearch.audit.indices`*::
 +
 --
@@ -4459,6 +4486,17 @@ type: keyword
 example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
 
 Indices accessed by action
+
+--
+
+*`elasticsearch.audit.request.id`*::
++
+--
+type: keyword
+
+example: WzL_kb6VSvOhAq0twPvHOQ
+
+Unique ID of request
 
 --
 
@@ -4869,7 +4907,7 @@ Logger name
 *`elasticsearch.slowlog.took`*::
 +
 --
-type: text
+type: keyword
 
 example: 300ms
 
@@ -4891,11 +4929,11 @@ Types
 *`elasticsearch.slowlog.stats`*::
 +
 --
-type: text
+type: keyword
 
-example: 
+example: group1
 
-Statistics
+Stats groups
 
 --
 
@@ -4913,7 +4951,7 @@ Search type
 *`elasticsearch.slowlog.source_query`*::
 +
 --
-type: text
+type: keyword
 
 example: {"query":{"match_all":{"boost":1.0}}}
 
@@ -4924,7 +4962,7 @@ Slow query
 *`elasticsearch.slowlog.extra_source`*::
 +
 --
-type: text
+type: keyword
 
 example: 
 

@@ -523,21 +523,6 @@ the end of the file is reached. By default harvesters are closed after
 `close_inactive` is reached.
 endif::[]
 
-*`--setup`*::
-ifdef::deprecate_dashboard_loading[]
-deprecated[{deprecate_dashboard_loading}]
-endif::[]
-+
-ifdef::has_ml_jobs[]
-Loads the initial setup, including Elasticsearch template, {kib} index pattern,
-{kib} dashboards (when available), and Machine learning jobs.
-endif::[]
-ifndef::has_ml_jobs[]
-Loads the initial setup, including Elasticsearch template, {kib} index pattern, and {kib} dashboards (when available).
-endif::[]
-If you want to use the command without running {beatname_uc}, use the <<setup-command,`setup`>> command instead.
-
-
 ifeval::["{beatname_lc}"=="metricbeat"]
 *`--system.hostfs MOUNT_POINT`*::
 
@@ -558,14 +543,14 @@ endif::[]
 
 ["source","sh",subs="attributes"]
 -----
-{beatname_lc} run -e --setup
+{beatname_lc} run -e
 -----
 
 Or:
 
 ["source","sh",subs="attributes"]
 -----
-{beatname_lc} -e --setup
+{beatname_lc} -e
 -----
 
 [[setup-command]]
@@ -583,8 +568,8 @@ ifdef::has_ml_jobs[]
 necessary to analyze data for anomalies.
 endif::[]
 
-Use this command instead of `run --setup` when you want to set up the
-environment without actually running {beatname_uc} and ingesting data.
+Use this command if you want to set up the environment without actually running
+{beatname_uc} and ingesting data.
 
 *SYNOPSIS*
 

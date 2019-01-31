@@ -119,6 +119,33 @@
                 "field": "elasticsearch.audit.user.name",
                 "target_field": "user.name"
             }
+        },
+        {
+            "dot_expander": {
+                "field": "request.method",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.request.method",
+                "target_field": "http.request.method",
+                "ignore_missing": true
+            }
+
+        },
+        {
+            "dot_expander": {
+                "field": "request.body",
+                "path": "elasticsearch.audit"
+            }
+        },
+        {
+            "rename": {
+                "field": "elasticsearch.audit.request.body",
+                "target_field": "http.request.body.content",
+                "ignore_missing": true
+            }
         }
     ],
     "on_failure": [

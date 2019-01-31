@@ -1977,10 +1977,28 @@ The name of the metricset that generated the event.
 
 --
 
+*`process.pgid`*::
++
+--
+type: long
+
+Process group id.
+
+
+--
+
 *`service.address`*::
 +
 --
-Connection address of the machine from which the metricset was collected. This field may not be present when the data was collected locally.
+Address of the machine where the service is running. This field may not be present when the data was collected locally.
+
+
+--
+
+*`service.hostname`*::
++
+--
+Host name of the machine where the service is running.
 
 
 --
@@ -7475,9 +7493,9 @@ Target node id.
 *`elasticsearch.index.recovery.target.host`*::
 +
 --
-type: ip
+type: keyword
 
-Target node host address.
+Target node host address (could be IP address or hostname).
 
 
 --
@@ -7505,9 +7523,9 @@ Source node id.
 *`elasticsearch.index.recovery.source.host`*::
 +
 --
-type: ip
+type: keyword
 
-Source node host address.
+Source node host address (could be IP address or hostname).
 
 
 --
@@ -11018,7 +11036,9 @@ Kibana stats and run-time metrics.
 *`kibana.stats.uuid`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.id
 
 Kibana instance UUID
 
@@ -11058,7 +11078,9 @@ Kibana instance hostname
 *`kibana.stats.transport_address`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.address
 
 Kibana server's hostname and port
 
@@ -11068,7 +11090,9 @@ Kibana server's hostname and port
 *`kibana.stats.version`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 Kibana version
 
@@ -11249,7 +11273,9 @@ Kibana instance name.
 *`kibana.status.uuid`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.id
 
 Kibana instance uuid.
 
@@ -11259,7 +11285,9 @@ Kibana instance uuid.
 *`kibana.status.version.number`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 Kibana version number.
 
@@ -13299,7 +13327,9 @@ node
 *`logstash.node.host`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: host.hostname
 
 Host name
 
@@ -13309,7 +13339,9 @@ Host name
 *`logstash.node.version`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 Logstash Version
 
@@ -13336,9 +13368,11 @@ Version
 *`logstash.node.jvm.pid`*::
 +
 --
-type: long
+type: alias
 
-Pid
+alias to: process.pid
+
+Process ID
 
 
 --
@@ -17339,11 +17373,25 @@ Munin node metrics exporter
 
 
 
-[float]
-== munin fields
+*`munin.metrics.*`*::
++
+--
+type: object
 
-munin contains metrics exposed by a munin node agent
+Metrics exposed by a plugin of a munin node agent.
 
+
+--
+
+*`munin.plugin.name`*::
++
+--
+type: keyword
+
+Name of the plugin collecting these metrics.
+
+
+--
 
 
 [[exported-fields-mysql]]
@@ -23348,10 +23396,9 @@ The number of outgoing packets that were dropped. This value is always 0 on Darw
 *`system.process.name`*::
 +
 --
-type: keyword
+type: alias
 
-The process name.
-
+alias to: process.name
 
 --
 
@@ -23368,30 +23415,27 @@ The process state. For example: "running".
 *`system.process.pid`*::
 +
 --
-type: long
+type: alias
 
-The process pid.
-
+alias to: process.pid
 
 --
 
 *`system.process.ppid`*::
 +
 --
-type: long
+type: alias
 
-The process parent pid.
-
+alias to: process.ppid
 
 --
 
 *`system.process.pgid`*::
 +
 --
-type: long
+type: alias
 
-The process group id.
-
+alias to: process.pgid
 
 --
 
@@ -23408,20 +23452,18 @@ The full command-line used to start the process, including the arguments separat
 *`system.process.username`*::
 +
 --
-type: keyword
+type: alias
 
-The username of the user that created the process. If the username cannot be determined, the field will contain the user's numeric identifier (UID). On Windows, this field includes the user's domain and is formatted as `domain\username`.
-
+alias to: user.name
 
 --
 
 *`system.process.cwd`*::
 +
 --
-type: keyword
+type: alias
 
-The current working directory of the process. This field is only available on Linux.
-
+alias to: process.working_directory
 
 --
 

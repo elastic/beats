@@ -25,6 +25,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/metric/system/process"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -124,9 +125,42 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	}
 
 	for _, proc := range procs {
+		rootFields := common.MapStr{
+			"process": common.MapStr{
+				"name": getAndRemove(proc, "name"),
+				"pid":  getAndRemove(proc, "pid"),
+				"ppid": getAndRemove(proc, "ppid"),
+				"pgid": getAndRemove(proc, "pgid"),
+			},
+			"user": common.MapStr{
+				"name": getAndRemove(proc, "username"),
+			},
+		}
+
+		if cwd := getAndRemove(proc, "cwd"); cwd != nil {
+			rootFields.Put("process.working_directory", cwd)
+		}
+
+		if exe := getAndRemove(proc, "exe"); exe != nil {
+			rootFields.Put("process.executable", exe)
+		}
+
+		if args := getAndRemove(proc, "args"); args != nil {
+			rootFields.Put("process.args", args)
+		}
+
 		e := mb.Event{
+			RootFields:      rootFields,
 			MetricSetFields: proc,
 		}
 		r.Event(e)
 	}
+}
+
+func getAndRemove(from common.MapStr, field string) interface{} {
+	if v, ok := from[field]; ok {
+		delete(from, field)
+		return v
+	}
+	return nil
 }

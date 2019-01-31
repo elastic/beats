@@ -20,6 +20,14 @@
           }
       },
       {
+          "split": {
+              "if": "ctx.elasticsearch.slowlog?.stats != ''",
+              "field": "elasticsearch.slowlog.stats",
+              "separator": ",",
+              "ignore_missing": true
+          }
+      },
+      {
           "date": {
               "field": "elasticsearch.slowlog.timestamp",
               "target_field": "@timestamp",
@@ -32,7 +40,9 @@
       },
       {
           "remove": {
-              "field": "elasticsearch.slowlog.timestamp"
+              "field": [
+                    "elasticsearch.slowlog.timestamp"
+              ]
           }
       },
 

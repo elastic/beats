@@ -15,3 +15,16 @@ setup.kibana.host: {{ kibana_url }}
 {% if kibana_path %}
 setup.dashboards.directory: {{ kibana_path }}
 {% endif %}
+
+{% if ilm %}
+setup.ilm:
+  enabled: {{ ilm.enabled | default("auto") }}
+  policy_name: libbeat-test-default-policy
+  {% if ilm.pattern %}
+  pattern: {{ ilm.pattern }}
+  {% endif %}
+  {% if ilm.rollover_alias %}
+  rollover_alias: {{ ilm.rollover_alias }}
+  {% endif %}
+{% endif %}
+
