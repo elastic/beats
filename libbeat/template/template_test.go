@@ -76,3 +76,17 @@ func TestNumberOfRoutingShardsOverwrite(t *testing.T) {
 
 	assert.Equal(t, 5, shards.(int))
 }
+
+func TestTemplate(t *testing.T) {
+	beatVersion := "6.6.0"
+	beatName := "testbeat"
+	ver := common.MustNewVersion("6.6.0")
+	template, err := New(beatVersion, beatName, *ver, TemplateConfig{}, false)
+	assert.NoError(t, err)
+
+	data := template.Generate(nil, nil)
+	assert.Equal(t, []string{"testbeat-6.6.0-*"}, data["index_patterns"])
+	meta, err := data.GetValue("mappings.doc._meta")
+	assert.NoError(t, err)
+	assert.Equal(t, common.MapStr{"beat": "testbeat", "version": "6.6.0"}, meta)
+}

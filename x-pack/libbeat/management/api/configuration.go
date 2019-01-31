@@ -5,6 +5,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -50,16 +51,40 @@ func (c *ConfigBlock) ConfigWithMeta() (*reload.ConfigWithMeta, error) {
 	}, nil
 }
 
+type configResponse struct {
+	Type string
+	Raw  map[string]interface{}
+}
+
+func (c *configResponse) UnmarshalJSON(b []byte) error {
+	var resp = struct {
+		Type string                 `json:"type"`
+		Raw  map[string]interface{} `json:"config"`
+	}{}
+
+	if err := json.Unmarshal(b, &resp); err != nil {
+		return err
+	}
+
+	converter := selectConverter(resp.Type)
+	newMap, err := converter(resp.Raw)
+	if err != nil {
+		return err
+	}
+	*c = configResponse{
+		Type: resp.Type,
+		Raw:  newMap,
+	}
+	return nil
+}
+
 // Configuration retrieves the list of configuration blocks from Kibana
 func (c *Client) Configuration(accessToken string, beatUUID uuid.UUID, configOK bool) (ConfigBlocks, error) {
 	headers := http.Header{}
 	headers.Set("kbn-beats-access-token", accessToken)
 
 	resp := struct {
-		ConfigBlocks []*struct {
-			Type string                 `json:"type"`
-			Raw  map[string]interface{} `json:"config"`
-		} `json:"configuration_blocks"`
+		ConfigBlocks []*configResponse `json:"configuration_blocks"`
 	}{}
 	url := fmt.Sprintf("/api/beats/agent/%s/configuration?validSetting=%t", beatUUID, configOK)
 	statusCode, err := c.request("GET", url, nil, headers, &resp)

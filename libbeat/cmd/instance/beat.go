@@ -111,18 +111,10 @@ type beatConfig struct {
 	ILM *common.Config `config:"output.elasticsearch.ilm"`
 }
 
-var (
-	printVersion bool
-	setup        bool
-)
-
 var debugf = logp.MakeDebug("beat")
 
 func init() {
 	initRand()
-
-	flag.BoolVar(&printVersion, "version", false, "Print the version and exit")
-	flag.BoolVar(&setup, "setup", false, "Load sample Kibana dashboards and setup Machine Learning")
 }
 
 // initRand initializes the runtime random number generator seed using
@@ -381,25 +373,12 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		defer reporter.Stop()
 	}
 
-	// If -configtest was specified, exit now prior to run.
-	if cfgfile.IsTestConfig() {
-		cfgwarn.Deprecate("6.0", "-configtest flag has been deprecated, use configtest subcommand")
-		fmt.Println("Config OK")
-		return beat.GracefulExit
-	}
-
 	ctx, cancel := context.WithCancel(context.Background())
 	svc.HandleSignals(beater.Stop, cancel)
 
 	err = b.loadDashboards(ctx, false)
 	if err != nil {
 		return err
-	}
-	if setup && b.SetupMLCallback != nil {
-		err = b.SetupMLCallback(&b.Beat, b.Config.Kibana)
-		if err != nil {
-			return err
-		}
 	}
 
 	logp.Info("%s start running.", b.Info.Beat)
@@ -548,18 +527,10 @@ func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
 	}())
 }
 
-// handleFlags parses the command line flags. It handles the '-version' flag
-// and invokes the HandleFlags callback if implemented by the Beat.
+// handleFlags parses the command line flags. It invokes the HandleFlags
+// callback if implemented by the Beat.
 func (b *Beat) handleFlags() error {
 	flag.Parse()
-
-	if printVersion {
-		cfgwarn.Deprecate("6.0", "-version flag has been deprecated, use version subcommand")
-		fmt.Printf("%s version %s (%s), libbeat %s\n",
-			b.Info.Beat, b.Info.Version, runtime.GOARCH, version.GetDefaultVersion())
-		return beat.GracefulExit
-	}
-
 	return cfgfile.HandleFlags()
 }
 
@@ -722,8 +693,8 @@ func openRegular(filename string) (*os.File, error) {
 }
 
 func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
-	if setup || force {
-		// -setup implies dashboards.enabled=true
+	if force {
+		// force implies dashboards.enabled=true
 		if b.Config.Dashboards == nil {
 			b.Config.Dashboards = common.NewConfig()
 		}
@@ -734,13 +705,8 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	}
 
 	if b.Config.Dashboards.Enabled() {
-		var esConfig *common.Config
-
-		if b.Config.Output.Name() == "elasticsearch" {
-			esConfig = b.Config.Output.Config()
-		}
 		err := dashboards.ImportDashboards(ctx, b.Info.Beat, b.Info.Hostname, paths.Resolve(paths.Home, ""),
-			b.Config.Kibana, esConfig, b.Config.Dashboards, nil)
+			b.Config.Kibana, b.Config.Dashboards, nil)
 		if err != nil {
 			return errw.Wrap(err, "Error importing Kibana dashboards")
 		}

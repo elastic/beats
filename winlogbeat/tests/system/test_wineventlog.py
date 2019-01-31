@@ -170,7 +170,8 @@ class Test(WriteReadTest):
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg)
         self.assertTrue("xml" in evts[0])
-        self.assertTrue(evts[0]["xml"].endswith('</Event>'), 'xml value: "{}"'.format(evts[0]["xml"]))
+        self.assertTrue(evts[0]["xml"].endswith('</Event>'),
+                        'xml value: "{}"'.format(evts[0]["xml"]))
 
     def test_query_event_id(self):
         """
@@ -205,8 +206,10 @@ class Test(WriteReadTest):
         """
         self.write_event_log("success", level=win32evtlog.EVENTLOG_SUCCESS)
         self.write_event_log("error", level=win32evtlog.EVENTLOG_ERROR_TYPE)
-        self.write_event_log("warning", level=win32evtlog.EVENTLOG_WARNING_TYPE)
-        self.write_event_log("information", level=win32evtlog.EVENTLOG_INFORMATION_TYPE)
+        self.write_event_log(
+            "warning", level=win32evtlog.EVENTLOG_WARNING_TYPE)
+        self.write_event_log(
+            "information", level=win32evtlog.EVENTLOG_INFORMATION_TYPE)
         evts = self.read_events(config={
             "event_logs": [
                 {
@@ -223,10 +226,14 @@ class Test(WriteReadTest):
         """
         wineventlog - Query by level (error, warning)
         """
-        self.write_event_log("success", level=win32evtlog.EVENTLOG_SUCCESS)  # Level 0, Info
-        self.write_event_log("error", level=win32evtlog.EVENTLOG_ERROR_TYPE)  # Level 2
-        self.write_event_log("warning", level=win32evtlog.EVENTLOG_WARNING_TYPE)  # Level 3
-        self.write_event_log("information", level=win32evtlog.EVENTLOG_INFORMATION_TYPE)  # Level 4
+        self.write_event_log(
+            "success", level=win32evtlog.EVENTLOG_SUCCESS)  # Level 0, Info
+        self.write_event_log(
+            "error", level=win32evtlog.EVENTLOG_ERROR_TYPE)  # Level 2
+        self.write_event_log(
+            "warning", level=win32evtlog.EVENTLOG_WARNING_TYPE)  # Level 3
+        self.write_event_log(
+            "information", level=win32evtlog.EVENTLOG_INFORMATION_TYPE)  # Level 4
         evts = self.read_events(config={
             "event_logs": [
                 {
@@ -284,7 +291,8 @@ class Test(WriteReadTest):
         self.write_event_log("selected", source=self.otherAppName,
                              eventID=556, level=win32evtlog.EVENTLOG_ERROR_TYPE)
         self.write_event_log("filtered", source=self.otherAppName, eventID=556)
-        self.write_event_log("filtered", level=win32evtlog.EVENTLOG_WARNING_TYPE)
+        self.write_event_log(
+            "filtered", level=win32evtlog.EVENTLOG_WARNING_TYPE)
         evts = self.read_events(config={
             "event_logs": [
                 {
@@ -312,8 +320,9 @@ class Test(WriteReadTest):
                     "invalid": "garbage"}
             ]
         )
-        self.start_beat(extra_args=["-configtest"]).check_wait(exit_code=1)
-        assert self.log_contains("1 error: Invalid event log key 'invalid' found.")
+        self.start_beat().check_wait(exit_code=1)
+        assert self.log_contains(
+            "1 error: Invalid event log key 'invalid' found.")
 
     def test_utf16_characters(self):
         """

@@ -53,6 +53,7 @@
                 "ignore_failure": true
             }
         },
+
         {
             "date": {
                 "field": "auditd.log.epoch",
@@ -69,6 +70,7 @@
                 "ignore_failure": true
             }
         },
+
         {
             "convert": {
                 "field": "auditd.log.sequence",
@@ -86,10 +88,56 @@
                 }
             }
         },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.arch", "target_field": "host.architecture" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.acct", "target_field": "user.name" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.uid", "target_field": "user.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.gid", "target_field": "user.group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.agid", "target_field": "user.audit.group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.auid", "target_field": "user.audit.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.fsgid", "target_field": "user.filesystem.group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.fsuid", "target_field": "user.filesystem.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.egid", "target_field": "user.effective.group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.euid", "target_field": "user.effective.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.sgid", "target_field": "user.saved.group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.suid", "target_field": "user.saved.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.ogid", "target_field": "user.owner.group.id" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.ouid", "target_field": "user.owner.id" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.comm", "target_field": "process.name" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.exe", "target_field": "process.executable" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.pid", "target_field": "process.pid" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.ppid", "target_field": "process.ppid" } },
+        { "convert": { "ignore_missing": true, "field": "process.pid", "type": "long" } },
+        { "convert": { "ignore_missing": true, "field": "process.ppid", "type": "long" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.cmd", "target_field": "process.args" } },
+        { "split": { "ignore_failure": true, "field": "process.args", "separator": "\\s+" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.terminal", "target_field": "user.terminal" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.msg", "target_field": "message" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.res", "target_field": "event.outcome" } },
+        { "rename": { "ignore_failure": true, "field": "auditd.log.record_type", "target_field": "event.action" } },
+        { "lowercase": { "ignore_failure": true, "field": "event.action" } },
+
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.src",  "target_field": "source.address" } },
+
+        { "rename": { "ignore_failure": true, "field": "auditd.log.dst", "target_field": "destination.address" } },
+
+        {
+            "grok": {
+                "field": "source.address",
+                "patterns": [ "^%{IP:source.ip}$" ],
+                "ignore_failure": true
+            }
+        },
         {
             "geoip": {
-                "field": "auditd.log.addr",
-                "target_field": "auditd.log.geoip",
+                "field": "source.ip",
+                "target_field": "source.geo",
                 "ignore_failure": true
             }
         }
