@@ -1977,6 +1977,16 @@ The name of the metricset that generated the event.
 
 --
 
+*`process.pgid`*::
++
+--
+type: long
+
+Process group id.
+
+
+--
+
 *`service.address`*::
 +
 --
@@ -23348,10 +23358,9 @@ The number of outgoing packets that were dropped. This value is always 0 on Darw
 *`system.process.name`*::
 +
 --
-type: keyword
+type: alias
 
-The process name.
-
+alias to: process.name
 
 --
 
@@ -23368,30 +23377,27 @@ The process state. For example: "running".
 *`system.process.pid`*::
 +
 --
-type: long
+type: alias
 
-The process pid.
-
+alias to: process.pid
 
 --
 
 *`system.process.ppid`*::
 +
 --
-type: long
+type: alias
 
-The process parent pid.
-
+alias to: process.ppid
 
 --
 
 *`system.process.pgid`*::
 +
 --
-type: long
+type: alias
 
-The process group id.
-
+alias to: process.pgid
 
 --
 
@@ -23408,20 +23414,18 @@ The full command-line used to start the process, including the arguments separat
 *`system.process.username`*::
 +
 --
-type: keyword
+type: alias
 
-The username of the user that created the process. If the username cannot be determined, the field will contain the user's numeric identifier (UID). On Windows, this field includes the user's domain and is formatted as `domain\username`.
-
+alias to: user.name
 
 --
 
 *`system.process.cwd`*::
 +
 --
-type: keyword
+type: alias
 
-The current working directory of the process. This field is only available on Linux.
-
+alias to: process.working_directory
 
 --
 
