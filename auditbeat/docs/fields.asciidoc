@@ -3022,6 +3022,33 @@ Short name or login of the user.
 --
 
 [float]
+== group fields
+
+The group fields are meant to represent groups that are relevant to the event.
+
+
+
+*`user.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
+
+[float]
 == file fields
 
 File attributes.
@@ -3240,6 +3267,72 @@ type: keyword
 example: s0
 
 The object's SELinux level.
+
+--
+
+[float]
+== user fields
+
+User information.
+
+
+[float]
+== effective fields
+
+Effective user information.
+
+
+*`user.effective.id`*::
++
+--
+type: keyword
+
+Effective user ID.
+
+--
+
+[float]
+== group fields
+
+Effective group information.
+
+
+*`user.effective.group.id`*::
++
+--
+type: keyword
+
+Effective group ID.
+
+--
+
+[float]
+== saved fields
+
+Saved user information.
+
+
+*`user.saved.id`*::
++
+--
+type: keyword
+
+Saved user ID.
+
+--
+
+[float]
+== group fields
+
+Saved group information.
+
+
+*`user.saved.group.id`*::
++
+--
+type: keyword
+
+Saved group ID.
 
 --
 
