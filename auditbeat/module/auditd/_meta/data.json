@@ -46,12 +46,10 @@
         "ip": "179.38.151.221"
     },
     "user": {
-        "auid": "unset",
-        "id": "0",
-        "name": "root",
-        "name_map": {
-            "uid": "root"
+        "audit": {
+            "id": "unset"
         },
-        "uid": "0"
+        "id": "0",
+        "name": "root"
     }
 }

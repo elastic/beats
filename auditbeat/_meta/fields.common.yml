@@ -62,6 +62,9 @@
       - name: id
         type: keyword
         description: Effective user ID.
+      - name: name
+        type: keyword
+        description: Effective user name.
       - name: group
         type: group
         description: Effective group information.
@@ -69,6 +72,9 @@
         - name: id
           type: keyword
           description: Effective group ID.
+        - name: name
+          type: keyword
+          description: Effective group name.
 
     - name: saved
       type: group
@@ -77,6 +83,9 @@
       - name: id
         type: keyword
         description: Saved user ID.
+      - name: name
+        type: keyword
+        description: Saved user name.
       - name: group
         type: group
         description: Saved group information.
@@ -84,3 +93,6 @@
         - name: id
           type: keyword
           description: Saved group ID.
+        - name: name
+          type: keyword
+          description: Saved group name.
