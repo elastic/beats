@@ -12471,7 +12471,7 @@ Total memory available
 --
 
 
-*`kubernetes.pod.memory.workingSet.bytes`*::
+*`kubernetes.pod.memory.working_set.bytes`*::
 +
 --
 type: long
@@ -12496,7 +12496,7 @@ Total resident set size memory
 
 --
 
-*`kubernetes.pod.memory.pageFaults`*::
+*`kubernetes.pod.memory.page_faults`*::
 +
 --
 type: long
@@ -12506,7 +12506,7 @@ Total page faults
 
 --
 
-*`kubernetes.pod.memory.majorPageFaults`*::
+*`kubernetes.pod.memory.major_page_faults`*::
 +
 --
 type: long
