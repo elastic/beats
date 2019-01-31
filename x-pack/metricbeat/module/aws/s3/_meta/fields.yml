@@ -2,6 +2,7 @@
   type: group
   description: >
     `s3` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
+  release: beta
   fields:
     - name: bucket.size.bytes
       type: scaled_float

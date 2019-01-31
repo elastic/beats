@@ -1,0 +1,39 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "aws": {
+        "s3": {
+            "bucket": {
+                "name": "test-s3-ks",
+                "size": {
+                    "bytes": 696445
+                },
+                "storage": {
+                    "type": "StandardStorage"
+                }
+            },
+            "object": {
+                "count": 1
+            }
+        }
+    },
+    "cloud": {
+        "provider": "s3",
+        "region": "ap-southeast-1"
+    },
+    "event": {
+        "dataset": "aws.s3",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "s3"
+    },
+    "service": {
+        "name": "s3",
+        "type": "s3"
+    }
+}

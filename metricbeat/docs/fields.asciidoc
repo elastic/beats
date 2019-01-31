@@ -1085,6 +1085,33 @@ The state of the instance (pending | running | shutting-down | terminated | stop
 
 --
 
+[float]
+== s3 fields
+
+`s3` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
+
+
+
+*`aws.s3.bucket.size.bytes`*::
++
+--
+type: scaled_float
+
+The amount of data in bytes stored in a bucket.
+
+
+--
+
+*`aws.s3.object.count`*::
++
+--
+type: long
+
+The total number of objects stored in a bucket for all storage classes.
+
+
+--
+
 [[exported-fields-beat]]
 == Beat fields
 

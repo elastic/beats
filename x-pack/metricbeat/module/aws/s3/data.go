@@ -13,6 +13,10 @@ import (
 var (
 	schemaMetricSetFields = s.Schema{
 		"bucket": s.Object{
+			"name": c.Str("bucket.name", s.Optional),
+			"storage": s.Object{
+				"type": c.Str("bucket.storage.type", s.Optional),
+			},
 			"size": s.Object{
 				"bytes": c.Float("bucket.size.bytes", s.Optional),
 			},
@@ -30,7 +34,7 @@ var (
 		},
 		"cloud": s.Object{
 			"provider": c.Str("cloud.provider", s.Optional),
-			"region": c.Str("cloud.region", s.Optional),
+			"region":   c.Str("cloud.region", s.Optional),
 		},
 	}
 )

@@ -97,5 +97,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-aws-ec2,ec2>>
 
+* <<metricbeat-metricset-aws-s3,s3>>
+
 include::aws/ec2.asciidoc[]
+
+include::aws/s3.asciidoc[]
 
