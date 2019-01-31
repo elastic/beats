@@ -96,7 +96,7 @@ class Test(BaseTest):
             template_name="filebeat_modules",
             output=cfgfile,
             index_name=self.index_name,
-            elasticsearch_url=self.elasticsearch_url
+            elasticsearch_url=self.elasticsearch_url,
         )
 
         self.run_on_file(
@@ -118,6 +118,7 @@ class Test(BaseTest):
             self.filebeat, "-systemTest",
             "-e", "-d", "*", "-once",
             "-c", cfgfile,
+            "-E", "setup.ilm.enabled=false",
             "-modules={}".format(module),
             "-M", "{module}.*.enabled=false".format(module=module),
             "-M", "{module}.{fileset}.enabled=true".format(

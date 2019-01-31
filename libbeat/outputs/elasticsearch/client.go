@@ -43,7 +43,7 @@ type Client struct {
 	Connection
 	tlsConfig *transport.TLSConfig
 
-	index    outil.Selector
+	index    outputs.IndexSelector
 	pipeline *outil.Selector
 	params   map[string]string
 	timeout  time.Duration
@@ -70,7 +70,7 @@ type ClientSettings struct {
 	EscapeHTML         bool
 	Parameters         map[string]string
 	Headers            map[string]string
-	Index              outil.Selector
+	Index              outputs.IndexSelector
 	Pipeline           *outil.Selector
 	Timeout            time.Duration
 	CompressionLevel   int
@@ -366,7 +366,7 @@ func (client *Client) publishEvents(
 // successfully added to bulk request.
 func bulkEncodePublishRequest(
 	body bulkWriter,
-	index outil.Selector,
+	index outputs.IndexSelector,
 	pipeline *outil.Selector,
 	eventType string,
 	data []publisher.Event,
@@ -390,7 +390,7 @@ func bulkEncodePublishRequest(
 }
 
 func createEventBulkMeta(
-	indexSel outil.Selector,
+	indexSel outputs.IndexSelector,
 	pipelineSel *outil.Selector,
 	eventType string,
 	event *beat.Event,
@@ -401,7 +401,7 @@ func createEventBulkMeta(
 		return nil, err
 	}
 
-	index, err := getIndex(event, indexSel)
+	index, err := indexSel.Select(event)
 	if err != nil {
 		err := fmt.Errorf("failed to select event index: %v", err)
 		return nil, err
@@ -445,24 +445,6 @@ func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error)
 		return pipelineSel.Select(event)
 	}
 	return "", nil
-}
-
-// getIndex returns the full index name
-// Index is either defined in the config as part of the output
-// or can be overload by the event through setting index
-func getIndex(event *beat.Event, index outil.Selector) (string, error) {
-	if event.Meta != nil {
-		if str, exists := event.Meta["index"]; exists {
-			idx, ok := str.(string)
-			if ok {
-				ts := event.Timestamp.UTC()
-				return fmt.Sprintf("%s-%d.%02d.%02d",
-					idx, ts.Year(), ts.Month(), ts.Day()), nil
-			}
-		}
-	}
-
-	return index.Select(event)
 }
 
 // bulkCollectPublishFails checks per item errors returning all events

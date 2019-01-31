@@ -18,15 +18,12 @@ existing indices.
 
 To use index lifecycle management on {beatname_uc} indices:
 
-. Enable index lifecycle management by setting `ilm.enabled: true` in the {es}
-output configuration. For example:
+. Enable index lifecycle management by setting `setup.ilm.enabled: true`. For example:
 +
 --
 [source,yaml]
 ------------------------------------------------------------------------------
-output.elasticsearch:
-  hosts: ["localhost:9200"]
-  ilm.enabled: true
+setup.ilm.enabled: true
 ------------------------------------------------------------------------------
 
 This configuration overwrites your index settings and adjusts the {beatname_uc}
