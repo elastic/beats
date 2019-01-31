@@ -1990,7 +1990,15 @@ Process group id.
 *`service.address`*::
 +
 --
-Connection address of the machine from which the metricset was collected. This field may not be present when the data was collected locally.
+Address of the machine where the service is running. This field may not be present when the data was collected locally.
+
+
+--
+
+*`service.hostname`*::
++
+--
+Host name of the machine where the service is running.
 
 
 --
@@ -7485,9 +7493,9 @@ Target node id.
 *`elasticsearch.index.recovery.target.host`*::
 +
 --
-type: ip
+type: keyword
 
-Target node host address.
+Target node host address (could be IP address or hostname).
 
 
 --
@@ -7515,9 +7523,9 @@ Source node id.
 *`elasticsearch.index.recovery.source.host`*::
 +
 --
-type: ip
+type: keyword
 
-Source node host address.
+Source node host address (could be IP address or hostname).
 
 
 --
@@ -11028,7 +11036,9 @@ Kibana stats and run-time metrics.
 *`kibana.stats.uuid`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.id
 
 Kibana instance UUID
 
@@ -11068,7 +11078,9 @@ Kibana instance hostname
 *`kibana.stats.transport_address`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.address
 
 Kibana server's hostname and port
 
@@ -11078,7 +11090,9 @@ Kibana server's hostname and port
 *`kibana.stats.version`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 Kibana version
 
@@ -11259,7 +11273,9 @@ Kibana instance name.
 *`kibana.status.uuid`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.id
 
 Kibana instance uuid.
 
@@ -11269,7 +11285,9 @@ Kibana instance uuid.
 *`kibana.status.version.number`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 Kibana version number.
 
@@ -13309,7 +13327,9 @@ node
 *`logstash.node.host`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: host.hostname
 
 Host name
 
@@ -13319,7 +13339,9 @@ Host name
 *`logstash.node.version`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 Logstash Version
 
@@ -13346,9 +13368,11 @@ Version
 *`logstash.node.jvm.pid`*::
 +
 --
-type: long
+type: alias
 
-Pid
+alias to: process.pid
+
+Process ID
 
 
 --
