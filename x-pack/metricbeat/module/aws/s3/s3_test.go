@@ -10,20 +10,8 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
-	"github.com/aws/aws-sdk-go-v2/service/s3/s3iface"
 	"github.com/stretchr/testify/assert"
 )
-
-// MockS3Client struct is used for unit tests.
-type MockS3Client struct {
-	s3iface.S3API
-}
-
-// MockCloudWatchClient struct is used for unit tests.
-type MockCloudWatchClient struct {
-	cloudwatchiface.CloudWatchAPI
-}
 
 var regionName = "us-west-1"
 
