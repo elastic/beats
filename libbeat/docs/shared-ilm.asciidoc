@@ -32,9 +32,9 @@ template to use the correct settings for index lifecycle management.
 NOTE: If you've previously loaded the index template for this version into {es}, 
 you must overwrite the template by setting `setup.template.overwrite: true`.
 
-The rollover alias is set to +{beatname_lc}-\{agent.version\}+ by default. You
+The rollover alias is set to +{beatname_lc}-\{{beat_version_key}\}+ by default. You
 can change the prefix used in the alias by setting `ilm.rollover_alias`, but you
-can't remove `{agent.version}` from the rollover alias name. The default pattern
+can't remove +{beat_version_key}+ from the rollover alias name. The default pattern
 used for the rollover index is `%{now/d}-000001`. You can change the
 pattern by setting `ilm.pattern`. For example:
 
