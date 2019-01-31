@@ -32,6 +32,12 @@
             }
         },
         {
+            "rename": {
+                "field": "elasticsearch.server.component",
+                "target_field": "elasticsearch.component"
+            }
+        },
+        {
             "dot_expander": {
                 "field": "cluster.name",
                 "path": "elasticsearch.server"

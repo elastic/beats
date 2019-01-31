@@ -4255,6 +4255,17 @@ Name of the cluster
 
 --
 
+*`elasticsearch.component`*::
++
+--
+type: keyword
+
+example: o.e.c.m.MetaDataCreateIndexService
+
+Elasticsearch component from where the log event originated
+
+--
+
 *`elasticsearch.cluster.uuid`*::
 +
 --
@@ -4748,17 +4759,6 @@ Young generation occupancy in kilobytes.
 
 Server log file
 
-
-*`elasticsearch.server.component`*::
-+
---
-type: keyword
-
-example: o.e.c.m.MetaDataCreateIndexService
-
-Log component
-
---
 
 [float]
 == gc fields

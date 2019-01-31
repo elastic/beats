@@ -2,10 +2,6 @@
   description: "Server log file"
   type: group
   fields:
-  - name: component
-    description: "Log component"
-    example: "o.e.c.m.MetaDataCreateIndexService"
-    type: keyword
   - name: gc
     description: "GC log"
     type: group
