@@ -84,12 +84,12 @@ type Record struct {
 func (e Record) ToEvent() beat.Event {
 	// Windows Log Specific data
 	win := common.MapStr{
-		"channel":        e.Channel,
-		"event":          common.MapStr{"id":e.EventIdentifier.ID},
-		"provider_name":  e.Provider.Name,
-		"record_id":      e.RecordID,
-		"task":           e.Task,
-		"api":            e.API,
+		"channel":       e.Channel,
+		"event":         common.MapStr{"id": e.EventIdentifier.ID},
+		"provider_name": e.Provider.Name,
+		"record_id":     e.RecordID,
+		"task":          e.Task,
+		"api":           e.API,
 	}
 	addOptional(win, "computer", e.Computer)
 	addOptional(win, "level", e.Level)
@@ -125,7 +125,7 @@ func (e Record) ToEvent() beat.Event {
 	addOptional(userData, "xml_name", e.UserData.Name.Local)
 
 	m := common.MapStr{
-		"winlog":  win,
+		"winlog": win,
 	}
 
 	// ECS data

@@ -133,7 +133,6 @@ func (t *TimeCreated) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 // EventData contains the event data. The EventData section is used if the
 // message provider template does not contain a UserData section.
 type EventData struct {
-	// TargetUserName    string `xml:"TargetUserName,attr"`
 	Pairs []KeyValue `xml:",any"`
 }
 
