@@ -178,3 +178,120 @@
       required: false
       description: >
         The code for this log message (Windows event ID).
+
+# Aliases for the old fields
+    - name: type
+      type: alias
+      path: winlog.type
+      migration: true
+
+    - name: activity_id
+      type: alias
+      path: winlog.activity_id
+      migration: true
+
+    - name: computer_name
+      type: alias
+      path: winlog.computer_name
+      migration: true
+
+    - name: event_id
+      type: alias
+      path: winlog.event_id
+      migration: true
+
+    - name: keywords
+      type: alias
+      path: winlog.keywords
+      migration: true
+
+    - name: log_name
+      type: alias
+      path: winlog.channel
+      migration: true
+
+    - name: message_error
+      type: alias
+      path: error.message
+      migration: true
+
+    - name: record_number
+      type: alias
+      path: winlog.record_id
+      migration: true
+
+    - name: related_activity_id
+      type: alias
+      path: winlog.related_activity_id
+      migration: true
+
+    - name: opcode
+      type: alias
+      path: winlog.opcode
+      migration: true
+
+    - name: provider_guid
+      type: alias
+      path: winlog.provider_guid
+      migration: true
+
+    - name: process_id
+      type: alias
+      path: winlog.process.pid
+      migration: true
+
+    - name: source_name
+      type: alias
+      path: winlog.provider_name
+      migration: true
+
+    - name: task
+      type: alias
+      path: winlog.task
+      migration: true
+
+    - name: thread_id
+      type: alias
+      path: winlog.process.thread.id
+      migration: true
+
+    - name: user_data
+      type: alias
+      path: winlog.user_data
+      migration: true
+
+    - name: user.identifier
+      type: alias
+      path:  winlog.user.identifier
+      migration: true
+
+    - name: user.domain
+      type: alias
+      path: winlog.user.domain
+      migration: true
+
+    - name: user.type
+      type: alias
+      path: winlog.user.type
+      migration: true
+
+    - name: version
+      type: alias
+      path: winlog.version
+      migration: true
+
+    - name: xml
+      type: alias
+      path: event.original
+      migration: true
+      description: >
+        The raw XML representation of the event obtained from Windows. This
+        field is only available on operating systems supporting the Windows
+        Event Log API (Microsoft Windows Vista and newer). This field is not
+        included by default and must be enabled by setting `include_xml: true`
+        as a configuration option for an individual event log.
+
+
+        The XML representation of the event is useful for troubleshooting
+        purposes. The data in the fields reported by Winlogbeat can be compared
+        to the data in the XML to diagnose problems.
