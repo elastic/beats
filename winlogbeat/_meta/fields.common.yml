@@ -1,7 +1,7 @@
-- key: common
-  title: "Common Winlogbeat"
+- key: winlog
+  title: "Windows Event Log fields"
   description: >
-    Contains common fields available in all event types.
+    Fields from the Windows Event Log.
   fields:
     - name: winlog
       type: group
@@ -48,7 +48,7 @@
             `param2`, and so on, because event log parameters are unnamed in
             earlier versions of Windows.
 
-        - name: event.id
+        - name: event_id
           type: keyword
           required: true
           description: >
@@ -67,11 +67,11 @@
             The name of the computer that generated the record. When using Windows
             event forwarding, this name can differ from `agent.hostname`.
 
-        - name: record_number
+        - name: record_id
           type: keyword
           required: true
           description: >
-            The record number of the event log record. The first record written
+            The record ID of the event log record. The first record written
             to an event log is record number 1, and other records are numbered
             sequentially. If the record number reaches the maximum value (2^32^
             for the Event Logging API and 2^64^ for the Windows Event Log API),
@@ -155,26 +155,11 @@
           required: false
           description: The version number of the event's definition.
 
-        - name: xml
-          type: text
-          required: false
-          description: >
-            The raw XML representation of the event obtained from Windows. This
-            field is only available on operating systems supporting the Windows
-            Event Log API (Microsoft Windows Vista and newer). This field is not
-            included by default and must be enabled by setting `include_xml: true`
-            as a configuration option for an individual event log.
-
-
-            The XML representation of the event is useful for troubleshooting
-            purposes. The data in the fields reported by Winlogbeat can be compared
-            to the data in the XML to diagnose problems.
-
-        - name: execution.process.pid
+        - name: process.pid
           type: long
           required: false
 
-        - name: execution.process.thread.id
+        - name: process.thread.id
           type: long
           required: false
 

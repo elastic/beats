@@ -85,14 +85,13 @@ func (e Record) ToEvent() beat.Event {
 	// Windows Log Specific data
 	win := common.MapStr{
 		"channel":       e.Channel,
-		"event":         common.MapStr{"id": e.EventIdentifier.ID},
+		"event_id":      e.EventIdentifier.ID,
 		"provider_name": e.Provider.Name,
 		"record_id":     e.RecordID,
 		"task":          e.Task,
 		"api":           e.API,
 	}
 	addOptional(win, "computer", e.Computer)
-	addOptional(win, "level", e.Level)
 	addOptional(win, "kernel_time", e.Execution.KernelTime)
 	addOptional(win, "keywords", e.Keywords)
 	addOptional(win, "opcode", e.Opcode)
@@ -107,8 +106,8 @@ func (e Record) ToEvent() beat.Event {
 	addOptional(win, "activity_id", e.Correlation.ActivityID)
 	addOptional(win, "related_activity_id", e.Correlation.RelatedActivityID)
 	// Execution
-	addOptional(win, "execution.process.pid", e.Execution.ProcessID)
-	addOptional(win, "execution.process.thread.id", e.Execution.ThreadID)
+	addOptional(win, "process.pid", e.Execution.ProcessID)
+	addOptional(win, "process.thread.id", e.Execution.ThreadID)
 
 	if e.User.Identifier != "" {
 		user := common.MapStr{
