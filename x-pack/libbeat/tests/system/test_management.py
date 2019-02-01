@@ -28,7 +28,7 @@ class TestManagement(BaseTest):
 
     # @unittest.skipIf(not INTEGRATION_TESTS,
     #                  "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
-    @unittest.skip("Skipping because snapshot is not ready yet. see #")
+    @unittest.skip("Skipping because snapshot is not ready yet. see #10481")
     def test_enroll(self):
         """
         Enroll the beat in Kibana Central Management
@@ -63,7 +63,7 @@ class TestManagement(BaseTest):
 
     # @unittest.skipIf(not INTEGRATION_TESTS,
     #                  "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
-    @unittest.skip("Skipping because snapshot is not ready yet. see #")
+    @unittest.skip("Skipping because snapshot is not ready yet. see #10481")
     def test_enroll_bad_pw(self):
         """
         Try to enroll the beat in Kibana Central Management with a bad password
