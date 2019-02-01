@@ -17,10 +17,30 @@
   - name: user
     type: group
     fields:
+    - name: entity_id
+      type: keyword
+      description: >
+        ID uniquely identifying the user.
     - name: terminal
       type: keyword
       description: >
         Terminal of the user.
+
+  - name: process
+    type: group
+    fields:
+    - name: entity_id
+      type: keyword
+      description: >
+        ID uniquely identifying the process.
+
+  - name: socket
+    type: group
+    fields:
+    - name: entity_id
+      type: keyword
+      description: >
+        ID uniquely identifying the socket.
 
   - name: system.audit
     type: group
