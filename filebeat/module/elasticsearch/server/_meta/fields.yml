@@ -2,6 +2,12 @@
   description: "Server log file"
   type: group
   fields:
+  - name: stacktrace
+    description": Stack trace in case of errors
+    type: keyword
+    multi_fields:
+      - name: text
+        type: text
   - name: gc
     description: "GC log"
     type: group
