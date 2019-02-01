@@ -161,7 +161,7 @@
                         "query": {
                             "query_string": {
                                 "analyze_wildcard": true, 
-                                "query": "_exists_:system.syslog"
+                                "query": "event.dataset:system.syslog"
                             }
                         }
                     }

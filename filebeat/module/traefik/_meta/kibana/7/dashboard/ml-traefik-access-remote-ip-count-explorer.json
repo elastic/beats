@@ -432,7 +432,7 @@
                         "query": {
                             "query_string": {
                                 "analyze_wildcard": true, 
-                                "query": "_exists_:traefik.access"
+                                "query": "event.dataset:traefik.access"
                             }
                         }
                     }
