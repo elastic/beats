@@ -91,7 +91,7 @@ func (e Record) ToEvent() beat.Event {
 		"task":          e.Task,
 		"api":           e.API,
 	}
-	addOptional(win, "computer", e.Computer)
+	addOptional(win, "computer_name", e.Computer)
 	addOptional(win, "kernel_time", e.Execution.KernelTime)
 	addOptional(win, "keywords", e.Keywords)
 	addOptional(win, "opcode", e.Opcode)
@@ -112,7 +112,7 @@ func (e Record) ToEvent() beat.Event {
 
 	if e.User.Identifier != "" {
 		user := common.MapStr{
-			"id": e.User.Identifier,
+			"identifier": e.User.Identifier,
 		}
 		win["user"] = user
 		addOptional(user, "name", e.User.Name)
