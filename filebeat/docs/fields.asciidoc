@@ -4327,6 +4327,37 @@ elasticsearch Module
 
 
 
+*`elasticsearch.component`*::
++
+--
+type: keyword
+
+example: o.e.c.m.MetaDataCreateIndexService
+
+Elasticsearch component from where the log event originated
+
+--
+
+*`elasticsearch.cluster.uuid`*::
++
+--
+type: keyword
+
+example: GmvrbHlNTiSVYiPf8kxg9g
+
+UUID of the cluster
+
+--
+
+*`elasticsearch.cluster.name`*::
++
+--
+example: docker-cluster
+
+Name of the cluster
+
+--
+
 *`elasticsearch.node.id`*::
 +
 --
