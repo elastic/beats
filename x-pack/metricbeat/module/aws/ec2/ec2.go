@@ -6,11 +6,9 @@ package ec2
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/defaults"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -41,12 +39,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	moduleConfig   *aws.Config
-	awsConfig      *awssdk.Config
-	regionsList    []string
-	durationString string
-	periodInSec    int
-	logger         *logp.Logger
+	logger *logp.Logger
 }
 
 // metricIDNameMap is a translating map between createMetricDataQuery id
@@ -90,38 +83,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "error creating aws metricset")
 	}
 
-	// Get a list of regions
-	awsConfig := defaults.Config()
-	awsCreds := awssdk.Credentials{
-		AccessKeyID:     moduleConfig.AccessKeyID,
-		SecretAccessKey: moduleConfig.SecretAccessKey,
-	}
-	if moduleConfig.SessionToken != "" {
-		awsCreds.SessionToken = moduleConfig.SessionToken
-	}
-
-	awsConfig.Credentials = awssdk.StaticCredentialsProvider{
-		Value: awsCreds,
-	}
-
-	awsConfig.Region = moduleConfig.DefaultRegion
-	svcEC2 := ec2.New(awsConfig)
-	regionsList, err := getRegions(svcEC2)
-	if err != nil {
-		err = errors.Wrap(err, "getRegions failed")
-		ec2Logger.Error(err.Error())
-	}
-
-	// Calculate duration based on period
-	durationString, periodSec, err := convertPeriodToDuration(moduleConfig.Period)
-	if err != nil {
-		ec2Logger.Error(err.Error())
-		return nil, err
-	}
-
 	// Check if period is set to be multiple of 60s or 300s
-	remainder300 := periodSec % 300
-	remainder60 := periodSec % 60
+	remainder300 := metricSet.PeriodInSec % 300
+	remainder60 := metricSet.PeriodInSec % 60
 	if remainder300 != 0 || remainder60 != 0 {
 		err := errors.New("period needs to be set to 60s (or a multiple of 60s) if detailed monitoring is " +
 			"enabled for EC2 instances or set to 300s (or a multiple of 300s) if EC2 instances has basic monitoring. " +
@@ -130,13 +94,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		MetricSet:      metricSet,
-		moduleConfig:   &moduleConfig,
-		awsConfig:      &awsConfig,
-		regionsList:    regionsList,
-		durationString: durationString,
-		periodInSec:    periodSec,
-		logger:         ec2Logger,
+		MetricSet: metricSet,
+		logger:    ec2Logger,
 	}, nil
 }
 
@@ -144,9 +103,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
-	for _, regionName := range m.regionsList {
-		m.awsConfig.Region = regionName
-		svcEC2 := ec2.New(*m.awsConfig)
+	for _, regionName := range m.MetricSet.RegionsList {
+		m.MetricSet.AwsConfig.Region = regionName
+		svcEC2 := ec2.New(*m.MetricSet.AwsConfig)
 		instanceIDs, instancesOutputs, err := getInstancesPerRegion(svcEC2)
 		if err != nil {
 			err = errors.Wrap(err, "getInstancesPerRegion failed, skipping region "+regionName)
@@ -155,13 +114,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 			continue
 		}
 
-		svcCloudwatch := cloudwatch.New(*m.awsConfig)
+		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
 		for _, instanceID := range instanceIDs {
 			init := true
 			getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 			for init || getMetricDataOutput.NextToken != nil {
 				init = false
-				output, err := getMetricDataPerRegion(m.durationString, m.periodInSec, instanceID, getMetricDataOutput.NextToken, svcCloudwatch)
+				output, err := getMetricDataPerRegion(m.MetricSet.DurationString, m.MetricSet.PeriodInSec, instanceID, getMetricDataOutput.NextToken, svcCloudwatch)
 				if err != nil {
 					err = errors.Wrap(err, "getMetricDataPerRegion failed, skipping region "+regionName+" for instance "+instanceID)
 					m.logger.Error(err.Error())
@@ -185,20 +144,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 			report.Event(event)
 		}
 	}
-}
-
-func getRegions(svc ec2iface.EC2API) (regionsList []string, err error) {
-	input := &ec2.DescribeRegionsInput{}
-	req := svc.DescribeRegionsRequest(input)
-	output, err := req.Send()
-	if err != nil {
-		err = errors.Wrap(err, "Failed DescribeRegions")
-		return
-	}
-	for _, region := range output.Regions {
-		regionsList = append(regionsList, *region.RegionName)
-	}
-	return
 }
 
 func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput, instanceID string, instanceOutput ec2.Instance, regionName string) (event mb.Event, info string, err error) {
@@ -311,32 +256,6 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instances
 		}
 	}
 	return
-}
-
-func convertPeriodToDuration(period string) (string, int, error) {
-	// Amazon EC2 sends metrics to Amazon CloudWatch with 5-minute default frequency.
-	// If detailed monitoring is enabled, then data will be available in 1-minute period.
-	// Set starttime double the default frequency earlier than the endtime in order to make sure
-	// GetMetricDataRequest gets the latest data point for each metric.
-	numberPeriod, err := strconv.Atoi(period[0 : len(period)-1])
-	if err != nil {
-		return "", 0, err
-	}
-
-	unitPeriod := period[len(period)-1:]
-	switch unitPeriod {
-	case "s":
-		duration := "-" + strconv.Itoa(numberPeriod*2) + unitPeriod
-		return duration, numberPeriod, nil
-	case "m":
-		duration := "-" + strconv.Itoa(numberPeriod*2) + unitPeriod
-		periodInSec := numberPeriod * 60
-		return duration, periodInSec, nil
-	default:
-		err = errors.New("invalid period in config. Please reset period in config")
-		duration := "-" + strconv.Itoa(numberPeriod*2) + "s"
-		return duration, numberPeriod, err
-	}
 }
 
 func getMetricDataPerRegion(durationString string, periodInSec int, instanceID string, nextToken *string, svc cloudwatchiface.CloudWatchAPI) (*cloudwatch.GetMetricDataOutput, error) {
