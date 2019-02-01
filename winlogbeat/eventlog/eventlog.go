@@ -141,24 +141,17 @@ func (e Record) ToEvent() beat.Event {
 	addOptional(m, "message", sys.RemoveWindowsLineEndings(e.Message))
 	addOptional(m, "error.message", e.RenderErr)
 
-	// Execution
-	// addOptional(m, "process.pid", e.Execution.ProcessID)
-	// addOptional(m, "process.thread.id", e.Execution.ThreadID)
+	// Additional field mappings, when available
+	// What about the old windows (nested under user_data instead of event_data)?
 
-	// debugf("EventData field inspection %v", e.EventData.TargetUserName)
-	// debugf("EventData inspection full %v", e.EventData)
-	// addOptional(m, "user_dbg.name", e.EventData.TargetUserName)
+	// Is this always the remote address?
+	// winlog.event_data.IpAddress => ?
+	// winlog.event_data.IpPort => ?
 
-  // Additional mapping ideas
-  // user.id
-  // - event_data.TargetUserSid (S-1-5-21-3541430928-2051711210-1391384369-1001)
-  // - event_data.SubjectUserSid (S-1-5-18)
-  // user.name
-  // - event_data.TargetUserName (vagrant)
-  // - event_data.SubjectUserName (VAGRANT-2012-R2$, vagrant)
-  // source.ip: event_data.IpAddress
-  // source.port: event_data.IpPort
-  // process.executable: event_data.ProcessName
+	// winlog.event_data.ProcessId => process.pid (hex to numeric)
+	// winlog.event_data.ProcessName => process.executable
+	// winlog.event_data.TargetUserSid => user.id
+	// winlog.event_data.TargetUserName => user.name
 
 	return beat.Event{
 		Timestamp: e.TimeCreated.SystemTime,
