@@ -13,7 +13,6 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -58,8 +57,7 @@ func TestConvertPeriodToDuration(t *testing.T) {
 
 	period2 := "30ss"
 	duration2, periodSec2, err := convertPeriodToDuration(period2)
-	expectedErr := errors.New("Invaid period in config. Please reset period in config.")
-	assert.Error(t, expectedErr, err)
+	assert.Error(t, err)
 	assert.Equal(t, "", duration2)
 	assert.Equal(t, 0, periodSec2)
 
