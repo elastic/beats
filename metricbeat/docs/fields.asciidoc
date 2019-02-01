@@ -994,6 +994,96 @@ Reports whether the instance has passed the instance status check in the last mi
 
 --
 
+*`aws.ec2.instance.core.count`*::
++
+--
+type: integer
+
+The number of CPU cores for the instance.
+
+
+--
+
+*`aws.ec2.instance.image.id`*::
++
+--
+type: keyword
+
+The ID of the image used to launch the instance.
+
+
+--
+
+*`aws.ec2.instance.monitoring.state`*::
++
+--
+type: keyword
+
+Indicates whether detailed monitoring is enabled.
+
+
+--
+
+*`aws.ec2.instance.private.dns_name`*::
++
+--
+type: keyword
+
+The private DNS name of the network interface.
+
+
+--
+
+*`aws.ec2.instance.private.ip`*::
++
+--
+type: ip
+
+The private IPv4 address associated with the network interface.
+
+
+--
+
+*`aws.ec2.instance.public.dns_name`*::
++
+--
+type: keyword
+
+The public DNS name of the instance.
+
+
+--
+
+*`aws.ec2.instance.public.ip`*::
++
+--
+type: ip
+
+The address of the Elastic IP address (IPv4) bound to the network interface.
+
+
+--
+
+*`aws.ec2.instance.state.code`*::
++
+--
+type: integer
+
+The state of the instance, as a 16-bit unsigned integer.
+
+
+--
+
+*`aws.ec2.instance.threads_per_core`*::
++
+--
+type: integer
+
+The state of the instance (pending | running | shutting-down | terminated | stopping | stopped).
+
+
+--
+
 [[exported-fields-beat]]
 == Beat fields
 
