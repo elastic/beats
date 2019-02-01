@@ -3290,7 +3290,7 @@ The code for this log message (Windows event ID).
 --
 type: alias
 
-alias to: winlog.type
+alias to: winlog.api
 
 --
 
@@ -3417,15 +3417,6 @@ alias to: winlog.task
 type: alias
 
 alias to: winlog.process.thread.id
-
---
-
-*`user_data`*::
-+
---
-type: alias
-
-alias to: winlog.user_data
 
 --
 
@@ -3604,18 +3595,6 @@ All fields specific to the Windows Event Log are defined here.
 
 
 
-*`winlog.channel`*::
-+
---
-type: keyword
-
-required: True
-
-The name of the channel from which this record was read. This value is one of the names from the `event_logs` collection in the configuration.
-
-
---
-
 *`winlog.type`*::
 +
 --
@@ -3671,6 +3650,18 @@ type: keyword
 required: False
 
 The keywords are used to classify an event.
+
+
+--
+
+*`winlog.channel`*::
++
+--
+type: keyword
+
+required: True
+
+The name of the channel from which this record was read. This value is one of the names from the `event_logs` collection in the configuration.
 
 
 --
@@ -3735,6 +3726,18 @@ A globally unique identifier that identifies the provider that logged the event.
 
 --
 
+*`winlog.process.pid`*::
++
+--
+type: long
+
+required: False
+
+The process_id of the Client Server Runtime Process.
+
+
+--
+
 *`winlog.provider_name`*::
 +
 --
@@ -3756,6 +3759,15 @@ required: False
 
 The task defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged. The category used by the Event Logging API (on pre Windows Vista operating systems) is written to this field.
 
+
+--
+
+*`winlog.process.thread.id`*::
++
+--
+type: long
+
+required: False
 
 --
 
@@ -3819,24 +3831,6 @@ type: long
 required: False
 
 The version number of the event's definition.
-
---
-
-*`winlog.process.pid`*::
-+
---
-type: long
-
-required: False
-
---
-
-*`winlog.process.thread.id`*::
-+
---
-type: long
-
-required: False
 
 --
 
