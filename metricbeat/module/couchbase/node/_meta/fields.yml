@@ -54,7 +54,6 @@
       type: long
       description: >
         Number of get hits.
-    # Couchbase node hostname
     - name: hostname
       type: keyword
       description: >
