@@ -1,5 +1,5 @@
 - key: winlog
-  title: "Windows Event Log fields"
+  title: "Windows Event Log fields emitted by Winlogbeat"
   description: >
     Fields from the Windows Event Log.
   fields:
@@ -66,6 +66,13 @@
           description: >
             The name of the computer that generated the record. When using Windows
             event forwarding, this name can differ from `agent.hostname`.
+
+        - name: message_error
+          type: keyword
+          required: false
+          description: >
+            The error that occurred while reading and formatting the message from
+            the log.
 
         - name: record_id
           type: keyword
@@ -215,7 +222,7 @@
 
     - name: message_error
       type: alias
-      path: error.message
+      path: winlog.message_error
       migration: true
 
     - name: record_number

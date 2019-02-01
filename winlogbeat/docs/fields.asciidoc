@@ -3344,7 +3344,7 @@ alias to: winlog.channel
 --
 type: alias
 
-alias to: error.message
+alias to: winlog.message_error
 
 --
 
@@ -3582,7 +3582,7 @@ alias to: process.executable
 --
 
 [[exported-fields-winlog]]
-== Windows Event Log fields fields
+== Windows Event Log fields emitted by Winlogbeat fields
 
 Fields from the Windows Event Log.
 
@@ -3674,6 +3674,18 @@ type: keyword
 required: True
 
 The name of the computer that generated the record. When using Windows event forwarding, this name can differ from `agent.hostname`.
+
+
+--
+
+*`winlog.message_error`*::
++
+--
+type: keyword
+
+required: False
+
+The error that occurred while reading and formatting the message from the log.
 
 
 --
