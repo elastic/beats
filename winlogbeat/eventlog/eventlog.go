@@ -82,46 +82,68 @@ type Record struct {
 
 // ToMapStr returns a new MapStr containing the data from this Record.
 func (e Record) ToEvent() beat.Event {
-	m := common.MapStr{
-		"type":          e.API,
-		"record_number": strconv.FormatUint(e.RecordID, 10),
+	// Windows Log Specific data
+	win := common.MapStr{
+		"channel":        e.Channel,
+		"event.id":       e.EventIdentifier.ID,
+		"provider_name":  e.Provider.Name,
+		"record_number":  strconv.FormatUint(e.RecordID, 10),
+		"task":           e.Task,
+		"type":           e.API,
+	}
+	addOptional(win, "kernel_time", e.Execution.KernelTime)
+	addOptional(win, "keywords", e.Keywords)
+	addOptional(win, "opcode", e.Opcode)
+	addOptional(win, "processor_id", e.Execution.ProcessorID)
+	addOptional(win, "processor_time", e.Execution.ProcessorTime)
+	addOptional(win, "provider_guid", e.Provider.GUID)
+	addOptional(win, "session_id", e.Execution.SessionID)
+	addOptional(win, "task", e.Task)
+	addOptional(win, "user_time", e.Execution.UserTime)
+	addOptional(win, "version", e.Version)
+	// Correlation
+	addOptional(win, "activity_id", e.Correlation.ActivityID)
+	addOptional(win, "related_activity_id", e.Correlation.RelatedActivityID)
+	// Execution
+	addOptional(win, "execution.process.pid", e.Execution.ProcessID)
+	addOptional(win, "execution.process.thread.id", e.Execution.ThreadID)
+
+	if e.User.Identifier != "" {
+		user := common.MapStr{
+			"id": e.User.Identifier,
+		}
+		win["user"] = user
+		addOptional(user, "name", e.User.Name)
+		addOptional(user, "domain", e.User.Domain)
+		addOptional(user, "type", e.User.Type.String())
 	}
 
+	addPairs(win, "event_data", e.EventData.Pairs)
+	userData := addPairs(win, "user_data", e.UserData.Pairs)
+	addOptional(userData, "xml_name", e.UserData.Name.Local)
+
+	addOptional(win, "xml", e.XML)
+
+	m := common.MapStr{
+		"winlog":  win,
+	}
+
+	// ECS data
 	m.Put("event.kind", "event")
 	m.Put("event.dataset", fmt.Sprintf("%v.%v", e.API, strings.ToLower(e.Channel)))
-	m.Put("log_name", e.Channel)
-	m.Put("source_name", e.Provider.Name)
-  // Why not keep the Windows naming for those?
-	m.Put("channel", e.Channel)
-	m.Put("provider_name", e.Provider.Name)
 	m.Put("event.code", e.EventIdentifier.ID)
 	addOptional(m, "event.action", e.Task)
 
 	m.Put("host.hostname", e.Computer)
 	m.Put("event.created", time.Now())
 
-	addOptional(m, "xml", e.XML)
-	addOptional(m, "provider_guid", e.Provider.GUID)
-	addOptional(m, "version", e.Version)
 	addOptional(m, "log.level", strings.ToLower(e.Level))
-	addOptional(m, "task", e.Task)
-	addOptional(m, "opcode", e.Opcode)
-	addOptional(m, "keywords", e.Keywords)
 	addOptional(m, "message", sys.RemoveWindowsLineEndings(e.Message))
 	addOptional(m, "error.message", e.RenderErr)
 
-	// Correlation
-	addOptional(m, "activity_id", e.Correlation.ActivityID)
-	addOptional(m, "related_activity_id", e.Correlation.RelatedActivityID)
-
 	// Execution
-	addOptional(m, "process.pid", e.Execution.ProcessID)
-	addOptional(m, "process.thread.id", e.Execution.ThreadID)
-	addOptional(m, "processor_id", e.Execution.ProcessorID)
-	addOptional(m, "session_id", e.Execution.SessionID)
-	addOptional(m, "kernel_time", e.Execution.KernelTime)
-	addOptional(m, "user_time", e.Execution.UserTime)
-	addOptional(m, "processor_time", e.Execution.ProcessorTime)
+	// addOptional(m, "process.pid", e.Execution.ProcessID)
+	// addOptional(m, "process.thread.id", e.Execution.ThreadID)
 
 	// debugf("EventData field inspection %v", e.EventData.TargetUserName)
 	// debugf("EventData inspection full %v", e.EventData)
@@ -137,21 +159,6 @@ func (e Record) ToEvent() beat.Event {
   // source.ip: event_data.IpAddress
   // source.port: event_data.IpPort
   // process.executable: event_data.ProcessName
-
-	if e.User.Identifier != "" {
-		user := common.MapStr{
-			"id": e.User.Identifier,
-		}
-		m["user"] = user
-
-		addOptional(user, "name", e.User.Name)
-		addOptional(user, "domain", e.User.Domain)
-		addOptional(user, "type", e.User.Type.String())
-	}
-
-	addPairs(m, "event_data", e.EventData.Pairs)
-	userData := addPairs(m, "user_data", e.UserData.Pairs)
-	addOptional(userData, "xml_name", e.UserData.Name.Local)
 
 	return beat.Event{
 		Timestamp: e.TimeCreated.SystemTime,

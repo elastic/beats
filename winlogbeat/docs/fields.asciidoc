@@ -171,7 +171,26 @@ Contains common fields available in all event types.
 
 
 
-*`type`*::
+[float]
+== winlog fields
+
+All fields specific to the Windows Event Log are defined here.
+
+
+
+*`winlog.channel`*::
++
+--
+type: keyword
+
+required: True
+
+The name of the channel from which this record was read. This value is one of the names from the `event_logs` collection in the configuration.
+
+
+--
+
+*`winlog.type`*::
 +
 --
 required: True
@@ -179,6 +198,233 @@ required: True
 The event log API type used to read the record. The possible values are "wineventlog" for the Windows Event Log API or "eventlogging" for the Event Logging API.
 The Event Logging API was designed for Windows Server 2003 or Windows 2000 operating systems. In Windows Vista, the event logging infrastructure was redesigned. On Windows Vista or later operating systems, the Windows Event Log API is used. Winlogbeat automatically detects which API to use for reading event logs.
 
+
+--
+
+*`winlog.activity_id`*::
++
+--
+type: keyword
+
+required: False
+
+A globally unique identifier that identifies the current activity. The events that are published with this identifier are part of the same activity.
+
+
+--
+
+*`winlog.event_data`*::
++
+--
+type: object
+
+required: False
+
+The event-specific data. This field is mutually exclusive with `user_data`. If you are capturing event data on versions prior to Windows Vista, the parameters in `event_data` are named `param1`, `param2`, and so on, because event log parameters are unnamed in earlier versions of Windows.
+
+
+--
+
+*`winlog.event.id`*::
++
+--
+type: keyword
+
+required: True
+
+The event identifier. The value is specific to the source of the event.
+
+
+--
+
+*`winlog.keywords`*::
++
+--
+type: keyword
+
+required: False
+
+The keywords are used to classify an event.
+
+
+--
+
+*`winlog.computer_name`*::
++
+--
+type: keyword
+
+required: True
+
+The name of the computer that generated the record. When using Windows event forwarding, this name can differ from `agent.hostname`.
+
+
+--
+
+*`winlog.record_number`*::
++
+--
+type: keyword
+
+required: True
+
+The record number of the event log record. The first record written to an event log is record number 1, and other records are numbered sequentially. If the record number reaches the maximum value (2^32^ for the Event Logging API and 2^64^ for the Windows Event Log API), the next record number will be 0.
+
+
+--
+
+*`winlog.related_activity_id`*::
++
+--
+type: keyword
+
+required: False
+
+A globally unique identifier that identifies the activity to which control was transferred to. The related events would then have this identifier as their `activity_id` identifier.
+
+
+--
+
+*`winlog.opcode`*::
++
+--
+type: keyword
+
+required: False
+
+The opcode defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged.
+
+
+--
+
+*`winlog.provider_guid`*::
++
+--
+type: keyword
+
+required: False
+
+A globally unique identifier that identifies the provider that logged the event.
+
+
+--
+
+*`winlog.provider_name`*::
++
+--
+type: keyword
+
+required: True
+
+The source of the event log record (the application or service that logged the record).
+
+
+--
+
+*`winlog.task`*::
++
+--
+type: keyword
+
+required: False
+
+The task defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged. The category used by the Event Logging API (on pre Windows Vista operating systems) is written to this field.
+
+
+--
+
+*`winlog.user_data`*::
++
+--
+type: object
+
+required: False
+
+The event specific data. This field is mutually exclusive with `event_data`.
+
+
+--
+
+*`winlog.user.identifier`*::
++
+--
+type: keyword
+
+example: S-1-5-21-3541430928-2051711210-1391384369-1001
+
+required: False
+
+The Windows security identifier (SID) of the account associated with this event.
+
+If Winlogbeat cannot resolve the SID to a name, then the `user.name`, `user.domain`, and `user.type` fields will be omitted from the event. If you discover Winlogbeat not resolving SIDs, review the log for clues as to what the problem may be.
+
+
+--
+
+*`winlog.user.domain`*::
++
+--
+type: keyword
+
+required: False
+
+The domain that the account associated with this event is a member of.
+
+
+--
+
+*`winlog.user.type`*::
++
+--
+type: keyword
+
+required: False
+
+The type of account associated with this event.
+
+
+--
+
+*`winlog.version`*::
++
+--
+type: long
+
+required: False
+
+The version number of the event's definition.
+
+--
+
+*`winlog.xml`*::
++
+--
+type: text
+
+required: False
+
+The raw XML representation of the event obtained from Windows. This field is only available on operating systems supporting the Windows Event Log API (Microsoft Windows Vista and newer). This field is not included by default and must be enabled by setting `include_xml: true` as a configuration option for an individual event log.
+
+The XML representation of the event is useful for troubleshooting purposes. The data in the fields reported by Winlogbeat can be compared to the data in the XML to diagnose problems.
+
+
+--
+
+*`winlog.execution.process.pid`*::
++
+--
+type: long
+
+required: False
+
+--
+
+*`winlog.execution.process.thread.id`*::
++
+--
+type: long
+
+required: False
 
 --
 
@@ -3299,297 +3545,6 @@ type: keyword
 required: False
 
 The code for this log message (Windows event ID).
-
-
---
-
-*`activity_id`*::
-+
---
-type: keyword
-
-required: False
-
-A globally unique identifier that identifies the current activity. The events that are published with this identifier are part of the same activity.
-
-
---
-
-*`computer_name`*::
-+
---
-type: alias
-
-required: True
-
-alias to: host.hostname
-
-The name of the computer that generated the record. When using Windows event forwarding, this name can differ from `agent.hostname`.
-
-
---
-
-*`event_data`*::
-+
---
-type: object
-
-required: False
-
-The event-specific data. This field is mutually exclusive with `user_data`. If you are capturing event data on versions prior to Windows Vista, the parameters in `event_data` are named `param1`, `param2`, and so on, because event log parameters are unnamed in earlier versions of Windows.
-
-
---
-
-*`event_id`*::
-+
---
-type: long
-
-required: True
-
-The event identifier. The value is specific to the source of the event.
-
-
---
-
-*`keywords`*::
-+
---
-type: keyword
-
-required: False
-
-The keywords are used to classify an event.
-
-
---
-
-*`channel`*::
-+
---
---
-
-*`provider_name`*::
-+
---
---
-
-*`log_name`*::
-+
---
-type: keyword
-
-required: True
-
-The name of the event log from which this record was read. This value is one of the names from the `event_logs` collection in the configuration.
-
-
---
-
-*`level`*::
-+
---
-type: alias
-
-required: False
-
-alias to: log.level
-
-The level of the event. There are five levels of events that can be logged: Success, Information, Warning, Error, Audit Success, and Audit Failure.
-
-
---
-
-*`message_error`*::
-+
---
-type: alias
-
-required: False
-
-alias to: error.message
-
-The error that occurred while reading and formatting the message from the log.
-
-
---
-
-*`record_number`*::
-+
---
-type: keyword
-
-required: True
-
-The record number of the event log record. The first record written to an event log is record number 1, and other records are numbered sequentially. If the record number reaches the maximum value (2^32^ for the Event Logging API and 2^64^ for the Windows Event Log API), the next record number will be 0.
-
-
---
-
-*`related_activity_id`*::
-+
---
-type: keyword
-
-required: False
-
-A globally unique identifier that identifies the activity to which control was transferred to. The related events would then have this identifier as their `activity_id` identifier.
-
-
---
-
-*`opcode`*::
-+
---
-type: keyword
-
-required: False
-
-The opcode defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged.
-
-
---
-
-*`provider_guid`*::
-+
---
-type: keyword
-
-required: False
-
-A globally unique identifier that identifies the provider that logged the event.
-
-
---
-
-*`process_id`*::
-+
---
-type: alias
-
-required: False
-
-alias to: process.pid
-
-The process_id identifies the process that generated the event.
-
-
---
-
-*`source_name`*::
-+
---
-type: keyword
-
-required: True
-
-The source of the event log record (the application or service that logged the record).
-
-
---
-
-*`task`*::
-+
---
-type: keyword
-
-required: False
-
-The task defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged. The category used by the Event Logging API (on pre Windows Vista operating systems) is written to this field.
-
-
---
-
-*`thread_id`*::
-+
---
-type: alias
-
-required: False
-
-alias to: process.thread.id
-
-The thread_id identifies the thread that generated the event.
-
-
---
-
-*`user_data`*::
-+
---
-type: object
-
-required: False
-
-The event specific data. This field is mutually exclusive with `event_data`.
-
-
---
-
-*`user.identifier`*::
-+
---
-type: alias
-
-example: S-1-5-21-3541430928-2051711210-1391384369-1001
-
-required: False
-
-alias to: user.id
-
-The Windows security identifier (SID) of the account associated with this event.
-
-If Winlogbeat cannot resolve the SID to a name, then the `user.name`, `user.domain`, and `user.type` fields will be omitted from the event. If you discover Winlogbeat not resolving SIDs, review the log for clues as to what the problem may be.
-
-
---
-
-*`user.domain`*::
-+
---
-type: keyword
-
-required: False
-
-The domain that the account associated with this event is a member of.
-
-
---
-
-*`user.type`*::
-+
---
-type: keyword
-
-required: False
-
-The type of account associated with this event.
-
-
---
-
-*`version`*::
-+
---
-type: long
-
-required: False
-
-The version number of the event's definition.
-
---
-
-*`xml`*::
-+
---
-type: text
-
-required: False
-
-The raw XML representation of the event obtained from Windows. This field is only available on operating systems supporting the Windows Event Log API (Microsoft Windows Vista and newer). This field is not included by default and must be enabled by setting `include_xml: true` as a configuration option for an individual event log.
-
-The XML representation of the event is useful for troubleshooting purposes. The data in the fields reported by Winlogbeat can be compared to the data in the XML to diagnose problems.
 
 
 --
