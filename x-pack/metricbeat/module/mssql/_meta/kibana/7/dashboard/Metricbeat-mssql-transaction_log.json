@@ -64,8 +64,11 @@
         }
       },
       "id": "e9654a40-1fb2-11e9-8a4d-eb34d2834f6b",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
       "type": "visualization",
-      "updated_at": "2019-01-24T08:34:49.188Z",
+      "updated_at": "2019-02-01T10:13:18.406Z",
       "version": 1
     },
     {
@@ -126,8 +129,11 @@
         }
       },
       "id": "1757d530-1fb3-11e9-8a4d-eb34d2834f6b",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
       "type": "visualization",
-      "updated_at": "2019-01-24T08:36:06.275Z",
+      "updated_at": "2019-02-01T10:13:18.406Z",
       "version": 1
     },
     {
@@ -188,8 +194,11 @@
         }
       },
       "id": "a55bb000-1fb2-11e9-8a4d-eb34d2834f6b",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
       "type": "visualization",
-      "updated_at": "2019-01-24T08:32:55.040Z",
+      "updated_at": "2019-02-01T10:13:18.406Z",
       "version": 1
     },
     {
@@ -250,8 +259,11 @@
         }
       },
       "id": "edb7a0c0-1f2b-11e9-8a4d-eb34d2834f6b",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
       "type": "visualization",
-      "updated_at": "2019-01-23T16:28:34.380Z",
+      "updated_at": "2019-02-01T10:13:18.406Z",
       "version": 1
     },
     {
@@ -312,8 +324,11 @@
         }
       },
       "id": "c9ead180-1fb2-11e9-8a4d-eb34d2834f6b",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
       "type": "visualization",
-      "updated_at": "2019-01-24T08:33:56.376Z",
+      "updated_at": "2019-02-01T10:13:18.406Z",
       "version": 1
     },
     {
@@ -374,8 +389,11 @@
         }
       },
       "id": "68fa61b0-1fb2-11e9-8a4d-eb34d2834f6b",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
       "type": "visualization",
-      "updated_at": "2019-01-24T08:31:13.739Z",
+      "updated_at": "2019-02-01T10:13:18.406Z",
       "version": 1
     },
     {
@@ -436,8 +454,62 @@
         }
       },
       "id": "6710ff20-1f2c-11e9-8a4d-eb34d2834f6b",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
       "type": "visualization",
-      "updated_at": "2019-01-23T16:31:57.969Z",
+      "updated_at": "2019-02-01T10:13:18.406Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Database selector [Metricbeat MSSQL]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "controls": [
+              {
+                "fieldName": "mssql.database.name",
+                "id": "1549016598264",
+                "indexPattern": "metricbeat-*",
+                "label": "",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              }
+            ],
+            "pinFilters": false,
+            "updateFiltersOnChange": false,
+            "useTimeFilter": false
+          },
+          "title": "Database selector [Metricbeat MSSQL]",
+          "type": "input_control_vis"
+        }
+      },
+      "id": "82bf9480-260b-11e9-a46a-471d2a76b305",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "type": "visualization",
+      "updated_at": "2019-02-01T10:24:09.159Z",
       "version": 1
     },
     {
@@ -462,11 +534,11 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 15,
+              "h": 12,
               "i": "1",
               "w": 24,
               "x": 0,
-              "y": 15
+              "y": 12
             },
             "id": "e9654a40-1fb2-11e9-8a4d-eb34d2834f6b",
             "panelIndex": "1",
@@ -477,11 +549,11 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 15,
+              "h": 13,
               "i": "2",
               "w": 24,
               "x": 24,
-              "y": 30
+              "y": 24
             },
             "id": "1757d530-1fb3-11e9-8a4d-eb34d2834f6b",
             "panelIndex": "2",
@@ -492,10 +564,10 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 15,
+              "h": 12,
               "i": "3",
-              "w": 24,
-              "x": 24,
+              "w": 18,
+              "x": 30,
               "y": 0
             },
             "id": "a55bb000-1fb2-11e9-8a4d-eb34d2834f6b",
@@ -507,11 +579,11 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 15,
+              "h": 13,
               "i": "4",
               "w": 24,
               "x": 0,
-              "y": 30
+              "y": 37
             },
             "id": "edb7a0c0-1f2b-11e9-8a4d-eb34d2834f6b",
             "panelIndex": "4",
@@ -522,11 +594,11 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 15,
+              "h": 13,
               "i": "5",
               "w": 24,
               "x": 0,
-              "y": 45
+              "y": 24
             },
             "id": "c9ead180-1fb2-11e9-8a4d-eb34d2834f6b",
             "panelIndex": "5",
@@ -537,11 +609,11 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 15,
+              "h": 12,
               "i": "6",
               "w": 24,
               "x": 24,
-              "y": 15
+              "y": 12
             },
             "id": "68fa61b0-1fb2-11e9-8a4d-eb34d2834f6b",
             "panelIndex": "6",
@@ -552,10 +624,10 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 15,
+              "h": 12,
               "i": "7",
-              "w": 24,
-              "x": 0,
+              "w": 18,
+              "x": 12,
               "y": 0
             },
             "id": "6710ff20-1f2c-11e9-8a4d-eb34d2834f6b",
@@ -563,6 +635,20 @@
             "title": "Total log space usage",
             "type": "visualization",
             "version": "7.0.0-alpha2"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 12,
+              "i": "8",
+              "w": 12,
+              "x": 0,
+              "y": 0
+            },
+            "id": "82bf9480-260b-11e9-a46a-471d2a76b305",
+            "panelIndex": "8",
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
@@ -571,9 +657,9 @@
       },
       "id": "18d66970-1fb4-11e9-8a4d-eb34d2834f6b",
       "type": "dashboard",
-      "updated_at": "2019-01-24T09:40:34.632Z",
-      "version": 2
+      "updated_at": "2019-02-01T10:39:36.585Z",
+      "version": 3
     }
   ],
-  "version": "7.0.0-alpha2"
+  "version": "7.0.0-SNAPSHOT"
 }
