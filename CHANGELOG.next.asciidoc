@@ -142,6 +142,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 
 - Add system module. {pull}9546[9546]
 - System module `process` dataset: Add user information to processes. {pull}9963[9963]
+- Add system `package` dataset. {pull}10225[10225]
 
 *Filebeat*
 
