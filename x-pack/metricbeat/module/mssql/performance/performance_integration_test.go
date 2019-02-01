@@ -60,6 +60,10 @@ func TestFetch(t *testing.T) {
 		return v > 0
 	}
 
+	int64EqualOrHigherThanZero := func(v int64) bool {
+		return v >= 0
+	}
+
 	int64EqualZero := func(v int64) bool {
 		return v == 0
 	}
@@ -73,7 +77,7 @@ func TestFetch(t *testing.T) {
 		{key: "buffer.page_life_expectancy.sec", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "lock_waits_per_sec", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "user_connections", assertion: int64Assertion(int64HigherThanZero)},
-		{key: "transactions", assertion: int64Assertion(int64EqualZero)},
+		{key: "transactions", assertion: int64Assertion(int64EqualOrHigherThanZero)},
 		{key: "active_temp_tables", assertion: int64Assertion(int64EqualZero)},
 		{key: "connections_reset_per_sec", assertion: int64Assertion(int64HigherThanZero)},
 		{key: "logouts_per_sec", assertion: int64Assertion(int64HigherThanZero)},
