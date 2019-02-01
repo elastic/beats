@@ -65,6 +65,8 @@ https://github.com/elastic/beats/compare/1035569addc4a3b29ffa14f8a08c27c1ace16ef
 
 *Filebeat*
 
+- Teach elasticsearch/audit fileset to parse out some more fields. {issue}10134[10134] {pull}10137[10137]
+
 *Heartbeat*
 
 *Journalbeat*
