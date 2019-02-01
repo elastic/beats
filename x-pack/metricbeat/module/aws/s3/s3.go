@@ -10,11 +10,8 @@ import (
 	"strings"
 	"time"
 
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/defaults"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
-	ec2sdk "github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -22,7 +19,6 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws/ec2"
 )
 
 var metricsetName = "s3"
@@ -43,12 +39,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	moduleConfig   *aws.Config
-	awsConfig      *awssdk.Config
-	regionsList    []string
-	durationString string
-	periodInSec    int
-	logger         *logp.Logger
+	logger *logp.Logger
 }
 
 // metricIDNameMap is a translating map between aws s3 module metric name and cloudwatch s3 metric name.
@@ -78,40 +69,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "error creating aws metricset")
 	}
 
-	// Get a list of regions
-	awsConfig := defaults.Config()
-	awsCreds := awssdk.Credentials{
-		AccessKeyID:     moduleConfig.AccessKeyID,
-		SecretAccessKey: moduleConfig.SecretAccessKey,
-	}
-	if moduleConfig.SessionToken != "" {
-		awsCreds.SessionToken = moduleConfig.SessionToken
-	}
-
-	awsConfig.Credentials = awssdk.StaticCredentialsProvider{
-		Value: awsCreds,
-	}
-
-	awsConfig.Region = moduleConfig.DefaultRegion
-
-	awsConfig.Region = moduleConfig.DefaultRegion
-	svcEC2 := ec2sdk.New(awsConfig)
-	regionsList, err := ec2.GetRegions(svcEC2)
-	if err != nil {
-		err = errors.Wrap(err, "GetRegions failed")
-		s3Logger.Error(err.Error())
-	}
-
-	// Calculate duration based on period
-	durationString, periodSec, err := ec2.ConvertPeriodToDuration(moduleConfig.Period)
-	if err != nil {
-		s3Logger.Error(err.Error())
-		return nil, err
-	}
-
 	// Check if period is set to be multiple of 60s or 300s
-	remainder300 := periodSec % 300
-	remainder60 := periodSec % 60
+	remainder300 := metricSet.PeriodInSec % 300
+	remainder60 := metricSet.PeriodInSec % 60
 	if remainder300 != 0 || remainder60 != 0 {
 		err := errors.New("period needs to be set to 60s (or a multiple of 60s) or set to 300s " +
 			"(or a multiple of 300s). To avoid data missing or extra costs, please make sure period is set correctly " +
@@ -120,13 +80,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		MetricSet:      metricSet,
-		moduleConfig:   &moduleConfig,
-		awsConfig:      &awsConfig,
-		regionsList:    regionsList,
-		durationString: durationString,
-		periodInSec:    periodSec,
-		logger:         s3Logger,
+		MetricSet: metricSet,
+		logger:    s3Logger,
 	}, nil
 }
 
@@ -136,7 +91,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	namespace := "AWS/S3"
 	// Get startTime and endTime
-	startTime, endTime, err := getStartTimeEndTime(m.durationString)
+	startTime, endTime, err := getStartTimeEndTime(m.MetricSet.DurationString)
 	if err != nil {
 		logp.Error(errors.Wrap(err, "Error ParseDuration"))
 		m.logger.Error(err.Error())
@@ -145,9 +100,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	}
 
 	// GetMetricData for AWS S3 from Cloudwatch
-	for _, regionName := range m.regionsList {
-		m.awsConfig.Region = regionName
-		svcCloudwatch := cloudwatch.New(*m.awsConfig)
+	for _, regionName := range m.MetricSet.RegionsList {
+		m.MetricSet.AwsConfig.Region = regionName
+		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
 		listMetricsInput := &cloudwatch.ListMetricsInput{Namespace: &namespace}
 		reqListMetrics := svcCloudwatch.ListMetricsRequest(listMetricsInput)
 
