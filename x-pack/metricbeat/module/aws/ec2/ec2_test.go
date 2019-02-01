@@ -50,6 +50,14 @@ func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) 
 }
 
 func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInput) ec2.DescribeInstancesRequest {
+	runningCode := int64(16)
+	coreCount := int64(1)
+	threadsPerCore := int64(1)
+	publicDNSName := "ec2-1-2-3-4.us-west-1.compute.amazonaws.com"
+	publicIP := "1.2.3.4"
+	privateDNSName := "ip-5-6-7-8.us-west-1.compute.internal"
+	privateIP := "5.6.7.8"
+
 	instance := ec2.Instance{
 		InstanceId:   awssdk.String("i-123"),
 		InstanceType: ec2.InstanceTypeT2Medium,
@@ -57,6 +65,21 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 			AvailabilityZone: awssdk.String("us-west-1a"),
 		},
 		ImageId: awssdk.String("image-123"),
+		State: &ec2.InstanceState{
+			Name: ec2.InstanceStateNameRunning,
+			Code: &runningCode,
+		},
+		Monitoring: &ec2.Monitoring{
+			State: ec2.MonitoringStateDisabled,
+		},
+		CpuOptions: &ec2.CpuOptions{
+			CoreCount:      &coreCount,
+			ThreadsPerCore: &threadsPerCore,
+		},
+		PublicDnsName:    &publicDNSName,
+		PublicIpAddress:  &publicIP,
+		PrivateDnsName:   &privateDNSName,
+		PrivateIpAddress: &privateIP,
 	}
 	return ec2.DescribeInstancesRequest{
 		Request: &awssdk.Request{
@@ -168,7 +191,6 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 		RootFields: common.MapStr{
 			"service": common.MapStr{"name": "ec2"},
 			"cloud": common.MapStr{
-				"image":             common.MapStr{"id": "image-123"},
 				"region":            regionName,
 				"provider":          "ec2",
 				"instance":          common.MapStr{"id": "i-123"},
@@ -179,6 +201,21 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 		MetricSetFields: common.MapStr{
 			"cpu": common.MapStr{
 				"total": common.MapStr{"pct": 0.25},
+			},
+			"instance": common.MapStr{
+				"image":            common.MapStr{"id": "image-123"},
+				"core":             common.MapStr{"count": int64(1)},
+				"threads_per_core": int64(1),
+				"state":            common.MapStr{"code": int64(16), "name": "running"},
+				"monitoring":       common.MapStr{"state": "disabled"},
+				"public": common.MapStr{
+					"dns_name": "ec2-1-2-3-4.us-west-1.compute.amazonaws.com",
+					"ip":       "1.2.3.4",
+				},
+				"private": common.MapStr{
+					"dns_name": "ip-5-6-7-8.us-west-1.compute.internal",
+					"ip":       "5.6.7.8",
+				},
 			},
 		},
 	}
@@ -202,4 +239,5 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 	assert.Equal(t, "", info)
 	assert.Equal(t, expectedEvent.RootFields, event.RootFields)
 	assert.Equal(t, expectedEvent.MetricSetFields["cpu"], event.MetricSetFields["cpu"])
+	assert.Equal(t, expectedEvent.MetricSetFields["instance"], event.MetricSetFields["instance"])
 }
