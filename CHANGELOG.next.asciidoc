@@ -106,6 +106,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   - mongodb.metrics.replication.executor.network_interface
   - php_fpm.process.request_uri
   - php_fpm.process.script
+- Add `service.name` option to all modules to explicitly set `service.name` if it is unset. {pull}10427[10427]
 - Update a few elasticsearch.* fields to map to ECS. {pull}10350[10350]
 - Update a few logstash.* fields to map to ECS. {pull}10350[10350]
 - Update a few kibana.* fields to map to ECS. {pull}10350[10350]
