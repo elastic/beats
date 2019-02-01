@@ -32,5 +32,5 @@ func init() {
 // AssetMunin returns asset data.
 // This is the base64 encoded gzipped contents of ../metricbeat/module/munin.
 func AssetMunin() string {
-	return "eJx8kU1qwzAUhPc+xZBNIBAfQIveoL1CkK2Jq0Z/SM+0vn2xpZaYmi7fzBvm09MVDy4Kfg42dIBYcVQ4va7zqQMMy5htEhuDwksHAJuHEA3hKdmOBfxKMQtzB2Q66kKFgaI74G7pTFFb8oqgPVtb38L9ZfMAWRIV4vDBUZpUh1t1TJwHx7/OzeuUbJja2vlybjsH7Bv/E3ShwbBAI7l5sgHxDl3x6gP1xCD9AXzd71dph//g8hmz+Z/gTXuuVfLOn+IxOsdRbJhWtfye9qB71zflOKemPJ+6pvaf8R0AAP//7IiXDQ=="
+	return "eJx8kUFuwyAURPc+xSibSJHiA7DoDdorRNhMKA0GBN9qffvKhlaOanX5Z/5oHp8rHlwUpjm40AHixFPh9LrOpw4wLGN2SVwMCi8dAGweQjTERMluLOBXilmYOyDTUxcqWN0Bd0dvitpyVwQ9sXX1LdpfNg+QJVEhDh8cpUl1uFXHxHnw/OvcJp2SC7atnS/ntnNAvtHvkAsNhgUayc/WBcQ7dMWrz9OWQfoD+Lrfr9IT/oPLZ8zmf4I3PXGtknf+FI/Re47igl3V8nvYg+6nPpvjnJqyP3VN7b/iOwAA//84wJVl"
 }
