@@ -4,7 +4,6 @@
     virtualmachine
   release: beta
   fields:
-    # ECS and potentially on module level?
     - name: host
       type: keyword
       description: >
@@ -42,7 +41,6 @@
       object_type: keyword
       description: >
         Custom fields
-    # ECS and potentially on module level?
     - name: network_names
       type: keyword
       description: >
