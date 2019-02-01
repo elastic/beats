@@ -208,7 +208,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms.osFamily = osInfo.Family
 	switch osInfo.Family {
 	case redhat:
-		return nil, fmt.Errorf("RPM support is not yet implemented")
+		// ok
 	case debian:
 		if _, err := os.Stat(dpkgStatusFile); err != nil {
 			return nil, errors.Wrapf(err, "error looking up %s", dpkgStatusFile)
@@ -472,8 +472,10 @@ func (ms *MetricSet) savePackagesToDisk(packages []*Package) error {
 func getPackages(osFamily string) (packages []*Package, err error) {
 	switch osFamily {
 	case redhat:
-		// TODO: Implement RPM
-		err = errors.New("RPM not yet supported")
+		packages, err = listRPMPackages()
+		if err != nil {
+			err = errors.Wrap(err, "error getting RPM packages")
+		}
 	case debian:
 		packages, err = listDebPackages()
 		if err != nil {
