@@ -85,12 +85,14 @@ func (e Record) ToEvent() beat.Event {
 	// Windows Log Specific data
 	win := common.MapStr{
 		"channel":        e.Channel,
-		"event.id":       e.EventIdentifier.ID,
+		"event":          common.MapStr{"id":e.EventIdentifier.ID},
 		"provider_name":  e.Provider.Name,
-		"record_number":  strconv.FormatUint(e.RecordID, 10),
+		"record_id":      e.RecordID,
 		"task":           e.Task,
-		"type":           e.API,
+		"api":            e.API,
 	}
+	addOptional(win, "computer", e.Computer)
+	addOptional(win, "level", e.Level)
 	addOptional(win, "kernel_time", e.Execution.KernelTime)
 	addOptional(win, "keywords", e.Keywords)
 	addOptional(win, "opcode", e.Opcode)
@@ -122,8 +124,6 @@ func (e Record) ToEvent() beat.Event {
 	userData := addPairs(win, "user_data", e.UserData.Pairs)
 	addOptional(userData, "xml_name", e.UserData.Name.Local)
 
-	addOptional(win, "xml", e.XML)
-
 	m := common.MapStr{
 		"winlog":  win,
 	}
@@ -141,17 +141,7 @@ func (e Record) ToEvent() beat.Event {
 	addOptional(m, "message", sys.RemoveWindowsLineEndings(e.Message))
 	addOptional(m, "error.message", e.RenderErr)
 
-	// Additional field mappings, when available
-	// What about the old windows (nested under user_data instead of event_data)?
-
-	// Is this always the remote address?
-	// winlog.event_data.IpAddress => ?
-	// winlog.event_data.IpPort => ?
-
-	// winlog.event_data.ProcessId => process.pid (hex to numeric)
-	// winlog.event_data.ProcessName => process.executable
-	// winlog.event_data.TargetUserSid => user.id
-	// winlog.event_data.TargetUserName => user.name
+	addOptional(m, "event.original", e.XML)
 
 	return beat.Event{
 		Timestamp: e.TimeCreated.SystemTime,
