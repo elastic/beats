@@ -8,7 +8,6 @@
       type: ip
       description: >
         Kubernetes pod IP
-    # ECS?
     - name: host_ip
       type: ip
       description: >
