@@ -1,0 +1,47 @@
+- name: server
+  type: group
+  description: 'server contains the metrics reported by the four-letter `srvr` command.'
+  release: ga
+  fields:
+    - name: connections
+      type: long
+      description: Connections established by the server
+    - name: latency
+      type: group
+      fields:
+        - name: avg
+          type: long
+          description: Average latency of the server
+        - name: max
+          type: long
+          description: Max latency reached by the server
+        - name: min
+          type: long
+          description: Minimum latency that has been reached by the server
+    - name: mode
+      type: keyword
+      description: Server mode
+    - name: node_count
+      type: long
+      description: Total number of nodes
+    - name: outstanding
+      type: long
+      description: Outstanding
+    - name: received
+      type: long
+      description: Received requests to the server
+    - name: sent
+      type: long
+      description: Requests sent by the server
+    - name: version_date
+      type: date
+      description: Date of the Zookeeper release in use
+    - name: zxid
+      type: keyword
+      description: Original value of the Zookeeper transaction ID
+    - name: count
+      type: long
+      description: Total transactions of the leader in epoch
+    - name: epoch
+      type: long
+      description: Epoch value of the Zookeeper transaction ID

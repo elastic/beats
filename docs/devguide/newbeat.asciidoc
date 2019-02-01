@@ -148,10 +148,10 @@ For the `github_name`, enter your github id. The `beat` and `beat_path` are set 
 
 [source,shell]
 ---------
-project_name [Examplebeat]: Countbeat
-github_name [your-github-name]: {username}
-beat_path [github.com/{github id}]:
-full_name [Firstname Lastname]: {Full Name}
+Beat Name [Examplebeat]: Countbeat
+Your Github Name [your-github-name]: {username}
+Beat Path [github.com/{github id}/{beat name}]:
+Firstname Lastname: {Full Name}
 ---------
 
 The Beat generator creates a directory called `countbeat` inside of your project folder.

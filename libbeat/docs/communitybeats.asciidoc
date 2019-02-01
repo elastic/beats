@@ -31,7 +31,7 @@ https://github.com/hsngerami/hsnburrowbeat[hsnburrowbeat]:: Monitors Kafka consu
 https://github.com/hartfordfive/cloudflarebeat[cloudflarebeat]:: Indexes log entries from the Cloudflare Enterprise Log Share API.
 https://github.com/jarl-tornroos/cloudfrontbeat[cloudfrontbeat]:: Reads log events from Amazon Web Services https://aws.amazon.com/cloudfront/[CloudFront].
 https://github.com/aidan-/cloudtrailbeat[cloudtrailbeat]:: Reads events from Amazon Web Services' https://aws.amazon.com/cloudtrail/[CloudTrail].
-https://github.com/narmitech/cloudwatchmetricbeat[cloudwatchmetricbeat]::  A beat for Amazon Web Services' https://aws.amazon.com/cloudwatch/details/#other-aws-resource-monitoring[CloudWatch Metrics]. 
+https://github.com/narmitech/cloudwatchmetricbeat[cloudwatchmetricbeat]::  A beat for Amazon Web Services' https://aws.amazon.com/cloudwatch/details/#other-aws-resource-monitoring[CloudWatch Metrics].
 https://github.com/e-travel/cloudwatchlogsbeat[cloudwatchlogsbeat]:: Reads log events from Amazon Web Services' https://aws.amazon.com/cloudwatch/details/#log-monitoring[CloudWatch Logs].
 https://github.com/eBay/collectbeat[collectbeat]:: Adds discovery on top of Filebeat and Metricbeat in environments like Kubernetes.
 https://github.com/raboof/connbeat[connbeat]:: Exposes metadata about TCP connections.
@@ -71,13 +71,15 @@ https://github.com/scottcrespo/mongobeat[mongobeat]:: Monitors MongoDB instances
 https://github.com/nathan-K-/mqttbeat[mqttbeat]:: Add messages from mqtt topics to Elasticsearch.
 https://github.com/adibendahan/mysqlbeat[mysqlbeat]:: Run any query on MySQL and send results to Elasticsearch.
 https://github.com/PhaedrusTheGreek/nagioscheckbeat[nagioscheckbeat]:: For Nagios checks and performance data.
+https://github.com/nfvsap/natsbeat[natsbeat]:: Collects data from NATS monitoring endpoints
 https://github.com/mrkschan/nginxbeat[nginxbeat]:: Reads status from Nginx.
 https://github.com/2Fast2BCn/nginxupstreambeat[nginxupstreambeat]:: Reads upstream status from nginx upstream module.
 https://github.com/mschneider82/nsqbeat[nsqbeat]:: Reads data from a NSQ topic.
-https://github.com/deepujain/nvidiagpubeat/[nvidiagpubeat]:: Uses nvidia-smi to grab metrics of NVIDIA GPUs.
+https://github.com/eBay/nvidiagpubeat[nvidiagpubeat]:: Uses nvidia-smi to grab metrics of NVIDIA GPUs.
 https://github.com/aristanetworks/openconfigbeat[openconfigbeat]:: Streams data from http://openconfig.net[OpenConfig]-enabled network devices
 https://github.com/joehillen/packagebeat[packagebeat]:: Collects information about system packages from package
 managers.
+https://github.com/WuerthIT/perfstatbeat[perfstatbeat]:: Collect performance metrics on the AIX operating system.
 https://github.com/kozlice/phpfpmbeat[phpfpmbeat]:: Reads status from PHP-FPM.
 https://github.com/joshuar/pingbeat[pingbeat]:: Sends ICMP pings to a list
 of targets and stores the round trip time (RTT) in Elasticsearch.
@@ -94,6 +96,7 @@ https://github.com/benben/serialbeat[serialbeat]:: Reads from a serial device.
 https://github.com/consulthys/springbeat[springbeat]:: Collects health and metrics data from Spring Boot applications running with the actuator module.
 https://github.com/philkra/springboot2beat[springboot2beat]:: Query and accumulate all metrics endpoints of a Spring Boot 2 web app via the web channel, leveraging the http://micrometer.io/[mircometer.io] metrics facade.
 https://github.com/sentient/statsdbeat[statsdbeat]:: Receives UDP https://github.com/etsy/statsd/wiki[statsd] events from a statsd client.
+https://github.com/live-wire/terminalbeat[terminalbeat]:: Runs an external command and forwards the https://www.computerhope.com/jargon/s/stdout.htm[stdout] for the same to Elasticsearch/Logstash.
 https://github.com/berfinsari/tracebeat[tracebeat]:: Reads traceroute output and indexes them into Elasticsearch.
 https://github.com/buehler/go-elastic-twitterbeat[twitterbeat]:: Reads tweets for specified screen names.
 https://github.com/gravitational/udpbeat[udpbeat]:: Ships structured logs via UDP.

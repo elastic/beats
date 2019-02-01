@@ -2,7 +2,7 @@
   type: group
   description: >
     shard fields
-  release: beta
+  release: ga
   fields:
     - name: primary
       type: boolean

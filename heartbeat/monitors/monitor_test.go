@@ -37,7 +37,7 @@ func TestMonitor(t *testing.T) {
 	require.NoError(t, err)
 	defer sched.Stop()
 
-	mon, err := newMonitor(serverMonConf, reg, pipelineConnector, sched, false)
+	mon, err := newMonitor(serverMonConf, reg, pipelineConnector, sched, false, nil)
 	require.NoError(t, err)
 
 	mon.Start()

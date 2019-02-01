@@ -11,3 +11,6 @@
         `zookeeper` contains the metrics reported by ZooKeeper
         commands.
       fields:
+        - name: service.version
+          type: keyword
+          description: The version of the zookeeper node.

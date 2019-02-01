@@ -280,7 +280,10 @@ func loadYamlByte(data []byte) (common.Fields, error) {
 	if err != nil {
 		return nil, err
 	}
-	cfg.Unpack(&keys)
+	err = cfg.Unpack(&keys)
+	if err != nil {
+		return nil, err
+	}
 
 	fields := common.Fields{}
 
