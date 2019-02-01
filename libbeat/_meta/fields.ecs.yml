@@ -2273,10 +2273,3 @@
       type: long
       description: >
         Minor version of the operating system.
-
-    # url.hostname was removed from ECS.
-    # TODO: Update Suricata module to use url.domain.
-    - name: url.hostname
-      type: keyword
-      description: >
-        Hostname of the request, such as "elastic.co".
