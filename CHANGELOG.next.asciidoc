@@ -230,6 +230,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add convert_timezone to nginx module. {issue}9839[9839] {pull}10148[10148]
 - Add support for Percona in the `slowlog` fileset of `mysql` module. {issue}6665[6665] {pull}10227[10227]
 - Added support for ingesting structured Elasticsearch audit logs {pull}10352[10352]
+- Added support for ingesting structured Elasticsearch slow logs {pull}10445[10445]
 
 *Heartbeat*
 
