@@ -117,5 +117,22 @@
         "offset": 986, 
         "prospector.type": "log", 
         "service.name": "elasticsearch"
+    }, 
+    {
+        "@timestamp": "2019-01-08T14:15:02.011Z", 
+        "elasticsearch.audit.event_type": "access_granted", 
+        "elasticsearch.audit.layer": "transport", 
+        "elasticsearch.audit.origin_address": "192.168.2.1", 
+        "elasticsearch.audit.origin_type": "transport", 
+        "elasticsearch.audit.principal": "username", 
+        "elasticsearch.node.name": "NodeName-0", 
+        "event.dataset": "elasticsearch.audit", 
+        "fileset.module": "elasticsearch", 
+        "fileset.name": "audit", 
+        "input.type": "log", 
+        "message": "[2019-01-08T14:15:02,011] [NodeName-0] [transport] [access_granted]     origin_type=[transport], origin_address=[192.168.2.1], principal=[username], realm=[active_directory], roles=[kibana_user,my_custom_role_1,foo_reader], action=[indices:data/read/search[free_context]], indices=[foo-2019.01.04,foo-2019.01.03,foo-2019.01.06,foo-2019.01.05,foo-2019.01.08,servicelog-2019.01.07], request=[SearchFreeContextRequest]", 
+        "offset": 1210, 
+        "prospector.type": "log", 
+        "service.name": "elasticsearch"
     }
 ]
