@@ -22,6 +22,7 @@ package checkpoint
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -88,7 +89,10 @@ func NewCheckpoint(file string, maxUpdates int, interval time.Duration) (*Checkp
 		save:          make(chan JournalState, 1),
 	}
 
-	c.file = paths.Resolve(paths.Data, c.file)
+	err := c.findRegistryFile()
+	if err != nil {
+		return nil, fmt.Errorf("error locating the proper registry file: %+v", err)
+	}
 
 	// Minimum batch size.
 	if c.maxUpdates < 1 {
@@ -121,6 +125,42 @@ func NewCheckpoint(file string, maxUpdates int, interval time.Duration) (*Checkp
 	c.wg.Add(1)
 	go c.run()
 	return c, nil
+}
+
+// Previously the registry file was written to the root folder. It was fixed on
+// 7.x but not on 6.x. Thus, migration is needed, so users avoid losing state info.
+func (c *Checkpoint) findRegistryFile() error {
+	migratedPath := paths.Resolve(paths.Data, c.file)
+
+	fs, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		c.file = migratedPath
+		return nil
+	}
+
+	f, err := os.Open(c.file)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	target, err := os.OpenFile(migratedPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, fs.Mode())
+	if err != nil {
+		return err
+	}
+	defer target.Close()
+
+	if _, err := io.Copy(target, f); err != nil {
+		return err
+	}
+
+	err = os.Rename(c.file, c.file+".bak")
+	if err != nil {
+		return fmt.Errorf("error backuping old registry: +v", err)
+	}
+
+	c.file = migratedPath
+	return nil
 }
 
 // run is worker loop that reads incoming state information from the save
