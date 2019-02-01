@@ -4576,7 +4576,7 @@ CPU time spent outside the kernel.
 --
 type: float
 
-CPU time spent inside the kernel.
+CPU time spent inside the kernel. 
 
 
 --
@@ -4742,7 +4742,7 @@ Young GC
 --
 type: long
 
-example:
+example: 
 
 
 
@@ -4753,7 +4753,7 @@ example:
 --
 type: long
 
-example:
+example: 
 
 
 
@@ -4825,7 +4825,7 @@ Time it took to execute the query
 --
 type: keyword
 
-example:
+example: 
 
 Types
 
@@ -4869,7 +4869,7 @@ Slow query
 --
 type: keyword
 
-example:
+example: 
 
 Extra source information
 
@@ -4913,7 +4913,7 @@ Routing
 --
 type: keyword
 
-example:
+example: 
 
 Id
 
