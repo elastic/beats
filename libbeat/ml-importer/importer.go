@@ -279,7 +279,6 @@ func checkResponse(r []byte) error {
 func makeMLURLPerESVersion(esVersion common.Version, mlURLPathSuffix string) string {
 	if esVersion.Major < 7 {
 		return "_xpack/ml/" + mlURLPathSuffix
-	} else {
-		return "_ml" + mlURLPathSuffix
 	}
+	return "_ml" + mlURLPathSuffix
 }
