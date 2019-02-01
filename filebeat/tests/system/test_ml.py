@@ -9,6 +9,7 @@ import logging
 from parameterized import parameterized
 import semver
 
+
 class Test(BaseTest):
 
     def init(self):
