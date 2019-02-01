@@ -8,12 +8,10 @@ package login
 
 import (
 	"encoding/binary"
-	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/elastic/beats/auditbeat/core"
-	"github.com/elastic/beats/libbeat/paths"
+	abtest "github.com/elastic/beats/auditbeat/testing"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
@@ -22,7 +20,7 @@ func TestData(t *testing.T) {
 		t.Skip("Test only works on little-endian systems - skipping.")
 	}
 
-	defer setup(t)()
+	defer abtest.SetupDataDir(t)()
 
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
 
@@ -48,16 +46,4 @@ func getConfig() map[string]interface{} {
 		"login.wtmp_file_pattern": "../../../tests/files/wtmp",
 		"login.btmp_file_pattern": "",
 	}
-}
-
-// setup is copied from file_integrity/metricset_test.go.
-// TODO: Move to shared location and use in all unit tests.
-func setup(t testing.TB) func() {
-	// path.data should be set so that the DB is written to a predictable location.
-	var err error
-	paths.Paths.Data, err = ioutil.TempDir("", "beat-data-dir")
-	if err != nil {
-		t.Fatal()
-	}
-	return func() { os.RemoveAll(paths.Paths.Data) }
 }

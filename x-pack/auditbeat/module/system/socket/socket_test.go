@@ -16,11 +16,14 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/auditbeat/core"
+	abtest "github.com/elastic/beats/auditbeat/testing"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
+	defer abtest.SetupDataDir(t)()
+
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
@@ -37,6 +40,8 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
+	defer abtest.SetupDataDir(t)()
+
 	// Consume first event: list of all currently open sockets
 	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2(ms)
