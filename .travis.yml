@@ -183,6 +183,7 @@ addons:
       - xsltproc
       - libxml2-utils
       - libsystemd-journal-dev
+      - librpm-dev
 
 before_install:
   - python --version

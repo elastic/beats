@@ -5339,16 +5339,6 @@ Minor version of the operating system.
 
 --
 
-*`url.hostname`*::
-+
---
-type: keyword
-
-Hostname of the request, such as "elastic.co".
-
-
---
-
 [[exported-fields-flows_event]]
 == Flow Event fields
 
