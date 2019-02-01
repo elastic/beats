@@ -2261,10 +2261,6 @@
       type: keyword
       description: >
         Major version of the user agent.
-    - name: user_agent.device
-      type: keyword
-      description: >
-        Name of the physical device.
     - name: user_agent.os.major
       type: long
       description: >
