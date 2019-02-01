@@ -2,6 +2,12 @@
     "description": "Pipeline for parsing Traefik access logs. Requires the geoip and user_agent plugins.",
     "processors": [
         {
+            "dissect": {
+                "field": "message",
+                "pattern": "%{source.address} %{traefik.access.user_identifier} %{user.name} [%{traefik.access.time}] \"%{http.request.method} %{url.original} HTTP/%{http.version}\" %{http.response.status_code} %{traefik.access.message}"
+            }
+        },
+        {
             "grok": {
                 "field": "traefik.access.message",
                 "patterns": [
