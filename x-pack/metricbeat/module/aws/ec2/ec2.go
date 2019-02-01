@@ -40,8 +40,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	*aws.MetricSet
-	moduleConfig   *aws.Config
-	logger         *logp.Logger
+	logger *logp.Logger
 }
 
 // metricIDNameMap is a translating map between createMetricDataQuery id
@@ -96,8 +95,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		MetricSet:      metricSet,
-		logger:         ec2Logger,
+		MetricSet: metricSet,
+		logger:    ec2Logger,
 	}, nil
 }
 
@@ -220,7 +219,7 @@ func createCloudWatchEvents(getMetricDataOutput *cloudwatch.GetMetricDataOutput,
 		mapOfMetricSetFieldResults[metricKey[0]] = fmt.Sprint(output.Values[0])
 		mapOfRootFieldsResults[metricKey[0]] = fmt.Sprint(output.Values[0])
 		if metricKey[0] == "cpu.total.pct" {
-			mapOfRootFieldsResults["cpu.system.pct"] = fmt.Sprint(output.Values[0]/100)
+			mapOfRootFieldsResults["cpu.system.pct"] = fmt.Sprint(output.Values[0] / 100)
 		}
 	}
 

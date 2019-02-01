@@ -101,7 +101,7 @@ var (
 				"system": s.Object{
 					"pct": c.Float("cpu.system.pct", s.Optional),
 				},
-				"cores":            c.Float("cpu.cores", s.Optional),
+				"cores":                   c.Float("cpu.cores", s.Optional),
 				"credit_usage":            c.Float("cpu.credit_usage", s.Optional),
 				"credit_balance":          c.Float("cpu.credit_balance", s.Optional),
 				"surplus_credit_balance":  c.Float("cpu.surplus_credit_balance", s.Optional),
@@ -110,11 +110,11 @@ var (
 			"diskio": s.Object{
 				"read": s.Object{
 					"bytes": c.Float("diskio.read.bytes", s.Optional),
-					"ops": c.Float("diskio.read.ops", s.Optional),
+					"ops":   c.Float("diskio.read.ops", s.Optional),
 				},
 				"write": s.Object{
 					"bytes": c.Float("diskio.write.bytes", s.Optional),
-					"ops": c.Float("diskio.write.ops", s.Optional),
+					"ops":   c.Float("diskio.write.ops", s.Optional),
 				},
 			},
 			"network": s.Object{
