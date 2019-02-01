@@ -126,6 +126,7 @@ class Test(WriteReadTest):
         })
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg, extra={
+            "log.level": "information",
             "fields.global": "field",
             "fields.env": "dev",
             "fields.level": "overwrite",
@@ -152,6 +153,7 @@ class Test(WriteReadTest):
         }, expected_events=1)
         self.assertTrue(len(evts), 1)
         self.assertEqual(evts[0]["winlog.event_id"], 10)
+        self.assertEqual(evts[0]["event.code"], 10)
 
     def test_unknown_eventlog_config(self):
         """

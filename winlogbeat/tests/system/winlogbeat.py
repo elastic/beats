@@ -135,6 +135,7 @@ class WriteReadTest(BaseTest):
         assert "winlog.record_id" in evt
         self.assertDictContainsSubset({
             "winlog.event_id": eventID,
+            "event.code": eventID,
             "log.level": level.lower(),
             "winlog.channel": self.providerName,
             "winlog.provider_name": self.applicationName,

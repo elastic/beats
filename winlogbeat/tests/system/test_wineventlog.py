@@ -142,6 +142,7 @@ class Test(WriteReadTest):
         })
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg, extra={
+            "log.level": "information",
             "winlog.keywords": ["Classic"],
             "winlog.opcode": "Info",
             "fields.global": "field",
@@ -172,7 +173,7 @@ class Test(WriteReadTest):
         self.assertTrue("event.original" in evts[0])
         original = evts[0]["event.original"]
         self.assertTrue(original.endswith('</Event>'),
-                        'xml value: "{}"'.format(original))
+                        'xml value should end with </Event>: "{}"'.format(original))
 
     def test_query_event_id(self):
         """
@@ -266,10 +267,11 @@ class Test(WriteReadTest):
         })
         self.assertTrue(len(evts), 1)
         self.assertEqual(evts[0]["winlog.event_id"], 10)
+        self.assertEqual(evts[0]["event.code"], 10)
 
     def test_query_provider(self):
         """
-        wineventlog - Query by provider name
+        wineventlog - Query by provider name (event source)
         """
         self.write_event_log("selected", source=self.otherAppName)
         self.write_event_log("filtered")
