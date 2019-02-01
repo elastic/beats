@@ -99,6 +99,22 @@
         description: >
           Short name or login of the user.
 
+      - name: group
+        title: Group
+        description: >
+          The group fields are meant to represent groups that are relevant to the
+          event.
+        type: group
+        fields:
+          - name: id
+            type: keyword
+            description: >
+              Unique identifier for the group on the system/platform.
+          - name: name
+            type: keyword
+            description: >
+              Name of the group.
+
   - name: file
     type: group
     description: File attributes.
@@ -204,3 +220,38 @@
         type: keyword
         example: s0
         description: The object's SELinux level.
+
+  - name: user
+    type: group
+    description: User information.
+    fields:
+
+    - name: effective
+      type: group
+      description: Effective user information.
+      fields:
+      - name: id
+        type: keyword
+        description: Effective user ID.
+      - name: group
+        type: group
+        description: Effective group information.
+        fields:
+        - name: id
+          type: keyword
+          description: Effective group ID.
+
+    - name: saved
+      type: group
+      description: Saved user information.
+      fields:
+      - name: id
+        type: keyword
+        description: Saved user ID.
+      - name: group
+        type: group
+        description: Saved group information.
+        fields:
+        - name: id
+          type: keyword
+          description: Saved group ID.

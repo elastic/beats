@@ -36,7 +36,7 @@
         "target_field": "@timestamp",
         "formats": [
           "ISO8601",
-          "YYMMdd H:m:s"
+          "yyMMdd H:m:s"
         ],
         "ignore_failure": true
       }

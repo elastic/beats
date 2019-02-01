@@ -64,7 +64,7 @@
                 "field": "redis.log.timestamp",
                 "target_field": "@timestamp",
                 "formats": [
-                    "dd MMM YYYY H:m:s.SSS",
+                    "dd MMM yyyy H:m:s.SSS",
                     "dd MMM H:m:s.SSS",
                     "dd MMM H:m:s",
                     "UNIX"

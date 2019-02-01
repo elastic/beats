@@ -173,4 +173,5 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/windows/service"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper/mntr"
+	_ "github.com/elastic/beats/metricbeat/module/zookeeper/server"
 )
