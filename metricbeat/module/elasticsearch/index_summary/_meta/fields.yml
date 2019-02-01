@@ -2,7 +2,7 @@
   type: group
   description: >
     index
-  release: beta
+  release: ga
   fields:
     - name: primaries
       type: group

@@ -35,11 +35,6 @@ func KibanaDashboards(moduleDirs ...string) error {
 		return err
 	}
 
-	// Create symlink from old directory so `make beats-dashboards` works.
-	if err := os.Symlink(filepath.Join("..", kibanaBuildDir), "_meta/kibana.generated"); err != nil && !os.IsExist(err) && !os.IsNotExist(err) {
-		return err
-	}
-
 	// Copy the OSS Beat's common dashboards if they exist. This assumes that
 	// X-Pack Beats only add dashboards with modules (this will require a
 	// change if we have X-Pack only Beats).

@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
@@ -54,6 +55,10 @@ func makeRedis(
 
 	if !cfg.HasField("index") {
 		cfg.SetString("index", -1, beat.Beat)
+	}
+
+	if cfg.HasField("port") {
+		cfgwarn.Deprecate("7.0.0", "The Redis outputs port setting")
 	}
 
 	// ensure we have a `key` field in settings

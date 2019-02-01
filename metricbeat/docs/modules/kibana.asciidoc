@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-kibana]]
 == Kibana module
 
-beta[]
-
 The Kibana module only tracks the high-level metrics. To monitor more Kibana metrics, use our {monitoringdoc}/xpack-monitoring.html[monitoring] feature.
 
 The default metricset is `status`.
@@ -32,6 +30,10 @@ metricbeat.modules:
   hosts: ["localhost:5601"]
   basepath: ""
   enabled: true
+
+  # Set to true to send data collected by module to X-Pack
+  # Monitoring instead of metricbeat-* indices.
+  #xpack.enabled: false
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.

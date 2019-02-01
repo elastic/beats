@@ -2721,7 +2721,7 @@ Size of the files that have been created or changed since creation.
 *`docker.container.tags`*::
 +
 --
-type: array
+type: keyword
 
 Image tags.
 
@@ -2999,6 +2999,90 @@ Number of reads and writes per second
 --
 
 [float]
+== event fields
+
+Docker event
+
+
+
+*`docker.event.status`*::
++
+--
+type: keyword
+
+Event status
+
+
+--
+
+*`docker.event.id`*::
++
+--
+type: keyword
+
+Event id when available
+
+
+--
+
+*`docker.event.from`*::
++
+--
+type: keyword
+
+Event source
+
+
+--
+
+*`docker.event.type`*::
++
+--
+type: keyword
+
+The type of object emitting the event
+
+
+--
+
+*`docker.event.action`*::
++
+--
+type: keyword
+
+The type of event
+
+
+--
+
+[float]
+== actor fields
+
+Actor
+
+
+
+*`docker.event.actor.id`*::
++
+--
+type: keyword
+
+The ID of the object emitting the event
+
+
+--
+
+*`docker.event.actor.attributes`*::
++
+--
+type: object
+
+Various key/value attributes of the object, depending on its type
+
+
+--
+
+[float]
 == healthcheck fields
 
 Docker container metrics.
@@ -3156,7 +3240,7 @@ Image labels.
 *`docker.image.tags`*::
 +
 --
-type: array
+type: keyword
 
 Image tags.
 
@@ -4671,7 +4755,6 @@ The node the shard was relocated from.
 [[exported-fields-envoyproxy]]
 == envoyproxy fields
 
-experimental[]
 envoyproxy module
 
 
@@ -7482,7 +7565,7 @@ Leader id (broker).
 *`kafka.partition.partition.isr`*::
 +
 --
-type: array
+type: keyword
 
 List of isr ids.
 
@@ -11775,7 +11858,7 @@ Optime of primary
 *`mongodb.replstatus.members.secondary.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of secondary hosts
 
@@ -11802,7 +11885,7 @@ type: long
 *`mongodb.replstatus.members.recovering.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of recovering members hosts
 
@@ -11822,7 +11905,7 @@ Count of members in the `recovering` state
 *`mongodb.replstatus.members.unknown.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of members' hosts in the `unknown` state
 
@@ -11842,7 +11925,7 @@ Count of members with `unknown` state
 *`mongodb.replstatus.members.startup2.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of initializing members hosts
 
@@ -11862,7 +11945,7 @@ Count of members in the `startup2` state
 *`mongodb.replstatus.members.arbiter.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of arbiters hosts
 
@@ -11882,7 +11965,7 @@ Count of arbiters
 *`mongodb.replstatus.members.down.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of `down` members hosts
 
@@ -11902,7 +11985,7 @@ Count of `down` members
 *`mongodb.replstatus.members.rollback.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of members in the `rollback` state
 
@@ -11922,7 +12005,7 @@ Count of members in the `rollback` state
 *`mongodb.replstatus.members.unhealthy.hosts`*::
 +
 --
-type: array
+type: keyword
 
 List of members' hosts with healthy = false
 
@@ -14479,7 +14562,6 @@ The current number of idle client connections waiting for a request.
 [[exported-fields-php_fpm]]
 == PHP_FPM fields
 
-beta[]
 PHP-FPM server status metrics collected from PHP-FPM.
 
 
@@ -17691,6 +17773,63 @@ Number of keys that were skipped by the active defragmentation process
 type: long
 
 Count of slow operations
+
+
+--
+
+[float]
+== key fields
+
+`key` contains information about keys.
+
+
+
+*`redis.key.name`*::
++
+--
+type: keyword
+
+Key name.
+
+
+--
+
+*`redis.key.id`*::
++
+--
+type: keyword
+
+Unique id for this key (With the form <keyspace>:<name>).
+
+
+--
+
+*`redis.key.type`*::
++
+--
+type: keyword
+
+Key type as shown by `TYPE` command.
+
+
+--
+
+*`redis.key.length`*::
++
+--
+type: long
+
+Length of the key (Number of elements for lists, length for strings, cardinality for sets).
+
+
+--
+
+*`redis.key.expire.ttl`*::
++
+--
+type: long
+
+Seconds to expire.
 
 
 --
@@ -21139,7 +21278,7 @@ Network names
 [[exported-fields-windows]]
 == Windows fields
 
-beta[] Module for Windows
+Module for Windows
 
 
 
@@ -21259,6 +21398,15 @@ ZooKeeper metrics collected by the four-letter monitoring commands.
 `zookeeper` contains the metrics reported by ZooKeeper commands.
 
 
+
+*`zookeeper.service.version`*::
++
+--
+type: keyword
+
+The version of the zookeeper node.
+
+--
 
 [float]
 == mntr fields
@@ -21454,6 +21602,130 @@ type: long
 
 Number of znodes reported by the local ZooKeeper process.
 
+
+--
+
+[float]
+== server fields
+
+server contains the metrics reported by the four-letter `srvr` command.
+
+
+*`zookeeper.server.connections`*::
++
+--
+type: long
+
+Connections established by the server
+
+--
+
+
+*`zookeeper.server.latency.avg`*::
++
+--
+type: long
+
+Average latency of the server
+
+--
+
+*`zookeeper.server.latency.max`*::
++
+--
+type: long
+
+Max latency reached by the server
+
+--
+
+*`zookeeper.server.latency.min`*::
++
+--
+type: long
+
+Minimum latency that has been reached by the server
+
+--
+
+*`zookeeper.server.mode`*::
++
+--
+type: keyword
+
+Server mode
+
+--
+
+*`zookeeper.server.node_count`*::
++
+--
+type: long
+
+Total number of nodes
+
+--
+
+*`zookeeper.server.outstanding`*::
++
+--
+type: long
+
+Outstanding
+
+--
+
+*`zookeeper.server.received`*::
++
+--
+type: long
+
+Received requests to the server
+
+--
+
+*`zookeeper.server.sent`*::
++
+--
+type: long
+
+Requests sent by the server
+
+--
+
+*`zookeeper.server.version_date`*::
++
+--
+type: date
+
+Date of the Zookeeper release in use
+
+--
+
+*`zookeeper.server.zxid`*::
++
+--
+type: keyword
+
+Original value of the Zookeeper transaction ID
+
+--
+
+*`zookeeper.server.count`*::
++
+--
+type: long
+
+Total transactions of the leader in epoch
+
+--
+
+*`zookeeper.server.epoch`*::
++
+--
+type: long
+
+Epoch value of the Zookeeper transaction ID
 
 --
 

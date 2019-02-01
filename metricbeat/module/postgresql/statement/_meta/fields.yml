@@ -4,7 +4,7 @@
     One document per query per user per database, showing information related
     invocation of that query, such as cpu usage and total time. Collected by
     querying pg_stat_statements.
-  release: beta
+  release: ga
   fields:
     - name: user.id
       type: long

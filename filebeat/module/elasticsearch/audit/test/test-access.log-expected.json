@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2018-06-19T05:16:15,549",
+        "@timestamp": "2018-06-19T05:16:15.549Z",
         "elasticsearch.audit.event_type": "authentication_failed",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.origin_address": "147.107.128.77",
@@ -16,7 +16,7 @@
         "service.name": "elasticsearch"
     },
     {
-        "@timestamp": "2018-06-19T05:07:52,304",
+        "@timestamp": "2018-06-19T05:07:52.304Z",
         "elasticsearch.audit.event_type": "authentication_failed",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.origin_address": "172.22.0.3",
@@ -33,7 +33,7 @@
         "service.name": "elasticsearch"
     },
     {
-        "@timestamp": "2018-06-19T05:00:15,778",
+        "@timestamp": "2018-06-19T05:00:15.778Z",
         "elasticsearch.audit.action": "indices:data/read/scroll/clear",
         "elasticsearch.audit.event_type": "access_granted",
         "elasticsearch.audit.layer": "transport",
@@ -51,7 +51,7 @@
         "service.name": "elasticsearch"
     },
     {
-        "@timestamp": "2018-06-19T05:07:45,544",
+        "@timestamp": "2018-06-19T05:07:45.544Z",
         "elasticsearch.audit.event_type": "anonymous_access_denied",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.origin_address": "172.22.0.3",
@@ -67,7 +67,7 @@
         "service.name": "elasticsearch"
     },
     {
-        "@timestamp": "2018-06-19T05:26:27,268",
+        "@timestamp": "2018-06-19T05:26:27.268Z",
         "elasticsearch.audit.event_type": "authentication_failed",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.origin_address": "147.107.128.77",
@@ -83,7 +83,7 @@
         "service.name": "elasticsearch"
     },
     {
-        "@timestamp": "2018-06-19T05:55:26,898",
+        "@timestamp": "2018-06-19T05:55:26.898Z",
         "elasticsearch.audit.action": "cluster:monitor/main",
         "elasticsearch.audit.event_type": "access_denied",
         "elasticsearch.audit.layer": "transport",
@@ -101,7 +101,7 @@
         "service.name": "elasticsearch"
     },
     {
-        "@timestamp": "2018-06-19T05:24:15,190",
+        "@timestamp": "2018-06-19T05:24:15.190Z",
         "elasticsearch.audit.event_type": "authentication_failed",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.origin_address": "172.18.0.3",
@@ -115,6 +115,59 @@
         "input.type": "log",
         "message": "[2018-06-19T05:24:15,190] [v_VJhjV] [rest] [authentication_failed]\torigin_address=[172.18.0.3], principal=[elastic], uri=[/_nodes?filter_path=nodes.*.version%2Cnodes.*.http.publish_address%2Cnodes.*.ip], request_body=[body]",
         "offset": 986,
+        "prospector.type": "log",
+        "service.name": "elasticsearch"
+    },
+    {
+        "@timestamp": "2019-01-08T14:15:02.011Z",
+        "elasticsearch.audit.action": "indices:data/read/search[free_context]",
+        "elasticsearch.audit.event_type": "access_granted",
+        "elasticsearch.audit.indices": [
+            "foo-2019.01.04",
+            "foo-2019.01.03",
+            "foo-2019.01.06",
+            "foo-2019.01.05",
+            "foo-2019.01.08",
+            "servicelog-2019.01.07"
+        ],
+        "elasticsearch.audit.layer": "transport",
+        "elasticsearch.audit.origin_address": "192.168.2.1",
+        "elasticsearch.audit.origin_type": "transport",
+        "elasticsearch.audit.principal": "username",
+        "elasticsearch.audit.realm": "active_directory",
+        "elasticsearch.audit.request": "SearchFreeContextRequest",
+        "elasticsearch.audit.roles": [
+            "kibana_user",
+            "my_custom_role_1",
+            "foo_reader"
+        ],
+        "elasticsearch.node.name": "NodeName-0",
+        "event.dataset": "elasticsearch.audit",
+        "fileset.module": "elasticsearch",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "message": "[2019-01-08T14:15:02,011] [NodeName-0] [transport] [access_granted]     origin_type=[transport], origin_address=[192.168.2.1], principal=[username], realm=[active_directory], roles=[kibana_user,my_custom_role_1,foo_reader], action=[indices:data/read/search[free_context]], indices=[foo-2019.01.04,foo-2019.01.03,foo-2019.01.06,foo-2019.01.05,foo-2019.01.08,servicelog-2019.01.07], request=[SearchFreeContextRequest]",
+        "offset": 1210,
+        "prospector.type": "log",
+        "service.name": "elasticsearch"
+    },
+    {
+        "@timestamp": "2019-01-27T20:04:27.244Z",
+        "elasticsearch.audit.event_type": "authentication_success",
+        "elasticsearch.audit.layer": "rest",
+        "elasticsearch.audit.origin_address": "::1",
+        "elasticsearch.audit.principal": "elastic-admin",
+        "elasticsearch.audit.realm": "default_file",
+        "elasticsearch.audit.request_body": "{\"metadata\":{\"intelligence\":7},\"full_name\":\"Jack Nicholson\",\"roles\":[\"admin\",\"other_role1\"",
+        "elasticsearch.audit.uri": "/_xpack/security/user/jacknich2",
+        "elasticsearch.audit.uri_params": "{username=jacknich2}",
+        "elasticsearch.node.name": "node-0",
+        "event.dataset": "elasticsearch.audit",
+        "fileset.module": "elasticsearch",
+        "fileset.name": "audit",
+        "input.type": "log",
+        "message": "[2019-01-27T20:04:27,244] [node-0] [rest] [authentication_success]    origin_address=[::1], principal=[elastic-admin], realm=[default_file], uri=[/_xpack/security/user/jacknich2], params=[{username=jacknich2}], request_body=[{\"metadata\":{\"intelligence\":7},\"full_name\":\"Jack Nicholson\",\"roles\":[\"admin\",\"other_role1\"],\"email\":\"jacknich@example.com\"}]",
+        "offset": 1626,
         "prospector.type": "log",
         "service.name": "elasticsearch"
     }

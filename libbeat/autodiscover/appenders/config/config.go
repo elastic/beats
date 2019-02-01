@@ -20,6 +20,8 @@ package config
 import (
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/autodiscover"
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
@@ -38,51 +40,38 @@ type config struct {
 	Config          *common.Config     `config:"config"`
 }
 
-type configs []config
-
-type configMap struct {
+type configAppender struct {
 	condition conditions.Condition
 	config    common.MapStr
-}
-
-type configAppender struct {
-	configMaps []configMap
 }
 
 // NewConfigAppender creates a configAppender that can append templatized configs into built configs
 func NewConfigAppender(cfg *common.Config) (autodiscover.Appender, error) {
 	cfgwarn.Beta("The config appender is beta")
 
-	confs := configs{}
-	err := cfg.Unpack(&confs)
+	config := config{}
+	err := cfg.Unpack(&config)
 	if err != nil {
 		return nil, fmt.Errorf("unable to unpack config appender due to error: %v", err)
 	}
 
-	var configMaps []configMap
-	for _, conf := range confs {
-		var cond conditions.Condition
+	var cond conditions.Condition
 
-		if conf.ConditionConfig != nil {
-			cond, err = conditions.NewCondition(conf.ConditionConfig)
-			if err != nil {
-				logp.Warn("config", "unable to create condition due to error: %v", err)
-				continue
-			}
-		}
-		cm := configMap{condition: cond}
-
-		// Unpack the config
-		cf := common.MapStr{}
-		err = conf.Config.Unpack(&cf)
+	if config.ConditionConfig != nil {
+		cond, err = conditions.NewCondition(config.ConditionConfig)
 		if err != nil {
-			logp.Warn("config", "unable to unpack config due to error: %v", err)
-			continue
+			return nil, errors.Wrap(err, "unable to create condition due to error")
 		}
-		cm.config = cf
-		configMaps = append(configMaps, cm)
 	}
-	return &configAppender{configMaps: configMaps}, nil
+
+	// Unpack the config
+	cf := common.MapStr{}
+	err = config.Config.Unpack(&cf)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to unpack config due to error")
+	}
+
+	return &configAppender{condition: cond, config: cf}, nil
 }
 
 // Append adds configuration into configs built by builds/templates. It applies conditions to filter out
@@ -99,25 +88,23 @@ func (c *configAppender) Append(event bus.Event) {
 	if !ok {
 		return
 	}
-	for _, configMap := range c.configMaps {
-		if configMap.condition == nil || configMap.condition.Check(common.MapStr(event)) == true {
-			// Merge the template with all the configs
-			for _, cfg := range cfgs {
-				cf := common.MapStr{}
-				err := cfg.Unpack(&cf)
-				if err != nil {
-					logp.Debug("config", "unable to unpack config due to error: %v", err)
-					continue
-				}
-				err = cfg.Merge(&configMap.config)
-				if err != nil {
-					logp.Debug("config", "unable to merge configs due to error: %v", err)
-				}
+	if c.condition == nil || c.condition.Check(common.MapStr(event)) == true {
+		// Merge the template with all the configs
+		for _, cfg := range cfgs {
+			cf := common.MapStr{}
+			err := cfg.Unpack(&cf)
+			if err != nil {
+				logp.Debug("config", "unable to unpack config due to error: %v", err)
+				continue
 			}
-
-			// Apply the template
-			template.ApplyConfigTemplate(event, cfgs)
+			err = cfg.Merge(&c.config)
+			if err != nil {
+				logp.Debug("config", "unable to merge configs due to error: %v", err)
+			}
 		}
+
+		// Apply the template
+		template.ApplyConfigTemplate(event, cfgs)
 	}
 
 	// Replace old config with newly appended configs

@@ -46,6 +46,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/docker/container"
 	_ "github.com/elastic/beats/metricbeat/module/docker/cpu"
 	_ "github.com/elastic/beats/metricbeat/module/docker/diskio"
+	_ "github.com/elastic/beats/metricbeat/module/docker/event"
 	_ "github.com/elastic/beats/metricbeat/module/docker/healthcheck"
 	_ "github.com/elastic/beats/metricbeat/module/docker/image"
 	_ "github.com/elastic/beats/metricbeat/module/docker/info"
@@ -142,6 +143,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/rabbitmq/queue"
 	_ "github.com/elastic/beats/metricbeat/module/redis"
 	_ "github.com/elastic/beats/metricbeat/module/redis/info"
+	_ "github.com/elastic/beats/metricbeat/module/redis/key"
 	_ "github.com/elastic/beats/metricbeat/module/redis/keyspace"
 	_ "github.com/elastic/beats/metricbeat/module/system"
 	_ "github.com/elastic/beats/metricbeat/module/system/core"
@@ -171,4 +173,5 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/windows/service"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper"
 	_ "github.com/elastic/beats/metricbeat/module/zookeeper/mntr"
+	_ "github.com/elastic/beats/metricbeat/module/zookeeper/server"
 )

@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-mysql-galera_status]]
 === MySQL galera_status metricset
 
-experimental[]
+beta[]
 
 include::../../../module/mysql/galera_status/_meta/docs.asciidoc[]
 

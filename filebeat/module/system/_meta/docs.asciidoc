@@ -14,7 +14,7 @@ include::../include/what-happens.asciidoc[]
 This module was tested with logs from OSes like Ubuntu 12.04, Centos 7, and
 macOS Sierra.
 
-This module requires the
+With Elasticsearch < 6.7, this module requires the
 {elasticsearch-plugins}/ingest-user-agent.html[ingest-user-agent] and
 {elasticsearch-plugins}/ingest-geoip.html[ingest-geoip] Elasticsearch plugins.
 

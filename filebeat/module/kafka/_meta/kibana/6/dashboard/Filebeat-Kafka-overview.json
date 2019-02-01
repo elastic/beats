@@ -117,7 +117,7 @@
                             }
                         ]
                     }, 
-                    "title": "Number of Kafka stracktraces by class", 
+                    "title": "Number of Kafka stracktraces by class [Filebeat Kafka]",
                     "type": "histogram"
                 }
             }, 

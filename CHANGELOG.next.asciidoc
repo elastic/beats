@@ -11,12 +11,18 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 *Affecting all Beats*
 
 - Dissect syntax change, use * instead of ? when working with field reference. {issue}8054[8054]
+- Fix registry handle leak on Windows (https://github.com/elastic/go-sysinfo/pull/33). {pull}9920[9920]
+- Allow to unenroll a Beat from the UI. {issue}9452[9452]
+- Port settings have been deprecated in redis/logstash output and will be removed in 7.0. {pull}9915[9915]
 
 *Auditbeat*
 
 *Filebeat*
 
 - Allow beats to blacklist certain part of the configuration while using Central Management. {pull}9099[9099]
+- Filesets with multiple ingest pipelines added in {pull}8914[8914] only work with Elasticsearch >= 6.5.0 {pull}10001[10001]
+- Add grok pattern to support redis 5.0.3 log timestamp. {issue}9819[9819] {pull}10033[10033]
+- Ingesting Elasticsearch audit logs is only supported with Elasticsearch 6.5.0 and above {pull}8852[8852]
 
 *Heartbeat*
 
@@ -26,7 +32,6 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 
 *Metricbeat*
 
-- Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
 - Allow beats to blacklist certain part of the configuration while using Central Management. {pull}9099[9099]
 
 *Packetbeat*
@@ -38,6 +43,8 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 *Functionbeat*
 
 - The CLI will now log CloudFormation Stack events. {issue}8912[8912]
+- Correctly normalize Cloudformation resource name. {issue}10087[10087]
+- Functionbeat can now deploy a function for Kinesis. {10116}10116[10116]
 
 ==== Bugfixes
 
@@ -52,10 +59,17 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Update Kibana index pattern attributes for objects that are disabled. {pull}9644[9644]
 - Enforce validation for the Central Management access token. {issue}9621[9621]
 - Update Golang to 1.10.7. {pull}9640[9640]
+- Fix config appender registration. {pull}9873[9873]
+- Gracefully handle TLS options when enrolling a Beat. {issue}9129[9129]
+- The backing off now implements jitter to better distribute the load. {issue}10172[10172]
+- Fix TLS certificate DoS vulnerability. {pull}10303[10303]
 
 *Auditbeat*
 
+- Enable System module config on Windows. {pull}10237[10237]
+
 *Filebeat*
+
 - Correctly parse `December` or `Dec` in the Syslog input. {pull}9349[9349]
 - Fix improperly set config for CRI Flag in Docker Input {pull}8899[8899]
 - Just enabling the `elasticsearch` fileset and starting Filebeat no longer causes an error. {pull}8891[8891]
@@ -66,37 +80,57 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Stop runners disabled by hints after previously being started. {pull}9305[9305]
 - Fix saved objects in filebeat haproxy dashboard. {pull}9417[9417]
 - Fixed a memory leak when harvesters are closed. {pull}7820[7820]
+- Add `convert_timezone` option to Elasticsearch module to convert dates to UTC. {issue}9756[9756] {pull}9761[9761]
+- Support IPv6 addresses with zone id in IIS ingest pipeline. {issue}9836[9836] error log: {pull}9869[9869] access log: {pull}10029[10029]
+- Support haproxy log lines without captured headers. {issue}9463[9463] {pull}9958[9958]
+- Make elasticsearch/audit fileset be more lenient in parsing node name. {issue}10035[10035] {pull}10135[10135]
+- Fix bad bytes count in `docker` input when filtering by stream. {pull}10211[10211]
+- Fixed data types for roles and indices fields in `elasticsearch/audit` fileset {pull}10307[10307]
 
 *Heartbeat*
 
 - Heartbeat now always downloads the entire body of HTTP endpoints, even if no checks against the body content are declared. This fixes an issue where timing metrics would be incorrect in scenarios where the body wasn't used since the connection would be closed soon after the headers were sent, but before the entire body was. {pull}8894[8894]
+- `Host` header can now be overridden for HTTP requests sent by Heartbeat monitors. {pull}9148[9516]
 
 *Journalbeat*
 
 - Add missing journalbeat non breaking fixes. {pull}9106[9106]
 
 *Metricbeat*
-- Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
 
+- Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
 - Add missing namespace field in http server metricset {pull}7890[7890]
 - Fix race condition when enriching events with kubernetes metadata. {issue}9055[9055] {issue}9067[9067]
 - Fix panic on docker healthcheck collection on dockers without healthchecks. {pull}9171[9171]
 - Fix issue with not collecting Elasticsearch cross-cluster replication stats correctly. {pull}9179[9179]
 - The `node.name` field in the `elasticsearch/node` metricset now correctly reports the Elasticsarch node name. Previously this field was incorrectly reporting the node ID instead. {pull}9209[9209]
+- Fix issue preventing diskio metrics collection for idle disks. {issue}9124[9124] {pull}9125[9125]
+- Fix MongoDB dashboard that had some incorrect field names from `status` Metricset {pull}9795[9795] {issue}9715[9715]
+- Fix pod UID metadata enrichment in Kubernetes module. {pull}10081[10081]
+- Fix issue that would prevent collection of processes without command line on Windows. {pull}10196[10196]
+- Fixed data type for tags field in `docker/container` metricset {pull}10307[10307]
+- Fixed data type for tags field in `docker/image` metricset {pull}10307[10307]
+- Fixed data type for isr field in `kafka/partition` metricset {pull}10307[10307]
+- Fixed data types for various hosts fields in `mongodb/replstatus` metricset {pull}10307[10307]
+- Added function to close sql database connection. {pull}10355[10355]
 
 *Packetbeat*
 
 - Fix issue with process monitor associating traffic to the wrong process. {issue}9151[9151] {pull}9443[9443]
+- Fix DHCPv4 dashboard that wouldn't load in Kibana. {issue}9850[9850]
 
 *Winlogbeat*
 
 *Functionbeat*
 
+- Ensure that functionbeat is logging at info level not debug. {issue}10262[10262]
+- Add the required permissions to the role when deployment SQS functions. {issue}9152[9152]
+
 ==== Added
 
 *Affecting all Beats*
-- Unify dashboard exporter tools. {pull}9097[9097]
 
+- Unify dashboard exporter tools. {pull}9097[9097]
 - Dissect will now flag event on parsing error. {pull}8751[8751]
 - Added the `redirect_stderr` option that allows panics to be logged to log files. {pull}8430[8430]
 - Add cache.ttl to add_host_metadata. {pull}9359[9359]
@@ -107,8 +141,10 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 *Auditbeat*
 
 - Add system module. {pull}9546[9546]
+- System module `process` dataset: Add user information to processes. {pull}9963[9963]
 
 *Filebeat*
+
 - Added `detect_null_bytes` selector to detect null bytes from a io.reader. {pull}9210[9210]
 - Added `syslog_host` variable to HAProxy module to allow syslog listener to bind to configured host. {pull}9366[9366]
 - Added support on Traefik for Common Log Format and Combined Log Format mixed which is the default Traefik format {issue}8015[8015] {issue}6111[6111] {pull}8768[8768].
@@ -119,8 +155,16 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Added netflow input type that supports NetFlow v1, v5, v6, v7, v8, v9 and IPFIX. {issue}9399[9399]
 - Support mysql 5.7.22 slowlog starting with time information. {issue}7892[7892] {pull}9647[9647]
 - Add support for ssl_request_log in apache2 module. {issue}8088[8088] {pull}9833[9833]
+- Add support for iis 7.5 log format. {issue}9753[9753] {pull}9967[9967]
+- Add support for MariaDB in the `slowlog` fileset of `mysql` module. {pull}9731[9731]
+- Add convert_timezone to nginx module. {issue}9839[9839] {pull}10148[10148]
+- Add support for Percona in the `slowlog` fileset of `mysql` module. {issue}6665[6665] {pull}10227[10227]
+- Teach elasticsearch/audit fileset to parse out some more fields. {issue}10134[10134] {pull}10137[10137]
+- Added support for ingesting structured Elasticsearch audit logs {pull}8852[8852]
 
 *Heartbeat*
+- Made monitors.d configuration part of the default config. {pull}9004[9004]
+- Autodiscover metadata is now included in events by default. So, if you are using the docker provider for instance, you'll see the correct fields under the `docker` key. {pull}10258[10258]
 
 *Journalbeat*
 
@@ -141,6 +185,32 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Add field `event.dataset` which is `{module}.{metricset).
 - Add more TCP statuses to `socket_summary` metricset. {pull}9430[9430]
 - Remove experimental tag from ceph metricsets. {pull}9708[9708]
+- Add `key` metricset to the Redis module. {issue}9582[9582] {pull}9657[9657]
+- Add DeDot for kubernetes labels and annotations. {issue}9860[9860] {pull}9939[9939]
+- Add docker `event` metricset. {pull}9856[9856]
+- Release Ceph module as GA. {pull}10202[10202]
+- Release windows Metricbeat module as GA. {pull}10163[10163]
+- Release traefik Metricbeat module as GA. {pull}10166[10166]
+- List filesystems on Windows that have an access path but not an assigned letter {issue}8916[8916] {pull}10196[10196]
+- Release uswgi Metricbeat module GA. {pull}10164[10164]
+- Release php_fpm module as GA. {pull}10198[10198]
+- Release Memcached module as GA. {pull}10199[10199]
+- Release etcd module as GA. {pull}10200[10200]
+- Release kubernetes apiserver and event metricsets as GA {pull}10212[10212]
+- Release Couchbase module as GA. {pull}10201[10201]
+- Release aerospike module as GA. {pull}10203[10203]
+- Release envoyproxy module GA. {pull}10223[10223]
+- Release mongodb.metrics and mongodb.replstatus as GA. {pull}10242[10242]
+- Release mysql.galera_status as Beta. {pull}10242[10242]
+- Release postgresql.statement as GA. {pull}10242[10242]
+- Release RabbitMQ Metricbeat module GA. {pull}10165[10165]
+- Release Dropwizard module as GA. {pull}10240[10240]
+- Release Graphite module as GA. {pull}10240[10240]
+- Release http.server metricset as GA. {pull}10240[10240]
+- Release use of xpack.enabled: true flag in Elasticsearch and Kibana modules as GA. {pull}10222[10222]
+- Making RabbitMQ Metricbeat module GA. {pull}10165[10165]
+- Release Elastic stack modules (Elasticsearch, Logstash, and Kibana) as GA. {pull}10094[10094]
+- Added 'server' Metricset to Zookeeper Metricbeat module {issue}8938[8938] {pull}10341[10341]
 
 *Packetbeat*
 

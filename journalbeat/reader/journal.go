@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/journalbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/backoff"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
@@ -43,7 +44,7 @@ type Reader struct {
 	config  Config
 	done    chan struct{}
 	logger  *logp.Logger
-	backoff *common.Backoff
+	backoff backoff.Backoff
 }
 
 // New creates a new journal reader and moves the FP to the configured position.
@@ -97,7 +98,7 @@ func newReader(logger *logp.Logger, done chan struct{}, c Config, journal *sdjou
 		config:  c,
 		done:    done,
 		logger:  logger,
-		backoff: common.NewBackoff(done, c.Backoff, c.MaxBackoff),
+		backoff: backoff.NewExpBackoff(done, c.Backoff, c.MaxBackoff),
 	}
 	r.seek(state.Cursor)
 

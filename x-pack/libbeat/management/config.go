@@ -5,7 +5,6 @@
 package management
 
 import (
-	"errors"
 	"io"
 	"text/template"
 	"time"
@@ -67,8 +66,6 @@ const ManagedConfigTemplate = `
 #xpack.monitoring.elasticsearch:
 `
 
-var errEmptyAccessToken = errors.New("access_token is empty, you must reenroll your Beat")
-
 // Config for central management
 type Config struct {
 	// true when enrolled
@@ -82,14 +79,6 @@ type Config struct {
 	Kibana *kibana.ClientConfig `config:"kibana" yaml:"kibana"`
 
 	Blacklist ConfigBlacklistSettings `config:"blacklist" yaml:"blacklist"`
-}
-
-// Validate validates the fields in the config.
-func (c *Config) Validate() error {
-	if len(c.AccessToken) == 0 {
-		return errEmptyAccessToken
-	}
-	return nil
 }
 
 func defaultConfig() *Config {

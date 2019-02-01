@@ -22,7 +22,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/rabbitmq"
 )
@@ -46,8 +45,6 @@ type ClusterMetricSet struct {
 
 // New creates new instance of MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The rabbitmq node metricset is beta")
-
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err

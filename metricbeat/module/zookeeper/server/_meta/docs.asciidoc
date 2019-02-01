@@ -1,0 +1,15 @@
+`server` Metricset fetches the data returned by the `srvr` admin keyword.
+
+* *connections*: Connections established by the server
+* *latency.avg*: Average latency of the server
+* *latency.max*: Max latency reached by the server
+* *latency.min*: Minimum latency that has been reached by the server
+* *mode*: Server mode
+* *node_count*: Total number of nodes
+* *outstanding*: Outstanding
+* *received*: Received requests to the server
+* *sent*: Requests sent by the server
+* *version_date*: Date of the Zookeeper release in use
+* *zxid*: Original value of the Zookeeper transaction ID
+* *count*: Total transactions of the leader in epoch
+* *epoch*: Epoch value of the Zookeeper transaction ID
