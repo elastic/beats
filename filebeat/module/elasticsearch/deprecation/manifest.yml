@@ -4,10 +4,13 @@ var:
   - name: paths
     default:
       - /var/log/elasticsearch/*_deprecation.log
+      - /var/log/elasticsearch/*_deprecation.json
     os.darwin:
       - /usr/local/var/lib/elasticsearch/*_deprecation.log
+      - /usr/local/var/lib/elasticsearch/*_deprecation.json
     os.windows:
       - c:/ProgramData/Elastic/Elasticsearch/logs/*_deprecation.log
+      - c:/ProgramData/Elastic/Elasticsearch/logs/*_deprecation.json
   - name: convert_timezone
     default: false
     # if ES < 6.1.0, this flag switches to false automatically when evaluating the
@@ -16,5 +19,8 @@ var:
       version: 6.1.0
       value: false
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline:
+  - ingest/pipeline.json
+  - ingest/pipeline-plaintext.json
+  - ingest/pipeline-json.json
 input: config/log.yml
