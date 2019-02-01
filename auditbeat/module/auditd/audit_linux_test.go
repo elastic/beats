@@ -117,6 +117,7 @@ func assertFieldsAreDocumented(t *testing.T, events []mb.Event) {
 				// to auditd.paths which does not exist in fields.yml.
 				if strings.HasPrefix(documentedFieldName, eventFieldName) {
 					found = true
+					break
 				}
 			}
 			if !found {
