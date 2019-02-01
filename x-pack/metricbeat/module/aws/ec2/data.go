@@ -24,11 +24,11 @@ var (
 		"diskio": s.Object{
 			"read": s.Object{
 				"bytes": c.Float("diskio.read.bytes", s.Optional),
-				"ops":   c.Float("diskio.read.ops", s.Optional),
+				"count": c.Float("diskio.read.count", s.Optional),
 			},
 			"write": s.Object{
 				"bytes": c.Float("diskio.write.bytes", s.Optional),
-				"ops":   c.Float("diskio.write.ops", s.Optional),
+				"count": c.Float("diskio.write.count", s.Optional),
 			},
 		},
 		"network": s.Object{
@@ -46,6 +46,30 @@ var (
 			"check_failed_instance": c.Int("status.check_failed_instance", s.Optional),
 			"check_failed_system":   c.Int("status.check_failed_system", s.Optional),
 		},
+		"instance": s.Object{
+			"image": s.Object{
+				"id": c.Str("instance.image.id", s.Optional),
+			},
+			"state": s.Object{
+				"name": c.Str("instance.state.name", s.Optional),
+				"code": c.Int("instance.state.code", s.Optional),
+			},
+			"monitoring": s.Object{
+				"state": c.Str("instance.monitoring.state", s.Optional),
+			},
+			"core": s.Object{
+				"count": c.Int("instance.core.count", s.Optional),
+			},
+			"threads_per_core": c.Int("instance.threads_per_core", s.Optional),
+			"public": s.Object{
+				"ip":       c.Str("instance.public.ip", s.Optional),
+				"dns_name": c.Str("instance.public.dns_name", s.Optional),
+			},
+			"private": s.Object{
+				"ip":       c.Str("instance.private.ip", s.Optional),
+				"dns_name": c.Str("instance.private.dns_name", s.Optional),
+			},
+		},
 	}
 )
 
@@ -55,18 +79,16 @@ var (
 			"name": c.Str("service.name", s.Optional),
 		},
 		"cloud": s.Object{
-			"provider": c.Str("cloud.provider", s.Optional),
+			"provider":          c.Str("cloud.provider", s.Optional),
+			"availability_zone": c.Str("cloud.availability_zone", s.Optional),
+			"region":            c.Str("cloud.region", s.Optional),
 			"instance": s.Object{
-				"id": c.Str("cloud.instance.id", s.Optional),
+				"id":   c.Str("cloud.instance.id", s.Optional),
+				"name": c.Str("cloud.instance.name", s.Optional),
 			},
 			"machine": s.Object{
 				"type": c.Str("cloud.machine.type", s.Optional),
 			},
-			"availability_zone": c.Str("cloud.availability_zone", s.Optional),
-			"image": s.Object{
-				"id": c.Str("cloud.image.id", s.Optional),
-			},
-			"region": c.Str("cloud.region", s.Optional),
 		},
 	}
 )

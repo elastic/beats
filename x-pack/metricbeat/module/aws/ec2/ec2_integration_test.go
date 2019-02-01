@@ -40,8 +40,8 @@ func TestFetch(t *testing.T) {
 			tempCreds["session_token"] = sessionToken
 		}
 
-		awsMetricSet := mbtest.NewReportingMetricSetV2(t, tempCreds)
-		events, errs := mbtest.ReportingFetchV2(awsMetricSet)
+		ec2MetricSet := mbtest.NewReportingMetricSetV2(t, tempCreds)
+		events, errs := mbtest.ReportingFetchV2(ec2MetricSet)
 		if errs != nil {
 			t.Skip("Skipping TestFetch: failed to make api calls. Please check $AWS_ACCESS_KEY_ID, " +
 				"$AWS_SECRET_ACCESS_KEY and $AWS_SESSION_TOKEN in config.yml")
@@ -51,7 +51,7 @@ func TestFetch(t *testing.T) {
 		if !assert.NotEmpty(t, events) {
 			t.FailNow()
 		}
-		t.Logf("Module: %s Metricset: %s", awsMetricSet.Module().Name(), awsMetricSet.Name())
+		t.Logf("Module: %s Metricset: %s", ec2MetricSet.Module().Name(), ec2MetricSet.Name())
 
 		for _, event := range events {
 			// RootField
@@ -82,7 +82,7 @@ func TestFetch(t *testing.T) {
 			checkEventField("status.check_failed_instance", "int", event, t)
 		}
 
-		err := mbtest.WriteEventsReporterV2(awsMetricSet, t, "/")
+		err := mbtest.WriteEventsReporterV2(ec2MetricSet, t, "/")
 		if err != nil {
 			t.Fatal("write", err)
 		}
