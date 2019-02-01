@@ -72,6 +72,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Migrate Elasticsearch audit logs fields to ECS {pull}10352[10352]
 - Several text fields in the Logstash module are now indexed as `keyword` fields with `text` multi-fields (ECS). {pull}10417[10417]
 - Several text fields in the Elasticsearch module are now indexed as `keyword` fields with `text` multi-fields (ECS). {pull}10414[10414]
+- Move dissect pattern for traefik.access fileset from Filbeat to Elasticsearch. {pull}10442[10442]
 
 *Heartbeat*
 
