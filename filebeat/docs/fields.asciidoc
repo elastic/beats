@@ -4342,6 +4342,8 @@ UUID of the cluster
 *`elasticsearch.cluster.name`*::
 +
 --
+type: keyword
+
 example: docker-cluster
 
 Name of the cluster
