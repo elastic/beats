@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-module-munin]]
 == Munin module
 
-beta[]
-
 This is the munin module.
 
 The default metricset is `node`.
