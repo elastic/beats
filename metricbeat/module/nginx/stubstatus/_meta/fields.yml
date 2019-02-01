@@ -4,7 +4,6 @@
     `stubstatus` contains the metrics that were scraped from the ngx_http_stub_status_module status page.
   release: ga
   fields:
-    # ECS?
     - name: hostname
       type: keyword
       description: >
