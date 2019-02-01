@@ -55,6 +55,17 @@
     description: User information.
     fields:
 
+    - name: audit
+      type: group
+      description: Audit user information.
+      fields:
+      - name: id
+        type: keyword
+        description: Audit user ID.
+      - name: name
+        type: keyword
+        description: Audit user name.
+
     - name: effective
       type: group
       description: Effective user information.
@@ -75,6 +86,27 @@
         - name: name
           type: keyword
           description: Effective group name.
+
+    - name: filesystem
+      type: group
+      description: Filesystem user information.
+      fields:
+      - name: id
+        type: keyword
+        description: Filesystem user ID.
+      - name: name
+        type: keyword
+        description: Filesystem user name.
+      - name: group
+        type: group
+        description: Filesystem group information.
+        fields:
+        - name: id
+          type: keyword
+          description: Filesystem group ID.
+        - name: name
+          type: keyword
+          description: Filesystem group name.
 
     - name: saved
       type: group
