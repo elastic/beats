@@ -7,28 +7,56 @@
     "aws": {
         "ec2": {
             "cpu": {
+                "credit_balance": 169.089216,
+                "credit_usage": 0.002926,
+                "surplus_credit_balance": 0,
+                "surplus_credits_charged": 0,
                 "total": {
-                    "pct": 3.34375
+                    "pct": 0.033333333333322
                 }
             },
             "diskio": {
                 "read": {
                     "bytes": 0,
-                    "ops": 0
+                    "count": 0
                 },
                 "write": {
-                    "bytes": 14036172.8,
-                    "ops": 1320.4
+                    "bytes": 0,
+                    "count": 0
                 }
+            },
+            "instance": {
+                "core": {
+                    "count": 1
+                },
+                "image": {
+                    "id": "ami-01e24be29428c15b2"
+                },
+                "monitoring": {
+                    "state": "disabled"
+                },
+                "private": {
+                    "dns_name": "ip-172-31-26-12.us-west-2.compute.internal",
+                    "ip": "172.31.26.12"
+                },
+                "public": {
+                    "dns_name": "ec2-34-217-213-210.us-west-2.compute.amazonaws.com",
+                    "ip": "34.217.213.210"
+                },
+                "state": {
+                    "code": 16,
+                    "name": "running"
+                },
+                "threads_per_core": 1
             },
             "network": {
                 "in": {
-                    "bytes": 112.8,
-                    "packets": 2
+                    "bytes": 296.6,
+                    "packets": 3
                 },
                 "out": {
-                    "bytes": 84.8,
-                    "packets": 2
+                    "bytes": 269,
+                    "packets": 3.6
                 }
             },
             "status": {
@@ -39,18 +67,15 @@
         }
     },
     "cloud": {
-        "availability_zone": "eu-central-1b",
-        "image": {
-            "id": "ami-556ef13a"
-        },
+        "availability_zone": "us-west-2a",
         "instance": {
-            "id": "i-08027f3dcddb9a976"
+            "id": "i-077bdaf7e5d81bba3"
         },
         "machine": {
-            "type": "i3.4xlarge"
+            "type": "t2.micro"
         },
         "provider": "ec2",
-        "region": "eu-central-1"
+        "region": "us-west-2"
     },
     "event": {
         "dataset": "aws.ec2",

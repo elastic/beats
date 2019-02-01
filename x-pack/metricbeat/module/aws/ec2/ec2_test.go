@@ -15,7 +15,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/metricbeat/mb"
@@ -117,17 +116,6 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 	}
 }
 
-func TestGetRegions(t *testing.T) {
-	mockSvc := &MockEC2Client{}
-	regionsList, err := getRegions(mockSvc)
-	if err != nil {
-		fmt.Println("failed getRegions: ", err)
-		t.FailNow()
-	}
-	assert.Equal(t, 1, len(regionsList))
-	assert.Equal(t, regionName, regionsList[0])
-}
-
 func TestGetInstanceIDs(t *testing.T) {
 	mockSvc := &MockEC2Client{}
 	instanceIDs, instancesOutputs, err := getInstancesPerRegion(mockSvc)
@@ -170,39 +158,6 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 	assert.Equal(t, 0.0, getMetricDataOutput.MetricDataResults[3].Values[0])
 }
 
-func TestConvertPeriodToDuration(t *testing.T) {
-	period1 := "300s"
-	duration1, periodSec1, err := convertPeriodToDuration(period1)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-600s", duration1)
-	assert.Equal(t, 300, periodSec1)
-
-	period2 := "30ss"
-	duration2, periodSec2, err := convertPeriodToDuration(period2)
-	expectedErr := errors.New("Invaid period in config. Please reset period in config.")
-	assert.Error(t, expectedErr, err)
-	assert.Equal(t, "", duration2)
-	assert.Equal(t, 0, periodSec2)
-
-	period3 := "10m"
-	duration3, periodSec3, err := convertPeriodToDuration(period3)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-20m", duration3)
-	assert.Equal(t, 600, periodSec3)
-
-	period4 := "30s"
-	duration4, periodSec4, err := convertPeriodToDuration(period4)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-60s", duration4)
-	assert.Equal(t, 30, periodSec4)
-
-	period5 := "60s"
-	duration5, periodSec5, err := convertPeriodToDuration(period5)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-120s", duration5)
-	assert.Equal(t, 60, periodSec5)
-}
-
 func TestCreateCloudWatchEvents(t *testing.T) {
 	mockModuleConfig := aws.Config{
 		Period:        "300s",
@@ -235,13 +190,7 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 	assert.Equal(t, "i-123", instanceID)
 
 	svcCloudwatchMock := &MockCloudWatchClient{}
-	//Calculate duration based on period
-	durationString, periodSec, err := convertPeriodToDuration(mockModuleConfig.Period)
-	assert.NoError(t, nil, err)
-	assert.Equal(t, "-600s", durationString)
-	assert.Equal(t, 300, periodSec)
-
-	getMetricDataOutput, err := getMetricDataPerRegion(durationString, periodSec, instanceID, nil, svcCloudwatchMock)
+	getMetricDataOutput, err := getMetricDataPerRegion("-600s", 300, instanceID, nil, svcCloudwatchMock)
 	assert.NoError(t, err)
 	assert.Equal(t, 4, len(getMetricDataOutput.MetricDataResults))
 	assert.Equal(t, "cpu1", *getMetricDataOutput.MetricDataResults[0].Id)

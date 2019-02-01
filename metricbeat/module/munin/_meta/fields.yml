@@ -2,7 +2,7 @@
   title: "Munin"
   description: >
     Munin node metrics exporter
-  release: beta
+  release: ga
   fields:
     - name: munin.metrics.*
       type: object

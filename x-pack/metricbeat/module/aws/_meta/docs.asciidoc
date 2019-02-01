@@ -25,8 +25,8 @@ see https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html[Te
 aws> sts get-session-token --serial-number arn:aws:iam::1234:mfa/your-email@example.com --token-code 456789 --duration-seconds 129600
 ----
 
-Specific permissions needs to be added into the IAM user's policy to allow Metricbeat collecting AWS monitoring metrics. Please
-see documentation under each metric set for required permissions.
+Specific permissions needs to be added into the IAM user's policy to authorize Metricbeat to collect AWS monitoring metrics. Please
+see documentation under each metricset for required permissions.
 
 By default, Amazon EC2 sends metric data to CloudWatch every 5 minutes. With this basic monitoring, `period` in aws module
 configuration should be larger or equal than `300s`. If `period` is set to be less than `300s`, the same cloudwatch metrics
