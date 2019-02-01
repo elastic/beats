@@ -4,7 +4,6 @@
     TCP sockets that are active.
   release: ga
   fields:
-    # How much of socket should be mapped to ECS?
     - name: direction
       type: keyword
       example: incoming
