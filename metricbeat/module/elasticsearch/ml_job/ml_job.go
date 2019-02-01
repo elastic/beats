@@ -33,7 +33,7 @@ func init() {
 }
 
 const (
-	jobPath = "/_ml/anomaly_detectors/_all/_stats"
+	jobPathSuffix = "/anomaly_detectors/_all/_stats"
 )
 
 // MetricSet for ml job
@@ -45,10 +45,21 @@ type MetricSet struct {
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	// Get the stats from the local node
-	ms, err := elasticsearch.NewMetricSet(base, jobPath)
+	ms, err := elasticsearch.NewMetricSet(base, "")
 	if err != nil {
 		return nil, err
 	}
+
+	esInfo, err := elasticsearch.GetInfo(ms.HTTP, "")
+	if err != nil {
+		return nil, err
+	}
+	if esInfo.Version.Number.Major < 7 {
+		ms.SetServiceURI("_xpack/ml" + jobPathSuffix)
+	} else {
+		ms.SetServiceURI("_ml" + jobPathSuffix)
+	}
+
 	return &MetricSet{MetricSet: ms}, nil
 }
 
