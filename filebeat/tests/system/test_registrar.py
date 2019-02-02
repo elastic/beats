@@ -53,10 +53,7 @@ class Test(BaseTest):
 
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
-        self.wait_until(
-            lambda: os.path.isfile(os.path.join(self.working_dir,
-                                                "registry")),
-            max_timeout=1)
+        self.wait_until(self.has_registry, max_timeout=1)
         filebeat.check_kill_and_wait()
 
         # Check that a single file exists in the registry.
@@ -124,10 +121,7 @@ class Test(BaseTest):
             max_timeout=15)
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
-        self.wait_until(
-            lambda: os.path.isfile(os.path.join(self.working_dir,
-                                                "registry")),
-            max_timeout=1)
+        self.wait_until(self.has_registry, max_timeout=1)
         filebeat.check_kill_and_wait()
 
         # Check that file exist
@@ -143,7 +137,7 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            registryFile="a/b/c/registry",
+            registry_home="a/b/c/registry",
         )
         os.mkdir(self.working_dir + "/log/")
         testfile_path = self.working_dir + "/log/test.log"
@@ -156,13 +150,10 @@ class Test(BaseTest):
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
         self.wait_until(
-            lambda: os.path.isfile(os.path.join(self.working_dir,
-                                                "a/b/c/registry")),
-
+            lambda: self.has_registry("a/b/c/registry/filebeat/data.json"),
             max_timeout=1)
         filebeat.check_kill_and_wait()
-
-        assert os.path.isfile(os.path.join(self.working_dir, "a/b/c/registry"))
+        assert self.has_registry("a/b/c/registry/filebeat/data.json")
 
     def test_registry_file_default_permissions(self):
         """
@@ -174,9 +165,12 @@ class Test(BaseTest):
             # configuration isn't implemented on Windows yet
             raise SkipTest
 
+        registry_home = "a/b/c/registry"
+        registry_file = os.path.join(registry_home, "filebeat/data.json")
+
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            registryFile="a/b/c/registry",
+            registry_home=registry_home,
         )
         os.mkdir(self.working_dir + "/log/")
         testfile_path = self.working_dir + "/log/test.log"
@@ -189,14 +183,11 @@ class Test(BaseTest):
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
         self.wait_until(
-            lambda: os.path.isfile(os.path.join(self.working_dir,
-                                                "a/b/c/registry")),
+            lambda: self.has_registry(registry_file),
             max_timeout=1)
         filebeat.check_kill_and_wait()
 
-        registry_file_perm_mask = oct(stat.S_IMODE(os.lstat(os.path.join(self.working_dir,
-                                                                         "a/b/c/registry")).st_mode))
-        self.assertEqual(registry_file_perm_mask, "0600")
+        self.assertEqual(self.file_permissions(registry_file), "0600")
 
     def test_registry_file_custom_permissions(self):
         """
@@ -208,10 +199,13 @@ class Test(BaseTest):
             # configuration isn't implemented on Windows yet
             raise SkipTest
 
+        registry_home = "a/b/c/registry"
+        registry_file = os.path.join(registry_home, "filebeat/data.json")
+
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            registryFile="a/b/c/registry",
-            registryFilePermissions=0644
+            registry_home=registry_home,
+            registry_file_permissions=0644,
         )
         os.mkdir(self.working_dir + "/log/")
         testfile_path = self.working_dir + "/log/test.log"
@@ -224,14 +218,11 @@ class Test(BaseTest):
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
         self.wait_until(
-            lambda: os.path.isfile(os.path.join(self.working_dir,
-                                                "a/b/c/registry")),
+            lambda: self.has_registry(registry_file),
             max_timeout=1)
         filebeat.check_kill_and_wait()
 
-        registry_file_perm_mask = oct(stat.S_IMODE(os.lstat(os.path.join(self.working_dir,
-                                                                         "a/b/c/registry")).st_mode))
-        self.assertEqual(registry_file_perm_mask, "0644")
+        self.assertEqual(self.file_permissions(registry_file), "0644")
 
     def test_registry_file_update_permissions(self):
         """
@@ -243,9 +234,12 @@ class Test(BaseTest):
             # configuration isn't implemented on Windows yet
             raise SkipTest
 
+        registry_home = "a/b/c/registry_x"
+        registry_file = os.path.join(registry_home, "filebeat/data.json")
+
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            registryFile="a/b/c/registry_x",
+            registry_home=registry_home,
         )
         os.mkdir(self.working_dir + "/log/")
         testfile_path = self.working_dir + "/log/test.log"
@@ -258,19 +252,16 @@ class Test(BaseTest):
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
         self.wait_until(
-            lambda: os.path.isfile(os.path.join(self.working_dir,
-                                                "a/b/c/registry_x")),
+            lambda: self.has_registry(registry_file),
             max_timeout=1)
         filebeat.check_kill_and_wait()
 
-        registry_file_perm_mask = oct(stat.S_IMODE(os.lstat(os.path.join(self.working_dir,
-                                                                         "a/b/c/registry_x")).st_mode))
-        self.assertEqual(registry_file_perm_mask, "0600")
+        self.assertEqual(self.file_permissions(registry_file), "0600")
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            registryFile="a/b/c/registry_x",
-            registryFilePermissions=0644
+            registry_home="a/b/c/registry_x",
+            registry_file_permissions=0644
         )
 
         filebeat = self.start_beat()
@@ -280,8 +271,7 @@ class Test(BaseTest):
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
         self.wait_until(
-            lambda: os.path.isfile(os.path.join(self.working_dir,
-                                                "a/b/c/registry_x")),
+            lambda: self.has_registry(registry_file),
             max_timeout=1)
 
         # Wait a moment to make sure registry is completely written
@@ -289,9 +279,7 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-        registry_file_perm_mask = oct(stat.S_IMODE(os.lstat(os.path.join(self.working_dir,
-                                                                         "a/b/c/registry_x")).st_mode))
-        self.assertEqual(registry_file_perm_mask, "0644")
+        self.assertEqual(self.file_permissions(registry_file), "0644")
 
     def test_rotating_file(self):
         """
@@ -361,7 +349,7 @@ class Test(BaseTest):
         self.wait_until(lambda: self.output_has(lines=1))
         filebeat.check_kill_and_wait()
 
-        assert os.path.isfile(self.working_dir + "/datapath/registry")
+        assert self.has_registry(data_path=self.working_dir+"/datapath")
 
     def test_rotating_file_inode(self):
         """
@@ -488,7 +476,11 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
         # Store first registry file
-        shutil.copyfile(self.working_dir + "/registry", self.working_dir + "/registry.first")
+        registry_file = "registry/filebeat/data.json"
+        shutil.copyfile(
+                self.working_dir + "/" + registry_file,
+                self.working_dir + "/registry.first",
+        )
 
         # Append file
         with open(testfile_path, 'a') as testfile:
@@ -585,7 +577,11 @@ class Test(BaseTest):
         filebeat.check_kill_and_wait()
 
         # Store first registry file
-        shutil.copyfile(self.working_dir + "/registry", self.working_dir + "/registry.first")
+        registry_file = "registry/filebeat/data.json"
+        shutil.copyfile(
+                self.working_dir + "/" + registry_file,
+                self.working_dir + "/registry.first",
+        )
 
         # Rotate log file, create a new empty one and remove it afterwards
         testfilerenamed2 = self.working_dir + "/log/input.2"
@@ -975,38 +971,12 @@ class Test(BaseTest):
         else:
             assert data[0]["offset"] == len("make sure registry is written\n" + "2\n")
 
-    def test_directory_failure(self):
-        """
-        Test that filebeat does not start if a directory is set as registry file
-        """
-
-        self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*",
-            registryFile="registrar",
-        )
-        os.mkdir(self.working_dir + "/log/")
-        os.mkdir(self.working_dir + "/registrar/")
-
-        testfile_path = self.working_dir + "/log/test.log"
-        with open(testfile_path, 'w') as testfile:
-            testfile.write("Hello World\n")
-
-        filebeat = self.start_beat()
-
-        # Make sure states written appears one more time
-        self.wait_until(
-            lambda: self.log_contains("Exiting: Registry file path must be a file"),
-            max_timeout=10)
-
-        filebeat.check_kill_and_wait(exit_code=1)
-
     def test_symlink_failure(self):
         """
         Test that filebeat does not start if a symlink is set as registry file
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            registryFile="registry_symlink",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -1014,15 +984,18 @@ class Test(BaseTest):
         with open(testfile_path, 'w') as testfile:
             testfile.write("Hello World\n")
 
-        registryfile = self.working_dir + "/registry"
-        with open(registryfile, 'w') as testfile:
-            testfile.write("[]")
+        registry_file = self.working_dir + "/registry/filebeat/data.json"
+        link_to_file = self.working_dir + "registry.data"
+        os.makedirs(self.working_dir + "/registry/filebeat")
+
+        with open(link_to_file, 'w') as f:
+            f.write("[]")
 
         if os.name == "nt":
             import win32file  # pylint: disable=import-error
-            win32file.CreateSymbolicLink(self.working_dir + "/registry_symlink", registryfile, 0)
+            win32file.CreateSymbolicLink(registry_file, link_to_file, 0)
         else:
-            os.symlink(registryfile, self.working_dir + "/registry_symlink")
+            os.symlink(link_to_file, registry_file)
 
         filebeat = self.start_beat()
 
@@ -1466,8 +1439,7 @@ class Test(BaseTest):
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
         self.wait_until(
-            lambda: os.path.isfile(os.path.join(self.working_dir,
-                                                "registry")),
+            self.has_registry,
             max_timeout=10)
 
         # Wait a moment to make sure registry is completely written
@@ -1549,10 +1521,7 @@ class Test(BaseTest):
         # wait until the registry file exist. Needed to avoid a race between
         # the logging and actual writing the file. Seems to happen on Windows.
 
-        self.wait_until(
-            lambda: os.path.isfile(os.path.join(self.working_dir,
-                                                "registry")),
-            max_timeout=1)
+        self.wait_until(self.has_registry, max_timeout=1)
 
         filebeat.check_kill_and_wait()
 
