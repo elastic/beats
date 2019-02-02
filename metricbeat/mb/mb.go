@@ -306,14 +306,15 @@ func (b *BaseMetricSet) Registration() MetricSetRegistration {
 // the metricset fetches not only the predefined fields but add alls raw data under
 // the raw namespace to the event.
 type ModuleConfig struct {
-	Hosts      []string      `config:"hosts"`
-	Period     time.Duration `config:"period"     validate:"positive"`
-	Timeout    time.Duration `config:"timeout"    validate:"positive"`
-	Module     string        `config:"module"     validate:"required"`
-	MetricSets []string      `config:"metricsets"`
-	Enabled    bool          `config:"enabled"`
-	Raw        bool          `config:"raw"`
-	Query      QueryParams   `config:"query"`
+	Hosts       []string      `config:"hosts"`
+	Period      time.Duration `config:"period"     validate:"positive"`
+	Timeout     time.Duration `config:"timeout"    validate:"positive"`
+	Module      string        `config:"module"     validate:"required"`
+	MetricSets  []string      `config:"metricsets"`
+	Enabled     bool          `config:"enabled"`
+	Raw         bool          `config:"raw"`
+	Query       QueryParams   `config:"query"`
+	ServiceName string        `config:"service.name"`
 }
 
 func (c ModuleConfig) String() string {

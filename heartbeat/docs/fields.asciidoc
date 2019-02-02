@@ -3407,16 +3407,6 @@ Major version of the user agent.
 
 --
 
-*`user_agent.device`*::
-+
---
-type: keyword
-
-Name of the physical device.
-
-
---
-
 *`user_agent.os.major`*::
 +
 --
@@ -3433,16 +3423,6 @@ Major version of the operating system.
 type: long
 
 Minor version of the operating system.
-
-
---
-
-*`url.hostname`*::
-+
---
-type: keyword
-
-Hostname of the request, such as "elastic.co".
 
 
 --

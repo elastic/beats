@@ -50,6 +50,8 @@ auditbeat.modules:
 - module: system
   datasets:
     - host    # General host information, e.g. uptime, IPs
+    - login   # User logins, logouts, and system boots.
+    - package # Installed, updated, and removed packages
     - process # Started and stopped processes
     - socket  # Opened and closed sockets
     - user    # User information
@@ -64,9 +66,13 @@ auditbeat.modules:
   # detect any changes.
   user.detect_password_changes: true
 
+  # File patterns of the login record files.
+  login.wtmp_file_pattern: /var/log/wtmp*
+  login.btmp_file_pattern: /var/log/btmp*
+
 #==================== Elasticsearch template setting ==========================
 setup.template.settings:
-  index.number_of_shards: 3
+  index.number_of_shards: 1
   #index.codec: best_compression
   #_source.enabled: false
 
@@ -89,7 +95,7 @@ setup.template.settings:
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
 # the dashboards is disabled by default and can be enabled either by setting the
-# options here, or by using the `-setup` CLI flag or the `setup` command.
+# options here or by using the `setup` command.
 #setup.dashboards.enabled: false
 
 # The URL from where to download the dashboards archive. By default this URL
@@ -136,9 +142,6 @@ setup.kibana:
 output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
-
-  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
-  #ilm.enabled: false
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"

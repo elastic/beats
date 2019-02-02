@@ -52,6 +52,12 @@
     }
   }, {
     "rename": {
+      "field": "user_agent.device",
+      "target_field": "user_agent.device.name",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
       "field": "user_agent.os",
       "target_field": "user_agent.os.full_name",
       "ignore_missing": true

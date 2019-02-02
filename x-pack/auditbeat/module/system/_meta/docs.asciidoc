@@ -46,6 +46,8 @@ sample suggested configuration.
 - module: system
   datasets:
     - host
+    - login
+    - package
     - process
     - socket
     - user
@@ -81,6 +83,8 @@ so a longer polling interval can be used.
 - module: system
   datasets:
     - host
+    - login
+    - package
     - user
   period: 1m
   user.detect_password_changes: true

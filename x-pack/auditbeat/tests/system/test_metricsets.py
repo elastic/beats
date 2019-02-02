@@ -1,5 +1,6 @@
 import jinja2
 import os
+import platform
 import sys
 import time
 import unittest
@@ -21,16 +22,36 @@ class Test(AuditbeatXPackTest):
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "host", COMMON_FIELDS + fields, warnings_allowed=True)
 
-    @unittest.skip("Packages metricset is disabled")
-    def test_metricset_packages(self):
+    @unittest.skipUnless(sys.platform == "linux2", "Only implemented for Linux")
+    @unittest.skipIf(sys.byteorder != "little", "Test only implemented for little-endian systems")
+    def test_metricset_login(self):
         """
-        packages metricset collects information about installed packages on a system.
+        login metricset collects information about logins (successful and failed) and system restarts.
         """
 
-        fields = ["system.audit.packages.package"]
+        fields = ["event.origin", "event.outcome", "message", "process.pid", "source.ip",
+                  "user.name", "user.terminal"]
+
+        config = {
+            "login.wtmp_file_pattern": os.path.abspath(os.path.join(self.beat_path, "tests/files/wtmp")),
+            "login.btmp_file_pattern": "-1"
+        }
 
         # Metricset is experimental and that generates a warning, TODO: remove later
-        self.check_metricset("system", "packages", COMMON_FIELDS + fields, warnings_allowed=True)
+        self.check_metricset("system", "login", COMMON_FIELDS + fields, config, warnings_allowed=True)
+
+    @unittest.skipIf(sys.platform == "win32", "Not implemented for Windows")
+    @unittest.skipIf(sys.platform == "linux2" and not (os.path.isdir("/var/lib/dpkg") or os.path.isdir("/var/lib/rpm")),
+                     "Only implemented for dpkg and rpm")
+    def test_metricset_package(self):
+        """
+        package metricset collects information about installed packages on a system.
+        """
+
+        fields = ["system.audit.package.name", "system.audit.package.version", "system.audit.package.installtime"]
+
+        # Metricset is experimental and that generates a warning, TODO: remove later
+        self.check_metricset("system", "package", COMMON_FIELDS + fields, warnings_allowed=True)
 
     def test_metricset_process(self):
         """
@@ -38,12 +59,12 @@ class Test(AuditbeatXPackTest):
         """
 
         fields = ["process.pid", "process.ppid", "process.name", "process.executable", "process.args",
-                  "process.start", "process.working_directory", "user.id", "user.group.id", "user.group.name"]
+                  "process.start", "process.working_directory", "user.id", "user.group.id"]
 
         # Windows does not have effective and saved IDs, and user.name is not always filled for system processes.
         if sys.platform != "win32":
             fields.extend(["user.effective.id", "user.saved.id", "user.effective.group.id", "user.saved.group.id",
-                           "user.name"])
+                           "user.name", "user.group.name"])
 
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "process", COMMON_FIELDS + fields, warnings_allowed=True)

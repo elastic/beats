@@ -48,8 +48,7 @@ SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
 # for some kernel level processes. fd is also part of the system process, but
 # is not available on all OSes and requires root to read for all processes.
 # cgroup is only available on linux.
-SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "name", "pid", "ppid", "pgid",
-                         "state", "username"]
+SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state"]
 
 
 class Test(metricbeat.BaseTest):
@@ -442,11 +441,11 @@ class Test(metricbeat.BaseTest):
 
         output = self.read_output()[0]
 
-        assert re.match("(?i)metricbeat.test(.exe)?", output["system.process.name"])
+        assert re.match("(?i)metricbeat.test(.exe)?", output["process.name"])
         assert re.match("(?i).*metricbeat.test(.exe)? -systemTest", output["system.process.cmdline"])
         assert isinstance(output["system.process.state"], six.string_types)
         assert isinstance(output["system.process.cpu.start_time"], six.string_types)
-        self.check_username(output["system.process.username"])
+        self.check_username(output["user.name"])
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_socket_summary(self):

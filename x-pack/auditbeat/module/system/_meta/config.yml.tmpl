@@ -7,9 +7,12 @@
 - module: system
   datasets:
     - host    # General host information, e.g. uptime, IPs
-    {{ if false -}}
-    - packages # Installed packages
-    {{- end -}}
+    {{ if eq .GOOS "linux" -}}
+    - login   # User logins, logouts, and system boots.
+    {{- end }}
+    {{ if ne .GOOS "windows" -}}
+    - package # Installed, updated, and removed packages
+    {{- end }}
     - process # Started and stopped processes
     {{ if eq .GOOS "linux" -}}
     - socket  # Opened and closed sockets
@@ -23,6 +26,9 @@
 {{ if .Reference }}
   # The state.period can be overridden for any dataset.
   # host.state.period: 12h
+  {{ if ne .GOOS "windows" -}}
+  # package.state.period: 12h
+  {{- end }}
   # process.state.period: 12h
   {{ if eq .GOOS "linux" -}}
   # socket.state.period: 12h
@@ -34,4 +40,14 @@
   # /etc/passwd and /etc/shadow and store a hash locally to
   # detect any changes.
   user.detect_password_changes: true
+  {{- end }}
+
+  {{ if eq .GOOS "linux" -}}
+  # File patterns of the login record files.
+{{- if .Reference }}
+  # wtmp: History of successful logins, logouts, and system shutdowns and boots.
+  # btmp: Failed login attempts.
+{{- end }}
+  login.wtmp_file_pattern: /var/log/wtmp*
+  login.btmp_file_pattern: /var/log/btmp*
   {{- end }}

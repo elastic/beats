@@ -21,7 +21,7 @@
         "url.path": "/",
         "url.query": "-",
         "user.name": "-",
-        "user_agent.device": "Other",
+        "user_agent.device.name": "Other",
         "user_agent.major": "7",
         "user_agent.minor": "0",
         "user_agent.name": "IE",

@@ -93,9 +93,11 @@ https://github.com/consulthys/retsbeat[retsbeat]:: Collects counts of http://www
 https://github.com/yourdream/rsbeat[rsbeat]:: Ships redis slow logs to elasticsearch and analyze by Kibana.
 https://github.com/martinhoefling/saltbeat[saltbeat]:: Reads events from salt master event bus.
 https://github.com/benben/serialbeat[serialbeat]:: Reads from a serial device.
+https://github.com/Corwind/servicebeat[servicebeat]:: Send services status to Elasticsearch
 https://github.com/consulthys/springbeat[springbeat]:: Collects health and metrics data from Spring Boot applications running with the actuator module.
 https://github.com/philkra/springboot2beat[springboot2beat]:: Query and accumulate all metrics endpoints of a Spring Boot 2 web app via the web channel, leveraging the http://micrometer.io/[mircometer.io] metrics facade.
 https://github.com/sentient/statsdbeat[statsdbeat]:: Receives UDP https://github.com/etsy/statsd/wiki[statsd] events from a statsd client.
+https://github.com/Corwind/supervisorctlbeat.git[supervisorctlbeat]:: This beat aims to parse the supervisorctl status command output and send it to elasticsearch for indexation
 https://github.com/live-wire/terminalbeat[terminalbeat]:: Runs an external command and forwards the https://www.computerhope.com/jargon/s/stdout.htm[stdout] for the same to Elasticsearch/Logstash.
 https://github.com/berfinsari/tracebeat[tracebeat]:: Reads traceroute output and indexes them into Elasticsearch.
 https://github.com/buehler/go-elastic-twitterbeat[twitterbeat]:: Reads tweets for specified screen names.

@@ -994,6 +994,96 @@ Reports whether the instance has passed the instance status check in the last mi
 
 --
 
+*`aws.ec2.instance.core.count`*::
++
+--
+type: integer
+
+The number of CPU cores for the instance.
+
+
+--
+
+*`aws.ec2.instance.image.id`*::
++
+--
+type: keyword
+
+The ID of the image used to launch the instance.
+
+
+--
+
+*`aws.ec2.instance.monitoring.state`*::
++
+--
+type: keyword
+
+Indicates whether detailed monitoring is enabled.
+
+
+--
+
+*`aws.ec2.instance.private.dns_name`*::
++
+--
+type: keyword
+
+The private DNS name of the network interface.
+
+
+--
+
+*`aws.ec2.instance.private.ip`*::
++
+--
+type: ip
+
+The private IPv4 address associated with the network interface.
+
+
+--
+
+*`aws.ec2.instance.public.dns_name`*::
++
+--
+type: keyword
+
+The public DNS name of the instance.
+
+
+--
+
+*`aws.ec2.instance.public.ip`*::
++
+--
+type: ip
+
+The address of the Elastic IP address (IPv4) bound to the network interface.
+
+
+--
+
+*`aws.ec2.instance.state.code`*::
++
+--
+type: integer
+
+The state of the instance, as a 16-bit unsigned integer.
+
+
+--
+
+*`aws.ec2.instance.threads_per_core`*::
++
+--
+type: integer
+
+The state of the instance (pending | running | shutting-down | terminated | stopping | stopped).
+
+
+--
+
 [[exported-fields-beat]]
 == Beat fields
 
@@ -1587,7 +1677,7 @@ osd node id
 *`ceph.osd_df.name`*::
 +
 --
-type: text
+type: keyword
 
 osd node name
 
@@ -1682,7 +1772,7 @@ osd or bucket node id
 *`ceph.osd_tree.name`*::
 +
 --
-type: text
+type: keyword
 
 osd or bucket node name
 
@@ -1712,7 +1802,7 @@ osd or bucket node typeID
 *`ceph.osd_tree.children`*::
 +
 --
-type: text
+type: keyword
 
 bucket children list, separated by comma.
 
@@ -1977,10 +2067,28 @@ The name of the metricset that generated the event.
 
 --
 
+*`process.pgid`*::
++
+--
+type: long
+
+Process group id.
+
+
+--
+
 *`service.address`*::
 +
 --
-Connection address of the machine from which the metricset was collected. This field may not be present when the data was collected locally.
+Address of the machine where the service is running. This field may not be present when the data was collected locally.
+
+
+--
+
+*`service.hostname`*::
++
+--
+Host name of the machine where the service is running.
 
 
 --
@@ -7053,16 +7161,6 @@ Major version of the user agent.
 
 --
 
-*`user_agent.device`*::
-+
---
-type: keyword
-
-Name of the physical device.
-
-
---
-
 *`user_agent.os.major`*::
 +
 --
@@ -7079,16 +7177,6 @@ Major version of the operating system.
 type: long
 
 Minor version of the operating system.
-
-
---
-
-*`url.hostname`*::
-+
---
-type: keyword
-
-Hostname of the request, such as "elastic.co".
 
 
 --
@@ -7475,9 +7563,9 @@ Target node id.
 *`elasticsearch.index.recovery.target.host`*::
 +
 --
-type: ip
+type: keyword
 
-Target node host address.
+Target node host address (could be IP address or hostname).
 
 
 --
@@ -7505,9 +7593,9 @@ Source node id.
 *`elasticsearch.index.recovery.source.host`*::
 +
 --
-type: ip
+type: keyword
 
-Source node host address.
+Source node host address (could be IP address or hostname).
 
 
 --
@@ -10779,7 +10867,7 @@ consumer offset into partition being read
 *`kafka.consumergroup.meta`*::
 +
 --
-type: text
+type: keyword
 
 custom consumer meta data string
 
@@ -11018,7 +11106,9 @@ Kibana stats and run-time metrics.
 *`kibana.stats.uuid`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.id
 
 Kibana instance UUID
 
@@ -11028,7 +11118,7 @@ Kibana instance UUID
 *`kibana.stats.name`*::
 +
 --
-type: text
+type: keyword
 
 Kibana instance name
 
@@ -11058,7 +11148,9 @@ Kibana instance hostname
 *`kibana.stats.transport_address`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.address
 
 Kibana server's hostname and port
 
@@ -11068,7 +11160,9 @@ Kibana server's hostname and port
 *`kibana.stats.version`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 Kibana version
 
@@ -11249,7 +11343,9 @@ Kibana instance name.
 *`kibana.status.uuid`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.id
 
 Kibana instance uuid.
 
@@ -11259,7 +11355,9 @@ Kibana instance uuid.
 *`kibana.status.version.number`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 Kibana version number.
 
@@ -12443,7 +12541,7 @@ Total memory available
 --
 
 
-*`kubernetes.pod.memory.workingSet.bytes`*::
+*`kubernetes.pod.memory.working_set.bytes`*::
 +
 --
 type: long
@@ -12468,7 +12566,7 @@ Total resident set size memory
 
 --
 
-*`kubernetes.pod.memory.pageFaults`*::
+*`kubernetes.pod.memory.page_faults`*::
 +
 --
 type: long
@@ -12478,7 +12576,7 @@ Total page faults
 
 --
 
-*`kubernetes.pod.memory.majorPageFaults`*::
+*`kubernetes.pod.memory.major_page_faults`*::
 +
 --
 type: long
@@ -13299,7 +13397,9 @@ node
 *`logstash.node.host`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: host.hostname
 
 Host name
 
@@ -13309,7 +13409,9 @@ Host name
 *`logstash.node.version`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 Logstash Version
 
@@ -13336,9 +13438,11 @@ Version
 *`logstash.node.jvm.pid`*::
 +
 --
-type: long
+type: alias
 
-Pid
+alias to: process.pid
+
+Process ID
 
 
 --
@@ -14736,7 +14840,7 @@ type: boolean
 *`mongodb.metrics.replication.executor.network_interface`*::
 +
 --
-type: text
+type: keyword
 
 --
 
@@ -15421,7 +15525,9 @@ MongoDB server status metrics.
 *`mongodb.status.version`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: service.version
 
 Instance version.
 
@@ -15431,7 +15537,9 @@ Instance version.
 *`mongodb.status.process`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: process.name
 
 The current MongoDB process. Possible values are mongos or mongod.
 
@@ -17335,11 +17443,25 @@ Munin node metrics exporter
 
 
 
-[float]
-== munin fields
+*`munin.metrics.*`*::
++
+--
+type: object
 
-munin contains metrics exposed by a munin node agent
+Metrics exposed by a plugin of a munin node agent.
 
+
+--
+
+*`munin.plugin.name`*::
++
+--
+type: keyword
+
+Name of the plugin collecting these metrics.
+
+
+--
 
 
 [[exported-fields-mysql]]
@@ -18851,7 +18973,9 @@ process contains the metrics that were obtained from the PHP-FPM process.
 *`php_fpm.process.pid`*::
 +
 --
-type: integer
+type: alias
+
+alias to: process.pid
 
 The PID of the process
 
@@ -18913,7 +19037,9 @@ The duration in microseconds (1 million in a second) of the current request (my 
 *`php_fpm.process.request_method`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: http.request.method
 
 The request method (GET, POST, etc) (of the current request)
 
@@ -18923,7 +19049,9 @@ The request method (GET, POST, etc) (of the current request)
 *`php_fpm.process.request_uri`*::
 +
 --
-type: text
+type: alias
+
+alias to: url.original
 
 The request URI with the query string (of the current request)
 
@@ -18933,7 +19061,9 @@ The request URI with the query string (of the current request)
 *`php_fpm.process.content_length`*::
 +
 --
-type: integer
+type: alias
+
+alias to: http.response.body.bytes
 
 The content length of the request (only with POST) (of the current request)
 
@@ -18943,7 +19073,9 @@ The content length of the request (only with POST) (of the current request)
 *`php_fpm.process.user`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: user.name
 
 The user (PHP_AUTH_USER) (or - if not set) (for the current request)
 
@@ -18953,7 +19085,7 @@ The user (PHP_AUTH_USER) (or - if not set) (for the current request)
 *`php_fpm.process.script`*::
 +
 --
-type: text
+type: keyword
 
 The main script called (or - if not set) (for the current request)
 
@@ -23334,10 +23466,9 @@ The number of outgoing packets that were dropped. This value is always 0 on Darw
 *`system.process.name`*::
 +
 --
-type: keyword
+type: alias
 
-The process name.
-
+alias to: process.name
 
 --
 
@@ -23354,30 +23485,27 @@ The process state. For example: "running".
 *`system.process.pid`*::
 +
 --
-type: long
+type: alias
 
-The process pid.
-
+alias to: process.pid
 
 --
 
 *`system.process.ppid`*::
 +
 --
-type: long
+type: alias
 
-The process parent pid.
-
+alias to: process.ppid
 
 --
 
 *`system.process.pgid`*::
 +
 --
-type: long
+type: alias
 
-The process group id.
-
+alias to: process.pgid
 
 --
 
@@ -23394,20 +23522,18 @@ The full command-line used to start the process, including the arguments separat
 *`system.process.username`*::
 +
 --
-type: keyword
+type: alias
 
-The username of the user that created the process. If the username cannot be determined, the field will contain the user's numeric identifier (UID). On Windows, this field includes the user's domain and is formatted as `domain\username`.
-
+alias to: user.name
 
 --
 
 *`system.process.cwd`*::
 +
 --
-type: keyword
+type: alias
 
-The current working directory of the process. This field is only available on Linux.
-
+alias to: process.working_directory
 
 --
 

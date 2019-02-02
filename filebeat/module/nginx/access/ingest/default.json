@@ -50,6 +50,13 @@
             }
         },
         {
+            "convert": {
+                "field": "source.ip",
+                "target_field": "source.address",
+                "type": "string"
+            }
+        },
+        {
             "remove": {
                 "field": "message"
             }
@@ -65,7 +72,7 @@
                 "field": "nginx.access.time",
                 "target_field": "@timestamp",
                 "formats": [
-                    "dd/MMM/YYYY:H:m:s Z"
+                    "dd/MMM/yyyy:H:m:s Z"
                 ],
                 {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
                 "ignore_failure": true
@@ -85,6 +92,13 @@
             "rename": {
                 "field": "nginx.access.agent",
                 "target_field": "user_agent.original"
+            }
+        },
+        {
+            "rename": {
+                "field": "user_agent.device",
+                "target_field": "user_agent.device.name",
+                "ignore_missing": true
             }
         },
         {
