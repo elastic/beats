@@ -9098,6 +9098,65 @@ Memory usage as a percentage of the defined limit for the pod containers (or tot
 
 --
 
+
+*`kubernetes.pod.memory.available.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total memory available
+
+
+--
+
+
+*`kubernetes.pod.memory.working_set.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total working set memory
+
+
+--
+
+
+*`kubernetes.pod.memory.rss.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total resident set size memory
+
+
+--
+
+*`kubernetes.pod.memory.page_faults`*::
++
+--
+type: long
+
+Total page faults
+
+
+--
+
+*`kubernetes.pod.memory.major_page_faults`*::
++
+--
+type: long
+
+Total major page faults
+
+
+--
+
 [float]
 == container fields
 
