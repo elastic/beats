@@ -53,7 +53,7 @@ class Test(metricbeat.BaseTest):
 
     def create_ml_job(self, es):
         es_version = self.get_version(es)
-        if es_version.major < 7:
+        if es_version["major"] < 7:
             ml_anomaly_detectors_url = "/_xpack/ml/anomaly_detectors"
         else:
             ml_anomaly_detectors_url = "/_ml/anomaly_detectors"
@@ -111,7 +111,7 @@ class Test(metricbeat.BaseTest):
 
     def start_trial(self, es):
         es_version = self.get_version(es)
-        if es_version.major < 7:
+        if es_version["major"] < 7:
             license_url = "/_xpack/license"
         else:
             license_url = "/_license"
@@ -133,7 +133,7 @@ class Test(metricbeat.BaseTest):
             return
 
         es_version = self.get_version(es)
-        if es_version.major <= 6 and es_version.minor < 5:
+        if es_version["major"] <= 6 and es_version["minor"] < 5:
             # Skip CCR metricset system test for Elasticsearch versions < 6.5.0 as CCR Stats
             # API endpoint is not available
             raise SkipTest("elasticsearch/ccr metricset system test only valid with Elasticsearch versions >= 6.5.0")
