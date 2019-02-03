@@ -166,7 +166,7 @@ func (ms *MetricSet) loginEvent(loginRecord *LoginRecord) mb.Event {
 		Timestamp: loginRecord.Timestamp,
 		RootFields: common.MapStr{
 			"event": common.MapStr{
-				"type":   eventTypeEvent,
+				"kind":   eventTypeEvent,
 				"action": loginRecord.Type.string(),
 				"origin": loginRecord.Origin,
 			},
