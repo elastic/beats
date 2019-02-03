@@ -154,8 +154,7 @@ func (l *Loader) CheckTemplate(templateName string) bool {
 }
 
 func loadJSON(client ESClient, path string, json map[string]interface{}) ([]byte, error) {
-	params := esVersionParams(client.GetVersion())
-	status, body, err := client.Request("PUT", path, "", params, json)
+	status, body, err := client.Request("PUT", path, "", nil, json)
 	if err != nil {
 		return body, fmt.Errorf("couldn't load json. Error: %s", err)
 	}
@@ -164,14 +163,4 @@ func loadJSON(client ESClient, path string, json map[string]interface{}) ([]byte
 	}
 
 	return body, nil
-}
-
-func esVersionParams(ver common.Version) map[string]string {
-	if ver.Major == 6 && ver.Minor == 7 {
-		return map[string]string{
-			"include_type_name": "false",
-		}
-	}
-
-	return nil
 }
