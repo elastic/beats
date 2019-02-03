@@ -63,6 +63,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Gracefully handle TLS options when enrolling a Beat. {issue}9129[9129]
 - The backing off now implements jitter to better distribute the load. {issue}10172[10172]
 - Fix TLS certificate DoS vulnerability. {pull}10303[10303]
+- Fix panic and file unlock in spool on atomic operation (arm, x86-32). File lock was not released when panic occurs, leading to the beat deadlocking on startup. {pull}10289[10289]
 
 *Auditbeat*
 
