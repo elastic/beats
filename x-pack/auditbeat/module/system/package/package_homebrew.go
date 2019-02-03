@@ -54,17 +54,25 @@ func listBrewPackages() ([]*Package, error) {
 				InstallTime: version.ModTime(),
 			}
 
-			// read formula
-			formulaPath := path.Join(homebrewCellarPath, pkg.Name, pkg.Version, ".brew", pkg.Name+".rb")
-
+			// Read formula
+			var formulaPath string
 			installReceiptPath := path.Join(homebrewCellarPath, pkg.Name, pkg.Version, "INSTALL_RECEIPT.json")
 			contents, err := ioutil.ReadFile(installReceiptPath)
 			if err != nil {
 				pkg.Error = errors.Wrapf(err, "error reading %v", installReceiptPath)
 			} else {
 				var installReceipt InstallReceipt
-				json.Unmarshal(contents, &installReceipt)
-				formulaPath = installReceipt.Source.Path
+				err = json.Unmarshal(contents, &installReceipt)
+				if err != nil {
+					pkg.Error = errors.Wrapf(err, "error unmarshalling JSON in %v", installReceiptPath)
+				} else {
+					formulaPath = installReceipt.Source.Path
+				}
+			}
+
+			if formulaPath == "" {
+				// Fallback to /usr/local/Cellar/{pkg.Name}/{pkg.Version}/.brew/{pkg.Name}.rb
+				formulaPath = path.Join(homebrewCellarPath, pkg.Name, pkg.Version, ".brew", pkg.Name+".rb")
 			}
 
 			file, err := os.Open(formulaPath)
