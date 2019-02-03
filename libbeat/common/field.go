@@ -238,3 +238,25 @@ func (f Fields) getKeys(namespace string) []string {
 
 	return keys
 }
+
+// ConcatFields concatenates two Fields lists into a new list.
+// The operation fails if the input definitions define the same keys.
+func ConcatFields(a, b Fields) (Fields, error) {
+	if len(b) == 0 {
+		return a, nil
+	}
+	if len(a) == 0 {
+		return b, nil
+	}
+
+	// check for duplicates
+	for _, k := range b.GetKeys() {
+		if a.HasNode(k) {
+			return nil, fmt.Errorf("concat fails because key '%s' exists is duplicated", k)
+		}
+	}
+
+	// all fine, let's concat a+b into new array
+	fields := make(Fields, 0, len(a)+len(b))
+	return append(append(fields, a...), b...), nil
+}
