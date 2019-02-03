@@ -27,6 +27,7 @@ type EvtHandle uintptr
 // Event log error codes.
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms681382(v=vs.85).aspx
 const (
+	ERROR_INVALID_HANDLE                  syscall.Errno = 6
 	ERROR_INSUFFICIENT_BUFFER             syscall.Errno = 122
 	ERROR_NO_MORE_ITEMS                   syscall.Errno = 259
 	ERROR_NONE_MAPPED                     syscall.Errno = 1332

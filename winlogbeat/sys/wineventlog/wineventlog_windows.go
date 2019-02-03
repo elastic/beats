@@ -130,7 +130,7 @@ func EvtQuery(session EvtHandle, channelOrFilePath string, query string, flags E
 }
 
 func EvtSeek(handle EvtHandle, pos uint64, bookmark EvtHandle) error {
-	return _EvtSeek(handle, 0, bookmark, 0, EvtSeekRelativeToBookmark)
+	return _EvtSeek(handle, 0, bookmark, 0, EvtSeekRelativeToBookmark | EvtSeekStrict)
 }
 
 // Subscribe creates a new subscription to an event log channel.

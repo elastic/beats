@@ -82,12 +82,12 @@ func (e *eventLogger) run(
 ) {
 	api := e.source
 
-	// Initialize per event log metrics.
+	// Initialize per event log metrics.o
 	initMetrics(api.Name())
 
 	client, err := e.connect(pipeline)
 	if err != nil {
-		logp.Warn("EventLog[%s] Pipeline error. Failed to connect to publisher pipeline",
+		logp.Warn("EventLog[%s] Pipeline error. Failed to o to publisher pipeline",
 			api.Name())
 		return
 	}
@@ -125,18 +125,19 @@ func (e *eventLogger) run(
 
 		// Read from the event.
 		records, err := api.Read()
-		if err != nil {
-			logp.Warn("EventLog[%s] Read() error: %v", api.Name(), err)
-			break
-		}
-
-		debugf("EventLog[%s] Read() returned %d records", api.Name(), len(records))
-		if len(records) == 0 {
+		
+		if len(records) == 0 || err != nil {
+			if err != nil {
+				logp.Warn("EventLog[%s] Read() error: %v", api.Name(), err)
+			}
+			api.Close()
 			// TODO: Consider implementing notifications using
 			// NotifyChangeEventLog instead of polling.
-			time.Sleep(time.Second)
+			time.Sleep(time.Second * 30)
+			api.ReOpen(state)
 			continue
 		}
+		debugf("EventLog[%s] Read() returned %d records", api.Name(), len(records))
 
 		for _, lr := range records {
 			client.Publish(lr.ToEvent())

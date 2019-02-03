@@ -49,7 +49,7 @@ type winEventLogFileConfig struct {
 
 // defaultWinEventLogConfig is the default configuration for new wineventlog readers.
 var defaultWinEventLogFileConfig = winEventLogFileConfig{
-	BatchReadSize: 100,
+	BatchReadSize: 1000,
 }
 
 type winEventFileLog struct {
@@ -93,7 +93,35 @@ func (l *winEventFileLog) Open(state checkpoint.EventLogState) error {
 	l.evtHandle = queryHandle
 	err = win.EvtSeek(l.evtHandle, 0, bookmark)
 	if err != nil {
+		l.lastRead.Bookmark = ""
+	}
+
+	return nil
+}
+
+func (l *winEventFileLog) ReOpen(state checkpoint.EventLogState) error {
+	var bookmark win.EvtHandle
+	var err error
+	if len(l.lastRead.Bookmark) > 0 {
+		bookmark, err = win.CreateBookmarkFromXML(l.lastRead.Bookmark)
+	} else {
+		bookmark, err = win.CreateBookmarkFromRecordID(l.path, 0)
+	}
+	if err != nil {
 		return err
+	}
+	defer win.Close(bookmark)
+
+	debugf("%s using EvtQuery and EvtSeek to read from file %s", l.logPrefix, l.path)
+
+	queryHandle, err := win.EvtQuery(0, l.path, "", win.EvtQueryFilePath)
+	if err != nil {
+		return err
+	}
+	l.evtHandle = queryHandle
+	err = win.EvtSeek(l.evtHandle, 0, bookmark)
+	if err != nil {
+		l.lastRead.Bookmark = ""
 	}
 
 	return nil

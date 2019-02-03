@@ -35,7 +35,7 @@ type Event struct {
 	// System
 	Provider        Provider        `xml:"System>Provider"`
 	EventIdentifier EventIdentifier `xml:"System>EventID"`
-	Version         uint8           `xml:"System>Version"`
+	Version         string           `xml:"System>Version"`
 	LevelRaw        uint8           `xml:"System>Level"`
 	TaskRaw         uint16          `xml:"System>Task"`
 	OpcodeRaw       uint8           `xml:"System>Opcode"`
