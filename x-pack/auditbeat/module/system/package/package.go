@@ -490,16 +490,24 @@ func listDebPackages() ([]*Package, error) {
 	defer file.Close()
 
 	var packages []*Package
+	var skipPackage bool
 	pkg := &Package{}
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
 		if len(strings.TrimSpace(line)) == 0 {
 			// empty line signals new package
-			packages = append(packages, pkg)
+			if !skipPackage {
+				packages = append(packages, pkg)
+			}
+			skipPackage = false
 			pkg = &Package{}
 			continue
+		} else if skipPackage {
+			// Skipping this package - read on.
+			continue
 		}
+
 		if strings.HasPrefix(line, " ") {
 			// not interested in multi-lines for now
 			continue
@@ -512,6 +520,11 @@ func listDebPackages() ([]*Package, error) {
 		switch strings.ToLower(words[0]) {
 		case "package":
 			pkg.Name = value
+		case "status":
+			if strings.HasPrefix(value, "deinstall ok") {
+				// Package was removed but not purged. We report both cases as removed.
+				skipPackage = true
+			}
 		case "architecture":
 			pkg.Arch = value
 		case "version":
@@ -528,7 +541,7 @@ func listDebPackages() ([]*Package, error) {
 		}
 	}
 	if err = scanner.Err(); err != nil {
-		return nil, errors.Wrap(err, "error scanning file")
+		return nil, errors.Wrapf(err, "error scanning file %v", dpkgStatusFile)
 	}
 	return packages, nil
 }
