@@ -114,7 +114,6 @@ func (pkg Package) Hash() uint64 {
 	h.WriteString(pkg.Name)
 	h.WriteString(pkg.Version)
 	h.WriteString(pkg.Release)
-	h.WriteString(pkg.InstallTime.String())
 	binary.Write(h, binary.LittleEndian, pkg.Size)
 	return h.Sum64()
 }
