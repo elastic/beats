@@ -108,15 +108,19 @@ type Package struct {
 func (pkg Package) Hash() uint64 {
 	h := xxhash.New64()
 	h.WriteString(pkg.Name)
+	h.WriteString(pkg.Version)
 	h.WriteString(pkg.InstallTime.String())
 	return h.Sum64()
 }
 
 func (pkg Package) toMapStr() common.MapStr {
 	mapstr := common.MapStr{
-		"name":        pkg.Name,
-		"version":     pkg.Version,
-		"installtime": pkg.InstallTime,
+		"name":    pkg.Name,
+		"version": pkg.Version,
+	}
+
+	if pkg.Release != "" {
+		mapstr.Put("release", pkg.Release)
 	}
 
 	if pkg.Arch != "" {
@@ -127,8 +131,8 @@ func (pkg Package) toMapStr() common.MapStr {
 		mapstr.Put("license", pkg.License)
 	}
 
-	if pkg.Release != "" {
-		mapstr.Put("release", pkg.Release)
+	if !pkg.InstallTime.IsZero() {
+		mapstr.Put("installtime", pkg.InstallTime)
 	}
 
 	if pkg.Size != 0 {
