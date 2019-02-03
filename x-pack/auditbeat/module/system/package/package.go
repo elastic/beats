@@ -312,18 +312,18 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	ms.log.Debugf("Found %v packages", len(packages))
 
 	newInCache, missingFromCache := ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
-	new := convertToPackage(newInCache)
-	missing := convertToPackage(missingFromCache)
+	newPackages := convertToPackage(newInCache)
+	missingPackages := convertToPackage(missingFromCache)
 
 	// Package names of updated packages
 	updated := make(map[string]struct{})
 
-	for _, missingPkg := range missing {
+	for _, missingPkg := range missingPackages {
 		found := false
 
 		// Using an inner loop is less efficient than using a map, but in this case
 		// we do not expect a lot of installed or removed packages all at once.
-		for _, newPkg := range new {
+		for _, newPkg := range newPackages {
 			if missingPkg.Name == newPkg.Name {
 				found = true
 				updated[newPkg.Name] = struct{}{}
@@ -337,13 +337,13 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 		}
 	}
 
-	for _, newPkg := range new {
+	for _, newPkg := range newPackages {
 		if _, contains := updated[newPkg.Name]; !contains {
 			report.Event(packageEvent(newPkg, eventTypeEvent, eventActionPackageInstalled))
 		}
 	}
 
-	if len(new) > 0 || len(missing) > 0 {
+	if len(newPackages) > 0 || len(missingPackages) > 0 {
 		return ms.savePackagesToDisk(packages)
 	}
 
