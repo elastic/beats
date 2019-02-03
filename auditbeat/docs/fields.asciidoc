@@ -3735,6 +3735,19 @@ Origin of the event. This can be a file path (e.g. `/var/log/log.1`), or the nam
 
 --
 
+*`event.outcome`*::
++
+--
+type: keyword
+
+example: success
+
+The outcome of the event.
+If the event describes an action, this fields contains the outcome of that action. Examples outcomes are `success` and `failure`. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+
+
+--
+
 
 *`user.terminal`*::
 +
