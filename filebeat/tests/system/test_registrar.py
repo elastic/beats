@@ -478,8 +478,8 @@ class Test(BaseTest):
         # Store first registry file
         registry_file = "registry/filebeat/data.json"
         shutil.copyfile(
-                self.working_dir + "/" + registry_file,
-                self.working_dir + "/registry.first",
+            self.working_dir + "/" + registry_file,
+            self.working_dir + "/registry.first",
         )
 
         # Append file
@@ -579,8 +579,8 @@ class Test(BaseTest):
         # Store first registry file
         registry_file = "registry/filebeat/data.json"
         shutil.copyfile(
-                self.working_dir + "/" + registry_file,
-                self.working_dir + "/registry.first",
+            self.working_dir + "/" + registry_file,
+            self.working_dir + "/registry.first",
         )
 
         # Rotate log file, create a new empty one and remove it afterwards

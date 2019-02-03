@@ -3,7 +3,8 @@ import os
 import stat
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../../libbeat/tests/system'))
+curdir = os.path.dirname(__file__)
+sys.path.append(os.path.join(curdir, '../../../libbeat/tests/system'))
 
 from beat.beat import TestCase
 
@@ -17,7 +18,7 @@ class BaseTest(TestCase):
         if not hasattr(self, "beat_name"):
             self.beat_name = "filebeat"
         if not hasattr(self, "beat_path"):
-            self.beat_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+            self.beat_path = os.path.abspath(os.path.join(curdir, "../../"))
 
         super(BaseTest, self).setUpClass()
 
