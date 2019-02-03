@@ -13,6 +13,17 @@
       description: >
         Origin of the event. This can be a file path (e.g. `/var/log/log.1`),
         or the name of the system component that supplied the data (e.g. `netlink`).
+    - name: outcome
+      type: keyword
+      description: >
+        The outcome of the event.
+
+        If the event describes an action, this fields contains the outcome of
+        that action. Examples outcomes are `success` and `failure`. Warning: In
+        future versions of ECS, we plan to provide a list of acceptable values
+        for this field, please use with caution.
+
+      example: success
 
   - name: user
     type: group
