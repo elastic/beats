@@ -9,6 +9,7 @@ package pkg
 import (
 	"bufio"
 	"bytes"
+	"encoding/binary"
 	"encoding/gob"
 	"fmt"
 	"io"
@@ -57,6 +58,7 @@ const (
 	eventActionExistingPackage eventAction = iota
 	eventActionPackageInstalled
 	eventActionPackageRemoved
+	eventActionPackageUpdated
 )
 
 func (action eventAction) String() string {
@@ -67,6 +69,8 @@ func (action eventAction) String() string {
 		return "package_installed"
 	case eventActionPackageRemoved:
 		return "package_removed"
+	case eventActionPackageUpdated:
+		return "package_updated"
 	default:
 		return ""
 	}
@@ -109,7 +113,9 @@ func (pkg Package) Hash() uint64 {
 	h := xxhash.New64()
 	h.WriteString(pkg.Name)
 	h.WriteString(pkg.Version)
+	h.WriteString(pkg.Release)
 	h.WriteString(pkg.InstallTime.String())
+	binary.Write(h, binary.LittleEndian, pkg.Size)
 	return h.Sum64()
 }
 
@@ -306,14 +312,36 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	}
 	ms.log.Debugf("Found %v packages", len(packages))
 
-	installed, removed := ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
+	newInCache, missingFromCache := ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
+	installed := convertToPackage(newInCache)
+	removed := convertToPackage(missingFromCache)
 
-	for _, cacheValue := range installed {
-		report.Event(packageEvent(cacheValue.(*Package), eventTypeEvent, eventActionPackageInstalled))
+	// Package names of updated packages
+	updated := make(map[string]struct{})
+
+	for _, removedPkg := range removed {
+		found := false
+
+		// Using an inner loop is less efficient than using a map, but in this case
+		// we do not expect a lot of installed or removed packages all at once.
+		for _, installedPkg := range installed {
+			if removedPkg.Name == installedPkg.Name {
+				found = true
+				updated[installedPkg.Name] = struct{}{}
+				report.Event(packageEvent(installedPkg, eventTypeEvent, eventActionPackageUpdated))
+				break
+			}
+		}
+
+		if !found {
+			report.Event(packageEvent(removedPkg, eventTypeEvent, eventActionPackageRemoved))
+		}
 	}
 
-	for _, cacheValue := range removed {
-		report.Event(packageEvent(cacheValue.(*Package), eventTypeEvent, eventActionPackageRemoved))
+	for _, installedPkg := range installed {
+		if _, contains := updated[installedPkg.Name]; !contains {
+			report.Event(packageEvent(installedPkg, eventTypeEvent, eventActionPackageInstalled))
+		}
 	}
 
 	if len(installed) > 0 || len(removed) > 0 {
@@ -321,6 +349,16 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	}
 
 	return nil
+}
+
+func convertToPackage(cacheValues []interface{}) []*Package {
+	packages := make([]*Package, 0, len(cacheValues))
+
+	for _, c := range cacheValues {
+		packages = append(packages, c.(*Package))
+	}
+
+	return packages
 }
 
 func packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
@@ -351,6 +389,8 @@ func packageMessage(pkg *Package, action eventAction) string {
 		actionString = "installed"
 	case eventActionPackageRemoved:
 		actionString = "removed"
+	case eventActionPackageUpdated:
+		actionString = "updated"
 	}
 
 	return fmt.Sprintf("Package %v (%v) %v",
