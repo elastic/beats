@@ -83,7 +83,7 @@ INTEGRATION_TESTS?=
 FIND?=. ${PYTHON_ENV}/bin/activate; find . -type f -not -path "*/vendor/*" -not -path "*/build/*" -not -path "*/.git/*"
 PERM_EXEC?=$(shell [ `uname -s` = "Darwin" ] && echo "+111" || echo "/a+x")
 XPACK_ONLY?=false
-XPACK_DIR=${ES_BEATS}/x-pack/${BEAT_NAME}
+XPACK_DIR=github.com/elastic/beats/x-pack/${BEAT_NAME}
 
 ifeq ($(DOCKER_CACHE),0)
 	DOCKER_NOCACHE=--no-cache
