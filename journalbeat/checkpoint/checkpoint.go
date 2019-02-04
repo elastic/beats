@@ -145,16 +145,23 @@ func (c *Checkpoint) findRegistryFile() error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
 
 	target, err := os.OpenFile(migratedPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, fs.Mode())
 	if err != nil {
 		return err
 	}
-	defer target.Close()
 
 	if _, err := io.Copy(target, f); err != nil {
 		return err
+	}
+
+	err = f.Close()
+	if err != nil {
+		return fmt.Errorf("error closing old registry file: %+v", err)
+	}
+	err = target.Close()
+	if err != nil {
+		return fmt.Errorf("error closing new registry file: %+v", err)
 	}
 
 	err = helper.SafeFileRotate(c.file, c.file+".bak")
