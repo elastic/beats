@@ -50,6 +50,7 @@ auditbeat.modules:
 - module: system
   datasets:
     - host    # General host information, e.g. uptime, IPs
+    - login   # User logins, logouts, and system boots.
     - package # Installed, updated, and removed packages
     - process # Started and stopped processes
     - socket  # Opened and closed sockets
@@ -64,6 +65,10 @@ auditbeat.modules:
   # /etc/passwd and /etc/shadow and store a hash locally to
   # detect any changes.
   user.detect_password_changes: true
+
+  # File patterns of the login record files.
+  login.wtmp_file_pattern: /var/log/wtmp*
+  login.btmp_file_pattern: /var/log/btmp*
 
 #==================== Elasticsearch template setting ==========================
 setup.template.settings:
