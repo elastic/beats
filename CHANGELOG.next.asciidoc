@@ -241,6 +241,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added support for ingesting structured Elasticsearch audit logs {pull}10352[10352]
 - Added support for ingesting structured Elasticsearch slow logs {pull}10445[10445]
 - Added support for ingesting structured Elasticsearch deprecation logs {pull}10445[10445]
+- Added support for ingesting structured Elasticsearch server logs {pull}10428[10428]
 
 *Heartbeat*
 

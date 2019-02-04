@@ -4727,14 +4727,10 @@ Young generation occupancy in kilobytes.
 Server log file
 
 
-*`elasticsearch.server.component`*::
+*`elasticsearch.server.stacktrace`*::
 +
 --
-type: keyword
-
-example: o.e.c.m.MetaDataCreateIndexService
-
-Log component
+Field is not indexed.
 
 --
 
