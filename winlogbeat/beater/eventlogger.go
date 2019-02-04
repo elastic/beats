@@ -82,7 +82,7 @@ func (e *eventLogger) run(
 ) {
 	api := e.source
 
-	// Initialize per event log metrics
+	// Initialize per event log metrics.
 	initMetrics(api.Name())
 
 	client, err := e.connect(pipeline)
@@ -127,15 +127,15 @@ func (e *eventLogger) run(
 		records, err := api.Read()
 		if err != nil {
 			logp.Warn("EventLog[%s] Read() error: %v", api.Name(), err)
-			break;
+			break
 		}
+		debugf("EventLog[%s] Read() returned %d records", api.Name(), len(records))
 		if len(records) == 0 {
 			// TODO: Consider implementing notifications using
 			// NotifyChangeEventLog instead of polling.
 			time.Sleep(time.Second)
 			continue
 		}
-		debugf("EventLog[%s] Read() returned %d records", api.Name(), len(records))
 
 		for _, lr := range records {
 			client.Publish(lr.ToEvent())
