@@ -7,7 +7,8 @@
   - name: entity_id
     type: keyword
     description: >
-      ID uniquely identifying the package.
+      ID uniquely identifying the package. It is computed as a SHA-256 hash of the
+        host ID, package name, and package version.
   - name: name
     type: keyword
     description: >

@@ -6242,7 +6242,7 @@ Origin of the event. This can be a file path (e.g. `/var/log/log.1`), or the nam
 --
 type: keyword
 
-ID uniquely identifying the user.
+ID uniquely identifying the user on a host. It is computed as a SHA-256 hash of the host ID, user ID, and user name.
 
 
 --
@@ -6263,7 +6263,7 @@ Terminal of the user.
 --
 type: keyword
 
-ID uniquely identifying the process.
+ID uniquely identifying the process. It is computed as a SHA-256 hash of the host ID, PID, and process start time.
 
 
 --
@@ -6274,7 +6274,7 @@ ID uniquely identifying the process.
 --
 type: keyword
 
-ID uniquely identifying the socket.
+ID uniquely identifying the socket. It is computed as a SHA-256 hash of the host ID, socket inode, local IP, local port, remote IP, and remote port.
 
 
 --
@@ -6461,7 +6461,8 @@ The operating system's kernel version.
 --
 type: keyword
 
-ID uniquely identifying the package.
+ID uniquely identifying the package. It is computed as a SHA-256 hash of the
+  host ID, package name, and package version.
 
 
 --
