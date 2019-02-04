@@ -78,6 +78,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - The `elasticsearch/deprecation` fileset now indexes the `component` field under `elasticsearch` instead of `elasticsearch.server`. {pull}10445[10445]
 - Remove field `kafka.log.trace.full` from kafka.log fielset. {pull}10398[10398]
 - Change field `kafka.log.class` for kafka.log fileset from text to keyword. {pull}10398[10398]
+- Address add_kubernetes_metadata processor issue where old source field is 
+  still used for matcher. {issue}10505[10505] {pull}10506[10506]
 
 *Heartbeat*
 
