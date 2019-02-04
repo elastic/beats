@@ -61,7 +61,9 @@
                 "field": "elasticsearch.server.timestamp",
                 "target_field": "@timestamp",
                 "formats": [
-                    "ISO8601"
+                    "ISO8601",
+                    "yyyy-MM-dd'T'HH:mm:ss,SSS",
+                    "yyyy-MM-dd'T'HH:mm:ss,SSSZ"
                 ],
                 {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
                 "ignore_failure": true
