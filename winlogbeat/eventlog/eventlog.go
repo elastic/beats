@@ -130,11 +130,9 @@ func (e Record) ToEvent() beat.Event {
 
 	// ECS data
 	m.Put("event.kind", "event")
-	m.Put("event.dataset", fmt.Sprintf("%v.%v", e.API, strings.ToLower(e.Channel)))
 	m.Put("event.code", e.EventIdentifier.ID)
 	addOptional(m, "event.action", e.Task)
 
-	m.Put("host.hostname", e.Computer)
 	m.Put("event.created", time.Now())
 
 	addOptional(m, "log.level", strings.ToLower(e.Level))

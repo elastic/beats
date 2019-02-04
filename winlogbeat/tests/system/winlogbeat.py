@@ -130,7 +130,6 @@ class WriteReadTest(BaseTest):
     def assert_common_fields(self, evt, msg=None, eventID=10, sid=None,
                              level="information", extra=None):
 
-        print("EVT: {}\n", evt)
         assert host_name(evt["winlog.computer_name"]).lower() == host_name(platform.node()).lower()
         assert "winlog.record_id" in evt
         self.assertDictContainsSubset({
