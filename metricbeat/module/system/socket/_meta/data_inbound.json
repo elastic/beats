@@ -4,6 +4,10 @@
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "destination": {
+        "ip": "::1",
+        "port": 45109
+    },
     "event": {
         "dataset": "system.socket",
         "duration": 115000,
@@ -13,40 +17,32 @@
         "name": "socket"
     },
     "network": {
-        "direction": "listening",
+        "direction": "inbound",
         "iana_number": "41",
         "type": "ipv6"
-    },
-    "process": {
-        "args": [
-            "/tmp/go-build774092237/b001/socket.test",
-            "-data"
-        ],
-        "executable": "/tmp/go-build774092237/b001/socket.test",
-        "name": "socket.test",
-        "pid": 32127
-    },
-    "server": {
-        "ip": "::",
-        "port": 45109
     },
     "service": {
         "type": "system"
     },
+    "source": {
+        "ip": "::1",
+        "port": 33972
+    },
     "system": {
         "socket": {
             "local": {
-                "ip": "::",
+                "ip": "::1",
                 "port": 45109
             },
-            "process": {
-                "cmdline": "/tmp/go-build774092237/b001/socket.test -data"
+            "remote": {
+                "ip": "::1",
+                "port": 33972
             }
         }
     },
     "user": {
-        "full_name": "Jaime Soriano Pastor",
-        "id": "1000",
-        "name": "jaime"
+        "full_name": "root",
+        "id": "0",
+        "name": "root"
     }
 }
