@@ -74,8 +74,8 @@ func TestGenerate(t *testing.T) {
 	tmpDir := tmpPath(t)
 	defer os.RemoveAll(tmpDir)
 
-	v6, _ := common.NewVersion("7.0.0-alpha1")
-	versions := []*common.Version{v6}
+	v7, _ := common.NewVersion("7.0.0-alpha1")
+	versions := []*common.Version{v7}
 	var d common.MapStr
 	for _, version := range versions {
 		data, err := ioutil.ReadFile("./testdata/fields.yml")
@@ -93,7 +93,7 @@ func TestGenerate(t *testing.T) {
 		}
 	}
 
-	tests := []ttt{
+	tests := []compare{
 		{
 			existing: "testdata/beat-6.json",
 			created:  d,
@@ -103,7 +103,7 @@ func TestGenerate(t *testing.T) {
 	testGenerate(t, tests, true)
 }
 
-type ttt struct {
+type compare struct {
 	existing string
 	created  common.MapStr
 }
@@ -112,8 +112,8 @@ func TestGenerateExtensive(t *testing.T) {
 	tmpDir := tmpPath(t)
 	defer os.RemoveAll(tmpDir)
 
-	version6, _ := common.NewVersion("7.0.0-alpha1")
-	versions := []*common.Version{version6}
+	version7, _ := common.NewVersion("7.0.0-alpha1")
+	versions := []*common.Version{version7}
 
 	var d common.MapStr
 	for _, version := range versions {
@@ -132,7 +132,7 @@ func TestGenerateExtensive(t *testing.T) {
 		}
 	}
 
-	tests := []ttt{
+	tests := []compare{
 		{
 			existing: "testdata/extensive/metricbeat-6.json",
 			created:  d,
@@ -141,7 +141,7 @@ func TestGenerateExtensive(t *testing.T) {
 	testGenerate(t, tests, false)
 }
 
-func testGenerate(t *testing.T, tests []ttt, sourceFilters bool) {
+func testGenerate(t *testing.T, tests []compare, sourceFilters bool) {
 	for _, test := range tests {
 		// compare default
 		existing, err := readJson(test.existing)
