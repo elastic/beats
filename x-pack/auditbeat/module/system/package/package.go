@@ -162,7 +162,6 @@ func (pkg Package) entityID(hostID string) string {
 	binary.Write(h, binary.LittleEndian, []byte(hostID))
 	binary.Write(h, binary.LittleEndian, []byte(pkg.Name))
 	binary.Write(h, binary.LittleEndian, []byte(pkg.Version))
-	binary.Write(h, binary.LittleEndian, int64(pkg.InstallTime.Nanosecond()))
 	return h.Sum()
 }
 
