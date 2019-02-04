@@ -1423,7 +1423,7 @@
               "enabled": true,
               "id": "1",
               "params": {
-                "customLabel": "Package Changes"
+                "customLabel": "Changes"
               },
               "schema": "metric",
               "type": "count"
@@ -1463,8 +1463,8 @@
       },
       "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519",
       "type": "visualization",
-      "updated_at": "2019-02-03T21:57:47.393Z",
-      "version": 1
+      "updated_at": "2019-02-04T10:44:06.826Z",
+      "version": 2
     },
     {
       "attributes": {
@@ -1889,6 +1889,37 @@
     },
     {
       "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "title": "Dashboard Links [Auditbeat System]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "fontSize": 12,
+            "markdown": "**Dashboards**: [System Overview](#/dashboard/2be46cb0-27f2-11e9-89af-fd12d59dac90) | [Hosts](#/dashboard/dfe62590-18da-11e9-9094-c50574723088) | [Logins](#/dashboard/2a17f200-285e-11e9-805f-43bf57dfa519) | [Users](#/dashboard/ae96a660-2864-11e9-97cb-474beda9f119) | [Processes](#/dashboard/4c68f110-2863-11e9-97cb-474beda9f119) | [Sockets](#/dashboard/957a3ef0-2867-11e9-9d21-0be348776e6c) | [Packages](#/dashboard/137c52f0-286a-11e9-9d21-0be348776e6c)",
+            "openLinksInNewTab": false
+          },
+          "title": "Dashboard Links [Auditbeat System]",
+          "type": "markdown"
+        }
+      },
+      "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90",
+      "type": "visualization",
+      "updated_at": "2019-02-04T11:37:25.234Z",
+      "version": 3
+    },
+    {
+      "attributes": {
         "description": "Overview of System Information.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
@@ -2070,7 +2101,7 @@
               "i": "1",
               "w": 8,
               "x": 0,
-              "y": 0
+              "y": 4
             },
             "id": "cf8aa0a0-18ca-11e9-9094-c50574723088",
             "panelIndex": "1",
@@ -2084,7 +2115,7 @@
               "i": "2",
               "w": 8,
               "x": 24,
-              "y": 0
+              "y": 4
             },
             "id": "bb0d1870-27f1-11e9-89af-fd12d59dac90",
             "panelIndex": "2",
@@ -2098,7 +2129,7 @@
               "i": "3",
               "w": 8,
               "x": 32,
-              "y": 0
+              "y": 4
             },
             "id": "7323dd90-27f2-11e9-89af-fd12d59dac90",
             "panelIndex": "3",
@@ -2112,7 +2143,7 @@
               "i": "4",
               "w": 8,
               "x": 16,
-              "y": 0
+              "y": 4
             },
             "id": "e9225120-27f2-11e9-89af-fd12d59dac90",
             "panelIndex": "4",
@@ -2126,7 +2157,7 @@
               "i": "5",
               "w": 8,
               "x": 40,
-              "y": 0
+              "y": 4
             },
             "id": "f664fb20-27f3-11e9-89af-fd12d59dac90",
             "panelIndex": "5",
@@ -2140,7 +2171,7 @@
               "i": "6",
               "w": 8,
               "x": 8,
-              "y": 0
+              "y": 4
             },
             "id": "8d63c420-27f4-11e9-89af-fd12d59dac90",
             "panelIndex": "6",
@@ -2154,7 +2185,7 @@
               "i": "8",
               "w": 8,
               "x": 0,
-              "y": 8
+              "y": 12
             },
             "id": "9dd991a0-18cb-11e9-9094-c50574723088",
             "panelIndex": "8",
@@ -2168,7 +2199,7 @@
               "i": "9",
               "w": 8,
               "x": 8,
-              "y": 8
+              "y": 12
             },
             "id": "593df9b0-27f7-11e9-89af-fd12d59dac90",
             "panelIndex": "9",
@@ -2182,7 +2213,7 @@
               "i": "10",
               "w": 8,
               "x": 16,
-              "y": 8
+              "y": 12
             },
             "id": "00fa0d20-27fc-11e9-89af-fd12d59dac90",
             "panelIndex": "10",
@@ -2196,7 +2227,7 @@
               "i": "11",
               "w": 8,
               "x": 24,
-              "y": 8
+              "y": 12
             },
             "id": "0db90830-27fd-11e9-89af-fd12d59dac90",
             "panelIndex": "11",
@@ -2210,7 +2241,7 @@
               "i": "12",
               "w": 8,
               "x": 24,
-              "y": 15
+              "y": 19
             },
             "id": "b885dae0-27fd-11e9-89af-fd12d59dac90",
             "panelIndex": "12",
@@ -2224,7 +2255,7 @@
               "i": "13",
               "w": 8,
               "x": 32,
-              "y": 8
+              "y": 12
             },
             "id": "295905e0-27fd-11e9-89af-fd12d59dac90",
             "panelIndex": "13",
@@ -2238,7 +2269,7 @@
               "i": "14",
               "w": 8,
               "x": 32,
-              "y": 15
+              "y": 19
             },
             "id": "82d46ec0-27fd-11e9-89af-fd12d59dac90",
             "panelIndex": "14",
@@ -2252,7 +2283,7 @@
               "i": "15",
               "w": 8,
               "x": 40,
-              "y": 8
+              "y": 12
             },
             "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519",
             "panelIndex": "15",
@@ -2266,7 +2297,7 @@
               "i": "16",
               "w": 48,
               "x": 0,
-              "y": 22
+              "y": 26
             },
             "id": "54135e50-27ff-11e9-805f-43bf57dfa519",
             "panelIndex": "16",
@@ -2280,7 +2311,7 @@
               "i": "17",
               "w": 24,
               "x": 0,
-              "y": 30
+              "y": 34
             },
             "id": "91962a30-1901-11e9-9094-c50574723088",
             "panelIndex": "17",
@@ -2294,11 +2325,25 @@
               "i": "18",
               "w": 24,
               "x": 24,
-              "y": 30
+              "y": 34
             },
             "id": "d08ebd30-27ff-11e9-805f-43bf57dfa519",
             "panelIndex": "18",
             "type": "search",
+            "version": "7.0.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 4,
+              "i": "19",
+              "w": 48,
+              "x": 0,
+              "y": 0
+            },
+            "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90",
+            "panelIndex": "19",
+            "type": "visualization",
             "version": "7.0.0"
           }
         ],
@@ -2308,8 +2353,8 @@
       },
       "id": "2be46cb0-27f2-11e9-89af-fd12d59dac90",
       "type": "dashboard",
-      "updated_at": "2019-02-03T22:19:39.094Z",
-      "version": 8
+      "updated_at": "2019-02-04T09:32:32.325Z",
+      "version": 9
     }
   ],
   "version": "7.0.0"
