@@ -96,6 +96,17 @@
       description: >
         The pid of the process.
 
+    - name: event.outcome
+      level: extended
+      type: keyword
+      description: >
+        The outcome of the event.
+
+        If the event describes an action, this fields contains the outcome of
+        that action. Examples outcomes are `success` and `failure`. Warning: In
+        future versions of ECS, we plan to provide a list of acceptable values
+        for this field, please use with caution.
+
     - name: event.severity
       type: long
       required: false
@@ -125,6 +136,11 @@
       type: keyword
       description: >
         Log source path.
+
+    - name: log.original
+      type: keyword
+      index: false
+      doc_values: false
 
     - name: event.created
       type: date
@@ -169,6 +185,12 @@
           IP address of the source.
 
           Can be one or multiple IPv4 or IPv6 addresses.
+
+      - name: mac
+        level: core
+        type: keyword
+        description: >
+          MAC address of the source.
 
       - name: port
         type: long
@@ -219,6 +241,12 @@
             IP address of the destination.
 
             Can be one or multiple IPv4 or IPv6 addresses.
+
+        - name: mac
+          level: core
+          type: keyword
+          description: >
+            MAC address of the destination.
 
         - name: port
           type: long
@@ -370,6 +398,33 @@
           type: long
           description: File size in bytes (field is only added when `type` is
             `file`).
+
+    - name: network
+      description: >
+        The network is defined as the communication path over which a host or
+        network event happens. The network.* fields should be populated with
+        details about the network activity associated with an event.
+      type: group
+      fields:
+
+      - name: transport
+        level: core
+        type: keyword
+        description: >
+          Same as network.iana_number, but instead using the Keyword name of the
+          transport layer (udp, tcp, ipv6-icmp, etc.)
+
+          The field value must be normalized to lowercase for querying. See
+          "Lowercase Capitalization" in the "Implementing ECS"  section.
+
+      - name: type
+        level: core
+        type: keyword
+        description: >
+          In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
+
+          The field value must be normalized to lowercase for querying. See
+          "Lowercase Capitalization" in the "Implementing ECS" section.
 
     # Alias compatibility fields
     - name: event.module
