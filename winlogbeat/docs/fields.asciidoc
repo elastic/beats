@@ -3264,18 +3264,6 @@ Contains data from a Windows event log record.
 
 
 
-*`event.code`*::
-+
---
-type: keyword
-
-required: False
-
-The code for this log message (Windows event ID).
-
-
---
-
 *`type`*::
 +
 --
@@ -3454,11 +3442,6 @@ type: alias
 
 alias to: event.original
 
-The raw XML representation of the event obtained from Windows. This field is only available on operating systems supporting the Windows Event Log API (Microsoft Windows Vista and newer). This field is not included by default and must be enabled by setting `include_xml: true` as a configuration option for an individual event log.
-
-The XML representation of the event is useful for troubleshooting purposes. The data in the fields reported by Winlogbeat can be compared to the data in the XML to diagnose problems.
-
-
 --
 
 [[exported-fields-host-processor]]
@@ -3578,6 +3561,27 @@ alias to: process.executable
 Fields from the Windows Event Log.
 
 
+
+*`event.code`*::
++
+--
+type: keyword
+
+required: False
+
+The code for this log message (Windows event ID).
+
+
+--
+
+*`event.original`*::
++
+--
+The raw XML representation of the event obtained from Windows. This field is only available on operating systems supporting the Windows Event Log API (Microsoft Windows Vista and newer). This field is not included by default and must be enabled by setting `include_xml: true` as a configuration option for an individual event log.
+The XML representation of the event is useful for troubleshooting purposes. The data in the fields reported by Winlogbeat can be compared to the data in the XML to diagnose problems.
+
+
+--
 
 [float]
 == winlog fields

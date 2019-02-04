@@ -3,6 +3,25 @@
   description: >
     Fields from the Windows Event Log.
   fields:
+    # Candidate to add to ECS
+    - name: event.code
+      type: keyword
+      required: false
+      description: >
+        The code for this log message (Windows event ID).
+
+    - name: event.original
+      description: >
+        The raw XML representation of the event obtained from Windows. This
+        field is only available on operating systems supporting the Windows
+        Event Log API (Microsoft Windows Vista and newer). This field is not
+        included by default and must be enabled by setting `include_xml: true`
+        as a configuration option for an individual event log.
+
+        The XML representation of the event is useful for troubleshooting
+        purposes. The data in the fields reported by Winlogbeat can be compared
+        to the data in the XML to diagnose problems.
+
     - name: winlog
       type: group
       description: >
@@ -173,19 +192,12 @@
           required: false
           description: The version number of the event's definition.
 
+# Aliases for the old fields
 - key: eventlog
   title: Event log record
   description: >
     Contains data from a Windows event log record.
   fields:
-    # Candidate to add to ECS?
-    - name: event.code
-      type: keyword
-      required: false
-      description: >
-        The code for this log message (Windows event ID).
-
-# Aliases for the old fields
     - name: type
       type: alias
       path: winlog.api
@@ -285,14 +297,3 @@
       type: alias
       path: event.original
       migration: true
-      description: >
-        The raw XML representation of the event obtained from Windows. This
-        field is only available on operating systems supporting the Windows
-        Event Log API (Microsoft Windows Vista and newer). This field is not
-        included by default and must be enabled by setting `include_xml: true`
-        as a configuration option for an individual event log.
-
-
-        The XML representation of the event is useful for troubleshooting
-        purposes. The data in the fields reported by Winlogbeat can be compared
-        to the data in the XML to diagnose problems.
