@@ -2647,7 +2647,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/tsg/gopacket
-Revision: f289b3ea3e41a01b2822be9caf5f40c01fdda05c
+Revision: 7c5392a5f2b5c5fa393c71e1f9064e22b5408995
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/tsg/gopacket/LICENSE:
 --------------------------------------------------------------------
