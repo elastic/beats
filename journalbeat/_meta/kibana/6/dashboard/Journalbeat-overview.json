@@ -1,0 +1,177 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "columns": [
+          "@timestamp",
+          "host.name",
+          "journald.kernel.subsystem",
+          "message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "index": "journalbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": "syslog.facility:0 AND syslog.priority:\u003c4"
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "event.created",
+          "desc"
+        ],
+        "title": "[Journalbeat] Kernel errors",
+        "version": 1
+      },
+      "id": "8fb3eee0-2866-11e9-af62-7d5932195f5c",
+      "type": "search",
+      "updated_at": "2019-02-04T10:58:39.648Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "@timestamp",
+          "host.name",
+          "process.name",
+          "message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "index": "journalbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": "syslog.facility:4"
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "event.created",
+          "desc"
+        ],
+        "title": "[Journalbeat] Authorization",
+        "version": 1
+      },
+      "id": "e3c84940-2866-11e9-af62-7d5932195f5c",
+      "type": "search",
+      "updated_at": "2019-02-04T10:58:39.655Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "columns": [
+          "@timestamp",
+          "host.name",
+          "message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "highlightAll": true,
+            "index": "journalbeat-*",
+            "query": {
+              "language": "lucene",
+              "query": "process.name:systemd"
+            },
+            "version": true
+          }
+        },
+        "sort": [
+          "event.created",
+          "desc"
+        ],
+        "title": "[Journalbeat] Systemd messages",
+        "version": 1
+      },
+      "id": "2d6b1b00-2866-11e9-af62-7d5932195f5c",
+      "type": "search",
+      "updated_at": "2019-02-04T10:58:39.642Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "lucene",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false,
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "1",
+              "w": 24,
+              "x": 0,
+              "y": 0
+            },
+            "id": "8fb3eee0-2866-11e9-af62-7d5932195f5c",
+            "panelIndex": "1",
+            "type": "search",
+            "version": "6.7.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "2",
+              "w": 24,
+              "x": 24,
+              "y": 0
+            },
+            "id": "e3c84940-2866-11e9-af62-7d5932195f5c",
+            "panelIndex": "2",
+            "type": "search",
+            "version": "6.7.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 14,
+              "i": "3",
+              "w": 48,
+              "x": 0,
+              "y": 15
+            },
+            "id": "2d6b1b00-2866-11e9-af62-7d5932195f5c",
+            "panelIndex": "3",
+            "type": "search",
+            "version": "6.7.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Journalbeat] Overview",
+        "version": 1
+      },
+      "id": "1649ab20-2867-11e9-af62-7d5932195f5c",
+      "type": "dashboard",
+      "updated_at": "2019-02-04T10:58:40.359Z",
+      "version": 1
+    }
+  ],
+  "version": "6.7.0"
+}
