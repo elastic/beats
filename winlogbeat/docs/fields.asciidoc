@@ -3264,15 +3264,6 @@ Contains data from a Windows event log record.
 
 
 
-*`user_dbg`*::
-+
---
-type: object
-
-required: False
-
---
-
 *`event.code`*::
 +
 --
