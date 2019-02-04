@@ -99,6 +99,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename host.name to host.hostname to align with ECS. {pull}10043[10043]
 - Fix typo in the field name `container.id_truncated`. {pull}10525[10525]
 - Rename `container.image.tag` to `container.log.tag`. {pull}10561[10561]
+- Change type of `text` fields to `keyword`. {pull}10542[10542]
 
 *Metricbeat*
 
