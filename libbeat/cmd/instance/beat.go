@@ -32,6 +32,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/libbeat/kibana"
+
 	"github.com/gofrs/uuid"
 	errw "github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -679,8 +681,42 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	}
 
 	if b.Config.Dashboards.Enabled() {
-		err := dashboards.ImportDashboards(ctx, b.Info.Beat, b.Info.Hostname, paths.Resolve(paths.Home, ""),
-			b.Config.Kibana, b.Config.Dashboards, nil)
+
+		var withMigration bool
+		if b.RawConfig.HasField("migration") {
+			sub, err := b.RawConfig.Child("migration", -1)
+			if err != nil {
+				return fmt.Errorf("Failed to read migration setting: %+v", err)
+			}
+			withMigration = sub.Enabled()
+		}
+
+		// init kibana config object
+		kibanaConfig := b.Config.Kibana
+		if kibanaConfig == nil {
+			kibanaConfig = common.NewConfig()
+		}
+
+		client, err := kibana.NewKibanaClient(kibanaConfig)
+		if err != nil {
+			return fmt.Errorf("error connecting to Kibana: %v", err)
+		}
+		// This fetches the version for Kibana. For the alias feature the version of ES would be needed
+		// but it's assumed that KB and ES have the same minor version.
+		v := client.GetVersion()
+
+		indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, b.Info.Version, v, withMigration)
+		if err != nil {
+			return fmt.Errorf("error creating index pattern generator: %v", err)
+		}
+
+		pattern, err := indexPattern.Generate()
+		if err != nil {
+			return fmt.Errorf("error generating index pattern: %v", err)
+		}
+
+		err = dashboards.ImportDashboards(ctx, b.Info, paths.Resolve(paths.Home, ""),
+			kibanaConfig, b.Config.Dashboards, nil, pattern)
 		if err != nil {
 			return errw.Wrap(err, "Error importing Kibana dashboards")
 		}

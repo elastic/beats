@@ -74,22 +74,7 @@ func KibanaDashboards(moduleDirs ...string) error {
 		return err
 	}
 
-	beatVersion, err := BeatQualifiedVersion()
-	if err != nil {
-		return err
-	}
-
-	// Generate Kibana index pattern files from fields.yml.
-	indexPatternCmd := sh.RunCmd("go", "run",
-		filepath.Join(esBeatsDir, "dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go"),
-		"-beat", BeatName,
-		"-version", beatVersion,
-		"-index", BeatIndexPrefix+"-*",
-		"-fields", "fields.yml",
-		"-out", kibanaBuildDir,
-	)
-
-	return indexPatternCmd()
+	return nil
 }
 
 // PackageKibanaDashboardsFromBuildDir reconfigures the packaging configuration
