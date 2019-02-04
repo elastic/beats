@@ -174,9 +174,9 @@ func (user User) toMapStr() common.MapStr {
 // entityID creates an ID that uniquely identifies this user across machines.
 func (u User) entityID(hostID string) string {
 	h := system.NewEntityHash()
-	binary.Write(h, binary.LittleEndian, []byte(hostID))
-	binary.Write(h, binary.LittleEndian, []byte(u.Name))
-	binary.Write(h, binary.LittleEndian, []byte(u.UID))
+	h.Write([]byte(hostID))
+	h.Write([]byte(u.Name))
+	h.Write([]byte(u.UID))
 	return h.Sum()
 }
 

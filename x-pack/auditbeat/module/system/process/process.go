@@ -116,7 +116,7 @@ func (p Process) toMapStr() common.MapStr {
 // entityID creates an ID that uniquely identifies this process across machines.
 func (p Process) entityID(hostID string) string {
 	h := system.NewEntityHash()
-	binary.Write(h, binary.LittleEndian, []byte(hostID))
+	h.Write([]byte(hostID))
 	binary.Write(h, binary.LittleEndian, int64(p.Info.PID))
 	binary.Write(h, binary.LittleEndian, int64(p.Info.StartTime.Nanosecond()))
 	return h.Sum()

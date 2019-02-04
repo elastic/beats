@@ -159,9 +159,9 @@ func (pkg Package) toMapStr() common.MapStr {
 // entityID creates an ID that uniquely identifies this package across machines.
 func (pkg Package) entityID(hostID string) string {
 	h := system.NewEntityHash()
-	binary.Write(h, binary.LittleEndian, []byte(hostID))
-	binary.Write(h, binary.LittleEndian, []byte(pkg.Name))
-	binary.Write(h, binary.LittleEndian, []byte(pkg.Version))
+	h.Write([]byte(hostID))
+	h.Write([]byte(pkg.Name))
+	h.Write([]byte(pkg.Version))
 	return h.Sum()
 }
 

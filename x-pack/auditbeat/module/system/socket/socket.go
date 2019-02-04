@@ -181,7 +181,7 @@ func (s Socket) toMapStr() common.MapStr {
 // entityID creates an ID that uniquely identifies this socket across machines.
 func (s Socket) entityID(hostID string) string {
 	h := system.NewEntityHash()
-	binary.Write(h, binary.LittleEndian, []byte(hostID))
+	h.Write([]byte(hostID))
 	binary.Write(h, binary.LittleEndian, int64(s.Inode))
 	h.Write(s.LocalIP)
 	h.Write(s.RemoteIP)
