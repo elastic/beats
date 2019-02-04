@@ -117,17 +117,17 @@
               description: >
                 The kernel subsystem name.
             - name: device_symlinks
-              type: text
+              type: keyword
               required: false
               description: >
                 Additional symlink names pointing to the device node in /dev.
             - name: device_node_path
-              type: text
+              type: keyword
               required: false
               description: >
                 The device node path of this device in /dev.
             - name: device_name
-              type: text
+              type: keyword
               required: false
               description: >
                 The kernel device name as it shows up in the device tree below /sys.
@@ -137,13 +137,13 @@
               Fields of the code generating the event.
           fields:
             - name: file
-              type: text
+              type: keyword
               required: false
               example: "../src/core/manager.c"
               description: >
                 The name of the source file where the log is generated.
             - name: function
-              type: text
+              type: keyword
               required: false
               example: "job_log_status_message"
               description: >
@@ -278,7 +278,7 @@
           Fields of the host.
       fields:
         - name: boot_id
-          type: text
+          type: keyword
           required: false
           example: "dd8c974asdf01dbe2ef26d7fasdf264c9"
           description: >
@@ -301,7 +301,7 @@
           description: >
             The facility of the message. A syslog compatibility field.
         - name: identifier
-          type: text
+          type: keyword
           required: false
           example: "su"
           description: >

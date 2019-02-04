@@ -470,7 +470,7 @@ Fields of the host.
 *`host.boot_id`*::
 +
 --
-type: text
+type: keyword
 
 example: dd8c974asdf01dbe2ef26d7fasdf264c9
 
@@ -519,7 +519,7 @@ The facility of the message. A syslog compatibility field.
 *`syslog.identifier`*::
 +
 --
-type: text
+type: keyword
 
 example: su
 
