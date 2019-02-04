@@ -132,7 +132,6 @@
           description: >
             The process_id of the Client Server Runtime Process.
 
-
         - name: provider_name
           type: keyword
           required: true
