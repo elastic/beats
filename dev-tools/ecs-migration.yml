@@ -588,7 +588,6 @@
   to: http.response.body.bytes
   alias: true
 
-# These expand all fields under geoip and user_agent
 - from: apache2.access.geoip.continent_name
   to: source.geo.continent_name
   alias: true
@@ -619,49 +618,50 @@
   alias: true
   beat: filebeat
 
-- from: apache2.access.user_agent.device
-  to: user_agent.device
-  alias: true
-  beat: filebeat
-
-- from: apache2.access.user_agent.major
-  to: user_agent.major
-  alias: true
-  beat: filebeat
-
-- from: apache2.access.user_agent.minor
-  to: user_agent.minor
-  alias: true
-  beat: filebeat
-
-- from: apache2.access.user_agent.name
-  to: user_agent.name
-  alias: true
-  beat: filebeat
-
 - from: apache2.access.user_agent.original
   to: user_agent.original
   alias: true
   beat: filebeat
-
+- from: apache2.access.user_agent.device
+  to: user_agent.device.name
+  alias: true
+  beat: filebeat
+- from: apache2.access.user_agent.name
+  to: user_agent.name
+  alias: true
+  beat: filebeat
 - from: apache2.access.user_agent.os
   to: user_agent.os.full_name
   alias: true
   beat: filebeat
-
 - from: apache2.access.user_agent.os_name
   to: user_agent.os.name
   alias: true
   beat: filebeat
 
-- from: apache2.access.user_agent.patch
-  to: user_agent.patch
-  alias: true
+- from: apache2.access.user_agent.major
+  to: user_agent.version
+  alias: false
   beat: filebeat
-
-- from: apache2.access.user_agent.user_name
-  to: user.name
-  alias: true
+- from: apache2.access.user_agent.minor
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.patch
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.os_major
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.os_minor
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.os_patch
+  to: user_agent.os.version
+  alias: false
   beat: filebeat
 
 ### Error fileset
@@ -762,6 +762,47 @@
 - from: iis.access.user_agent.original
   to: user_agent.original
   alias: true
+  beat: filebeat
+- from: iis.access.user_agent.device
+  to: user_agent.device.name
+  alias: true
+  beat: filebeat
+- from: iis.access.user_agent.name
+  to: user_agent.name
+  alias: true
+  beat: filebeat
+- from: iis.access.user_agent.os
+  to: user_agent.os.full_name
+  alias: true
+  beat: filebeat
+- from: iis.access.user_agent.os_name
+  to: user_agent.os.name
+  alias: true
+  beat: filebeat
+
+- from: iis.access.user_agent.major
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: iis.access.user_agent.minor
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: iis.access.user_agent.patch
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: iis.access.user_agent.os_major
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: iis.access.user_agent.os_minor
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: iis.access.user_agent.os_patch
+  to: user_agent.os.version
+  alias: false
   beat: filebeat
 
 - from: iis.access.geoip.continent_name
@@ -1187,6 +1228,48 @@
   alias: true
   beat: filebeat
 
+- from: nginx.access.user_agent.device
+  to: user_agent.device.name
+  alias: true
+  beat: filebeat
+- from: nginx.access.user_agent.name
+  to: user_agent.name
+  alias: true
+  beat: filebeat
+- from: nginx.access.user_agent.os
+  to: user_agent.os.full_name
+  alias: true
+  beat: filebeat
+- from: nginx.access.user_agent.os_name
+  to: user_agent.os.name
+  alias: true
+  beat: filebeat
+
+- from: nginx.access.user_agent.major
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: nginx.access.user_agent.minor
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: nginx.access.user_agent.patch
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: nginx.access.user_agent.os_major
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: nginx.access.user_agent.os_minor
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: nginx.access.user_agent.os_patch
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+
 - from: nginx.error.level
   to: log.level
   alias: true
@@ -1314,50 +1397,46 @@
   to: user_agent.original
   alias: true
   beat: filebeat
-
 - from: traefik.access.user_agent.device
-  to: user_agent.device
+  to: user_agent.device.name
   alias: true
   beat: filebeat
-
-- from: traefik.access.user_agent.major
-  to: user_agent.major
-  alias: true
-  beat: filebeat
-
-- from: traefik.access.user_agent.minor
-  to: user_agent.minor
-  alias: true
-  beat: filebeat
-
 - from: traefik.access.user_agent.name
   to: user_agent.name
   alias: true
   beat: filebeat
-
-- from: traefik.access.user_agent.original
-  to: user_agent.original
-  alias: true
-  beat: filebeat
-
 - from: traefik.access.user_agent.os
   to: user_agent.os.full_name
   alias: true
   beat: filebeat
-
 - from: traefik.access.user_agent.os_name
   to: user_agent.os.name
   alias: true
   beat: filebeat
 
-- from: traefik.access.user_agent.patch
-  to: user_agent.patch
-  alias: true
+- from: traefik.access.user_agent.major
+  to: user_agent.version
+  alias: false
   beat: filebeat
-
-- from: traefik.access.user_agent.user_name
-  to: user.name
-  alias: true
+- from: traefik.access.user_agent.minor
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: traefik.access.user_agent.patch
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: traefik.access.user_agent.os_major
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: traefik.access.user_agent.os_minor
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: traefik.access.user_agent.os_patch
+  to: user_agent.os.version
+  alias: false
   beat: filebeat
 
 - from: traefik.access.geoip.continent_name

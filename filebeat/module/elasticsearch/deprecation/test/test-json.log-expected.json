@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2019-01-30T22:16:20.233Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.cluster.name": "es1",
         "elasticsearch.cluster.uuid": "S4dWw65ZT1eu3SltmAr84A",
@@ -17,7 +16,6 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2019-01-30T22:16:22.388Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.cluster.name": "es1",
         "elasticsearch.cluster.uuid": "S4dWw65ZT1eu3SltmAr84A",
@@ -34,7 +32,6 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2019-01-30T22:16:22.566Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.cluster.name": "es1",
         "elasticsearch.cluster.uuid": "S4dWw65ZT1eu3SltmAr84A",
@@ -51,7 +48,6 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2019-01-30T22:16:24.538Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.cluster.name": "es1",
         "elasticsearch.cluster.uuid": "S4dWw65ZT1eu3SltmAr84A",
@@ -68,7 +64,6 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2019-01-30T22:16:59.311Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.cluster.name": "es1",
         "elasticsearch.cluster.uuid": "S4dWw65ZT1eu3SltmAr84A",
@@ -85,7 +80,6 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2019-01-30T22:16:59.922Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.cluster.name": "es1",
         "elasticsearch.cluster.uuid": "S4dWw65ZT1eu3SltmAr84A",
@@ -102,7 +96,6 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2019-01-30T22:17:00.095Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.cluster.name": "es1",
         "elasticsearch.cluster.uuid": "S4dWw65ZT1eu3SltmAr84A",
@@ -119,7 +112,6 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2019-01-30T22:17:13.226Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.cluster.name": "es1",
         "elasticsearch.cluster.uuid": "S4dWw65ZT1eu3SltmAr84A",
@@ -136,7 +128,6 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2019-01-30T22:17:14.747Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.cluster.name": "es1",
         "elasticsearch.cluster.uuid": "S4dWw65ZT1eu3SltmAr84A",
@@ -153,7 +144,6 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2019-01-30T22:17:14.801Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.cluster.name": "es1",
         "elasticsearch.cluster.uuid": "S4dWw65ZT1eu3SltmAr84A",
@@ -170,7 +160,6 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2019-01-30T22:17:17.546Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.cluster.name": "es1",
         "elasticsearch.cluster.uuid": "S4dWw65ZT1eu3SltmAr84A",
@@ -187,7 +176,6 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2019-01-30T22:18:33.367Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.cluster.name": "es1",
         "elasticsearch.cluster.uuid": "S4dWw65ZT1eu3SltmAr84A",
@@ -204,7 +192,6 @@
         "service.type": "elasticsearch"
     },
     {
-        "@timestamp": "2019-01-30T22:18:46.493Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.cluster.name": "es1",
         "elasticsearch.cluster.uuid": "S4dWw65ZT1eu3SltmAr84A",
