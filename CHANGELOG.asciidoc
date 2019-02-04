@@ -22,6 +22,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Auditbeat*
 
+- Field `file.origin` changed type from `text` to `keyword`. {pull}10544[10544]
+
 *Filebeat*
 
 - Modify apache/error dataset to follow ECS. {pull}8963[8963]
