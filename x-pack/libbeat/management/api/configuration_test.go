@@ -28,7 +28,7 @@ func TestConfiguration(t *testing.T) {
 
 		assert.Equal(t, "false", r.URL.Query().Get("validSetting"))
 
-		fmt.Fprintf(w, `{"configuration_blocks":[{"type":"filebeat.modules","config":{"module":"apache2"}},{"type":"metricbeat.modules","config":{"module":"system","period":"10s"}}]}`)
+		fmt.Fprintf(w, `{"configuration_blocks":[{"type":"filebeat.modules","config":{"_sub_type":"apache2"}},{"type":"metricbeat.modules","config":{"_sub_type":"system","period":"10s"}}]}`)
 	}))
 	defer server.Close()
 
