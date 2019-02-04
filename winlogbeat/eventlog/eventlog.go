@@ -59,6 +59,7 @@ type EventLog interface {
 	// in this event log. Read will resume from the next record. To start reading
 	// from the first event specify a zero-valued EventLogState.
 	Open(state checkpoint.EventLogState) error
+
 	// Read records from the event log.
 	Read() ([]Record, error)
 

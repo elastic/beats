@@ -94,6 +94,7 @@ type eventLogging struct {
 func (l eventLogging) Name() string {
 	return l.name
 }
+
 func (l *eventLogging) Open(state checkpoint.EventLogState) error {
 	detailf("%s Open(recordNumber=%d) calling OpenEventLog(uncServerPath=, "+
 		"providerName=%s)", l.logPrefix, state.RecordNumber, l.name)

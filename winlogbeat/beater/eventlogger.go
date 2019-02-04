@@ -129,6 +129,7 @@ func (e *eventLogger) run(
 			logp.Warn("EventLog[%s] Read() error: %v", api.Name(), err)
 			break
 		}
+
 		debugf("EventLog[%s] Read() returned %d records", api.Name(), len(records))
 		if len(records) == 0 {
 			// TODO: Consider implementing notifications using
