@@ -30,6 +30,13 @@
             events that are published with this identifier are part of the same
             activity.
 
+        - name: computer_name
+          type: keyword
+          required: true
+          description: >
+            The name of the computer that generated the record. When using Windows
+            event forwarding, this name can differ from `agent.hostname`.
+
         - name: event_data
           type: object
           object_type: keyword
@@ -59,13 +66,6 @@
           description: >
             The name of the channel from which this record was read. This value is
             one of the names from the `event_logs` collection in the configuration.
-
-        - name: computer_name
-          type: keyword
-          required: true
-          description: >
-            The name of the computer that generated the record. When using Windows
-            event forwarding, this name can differ from `agent.hostname`.
 
         - name: message_error
           type: keyword

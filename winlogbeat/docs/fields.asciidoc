@@ -3618,6 +3618,18 @@ A globally unique identifier that identifies the current activity. The events th
 
 --
 
+*`winlog.computer_name`*::
++
+--
+type: keyword
+
+required: True
+
+The name of the computer that generated the record. When using Windows event forwarding, this name can differ from `agent.hostname`.
+
+
+--
+
 *`winlog.event_data`*::
 +
 --
@@ -3662,18 +3674,6 @@ type: keyword
 required: True
 
 The name of the channel from which this record was read. This value is one of the names from the `event_logs` collection in the configuration.
-
-
---
-
-*`winlog.computer_name`*::
-+
---
-type: keyword
-
-required: True
-
-The name of the computer that generated the record. When using Windows event forwarding, this name can differ from `agent.hostname`.
 
 
 --
