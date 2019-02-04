@@ -5279,56 +5279,6 @@ Hostname of the agent.
 
 --
 
-*`user_agent.patch`*::
-+
---
-type: keyword
-
-Patch version of the user agent.
-
-
---
-
-*`user_agent.minor`*::
-+
---
-type: keyword
-
-Minor version of the user agent.
-
-
---
-
-*`user_agent.major`*::
-+
---
-type: keyword
-
-Major version of the user agent.
-
-
---
-
-*`user_agent.os.major`*::
-+
---
-type: long
-
-Major version of the operating system.
-
-
---
-
-*`user_agent.os.minor`*::
-+
---
-type: long
-
-Minor version of the operating system.
-
-
---
-
 [[exported-fields-flows_event]]
 == Flow Event fields
 

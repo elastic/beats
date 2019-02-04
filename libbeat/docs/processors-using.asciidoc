@@ -755,7 +755,8 @@ construct a lookup key with the value of the field `metricset.host`.
 Each Beat can define its own default indexers and matchers which are enabled by
 default. For example, FileBeat enables the `container` indexer, which indexes
 pod metadata based on all container IDs, and a `logs_path` matcher, which takes
-the `source` field, extracts the container ID, and uses it to retrieve metadata.
+the `log.file.path` field, extracts the container ID, and uses it to retrieve 
+metadata.
 
 The configuration below enables the processor when {beatname_lc} is run as a pod in
 Kubernetes.

@@ -30,14 +30,11 @@
         "url.query": "-",
         "user.name": "-",
         "user_agent.device.name": "Other",
-        "user_agent.major": "70",
-        "user_agent.minor": "0",
         "user_agent.name": "Chrome",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36",
-        "user_agent.os.full_name": "Mac OS X 10.14.0",
-        "user_agent.os.major": "10",
-        "user_agent.os.minor": "14",
+        "user_agent.os.full": "Mac OS X 10.14.0",
         "user_agent.os.name": "Mac OS X",
-        "user_agent.patch": "3538"
+        "user_agent.os.version": "10.14.0",
+        "user_agent.version": "70.0.3538"
     }
 ]

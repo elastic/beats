@@ -25,15 +25,17 @@ import (
 
 	errw "github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 )
 
 // ImportDashboards tries to import the kibana dashboards.
 func ImportDashboards(
 	ctx context.Context,
-	beatName, hostname, homePath string,
+	beatInfo beat.Info, homePath string,
 	kibanaConfig, dashboardsConfig *common.Config,
 	msgOutputter MessageOutputter,
+	pattern common.MapStr,
 ) error {
 	if dashboardsConfig == nil || !dashboardsConfig.Enabled() {
 		return nil
@@ -41,28 +43,22 @@ func ImportDashboards(
 
 	// unpack dashboard config
 	dashConfig := defaultConfig
-	dashConfig.Beat = beatName
+	dashConfig.Beat = beatInfo.Beat
 	dashConfig.Dir = filepath.Join(homePath, defaultDirectory)
 	err := dashboardsConfig.Unpack(&dashConfig)
 	if err != nil {
 		return err
 	}
 
-	// init kibana config object
-	if kibanaConfig == nil {
-		kibanaConfig = common.NewConfig()
-	}
-
 	if !kibanaConfig.Enabled() {
 		return errors.New("kibana configuration missing for loading dashboards.")
 	}
 
-	return setupAndImportDashboardsViaKibana(ctx, hostname, kibanaConfig, &dashConfig, msgOutputter)
-
+	return setupAndImportDashboardsViaKibana(ctx, beatInfo.Hostname, kibanaConfig, &dashConfig, msgOutputter, pattern)
 }
 
 func setupAndImportDashboardsViaKibana(ctx context.Context, hostname string, kibanaConfig *common.Config,
-	dashboardsConfig *Config, msgOutputter MessageOutputter) error {
+	dashboardsConfig *Config, msgOutputter MessageOutputter, fields common.MapStr) error {
 
 	kibanaLoader, err := NewKibanaLoader(ctx, kibanaConfig, dashboardsConfig, hostname, msgOutputter)
 	if err != nil {
@@ -73,10 +69,11 @@ func setupAndImportDashboardsViaKibana(ctx context.Context, hostname string, kib
 
 	kibanaLoader.statusMsg("Kibana URL %v", kibanaLoader.client.Connection.URL)
 
-	return ImportDashboardsViaKibana(kibanaLoader)
+	return ImportDashboardsViaKibana(kibanaLoader, fields)
 }
 
-func ImportDashboardsViaKibana(kibanaLoader *KibanaLoader) error {
+// ImportDashboardsViaKibana imports Dashboards to Kibana
+func ImportDashboardsViaKibana(kibanaLoader *KibanaLoader, fields common.MapStr) error {
 	version := kibanaLoader.version
 	if !version.IsValid() {
 		return errors.New("No valid kibana version available")
@@ -86,7 +83,7 @@ func ImportDashboardsViaKibana(kibanaLoader *KibanaLoader) error {
 		return fmt.Errorf("Kibana API is not available in Kibana version %s", kibanaLoader.version.String())
 	}
 
-	importer, err := NewImporter(version, kibanaLoader.config, kibanaLoader)
+	importer, err := NewImporter(version, kibanaLoader.config, *kibanaLoader, fields)
 	if err != nil {
 		return fmt.Errorf("fail to create a Kibana importer for loading the dashboards: %v", err)
 	}

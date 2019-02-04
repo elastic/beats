@@ -2610,7 +2610,7 @@ Set if the file has the `setgid` bit set. Omitted otherwise.
 *`file.origin`*::
 +
 --
-type: text
+type: keyword
 
 An array of strings describing a possible external origin for this file. For example, the URL it was downloaded from. Only supported in macOS, via the kMDItemWhereFroms attribute. Omitted if origin information is not available.
 
@@ -5826,56 +5826,6 @@ Operating system kernel version as a raw string.
 type: keyword
 
 Hostname of the agent.
-
-
---
-
-*`user_agent.patch`*::
-+
---
-type: keyword
-
-Patch version of the user agent.
-
-
---
-
-*`user_agent.minor`*::
-+
---
-type: keyword
-
-Minor version of the user agent.
-
-
---
-
-*`user_agent.major`*::
-+
---
-type: keyword
-
-Major version of the user agent.
-
-
---
-
-*`user_agent.os.major`*::
-+
---
-type: long
-
-Major version of the operating system.
-
-
---
-
-*`user_agent.os.minor`*::
-+
---
-type: long
-
-Minor version of the operating system.
 
 
 --

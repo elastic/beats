@@ -21,6 +21,7 @@ The list below covers the major changes between 7.0.0-alpha2 and master only.
 ==== Breaking changes
 - Outputs receive Index Manager as additional parameter. The index manager can
   be used to create an index selector. {pull}10347[10347]
+- Remove support for loading dashboards to Elasticsearch 5. {pull}10451[10451]
 
 ==== Bugfixes
 
@@ -31,3 +32,4 @@ The list below covers the major changes between 7.0.0-alpha2 and master only.
 - Add (*common.Config).Has and (*common.Config).Remove. {pull}10363[10363]
 - Introduce ILM and IndexManagment support to beat.Settings. {pull}10347[10347]
 - Introduce ILM and IndexManagement support to beat.Settings. {pull}10347[10347]
+- Generating index pattern on demand instead of shipping them in the packages. {pull}10478[10478]

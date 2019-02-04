@@ -74,6 +74,8 @@ type Config struct {
 	// Poll configs period
 	Period time.Duration `config:"period" yaml:"period"`
 
+	EventsReporter EventReporterConfig `config:"events_reporter" yaml:"events_reporter"`
+
 	AccessToken string `config:"access_token" yaml:"access_token"`
 
 	Kibana *kibana.ClientConfig `config:"kibana" yaml:"kibana"`
@@ -81,9 +83,19 @@ type Config struct {
 	Blacklist ConfigBlacklistSettings `config:"blacklist" yaml:"blacklist"`
 }
 
+// EventReporterConfig configuration of the events reporter.
+type EventReporterConfig struct {
+	Period       time.Duration `config:"period" yaml:"period"`
+	MaxBatchSize int           `config:"max_batch_size" yaml:"max_batch_size" validate:"nonzero,positive"`
+}
+
 func defaultConfig() *Config {
 	return &Config{
 		Period: 60 * time.Second,
+		EventsReporter: EventReporterConfig{
+			Period:       30 * time.Second,
+			MaxBatchSize: 1000,
+		},
 		Blacklist: ConfigBlacklistSettings{
 			Patterns: map[string]string{
 				"output": "console|file",
