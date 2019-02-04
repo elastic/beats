@@ -96,6 +96,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Migrate system process metricset fields to ECS. {pull}10332[10332]
 - Refactor Prometheus metric mappings {pull}9948[9948]
 - Removed Prometheus stats metricset in favor of just using Prometheus collector {pull}9948[9948]
+- Migrate system socket metricset fields to ECS. {pull}10339[10339]
+- Renamed direction values in sockets to ECS recommendations, from incoming/outcoming to inbound/outbound. {pull}10339[10339]
 - Adjust Redis.info metricset fields to ECS. {pull}10319[10319]
 - Change type of field docker.container.ip_addresses to `ip` instead of `keyword`. {pull}10364[10364]
 - Rename http.request.body field to http.request.body.content. {pull}10315[10315]
