@@ -9,7 +9,7 @@ It is implemented for Linux only.
 [float]
 ==== Example dashboard
 
-The module comes with a sample dashboard:
+The dataset comes with a sample dashboard:
 
 [role="screenshot"]
 image:./images/auditbeat-system-login-dashboard.png[Auditbeat System Login Dashboard]
