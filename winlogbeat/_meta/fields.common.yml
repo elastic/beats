@@ -11,6 +11,7 @@
         The code for this log message (Windows event ID).
 
     - name: event.original
+      overwrite: true
       description: >
         The raw XML representation of the event obtained from Windows. This
         field is only available on operating systems supporting the Windows
