@@ -106,9 +106,6 @@ type winEventLog struct {
 func (l *winEventLog) Name() string {
 	return l.channelName
 }
-func (l *winEventLog) ReOpen(state checkpoint.EventLogState) error {
-	return l.Open(state);
-}
 func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 	var bookmark win.EvtHandle
 	var err error
