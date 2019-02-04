@@ -86,6 +86,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Rename read_timestamp to event.created to align with ECS. {pull}10043[10043], {pull}10139[10139]
 - Rename host.name to host.hostname to align with ECS. {pull}10043[10043]
+- Fix typo in field name. {pull}10525[10525]
 
 *Metricbeat*
 
