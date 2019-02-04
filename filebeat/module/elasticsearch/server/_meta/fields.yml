@@ -4,10 +4,7 @@
   fields:
   - name: stacktrace
     description": Stack trace in case of errors
-    type: keyword
-    multi_fields:
-      - name: text
-        type: text
+    index: false
   - name: gc
     description: "GC log"
     type: group

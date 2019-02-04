@@ -4730,14 +4730,7 @@ Server log file
 *`elasticsearch.server.stacktrace`*::
 +
 --
-type: keyword
-
-*`elasticsearch.server.stacktrace.text`*::
-+
---
-type: text
-
---
+Field is not indexed.
 
 --
 
