@@ -12,12 +12,15 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/auditbeat/core"
+	abtest "github.com/elastic/beats/auditbeat/testing"
 	"github.com/elastic/beats/libbeat/common"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/go-sysinfo/types"
 )
 
 func TestData(t *testing.T) {
+	defer abtest.SetupDataDir(t)()
+
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
