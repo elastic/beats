@@ -79,6 +79,8 @@ func listBrewPackages() ([]*Package, error) {
 			if err != nil {
 				pkg.Error = errors.Wrapf(err, "error reading %v", formulaPath)
 			} else {
+				defer file.Close()
+
 				scanner := bufio.NewScanner(file)
 				count := 15 // only look into the first few lines of the formula
 				for scanner.Scan() {
@@ -92,6 +94,9 @@ func listBrewPackages() ([]*Package, error) {
 					} else if strings.HasPrefix(line, "  homepage ") {
 						pkg.URL = strings.Trim(line[11:], " \"")
 					}
+				}
+				if err = scanner.Err(); err != nil {
+					pkg.Error = errors.Wrapf(err, "error parsing %v", formulaPath)
 				}
 			}
 
