@@ -28,7 +28,7 @@
                         "index": "filebeat-*", 
                         "query": {
                             "language": "lucene", 
-                            "query": "_exists_:nginx AND _exists_:nginx.error.message"
+                            "query": "event.module:nginx AND _exists_:message"
                         }, 
                         "version": true
                     }
@@ -74,7 +74,7 @@
                         "index": "filebeat-*", 
                         "query": {
                             "language": "lucene", 
-                            "query": "_exists_:nginx AND _exists_:nginx.access.url"
+                            "query": "event.module:nginx AND _exists_:url.original"
                         }, 
                         "version": true
                     }

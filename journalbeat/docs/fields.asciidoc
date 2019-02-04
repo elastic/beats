@@ -3674,16 +3674,6 @@ Major version of the user agent.
 
 --
 
-*`user_agent.device`*::
-+
---
-type: keyword
-
-Name of the physical device.
-
-
---
-
 *`user_agent.os.major`*::
 +
 --

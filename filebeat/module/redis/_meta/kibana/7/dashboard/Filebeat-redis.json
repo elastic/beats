@@ -13,7 +13,7 @@
                             "query": {
                                 "query_string": {
                                     "analyze_wildcard": true, 
-                                    "query": "_exists_:redis.log"
+                                    "query": "event.dataset:redis.log"
                                 }
                             }
                         }, 
@@ -86,7 +86,7 @@
                             "query": {
                                 "query_string": {
                                     "analyze_wildcard": true, 
-                                    "query": "_exists_:redis.log"
+                                    "query": "event.dataset:redis.log"
                                 }
                             }
                         }, 
@@ -454,7 +454,7 @@
                             "query": {
                                 "query_string": {
                                     "analyze_wildcard": true, 
-                                    "query": "_exists_:redis.slowlog"
+                                    "query": "event.dataset:redis.slowlog"
                                 }
                             }
                         }, 
