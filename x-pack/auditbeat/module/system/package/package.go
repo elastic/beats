@@ -9,7 +9,6 @@ package pkg
 import (
 	"bufio"
 	"bytes"
-	"encoding/binary"
 	"encoding/gob"
 	"fmt"
 	"io"
