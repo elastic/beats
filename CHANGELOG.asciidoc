@@ -71,6 +71,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Fixed a crash when using af_packet capture {pull}10477[10477]
+
 *Winlogbeat*
 
 *Functionbeat*
