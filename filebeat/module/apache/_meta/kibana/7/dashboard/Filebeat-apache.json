@@ -450,7 +450,7 @@
                         "query": {
                             "query_string": {
                                 "analyze_wildcard": true, 
-                                "query": "_exists_:apache2.error"
+                                "query": "event.dataset:apache.error"
                             }
                         }
                     }
@@ -496,7 +496,7 @@
                         "query": {
                             "query_string": {
                                 "analyze_wildcard": true, 
-                                "query": "_exists_:apache2.access"
+                                "query": "event.dataset:apache.access"
                             }
                         }
                     }
