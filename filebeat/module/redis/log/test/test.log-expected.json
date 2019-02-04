@@ -8,7 +8,7 @@
         "prospector.type": "log",
         "redis.log.level": "notice",
         "redis.log.message": "Saving the final RDB snapshot before exiting.",
-        "redis.log.pid": "98738",
+        "redis.log.pid": 98738,
         "redis.log.role": "master"
     },
     {
@@ -39,6 +39,6 @@
         "offset": 250,
         "prospector.type": "log",
         "redis.log.message": "Received SIGINT scheduling shutdown...",
-        "redis.log.pid": "5092"
+        "redis.log.pid": 5092
     }
 ]
