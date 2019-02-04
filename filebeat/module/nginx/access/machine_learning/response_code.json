@@ -29,7 +29,7 @@
       },
       {
         "url_name": "Raw Data",
-        "url_value": "kibana#/discover/ML-Filebeat-Nginx-Access?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:\u0027$earliest$\u0027,mode:absolute,to:\u0027$latest$\u0027))&_a=(columns:!(_source),filters:!((\u0027$state\u0027:(store:appState),meta:(alias:!n,disabled:!f,index:\u0027filebeat-*\u0027,key:nginx.access.response_code,negate:!f,type:phrase,value:\u0027$nginx.access.response_code$\u0027),query:(match:(nginx.access.response_code:(query:\u0027$nginx.access.response_code$\u0027,type:phrase))))),index:\u0027filebeat-*\u0027,interval:auto,query:(query_string:(analyze_wildcard:!t,query:\u0027_exists_:nginx.access\u0027)),sort:!(\u0027@timestamp\u0027,desc))"
+        "url_value": "kibana#/discover/ML-Filebeat-Nginx-Access?_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:\u0027$earliest$\u0027,mode:absolute,to:\u0027$latest$\u0027))&_a=(columns:!(_source),filters:!((\u0027$state\u0027:(store:appState),meta:(alias:!n,disabled:!f,index:\u0027filebeat-*\u0027,key:nginx.access.response_code,negate:!f,type:phrase,value:\u0027$nginx.access.response_code$\u0027),query:(match:(nginx.access.response_code:(query:\u0027$nginx.access.response_code$\u0027,type:phrase))))),index:\u0027filebeat-*\u0027,interval:auto,query:(query_string:(analyze_wildcard:!t,query:\u0027event.dataset:nginx.access\u0027)),sort:!(\u0027@timestamp\u0027,desc))"
       }
     ]
   }

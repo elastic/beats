@@ -528,7 +528,7 @@
                             "query": {
                                 "query_string": {
                                     "analyze_wildcard": true, 
-                                    "query": "_exists_:nginx"
+                                    "query": "event.module:nginx"
                                 }
                             }
                         }, 
