@@ -3433,12 +3433,45 @@ event.created contains the date on which the event was created. In case of log e
 
 --
 
+*`event.duration`*::
++
+--
+type: long
+
+format: duration
+
+Duration of the event in nanoseconds.
+If event.start and event.end are known this value should be the difference between the end and start time.
+
+
+--
+
+*`event.end`*::
++
+--
+type: date
+
+event.end contains the date when the event ended or when the activity was last observed.
+
+
+--
+
 *`event.type`*::
 +
 --
 type: keyword
 
 A type given to this kind of event which can be used for grouping.
+
+
+--
+
+*`event.start`*::
++
+--
+type: date
+
+event.start contains the date when the event started or when the activity was first observed.
 
 
 --
@@ -3465,6 +3498,18 @@ Elapsed time between request and response in milli seconds.
 
 --
 
+*`http.response.body.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Size in bytes of the response body.
+
+
+--
+
 *`http.response.content_length`*::
 +
 --
@@ -3486,6 +3531,18 @@ Request method.
 --
 
 
+*`source_ecs.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Bytes sent from the source to the destination.
+
+
+--
+
 *`source_ecs.ip`*::
 +
 --
@@ -3503,6 +3560,16 @@ Can be one or multiple IPv4 or IPv6 addresses.
 type: keyword
 
 MAC address of the source.
+
+
+--
+
+*`source_ecs.packets`*::
++
+--
+type: long
+
+Packets sent from the client to the server.
 
 
 --
@@ -3584,6 +3651,28 @@ Region ISO code.
 --
 
 
+*`destination.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Bytes sent from the destination to the source.
+
+
+--
+
+*`destination.domain`*::
++
+--
+type: keyword
+
+Destination domain.
+
+
+--
+
 *`destination.ip`*::
 +
 --
@@ -3601,6 +3690,16 @@ Can be one or multiple IPv4 or IPv6 addresses.
 type: keyword
 
 MAC address of the destination.
+
+
+--
+
+*`destination.packets`*::
++
+--
+type: long
+
+Packets sent from the destination to the source.
 
 
 --
@@ -3817,12 +3916,33 @@ URL fields provide a complete URL, with scheme, host, and path. The URL object c
 
 
 
+*`url.domain`*::
++
+--
+type: keyword
+
+Domain of the request, such as "www.elastic.co".
+In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `domain` field.
+
+
+--
+
 *`url.hostname`*::
 +
 --
 type: keyword
 
 Hostname of the request, such as "elastic.co". In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `hostname` field.
+
+
+--
+
+*`url.path`*::
++
+--
+type: keyword
+
+Path of the request, such as "/search".
 
 
 --
@@ -3858,6 +3978,39 @@ File size in bytes (field is only added when `type` is `file`).
 The network is defined as the communication path over which a host or network event happens. The network.* fields should be populated with details about the network activity associated with an event.
 
 
+
+*`network.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total bytes transferred in both directions. If `source.bytes` and `destination.bytes` are known, `network.bytes` is their sum.
+
+
+--
+
+*`network.packets`*::
++
+--
+type: long
+
+Total packets transferred in both directions. If `source.packets` and `destination.packets` are known, `network.packets` is their sum.
+
+
+--
+
+*`network.protocol`*::
++
+--
+type: keyword
+
+L7 Network protocol name. ex. http, lumberjack, transport protocol.
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS" section.
+
+
+--
 
 *`network.transport`*::
 +
