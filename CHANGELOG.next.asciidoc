@@ -97,6 +97,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 *Journalbeat*
 
 - Add missing journalbeat non breaking fixes. {pull}9106[9106]
+- Do not stop collecting events when journal entries change. {pull}9994[9994]
 
 *Metricbeat*
 
