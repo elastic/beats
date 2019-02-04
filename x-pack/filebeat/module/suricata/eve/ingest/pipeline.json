@@ -249,7 +249,8 @@
                     "suricata.eve.flow.start",
                     "suricata.eve.http.http_method",
                     "suricata.eve.proto",
-                    "suricata.eve.timestamp"
+                    "suricata.eve.timestamp",
+                    "suricata.eve.http.http_user_agent"
                 ],
                 "ignore_missing": true
             }

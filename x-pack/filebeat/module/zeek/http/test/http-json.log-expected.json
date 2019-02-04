@@ -32,8 +32,7 @@
         "url.port": "80",
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
-        "user_agent.os.full_name": "Other",
-        "user_agent.os.name": "Other",
+        "user_agent.original": "com.apple.trustd/2.0",
         "zeek.http.resp_fuids": [
             "F5zuip1tSwASjNAHy7"
         ],
