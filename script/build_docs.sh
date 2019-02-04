@@ -30,7 +30,7 @@ do
   mkdir -p "$dest_dir"
   params="--chunk=1"
   if [ "$PREVIEW" = "1" ]; then
-    params+=" -open chunk=1 -open"
+    params+=" -open"
   fi
 
   if [ ! -z "$resource_dir" ]; then
