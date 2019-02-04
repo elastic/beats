@@ -92,6 +92,7 @@ func DefaultCreator() beat.Creator {
 	return Creator(
 		WithModuleOptions(
 			module.WithMetricSetInfo(),
+			module.WithServiceName(),
 		),
 	)
 }

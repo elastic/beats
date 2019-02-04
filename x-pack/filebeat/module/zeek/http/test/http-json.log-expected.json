@@ -30,7 +30,7 @@
         "url.domain": "ocsp.apple.com",
         "url.original": "/ocsp04-aaica02/ME4wTKADAgEAMEUwQzBBMAkGBSsOAwIaBQAEFNqvF+Za6oA4ceFRLsAWwEInjUhJBBQx6napI3Sl39T97qDBpp7GEQ4R7AIIUP1IOZZ86ns=",
         "url.port": "80",
-        "user_agent.device": "Other",
+        "user_agent.device.name": "Other",
         "user_agent.name": "Other",
         "user_agent.os.full_name": "Other",
         "user_agent.os.name": "Other",

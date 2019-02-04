@@ -164,7 +164,7 @@ alias to: user_agent.original
 --
 type: alias
 
-alias to: user_agent.device
+alias to: user_agent.device.name
 
 --
 
@@ -4284,16 +4284,6 @@ Major version of the user agent.
 
 --
 
-*`user_agent.device`*::
-+
---
-type: keyword
-
-Name of the physical device.
-
-
---
-
 *`user_agent.os.major`*::
 +
 --
@@ -4326,6 +4316,39 @@ elasticsearch Module
 
 
 
+
+*`elasticsearch.component`*::
++
+--
+type: keyword
+
+example: o.e.c.m.MetaDataCreateIndexService
+
+Elasticsearch component from where the log event originated
+
+--
+
+*`elasticsearch.cluster.uuid`*::
++
+--
+type: keyword
+
+example: GmvrbHlNTiSVYiPf8kxg9g
+
+UUID of the cluster
+
+--
+
+*`elasticsearch.cluster.name`*::
++
+--
+type: keyword
+
+example: docker-cluster
+
+Name of the cluster
+
+--
 
 *`elasticsearch.node.id`*::
 +
@@ -5754,7 +5777,7 @@ alias to: host.hostname
 --
 type: alias
 
-alias to: user_agent.device
+alias to: user_agent.device.name
 
 --
 
@@ -10846,7 +10869,7 @@ alias to: user_agent.original
 --
 type: alias
 
-alias to: user_agent.device
+alias to: user_agent.device.name
 
 --
 
@@ -13520,7 +13543,7 @@ alias to: user_agent.original
 --
 type: alias
 
-alias to: user_agent.device
+alias to: user_agent.device.name
 
 --
 

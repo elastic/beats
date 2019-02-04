@@ -235,6 +235,13 @@
         },
         {
             "rename": {
+                "field": "user_agent.device",
+                "target_field": "user_agent.device.name",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
                 "field": "user_agent.os",
                 "target_field": "user_agent.temp_os",
                 "ignore_missing": true
