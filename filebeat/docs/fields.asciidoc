@@ -6442,7 +6442,7 @@ Component the log is coming from.
 *`kafka.log.class`*::
 +
 --
-type: text
+type: keyword
 
 Java class the log is coming from.
 
@@ -6472,16 +6472,6 @@ Java class the trace is coming from.
 type: text
 
 Message part of the trace.
-
-
---
-
-*`kafka.log.trace.full`*::
-+
---
-type: text
-
-The full trace in the log line.
 
 
 --
