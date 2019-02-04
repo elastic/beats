@@ -35,7 +35,7 @@ var (
 )
 
 func TestEmpty(t *testing.T) {
-	trans, err := newFieldsTransformer(version, common.Fields{})
+	trans, err := newFieldsTransformer(version, common.Fields{}, true)
 	assert.NoError(t, err)
 	out, err := trans.transform()
 	assert.NoError(t, err)
@@ -93,7 +93,7 @@ func TestEmpty(t *testing.T) {
 
 func TestMissingVersion(t *testing.T) {
 	var c *common.Version
-	_, err := newFieldsTransformer(c, common.Fields{})
+	_, err := newFieldsTransformer(c, common.Fields{}, true)
 	assert.Error(t, err)
 }
 
@@ -118,9 +118,10 @@ func TestDuplicateField(t *testing.T) {
 		}},
 	}
 	for _, testCase := range testCases {
-		trans, err := newFieldsTransformer(version, testCase.commonFields)
+		trans, err := newFieldsTransformer(version, testCase.commonFields, true)
 		require.NoError(t, err)
 		_, err = trans.transform()
+		fmt.Println(err)
 		assert.Error(t, err)
 	}
 }
@@ -151,7 +152,7 @@ func TestValidDuplicateField(t *testing.T) {
 			},
 		},
 	}
-	trans, err := newFieldsTransformer(version, commonFields)
+	trans, err := newFieldsTransformer(version, commonFields, true)
 	require.NoError(t, err)
 	transformed, err := trans.transform()
 	require.NoError(t, err)
@@ -179,7 +180,7 @@ func TestInvalidVersion(t *testing.T) {
 			},
 		},
 	}
-	trans, err := newFieldsTransformer(version, commonFields)
+	trans, err := newFieldsTransformer(version, commonFields, true)
 	assert.NoError(t, err)
 	_, err = trans.transform()
 	assert.Error(t, err)
@@ -206,7 +207,7 @@ func TestTransformTypes(t *testing.T) {
 		{commonField: common.Field{Type: "invalid"}, expected: nil},
 	}
 	for idx, test := range tests {
-		trans, _ := newFieldsTransformer(version, common.Fields{test.commonField})
+		trans, _ := newFieldsTransformer(version, common.Fields{test.commonField}, true)
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
 		out := transformed["fields"].([]common.MapStr)[0]
@@ -251,7 +252,7 @@ func TestTransformGroup(t *testing.T) {
 		},
 	}
 	for idx, test := range tests {
-		trans, _ := newFieldsTransformer(version, test.commonFields)
+		trans, _ := newFieldsTransformer(version, test.commonFields, false)
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
 		out := transformed["fields"].([]common.MapStr)
@@ -327,7 +328,7 @@ func TestTransformMisc(t *testing.T) {
 		{commonField: common.Field{Script: "doc[]"}, expected: "painless", attr: "lang"},
 	}
 	for idx, test := range tests {
-		trans, _ := newFieldsTransformer(version, common.Fields{test.commonField})
+		trans, _ := newFieldsTransformer(version, common.Fields{test.commonField}, true)
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
 		out := transformed["fields"].([]common.MapStr)[0]
@@ -526,7 +527,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 		},
 	}
 	for idx, test := range tests {
-		trans, _ := newFieldsTransformer(test.version, common.Fields{test.commonField})
+		trans, _ := newFieldsTransformer(test.version, common.Fields{test.commonField}, true)
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
 		out := transformed["fieldFormatMap"]
@@ -594,7 +595,7 @@ func TestTransformGroupAndEnabled(t *testing.T) {
 		},
 	}
 	for idx, test := range tests {
-		trans, _ := newFieldsTransformer(version, test.commonFields)
+		trans, _ := newFieldsTransformer(version, test.commonFields, true)
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
 		out := transformed["fields"].([]common.MapStr)
@@ -614,7 +615,7 @@ func TestTransformMultiField(t *testing.T) {
 			common.Field{Name: "text", Type: "text"},
 		},
 	}
-	trans, _ := newFieldsTransformer(version, common.Fields{f})
+	trans, _ := newFieldsTransformer(version, common.Fields{f}, true)
 	transformed, err := trans.transform()
 	assert.NoError(t, err)
 	out := transformed["fields"].([]common.MapStr)

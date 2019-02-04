@@ -227,62 +227,6 @@
             }
         },
         {
-            "rename": {
-                "field": "suricata.eve.http.http_user_agent",
-                "target_field": "user_agent.original",
-                "ignore_missing": true
-            }
-        },
-        {
-            "rename": {
-                "field": "user_agent.device",
-                "target_field": "user_agent.device.name",
-                "ignore_missing": true
-            }
-        },
-        {
-            "rename": {
-                "field": "user_agent.os",
-                "target_field": "user_agent.temp_os",
-                "ignore_missing": true
-            }
-        },
-        {
-            "rename": {
-                "field": "user_agent.temp_os",
-                "target_field": "user_agent.os.full_name",
-                "ignore_missing": true
-            }
-        },
-        {
-            "rename": {
-                "field": "user_agent.os_name",
-                "target_field": "user_agent.os.name",
-                "ignore_missing": true
-            }
-        },
-        {
-            "rename": {
-                "field": "user_agent.os_version",
-                "target_field": "user_agent.os.version",
-                "ignore_missing": true
-            }
-        },
-        {
-            "rename": {
-                "field": "user_agent.os_major",
-                "target_field": "user_agent.os.major",
-                "ignore_missing": true
-            }
-        },
-        {
-            "rename": {
-                "field": "user_agent.os_minor",
-                "target_field": "user_agent.os.minor",
-                "ignore_missing": true
-            }
-        },
-        {
             "geoip": {
                 "field": "source.ip",
                 "target_field": "source.geo",
@@ -305,7 +249,8 @@
                     "suricata.eve.flow.start",
                     "suricata.eve.http.http_method",
                     "suricata.eve.proto",
-                    "suricata.eve.timestamp"
+                    "suricata.eve.timestamp",
+                    "suricata.eve.http.http_user_agent"
                 ],
                 "ignore_missing": true
             }
