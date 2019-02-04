@@ -1,0 +1,263 @@
+[
+    {
+        "nats" : {
+            "log" : {
+                "level" : "INF",
+                "context" : "Starting nats-server version 1.3.0",
+                "pid" : "1"
+            }
+        },
+        "log" : {
+            "offset" : 0
+        },
+        "fileset" : {
+            "name" : "log"
+        },
+        "input" : {
+            "type" : "log"
+        },
+        "@timestamp" : "2019-02-06T07:19:40.624Z",
+        "ecs" : {
+            "version" : "1.0.0-beta2"
+        },
+        "service" : {
+            "type" : "nats"
+        },
+        "event" : {
+            "module" : "nats",
+            "dataset" : "nats.log"
+        }
+    },
+    {
+        "nats" : {
+            "log" : {
+                "level" : "INF",
+                "context" : "Listening for client connections on 0.0.0.0:4222",
+                "pid" : "1"
+            }
+        },
+        "log" : {
+            "offset" : 266
+        },
+        "fileset" : {
+            "name" : "log"
+        },
+        "input" : {
+            "type" : "log"
+        },
+        "@timestamp" : "2019-02-06T07:19:40.624Z",
+        "ecs" : {
+            "version" : "1.0.0-beta2"
+        },
+        "service" : {
+            "type" : "nats"
+        },
+        "event" : {
+            "module" : "nats",
+            "dataset" : "nats.log"
+        }
+    },
+    {
+        "nats" : {
+            "log" : {
+                "level" : "DBG",
+                "context" : "172.18.0.1:38630 - cid:1 - Client connection created",
+                "pid" : "1"
+            }
+        },
+        "log" : {
+            "offset" : 478
+        },
+        "fileset" : {
+            "name" : "log"
+        },
+        "input" : {
+            "type" : "log"
+        },
+        "@timestamp" : "2019-02-06T07:20:08.508Z",
+        "ecs" : {
+            "version" : "1.0.0-beta2"
+        },
+        "service" : {
+            "type" : "nats"
+        },
+        "event" : {
+            "module" : "nats",
+            "dataset" : "nats.log"
+        }
+    },
+    {
+        "nats" : {
+            "log" : {
+                "level" : "TRC",
+                "context" : "172.18.0.1:38630 - cid:1 - ->> [SUB foo  1]",
+                "pid" : "1"
+            }
+        },
+        "log" : {
+            "offset" : 1021
+        },
+        "fileset" : {
+            "name" : "log"
+        },
+        "input" : {
+            "type" : "log"
+        },
+        "@timestamp" : "2019-02-06T07:20:08.512Z",
+        "ecs" : {
+            "version" : "1.0.0-beta2"
+        },
+        "service" : {
+            "type" : "nats"
+        },
+        "event" : {
+            "module" : "nats",
+            "dataset" : "nats.log"
+        }
+    },
+    {
+        "nats" : {
+            "log" : {
+                "level" : "TRC",
+                "context" : "172.18.0.1:38630 - cid:1 - ->> [PING]",
+                "pid" : "1"
+            }
+        },
+        "log" : {
+            "offset" : 1102
+        },
+        "fileset" : {
+            "name" : "log"
+        },
+        "input" : {
+            "type" : "log"
+        },
+        "@timestamp" : "2019-02-06T07:20:08.512Z",
+        "ecs" : {
+            "version" : "1.0.0-beta2"
+        },
+        "service" : {
+            "type" : "nats"
+        },
+        "event" : {
+            "module" : "nats",
+            "dataset" : "nats.log"
+        }
+    },
+    {
+        "nats" : {
+            "log" : {
+                "level" : "TRC",
+                "context" : "172.18.0.1:38630 - cid:1 - <<- [PONG]",
+                "pid" : "1"
+            }
+        },
+        "log" : {
+            "offset" : 1177
+        },
+        "fileset" : {
+            "name" : "log"
+        },
+        "input" : {
+            "type" : "log"
+        },
+        "@timestamp" : "2019-02-06T07:20:08.512Z",
+        "ecs" : {
+            "version" : "1.0.0-beta2"
+        },
+        "service" : {
+            "type" : "nats"
+        },
+        "event" : {
+            "module" : "nats",
+            "dataset" : "nats.log"
+        }
+    },
+    {
+        "nats" : {
+            "log" : {
+                "level" : "INF",
+                "context" : "Git commit [eed4fbc]",
+                "pid" : "1"
+            }
+        },
+        "log" : {
+            "offset" : 133
+        },
+        "fileset" : {
+            "name" : "log"
+        },
+        "input" : {
+            "type" : "log"
+        },
+        "@timestamp" : "2019-02-06T07:19:40.624Z",
+        "ecs" : {
+            "version" : "1.0.0-beta2"
+        },
+        "service" : {
+            "type" : "nats"
+        },
+        "event" : {
+            "module" : "nats",
+            "dataset" : "nats.log"
+        }
+    },
+    {
+        "nats" : {
+            "log" : {
+                "level" : "INF",
+                "context" : "Server is ready",
+                "pid" : "1"
+            }
+        },
+        "log" : {
+            "offset" : 425
+        },
+        "fileset" : {
+            "name" : "log"
+        },
+        "input" : {
+            "type" : "log"
+        },
+        "@timestamp" : "2019-02-06T07:19:40.624Z",
+        "ecs" : {
+            "version" : "1.0.0-beta2"
+        },
+        "service" : {
+            "type" : "nats"
+        },
+        "event" : {
+            "module" : "nats",
+            "dataset" : "nats.log"
+        }
+    },
+    {
+        "nats" : {
+            "log" : {
+                "level" : "TRC",
+                "context" : "172.18.0.1:38630 - cid:1 - ->> [CONNECT {\"verbose\":false,\"pedantic\":false,\"tls_required\":false,\"name\":\"NATS Benchmark\",\"lang\":\"go\",\"version\":\"1.7.0\",\"protocol\":1,\"echo\":true}]",
+                "pid" : "1"
+            }
+        },
+        "log" : {
+            "offset" : 568
+        },
+        "fileset" : {
+            "name" : "log"
+        },
+        "input" : {
+            "type" : "log"
+        },
+        "@timestamp" : "2019-02-06T07:20:08.510Z",
+        "ecs" : {
+            "version" : "1.0.0-beta2"
+        },
+        "service" : {
+            "type" : "nats"
+        },
+        "event" : {
+            "module" : "nats",
+            "dataset" : "nats.log"
+        }
+    }
+]
