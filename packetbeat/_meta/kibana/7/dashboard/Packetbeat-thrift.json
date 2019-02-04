@@ -188,7 +188,7 @@
               "enabled": true,
               "id": "2",
               "params": {
-                "field": "http.request.method",
+                "field": "method",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -371,7 +371,7 @@
             {
               "id": "2",
               "params": {
-                "field": "http.request.method",
+                "field": "method",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -424,7 +424,7 @@
             {
               "id": "2",
               "params": {
-                "field": "http.request.method",
+                "field": "method",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
@@ -452,9 +452,9 @@
     {
       "attributes": {
         "columns": [
-          "http.request.method",
+          "method",
           "type",
-          "url.path",
+          "path",
           "event.duration",
           "status"
         ],
@@ -530,9 +530,9 @@
     {
       "attributes": {
         "columns": [
-          "http.request.method",
+          "method",
           "type",
-          "url.path",
+          "path",
           "event.duration",
           "status"
         ],

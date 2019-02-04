@@ -97,7 +97,7 @@
               "enabled": true,
               "id": "4",
               "params": {
-                "field": "http.request.method",
+                "field": "method",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -246,7 +246,7 @@
               "enabled": true,
               "id": "3",
               "params": {
-                "field": "http.request.method",
+                "field": "method",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -1112,9 +1112,9 @@
     {
       "attributes": {
         "columns": [
-          "http.request.method",
+          "method",
           "type",
-          "url.path",
+          "path",
           "event.duration",
           "status",
           "query"
@@ -1192,9 +1192,9 @@
     {
       "attributes": {
         "columns": [
-          "http.request.method",
+          "method",
           "type",
-          "url.path",
+          "path",
           "event.duration",
           "status",
           "query"

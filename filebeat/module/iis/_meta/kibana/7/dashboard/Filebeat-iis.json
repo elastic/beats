@@ -224,7 +224,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "iis.access.user_agent.name", 
+                                "field": "user_agent.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -296,7 +296,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "iis.access.user_agent.os_name", 
+                                "field": "user_agent.os.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5

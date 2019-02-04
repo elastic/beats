@@ -58,66 +58,33 @@
             "version": "7.0.0"
           }
         ],
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
         "timeRestore": false,
-        "title": "[Journalbeat] Overview",
+        "title": "[Journalbeat] Overview ECS",
         "version": 1
       },
-      "id": "effdfcd0-2877-11e9-bc7e-af96a8fe0ddd",
+      "id": "effdfcd0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
       "migrationVersion": {
         "dashboard": "7.0.0"
       },
       "references": [
         {
-          "id": "25251fc0-2877-11e9-bc7e-af96a8fe0ddd",
+          "id": "25251fc0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
           "name": "panel_0",
           "type": "search"
         },
         {
-          "id": "52a2a1c0-2877-11e9-bc7e-af96a8fe0ddd",
+          "id": "52a2a1c0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
           "name": "panel_1",
           "type": "search"
         },
         {
-          "id": "842a1340-2877-11e9-bc7e-af96a8fe0ddd",
+          "id": "842a1340-2877-11e9-bc7e-af96a8fe0ddd-ecs",
           "name": "panel_2",
           "type": "search"
         }
       ],
       "type": "dashboard",
       "updated_at": "2019-02-04T12:25:20.413Z",
-=======
-        "title": "[Journalbeat] Systemd messages 7.x",
-=======
-        "title": "[Journalbeat] Systemd messages",
->>>>>>> checkout again
-=======
-        "title": "[Journalbeat] Systemd messages ECS",
->>>>>>> apply changes to all dashboards
-=======
-        "title": "[Journalbeat] Systemd messages",
->>>>>>> reset dashboards
-=======
-        "title": "[Journalbeat] Systemd messages ECS",
->>>>>>> change all dashboards
-=======
-        "title": "[Journalbeat] Systemd messages",
->>>>>>> reset dashboards
-=======
-        "title": "[Journalbeat] Systemd messages ECS",
->>>>>>> change dashboards
-        "version": 1
-      },
-      "id": "aa003e90-e2b9-11e8-9f52-734e93de180d-ecs",
-      "type": "search",
-      "updated_at": "2018-11-07T18:19:28.377Z",
->>>>>>> Introduce migration script for data in Kibana files
       "version": 1
     },
     {
@@ -149,14 +116,7 @@
         "title": "[Journalbeat] Kernel errors ECS",
         "version": 1
       },
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-      "id": "25251fc0-2877-11e9-bc7e-af96a8fe0ddd",
+      "id": "25251fc0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
       "migrationVersion": {
         "search": "7.0.0"
       },
@@ -167,27 +127,6 @@
           "type": "index-pattern"
         }
       ],
-=======
-      "id": "5db75310-e2ba-11e8-9f52-734e93de180d-7x",
->>>>>>> Introduce migration script for data in Kibana files
-=======
-      "id": "5db75310-e2ba-11e8-9f52-734e93de180d",
->>>>>>> checkout again
-=======
-      "id": "5db75310-e2ba-11e8-9f52-734e93de180d-ecs",
->>>>>>> apply changes to all dashboards
-=======
-      "id": "5db75310-e2ba-11e8-9f52-734e93de180d",
->>>>>>> reset dashboards
-=======
-      "id": "5db75310-e2ba-11e8-9f52-734e93de180d-ecs",
->>>>>>> change all dashboards
-=======
-      "id": "5db75310-e2ba-11e8-9f52-734e93de180d",
->>>>>>> reset dashboards
-=======
-      "id": "5db75310-e2ba-11e8-9f52-734e93de180d-ecs",
->>>>>>> change dashboards
       "type": "search",
       "updated_at": "2019-02-04T12:19:40.092Z",
       "version": 1
@@ -218,17 +157,10 @@
           "@timestamp",
           "desc"
         ],
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "title": "[Journalbeat] Authorization",
+        "title": "[Journalbeat] Authorization ECS",
         "version": 1
       },
-      "id": "52a2a1c0-2877-11e9-bc7e-af96a8fe0ddd",
+      "id": "52a2a1c0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
       "migrationVersion": {
         "search": "7.0.0"
       },
@@ -239,48 +171,6 @@
           "type": "index-pattern"
         }
       ],
-=======
-        "title": "[Journalbeat] Login authorization 7.x",
-        "version": 1
-      },
-      "id": "82408120-e2ba-11e8-9f52-734e93de180d-7x",
->>>>>>> Introduce migration script for data in Kibana files
-=======
-        "title": "[Journalbeat] Login authorization",
-        "version": 1
-      },
-      "id": "82408120-e2ba-11e8-9f52-734e93de180d",
->>>>>>> checkout again
-=======
-        "title": "[Journalbeat] Login authorization ECS",
-        "version": 1
-      },
-      "id": "82408120-e2ba-11e8-9f52-734e93de180d-ecs",
->>>>>>> apply changes to all dashboards
-=======
-        "title": "[Journalbeat] Login authorization",
-        "version": 1
-      },
-      "id": "82408120-e2ba-11e8-9f52-734e93de180d",
->>>>>>> reset dashboards
-=======
-        "title": "[Journalbeat] Login authorization ECS",
-        "version": 1
-      },
-      "id": "82408120-e2ba-11e8-9f52-734e93de180d-ecs",
->>>>>>> change all dashboards
-=======
-        "title": "[Journalbeat] Login authorization",
-        "version": 1
-      },
-      "id": "82408120-e2ba-11e8-9f52-734e93de180d",
->>>>>>> reset dashboards
-=======
-        "title": "[Journalbeat] Login authorization ECS",
-        "version": 1
-      },
-      "id": "82408120-e2ba-11e8-9f52-734e93de180d-ecs",
->>>>>>> change dashboards
       "type": "search",
       "updated_at": "2019-02-04T12:20:56.412Z",
       "version": 1
@@ -310,17 +200,10 @@
           "@timestamp",
           "desc"
         ],
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        "title": "[Journalbeat] Systemd messages",
+        "title": "[Journalbeat] Systemd messages ECS",
         "version": 1
       },
-      "id": "842a1340-2877-11e9-bc7e-af96a8fe0ddd",
+      "id": "842a1340-2877-11e9-bc7e-af96a8fe0ddd-ecs",
       "migrationVersion": {
         "search": "7.0.0"
       },
@@ -331,82 +214,9 @@
           "type": "index-pattern"
         }
       ],
-=======
-        "title": "[Journalbeat] USB and HID messages 7.x",
-        "version": 1
-      },
-      "id": "f0232670-e2ba-11e8-9f52-734e93de180d-7x",
->>>>>>> Introduce migration script for data in Kibana files
-=======
-        "title": "[Journalbeat] USB and HID messages",
-        "version": 1
-      },
-      "id": "f0232670-e2ba-11e8-9f52-734e93de180d",
->>>>>>> checkout again
-=======
-        "title": "[Journalbeat] USB and HID messages ECS",
-        "version": 1
-      },
-      "id": "f0232670-e2ba-11e8-9f52-734e93de180d-ecs",
->>>>>>> apply changes to all dashboards
-=======
-        "title": "[Journalbeat] USB and HID messages",
-        "version": 1
-      },
-      "id": "f0232670-e2ba-11e8-9f52-734e93de180d",
->>>>>>> reset dashboards
-=======
-        "title": "[Journalbeat] USB and HID messages ECS",
-        "version": 1
-      },
-      "id": "f0232670-e2ba-11e8-9f52-734e93de180d-ecs",
->>>>>>> change all dashboards
-=======
-        "title": "[Journalbeat] USB and HID messages",
-        "version": 1
-      },
-      "id": "f0232670-e2ba-11e8-9f52-734e93de180d",
->>>>>>> reset dashboards
-=======
-        "title": "[Journalbeat] USB and HID messages ECS",
-        "version": 1
-      },
-      "id": "f0232670-e2ba-11e8-9f52-734e93de180d-ecs",
->>>>>>> change dashboards
       "type": "search",
       "updated_at": "2019-02-04T12:22:19.508Z",
       "version": 1
-<<<<<<< HEAD
-=======
-    },
-    {
-      "attributes": {
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "lucene",
-              "query": ""
-            }
-          }
-        },
-        "optionsJSON": {
-          "darkTheme": false,
-          "hidePanelTitles": false,
-          "useMargins": true
-        },
-        "panelsJSON": null,
-        "timeRestore": false,
-        "title": "[Journalbeat] Overview ECS",
-        "version": 1
-      },
-      "id": "f2de4440-e2b9-11e8-9f52-734e93de180d-ecs",
-      "type": "dashboard",
-      "updated_at": "2018-11-07T18:30:18.083Z",
-      "version": 2
->>>>>>> Introduce migration script for data in Kibana files
     }
   ],
   "version": "7.0.0"

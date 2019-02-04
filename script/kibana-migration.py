@@ -46,6 +46,8 @@ def read_migration_fields():
             if "to" in k and "from" in k:
                 if "rename" in k and k["rename"] is False:
                     continue
+                if k["alias"] == False:
+                    continue
                 if not isinstance(k["to"], basestring):
                     continue
 

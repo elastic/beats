@@ -186,7 +186,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "user_agent.major", 
+                                "field": "apache2.access.user_agent.major", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5

@@ -207,7 +207,7 @@
               "enabled": true,
               "id": "3",
               "params": {
-                "field": "http.request.method",
+                "field": "method",
                 "missingBucket": false,
                 "missingBucketLabel": "Missing",
                 "order": "desc",
@@ -624,14 +624,14 @@
                       "query": {
                         "query_string": {
                           "analyze_wildcard": true,
-                          "query": "http.request.method: SELECT"
+                          "query": "method: SELECT"
                         }
                       }
                     }
                   },
                   {
                     "input": {
-                      "query": "http.request.method: INSERT OR http.request.method: UPDATE OR http.request.method: DELETE"
+                      "query": "method: INSERT OR method: UPDATE OR method: DELETE"
                     }
                   }
                 ]
@@ -876,9 +876,9 @@
     {
       "attributes": {
         "columns": [
-          "http.request.method",
+          "method",
           "type",
-          "url.path",
+          "path",
           "event.duration",
           "status"
         ],
@@ -975,9 +975,9 @@
     {
       "attributes": {
         "columns": [
-          "http.request.method",
+          "method",
           "type",
-          "url.path",
+          "path",
           "event.duration",
           "status"
         ],

@@ -28,7 +28,7 @@
                             "id": "1", 
                             "params": {
                                 "customLabel": "Query time", 
-                                "field": "event.duration"
+                                "field": "mysql.slowlog.query_time.sec"
                             }, 
                             "schema": "metric", 
                             "type": "max"

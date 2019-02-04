@@ -1411,7 +1411,7 @@
           "server.port",
           "event.dataset",
           "query",
-          "http.request.method",
+          "method",
           "event.duration",
           "status"
         ],
@@ -1490,7 +1490,7 @@
           "server.port",
           "event.dataset",
           "query",
-          "http.request.method",
+          "method",
           "event.duration",
           "status"
         ],
