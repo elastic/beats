@@ -1092,12 +1092,32 @@ The state of the instance (pending | running | shutting-down | terminated | stop
 
 
 
+*`aws.s3.bucket.name`*::
++
+--
+type: keyword
+
+Name of a S3 bucket.
+
+
+--
+
 *`aws.s3.bucket.size.bytes`*::
 +
 --
 type: scaled_float
 
 The amount of data in bytes stored in a bucket.
+
+
+--
+
+*`aws.s3.bucket.storage.type`*::
++
+--
+type: keyword
+
+Storage type specified for each S3 bucket.
 
 
 --
