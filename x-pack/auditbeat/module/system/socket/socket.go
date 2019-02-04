@@ -144,7 +144,7 @@ func (s Socket) toMapStr() common.MapStr {
 	}
 
 	switch s.Direction {
-	case sock.Outgoing:
+	case sock.Outbound:
 		mapstr.Put("source", common.MapStr{
 			"ip":   s.LocalIP,
 			"port": s.LocalPort,
@@ -153,7 +153,7 @@ func (s Socket) toMapStr() common.MapStr {
 			"ip":   s.RemoteIP,
 			"port": s.RemotePort,
 		})
-	case sock.Incoming:
+	case sock.Inbound:
 		mapstr.Put("source", common.MapStr{
 			"ip":   s.RemoteIP,
 			"port": s.RemotePort,
@@ -180,9 +180,9 @@ func (s Socket) toMapStr() common.MapStr {
 // to be compatible with recommended ECS values for network.direction.
 func ecsDirectionString(direction sock.Direction) string {
 	switch direction {
-	case sock.Incoming:
+	case sock.Inbound:
 		return "inbound"
-	case sock.Outgoing:
+	case sock.Outbound:
 		return "outbound"
 	case sock.Listening:
 		return "listening"
@@ -330,10 +330,10 @@ func socketMessage(socket *Socket, action eventAction) string {
 
 	var endpointString string
 	switch socket.Direction {
-	case sock.Incoming:
+	case sock.Inbound:
 		endpointString = fmt.Sprintf("%v:%d -> %v:%d",
 			socket.RemoteIP, socket.RemotePort, socket.LocalIP, socket.LocalPort)
-	case sock.Outgoing:
+	case sock.Outbound:
 		endpointString = fmt.Sprintf("%v:%d -> %v:%d",
 			socket.LocalIP, socket.LocalPort, socket.RemoteIP, socket.RemotePort)
 	case sock.Listening:

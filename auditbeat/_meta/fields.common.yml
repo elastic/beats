@@ -19,7 +19,7 @@
       description: Set if the file has the `setgid` bit set. Omitted otherwise.
 
     - name: origin
-      type: text
+      type: keyword
       description: >
           An array of strings describing a possible external origin for
           this file. For example, the URL it was downloaded from. Only
