@@ -32,6 +32,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
+	helper "github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/paths"
 )
@@ -132,10 +133,12 @@ func NewCheckpoint(file string, maxUpdates int, interval time.Duration) (*Checkp
 func (c *Checkpoint) findRegistryFile() error {
 	migratedPath := paths.Resolve(paths.Data, c.file)
 
-	fs, err := os.Stat(filename)
+	fs, err := os.Stat(c.file)
 	if os.IsNotExist(err) {
 		c.file = migratedPath
 		return nil
+	} else if err != nil {
+		return fmt.Errorf("error accessing previous registry file: %+v", err)
 	}
 
 	f, err := os.Open(c.file)
@@ -154,7 +157,7 @@ func (c *Checkpoint) findRegistryFile() error {
 		return err
 	}
 
-	err = os.Rename(c.file, c.file+".bak")
+	err = helper.SafeFileRotate(c.file, c.file+".bak")
 	if err != nil {
 		return fmt.Errorf("error backuping old registry: +v", err)
 	}
