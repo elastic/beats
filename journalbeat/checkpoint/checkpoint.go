@@ -159,7 +159,7 @@ func (c *Checkpoint) findRegistryFile() error {
 
 	err = helper.SafeFileRotate(c.file, c.file+".bak")
 	if err != nil {
-		return fmt.Errorf("error backuping old registry: +v", err)
+		return fmt.Errorf("error backuping old registry: %+v", err)
 	}
 
 	c.file = migratedPath
