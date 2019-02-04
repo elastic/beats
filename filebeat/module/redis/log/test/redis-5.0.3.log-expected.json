@@ -8,7 +8,7 @@
         "prospector.type": "log",
         "redis.log.level": "notice",
         "redis.log.message": "Synchronization with replica 10.114.208.18:6023 succeeded",
-        "redis.log.pid": "26571",
+        "redis.log.pid": 26571,
         "redis.log.role": "master"
     }
 ]
