@@ -168,33 +168,6 @@ alias to: user_agent.device.name
 
 --
 
-*`apache2.access.user_agent.major`*::
-+
---
-type: alias
-
-alias to: user_agent.major
-
---
-
-*`apache2.access.user_agent.minor`*::
-+
---
-type: alias
-
-alias to: user_agent.minor
-
---
-
-*`apache2.access.user_agent.patch`*::
-+
---
-type: alias
-
-alias to: user_agent.patch
-
---
-
 *`apache2.access.user_agent.name`*::
 +
 --
@@ -210,24 +183,6 @@ alias to: user_agent.name
 type: alias
 
 alias to: user_agent.os.full_name
-
---
-
-*`apache2.access.user_agent.os_major`*::
-+
---
-type: alias
-
-alias to: user_agent.os.major
-
---
-
-*`apache2.access.user_agent.os_minor`*::
-+
---
-type: alias
-
-alias to: user_agent.os.minor
 
 --
 
@@ -4254,56 +4209,6 @@ Hostname of the agent.
 
 --
 
-*`user_agent.patch`*::
-+
---
-type: keyword
-
-Patch version of the user agent.
-
-
---
-
-*`user_agent.minor`*::
-+
---
-type: keyword
-
-Minor version of the user agent.
-
-
---
-
-*`user_agent.major`*::
-+
---
-type: keyword
-
-Major version of the user agent.
-
-
---
-
-*`user_agent.os.major`*::
-+
---
-type: long
-
-Major version of the operating system.
-
-
---
-
-*`user_agent.os.minor`*::
-+
---
-type: long
-
-Minor version of the operating system.
-
-
---
-
 [[exported-fields-elasticsearch]]
 == elasticsearch fields
 
@@ -5781,33 +5686,6 @@ alias to: user_agent.device.name
 
 --
 
-*`iis.access.user_agent.major`*::
-+
---
-type: alias
-
-alias to: user_agent.major
-
---
-
-*`iis.access.user_agent.minor`*::
-+
---
-type: alias
-
-alias to: user_agent.minor
-
---
-
-*`iis.access.user_agent.patch`*::
-+
---
-type: alias
-
-alias to: user_agent.patch
-
---
-
 *`iis.access.user_agent.name`*::
 +
 --
@@ -5823,24 +5701,6 @@ alias to: user_agent.name
 type: alias
 
 alias to: user_agent.os.full_name
-
---
-
-*`iis.access.user_agent.os_major`*::
-+
---
-type: alias
-
-alias to: user_agent.os.major
-
---
-
-*`iis.access.user_agent.os_minor`*::
-+
---
-type: alias
-
-alias to: user_agent.os.minor
 
 --
 
@@ -10863,33 +10723,6 @@ alias to: user_agent.device.name
 
 --
 
-*`nginx.access.user_agent.major`*::
-+
---
-type: alias
-
-alias to: user_agent.major
-
---
-
-*`nginx.access.user_agent.minor`*::
-+
---
-type: alias
-
-alias to: user_agent.minor
-
---
-
-*`nginx.access.user_agent.patch`*::
-+
---
-type: alias
-
-alias to: user_agent.patch
-
---
-
 *`nginx.access.user_agent.name`*::
 +
 --
@@ -10905,24 +10738,6 @@ alias to: user_agent.name
 type: alias
 
 alias to: user_agent.os.full_name
-
---
-
-*`nginx.access.user_agent.os_major`*::
-+
---
-type: alias
-
-alias to: user_agent.os.major
-
---
-
-*`nginx.access.user_agent.os_minor`*::
-+
---
-type: alias
-
-alias to: user_agent.os.minor
 
 --
 
@@ -13537,33 +13352,6 @@ alias to: user_agent.device.name
 
 --
 
-*`traefik.access.user_agent.major`*::
-+
---
-type: alias
-
-alias to: user_agent.major
-
---
-
-*`traefik.access.user_agent.minor`*::
-+
---
-type: alias
-
-alias to: user_agent.minor
-
---
-
-*`traefik.access.user_agent.patch`*::
-+
---
-type: alias
-
-alias to: user_agent.patch
-
---
-
 *`traefik.access.user_agent.name`*::
 +
 --
@@ -13579,24 +13367,6 @@ alias to: user_agent.name
 type: alias
 
 alias to: user_agent.os.full_name
-
---
-
-*`traefik.access.user_agent.os_major`*::
-+
---
-type: alias
-
-alias to: user_agent.os.major
-
---
-
-*`traefik.access.user_agent.os_minor`*::
-+
---
-type: alias
-
-alias to: user_agent.os.minor
 
 --
 
