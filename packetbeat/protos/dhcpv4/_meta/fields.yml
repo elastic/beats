@@ -186,6 +186,7 @@
                 IP address.  In a server reply (DHCPOFFER), a DHCP server uses
                 this option to specify the lease time it is willing to offer.
 
+            # error.message? or just message?
             - name: message
               type: text
               description: |

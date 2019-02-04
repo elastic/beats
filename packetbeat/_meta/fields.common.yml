@@ -175,6 +175,7 @@
         something like `GET /users/_search?name=test`. For MySQL, it is
         something like `SELECT id from users where name=test`.
 
+    #keyword(s)?
     - name: params
       type: text
       description: >
@@ -193,6 +194,7 @@
   title: Raw
   description: These fields contain the raw transaction data.
   fields:
+   #keyword?
     - name: request
       type: text
       description: >
@@ -200,6 +202,7 @@
         (application layer only). For binary protocols this is our
         representation of the request.
 
+    #keyword?
     - name: response
       type: text
       description: >

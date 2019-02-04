@@ -829,6 +829,7 @@
           type: keyword
           description: This is the path associated with a unix socket.
     - name: messages
+      # As it's the raw message should it be keyword. Should it even be indexed?
       type: text
       description: >
         An ordered list of the raw messages received from the kernel that

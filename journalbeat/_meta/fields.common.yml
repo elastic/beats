@@ -116,16 +116,19 @@
               required: false
               description: >
                 The kernel subsystem name.
+              # Keyword?
             - name: device_symlinks
               type: text
               required: false
               description: >
                 Additional symlink names pointing to the device node in /dev.
+              # keyword?
             - name: device_node_path
               type: text
               required: false
               description: >
                 The device node path of this device in /dev.
+              # keyword?
             - name: device_name
               type: text
               required: false
@@ -136,12 +139,14 @@
           description: >
               Fields of the code generating the event.
           fields:
+            #keyword?
             - name: file
               type: text
               required: false
               example: "../src/core/manager.c"
               description: >
                 The name of the source file where the log is generated.
+              #keyword?
             - name: function
               type: text
               required: false
@@ -277,6 +282,7 @@
       description: >
           Fields of the host.
       fields:
+        #keyword?
         - name: boot_id
           type: text
           required: false
@@ -300,6 +306,7 @@
           example: 1
           description: >
             The facility of the message. A syslog compatibility field.
+          #keyword?
         - name: identifier
           type: text
           required: false

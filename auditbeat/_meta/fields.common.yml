@@ -19,6 +19,7 @@
       description: Set if the file has the `setgid` bit set. Omitted otherwise.
 
     - name: origin
+      # Should this be keyword?
       type: text
       description: >
           An array of strings describing a possible external origin for

@@ -24,6 +24,7 @@
       type: keyword
       description: >
           Program to run at login.
+      #keyword?
     - name: user_information
       type: text
       description: >
