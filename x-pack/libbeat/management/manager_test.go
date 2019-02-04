@@ -277,9 +277,9 @@ func TestBadConfig(t *testing.T) {
 	mux := http.NewServeMux()
 	i := 0
 	responses := []http.HandlerFunc{ // Initial load
-		responseText(`{"configuration_blocks":[{"type":"output","config":{"console": { "path": "/tmp/bad"}}}]}`),
+		responseText(`{"configuration_blocks":[{"type":"output","config":{"_sub_type": "console", "path": "/tmp/bad"}}]}`),
 		// will not resend new events
-		responseText(`{"configuration_blocks":[{"type":"output","config":{"console": { "path": "/tmp/bad"}}}]}`),
+		responseText(`{"configuration_blocks":[{"type":"output","config":{"_sub_type": "console", "path": "/tmp/bad"}}]}`),
 		// recover on call
 		http.NotFound,
 	}
@@ -347,7 +347,7 @@ type testEventRequest struct {
 
 func (er *testEventRequest) UnmarshalJSON(b []byte) error {
 	resp := struct {
-		EventType api.EventType   `json:"event_type"`
+		EventType api.EventType   `json:"type"`
 		Event     json.RawMessage `json:"event"`
 	}{}
 
@@ -394,7 +394,7 @@ func (r *collectEventRequest) Add(requests ...testEventRequest) {
 
 func addEventsReporterHandle(mux *http.ServeMux, uuid uuid.UUID) *collectEventRequest {
 	reporter := &collectEventRequest{}
-	path := "/api/beats/agent/" + uuid.String() + "/events"
+	path := "/api/beats/" + uuid.String() + "/events"
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		var requests []testEventRequest
 		decoder := json.NewDecoder(r.Body)

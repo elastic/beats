@@ -85,8 +85,7 @@ func (e *EventReporter) reportEvents(events []Event) {
 	if len(events) == 0 {
 		return
 	}
-	e.logger.Debug("Reporting %d events to Kibana", len(events))
-
+	e.logger.Debugf("Reporting %d events to Kibana", len(events))
 	if err := e.sendBatchEvents(events); err != nil {
 		e.logger.Errorf("could not send events, error: %+v", err)
 	}

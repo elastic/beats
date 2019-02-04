@@ -25,7 +25,7 @@ type testEvent struct {
 
 func (er *EventRequest) UnmarshalJSON(b []byte) error {
 	resp := struct {
-		EventType EventType       `json:"event_type"`
+		EventType EventType       `json:"type"`
 		Event     json.RawMessage `json:"event"`
 	}{}
 
@@ -55,7 +55,7 @@ func (t *testEvent) MarshalJSON() ([]byte, error) {
 func (t *testEvent) UnmarshalJSON(b []byte) error {
 	resp := struct {
 		Message string    `json:"message"`
-		Type    EventType `json:"event_type"`
+		Type    EventType `json:"type"`
 	}{}
 	if err := json.Unmarshal(b, &resp); err != nil {
 		return err
@@ -75,7 +75,7 @@ func TestReportEvents(t *testing.T) {
 	t.Run("successfully send events", func(t *testing.T) {
 		server, client := newServerClientPair(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Check correct path is used
-			assert.Equal(t, "/api/beats/agent/"+beatUUID.String()+"/events", r.URL.Path)
+			assert.Equal(t, "/api/beats/"+beatUUID.String()+"/events", r.URL.Path)
 
 			// Check enrollment token is correct
 			assert.Equal(t, accessToken, r.Header.Get("kbn-beats-access-token"))

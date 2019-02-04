@@ -27,7 +27,7 @@ type Event interface {
 // EventRequest is the data send to the CM event endpoint.
 type EventRequest struct {
 	Timestamp time.Time `json:"timestamp"`
-	EventType EventType `json:"event_type"`
+	EventType EventType `json:"type"`
 	Event     Event     `json:"event"`
 }
 
@@ -73,7 +73,7 @@ func (c *AuthClient) SendEvents(requests []EventRequest) error {
 	})
 
 	resp := EventAPIResponse{}
-	url := fmt.Sprintf("/api/beats/agent/%s/events", c.BeatUUID)
+	url := fmt.Sprintf("/api/beats/%s/events", c.BeatUUID)
 	statusCode, err := c.Client.request("POST", url, requests, c.headers(), &resp)
 	if err != nil {
 		return err
@@ -102,7 +102,7 @@ func (c *AuthClient) SendEvents(requests []EventRequest) error {
 	var errors multierror.Errors
 	for _, response := range resp.Response {
 		if !response.Success {
-			errors = append(errors, fmt.Errorf("error sending event %+v", response.Reason))
+			errors = append(errors, fmt.Errorf("error sending event, reason: %+v", response.Reason))
 		}
 	}
 

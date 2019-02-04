@@ -84,6 +84,7 @@ func (c *Client) request(method, extraPath string,
 	if err != nil {
 		return statusCode, err
 	}
+
 	if statusCode >= 300 {
 		err = extractError(result)
 	} else {
