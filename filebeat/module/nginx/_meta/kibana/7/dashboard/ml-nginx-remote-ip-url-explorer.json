@@ -421,7 +421,7 @@
                         "query": {
                             "query_string": {
                                 "analyze_wildcard": true, 
-                                "query": "_exists_:nginx.access"
+                                "query": "event.dataset:nginx.access"
                             }
                         }
                     }
