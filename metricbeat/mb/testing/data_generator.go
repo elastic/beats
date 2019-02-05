@@ -50,7 +50,7 @@ func WriteEvent(f mb.EventFetcher, t testing.TB) error {
 	}
 
 	fullEvent := CreateFullEvent(f, event)
-	WriteEventToDataJSON(t, fullEvent, "")
+	WriteEventToDataJSON(t, fullEvent, ".")
 	return nil
 }
 

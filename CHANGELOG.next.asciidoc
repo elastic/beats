@@ -302,6 +302,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release http.server metricset as GA. {pull}10240[10240]
 - Release Nats module as GA. {pull}10281[10281]
 - Release munin module as GA. {pull}10311[10311]
+- Release Golang module as GA. {pull}10312[10312]
 - Release use of xpack.enabled: true flag in Elasticsearch and Kibana modules as GA. {pull}10222[10222]
 - Add support for MySQL 8.0 and tests also for Percona and MariaDB. {pull}10261[10261]
 - Rename 'db' Metricset to 'transaction_log' in MSSQL Metricbeat module {pull}10109[10109]
