@@ -47,6 +47,8 @@ https://github.com/elastic/beats/compare/1035569addc4a3b29ffa14f8a08c27c1ace16ef
 
 *Journalbeat*
 
+- Fix fields.yml indentation of audit group which had the effect of creating an incomplete Elasticsearch index template. {pull}10556[10556]
+
 *Metricbeat*
 
 *Packetbeat*
