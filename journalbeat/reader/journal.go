@@ -206,8 +206,6 @@ func (r *Reader) waitUntilNewEventOrError() (*beat.Event, error) {
 			return nil, nil
 		case c := <-r.changesChan:
 			switch c {
-			// no changes
-			case sdjournal.SD_JOURNAL_NOP:
 			// new entries are added or the journal has changed (e.g. vacuum, rotate)
 			case sdjournal.SD_JOURNAL_APPEND, sdjournal.SD_JOURNAL_INVALIDATE:
 				event, err := r.readEvent()
@@ -216,11 +214,9 @@ func (r *Reader) waitUntilNewEventOrError() (*beat.Event, error) {
 				}
 
 				if event == nil {
-					r.backoff.Wait()
 					continue
 				}
 
-				r.backoff.Reset()
 				return event, nil
 			default:
 				if c < 0 {
@@ -243,6 +239,12 @@ func (r *Reader) waitForChange() {
 		}
 
 		c := r.journal.Wait(100 * time.Millisecond)
+		if c == sdjournal.SD_JOURNAL_NOP {
+			r.backoff.Wait()
+			continue
+		}
+		r.backoff.Reset()
+
 		select {
 		case <-r.done:
 			return
