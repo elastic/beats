@@ -15,10 +15,10 @@
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
-        "title": "Cassandra ResponseKeyspace [Packetbeat] ECS",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
+        "title": "Cassandra ResponseKeyspace [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -26,7 +26,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -38,7 +38,7 @@
                 "size": 10
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
@@ -50,7 +50,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "listeners": {},
@@ -61,14 +61,14 @@
             "legendPosition": "right",
             "shareYAxis": true
           },
-          "title": "Cassandra ResponseKeyspace ECS",
-          "winlog.api": "pie"
+          "title": "Cassandra ResponseKeyspace",
+          "type": "pie"
         }
       },
-      "id": "Cassandra-ResponseKeyspace-ecs",
-      "winlog.api": "visualization",
+      "id": "Cassandra-ResponseKeyspace",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -85,10 +85,10 @@
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
-        "title": "Cassandra ResponseType [Packetbeat] ECS",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
+        "title": "Cassandra ResponseType [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -96,7 +96,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -108,7 +108,7 @@
                 "size": 10
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "listeners": {},
@@ -119,14 +119,14 @@
             "legendPosition": "right",
             "shareYAxis": true
           },
-          "title": "Cassandra ResponseType ECS",
-          "winlog.api": "pie"
+          "title": "Cassandra ResponseType",
+          "type": "pie"
         }
       },
-      "id": "Cassandra-ResponseType-ecs",
-      "winlog.api": "visualization",
+      "id": "Cassandra-ResponseType",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -143,10 +143,10 @@
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
-        "title": "Cassandra ResponseTime [Packetbeat] ECS",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
+        "title": "Cassandra ResponseTime [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -163,7 +163,7 @@
                 ]
               },
               "schema": "metric",
-              "winlog.api": "percentiles"
+              "type": "percentiles"
             },
             {
               "enabled": true,
@@ -178,7 +178,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             }
           ],
           "params": {
@@ -194,12 +194,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "defaultYExtents": false,
@@ -226,7 +226,7 @@
                 "radiusRatio": 9,
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -235,7 +235,7 @@
             "showCircles": true,
             "smoothLines": true,
             "times": [],
-            "winlog.api": "line",
+            "type": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -251,26 +251,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "winlog.api": "square root"
+                  "type": "square root"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Percentiles of event.duration"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ],
             "yAxis": {}
           },
-          "title": "Cassandra ResponseTime [Packetbeat] ECS",
-          "winlog.api": "line"
+          "title": "Cassandra ResponseTime [Packetbeat]",
+          "type": "line"
         }
       },
-      "id": "Cassandra-ResponseTime-ecs",
-      "winlog.api": "visualization",
+      "id": "Cassandra-ResponseTime",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -287,10 +287,10 @@
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
-        "title": "Cassandra RequestCount [Packetbeat] ECS",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
+        "title": "Cassandra RequestCount [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -298,7 +298,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -311,7 +311,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             }
           ],
           "listeners": {},
@@ -332,14 +332,14 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Cassandra RequestCount ECS",
-          "winlog.api": "line"
+          "title": "Cassandra RequestCount",
+          "type": "line"
         }
       },
-      "id": "Cassandra-RequestCount-ecs",
-      "winlog.api": "visualization",
+      "id": "Cassandra-RequestCount",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -356,10 +356,10 @@
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
-        "title": "Cassandra Ops [Packetbeat] ECS",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
+        "title": "Cassandra Ops [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -367,7 +367,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -379,7 +379,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
@@ -391,7 +391,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "listeners": {},
@@ -402,14 +402,14 @@
             "legendPosition": "right",
             "shareYAxis": true
           },
-          "title": "Cassandra Ops ECS",
-          "winlog.api": "pie"
+          "title": "Cassandra Ops",
+          "type": "pie"
         }
       },
-      "id": "Cassandra-Ops-ecs",
-      "winlog.api": "visualization",
+      "id": "Cassandra-Ops",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -426,10 +426,10 @@
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
-        "title": "Cassandra RequestCountStackByType [Packetbeat] ECS",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
+        "title": "Cassandra RequestCountStackByType [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -437,7 +437,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -450,7 +450,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -462,7 +462,7 @@
                 "size": 5
               },
               "schema": "group",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "listeners": {},
@@ -479,14 +479,14 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Cassandra RequestCountStackByType ECS",
-          "winlog.api": "histogram"
+          "title": "Cassandra RequestCountStackByType",
+          "type": "histogram"
         }
       },
-      "id": "Cassandra-RequestCountStackByType-ecs",
-      "winlog.api": "visualization",
+      "id": "Cassandra-RequestCountStackByType",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -503,10 +503,10 @@
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
-        "title": "Cassandra ResponseCountStackByType [Packetbeat] ECS",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
+        "title": "Cassandra ResponseCountStackByType [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -514,7 +514,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -527,7 +527,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -539,7 +539,7 @@
                 "size": 5
               },
               "schema": "group",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "listeners": {},
@@ -556,14 +556,14 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Cassandra ResponseCountStackByType ECS",
-          "winlog.api": "histogram"
+          "title": "Cassandra ResponseCountStackByType",
+          "type": "histogram"
         }
       },
-      "id": "Cassandra-ResponseCountStackByType-ecs",
-      "winlog.api": "visualization",
+      "id": "Cassandra-ResponseCountStackByType",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -580,10 +580,10 @@
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
-        "title": "Cassandra RequestCountByType [Packetbeat] ECS",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
+        "title": "Cassandra RequestCountByType [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -591,7 +591,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -604,7 +604,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -616,14 +616,14 @@
                 "size": 10
               },
               "schema": "group",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
               "id": "4",
               "params": {},
               "schema": "radius",
-              "winlog.api": "count"
+              "type": "count"
             }
           ],
           "listeners": {},
@@ -644,14 +644,14 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Cassandra RequestCountByType ECS",
-          "winlog.api": "line"
+          "title": "Cassandra RequestCountByType",
+          "type": "line"
         }
       },
-      "id": "Cassandra-RequestCountByType-ecs",
-      "winlog.api": "visualization",
+      "id": "Cassandra-RequestCountByType",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -668,17 +668,17 @@
             }
           }
         },
-        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
-        "title": "Cassandra ResponseCountByType [Packetbeat] ECS",
+        "savedSearchId": "eaa83e60-190b-11e9-be0d-adde5066235e",
+        "title": "Cassandra ResponseCountByType [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "id": "2",
@@ -690,7 +690,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "id": "3",
@@ -701,13 +701,13 @@
                 "size": 10
               },
               "schema": "group",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "id": "4",
               "params": {},
               "schema": "radius",
-              "winlog.api": "count"
+              "type": "count"
             }
           ],
           "listeners": {},
@@ -727,14 +727,14 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Cassandra: ResponseCountByType ECS",
-          "winlog.api": "line"
+          "title": "Cassandra: ResponseCountByType",
+          "type": "line"
         }
       },
-      "id": "Cassandra-ResponseCountByType-ecs",
-      "winlog.api": "visualization",
+      "id": "Cassandra-ResponseCountByType",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:20.964Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -753,24 +753,24 @@
             }
           }
         },
-        "title": "Navigation [Packetbeat] ECS",
+        "title": "Navigation [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 10,
-            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard-ecs)\n\n[Network Flows](#/dashboard/Packetbeat-Flows-ecs)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e-ecs) | [Tunneling](#/dashboard/DNS-Unique-Domains-ecs)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb-ecs)\n\n[TLS Overview](#/dashboard/tls-sessions-ecs)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP-ecs)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance-ecs) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance-ecs) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance-ecs) | [Cassandra](#/dashboard/Packetbeat-Cassandra-ecs)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance-ecs)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS-ecs)",
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
             "openLinksInNewTab": false
           },
-          "title": "Navigation [Packetbeat] ECS",
-          "winlog.api": "markdown"
+          "title": "Navigation [Packetbeat]",
+          "type": "markdown"
         }
       },
-      "id": "Navigation-ecs",
-      "winlog.api": "visualization",
+      "id": "Navigation",
+      "type": "visualization",
       "updated_at": "2019-01-19T00:18:59.372Z",
-      "winlog.version": 11
+      "version": 11
     },
     {
       "attributes": {
@@ -797,16 +797,16 @@
                   "negate": false,
                   "params": {
                     "query": "QUERY",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "QUERY"
                 },
                 "query": {
                   "match": {
                     "cassandra.request.headers.op": {
                       "query": "QUERY",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -823,16 +823,16 @@
                   "negate": true,
                   "params": {
                     "query": "ERROR",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "ERROR"
                 },
                 "query": {
                   "match": {
                     "cassandra.response.headers.op": {
                       "query": "ERROR",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -862,20 +862,20 @@
                 }
               }
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "Cassandra Query Search [Packetbeat] ECS",
-        "winlog.version": 1
+        "title": "Cassandra Query Search [Packetbeat]",
+        "version": 1
       },
-      "id": "Cassandra-QueryView-ecs",
-      "winlog.api": "search",
+      "id": "Cassandra-QueryView",
+      "type": "search",
       "updated_at": "2019-01-18T23:49:20.964Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -899,16 +899,16 @@
                   "negate": false,
                   "params": {
                     "query": "cassandra",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "cassandra"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "cassandra",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -920,20 +920,20 @@
               "language": "kuery",
               "query": ""
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "Cassandra Search [Packetbeat] ECS",
-        "winlog.version": 1
+        "title": "Cassandra Search [Packetbeat]",
+        "version": 1
       },
-      "id": "eaa83e60-190b-11e9-be0d-adde5066235e-ecs",
-      "winlog.api": "search",
+      "id": "eaa83e60-190b-11e9-be0d-adde5066235e",
+      "type": "search",
       "updated_at": "2019-01-18T23:49:20.964Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -952,7 +952,7 @@
                 }
               }
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "optionsJSON": {
@@ -961,93 +961,93 @@
         "panelsJSON": [
           {
             "col": 10,
-            "id": "Cassandra-ResponseKeyspace-ecs",
+            "id": "Cassandra-ResponseKeyspace",
             "panelIndex": 3,
             "row": 3,
             "size_x": 3,
             "size_y": 2,
-            "winlog.api": "visualization"
+            "type": "visualization"
           },
           {
             "col": 7,
-            "id": "Cassandra-ResponseType-ecs",
+            "id": "Cassandra-ResponseType",
             "panelIndex": 4,
             "row": 3,
             "size_x": 3,
             "size_y": 2,
-            "winlog.api": "visualization"
+            "type": "visualization"
           },
           {
             "col": 1,
-            "id": "Cassandra-ResponseTime-ecs",
+            "id": "Cassandra-ResponseTime",
             "panelIndex": 9,
             "row": 5,
             "size_x": 12,
             "size_y": 2,
-            "winlog.api": "visualization"
+            "type": "visualization"
           },
           {
             "col": 4,
-            "id": "Cassandra-RequestCount-ecs",
+            "id": "Cassandra-RequestCount",
             "panelIndex": 10,
             "row": 1,
             "size_x": 9,
             "size_y": 2,
-            "winlog.api": "visualization"
+            "type": "visualization"
           },
           {
             "col": 4,
-            "id": "Cassandra-Ops-ecs",
+            "id": "Cassandra-Ops",
             "panelIndex": 11,
             "row": 3,
             "size_x": 3,
             "size_y": 2,
-            "winlog.api": "visualization"
+            "type": "visualization"
           },
           {
             "col": 1,
-            "id": "Cassandra-RequestCountStackByType-ecs",
+            "id": "Cassandra-RequestCountStackByType",
             "panelIndex": 15,
             "row": 7,
             "size_x": 12,
             "size_y": 2,
-            "winlog.api": "visualization"
+            "type": "visualization"
           },
           {
             "col": 1,
-            "id": "Cassandra-ResponseCountStackByType-ecs",
+            "id": "Cassandra-ResponseCountStackByType",
             "panelIndex": 16,
             "row": 9,
             "size_x": 12,
             "size_y": 2,
-            "winlog.api": "visualization"
+            "type": "visualization"
           },
           {
             "col": 1,
-            "id": "Cassandra-RequestCountByType-ecs",
+            "id": "Cassandra-RequestCountByType",
             "panelIndex": 17,
             "row": 11,
             "size_x": 6,
             "size_y": 3,
-            "winlog.api": "visualization"
+            "type": "visualization"
           },
           {
             "col": 7,
-            "id": "Cassandra-ResponseCountByType-ecs",
+            "id": "Cassandra-ResponseCountByType",
             "panelIndex": 18,
             "row": 11,
             "size_x": 6,
             "size_y": 3,
-            "winlog.api": "visualization"
+            "type": "visualization"
           },
           {
             "col": 1,
-            "id": "Navigation-ecs",
+            "id": "Navigation",
             "panelIndex": 19,
             "row": 1,
             "size_x": 3,
             "size_y": 4,
-            "winlog.api": "visualization"
+            "type": "visualization"
           },
           {
             "col": 1,
@@ -1057,7 +1057,7 @@
               "cassandra.response.result.rows.meta.table",
               "cassandra.response.result.rows.num_rows"
             ],
-            "id": "Cassandra-QueryView-ecs",
+            "id": "Cassandra-QueryView",
             "panelIndex": 20,
             "row": 14,
             "size_x": 12,
@@ -1066,11 +1066,11 @@
               "@timestamp",
               "desc"
             ],
-            "winlog.api": "search"
+            "type": "search"
           }
         ],
         "timeRestore": false,
-        "title": "[Packetbeat] Cassandra ECS",
+        "title": "[Packetbeat] Cassandra",
         "uiStateJSON": {
           "P-10": {
             "vis": {
@@ -1088,13 +1088,13 @@
             }
           }
         },
-        "winlog.version": 1
+        "version": 1
       },
-      "id": "Packetbeat-Cassandra-ecs",
-      "winlog.api": "dashboard",
+      "id": "Packetbeat-Cassandra",
+      "type": "dashboard",
       "updated_at": "2019-01-18T23:49:20.964Z",
-      "winlog.version": 1
+      "version": 1
     }
   ],
-  "winlog.version": "7.0.0-SNAPSHOT"
+  "version": "7.0.0-SNAPSHOT"
 }

@@ -12,7 +12,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -29,10 +29,10 @@
                             "x": 0, 
                             "y": 5
                         }, 
-                        "id": "a64b4fd0-471c-11e8-bc13-1397384faad3-ecs", 
+                        "id": "a64b4fd0-471c-11e8-bc13-1397384faad3", 
                         "panelIndex": "1", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.2"
+                        "type": "visualization", 
+                        "version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -42,10 +42,10 @@
                             "x": 9, 
                             "y": 0
                         }, 
-                        "id": "794b6cd0-471d-11e8-bc13-1397384faad3-ecs", 
+                        "id": "794b6cd0-471d-11e8-bc13-1397384faad3", 
                         "panelIndex": "2", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.2"
+                        "type": "visualization", 
+                        "version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -55,10 +55,10 @@
                             "x": 6, 
                             "y": 2
                         }, 
-                        "id": "bb0ab500-4735-11e8-bc13-1397384faad3-ecs", 
+                        "id": "bb0ab500-4735-11e8-bc13-1397384faad3", 
                         "panelIndex": "3", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.2"
+                        "type": "visualization", 
+                        "version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -68,10 +68,10 @@
                             "x": 6, 
                             "y": 0
                         }, 
-                        "id": "40bed190-473b-11e8-bc13-1397384faad3-ecs", 
+                        "id": "40bed190-473b-11e8-bc13-1397384faad3", 
                         "panelIndex": "4", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.2"
+                        "type": "visualization", 
+                        "version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -81,10 +81,10 @@
                             "x": 4, 
                             "y": 5
                         }, 
-                        "id": "0751ed00-479c-11e8-bc13-1397384faad3-ecs", 
+                        "id": "0751ed00-479c-11e8-bc13-1397384faad3", 
                         "panelIndex": "5", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.2"
+                        "type": "visualization", 
+                        "version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -94,10 +94,10 @@
                             "x": 8, 
                             "y": 5
                         }, 
-                        "id": "b3463670-47a1-11e8-bc13-1397384faad3-ecs", 
+                        "id": "b3463670-47a1-11e8-bc13-1397384faad3", 
                         "panelIndex": "6", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.2"
+                        "type": "visualization", 
+                        "version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -107,10 +107,10 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "fcbdfa60-47bd-11e8-bc13-1397384faad3-ecs", 
+                        "id": "fcbdfa60-47bd-11e8-bc13-1397384faad3", 
                         "panelIndex": "7", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.2"
+                        "type": "visualization", 
+                        "version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -120,21 +120,21 @@
                             "x": 0, 
                             "y": 3
                         }, 
-                        "id": "981d1040-47be-11e8-bc13-1397384faad3-ecs", 
+                        "id": "981d1040-47be-11e8-bc13-1397384faad3", 
                         "panelIndex": "8", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.2"
+                        "type": "visualization", 
+                        "version": "6.2.2"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat HAProxy] HTTP backend ECS", 
-                "winlog.version": 1
+                "title": "[Metricbeat HAProxy] HTTP backend", 
+                "version": 1
             }, 
-            "id": "0836a4b0-47bd-11e8-bc13-1397384faad3-ecs", 
-            "winlog.api": "dashboard", 
+            "id": "0836a4b0-47bd-11e8-bc13-1397384faad3", 
+            "type": "dashboard", 
             "updated_at": "2018-04-24T18:33:28.791Z", 
-            "winlog.version": 6
+            "version": 6
         }
     ], 
-    "winlog.version": "6.2.2"
+    "version": "6.2.2"
 }

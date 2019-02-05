@@ -17,24 +17,24 @@
             }
           }
         },
-        "title": "Navigation [Packetbeat] ECS",
+        "title": "Navigation [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 10,
-            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard-ecs)\n\n[Network Flows](#/dashboard/Packetbeat-Flows-ecs)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e-ecs) | [Tunneling](#/dashboard/DNS-Unique-Domains-ecs)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb-ecs)\n\n[TLS Overview](#/dashboard/tls-sessions-ecs)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP-ecs)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance-ecs) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance-ecs) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance-ecs) | [Cassandra](#/dashboard/Packetbeat-Cassandra-ecs)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance-ecs)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS-ecs)",
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
             "openLinksInNewTab": false
           },
-          "title": "Navigation [Packetbeat] ECS",
-          "winlog.api": "markdown"
+          "title": "Navigation [Packetbeat]",
+          "type": "markdown"
         }
       },
-      "id": "Navigation-ecs",
-      "winlog.api": "visualization",
+      "id": "Navigation",
+      "type": "visualization",
       "updated_at": "2019-01-19T00:18:59.372Z",
-      "winlog.version": 11
+      "version": 11
     },
     {
       "attributes": {
@@ -48,8 +48,8 @@
             }
           }
         },
-        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
-        "title": "TLS Sessions [Packetbeat] ECS",
+        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
+        "title": "TLS Sessions [Packetbeat]",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -59,7 +59,7 @@
             "legendOpen": false
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -67,7 +67,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -81,7 +81,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -95,7 +95,7 @@
                 "size": 5
               },
               "schema": "group",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -111,12 +111,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "grid": {
@@ -137,12 +137,12 @@
                 "mode": "stacked",
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "histogram",
+                "type": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "winlog.api": "histogram",
+            "type": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -156,25 +156,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ]
           },
-          "title": "TLS Sessions ECS",
-          "winlog.api": "histogram"
+          "title": "TLS Sessions",
+          "type": "histogram"
         }
       },
-      "id": "059fe5e0-d2dd-11e7-9914-4982455b3063-ecs",
-      "winlog.api": "visualization",
+      "id": "059fe5e0-d2dd-11e7-9914-4982455b3063",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -192,7 +192,7 @@
                   "index": "packetbeat-*",
                   "key": "query",
                   "negate": false,
-                  "winlog.api": "custom",
+                  "type": "custom",
                   "value": "{\"exists\":{\"field\":\"tls\"}}"
                 },
                 "query": {
@@ -209,7 +209,7 @@
             }
           }
         },
-        "title": "TLS Alerts [Packetbeat] ECS",
+        "title": "TLS Alerts [Packetbeat]",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -218,7 +218,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -226,7 +226,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -240,7 +240,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -248,16 +248,16 @@
             "addTooltip": true,
             "isDonut": true,
             "legendPosition": "right",
-            "winlog.api": "pie"
+            "type": "pie"
           },
-          "title": "TLS Alerts ECS",
-          "winlog.api": "pie"
+          "title": "TLS Alerts",
+          "type": "pie"
         }
       },
-      "id": "c14377a0-d353-11e7-9914-4982455b3063-ecs",
-      "winlog.api": "visualization",
+      "id": "c14377a0-d353-11e7-9914-4982455b3063",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -278,7 +278,7 @@
                   "index": "packetbeat-*",
                   "key": "tls.handshake_completed",
                   "negate": false,
-                  "winlog.api": "exists",
+                  "type": "exists",
                   "value": "exists"
                 }
               }
@@ -295,7 +295,7 @@
             }
           }
         },
-        "title": "Total Number of TLS Sessions [Packetbeat] ECS",
+        "title": "Total Number of TLS Sessions [Packetbeat]",
         "uiStateJSON": {
           "P-5": {
             "vis": {
@@ -315,7 +315,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -323,7 +323,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             }
           ],
           "params": {
@@ -352,16 +352,16 @@
               },
               "useRanges": false
             },
-            "winlog.api": "metric"
+            "type": "metric"
           },
-          "title": "Total Number of TLS Sessions ECS",
-          "winlog.api": "metric"
+          "title": "Total Number of TLS Sessions",
+          "type": "metric"
         }
       },
-      "id": "061de380-d361-11e7-9914-4982455b3063-ecs",
-      "winlog.api": "visualization",
+      "id": "061de380-d361-11e7-9914-4982455b3063",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -375,10 +375,10 @@
             }
           }
         },
-        "savedSearchId": "94908e80-d2d8-11e7-9914-4982455b3063-ecs",
-        "title": "TLS Server Name Indication [Packetbeat] ECS",
+        "savedSearchId": "94908e80-d2d8-11e7-9914-4982455b3063",
+        "title": "TLS Server Name Indication [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -386,7 +386,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -399,7 +399,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -409,14 +409,14 @@
             "orientation": "single",
             "scale": "linear"
           },
-          "title": "TLS Server Name Indication ECS",
-          "winlog.api": "tagcloud"
+          "title": "TLS Server Name Indication",
+          "type": "tagcloud"
         }
       },
-      "id": "a28d09d0-d361-11e7-9914-4982455b3063-ecs",
-      "winlog.api": "visualization",
+      "id": "a28d09d0-d361-11e7-9914-4982455b3063",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -430,10 +430,10 @@
             }
           }
         },
-        "savedSearchId": "bf3d23b0-d37c-11e7-9914-4982455b3063-ecs",
-        "title": "TLS Versions [Packetbeat] ECS",
+        "savedSearchId": "bf3d23b0-d37c-11e7-9914-4982455b3063",
+        "title": "TLS Versions [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -441,7 +441,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -454,7 +454,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -462,16 +462,16 @@
             "addTooltip": true,
             "isDonut": true,
             "legendPosition": "right",
-            "winlog.api": "pie"
+            "type": "pie"
           },
-          "title": "TLS Versions ECS",
-          "winlog.api": "pie"
+          "title": "TLS Versions",
+          "type": "pie"
         }
       },
-      "id": "0af0b790-d37d-11e7-9914-4982455b3063-ecs",
-      "winlog.api": "visualization",
+      "id": "0af0b790-d37d-11e7-9914-4982455b3063",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -485,10 +485,10 @@
             }
           }
         },
-        "savedSearchId": "8f0ff590-d37d-11e7-9914-4982455b3063-ecs",
-        "title": "TLS Server Public Key Size [Packetbeat] ECS",
+        "savedSearchId": "8f0ff590-d37d-11e7-9914-4982455b3063",
+        "title": "TLS Server Public Key Size [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -496,7 +496,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -509,7 +509,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -517,16 +517,16 @@
             "addTooltip": true,
             "isDonut": true,
             "legendPosition": "right",
-            "winlog.api": "pie"
+            "type": "pie"
           },
-          "title": "Server Public Key Size ECS",
-          "winlog.api": "pie"
+          "title": "Server Public Key Size",
+          "type": "pie"
         }
       },
-      "id": "ae6e33c0-d37d-11e7-9914-4982455b3063-ecs",
-      "winlog.api": "visualization",
+      "id": "ae6e33c0-d37d-11e7-9914-4982455b3063",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -540,10 +540,10 @@
             }
           }
         },
-        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
-        "title": "TLS Session Resume [Packetbeat] ECS",
+        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
+        "title": "TLS Session Resume [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -551,7 +551,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -569,7 +569,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -583,16 +583,16 @@
               "values": true
             },
             "legendPosition": "right",
-            "winlog.api": "pie"
+            "type": "pie"
           },
-          "title": "TLS Session Resume [Packetbeat] ECS",
-          "winlog.api": "pie"
+          "title": "TLS Session Resume [Packetbeat]",
+          "type": "pie"
         }
       },
-      "id": "2c467370-d392-11e7-8fa0-232aa9259081-ecs",
-      "winlog.api": "visualization",
+      "id": "2c467370-d392-11e7-8fa0-232aa9259081",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -606,8 +606,8 @@
             }
           }
         },
-        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
-        "title": "TLS Server Certificates [Packetbeat] ECS",
+        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
+        "title": "TLS Server Certificates [Packetbeat]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -618,7 +618,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -628,7 +628,7 @@
                 "customLabel": ""
               },
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -641,7 +641,7 @@
                 "size": 10
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
@@ -654,7 +654,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -668,14 +668,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "TLS Server Certificates ECS",
-          "winlog.api": "table"
+          "title": "TLS Server Certificates",
+          "type": "table"
         }
       },
-      "id": "0958a910-d396-11e7-8fa0-232aa9259081-ecs",
-      "winlog.api": "visualization",
+      "id": "0958a910-d396-11e7-8fa0-232aa9259081",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -689,8 +689,8 @@
             }
           }
         },
-        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
-        "title": "TLS Client Certificates [Packetbeat] ECS",
+        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
+        "title": "TLS Client Certificates [Packetbeat]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -701,7 +701,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -709,7 +709,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -722,7 +722,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
@@ -736,7 +736,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -750,14 +750,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "TLS Client Certificates ECS",
-          "winlog.api": "table"
+          "title": "TLS Client Certificates",
+          "type": "table"
         }
       },
-      "id": "86743f90-d396-11e7-8fa0-232aa9259081-ecs",
-      "winlog.api": "visualization",
+      "id": "86743f90-d396-11e7-8fa0-232aa9259081",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -771,8 +771,8 @@
             }
           }
         },
-        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
-        "title": "TLS Cipher [Packetbeat] ECS",
+        "savedSearchId": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
+        "title": "TLS Cipher [Packetbeat]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -783,7 +783,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -791,7 +791,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -804,7 +804,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -818,14 +818,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "TLS Cipher ECS",
-          "winlog.api": "table"
+          "title": "TLS Cipher",
+          "type": "table"
         }
       },
-      "id": "463d2bf0-d3a8-11e7-9081-ab2af08e9961-ecs",
-      "winlog.api": "visualization",
+      "id": "463d2bf0-d3a8-11e7-9081-ab2af08e9961",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -839,8 +839,8 @@
             }
           }
         },
-        "savedSearchId": "6b1b1360-d49d-11e7-996f-bd7c1ca4591b-ecs",
-        "title": "TLS Fingerprint [Packetbeat] ECS",
+        "savedSearchId": "6b1b1360-d49d-11e7-996f-bd7c1ca4591b",
+        "title": "TLS Fingerprint [Packetbeat]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -851,7 +851,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -859,7 +859,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -872,7 +872,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -886,14 +886,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "TLS Fingerprint ECS",
-          "winlog.api": "table"
+          "title": "TLS Fingerprint",
+          "type": "table"
         }
       },
-      "id": "ad2a8b50-d49d-11e7-996f-bd7c1ca4591b-ecs",
-      "winlog.api": "visualization",
+      "id": "ad2a8b50-d49d-11e7-996f-bd7c1ca4591b",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -915,7 +915,7 @@
                     "gte": 0,
                     "lt": 1000000000
                   },
-                  "winlog.api": "range",
+                  "type": "range",
                   "value": "0 to 1,000,000,000"
                 },
                 "range": {
@@ -932,14 +932,14 @@
             }
           }
         },
-        "savedSearchId": "8e2af860-d520-11e7-9fff-7b1ebf397ba9-ecs",
-        "title": "TLS Handshake Latency [Packetbeat] ECS",
+        "savedSearchId": "8e2af860-d520-11e7-9fff-7b1ebf397ba9",
+        "title": "TLS Handshake Latency [Packetbeat]",
         "uiStateJSON": {
           "vis": {
             "legendOpen": false
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -947,7 +947,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -959,7 +959,7 @@
                 "interval": 2000000
               },
               "schema": "segment",
-              "winlog.api": "histogram"
+              "type": "histogram"
             }
           ],
           "params": {
@@ -976,12 +976,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "grid": {
@@ -1002,12 +1002,12 @@
                 "mode": "stacked",
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "area",
+                "type": "area",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "winlog.api": "area",
+            "type": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -1021,25 +1021,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ]
           },
-          "title": "TLS Handshake Latency ECS",
-          "winlog.api": "area"
+          "title": "TLS Handshake Latency",
+          "type": "area"
         }
       },
-      "id": "d2e15950-d560-11e7-9fff-7b1ebf397ba9-ecs",
-      "winlog.api": "visualization",
+      "id": "d2e15950-d560-11e7-9fff-7b1ebf397ba9",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -1064,7 +1064,7 @@
                   "index": "packetbeat-*",
                   "key": "tls.handshake_completed",
                   "negate": false,
-                  "winlog.api": "exists",
+                  "type": "exists",
                   "value": "exists"
                 }
               }
@@ -1080,20 +1080,20 @@
                 }
               }
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "TLS Sessions [Packetbeat] ECS",
-        "winlog.version": 1
+        "title": "TLS Sessions [Packetbeat]",
+        "version": 1
       },
-      "id": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
-      "winlog.api": "search",
+      "id": "ffc3c0b0-d2d7-11e7-9914-4982455b3063",
+      "type": "search",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -1118,7 +1118,7 @@
                   "index": "packetbeat-*",
                   "key": "tls.client_hello.extensions.server_name_indication",
                   "negate": false,
-                  "winlog.api": "exists",
+                  "type": "exists",
                   "value": "exists"
                 }
               }
@@ -1134,20 +1134,20 @@
                 }
               }
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "TLS Server Name Indication [Packetbeat] ECS",
-        "winlog.version": 1
+        "title": "TLS Server Name Indication [Packetbeat]",
+        "version": 1
       },
-      "id": "94908e80-d2d8-11e7-9914-4982455b3063-ecs",
-      "winlog.api": "search",
+      "id": "94908e80-d2d8-11e7-9914-4982455b3063",
+      "type": "search",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -1172,7 +1172,7 @@
                   "index": "packetbeat-*",
                   "key": "tls.version",
                   "negate": false,
-                  "winlog.api": "exists",
+                  "type": "exists",
                   "value": "exists"
                 }
               }
@@ -1188,20 +1188,20 @@
                 }
               }
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "TLS Version [Packetbeat] ECS",
-        "winlog.version": 1
+        "title": "TLS Version [Packetbeat]",
+        "version": 1
       },
-      "id": "bf3d23b0-d37c-11e7-9914-4982455b3063-ecs",
-      "winlog.api": "search",
+      "id": "bf3d23b0-d37c-11e7-9914-4982455b3063",
+      "type": "search",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -1226,7 +1226,7 @@
                   "index": "packetbeat-*",
                   "key": "tls.server_certificate.public_key_size",
                   "negate": false,
-                  "winlog.api": "exists",
+                  "type": "exists",
                   "value": "exists"
                 }
               }
@@ -1242,20 +1242,20 @@
                 }
               }
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "Server Public Key Size ECS",
-        "winlog.version": 1
+        "title": "Server Public Key Size",
+        "version": 1
       },
-      "id": "8f0ff590-d37d-11e7-9914-4982455b3063-ecs",
-      "winlog.api": "search",
+      "id": "8f0ff590-d37d-11e7-9914-4982455b3063",
+      "type": "search",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -1280,7 +1280,7 @@
                   "index": "packetbeat-*",
                   "key": "tls.fingerprints.ja3.hash",
                   "negate": false,
-                  "winlog.api": "exists",
+                  "type": "exists",
                   "value": "exists"
                 }
               }
@@ -1291,20 +1291,20 @@
               "language": "lucene",
               "query": ""
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "TLS Fingerprint [Packetbeat] ECS",
-        "winlog.version": 1
+        "title": "TLS Fingerprint [Packetbeat]",
+        "version": 1
       },
-      "id": "6b1b1360-d49d-11e7-996f-bd7c1ca4591b-ecs",
-      "winlog.api": "search",
+      "id": "6b1b1360-d49d-11e7-996f-bd7c1ca4591b",
+      "type": "search",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -1329,7 +1329,7 @@
                   "index": "packetbeat-*",
                   "key": "tls.handshake_completed",
                   "negate": false,
-                  "winlog.api": "exists",
+                  "type": "exists",
                   "value": "exists"
                 }
               },
@@ -1346,7 +1346,7 @@
                   "index": "packetbeat-*",
                   "key": "event.duration",
                   "negate": false,
-                  "winlog.api": "exists",
+                  "type": "exists",
                   "value": "exists"
                 }
               }
@@ -1357,24 +1357,24 @@
               "language": "lucene",
               "query": ""
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "TLS Handshake Latency [Packetbeat] ECS",
-        "winlog.version": 1
+        "title": "TLS Handshake Latency [Packetbeat]",
+        "version": 1
       },
-      "id": "8e2af860-d520-11e7-9fff-7b1ebf397ba9-ecs",
-      "winlog.api": "search",
+      "id": "8e2af860-d520-11e7-9fff-7b1ebf397ba9",
+      "type": "search",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
-        "description": "TLS Sessions ECS",
+        "description": "TLS Sessions",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
@@ -1389,7 +1389,7 @@
                 }
               }
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "optionsJSON": {
@@ -1405,10 +1405,10 @@
               "x": 0,
               "y": 0
             },
-            "id": "Navigation-ecs",
+            "id": "Navigation",
             "panelIndex": "4",
-            "winlog.api": "visualization",
-            "winlog.version": "6.2.4"
+            "type": "visualization",
+            "version": "6.2.4"
           },
           {
             "gridData": {
@@ -1418,10 +1418,10 @@
               "x": 3,
               "y": 0
             },
-            "id": "059fe5e0-d2dd-11e7-9914-4982455b3063-ecs",
+            "id": "059fe5e0-d2dd-11e7-9914-4982455b3063",
             "panelIndex": "8",
-            "winlog.api": "visualization",
-            "winlog.version": "6.2.4"
+            "type": "visualization",
+            "version": "6.2.4"
           },
           {
             "gridData": {
@@ -1431,10 +1431,10 @@
               "x": 3,
               "y": 7
             },
-            "id": "c14377a0-d353-11e7-9914-4982455b3063-ecs",
+            "id": "c14377a0-d353-11e7-9914-4982455b3063",
             "panelIndex": "9",
-            "winlog.api": "visualization",
-            "winlog.version": "6.2.4"
+            "type": "visualization",
+            "version": "6.2.4"
           },
           {
             "gridData": {
@@ -1444,10 +1444,10 @@
               "x": 0,
               "y": 4
             },
-            "id": "061de380-d361-11e7-9914-4982455b3063-ecs",
+            "id": "061de380-d361-11e7-9914-4982455b3063",
             "panelIndex": "10",
-            "winlog.api": "visualization",
-            "winlog.version": "6.2.4"
+            "type": "visualization",
+            "version": "6.2.4"
           },
           {
             "gridData": {
@@ -1457,10 +1457,10 @@
               "x": 0,
               "y": 10
             },
-            "id": "a28d09d0-d361-11e7-9914-4982455b3063-ecs",
+            "id": "a28d09d0-d361-11e7-9914-4982455b3063",
             "panelIndex": "11",
-            "winlog.api": "visualization",
-            "winlog.version": "6.2.4"
+            "type": "visualization",
+            "version": "6.2.4"
           },
           {
             "gridData": {
@@ -1470,10 +1470,10 @@
               "x": 6,
               "y": 7
             },
-            "id": "0af0b790-d37d-11e7-9914-4982455b3063-ecs",
+            "id": "0af0b790-d37d-11e7-9914-4982455b3063",
             "panelIndex": "12",
-            "winlog.api": "visualization",
-            "winlog.version": "6.2.4"
+            "type": "visualization",
+            "version": "6.2.4"
           },
           {
             "gridData": {
@@ -1483,10 +1483,10 @@
               "x": 9,
               "y": 7
             },
-            "id": "ae6e33c0-d37d-11e7-9914-4982455b3063-ecs",
+            "id": "ae6e33c0-d37d-11e7-9914-4982455b3063",
             "panelIndex": "13",
-            "winlog.api": "visualization",
-            "winlog.version": "6.2.4"
+            "type": "visualization",
+            "version": "6.2.4"
           },
           {
             "gridData": {
@@ -1496,10 +1496,10 @@
               "x": 0,
               "y": 7
             },
-            "id": "2c467370-d392-11e7-8fa0-232aa9259081-ecs",
+            "id": "2c467370-d392-11e7-8fa0-232aa9259081",
             "panelIndex": "14",
-            "winlog.api": "visualization",
-            "winlog.version": "6.2.4"
+            "type": "visualization",
+            "version": "6.2.4"
           },
           {
             "gridData": {
@@ -1509,10 +1509,10 @@
               "x": 0,
               "y": 13
             },
-            "id": "0958a910-d396-11e7-8fa0-232aa9259081-ecs",
+            "id": "0958a910-d396-11e7-8fa0-232aa9259081",
             "panelIndex": "15",
-            "winlog.api": "visualization",
-            "winlog.version": "6.2.4"
+            "type": "visualization",
+            "version": "6.2.4"
           },
           {
             "gridData": {
@@ -1522,10 +1522,10 @@
               "x": 0,
               "y": 16
             },
-            "id": "86743f90-d396-11e7-8fa0-232aa9259081-ecs",
+            "id": "86743f90-d396-11e7-8fa0-232aa9259081",
             "panelIndex": "16",
-            "winlog.api": "visualization",
-            "winlog.version": "6.2.4"
+            "type": "visualization",
+            "version": "6.2.4"
           },
           {
             "gridData": {
@@ -1535,10 +1535,10 @@
               "x": 6,
               "y": 13
             },
-            "id": "463d2bf0-d3a8-11e7-9081-ab2af08e9961-ecs",
+            "id": "463d2bf0-d3a8-11e7-9081-ab2af08e9961",
             "panelIndex": "17",
-            "winlog.api": "visualization",
-            "winlog.version": "6.2.4"
+            "type": "visualization",
+            "version": "6.2.4"
           },
           {
             "gridData": {
@@ -1548,10 +1548,10 @@
               "x": 6,
               "y": 16
             },
-            "id": "ad2a8b50-d49d-11e7-996f-bd7c1ca4591b-ecs",
+            "id": "ad2a8b50-d49d-11e7-996f-bd7c1ca4591b",
             "panelIndex": "18",
-            "winlog.api": "visualization",
-            "winlog.version": "6.2.4"
+            "type": "visualization",
+            "version": "6.2.4"
           },
           {
             "gridData": {
@@ -1561,14 +1561,14 @@
               "x": 3,
               "y": 4
             },
-            "id": "d2e15950-d560-11e7-9fff-7b1ebf397ba9-ecs",
+            "id": "d2e15950-d560-11e7-9fff-7b1ebf397ba9",
             "panelIndex": "19",
-            "winlog.api": "visualization",
-            "winlog.version": "6.2.4"
+            "type": "visualization",
+            "version": "6.2.4"
           }
         ],
         "timeRestore": false,
-        "title": "[Packetbeat] TLS Sessions ECS",
+        "title": "[Packetbeat] TLS Sessions",
         "uiStateJSON": {
           "P-15": {
             "vis": {
@@ -1628,13 +1628,13 @@
             }
           }
         },
-        "winlog.version": 1
+        "version": 1
       },
-      "id": "tls-sessions-ecs",
-      "winlog.api": "dashboard",
+      "id": "tls-sessions",
+      "type": "dashboard",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "winlog.version": 1
+      "version": 1
     }
   ],
-  "winlog.version": "7.0.0-SNAPSHOT"
+  "version": "7.0.0-SNAPSHOT"
 }

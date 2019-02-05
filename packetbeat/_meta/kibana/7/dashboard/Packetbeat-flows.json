@@ -12,10 +12,10 @@
             }
           }
         },
-        "savedSearchId": "Packetbeat-Flows-Search-ecs",
-        "title": "Top Hosts Creating Traffic [Packetbeat Flows] ECS",
+        "savedSearchId": "Packetbeat-Flows-Search",
+        "title": "Top Hosts Creating Traffic [Packetbeat Flows]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -26,7 +26,7 @@
                 "field": "source.bytes"
               },
               "schema": "metric",
-              "winlog.api": "sum"
+              "type": "sum"
             },
             {
               "enabled": true,
@@ -41,7 +41,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -58,7 +58,7 @@
                 "size": 5
               },
               "schema": "group",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -74,12 +74,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "defaultYExtents": false,
@@ -102,7 +102,7 @@
                 "interpolate": "cardinal",
                 "mode": "stacked",
                 "show": "true",
-                "winlog.api": "area",
+                "type": "area",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -110,7 +110,7 @@
             "shareYAxis": true,
             "smoothLines": true,
             "times": [],
-            "winlog.api": "area",
+            "type": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -126,26 +126,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ],
             "yAxis": {}
           },
-          "title": "Top Hosts Creating Traffic [Packetbeat Flows] ECS",
-          "winlog.api": "area"
+          "title": "Top Hosts Creating Traffic [Packetbeat Flows]",
+          "type": "area"
         }
       },
-      "id": "Top-hosts-creating-traffic-ecs",
-      "winlog.api": "visualization",
+      "id": "Top-hosts-creating-traffic",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:25.168Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -164,24 +164,24 @@
             }
           }
         },
-        "title": "Navigation [Packetbeat] ECS",
+        "title": "Navigation [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 10,
-            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard-ecs)\n\n[Network Flows](#/dashboard/Packetbeat-Flows-ecs)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e-ecs) | [Tunneling](#/dashboard/DNS-Unique-Domains-ecs)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb-ecs)\n\n[TLS Overview](#/dashboard/tls-sessions-ecs)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP-ecs)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance-ecs) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance-ecs) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance-ecs) | [Cassandra](#/dashboard/Packetbeat-Cassandra-ecs)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance-ecs)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS-ecs)",
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
             "openLinksInNewTab": false
           },
-          "title": "Navigation [Packetbeat] ECS",
-          "winlog.api": "markdown"
+          "title": "Navigation [Packetbeat]",
+          "type": "markdown"
         }
       },
-      "id": "Navigation-ecs",
-      "winlog.api": "visualization",
+      "id": "Navigation",
+      "type": "visualization",
       "updated_at": "2019-01-19T00:18:59.372Z",
-      "winlog.version": 11
+      "version": 11
     },
     {
       "attributes": {
@@ -195,10 +195,10 @@
             }
           }
         },
-        "savedSearchId": "Packetbeat-Flows-Search-ecs",
-        "title": "Connections over time [Packetbeat Flows] ECS",
+        "savedSearchId": "Packetbeat-Flows-Search",
+        "title": "Connections over time [Packetbeat Flows]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -209,7 +209,7 @@
                 "field": "flow.id"
               },
               "schema": "metric",
-              "winlog.api": "cardinality"
+              "type": "cardinality"
             },
             {
               "enabled": true,
@@ -224,7 +224,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             }
           ],
           "params": {
@@ -240,12 +240,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "defaultYExtents": false,
@@ -268,7 +268,7 @@
                 "interpolate": "cardinal",
                 "mode": "stacked",
                 "show": "true",
-                "winlog.api": "area",
+                "type": "area",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -276,7 +276,7 @@
             "shareYAxis": true,
             "smoothLines": true,
             "times": [],
-            "winlog.api": "area",
+            "type": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -292,26 +292,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ],
             "yAxis": {}
           },
-          "title": "Connections over time [Packetbeat Flows] ECS",
-          "winlog.api": "area"
+          "title": "Connections over time [Packetbeat Flows]",
+          "type": "area"
         }
       },
-      "id": "Connections-over-time-ecs",
-      "winlog.api": "visualization",
+      "id": "Connections-over-time",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:25.168Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -325,10 +325,10 @@
             }
           }
         },
-        "savedSearchId": "Packetbeat-Flows-Search-ecs",
-        "title": "Top Hosts Receiving Traffic [Packetbeat Flows] ECS",
+        "savedSearchId": "Packetbeat-Flows-Search",
+        "title": "Top Hosts Receiving Traffic [Packetbeat Flows]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -339,7 +339,7 @@
                 "field": "destination.bytes"
               },
               "schema": "metric",
-              "winlog.api": "sum"
+              "type": "sum"
             },
             {
               "enabled": true,
@@ -354,7 +354,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -371,7 +371,7 @@
                 "size": 5
               },
               "schema": "group",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -387,12 +387,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "defaultYExtents": false,
@@ -415,7 +415,7 @@
                 "interpolate": "cardinal",
                 "mode": "stacked",
                 "show": "true",
-                "winlog.api": "area",
+                "type": "area",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -423,7 +423,7 @@
             "shareYAxis": true,
             "smoothLines": true,
             "times": [],
-            "winlog.api": "area",
+            "type": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -439,26 +439,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ],
             "yAxis": {}
           },
-          "title": "Top Hosts Receiving Traffic [Packetbeat Flows] ECS",
-          "winlog.api": "area"
+          "title": "Top Hosts Receiving Traffic [Packetbeat Flows]",
+          "type": "area"
         }
       },
-      "id": "Top-hosts-receiving-traffic-ecs",
-      "winlog.api": "visualization",
+      "id": "Top-hosts-receiving-traffic",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:25.168Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -472,8 +472,8 @@
             }
           }
         },
-        "savedSearchId": "Packetbeat-Flows-Search-ecs",
-        "title": "Network Traffic Between Hosts [Packetbeat Flows] ECS",
+        "savedSearchId": "Packetbeat-Flows-Search",
+        "title": "Network Traffic Between Hosts [Packetbeat Flows]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -484,7 +484,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -495,7 +495,7 @@
                 "field": "source.bytes"
               },
               "schema": "metric",
-              "winlog.api": "sum"
+              "type": "sum"
             },
             {
               "enabled": true,
@@ -505,7 +505,7 @@
                 "field": "destination.bytes"
               },
               "schema": "metric",
-              "winlog.api": "sum"
+              "type": "sum"
             },
             {
               "enabled": true,
@@ -522,7 +522,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
@@ -539,7 +539,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -553,19 +553,19 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Network Traffic Between Hosts [Packetbeat Flows] ECS",
-          "winlog.api": "table"
+          "title": "Network Traffic Between Hosts [Packetbeat Flows]",
+          "type": "table"
         }
       },
-      "id": "Network-traffic-between-your-hosts-ecs",
-      "winlog.api": "visualization",
+      "id": "Network-traffic-between-your-hosts",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:25.168Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
         "columns": [
-          "winlog.api",
+          "type",
           "event.start",
           "event.end",
           "source.ip",
@@ -600,24 +600,24 @@
               "query": {
                 "query_string": {
                   "analyze_wildcard": true,
-                  "query": "winlog.api: flow"
+                  "query": "type: flow"
                 }
               }
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "Flows Search [Packetbeat] ECS",
-        "winlog.version": 1
+        "title": "Flows Search [Packetbeat]",
+        "version": 1
       },
-      "id": "Packetbeat-Flows-Search-ecs",
-      "winlog.api": "search",
+      "id": "Packetbeat-Flows-Search",
+      "type": "search",
       "updated_at": "2019-01-18T23:49:25.168Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -631,7 +631,7 @@
               "language": "lucene",
               "query": "*"
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "optionsJSON": {
@@ -646,10 +646,10 @@
               "x": 0,
               "y": 25
             },
-            "id": "Top-hosts-creating-traffic-ecs",
+            "id": "Top-hosts-creating-traffic",
             "panelIndex": "1",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -659,10 +659,10 @@
               "x": 0,
               "y": 0
             },
-            "id": "Navigation-ecs",
+            "id": "Navigation",
             "panelIndex": "2",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -672,10 +672,10 @@
               "x": 12,
               "y": 0
             },
-            "id": "Connections-over-time-ecs",
+            "id": "Connections-over-time",
             "panelIndex": "3",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -685,10 +685,10 @@
               "x": 24,
               "y": 25
             },
-            "id": "Top-hosts-receiving-traffic-ecs",
+            "id": "Top-hosts-receiving-traffic",
             "panelIndex": "4",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -708,21 +708,21 @@
               "x": 0,
               "y": 60
             },
-            "id": "Network-traffic-between-your-hosts-ecs",
+            "id": "Network-traffic-between-your-hosts",
             "panelIndex": "5",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
-        "title": "[Packetbeat] Flows ECS",
-        "winlog.version": 1
+        "title": "[Packetbeat] Flows",
+        "version": 1
       },
-      "id": "Packetbeat-Flows-ecs",
-      "winlog.api": "dashboard",
+      "id": "Packetbeat-Flows",
+      "type": "dashboard",
       "updated_at": "2019-01-18T23:49:25.168Z",
-      "winlog.version": 1
+      "version": 1
     }
   ],
-  "winlog.version": "7.0.0-SNAPSHOT"
+  "version": "7.0.0-SNAPSHOT"
 }

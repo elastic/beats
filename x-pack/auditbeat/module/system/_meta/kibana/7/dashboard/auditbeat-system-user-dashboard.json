@@ -18,16 +18,16 @@
                   "negate": false,
                   "params": {
                     "query": "user",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "user"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "user",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -40,9 +40,9 @@
             }
           }
         },
-        "title": "User Count [Auditbeat System] ECS",
+        "title": "User Count [Auditbeat System]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -53,7 +53,7 @@
                 "field": "user.entity_id"
               },
               "schema": "metric",
-              "winlog.api": "cardinality"
+              "type": "cardinality"
             }
           ],
           "params": {
@@ -82,16 +82,16 @@
               },
               "useRanges": false
             },
-            "winlog.api": "metric"
+            "type": "metric"
           },
-          "title": "User Count [Auditbeat System] ECS",
-          "winlog.api": "metric"
+          "title": "User Count [Auditbeat System]",
+          "type": "metric"
         }
       },
-      "id": "e9225120-27f2-11e9-89af-fd12d59dac90-ecs",
-      "winlog.api": "visualization",
+      "id": "e9225120-27f2-11e9-89af-fd12d59dac90",
+      "type": "visualization",
       "updated_at": "2019-02-03T20:35:48.640Z",
-      "winlog.version": 2
+      "version": 2
     },
     {
       "attributes": {
@@ -111,16 +111,16 @@
                   "negate": false,
                   "params": {
                     "query": "user",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "user"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "user",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -137,16 +137,16 @@
                   "negate": true,
                   "params": {
                     "query": "existing_user",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "existing_user"
                 },
                 "query": {
                   "match": {
                     "event.action": {
                       "query": "existing_user",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -159,9 +159,9 @@
             }
           }
         },
-        "title": "User Changes [Auditbeat System] ECS",
+        "title": "User Changes [Auditbeat System]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -171,7 +171,7 @@
                 "customLabel": "User Changes"
               },
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             }
           ],
           "params": {
@@ -200,16 +200,16 @@
               },
               "useRanges": false
             },
-            "winlog.api": "metric"
+            "type": "metric"
           },
-          "title": "User Changes [Auditbeat System] ECS",
-          "winlog.api": "metric"
+          "title": "User Changes [Auditbeat System]",
+          "type": "metric"
         }
       },
-      "id": "00fa0d20-27fc-11e9-89af-fd12d59dac90-ecs",
-      "winlog.api": "visualization",
+      "id": "00fa0d20-27fc-11e9-89af-fd12d59dac90",
+      "type": "visualization",
       "updated_at": "2019-02-03T21:38:11.314Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -229,16 +229,16 @@
                   "negate": false,
                   "params": {
                     "query": "user",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "user"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "user",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -255,16 +255,16 @@
                   "negate": true,
                   "params": {
                     "query": "existing_user",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "existing_user"
                 },
                 "query": {
                   "match": {
                     "event.action": {
                       "query": "existing_user",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -277,9 +277,9 @@
             }
           }
         },
-        "title": "User Change Actions [Auditbeat System] ECS",
+        "title": "User Change Actions [Auditbeat System]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -287,7 +287,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -303,7 +303,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -317,16 +317,16 @@
               "values": true
             },
             "legendPosition": "right",
-            "winlog.api": "pie"
+            "type": "pie"
           },
-          "title": "User Change Actions [Auditbeat System] ECS",
-          "winlog.api": "pie"
+          "title": "User Change Actions [Auditbeat System]",
+          "type": "pie"
         }
       },
-      "id": "dc514de0-2863-11e9-97cb-474beda9f119-ecs",
-      "winlog.api": "visualization",
+      "id": "dc514de0-2863-11e9-97cb-474beda9f119",
+      "type": "visualization",
       "updated_at": "2019-02-04T10:01:37.470Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -346,16 +346,16 @@
                   "negate": false,
                   "params": {
                     "query": "user",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "user"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "user",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -368,9 +368,9 @@
             }
           }
         },
-        "title": "Password Types [Auditbeat System] ECS",
+        "title": "Password Types [Auditbeat System]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -378,7 +378,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -394,7 +394,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -408,16 +408,16 @@
               "values": true
             },
             "legendPosition": "right",
-            "winlog.api": "pie"
+            "type": "pie"
           },
-          "title": "Password Types [Auditbeat System] ECS",
-          "winlog.api": "pie"
+          "title": "Password Types [Auditbeat System]",
+          "type": "pie"
         }
       },
-      "id": "0bf8b4c0-2864-11e9-97cb-474beda9f119-ecs",
-      "winlog.api": "visualization",
+      "id": "0bf8b4c0-2864-11e9-97cb-474beda9f119",
+      "type": "visualization",
       "updated_at": "2019-02-04T10:02:57.420Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -437,16 +437,16 @@
                   "negate": false,
                   "params": {
                     "query": "user",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "user"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "user",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -459,9 +459,9 @@
             }
           }
         },
-        "title": "User Documents Histogram [Auditbeat System] ECS",
+        "title": "User Documents Histogram [Auditbeat System]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -469,7 +469,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -485,7 +485,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             }
           ],
           "params": {
@@ -501,12 +501,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "grid": {
@@ -526,12 +526,12 @@
                 "mode": "stacked",
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "histogram",
+                "type": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "winlog.api": "histogram",
+            "type": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -545,25 +545,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ]
           },
-          "title": "User Documents Histogram [Auditbeat System] ECS",
-          "winlog.api": "histogram"
+          "title": "User Documents Histogram [Auditbeat System]",
+          "type": "histogram"
         }
       },
-      "id": "30f4eff0-2864-11e9-97cb-474beda9f119-ecs",
-      "winlog.api": "visualization",
+      "id": "30f4eff0-2864-11e9-97cb-474beda9f119",
+      "type": "visualization",
       "updated_at": "2019-02-04T10:03:59.471Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -590,16 +590,16 @@
                   "negate": false,
                   "params": {
                     "query": "user",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "user"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "user",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -611,20 +611,20 @@
               "language": "lucene",
               "query": ""
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "User Documents [Auditbeat System] ECS",
-        "winlog.version": 1
+        "title": "User Documents [Auditbeat System]",
+        "version": 1
       },
-      "id": "658a3db0-2864-11e9-97cb-474beda9f119-ecs",
-      "winlog.api": "search",
+      "id": "658a3db0-2864-11e9-97cb-474beda9f119",
+      "type": "search",
       "updated_at": "2019-02-04T10:05:27.691Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -644,16 +644,16 @@
                   "negate": false,
                   "params": {
                     "query": "user",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "user"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "user",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -666,9 +666,9 @@
             }
           }
         },
-        "title": "User OS Distribution [Auditbeat System] ECS",
+        "title": "User OS Distribution [Auditbeat System]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -678,7 +678,7 @@
                 "field": "host.id"
               },
               "schema": "metric",
-              "winlog.api": "cardinality"
+              "type": "cardinality"
             },
             {
               "enabled": true,
@@ -695,7 +695,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
@@ -711,7 +711,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -725,16 +725,16 @@
               "values": true
             },
             "legendPosition": "right",
-            "winlog.api": "pie"
+            "type": "pie"
           },
-          "title": "User OS Distribution [Auditbeat System] ECS",
-          "winlog.api": "pie"
+          "title": "User OS Distribution [Auditbeat System]",
+          "type": "pie"
         }
       },
-      "id": "7f480de0-2864-11e9-97cb-474beda9f119-ecs",
-      "winlog.api": "visualization",
+      "id": "7f480de0-2864-11e9-97cb-474beda9f119",
+      "type": "visualization",
       "updated_at": "2019-02-04T10:06:10.878Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -748,24 +748,24 @@
             }
           }
         },
-        "title": "Dashboard Links [Auditbeat System] ECS",
+        "title": "Dashboard Links [Auditbeat System]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 12,
-            "markdown": "**Dashboards**: [System Overview](#/dashboard/2be46cb0-27f2-11e9-89af-fd12d59dac90-ecs) | [Hosts](#/dashboard/dfe62590-18da-11e9-9094-c50574723088-ecs) | [Logins](#/dashboard/2a17f200-285e-11e9-805f-43bf57dfa519-ecs) | [Users](#/dashboard/ae96a660-2864-11e9-97cb-474beda9f119-ecs) | [Processes](#/dashboard/4c68f110-2863-11e9-97cb-474beda9f119-ecs) | [Sockets](#/dashboard/957a3ef0-2867-11e9-9d21-0be348776e6c-ecs) | [Packages](#/dashboard/137c52f0-286a-11e9-9d21-0be348776e6c-ecs)",
+            "markdown": "**Dashboards**: [System Overview](#/dashboard/2be46cb0-27f2-11e9-89af-fd12d59dac90) | [Hosts](#/dashboard/dfe62590-18da-11e9-9094-c50574723088) | [Logins](#/dashboard/2a17f200-285e-11e9-805f-43bf57dfa519) | [Users](#/dashboard/ae96a660-2864-11e9-97cb-474beda9f119) | [Processes](#/dashboard/4c68f110-2863-11e9-97cb-474beda9f119) | [Sockets](#/dashboard/957a3ef0-2867-11e9-9d21-0be348776e6c) | [Packages](#/dashboard/137c52f0-286a-11e9-9d21-0be348776e6c)",
             "openLinksInNewTab": false
           },
-          "title": "Dashboard Links [Auditbeat System] ECS",
-          "winlog.api": "markdown"
+          "title": "Dashboard Links [Auditbeat System]",
+          "type": "markdown"
         }
       },
-      "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90-ecs",
-      "winlog.api": "visualization",
+      "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90",
+      "type": "visualization",
       "updated_at": "2019-02-04T11:37:25.234Z",
-      "winlog.version": 3
+      "version": 3
     },
     {
       "attributes": {
@@ -795,10 +795,10 @@
               "x": 0,
               "y": 4
             },
-            "id": "e9225120-27f2-11e9-89af-fd12d59dac90-ecs",
+            "id": "e9225120-27f2-11e9-89af-fd12d59dac90",
             "panelIndex": "1",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0"
+            "type": "visualization",
+            "version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -809,10 +809,10 @@
               "x": 8,
               "y": 4
             },
-            "id": "00fa0d20-27fc-11e9-89af-fd12d59dac90-ecs",
+            "id": "00fa0d20-27fc-11e9-89af-fd12d59dac90",
             "panelIndex": "2",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0"
+            "type": "visualization",
+            "version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -823,10 +823,10 @@
               "x": 26,
               "y": 4
             },
-            "id": "dc514de0-2863-11e9-97cb-474beda9f119-ecs",
+            "id": "dc514de0-2863-11e9-97cb-474beda9f119",
             "panelIndex": "3",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0"
+            "type": "visualization",
+            "version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -837,10 +837,10 @@
               "x": 37,
               "y": 4
             },
-            "id": "0bf8b4c0-2864-11e9-97cb-474beda9f119-ecs",
+            "id": "0bf8b4c0-2864-11e9-97cb-474beda9f119",
             "panelIndex": "4",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0"
+            "type": "visualization",
+            "version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -851,10 +851,10 @@
               "x": 0,
               "y": 14
             },
-            "id": "30f4eff0-2864-11e9-97cb-474beda9f119-ecs",
+            "id": "30f4eff0-2864-11e9-97cb-474beda9f119",
             "panelIndex": "5",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0"
+            "type": "visualization",
+            "version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -865,10 +865,10 @@
               "x": 0,
               "y": 23
             },
-            "id": "658a3db0-2864-11e9-97cb-474beda9f119-ecs",
+            "id": "658a3db0-2864-11e9-97cb-474beda9f119",
             "panelIndex": "6",
-            "winlog.api": "search",
-            "winlog.version": "7.0.0"
+            "type": "search",
+            "version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -879,10 +879,10 @@
               "x": 16,
               "y": 4
             },
-            "id": "7f480de0-2864-11e9-97cb-474beda9f119-ecs",
+            "id": "7f480de0-2864-11e9-97cb-474beda9f119",
             "panelIndex": "7",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0"
+            "type": "visualization",
+            "version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -893,21 +893,21 @@
               "x": 0,
               "y": 0
             },
-            "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90-ecs",
+            "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90",
             "panelIndex": "8",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0"
+            "type": "visualization",
+            "version": "7.0.0"
           }
         ],
         "timeRestore": false,
-        "title": "[Auditbeat System] User Dashboard ECS",
-        "winlog.version": 1
+        "title": "[Auditbeat System] User Dashboard",
+        "version": 1
       },
-      "id": "ae96a660-2864-11e9-97cb-474beda9f119-ecs",
-      "winlog.api": "dashboard",
+      "id": "ae96a660-2864-11e9-97cb-474beda9f119",
+      "type": "dashboard",
       "updated_at": "2019-02-04T11:02:23.820Z",
-      "winlog.version": 3
+      "version": 3
     }
   ],
-  "winlog.version": "7.0.0"
+  "version": "7.0.0"
 }

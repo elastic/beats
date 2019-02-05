@@ -17,24 +17,24 @@
             }
           }
         },
-        "title": "Navigation [Packetbeat] ECS",
+        "title": "Navigation [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 10,
-            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard-ecs)\n\n[Network Flows](#/dashboard/Packetbeat-Flows-ecs)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e-ecs) | [Tunneling](#/dashboard/DNS-Unique-Domains-ecs)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb-ecs)\n\n[TLS Overview](#/dashboard/tls-sessions-ecs)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP-ecs)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance-ecs) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance-ecs) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance-ecs) | [Cassandra](#/dashboard/Packetbeat-Cassandra-ecs)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance-ecs)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS-ecs)",
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
             "openLinksInNewTab": false
           },
-          "title": "Navigation [Packetbeat] ECS",
-          "winlog.api": "markdown"
+          "title": "Navigation [Packetbeat]",
+          "type": "markdown"
         }
       },
-      "id": "Navigation-ecs",
-      "winlog.api": "visualization",
+      "id": "Navigation",
+      "type": "visualization",
       "updated_at": "2019-01-19T00:18:59.372Z",
-      "winlog.version": 11
+      "version": 11
     },
     {
       "attributes": {
@@ -48,10 +48,10 @@
             }
           }
         },
-        "savedSearchId": "651fd6d0-88d0-11e7-ad9c-db80de0bf8d3-ecs",
-        "title": "MongoDB errors [Packetbeat] ECS",
+        "savedSearchId": "651fd6d0-88d0-11e7-ad9c-db80de0bf8d3",
+        "title": "MongoDB errors [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -59,7 +59,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -74,7 +74,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -91,7 +91,7 @@
                 "size": 3
               },
               "schema": "split",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
@@ -107,7 +107,7 @@
                 "size": 5
               },
               "schema": "group",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -123,12 +123,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "defaultYExtents": false,
@@ -155,7 +155,7 @@
                 "radiusRatio": 9,
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -165,7 +165,7 @@
             "smoothLines": false,
             "spyPerPage": 10,
             "times": [],
-            "winlog.api": "line",
+            "type": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -181,26 +181,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ],
             "yAxis": {}
           },
-          "title": "MongoDB errors [Packetbeat] ECS",
-          "winlog.api": "line"
+          "title": "MongoDB errors [Packetbeat]",
+          "type": "line"
         }
       },
-      "id": "MongoDB-errors-ecs",
-      "winlog.api": "visualization",
+      "id": "MongoDB-errors",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:27.239Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -214,10 +214,10 @@
             }
           }
         },
-        "savedSearchId": "MongoDB-transactions-ecs",
-        "title": "MongoDB Commands [Packetbeat] ECS",
+        "savedSearchId": "MongoDB-transactions",
+        "title": "MongoDB Commands [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -225,7 +225,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -240,7 +240,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -256,7 +256,7 @@
                 "size": 5
               },
               "schema": "group",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -272,12 +272,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "defaultYExtents": false,
@@ -300,7 +300,7 @@
                 "interpolate": "cardinal",
                 "mode": "stacked",
                 "show": "true",
-                "winlog.api": "area",
+                "type": "area",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -308,7 +308,7 @@
             "shareYAxis": true,
             "smoothLines": true,
             "times": [],
-            "winlog.api": "area",
+            "type": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -324,26 +324,26 @@
                   "defaultYExtents": false,
                   "mode": "silhouette",
                   "setYExtents": false,
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ],
             "yAxis": {}
           },
-          "title": "MongoDB Commands [Packetbeat] ECS",
-          "winlog.api": "area"
+          "title": "MongoDB Commands [Packetbeat]",
+          "type": "area"
         }
       },
-      "id": "MongoDB-commands-ecs",
-      "winlog.api": "visualization",
+      "id": "MongoDB-commands",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:27.239Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -357,10 +357,10 @@
             }
           }
         },
-        "savedSearchId": "651fd6d0-88d0-11e7-ad9c-db80de0bf8d3-ecs",
-        "title": "MongoDB errors per collection [Packetbeat] ECS",
+        "savedSearchId": "651fd6d0-88d0-11e7-ad9c-db80de0bf8d3",
+        "title": "MongoDB errors per collection [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -368,7 +368,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -383,7 +383,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -399,7 +399,7 @@
                 "size": 5
               },
               "schema": "group",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -415,12 +415,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "defaultYExtents": false,
@@ -447,7 +447,7 @@
                 "radiusRatio": 9,
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -457,7 +457,7 @@
             "smoothLines": false,
             "spyPerPage": 10,
             "times": [],
-            "winlog.api": "line",
+            "type": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -473,26 +473,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ],
             "yAxis": {}
           },
-          "title": "MongoDB errors per collection [Packetbeat] ECS",
-          "winlog.api": "line"
+          "title": "MongoDB errors per collection [Packetbeat]",
+          "type": "line"
         }
       },
-      "id": "MongoDB-errors-per-collection-ecs",
-      "winlog.api": "visualization",
+      "id": "MongoDB-errors-per-collection",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:27.239Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -506,10 +506,10 @@
             }
           }
         },
-        "savedSearchId": "MongoDB-transactions-ecs",
-        "title": "MongoDB in/out throughput [Packetbeat] ECS",
+        "savedSearchId": "MongoDB-transactions",
+        "title": "MongoDB in/out throughput [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -519,7 +519,7 @@
                 "field": "source.bytes"
               },
               "schema": "metric",
-              "winlog.api": "sum"
+              "type": "sum"
             },
             {
               "enabled": true,
@@ -534,7 +534,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -543,7 +543,7 @@
                 "field": "destination.bytes"
               },
               "schema": "metric",
-              "winlog.api": "sum"
+              "type": "sum"
             }
           ],
           "params": {
@@ -559,12 +559,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "defaultYExtents": false,
@@ -591,7 +591,7 @@
                 "radiusRatio": 9,
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -604,7 +604,7 @@
                 "mode": "normal",
                 "show": true,
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -613,7 +613,7 @@
             "showCircles": true,
             "smoothLines": false,
             "times": [],
-            "winlog.api": "line",
+            "type": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -629,26 +629,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ],
             "yAxis": {}
           },
-          "title": "MongoDB in/out throughput [Packetbeat] ECS",
-          "winlog.api": "line"
+          "title": "MongoDB in/out throughput [Packetbeat]",
+          "type": "line"
         }
       },
-      "id": "MongoDB-in-slash-out-throughput-ecs",
-      "winlog.api": "visualization",
+      "id": "MongoDB-in-slash-out-throughput",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:27.239Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -662,10 +662,10 @@
             }
           }
         },
-        "savedSearchId": "MongoDB-transactions-ecs",
-        "title": "MongoDB response times by collection [Packetbeat] ECS",
+        "savedSearchId": "MongoDB-transactions",
+        "title": "MongoDB response times by collection [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -678,7 +678,7 @@
                 ]
               },
               "schema": "metric",
-              "winlog.api": "percentiles"
+              "type": "percentiles"
             },
             {
               "enabled": true,
@@ -693,7 +693,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -709,14 +709,14 @@
                 "size": 5
               },
               "schema": "group",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
               "id": "4",
               "params": {},
               "schema": "radius",
-              "winlog.api": "count"
+              "type": "count"
             }
           ],
           "params": {
@@ -732,12 +732,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "defaultYExtents": false,
@@ -764,7 +764,7 @@
                 "radiusRatio": "9",
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -773,7 +773,7 @@
             "showCircles": true,
             "smoothLines": false,
             "times": [],
-            "winlog.api": "line",
+            "type": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -789,26 +789,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Percentiles of event.duration"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ],
             "yAxis": {}
           },
-          "title": "MongoDB response times by collection [Packetbeat] ECS",
-          "winlog.api": "line"
+          "title": "MongoDB response times by collection [Packetbeat]",
+          "type": "line"
         }
       },
-      "id": "MongoDB-response-times-by-collection-ecs",
-      "winlog.api": "visualization",
+      "id": "MongoDB-response-times-by-collection",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:27.239Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -822,8 +822,8 @@
             }
           }
         },
-        "savedSearchId": "MongoDB-transactions-ecs",
-        "title": "Top slowest MongoDB queries [Packetbeat] ECS",
+        "savedSearchId": "MongoDB-transactions",
+        "title": "Top slowest MongoDB queries [Packetbeat]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -834,7 +834,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -847,7 +847,7 @@
                 ]
               },
               "schema": "metric",
-              "winlog.api": "percentiles"
+              "type": "percentiles"
             },
             {
               "enabled": true,
@@ -863,7 +863,7 @@
                 "size": 10
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -877,14 +877,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top slowest MongoDB queries [Packetbeat] ECS",
-          "winlog.api": "table"
+          "title": "Top slowest MongoDB queries [Packetbeat]",
+          "type": "table"
         }
       },
-      "id": "Top-slowest-MongoDB-queries-ecs",
-      "winlog.api": "visualization",
+      "id": "Top-slowest-MongoDB-queries",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:27.239Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -898,10 +898,10 @@
             }
           }
         },
-        "savedSearchId": "MongoDB-transactions-with-write-concern-0-ecs",
-        "title": "Number of MongoDB transactions with writeConcern w=0 [Packetbeat] ECS",
+        "savedSearchId": "MongoDB-transactions-with-write-concern-0",
+        "title": "Number of MongoDB transactions with writeConcern w=0 [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -909,7 +909,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -924,14 +924,14 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
               "id": "3",
               "params": {},
               "schema": "radius",
-              "winlog.api": "count"
+              "type": "count"
             }
           ],
           "params": {
@@ -947,12 +947,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "defaultYExtents": false,
@@ -979,7 +979,7 @@
                 "radiusRatio": 9,
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -988,7 +988,7 @@
             "showCircles": true,
             "smoothLines": false,
             "times": [],
-            "winlog.api": "line",
+            "type": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -1004,26 +1004,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ],
             "yAxis": {}
           },
-          "title": "Number of MongoDB transactions with writeConcern w=0 [Packetbeat] ECS",
-          "winlog.api": "line"
+          "title": "Number of MongoDB transactions with writeConcern w=0 [Packetbeat]",
+          "type": "line"
         }
       },
-      "id": "Number-of-MongoDB-transactions-with-writeConcern-w-equal-0-ecs",
-      "winlog.api": "visualization",
+      "id": "Number-of-MongoDB-transactions-with-writeConcern-w-equal-0",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:27.239Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -1043,20 +1043,20 @@
                   "alias": null,
                   "disabled": false,
                   "index": "packetbeat-*",
-                  "key": "winlog.api",
+                  "key": "type",
                   "negate": false,
                   "params": {
                     "query": "mongodb",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "mongodb"
                 },
                 "query": {
                   "match": {
-                    "winlog.api": {
+                    "type": {
                       "query": "mongodb",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -1073,16 +1073,16 @@
                   "negate": true,
                   "params": {
                     "query": "OK",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "OK"
                 },
                 "query": {
                   "match": {
                     "status": {
                       "query": "OK",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -1094,26 +1094,26 @@
               "language": "lucene",
               "query": "*"
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "MongoDB errors [Packetbeat] ECS",
-        "winlog.version": 1
+        "title": "MongoDB errors [Packetbeat]",
+        "version": 1
       },
-      "id": "651fd6d0-88d0-11e7-ad9c-db80de0bf8d3-ecs",
-      "winlog.api": "search",
+      "id": "651fd6d0-88d0-11e7-ad9c-db80de0bf8d3",
+      "type": "search",
       "updated_at": "2019-01-18T23:49:27.239Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
         "columns": [
           "method",
-          "winlog.api",
+          "type",
           "path",
           "event.duration",
           "status",
@@ -1136,16 +1136,16 @@
                   "negate": false,
                   "params": {
                     "query": "mongodb",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "mongodb"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "mongodb",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -1174,26 +1174,26 @@
                 }
               }
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "MongoDB Transaction Search [Packetbeat] ECS",
-        "winlog.version": 1
+        "title": "MongoDB Transaction Search [Packetbeat]",
+        "version": 1
       },
-      "id": "MongoDB-transactions-ecs",
-      "winlog.api": "search",
+      "id": "MongoDB-transactions",
+      "type": "search",
       "updated_at": "2019-01-18T23:49:27.239Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
         "columns": [
           "method",
-          "winlog.api",
+          "type",
           "path",
           "event.duration",
           "status",
@@ -1216,16 +1216,16 @@
                   "negate": false,
                   "params": {
                     "query": "mongodb",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "mongodb"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "mongodb",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -1254,20 +1254,20 @@
                 }
               }
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "MongoDB transactions with write concern 0 [Packetbeat] ECS",
-        "winlog.version": 1
+        "title": "MongoDB transactions with write concern 0 [Packetbeat]",
+        "version": 1
       },
-      "id": "MongoDB-transactions-with-write-concern-0-ecs",
-      "winlog.api": "search",
+      "id": "MongoDB-transactions-with-write-concern-0",
+      "type": "search",
       "updated_at": "2019-01-18T23:49:27.239Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -1281,7 +1281,7 @@
               "language": "lucene",
               "query": "*"
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "optionsJSON": {
@@ -1296,10 +1296,10 @@
               "x": 0,
               "y": 0
             },
-            "id": "Navigation-ecs",
+            "id": "Navigation",
             "panelIndex": "1",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1309,10 +1309,10 @@
               "x": 12,
               "y": 0
             },
-            "id": "MongoDB-errors-ecs",
+            "id": "MongoDB-errors",
             "panelIndex": "2",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1322,10 +1322,10 @@
               "x": 32,
               "y": 0
             },
-            "id": "MongoDB-commands-ecs",
+            "id": "MongoDB-commands",
             "panelIndex": "3",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1335,10 +1335,10 @@
               "x": 0,
               "y": 20
             },
-            "id": "MongoDB-errors-per-collection-ecs",
+            "id": "MongoDB-errors-per-collection",
             "panelIndex": "4",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1348,10 +1348,10 @@
               "x": 16,
               "y": 20
             },
-            "id": "MongoDB-in-slash-out-throughput-ecs",
+            "id": "MongoDB-in-slash-out-throughput",
             "panelIndex": "5",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1361,10 +1361,10 @@
               "x": 0,
               "y": 35
             },
-            "id": "MongoDB-response-times-by-collection-ecs",
+            "id": "MongoDB-response-times-by-collection",
             "panelIndex": "6",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -1384,10 +1384,10 @@
               "x": 32,
               "y": 35
             },
-            "id": "Top-slowest-MongoDB-queries-ecs",
+            "id": "Top-slowest-MongoDB-queries",
             "panelIndex": "7",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1397,21 +1397,21 @@
               "x": 32,
               "y": 20
             },
-            "id": "Number-of-MongoDB-transactions-with-writeConcern-w-equal-0-ecs",
+            "id": "Number-of-MongoDB-transactions-with-writeConcern-w-equal-0",
             "panelIndex": "8",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
-        "title": "[Packetbeat] MongoDB ECS",
-        "winlog.version": 1
+        "title": "[Packetbeat] MongoDB",
+        "version": 1
       },
-      "id": "Packetbeat-MongoDB-performance-ecs",
-      "winlog.api": "dashboard",
+      "id": "Packetbeat-MongoDB-performance",
+      "type": "dashboard",
       "updated_at": "2019-01-18T23:49:27.239Z",
-      "winlog.version": 1
+      "version": 1
     }
   ],
-  "winlog.version": "7.0.0-SNAPSHOT"
+  "version": "7.0.0-SNAPSHOT"
 }

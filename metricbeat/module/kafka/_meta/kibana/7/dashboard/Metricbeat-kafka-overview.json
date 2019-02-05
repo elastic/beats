@@ -6,9 +6,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kafka Topic & Consumer Offsets [Metricbeat Kafka] ECS", 
+                "title": "Kafka Topic & Consumer Offsets [Metricbeat Kafka]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -38,7 +38,7 @@
                                     {
                                         "field": "kafka.partition.offset.newest", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "sum"
+                                        "type": "sum"
                                     }
                                 ], 
                                 "point_size": "0", 
@@ -64,7 +64,7 @@
                                     {
                                         "field": "kafka.consumergroup.offset", 
                                         "id": "d43034c1-8f1e-11e8-8784-cd0acd161a28", 
-                                        "winlog.api": "sum"
+                                        "type": "sum"
                                     }
                                 ], 
                                 "point_size": "1.5", 
@@ -86,16 +86,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Kafka Topic & Consumer Offsets [Metricbeat Kafka] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Kafka Topic & Consumer Offsets [Metricbeat Kafka]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "b9d12c80-8e63-11e8-8fa2-3d5f811fbd0f-ecs", 
-            "winlog.api": "visualization", 
+            "id": "b9d12c80-8e63-11e8-8fa2-3d5f811fbd0f", 
+            "type": "visualization", 
             "updated_at": "2018-10-18T16:12:14.222Z", 
-            "winlog.version": 9
+            "version": 9
         }, 
         {
             "attributes": {
@@ -103,9 +103,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kafka Controls [Metricbeat Kafka] ECS", 
+                "title": "Kafka Controls [Metricbeat Kafka]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -119,10 +119,10 @@
                                     "multiselect": true, 
                                     "order": "desc", 
                                     "size": 10, 
-                                    "winlog.api": "terms"
+                                    "type": "terms"
                                 }, 
                                 "parent": "", 
-                                "winlog.api": "list"
+                                "type": "list"
                             }, 
                             {
                                 "fieldName": "kafka.partition.id", 
@@ -133,24 +133,24 @@
                                     "multiselect": true, 
                                     "order": "desc", 
                                     "size": 5, 
-                                    "winlog.api": "terms"
+                                    "type": "terms"
                                 }, 
                                 "parent": "1532342651170", 
-                                "winlog.api": "list"
+                                "type": "list"
                             }
                         ], 
                         "pinFilters": false, 
                         "updateFiltersOnChange": true, 
                         "useTimeFilter": false
                     }, 
-                    "title": "Kafka Controls [Metricbeat Kafka] ECS", 
-                    "winlog.api": "input_control_vis"
+                    "title": "Kafka Controls [Metricbeat Kafka]", 
+                    "type": "input_control_vis"
                 }
             }, 
-            "id": "8d2f79a0-8e65-11e8-8fa2-3d5f811fbd0f-ecs", 
-            "winlog.api": "visualization", 
+            "id": "8d2f79a0-8e65-11e8-8fa2-3d5f811fbd0f", 
+            "type": "visualization", 
             "updated_at": "2018-10-18T16:12:14.222Z", 
-            "winlog.version": 10
+            "version": 10
         }, 
         {
             "attributes": {
@@ -158,9 +158,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kafka Consumer Group Lag vs Time [Metricbeat Kafka] ECS", 
+                "title": "Kafka Consumer Group Lag vs Time [Metricbeat Kafka]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -184,17 +184,17 @@
                                     {
                                         "field": "kafka.partition.offset.newest", 
                                         "id": "0dcb8021-8e6d-11e8-bfab-6f29bad3a6f2", 
-                                        "winlog.api": "max"
+                                        "type": "max"
                                     }, 
                                     {
                                         "field": "kafka.consumergroup.offset", 
                                         "id": "4bd11db0-8e6f-11e8-bfab-6f29bad3a6f2", 
-                                        "winlog.api": "max"
+                                        "type": "max"
                                     }, 
                                     {
                                         "id": "e0742d50-8e78-11e8-abb3-cf57ca7a810c", 
                                         "script": "def lag = params.partition - params.consumergroup; if (lag < 0) { return 0 } return lag", 
-                                        "winlog.api": "calculation", 
+                                        "type": "calculation", 
                                         "variables": [
                                             {
                                                 "field": "0dcb8021-8e6d-11e8-bfab-6f29bad3a6f2", 
@@ -220,16 +220,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Kafka Consumer Group Lag vs Time [Metricbeat Kafka] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Kafka Consumer Group Lag vs Time [Metricbeat Kafka]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "944188f0-8e79-11e8-8fa2-3d5f811fbd0f-ecs", 
-            "winlog.api": "visualization", 
+            "id": "944188f0-8e79-11e8-8fa2-3d5f811fbd0f", 
+            "type": "visualization", 
             "updated_at": "2018-10-18T16:12:14.222Z", 
-            "winlog.version": 8
+            "version": 8
         }, 
         {
             "attributes": {
@@ -249,16 +249,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "partition", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "partition"
                                 }, 
                                 "query": {
                                     "match": {
                                         "metricset.name": {
                                             "query": "partition", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -275,16 +275,16 @@
                                     "negate": true, 
                                     "params": {
                                         "query": "__consumer_offsets", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "__consumer_offsets"
                                 }, 
                                 "query": {
                                     "match": {
                                         "kafka.topic.name": {
                                             "query": "__consumer_offsets", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -297,9 +297,9 @@
                         }
                     }
                 }, 
-                "title": "Kafka Metrics [Metricbeat Kafka] ECS", 
+                "title": "Kafka Metrics [Metricbeat Kafka]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -310,7 +310,7 @@
                                 "field": "kafka.topic.name"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "cardinality"
+                            "type": "cardinality"
                         }, 
                         {
                             "enabled": true, 
@@ -320,7 +320,7 @@
                                 "field": "kafka.partition.broker.id"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "cardinality"
+                            "type": "cardinality"
                         }, 
                         {
                             "enabled": true, 
@@ -330,7 +330,7 @@
                                 "field": "kafka.partition.topic_id"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "cardinality"
+                            "type": "cardinality"
                         }, 
                         {
                             "enabled": true, 
@@ -340,7 +340,7 @@
                                 "field": "kafka.partition.topic_broker_id"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "cardinality"
+                            "type": "cardinality"
                         }
                     ], 
                     "params": {
@@ -369,16 +369,16 @@
                             }, 
                             "useRanges": false
                         }, 
-                        "winlog.api": "metric"
+                        "type": "metric"
                     }, 
-                    "title": "Kafka Metrics [Metricbeat Kafka] ECS", 
-                    "winlog.api": "metric"
+                    "title": "Kafka Metrics [Metricbeat Kafka]", 
+                    "type": "metric"
                 }
             }, 
-            "id": "dc89f8d0-8e8e-11e8-8fa2-3d5f811fbd0f-ecs", 
-            "winlog.api": "visualization", 
+            "id": "dc89f8d0-8e8e-11e8-8fa2-3d5f811fbd0f", 
+            "type": "visualization", 
             "updated_at": "2018-10-18T16:12:14.222Z", 
-            "winlog.version": 12
+            "version": 12
         }, 
         {
             "attributes": {
@@ -386,9 +386,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Consumer Partition Reassignments [Metricbeat Kafka] ECS", 
+                "title": "Consumer Partition Reassignments [Metricbeat Kafka]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -415,18 +415,18 @@
                                     {
                                         "field": "kafka.consumergroup.partition", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "sum"
+                                        "type": "sum"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "6b69c760-8f20-11e8-8927-d7e991b5b6ab", 
-                                        "winlog.api": "derivative", 
+                                        "type": "derivative", 
                                         "unit": ""
                                     }, 
                                     {
                                         "id": "976f9d80-8f20-11e8-8927-d7e991b5b6ab", 
                                         "script": "if (params.sum_partition < 0) { return -1 } else if (params.sum_partition > 0) { return 1 }", 
-                                        "winlog.api": "calculation", 
+                                        "type": "calculation", 
                                         "variables": [
                                             {
                                                 "field": "6b69c760-8f20-11e8-8927-d7e991b5b6ab", 
@@ -448,16 +448,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Consumer Partition Reassignments [Metricbeat Kafka] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Consumer Partition Reassignments [Metricbeat Kafka]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "587f2360-8f21-11e8-8fa2-3d5f811fbd0f-ecs", 
-            "winlog.api": "visualization", 
+            "id": "587f2360-8f21-11e8-8fa2-3d5f811fbd0f", 
+            "type": "visualization", 
             "updated_at": "2018-10-18T16:12:14.222Z", 
-            "winlog.version": 8
+            "version": 8
         }, 
         {
             "attributes": {
@@ -477,16 +477,16 @@
                                     "negate": true, 
                                     "params": {
                                         "query": "__consumer_offsets", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "__consumer_offsets"
                                 }, 
                                 "query": {
                                     "match": {
                                         "kafka.topic.name": {
                                             "query": "__consumer_offsets", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -499,9 +499,9 @@
                         }
                     }
                 }, 
-                "title": "Consumer Metrics [Metricbeat Kafka] ECS", 
+                "title": "Consumer Metrics [Metricbeat Kafka]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -512,7 +512,7 @@
                                 "field": "kafka.consumergroup.id"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "cardinality"
+                            "type": "cardinality"
                         }
                     ], 
                     "params": {
@@ -541,16 +541,16 @@
                             }, 
                             "useRanges": false
                         }, 
-                        "winlog.api": "metric"
+                        "type": "metric"
                     }, 
-                    "title": "Consumer Metrics [Metricbeat Kafka] ECS", 
-                    "winlog.api": "metric"
+                    "title": "Consumer Metrics [Metricbeat Kafka]", 
+                    "type": "metric"
                 }
             }, 
-            "id": "1681f1a0-90e7-11e8-8fa2-3d5f811fbd0f-ecs", 
-            "winlog.api": "visualization", 
+            "id": "1681f1a0-90e7-11e8-8fa2-3d5f811fbd0f", 
+            "type": "visualization", 
             "updated_at": "2018-10-18T16:12:14.222Z", 
-            "winlog.version": 8
+            "version": 8
         }, 
         {
             "attributes": {
@@ -565,7 +565,7 @@
                         }
                     }
                 }, 
-                "title": "Kafka Consumer Group Clients [Metricbeat Kafka] ECS", 
+                "title": "Kafka Consumer Group Clients [Metricbeat Kafka]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -576,7 +576,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -587,7 +587,7 @@
                                 "field": "kafka.consumergroup.offset"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -604,7 +604,7 @@
                                 "size": 64
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -621,7 +621,7 @@
                                 "size": 64
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -638,7 +638,7 @@
                                 "size": 256
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -652,14 +652,14 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Kafka Consumer Group Clients [Metricbeat Kafka] ECS", 
-                    "winlog.api": "table"
+                    "title": "Kafka Consumer Group Clients [Metricbeat Kafka]", 
+                    "type": "table"
                 }
             }, 
-            "id": "9a7576e0-d231-11e8-8766-dbbdc39e7ba9-ecs", 
-            "winlog.api": "visualization", 
+            "id": "9a7576e0-d231-11e8-8766-dbbdc39e7ba9", 
+            "type": "visualization", 
             "updated_at": "2018-10-18T16:12:14.222Z", 
-            "winlog.version": 2
+            "version": 2
         }, 
         {
             "attributes": {
@@ -667,7 +667,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kafka Broker Details [Metricbeat Kafka] ECS", 
+                "title": "Kafka Broker Details [Metricbeat Kafka]", 
                 "uiStateJSON": {
                     "table": {
                         "sort": {
@@ -676,7 +676,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -708,7 +708,7 @@
                                     {
                                         "field": "kafka.topic.name", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "cardinality"
+                                        "type": "cardinality"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -737,7 +737,7 @@
                                     {
                                         "field": "kafka.partition.topic_id", 
                                         "id": "b38eb8b0-d2ec-11e8-88c8-af5b2a9ee6b2", 
-                                        "winlog.api": "cardinality"
+                                        "type": "cardinality"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -764,7 +764,7 @@
                                     {
                                         "field": "kafka.partition.topic_broker_id", 
                                         "id": "cf09f050-d2ec-11e8-88c8-af5b2a9ee6b2", 
-                                        "winlog.api": "cardinality"
+                                        "type": "cardinality"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -776,16 +776,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "table"
+                        "type": "table"
                     }, 
-                    "title": "Kafka Broker Details [Metricbeat Kafka] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Kafka Broker Details [Metricbeat Kafka]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "27dd5960-d2ed-11e8-8766-dbbdc39e7ba9-ecs", 
-            "winlog.api": "visualization", 
+            "id": "27dd5960-d2ed-11e8-8766-dbbdc39e7ba9", 
+            "type": "visualization", 
             "updated_at": "2018-10-18T16:28:30.809Z", 
-            "winlog.version": 6
+            "version": 6
         }, 
         {
             "attributes": {
@@ -793,7 +793,7 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kafka Topic Details [Metricbeat Kafka] ECS", 
+                "title": "Kafka Topic Details [Metricbeat Kafka]", 
                 "uiStateJSON": {
                     "table": {
                         "sort": {
@@ -802,7 +802,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -839,7 +839,7 @@
                                     {
                                         "field": "kafka.broker.id", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "cardinality"
+                                        "type": "cardinality"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -866,7 +866,7 @@
                                     {
                                         "field": "kafka.partition.id", 
                                         "id": "7d640441-d2f4-11e8-9dd4-c5f03280d7b0", 
-                                        "winlog.api": "cardinality"
+                                        "type": "cardinality"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -893,7 +893,7 @@
                                     {
                                         "field": "kafka.partition.topic_broker_id", 
                                         "id": "ad26e261-d2f4-11e8-9dd4-c5f03280d7b0", 
-                                        "winlog.api": "cardinality"
+                                        "type": "cardinality"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -920,7 +920,7 @@
                                     {
                                         "field": "kafka.consumergroup.client.id", 
                                         "id": "26d2cd91-d2f5-11e8-9dd4-c5f03280d7b0", 
-                                        "winlog.api": "cardinality"
+                                        "type": "cardinality"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -947,7 +947,7 @@
                                     {
                                         "field": "kafka.partition.offset.newest", 
                                         "id": "dc393530-d2f4-11e8-9dd4-c5f03280d7b0", 
-                                        "winlog.api": "max"
+                                        "type": "max"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -974,7 +974,7 @@
                                     {
                                         "field": "kafka.partition.offset.oldest", 
                                         "id": "11366c81-d2f5-11e8-9dd4-c5f03280d7b0", 
-                                        "winlog.api": "min"
+                                        "type": "min"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -986,16 +986,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "table"
+                        "type": "table"
                     }, 
-                    "title": "Kafka Topic Details [Metricbeat Kafka] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Kafka Topic Details [Metricbeat Kafka]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "491fee50-d2f5-11e8-8766-dbbdc39e7ba9-ecs", 
-            "winlog.api": "visualization", 
+            "id": "491fee50-d2f5-11e8-8766-dbbdc39e7ba9", 
+            "type": "visualization", 
             "updated_at": "2018-10-18T16:51:33.352Z", 
-            "winlog.version": 3
+            "version": 3
         }, 
         {
             "attributes": {
@@ -1009,7 +1009,7 @@
                             "language": "kuery", 
                             "query": ""
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -1026,11 +1026,11 @@
                             "x": 0, 
                             "y": 20
                         }, 
-                        "id": "b9d12c80-8e63-11e8-8fa2-3d5f811fbd0f-ecs", 
+                        "id": "b9d12c80-8e63-11e8-8fa2-3d5f811fbd0f", 
                         "panelIndex": "1", 
                         "title": "Kafka Topic & Consumer Offsets", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.3.1"
+                        "type": "visualization", 
+                        "version": "6.3.1"
                     }, 
                     {
                         "gridData": {
@@ -1040,11 +1040,11 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "8d2f79a0-8e65-11e8-8fa2-3d5f811fbd0f-ecs", 
+                        "id": "8d2f79a0-8e65-11e8-8fa2-3d5f811fbd0f", 
                         "panelIndex": "3", 
                         "title": "Kafka Controls", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.3.1"
+                        "type": "visualization", 
+                        "version": "6.3.1"
                     }, 
                     {
                         "gridData": {
@@ -1054,11 +1054,11 @@
                             "x": 0, 
                             "y": 6
                         }, 
-                        "id": "944188f0-8e79-11e8-8fa2-3d5f811fbd0f-ecs", 
+                        "id": "944188f0-8e79-11e8-8fa2-3d5f811fbd0f", 
                         "panelIndex": "6", 
                         "title": "Consumer Group Lag by Topic", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.3.1"
+                        "type": "visualization", 
+                        "version": "6.3.1"
                     }, 
                     {
                         "embeddableConfig": {
@@ -1071,11 +1071,11 @@
                             "x": 16, 
                             "y": 0
                         }, 
-                        "id": "dc89f8d0-8e8e-11e8-8fa2-3d5f811fbd0f-ecs", 
+                        "id": "dc89f8d0-8e8e-11e8-8fa2-3d5f811fbd0f", 
                         "panelIndex": "10", 
                         "title": "Kafka Metrics", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.3.1"
+                        "type": "visualization", 
+                        "version": "6.3.1"
                     }, 
                     {
                         "embeddableConfig": {}, 
@@ -1086,11 +1086,11 @@
                             "x": 0, 
                             "y": 33
                         }, 
-                        "id": "587f2360-8f21-11e8-8fa2-3d5f811fbd0f-ecs", 
+                        "id": "587f2360-8f21-11e8-8fa2-3d5f811fbd0f", 
                         "panelIndex": "12", 
                         "title": "Consumer Partition Reassignments", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.3.1"
+                        "type": "visualization", 
+                        "version": "6.3.1"
                     }, 
                     {
                         "embeddableConfig": {}, 
@@ -1101,11 +1101,11 @@
                             "x": 41, 
                             "y": 0
                         }, 
-                        "id": "1681f1a0-90e7-11e8-8fa2-3d5f811fbd0f-ecs", 
+                        "id": "1681f1a0-90e7-11e8-8fa2-3d5f811fbd0f", 
                         "panelIndex": "13", 
                         "title": "Consumer Metrics", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.3.1"
+                        "type": "visualization", 
+                        "version": "6.3.1"
                     }, 
                     {
                         "embeddableConfig": {
@@ -1126,11 +1126,11 @@
                             "x": 24, 
                             "y": 27
                         }, 
-                        "id": "9a7576e0-d231-11e8-8766-dbbdc39e7ba9-ecs", 
+                        "id": "9a7576e0-d231-11e8-8766-dbbdc39e7ba9", 
                         "panelIndex": "14", 
                         "title": "Kafka Consumer Group Clients", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.3.0"
+                        "type": "visualization", 
+                        "version": "6.3.0"
                     }, 
                     {
                         "embeddableConfig": {}, 
@@ -1141,11 +1141,11 @@
                             "x": 24, 
                             "y": 6
                         }, 
-                        "id": "27dd5960-d2ed-11e8-8766-dbbdc39e7ba9-ecs", 
+                        "id": "27dd5960-d2ed-11e8-8766-dbbdc39e7ba9", 
                         "panelIndex": "15", 
                         "title": "Kafka Brokers", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.3.0"
+                        "type": "visualization", 
+                        "version": "6.3.0"
                     }, 
                     {
                         "embeddableConfig": {
@@ -1163,22 +1163,22 @@
                             "x": 24, 
                             "y": 16
                         }, 
-                        "id": "491fee50-d2f5-11e8-8766-dbbdc39e7ba9-ecs", 
+                        "id": "491fee50-d2f5-11e8-8766-dbbdc39e7ba9", 
                         "panelIndex": "16", 
                         "title": "Kafka Topic Details", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.3.0"
+                        "type": "visualization", 
+                        "version": "6.3.0"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat Kafka] Overview ECS", 
-                "winlog.version": 1
+                "title": "[Metricbeat Kafka] Overview", 
+                "version": 1
             }, 
-            "id": "ea488d90-8e63-11e8-8fa2-3d5f811fbd0f-ecs", 
-            "winlog.api": "dashboard", 
+            "id": "ea488d90-8e63-11e8-8fa2-3d5f811fbd0f", 
+            "type": "dashboard", 
             "updated_at": "2018-10-18T17:11:35.895Z", 
-            "winlog.version": 23
+            "version": 23
         }
     ], 
-    "winlog.version": "6.3.0"
+    "version": "6.3.0"
 }

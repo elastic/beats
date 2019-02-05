@@ -11,12 +11,12 @@
                         "query": {
                             "query_string": {
                                 "analyze_wildcard": true, 
-                                "query": "event.action:Accepted"
+                                "query": "system.auth.ssh.event:Accepted"
                             }
                         }
                     }
                 }, 
-                "title": "Successful SSH logins [Filebeat System] ECS", 
+                "title": "Successful SSH logins [Filebeat System]", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -28,7 +28,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -36,7 +36,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -49,7 +49,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -61,7 +61,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -76,13 +76,13 @@
                         "setYExtents": false, 
                         "times": []
                     }, 
-                    "title": "Successful SSH logins ECS", 
-                    "winlog.api": "histogram"
+                    "title": "Successful SSH logins", 
+                    "type": "histogram"
                 }
             }, 
-            "id": "d16bb400-f9cc-11e6-8115-a7c18106d86a-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "d16bb400-f9cc-11e6-8115-a7c18106d86a", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -94,7 +94,7 @@
                         "index": "filebeat-*"
                     }
                 }, 
-                "title": "SSH login attempts [Filebeat System] ECS", 
+                "title": "SSH login attempts [Filebeat System]", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -104,7 +104,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -112,7 +112,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -125,19 +125,19 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "event.action", 
+                                "field": "system.auth.ssh.event", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -152,13 +152,13 @@
                         "setYExtents": false, 
                         "times": []
                     }, 
-                    "title": "SSH login attempts ECS", 
-                    "winlog.api": "histogram"
+                    "title": "SSH login attempts", 
+                    "type": "histogram"
                 }
             }, 
-            "id": "78b74f30-f9cd-11e6-8115-a7c18106d86a-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "78b74f30-f9cd-11e6-8115-a7c18106d86a", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -171,14 +171,14 @@
                         "query": {
                             "query_string": {
                                 "analyze_wildcard": true, 
-                                "query": "event.action:Failed OR event.action:Invalid"
+                                "query": "system.auth.ssh.event:Failed OR system.auth.ssh.event:Invalid"
                             }
                         }
                     }
                 }, 
-                "title": "SSH users of failed login attempts [Filebeat System] ECS", 
+                "title": "SSH users of failed login attempts [Filebeat System]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -186,7 +186,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -198,7 +198,7 @@
                                 "size": 50
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -208,13 +208,13 @@
                         "orientation": "single", 
                         "scale": "linear"
                     }, 
-                    "title": "SSH users of failed login attempts ECS", 
-                    "winlog.api": "tagcloud"
+                    "title": "SSH users of failed login attempts", 
+                    "type": "tagcloud"
                 }
             }, 
-            "id": "341ffe70-f9ce-11e6-8115-a7c18106d86a-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "341ffe70-f9ce-11e6-8115-a7c18106d86a", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -227,12 +227,12 @@
                         "query": {
                             "query_string": {
                                 "analyze_wildcard": true, 
-                                "query": "event.action:Failed OR event.action:Invalid"
+                                "query": "system.auth.ssh.event:Failed OR system.auth.ssh.event:Invalid"
                             }
                         }
                     }
                 }, 
-                "title": "SSH failed login attempts source locations [Filebeat System] ECS", 
+                "title": "SSH failed login attempts source locations [Filebeat System]", 
                 "uiStateJSON": {
                     "mapCenter": [
                         17.602139123350838, 
@@ -240,7 +240,7 @@
                     ], 
                     "mapZoom": 2
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -248,18 +248,18 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
                             "id": "2", 
                             "params": {
                                 "autoPrecision": true, 
-                                "field": "source.geo.location", 
+                                "field": "system.auth.ssh.geoip.location", 
                                 "precision": 2
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "geohash_grid"
+                            "type": "geohash_grid"
                         }
                     ], 
                     "listeners": {}, 
@@ -286,27 +286,27 @@
                                 "layers": "0", 
                                 "styles": "", 
                                 "transparent": true, 
-                                "winlog.version": "1.3.0"
+                                "version": "1.3.0"
                             }, 
                             "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
                         }
                     }, 
-                    "title": "SSH failed login attempts source locations ECS", 
-                    "winlog.api": "tile_map"
+                    "title": "SSH failed login attempts source locations", 
+                    "type": "tile_map"
                 }
             }, 
-            "id": "3cec3eb0-f9d3-11e6-8a3e-2b904044ea1d-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "3cec3eb0-f9d3-11e6-8a3e-2b904044ea1d", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
                 "columns": [
-                    "event.action", 
+                    "system.auth.ssh.event", 
                     "system.auth.ssh.method", 
                     "system.auth.user", 
-                    "source.ip", 
-                    "source.geo.country_iso_code"
+                    "system.auth.ssh.ip", 
+                    "system.auth.ssh.geoip.country_iso_code"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -327,12 +327,12 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "SSH login attempts [Filebeat System] ECS", 
-                "winlog.version": 1
+                "title": "SSH login attempts [Filebeat System]", 
+                "version": 1
             }, 
-            "id": "62439dc0-f9c9-11e6-a747-6121780e0414-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 2
+            "id": "62439dc0-f9c9-11e6-a747-6121780e0414", 
+            "type": "search", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -340,22 +340,22 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Dashboards [Filebeat System] ECS", 
+                "title": "Dashboards [Filebeat System]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
                         "fontSize": 12, 
-                        "markdown": "[Syslog](#/dashboard/Filebeat-syslog-dashboard-ecs) | [Sudo commands](#/dashboard/277876d0-fa2c-11e6-bbd3-29c986c96e5a-ecs) | [SSH logins](#/dashboard/5517a150-f9ce-11e6-8115-a7c18106d86a-ecs) | [New users and groups](#/dashboard/0d3f2380-fa78-11e6-ae9b-81e5311e8cab-ecs)"
+                        "markdown": "[Syslog](#/dashboard/Filebeat-syslog-dashboard) | [Sudo commands](#/dashboard/277876d0-fa2c-11e6-bbd3-29c986c96e5a) | [SSH logins](#/dashboard/5517a150-f9ce-11e6-8115-a7c18106d86a) | [New users and groups](#/dashboard/0d3f2380-fa78-11e6-ae9b-81e5311e8cab)"
                     }, 
-                    "title": "Dashboards [Filebeat System] ECS", 
-                    "winlog.api": "markdown"
+                    "title": "Dashboards [Filebeat System]", 
+                    "type": "markdown"
                 }
             }, 
-            "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -374,7 +374,7 @@
                                 }
                             }
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -383,50 +383,50 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "d16bb400-f9cc-11e6-8115-a7c18106d86a-ecs", 
+                        "id": "d16bb400-f9cc-11e6-8115-a7c18106d86a", 
                         "panelIndex": 1, 
                         "row": 5, 
                         "size_x": 12, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "78b74f30-f9cd-11e6-8115-a7c18106d86a-ecs", 
+                        "id": "78b74f30-f9cd-11e6-8115-a7c18106d86a", 
                         "panelIndex": 2, 
                         "row": 2, 
                         "size_x": 12, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "341ffe70-f9ce-11e6-8115-a7c18106d86a-ecs", 
+                        "id": "341ffe70-f9ce-11e6-8115-a7c18106d86a", 
                         "panelIndex": 3, 
                         "row": 8, 
                         "size_x": 6, 
                         "size_y": 4, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 7, 
-                        "id": "3cec3eb0-f9d3-11e6-8a3e-2b904044ea1d-ecs", 
+                        "id": "3cec3eb0-f9d3-11e6-8a3e-2b904044ea1d", 
                         "panelIndex": 4, 
                         "row": 8, 
                         "size_x": 6, 
                         "size_y": 4, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
                         "columns": [
-                            "event.action", 
+                            "system.auth.ssh.event", 
                             "system.auth.ssh.method", 
                             "system.auth.user", 
-                            "source.ip", 
-                            "source.geo.country_iso_code"
+                            "system.auth.ssh.ip", 
+                            "system.auth.ssh.geoip.country_iso_code"
                         ], 
-                        "id": "62439dc0-f9c9-11e6-a747-6121780e0414-ecs", 
+                        "id": "62439dc0-f9c9-11e6-a747-6121780e0414", 
                         "panelIndex": 5, 
                         "row": 12, 
                         "size_x": 12, 
@@ -435,20 +435,20 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "winlog.api": "search"
+                        "type": "search"
                     }, 
                     {
                         "col": 1, 
-                        "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54-ecs", 
+                        "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54", 
                         "panelIndex": 6, 
                         "row": 1, 
                         "size_x": 12, 
                         "size_y": 1, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat System] SSH login attempts ECS", 
+                "title": "[Filebeat System] SSH login attempts", 
                 "uiStateJSON": {
                     "P-4": {
                         "mapBounds": {
@@ -479,12 +479,12 @@
                         "mapZoom": 3
                     }
                 }, 
-                "winlog.version": 1
+                "version": 1
             }, 
-            "id": "5517a150-f9ce-11e6-8115-a7c18106d86a-ecs", 
-            "winlog.api": "dashboard", 
-            "winlog.version": 7
+            "id": "5517a150-f9ce-11e6-8115-a7c18106d86a", 
+            "type": "dashboard", 
+            "version": 7
         }
     ], 
-    "winlog.version": "6.0.0-beta1-SNAPSHOT"
+    "version": "6.0.0-beta1-SNAPSHOT"
 }

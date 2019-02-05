@@ -12,10 +12,10 @@
             }
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
-        "title": "DNS Query Summary [Packetbeat] ECS",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
+        "title": "DNS Query Summary [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -23,7 +23,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -33,7 +33,7 @@
                 "field": "source.bytes"
               },
               "schema": "metric",
-              "winlog.api": "sum"
+              "type": "sum"
             },
             {
               "enabled": true,
@@ -43,7 +43,7 @@
                 "field": "destination.bytes"
               },
               "schema": "metric",
-              "winlog.api": "sum"
+              "type": "sum"
             },
             {
               "enabled": true,
@@ -53,7 +53,7 @@
                 "field": "event.duration"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             }
           ],
           "params": {
@@ -84,16 +84,16 @@
               },
               "useRanges": false
             },
-            "winlog.api": "metric"
+            "type": "metric"
           },
-          "title": "DNS Query Summary [Packetbeat] ECS",
-          "winlog.api": "metric"
+          "title": "DNS Query Summary [Packetbeat]",
+          "type": "metric"
         }
       },
-      "id": "DNS-Query-Summary-ecs",
-      "winlog.api": "visualization",
+      "id": "DNS-Query-Summary",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:24.089Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -108,8 +108,8 @@
             }
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
-        "title": "DNS Request Status Over Time [Packetbeat] ECS",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
+        "title": "DNS Request Status Over Time [Packetbeat]",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -118,7 +118,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -126,7 +126,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -141,7 +141,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -157,7 +157,7 @@
                 "size": 5
               },
               "schema": "group",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -173,12 +173,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "defaultYExtents": false,
@@ -201,7 +201,7 @@
                 "interpolate": "cardinal",
                 "mode": "stacked",
                 "show": "true",
-                "winlog.api": "area",
+                "type": "area",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -209,7 +209,7 @@
             "shareYAxis": true,
             "smoothLines": false,
             "times": [],
-            "winlog.api": "area",
+            "type": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -225,26 +225,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ],
             "yAxis": {}
           },
-          "title": "DNS Request Status Over Time [Packetbeat] ECS",
-          "winlog.api": "area"
+          "title": "DNS Request Status Over Time [Packetbeat]",
+          "type": "area"
         }
       },
-      "id": "DNS-Request-Status-Over-Time-ecs",
-      "winlog.api": "visualization",
+      "id": "DNS-Request-Status-Over-Time",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:24.089Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -264,10 +264,10 @@
             }
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
-        "title": "DNS Question Types [Packetbeat] ECS",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
+        "title": "DNS Question Types [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -275,7 +275,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -291,7 +291,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -306,16 +306,16 @@
             },
             "legendPosition": "right",
             "shareYAxis": true,
-            "winlog.api": "pie"
+            "type": "pie"
           },
-          "title": "DNS Question Types [Packetbeat] ECS",
-          "winlog.api": "pie"
+          "title": "DNS Question Types [Packetbeat]",
+          "type": "pie"
         }
       },
-      "id": "DNS-Question-Types-ecs",
-      "winlog.api": "visualization",
+      "id": "DNS-Question-Types",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:24.089Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -335,16 +335,16 @@
                   "negate": false,
                   "params": {
                     "query": "OK",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "OK"
                 },
                 "query": {
                   "match": {
                     "status": {
                       "query": "OK",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -370,8 +370,8 @@
             }
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
-        "title": "DNS Top 10 Questions [Packetbeat] ECS",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
+        "title": "DNS Top 10 Questions [Packetbeat]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -382,7 +382,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -390,7 +390,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -407,7 +407,7 @@
                 "size": 30
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -421,14 +421,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "DNS Top 10 Questions [Packetbeat] ECS",
-          "winlog.api": "table"
+          "title": "DNS Top 10 Questions [Packetbeat]",
+          "type": "table"
         }
       },
-      "id": "DNS-Top-10-Questions-ecs",
-      "winlog.api": "visualization",
+      "id": "DNS-Top-10-Questions",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:24.089Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -456,8 +456,8 @@
             }
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
-        "title": "DNS Response Codes [Packetbeat] ECS",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
+        "title": "DNS Response Codes [Packetbeat]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -468,7 +468,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -476,7 +476,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -493,7 +493,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -507,14 +507,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "DNS Response Codes [Packetbeat] ECS",
-          "winlog.api": "table"
+          "title": "DNS Response Codes [Packetbeat]",
+          "type": "table"
         }
       },
-      "id": "DNS-Response-Codes-ecs",
-      "winlog.api": "visualization",
+      "id": "DNS-Response-Codes",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:24.089Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -528,8 +528,8 @@
             }
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
-        "title": "DNS Min/Max/Avg Response Time Histogram [Packetbeat] ECS",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
+        "title": "DNS Min/Max/Avg Response Time Histogram [Packetbeat]",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -539,7 +539,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -555,7 +555,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -565,7 +565,7 @@
                 "field": "event.duration"
               },
               "schema": "metric",
-              "winlog.api": "min"
+              "type": "min"
             },
             {
               "enabled": true,
@@ -575,7 +575,7 @@
                 "field": "event.duration"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -585,7 +585,7 @@
                 "field": "event.duration"
               },
               "schema": "metric",
-              "winlog.api": "max"
+              "type": "max"
             }
           ],
           "params": {
@@ -601,12 +601,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "grid": {
@@ -627,7 +627,7 @@
                 "mode": "stacked",
                 "show": true,
                 "showCircles": true,
-                "winlog.api": "area",
+                "type": "area",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -640,7 +640,7 @@
                 "mode": "stacked",
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "area",
+                "type": "area",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -653,12 +653,12 @@
                 "mode": "stacked",
                 "show": true,
                 "showCircles": true,
-                "winlog.api": "area",
+                "type": "area",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "winlog.api": "area",
+            "type": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -672,25 +672,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Average event.duration"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ]
           },
-          "title": "DNS Min/Max/Avg Response Time Histogram [Packetbeat] ECS",
-          "winlog.api": "area"
+          "title": "DNS Min/Max/Avg Response Time Histogram [Packetbeat]",
+          "type": "area"
         }
       },
-      "id": "735d25c0-1459-11e9-9de0-f98d1808db8e-ecs",
-      "winlog.api": "visualization",
+      "id": "735d25c0-1459-11e9-9de0-f98d1808db8e",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:24.089Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -704,10 +704,10 @@
             }
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
-        "title": "DNS Client and Servers Pie Chart [Packetbeat] ECS",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
+        "title": "DNS Client and Servers Pie Chart [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -715,7 +715,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -732,7 +732,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
@@ -749,7 +749,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -763,16 +763,16 @@
               "values": true
             },
             "legendPosition": "right",
-            "winlog.api": "pie"
+            "type": "pie"
           },
-          "title": "DNS Client and Servers Pie Chart [Packetbeat] ECS",
-          "winlog.api": "pie"
+          "title": "DNS Client and Servers Pie Chart [Packetbeat]",
+          "type": "pie"
         }
       },
-      "id": "bacb6ed0-1459-11e9-9de0-f98d1808db8e-ecs",
-      "winlog.api": "visualization",
+      "id": "bacb6ed0-1459-11e9-9de0-f98d1808db8e",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:24.089Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -799,16 +799,16 @@
                   "negate": false,
                   "params": {
                     "query": "dns",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "dns"
                 },
                 "query": {
                   "match": {
                     "network.protocol": {
                       "query": "dns",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -833,20 +833,20 @@
               "language": "lucene",
               "query": ""
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "DNS Protocol [Packetbeat] ECS",
-        "winlog.version": 1
+        "title": "DNS Protocol [Packetbeat]",
+        "version": 1
       },
-      "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
-      "winlog.api": "search",
+      "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
+      "type": "search",
       "updated_at": "2019-01-18T23:49:24.089Z",
-      "winlog.version": 2
+      "version": 2
     },
     {
       "attributes": {
@@ -876,10 +876,10 @@
               "x": 0,
               "y": 0
             },
-            "id": "DNS-Query-Summary-ecs",
+            "id": "DNS-Query-Summary",
             "panelIndex": "1",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {},
@@ -890,10 +890,10 @@
               "x": 24,
               "y": 0
             },
-            "id": "DNS-Request-Status-Over-Time-ecs",
+            "id": "DNS-Request-Status-Over-Time",
             "panelIndex": "2",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {},
@@ -904,10 +904,10 @@
               "x": 0,
               "y": 15
             },
-            "id": "DNS-Question-Types-ecs",
+            "id": "DNS-Question-Types",
             "panelIndex": "3",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {},
@@ -918,10 +918,10 @@
               "x": 0,
               "y": 30
             },
-            "id": "DNS-Top-10-Questions-ecs",
+            "id": "DNS-Top-10-Questions",
             "panelIndex": "5",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {},
@@ -932,10 +932,10 @@
               "x": 24,
               "y": 30
             },
-            "id": "DNS-Response-Codes-ecs",
+            "id": "DNS-Response-Codes",
             "panelIndex": "6",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {},
@@ -946,10 +946,10 @@
               "x": 24,
               "y": 15
             },
-            "id": "735d25c0-1459-11e9-9de0-f98d1808db8e-ecs",
+            "id": "735d25c0-1459-11e9-9de0-f98d1808db8e",
             "panelIndex": "7",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {},
@@ -960,21 +960,21 @@
               "x": 13,
               "y": 15
             },
-            "id": "bacb6ed0-1459-11e9-9de0-f98d1808db8e-ecs",
+            "id": "bacb6ed0-1459-11e9-9de0-f98d1808db8e",
             "panelIndex": "8",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
-        "title": "[Packetbeat] DNS Overview ECS",
-        "winlog.version": 1
+        "title": "[Packetbeat] DNS Overview",
+        "version": 1
       },
-      "id": "65120940-1454-11e9-9de0-f98d1808db8e-ecs",
-      "winlog.api": "dashboard",
+      "id": "65120940-1454-11e9-9de0-f98d1808db8e",
+      "type": "dashboard",
       "updated_at": "2019-01-18T23:49:24.089Z",
-      "winlog.version": 1
+      "version": 1
     }
   ],
-  "winlog.version": "7.0.0-SNAPSHOT"
+  "version": "7.0.0-SNAPSHOT"
 }

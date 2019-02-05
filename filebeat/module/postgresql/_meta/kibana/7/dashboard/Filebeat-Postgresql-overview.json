@@ -8,8 +8,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "PostgreSQL All Logs-ecs", 
-                "title": "Log Level Count [Filebeat PostgreSQL] ECS", 
+                "savedSearchId": "PostgreSQL All Logs", 
+                "title": "Log Level Count [Filebeat PostgreSQL]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -20,7 +20,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -28,19 +28,19 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "log.level", 
+                                "field": "postgresql.log.level", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 12
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -54,21 +54,21 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Log Level Count [Filebeat PostgreSQL] ECS", 
-                    "winlog.api": "table"
+                    "title": "Log Level Count [Filebeat PostgreSQL]", 
+                    "type": "table"
                 }
             }, 
-            "id": "PostgreSQL Log Level Count-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "PostgreSQL Log Level Count", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
                 "columns": [
-                    "user.name", 
+                    "postgresql.log.user", 
                     "postgresql.log.database", 
-                    "log.level", 
-                    "message", 
+                    "postgresql.log.level", 
+                    "postgresql.log.message", 
                     "postgresql.log.query"
                 ], 
                 "description": "", 
@@ -84,20 +84,20 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "filebeat-*", 
-                                    "key": "event.module", 
+                                    "key": "fileset.module", 
                                     "negate": false, 
                                     "params": {
                                         "query": "postgresql", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "postgresql"
                                 }, 
                                 "query": {
                                     "match": {
-                                        "event.module": {
+                                        "fileset.module": {
                                             "query": "postgresql", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -109,19 +109,19 @@
                             "language": "lucene", 
                             "query": "*"
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "All Logs [Filebeat PostgreSQL] ECS", 
-                "winlog.version": 1
+                "title": "All Logs [Filebeat PostgreSQL]", 
+                "version": 1
             }, 
-            "id": "PostgreSQL All Logs-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 1
+            "id": "PostgreSQL All Logs", 
+            "type": "search", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -131,10 +131,10 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "PostgreSQL All Logs-ecs", 
-                "title": "Logs by level over time [Filebeat PostgreSQL] ECS", 
+                "savedSearchId": "PostgreSQL All Logs", 
+                "title": "Logs by level over time [Filebeat PostgreSQL]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -142,7 +142,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -155,19 +155,19 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "log.level", 
+                                "field": "postgresql.log.level", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -183,14 +183,14 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "@timestamp per month"
                                 }, 
-                                "winlog.api": "category"
+                                "type": "category"
                             }
                         ], 
                         "grid": {
@@ -210,12 +210,12 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "winlog.api": "histogram", 
+                                "type": "histogram", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
                         "times": [], 
-                        "winlog.api": "histogram", 
+                        "type": "histogram", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -229,24 +229,24 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "winlog.api": "value"
+                                "type": "value"
                             }
                         ]
                     }, 
-                    "title": "Logs by level over time [Filebeat PostgreSQL] ECS", 
-                    "winlog.api": "histogram"
+                    "title": "Logs by level over time [Filebeat PostgreSQL]", 
+                    "type": "histogram"
                 }
             }, 
-            "id": "3dbd5370-87f3-11e7-ad9c-db80de0bf8d3-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "3dbd5370-87f3-11e7-ad9c-db80de0bf8d3", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -260,7 +260,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -269,23 +269,23 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "PostgreSQL Log Level Count-ecs", 
+                        "id": "PostgreSQL Log Level Count", 
                         "panelIndex": 1, 
                         "row": 1, 
                         "size_x": 3, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
                         "columns": [
-                            "user.name", 
+                            "postgresql.log.user", 
                             "postgresql.log.database", 
-                            "log.level", 
-                            "message", 
+                            "postgresql.log.level", 
+                            "postgresql.log.message", 
                             "postgresql.log.query"
                         ], 
-                        "id": "PostgreSQL All Logs-ecs", 
+                        "id": "PostgreSQL All Logs", 
                         "panelIndex": 2, 
                         "row": 4, 
                         "size_x": 12, 
@@ -294,20 +294,20 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "winlog.api": "search"
+                        "type": "search"
                     }, 
                     {
                         "col": 4, 
-                        "id": "3dbd5370-87f3-11e7-ad9c-db80de0bf8d3-ecs", 
+                        "id": "3dbd5370-87f3-11e7-ad9c-db80de0bf8d3", 
                         "panelIndex": 3, 
                         "row": 1, 
                         "size_x": 9, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat PostgreSQL] Overview ECS", 
+                "title": "[Filebeat PostgreSQL] Overview", 
                 "uiStateJSON": {
                     "P-1": {
                         "vis": {
@@ -320,12 +320,12 @@
                         }
                     }
                 }, 
-                "winlog.version": 1
+                "version": 1
             }, 
-            "id": "158be870-87f4-11e7-ad9c-db80de0bf8d3-ecs", 
-            "winlog.api": "dashboard", 
-            "winlog.version": 1
+            "id": "158be870-87f4-11e7-ad9c-db80de0bf8d3", 
+            "type": "dashboard", 
+            "version": 1
         }
     ], 
-    "winlog.version": "6.0.0-beta1-SNAPSHOT"
+    "version": "6.0.0-beta1-SNAPSHOT"
 }

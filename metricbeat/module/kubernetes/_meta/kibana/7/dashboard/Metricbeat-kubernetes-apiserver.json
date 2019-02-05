@@ -6,9 +6,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kubernetes API Server: Top clients by number of requests ECS", 
+                "title": "Kubernetes API Server: Top clients by number of requests", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -37,12 +37,12 @@
                                     {
                                         "field": "kubernetes.apiserver.request.count", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "sum"
+                                        "type": "sum"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "0e6ff4a0-5792-11e8-8bd0-2180975e72dd", 
-                                        "winlog.api": "derivative", 
+                                        "type": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -64,16 +64,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "top_n"
+                        "type": "top_n"
                     }, 
-                    "title": "Kubernetes API Server: Top clients by number of requests ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Kubernetes API Server: Top clients by number of requests", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "7cbeb750-5794-11e8-afa2-e9067ea62228-ecs", 
-            "winlog.api": "visualization", 
+            "id": "7cbeb750-5794-11e8-afa2-e9067ea62228", 
+            "type": "visualization", 
             "updated_at": "2018-05-14T18:23:10.501Z", 
-            "winlog.version": 5
+            "version": 5
         }, 
         {
             "attributes": {
@@ -81,9 +81,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kubernetes API Server: Requests ECS", 
+                "title": "Kubernetes API Server: Requests", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -107,17 +107,17 @@
                                     {
                                         "field": "kubernetes.apiserver.request.latency.sum", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "sum"
+                                        "type": "sum"
                                     }, 
                                     {
                                         "field": "kubernetes.apiserver.request.count", 
                                         "id": "a2185e50-57a0-11e8-af57-a1d645d2b569", 
-                                        "winlog.api": "sum"
+                                        "type": "sum"
                                     }, 
                                     {
                                         "id": "b09133d0-57a0-11e8-af57-a1d645d2b569", 
                                         "script": "params.sum / params.count", 
-                                        "winlog.api": "calculation", 
+                                        "type": "calculation", 
                                         "variables": [
                                             {
                                                 "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
@@ -151,12 +151,12 @@
                                     {
                                         "field": "kubernetes.apiserver.request.count", 
                                         "id": "c001ba50-57a1-11e8-a049-ff54cef064a2", 
-                                        "winlog.api": "sum"
+                                        "type": "sum"
                                     }, 
                                     {
                                         "field": "c001ba50-57a1-11e8-a049-ff54cef064a2", 
                                         "id": "dc83b390-57a1-11e8-a049-ff54cef064a2", 
-                                        "winlog.api": "derivative", 
+                                        "type": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -169,16 +169,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Kubernetes API Server: Requests ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Kubernetes API Server: Requests", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "ec360ff0-57a0-11e8-afa2-e9067ea62228-ecs", 
-            "winlog.api": "visualization", 
+            "id": "ec360ff0-57a0-11e8-afa2-e9067ea62228", 
+            "type": "visualization", 
             "updated_at": "2018-05-14T18:21:27.515Z", 
-            "winlog.version": 4
+            "version": 4
         }, 
         {
             "attributes": {
@@ -186,9 +186,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Kubernetes API Server: Top clients by resource ECS", 
+                "title": "Kubernetes API Server: Top clients by resource", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -217,12 +217,12 @@
                                     {
                                         "field": "kubernetes.apiserver.request.count", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "sum"
+                                        "type": "sum"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "0e6ff4a0-5792-11e8-8bd0-2180975e72dd", 
-                                        "winlog.api": "derivative", 
+                                        "type": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -246,16 +246,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "top_n"
+                        "type": "top_n"
                     }, 
-                    "title": "Kubernetes API Server: Top clients by resource ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Kubernetes API Server: Top clients by resource", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "95a7f110-57a2-11e8-afa2-e9067ea62228-ecs", 
-            "winlog.api": "visualization", 
+            "id": "95a7f110-57a2-11e8-afa2-e9067ea62228", 
+            "type": "visualization", 
             "updated_at": "2018-05-14T18:23:50.093Z", 
-            "winlog.version": 4
+            "version": 4
         }, 
         {
             "attributes": {
@@ -269,7 +269,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -287,10 +287,10 @@
                             "x": 0, 
                             "y": 22
                         }, 
-                        "id": "7cbeb750-5794-11e8-afa2-e9067ea62228-ecs", 
+                        "id": "7cbeb750-5794-11e8-afa2-e9067ea62228", 
                         "panelIndex": "1", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.3.0"
+                        "type": "visualization", 
+                        "version": "6.3.0"
                     }, 
                     {
                         "embeddableConfig": {}, 
@@ -301,10 +301,10 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "ec360ff0-57a0-11e8-afa2-e9067ea62228-ecs", 
+                        "id": "ec360ff0-57a0-11e8-afa2-e9067ea62228", 
                         "panelIndex": "3", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.3.0"
+                        "type": "visualization", 
+                        "version": "6.3.0"
                     }, 
                     {
                         "embeddableConfig": {}, 
@@ -315,21 +315,21 @@
                             "x": 24, 
                             "y": 22
                         }, 
-                        "id": "95a7f110-57a2-11e8-afa2-e9067ea62228-ecs", 
+                        "id": "95a7f110-57a2-11e8-afa2-e9067ea62228", 
                         "panelIndex": "4", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.3.0"
+                        "type": "visualization", 
+                        "version": "6.3.0"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat Kubernetes] API server ECS", 
-                "winlog.version": 1
+                "title": "[Metricbeat Kubernetes] API server", 
+                "version": 1
             }, 
-            "id": "af7225b0-5794-11e8-afa2-e9067ea62228-ecs", 
-            "winlog.api": "dashboard", 
+            "id": "af7225b0-5794-11e8-afa2-e9067ea62228", 
+            "type": "dashboard", 
             "updated_at": "2018-05-14T18:23:55.202Z", 
-            "winlog.version": 5
+            "version": 5
         }
     ], 
-    "winlog.version": "6.3.0"
+    "version": "6.3.0"
 }

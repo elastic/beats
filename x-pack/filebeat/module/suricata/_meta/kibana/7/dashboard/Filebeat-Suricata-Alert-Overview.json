@@ -12,10 +12,10 @@
             }
           }
         },
-        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
-        "title": "Top Alerting Hosts [Suricata] ECS",
+        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c",
+        "title": "Top Alerting Hosts [Suricata]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -23,7 +23,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -36,7 +36,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -52,7 +52,7 @@
                 "size": 10
               },
               "schema": "group",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -68,12 +68,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "grid": {
@@ -93,12 +93,12 @@
                 "mode": "stacked",
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "histogram",
+                "type": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "winlog.api": "histogram",
+            "type": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -112,25 +112,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ]
           },
-          "title": "Top Alerting Hosts [Suricata] ECS",
-          "winlog.api": "histogram"
+          "title": "Top Alerting Hosts [Suricata]",
+          "type": "histogram"
         }
       },
-      "id": "494fa290-86d2-11e8-b59d-21efb914e65c-ecs",
-      "winlog.api": "visualization",
+      "id": "494fa290-86d2-11e8-b59d-21efb914e65c",
+      "type": "visualization",
       "updated_at": "2018-11-07T22:56:23.933Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -144,8 +144,8 @@
             }
           }
         },
-        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
-        "title": "Top Alert Signatures [Suricata] ECS",
+        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c",
+        "title": "Top Alert Signatures [Suricata]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -156,7 +156,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -164,7 +164,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -181,7 +181,7 @@
                 "size": 10
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
@@ -198,7 +198,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -212,14 +212,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top Alert Signatures [Suricata] ECS",
-          "winlog.api": "table"
+          "title": "Top Alert Signatures [Suricata]",
+          "type": "table"
         }
       },
-      "id": "16033310-86d3-11e8-b59d-21efb914e65c-ecs",
-      "winlog.api": "visualization",
+      "id": "16033310-86d3-11e8-b59d-21efb914e65c",
+      "type": "visualization",
       "updated_at": "2018-11-07T22:56:23.933Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -250,16 +250,16 @@
                   "negate": false,
                   "params": {
                     "query": "alert",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "alert"
                 },
                 "query": {
                   "match": {
                     "suricata.eve.event_type": {
                       "query": "alert",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -276,16 +276,16 @@
                   "negate": false,
                   "params": {
                     "query": "suricata",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "suricata"
                 },
                 "query": {
                   "match": {
                     "event.module": {
                       "query": "suricata",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -297,20 +297,20 @@
               "language": "kuery",
               "query": ""
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "Alerts [Suricata] ECS",
-        "winlog.version": 1
+        "title": "Alerts [Suricata]",
+        "version": 1
       },
-      "id": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
-      "winlog.api": "search",
+      "id": "1c2bcec0-86d1-11e8-b59d-21efb914e65c",
+      "type": "search",
       "updated_at": "2018-11-07T22:56:23.933Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -324,10 +324,10 @@
             }
           }
         },
-        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
-        "title": "Alert - Source Location [Suricata] ECS",
+        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c",
+        "title": "Alert - Source Location [Suricata]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -335,7 +335,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -353,7 +353,7 @@
                 "useGeocentroid": true
               },
               "schema": "segment",
-              "winlog.api": "geohash_grid"
+              "type": "geohash_grid"
             }
           ],
           "params": {
@@ -395,14 +395,14 @@
               ]
             }
           },
-          "title": "Alert - Source Location [Suricata] ECS",
-          "winlog.api": "tile_map"
+          "title": "Alert - Source Location [Suricata]",
+          "type": "tile_map"
         }
       },
-      "id": "85fed080-86d7-11e8-b59d-21efb914e65c-ecs",
-      "winlog.api": "visualization",
+      "id": "85fed080-86d7-11e8-b59d-21efb914e65c",
+      "type": "visualization",
       "updated_at": "2018-11-07T22:56:23.933Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -416,10 +416,10 @@
             }
           }
         },
-        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
-        "title": "Alert - Destination Location [Suricata] ECS",
+        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c",
+        "title": "Alert - Destination Location [Suricata]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -427,7 +427,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -445,7 +445,7 @@
                 "useGeocentroid": true
               },
               "schema": "segment",
-              "winlog.api": "geohash_grid"
+              "type": "geohash_grid"
             }
           ],
           "params": {
@@ -487,14 +487,14 @@
               ]
             }
           },
-          "title": "Alert - Destination Location [Suricata] ECS",
-          "winlog.api": "tile_map"
+          "title": "Alert - Destination Location [Suricata]",
+          "type": "tile_map"
         }
       },
-      "id": "a09ca070-86d7-11e8-b59d-21efb914e65c-ecs",
-      "winlog.api": "visualization",
+      "id": "a09ca070-86d7-11e8-b59d-21efb914e65c",
+      "type": "visualization",
       "updated_at": "2018-11-07T22:56:23.933Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -508,8 +508,8 @@
             }
           }
         },
-        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
-        "title": "Alerts - Top Destination Countries [Suricata] ECS",
+        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c",
+        "title": "Alerts - Top Destination Countries [Suricata]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -520,7 +520,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -528,7 +528,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -545,7 +545,7 @@
                 "size": 10
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -559,14 +559,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Alerts - Top Destination Countries [Suricata] ECS",
-          "winlog.api": "table"
+          "title": "Alerts - Top Destination Countries [Suricata]",
+          "type": "table"
         }
       },
-      "id": "2ccdc1a0-86d8-11e8-b59d-21efb914e65c-ecs",
-      "winlog.api": "visualization",
+      "id": "2ccdc1a0-86d8-11e8-b59d-21efb914e65c",
+      "type": "visualization",
       "updated_at": "2018-11-07T22:56:23.933Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -580,8 +580,8 @@
             }
           }
         },
-        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
-        "title": "Alerts - Top Source Countries [Suricata] ECS",
+        "savedSearchId": "1c2bcec0-86d1-11e8-b59d-21efb914e65c",
+        "title": "Alerts - Top Source Countries [Suricata]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -592,7 +592,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -600,7 +600,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -617,7 +617,7 @@
                 "size": 10
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -631,14 +631,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Alerts - Top Source Countries [Suricata] ECS",
-          "winlog.api": "table"
+          "title": "Alerts - Top Source Countries [Suricata]",
+          "type": "table"
         }
       },
-      "id": "c7b8b8f0-86d8-11e8-b59d-21efb914e65c-ecs",
-      "winlog.api": "visualization",
+      "id": "c7b8b8f0-86d8-11e8-b59d-21efb914e65c",
+      "type": "visualization",
       "updated_at": "2018-11-07T22:56:23.933Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -652,7 +652,7 @@
               "language": "kuery",
               "query": ""
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "optionsJSON": {
@@ -670,10 +670,10 @@
               "x": 0,
               "y": 0
             },
-            "id": "494fa290-86d2-11e8-b59d-21efb914e65c-ecs",
+            "id": "494fa290-86d2-11e8-b59d-21efb914e65c",
             "panelIndex": "1",
-            "winlog.api": "visualization",
-            "winlog.version": "6.3.0"
+            "type": "visualization",
+            "version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -684,10 +684,10 @@
               "x": 23,
               "y": 0
             },
-            "id": "16033310-86d3-11e8-b59d-21efb914e65c-ecs",
+            "id": "16033310-86d3-11e8-b59d-21efb914e65c",
             "panelIndex": "2",
-            "winlog.api": "visualization",
-            "winlog.version": "6.3.0"
+            "type": "visualization",
+            "version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -698,10 +698,10 @@
               "x": 0,
               "y": 37
             },
-            "id": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
+            "id": "1c2bcec0-86d1-11e8-b59d-21efb914e65c",
             "panelIndex": "3",
-            "winlog.api": "search",
-            "winlog.version": "6.3.0"
+            "type": "search",
+            "version": "6.3.0"
           },
           {
             "embeddableConfig": {
@@ -718,10 +718,10 @@
               "x": 0,
               "y": 22
             },
-            "id": "85fed080-86d7-11e8-b59d-21efb914e65c-ecs",
+            "id": "85fed080-86d7-11e8-b59d-21efb914e65c",
             "panelIndex": "4",
-            "winlog.api": "visualization",
-            "winlog.version": "6.3.0"
+            "type": "visualization",
+            "version": "6.3.0"
           },
           {
             "embeddableConfig": {
@@ -738,10 +738,10 @@
               "x": 23,
               "y": 22
             },
-            "id": "a09ca070-86d7-11e8-b59d-21efb914e65c-ecs",
+            "id": "a09ca070-86d7-11e8-b59d-21efb914e65c",
             "panelIndex": "5",
-            "winlog.api": "visualization",
-            "winlog.version": "6.3.0"
+            "type": "visualization",
+            "version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -752,10 +752,10 @@
               "x": 11,
               "y": 10
             },
-            "id": "2ccdc1a0-86d8-11e8-b59d-21efb914e65c-ecs",
+            "id": "2ccdc1a0-86d8-11e8-b59d-21efb914e65c",
             "panelIndex": "7",
-            "winlog.api": "visualization",
-            "winlog.version": "6.3.0"
+            "type": "visualization",
+            "version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -766,21 +766,21 @@
               "x": 0,
               "y": 10
             },
-            "id": "c7b8b8f0-86d8-11e8-b59d-21efb914e65c-ecs",
+            "id": "c7b8b8f0-86d8-11e8-b59d-21efb914e65c",
             "panelIndex": "8",
-            "winlog.api": "visualization",
-            "winlog.version": "6.3.0"
+            "type": "visualization",
+            "version": "6.3.0"
           }
         ],
         "timeRestore": false,
-        "title": "[Suricata] Alert Overview ECS",
-        "winlog.version": 1
+        "title": "[Suricata] Alert Overview",
+        "version": 1
       },
-      "id": "05268ee0-86d1-11e8-b59d-21efb914e65c-ecs",
-      "winlog.api": "dashboard",
+      "id": "05268ee0-86d1-11e8-b59d-21efb914e65c",
+      "type": "dashboard",
       "updated_at": "2018-11-07T22:56:23.933Z",
-      "winlog.version": 1
+      "version": 1
     }
   ],
-  "winlog.version": "6.4.3"
+  "version": "6.4.3"
 }

@@ -6,7 +6,7 @@ def migration():
     print "Start Kibana files migration"
 
     print "Migrate all fields to the ECS fields"
-    migration_fields = read_migration_fields()
+    migration_fields = read_migration_fields("filebeat")
     rename_entries(migration_fields)
 
     print "Postfix all ids with -ecs"
@@ -37,12 +37,14 @@ def get_replaceable_ids():
     return ids
 
 
-def read_migration_fields():
+def read_migration_fields(beat):
     migration_fields = {}
     migration_yml = "../dev-tools/ecs-migration.yml"
     with open(migration_yml, 'r') as f:
         migration = yaml.safe_load(f)
         for k in migration:
+            if "beat" in k and k["beat"] not beat:
+                continue
             if "to" in k and "from" in k:
                 if "rename" in k and k["rename"] is False:
                     continue

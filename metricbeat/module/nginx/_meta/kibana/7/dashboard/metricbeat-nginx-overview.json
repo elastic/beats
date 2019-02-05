@@ -6,9 +6,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Request Rate [Metricbeat Nginx] ECS", 
+                "title": "Request Rate [Metricbeat Nginx]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -32,12 +32,12 @@
                                     {
                                         "field": "nginx.stubstatus.requests", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "396ec980-f1a1-11e7-95d0-8ddf041d42a2", 
-                                        "winlog.api": "derivative", 
+                                        "type": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -50,16 +50,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Request Rate [Metricbeat Nginx] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Request Rate [Metricbeat Nginx]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "555df8a0-f1a1-11e7-a9ef-93c69af7b129-ecs", 
-            "winlog.api": "visualization", 
+            "id": "555df8a0-f1a1-11e7-a9ef-93c69af7b129", 
+            "type": "visualization", 
             "updated_at": "2018-01-04T22:48:58.542Z", 
-            "winlog.version": 2
+            "version": 2
         }, 
         {
             "attributes": {
@@ -67,9 +67,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Accepts and Handled Rate [Metricbeat Nginx] ECS", 
+                "title": "Accepts and Handled Rate [Metricbeat Nginx]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -104,12 +104,12 @@
                                     {
                                         "field": "nginx.stubstatus.accepts", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "396ec980-f1a1-11e7-95d0-8ddf041d42a2", 
-                                        "winlog.api": "derivative", 
+                                        "type": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -132,12 +132,12 @@
                                     {
                                         "field": "nginx.stubstatus.handled", 
                                         "id": "56dd33b1-f1a3-11e7-95d0-8ddf041d42a2", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }, 
                                     {
                                         "field": "56dd33b1-f1a3-11e7-95d0-8ddf041d42a2", 
                                         "id": "56dd33b2-f1a3-11e7-95d0-8ddf041d42a2", 
-                                        "winlog.api": "derivative", 
+                                        "type": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -150,16 +150,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Accepts and Handled Rate [Metricbeat Nginx] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Accepts and Handled Rate [Metricbeat Nginx]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "a1d92240-f1a1-11e7-a9ef-93c69af7b129-ecs", 
-            "winlog.api": "visualization", 
+            "id": "a1d92240-f1a1-11e7-a9ef-93c69af7b129", 
+            "type": "visualization", 
             "updated_at": "2018-01-04T23:07:23.056Z", 
-            "winlog.version": 2
+            "version": 2
         }, 
         {
             "attributes": {
@@ -167,9 +167,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Drops Rate [Metricbeat Nginx] ECS", 
+                "title": "Drops Rate [Metricbeat Nginx]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -193,12 +193,12 @@
                                     {
                                         "field": "nginx.stubstatus.dropped", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "396ec980-f1a1-11e7-95d0-8ddf041d42a2", 
-                                        "winlog.api": "derivative", 
+                                        "type": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -211,16 +211,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Drops Rate [Metricbeat Nginx] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Drops Rate [Metricbeat Nginx]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "d763a570-f1a1-11e7-a9ef-93c69af7b129-ecs", 
-            "winlog.api": "visualization", 
+            "id": "d763a570-f1a1-11e7-a9ef-93c69af7b129", 
+            "type": "visualization", 
             "updated_at": "2018-01-04T22:51:46.375Z", 
-            "winlog.version": 1
+            "version": 1
         }, 
         {
             "attributes": {
@@ -228,9 +228,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Active connections [Metricbeat Nginx] ECS", 
+                "title": "Active connections [Metricbeat Nginx]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -253,7 +253,7 @@
                                     {
                                         "field": "nginx.stubstatus.active", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -265,16 +265,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Active connections [Metricbeat Nginx] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Active connections [Metricbeat Nginx]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "47a8e0f0-f1a4-11e7-a9ef-93c69af7b129-ecs", 
-            "winlog.api": "visualization", 
+            "id": "47a8e0f0-f1a4-11e7-a9ef-93c69af7b129", 
+            "type": "visualization", 
             "updated_at": "2018-01-04T23:09:55.944Z", 
-            "winlog.version": 2
+            "version": 2
         }, 
         {
             "attributes": {
@@ -282,9 +282,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Reading / Writing / Waiting Rates [Metricbeat Nginx] ECS", 
+                "title": "Reading / Writing / Waiting Rates [Metricbeat Nginx]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -308,7 +308,7 @@
                                     {
                                         "field": "nginx.stubstatus.reading", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -329,7 +329,7 @@
                                     {
                                         "field": "nginx.stubstatus.writing", 
                                         "id": "b1773681-f1a4-11e7-95d0-8ddf041d42a2", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -350,7 +350,7 @@
                                     {
                                         "field": "nginx.stubstatus.waiting", 
                                         "id": "b68aa6c1-f1a4-11e7-95d0-8ddf041d42a2", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -362,16 +362,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Reading / Writing / Waiting Rates [Metricbeat Nginx] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Reading / Writing / Waiting Rates [Metricbeat Nginx]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "dcbffe30-f1a4-11e7-a9ef-93c69af7b129-ecs", 
-            "winlog.api": "visualization", 
+            "id": "dcbffe30-f1a4-11e7-a9ef-93c69af7b129", 
+            "type": "visualization", 
             "updated_at": "2018-01-04T23:13:23.859Z", 
-            "winlog.version": 1
+            "version": 1
         }, 
         {
             "attributes": {
@@ -385,7 +385,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -402,10 +402,10 @@
                             "x": 6, 
                             "y": 0
                         }, 
-                        "id": "555df8a0-f1a1-11e7-a9ef-93c69af7b129-ecs", 
+                        "id": "555df8a0-f1a1-11e7-a9ef-93c69af7b129", 
                         "panelIndex": "1", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -415,10 +415,10 @@
                             "x": 6, 
                             "y": 3
                         }, 
-                        "id": "a1d92240-f1a1-11e7-a9ef-93c69af7b129-ecs", 
+                        "id": "a1d92240-f1a1-11e7-a9ef-93c69af7b129", 
                         "panelIndex": "2", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -428,10 +428,10 @@
                             "x": 0, 
                             "y": 3
                         }, 
-                        "id": "d763a570-f1a1-11e7-a9ef-93c69af7b129-ecs", 
+                        "id": "d763a570-f1a1-11e7-a9ef-93c69af7b129", 
                         "panelIndex": "3", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -441,10 +441,10 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "47a8e0f0-f1a4-11e7-a9ef-93c69af7b129-ecs", 
+                        "id": "47a8e0f0-f1a4-11e7-a9ef-93c69af7b129", 
                         "panelIndex": "4", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -454,21 +454,21 @@
                             "x": 0, 
                             "y": 6
                         }, 
-                        "id": "dcbffe30-f1a4-11e7-a9ef-93c69af7b129-ecs", 
+                        "id": "dcbffe30-f1a4-11e7-a9ef-93c69af7b129", 
                         "panelIndex": "5", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat Nginx] Overview ECS", 
-                "winlog.version": 1
+                "title": "[Metricbeat Nginx] Overview", 
+                "version": 1
             }, 
-            "id": "023d2930-f1a5-11e7-a9ef-93c69af7b129-ecs", 
-            "winlog.api": "dashboard", 
+            "id": "023d2930-f1a5-11e7-a9ef-93c69af7b129", 
+            "type": "dashboard", 
             "updated_at": "2018-01-04T23:14:26.755Z", 
-            "winlog.version": 1
+            "version": 1
         }
     ], 
-    "winlog.version": "6.2.4"
+    "version": "6.2.4"
 }

@@ -8,8 +8,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Filebeat-MySQL-Slow-log-ecs", 
-                "title": "Top slowest queries [Filebeat MySQL] ECS", 
+                "savedSearchId": "Filebeat-MySQL-Slow-log", 
+                "title": "Top slowest queries [Filebeat MySQL]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -20,7 +20,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -31,7 +31,7 @@
                                 "field": "mysql.slowlog.query_time.sec"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -44,20 +44,20 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
                             "id": "3", 
                             "params": {
                                 "customLabel": "User", 
-                                "field": "user.name", 
+                                "field": "mysql.slowlog.user", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -71,13 +71,13 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Top slowest queries [Filebeat MySQL] ECS", 
-                    "winlog.api": "table"
+                    "title": "Top slowest queries [Filebeat MySQL]", 
+                    "type": "table"
                 }
             }, 
-            "id": "MySQL-slowest-queries-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "MySQL-slowest-queries", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -87,8 +87,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Filebeat-MySQL-Slow-log-ecs", 
-                "title": "Slow queries over time [Filebeat MySQL] ECS", 
+                "savedSearchId": "Filebeat-MySQL-Slow-log", 
+                "title": "Slow queries over time [Filebeat MySQL]", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -96,7 +96,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -106,7 +106,7 @@
                                 "customLabel": "Slow queries"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -119,7 +119,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }
                     ], 
                     "params": {
@@ -135,14 +135,14 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "@timestamp per 30 seconds"
                                 }, 
-                                "winlog.api": "category"
+                                "type": "category"
                             }
                         ], 
                         "defaultYExtents": false, 
@@ -165,14 +165,14 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "winlog.api": "histogram", 
+                                "type": "histogram", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
                         "setYExtents": false, 
                         "shareYAxis": true, 
                         "times": [], 
-                        "winlog.api": "histogram", 
+                        "type": "histogram", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -186,25 +186,25 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Slow queries"
                                 }, 
-                                "winlog.api": "value"
+                                "type": "value"
                             }
                         ], 
                         "yAxis": {}
                     }, 
-                    "title": "Slow queries over time [Filebeat MySQL] ECS", 
-                    "winlog.api": "histogram"
+                    "title": "Slow queries over time [Filebeat MySQL]", 
+                    "type": "histogram"
                 }
             }, 
-            "id": "MySQL-Slow-queries-over-time-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "MySQL-Slow-queries-over-time", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -214,8 +214,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Filebeat-MySQL-error-log-ecs", 
-                "title": "Error logs over time [Filebeat MySQL] ECS", 
+                "savedSearchId": "Filebeat-MySQL-error-log", 
+                "title": "Error logs over time [Filebeat MySQL]", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -224,7 +224,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -234,7 +234,7 @@
                                 "customLabel": "Error logs"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -247,7 +247,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }
                     ], 
                     "params": {
@@ -263,14 +263,14 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "@timestamp per 30 seconds"
                                 }, 
-                                "winlog.api": "category"
+                                "type": "category"
                             }
                         ], 
                         "defaultYExtents": false, 
@@ -293,14 +293,14 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "winlog.api": "histogram", 
+                                "type": "histogram", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
                         "setYExtents": false, 
                         "shareYAxis": true, 
                         "times": [], 
-                        "winlog.api": "histogram", 
+                        "type": "histogram", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -314,31 +314,31 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Error logs"
                                 }, 
-                                "winlog.api": "value"
+                                "type": "value"
                             }
                         ], 
                         "yAxis": {}
                     }, 
-                    "title": "Error logs over time [Filebeat MySQL] ECS", 
-                    "winlog.api": "histogram"
+                    "title": "Error logs over time [Filebeat MySQL]", 
+                    "type": "histogram"
                 }
             }, 
-            "id": "MySQL-error-logs-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "MySQL-error-logs", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
                 "columns": [
-                    "log.level", 
-                    "message"
+                    "mysql.error.level", 
+                    "mysql.error.message"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -353,20 +353,20 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "filebeat-*", 
-                                    "key": "event.module", 
+                                    "key": "fileset.module", 
                                     "negate": false, 
                                     "params": {
                                         "query": "mysql", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "mysql"
                                 }, 
                                 "query": {
                                     "match": {
-                                        "event.module": {
+                                        "fileset.module": {
                                             "query": "mysql", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -383,16 +383,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "error", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "error"
                                 }, 
                                 "query": {
                                     "match": {
                                         "fileset.name": {
                                             "query": "error", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -417,19 +417,19 @@
                             "language": "lucene", 
                             "query": "*"
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Error logs [Filebeat MySQL] ECS", 
-                "winlog.version": 1
+                "title": "Error logs [Filebeat MySQL]", 
+                "version": 1
             }, 
-            "id": "Filebeat-MySQL-error-log-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 1
+            "id": "Filebeat-MySQL-error-log", 
+            "type": "search", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -439,8 +439,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Filebeat-MySQL-error-log-ecs", 
-                "title": "Error logs levels breakdown [Filebeat MySQL] ECS", 
+                "savedSearchId": "Filebeat-MySQL-error-log", 
+                "title": "Error logs levels breakdown [Filebeat MySQL]", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -450,7 +450,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -458,19 +458,19 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "log.level", 
+                                "field": "mysql.error.level", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -479,15 +479,15 @@
                         "isDonut": false, 
                         "legendPosition": "bottom", 
                         "shareYAxis": true, 
-                        "winlog.api": "pie"
+                        "type": "pie"
                     }, 
-                    "title": "Error logs levels breakdown [Filebeat MySQL] ECS", 
-                    "winlog.api": "pie"
+                    "title": "Error logs levels breakdown [Filebeat MySQL]", 
+                    "type": "pie"
                 }
             }, 
-            "id": "MySQL-Error-logs-levels-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "MySQL-Error-logs-levels", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -497,10 +497,10 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Filebeat-MySQL-Slow-log-ecs", 
-                "title": "Slow logs breakdown [Filebeat MySQL] ECS", 
+                "savedSearchId": "Filebeat-MySQL-Slow-log", 
+                "title": "Slow logs breakdown [Filebeat MySQL]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -508,7 +508,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -520,7 +520,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -529,15 +529,15 @@
                         "isDonut": false, 
                         "legendPosition": "bottom", 
                         "shareYAxis": true, 
-                        "winlog.api": "pie"
+                        "type": "pie"
                     }, 
-                    "title": "Slow logs breakdown [Filebeat MySQL] ECS", 
-                    "winlog.api": "pie"
+                    "title": "Slow logs breakdown [Filebeat MySQL]", 
+                    "type": "pie"
                 }
             }, 
-            "id": "MySQL-Slow-logs-by-count-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "MySQL-Slow-logs-by-count", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -557,20 +557,20 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "filebeat-*", 
-                                    "key": "event.module", 
+                                    "key": "fileset.module", 
                                     "negate": false, 
                                     "params": {
                                         "query": "mysql", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "mysql"
                                 }, 
                                 "query": {
                                     "match": {
-                                        "event.module": {
+                                        "fileset.module": {
                                             "query": "mysql", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -587,16 +587,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "slowlog", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "slowlog"
                                 }, 
                                 "query": {
                                     "match": {
                                         "fileset.name": {
                                             "query": "slowlog", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -621,19 +621,19 @@
                             "language": "lucene", 
                             "query": "*"
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Slow logs [Filebeat MySQL] ECS", 
-                "winlog.version": 1
+                "title": "Slow logs [Filebeat MySQL]", 
+                "version": 1
             }, 
-            "id": "Filebeat-MySQL-Slow-log-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 1
+            "id": "Filebeat-MySQL-Slow-log", 
+            "type": "search", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -652,7 +652,7 @@
                                 }
                             }
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -661,38 +661,38 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "MySQL-slowest-queries-ecs", 
+                        "id": "MySQL-slowest-queries", 
                         "panelIndex": 1, 
                         "row": 8, 
                         "size_x": 6, 
                         "size_y": 4, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "MySQL-Slow-queries-over-time-ecs", 
+                        "id": "MySQL-Slow-queries-over-time", 
                         "panelIndex": 2, 
                         "row": 1, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 7, 
-                        "id": "MySQL-error-logs-ecs", 
+                        "id": "MySQL-error-logs", 
                         "panelIndex": 3, 
                         "row": 1, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 7, 
                         "columns": [
-                            "log.level", 
-                            "message"
+                            "mysql.error.level", 
+                            "mysql.error.message"
                         ], 
-                        "id": "Filebeat-MySQL-error-log-ecs", 
+                        "id": "Filebeat-MySQL-error-log", 
                         "panelIndex": 4, 
                         "row": 8, 
                         "size_x": 6, 
@@ -701,29 +701,29 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "winlog.api": "search"
+                        "type": "search"
                     }, 
                     {
                         "col": 7, 
-                        "id": "MySQL-Error-logs-levels-ecs", 
+                        "id": "MySQL-Error-logs-levels", 
                         "panelIndex": 5, 
                         "row": 4, 
                         "size_x": 6, 
                         "size_y": 4, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "MySQL-Slow-logs-by-count-ecs", 
+                        "id": "MySQL-Slow-logs-by-count", 
                         "panelIndex": 6, 
                         "row": 4, 
                         "size_x": 6, 
                         "size_y": 4, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat MySQL] Overview ECS", 
+                "title": "[Filebeat MySQL] Overview", 
                 "uiStateJSON": {
                     "P-1": {
                         "vis": {
@@ -736,12 +736,12 @@
                         }
                     }
                 }, 
-                "winlog.version": 1
+                "version": 1
             }, 
-            "id": "Filebeat-MySQL-Dashboard-ecs", 
-            "winlog.api": "dashboard", 
-            "winlog.version": 2
+            "id": "Filebeat-MySQL-Dashboard", 
+            "type": "dashboard", 
+            "version": 2
         }
     ], 
-    "winlog.version": "6.0.0-beta1-SNAPSHOT"
+    "version": "6.0.0-beta1-SNAPSHOT"
 }

@@ -8,8 +8,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "8030c1b0-fa77-11e6-ae9b-81e5311e8cab-ecs", 
-                "title": "New users [Filebeat System] ECS", 
+                "savedSearchId": "8030c1b0-fa77-11e6-ae9b-81e5311e8cab", 
+                "title": "New users [Filebeat System]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -20,7 +20,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -28,20 +28,20 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
                             "id": "2", 
                             "params": {
                                 "customLabel": "Host", 
-                                "field": "host.hostname", 
+                                "field": "system.auth.hostname", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -54,20 +54,20 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
                             "id": "4", 
                             "params": {
                                 "customLabel": "UID", 
-                                "field": "user.id", 
+                                "field": "system.auth.useradd.uid", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -80,7 +80,7 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -93,7 +93,7 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -106,7 +106,7 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -121,13 +121,13 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "New users ECS", 
-                    "winlog.api": "table"
+                    "title": "New users", 
+                    "type": "table"
                 }
             }, 
-            "id": "f398d2f0-fa77-11e6-ae9b-81e5311e8cab-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "f398d2f0-fa77-11e6-ae9b-81e5311e8cab", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -137,10 +137,10 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "8030c1b0-fa77-11e6-ae9b-81e5311e8cab-ecs", 
-                "title": "New users over time [Filebeat System] ECS", 
+                "savedSearchId": "8030c1b0-fa77-11e6-ae9b-81e5311e8cab", 
+                "title": "New users over time [Filebeat System]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -148,7 +148,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -161,7 +161,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -173,7 +173,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -188,13 +188,13 @@
                         "setYExtents": false, 
                         "times": []
                     }, 
-                    "title": "New users over time ECS", 
-                    "winlog.api": "histogram"
+                    "title": "New users over time", 
+                    "type": "histogram"
                 }
             }, 
-            "id": "5dd15c00-fa78-11e6-ae9b-81e5311e8cab-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "5dd15c00-fa78-11e6-ae9b-81e5311e8cab", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -204,8 +204,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "8030c1b0-fa77-11e6-ae9b-81e5311e8cab-ecs", 
-                "title": "New users by shell [Filebeat System] ECS", 
+                "savedSearchId": "8030c1b0-fa77-11e6-ae9b-81e5311e8cab", 
+                "title": "New users by shell [Filebeat System]", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -216,7 +216,7 @@
                         "legendOpen": true
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -224,7 +224,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -236,7 +236,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -248,7 +248,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -258,13 +258,13 @@
                         "isDonut": false, 
                         "legendPosition": "right"
                     }, 
-                    "title": "New users by shell ECS", 
-                    "winlog.api": "pie"
+                    "title": "New users by shell", 
+                    "type": "pie"
                 }
             }, 
-            "id": "e121b140-fa78-11e6-a1df-a78bd7504d38-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "e121b140-fa78-11e6-a1df-a78bd7504d38", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -274,8 +274,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "8030c1b0-fa77-11e6-ae9b-81e5311e8cab-ecs", 
-                "title": "New users by home directory [Filebeat System] ECS", 
+                "savedSearchId": "8030c1b0-fa77-11e6-ae9b-81e5311e8cab", 
+                "title": "New users by home directory [Filebeat System]", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -287,7 +287,7 @@
                         "legendOpen": true
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -295,7 +295,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -307,7 +307,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -319,7 +319,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -329,13 +329,13 @@
                         "isDonut": false, 
                         "legendPosition": "right"
                     }, 
-                    "title": "New users by home directory ECS", 
-                    "winlog.api": "pie"
+                    "title": "New users by home directory", 
+                    "type": "pie"
                 }
             }, 
-            "id": "d56ee420-fa79-11e6-a1df-a78bd7504d38-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "d56ee420-fa79-11e6-a1df-a78bd7504d38", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -345,8 +345,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "eb0039f0-fa7f-11e6-a1df-a78bd7504d38-ecs", 
-                "title": "New groups [Filebeat System] ECS", 
+                "savedSearchId": "eb0039f0-fa7f-11e6-a1df-a78bd7504d38", 
+                "title": "New groups [Filebeat System]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -357,7 +357,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -365,7 +365,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -377,19 +377,19 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "group.id", 
+                                "field": "system.auth.groupadd.gid", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -404,13 +404,13 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "New groups ECS", 
-                    "winlog.api": "table"
+                    "title": "New groups", 
+                    "type": "table"
                 }
             }, 
-            "id": "12667040-fa80-11e6-a1df-a78bd7504d38-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "12667040-fa80-11e6-a1df-a78bd7504d38", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -420,10 +420,10 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "eb0039f0-fa7f-11e6-a1df-a78bd7504d38-ecs", 
-                "title": "New groups over time [Filebeat System] ECS", 
+                "savedSearchId": "eb0039f0-fa7f-11e6-a1df-a78bd7504d38", 
+                "title": "New groups over time [Filebeat System]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -431,7 +431,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -444,7 +444,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -456,7 +456,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -471,13 +471,13 @@
                         "setYExtents": false, 
                         "times": []
                     }, 
-                    "title": "New groups over time ECS", 
-                    "winlog.api": "histogram"
+                    "title": "New groups over time", 
+                    "type": "histogram"
                 }
             }, 
-            "id": "346bb290-fa80-11e6-a1df-a78bd7504d38-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "346bb290-fa80-11e6-a1df-a78bd7504d38", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -485,28 +485,28 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Dashboards [Filebeat System] ECS", 
+                "title": "Dashboards [Filebeat System]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
                         "fontSize": 12, 
-                        "markdown": "[Syslog](#/dashboard/Filebeat-syslog-dashboard-ecs) | [Sudo commands](#/dashboard/277876d0-fa2c-11e6-bbd3-29c986c96e5a-ecs) | [SSH logins](#/dashboard/5517a150-f9ce-11e6-8115-a7c18106d86a-ecs) | [New users and groups](#/dashboard/0d3f2380-fa78-11e6-ae9b-81e5311e8cab-ecs)"
+                        "markdown": "[Syslog](#/dashboard/Filebeat-syslog-dashboard) | [Sudo commands](#/dashboard/277876d0-fa2c-11e6-bbd3-29c986c96e5a) | [SSH logins](#/dashboard/5517a150-f9ce-11e6-8115-a7c18106d86a) | [New users and groups](#/dashboard/0d3f2380-fa78-11e6-ae9b-81e5311e8cab)"
                     }, 
-                    "title": "Dashboards [Filebeat System] ECS", 
-                    "winlog.api": "markdown"
+                    "title": "Dashboards [Filebeat System]", 
+                    "type": "markdown"
                 }
             }, 
-            "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
                 "columns": [
                     "system.auth.useradd.name", 
-                    "user.id", 
+                    "system.auth.useradd.uid", 
                     "system.auth.useradd.gid", 
                     "system.auth.useradd.home", 
                     "system.auth.useradd.shell"
@@ -530,18 +530,18 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "useradd logs [Filebeat System] ECS", 
-                "winlog.version": 1
+                "title": "useradd logs [Filebeat System]", 
+                "version": 1
             }, 
-            "id": "8030c1b0-fa77-11e6-ae9b-81e5311e8cab-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 2
+            "id": "8030c1b0-fa77-11e6-ae9b-81e5311e8cab", 
+            "type": "search", 
+            "version": 2
         }, 
         {
             "attributes": {
                 "columns": [
                     "system.auth.groupadd.name", 
-                    "group.id"
+                    "system.auth.groupadd.gid"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -562,12 +562,12 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "groupadd logs [Filebeat System] ECS", 
-                "winlog.version": 1
+                "title": "groupadd logs [Filebeat System]", 
+                "version": 1
             }, 
-            "id": "eb0039f0-fa7f-11e6-a1df-a78bd7504d38-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 2
+            "id": "eb0039f0-fa7f-11e6-a1df-a78bd7504d38", 
+            "type": "search", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -586,7 +586,7 @@
                                 }
                             }
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -595,70 +595,70 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "f398d2f0-fa77-11e6-ae9b-81e5311e8cab-ecs", 
+                        "id": "f398d2f0-fa77-11e6-ae9b-81e5311e8cab", 
                         "panelIndex": 1, 
                         "row": 2, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 7, 
-                        "id": "5dd15c00-fa78-11e6-ae9b-81e5311e8cab-ecs", 
+                        "id": "5dd15c00-fa78-11e6-ae9b-81e5311e8cab", 
                         "panelIndex": 2, 
                         "row": 2, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "e121b140-fa78-11e6-a1df-a78bd7504d38-ecs", 
+                        "id": "e121b140-fa78-11e6-a1df-a78bd7504d38", 
                         "panelIndex": 3, 
                         "row": 5, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 7, 
-                        "id": "d56ee420-fa79-11e6-a1df-a78bd7504d38-ecs", 
+                        "id": "d56ee420-fa79-11e6-a1df-a78bd7504d38", 
                         "panelIndex": 4, 
                         "row": 5, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "12667040-fa80-11e6-a1df-a78bd7504d38-ecs", 
+                        "id": "12667040-fa80-11e6-a1df-a78bd7504d38", 
                         "panelIndex": 5, 
                         "row": 8, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 7, 
-                        "id": "346bb290-fa80-11e6-a1df-a78bd7504d38-ecs", 
+                        "id": "346bb290-fa80-11e6-a1df-a78bd7504d38", 
                         "panelIndex": 6, 
                         "row": 8, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54-ecs", 
+                        "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54", 
                         "panelIndex": 7, 
                         "row": 1, 
                         "size_x": 12, 
                         "size_y": 1, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat System] New users and groups ECS", 
+                "title": "[Filebeat System] New users and groups", 
                 "uiStateJSON": {
                     "P-1": {
                         "vis": {
@@ -681,12 +681,12 @@
                         }
                     }
                 }, 
-                "winlog.version": 1
+                "version": 1
             }, 
-            "id": "0d3f2380-fa78-11e6-ae9b-81e5311e8cab-ecs", 
-            "winlog.api": "dashboard", 
-            "winlog.version": 6
+            "id": "0d3f2380-fa78-11e6-ae9b-81e5311e8cab", 
+            "type": "dashboard", 
+            "version": 6
         }
     ], 
-    "winlog.version": "6.0.0-beta1-SNAPSHOT"
+    "version": "6.0.0-beta1-SNAPSHOT"
 }

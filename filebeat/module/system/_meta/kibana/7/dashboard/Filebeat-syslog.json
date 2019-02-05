@@ -8,10 +8,10 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Syslog-system-logs-ecs", 
-                "title": "Syslog events by hostname [Filebeat System] ECS", 
+                "savedSearchId": "Syslog-system-logs", 
+                "title": "Syslog events by hostname [Filebeat System]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -19,7 +19,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -32,19 +32,19 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "host.hostname", 
+                                "field": "system.syslog.hostname", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -61,13 +61,13 @@
                         "times": [], 
                         "yAxis": {}
                     }, 
-                    "title": "Syslog events by hostname ECS", 
-                    "winlog.api": "histogram"
+                    "title": "Syslog events by hostname", 
+                    "type": "histogram"
                 }
             }, 
-            "id": "Syslog-events-by-hostname-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "Syslog-events-by-hostname", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -77,10 +77,10 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Syslog-system-logs-ecs", 
-                "title": "Syslog hostnames and processes [Filebeat System] ECS", 
+                "savedSearchId": "Syslog-system-logs", 
+                "title": "Syslog hostnames and processes [Filebeat System]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -88,31 +88,31 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "host.hostname", 
+                                "field": "system.syslog.hostname", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "process.name", 
+                                "field": "system.syslog.program", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -123,20 +123,20 @@
                         "legendPosition": "bottom", 
                         "shareYAxis": true
                     }, 
-                    "title": "Syslog hostnames and processes ECS", 
-                    "winlog.api": "pie"
+                    "title": "Syslog hostnames and processes", 
+                    "type": "pie"
                 }
             }, 
-            "id": "Syslog-hostnames-and-processes-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "Syslog-hostnames-and-processes", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
                 "columns": [
-                    "host.hostname", 
-                    "process.name", 
-                    "message"
+                    "system.syslog.hostname", 
+                    "system.syslog.program", 
+                    "system.syslog.message"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -170,12 +170,12 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Syslog logs [Filebeat System] ECS", 
-                "winlog.version": 1
+                "title": "Syslog logs [Filebeat System]", 
+                "version": 1
             }, 
-            "id": "Syslog-system-logs-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 2
+            "id": "Syslog-system-logs", 
+            "type": "search", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -183,22 +183,22 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Dashboards [Filebeat System] ECS", 
+                "title": "Dashboards [Filebeat System]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
                         "fontSize": 12, 
-                        "markdown": "[Syslog](#/dashboard/Filebeat-syslog-dashboard-ecs) | [Sudo commands](#/dashboard/277876d0-fa2c-11e6-bbd3-29c986c96e5a-ecs) | [SSH logins](#/dashboard/5517a150-f9ce-11e6-8115-a7c18106d86a-ecs) | [New users and groups](#/dashboard/0d3f2380-fa78-11e6-ae9b-81e5311e8cab-ecs)"
+                        "markdown": "[Syslog](#/dashboard/Filebeat-syslog-dashboard) | [Sudo commands](#/dashboard/277876d0-fa2c-11e6-bbd3-29c986c96e5a) | [SSH logins](#/dashboard/5517a150-f9ce-11e6-8115-a7c18106d86a) | [New users and groups](#/dashboard/0d3f2380-fa78-11e6-ae9b-81e5311e8cab)"
                     }, 
-                    "title": "Dashboards [Filebeat System] ECS", 
-                    "winlog.api": "markdown"
+                    "title": "Dashboards [Filebeat System]", 
+                    "type": "markdown"
                 }
             }, 
-            "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -217,7 +217,7 @@
                                 }
                             }
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -226,30 +226,30 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "Syslog-events-by-hostname-ecs", 
+                        "id": "Syslog-events-by-hostname", 
                         "panelIndex": 1, 
                         "row": 2, 
                         "size_x": 8, 
                         "size_y": 4, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 9, 
-                        "id": "Syslog-hostnames-and-processes-ecs", 
+                        "id": "Syslog-hostnames-and-processes", 
                         "panelIndex": 2, 
                         "row": 2, 
                         "size_x": 4, 
                         "size_y": 4, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
                         "columns": [
-                            "host.hostname", 
-                            "process.name", 
-                            "message"
+                            "system.syslog.hostname", 
+                            "system.syslog.program", 
+                            "system.syslog.message"
                         ], 
-                        "id": "Syslog-system-logs-ecs", 
+                        "id": "Syslog-system-logs", 
                         "panelIndex": 3, 
                         "row": 6, 
                         "size_x": 12, 
@@ -258,27 +258,27 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "winlog.api": "search"
+                        "type": "search"
                     }, 
                     {
                         "col": 1, 
-                        "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54-ecs", 
+                        "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54", 
                         "panelIndex": 4, 
                         "row": 1, 
                         "size_x": 12, 
                         "size_y": 1, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat System] Syslog dashboard ECS", 
+                "title": "[Filebeat System] Syslog dashboard", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1
+                "version": 1
             }, 
-            "id": "Filebeat-syslog-dashboard-ecs", 
-            "winlog.api": "dashboard", 
-            "winlog.version": 6
+            "id": "Filebeat-syslog-dashboard", 
+            "type": "dashboard", 
+            "version": 6
         }
     ], 
-    "winlog.version": "6.0.0-beta1-SNAPSHOT"
+    "version": "6.0.0-beta1-SNAPSHOT"
 }

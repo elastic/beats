@@ -12,10 +12,10 @@
                         }
                     }
                 }, 
-                "savedSearchId": "bfc96a60-0a80-11e8-bffe-ff7d4f68cf94-ecs", 
-                "title": "Logs Severity [Filebeat MongoDB] ECS", 
+                "savedSearchId": "bfc96a60-0a80-11e8-bffe-ff7d4f68cf94", 
+                "title": "Logs Severity [Filebeat MongoDB]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -23,20 +23,20 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
                             "id": "2", 
                             "params": {
                                 "customLabel": "Log severity", 
-                                "field": "log.level", 
+                                "field": "mongodb.log.severity", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -44,24 +44,24 @@
                         "addTooltip": true, 
                         "isDonut": true, 
                         "legendPosition": "right", 
-                        "winlog.api": "pie"
+                        "type": "pie"
                     }, 
-                    "title": "Logs Severity [Filebeat MongoDB] ECS", 
-                    "winlog.api": "pie"
+                    "title": "Logs Severity [Filebeat MongoDB]", 
+                    "type": "pie"
                 }
             }, 
-            "id": "0fef5710-0a82-11e8-bffe-ff7d4f68cf94-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 3
+            "id": "0fef5710-0a82-11e8-bffe-ff7d4f68cf94", 
+            "type": "visualization", 
+            "version": 3
         }, 
         {
             "attributes": {
                 "columns": [
                     "mongodb.log.timestamp", 
-                    "log.level", 
+                    "mongodb.log.severity", 
                     "mongodb.log.component", 
                     "mongodb.log.context", 
-                    "message"
+                    "mongodb.log.message"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -72,30 +72,30 @@
                         "index": "filebeat-*", 
                         "query": {
                             "language": "lucene", 
-                            "query": "log.level: F or log.level: W"
+                            "query": "mongodb.log.severity: F or mongodb.log.severity: W"
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Error logs [Filebeat MongoDB] ECS", 
-                "winlog.version": 1
+                "title": "Error logs [Filebeat MongoDB]", 
+                "version": 1
             }, 
-            "id": "e49fe000-0a7e-11e8-bffe-ff7d4f68cf94-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 3
+            "id": "e49fe000-0a7e-11e8-bffe-ff7d4f68cf94", 
+            "type": "search", 
+            "version": 3
         }, 
         {
             "attributes": {
                 "columns": [
                     "mongodb.log.timestamp", 
-                    "log.level", 
+                    "mongodb.log.severity", 
                     "mongodb.log.component", 
                     "mongodb.log.context", 
-                    "message"
+                    "mongodb.log.message"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -106,21 +106,21 @@
                         "index": "filebeat-*", 
                         "query": {
                             "language": "lucene", 
-                            "query": "log.level: *"
+                            "query": "mongodb.log.severity: *"
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "sort": [
                     "mongodb.log.timestamp", 
                     "asc"
                 ], 
-                "title": "All logs [Filebeat MongoDB] ECS", 
-                "winlog.version": 1
+                "title": "All logs [Filebeat MongoDB]", 
+                "version": 1
             }, 
-            "id": "bfc96a60-0a80-11e8-bffe-ff7d4f68cf94-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 2
+            "id": "bfc96a60-0a80-11e8-bffe-ff7d4f68cf94", 
+            "type": "search", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -134,7 +134,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -143,23 +143,23 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "0fef5710-0a82-11e8-bffe-ff7d4f68cf94-ecs", 
+                        "id": "0fef5710-0a82-11e8-bffe-ff7d4f68cf94", 
                         "panelIndex": 1, 
                         "row": 1, 
                         "size_x": 4, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 5, 
                         "columns": [
                             "mongodb.log.timestamp", 
-                            "log.level", 
+                            "mongodb.log.severity", 
                             "mongodb.log.component", 
                             "mongodb.log.context", 
-                            "message"
+                            "mongodb.log.message"
                         ], 
-                        "id": "e49fe000-0a7e-11e8-bffe-ff7d4f68cf94-ecs", 
+                        "id": "e49fe000-0a7e-11e8-bffe-ff7d4f68cf94", 
                         "panelIndex": 2, 
                         "row": 1, 
                         "size_x": 8, 
@@ -168,18 +168,18 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "winlog.api": "search"
+                        "type": "search"
                     }, 
                     {
                         "col": 1, 
                         "columns": [
                             "mongodb.log.timestamp", 
-                            "log.level", 
+                            "mongodb.log.severity", 
                             "mongodb.log.component", 
                             "mongodb.log.context", 
-                            "message"
+                            "mongodb.log.message"
                         ], 
-                        "id": "bfc96a60-0a80-11e8-bffe-ff7d4f68cf94-ecs", 
+                        "id": "bfc96a60-0a80-11e8-bffe-ff7d4f68cf94", 
                         "panelIndex": 3, 
                         "row": 4, 
                         "size_x": 12, 
@@ -188,18 +188,18 @@
                             "mongodb.log.timestamp", 
                             "asc"
                         ], 
-                        "winlog.api": "search"
+                        "type": "search"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "Overview [Filebeat MongoDB] ECS", 
+                "title": "Overview [Filebeat MongoDB]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1
+                "version": 1
             }, 
-            "id": "abcf35b0-0a82-11e8-bffe-ff7d4f68cf94-ecs", 
-            "winlog.api": "dashboard", 
-            "winlog.version": 2
+            "id": "abcf35b0-0a82-11e8-bffe-ff7d4f68cf94", 
+            "type": "dashboard", 
+            "version": 2
         }
     ], 
-    "winlog.version": "6.0.0"
+    "version": "6.0.0"
 }

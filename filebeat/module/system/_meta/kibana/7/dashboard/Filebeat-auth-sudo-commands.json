@@ -8,10 +8,10 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a-ecs", 
-                "title": "Sudo commands by user [Filebeat System] ECS", 
+                "savedSearchId": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a", 
+                "title": "Sudo commands by user [Filebeat System]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -19,7 +19,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -32,7 +32,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -44,7 +44,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -59,13 +59,13 @@
                         "setYExtents": false, 
                         "times": []
                     }, 
-                    "title": "Sudo commands by user ECS", 
-                    "winlog.api": "histogram"
+                    "title": "Sudo commands by user", 
+                    "type": "histogram"
                 }
             }, 
-            "id": "5c7af030-fa2a-11e6-bbd3-29c986c96e5a-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "5c7af030-fa2a-11e6-bbd3-29c986c96e5a", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -83,9 +83,9 @@
                         }
                     }
                 }, 
-                "title": "Sudo errors [Filebeat System] ECS", 
+                "title": "Sudo errors [Filebeat System]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -93,7 +93,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -106,7 +106,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -118,7 +118,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -133,13 +133,13 @@
                         "setYExtents": false, 
                         "times": []
                     }, 
-                    "title": "Sudo errors ECS", 
-                    "winlog.api": "histogram"
+                    "title": "Sudo errors", 
+                    "type": "histogram"
                 }
             }, 
-            "id": "51164310-fa2b-11e6-bbd3-29c986c96e5a-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "51164310-fa2b-11e6-bbd3-29c986c96e5a", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -149,8 +149,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a-ecs", 
-                "title": "Top sudo commands [Filebeat System] ECS", 
+                "savedSearchId": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a", 
+                "title": "Top sudo commands [Filebeat System]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -161,7 +161,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -169,7 +169,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -181,7 +181,7 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -193,7 +193,7 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -208,13 +208,13 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Top sudo commands ECS", 
-                    "winlog.api": "table"
+                    "title": "Top sudo commands", 
+                    "type": "table"
                 }
             }, 
-            "id": "dc589770-fa2b-11e6-bbd3-29c986c96e5a-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "dc589770-fa2b-11e6-bbd3-29c986c96e5a", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -222,22 +222,22 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Dashboards [Filebeat System] ECS", 
+                "title": "Dashboards [Filebeat System]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
                         "fontSize": 12, 
-                        "markdown": "[Syslog](#/dashboard/Filebeat-syslog-dashboard-ecs) | [Sudo commands](#/dashboard/277876d0-fa2c-11e6-bbd3-29c986c96e5a-ecs) | [SSH logins](#/dashboard/5517a150-f9ce-11e6-8115-a7c18106d86a-ecs) | [New users and groups](#/dashboard/0d3f2380-fa78-11e6-ae9b-81e5311e8cab-ecs)"
+                        "markdown": "[Syslog](#/dashboard/Filebeat-syslog-dashboard) | [Sudo commands](#/dashboard/277876d0-fa2c-11e6-bbd3-29c986c96e5a) | [SSH logins](#/dashboard/5517a150-f9ce-11e6-8115-a7c18106d86a) | [New users and groups](#/dashboard/0d3f2380-fa78-11e6-ae9b-81e5311e8cab)"
                     }, 
-                    "title": "Dashboards [Filebeat System] ECS", 
-                    "winlog.api": "markdown"
+                    "title": "Dashboards [Filebeat System]", 
+                    "type": "markdown"
                 }
             }, 
-            "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -266,12 +266,12 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Sudo commands [Filebeat System] ECS", 
-                "winlog.version": 1
+                "title": "Sudo commands [Filebeat System]", 
+                "version": 1
             }, 
-            "id": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 2
+            "id": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a", 
+            "type": "search", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -290,7 +290,7 @@
                                 }
                             }
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -299,43 +299,43 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "5c7af030-fa2a-11e6-bbd3-29c986c96e5a-ecs", 
+                        "id": "5c7af030-fa2a-11e6-bbd3-29c986c96e5a", 
                         "panelIndex": 1, 
                         "row": 6, 
                         "size_x": 12, 
                         "size_y": 4, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "51164310-fa2b-11e6-bbd3-29c986c96e5a-ecs", 
+                        "id": "51164310-fa2b-11e6-bbd3-29c986c96e5a", 
                         "panelIndex": 2, 
                         "row": 10, 
                         "size_x": 12, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "dc589770-fa2b-11e6-bbd3-29c986c96e5a-ecs", 
+                        "id": "dc589770-fa2b-11e6-bbd3-29c986c96e5a", 
                         "panelIndex": 3, 
                         "row": 2, 
                         "size_x": 12, 
                         "size_y": 4, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54-ecs", 
+                        "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54", 
                         "panelIndex": 4, 
                         "row": 1, 
                         "size_x": 12, 
                         "size_y": 1, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat System] Sudo commands ECS", 
+                "title": "[Filebeat System] Sudo commands", 
                 "uiStateJSON": {
                     "P-3": {
                         "vis": {
@@ -348,12 +348,12 @@
                         }
                     }
                 }, 
-                "winlog.version": 1
+                "version": 1
             }, 
-            "id": "277876d0-fa2c-11e6-bbd3-29c986c96e5a-ecs", 
-            "winlog.api": "dashboard", 
-            "winlog.version": 6
+            "id": "277876d0-fa2c-11e6-bbd3-29c986c96e5a", 
+            "type": "dashboard", 
+            "version": 6
         }
     ], 
-    "winlog.version": "6.0.0-beta1-SNAPSHOT"
+    "version": "6.0.0-beta1-SNAPSHOT"
 }

@@ -8,8 +8,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "MongoDB-search-ecs", 
-                "title": "Hosts [Metricbeat MongoDB] ECS", 
+                "savedSearchId": "MongoDB-search", 
+                "title": "Hosts [Metricbeat MongoDB]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -20,7 +20,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -31,19 +31,19 @@
                                 "field": "mongodb.status.connections.current"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "service.address", 
+                                "field": "metricset.host", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -53,7 +53,7 @@
                                 "field": "mongodb.status.memory.bits"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -63,7 +63,7 @@
                                 "field": "mongodb.status.memory.resident.mb"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -73,7 +73,7 @@
                                 "field": "mongodb.status.memory.virtual.mb"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }
                     ], 
                     "params": {
@@ -87,13 +87,13 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Hosts [Metricbeat MongoDB] ECS", 
-                    "winlog.api": "table"
+                    "title": "Hosts [Metricbeat MongoDB]", 
+                    "type": "table"
                 }
             }, 
-            "id": "MongoDB-hosts-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "MongoDB-hosts", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -103,20 +103,20 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "MongoDB-search-ecs", 
-                "title": "Engine & Version [Metricbeat MongoDB] ECS", 
+                "savedSearchId": "MongoDB-search", 
+                "title": "Engine & Version [Metricbeat MongoDB]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
                             "enabled": true, 
                             "id": "1", 
                             "params": {
-                                "field": "service.address"
+                                "field": "metricset.host"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "cardinality"
+                            "type": "cardinality"
                         }, 
                         {
                             "enabled": true, 
@@ -129,20 +129,20 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
                             "id": "3", 
                             "params": {
                                 "customLabel": "Version", 
-                                "field": "service.version", 
+                                "field": "mongodb.status.version", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -151,15 +151,15 @@
                         "isDonut": true, 
                         "legendPosition": "bottom", 
                         "shareYAxis": true, 
-                        "winlog.api": "pie"
+                        "type": "pie"
                     }, 
-                    "title": "Engine & Version [Metricbeat MongoDB] ECS", 
-                    "winlog.api": "pie"
+                    "title": "Engine & Version [Metricbeat MongoDB]", 
+                    "type": "pie"
                 }
             }, 
-            "id": "MongoDB-Engine-ampersand-Version-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "MongoDB-Engine-ampersand-Version", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -169,10 +169,10 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "MongoDB-search-ecs", 
-                "title": "Operation counters [Metricbeat MongoDB] ECS", 
+                "savedSearchId": "MongoDB-search", 
+                "title": "Operation counters [Metricbeat MongoDB]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -183,7 +183,7 @@
                                 "field": "mongodb.status.ops.counters.command"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -196,7 +196,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -206,7 +206,7 @@
                                 "field": "mongodb.status.ops.counters.delete"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -216,7 +216,7 @@
                                 "field": "mongodb.status.ops.counters.getmore"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -226,7 +226,7 @@
                                 "field": "mongodb.status.ops.counters.insert"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -236,7 +236,7 @@
                                 "field": "mongodb.status.ops.counters.query"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -246,7 +246,7 @@
                                 "field": "mongodb.status.ops.replicated.update"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }
                     ], 
                     "params": {
@@ -262,12 +262,12 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {}, 
-                                "winlog.api": "category"
+                                "type": "category"
                             }
                         ], 
                         "defaultYExtents": false, 
@@ -292,7 +292,7 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "winlog.api": "area", 
+                                "type": "area", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
@@ -300,7 +300,7 @@
                         "shareYAxis": true, 
                         "smoothLines": false, 
                         "times": [], 
-                        "winlog.api": "area", 
+                        "type": "area", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -314,25 +314,25 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "winlog.api": "value"
+                                "type": "value"
                             }
                         ], 
                         "yAxis": {}
                     }, 
-                    "title": "Operation counters [Metricbeat MongoDB] ECS", 
-                    "winlog.api": "area"
+                    "title": "Operation counters [Metricbeat MongoDB]", 
+                    "type": "area"
                 }
             }, 
-            "id": "MongoDB-operation-counters-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "MongoDB-operation-counters", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -342,8 +342,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "MongoDB-search-ecs", 
-                "title": "Concurrent transactions Read [Metricbeat MongoDB] ECS", 
+                "savedSearchId": "MongoDB-search", 
+                "title": "Concurrent transactions Read [Metricbeat MongoDB]", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -352,7 +352,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -363,7 +363,7 @@
                                 "field": "mongodb.status.wired_tiger.concurrent_transactions.read.available"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -376,7 +376,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -386,7 +386,7 @@
                                 "field": "mongodb.status.wired_tiger.concurrent_transactions.read.out"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }
                     ], 
                     "params": {
@@ -402,12 +402,12 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {}, 
-                                "winlog.api": "category"
+                                "type": "category"
                             }
                         ], 
                         "defaultYExtents": false, 
@@ -432,7 +432,7 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "winlog.api": "area", 
+                                "type": "area", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
@@ -440,7 +440,7 @@
                         "shareYAxis": true, 
                         "smoothLines": false, 
                         "times": [], 
-                        "winlog.api": "area", 
+                        "type": "area", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -454,25 +454,25 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "winlog.api": "value"
+                                "type": "value"
                             }
                         ], 
                         "yAxis": {}
                     }, 
-                    "title": "Concurrent transactions Read [Metricbeat MongoDB] ECS", 
-                    "winlog.api": "area"
+                    "title": "Concurrent transactions Read [Metricbeat MongoDB]", 
+                    "type": "area"
                 }
             }, 
-            "id": "MongoDB-Concurrent-transactions-Read-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "MongoDB-Concurrent-transactions-Read", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -482,8 +482,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "MongoDB-search-ecs", 
-                "title": "Concurrent transactions Write [Metricbeat MongoDB] ECS", 
+                "savedSearchId": "MongoDB-search", 
+                "title": "Concurrent transactions Write [Metricbeat MongoDB]", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -492,7 +492,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -503,7 +503,7 @@
                                 "field": "mongodb.status.wired_tiger.concurrent_transactions.write.available"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -516,7 +516,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -526,7 +526,7 @@
                                 "field": "mongodb.status.wired_tiger.concurrent_transactions.write.out"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }
                     ], 
                     "params": {
@@ -542,12 +542,12 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {}, 
-                                "winlog.api": "category"
+                                "type": "category"
                             }
                         ], 
                         "defaultYExtents": false, 
@@ -572,7 +572,7 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "winlog.api": "area", 
+                                "type": "area", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
@@ -580,7 +580,7 @@
                         "shareYAxis": true, 
                         "smoothLines": false, 
                         "times": [], 
-                        "winlog.api": "area", 
+                        "type": "area", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -594,25 +594,25 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "winlog.api": "value"
+                                "type": "value"
                             }
                         ], 
                         "yAxis": {}
                     }, 
-                    "title": "Concurrent transactions Write [Metricbeat MongoDB] ECS", 
-                    "winlog.api": "area"
+                    "title": "Concurrent transactions Write [Metricbeat MongoDB]", 
+                    "type": "area"
                 }
             }, 
-            "id": "MongoDB-Concurrent-transactions-Write-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "MongoDB-Concurrent-transactions-Write", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -622,10 +622,10 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "MongoDB-search-ecs", 
-                "title": "Memory stats [Metricbeat MongoDB] ECS", 
+                "savedSearchId": "MongoDB-search", 
+                "title": "Memory stats [Metricbeat MongoDB]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -636,7 +636,7 @@
                                 "field": "mongodb.status.memory.mapped.mb"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -649,7 +649,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -659,7 +659,7 @@
                                 "field": "mongodb.status.memory.mapped_with_journal.mb"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -669,7 +669,7 @@
                                 "field": "mongodb.status.memory.resident.mb"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -679,7 +679,7 @@
                                 "field": "mongodb.status.memory.virtual.mb"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }
                     ], 
                     "params": {
@@ -695,12 +695,12 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {}, 
-                                "winlog.api": "category"
+                                "type": "category"
                             }
                         ], 
                         "defaultYExtents": false, 
@@ -725,7 +725,7 @@
                                 "mode": "normal", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "winlog.api": "line", 
+                                "type": "line", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
@@ -734,7 +734,7 @@
                         "showCircles": true, 
                         "smoothLines": false, 
                         "times": [], 
-                        "winlog.api": "line", 
+                        "type": "line", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -748,25 +748,25 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "winlog.api": "value"
+                                "type": "value"
                             }
                         ], 
                         "yAxis": {}
                     }, 
-                    "title": "Memory stats [Metricbeat MongoDB] ECS", 
-                    "winlog.api": "line"
+                    "title": "Memory stats [Metricbeat MongoDB]", 
+                    "type": "line"
                 }
             }, 
-            "id": "MongoDB-memory-stats-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "MongoDB-memory-stats", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -776,10 +776,10 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "MongoDB-search-ecs", 
-                "title": "Asserts [Metricbeat MongoDB] ECS", 
+                "savedSearchId": "MongoDB-search", 
+                "title": "Asserts [Metricbeat MongoDB]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -790,7 +790,7 @@
                                 "field": "mongodb.status.asserts.msg"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -803,7 +803,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -813,7 +813,7 @@
                                 "field": "mongodb.status.asserts.regular"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -823,7 +823,7 @@
                                 "field": "mongodb.status.asserts.rollovers"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -833,7 +833,7 @@
                                 "field": "mongodb.status.asserts.user"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -843,7 +843,7 @@
                                 "field": "mongodb.status.asserts.warning"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }
                     ], 
                     "params": {
@@ -859,12 +859,12 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {}, 
-                                "winlog.api": "category"
+                                "type": "category"
                             }
                         ], 
                         "defaultYExtents": false, 
@@ -889,7 +889,7 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "winlog.api": "area", 
+                                "type": "area", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
@@ -897,7 +897,7 @@
                         "shareYAxis": true, 
                         "smoothLines": false, 
                         "times": [], 
-                        "winlog.api": "area", 
+                        "type": "area", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -911,25 +911,25 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "winlog.api": "value"
+                                "type": "value"
                             }
                         ], 
                         "yAxis": {}
                     }, 
-                    "title": "Asserts [Metricbeat MongoDB] ECS", 
-                    "winlog.api": "area"
+                    "title": "Asserts [Metricbeat MongoDB]", 
+                    "type": "area"
                 }
             }, 
-            "id": "MongoDB-asserts-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "MongoDB-asserts", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -939,10 +939,10 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "MongoDB-search-ecs", 
-                "title": "WiredTiger Cache [Metricbeat MongoDB] ECS", 
+                "savedSearchId": "MongoDB-search", 
+                "title": "WiredTiger Cache [Metricbeat MongoDB]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -953,7 +953,7 @@
                                 "field": "mongodb.status.wired_tiger.cache.maximum.bytes"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -966,7 +966,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -976,7 +976,7 @@
                                 "field": "mongodb.status.wired_tiger.cache.used.bytes"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -986,7 +986,7 @@
                                 "field": "mongodb.status.wired_tiger.cache.dirty.bytes"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }
                     ], 
                     "params": {
@@ -1002,12 +1002,12 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {}, 
-                                "winlog.api": "category"
+                                "type": "category"
                             }
                         ], 
                         "defaultYExtents": false, 
@@ -1032,7 +1032,7 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "winlog.api": "area", 
+                                "type": "area", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
@@ -1040,7 +1040,7 @@
                         "shareYAxis": true, 
                         "smoothLines": false, 
                         "times": [], 
-                        "winlog.api": "area", 
+                        "type": "area", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -1054,25 +1054,25 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "winlog.api": "value"
+                                "type": "value"
                             }
                         ], 
                         "yAxis": {}
                     }, 
-                    "title": "WiredTiger Cache [Metricbeat MongoDB] ECS", 
-                    "winlog.api": "area"
+                    "title": "WiredTiger Cache [Metricbeat MongoDB]", 
+                    "type": "area"
                 }
             }, 
-            "id": "MongoDB-WiredTiger-Cache-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "MongoDB-WiredTiger-Cache", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -1101,7 +1101,7 @@
                         "query": {
                             "query_string": {
                                 "analyze_wildcard": true, 
-                                "query": "event.module:mongodb"
+                                "query": "metricset.module:mongodb"
                             }
                         }
                     }
@@ -1110,12 +1110,12 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "MongoDB search ECS", 
-                "winlog.version": 1
+                "title": "MongoDB search", 
+                "version": 1
             }, 
-            "id": "MongoDB-search-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 1
+            "id": "MongoDB-search", 
+            "type": "search", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -1134,7 +1134,7 @@
                                 }
                             }
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -1143,79 +1143,79 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "MongoDB-hosts-ecs", 
+                        "id": "MongoDB-hosts", 
                         "panelIndex": 1, 
                         "row": 1, 
                         "size_x": 8, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 9, 
-                        "id": "MongoDB-Engine-ampersand-Version-ecs", 
+                        "id": "MongoDB-Engine-ampersand-Version", 
                         "panelIndex": 4, 
                         "row": 1, 
                         "size_x": 4, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "MongoDB-operation-counters-ecs", 
+                        "id": "MongoDB-operation-counters", 
                         "panelIndex": 2, 
                         "row": 4, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 7, 
-                        "id": "MongoDB-Concurrent-transactions-Read-ecs", 
+                        "id": "MongoDB-Concurrent-transactions-Read", 
                         "panelIndex": 6, 
                         "row": 4, 
                         "size_x": 3, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 10, 
-                        "id": "MongoDB-Concurrent-transactions-Write-ecs", 
+                        "id": "MongoDB-Concurrent-transactions-Write", 
                         "panelIndex": 7, 
                         "row": 4, 
                         "size_x": 3, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "MongoDB-memory-stats-ecs", 
+                        "id": "MongoDB-memory-stats", 
                         "panelIndex": 5, 
                         "row": 10, 
                         "size_x": 12, 
                         "size_y": 4, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 7, 
-                        "id": "MongoDB-asserts-ecs", 
+                        "id": "MongoDB-asserts", 
                         "panelIndex": 3, 
                         "row": 7, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "MongoDB-WiredTiger-Cache-ecs", 
+                        "id": "MongoDB-WiredTiger-Cache", 
                         "panelIndex": 8, 
                         "row": 7, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat MongoDB] Overview ECS", 
+                "title": "[Metricbeat MongoDB] Overview", 
                 "uiStateJSON": {
                     "P-1": {
                         "vis": {
@@ -1228,12 +1228,12 @@
                         }
                     }
                 }, 
-                "winlog.version": 1
+                "version": 1
             }, 
-            "id": "Metricbeat-MongoDB-ecs", 
-            "winlog.api": "dashboard", 
-            "winlog.version": 3
+            "id": "Metricbeat-MongoDB", 
+            "type": "dashboard", 
+            "version": 3
         }
     ], 
-    "winlog.version": "6.0.0-beta1-SNAPSHOT"
+    "version": "6.0.0-beta1-SNAPSHOT"
 }

@@ -24,16 +24,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "pack_it-compliance_mounts", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "pack_it-compliance_mounts"
                                 }, 
                                 "query": {
                                     "match": {
                                         "osquery.result.name": {
                                             "query": "pack_it-compliance_mounts", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -45,20 +45,20 @@
                             "language": "lucene", 
                             "query": "*"
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Mounts [Osquery results] ECS", 
-                "winlog.version": 1
+                "title": "Mounts [Osquery results]", 
+                "version": 1
             }, 
-            "id": "7a9482d0-eb00-11e7-8f04-51231daa5b05-ecs", 
-            "winlog.api": "search", 
+            "id": "7a9482d0-eb00-11e7-8f04-51231daa5b05", 
+            "type": "search", 
             "updated_at": "2018-01-08T17:35:32.102Z", 
-            "winlog.version": 1
+            "version": 1
         }, 
         {
             "attributes": {
@@ -72,10 +72,10 @@
                         }
                     }
                 }, 
-                "savedSearchId": "7a9482d0-eb00-11e7-8f04-51231daa5b05-ecs", 
-                "title": "Mounts by type [Osquery Result] ECS", 
+                "savedSearchId": "7a9482d0-eb00-11e7-8f04-51231daa5b05", 
+                "title": "Mounts by type [Osquery Result]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -83,7 +83,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -95,7 +95,7 @@
                                 "size": 10
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -107,7 +107,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -121,16 +121,16 @@
                             "values": true
                         }, 
                         "legendPosition": "right", 
-                        "winlog.api": "pie"
+                        "type": "pie"
                     }, 
-                    "title": "Mounts by type [Osquery Result] ECS", 
-                    "winlog.api": "pie"
+                    "title": "Mounts by type [Osquery Result]", 
+                    "type": "pie"
                 }
             }, 
-            "id": "a9fd8bb0-eb01-11e7-8f04-51231daa5b05-ecs", 
-            "winlog.api": "visualization", 
+            "id": "a9fd8bb0-eb01-11e7-8f04-51231daa5b05", 
+            "type": "visualization", 
             "updated_at": "2018-01-08T17:35:32.102Z", 
-            "winlog.version": 1
+            "version": 1
         }, 
         {
             "attributes": {
@@ -156,16 +156,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "pack_it-compliance_deb_packages", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "pack_it-compliance_deb_packages"
                                 }, 
                                 "query": {
                                     "match": {
                                         "osquery.result.name": {
                                             "query": "pack_it-compliance_deb_packages", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -177,20 +177,20 @@
                             "language": "lucene", 
                             "query": "*"
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "DEB packages installed [Osquery results] ECS", 
-                "winlog.version": 1
+                "title": "DEB packages installed [Osquery results]", 
+                "version": 1
             }, 
-            "id": "3824b080-eb02-11e7-8f04-51231daa5b05-ecs", 
-            "winlog.api": "search", 
+            "id": "3824b080-eb02-11e7-8f04-51231daa5b05", 
+            "type": "search", 
             "updated_at": "2018-01-08T17:35:32.102Z", 
-            "winlog.version": 1
+            "version": 1
         }, 
         {
             "attributes": {
@@ -204,10 +204,10 @@
                         }
                     }
                 }, 
-                "savedSearchId": "b5d6baa0-eb02-11e7-8f04-51231daa5b05-ecs", 
-                "title": "OS versions [Osquery result] ECS", 
+                "savedSearchId": "b5d6baa0-eb02-11e7-8f04-51231daa5b05", 
+                "title": "OS versions [Osquery result]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -217,7 +217,7 @@
                                 "field": "osquery.result.host_identifier"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "cardinality"
+                            "type": "cardinality"
                         }, 
                         {
                             "enabled": true, 
@@ -229,7 +229,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -241,7 +241,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -253,7 +253,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -267,16 +267,16 @@
                             "values": true
                         }, 
                         "legendPosition": "right", 
-                        "winlog.api": "pie"
+                        "type": "pie"
                     }, 
-                    "title": "OS versions [Osquery result] ECS", 
-                    "winlog.api": "pie"
+                    "title": "OS versions [Osquery result]", 
+                    "type": "pie"
                 }
             }, 
-            "id": "1da1ed30-eb03-11e7-8f04-51231daa5b05-ecs", 
-            "winlog.api": "visualization", 
+            "id": "1da1ed30-eb03-11e7-8f04-51231daa5b05", 
+            "type": "visualization", 
             "updated_at": "2018-01-08T17:35:32.102Z", 
-            "winlog.version": 1
+            "version": 1
         }, 
         {
             "attributes": {
@@ -296,16 +296,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "Live", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "Live"
                                 }, 
                                 "query": {
                                     "match": {
                                         "osquery.result.columns.status": {
                                             "query": "Live", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -317,8 +317,8 @@
                         }
                     }
                 }, 
-                "savedSearchId": "f59e21e0-eb03-11e7-8f04-51231daa5b05-ecs", 
-                "title": "Number of Kernel modules [Osquery Result] ECS", 
+                "savedSearchId": "f59e21e0-eb03-11e7-8f04-51231daa5b05", 
+                "title": "Number of Kernel modules [Osquery Result]", 
                 "uiStateJSON": {
                     "vis": {
                         "defaultColors": {
@@ -326,7 +326,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -337,7 +337,7 @@
                                 "field": "osquery.result.columns.name"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "cardinality"
+                            "type": "cardinality"
                         }
                     ], 
                     "params": {
@@ -380,20 +380,20 @@
                                 "subText": "", 
                                 "width": 0.9
                             }, 
-                            "winlog.api": "meter", 
+                            "type": "meter", 
                             "verticalSplit": false
                         }, 
                         "isDisplayWarning": false, 
-                        "winlog.api": "gauge"
+                        "type": "gauge"
                     }, 
-                    "title": "Number of Kernel modules [Osquery Result] ECS", 
-                    "winlog.api": "gauge"
+                    "title": "Number of Kernel modules [Osquery Result]", 
+                    "type": "gauge"
                 }
             }, 
-            "id": "240f3630-eb05-11e7-8f04-51231daa5b05-ecs", 
-            "winlog.api": "visualization", 
+            "id": "240f3630-eb05-11e7-8f04-51231daa5b05", 
+            "type": "visualization", 
             "updated_at": "2018-01-08T17:35:32.102Z", 
-            "winlog.version": 1
+            "version": 1
         }, 
         {
             "attributes": {
@@ -401,23 +401,23 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Navigation [Osquery Result] ECS", 
+                "title": "Navigation [Osquery Result]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
                         "fontSize": 10, 
-                        "markdown": "[Compilance](#/dashboard/69f5ae20-eb02-11e7-8f04-51231daa5b05-ecs) | [OSSEC Rootkit](#/dashboard/c0a7ce90-f4aa-11e7-8647-534bb4c21040-ecs)"
+                        "markdown": "[Compilance](#/dashboard/69f5ae20-eb02-11e7-8f04-51231daa5b05) | [OSSEC Rootkit](#/dashboard/c0a7ce90-f4aa-11e7-8647-534bb4c21040)"
                     }, 
-                    "title": "Navigation [Osquery Result] ECS", 
-                    "winlog.api": "markdown"
+                    "title": "Navigation [Osquery Result]", 
+                    "type": "markdown"
                 }
             }, 
-            "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040-ecs", 
-            "winlog.api": "visualization", 
+            "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040", 
+            "type": "visualization", 
             "updated_at": "2018-01-08T19:41:10.264Z", 
-            "winlog.version": 3
+            "version": 3
         }, 
         {
             "attributes": {
@@ -441,16 +441,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "pack_it-compliance_os_version", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "pack_it-compliance_os_version"
                                 }, 
                                 "query": {
                                     "match": {
                                         "osquery.result.name": {
                                             "query": "pack_it-compliance_os_version", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -462,20 +462,20 @@
                             "language": "lucene", 
                             "query": "*"
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "OS versions [Osquery results] ECS", 
-                "winlog.version": 1
+                "title": "OS versions [Osquery results]", 
+                "version": 1
             }, 
-            "id": "b5d6baa0-eb02-11e7-8f04-51231daa5b05-ecs", 
-            "winlog.api": "search", 
+            "id": "b5d6baa0-eb02-11e7-8f04-51231daa5b05", 
+            "type": "search", 
             "updated_at": "2018-01-08T17:35:32.102Z", 
-            "winlog.version": 1
+            "version": 1
         }, 
         {
             "attributes": {
@@ -501,16 +501,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "pack_it-compliance_kernel_modules", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "pack_it-compliance_kernel_modules"
                                 }, 
                                 "query": {
                                     "match": {
                                         "osquery.result.name": {
                                             "query": "pack_it-compliance_kernel_modules", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -522,20 +522,20 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Kernel modules [Osquery results] ECS", 
-                "winlog.version": 1
+                "title": "Kernel modules [Osquery results]", 
+                "version": 1
             }, 
-            "id": "f59e21e0-eb03-11e7-8f04-51231daa5b05-ecs", 
-            "winlog.api": "search", 
+            "id": "f59e21e0-eb03-11e7-8f04-51231daa5b05", 
+            "type": "search", 
             "updated_at": "2018-01-08T17:35:32.102Z", 
-            "winlog.version": 1
+            "version": 1
         }, 
         {
             "attributes": {
@@ -549,7 +549,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -566,10 +566,10 @@
                             "x": 6, 
                             "y": 6
                         }, 
-                        "id": "7a9482d0-eb00-11e7-8f04-51231daa5b05-ecs", 
+                        "id": "7a9482d0-eb00-11e7-8f04-51231daa5b05", 
                         "panelIndex": "1", 
-                        "winlog.api": "search", 
-                        "winlog.version": "6.2.4"
+                        "type": "search", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -579,10 +579,10 @@
                             "x": 5, 
                             "y": 1
                         }, 
-                        "id": "a9fd8bb0-eb01-11e7-8f04-51231daa5b05-ecs", 
+                        "id": "a9fd8bb0-eb01-11e7-8f04-51231daa5b05", 
                         "panelIndex": "2", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -592,10 +592,10 @@
                             "x": 0, 
                             "y": 6
                         }, 
-                        "id": "3824b080-eb02-11e7-8f04-51231daa5b05-ecs", 
+                        "id": "3824b080-eb02-11e7-8f04-51231daa5b05", 
                         "panelIndex": "3", 
-                        "winlog.api": "search", 
-                        "winlog.version": "6.2.4"
+                        "type": "search", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -605,10 +605,10 @@
                             "x": 0, 
                             "y": 1
                         }, 
-                        "id": "1da1ed30-eb03-11e7-8f04-51231daa5b05-ecs", 
+                        "id": "1da1ed30-eb03-11e7-8f04-51231daa5b05", 
                         "panelIndex": "4", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "embeddableConfig": {
@@ -626,10 +626,10 @@
                             "x": 0, 
                             "y": 4
                         }, 
-                        "id": "240f3630-eb05-11e7-8f04-51231daa5b05-ecs", 
+                        "id": "240f3630-eb05-11e7-8f04-51231daa5b05", 
                         "panelIndex": "5", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -639,14 +639,14 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040-ecs", 
+                        "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040", 
                         "panelIndex": "6", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.1.0-SNAPSHOT"
+                        "type": "visualization", 
+                        "version": "6.1.0-SNAPSHOT"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Osquery Result] Compliance pack ECS", 
+                "title": "[Osquery Result] Compliance pack", 
                 "uiStateJSON": {
                     "P-5": {
                         "vis": {
@@ -656,13 +656,13 @@
                         }
                     }
                 }, 
-                "winlog.version": 1
+                "version": 1
             }, 
-            "id": "69f5ae20-eb02-11e7-8f04-51231daa5b05-ecs", 
-            "winlog.api": "dashboard", 
+            "id": "69f5ae20-eb02-11e7-8f04-51231daa5b05", 
+            "type": "dashboard", 
             "updated_at": "2018-01-08T19:42:15.406Z", 
-            "winlog.version": 2
+            "version": 2
         }
     ], 
-    "winlog.version": "6.1.0-SNAPSHOT"
+    "version": "6.1.0-SNAPSHOT"
 }

@@ -29,7 +29,7 @@
             },
             "panelIndex": "1",
             "panelRefName": "panel_0",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -41,7 +41,7 @@
             },
             "panelIndex": "3",
             "panelRefName": "panel_1",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -63,7 +63,7 @@
             },
             "panelIndex": "4",
             "panelRefName": "panel_2",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -75,7 +75,7 @@
             },
             "panelIndex": "5",
             "panelRefName": "panel_3",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -87,47 +87,47 @@
             },
             "panelIndex": "6",
             "panelRefName": "panel_4",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
-        "title": "Winlogbeat Dashboard ECS",
-        "winlog.version": 1
+        "title": "Winlogbeat Dashboard",
+        "version": 1
       },
-      "id": "Winlogbeat-Dashboard-ecs",
+      "id": "Winlogbeat-Dashboard",
       "migrationVersion": {
         "dashboard": "7.0.0"
       },
       "references": [
         {
-          "id": "Number-of-Events-Over-Time-By-Event-Log-ecs",
+          "id": "Number-of-Events-Over-Time-By-Event-Log",
           "name": "panel_0",
-          "winlog.api": "visualization"
+          "type": "visualization"
         },
         {
-          "id": "Number-of-Events-ecs",
+          "id": "Number-of-Events",
           "name": "panel_1",
-          "winlog.api": "visualization"
+          "type": "visualization"
         },
         {
-          "id": "Top-Event-IDs-ecs",
+          "id": "Top-Event-IDs",
           "name": "panel_2",
-          "winlog.api": "visualization"
+          "type": "visualization"
         },
         {
-          "id": "Event-Levels-ecs",
+          "id": "Event-Levels",
           "name": "panel_3",
-          "winlog.api": "visualization"
+          "type": "visualization"
         },
         {
-          "id": "Sources-ecs",
+          "id": "Sources",
           "name": "panel_4",
-          "winlog.api": "visualization"
+          "type": "visualization"
         }
       ],
-      "winlog.api": "dashboard",
+      "type": "dashboard",
       "updated_at": "2019-02-05T19:56:19.932Z",
-      "winlog.version": 7
+      "version": 7
     },
     {
       "attributes": {
@@ -142,9 +142,9 @@
             }
           }
         },
-        "title": "Number of Events Over Time By Channel ECS",
+        "title": "Number of Events Over Time By Channel",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -152,7 +152,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -173,7 +173,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -190,7 +190,7 @@
                 "size": 6
               },
               "schema": "group",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -206,12 +206,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "defaultYExtents": false,
@@ -278,14 +278,14 @@
                 },
                 "mode": "stacked",
                 "show": "true",
-                "winlog.api": "histogram",
+                "type": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "setYExtents": false,
             "shareYAxis": true,
             "times": [],
-            "winlog.api": "histogram",
+            "type": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -301,23 +301,23 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ],
             "yAxis": {}
           },
-          "title": "Number of Events Over Time By Channel ECS",
-          "winlog.api": "histogram"
+          "title": "Number of Events Over Time By Channel",
+          "type": "histogram"
         }
       },
-      "id": "Number-of-Events-Over-Time-By-Event-Log-ecs",
+      "id": "Number-of-Events-Over-Time-By-Event-Log",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
@@ -325,12 +325,12 @@
         {
           "id": "winlogbeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "winlog.api": "index-pattern"
+          "type": "index-pattern"
         }
       ],
-      "winlog.api": "visualization",
+      "type": "visualization",
       "updated_at": "2019-02-05T19:56:19.932Z",
-      "winlog.version": 7
+      "version": 7
     },
     {
       "attributes": {
@@ -347,26 +347,26 @@
             }
           }
         },
-        "title": "Number of Events ECS",
+        "title": "Number of Events",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             }
           ],
           "listeners": {},
           "params": {
             "fontSize": 60
           },
-          "winlog.api": "metric"
+          "type": "metric"
         }
       },
-      "id": "Number-of-Events-ecs",
+      "id": "Number-of-Events",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
@@ -374,12 +374,12 @@
         {
           "id": "winlogbeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "winlog.api": "index-pattern"
+          "type": "index-pattern"
         }
       ],
-      "winlog.api": "visualization",
+      "type": "visualization",
       "updated_at": "2019-02-05T19:56:19.932Z",
-      "winlog.version": 7
+      "version": 7
     },
     {
       "attributes": {
@@ -399,7 +399,7 @@
             }
           }
         },
-        "title": "Top Event IDs ECS",
+        "title": "Top Event IDs",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -410,7 +410,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -418,7 +418,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -435,7 +435,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -476,11 +476,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top Event IDs ECS",
-          "winlog.api": "table"
+          "title": "Top Event IDs",
+          "type": "table"
         }
       },
-      "id": "Top-Event-IDs-ecs",
+      "id": "Top-Event-IDs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
@@ -488,12 +488,12 @@
         {
           "id": "winlogbeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "winlog.api": "index-pattern"
+          "type": "index-pattern"
         }
       ],
-      "winlog.api": "visualization",
+      "type": "visualization",
       "updated_at": "2019-02-05T19:56:19.932Z",
-      "winlog.version": 7
+      "version": 7
     },
     {
       "attributes": {
@@ -513,7 +513,7 @@
             }
           }
         },
-        "title": "Event Levels ECS",
+        "title": "Event Levels",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -524,7 +524,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -532,7 +532,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -549,7 +549,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -590,11 +590,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Event Levels ECS",
-          "winlog.api": "table"
+          "title": "Event Levels",
+          "type": "table"
         }
       },
-      "id": "Event-Levels-ecs",
+      "id": "Event-Levels",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
@@ -602,12 +602,12 @@
         {
           "id": "winlogbeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "winlog.api": "index-pattern"
+          "type": "index-pattern"
         }
       ],
-      "winlog.api": "visualization",
+      "type": "visualization",
       "updated_at": "2019-02-05T19:56:19.932Z",
-      "winlog.version": 7
+      "version": 7
     },
     {
       "attributes": {
@@ -627,9 +627,9 @@
             }
           }
         },
-        "title": "Sources (Provider Names) ECS",
+        "title": "Sources (Provider Names)",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -637,7 +637,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -653,7 +653,7 @@
                 "size": 7
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -668,13 +668,13 @@
             },
             "legendPosition": "right",
             "shareYAxis": true,
-            "winlog.api": "pie"
+            "type": "pie"
           },
-          "title": "Sources (Provider Names) ECS",
-          "winlog.api": "pie"
+          "title": "Sources (Provider Names)",
+          "type": "pie"
         }
       },
-      "id": "Sources-ecs",
+      "id": "Sources",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
@@ -682,13 +682,13 @@
         {
           "id": "winlogbeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "winlog.api": "index-pattern"
+          "type": "index-pattern"
         }
       ],
-      "winlog.api": "visualization",
+      "type": "visualization",
       "updated_at": "2019-02-05T19:56:19.932Z",
-      "winlog.version": 7
+      "version": 7
     }
   ],
-  "winlog.version": "7.0.0-SNAPSHOT"
+  "version": "7.0.0-SNAPSHOT"
 }

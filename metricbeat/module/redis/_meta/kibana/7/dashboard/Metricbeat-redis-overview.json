@@ -8,8 +8,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Metricbeat-Redis-ecs", 
-                "title": "Clients [Metricbeat Redis] ECS", 
+                "savedSearchId": "Metricbeat-Redis", 
+                "title": "Clients [Metricbeat Redis]", 
                 "uiStateJSON": {
                     "vis": {
                         "defaultColors": {
@@ -17,7 +17,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -28,7 +28,7 @@
                                 "field": "redis.info.clients.connected"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }
                     ], 
                     "listeners": {}, 
@@ -68,25 +68,25 @@
                                 "labelColor": false, 
                                 "subText": ""
                             }, 
-                            "winlog.api": "simple", 
+                            "type": "simple", 
                             "useRange": false, 
                             "verticalSplit": false
                         }, 
                         "handleNoResults": true, 
-                        "winlog.api": "gauge"
+                        "type": "gauge"
                     }, 
-                    "title": "Clients [Metricbeat Redis] ECS", 
-                    "winlog.api": "metric"
+                    "title": "Clients [Metricbeat Redis]", 
+                    "type": "metric"
                 }
             }, 
             "col": 1, 
-            "id": "Redis-Clients-Metrics-ecs", 
+            "id": "Redis-Clients-Metrics", 
             "panelIndex": 2, 
             "row": 1, 
             "size_x": 3, 
             "size_y": 3, 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -96,8 +96,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Metricbeat-Redis-ecs", 
-                "title": "Connected clients [Metricbeat Redis] ECS", 
+                "savedSearchId": "Metricbeat-Redis", 
+                "title": "Connected clients [Metricbeat Redis]", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -105,7 +105,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -116,7 +116,7 @@
                                 "field": "redis.info.clients.connected"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -129,7 +129,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -139,7 +139,7 @@
                                 "field": "redis.info.clients.blocked"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }
                     ], 
                     "listeners": {}, 
@@ -156,12 +156,12 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {}, 
-                                "winlog.api": "category"
+                                "type": "category"
                             }
                         ], 
                         "defaultYExtents": false, 
@@ -184,7 +184,7 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "winlog.api": "histogram", 
+                                "type": "histogram", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
@@ -204,30 +204,30 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "winlog.api": "value"
+                                "type": "value"
                             }
                         ], 
                         "yAxis": {}
                     }, 
-                    "title": "Connected clients [Metricbeat Redis] ECS", 
-                    "winlog.api": "histogram"
+                    "title": "Connected clients [Metricbeat Redis]", 
+                    "type": "histogram"
                 }
             }, 
             "col": 4, 
-            "id": "Redis-Connected-clients-ecs", 
+            "id": "Redis-Connected-clients", 
             "panelIndex": 1, 
             "row": 1, 
             "size_x": 5, 
             "size_y": 3, 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -237,8 +237,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Metricbeat-Redis-ecs", 
-                "title": "Hosts [Metricbeat Redis] ECS", 
+                "savedSearchId": "Metricbeat-Redis", 
+                "title": "Hosts [Metricbeat Redis]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -249,20 +249,20 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "service.address", 
+                                "field": "metricset.host", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -272,17 +272,17 @@
                                 "field": "redis.info.server.uptime"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }, 
                         {
                             "enabled": true, 
                             "id": "6", 
                             "params": {
                                 "customLabel": "PID", 
-                                "field": "process.pid"
+                                "field": "redis.info.server.process_id"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -292,7 +292,7 @@
                                 "field": "redis.info.memory.used.peak"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -302,7 +302,7 @@
                                 "field": "redis.info.cpu.used.user"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -312,7 +312,7 @@
                                 "field": "redis.info.cpu.used.sys"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }
                     ], 
                     "listeners": {}, 
@@ -327,18 +327,18 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Hosts [Metricbeat Redis] ECS", 
-                    "winlog.api": "table"
+                    "title": "Hosts [Metricbeat Redis]", 
+                    "type": "table"
                 }
             }, 
             "col": 1, 
-            "id": "Redis-hosts-ecs", 
+            "id": "Redis-hosts", 
             "panelIndex": 3, 
             "row": 4, 
             "size_x": 12, 
             "size_y": 2, 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -348,10 +348,10 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Metricbeat-Redis-ecs", 
-                "title": "Server Versions [Metricbeat Redis] ECS", 
+                "savedSearchId": "Metricbeat-Redis", 
+                "title": "Server Versions [Metricbeat Redis]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -359,23 +359,23 @@
                             "id": "1", 
                             "params": {
                                 "customLabel": "Hosts", 
-                                "field": "service.address"
+                                "field": "metricset.host"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "cardinality"
+                            "type": "cardinality"
                         }, 
                         {
                             "enabled": true, 
                             "id": "2", 
                             "params": {
                                 "customLabel": "Multiplexing API", 
-                                "field": "service.version", 
+                                "field": "redis.info.server.version", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -386,18 +386,18 @@
                         "legendPosition": "right", 
                         "shareYAxis": true
                     }, 
-                    "title": "Server Versions [Metricbeat Redis] ECS", 
-                    "winlog.api": "pie"
+                    "title": "Server Versions [Metricbeat Redis]", 
+                    "type": "pie"
                 }
             }, 
             "col": 1, 
-            "id": "Redis-Server-Versions-ecs", 
+            "id": "Redis-Server-Versions", 
             "panelIndex": 4, 
             "row": 6, 
             "size_x": 4, 
             "size_y": 2, 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -407,10 +407,10 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Metricbeat-Redis-ecs", 
-                "title": "Server mode [Metricbeat Redis] ECS", 
+                "savedSearchId": "Metricbeat-Redis", 
+                "title": "Server mode [Metricbeat Redis]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -418,10 +418,10 @@
                             "id": "1", 
                             "params": {
                                 "customLabel": "Hosts", 
-                                "field": "service.address"
+                                "field": "metricset.host"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "cardinality"
+                            "type": "cardinality"
                         }, 
                         {
                             "enabled": true, 
@@ -434,7 +434,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -445,18 +445,18 @@
                         "legendPosition": "right", 
                         "shareYAxis": true
                     }, 
-                    "title": "Server mode [Metricbeat Redis] ECS", 
-                    "winlog.api": "pie"
+                    "title": "Server mode [Metricbeat Redis]", 
+                    "type": "pie"
                 }
             }, 
             "col": 5, 
-            "id": "Redis-server-mode-ecs", 
+            "id": "Redis-server-mode", 
             "panelIndex": 5, 
             "row": 6, 
             "size_x": 4, 
             "size_y": 2, 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -466,10 +466,10 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Metricbeat-Redis-ecs", 
-                "title": "Multiplexing API [Metricbeat Redis] ECS", 
+                "savedSearchId": "Metricbeat-Redis", 
+                "title": "Multiplexing API [Metricbeat Redis]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -477,10 +477,10 @@
                             "id": "1", 
                             "params": {
                                 "customLabel": "Hosts", 
-                                "field": "service.address"
+                                "field": "metricset.host"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "cardinality"
+                            "type": "cardinality"
                         }, 
                         {
                             "enabled": true, 
@@ -493,7 +493,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -504,18 +504,18 @@
                         "legendPosition": "right", 
                         "shareYAxis": true
                     }, 
-                    "title": "Multiplexing API [Metricbeat Redis] ECS", 
-                    "winlog.api": "pie"
+                    "title": "Multiplexing API [Metricbeat Redis]", 
+                    "type": "pie"
                 }
             }, 
             "col": 9, 
-            "id": "Redis-multiplexing-API-ecs", 
+            "id": "Redis-multiplexing-API", 
             "panelIndex": 6, 
             "row": 6, 
             "size_x": 3, 
             "size_y": 2, 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -525,10 +525,10 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Metricbeat-Redis-ecs", 
-                "title": "Keyspaces [Metricbeat Redis] ECS", 
+                "savedSearchId": "Metricbeat-Redis", 
+                "title": "Keyspaces [Metricbeat Redis]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -539,7 +539,7 @@
                                 "field": "redis.keyspace.keys"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -552,7 +552,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -565,7 +565,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -582,12 +582,12 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {}, 
-                                "winlog.api": "category"
+                                "type": "category"
                             }
                         ], 
                         "defaultYExtents": false, 
@@ -612,7 +612,7 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "winlog.api": "area", 
+                                "type": "area", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
@@ -633,30 +633,30 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "winlog.api": "value"
+                                "type": "value"
                             }
                         ], 
                         "yAxis": {}
                     }, 
-                    "title": "Keyspaces [Metricbeat Redis] ECS", 
-                    "winlog.api": "area"
+                    "title": "Keyspaces [Metricbeat Redis]", 
+                    "type": "area"
                 }
             }, 
             "col": 9, 
-            "id": "Redis-Keyspaces-ecs", 
+            "id": "Redis-Keyspaces", 
             "panelIndex": 7, 
             "row": 1, 
             "size_x": 4, 
             "size_y": 3, 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -685,7 +685,7 @@
                         "query": {
                             "query_string": {
                                 "analyze_wildcard": true, 
-                                "query": "event.module:redis"
+                                "query": "metricset.module:redis"
                             }
                         }
                     }
@@ -694,12 +694,12 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Metricbeat Redis ECS", 
-                "winlog.version": 1
+                "title": "Metricbeat Redis", 
+                "version": 1
             }, 
-            "id": "Metricbeat-Redis-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 7
+            "id": "Metricbeat-Redis", 
+            "type": "search", 
+            "version": 7
         }, 
         {
             "attributes": {
@@ -718,7 +718,7 @@
                             }
                         ], 
                         "highlightAll": true, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -727,70 +727,70 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "Redis-Clients-Metrics-ecs", 
+                        "id": "Redis-Clients-Metrics", 
                         "panelIndex": 2, 
                         "row": 1, 
                         "size_x": 3, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 4, 
-                        "id": "Redis-Connected-clients-ecs", 
+                        "id": "Redis-Connected-clients", 
                         "panelIndex": 1, 
                         "row": 1, 
                         "size_x": 5, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "Redis-hosts-ecs", 
+                        "id": "Redis-hosts", 
                         "panelIndex": 3, 
                         "row": 4, 
                         "size_x": 12, 
                         "size_y": 2, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "Redis-Server-Versions-ecs", 
+                        "id": "Redis-Server-Versions", 
                         "panelIndex": 4, 
                         "row": 6, 
                         "size_x": 4, 
                         "size_y": 2, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 5, 
-                        "id": "Redis-server-mode-ecs", 
+                        "id": "Redis-server-mode", 
                         "panelIndex": 5, 
                         "row": 6, 
                         "size_x": 4, 
                         "size_y": 2, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 9, 
-                        "id": "Redis-multiplexing-API-ecs", 
+                        "id": "Redis-multiplexing-API", 
                         "panelIndex": 6, 
                         "row": 6, 
                         "size_x": 3, 
                         "size_y": 2, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 9, 
-                        "id": "Redis-Keyspaces-ecs", 
+                        "id": "Redis-Keyspaces", 
                         "panelIndex": 7, 
                         "row": 1, 
                         "size_x": 4, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat Redis] Overview ECS", 
+                "title": "[Metricbeat Redis] Overview", 
                 "uiStateJSON": {
                     "P-2": {
                         "vis": {
@@ -815,12 +815,12 @@
                         }
                     }
                 }, 
-                "winlog.version": 1
+                "version": 1
             }, 
-            "id": "AV4YjZ5pux-M-tCAunxK-ecs", 
-            "winlog.api": "dashboard", 
-            "winlog.version": 1
+            "id": "AV4YjZ5pux-M-tCAunxK", 
+            "type": "dashboard", 
+            "version": 1
         }
     ], 
-    "winlog.version": "5.6.0-SNAPSHOT"
+    "version": "5.6.0-SNAPSHOT"
 }

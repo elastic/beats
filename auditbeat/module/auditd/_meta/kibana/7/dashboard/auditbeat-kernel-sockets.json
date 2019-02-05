@@ -19,16 +19,16 @@
                                     "negate": true, 
                                     "params": {
                                         "query": "0", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "0"
                                 }, 
                                 "query": {
                                     "match": {
                                         "auditd.summary.object.secondary": {
                                             "query": "0", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -40,8 +40,8 @@
                         }
                     }
                 }, 
-                "savedSearchId": "b4c93470-c240-11e7-8692-232bd1143e8a-ecs", 
-                "title": "Bind (non-ephemeral) [Auditbeat Auditd] ECS", 
+                "savedSearchId": "b4c93470-c240-11e7-8692-232bd1143e8a", 
+                "title": "Bind (non-ephemeral) [Auditbeat Auditd]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -52,7 +52,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -60,7 +60,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -73,7 +73,7 @@
                                 "size": 50
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -86,7 +86,7 @@
                                 "size": 10
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -99,7 +99,7 @@
                                 "size": 10
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -113,14 +113,14 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Bind (non-ephemeral) [Auditbeat Auditd] ECS", 
-                    "winlog.api": "table"
+                    "title": "Bind (non-ephemeral) [Auditbeat Auditd]", 
+                    "type": "table"
                 }
             }, 
-            "id": "faf882f0-c242-11e7-8692-232bd1143e8a-ecs", 
-            "winlog.api": "visualization", 
+            "id": "faf882f0-c242-11e7-8692-232bd1143e8a", 
+            "type": "visualization", 
             "updated_at": "2018-01-16T22:08:02.522Z", 
-            "winlog.version": 3
+            "version": 3
         }, 
         {
             "attributes": {
@@ -134,8 +134,8 @@
                         }
                     }
                 }, 
-                "savedSearchId": "5438b030-c246-11e7-8692-232bd1143e8a-ecs", 
-                "title": "Connect [Auditbeat Auditd] ECS", 
+                "savedSearchId": "5438b030-c246-11e7-8692-232bd1143e8a", 
+                "title": "Connect [Auditbeat Auditd]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -146,7 +146,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -154,20 +154,20 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
                             "id": "2", 
                             "params": {
                                 "customLabel": "Exe", 
-                                "field": "process.executable", 
+                                "field": "process.exe", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 50
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -180,7 +180,7 @@
                                 "size": 10
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -193,7 +193,7 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -207,14 +207,14 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Connect [Auditbeat Auditd] ECS", 
-                    "winlog.api": "table"
+                    "title": "Connect [Auditbeat Auditd]", 
+                    "type": "table"
                 }
             }, 
-            "id": "ea483730-c246-11e7-8692-232bd1143e8a-ecs", 
-            "winlog.api": "visualization", 
+            "id": "ea483730-c246-11e7-8692-232bd1143e8a", 
+            "type": "visualization", 
             "updated_at": "2018-01-16T23:24:16.851Z", 
-            "winlog.version": 4
+            "version": 4
         }, 
         {
             "attributes": {
@@ -228,8 +228,8 @@
                         }
                     }
                 }, 
-                "savedSearchId": "e8734160-c24c-11e7-8692-232bd1143e8a-ecs", 
-                "title": "Accept / Recvfrom Unique Address Table [Auditbeat Auditd] ECS", 
+                "savedSearchId": "e8734160-c24c-11e7-8692-232bd1143e8a", 
+                "title": "Accept / Recvfrom Unique Address Table [Auditbeat Auditd]", 
                 "uiStateJSON": {
                     "spy": {
                         "mode": {
@@ -246,7 +246,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -257,20 +257,20 @@
                                 "field": "auditd.summary.object.primary"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "cardinality"
+                            "type": "cardinality"
                         }, 
                         {
                             "enabled": true, 
                             "id": "2", 
                             "params": {
                                 "customLabel": "Exe", 
-                                "field": "process.executable", 
+                                "field": "process.exe", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 50
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -283,7 +283,7 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -297,14 +297,14 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Accept / Recvfrom Unique Address Table [Auditbeat Auditd] ECS", 
-                    "winlog.api": "table"
+                    "title": "Accept / Recvfrom Unique Address Table [Auditbeat Auditd]", 
+                    "type": "table"
                 }
             }, 
-            "id": "ceb91de0-c250-11e7-8692-232bd1143e8a-ecs", 
-            "winlog.api": "visualization", 
+            "id": "ceb91de0-c250-11e7-8692-232bd1143e8a", 
+            "type": "visualization", 
             "updated_at": "2018-01-16T22:16:51.535Z", 
-            "winlog.version": 5
+            "version": 5
         }, 
         {
             "attributes": {
@@ -312,9 +312,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Socket Syscalls Time Series [Auditbeat Auditd] ECS", 
+                "title": "Socket Syscalls Time Series [Auditbeat Auditd]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -330,7 +330,7 @@
                                 "id": "2cebb0c0-c252-11e7-8a68-93ffe9ec5950"
                             }
                         ], 
-                        "filter": "auditd.summary.object.winlog.api:socket", 
+                        "filter": "auditd.summary.object.type:socket", 
                         "gauge_color_rules": [
                             {
                                 "id": "6c891740-c252-11e7-8a68-93ffe9ec5950"
@@ -356,7 +356,7 @@
                                 "metrics": [
                                     {
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "count"
+                                        "type": "count"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -369,16 +369,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Socket Syscalls Time Series [Auditbeat Auditd] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Socket Syscalls Time Series [Auditbeat Auditd]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "b21e0c70-c252-11e7-8692-232bd1143e8a-ecs", 
-            "winlog.api": "visualization", 
+            "id": "b21e0c70-c252-11e7-8692-232bd1143e8a", 
+            "type": "visualization", 
             "updated_at": "2018-01-16T22:13:38.857Z", 
-            "winlog.version": 3
+            "version": 3
         }, 
         {
             "attributes": {
@@ -393,9 +393,9 @@
                         }
                     }
                 }, 
-                "title": "Socket Families [Auditbeat Auditd] ECS", 
+                "title": "Socket Families [Auditbeat Auditd]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -403,7 +403,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -416,7 +416,7 @@
                                 "size": 10
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -429,7 +429,7 @@
                                 "size": 10
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -437,21 +437,21 @@
                         "addTooltip": true, 
                         "isDonut": true, 
                         "legendPosition": "left", 
-                        "winlog.api": "pie"
+                        "type": "pie"
                     }, 
-                    "title": "Socket Families [Auditbeat Auditd] ECS", 
-                    "winlog.api": "pie"
+                    "title": "Socket Families [Auditbeat Auditd]", 
+                    "type": "pie"
                 }
             }, 
-            "id": "a8e20450-c256-11e7-8692-232bd1143e8a-ecs", 
-            "winlog.api": "visualization", 
+            "id": "a8e20450-c256-11e7-8692-232bd1143e8a", 
+            "type": "visualization", 
             "updated_at": "2018-01-16T22:12:51.655Z", 
-            "winlog.version": 3
+            "version": 3
         }, 
         {
             "attributes": {
                 "columns": [
-                    "agent.hostname", 
+                    "beat.hostname", 
                     "auditd.summary.how", 
                     "auditd.summary.object.primary", 
                     "auditd.summary.object.secondary", 
@@ -475,16 +475,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "auditd", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "auditd"
                                 }, 
                                 "query": {
                                     "match": {
                                         "event.module": {
                                             "query": "auditd", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -501,16 +501,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "bind", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "bind"
                                 }, 
                                 "query": {
                                     "match": {
                                         "auditd.data.syscall": {
                                             "query": "bind", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -527,16 +527,16 @@
                                     "negate": true, 
                                     "params": {
                                         "query": "netlink", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "netlink"
                                 }, 
                                 "query": {
                                     "match": {
                                         "auditd.data.socket.family": {
                                             "query": "netlink", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -548,25 +548,25 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Socket Binds [Auditbeat Auditd] ECS", 
-                "winlog.version": 1
+                "title": "Socket Binds [Auditbeat Auditd]", 
+                "version": 1
             }, 
-            "id": "b4c93470-c240-11e7-8692-232bd1143e8a-ecs", 
-            "winlog.api": "search", 
+            "id": "b4c93470-c240-11e7-8692-232bd1143e8a", 
+            "type": "search", 
             "updated_at": "2018-01-16T23:05:58.935Z", 
-            "winlog.version": 5
+            "version": 5
         }, 
         {
             "attributes": {
                 "columns": [
-                    "agent.hostname", 
+                    "beat.hostname", 
                     "auditd.summary.how", 
                     "auditd.summary.object.primary", 
                     "auditd.summary.object.secondary", 
@@ -591,16 +591,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "auditd", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "auditd"
                                 }, 
                                 "query": {
                                     "match": {
                                         "event.module": {
                                             "query": "auditd", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -617,16 +617,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "connected-to", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "connected-to"
                                 }, 
                                 "query": {
                                     "match": {
                                         "event.action": {
                                             "query": "connected-to", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -644,7 +644,7 @@
                                     "index": "auditbeat-*", 
                                     "key": "auditd.summary.object.primary", 
                                     "negate": false, 
-                                    "winlog.api": "exists", 
+                                    "type": "exists", 
                                     "value": "exists"
                                 }
                             }
@@ -655,25 +655,25 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Socket Connects [Auditbeat Auditd] ECS", 
-                "winlog.version": 1
+                "title": "Socket Connects [Auditbeat Auditd]", 
+                "version": 1
             }, 
-            "id": "5438b030-c246-11e7-8692-232bd1143e8a-ecs", 
-            "winlog.api": "search", 
+            "id": "5438b030-c246-11e7-8692-232bd1143e8a", 
+            "type": "search", 
             "updated_at": "2018-01-16T23:09:43.937Z", 
-            "winlog.version": 5
+            "version": 5
         }, 
         {
             "attributes": {
                 "columns": [
-                    "agent.hostname", 
+                    "beat.hostname", 
                     "auditd.summary.how", 
                     "auditd.summary.object.primary", 
                     "auditd.summary.object.secondary", 
@@ -697,16 +697,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "auditd", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "auditd"
                                 }, 
                                 "query": {
                                     "match": {
                                         "event.module": {
                                             "query": "auditd", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -723,16 +723,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "socket", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "socket"
                                 }, 
                                 "query": {
                                     "match": {
                                         "auditd.summary.object.type": {
                                             "query": "socket", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -750,7 +750,7 @@
                                     "index": "auditbeat-*", 
                                     "key": "auditd.summary.object.primary", 
                                     "negate": false, 
-                                    "winlog.api": "exists", 
+                                    "type": "exists", 
                                     "value": "exists"
                                 }
                             }, 
@@ -764,7 +764,7 @@
                                     "index": "auditbeat-*", 
                                     "key": "query", 
                                     "negate": false, 
-                                    "winlog.api": "custom", 
+                                    "type": "custom", 
                                     "value": "{\"terms\":{\"auditd.data.syscall\":[\"accept\",\"accept4\",\"recvfrom\",\"recvmsg\"]}}"
                                 }, 
                                 "query": {
@@ -785,20 +785,20 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Socket Accept / Recvfrom [Auditbeat Auditd] ECS", 
-                "winlog.version": 1
+                "title": "Socket Accept / Recvfrom [Auditbeat Auditd]", 
+                "version": 1
             }, 
-            "id": "e8734160-c24c-11e7-8692-232bd1143e8a-ecs", 
-            "winlog.api": "search", 
+            "id": "e8734160-c24c-11e7-8692-232bd1143e8a", 
+            "type": "search", 
             "updated_at": "2018-01-16T23:20:51.403Z", 
-            "winlog.version": 4
+            "version": 4
         }, 
         {
             "attributes": {
@@ -812,7 +812,7 @@
                             "language": "lucene", 
                             "query": "*"
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -838,10 +838,10 @@
                             "x": 6, 
                             "y": 3
                         }, 
-                        "id": "faf882f0-c242-11e7-8692-232bd1143e8a-ecs", 
+                        "id": "faf882f0-c242-11e7-8692-232bd1143e8a", 
                         "panelIndex": "1", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "embeddableConfig": {
@@ -861,10 +861,10 @@
                             "x": 0, 
                             "y": 7
                         }, 
-                        "id": "ea483730-c246-11e7-8692-232bd1143e8a-ecs", 
+                        "id": "ea483730-c246-11e7-8692-232bd1143e8a", 
                         "panelIndex": "2", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "embeddableConfig": {
@@ -884,10 +884,10 @@
                             "x": 6, 
                             "y": 7
                         }, 
-                        "id": "ceb91de0-c250-11e7-8692-232bd1143e8a-ecs", 
+                        "id": "ceb91de0-c250-11e7-8692-232bd1143e8a", 
                         "panelIndex": "3", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -897,10 +897,10 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "b21e0c70-c252-11e7-8692-232bd1143e8a-ecs", 
+                        "id": "b21e0c70-c252-11e7-8692-232bd1143e8a", 
                         "panelIndex": "4", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -910,21 +910,21 @@
                             "x": 0, 
                             "y": 3
                         }, 
-                        "id": "a8e20450-c256-11e7-8692-232bd1143e8a-ecs", 
+                        "id": "a8e20450-c256-11e7-8692-232bd1143e8a", 
                         "panelIndex": "5", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Auditbeat Auditd] Sockets ECS", 
-                "winlog.version": 1
+                "title": "[Auditbeat Auditd] Sockets", 
+                "version": 1
             }, 
-            "id": "693a5f40-c243-11e7-8692-232bd1143e8a-ecs", 
-            "winlog.api": "dashboard", 
+            "id": "693a5f40-c243-11e7-8692-232bd1143e8a", 
+            "type": "dashboard", 
             "updated_at": "2018-01-16T23:24:37.521Z", 
-            "winlog.version": 4
+            "version": 4
         }
     ], 
-    "winlog.version": "6.2.4"
+    "version": "6.2.4"
 }

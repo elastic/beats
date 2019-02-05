@@ -8,35 +8,35 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-access-logs-ecs", 
-                "title": "Unique IPs map [Filebeat Apache] ECS", 
+                "savedSearchId": "Apache-access-logs", 
+                "title": "Unique IPs map [Filebeat Apache]", 
                 "uiStateJSON": {
                     "mapCenter": [
                         14.944784875088372, 
                         5.09765625
                     ]
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
                             "enabled": true, 
                             "id": "1", 
                             "params": {
-                                "field": "source.address"
+                                "field": "apache2.access.remote_ip"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "cardinality"
+                            "type": "cardinality"
                         }, 
                         {
                             "enabled": true, 
                             "id": "2", 
                             "params": {
                                 "autoPrecision": true, 
-                                "field": "source.geo.location"
+                                "field": "apache2.access.geoip.location"
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "geohash_grid"
+                            "type": "geohash_grid"
                         }
                     ], 
                     "listeners": {}, 
@@ -63,18 +63,18 @@
                                 "layers": "0", 
                                 "styles": "", 
                                 "transparent": true, 
-                                "winlog.version": "1.3.0"
+                                "version": "1.3.0"
                             }, 
                             "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
                         }
                     }, 
-                    "title": "Apache access unique IPs map ECS", 
-                    "winlog.api": "tile_map"
+                    "title": "Apache access unique IPs map", 
+                    "type": "tile_map"
                 }
             }, 
-            "id": "Apache-access-unique-IPs-map-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "Apache-access-unique-IPs-map", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -84,8 +84,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-access-logs-ecs", 
-                "title": "Top URLs by response code [Filebeat Apache] ECS", 
+                "savedSearchId": "Apache-access-logs", 
+                "title": "Top URLs by response code [Filebeat Apache]", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -94,7 +94,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -102,33 +102,33 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
                             "id": "3", 
                             "params": {
                                 "customLabel": "URL", 
-                                "field": "url.original", 
+                                "field": "apache2.access.url", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "row": false, 
                                 "size": 5
                             }, 
                             "schema": "split", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "http.response.status_code", 
+                                "field": "apache2.access.response_code", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -139,13 +139,13 @@
                         "legendPosition": "right", 
                         "shareYAxis": true
                     }, 
-                    "title": "Apache response codes of top URLs ECS", 
-                    "winlog.api": "pie"
+                    "title": "Apache response codes of top URLs", 
+                    "type": "pie"
                 }
             }, 
-            "id": "Apache-response-codes-of-top-URLs-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "Apache-response-codes-of-top-URLs", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -155,32 +155,32 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-access-logs-ecs", 
-                "title": "Browsers breakdown [Filebeat Apache] ECS", 
+                "savedSearchId": "Apache-access-logs", 
+                "title": "Browsers breakdown [Filebeat Apache]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
                             "enabled": true, 
                             "id": "1", 
                             "params": {
-                                "field": "source.address"
+                                "field": "apache2.access.remote_ip"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "cardinality"
+                            "type": "cardinality"
                         }, 
                         {
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "user_agent.name", 
+                                "field": "apache2.access.user_agent.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -192,7 +192,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -203,13 +203,13 @@
                         "legendPosition": "bottom", 
                         "shareYAxis": true
                     }, 
-                    "title": "Apache browsers ECS", 
-                    "winlog.api": "pie"
+                    "title": "Apache browsers", 
+                    "type": "pie"
                 }
             }, 
-            "id": "Apache-browsers-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "Apache-browsers", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -219,32 +219,32 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-access-logs-ecs", 
-                "title": "Operating systems breakdown [Filebeat Apache] ECS", 
+                "savedSearchId": "Apache-access-logs", 
+                "title": "Operating systems breakdown [Filebeat Apache]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
                             "enabled": true, 
                             "id": "1", 
                             "params": {
-                                "field": "source.address"
+                                "field": "apache2.access.remote_ip"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "cardinality"
+                            "type": "cardinality"
                         }, 
                         {
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "user_agent.os.name", 
+                                "field": "apache2.access.user_agent.os_name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -256,7 +256,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -267,13 +267,13 @@
                         "legendPosition": "bottom", 
                         "shareYAxis": true
                     }, 
-                    "title": "Apache operating systems ECS", 
-                    "winlog.api": "pie"
+                    "title": "Apache operating systems", 
+                    "type": "pie"
                 }
             }, 
-            "id": "Apache-operating-systems-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "Apache-operating-systems", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -283,10 +283,10 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-errors-log-ecs", 
-                "title": "Error logs over time [Filebeat Apache] ECS", 
+                "savedSearchId": "Apache-errors-log", 
+                "title": "Error logs over time [Filebeat Apache]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -294,7 +294,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -307,19 +307,19 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "log.level", 
+                                "field": "apache2.error.level", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -336,13 +336,13 @@
                         "times": [], 
                         "yAxis": {}
                     }, 
-                    "title": "Apache error logs over time ECS", 
-                    "winlog.api": "histogram"
+                    "title": "Apache error logs over time", 
+                    "type": "histogram"
                 }
             }, 
-            "id": "Apache-error-logs-over-time-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "Apache-error-logs-over-time", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -352,8 +352,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Apache-access-logs-ecs", 
-                "title": "Response codes over time [Filebeat Apache] ECS", 
+                "savedSearchId": "Apache-access-logs", 
+                "title": "Response codes over time [Filebeat Apache]", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -362,7 +362,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -370,7 +370,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -383,19 +383,19 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "http.response.status_code", 
+                                "field": "apache2.access.response_code", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -412,21 +412,21 @@
                         "times": [], 
                         "yAxis": {}
                     }, 
-                    "title": "Apache response codes over time ECS", 
-                    "winlog.api": "histogram"
+                    "title": "Apache response codes over time", 
+                    "type": "histogram"
                 }
             }, 
-            "id": "Apache-response-codes-over-time-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "Apache-response-codes-over-time", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
                 "columns": [
-                    "source.address", 
-                    "log.level", 
+                    "apache2.error.client", 
+                    "apache2.error.level", 
                     "apache2.error.module", 
-                    "message"
+                    "apache2.error.message"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -459,20 +459,20 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Apache errors log [Filebeat Apache] ECS", 
-                "winlog.version": 1
+                "title": "Apache errors log [Filebeat Apache]", 
+                "version": 1
             }, 
-            "id": "Apache-errors-log-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 1
+            "id": "Apache-errors-log", 
+            "type": "search", 
+            "version": 1
         }, 
         {
             "attributes": {
                 "columns": [
-                    "source.address", 
-                    "http.request.method", 
-                    "url.original", 
-                    "http.response.status_code"
+                    "apache2.access.remote_ip", 
+                    "apache2.access.method", 
+                    "apache2.access.url", 
+                    "apache2.access.response_code"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -505,12 +505,12 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Apache access logs [Filebeat Apache] ECS", 
-                "winlog.version": 1
+                "title": "Apache access logs [Filebeat Apache]", 
+                "version": 1
             }, 
-            "id": "Apache-access-logs-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 1
+            "id": "Apache-access-logs", 
+            "type": "search", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -529,7 +529,7 @@
                                 }
                             }
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -538,67 +538,67 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "Apache-access-unique-IPs-map-ecs", 
+                        "id": "Apache-access-unique-IPs-map", 
                         "panelIndex": 1, 
                         "row": 1, 
                         "size_x": 12, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "Apache-response-codes-of-top-URLs-ecs", 
+                        "id": "Apache-response-codes-of-top-URLs", 
                         "panelIndex": 2, 
                         "row": 6, 
                         "size_x": 8, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 9, 
-                        "id": "Apache-browsers-ecs", 
+                        "id": "Apache-browsers", 
                         "panelIndex": 3, 
                         "row": 6, 
                         "size_x": 4, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 11, 
-                        "id": "Apache-operating-systems-ecs", 
+                        "id": "Apache-operating-systems", 
                         "panelIndex": 4, 
                         "row": 4, 
                         "size_x": 2, 
                         "size_y": 2, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "Apache-error-logs-over-time-ecs", 
+                        "id": "Apache-error-logs-over-time", 
                         "panelIndex": 5, 
                         "row": 9, 
                         "size_x": 12, 
                         "size_y": 2, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "Apache-response-codes-over-time-ecs", 
+                        "id": "Apache-response-codes-over-time", 
                         "panelIndex": 6, 
                         "row": 4, 
                         "size_x": 10, 
                         "size_y": 2, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
                         "columns": [
-                            "source.address", 
-                            "log.level", 
+                            "apache2.error.client", 
+                            "apache2.error.level", 
                             "apache2.error.module", 
-                            "message"
+                            "apache2.error.message"
                         ], 
-                        "id": "Apache-errors-log-ecs", 
+                        "id": "Apache-errors-log", 
                         "panelIndex": 7, 
                         "row": 11, 
                         "size_x": 12, 
@@ -607,11 +607,11 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "winlog.api": "search"
+                        "type": "search"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat Apache] Access and error logs ECS", 
+                "title": "[Filebeat Apache] Access and error logs", 
                 "uiStateJSON": {
                     "P-1": {
                         "mapBounds": {
@@ -642,12 +642,12 @@
                         "mapZoom": 2
                     }
                 }, 
-                "winlog.version": 1
+                "version": 1
             }, 
-            "id": "Filebeat-Apache-Dashboard-ecs", 
-            "winlog.api": "dashboard", 
-            "winlog.version": 2
+            "id": "Filebeat-Apache-Dashboard", 
+            "type": "dashboard", 
+            "version": 2
         }
     ], 
-    "winlog.version": "6.0.0-beta1-SNAPSHOT"
+    "version": "6.0.0-beta1-SNAPSHOT"
 }

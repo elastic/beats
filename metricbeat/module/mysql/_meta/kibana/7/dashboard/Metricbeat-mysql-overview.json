@@ -6,9 +6,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Connections rate [Metricbeat MySQL] ECS", 
+                "title": "Connections rate [Metricbeat MySQL]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -32,12 +32,12 @@
                                     {
                                         "field": "mysql.status.connections", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "aee9bbf0-f1f3-11e7-a752-236fe3270d99", 
-                                        "winlog.api": "derivative", 
+                                        "type": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -50,16 +50,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Connections rate [Metricbeat MySQL] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Connections rate [Metricbeat MySQL]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "d7e6bee0-f1f3-11e7-85ab-594b1652e0d1-ecs", 
-            "winlog.api": "visualization", 
+            "id": "d7e6bee0-f1f3-11e7-85ab-594b1652e0d1", 
+            "type": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
-            "winlog.version": 2
+            "version": 2
         }, 
         {
             "attributes": {
@@ -67,9 +67,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Command rates [Metricbeat MySQL] ECS", 
+                "title": "Command rates [Metricbeat MySQL]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -92,12 +92,12 @@
                                     {
                                         "field": "mysql.status.command.select", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "2d149f90-f1f4-11e7-a752-236fe3270d99", 
-                                        "winlog.api": "derivative", 
+                                        "type": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -119,12 +119,12 @@
                                     {
                                         "field": "mysql.status.command.insert", 
                                         "id": "3c2a2a41-f1f4-11e7-a752-236fe3270d99", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }, 
                                     {
                                         "field": "3c2a2a41-f1f4-11e7-a752-236fe3270d99", 
                                         "id": "3c2a2a42-f1f4-11e7-a752-236fe3270d99", 
-                                        "winlog.api": "derivative", 
+                                        "type": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -146,12 +146,12 @@
                                     {
                                         "field": "mysql.status.command.update", 
                                         "id": "485ce051-f1f4-11e7-a752-236fe3270d99", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }, 
                                     {
                                         "field": "485ce051-f1f4-11e7-a752-236fe3270d99", 
                                         "id": "485ce052-f1f4-11e7-a752-236fe3270d99", 
-                                        "winlog.api": "derivative", 
+                                        "type": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -173,12 +173,12 @@
                                     {
                                         "field": "mysql.status.command.delete", 
                                         "id": "543a4a71-f1f4-11e7-a752-236fe3270d99", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }, 
                                     {
                                         "field": "543a4a71-f1f4-11e7-a752-236fe3270d99", 
                                         "id": "543a4a72-f1f4-11e7-a752-236fe3270d99", 
-                                        "winlog.api": "derivative", 
+                                        "type": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -191,16 +191,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Command rates [Metricbeat MySQL] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Command rates [Metricbeat MySQL]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "695a4f90-f1f4-11e7-85ab-594b1652e0d1-ecs", 
-            "winlog.api": "visualization", 
+            "id": "695a4f90-f1f4-11e7-85ab-594b1652e0d1", 
+            "type": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
-            "winlog.version": 2
+            "version": 2
         }, 
         {
             "attributes": {
@@ -208,9 +208,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Running threads [Metricbeat MySQL] ECS", 
+                "title": "Running threads [Metricbeat MySQL]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -234,7 +234,7 @@
                                     {
                                         "field": "mysql.status.threads.running", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -246,16 +246,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Running threads [Metricbeat MySQL] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Running threads [Metricbeat MySQL]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "124dce60-f1f5-11e7-85ab-594b1652e0d1-ecs", 
-            "winlog.api": "visualization", 
+            "id": "124dce60-f1f5-11e7-85ab-594b1652e0d1", 
+            "type": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
-            "winlog.version": 2
+            "version": 2
         }, 
         {
             "attributes": {
@@ -263,9 +263,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Opened tables rate [Metricbeat MySQL] ECS", 
+                "title": "Opened tables rate [Metricbeat MySQL]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -289,12 +289,12 @@
                                     {
                                         "field": "mysql.status.opened_tables", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "9972d250-f1f5-11e7-a752-236fe3270d99", 
-                                        "winlog.api": "derivative", 
+                                        "type": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -307,16 +307,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Opened tables rate [Metricbeat MySQL] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Opened tables rate [Metricbeat MySQL]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "aaa326b0-f1f5-11e7-85ab-594b1652e0d1-ecs", 
-            "winlog.api": "visualization", 
+            "id": "aaa326b0-f1f5-11e7-85ab-594b1652e0d1", 
+            "type": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
-            "winlog.version": 3
+            "version": 3
         }, 
         {
             "attributes": {
@@ -324,9 +324,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Threads created rate [Metricbeat MySQL] ECS", 
+                "title": "Threads created rate [Metricbeat MySQL]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -350,12 +350,12 @@
                                     {
                                         "field": "mysql.status.threads.created", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "9972d250-f1f5-11e7-a752-236fe3270d99", 
-                                        "winlog.api": "derivative", 
+                                        "type": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -368,16 +368,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Threads created rate [Metricbeat MySQL] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Threads created rate [Metricbeat MySQL]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "fb1f3f20-f1f5-11e7-85ab-594b1652e0d1-ecs", 
-            "winlog.api": "visualization", 
+            "id": "fb1f3f20-f1f5-11e7-85ab-594b1652e0d1", 
+            "type": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
-            "winlog.version": 2
+            "version": 2
         }, 
         {
             "attributes": {
@@ -385,9 +385,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Open files [Metricbeat MySQL] ECS", 
+                "title": "Open files [Metricbeat MySQL]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -411,7 +411,7 @@
                                     {
                                         "field": "mysql.status.open.files", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -423,16 +423,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Open files [Metricbeat MySQL] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Open files [Metricbeat MySQL]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "f5b35930-f1f6-11e7-85ab-594b1652e0d1-ecs", 
-            "winlog.api": "visualization", 
+            "id": "f5b35930-f1f6-11e7-85ab-594b1652e0d1", 
+            "type": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
-            "winlog.version": 2
+            "version": 2
         }, 
         {
             "attributes": {
@@ -440,9 +440,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Sent and received bytes rates [Metricbeat MySQL] ECS", 
+                "title": "Sent and received bytes rates [Metricbeat MySQL]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -466,12 +466,12 @@
                                     {
                                         "field": "mysql.status.bytes.received", 
                                         "id": "2b1c2391-f1f7-11e7-a752-236fe3270d99", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }, 
                                     {
                                         "field": "2b1c2391-f1f7-11e7-a752-236fe3270d99", 
                                         "id": "2b1c2392-f1f7-11e7-a752-236fe3270d99", 
-                                        "winlog.api": "derivative", 
+                                        "type": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -493,12 +493,12 @@
                                     {
                                         "field": "mysql.status.bytes.sent", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "avg"
+                                        "type": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "23cfda50-f1f7-11e7-a752-236fe3270d99", 
-                                        "winlog.api": "derivative", 
+                                        "type": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -511,16 +511,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Sent and received bytes rates [Metricbeat MySQL] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Sent and received bytes rates [Metricbeat MySQL]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "7404feb0-f1f7-11e7-85ab-594b1652e0d1-ecs", 
-            "winlog.api": "visualization", 
+            "id": "7404feb0-f1f7-11e7-85ab-594b1652e0d1", 
+            "type": "visualization", 
             "updated_at": "2018-01-05T09:15:49.714Z", 
-            "winlog.version": 3
+            "version": 3
         }, 
         {
             "attributes": {
@@ -539,7 +539,7 @@
                                 }
                             }
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -555,10 +555,10 @@
                             "x": 0, 
                             "y": 3
                         }, 
-                        "id": "d7e6bee0-f1f3-11e7-85ab-594b1652e0d1-ecs", 
+                        "id": "d7e6bee0-f1f3-11e7-85ab-594b1652e0d1", 
                         "panelIndex": "10", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -568,10 +568,10 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "695a4f90-f1f4-11e7-85ab-594b1652e0d1-ecs", 
+                        "id": "695a4f90-f1f4-11e7-85ab-594b1652e0d1", 
                         "panelIndex": "11", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -581,10 +581,10 @@
                             "x": 6, 
                             "y": 3
                         }, 
-                        "id": "124dce60-f1f5-11e7-85ab-594b1652e0d1-ecs", 
+                        "id": "124dce60-f1f5-11e7-85ab-594b1652e0d1", 
                         "panelIndex": "13", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -594,10 +594,10 @@
                             "x": 0, 
                             "y": 6
                         }, 
-                        "id": "aaa326b0-f1f5-11e7-85ab-594b1652e0d1-ecs", 
+                        "id": "aaa326b0-f1f5-11e7-85ab-594b1652e0d1", 
                         "panelIndex": "14", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -607,10 +607,10 @@
                             "x": 6, 
                             "y": 6
                         }, 
-                        "id": "fb1f3f20-f1f5-11e7-85ab-594b1652e0d1-ecs", 
+                        "id": "fb1f3f20-f1f5-11e7-85ab-594b1652e0d1", 
                         "panelIndex": "15", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -620,10 +620,10 @@
                             "x": 6, 
                             "y": 9
                         }, 
-                        "id": "f5b35930-f1f6-11e7-85ab-594b1652e0d1-ecs", 
+                        "id": "f5b35930-f1f6-11e7-85ab-594b1652e0d1", 
                         "panelIndex": "16", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -633,21 +633,21 @@
                             "x": 0, 
                             "y": 9
                         }, 
-                        "id": "7404feb0-f1f7-11e7-85ab-594b1652e0d1-ecs", 
+                        "id": "7404feb0-f1f7-11e7-85ab-594b1652e0d1", 
                         "panelIndex": "17", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.4"
+                        "type": "visualization", 
+                        "version": "6.2.4"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat MySQL] Overview ECS", 
-                "winlog.version": 1
+                "title": "[Metricbeat MySQL] Overview", 
+                "version": 1
             }, 
-            "id": "66881e90-0006-11e7-bf7f-c9acc3d3e306-ecs", 
-            "winlog.api": "dashboard", 
+            "id": "66881e90-0006-11e7-bf7f-c9acc3d3e306", 
+            "type": "dashboard", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
-            "winlog.version": 3
+            "version": 3
         }
     ], 
-    "winlog.version": "6.2.4"
+    "version": "6.2.4"
 }

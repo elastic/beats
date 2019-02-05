@@ -12,9 +12,9 @@
             }
           }
         },
-        "title": "AWS EC2 DiskIO Write Bytes ECS",
+        "title": "AWS EC2 DiskIO Write Bytes",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -44,13 +44,13 @@
                 "filter": "",
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "AWS EC2 DiskIO Write Bytes ECS",
+                "label": "AWS EC2 DiskIO Write Bytes",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "aws.ec2.diskio.write.bytes",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "winlog.api": "avg"
+                    "type": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -68,16 +68,16 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "winlog.api": "timeseries"
+            "type": "timeseries"
           },
-          "title": "AWS EC2 DiskIO Write Bytes ECS",
-          "winlog.api": "metrics"
+          "title": "AWS EC2 DiskIO Write Bytes",
+          "type": "metrics"
         }
       },
-      "id": "fed59380-f7f8-11e8-af03-c999c9dea608-ecs",
-      "winlog.api": "visualization",
+      "id": "fed59380-f7f8-11e8-af03-c999c9dea608",
+      "type": "visualization",
       "updated_at": "2018-12-04T19:15:43.416Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -91,9 +91,9 @@
             }
           }
         },
-        "title": "AWS EC2 Status Check Failed ECS",
+        "title": "AWS EC2 Status Check Failed",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -135,7 +135,7 @@
                   {
                     "field": "aws.ec2.status.check_failed",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "winlog.api": "sum"
+                    "type": "sum"
                   }
                 ],
                 "point_size": 1,
@@ -149,16 +149,16 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "winlog.api": "metric"
+            "type": "metric"
           },
-          "title": "AWS EC2 Status Check Failed ECS",
-          "winlog.api": "metrics"
+          "title": "AWS EC2 Status Check Failed",
+          "type": "metrics"
         }
       },
-      "id": "9e8c6030-f7f8-11e8-af03-c999c9dea608-ecs",
-      "winlog.api": "visualization",
+      "id": "9e8c6030-f7f8-11e8-af03-c999c9dea608",
+      "type": "visualization",
       "updated_at": "2018-12-04T19:13:01.875Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -172,9 +172,9 @@
             }
           }
         },
-        "title": "AWS EC2 Network In Bytes ECS",
+        "title": "AWS EC2 Network In Bytes",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -204,13 +204,13 @@
                 "filter": "",
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "AWS EC2 Network In Bytes ECS",
+                "label": "AWS EC2 Network In Bytes",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "aws.ec2.network.in.bytes",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "winlog.api": "avg"
+                    "type": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -228,16 +228,16 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "winlog.api": "timeseries"
+            "type": "timeseries"
           },
-          "title": "AWS EC2 Network In Bytes ECS",
-          "winlog.api": "metrics"
+          "title": "AWS EC2 Network In Bytes",
+          "type": "metrics"
         }
       },
-      "id": "15818fd0-f7f9-11e8-af03-c999c9dea608-ecs",
-      "winlog.api": "visualization",
+      "id": "15818fd0-f7f9-11e8-af03-c999c9dea608",
+      "type": "visualization",
       "updated_at": "2018-12-04T19:16:21.453Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -251,9 +251,9 @@
             }
           }
         },
-        "title": "AWS EC2 Network Out Bytes ECS",
+        "title": "AWS EC2 Network Out Bytes",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -283,13 +283,13 @@
                 "filter": "",
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "AWS EC2 Network Out Bytes ECS",
+                "label": "AWS EC2 Network Out Bytes",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "aws.ec2.network.out.bytes",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "winlog.api": "avg"
+                    "type": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -307,16 +307,16 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "winlog.api": "timeseries"
+            "type": "timeseries"
           },
-          "title": "AWS EC2 Network Out Bytes ECS",
-          "winlog.api": "metrics"
+          "title": "AWS EC2 Network Out Bytes",
+          "type": "metrics"
         }
       },
-      "id": "233b3400-f7f9-11e8-af03-c999c9dea608-ecs",
-      "winlog.api": "visualization",
+      "id": "233b3400-f7f9-11e8-af03-c999c9dea608",
+      "type": "visualization",
       "updated_at": "2018-12-04T19:16:44.480Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -330,9 +330,9 @@
             }
           }
         },
-        "title": "AWS EC2 DiskIO Read Bytes ECS",
+        "title": "AWS EC2 DiskIO Read Bytes",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -362,13 +362,13 @@
                 "filter": "",
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "AWS EC2 DiskIO Read Bytes ECS",
+                "label": "AWS EC2 DiskIO Read Bytes",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "aws.ec2.diskio.read.bytes",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "winlog.api": "avg"
+                    "type": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -386,16 +386,16 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "winlog.api": "timeseries"
+            "type": "timeseries"
           },
-          "title": "AWS EC2 DiskIO Read Bytes ECS",
-          "winlog.api": "metrics"
+          "title": "AWS EC2 DiskIO Read Bytes",
+          "type": "metrics"
         }
       },
-      "id": "f1db6ec0-f7f8-11e8-af03-c999c9dea608-ecs",
-      "winlog.api": "visualization",
+      "id": "f1db6ec0-f7f8-11e8-af03-c999c9dea608",
+      "type": "visualization",
       "updated_at": "2018-12-04T19:15:21.644Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -409,9 +409,9 @@
             }
           }
         },
-        "title": "AWS EC2 CPU Utilization ECS",
+        "title": "AWS EC2 CPU Utilization",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -441,13 +441,13 @@
                 "filter": "",
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "AWS EC2 CPU Utilization ECS",
+                "label": "AWS EC2 CPU Utilization",
                 "line_width": 1,
                 "metrics": [
                   {
                     "field": "aws.ec2.cpu.total.pct",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "winlog.api": "avg"
+                    "type": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -465,16 +465,16 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "winlog.api": "timeseries"
+            "type": "timeseries"
           },
-          "title": "AWS EC2 CPU Utilization ECS",
-          "winlog.api": "metrics"
+          "title": "AWS EC2 CPU Utilization",
+          "type": "metrics"
         }
       },
-      "id": "be8828d0-f7f6-11e8-af03-c999c9dea608-ecs",
-      "winlog.api": "visualization",
+      "id": "be8828d0-f7f6-11e8-af03-c999c9dea608",
+      "type": "visualization",
       "updated_at": "2018-12-04T19:14:42.745Z",
-      "winlog.version": 4
+      "version": 4
     },
     {
       "attributes": {
@@ -504,10 +504,10 @@
               "x": 24,
               "y": 15
             },
-            "id": "fed59380-f7f8-11e8-af03-c999c9dea608-ecs",
+            "id": "fed59380-f7f8-11e8-af03-c999c9dea608",
             "panelIndex": "3",
-            "winlog.api": "visualization",
-            "winlog.version": "6.5.0"
+            "type": "visualization",
+            "version": "6.5.0"
           },
           {
             "embeddableConfig": {},
@@ -518,10 +518,10 @@
               "x": 36,
               "y": 0
             },
-            "id": "9e8c6030-f7f8-11e8-af03-c999c9dea608-ecs",
+            "id": "9e8c6030-f7f8-11e8-af03-c999c9dea608",
             "panelIndex": "5",
-            "winlog.api": "visualization",
-            "winlog.version": "6.5.0"
+            "type": "visualization",
+            "version": "6.5.0"
           },
           {
             "embeddableConfig": {},
@@ -532,10 +532,10 @@
               "x": 0,
               "y": 30
             },
-            "id": "15818fd0-f7f9-11e8-af03-c999c9dea608-ecs",
+            "id": "15818fd0-f7f9-11e8-af03-c999c9dea608",
             "panelIndex": "11",
-            "winlog.api": "visualization",
-            "winlog.version": "6.5.0"
+            "type": "visualization",
+            "version": "6.5.0"
           },
           {
             "embeddableConfig": {},
@@ -546,10 +546,10 @@
               "x": 24,
               "y": 30
             },
-            "id": "233b3400-f7f9-11e8-af03-c999c9dea608-ecs",
+            "id": "233b3400-f7f9-11e8-af03-c999c9dea608",
             "panelIndex": "12",
-            "winlog.api": "visualization",
-            "winlog.version": "6.5.0"
+            "type": "visualization",
+            "version": "6.5.0"
           },
           {
             "embeddableConfig": {},
@@ -560,10 +560,10 @@
               "x": 0,
               "y": 15
             },
-            "id": "f1db6ec0-f7f8-11e8-af03-c999c9dea608-ecs",
+            "id": "f1db6ec0-f7f8-11e8-af03-c999c9dea608",
             "panelIndex": "15",
-            "winlog.api": "visualization",
-            "winlog.version": "6.5.0"
+            "type": "visualization",
+            "version": "6.5.0"
           },
           {
             "embeddableConfig": {},
@@ -574,21 +574,21 @@
               "x": 0,
               "y": 0
             },
-            "id": "be8828d0-f7f6-11e8-af03-c999c9dea608-ecs",
+            "id": "be8828d0-f7f6-11e8-af03-c999c9dea608",
             "panelIndex": "17",
-            "winlog.api": "visualization",
-            "winlog.version": "6.5.0"
+            "type": "visualization",
+            "version": "6.5.0"
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat AWS] EC2 Overview ECS",
-        "winlog.version": 1
+        "title": "[Metricbeat AWS] EC2 Overview",
+        "version": 1
       },
-      "id": "c5846400-f7fb-11e8-af03-c999c9dea608-ecs",
-      "winlog.api": "dashboard",
+      "id": "c5846400-f7fb-11e8-af03-c999c9dea608",
+      "type": "dashboard",
       "updated_at": "2018-12-04T19:35:35.744Z",
-      "winlog.version": 1
+      "version": 1
     }
   ],
-  "winlog.version": "6.5.0"
+  "version": "6.5.0"
 }

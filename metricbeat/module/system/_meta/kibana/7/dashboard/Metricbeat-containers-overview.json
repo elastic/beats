@@ -18,7 +18,7 @@
                         }
                     }
                 }, 
-                "title": "Container CPU usage [Metricbeat System] ECS", 
+                "title": "Container CPU usage [Metricbeat System]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -29,7 +29,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -40,7 +40,7 @@
                                 "field": "system.process.cgroup.cpuacct.stats.user.ns"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -50,7 +50,7 @@
                                 "field": "system.process.cgroup.cpu.cfs.quota.us"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -63,7 +63,7 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -73,7 +73,7 @@
                                 "field": "system.process.cgroup.cpu.stats.throttled.ns"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -83,20 +83,20 @@
                                 "field": "system.process.cgroup.cpuacct.stats.system.ns"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "max"
+                            "type": "max"
                         }, 
                         {
                             "enabled": true, 
                             "id": "6", 
                             "params": {
                                 "customLabel": "Process name", 
-                                "field": "process.name", 
+                                "field": "system.process.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -110,13 +110,13 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Container CPU usage [Metricbeat System] ECS", 
-                    "winlog.api": "table"
+                    "title": "Container CPU usage [Metricbeat System]", 
+                    "type": "table"
                 }
             }, 
-            "id": "Container-CPU-usage-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "Container-CPU-usage", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -135,22 +135,22 @@
                         }
                     }
                 }, 
-                "title": "System Navigation [Metricbeat System] ECS", 
+                "title": "System Navigation [Metricbeat System]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
                         "fontSize": 12, 
-                        "markdown": "[System Overview](#/dashboard/Metricbeat-system-overview-ecs)  | [Host Overview](#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8-ecs) |\n[Containers overview](#/dashboard/CPU-slash-Memory-per-container-ecs)"
+                        "markdown": "[System Overview](#/dashboard/Metricbeat-system-overview)  | [Host Overview](#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8) |\n[Containers overview](#/dashboard/CPU-slash-Memory-per-container)"
                     }, 
-                    "title": "System Navigation [Metricbeat System] ECS", 
-                    "winlog.api": "markdown"
+                    "title": "System Navigation [Metricbeat System]", 
+                    "type": "markdown"
                 }
             }, 
-            "id": "System-Navigation-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 3
+            "id": "System-Navigation", 
+            "type": "visualization", 
+            "version": 3
         }, 
         {
             "attributes": {
@@ -170,7 +170,7 @@
                         }
                     }
                 }, 
-                "title": "Container Memory stats [Metricbeat System] ECS", 
+                "title": "Container Memory stats [Metricbeat System]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -181,7 +181,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -192,7 +192,7 @@
                                 "field": "system.process.cgroup.memory.mem.usage.bytes"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -202,7 +202,7 @@
                                 "field": "system.process.cgroup.memory.mem.usage.max.bytes"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -212,7 +212,7 @@
                                 "field": "system.process.cgroup.memory.stats.page_faults"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -222,7 +222,7 @@
                                 "field": "system.process.cgroup.memory.stats.pages_in"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -232,7 +232,7 @@
                                 "field": "system.process.cgroup.memory.stats.pages_out"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -245,7 +245,7 @@
                                 "size": 50
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -255,7 +255,7 @@
                                 "field": "system.process.cgroup.memory.stats.inactive_file.bytes"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -265,20 +265,20 @@
                                 "field": "system.process.cgroup.memory.stats.major_page_faults"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
                             "id": "8", 
                             "params": {
                                 "customLabel": "Process name", 
-                                "field": "process.name", 
+                                "field": "system.process.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -288,7 +288,7 @@
                                 "field": "system.process.cgroup.memory.mem.failures"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -298,7 +298,7 @@
                                 "field": "system.process.cgroup.memory.kmem_tcp.usage.bytes"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -308,7 +308,7 @@
                                 "field": "system.process.cgroup.memory.stats.rss_huge.bytes"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -318,7 +318,7 @@
                                 "field": "system.process.cgroup.memory.stats.rss.bytes"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -328,7 +328,7 @@
                                 "field": "system.process.cgroup.memory.stats.swap.bytes"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -338,7 +338,7 @@
                                 "field": "system.process.cgroup.blkio.total.ios"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }
                     ], 
                     "params": {
@@ -352,13 +352,13 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Container Memory stats [Metricbeat System] ECS", 
-                    "winlog.api": "table"
+                    "title": "Container Memory stats [Metricbeat System]", 
+                    "type": "table"
                 }
             }, 
-            "id": "Container-Memory-stats-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "Container-Memory-stats", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -378,7 +378,7 @@
                         }
                     }
                 }, 
-                "title": "Container Block IO [Metricbeat System] ECS", 
+                "title": "Container Block IO [Metricbeat System]", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -389,7 +389,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -400,7 +400,7 @@
                                 "field": "system.process.cgroup.blkio.total.bytes"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -410,7 +410,7 @@
                                 "field": "system.process.cgroup.blkio.total.ios"
                             }, 
                             "schema": "metric", 
-                            "winlog.api": "avg"
+                            "type": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -423,20 +423,20 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }, 
                         {
                             "enabled": true, 
                             "id": "4", 
                             "params": {
                                 "customLabel": "Process name", 
-                                "field": "process.name", 
+                                "field": "system.process.name", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -450,13 +450,13 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Container Block IO [Metricbeat System] ECS", 
-                    "winlog.api": "table"
+                    "title": "Container Block IO [Metricbeat System]", 
+                    "type": "table"
                 }
             }, 
-            "id": "Container-Block-IO-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "Container-Block-IO", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -475,7 +475,7 @@
                                 }
                             }
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -484,43 +484,43 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "Container-CPU-usage-ecs", 
+                        "id": "Container-CPU-usage", 
                         "panelIndex": 2, 
                         "row": 2, 
                         "size_x": 12, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "System-Navigation-ecs", 
+                        "id": "System-Navigation", 
                         "panelIndex": 3, 
                         "row": 1, 
                         "size_x": 12, 
                         "size_y": 1, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "Container-Memory-stats-ecs", 
+                        "id": "Container-Memory-stats", 
                         "panelIndex": 4, 
                         "row": 5, 
                         "size_x": 12, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "Container-Block-IO-ecs", 
+                        "id": "Container-Block-IO", 
                         "panelIndex": 5, 
                         "row": 8, 
                         "size_x": 12, 
                         "size_y": 4, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat System] Containers overview ECS", 
+                "title": "[Metricbeat System] Containers overview", 
                 "uiStateJSON": {
                     "P-2": {
                         "vis": {
@@ -553,12 +553,12 @@
                         }
                     }
                 }, 
-                "winlog.version": 1
+                "version": 1
             }, 
-            "id": "CPU-slash-Memory-per-container-ecs", 
-            "winlog.api": "dashboard", 
-            "winlog.version": 1
+            "id": "CPU-slash-Memory-per-container", 
+            "type": "dashboard", 
+            "version": 1
         }
     ], 
-    "winlog.version": "6.0.0-rc1-SNAPSHOT"
+    "version": "6.0.0-rc1-SNAPSHOT"
 }

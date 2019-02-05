@@ -8,8 +8,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "710043e0-2417-11e7-a83b-d5f4cebac9ff-ecs", 
-                "title": "Startup Errors [Filebeat Icinga] ECS", 
+                "savedSearchId": "710043e0-2417-11e7-a83b-d5f4cebac9ff", 
+                "title": "Startup Errors [Filebeat Icinga]", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -17,7 +17,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -25,7 +25,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -38,7 +38,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }
                     ], 
                     "listeners": {}, 
@@ -53,20 +53,20 @@
                         "setYExtents": false, 
                         "times": []
                     }, 
-                    "title": "Icinga Startup Errors ECS", 
-                    "winlog.api": "histogram"
+                    "title": "Icinga Startup Errors", 
+                    "type": "histogram"
                 }
             }, 
-            "id": "a59b5e00-2417-11e7-a83b-d5f4cebac9ff-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "a59b5e00-2417-11e7-a83b-d5f4cebac9ff", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
                 "columns": [
                     "icinga.startup.facility", 
-                    "log.level", 
-                    "message"
+                    "icinga.startup.severity", 
+                    "icinga.startup.message"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -80,23 +80,23 @@
                             "query": {
                                 "query_string": {
                                     "analyze_wildcard": true, 
-                                    "query": "log.level:critical"
+                                    "query": "icinga.startup.severity:critical"
                                 }
                             }
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Startup Errors [Filebeat Icinga] ECS", 
-                "winlog.version": 1
+                "title": "Startup Errors [Filebeat Icinga]", 
+                "version": 1
             }, 
-            "id": "710043e0-2417-11e7-a83b-d5f4cebac9ff-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 2
+            "id": "710043e0-2417-11e7-a83b-d5f4cebac9ff", 
+            "type": "search", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -115,7 +115,7 @@
                                 }
                             }
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -124,21 +124,21 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "a59b5e00-2417-11e7-a83b-d5f4cebac9ff-ecs", 
+                        "id": "a59b5e00-2417-11e7-a83b-d5f4cebac9ff", 
                         "panelIndex": 1, 
                         "row": 1, 
                         "size_x": 12, 
                         "size_y": 2, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
                         "columns": [
                             "icinga.startup.facility", 
-                            "log.level", 
-                            "message"
+                            "icinga.startup.severity", 
+                            "icinga.startup.message"
                         ], 
-                        "id": "710043e0-2417-11e7-a83b-d5f4cebac9ff-ecs", 
+                        "id": "710043e0-2417-11e7-a83b-d5f4cebac9ff", 
                         "panelIndex": 2, 
                         "row": 3, 
                         "size_x": 12, 
@@ -147,18 +147,18 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "winlog.api": "search"
+                        "type": "search"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat Icinga] Startup Errors ECS", 
+                "title": "[Filebeat Icinga] Startup Errors", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1
+                "version": 1
             }, 
-            "id": "b9163ea0-2417-11e7-a83b-d5f4cebac9ff-ecs", 
-            "winlog.api": "dashboard", 
-            "winlog.version": 2
+            "id": "b9163ea0-2417-11e7-a83b-d5f4cebac9ff", 
+            "type": "dashboard", 
+            "version": 2
         }
     ], 
-    "winlog.version": "6.0.0-beta1-SNAPSHOT"
+    "version": "6.0.0-beta1-SNAPSHOT"
 }

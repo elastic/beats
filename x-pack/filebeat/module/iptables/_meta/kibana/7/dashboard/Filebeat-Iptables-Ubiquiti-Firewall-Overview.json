@@ -12,8 +12,8 @@
             }
           }
         },
-        "savedSearchId": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e-ecs",
-        "title": "Ubiquiti Firewall Event Timeline [Filebeat Iptables] ECS",
+        "savedSearchId": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e",
+        "title": "Ubiquiti Firewall Event Timeline [Filebeat Iptables]",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -22,7 +22,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -30,7 +30,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -51,7 +51,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -67,7 +67,7 @@
                 "size": 5
               },
               "schema": "group",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -83,12 +83,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "grid": {
@@ -108,12 +108,12 @@
                 "mode": "stacked",
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "histogram",
+                "type": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "winlog.api": "histogram",
+            "type": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -127,25 +127,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ]
           },
-          "title": "Ubiquiti Firewall Event Timeline [Filebeat Iptables] ECS",
-          "winlog.api": "histogram"
+          "title": "Ubiquiti Firewall Event Timeline [Filebeat Iptables]",
+          "type": "histogram"
         }
       },
-      "id": "758b3620-1fda-11e9-ae2a-939083c6a64e-ecs",
-      "winlog.api": "visualization",
+      "id": "758b3620-1fda-11e9-ae2a-939083c6a64e",
+      "type": "visualization",
       "updated_at": "2019-01-24T16:37:11.788Z",
-      "winlog.version": 2
+      "version": 2
     },
     {
       "attributes": {
@@ -159,8 +159,8 @@
             }
           }
         },
-        "savedSearchId": "9f7d97c0-1fe9-11e9-ae2a-939083c6a64e-ecs",
-        "title": "Ubiquiti Firewall Top Blocked IPs [Filebeat Iptables] ECS",
+        "savedSearchId": "9f7d97c0-1fe9-11e9-ae2a-939083c6a64e",
+        "title": "Ubiquiti Firewall Top Blocked IPs [Filebeat Iptables]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -171,7 +171,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -179,7 +179,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -196,7 +196,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -210,14 +210,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Ubiquiti Firewall Top Blocked IPs [Filebeat Iptables] ECS",
-          "winlog.api": "table"
+          "title": "Ubiquiti Firewall Top Blocked IPs [Filebeat Iptables]",
+          "type": "table"
         }
       },
-      "id": "1ba82fd0-1ff0-11e9-ae2a-939083c6a64e-ecs",
-      "winlog.api": "visualization",
+      "id": "1ba82fd0-1ff0-11e9-ae2a-939083c6a64e",
+      "type": "visualization",
       "updated_at": "2019-01-24T16:06:20.635Z",
-      "winlog.version": 2
+      "version": 2
     },
     {
       "attributes": {
@@ -231,10 +231,10 @@
             }
           }
         },
-        "savedSearchId": "7862cab0-1fdb-11e9-ae2a-939083c6a64e-ecs",
-        "title": "Ubiquiti Firewall Allowed Traffic Map [Filebeat Iptables] ECS",
+        "savedSearchId": "7862cab0-1fdb-11e9-ae2a-939083c6a64e",
+        "title": "Ubiquiti Firewall Allowed Traffic Map [Filebeat Iptables]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -242,7 +242,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -260,7 +260,7 @@
                 "useGeocentroid": true
               },
               "schema": "segment",
-              "winlog.api": "geohash_grid"
+              "type": "geohash_grid"
             }
           ],
           "params": {
@@ -290,14 +290,14 @@
               }
             }
           },
-          "title": "Ubiquiti Firewall Allowed Traffic Map [Filebeat Iptables] ECS",
-          "winlog.api": "tile_map"
+          "title": "Ubiquiti Firewall Allowed Traffic Map [Filebeat Iptables]",
+          "type": "tile_map"
         }
       },
-      "id": "5bd53050-1fe9-11e9-ae2a-939083c6a64e-ecs",
-      "winlog.api": "visualization",
+      "id": "5bd53050-1fe9-11e9-ae2a-939083c6a64e",
+      "type": "visualization",
       "updated_at": "2019-01-24T15:04:34.005Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -311,8 +311,8 @@
             }
           }
         },
-        "savedSearchId": "9f7d97c0-1fe9-11e9-ae2a-939083c6a64e-ecs",
-        "title": "Ubiquiti Firewall Blocked Traffic Map [Filebeat Iptables] ECS",
+        "savedSearchId": "9f7d97c0-1fe9-11e9-ae2a-939083c6a64e",
+        "title": "Ubiquiti Firewall Blocked Traffic Map [Filebeat Iptables]",
         "uiStateJSON": {
           "mapCenter": [
             19.228176737766262,
@@ -320,7 +320,7 @@
           ],
           "mapZoom": 3
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -328,7 +328,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -346,7 +346,7 @@
                 "useGeocentroid": true
               },
               "schema": "segment",
-              "winlog.api": "geohash_grid"
+              "type": "geohash_grid"
             }
           ],
           "params": {
@@ -376,14 +376,14 @@
               }
             }
           },
-          "title": "Ubiquiti Firewall Blocked Traffic Map [Filebeat Iptables] ECS",
-          "winlog.api": "tile_map"
+          "title": "Ubiquiti Firewall Blocked Traffic Map [Filebeat Iptables]",
+          "type": "tile_map"
         }
       },
-      "id": "8853aa20-1fef-11e9-ae2a-939083c6a64e-ecs",
-      "winlog.api": "visualization",
+      "id": "8853aa20-1fef-11e9-ae2a-939083c6a64e",
+      "type": "visualization",
       "updated_at": "2019-01-24T15:50:31.689Z",
-      "winlog.version": 2
+      "version": 2
     },
     {
       "attributes": {
@@ -397,8 +397,8 @@
             }
           }
         },
-        "savedSearchId": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e-ecs",
-        "title": "Ubiquiti Firewall Traffic Breakdown [Filebeat Iptables] ECS",
+        "savedSearchId": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e",
+        "title": "Ubiquiti Firewall Traffic Breakdown [Filebeat Iptables]",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -412,7 +412,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -420,7 +420,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -436,7 +436,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
@@ -452,7 +452,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
@@ -468,7 +468,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -482,16 +482,16 @@
               "values": false
             },
             "legendPosition": "top",
-            "winlog.api": "pie"
+            "type": "pie"
           },
-          "title": "Ubiquiti Firewall Traffic Breakdown [Filebeat Iptables] ECS",
-          "winlog.api": "pie"
+          "title": "Ubiquiti Firewall Traffic Breakdown [Filebeat Iptables]",
+          "type": "pie"
         }
       },
-      "id": "fdea1ad0-1ff4-11e9-ae2a-939083c6a64e-ecs",
-      "winlog.api": "visualization",
+      "id": "fdea1ad0-1ff4-11e9-ae2a-939083c6a64e",
+      "type": "visualization",
       "updated_at": "2019-01-24T16:27:50.397Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -509,20 +509,20 @@
               "language": "kuery",
               "query": "iptables.ubiquiti.rule_set :*"
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "Ubiquiti Firewall Events [Filebeat Iptables] ECS",
-        "winlog.version": 1
+        "title": "Ubiquiti Firewall Events [Filebeat Iptables]",
+        "version": 1
       },
-      "id": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e-ecs",
-      "winlog.api": "search",
+      "id": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e",
+      "type": "search",
       "updated_at": "2019-01-24T12:37:10.858Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -536,8 +536,8 @@
             }
           }
         },
-        "savedSearchId": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e-ecs",
-        "title": "Ubiquiti Firewall Traffic by Port [Filebeat Iptables] ECS",
+        "savedSearchId": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e",
+        "title": "Ubiquiti Firewall Traffic by Port [Filebeat Iptables]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -548,7 +548,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -556,7 +556,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -574,7 +574,7 @@
                 "size": 5
               },
               "schema": "split",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
@@ -591,7 +591,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -605,14 +605,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Ubiquiti Firewall Traffic by Port [Filebeat Iptables] ECS",
-          "winlog.api": "table"
+          "title": "Ubiquiti Firewall Traffic by Port [Filebeat Iptables]",
+          "type": "table"
         }
       },
-      "id": "190bcb50-1ff6-11e9-ae2a-939083c6a64e-ecs",
-      "winlog.api": "visualization",
+      "id": "190bcb50-1ff6-11e9-ae2a-939083c6a64e",
+      "type": "visualization",
       "updated_at": "2019-01-24T16:35:45.413Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -630,20 +630,20 @@
               "language": "kuery",
               "query": "iptables.ubiquiti.rule_set :* and event.outcome : \"deny\""
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "Ubiquiti Firewall Blocked Events [Filebeat Iptables] ECS",
-        "winlog.version": 1
+        "title": "Ubiquiti Firewall Blocked Events [Filebeat Iptables]",
+        "version": 1
       },
-      "id": "9f7d97c0-1fe9-11e9-ae2a-939083c6a64e-ecs",
-      "winlog.api": "search",
+      "id": "9f7d97c0-1fe9-11e9-ae2a-939083c6a64e",
+      "type": "search",
       "updated_at": "2019-01-24T15:35:33.942Z",
-      "winlog.version": 2
+      "version": 2
     },
     {
       "attributes": {
@@ -661,20 +661,20 @@
               "language": "kuery",
               "query": "iptables.ubiquiti.rule_set :* and event.outcome : \"allow\""
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "Ubiquiti Firewall Allowed Events [Filebeat Iptables] ECS",
-        "winlog.version": 1
+        "title": "Ubiquiti Firewall Allowed Events [Filebeat Iptables]",
+        "version": 1
       },
-      "id": "7862cab0-1fdb-11e9-ae2a-939083c6a64e-ecs",
-      "winlog.api": "search",
+      "id": "7862cab0-1fdb-11e9-ae2a-939083c6a64e",
+      "type": "search",
       "updated_at": "2019-01-24T15:04:12.010Z",
-      "winlog.version": 3
+      "version": 3
     },
     {
       "attributes": {
@@ -712,11 +712,11 @@
               "x": 0,
               "y": 0
             },
-            "id": "758b3620-1fda-11e9-ae2a-939083c6a64e-ecs",
+            "id": "758b3620-1fda-11e9-ae2a-939083c6a64e",
             "panelIndex": "1",
             "title": "Event Timeline",
-            "winlog.api": "visualization",
-            "winlog.version": "6.6.0"
+            "type": "visualization",
+            "version": "6.6.0"
           },
           {
             "embeddableConfig": {},
@@ -727,11 +727,11 @@
               "x": 33,
               "y": 0
             },
-            "id": "1ba82fd0-1ff0-11e9-ae2a-939083c6a64e-ecs",
+            "id": "1ba82fd0-1ff0-11e9-ae2a-939083c6a64e",
             "panelIndex": "2",
             "title": "Top Blocked by source IP",
-            "winlog.api": "visualization",
-            "winlog.version": "6.6.0"
+            "type": "visualization",
+            "version": "6.6.0"
           },
           {
             "embeddableConfig": {
@@ -748,11 +748,11 @@
               "x": 0,
               "y": 15
             },
-            "id": "5bd53050-1fe9-11e9-ae2a-939083c6a64e-ecs",
+            "id": "5bd53050-1fe9-11e9-ae2a-939083c6a64e",
             "panelIndex": "3",
             "title": "Allowed Traffic Map",
-            "winlog.api": "visualization",
-            "winlog.version": "6.6.0"
+            "type": "visualization",
+            "version": "6.6.0"
           },
           {
             "embeddableConfig": {
@@ -769,11 +769,11 @@
               "x": 24,
               "y": 15
             },
-            "id": "8853aa20-1fef-11e9-ae2a-939083c6a64e-ecs",
+            "id": "8853aa20-1fef-11e9-ae2a-939083c6a64e",
             "panelIndex": "4",
             "title": "Blocked Traffic Map",
-            "winlog.api": "visualization",
-            "winlog.version": "6.6.0"
+            "type": "visualization",
+            "version": "6.6.0"
           },
           {
             "embeddableConfig": {
@@ -797,11 +797,11 @@
               "x": 0,
               "y": 30
             },
-            "id": "fdea1ad0-1ff4-11e9-ae2a-939083c6a64e-ecs",
+            "id": "fdea1ad0-1ff4-11e9-ae2a-939083c6a64e",
             "panelIndex": "5",
             "title": "Traffic Breakdown by Protocol",
-            "winlog.api": "visualization",
-            "winlog.version": "6.6.0"
+            "type": "visualization",
+            "version": "6.6.0"
           },
           {
             "embeddableConfig": {},
@@ -812,11 +812,11 @@
               "x": 0,
               "y": 48
             },
-            "id": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e-ecs",
+            "id": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e",
             "panelIndex": "6",
             "title": "Event View",
-            "winlog.api": "search",
-            "winlog.version": "6.6.0"
+            "type": "search",
+            "version": "6.6.0"
           },
           {
             "embeddableConfig": {},
@@ -827,22 +827,22 @@
               "x": 24,
               "y": 30
             },
-            "id": "190bcb50-1ff6-11e9-ae2a-939083c6a64e-ecs",
+            "id": "190bcb50-1ff6-11e9-ae2a-939083c6a64e",
             "panelIndex": "7",
             "title": "Traffic Breakdown by Port",
-            "winlog.api": "visualization",
-            "winlog.version": "6.6.0"
+            "type": "visualization",
+            "version": "6.6.0"
           }
         ],
         "timeRestore": false,
-        "title": "[Filebeat Iptables] Ubiquiti Firewall Overview ECS",
-        "winlog.version": 1
+        "title": "[Filebeat Iptables] Ubiquiti Firewall Overview",
+        "version": 1
       },
-      "id": "d39f0980-1ff3-11e9-ae2a-939083c6a64e-ecs",
-      "winlog.api": "dashboard",
+      "id": "d39f0980-1ff3-11e9-ae2a-939083c6a64e",
+      "type": "dashboard",
       "updated_at": "2019-01-24T16:38:35.174Z",
-      "winlog.version": 4
+      "version": 4
     }
   ],
-  "winlog.version": "6.6.0"
+  "version": "6.6.0"
 }

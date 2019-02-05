@@ -12,9 +12,9 @@
                         }
                     }
                 },
-                "title": "Description [Filebeat Santa] ECS",
+                "title": "Description [Filebeat Santa]",
                 "uiStateJSON": {},
-                "winlog.version": 1,
+                "version": 1,
                 "visState": {
                     "aggs": [],
                     "params": {
@@ -22,14 +22,14 @@
                         "markdown": "![Santa Icon](https://raw.githubusercontent.com/google/santa/master/Source/SantaGUI/Resources/Images.xcassets/AppIcon.appiconset/santa-hat-icon-128.png)\n\nGoogle Santa is a binary whitelisting/blacklisting system for macOS that monitors process executions.",
                         "openLinksInNewTab": false
                     },
-                    "title": "Description [Filebeat Santa] ECS",
-                    "winlog.api": "markdown"
+                    "title": "Description [Filebeat Santa]",
+                    "type": "markdown"
                 }
             },
-            "id": "dad521d0-ff69-11e8-93c5-d5ecd1b3e307-ecs",
-            "winlog.api": "visualization",
+            "id": "dad521d0-ff69-11e8-93c5-d5ecd1b3e307",
+            "type": "visualization",
             "updated_at": "2018-12-14T06:31:14.285Z",
-            "winlog.version": 1
+            "version": 1
         },
         {
             "attributes": {
@@ -43,9 +43,9 @@
                         }
                     }
                 },
-                "title": "Decisions [Filebeat Santa] ECS",
+                "title": "Decisions [Filebeat Santa]",
                 "uiStateJSON": {},
-                "winlog.version": 1,
+                "version": 1,
                 "visState": {
                     "aggs": [],
                     "params": {
@@ -69,7 +69,7 @@
                                 "metrics": [
                                     {
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                                        "winlog.api": "count"
+                                        "type": "count"
                                     }
                                 ],
                                 "point_size": 1,
@@ -82,16 +82,16 @@
                         "show_grid": 1,
                         "show_legend": 1,
                         "time_field": "@timestamp",
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     },
-                    "title": "Decisions [Filebeat Santa] ECS",
-                    "winlog.api": "metrics"
+                    "title": "Decisions [Filebeat Santa]",
+                    "type": "metrics"
                 }
             },
-            "id": "1579d690-ff6b-11e8-93c5-d5ecd1b3e307-ecs",
-            "winlog.api": "visualization",
+            "id": "1579d690-ff6b-11e8-93c5-d5ecd1b3e307",
+            "type": "visualization",
             "updated_at": "2018-12-14T06:40:02.169Z",
-            "winlog.version": 1
+            "version": 1
         },
         {
             "attributes": {
@@ -105,10 +105,10 @@
                         }
                     }
                 },
-                "savedSearchId": "6d56a010-ff6a-11e8-93c5-d5ecd1b3e307-ecs",
-                "title": "Total Events [Filebeat Santa] ECS",
+                "savedSearchId": "6d56a010-ff6a-11e8-93c5-d5ecd1b3e307",
+                "title": "Total Events [Filebeat Santa]",
                 "uiStateJSON": {},
-                "winlog.version": 1,
+                "version": 1,
                 "visState": {
                     "aggs": [
                         {
@@ -118,7 +118,7 @@
                                 "customLabel": "Total Events"
                             },
                             "schema": "metric",
-                            "winlog.api": "count"
+                            "type": "count"
                         }
                     ],
                     "params": {
@@ -147,16 +147,16 @@
                             },
                             "useRanges": false
                         },
-                        "winlog.api": "metric"
+                        "type": "metric"
                     },
-                    "title": "Total Events [Filebeat Santa] ECS",
-                    "winlog.api": "metric"
+                    "title": "Total Events [Filebeat Santa]",
+                    "type": "metric"
                 }
             },
-            "id": "51677b80-ff6b-11e8-93c5-d5ecd1b3e307-ecs",
-            "winlog.api": "visualization",
+            "id": "51677b80-ff6b-11e8-93c5-d5ecd1b3e307",
+            "type": "visualization",
             "updated_at": "2018-12-14T06:41:42.712Z",
-            "winlog.version": 1
+            "version": 1
         },
         {
             "attributes": {
@@ -170,8 +170,8 @@
                         }
                     }
                 },
-                "savedSearchId": "6d56a010-ff6a-11e8-93c5-d5ecd1b3e307-ecs",
-                "title": "Decision and Reason [Filebeat Santa] ECS",
+                "savedSearchId": "6d56a010-ff6a-11e8-93c5-d5ecd1b3e307",
+                "title": "Decision and Reason [Filebeat Santa]",
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -179,7 +179,7 @@
                         }
                     }
                 },
-                "winlog.version": 1,
+                "version": 1,
                 "visState": {
                     "aggs": [
                         {
@@ -187,7 +187,7 @@
                             "id": "1",
                             "params": {},
                             "schema": "metric",
-                            "winlog.api": "count"
+                            "type": "count"
                         },
                         {
                             "enabled": true,
@@ -204,7 +204,7 @@
                                 "size": 5
                             },
                             "schema": "segment",
-                            "winlog.api": "terms"
+                            "type": "terms"
                         },
                         {
                             "enabled": true,
@@ -221,7 +221,7 @@
                                 "size": 5
                             },
                             "schema": "segment",
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ],
                     "params": {
@@ -235,16 +235,16 @@
                             "values": true
                         },
                         "legendPosition": "right",
-                        "winlog.api": "pie"
+                        "type": "pie"
                     },
-                    "title": "Decision and Reason [Filebeat Santa] ECS",
-                    "winlog.api": "pie"
+                    "title": "Decision and Reason [Filebeat Santa]",
+                    "type": "pie"
                 }
             },
-            "id": "30962fe0-ff6c-11e8-93c5-d5ecd1b3e307-ecs",
-            "winlog.api": "visualization",
+            "id": "30962fe0-ff6c-11e8-93c5-d5ecd1b3e307",
+            "type": "visualization",
             "updated_at": "2018-12-14T06:47:57.150Z",
-            "winlog.version": 1
+            "version": 1
         },
         {
             "attributes": {
@@ -258,10 +258,10 @@
                         }
                     }
                 },
-                "savedSearchId": "6d56a010-ff6a-11e8-93c5-d5ecd1b3e307-ecs",
-                "title": "Num of Hosts Reporting [Filebeat Santa] ECS",
+                "savedSearchId": "6d56a010-ff6a-11e8-93c5-d5ecd1b3e307",
+                "title": "Num of Hosts Reporting [Filebeat Santa]",
                 "uiStateJSON": {},
-                "winlog.version": 1,
+                "version": 1,
                 "visState": {
                     "aggs": [
                         {
@@ -272,7 +272,7 @@
                                 "field": "agent.hostname"
                             },
                             "schema": "metric",
-                            "winlog.api": "cardinality"
+                            "type": "cardinality"
                         }
                     ],
                     "params": {
@@ -301,16 +301,16 @@
                             },
                             "useRanges": false
                         },
-                        "winlog.api": "metric"
+                        "type": "metric"
                     },
-                    "title": "Num of Hosts Reporting [Filebeat Santa] ECS",
-                    "winlog.api": "metric"
+                    "title": "Num of Hosts Reporting [Filebeat Santa]",
+                    "type": "metric"
                 }
             },
-            "id": "b06c0460-ff6c-11e8-93c5-d5ecd1b3e307-ecs",
-            "winlog.api": "visualization",
+            "id": "b06c0460-ff6c-11e8-93c5-d5ecd1b3e307",
+            "type": "visualization",
             "updated_at": "2018-12-14T06:51:31.622Z",
-            "winlog.version": 1
+            "version": 1
         },
         {
             "attributes": {
@@ -324,10 +324,10 @@
                         }
                     }
                 },
-                "savedSearchId": "6d56a010-ff6a-11e8-93c5-d5ecd1b3e307-ecs",
-                "title": "Code Signers [Filebeat Santa] ECS",
+                "savedSearchId": "6d56a010-ff6a-11e8-93c5-d5ecd1b3e307",
+                "title": "Code Signers [Filebeat Santa]",
                 "uiStateJSON": {},
-                "winlog.version": 1,
+                "version": 1,
                 "visState": {
                     "aggs": [
                         {
@@ -335,7 +335,7 @@
                             "id": "1",
                             "params": {},
                             "schema": "metric",
-                            "winlog.api": "count"
+                            "type": "count"
                         },
                         {
                             "enabled": true,
@@ -351,7 +351,7 @@
                                 "size": 5
                             },
                             "schema": "segment",
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ],
                     "params": {
@@ -361,14 +361,14 @@
                         "scale": "linear",
                         "showLabel": true
                     },
-                    "title": "Code Signers [Filebeat Santa] ECS",
-                    "winlog.api": "tagcloud"
+                    "title": "Code Signers [Filebeat Santa]",
+                    "type": "tagcloud"
                 }
             },
-            "id": "11858000-ff6d-11e8-93c5-d5ecd1b3e307-ecs",
-            "winlog.api": "visualization",
+            "id": "11858000-ff6d-11e8-93c5-d5ecd1b3e307",
+            "type": "visualization",
             "updated_at": "2018-12-14T06:57:58.885Z",
-            "winlog.version": 2
+            "version": 2
         },
         {
             "attributes": {
@@ -395,16 +395,16 @@
                                     "negate": false,
                                     "params": {
                                         "query": "santa",
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     },
-                                    "winlog.api": "phrase",
+                                    "type": "phrase",
                                     "value": "santa"
                                 },
                                 "query": {
                                     "match": {
                                         "event.module": {
                                             "query": "santa",
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -421,16 +421,16 @@
                                     "negate": false,
                                     "params": {
                                         "query": "log",
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     },
-                                    "winlog.api": "phrase",
+                                    "type": "phrase",
                                     "value": "log"
                                 },
                                 "query": {
                                     "match": {
                                         "event.dataset": {
                                             "query": "log",
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -442,20 +442,20 @@
                             "language": "kuery",
                             "query": ""
                         },
-                        "winlog.version": true
+                        "version": true
                     }
                 },
                 "sort": [
                     "@timestamp",
                     "desc"
                 ],
-                "title": "Santa Logs Search [Filebeat Santa] ECS",
-                "winlog.version": 1
+                "title": "Santa Logs Search [Filebeat Santa]",
+                "version": 1
             },
-            "id": "6d56a010-ff6a-11e8-93c5-d5ecd1b3e307-ecs",
-            "winlog.api": "search",
+            "id": "6d56a010-ff6a-11e8-93c5-d5ecd1b3e307",
+            "type": "search",
             "updated_at": "2018-12-14T06:57:11.037Z",
-            "winlog.version": 2
+            "version": 2
         },
         {
             "attributes": {
@@ -485,10 +485,10 @@
                             "x": 0,
                             "y": 0
                         },
-                        "id": "dad521d0-ff69-11e8-93c5-d5ecd1b3e307-ecs",
+                        "id": "dad521d0-ff69-11e8-93c5-d5ecd1b3e307",
                         "panelIndex": "1",
-                        "winlog.api": "visualization",
-                        "winlog.version": "7.0.0-alpha1-SNAPSHOT"
+                        "type": "visualization",
+                        "version": "7.0.0-alpha1-SNAPSHOT"
                     },
                     {
                         "embeddableConfig": {},
@@ -499,10 +499,10 @@
                             "x": 10,
                             "y": 0
                         },
-                        "id": "1579d690-ff6b-11e8-93c5-d5ecd1b3e307-ecs",
+                        "id": "1579d690-ff6b-11e8-93c5-d5ecd1b3e307",
                         "panelIndex": "2",
-                        "winlog.api": "visualization",
-                        "winlog.version": "7.0.0-alpha1-SNAPSHOT"
+                        "type": "visualization",
+                        "version": "7.0.0-alpha1-SNAPSHOT"
                     },
                     {
                         "embeddableConfig": {},
@@ -513,10 +513,10 @@
                             "x": 8,
                             "y": 12
                         },
-                        "id": "51677b80-ff6b-11e8-93c5-d5ecd1b3e307-ecs",
+                        "id": "51677b80-ff6b-11e8-93c5-d5ecd1b3e307",
                         "panelIndex": "3",
-                        "winlog.api": "visualization",
-                        "winlog.version": "7.0.0-alpha1-SNAPSHOT"
+                        "type": "visualization",
+                        "version": "7.0.0-alpha1-SNAPSHOT"
                     },
                     {
                         "embeddableConfig": {},
@@ -527,10 +527,10 @@
                             "x": 36,
                             "y": 12
                         },
-                        "id": "30962fe0-ff6c-11e8-93c5-d5ecd1b3e307-ecs",
+                        "id": "30962fe0-ff6c-11e8-93c5-d5ecd1b3e307",
                         "panelIndex": "4",
-                        "winlog.api": "visualization",
-                        "winlog.version": "7.0.0-alpha1-SNAPSHOT"
+                        "type": "visualization",
+                        "version": "7.0.0-alpha1-SNAPSHOT"
                     },
                     {
                         "embeddableConfig": {},
@@ -541,10 +541,10 @@
                             "x": 0,
                             "y": 12
                         },
-                        "id": "b06c0460-ff6c-11e8-93c5-d5ecd1b3e307-ecs",
+                        "id": "b06c0460-ff6c-11e8-93c5-d5ecd1b3e307",
                         "panelIndex": "5",
-                        "winlog.api": "visualization",
-                        "winlog.version": "7.0.0-alpha1-SNAPSHOT"
+                        "type": "visualization",
+                        "version": "7.0.0-alpha1-SNAPSHOT"
                     },
                     {
                         "embeddableConfig": {},
@@ -555,10 +555,10 @@
                             "x": 18,
                             "y": 12
                         },
-                        "id": "11858000-ff6d-11e8-93c5-d5ecd1b3e307-ecs",
+                        "id": "11858000-ff6d-11e8-93c5-d5ecd1b3e307",
                         "panelIndex": "6",
-                        "winlog.api": "visualization",
-                        "winlog.version": "7.0.0-alpha1-SNAPSHOT"
+                        "type": "visualization",
+                        "version": "7.0.0-alpha1-SNAPSHOT"
                     },
                     {
                         "embeddableConfig": {},
@@ -569,21 +569,21 @@
                             "x": 0,
                             "y": 22
                         },
-                        "id": "6d56a010-ff6a-11e8-93c5-d5ecd1b3e307-ecs",
+                        "id": "6d56a010-ff6a-11e8-93c5-d5ecd1b3e307",
                         "panelIndex": "7",
-                        "winlog.api": "search",
-                        "winlog.version": "7.0.0-alpha1-SNAPSHOT"
+                        "type": "search",
+                        "version": "7.0.0-alpha1-SNAPSHOT"
                     }
                 ],
                 "timeRestore": false,
-                "title": "[Filebeat Santa] Overview ECS",
-                "winlog.version": 1
+                "title": "[Filebeat Santa] Overview",
+                "version": 1
             },
-            "id": "161855f0-ff6a-11e8-93c5-d5ecd1b3e307-ecs",
-            "winlog.api": "dashboard",
+            "id": "161855f0-ff6a-11e8-93c5-d5ecd1b3e307",
+            "type": "dashboard",
             "updated_at": "2018-12-14T06:58:23.367Z",
-            "winlog.version": 5
+            "version": 5
         }
     ],
-    "winlog.version": "7.0.0-alpha1-SNAPSHOT"
+    "version": "7.0.0-alpha1-SNAPSHOT"
 }

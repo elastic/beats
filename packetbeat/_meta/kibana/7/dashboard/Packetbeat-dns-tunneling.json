@@ -8,8 +8,8 @@
             "filter": []
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
-        "title": "Unique FQDNs per eTLD+1 ECS",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
+        "title": "Unique FQDNs per eTLD+1",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -18,7 +18,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -29,7 +29,7 @@
                 "field": "dns.question.name"
               },
               "schema": "metric",
-              "winlog.api": "cardinality"
+              "type": "cardinality"
             },
             {
               "enabled": true,
@@ -42,7 +42,7 @@
                 "size": 20
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "listeners": {},
@@ -59,14 +59,14 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Unique FQDNs per eTLD+1 ECS",
-          "winlog.api": "histogram"
+          "title": "Unique FQDNs per eTLD+1",
+          "type": "histogram"
         }
       },
-      "id": "Unique-FQDNs-per-eTLD 1-ecs",
-      "winlog.api": "visualization",
+      "id": "Unique-FQDNs-per-eTLD 1",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:23.036Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -76,8 +76,8 @@
             "filter": []
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
-        "title": "Unique FQDNs per eTLD+1 Table ECS",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
+        "title": "Unique FQDNs per eTLD+1 Table",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -88,7 +88,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -98,7 +98,7 @@
                 "customLabel": ""
               },
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -111,7 +111,7 @@
                 "size": 20
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
@@ -121,7 +121,7 @@
                 "field": "dns.question.name"
               },
               "schema": "metric",
-              "winlog.api": "cardinality"
+              "type": "cardinality"
             }
           ],
           "listeners": {},
@@ -136,14 +136,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Unique FQDNs per eTLD+1 Table ECS",
-          "winlog.api": "table"
+          "title": "Unique FQDNs per eTLD+1 Table",
+          "type": "table"
         }
       },
-      "id": "Unique-FQDNs-per-eTLD 1-Table-ecs",
-      "winlog.api": "visualization",
+      "id": "Unique-FQDNs-per-eTLD 1-Table",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:23.036Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -157,8 +157,8 @@
             }
           }
         },
-        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
-        "title": "Bytes Transferred per Domain ECS",
+        "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
+        "title": "Bytes Transferred per Domain",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -169,7 +169,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -180,7 +180,7 @@
                 "field": "destination.bytes"
               },
               "schema": "metric",
-              "winlog.api": "sum"
+              "type": "sum"
             },
             {
               "enabled": true,
@@ -197,7 +197,7 @@
                 "size": 20
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
@@ -207,7 +207,7 @@
                 "field": "source.bytes"
               },
               "schema": "metric",
-              "winlog.api": "sum"
+              "type": "sum"
             }
           ],
           "params": {
@@ -223,12 +223,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "defaultYExtents": true,
@@ -249,7 +249,7 @@
                 },
                 "mode": "normal",
                 "show": "true",
-                "winlog.api": "histogram",
+                "type": "histogram",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -259,14 +259,14 @@
                 },
                 "mode": "normal",
                 "show": true,
-                "winlog.api": "histogram",
+                "type": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "setYExtents": false,
             "shareYAxis": true,
             "times": [],
-            "winlog.api": "histogram",
+            "type": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -282,26 +282,26 @@
                   "defaultYExtents": true,
                   "mode": "grouped",
                   "setYExtents": false,
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ],
             "yAxis": {}
           },
-          "title": "Bytes Transferred per Domain ECS",
-          "winlog.api": "histogram"
+          "title": "Bytes Transferred per Domain",
+          "type": "histogram"
         }
       },
-      "id": "Bytes-Transferred-per-Domain-ecs",
-      "winlog.api": "visualization",
+      "id": "Bytes-Transferred-per-Domain",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:23.036Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -315,13 +315,13 @@
               "query": {
                 "query_string": {
                   "analyze_wildcard": true,
-                  "query": "winlog.api:dns"
+                  "query": "type:dns"
                 }
               }
             }
           }
         },
-        "title": "Top Domains by Data Volume ECS",
+        "title": "Top Domains by Data Volume",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -332,7 +332,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -343,7 +343,7 @@
                 "field": "source.bytes"
               },
               "schema": "metric",
-              "winlog.api": "sum"
+              "type": "sum"
             },
             {
               "enabled": true,
@@ -360,7 +360,7 @@
                 "size": 20
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
@@ -370,7 +370,7 @@
                 "field": "destination.bytes"
               },
               "schema": "metric",
-              "winlog.api": "sum"
+              "type": "sum"
             }
           ],
           "params": {
@@ -384,14 +384,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top Domains by Data Volume ECS",
-          "winlog.api": "table"
+          "title": "Top Domains by Data Volume",
+          "type": "table"
         }
       },
-      "id": "dc743240-1665-11e7-a6de-cbac1a3d0a7d-ecs",
-      "winlog.api": "visualization",
+      "id": "dc743240-1665-11e7-a6de-cbac1a3d0a7d",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:23.036Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -418,16 +418,16 @@
                   "negate": false,
                   "params": {
                     "query": "dns",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "dns"
                 },
                 "query": {
                   "match": {
                     "network.protocol": {
                       "query": "dns",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -452,20 +452,20 @@
               "language": "lucene",
               "query": ""
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "DNS Protocol [Packetbeat] ECS",
-        "winlog.version": 1
+        "title": "DNS Protocol [Packetbeat]",
+        "version": 1
       },
-      "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
-      "winlog.api": "search",
+      "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17",
+      "type": "search",
       "updated_at": "2019-01-18T23:49:24.089Z",
-      "winlog.version": 2
+      "version": 2
     },
     {
       "attributes": {
@@ -477,9 +477,9 @@
             "highlightAll": true,
             "query": {
               "language": "lucene",
-              "query": "NOT dns.question.winlog.api:PTR"
+              "query": "NOT dns.question.type:PTR"
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "optionsJSON": {
@@ -510,10 +510,10 @@
               "x": 0,
               "y": 0
             },
-            "id": "Unique-FQDNs-per-eTLD 1-ecs",
+            "id": "Unique-FQDNs-per-eTLD 1",
             "panelIndex": "1",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -533,10 +533,10 @@
               "x": 0,
               "y": 35
             },
-            "id": "Unique-FQDNs-per-eTLD 1-Table-ecs",
+            "id": "Unique-FQDNs-per-eTLD 1-Table",
             "panelIndex": "2",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -551,10 +551,10 @@
               "x": 0,
               "y": 20
             },
-            "id": "Bytes-Transferred-per-Domain-ecs",
+            "id": "Bytes-Transferred-per-Domain",
             "panelIndex": "4",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -574,21 +574,21 @@
               "x": 24,
               "y": 35
             },
-            "id": "dc743240-1665-11e7-a6de-cbac1a3d0a7d-ecs",
+            "id": "dc743240-1665-11e7-a6de-cbac1a3d0a7d",
             "panelIndex": "5",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0-SNAPSHOT"
+            "type": "visualization",
+            "version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
-        "title": "[Packetbeat] DNS Tunneling ECS",
-        "winlog.version": 1
+        "title": "[Packetbeat] DNS Tunneling",
+        "version": 1
       },
-      "id": "DNS-Unique-Domains-ecs",
-      "winlog.api": "dashboard",
+      "id": "DNS-Unique-Domains",
+      "type": "dashboard",
       "updated_at": "2019-01-18T23:49:23.036Z",
-      "winlog.version": 1
+      "version": 1
     }
   ],
-  "winlog.version": "7.0.0-SNAPSHOT"
+  "version": "7.0.0-SNAPSHOT"
 }

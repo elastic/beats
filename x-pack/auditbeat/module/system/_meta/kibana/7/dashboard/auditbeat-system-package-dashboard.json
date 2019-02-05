@@ -12,24 +12,24 @@
             }
           }
         },
-        "title": "Dashboard Links [Auditbeat System] ECS",
+        "title": "Dashboard Links [Auditbeat System]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 12,
-            "markdown": "**Dashboards**: [System Overview](#/dashboard/2be46cb0-27f2-11e9-89af-fd12d59dac90-ecs) | [Hosts](#/dashboard/dfe62590-18da-11e9-9094-c50574723088-ecs) | [Logins](#/dashboard/2a17f200-285e-11e9-805f-43bf57dfa519-ecs) | [Users](#/dashboard/ae96a660-2864-11e9-97cb-474beda9f119-ecs) | [Processes](#/dashboard/4c68f110-2863-11e9-97cb-474beda9f119-ecs) | [Sockets](#/dashboard/957a3ef0-2867-11e9-9d21-0be348776e6c-ecs) | [Packages](#/dashboard/137c52f0-286a-11e9-9d21-0be348776e6c-ecs)",
+            "markdown": "**Dashboards**: [System Overview](#/dashboard/2be46cb0-27f2-11e9-89af-fd12d59dac90) | [Hosts](#/dashboard/dfe62590-18da-11e9-9094-c50574723088) | [Logins](#/dashboard/2a17f200-285e-11e9-805f-43bf57dfa519) | [Users](#/dashboard/ae96a660-2864-11e9-97cb-474beda9f119) | [Processes](#/dashboard/4c68f110-2863-11e9-97cb-474beda9f119) | [Sockets](#/dashboard/957a3ef0-2867-11e9-9d21-0be348776e6c) | [Packages](#/dashboard/137c52f0-286a-11e9-9d21-0be348776e6c)",
             "openLinksInNewTab": false
           },
-          "title": "Dashboard Links [Auditbeat System] ECS",
-          "winlog.api": "markdown"
+          "title": "Dashboard Links [Auditbeat System]",
+          "type": "markdown"
         }
       },
-      "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90-ecs",
-      "winlog.api": "visualization",
+      "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90",
+      "type": "visualization",
       "updated_at": "2019-02-04T11:37:25.234Z",
-      "winlog.version": 3
+      "version": 3
     },
     {
       "attributes": {
@@ -49,16 +49,16 @@
                   "negate": false,
                   "params": {
                     "query": "package",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "package"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "package",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -71,9 +71,9 @@
             }
           }
         },
-        "title": "Package Count [Auditbeat System] ECS",
+        "title": "Package Count [Auditbeat System]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -84,7 +84,7 @@
                 "field": "system.audit.package.entity_id"
               },
               "schema": "metric",
-              "winlog.api": "cardinality"
+              "type": "cardinality"
             }
           ],
           "params": {
@@ -113,16 +113,16 @@
               },
               "useRanges": false
             },
-            "winlog.api": "metric"
+            "type": "metric"
           },
-          "title": "Package Count [Auditbeat System] ECS",
-          "winlog.api": "metric"
+          "title": "Package Count [Auditbeat System]",
+          "type": "metric"
         }
       },
-      "id": "f664fb20-27f3-11e9-89af-fd12d59dac90-ecs",
-      "winlog.api": "visualization",
+      "id": "f664fb20-27f3-11e9-89af-fd12d59dac90",
+      "type": "visualization",
       "updated_at": "2019-02-03T20:40:37.585Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -142,16 +142,16 @@
                   "negate": false,
                   "params": {
                     "query": "package",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "package"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "package",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -168,16 +168,16 @@
                   "negate": true,
                   "params": {
                     "query": "existing_package",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "existing_package"
                 },
                 "query": {
                   "match": {
                     "event.action": {
                       "query": "existing_package",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -190,9 +190,9 @@
             }
           }
         },
-        "title": "Package Changes [Auditbeat System] ECS",
+        "title": "Package Changes [Auditbeat System]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -202,7 +202,7 @@
                 "customLabel": "Changes"
               },
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             }
           ],
           "params": {
@@ -231,16 +231,16 @@
               },
               "useRanges": false
             },
-            "winlog.api": "metric"
+            "type": "metric"
           },
-          "title": "Package Changes [Auditbeat System] ECS",
-          "winlog.api": "metric"
+          "title": "Package Changes [Auditbeat System]",
+          "type": "metric"
         }
       },
-      "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519-ecs",
-      "winlog.api": "visualization",
+      "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519",
+      "type": "visualization",
       "updated_at": "2019-02-04T10:44:06.826Z",
-      "winlog.version": 2
+      "version": 2
     },
     {
       "attributes": {
@@ -260,16 +260,16 @@
                   "negate": false,
                   "params": {
                     "query": "package",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "package"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "package",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -282,9 +282,9 @@
             }
           }
         },
-        "title": "Package OS Distribution [Auditbeat System] ECS",
+        "title": "Package OS Distribution [Auditbeat System]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -294,7 +294,7 @@
                 "field": "host.id"
               },
               "schema": "metric",
-              "winlog.api": "cardinality"
+              "type": "cardinality"
             },
             {
               "enabled": true,
@@ -311,7 +311,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             },
             {
               "enabled": true,
@@ -327,7 +327,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -341,16 +341,16 @@
               "values": true
             },
             "legendPosition": "right",
-            "winlog.api": "pie"
+            "type": "pie"
           },
-          "title": "Package OS Distribution [Auditbeat System] ECS",
-          "winlog.api": "pie"
+          "title": "Package OS Distribution [Auditbeat System]",
+          "type": "pie"
         }
       },
-      "id": "6ed51940-2868-11e9-9d21-0be348776e6c-ecs",
-      "winlog.api": "visualization",
+      "id": "6ed51940-2868-11e9-9d21-0be348776e6c",
+      "type": "visualization",
       "updated_at": "2019-02-04T10:34:21.268Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -370,16 +370,16 @@
                   "negate": false,
                   "params": {
                     "query": "package",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "package"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "package",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -396,16 +396,16 @@
                   "negate": false,
                   "params": {
                     "query": "event",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "event"
                 },
                 "query": {
                   "match": {
                     "event.kind": {
                       "query": "event",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -418,9 +418,9 @@
             }
           }
         },
-        "title": "Package Change Actions [Auditbeat System] ECS",
+        "title": "Package Change Actions [Auditbeat System]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -428,7 +428,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -444,7 +444,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -458,16 +458,16 @@
               "values": true
             },
             "legendPosition": "right",
-            "winlog.api": "pie"
+            "type": "pie"
           },
-          "title": "Package Change Actions [Auditbeat System] ECS",
-          "winlog.api": "pie"
+          "title": "Package Change Actions [Auditbeat System]",
+          "type": "pie"
         }
       },
-      "id": "fe23f530-2868-11e9-9d21-0be348776e6c-ecs",
-      "winlog.api": "visualization",
+      "id": "fe23f530-2868-11e9-9d21-0be348776e6c",
+      "type": "visualization",
       "updated_at": "2019-02-04T10:38:21.699Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -487,16 +487,16 @@
                   "negate": false,
                   "params": {
                     "query": "package",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "package"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "package",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -509,9 +509,9 @@
             }
           }
         },
-        "title": "Package Document Histogram [Auditbeat System] ECS",
+        "title": "Package Document Histogram [Auditbeat System]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -519,7 +519,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -535,7 +535,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             }
           ],
           "params": {
@@ -551,12 +551,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "grid": {
@@ -576,12 +576,12 @@
                 "mode": "stacked",
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "histogram",
+                "type": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "winlog.api": "histogram",
+            "type": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -595,25 +595,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ]
           },
-          "title": "Package Document Histogram [Auditbeat System] ECS",
-          "winlog.api": "histogram"
+          "title": "Package Document Histogram [Auditbeat System]",
+          "type": "histogram"
         }
       },
-      "id": "4e7701d0-2869-11e9-9d21-0be348776e6c-ecs",
-      "winlog.api": "visualization",
+      "id": "4e7701d0-2869-11e9-9d21-0be348776e6c",
+      "type": "visualization",
       "updated_at": "2019-02-04T10:40:36.461Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -639,16 +639,16 @@
                   "negate": false,
                   "params": {
                     "query": "package",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "package"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "package",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -660,20 +660,20 @@
               "language": "lucene",
               "query": ""
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "Package Documents [Auditbeat System] ECS",
-        "winlog.version": 1
+        "title": "Package Documents [Auditbeat System]",
+        "version": 1
       },
-      "id": "391ef230-2868-11e9-9d21-0be348776e6c-ecs",
-      "winlog.api": "search",
+      "id": "391ef230-2868-11e9-9d21-0be348776e6c",
+      "type": "search",
       "updated_at": "2019-02-04T10:32:51.155Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -693,16 +693,16 @@
                   "negate": false,
                   "params": {
                     "query": "package",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "package"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "package",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -715,7 +715,7 @@
             }
           }
         },
-        "title": "Package Names [Auditbeat System] ECS",
+        "title": "Package Names [Auditbeat System]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -726,7 +726,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -734,7 +734,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "enabled": true,
@@ -750,7 +750,7 @@
                 "size": 25
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -764,14 +764,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Package Names [Auditbeat System] ECS",
-          "winlog.api": "table"
+          "title": "Package Names [Auditbeat System]",
+          "type": "table"
         }
       },
-      "id": "8dc55df0-2869-11e9-9d21-0be348776e6c-ecs",
-      "winlog.api": "visualization",
+      "id": "8dc55df0-2869-11e9-9d21-0be348776e6c",
+      "type": "visualization",
       "updated_at": "2019-02-04T10:45:22.440Z",
-      "winlog.version": 2
+      "version": 2
     },
     {
       "attributes": {
@@ -801,10 +801,10 @@
               "x": 0,
               "y": 0
             },
-            "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90-ecs",
+            "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90",
             "panelIndex": "1",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0"
+            "type": "visualization",
+            "version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -815,10 +815,10 @@
               "x": 0,
               "y": 4
             },
-            "id": "f664fb20-27f3-11e9-89af-fd12d59dac90-ecs",
+            "id": "f664fb20-27f3-11e9-89af-fd12d59dac90",
             "panelIndex": "2",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0"
+            "type": "visualization",
+            "version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -829,10 +829,10 @@
               "x": 6,
               "y": 4
             },
-            "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519-ecs",
+            "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519",
             "panelIndex": "3",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0"
+            "type": "visualization",
+            "version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -843,10 +843,10 @@
               "x": 24,
               "y": 4
             },
-            "id": "6ed51940-2868-11e9-9d21-0be348776e6c-ecs",
+            "id": "6ed51940-2868-11e9-9d21-0be348776e6c",
             "panelIndex": "4",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0"
+            "type": "visualization",
+            "version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -857,10 +857,10 @@
               "x": 11,
               "y": 4
             },
-            "id": "fe23f530-2868-11e9-9d21-0be348776e6c-ecs",
+            "id": "fe23f530-2868-11e9-9d21-0be348776e6c",
             "panelIndex": "5",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0"
+            "type": "visualization",
+            "version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -871,10 +871,10 @@
               "x": 0,
               "y": 15
             },
-            "id": "4e7701d0-2869-11e9-9d21-0be348776e6c-ecs",
+            "id": "4e7701d0-2869-11e9-9d21-0be348776e6c",
             "panelIndex": "6",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0"
+            "type": "visualization",
+            "version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -885,10 +885,10 @@
               "x": 0,
               "y": 23
             },
-            "id": "391ef230-2868-11e9-9d21-0be348776e6c-ecs",
+            "id": "391ef230-2868-11e9-9d21-0be348776e6c",
             "panelIndex": "7",
-            "winlog.api": "search",
-            "winlog.version": "7.0.0"
+            "type": "search",
+            "version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -899,21 +899,21 @@
               "x": 37,
               "y": 4
             },
-            "id": "8dc55df0-2869-11e9-9d21-0be348776e6c-ecs",
+            "id": "8dc55df0-2869-11e9-9d21-0be348776e6c",
             "panelIndex": "8",
-            "winlog.api": "visualization",
-            "winlog.version": "7.0.0"
+            "type": "visualization",
+            "version": "7.0.0"
           }
         ],
         "timeRestore": false,
-        "title": "[Auditbeat System] Package Dashboard ECS",
-        "winlog.version": 1
+        "title": "[Auditbeat System] Package Dashboard",
+        "version": 1
       },
-      "id": "137c52f0-286a-11e9-9d21-0be348776e6c-ecs",
-      "winlog.api": "dashboard",
+      "id": "137c52f0-286a-11e9-9d21-0be348776e6c",
+      "type": "dashboard",
       "updated_at": "2019-02-04T11:03:23.945Z",
-      "winlog.version": 2
+      "version": 2
     }
   ],
-  "winlog.version": "7.0.0"
+  "version": "7.0.0"
 }

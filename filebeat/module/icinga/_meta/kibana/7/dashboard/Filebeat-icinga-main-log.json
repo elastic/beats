@@ -8,8 +8,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f-ecs", 
-                "title": "Mainlog Severity [Filebeat Icinga] ECS", 
+                "savedSearchId": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f", 
+                "title": "Mainlog Severity [Filebeat Icinga]", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -18,7 +18,7 @@
                         }
                     }
                 }, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -26,7 +26,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -39,19 +39,19 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "log.level", 
+                                "field": "icinga.main.severity", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -66,20 +66,20 @@
                         "setYExtents": false, 
                         "times": []
                     }, 
-                    "title": "Icinga Mainlog Severity ECS", 
-                    "winlog.api": "histogram"
+                    "title": "Icinga Mainlog Severity", 
+                    "type": "histogram"
                 }
             }, 
-            "id": "d8e5dc40-2417-11e7-a83b-d5f4cebac9ff-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "d8e5dc40-2417-11e7-a83b-d5f4cebac9ff", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
                 "columns": [
                     "icinga.main.facility", 
-                    "log.level", 
-                    "message"
+                    "icinga.main.severity", 
+                    "icinga.main.message"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -94,20 +94,20 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "filebeat-*", 
-                                    "key": "event.module", 
+                                    "key": "fileset.module", 
                                     "negate": false, 
                                     "params": {
                                         "query": "icinga", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "icinga"
                                 }, 
                                 "query": {
                                     "match": {
-                                        "event.module": {
+                                        "fileset.module": {
                                             "query": "icinga", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -124,16 +124,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "main", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "main"
                                 }, 
                                 "query": {
                                     "match": {
                                         "fileset.name": {
                                             "query": "main", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -145,19 +145,19 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Main Log [Filebeat Icinga] ECS", 
-                "winlog.version": 1
+                "title": "Main Log [Filebeat Icinga]", 
+                "version": 1
             }, 
-            "id": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 2
+            "id": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f", 
+            "type": "search", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -167,10 +167,10 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f-ecs", 
-                "title": "Mainlog Facility [Filebeat Icinga] ECS", 
+                "savedSearchId": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f", 
+                "title": "Mainlog Facility [Filebeat Icinga]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -178,7 +178,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -191,7 +191,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -203,7 +203,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -218,13 +218,13 @@
                         "setYExtents": false, 
                         "times": []
                     }, 
-                    "title": "Icinga Mainlog Facility ECS", 
-                    "winlog.api": "histogram"
+                    "title": "Icinga Mainlog Facility", 
+                    "type": "histogram"
                 }
             }, 
-            "id": "2cf77780-2418-11e7-a83b-d5f4cebac9ff-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "2cf77780-2418-11e7-a83b-d5f4cebac9ff", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -243,7 +243,7 @@
                                 }
                             }
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -252,21 +252,21 @@
                 "panelsJSON": [
                     {
                         "col": 7, 
-                        "id": "d8e5dc40-2417-11e7-a83b-d5f4cebac9ff-ecs", 
+                        "id": "d8e5dc40-2417-11e7-a83b-d5f4cebac9ff", 
                         "panelIndex": 1, 
                         "row": 1, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
                         "columns": [
                             "icinga.main.facility", 
-                            "log.level", 
-                            "message"
+                            "icinga.main.severity", 
+                            "icinga.main.message"
                         ], 
-                        "id": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f-ecs", 
+                        "id": "ffaf5a30-2413-11e7-a0d9-39604d45ca7f", 
                         "panelIndex": 2, 
                         "row": 4, 
                         "size_x": 12, 
@@ -275,27 +275,27 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "winlog.api": "search"
+                        "type": "search"
                     }, 
                     {
                         "col": 1, 
-                        "id": "2cf77780-2418-11e7-a83b-d5f4cebac9ff-ecs", 
+                        "id": "2cf77780-2418-11e7-a83b-d5f4cebac9ff", 
                         "panelIndex": 3, 
                         "row": 1, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat Icinga] Main Log ECS", 
+                "title": "[Filebeat Icinga] Main Log", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1
+                "version": 1
             }, 
-            "id": "f693d260-2417-11e7-a83b-d5f4cebac9ff-ecs", 
-            "winlog.api": "dashboard", 
-            "winlog.version": 4
+            "id": "f693d260-2417-11e7-a83b-d5f4cebac9ff", 
+            "type": "dashboard", 
+            "version": 4
         }
     ], 
-    "winlog.version": "6.0.0-beta1-SNAPSHOT"
+    "version": "6.0.0-beta1-SNAPSHOT"
 }

@@ -12,10 +12,10 @@
                         }
                     }
                 }, 
-                "savedSearchId": "cfaba090-cbda-11e7-9852-73e0a9df1bb6-ecs", 
-                "title": "Logs Severity [Filebeat Logstash] ECS", 
+                "savedSearchId": "cfaba090-cbda-11e7-9852-73e0a9df1bb6", 
+                "title": "Logs Severity [Filebeat Logstash]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -23,19 +23,19 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "log.level", 
+                                "field": "logstash.log.level", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -43,15 +43,15 @@
                         "addTooltip": true, 
                         "isDonut": true, 
                         "legendPosition": "right", 
-                        "winlog.api": "pie"
+                        "type": "pie"
                     }, 
-                    "title": "Logs Severity [Filebeat Logstash] ECS", 
-                    "winlog.api": "pie"
+                    "title": "Logs Severity [Filebeat Logstash]", 
+                    "type": "pie"
                 }
             }, 
-            "id": "0b1dace0-cbdb-11e7-9852-73e0a9df1bb6-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "0b1dace0-cbdb-11e7-9852-73e0a9df1bb6", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -65,10 +65,10 @@
                         }
                     }
                 }, 
-                "savedSearchId": "cfaba090-cbda-11e7-9852-73e0a9df1bb6-ecs", 
-                "title": "logs over time [Filebeat Logstash] ECS", 
+                "savedSearchId": "cfaba090-cbda-11e7-9852-73e0a9df1bb6", 
+                "title": "logs over time [Filebeat Logstash]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -76,7 +76,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "winlog.api": "count"
+                            "type": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -89,19 +89,19 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "winlog.api": "date_histogram"
+                            "type": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "log.level", 
+                                "field": "logstash.log.level", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "winlog.api": "terms"
+                            "type": "terms"
                         }
                     ], 
                     "params": {
@@ -117,12 +117,12 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {}, 
-                                "winlog.api": "category"
+                                "type": "category"
                             }
                         ], 
                         "grid": {
@@ -142,12 +142,12 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "winlog.api": "histogram", 
+                                "type": "histogram", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
                         "times": [], 
-                        "winlog.api": "histogram", 
+                        "type": "histogram", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -161,31 +161,31 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "winlog.api": "linear"
+                                    "type": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "winlog.api": "value"
+                                "type": "value"
                             }
                         ]
                     }, 
-                    "title": "logs over time [Filebeat Logstash] ECS", 
-                    "winlog.api": "histogram"
+                    "title": "logs over time [Filebeat Logstash]", 
+                    "type": "histogram"
                 }
             }, 
-            "id": "e90b7240-cbda-11e7-9852-73e0a9df1bb6-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "e90b7240-cbda-11e7-9852-73e0a9df1bb6", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
                 "columns": [
-                    "log.level", 
+                    "logstash.log.level", 
                     "logstash.log.module", 
-                    "message", 
+                    "logstash.log.message", 
                     "source"
                 ], 
                 "description": "", 
@@ -201,20 +201,20 @@
                                     "alias": null, 
                                     "disabled": false, 
                                     "index": "filebeat-*", 
-                                    "key": "event.module", 
+                                    "key": "fileset.module", 
                                     "negate": false, 
                                     "params": {
                                         "query": "logstash", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "logstash"
                                 }, 
                                 "query": {
                                     "match": {
-                                        "event.module": {
+                                        "fileset.module": {
                                             "query": "logstash", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -231,16 +231,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "log", 
-                                        "winlog.api": "phrase"
+                                        "type": "phrase"
                                     }, 
-                                    "winlog.api": "phrase", 
+                                    "type": "phrase", 
                                     "value": "log"
                                 }, 
                                 "query": {
                                     "match": {
                                         "fileset.name": {
                                             "query": "log", 
-                                            "winlog.api": "phrase"
+                                            "type": "phrase"
                                         }
                                     }
                                 }
@@ -252,19 +252,19 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "logs [Filebeat Logstash] ECS", 
-                "winlog.version": 1
+                "title": "logs [Filebeat Logstash]", 
+                "version": 1
             }, 
-            "id": "cfaba090-cbda-11e7-9852-73e0a9df1bb6-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 1
+            "id": "cfaba090-cbda-11e7-9852-73e0a9df1bb6", 
+            "type": "search", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -278,7 +278,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -287,31 +287,31 @@
                 "panelsJSON": [
                     {
                         "col": 7, 
-                        "id": "0b1dace0-cbdb-11e7-9852-73e0a9df1bb6-ecs", 
+                        "id": "0b1dace0-cbdb-11e7-9852-73e0a9df1bb6", 
                         "panelIndex": 2, 
                         "row": 1, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "e90b7240-cbda-11e7-9852-73e0a9df1bb6-ecs", 
+                        "id": "e90b7240-cbda-11e7-9852-73e0a9df1bb6", 
                         "panelIndex": 3, 
                         "row": 1, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
                         "columns": [
-                            "log.level", 
+                            "logstash.log.level", 
                             "logstash.log.module", 
-                            "message", 
+                            "logstash.log.message", 
                             "source"
                         ], 
-                        "id": "cfaba090-cbda-11e7-9852-73e0a9df1bb6-ecs", 
+                        "id": "cfaba090-cbda-11e7-9852-73e0a9df1bb6", 
                         "panelIndex": 4, 
                         "row": 4, 
                         "size_x": 12, 
@@ -320,18 +320,18 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "winlog.api": "search"
+                        "type": "search"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "Logstash Logs [Filebeat Logstash] ECS", 
+                "title": "Logstash Logs [Filebeat Logstash]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1
+                "version": 1
             }, 
-            "id": "Filebeat-Logstash-Log-Dashboard-ecs", 
-            "winlog.api": "dashboard", 
-            "winlog.version": 1
+            "id": "Filebeat-Logstash-Log-Dashboard", 
+            "type": "dashboard", 
+            "version": 1
         }
     ], 
-    "winlog.version": "6.0.0"
+    "version": "6.0.0"
 }

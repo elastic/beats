@@ -12,7 +12,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -29,11 +29,11 @@
                             "x": 8, 
                             "y": 2
                         }, 
-                        "id": "79350d50-47db-11e8-bc13-1397384faad3-ecs", 
+                        "id": "79350d50-47db-11e8-bc13-1397384faad3", 
                         "panelIndex": "2", 
                         "title": "Servers", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.2"
+                        "type": "visualization", 
+                        "version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -43,11 +43,11 @@
                             "x": 4, 
                             "y": 2
                         }, 
-                        "id": "8c8f0300-47dc-11e8-bc13-1397384faad3-ecs", 
+                        "id": "8c8f0300-47dc-11e8-bc13-1397384faad3", 
                         "panelIndex": "3", 
                         "title": "Backends", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.2"
+                        "type": "visualization", 
+                        "version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -57,11 +57,11 @@
                             "x": 0, 
                             "y": 2
                         }, 
-                        "id": "f1e27ed0-47dc-11e8-bc13-1397384faad3-ecs", 
+                        "id": "f1e27ed0-47dc-11e8-bc13-1397384faad3", 
                         "panelIndex": "4", 
                         "title": "Frontends", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.2"
+                        "type": "visualization", 
+                        "version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -71,21 +71,21 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "a64b4fd0-471c-11e8-bc13-1397384faad3-ecs", 
+                        "id": "a64b4fd0-471c-11e8-bc13-1397384faad3", 
                         "panelIndex": "5", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.2"
+                        "type": "visualization", 
+                        "version": "6.2.2"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat HAProxy] Overview ECS", 
-                "winlog.version": 1
+                "title": "[Metricbeat HAProxy] Overview", 
+                "version": 1
             }, 
-            "id": "4b555c30-47dd-11e8-bc13-1397384faad3-ecs", 
-            "winlog.api": "dashboard", 
+            "id": "4b555c30-47dd-11e8-bc13-1397384faad3", 
+            "type": "dashboard", 
             "updated_at": "2018-04-24T18:31:56.356Z", 
-            "winlog.version": 3
+            "version": 3
         }
     ], 
-    "winlog.version": "6.2.2"
+    "version": "6.2.2"
 }

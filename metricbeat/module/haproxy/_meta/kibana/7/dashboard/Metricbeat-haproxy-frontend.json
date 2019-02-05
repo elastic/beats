@@ -12,7 +12,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -29,10 +29,10 @@
                             "x": 0, 
                             "y": 0
                         }, 
-                        "id": "a64b4fd0-471c-11e8-bc13-1397384faad3-ecs", 
+                        "id": "a64b4fd0-471c-11e8-bc13-1397384faad3", 
                         "panelIndex": "2", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.2"
+                        "type": "visualization", 
+                        "version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -42,21 +42,21 @@
                             "x": 6, 
                             "y": 0
                         }, 
-                        "id": "86159190-47c5-11e8-bc13-1397384faad3-ecs", 
+                        "id": "86159190-47c5-11e8-bc13-1397384faad3", 
                         "panelIndex": "3", 
-                        "winlog.api": "visualization", 
-                        "winlog.version": "6.2.2"
+                        "type": "visualization", 
+                        "version": "6.2.2"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Metricbeat HAProxy] Frontend ECS", 
-                "winlog.version": 1
+                "title": "[Metricbeat HAProxy] Frontend", 
+                "version": 1
             }, 
-            "id": "d5878d00-47c5-11e8-bc13-1397384faad3-ecs", 
-            "winlog.api": "dashboard", 
+            "id": "d5878d00-47c5-11e8-bc13-1397384faad3", 
+            "type": "dashboard", 
             "updated_at": "2018-04-24T18:32:51.945Z", 
-            "winlog.version": 5
+            "version": 5
         }
     ], 
-    "winlog.version": "6.2.2"
+    "version": "6.2.2"
 }

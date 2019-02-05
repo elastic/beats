@@ -17,24 +17,24 @@
             }
           }
         },
-        "title": "Navigation [Packetbeat] ECS",
+        "title": "Navigation [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 10,
-            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard-ecs)\n\n[Network Flows](#/dashboard/Packetbeat-Flows-ecs)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e-ecs) | [Tunneling](#/dashboard/DNS-Unique-Domains-ecs)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb-ecs)\n\n[TLS Overview](#/dashboard/tls-sessions-ecs)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP-ecs)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance-ecs) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance-ecs) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance-ecs) | [Cassandra](#/dashboard/Packetbeat-Cassandra-ecs)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance-ecs)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS-ecs)",
+            "markdown": "### Packetbeat:\n\n[Overview](#/dashboard/Packetbeat-Dashboard)\n\n[Network Flows](#/dashboard/Packetbeat-Flows)\n\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e) | [Tunneling](#/dashboard/DNS-Unique-Domains)\n\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb)\n\n[TLS Overview](#/dashboard/tls-sessions)\n\n[HTTP transactions](#/dashboard/Packetbeat-HTTP)\n\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance) | [Cassandra](#/dashboard/Packetbeat-Cassandra)\n\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance)\n\nStorage: [NFS](#/dashboard/Packetbeat-NFS)",
             "openLinksInNewTab": false
           },
-          "title": "Navigation [Packetbeat] ECS",
-          "winlog.api": "markdown"
+          "title": "Navigation [Packetbeat]",
+          "type": "markdown"
         }
       },
-      "id": "Navigation-ecs",
-      "winlog.api": "visualization",
+      "id": "Navigation",
+      "type": "visualization",
       "updated_at": "2019-01-19T00:18:59.372Z",
-      "winlog.version": 11
+      "version": 11
     },
     {
       "attributes": {
@@ -44,17 +44,17 @@
             "filter": []
           }
         },
-        "savedSearchId": "Thrift-transactions-ecs",
-        "title": "Thrift requests per minute [Packetbeat] ECS",
+        "savedSearchId": "Thrift-transactions",
+        "title": "Thrift requests per minute [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "id": "2",
@@ -66,7 +66,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             }
           ],
           "listeners": {},
@@ -82,14 +82,14 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Thrift requests per minute ECS",
-          "winlog.api": "histogram"
+          "title": "Thrift requests per minute",
+          "type": "histogram"
         }
       },
-      "id": "Thrift-requests-per-minute-ecs",
-      "winlog.api": "visualization",
+      "id": "Thrift-requests-per-minute",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:32.418Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -99,17 +99,17 @@
             "filter": []
           }
         },
-        "savedSearchId": "Thrift-errors-ecs",
-        "title": "Thrift RPC Errors [Packetbeat] ECS",
+        "savedSearchId": "Thrift-errors",
+        "title": "Thrift RPC Errors [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "id": "2",
@@ -121,7 +121,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             }
           ],
           "listeners": {},
@@ -139,14 +139,14 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Thrift RPC Errors ECS",
-          "winlog.api": "area"
+          "title": "Thrift RPC Errors",
+          "type": "area"
         }
       },
-      "id": "Thrift-RPC-Errors-ecs",
-      "winlog.api": "visualization",
+      "id": "Thrift-RPC-Errors",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:32.418Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -160,8 +160,8 @@
             }
           }
         },
-        "savedSearchId": "Thrift-transactions-ecs",
-        "title": "Slowest Thrift RPC methods [Packetbeat] ECS",
+        "savedSearchId": "Thrift-transactions",
+        "title": "Slowest Thrift RPC methods [Packetbeat]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -172,7 +172,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -182,7 +182,7 @@
                 "field": "event.duration"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -198,7 +198,7 @@
                 "size": 10
               },
               "schema": "bucket",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "params": {
@@ -212,14 +212,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Slowest Thrift RPC methods [Packetbeat] ECS",
-          "winlog.api": "table"
+          "title": "Slowest Thrift RPC methods [Packetbeat]",
+          "type": "table"
         }
       },
-      "id": "Slowest-Thrift-RPC-methods-ecs",
-      "winlog.api": "visualization",
+      "id": "Slowest-Thrift-RPC-methods",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:32.418Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -233,10 +233,10 @@
             }
           }
         },
-        "savedSearchId": "Thrift-transactions-ecs",
-        "title": "Thrift response times percentiles [Packetbeat] ECS",
+        "savedSearchId": "Thrift-transactions",
+        "title": "Thrift response times percentiles [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -251,7 +251,7 @@
                 ]
               },
               "schema": "metric",
-              "winlog.api": "percentiles"
+              "type": "percentiles"
             },
             {
               "enabled": true,
@@ -266,7 +266,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             }
           ],
           "params": {
@@ -282,12 +282,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "defaultYExtents": false,
@@ -306,13 +306,13 @@
                 },
                 "mode": "normal",
                 "show": "true",
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "shareYAxis": true,
             "times": [],
-            "winlog.api": "line",
+            "type": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -328,25 +328,25 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Percentiles of event.duration"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ]
           },
-          "title": "Thrift response times percentiles [Packetbeat] ECS",
-          "winlog.api": "line"
+          "title": "Thrift response times percentiles [Packetbeat]",
+          "type": "line"
         }
       },
-      "id": "Thrift-response-times-percentiles-ecs",
-      "winlog.api": "visualization",
+      "id": "Thrift-response-times-percentiles",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:32.418Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -356,17 +356,17 @@
             "filter": []
           }
         },
-        "savedSearchId": "Thrift-transactions-ecs",
-        "title": "Top Thrift-RPC methods  [Packetbeat] ECS",
+        "savedSearchId": "Thrift-transactions",
+        "title": "Top Thrift-RPC methods  [Packetbeat]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "id": "2",
@@ -377,7 +377,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "listeners": {},
@@ -393,14 +393,14 @@
             "times": [],
             "yAxis": {}
           },
-          "title": "Top Thrift-RPC methods ECS",
-          "winlog.api": "histogram"
+          "title": "Top Thrift-RPC methods",
+          "type": "histogram"
         }
       },
-      "id": "Top-Thrift-RPC-methods-ecs",
-      "winlog.api": "visualization",
+      "id": "Top-Thrift-RPC-methods",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:32.418Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -410,16 +410,16 @@
             "filter": []
           }
         },
-        "savedSearchId": "Thrift-errors-ecs",
-        "title": "Top Thrift-RPC calls with errors [Packetbeat] ECS",
-        "winlog.version": 1,
+        "savedSearchId": "Thrift-errors",
+        "title": "Top Thrift-RPC calls with errors [Packetbeat]",
+        "version": 1,
         "visState": {
           "aggs": [
             {
               "id": "1",
               "params": {},
               "schema": "metric",
-              "winlog.api": "count"
+              "type": "count"
             },
             {
               "id": "2",
@@ -430,7 +430,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "winlog.api": "terms"
+              "type": "terms"
             }
           ],
           "listeners": {},
@@ -441,19 +441,19 @@
             "mode": "stacked",
             "shareYAxis": true
           },
-          "winlog.api": "histogram"
+          "type": "histogram"
         }
       },
-      "id": "Top-Thrift-RPC-calls-with-errors-ecs",
-      "winlog.api": "visualization",
+      "id": "Top-Thrift-RPC-calls-with-errors",
+      "type": "visualization",
       "updated_at": "2019-01-18T23:49:32.418Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
         "columns": [
           "method",
-          "winlog.api",
+          "type",
           "path",
           "event.duration",
           "status"
@@ -475,16 +475,16 @@
                   "negate": false,
                   "params": {
                     "query": "thrift",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "thrift"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "thrift",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -508,30 +508,30 @@
               "query": {
                 "query_string": {
                   "analyze_wildcard": true,
-                  "query": "winlog.api: thrift"
+                  "query": "type: thrift"
                 }
               }
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "Thrift Transactions Search [Packetbeat] ECS",
-        "winlog.version": 1
+        "title": "Thrift Transactions Search [Packetbeat]",
+        "version": 1
       },
-      "id": "Thrift-transactions-ecs",
-      "winlog.api": "search",
+      "id": "Thrift-transactions",
+      "type": "search",
       "updated_at": "2019-01-18T23:49:32.418Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
         "columns": [
           "method",
-          "winlog.api",
+          "type",
           "path",
           "event.duration",
           "status"
@@ -553,16 +553,16 @@
                   "negate": true,
                   "params": {
                     "query": "OK",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "OK"
                 },
                 "query": {
                   "match": {
                     "status": {
                       "query": "OK",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -579,16 +579,16 @@
                   "negate": false,
                   "params": {
                     "query": "thrift",
-                    "winlog.api": "phrase"
+                    "type": "phrase"
                   },
-                  "winlog.api": "phrase",
+                  "type": "phrase",
                   "value": "thrift"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "thrift",
-                      "winlog.api": "phrase"
+                      "type": "phrase"
                     }
                   }
                 }
@@ -612,24 +612,24 @@
               "query": {
                 "query_string": {
                   "analyze_wildcard": true,
-                  "query": "winlog.api: thrift"
+                  "query": "type: thrift"
                 }
               }
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "Thrift Errors [Packetbeat] ECS",
-        "winlog.version": 1
+        "title": "Thrift Errors [Packetbeat]",
+        "version": 1
       },
-      "id": "Thrift-errors-ecs",
-      "winlog.api": "search",
+      "id": "Thrift-errors",
+      "type": "search",
       "updated_at": "2019-01-18T23:49:32.418Z",
-      "winlog.version": 1
+      "version": 1
     },
     {
       "attributes": {
@@ -648,7 +648,7 @@
                 }
               }
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "optionsJSON": {
@@ -657,70 +657,70 @@
         "panelsJSON": [
           {
             "col": 1,
-            "id": "Navigation-ecs",
+            "id": "Navigation",
             "panelIndex": 1,
             "row": 1,
             "size_x": 3,
             "size_y": 4,
-            "winlog.api": "visualization"
+            "type": "visualization"
           },
           {
             "col": 4,
-            "id": "Thrift-requests-per-minute-ecs",
+            "id": "Thrift-requests-per-minute",
             "panelIndex": 2,
             "row": 1,
             "size_x": 5,
             "size_y": 4,
-            "winlog.api": "visualization"
+            "type": "visualization"
           },
           {
             "col": 9,
-            "id": "Thrift-RPC-Errors-ecs",
+            "id": "Thrift-RPC-Errors",
             "panelIndex": 3,
             "row": 1,
             "size_x": 4,
             "size_y": 4,
-            "winlog.api": "visualization"
+            "type": "visualization"
           },
           {
             "col": 1,
-            "id": "Slowest-Thrift-RPC-methods-ecs",
+            "id": "Slowest-Thrift-RPC-methods",
             "panelIndex": 4,
             "row": 5,
             "size_x": 6,
             "size_y": 3,
-            "winlog.api": "visualization"
+            "type": "visualization"
           },
           {
             "col": 7,
-            "id": "Thrift-response-times-percentiles-ecs",
+            "id": "Thrift-response-times-percentiles",
             "panelIndex": 5,
             "row": 5,
             "size_x": 6,
             "size_y": 3,
-            "winlog.api": "visualization"
+            "type": "visualization"
           },
           {
             "col": 1,
-            "id": "Top-Thrift-RPC-methods-ecs",
+            "id": "Top-Thrift-RPC-methods",
             "panelIndex": 6,
             "row": 8,
             "size_x": 6,
             "size_y": 4,
-            "winlog.api": "visualization"
+            "type": "visualization"
           },
           {
             "col": 7,
-            "id": "Top-Thrift-RPC-calls-with-errors-ecs",
+            "id": "Top-Thrift-RPC-calls-with-errors",
             "panelIndex": 7,
             "row": 8,
             "size_x": 6,
             "size_y": 4,
-            "winlog.api": "visualization"
+            "type": "visualization"
           }
         ],
         "timeRestore": false,
-        "title": "[Packetbeat] Thrift performance ECS",
+        "title": "[Packetbeat] Thrift performance",
         "uiStateJSON": {
           "P-4": {
             "vis": {
@@ -733,13 +733,13 @@
             }
           }
         },
-        "winlog.version": 1
+        "version": 1
       },
-      "id": "Packetbeat-Thrift-performance-ecs",
-      "winlog.api": "dashboard",
+      "id": "Packetbeat-Thrift-performance",
+      "type": "dashboard",
       "updated_at": "2019-01-18T23:49:32.418Z",
-      "winlog.version": 1
+      "version": 1
     }
   ],
-  "winlog.version": "7.0.0-SNAPSHOT"
+  "version": "7.0.0-SNAPSHOT"
 }

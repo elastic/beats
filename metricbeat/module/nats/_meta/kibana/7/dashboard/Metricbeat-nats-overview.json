@@ -13,7 +13,7 @@
             }
           }
         },
-        "title": "Subscriptions Info [Metricbeat NATS] ECS",
+        "title": "Subscriptions Info [Metricbeat NATS]",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -24,7 +24,7 @@
             }
           }
         },
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -35,7 +35,7 @@
                 "field": "nats.subscriptions.cache.fanout.avg"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -45,7 +45,7 @@
                 "field": "nats.subscriptions.cache.fanout.max"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -55,7 +55,7 @@
                 "field": "nats.subscriptions.cache.hit_rate"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -65,7 +65,7 @@
                 "field": "nats.subscriptions.cache.size"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -75,7 +75,7 @@
                 "field": "nats.subscriptions.inserts"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -85,7 +85,7 @@
                 "field": "nats.subscriptions.matches"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -95,7 +95,7 @@
                 "field": "nats.subscriptions.removes"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -105,7 +105,7 @@
                 "field": "nats.subscriptions.total"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             }
           ],
           "params": {
@@ -120,14 +120,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Subscriptions Info [Metricbeat NATS] ECS",
-          "winlog.api": "table"
+          "title": "Subscriptions Info [Metricbeat NATS]",
+          "type": "table"
         }
       },
-      "id": "b129b220-1e44-11e9-a1b4-79a7ae42ab61-ecs",
-      "winlog.api": "visualization",
+      "id": "b129b220-1e44-11e9-a1b4-79a7ae42ab61",
+      "type": "visualization",
       "updated_at": "2019-01-24T07:54:30.301Z",
-      "winlog.version": 3
+      "version": 3
     },
     {
       "attributes": {
@@ -142,9 +142,9 @@
             }
           }
         },
-        "title": "Current Memory Usage [Metricbeat NATS] ECS",
+        "title": "Current Memory Usage [Metricbeat NATS]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -155,7 +155,7 @@
                 "field": "nats.stats.mem.bytes"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             }
           ],
           "params": {
@@ -184,16 +184,16 @@
               },
               "useRanges": false
             },
-            "winlog.api": "metric"
+            "type": "metric"
           },
-          "title": "Current Memory Usage [Metricbeat NATS] ECS",
-          "winlog.api": "metric"
+          "title": "Current Memory Usage [Metricbeat NATS]",
+          "type": "metric"
         }
       },
-      "id": "30a61c00-1e45-11e9-a1b4-79a7ae42ab61-ecs",
-      "winlog.api": "visualization",
+      "id": "30a61c00-1e45-11e9-a1b4-79a7ae42ab61",
+      "type": "visualization",
       "updated_at": "2019-01-24T07:56:32.097Z",
-      "winlog.version": 4
+      "version": 4
     },
     {
       "attributes": {
@@ -208,9 +208,9 @@
             }
           }
         },
-        "title": "Server Uptime [Metricbeat NATS] ECS",
+        "title": "Server Uptime [Metricbeat NATS]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -221,7 +221,7 @@
                 "field": "nats.stats.uptime"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             }
           ],
           "params": {
@@ -250,16 +250,16 @@
               },
               "useRanges": false
             },
-            "winlog.api": "metric"
+            "type": "metric"
           },
-          "title": "Server Uptime [Metricbeat NATS] ECS",
-          "winlog.api": "metric"
+          "title": "Server Uptime [Metricbeat NATS]",
+          "type": "metric"
         }
       },
-      "id": "206f1bc0-1e45-11e9-a1b4-79a7ae42ab61-ecs",
-      "winlog.api": "visualization",
+      "id": "206f1bc0-1e45-11e9-a1b4-79a7ae42ab61",
+      "type": "visualization",
       "updated_at": "2019-01-24T07:57:04.084Z",
-      "winlog.version": 4
+      "version": 4
     },
     {
       "attributes": {
@@ -274,9 +274,9 @@
             }
           }
         },
-        "title": "Total Connections [Metricbeat NATS] ECS",
+        "title": "Total Connections [Metricbeat NATS]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -287,7 +287,7 @@
                 "field": "nats.stats.total_connections"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             }
           ],
           "params": {
@@ -316,16 +316,16 @@
               },
               "useRanges": false
             },
-            "winlog.api": "metric"
+            "type": "metric"
           },
-          "title": "Total Connections [Metricbeat NATS] ECS",
-          "winlog.api": "metric"
+          "title": "Total Connections [Metricbeat NATS]",
+          "type": "metric"
         }
       },
-      "id": "4c380ff0-1e45-11e9-a1b4-79a7ae42ab61-ecs",
-      "winlog.api": "visualization",
+      "id": "4c380ff0-1e45-11e9-a1b4-79a7ae42ab61",
+      "type": "visualization",
       "updated_at": "2019-01-24T07:57:32.006Z",
-      "winlog.version": 4
+      "version": 4
     },
     {
       "attributes": {
@@ -340,9 +340,9 @@
             }
           }
         },
-        "title": "Remotes-Subsz-Connz-Routez Timeline [Metricbeat NATS] ECS",
+        "title": "Remotes-Subsz-Connz-Routez Timeline [Metricbeat NATS]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -353,7 +353,7 @@
                 "field": "nats.connections.total"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -366,7 +366,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -376,7 +376,7 @@
                 "field": "nats.routes.total"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -386,7 +386,7 @@
                 "field": "nats.stats.remotes"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -396,7 +396,7 @@
                 "field": "nats.subscriptions.total"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             }
           ],
           "params": {
@@ -412,12 +412,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "grid": {
@@ -438,7 +438,7 @@
                 "mode": "stacked",
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "area",
+                "type": "area",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -451,7 +451,7 @@
                 "mode": "stacked",
                 "show": true,
                 "showCircles": true,
-                "winlog.api": "area",
+                "type": "area",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -464,7 +464,7 @@
                 "mode": "stacked",
                 "show": true,
                 "showCircles": true,
-                "winlog.api": "area",
+                "type": "area",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -477,12 +477,12 @@
                 "mode": "stacked",
                 "show": true,
                 "showCircles": true,
-                "winlog.api": "area",
+                "type": "area",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "winlog.api": "area",
+            "type": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -496,25 +496,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Connections"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ]
           },
-          "title": "Remotes-Subsz-Connz-Routez Timeline [Metricbeat NATS] ECS",
-          "winlog.api": "area"
+          "title": "Remotes-Subsz-Connz-Routez Timeline [Metricbeat NATS]",
+          "type": "area"
         }
       },
-      "id": "199d3d30-1e46-11e9-a1b4-79a7ae42ab61-ecs",
-      "winlog.api": "visualization",
+      "id": "199d3d30-1e46-11e9-a1b4-79a7ae42ab61",
+      "type": "visualization",
       "updated_at": "2019-01-24T07:53:31.785Z",
-      "winlog.version": 3
+      "version": 3
     },
     {
       "attributes": {
@@ -529,9 +529,9 @@
             }
           }
         },
-        "title": "Subscription Stats Timeline [Metricbeat NATS] ECS",
+        "title": "Subscription Stats Timeline [Metricbeat NATS]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -542,7 +542,7 @@
                 "field": "nats.subscriptions.cache.fanout.avg"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -555,7 +555,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             },
             {
               "enabled": true,
@@ -565,7 +565,7 @@
                 "field": "nats.subscriptions.cache.fanout.max"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -575,7 +575,7 @@
                 "field": "nats.subscriptions.inserts"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -585,7 +585,7 @@
                 "field": "nats.subscriptions.removes"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -595,7 +595,7 @@
                 "field": "nats.subscriptions.matches"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             }
           ],
           "params": {
@@ -611,12 +611,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "grid": {
@@ -636,7 +636,7 @@
                 "mode": "normal",
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -648,7 +648,7 @@
                 "mode": "normal",
                 "show": true,
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -660,7 +660,7 @@
                 "mode": "normal",
                 "show": true,
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -672,7 +672,7 @@
                 "mode": "normal",
                 "show": true,
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -684,12 +684,12 @@
                 "mode": "normal",
                 "show": true,
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "winlog.api": "line",
+            "type": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -703,25 +703,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Cache Fanout Avg"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ]
           },
-          "title": "Subscription Stats Timeline [Metricbeat NATS] ECS",
-          "winlog.api": "line"
+          "title": "Subscription Stats Timeline [Metricbeat NATS]",
+          "type": "line"
         }
       },
-      "id": "754215c0-1e46-11e9-a1b4-79a7ae42ab61-ecs",
-      "winlog.api": "visualization",
+      "id": "754215c0-1e46-11e9-a1b4-79a7ae42ab61",
+      "type": "visualization",
       "updated_at": "2019-01-23T14:55:04.899Z",
-      "winlog.version": 3
+      "version": 3
     },
     {
       "attributes": {
@@ -736,9 +736,9 @@
             }
           }
         },
-        "title": "Slow Consumers Timeline [Metricbeat NATS] ECS",
+        "title": "Slow Consumers Timeline [Metricbeat NATS]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -749,7 +749,7 @@
                 "field": "nats.stats.slow_consumers"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -762,7 +762,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             }
           ],
           "params": {
@@ -778,12 +778,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "grid": {
@@ -803,12 +803,12 @@
                 "mode": "normal",
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "winlog.api": "line",
+            "type": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -822,25 +822,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Slow Consumers"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ]
           },
-          "title": "Slow Consumers Timeline [Metricbeat NATS] ECS",
-          "winlog.api": "line"
+          "title": "Slow Consumers Timeline [Metricbeat NATS]",
+          "type": "line"
         }
       },
-      "id": "94534190-1e97-11e9-b9e7-93b3bd2eec90-ecs",
-      "winlog.api": "visualization",
+      "id": "94534190-1e97-11e9-b9e7-93b3bd2eec90",
+      "type": "visualization",
       "updated_at": "2019-01-23T14:53:57.137Z",
-      "winlog.version": 2
+      "version": 2
     },
     {
       "attributes": {
@@ -855,9 +855,9 @@
             }
           }
         },
-        "title": "IO Bytes Stats [Metricbeat NATS] ECS",
+        "title": "IO Bytes Stats [Metricbeat NATS]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -868,7 +868,7 @@
                 "field": "nats.stats.in.bytes"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -878,7 +878,7 @@
                 "field": "nats.stats.out.bytes"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -891,7 +891,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             }
           ],
           "params": {
@@ -907,12 +907,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "grid": {
@@ -932,7 +932,7 @@
                 "mode": "normal",
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -944,12 +944,12 @@
                 "mode": "normal",
                 "show": true,
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "winlog.api": "line",
+            "type": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -963,25 +963,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "IO Bytes"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ]
           },
-          "title": "IO Bytes Stats [Metricbeat NATS] ECS",
-          "winlog.api": "line"
+          "title": "IO Bytes Stats [Metricbeat NATS]",
+          "type": "line"
         }
       },
-      "id": "be1d8a20-1e98-11e9-b9e7-93b3bd2eec90-ecs",
-      "winlog.api": "visualization",
+      "id": "be1d8a20-1e98-11e9-b9e7-93b3bd2eec90",
+      "type": "visualization",
       "updated_at": "2019-01-24T07:48:22.914Z",
-      "winlog.version": 4
+      "version": 4
     },
     {
       "attributes": {
@@ -996,9 +996,9 @@
             }
           }
         },
-        "title": "Memory Utilization Timeline [Metricbeat NATS] ECS",
+        "title": "Memory Utilization Timeline [Metricbeat NATS]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -1009,7 +1009,7 @@
                 "field": "nats.stats.mem.bytes"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -1022,7 +1022,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             }
           ],
           "params": {
@@ -1038,12 +1038,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "grid": {
@@ -1063,12 +1063,12 @@
                 "mode": "normal",
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "winlog.api": "line",
+            "type": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -1082,25 +1082,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Memory Avg (Bytes)"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ]
           },
-          "title": "Memory Utilization Timeline [Metricbeat NATS] ECS",
-          "winlog.api": "line"
+          "title": "Memory Utilization Timeline [Metricbeat NATS]",
+          "type": "line"
         }
       },
-      "id": "8204e820-1e99-11e9-b9e7-93b3bd2eec90-ecs",
-      "winlog.api": "visualization",
+      "id": "8204e820-1e99-11e9-b9e7-93b3bd2eec90",
+      "type": "visualization",
       "updated_at": "2019-01-24T07:52:55.445Z",
-      "winlog.version": 5
+      "version": 5
     },
     {
       "attributes": {
@@ -1115,9 +1115,9 @@
             }
           }
         },
-        "title": "IO Messages Stats [Metricbeat NATS] ECS",
+        "title": "IO Messages Stats [Metricbeat NATS]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -1128,7 +1128,7 @@
                 "field": "nats.stats.in.messages"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -1138,7 +1138,7 @@
                 "field": "nats.stats.out.messages"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -1151,7 +1151,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             }
           ],
           "params": {
@@ -1167,12 +1167,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "grid": {
@@ -1192,7 +1192,7 @@
                 "mode": "normal",
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -1204,12 +1204,12 @@
                 "mode": "normal",
                 "show": true,
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "winlog.api": "line",
+            "type": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -1223,25 +1223,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "IO Messages"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ]
           },
-          "title": "IO Messages Stats [Metricbeat NATS] ECS",
-          "winlog.api": "line"
+          "title": "IO Messages Stats [Metricbeat NATS]",
+          "type": "line"
         }
       },
-      "id": "cdbf4110-1f0d-11e9-a673-d9577e5e50eb-ecs",
-      "winlog.api": "visualization",
+      "id": "cdbf4110-1f0d-11e9-a673-d9577e5e50eb",
+      "type": "visualization",
       "updated_at": "2019-01-24T07:47:25.774Z",
-      "winlog.version": 2
+      "version": 2
     },
     {
       "attributes": {
@@ -1256,9 +1256,9 @@
             }
           }
         },
-        "title": "CPU Utilization Timeline [Metricbeat NATS] ECS",
+        "title": "CPU Utilization Timeline [Metricbeat NATS]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -1269,7 +1269,7 @@
                 "field": "nats.stats.cpu"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -1282,7 +1282,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             }
           ],
           "params": {
@@ -1298,12 +1298,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "grid": {
@@ -1323,12 +1323,12 @@
                 "mode": "normal",
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "winlog.api": "line",
+            "type": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -1342,25 +1342,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "CPU Avg (%)"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ]
           },
-          "title": "CPU Utilization Timeline [Metricbeat NATS] ECS",
-          "winlog.api": "line"
+          "title": "CPU Utilization Timeline [Metricbeat NATS]",
+          "type": "line"
         }
       },
-      "id": "138dc660-1f1a-11e9-a673-d9577e5e50eb-ecs",
-      "winlog.api": "visualization",
+      "id": "138dc660-1f1a-11e9-a673-d9577e5e50eb",
+      "type": "visualization",
       "updated_at": "2019-01-24T07:51:51.767Z",
-      "winlog.version": 2
+      "version": 2
     },
     {
       "attributes": {
@@ -1375,9 +1375,9 @@
             }
           }
         },
-        "title": "Cache Hit Rate Timeline [Metricbeat NATS] ECS",
+        "title": "Cache Hit Rate Timeline [Metricbeat NATS]",
         "uiStateJSON": {},
-        "winlog.version": 1,
+        "version": 1,
         "visState": {
           "aggs": [
             {
@@ -1388,7 +1388,7 @@
                 "field": "nats.subscriptions.cache.hit_rate"
               },
               "schema": "metric",
-              "winlog.api": "avg"
+              "type": "avg"
             },
             {
               "enabled": true,
@@ -1401,7 +1401,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "winlog.api": "date_histogram"
+              "type": "date_histogram"
             }
           ],
           "params": {
@@ -1417,12 +1417,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "winlog.api": "category"
+                "type": "category"
               }
             ],
             "grid": {
@@ -1442,12 +1442,12 @@
                 "mode": "normal",
                 "show": "true",
                 "showCircles": true,
-                "winlog.api": "line",
+                "type": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "winlog.api": "line",
+            "type": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -1461,25 +1461,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "winlog.api": "linear"
+                  "type": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Cache Hit Rate (%)"
                 },
-                "winlog.api": "value"
+                "type": "value"
               }
             ]
           },
-          "title": "Cache Hit Rate Timeline [Metricbeat NATS] ECS",
-          "winlog.api": "line"
+          "title": "Cache Hit Rate Timeline [Metricbeat NATS]",
+          "type": "line"
         }
       },
-      "id": "dff743a0-1f1c-11e9-a673-d9577e5e50eb-ecs",
-      "winlog.api": "visualization",
+      "id": "dff743a0-1f1c-11e9-a673-d9577e5e50eb",
+      "type": "visualization",
       "updated_at": "2019-01-23T14:57:20.994Z",
-      "winlog.version": 2
+      "version": 2
     },
     {
       "attributes": {
@@ -1493,7 +1493,7 @@
               "language": "lucene",
               "query": ""
             },
-            "winlog.version": true
+            "version": true
           }
         },
         "optionsJSON": {
@@ -1511,10 +1511,10 @@
               "x": 0,
               "y": 45
             },
-            "id": "b129b220-1e44-11e9-a1b4-79a7ae42ab61-ecs",
+            "id": "b129b220-1e44-11e9-a1b4-79a7ae42ab61",
             "panelIndex": "6",
-            "winlog.api": "visualization",
-            "winlog.version": "6.5.4"
+            "type": "visualization",
+            "version": "6.5.4"
           },
           {
             "embeddableConfig": {},
@@ -1525,10 +1525,10 @@
               "x": 24,
               "y": 34
             },
-            "id": "30a61c00-1e45-11e9-a1b4-79a7ae42ab61-ecs",
+            "id": "30a61c00-1e45-11e9-a1b4-79a7ae42ab61",
             "panelIndex": "7",
-            "winlog.api": "visualization",
-            "winlog.version": "6.5.4"
+            "type": "visualization",
+            "version": "6.5.4"
           },
           {
             "embeddableConfig": {},
@@ -1539,10 +1539,10 @@
               "x": 37,
               "y": 34
             },
-            "id": "206f1bc0-1e45-11e9-a1b4-79a7ae42ab61-ecs",
+            "id": "206f1bc0-1e45-11e9-a1b4-79a7ae42ab61",
             "panelIndex": "8",
-            "winlog.api": "visualization",
-            "winlog.version": "6.5.4"
+            "type": "visualization",
+            "version": "6.5.4"
           },
           {
             "embeddableConfig": {},
@@ -1553,10 +1553,10 @@
               "x": 24,
               "y": 41
             },
-            "id": "4c380ff0-1e45-11e9-a1b4-79a7ae42ab61-ecs",
+            "id": "4c380ff0-1e45-11e9-a1b4-79a7ae42ab61",
             "panelIndex": "9",
-            "winlog.api": "visualization",
-            "winlog.version": "6.5.4"
+            "type": "visualization",
+            "version": "6.5.4"
           },
           {
             "embeddableConfig": {},
@@ -1567,10 +1567,10 @@
               "x": 0,
               "y": 34
             },
-            "id": "199d3d30-1e46-11e9-a1b4-79a7ae42ab61-ecs",
+            "id": "199d3d30-1e46-11e9-a1b4-79a7ae42ab61",
             "panelIndex": "11",
-            "winlog.api": "visualization",
-            "winlog.version": "6.5.4"
+            "type": "visualization",
+            "version": "6.5.4"
           },
           {
             "embeddableConfig": {},
@@ -1581,10 +1581,10 @@
               "x": 15,
               "y": 0
             },
-            "id": "754215c0-1e46-11e9-a1b4-79a7ae42ab61-ecs",
+            "id": "754215c0-1e46-11e9-a1b4-79a7ae42ab61",
             "panelIndex": "12",
-            "winlog.api": "visualization",
-            "winlog.version": "6.5.4"
+            "type": "visualization",
+            "version": "6.5.4"
           },
           {
             "embeddableConfig": {},
@@ -1595,10 +1595,10 @@
               "x": 0,
               "y": 0
             },
-            "id": "94534190-1e97-11e9-b9e7-93b3bd2eec90-ecs",
+            "id": "94534190-1e97-11e9-b9e7-93b3bd2eec90",
             "panelIndex": "13",
-            "winlog.api": "visualization",
-            "winlog.version": "6.5.4"
+            "type": "visualization",
+            "version": "6.5.4"
           },
           {
             "embeddableConfig": {},
@@ -1609,10 +1609,10 @@
               "x": 24,
               "y": 10
             },
-            "id": "be1d8a20-1e98-11e9-b9e7-93b3bd2eec90-ecs",
+            "id": "be1d8a20-1e98-11e9-b9e7-93b3bd2eec90",
             "panelIndex": "14",
-            "winlog.api": "visualization",
-            "winlog.version": "6.5.4"
+            "type": "visualization",
+            "version": "6.5.4"
           },
           {
             "embeddableConfig": {
@@ -1627,10 +1627,10 @@
               "x": 24,
               "y": 22
             },
-            "id": "8204e820-1e99-11e9-b9e7-93b3bd2eec90-ecs",
+            "id": "8204e820-1e99-11e9-b9e7-93b3bd2eec90",
             "panelIndex": "15",
-            "winlog.api": "visualization",
-            "winlog.version": "6.5.4"
+            "type": "visualization",
+            "version": "6.5.4"
           },
           {
             "embeddableConfig": {},
@@ -1641,10 +1641,10 @@
               "x": 0,
               "y": 10
             },
-            "id": "cdbf4110-1f0d-11e9-a673-d9577e5e50eb-ecs",
+            "id": "cdbf4110-1f0d-11e9-a673-d9577e5e50eb",
             "panelIndex": "16",
-            "winlog.api": "visualization",
-            "winlog.version": "6.3.2"
+            "type": "visualization",
+            "version": "6.3.2"
           },
           {
             "embeddableConfig": {},
@@ -1655,10 +1655,10 @@
               "x": 0,
               "y": 22
             },
-            "id": "138dc660-1f1a-11e9-a673-d9577e5e50eb-ecs",
+            "id": "138dc660-1f1a-11e9-a673-d9577e5e50eb",
             "panelIndex": "17",
-            "winlog.api": "visualization",
-            "winlog.version": "6.3.2"
+            "type": "visualization",
+            "version": "6.3.2"
           },
           {
             "embeddableConfig": {},
@@ -1669,21 +1669,21 @@
               "x": 33,
               "y": 0
             },
-            "id": "dff743a0-1f1c-11e9-a673-d9577e5e50eb-ecs",
+            "id": "dff743a0-1f1c-11e9-a673-d9577e5e50eb",
             "panelIndex": "18",
-            "winlog.api": "visualization",
-            "winlog.version": "6.3.2"
+            "type": "visualization",
+            "version": "6.3.2"
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat NATS] Overview ECS",
-        "winlog.version": 1
+        "title": "[Metricbeat NATS] Overview",
+        "version": 1
       },
-      "id": "Metricbeat-Nats-Dashboard-ecs",
-      "winlog.api": "dashboard",
+      "id": "Metricbeat-Nats-Dashboard",
+      "type": "dashboard",
       "updated_at": "2019-01-24T08:13:29.732Z",
-      "winlog.version": 4
+      "version": 4
     }
   ],
-  "winlog.version": "6.3.2"
+  "version": "6.3.2"
 }

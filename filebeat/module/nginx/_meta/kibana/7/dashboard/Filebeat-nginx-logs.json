@@ -3,8 +3,8 @@
         {
             "attributes": {
                 "columns": [
-                    "log.level", 
-                    "message"
+                    "nginx.error.level", 
+                    "nginx.error.message"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -30,27 +30,27 @@
                             "language": "lucene", 
                             "query": "event.module:nginx AND _exists_:message"
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Nginx error logs [Filebeat Nginx] ECS", 
-                "winlog.version": 1
+                "title": "Nginx error logs [Filebeat Nginx]", 
+                "version": 1
             }, 
-            "id": "9eb25600-a1f0-11e7-928f-5dbe6f6f5519-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 1
+            "id": "9eb25600-a1f0-11e7-928f-5dbe6f6f5519", 
+            "type": "search", 
+            "version": 1
         }, 
         {
             "attributes": {
                 "columns": [
-                    "url.original", 
-                    "http.request.method", 
-                    "http.response.status_code", 
-                    "http.response.body.bytes"
+                    "nginx.access.url", 
+                    "nginx.access.method", 
+                    "nginx.access.response_code", 
+                    "nginx.access.body_sent.bytes"
                 ], 
                 "description": "", 
                 "hits": 0, 
@@ -76,19 +76,19 @@
                             "language": "lucene", 
                             "query": "event.module:nginx AND _exists_:url.original"
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "sort": [
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Nginx access logs [Filebeat Nginx] ECS", 
-                "winlog.version": 1
+                "title": "Nginx access logs [Filebeat Nginx]", 
+                "version": 1
             }, 
-            "id": "6d9e66d0-a1f0-11e7-928f-5dbe6f6f5519-ecs", 
-            "winlog.api": "search", 
-            "winlog.version": 4
+            "id": "6d9e66d0-a1f0-11e7-928f-5dbe6f6f5519", 
+            "type": "search", 
+            "version": 4
         }, 
         {
             "attributes": {
@@ -96,9 +96,9 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Access logs over time [Filebeat Nginx] ECS", 
+                "title": "Access logs over time [Filebeat Nginx]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -120,7 +120,7 @@
                                 "id": "3189aa80-a1f3-11e7-a062-a1c3587f4874"
                             }
                         ], 
-                        "filter": "event.module:nginx AND fileset.name:access", 
+                        "filter": "fileset.module:nginx AND fileset.name:access", 
                         "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
                         "index_pattern": "filebeat-*", 
                         "interval": "auto", 
@@ -138,7 +138,7 @@
                                 "metrics": [
                                     {
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "winlog.api": "count"
+                                        "type": "count"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -151,22 +151,22 @@
                                 ], 
                                 "split_mode": "everything", 
                                 "stacked": "none", 
-                                "terms_field": "url.original", 
+                                "terms_field": "nginx.access.url", 
                                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417"
                             }
                         ], 
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "winlog.api": "timeseries"
+                        "type": "timeseries"
                     }, 
-                    "title": "Access logs over time [Filebeat Nginx] ECS", 
-                    "winlog.api": "metrics"
+                    "title": "Access logs over time [Filebeat Nginx]", 
+                    "type": "metrics"
                 }
             }, 
-            "id": "1cfb1a80-a1f4-11e7-928f-5dbe6f6f5519-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 2
+            "id": "1cfb1a80-a1f4-11e7-928f-5dbe6f6f5519", 
+            "type": "visualization", 
+            "version": 2
         }, 
         {
             "attributes": {
@@ -174,22 +174,22 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Dashboards [Filebeat Nginx] ECS", 
+                "title": "Dashboards [Filebeat Nginx]", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1, 
+                "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
                         "fontSize": 12, 
-                        "markdown": "[Nginx logs overview](#/dashboard/55a9e6e0-a29e-11e7-928f-5dbe6f6f5519-ecs) | [Nginx access and error logs](#/dashboard/046212a0-a2a1-11e7-928f-5dbe6f6f5519-ecs)"
+                        "markdown": "[Nginx logs overview](#/dashboard/55a9e6e0-a29e-11e7-928f-5dbe6f6f5519) | [Nginx access and error logs](#/dashboard/046212a0-a2a1-11e7-928f-5dbe6f6f5519)"
                     }, 
-                    "title": "Dashboards [Filebeat Nginx] ECS", 
-                    "winlog.api": "markdown"
+                    "title": "Dashboards [Filebeat Nginx]", 
+                    "type": "markdown"
                 }
             }, 
-            "id": "97109780-a2a5-11e7-928f-5dbe6f6f5519-ecs", 
-            "winlog.api": "visualization", 
-            "winlog.version": 1
+            "id": "97109780-a2a5-11e7-928f-5dbe6f6f5519", 
+            "type": "visualization", 
+            "version": 1
         }, 
         {
             "attributes": {
@@ -208,7 +208,7 @@
                                 }
                             }
                         }, 
-                        "winlog.version": true
+                        "version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -218,10 +218,10 @@
                     {
                         "col": 1, 
                         "columns": [
-                            "log.level", 
-                            "message"
+                            "nginx.error.level", 
+                            "nginx.error.message"
                         ], 
-                        "id": "9eb25600-a1f0-11e7-928f-5dbe6f6f5519-ecs", 
+                        "id": "9eb25600-a1f0-11e7-928f-5dbe6f6f5519", 
                         "panelIndex": 11, 
                         "row": 5, 
                         "size_x": 12, 
@@ -230,17 +230,17 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "winlog.api": "search"
+                        "type": "search"
                     }, 
                     {
                         "col": 1, 
                         "columns": [
-                            "url.original", 
-                            "http.request.method", 
-                            "http.response.status_code", 
-                            "http.response.body.bytes"
+                            "nginx.access.url", 
+                            "nginx.access.method", 
+                            "nginx.access.response_code", 
+                            "nginx.access.body_sent.bytes"
                         ], 
-                        "id": "6d9e66d0-a1f0-11e7-928f-5dbe6f6f5519-ecs", 
+                        "id": "6d9e66d0-a1f0-11e7-928f-5dbe6f6f5519", 
                         "panelIndex": 16, 
                         "row": 8, 
                         "size_x": 12, 
@@ -249,36 +249,36 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "winlog.api": "search"
+                        "type": "search"
                     }, 
                     {
                         "col": 1, 
-                        "id": "1cfb1a80-a1f4-11e7-928f-5dbe6f6f5519-ecs", 
+                        "id": "1cfb1a80-a1f4-11e7-928f-5dbe6f6f5519", 
                         "panelIndex": 18, 
                         "row": 2, 
                         "size_x": 12, 
                         "size_y": 3, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }, 
                     {
                         "col": 1, 
-                        "id": "97109780-a2a5-11e7-928f-5dbe6f6f5519-ecs", 
+                        "id": "97109780-a2a5-11e7-928f-5dbe6f6f5519", 
                         "panelIndex": 19, 
                         "row": 1, 
                         "size_x": 12, 
                         "size_y": 1, 
-                        "winlog.api": "visualization"
+                        "type": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat Nginx] Access and error logs ECS", 
+                "title": "[Filebeat Nginx] Access and error logs", 
                 "uiStateJSON": {}, 
-                "winlog.version": 1
+                "version": 1
             }, 
-            "id": "046212a0-a2a1-11e7-928f-5dbe6f6f5519-ecs", 
-            "winlog.api": "dashboard", 
-            "winlog.version": 2
+            "id": "046212a0-a2a1-11e7-928f-5dbe6f6f5519", 
+            "type": "dashboard", 
+            "version": 2
         }
     ], 
-    "winlog.version": "6.0.0-beta2"
+    "version": "6.0.0-beta2"
 }
