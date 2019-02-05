@@ -83,7 +83,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Address add_kubernetes_metadata processor issue where old source field is 
   still used for matcher. {issue}10505[10505] {pull}10506[10506]
 - Change type of haproxy.source from text to keyword. {pull}10506[10506]
-- Populate more ECS fields in the Suricata module. {pull}10006[10006]
 - Rename `event.type` to `suricata.eve.event_type` in Suricata module because event.type is reserved for future use by ECS. {pull}10575[10575]
 
 *Heartbeat*
@@ -259,6 +258,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added support for ingesting structured Elasticsearch deprecation logs {pull}10445[10445]
 - New iptables module that receives iptables/ip6tables logs over syslog or file. Supports Ubiquiti Firewall extensions. {issue}8781[8781] {pull}10176[10176]
 - Added support for ingesting structured Elasticsearch server logs {pull}10428[10428]
+- Populate more ECS fields in the Suricata module. {pull}10006[10006]
 
 *Heartbeat*
 
