@@ -2084,7 +2084,7 @@
 # Fields moved without adjusting the name
 
 - from: activity_id
-  to: winlog.
+  to: winlog.activity_id
   alias: true
   beat: winlogbeat
 
