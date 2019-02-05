@@ -54,8 +54,6 @@ func TestFetchEventContents(t *testing.T) {
 	}
 
 	assert.Equal(t, "exchange.name", event["name"])
-	assert.Equal(t, "guest", event["user"])
-	assert.Equal(t, "/", event["vhost"])
 	assert.Equal(t, true, event["durable"])
 	assert.Equal(t, false, event["auto_delete"])
 	assert.Equal(t, false, event["internal"])

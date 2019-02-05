@@ -19831,6 +19831,26 @@ RabbitMQ module
 
 
 
+*`rabbitmq.node.name`*::
++
+--
+type: keyword
+
+Node name
+
+
+--
+
+*`rabbitmq.vhost`*::
++
+--
+type: keyword
+
+Virtual host name with non-ASCII characters escaped as in C.
+
+
+--
+
 [float]
 == connection fields
 
@@ -19841,7 +19861,9 @@ connection
 *`rabbitmq.connection.name`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: rabbitmq.name
 
 The name of the connection with non-ASCII characters escaped as in C.
 
@@ -19851,7 +19873,9 @@ The name of the connection with non-ASCII characters escaped as in C.
 *`rabbitmq.connection.vhost`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: rabbitmq.vhost
 
 Virtual host name with non-ASCII characters escaped as in C.
 
@@ -19861,7 +19885,9 @@ Virtual host name with non-ASCII characters escaped as in C.
 *`rabbitmq.connection.user`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: user.name
 
 User name.
 
@@ -19871,7 +19897,9 @@ User name.
 *`rabbitmq.connection.node`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: rabbitmq.node.name
 
 Node name.
 
@@ -20030,7 +20058,9 @@ The name of the queue with non-ASCII characters escaped as in C.
 *`rabbitmq.exchange.vhost`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: rabbitmq.vhost
 
 Virtual host name with non-ASCII characters escaped as in C.
 
@@ -20070,7 +20100,9 @@ Whether the exchange is internal, i.e. cannot be directly published to by a clie
 *`rabbitmq.exchange.user`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: user.name
 
 User who created the exchange.
 
@@ -20389,7 +20421,9 @@ Number of messages which have been written to the message store.
 *`rabbitmq.node.name`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: rabbitmq.node.name
 
 Node name
 
@@ -20526,7 +20560,9 @@ The name of the queue with non-ASCII characters escaped as in C.
 *`rabbitmq.queue.vhost`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: rabbitmq.vhost
 
 Virtual host name with non-ASCII characters escaped as in C.
 
@@ -20566,7 +20602,9 @@ Whether the queue is exclusive (i.e. has owner_pid).
 *`rabbitmq.queue.node`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: rabbitmq.node.name
 
 Node name.
 

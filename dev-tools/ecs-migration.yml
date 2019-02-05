@@ -1678,6 +1678,44 @@
   alias: true
   beat: metricbeat
 
+### Rabbitmq
+
+- from: rabbitmq.connection.node
+  to: rabbitmq.node.name
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.connection.vhost
+  to: rabbitmq.vhost
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.connection.user
+  to: user.name
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.exchange.vhost
+  to: rabbitmq.vhost
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.exchange.user
+  to: user.name
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.queue.node
+  to: rabbitmq.node.name
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.queue.vhost
+  to: rabbitmq.vhost
+  alias: true
+  beat: metricbeat
+
+
 ### Redis
 
 - from: php_fpm.status.pid
