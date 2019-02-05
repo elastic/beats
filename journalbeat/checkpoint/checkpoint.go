@@ -164,7 +164,7 @@ func (c *Checkpoint) findRegistryFile() error {
 	c.file = migratedPath
 
 	p := filepath.Dir(migratedPath)
-	pf, _ := os.Open(p)
+	pf, err := os.Open(p)
 	if err != nil {
 		return nil
 	}
