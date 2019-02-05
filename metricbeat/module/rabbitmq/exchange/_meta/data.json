@@ -33,13 +33,15 @@
                 }
             },
             "name": "exchange.name",
-            "type": "fanout",
-            "user": "guest",
-            "vhost": "/"
-        }
+            "type": "fanout"
+        },
+        "vhost": "/"
     },
     "service": {
-        "address": "127.0.0.1:55006",
+        "address": "127.0.0.1:53926",
         "type": "rabbitmq"
+    },
+    "user": {
+        "name": "guest"
     }
 }
