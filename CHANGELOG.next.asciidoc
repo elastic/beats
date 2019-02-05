@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change data type of `file.uid` and `file.gid` to string in JSON output of the
   FIM module. {pull}10195[10195]
 - Field `file.origin` changed type from `text` to `keyword`. {pull}10544[10544]
+- Rename user fields to ECS in auditd module. {pull}10456[10456]
 
 *Filebeat*
 
