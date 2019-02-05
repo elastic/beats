@@ -30,11 +30,11 @@ do
   mkdir -p "$dest_dir"
   params="--chunk=1"
   if [ "$PREVIEW" = "1" ]; then
-    params+=" -open"
+    params="$params -open"
   fi
 
-  if [ ! -z "$resource_dir" ]; then
-    params+=" -resource=$resource_dir"
+  if [ -d "$resource_dir" ]; then
+    params="$params -resource=${resource_dir}"
   fi
 
   $docs_dir/build_docs.pl $params --doc "$index" -out "$dest_dir"
