@@ -12,9 +12,7 @@ import (
 	"encoding/gob"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
-	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -103,6 +101,7 @@ type Package struct {
 	Size        uint64
 	Summary     string
 	URL         string
+	Error       error
 }
 
 // Hash creates a hash for Package.
@@ -321,7 +320,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 }
 
 func packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
-	return mb.Event{
+	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
 				"kind":   eventType,
@@ -331,6 +330,12 @@ func packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
 		},
 		MetricSetFields: pkg.toMapStr(),
 	}
+
+	if pkg.Error != nil {
+		event.RootFields.Put("error.message", pkg.Error.Error())
+	}
+
+	return event
 }
 
 func packageMessage(pkg *Package, action eventAction) string {
@@ -478,62 +483,6 @@ func listDebPackages() ([]*Package, error) {
 	}
 	if err = scanner.Err(); err != nil {
 		return nil, errors.Wrap(err, "error scanning file")
-	}
-	return packages, nil
-}
-
-func listBrewPackages() ([]*Package, error) {
-	packageDirs, err := ioutil.ReadDir(homebrewCellarPath)
-	if err != nil {
-		return nil, errors.Wrapf(err, "error reading directory %s", homebrewCellarPath)
-	}
-
-	var packages []*Package
-	for _, packageDir := range packageDirs {
-		if !packageDir.IsDir() {
-			continue
-		}
-		pkgPath := path.Join(homebrewCellarPath, packageDir.Name())
-		versions, err := ioutil.ReadDir(pkgPath)
-		if err != nil {
-			return nil, errors.Wrapf(err, "error reading directory: %s", pkgPath)
-		}
-
-		for _, version := range versions {
-			if !version.IsDir() {
-				continue
-			}
-			pkg := &Package{
-				Name:        packageDir.Name(),
-				Version:     version.Name(),
-				InstallTime: version.ModTime(),
-			}
-
-			// read formula
-			formulaPath := path.Join(homebrewCellarPath, pkg.Name, pkg.Version, ".brew", pkg.Name+".rb")
-			file, err := os.Open(formulaPath)
-			if err != nil {
-				//fmt.Printf("WARNING: Can't get formula for package %s-%s\n", pkg.Name, pkg.Version)
-				// TODO: follow the path from INSTALL_RECEIPT.json to find the formula
-				continue
-			}
-			scanner := bufio.NewScanner(file)
-			count := 15 // only look into the first few lines of the formula
-			for scanner.Scan() {
-				count--
-				if count == 0 {
-					break
-				}
-				line := scanner.Text()
-				if strings.HasPrefix(line, "  desc ") {
-					pkg.Summary = strings.Trim(line[7:], " \"")
-				} else if strings.HasPrefix(line, "  homepage ") {
-					pkg.URL = strings.Trim(line[11:], " \"")
-				}
-			}
-
-			packages = append(packages, pkg)
-		}
 	}
 	return packages, nil
 }

@@ -1,0 +1,163 @@
+- name: ether_type
+  type: long
+  description: >
+    Value of the ethernet type field identifying the network layer protocol.
+
+- name: flow_label
+  type: integer
+  description: >
+    IPv6 flow label.
+
+- name: fragment_flags
+  type: keyword
+  description: >
+    IP fragment flags. A combination of CE, DF and MF.
+
+- name: fragment_offset
+  type: long
+  description: >
+    Offset of the current IP fragment.
+
+- name: icmp
+  type: group
+  description: >
+    ICMP fields.
+  fields:
+
+  - name: code
+    type: long
+    description: >
+      ICMP code.
+
+  - name: id
+    type: long
+    description: >
+      ICMP ID.
+
+  - name: parameter
+    type: long
+    description: >
+      ICMP parameter.
+
+  - name: redirect
+    type: ip
+    description: >
+      ICMP redirect address.
+
+  - name: seq
+    type: long
+    description: >
+      ICMP sequence number.
+
+  - name: type
+    type: long
+    description: >
+      ICMP type.
+
+- name: id
+  type: long
+  description: >
+    Packet identifier.
+
+- name: incomplete_bytes
+  type: long
+  description: >
+    Number of incomplete bytes.
+
+- name: input_device
+  type: keyword
+  description: >
+    Device that received the packet.
+
+- name: precedence_bits
+  type: short
+  description: >
+    IP precedence bits.
+
+- name: tos
+  type: long
+  description: >
+      IP Type of Service field.
+
+- name: length
+  type: long
+  description: >
+    Packet length.
+
+- name: output_device
+  type: keyword
+  description: >
+    Device that output the packet.
+
+- name: tcp
+  type: group
+  description: >
+    TCP fields.
+  fields:
+
+  - name: flags
+    type: keyword
+    description: >
+      TCP flags.
+
+  - name: reserved_bits
+    type: short
+    description: >
+      TCP reserved bits.
+
+  - name: seq
+    type: long
+    description: >
+      TCP sequence number.
+
+  - name: ack
+    type: long
+    description: >
+      TCP Acknowledgment number.
+
+  - name: window
+    type: long
+    description: >
+      Advertised TCP window size.
+
+- name: ttl
+  type: integer
+  description: >
+    Time To Live field.
+
+- name: udp
+  type: group
+  description: >
+    UDP fields.
+  fields:
+
+  - name: length
+    type: long
+    description: >
+      Length of the UDP header and payload.
+
+- name: ubiquiti
+  type: group
+  description: >
+    Fields for Ubiquiti network devices.
+  fields:
+
+    - name: input_zone
+      type: keyword
+      description: >
+        Input zone.
+
+    - name: output_zone
+      type: keyword
+      description: >
+        Output zone.
+
+    - name: rule_number
+      type: keyword
+      description:
+        The rule number within the rule set.
+
+    - name: rule_set
+      type: keyword
+      description:
+        The rule set name.

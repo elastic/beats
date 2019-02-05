@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	conf "github.com/elastic/beats/journalbeat/config"
+	_ "github.com/elastic/beats/journalbeat/include"
 )
 
 // Journalbeat instance

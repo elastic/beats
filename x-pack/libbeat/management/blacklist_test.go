@@ -273,8 +273,8 @@ func TestConfigBlacklist(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			err = bl.Filter(test.blocks)
-			assert.Equal(t, test.blacklisted, err != nil)
+			errs := bl.Detect(test.blocks)
+			assert.Equal(t, test.blacklisted, !errs.IsEmpty())
 		})
 	}
 }
