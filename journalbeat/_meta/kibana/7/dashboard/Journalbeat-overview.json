@@ -59,26 +59,26 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Journalbeat] Overview",
+        "title": "[Journalbeat] Overview ECS",
         "version": 1
       },
-      "id": "effdfcd0-2877-11e9-bc7e-af96a8fe0ddd",
+      "id": "effdfcd0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
       "migrationVersion": {
         "dashboard": "7.0.0"
       },
       "references": [
         {
-          "id": "25251fc0-2877-11e9-bc7e-af96a8fe0ddd",
+          "id": "25251fc0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
           "name": "panel_0",
           "type": "search"
         },
         {
-          "id": "52a2a1c0-2877-11e9-bc7e-af96a8fe0ddd",
+          "id": "52a2a1c0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
           "name": "panel_1",
           "type": "search"
         },
         {
-          "id": "842a1340-2877-11e9-bc7e-af96a8fe0ddd",
+          "id": "842a1340-2877-11e9-bc7e-af96a8fe0ddd-ecs",
           "name": "panel_2",
           "type": "search"
         }
@@ -113,10 +113,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "[Journalbeat] Kernel errors",
+        "title": "[Journalbeat] Kernel errors ECS",
         "version": 1
       },
-      "id": "25251fc0-2877-11e9-bc7e-af96a8fe0ddd",
+      "id": "25251fc0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
       "migrationVersion": {
         "search": "7.0.0"
       },
@@ -157,10 +157,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "[Journalbeat] Authorization",
+        "title": "[Journalbeat] Authorization ECS",
         "version": 1
       },
-      "id": "52a2a1c0-2877-11e9-bc7e-af96a8fe0ddd",
+      "id": "52a2a1c0-2877-11e9-bc7e-af96a8fe0ddd-ecs",
       "migrationVersion": {
         "search": "7.0.0"
       },
@@ -200,10 +200,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "[Journalbeat] Systemd messages",
+        "title": "[Journalbeat] Systemd messages ECS",
         "version": 1
       },
-      "id": "842a1340-2877-11e9-bc7e-af96a8fe0ddd",
+      "id": "842a1340-2877-11e9-bc7e-af96a8fe0ddd-ecs",
       "migrationVersion": {
         "search": "7.0.0"
       },

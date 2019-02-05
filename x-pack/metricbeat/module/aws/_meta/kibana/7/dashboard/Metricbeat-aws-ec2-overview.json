@@ -12,7 +12,7 @@
             }
           }
         },
-        "title": "AWS EC2 DiskIO Write Bytes",
+        "title": "AWS EC2 DiskIO Write Bytes ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -44,7 +44,7 @@
                 "filter": "",
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "AWS EC2 DiskIO Write Bytes",
+                "label": "AWS EC2 DiskIO Write Bytes ECS",
                 "line_width": 1,
                 "metrics": [
                   {
@@ -70,11 +70,11 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "AWS EC2 DiskIO Write Bytes",
+          "title": "AWS EC2 DiskIO Write Bytes ECS",
           "type": "metrics"
         }
       },
-      "id": "fed59380-f7f8-11e8-af03-c999c9dea608",
+      "id": "fed59380-f7f8-11e8-af03-c999c9dea608-ecs",
       "type": "visualization",
       "updated_at": "2018-12-04T19:15:43.416Z",
       "version": 1
@@ -91,7 +91,7 @@
             }
           }
         },
-        "title": "AWS EC2 Status Check Failed",
+        "title": "AWS EC2 Status Check Failed ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -151,11 +151,11 @@
             "time_field": "@timestamp",
             "type": "metric"
           },
-          "title": "AWS EC2 Status Check Failed",
+          "title": "AWS EC2 Status Check Failed ECS",
           "type": "metrics"
         }
       },
-      "id": "9e8c6030-f7f8-11e8-af03-c999c9dea608",
+      "id": "9e8c6030-f7f8-11e8-af03-c999c9dea608-ecs",
       "type": "visualization",
       "updated_at": "2018-12-04T19:13:01.875Z",
       "version": 1
@@ -172,7 +172,7 @@
             }
           }
         },
-        "title": "AWS EC2 Network In Bytes",
+        "title": "AWS EC2 Network In Bytes ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -204,7 +204,7 @@
                 "filter": "",
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "AWS EC2 Network In Bytes",
+                "label": "AWS EC2 Network In Bytes ECS",
                 "line_width": 1,
                 "metrics": [
                   {
@@ -230,11 +230,11 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "AWS EC2 Network In Bytes",
+          "title": "AWS EC2 Network In Bytes ECS",
           "type": "metrics"
         }
       },
-      "id": "15818fd0-f7f9-11e8-af03-c999c9dea608",
+      "id": "15818fd0-f7f9-11e8-af03-c999c9dea608-ecs",
       "type": "visualization",
       "updated_at": "2018-12-04T19:16:21.453Z",
       "version": 1
@@ -251,7 +251,7 @@
             }
           }
         },
-        "title": "AWS EC2 Network Out Bytes",
+        "title": "AWS EC2 Network Out Bytes ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -283,7 +283,7 @@
                 "filter": "",
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "AWS EC2 Network Out Bytes",
+                "label": "AWS EC2 Network Out Bytes ECS",
                 "line_width": 1,
                 "metrics": [
                   {
@@ -309,11 +309,11 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "AWS EC2 Network Out Bytes",
+          "title": "AWS EC2 Network Out Bytes ECS",
           "type": "metrics"
         }
       },
-      "id": "233b3400-f7f9-11e8-af03-c999c9dea608",
+      "id": "233b3400-f7f9-11e8-af03-c999c9dea608-ecs",
       "type": "visualization",
       "updated_at": "2018-12-04T19:16:44.480Z",
       "version": 1
@@ -330,7 +330,7 @@
             }
           }
         },
-        "title": "AWS EC2 DiskIO Read Bytes",
+        "title": "AWS EC2 DiskIO Read Bytes ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -362,7 +362,7 @@
                 "filter": "",
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "AWS EC2 DiskIO Read Bytes",
+                "label": "AWS EC2 DiskIO Read Bytes ECS",
                 "line_width": 1,
                 "metrics": [
                   {
@@ -388,11 +388,11 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "AWS EC2 DiskIO Read Bytes",
+          "title": "AWS EC2 DiskIO Read Bytes ECS",
           "type": "metrics"
         }
       },
-      "id": "f1db6ec0-f7f8-11e8-af03-c999c9dea608",
+      "id": "f1db6ec0-f7f8-11e8-af03-c999c9dea608-ecs",
       "type": "visualization",
       "updated_at": "2018-12-04T19:15:21.644Z",
       "version": 1
@@ -409,7 +409,7 @@
             }
           }
         },
-        "title": "AWS EC2 CPU Utilization",
+        "title": "AWS EC2 CPU Utilization ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -441,7 +441,7 @@
                 "filter": "",
                 "formatter": "number",
                 "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "label": "AWS EC2 CPU Utilization",
+                "label": "AWS EC2 CPU Utilization ECS",
                 "line_width": 1,
                 "metrics": [
                   {
@@ -467,11 +467,11 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "AWS EC2 CPU Utilization",
+          "title": "AWS EC2 CPU Utilization ECS",
           "type": "metrics"
         }
       },
-      "id": "be8828d0-f7f6-11e8-af03-c999c9dea608",
+      "id": "be8828d0-f7f6-11e8-af03-c999c9dea608-ecs",
       "type": "visualization",
       "updated_at": "2018-12-04T19:14:42.745Z",
       "version": 4
@@ -504,7 +504,7 @@
               "x": 24,
               "y": 15
             },
-            "id": "fed59380-f7f8-11e8-af03-c999c9dea608",
+            "id": "fed59380-f7f8-11e8-af03-c999c9dea608-ecs",
             "panelIndex": "3",
             "type": "visualization",
             "version": "6.5.0"
@@ -518,7 +518,7 @@
               "x": 36,
               "y": 0
             },
-            "id": "9e8c6030-f7f8-11e8-af03-c999c9dea608",
+            "id": "9e8c6030-f7f8-11e8-af03-c999c9dea608-ecs",
             "panelIndex": "5",
             "type": "visualization",
             "version": "6.5.0"
@@ -532,7 +532,7 @@
               "x": 0,
               "y": 30
             },
-            "id": "15818fd0-f7f9-11e8-af03-c999c9dea608",
+            "id": "15818fd0-f7f9-11e8-af03-c999c9dea608-ecs",
             "panelIndex": "11",
             "type": "visualization",
             "version": "6.5.0"
@@ -546,7 +546,7 @@
               "x": 24,
               "y": 30
             },
-            "id": "233b3400-f7f9-11e8-af03-c999c9dea608",
+            "id": "233b3400-f7f9-11e8-af03-c999c9dea608-ecs",
             "panelIndex": "12",
             "type": "visualization",
             "version": "6.5.0"
@@ -560,7 +560,7 @@
               "x": 0,
               "y": 15
             },
-            "id": "f1db6ec0-f7f8-11e8-af03-c999c9dea608",
+            "id": "f1db6ec0-f7f8-11e8-af03-c999c9dea608-ecs",
             "panelIndex": "15",
             "type": "visualization",
             "version": "6.5.0"
@@ -574,17 +574,17 @@
               "x": 0,
               "y": 0
             },
-            "id": "be8828d0-f7f6-11e8-af03-c999c9dea608",
+            "id": "be8828d0-f7f6-11e8-af03-c999c9dea608-ecs",
             "panelIndex": "17",
             "type": "visualization",
             "version": "6.5.0"
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat AWS] EC2 Overview",
+        "title": "[Metricbeat AWS] EC2 Overview ECS",
         "version": 1
       },
-      "id": "c5846400-f7fb-11e8-af03-c999c9dea608",
+      "id": "c5846400-f7fb-11e8-af03-c999c9dea608-ecs",
       "type": "dashboard",
       "updated_at": "2018-12-04T19:35:35.744Z",
       "version": 1

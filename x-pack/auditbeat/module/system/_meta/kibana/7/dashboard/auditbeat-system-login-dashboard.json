@@ -40,7 +40,7 @@
             }
           }
         },
-        "title": "Login Count [Auditbeat System]",
+        "title": "Login Count [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -83,11 +83,11 @@
             },
             "type": "metric"
           },
-          "title": "Login Count [Auditbeat System]",
+          "title": "Login Count [Auditbeat System] ECS",
           "type": "metric"
         }
       },
-      "id": "8d63c420-27f4-11e9-89af-fd12d59dac90",
+      "id": "8d63c420-27f4-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-03T20:44:50.914Z",
       "version": 1
@@ -132,7 +132,7 @@
             }
           }
         },
-        "title": "Login Actions [Auditbeat System]",
+        "title": "Login Actions [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -174,11 +174,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Login Actions [Auditbeat System]",
+          "title": "Login Actions [Auditbeat System] ECS",
           "type": "pie"
         }
       },
-      "id": "593df9b0-27f7-11e9-89af-fd12d59dac90",
+      "id": "593df9b0-27f7-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-03T21:04:51.914Z",
       "version": 1
@@ -249,7 +249,7 @@
             }
           }
         },
-        "title": "Login Success Table [Auditbeat System]",
+        "title": "Login Success Table [Auditbeat System] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -301,11 +301,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Login Success Table [Auditbeat System]",
+          "title": "Login Success Table [Auditbeat System] ECS",
           "type": "table"
         }
       },
-      "id": "5eb5f250-285e-11e9-805f-43bf57dfa519",
+      "id": "5eb5f250-285e-11e9-805f-43bf57dfa519-ecs",
       "type": "visualization",
       "updated_at": "2019-02-04T09:22:44.444Z",
       "version": 2
@@ -376,7 +376,7 @@
             }
           }
         },
-        "title": "Login Failures Table [Auditbeat System]",
+        "title": "Login Failures Table [Auditbeat System] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -428,11 +428,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Login Failures Table [Auditbeat System]",
+          "title": "Login Failures Table [Auditbeat System] ECS",
           "type": "table"
         }
       },
-      "id": "a1951650-285e-11e9-805f-43bf57dfa519",
+      "id": "a1951650-285e-11e9-805f-43bf57dfa519-ecs",
       "type": "visualization",
       "updated_at": "2019-02-04T09:24:11.445Z",
       "version": 1
@@ -477,7 +477,7 @@
             }
           }
         },
-        "title": "Login Event Histogram [Auditbeat System]",
+        "title": "Login Event Histogram [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -574,11 +574,11 @@
               }
             ]
           },
-          "title": "Login Event Histogram [Auditbeat System]",
+          "title": "Login Event Histogram [Auditbeat System] ECS",
           "type": "histogram"
         }
       },
-      "id": "e4d25fe0-285e-11e9-805f-43bf57dfa519",
+      "id": "e4d25fe0-285e-11e9-805f-43bf57dfa519-ecs",
       "type": "visualization",
       "updated_at": "2019-02-04T09:26:04.254Z",
       "version": 1
@@ -636,10 +636,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Login Events [Auditbeat System]",
+        "title": "Login Events [Auditbeat System] ECS",
         "version": 1
       },
-      "id": "2e04c720-285f-11e9-805f-43bf57dfa519",
+      "id": "2e04c720-285f-11e9-805f-43bf57dfa519-ecs",
       "type": "search",
       "updated_at": "2019-02-04T09:28:07.058Z",
       "version": 1
@@ -684,7 +684,7 @@
             }
           }
         },
-        "title": "Login OS Distribution [Auditbeat System]",
+        "title": "Login OS Distribution [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -745,11 +745,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Login OS Distribution [Auditbeat System]",
+          "title": "Login OS Distribution [Auditbeat System] ECS",
           "type": "pie"
         }
       },
-      "id": "e8eb58a0-2860-11e9-805f-43bf57dfa519",
+      "id": "e8eb58a0-2860-11e9-805f-43bf57dfa519-ecs",
       "type": "visualization",
       "updated_at": "2019-02-04T09:40:30.122Z",
       "version": 1
@@ -766,21 +766,21 @@
             }
           }
         },
-        "title": "Dashboard Links [Auditbeat System]",
+        "title": "Dashboard Links [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 12,
-            "markdown": "**Dashboards**: [System Overview](#/dashboard/2be46cb0-27f2-11e9-89af-fd12d59dac90) | [Hosts](#/dashboard/dfe62590-18da-11e9-9094-c50574723088) | [Logins](#/dashboard/2a17f200-285e-11e9-805f-43bf57dfa519) | [Users](#/dashboard/ae96a660-2864-11e9-97cb-474beda9f119) | [Processes](#/dashboard/4c68f110-2863-11e9-97cb-474beda9f119) | [Sockets](#/dashboard/957a3ef0-2867-11e9-9d21-0be348776e6c) | [Packages](#/dashboard/137c52f0-286a-11e9-9d21-0be348776e6c)",
+            "markdown": "**Dashboards**: [System Overview](#/dashboard/2be46cb0-27f2-11e9-89af-fd12d59dac90-ecs) | [Hosts](#/dashboard/dfe62590-18da-11e9-9094-c50574723088-ecs) | [Logins](#/dashboard/2a17f200-285e-11e9-805f-43bf57dfa519-ecs) | [Users](#/dashboard/ae96a660-2864-11e9-97cb-474beda9f119-ecs) | [Processes](#/dashboard/4c68f110-2863-11e9-97cb-474beda9f119-ecs) | [Sockets](#/dashboard/957a3ef0-2867-11e9-9d21-0be348776e6c-ecs) | [Packages](#/dashboard/137c52f0-286a-11e9-9d21-0be348776e6c-ecs)",
             "openLinksInNewTab": false
           },
-          "title": "Dashboard Links [Auditbeat System]",
+          "title": "Dashboard Links [Auditbeat System] ECS",
           "type": "markdown"
         }
       },
-      "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90",
+      "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-04T11:37:25.234Z",
       "version": 3
@@ -813,7 +813,7 @@
               "x": 0,
               "y": 4
             },
-            "id": "8d63c420-27f4-11e9-89af-fd12d59dac90",
+            "id": "8d63c420-27f4-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "1",
             "type": "visualization",
             "version": "7.0.0"
@@ -827,7 +827,7 @@
               "x": 8,
               "y": 4
             },
-            "id": "593df9b0-27f7-11e9-89af-fd12d59dac90",
+            "id": "593df9b0-27f7-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "2",
             "type": "visualization",
             "version": "7.0.0"
@@ -841,7 +841,7 @@
               "x": 28,
               "y": 4
             },
-            "id": "5eb5f250-285e-11e9-805f-43bf57dfa519",
+            "id": "5eb5f250-285e-11e9-805f-43bf57dfa519-ecs",
             "panelIndex": "4",
             "type": "visualization",
             "version": "7.0.0"
@@ -855,7 +855,7 @@
               "x": 38,
               "y": 4
             },
-            "id": "a1951650-285e-11e9-805f-43bf57dfa519",
+            "id": "a1951650-285e-11e9-805f-43bf57dfa519-ecs",
             "panelIndex": "5",
             "type": "visualization",
             "version": "7.0.0"
@@ -869,7 +869,7 @@
               "x": 0,
               "y": 14
             },
-            "id": "e4d25fe0-285e-11e9-805f-43bf57dfa519",
+            "id": "e4d25fe0-285e-11e9-805f-43bf57dfa519-ecs",
             "panelIndex": "6",
             "type": "visualization",
             "version": "7.0.0"
@@ -883,7 +883,7 @@
               "x": 0,
               "y": 23
             },
-            "id": "2e04c720-285f-11e9-805f-43bf57dfa519",
+            "id": "2e04c720-285f-11e9-805f-43bf57dfa519-ecs",
             "panelIndex": "7",
             "type": "search",
             "version": "7.0.0"
@@ -897,7 +897,7 @@
               "x": 18,
               "y": 4
             },
-            "id": "e8eb58a0-2860-11e9-805f-43bf57dfa519",
+            "id": "e8eb58a0-2860-11e9-805f-43bf57dfa519-ecs",
             "panelIndex": "8",
             "type": "visualization",
             "version": "7.0.0"
@@ -911,17 +911,17 @@
               "x": 0,
               "y": 0
             },
-            "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90",
+            "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "9",
             "type": "visualization",
             "version": "7.0.0"
           }
         ],
         "timeRestore": false,
-        "title": "[Auditbeat System] Login Dashboard",
+        "title": "[Auditbeat System] Login Dashboard ECS",
         "version": 1
       },
-      "id": "2a17f200-285e-11e9-805f-43bf57dfa519",
+      "id": "2a17f200-285e-11e9-805f-43bf57dfa519-ecs",
       "type": "dashboard",
       "updated_at": "2019-02-04T11:38:50.007Z",
       "version": 6
