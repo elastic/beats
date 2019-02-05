@@ -5046,7 +5046,7 @@ Error message logged by HAProxy in case of error.
 *`haproxy.source`*::
 +
 --
-type: text
+type: keyword
 
 The HAProxy source of the log
 

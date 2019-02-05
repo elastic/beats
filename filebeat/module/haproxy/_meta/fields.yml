@@ -53,7 +53,7 @@
           type: text
 
         - name: source
-          type: text
+          type: keyword
           description: The HAProxy source of the log
 
         - name: termination_state
