@@ -9410,7 +9410,9 @@ Process number.
 *`haproxy.info.pid`*::
 +
 --
-type: long
+type: alias
+
+alias to: process.pid
 
 Process ID.
 

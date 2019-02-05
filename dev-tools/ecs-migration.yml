@@ -1666,6 +1666,11 @@
   alias: true
   beat: metricbeat
 
+- from: haproxy.info.pid
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
 ### Mongodb
 
 - from: mongodb.status.version
