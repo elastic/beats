@@ -48,7 +48,7 @@ class Test(AuditbeatXPackTest):
         package metricset collects information about installed packages on a system.
         """
 
-        fields = ["system.audit.package.name", "system.audit.package.version", "system.audit.package.installtime"]
+        fields = ["system.audit.package.name", "system.audit.package.version"]
 
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "package", COMMON_FIELDS + fields, warnings_allowed=True)
