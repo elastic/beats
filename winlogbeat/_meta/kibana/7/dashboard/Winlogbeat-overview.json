@@ -5,10 +5,16 @@
         "description": "",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}"
+          "searchSourceJSON": {"filter":[],"query":{"query_string":{"analyze_wildcard":true,"query":"*"}}}
         },
-        "optionsJSON": "{\"darkTheme\":false}",
-        "panelsJSON": "[{\"gridData\":{\"h\":20,\"i\":\"1\",\"w\":36,\"x\":12,\"y\":0},\"panelIndex\":\"1\",\"version\":\"7.0.0-SNAPSHOT\",\"panelRefName\":\"panel_0\"},{\"gridData\":{\"h\":20,\"i\":\"3\",\"w\":12,\"x\":0,\"y\":0},\"panelIndex\":\"3\",\"version\":\"7.0.0-SNAPSHOT\",\"panelRefName\":\"panel_1\"},{\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"gridData\":{\"h\":20,\"i\":\"4\",\"w\":16,\"x\":16,\"y\":20},\"panelIndex\":\"4\",\"version\":\"7.0.0-SNAPSHOT\",\"panelRefName\":\"panel_2\"},{\"gridData\":{\"h\":20,\"i\":\"5\",\"w\":16,\"x\":32,\"y\":20},\"panelIndex\":\"5\",\"version\":\"7.0.0-SNAPSHOT\",\"panelRefName\":\"panel_3\"},{\"gridData\":{\"h\":20,\"i\":\"6\",\"w\":16,\"x\":0,\"y\":20},\"panelIndex\":\"6\",\"version\":\"7.0.0-SNAPSHOT\",\"panelRefName\":\"panel_4\"}]",
+        "optionsJSON": {"darkTheme":false},
+        "panelsJSON": [
+            {"gridData":{
+                "h":20,"i":"1","w":36,"x":12,"y":0},
+                "panelIndex":"1","version":"7.0.0-SNAPSHOT","panelRefName":"panel_0"
+            },{"gridData":{
+                "h":20,"i":"3","w":12,"x":0,"y":0},"panelIndex":"3","version":"7.0.0-SNAPSHOT","panelRefName":"panel_1"},{"embeddableConfig":{"vis":{"params":{"sort":{"columnIndex":null,"direction":null}}}},"gridData":{"h":20,"i":"4","w":16,"x":16,"y":20},"panelIndex":"4","version":"7.0.0-SNAPSHOT","panelRefName":"panel_2"},{"gridData":{"h":20,"i":"5","w":16,"x":32,"y":20},"panelIndex":"5","version":"7.0.0-SNAPSHOT","panelRefName":"panel_3"},{"gridData":{"h":20,"i":"6","w":16,"x":0,"y":20},"panelIndex":"6","version":"7.0.0-SNAPSHOT","panelRefName":"panel_4"}
+        ],
         "timeRestore": false,
         "title": "Winlogbeat Dashboard",
         "version": 1
@@ -52,12 +58,12 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"*\",\"language\":\"lucene\"},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+          "searchSourceJSON": {"filter":[],"query":{"query":"*","language":"lucene"},"indexRefName":"kibanaSavedObjectMeta.searchSourceJSON.index"}
         },
         "title": "Number of Events Over Time By Channel",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"title\":\"Number of Events Over Time By Channel\",\"type\":\"histogram\",\"params\":{\"scale\":\"linear\",\"yAxis\":{},\"addTimeMarker\":false,\"addLegend\":true,\"shareYAxis\":true,\"mode\":\"stacked\",\"defaultYExtents\":false,\"setYExtents\":false,\"addTooltip\":true,\"times\":[],\"type\":\"histogram\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"histogram\",\"mode\":\"stacked\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\"}],\"legendPosition\":\"right\",\"dimensions\":{\"x\":{\"accessor\":0,\"format\":{\"id\":\"date\",\"params\":{\"pattern\":\"YYYY-MM-DD HH:mm\"}},\"params\":{\"date\":true,\"interval\":43200000,\"format\":\"YYYY-MM-DD HH:mm\",\"bounds\":{\"min\":\"2019-01-21T04:30:25.961Z\",\"max\":\"2019-02-05T04:30:25.961Z\"}},\"aggType\":\"date_histogram\"},\"y\":[{\"accessor\":2,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}],\"series\":[{\"accessor\":1,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"timeRange\":{\"from\":\"now-15d\",\"to\":\"now\",\"mode\":\"relative\"},\"useNormalizedEsInterval\":true,\"interval\":\"auto\",\"time_zone\":\"America/Montreal\",\"drop_partials\":false,\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"winlog.channel\",\"size\":6,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Channel\"}}]}"
+        "visState": {"title":"Number of Events Over Time By Channel","type":"histogram","params":{"scale":"linear","yAxis":{},"addTimeMarker":false,"addLegend":true,"shareYAxis":true,"mode":"stacked","defaultYExtents":false,"setYExtents":false,"addTooltip":true,"times":[],"type":"histogram","grid":{"categoryLines":false,"style":{"color":"#eee"}},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal","setYExtents":false,"defaultYExtents":false},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"histogram","mode":"stacked","data":{"label":"Count","id":"1"},"valueAxis":"ValueAxis-1"}],"legendPosition":"right","dimensions":{"x":{"accessor":0,"format":{"id":"date","params":{"pattern":"YYYY-MM-DD HH:mm"}},"params":{"date":true,"interval":43200000,"format":"YYYY-MM-DD HH:mm","bounds":{"min":"2019-01-21T04:30:25.961Z","max":"2019-02-05T04:30:25.961Z"}},"aggType":"date_histogram"},"y":[{"accessor":2,"format":{"id":"number"},"params":{},"aggType":"count"}],"series":[{"accessor":1,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"}]}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"date_histogram","schema":"segment","params":{"field":"@timestamp","timeRange":{"from":"now-15d","to":"now","mode":"relative"},"useNormalizedEsInterval":true,"interval":"auto","time_zone":"America/Montreal","drop_partials":false,"customInterval":"2h","min_doc_count":1,"extended_bounds":{}}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"winlog.channel","size":6,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Channel"}}]}
       },
       "id": "Number-of-Events-Over-Time-By-Event-Log",
       "migrationVersion": {
@@ -78,12 +84,12 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+          "searchSourceJSON": {"filter":[],"query":{"query_string":{"analyze_wildcard":true,"query":"*"}},"indexRefName":"kibanaSavedObjectMeta.searchSourceJSON.index"}
         },
         "title": "Number of Events",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"type\": \"metric\", \"listeners\": {}, \"params\": {\"fontSize\": 60}, \"aggs\": [{\"type\": \"count\", \"params\": {}, \"id\": \"1\", \"schema\": \"metric\"}]}"
+        "visState": {"type": "metric", "listeners": {}, "params": {"fontSize": 60}, "aggs": [{"type": "count", "params": {}, "id": "1", "schema": "metric"}]}
       },
       "id": "Number-of-Events",
       "migrationVersion": {
@@ -104,12 +110,12 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+          "searchSourceJSON": {"filter":[],"query":{"query":{"query_string":{"analyze_wildcard":true,"query":"*"}},"language":"lucene"},"indexRefName":"kibanaSavedObjectMeta.searchSourceJSON.index"}
         },
         "title": "Top Event IDs",
-        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "uiStateJSON": {"vis":{"params":{"sort":{"columnIndex":null,"direction":null}}}},
         "version": 1,
-        "visState": "{\"title\":\"Top Event IDs\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"dimensions\":{\"metrics\":[{\"accessor\":1,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}],\"buckets\":[{\"accessor\":0,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"winlog.event_id\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Event IDs\"}}]}"
+        "visState": {"title":"Top Event IDs","type":"table","params":{"perPage":10,"showPartialRows":false,"showMetricsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum","dimensions":{"metrics":[{"accessor":1,"format":{"id":"number"},"params":{},"aggType":"count"}],"buckets":[{"accessor":0,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"}]}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"winlog.event_id","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Event IDs"}}]}
       },
       "id": "Top-Event-IDs",
       "migrationVersion": {
@@ -130,12 +136,12 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+          "searchSourceJSON": {"filter":[],"query":{"query":{"query_string":{"analyze_wildcard":true,"query":"*"}},"language":"lucene"},"indexRefName":"kibanaSavedObjectMeta.searchSourceJSON.index"}
         },
         "title": "Event Levels",
-        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "uiStateJSON": {"vis":{"params":{"sort":{"columnIndex":null,"direction":null}}}},
         "version": 1,
-        "visState": "{\"title\":\"Event Levels\",\"type\":\"table\",\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null},\"perPage\":10,\"showPartialRows\":false,\"totalFunc\":\"sum\",\"showTotal\":false,\"showMetricsAtAllLevels\":false,\"dimensions\":{\"metrics\":[{\"accessor\":1,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}],\"buckets\":[{\"accessor\":0,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"log.level\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Log Levels\"}}]}"
+        "visState": {"title":"Event Levels","type":"table","params":{"sort":{"columnIndex":null,"direction":null},"perPage":10,"showPartialRows":false,"totalFunc":"sum","showTotal":false,"showMetricsAtAllLevels":false,"dimensions":{"metrics":[{"accessor":1,"format":{"id":"number"},"params":{},"aggType":"count"}],"buckets":[{"accessor":0,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"}]}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"log.level","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Log Levels"}}]}
       },
       "id": "Event-Levels",
       "migrationVersion": {
@@ -156,12 +162,12 @@
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+          "searchSourceJSON": {"filter":[],"query":{"query":{"query_string":{"analyze_wildcard":true,"query":"*"}},"language":"lucene"},"indexRefName":"kibanaSavedObjectMeta.searchSourceJSON.index"}
         },
         "title": "Sources (Provider Names)",
-        "uiStateJSON": "{}",
+        "uiStateJSON": {},
         "version": 1,
-        "visState": "{\"title\":\"Sources (Provider Names)\",\"type\":\"pie\",\"params\":{\"legendPosition\":\"right\",\"isDonut\":false,\"addTooltip\":true,\"shareYAxis\":true,\"addLegend\":true,\"type\":\"pie\",\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"winlog.provider_name\",\"size\":7,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"}}]}"
+        "visState": {"title":"Sources (Provider Names)","type":"pie","params":{"legendPosition":"right","isDonut":false,"addTooltip":true,"shareYAxis":true,"addLegend":true,"type":"pie","labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"winlog.provider_name","size":7,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}
       },
       "id": "Sources",
       "migrationVersion": {
