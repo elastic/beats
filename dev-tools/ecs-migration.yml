@@ -1654,6 +1654,18 @@
 
 ## Modules
 
+### HAProxy
+
+- from: haproxy.stat.process_id
+  to: process.pid
+  alias: true
+  beat: metricbeat
+
+- from: haproxy.stat.service_name
+  to: process.name
+  alias: true
+  beat: metricbeat
+
 ### Mongodb
 
 - from: mongodb.status.version
