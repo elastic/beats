@@ -18,7 +18,6 @@
 package queue
 
 import (
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/rabbitmq"
 )
@@ -44,13 +43,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{ms}, nil
 }
 
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+// Fetch fetches queue data
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	content, err := m.HTTP.FetchContent()
 
 	if err != nil {
-		return nil, err
+		r.Error(err)
+		return
 	}
 
-	events, _ := eventsMapping(content)
-	return events, nil
+	eventsMapping(content, r)
 }
