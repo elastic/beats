@@ -15,6 +15,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Allow to unenroll a Beat from the UI. {issue}9452[9452]
 - Port settings have been deprecated in redis/logstash output and will be removed in 7.0. {pull}9915[9915]
 - Update the code of Central Management to align with the new returned format. {pull}10019[10019]
+- Allow Central Management to send events back to kibana. {issue}9382[9382]
 
 *Auditbeat*
 
