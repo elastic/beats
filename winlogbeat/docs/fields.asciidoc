@@ -3323,7 +3323,7 @@ alias to: winlog.channel
 --
 type: alias
 
-alias to: winlog.message_error
+alias to: error.message
 
 --
 
@@ -3669,18 +3669,6 @@ type: keyword
 required: True
 
 The name of the channel from which this record was read. This value is one of the names from the `event_logs` collection in the configuration.
-
-
---
-
-*`winlog.message_error`*::
-+
---
-type: keyword
-
-required: False
-
-The error that occurred while reading and formatting the message from the log.
 
 
 --

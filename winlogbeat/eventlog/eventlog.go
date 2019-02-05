@@ -102,7 +102,6 @@ func (e Record) ToEvent() beat.Event {
 	addOptional(win, "task", e.Task)
 	addOptional(win, "user_time", e.Execution.UserTime)
 	addOptional(win, "version", e.Version)
-	addOptional(win, "message_error", e.RenderErr)
 	// Correlation
 	addOptional(win, "activity_id", e.Correlation.ActivityID)
 	addOptional(win, "related_activity_id", e.Correlation.RelatedActivityID)
@@ -137,6 +136,9 @@ func (e Record) ToEvent() beat.Event {
 
 	addOptional(m, "log.level", strings.ToLower(e.Level))
 	addOptional(m, "message", sys.RemoveWindowsLineEndings(e.Message))
+	// Errors
+	addOptional(m, "error.code", e.RenderErrorCode)
+	addOptional(m, "error.message", e.RenderErr)
 
 	addOptional(m, "event.original", e.XML)
 

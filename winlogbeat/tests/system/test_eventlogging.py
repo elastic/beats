@@ -61,7 +61,7 @@ class Test(WriteReadTest):
         evts = self.read_events()
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], eventID=event_id)
-        self.assertEqual(evts[0]["winlog.message_error"].lower(),
+        self.assertEqual(evts[0]["error.message"].lower(),
                          ("The system cannot find message text for message "
                           "number 1111 in the message file for "
                           "C:\\Windows\\system32\\EventCreate.exe.").lower())

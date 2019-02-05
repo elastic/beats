@@ -75,7 +75,7 @@ class Test(WriteReadTest):
             "winlog.opcode": "Info",
         })
         # Oddly, no rendering error is being given.
-        self.assertTrue("winlog.message_error" not in evts[0])
+        self.assertTrue("error.message" not in evts[0])
 
     def test_read_unknown_sid(self):
         """

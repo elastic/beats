@@ -243,7 +243,7 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 
 	if e.RenderErrorCode != 0 {
 		// Convert the render error code to an error message that can be
-		// included in the "message_error" field.
+		// included in the "error.message" field.
 		e.RenderErr = syscall.Errno(e.RenderErrorCode).Error()
 	} else if recoveredErr != nil {
 		e.RenderErr = recoveredErr.Error()

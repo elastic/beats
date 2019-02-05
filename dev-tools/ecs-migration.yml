@@ -2104,7 +2104,7 @@
   beat: winlogbeat
 
 - from: message_error
-  to: winlog.message_error
+  to: error.message
   alias: true
   beat: winlogbeat
 
