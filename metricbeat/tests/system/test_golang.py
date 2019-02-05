@@ -1,7 +1,6 @@
 import os
 import metricbeat
 import unittest
-import time
 
 GOLANG_FIELDS = metricbeat.COMMON_FIELDS + ["golang"]
 
@@ -11,7 +10,7 @@ class Test(metricbeat.BaseTest):
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_stats(self):
         """
-        prometheus stats test
+        golang heap test
         """
         self.render_config_template(modules=[{
             "name": "golang",
@@ -22,13 +21,7 @@ class Test(metricbeat.BaseTest):
         proc = self.start_beat(
             extra_args=[
                 "-httpprof",
-                os.getenv(
-                    'GOLANG_HOST',
-                    'localhost') +
-                ":" +
-                os.getenv(
-                    'GOLANG_PORT',
-                    '6060')])
+                "localhost:" + os.getenv('GOLANG_PORT', '6060')])
 
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
