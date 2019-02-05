@@ -75,6 +75,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Fix stopping of modules started by kubernetes autodiscover. {pull}10476[10476]
 - Fix a issue when remote and local configuration didn't match when fetching configuration from Central Management. {issue}10587[10587]
 - Add ECS-like selectors and dedotting to docker autodiscover. {issue}10757[10757] {pull}10862[10862]
+- Fix encoding of timestamps when using disk spool. {issue}10099[10099]
 
 *Auditbeat*
 
