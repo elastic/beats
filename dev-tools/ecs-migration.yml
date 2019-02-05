@@ -1509,6 +1509,16 @@
 # Auditbeat
 
 ## From Auditbeat's auditd module.
+- from: auditd.messages
+  to: event.original
+  alias: true
+  beat: auditbeat
+
+- from: auditd.warnings
+  to: error.message
+  alias: true
+  beat: auditbeat
+
 - from: source.hostname
   to: source.domain
   alias: true

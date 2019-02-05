@@ -129,9 +129,11 @@ func assertFieldsAreDocumented(t *testing.T, events []mb.Event) {
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":       "auditd",
-		"failure_mode": "log",
-		"socket_type":  "unicast",
+		"module":              "auditd",
+		"failure_mode":        "log",
+		"socket_type":         "unicast",
+		"include_warnings":    true,
+		"include_raw_message": true,
 	}
 }
 
