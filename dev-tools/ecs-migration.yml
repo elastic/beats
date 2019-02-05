@@ -1523,6 +1523,96 @@
   alias: true
   beat: auditbeat
 
+- from: user.auid
+  to: user.audit.id
+  alias: true
+  beat: auditbeat
+
+- from: user.uid
+  to: user.id
+  alias: true
+  beat: auditbeat
+
+- from: user.euid
+  to: user.effective.id
+  alias: true
+  beat: auditbeat
+
+- from: user.fsuid
+  to: user.filesystem.id
+  alias: true
+  beat: auditbeat
+
+- from: user.suid
+  to: user.saved.id
+  alias: true
+  beat: auditbeat
+
+- from: user.gid
+  to: user.group.id
+  alias: true
+  beat: auditbeat
+
+- from: user.egid
+  to: user.effective.group.id
+  alias: true
+  beat: auditbeat
+
+- from: user.sgid
+  to: user.saved.group.id
+  alias: true
+  beat: auditbeat
+
+- from: user.fsgid
+  to: user.filesystem.group.id
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.auid
+  to: user.audit.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.uid
+  to: user.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.euid
+  to: user.effective.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.fsuid
+  to: user.filesystem.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.suid
+  to: user.saved.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.gid
+  to: user.group.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.egid
+  to: user.effective.group.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.sgid
+  to: user.saved.group.name
+  alias: true
+  beat: auditbeat
+
+- from: user.name_map.fsgid
+  to: user.filesystem.group.name
+  alias: true
+  beat: auditbeat
+
 # Metricbeat
 
 ## Metricbeat base fields

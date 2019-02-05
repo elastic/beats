@@ -7,32 +7,41 @@
     type: group
     fields:
     - name: auid
-      type: keyword
-      description: login user ID
+      type: alias
+      path: user.audit.id
+      migration: true
     - name: uid
-      type: keyword
-      description: user ID
+      type: alias
+      path: user.id
+      migration: true
     - name: euid
-      type: keyword
-      description: effective user ID
+      type: alias
+      path: user.effective.id
+      migration: true
     - name: fsuid
-      type: keyword
-      description: file system user ID
+      type: alias
+      path: user.filesystem.id
+      migration: true
     - name: suid
-      type: keyword
-      description: sent user ID
+      type: alias
+      path: user.saved.id
+      migration: true
     - name: gid
-      type: keyword
-      description: group ID
+      type: alias
+      path: user.group.id
+      migration: true
     - name: egid
-      type: keyword
-      description: effective group ID
+      type: alias
+      path: user.effective.group.id
+      migration: true
     - name: sgid
-      type: keyword
-      description: set group ID
+      type: alias
+      path: user.saved.group.id
+      migration: true
     - name: fsgid
-      type: keyword
-      description: file system group ID
+      type: alias
+      path: user.filesystem.group.id
+      migration: true
     - name: name_map
       type: group
       description: >
@@ -41,32 +50,41 @@
         (e.g. auid -> root).
       fields:
       - name: auid
-        type: keyword
-        description: login user name
+        type: alias
+        path: user.audit.name
+        migration: true
       - name: uid
-        type: keyword
-        description: user name
+        type: alias
+        path: user.name
+        migration: true
       - name: euid
-        type: keyword
-        description: effective user name
+        type: alias
+        path: user.effective.name
+        migration: true
       - name: fsuid
-        type: keyword
-        description: file system user name
+        type: alias
+        path: user.filesystem.name
+        migration: true
       - name: suid
-        type: keyword
-        description: sent user name
+        type: alias
+        path: user.saved.name
+        migration: true
       - name: gid
-        type: keyword
-        description: group name
+        type: alias
+        path: user.group.name
+        migration: true
       - name: egid
-        type: keyword
-        description: effective group name
+        type: alias
+        path: user.effective.group.name
+        migration: true
       - name: sgid
-        type: keyword
-        description: set group name
+        type: alias
+        path: user.saved.group.name
+        migration: true
       - name: fsgid
-        type: keyword
-        description: file system group name
+        type: alias
+        path: user.filesystem.group.name
+        migration: true
     - name: selinux
       type: group
       description: The SELinux identity of the actor.

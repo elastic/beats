@@ -486,7 +486,6 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 
 	// Add root level fields.
 	addUser(auditEvent.User, out.RootFields)
-	addGroup(auditEvent.User, out.RootFields)
 	addProcess(auditEvent.Process, out.RootFields)
 	addFile(auditEvent.File, out.RootFields)
 	addAddress(auditEvent.Source, "source", out.RootFields)
@@ -535,36 +534,61 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 }
 
 func addUser(u aucoalesce.User, m common.MapStr) {
-	user := make(common.MapStr, len(u.IDs))
+	user := common.MapStr{}
 	m.Put("user", user)
 
 	for id, value := range u.IDs {
-		user[id] = value
+		switch id {
+		case "uid":
+			user["id"] = value
+		case "gid":
+			user.Put("group.id", value)
+		case "euid":
+			user.Put("effective.id", value)
+		case "egid":
+			user.Put("effective.group.id", value)
+		case "suid":
+			user.Put("saved.id", value)
+		case "sgid":
+			user.Put("saved.group.id", value)
+		case "fsuid":
+			user.Put("filesystem.id", value)
+		case "fsgid":
+			user.Put("filesystem.group.id", value)
+		case "auid":
+			user.Put("audit.id", value)
+		default:
+			user.Put(id+".id", value)
+		}
+
 		if len(u.SELinux) > 0 {
 			user["selinux"] = u.SELinux
 		}
-		if len(u.Names) > 0 {
-			user["name_map"] = u.Names
-		}
 	}
-	if uid, found := u.IDs["uid"]; found {
-		user["id"] = uid
-	}
-	if uidName, found := u.Names["uid"]; found {
-		user["name"] = uidName
-	}
-}
 
-func addGroup(u aucoalesce.User, m common.MapStr) {
-	group := make(common.MapStr, 2)
-	if gid, found := u.IDs["gid"]; found {
-		group["id"] = gid
-	}
-	if gidName, found := u.Names["gid"]; found {
-		group["name"] = gidName
-	}
-	if len(group) > 0 {
-		m.Put("group", group)
+	for id, value := range u.Names {
+		switch id {
+		case "uid":
+			user["name"] = value
+		case "gid":
+			user.Put("group.name", value)
+		case "euid":
+			user.Put("effective.name", value)
+		case "egid":
+			user.Put("effective.group.name", value)
+		case "suid":
+			user.Put("saved.name", value)
+		case "sgid":
+			user.Put("saved.group.name", value)
+		case "fsuid":
+			user.Put("filesystem.name", value)
+		case "fsgid":
+			user.Put("filesystem.group.name", value)
+		case "auid":
+			user.Put("audit.name", value)
+		default:
+			user.Put(id+".name", value)
+		}
 	}
 }
 
