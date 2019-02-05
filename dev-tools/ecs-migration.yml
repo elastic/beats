@@ -108,12 +108,6 @@
   alias: true
   beat: filebeat
 
-- from: fileset.name
-  to: event.dataset
-  alias6: true
-  alias: true
-  beat: filebeat
-
 - from: fileset.module
   to: event.module
   alias6: true
@@ -1633,13 +1627,6 @@
 # Metricbeat
 
 ## Metricbeat base fields
-- from: metricset.name
-  to: event.dataset
-  alias: false
-  comment: Data structure of field changed, old field will stay around
-  breaking: true
-  beat: metricbeat
-
 - from: metricset.module
   to: event.module
   alias: true
@@ -2087,6 +2074,7 @@
   alias: false
   beat: journalbeat
   comment: This field should not be renamed as it would cause issue some Beats and Journalbeat does not have dashboards
+  # This field should not be renamed as it would cause issue some Beats and Journalbeat does not have dashboards
   rename: false
 
 - from: read_timestamp
@@ -2116,6 +2104,7 @@
   to: winlog.api
   alias: true
   beat: winlogbeat
+  rename: false
 
 - from: log_name
   to: winlog.channel
@@ -2208,3 +2197,4 @@
   to: winlog.version
   alias: true
   beat: winlogbeat
+  rename: false

@@ -8,8 +8,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a", 
-                "title": "Sudo commands by user [Filebeat System]", 
+                "savedSearchId": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a-ecs", 
+                "title": "Sudo commands by user [Filebeat System] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -59,11 +59,11 @@
                         "setYExtents": false, 
                         "times": []
                     }, 
-                    "title": "Sudo commands by user", 
+                    "title": "Sudo commands by user ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "5c7af030-fa2a-11e6-bbd3-29c986c96e5a", 
+            "id": "5c7af030-fa2a-11e6-bbd3-29c986c96e5a-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -83,7 +83,7 @@
                         }
                     }
                 }, 
-                "title": "Sudo errors [Filebeat System]", 
+                "title": "Sudo errors [Filebeat System] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
@@ -133,11 +133,11 @@
                         "setYExtents": false, 
                         "times": []
                     }, 
-                    "title": "Sudo errors", 
+                    "title": "Sudo errors ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "51164310-fa2b-11e6-bbd3-29c986c96e5a", 
+            "id": "51164310-fa2b-11e6-bbd3-29c986c96e5a-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -149,8 +149,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a", 
-                "title": "Top sudo commands [Filebeat System]", 
+                "savedSearchId": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a-ecs", 
+                "title": "Top sudo commands [Filebeat System] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -208,11 +208,11 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "Top sudo commands", 
+                    "title": "Top sudo commands ECS", 
                     "type": "table"
                 }
             }, 
-            "id": "dc589770-fa2b-11e6-bbd3-29c986c96e5a", 
+            "id": "dc589770-fa2b-11e6-bbd3-29c986c96e5a-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -222,20 +222,20 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "title": "Dashboards [Filebeat System]", 
+                "title": "Dashboards [Filebeat System] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
                         "fontSize": 12, 
-                        "markdown": "[Syslog](#/dashboard/Filebeat-syslog-dashboard) | [Sudo commands](#/dashboard/277876d0-fa2c-11e6-bbd3-29c986c96e5a) | [SSH logins](#/dashboard/5517a150-f9ce-11e6-8115-a7c18106d86a) | [New users and groups](#/dashboard/0d3f2380-fa78-11e6-ae9b-81e5311e8cab)"
+                        "markdown": "[Syslog](#/dashboard/Filebeat-syslog-dashboard-ecs) | [Sudo commands](#/dashboard/277876d0-fa2c-11e6-bbd3-29c986c96e5a-ecs) | [SSH logins](#/dashboard/5517a150-f9ce-11e6-8115-a7c18106d86a-ecs) | [New users and groups](#/dashboard/0d3f2380-fa78-11e6-ae9b-81e5311e8cab-ecs)"
                     }, 
-                    "title": "Dashboards [Filebeat System]", 
+                    "title": "Dashboards [Filebeat System] ECS", 
                     "type": "markdown"
                 }
             }, 
-            "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54", 
+            "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54-ecs", 
             "type": "visualization", 
             "version": 1
         }, 
@@ -266,10 +266,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Sudo commands [Filebeat System]", 
+                "title": "Sudo commands [Filebeat System] ECS", 
                 "version": 1
             }, 
-            "id": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a", 
+            "id": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a-ecs", 
             "type": "search", 
             "version": 2
         }, 
@@ -299,7 +299,7 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "5c7af030-fa2a-11e6-bbd3-29c986c96e5a", 
+                        "id": "5c7af030-fa2a-11e6-bbd3-29c986c96e5a-ecs", 
                         "panelIndex": 1, 
                         "row": 6, 
                         "size_x": 12, 
@@ -308,7 +308,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "51164310-fa2b-11e6-bbd3-29c986c96e5a", 
+                        "id": "51164310-fa2b-11e6-bbd3-29c986c96e5a-ecs", 
                         "panelIndex": 2, 
                         "row": 10, 
                         "size_x": 12, 
@@ -317,7 +317,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "dc589770-fa2b-11e6-bbd3-29c986c96e5a", 
+                        "id": "dc589770-fa2b-11e6-bbd3-29c986c96e5a-ecs", 
                         "panelIndex": 3, 
                         "row": 2, 
                         "size_x": 12, 
@@ -326,7 +326,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54", 
+                        "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54-ecs", 
                         "panelIndex": 4, 
                         "row": 1, 
                         "size_x": 12, 
@@ -335,7 +335,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat System] Sudo commands", 
+                "title": "[Filebeat System] Sudo commands ECS", 
                 "uiStateJSON": {
                     "P-3": {
                         "vis": {
@@ -350,7 +350,7 @@
                 }, 
                 "version": 1
             }, 
-            "id": "277876d0-fa2c-11e6-bbd3-29c986c96e5a", 
+            "id": "277876d0-fa2c-11e6-bbd3-29c986c96e5a-ecs", 
             "type": "dashboard", 
             "version": 6
         }
