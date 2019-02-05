@@ -110,6 +110,12 @@
       type: long
       description: >
         Number of messages which have been written to the message store.
+    - name: name
+      type: alias
+      path: rabbitmq.node.name
+      migration: true
+      description: >
+        Node name
     - name: proc.total
       type: long
       description: >

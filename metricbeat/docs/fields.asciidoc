@@ -20418,6 +20418,18 @@ Number of messages which have been written to the message store.
 
 --
 
+*`rabbitmq.node.name`*::
++
+--
+type: alias
+
+alias to: rabbitmq.node.name
+
+Node name
+
+
+--
+
 *`rabbitmq.node.proc.total`*::
 +
 --
