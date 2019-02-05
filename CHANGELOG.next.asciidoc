@@ -84,6 +84,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   still used for matcher. {issue}10505[10505] {pull}10506[10506]
 - Change type of haproxy.source from text to keyword. {pull}10506[10506]
 - Populate more ECS fields in the Suricata module. {pull}10006[10006]
+- Rename `event.type` to `suricata.eve.event_type` in Suricata module because event.type is reserved for future use by ECS. {pull}10575[10575]
 
 *Heartbeat*
 
