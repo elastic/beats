@@ -18,11 +18,11 @@ var (
 				"type": c.Str("bucket.storage.type", s.Optional),
 			},
 			"size": s.Object{
-				"bytes": c.Float("bucket.size.bytes", s.Optional),
+				"bytes": c.Float("BucketSizeBytes", s.Optional),
 			},
 		},
 		"object": s.Object{
-			"count": c.Float("object.count", s.Optional),
+			"count": c.Float("NumberOfObjects", s.Optional),
 		},
 	}
 )

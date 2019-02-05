@@ -42,12 +42,6 @@ type MetricSet struct {
 	logger *logp.Logger
 }
 
-// metricIDNameMap is a translating map between aws s3 module metric name and cloudwatch s3 metric name.
-var metricIDNameMap = map[string][]string{
-	"BucketSizeBytes": {"bucket.size.bytes"},
-	"NumberOfObjects": {"object.count"},
-}
-
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -69,12 +63,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, errors.Wrap(err, "error creating aws metricset")
 	}
 
-	// Check if period is set to be multiple of 60s or 300s
-	remainder300 := metricSet.PeriodInSec % 300
-	remainder60 := metricSet.PeriodInSec % 60
-	if remainder300 != 0 || remainder60 != 0 {
-		err := errors.New("period needs to be set to 60s (or a multiple of 60s) or set to 300s " +
-			"(or a multiple of 300s). To avoid data missing or extra costs, please make sure period is set correctly " +
+	// Check if period is set to be multiple of 86400s
+	remainder := metricSet.PeriodInSec % 86400
+	if remainder != 0 {
+		err := errors.New("period needs to be set to 86400s (or a multiple of 86400s). " +
+			"To avoid data missing or extra costs, please make sure period is set correctly " +
 			"in config.yml")
 		s3Logger.Info(err)
 	}
@@ -116,11 +109,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		}
 
 		if listMetricsOutput.Metrics == nil || len(listMetricsOutput.Metrics) == 0 {
-			m.logger.Info("No S3 buckets in region " + regionName)
+			// No S3 buckets in this region
 			continue
 		}
 
-		fmt.Println("listMetricsOutput.Metrics = ", listMetricsOutput.Metrics)
 		metricDataQueries := constructMetricQueries(listMetricsOutput.Metrics)
 
 		init := true
@@ -224,7 +216,6 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 	event.RootFields = common.MapStr{}
 	mapOfRootFieldsResults := make(map[string]interface{})
 	mapOfRootFieldsResults["service.name"] = metricsetName
-	mapOfRootFieldsResults["cloud.provider"] = metricsetName
 	mapOfRootFieldsResults["cloud.region"] = regionName
 
 	resultRootFields, err := eventMapping(mapOfRootFieldsResults, schemaRootFields)
@@ -240,11 +231,9 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 			continue
 		}
 		labels := strings.Split(*output.Label, " ")
-
 		mapOfMetricSetFieldResults["bucket.name"] = labels[0]
 		mapOfMetricSetFieldResults["bucket.storage.type"] = labels[1]
-		metricKey := metricIDNameMap[labels[2]]
-		mapOfMetricSetFieldResults[metricKey[0]] = fmt.Sprint(output.Values[0])
+		mapOfMetricSetFieldResults[labels[2]] = fmt.Sprint(output.Values[0])
 	}
 
 	resultMetricSetFields, err := eventMapping(mapOfMetricSetFieldResults, schemaMetricSetFields)

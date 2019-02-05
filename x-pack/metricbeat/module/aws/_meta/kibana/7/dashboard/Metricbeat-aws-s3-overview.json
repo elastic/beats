@@ -1,0 +1,328 @@
+{
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "AWS S3 Bucket Size",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "background_color_rules": [
+              {
+                "id": "ef564840-2981-11e9-83d0-b77cc562b223"
+              }
+            ],
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "5m",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "S3 Bucket Size",
+                "line_width": "2",
+                "metrics": [
+                  {
+                    "field": "aws.s3.bucket.size.bytes",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": "2",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "aws.s3.bucket.name",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "terms_size": "5"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "AWS S3 Bucket Size",
+          "type": "metrics"
+        }
+      },
+      "id": "6aad2780-2986-11e9-86eb-a3a07a77f530",
+      "type": "visualization",
+      "updated_at": "2019-02-05T20:45:47.820Z",
+      "version": 2
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "AWS S3 Number of Objects",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "axis_formatter": "number",
+            "axis_position": "left",
+            "axis_scale": "normal",
+            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+            "index_pattern": "metricbeat-*",
+            "interval": "5m",
+            "series": [
+              {
+                "axis_position": "right",
+                "chart_type": "line",
+                "color": "#68BC00",
+                "fill": "0",
+                "filter": "",
+                "formatter": "number",
+                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                "label": "AWS S3 Number of Objects",
+                "line_width": "2",
+                "metrics": [
+                  {
+                    "field": "aws.s3.object.count",
+                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                    "type": "avg"
+                  }
+                ],
+                "point_size": "2",
+                "separate_axis": 0,
+                "split_color_mode": "rainbow",
+                "split_filters": [
+                  {
+                    "color": "#68BC00",
+                    "id": "572e0bb0-2987-11e9-af5a-b94b5e2e861a"
+                  }
+                ],
+                "split_mode": "terms",
+                "stacked": "none",
+                "terms_field": "aws.s3.bucket.name",
+                "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                "terms_size": "5"
+              }
+            ],
+            "show_grid": 1,
+            "show_legend": 1,
+            "time_field": "@timestamp",
+            "type": "timeseries"
+          },
+          "title": "AWS S3 Number of Objects",
+          "type": "metrics"
+        }
+      },
+      "id": "36d26540-2988-11e9-86eb-a3a07a77f530",
+      "type": "visualization",
+      "updated_at": "2019-02-05T20:54:22.356Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "AWS filter by region",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "controls": [
+              {
+                "fieldName": "cloud.region",
+                "id": "1549397251041",
+                "indexPattern": "metricbeat-*",
+                "label": "Filter by Region",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              }
+            ],
+            "pinFilters": false,
+            "updateFiltersOnChange": false,
+            "useTimeFilter": false
+          },
+          "title": "AWS filter by region",
+          "type": "input_control_vis"
+        }
+      },
+      "id": "deab0260-2981-11e9-86eb-a3a07a77f530",
+      "type": "visualization",
+      "updated_at": "2019-02-05T20:08:57.478Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "title": "AWS S3 filter by storage type",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [],
+          "params": {
+            "controls": [
+              {
+                "fieldName": "aws.s3.bucket.storage.type",
+                "id": "1549400584019",
+                "indexPattern": "metricbeat-*",
+                "label": "Filter by Storage Type",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
+              }
+            ],
+            "pinFilters": false,
+            "updateFiltersOnChange": false,
+            "useTimeFilter": false
+          },
+          "title": "AWS S3 filter by storage type",
+          "type": "input_control_vis"
+        }
+      },
+      "id": "9ad99580-2989-11e9-86eb-a3a07a77f530",
+      "type": "visualization",
+      "updated_at": "2019-02-05T21:04:19.672Z",
+      "version": 1
+    },
+    {
+      "attributes": {
+        "description": "Overview of AWS S3 bucket metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "optionsJSON": {
+          "darkTheme": false,
+          "hidePanelTitles": false,
+          "useMargins": true
+        },
+        "panelsJSON": [
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "1",
+              "w": 48,
+              "x": 0,
+              "y": 8
+            },
+            "id": "6aad2780-2986-11e9-86eb-a3a07a77f530",
+            "panelIndex": "1",
+            "type": "visualization",
+            "version": "6.6.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 15,
+              "i": "2",
+              "w": 48,
+              "x": 0,
+              "y": 23
+            },
+            "id": "36d26540-2988-11e9-86eb-a3a07a77f530",
+            "panelIndex": "2",
+            "type": "visualization",
+            "version": "6.6.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 8,
+              "i": "3",
+              "w": 24,
+              "x": 0,
+              "y": 0
+            },
+            "id": "deab0260-2981-11e9-86eb-a3a07a77f530",
+            "panelIndex": "3",
+            "type": "visualization",
+            "version": "6.6.0"
+          },
+          {
+            "embeddableConfig": {},
+            "gridData": {
+              "h": 8,
+              "i": "4",
+              "w": 24,
+              "x": 24,
+              "y": 0
+            },
+            "id": "9ad99580-2989-11e9-86eb-a3a07a77f530",
+            "panelIndex": "4",
+            "type": "visualization",
+            "version": "6.6.0"
+          }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWS S3] Overview",
+        "version": 1
+      },
+      "id": "47f57dc0-2989-11e9-86eb-a3a07a77f530",
+      "type": "dashboard",
+      "updated_at": "2019-02-05T21:07:56.959Z",
+      "version": 3
+    }
+  ],
+  "version": "6.6.0"
+}
