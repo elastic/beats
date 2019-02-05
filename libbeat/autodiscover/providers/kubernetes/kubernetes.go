@@ -161,7 +161,9 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 
 	// Emit container and port information
 	for _, c := range containers {
-		cid := fmt.Sprintf("%s.%s", pod.Metadata.GetName(), c.GetName())
+		// This must be an id that doesn't depend on the state of the container
+		// so it works also on `stop` if containers have been already stopped.
+		cid := fmt.Sprintf("%s.%s", pod.Metadata.GetUid(), c.GetName())
 
 		cmeta := common.MapStr{
 			"id":      cid,
