@@ -2044,3 +2044,118 @@
   to: event.created
   alias: true
   beat: journalbeat
+
+## Winlogbeat
+
+# Alias to ECS fields
+
+- from: xml
+  to: event.original
+  alias: true
+  beat: winlogbeat
+
+- from: level
+  to: log.level
+  alias: true
+  beat: winlogbeat
+
+# Move fields to winlog.* section, to reduce chances of top level field name conflicts.
+
+# renames to match Windows Event Log naming
+
+- from: type
+  to: winlog.api
+  alias: true
+  beat: winlogbeat
+
+- from: log_name
+  to: winlog.channel
+  alias: true
+  beat: winlogbeat
+
+- from: record_number
+  to: winlog.record_id
+  alias: true
+  beat: winlogbeat
+
+- from: process_id
+  to: winlog.process.pid
+  alias: true
+  beat: winlogbeat
+
+- from: source_name
+  to: winlog.provider_name
+  alias: true
+  beat: winlogbeat
+
+- from: thread_id
+  to: winlog.process.thread.id
+  alias: true
+  beat: winlogbeat
+
+# Fields moved without adjusting the name
+
+- from: activity_id
+  to: winlog.activity_id
+  alias: true
+  beat: winlogbeat
+
+- from: computer_name
+  to: winlog.computer_name
+  alias: true
+  beat: winlogbeat
+
+- from: event_id
+  to: winlog.event_id
+  alias: true
+  beat: winlogbeat
+
+- from: keywords
+  to: winlog.keywords
+  alias: true
+  beat: winlogbeat
+
+- from: message_error
+  to: error.message
+  alias: true
+  beat: winlogbeat
+
+- from: related_activity_id
+  to: winlog.related_activity_id
+  alias: true
+  beat: winlogbeat
+
+- from: opcode
+  to: winlog.opcode
+  alias: true
+  beat: winlogbeat
+
+- from: provider_guid
+  to: winlog.provider_guid
+  alias: true
+  beat: winlogbeat
+
+- from: task
+  to: winlog.task
+  alias: true
+  beat: winlogbeat
+
+- from: user.identifier
+  to: winlog.user.identifier
+  alias: true
+  beat: winlogbeat
+
+- from: user.domain
+  to: winlog.user.domain
+  alias: true
+  beat: winlogbeat
+
+- from: user.type
+  to: winlog.user.type
+  alias: true
+  beat: winlogbeat
+
+- from: version
+  to: winlog.version
+  alias: true
+  beat: winlogbeat
