@@ -1,0 +1,9 @@
+- name: metrics
+  type: group
+  description: >
+    metrics
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

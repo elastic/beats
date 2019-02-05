@@ -182,6 +182,12 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:8500"]
 
+#------------------------------- Coredns Module ------------------------------
+- module: coredns
+  metricsets: ["stats"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:9153"]
 
 #------------------------------ Couchbase Module ------------------------------
 - module: couchbase

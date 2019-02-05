@@ -20,6 +20,7 @@ grouped in the following categories:
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-consul>>
+* <<exported-fields-coredns>>
 * <<exported-fields-couchbase>>
 * <<exported-fields-couchdb>>
 * <<exported-fields-docker-processor>>
@@ -2564,6 +2565,36 @@ Garbage collector pause time in nanoseconds
 type: long
 
 Nanoseconds consumed by stop-the-world garbage collection pauses since Consul started.
+
+--
+
+[[exported-fields-coredns]]
+== coredns fields
+
+experimental[]
+coredns module
+
+
+
+[float]
+== coredns fields
+
+
+
+
+[float]
+== metrics fields
+
+metrics
+
+
+
+*`coredns.metrics.example`*::
++
+--
+type: keyword
+
+Example field
 
 --
 
@@ -21632,7 +21663,7 @@ type: long
 
 format: bytes
 
-Used memory by the Lua engine.        
+Used memory by the Lua engine.
 
 
 --
@@ -21644,7 +21675,7 @@ type: long
 
 format: bytes
 
-The size in bytes of the dataset 
+The size in bytes of the dataset
 
 
 --
@@ -21889,7 +21920,7 @@ type: long
 
 format: bytes
 
-The size in bytes of copy-on-write allocations during the last RBD save operation                
+The size in bytes of copy-on-write allocations during the last RBD save operation
 
 
 --
@@ -22018,7 +22049,7 @@ type: long
 
 format: bytes
 
-AOF current file size             
+AOF current file size
 
 
 --
@@ -22122,7 +22153,7 @@ Total size in bytes of the replication backlog buffer
 --
 type: long
 
-The master offset of the replication backlog buffer          
+The master offset of the replication backlog buffer
 
 
 --
@@ -26580,4 +26611,3 @@ type: long
 Epoch value of the Zookeeper transaction ID. An epoch signifies the period in which a server is a leader
 
 --
-

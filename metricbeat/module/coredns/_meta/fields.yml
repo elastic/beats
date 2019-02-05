@@ -1,0 +1,11 @@
+- key: coredns
+  title: "coredns"
+  description: >
+    experimental[]
+
+    coredns module
+  fields:
+    - name: coredns
+      type: group
+      description: >
+      fields:
