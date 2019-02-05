@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/auditbeat/cache"
+	"github.com/elastic/beats/x-pack/auditbeat/module/system"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -85,7 +86,7 @@ func init() {
 
 // MetricSet collects data about the system's packages.
 type MetricSet struct {
-	mb.BaseMetricSet
+	system.SystemMetricSet
 	config    config
 	log       *logp.Logger
 	cache     *cache.Cache
@@ -155,6 +156,15 @@ func (pkg Package) toMapStr() common.MapStr {
 	return mapstr
 }
 
+// entityID creates an ID that uniquely identifies this package across machines.
+func (pkg Package) entityID(hostID string) string {
+	h := system.NewEntityHash()
+	h.Write([]byte(hostID))
+	h.Write([]byte(pkg.Name))
+	h.Write([]byte(pkg.Version))
+	return h.Sum()
+}
+
 func getOS() (*types.OSInfo, error) {
 	host, err := sysinfo.Host()
 	if err != nil {
@@ -184,11 +194,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	ms := &MetricSet{
-		BaseMetricSet: base,
-		config:        config,
-		log:           logp.NewLogger(metricsetName),
-		cache:         cache.New(),
-		bucket:        bucket,
+		SystemMetricSet: system.NewSystemMetricSet(base),
+		config:          config,
+		log:             logp.NewLogger(metricsetName),
+		cache:           cache.New(),
+		bucket:          bucket,
 	}
 
 	osInfo, err := getOS()
@@ -282,7 +292,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 		return errors.Wrap(err, "error generating state ID")
 	}
 	for _, pkg := range packages {
-		event := packageEvent(pkg, eventTypeState, eventActionExistingPackage)
+		event := ms.packageEvent(pkg, eventTypeState, eventActionExistingPackage)
 		event.RootFields.Put("event.id", stateID.String())
 		report.Event(event)
 	}
@@ -327,19 +337,19 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 			if missingPkg.Name == newPkg.Name {
 				found = true
 				updated[newPkg.Name] = struct{}{}
-				report.Event(packageEvent(newPkg, eventTypeEvent, eventActionPackageUpdated))
+				report.Event(ms.packageEvent(newPkg, eventTypeEvent, eventActionPackageUpdated))
 				break
 			}
 		}
 
 		if !found {
-			report.Event(packageEvent(missingPkg, eventTypeEvent, eventActionPackageRemoved))
+			report.Event(ms.packageEvent(missingPkg, eventTypeEvent, eventActionPackageRemoved))
 		}
 	}
 
 	for _, newPkg := range newPackages {
 		if _, contains := updated[newPkg.Name]; !contains {
-			report.Event(packageEvent(newPkg, eventTypeEvent, eventActionPackageInstalled))
+			report.Event(ms.packageEvent(newPkg, eventTypeEvent, eventActionPackageInstalled))
 		}
 	}
 
@@ -360,7 +370,7 @@ func convertToPackage(cacheValues []interface{}) []*Package {
 	return packages
 }
 
-func packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
+func (ms *MetricSet) packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
 	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
@@ -371,6 +381,8 @@ func packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
 		},
 		MetricSetFields: pkg.toMapStr(),
 	}
+
+	event.MetricSetFields.Put("entity_id", pkg.entityID(ms.HostID()))
 
 	if pkg.Error != nil {
 		event.RootFields.Put("error.message", pkg.Error.Error())

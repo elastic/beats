@@ -28,10 +28,33 @@
   - name: user
     type: group
     fields:
+    - name: entity_id
+      type: keyword
+      description: >
+        ID uniquely identifying the user on a host. It is computed as a SHA-256 hash
+        of the host ID, user ID, and user name.
     - name: terminal
       type: keyword
       description: >
         Terminal of the user.
+
+  - name: process
+    type: group
+    fields:
+    - name: entity_id
+      type: keyword
+      description: >
+        ID uniquely identifying the process. It is computed as a SHA-256 hash of the
+        host ID, PID, and process start time.
+
+  - name: socket
+    type: group
+    fields:
+    - name: entity_id
+      type: keyword
+      description: >
+        ID uniquely identifying the socket. It is computed as a SHA-256 hash of the
+        host ID, socket inode, local IP, local port, remote IP, and remote port.
 
   - name: system.audit
     type: group

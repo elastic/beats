@@ -7,6 +7,7 @@
 package socket
 
 import (
+	"encoding/binary"
 	"fmt"
 	"net"
 	"os/user"
@@ -25,6 +26,7 @@ import (
 	sock "github.com/elastic/beats/metricbeat/helper/socket"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/auditbeat/cache"
+	"github.com/elastic/beats/x-pack/auditbeat/module/system"
 	"github.com/elastic/gosigar/sys/linux"
 )
 
@@ -67,7 +69,7 @@ func init() {
 
 // MetricSet collects data about sockets.
 type MetricSet struct {
-	mb.BaseMetricSet
+	system.SystemMetricSet
 	config Config
 	cache  *cache.Cache
 	log    *logp.Logger
@@ -176,6 +178,18 @@ func (s Socket) toMapStr() common.MapStr {
 	return mapstr
 }
 
+// entityID creates an ID that uniquely identifies this socket across machines.
+func (s Socket) entityID(hostID string) string {
+	h := system.NewEntityHash()
+	h.Write([]byte(hostID))
+	binary.Write(h, binary.LittleEndian, int64(s.Inode))
+	h.Write(s.LocalIP)
+	h.Write(s.RemoteIP)
+	binary.Write(h, binary.LittleEndian, int64(s.LocalPort))
+	binary.Write(h, binary.LittleEndian, int64(s.RemotePort))
+	return h.Sum()
+}
+
 // ecsDirectionString is a custom alternative to the existing String()
 // to be compatible with recommended ECS values for network.direction.
 func ecsDirectionString(direction sock.Direction) string {
@@ -206,13 +220,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	ms := &MetricSet{
-		BaseMetricSet: base,
-		config:        config,
-		log:           logp.NewLogger(metricsetName),
-		cache:         cache.New(),
-		netlink:       sock.NewNetlinkSession(),
-		ptable:        ptable,
-		listeners:     sock.NewListenerTable(),
+		SystemMetricSet: system.NewSystemMetricSet(base),
+		config:          config,
+		log:             logp.NewLogger(metricsetName),
+		cache:           cache.New(),
+		netlink:         sock.NewNetlinkSession(),
+		ptable:          ptable,
+		listeners:       sock.NewListenerTable(),
 	}
 
 	return ms, nil
@@ -262,7 +276,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 			return err
 		}
 
-		event := socketEvent(socket, eventTypeState, eventActionExistingSocket)
+		event := ms.socketEvent(socket, eventTypeState, eventActionExistingSocket)
 		event.RootFields.Put("event.id", stateID.String())
 		report.Event(event)
 	}
@@ -294,18 +308,18 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 				return err
 			}
 
-			report.Event(socketEvent(s.(*Socket), eventTypeEvent, eventActionSocketOpened))
+			report.Event(ms.socketEvent(s.(*Socket), eventTypeEvent, eventActionSocketOpened))
 		}
 	}
 
 	for _, s := range closed {
-		report.Event(socketEvent(s.(*Socket), eventTypeEvent, eventActionSocketClosed))
+		report.Event(ms.socketEvent(s.(*Socket), eventTypeEvent, eventActionSocketClosed))
 	}
 
 	return nil
 }
 
-func socketEvent(socket *Socket, eventType string, action eventAction) mb.Event {
+func (ms *MetricSet) socketEvent(socket *Socket, eventType string, action eventAction) mb.Event {
 	event := mb.Event{
 		RootFields: socket.toMapStr(),
 	}
@@ -313,6 +327,8 @@ func socketEvent(socket *Socket, eventType string, action eventAction) mb.Event 
 	event.RootFields.Put("event.kind", eventType)
 	event.RootFields.Put("event.action", action.String())
 	event.RootFields.Put("message", socketMessage(socket, action))
+
+	event.RootFields.Put("socket.entity_id", socket.entityID(ms.HostID()))
 
 	return event
 }
