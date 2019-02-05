@@ -166,6 +166,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Add support for Percona in the `slowlog` fileset of `mysql` module. {issue}6665[6665] {pull}10227[10227]
 - Teach elasticsearch/audit fileset to parse out some more fields. {issue}10134[10134] {pull}10137[10137]
 - Added support for ingesting structured Elasticsearch audit logs {pull}8852[8852]
+- New iptables module that receives iptables/ip6tables logs over syslog or file. Supports Ubiquiti Firewall extensions. {issue}8781[8781] {pull}10176[10176]
 
 *Heartbeat*
 - Made monitors.d configuration part of the default config. {pull}9004[9004]
