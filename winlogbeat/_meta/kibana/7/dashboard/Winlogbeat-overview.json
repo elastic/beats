@@ -1,366 +1,183 @@
 {
-    "objects": [
+  "objects": [
+    {
+      "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}}}"
+        },
+        "optionsJSON": "{\"darkTheme\":false}",
+        "panelsJSON": "[{\"gridData\":{\"h\":20,\"i\":\"1\",\"w\":36,\"x\":12,\"y\":0},\"panelIndex\":\"1\",\"version\":\"7.0.0-SNAPSHOT\",\"panelRefName\":\"panel_0\"},{\"gridData\":{\"h\":20,\"i\":\"3\",\"w\":12,\"x\":0,\"y\":0},\"panelIndex\":\"3\",\"version\":\"7.0.0-SNAPSHOT\",\"panelRefName\":\"panel_1\"},{\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}},\"gridData\":{\"h\":20,\"i\":\"4\",\"w\":16,\"x\":16,\"y\":20},\"panelIndex\":\"4\",\"version\":\"7.0.0-SNAPSHOT\",\"panelRefName\":\"panel_2\"},{\"gridData\":{\"h\":20,\"i\":\"5\",\"w\":16,\"x\":32,\"y\":20},\"panelIndex\":\"5\",\"version\":\"7.0.0-SNAPSHOT\",\"panelRefName\":\"panel_3\"},{\"gridData\":{\"h\":20,\"i\":\"6\",\"w\":16,\"x\":0,\"y\":20},\"panelIndex\":\"6\",\"version\":\"7.0.0-SNAPSHOT\",\"panelRefName\":\"panel_4\"}]",
+        "timeRestore": false,
+        "title": "Winlogbeat Dashboard",
+        "version": 1
+      },
+      "id": "Winlogbeat-Dashboard",
+      "migrationVersion": {
+        "dashboard": "7.0.0"
+      },
+      "references": [
         {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [], 
-                        "index": "winlogbeat-*", 
-                        "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
-                        }
-                    }
-                }, 
-                "title": "Number of Events Over Time By Event Log", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }, 
-                        {
-                            "id": "2", 
-                            "params": {
-                                "customInterval": "2h", 
-                                "extended_bounds": {}, 
-                                "field": "@timestamp", 
-                                "interval": "auto", 
-                                "min_doc_count": 1
-                            }, 
-                            "schema": "segment", 
-                            "type": "date_histogram"
-                        }, 
-                        {
-                            "id": "3", 
-                            "params": {
-                                "field": "log_name", 
-                                "order": "desc", 
-                                "orderBy": "1", 
-                                "size": 6
-                            }, 
-                            "schema": "group", 
-                            "type": "terms"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "addLegend": true, 
-                        "addTimeMarker": false, 
-                        "addTooltip": true, 
-                        "defaultYExtents": false, 
-                        "mode": "stacked", 
-                        "scale": "linear", 
-                        "setYExtents": false, 
-                        "shareYAxis": true, 
-                        "times": [], 
-                        "yAxis": {}
-                    }, 
-                    "type": "histogram"
-                }
-            }, 
-            "id": "Number-of-Events-Over-Time-By-Event-Log", 
-            "type": "visualization", 
-            "version": 1
-        }, 
+          "id": "Number-of-Events-Over-Time-By-Event-Log",
+          "name": "panel_0",
+          "type": "visualization"
+        },
         {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [], 
-                        "index": "winlogbeat-*", 
-                        "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
-                        }
-                    }
-                }, 
-                "title": "Number of Events", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "fontSize": 60
-                    }, 
-                    "type": "metric"
-                }
-            }, 
-            "id": "Number-of-Events", 
-            "type": "visualization", 
-            "version": 1
-        }, 
+          "id": "Number-of-Events",
+          "name": "panel_1",
+          "type": "visualization"
+        },
         {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [], 
-                        "index": "winlogbeat-*", 
-                        "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
-                        }
-                    }
-                }, 
-                "title": "Top Event IDs", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }, 
-                        {
-                            "id": "2", 
-                            "params": {
-                                "field": "event_id", 
-                                "order": "desc", 
-                                "orderBy": "1", 
-                                "size": 5
-                            }, 
-                            "schema": "bucket", 
-                            "type": "terms"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "perPage": 10, 
-                        "showMeticsAtAllLevels": false, 
-                        "showPartialRows": false
-                    }, 
-                    "type": "table"
-                }
-            }, 
-            "id": "Top-Event-IDs", 
-            "type": "visualization", 
-            "version": 1
-        }, 
+          "id": "Top-Event-IDs",
+          "name": "panel_2",
+          "type": "visualization"
+        },
         {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [], 
-                        "index": "winlogbeat-*", 
-                        "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
-                        }
-                    }
-                }, 
-                "title": "Event Levels", 
-                "uiStateJSON": {
-                    "vis": {
-                        "params": {
-                            "sort": {
-                                "columnIndex": null, 
-                                "direction": null
-                            }
-                        }
-                    }
-                }, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "enabled": true, 
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }, 
-                        {
-                            "enabled": true, 
-                            "id": "2", 
-                            "params": {
-                                "field": "level", 
-                                "order": "desc", 
-                                "orderBy": "1", 
-                                "size": 5
-                            }, 
-                            "schema": "bucket", 
-                            "type": "terms"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "perPage": 10, 
-                        "showMeticsAtAllLevels": false, 
-                        "showPartialRows": false, 
-                        "showTotal": false, 
-                        "sort": {
-                            "columnIndex": null, 
-                            "direction": null
-                        }, 
-                        "totalFunc": "sum"
-                    }, 
-                    "title": "Event Levels", 
-                    "type": "table"
-                }
-            }, 
-            "id": "Event-Levels", 
-            "type": "visualization", 
-            "version": 1
-        }, 
+          "id": "Event-Levels",
+          "name": "panel_3",
+          "type": "visualization"
+        },
         {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [], 
-                        "index": "winlogbeat-*", 
-                        "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
-                        }
-                    }
-                }, 
-                "title": "Sources", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "enabled": true, 
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }, 
-                        {
-                            "enabled": true, 
-                            "id": "2", 
-                            "params": {
-                                "field": "source_name", 
-                                "order": "desc", 
-                                "orderBy": "1", 
-                                "size": 7
-                            }, 
-                            "schema": "segment", 
-                            "type": "terms"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "addLegend": true, 
-                        "addTooltip": true, 
-                        "isDonut": false, 
-                        "legendPosition": "right", 
-                        "shareYAxis": true
-                    }, 
-                    "title": "Sources", 
-                    "type": "pie"
-                }
-            }, 
-            "id": "Sources", 
-            "type": "visualization", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "hits": 0, 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [
-                            {
-                                "query": {
-                                    "query_string": {
-                                        "analyze_wildcard": true, 
-                                        "query": "*"
-                                    }
-                                }
-                            }
-                        ]
-                    }
-                }, 
-                "optionsJSON": {
-                    "darkTheme": false
-                }, 
-                "panelsJSON": [
-                    {
-                        "col": 4, 
-                        "id": "Number-of-Events-Over-Time-By-Event-Log", 
-                        "panelIndex": 1, 
-                        "row": 1, 
-                        "size_x": 9, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 1, 
-                        "id": "Number-of-Events", 
-                        "panelIndex": 3, 
-                        "row": 1, 
-                        "size_x": 3, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 5, 
-                        "id": "Top-Event-IDs", 
-                        "panelIndex": 4, 
-                        "row": 5, 
-                        "size_x": 4, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 9, 
-                        "id": "Event-Levels", 
-                        "panelIndex": 5, 
-                        "row": 5, 
-                        "size_x": 4, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 1, 
-                        "id": "Sources", 
-                        "panelIndex": 6, 
-                        "row": 5, 
-                        "size_x": 4, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }
-                ], 
-                "timeRestore": false, 
-                "title": "Winlogbeat Dashboard", 
-                "uiStateJSON": {}, 
-                "version": 1
-            }, 
-            "id": "Winlogbeat-Dashboard", 
-            "type": "dashboard", 
-            "version": 1
+          "id": "Sources",
+          "name": "panel_4",
+          "type": "visualization"
         }
-    ], 
-    "version": "6.0.0-alpha3-SNAPSHOT"
+      ],
+      "type": "dashboard",
+      "updated_at": "2019-02-05T04:31:28.874Z",
+      "version": 5
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"*\",\"language\":\"lucene\"},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "Number of Events Over Time By Channel",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Number of Events Over Time By Channel\",\"type\":\"histogram\",\"params\":{\"scale\":\"linear\",\"yAxis\":{},\"addTimeMarker\":false,\"addLegend\":true,\"shareYAxis\":true,\"mode\":\"stacked\",\"defaultYExtents\":false,\"setYExtents\":false,\"addTooltip\":true,\"times\":[],\"type\":\"histogram\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"histogram\",\"mode\":\"stacked\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\"}],\"legendPosition\":\"right\",\"dimensions\":{\"x\":{\"accessor\":0,\"format\":{\"id\":\"date\",\"params\":{\"pattern\":\"YYYY-MM-DD HH:mm\"}},\"params\":{\"date\":true,\"interval\":43200000,\"format\":\"YYYY-MM-DD HH:mm\",\"bounds\":{\"min\":\"2019-01-21T04:30:25.961Z\",\"max\":\"2019-02-05T04:30:25.961Z\"}},\"aggType\":\"date_histogram\"},\"y\":[{\"accessor\":2,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}],\"series\":[{\"accessor\":1,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"timeRange\":{\"from\":\"now-15d\",\"to\":\"now\",\"mode\":\"relative\"},\"useNormalizedEsInterval\":true,\"interval\":\"auto\",\"time_zone\":\"America/Montreal\",\"drop_partials\":false,\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"winlog.channel\",\"size\":6,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Channel\"}}]}"
+      },
+      "id": "Number-of-Events-Over-Time-By-Event-Log",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-02-05T04:30:57.063Z",
+      "version": 9
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "Number of Events",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"type\": \"metric\", \"listeners\": {}, \"params\": {\"fontSize\": 60}, \"aggs\": [{\"type\": \"count\", \"params\": {}, \"id\": \"1\", \"schema\": \"metric\"}]}"
+      },
+      "id": "Number-of-Events",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-02-05T03:54:42.903Z",
+      "version": 4
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "Top Event IDs",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Top Event IDs\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\",\"dimensions\":{\"metrics\":[{\"accessor\":1,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}],\"buckets\":[{\"accessor\":0,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"winlog.event_id\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Event IDs\"}}]}"
+      },
+      "id": "Top-Event-IDs",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-02-05T04:29:29.657Z",
+      "version": 7
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "Event Levels",
+        "uiStateJSON": "{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}}}",
+        "version": 1,
+        "visState": "{\"title\":\"Event Levels\",\"type\":\"table\",\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null},\"perPage\":10,\"showPartialRows\":false,\"totalFunc\":\"sum\",\"showTotal\":false,\"showMetricsAtAllLevels\":false,\"dimensions\":{\"metrics\":[{\"accessor\":1,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}],\"buckets\":[{\"accessor\":0,\"format\":{\"id\":\"terms\",\"params\":{\"id\":\"string\",\"otherBucketLabel\":\"Other\",\"missingBucketLabel\":\"Missing\"}},\"params\":{},\"aggType\":\"terms\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"log.level\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Log Levels\"}}]}"
+      },
+      "id": "Event-Levels",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-02-05T04:29:58.730Z",
+      "version": 7
+    },
+    {
+      "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "Sources (Provider Names)",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"title\":\"Sources (Provider Names)\",\"type\":\"pie\",\"params\":{\"legendPosition\":\"right\",\"isDonut\":false,\"addTooltip\":true,\"shareYAxis\":true,\"addLegend\":true,\"type\":\"pie\",\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"winlog.provider_name\",\"size\":7,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"}}]}"
+      },
+      "id": "Sources",
+      "migrationVersion": {
+        "visualization": "7.0.0"
+      },
+      "references": [
+        {
+          "id": "winlogbeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+          "type": "index-pattern"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2019-02-05T04:28:30.544Z",
+      "version": 7
+    }
+  ],
+  "version": "7.0.0-SNAPSHOT"
 }
