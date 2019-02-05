@@ -18,7 +18,8 @@
 package pipeline
 
 import (
-	"github.com/elastic/beats/libbeat/common/atomic"
+	"sync"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 )
@@ -28,7 +29,8 @@ type clientWorker struct {
 	observer outputObserver
 	qu       workQueue
 	client   outputs.Client
-	closed   atomic.Bool
+	done     chan struct{}
+	wg       sync.WaitGroup
 }
 
 // netClientWorker manages reconnectable output clients of type outputs.NetworkClient.
@@ -37,6 +39,7 @@ type netClientWorker struct {
 	qu       workQueue
 	client   outputs.NetworkClient
 	done     chan struct{}
+	wg       sync.WaitGroup
 
 	batchSize  int
 	batchSizer func() int
@@ -45,22 +48,40 @@ type netClientWorker struct {
 func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Client) outputWorker {
 	if nc, ok := client.(outputs.NetworkClient); ok {
 		c := &netClientWorker{observer: observer, qu: qu, client: nc, done: make(chan struct{})}
-		go c.run()
+		c.start()
 		return c
 	}
 	c := &clientWorker{observer: observer, qu: qu, client: client}
-	go c.run()
+	c.start()
 	return c
 }
 
+func (w *clientWorker) start() {
+	w.wg.Add(1)
+	go func() {
+		defer w.wg.Done()
+		w.run()
+	}()
+}
+
 func (w *clientWorker) Close() error {
-	w.closed.Store(true)
+	close(w.done)
+	w.wg.Wait()
 	return w.client.Close()
 }
 
 func (w *clientWorker) run() {
-	for !w.closed.Load() {
-		for batch := range w.qu {
+	for {
+		select {
+		case <-w.done:
+			return
+		default:
+		}
+
+		select {
+		case <-w.done:
+			return
+		case batch := <-w.qu:
 			w.observer.outBatchSend(len(batch.events))
 			if err := w.client.Publish(batch); err != nil {
 				return
@@ -71,7 +92,16 @@ func (w *clientWorker) run() {
 
 func (w *netClientWorker) Close() error {
 	close(w.done)
+	w.wg.Wait()
 	return w.client.Close()
+}
+
+func (w *netClientWorker) start() {
+	w.wg.Add(1)
+	go func() {
+		defer w.wg.Done()
+		w.run()
+	}()
 }
 
 func (w *netClientWorker) run() {
@@ -81,6 +111,15 @@ func (w *netClientWorker) run() {
 	)
 
 	for {
+		// Prioritize on next loop to close the client.
+		select {
+		case <-w.done:
+			logp.Info("Closed connection to %v", w.client)
+			return
+		default:
+		}
+
+		// Either we are closing or we are waiting on events.
 		select {
 		case <-w.done:
 			logp.Info("Closed connection to %v", w.client)

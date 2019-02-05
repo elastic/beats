@@ -225,13 +225,7 @@ func (cm *ConfigManager) fetch() bool {
 		return false
 	}
 
-	equal, err := api.ConfigBlocksEqual(configs, cm.cache.Configs)
-	if err != nil {
-		cm.logger.Errorf("error comparing the configurations, will use cached ones: %s", err)
-		return false
-	}
-
-	if equal {
+	if api.ConfigBlocksEqual(configs, cm.cache.Configs) {
 		cm.logger.Debug("configuration didn't change, sleeping")
 		return false
 	}
