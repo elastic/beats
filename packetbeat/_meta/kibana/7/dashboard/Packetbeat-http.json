@@ -15,7 +15,7 @@
         "savedSearchId": "71908f00-88ca-11e7-ad9c-db80de0bf8d3-ecs",
         "title": "HTTP Transactions [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -23,7 +23,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -38,7 +38,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             }
           ],
           "params": {
@@ -54,12 +54,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -80,14 +80,14 @@
                 },
                 "mode": "stacked",
                 "show": "true",
-                "type": "histogram",
+                "winlog.api": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "setYExtents": false,
             "shareYAxis": true,
             "times": [],
-            "type": "histogram",
+            "winlog.api": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -103,26 +103,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "HTTP Transactions [Packetbeat] ECS",
-          "type": "histogram"
+          "winlog.api": "histogram"
         }
       },
       "id": "Web-transactions-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-19T00:21:31.922Z",
-      "version": 3
+      "winlog.version": 3
     },
     {
       "attributes": {
@@ -138,20 +138,20 @@
                   "alias": null,
                   "disabled": false,
                   "index": "packetbeat-*",
-                  "key": "type",
+                  "key": "winlog.api",
                   "negate": false,
                   "params": {
                     "query": "http",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "http"
                 },
                 "query": {
                   "match": {
                     "network.protocol": {
                       "query": "http",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -182,17 +182,17 @@
         },
         "title": "HTTP error codes [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
               "enabled": true,
               "id": "1",
               "params": {
-                "field": "type"
+                "field": "winlog.api"
               },
               "schema": "metric",
-              "type": "cardinality"
+              "winlog.api": "cardinality"
             },
             {
               "enabled": true,
@@ -209,7 +209,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -225,12 +225,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -251,14 +251,14 @@
                 },
                 "mode": "stacked",
                 "show": "true",
-                "type": "histogram",
+                "winlog.api": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "setYExtents": false,
             "shareYAxis": true,
             "times": [],
-            "type": "histogram",
+            "winlog.api": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -274,26 +274,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "HTTP error codes [Packetbeat] ECS",
-          "type": "histogram"
+          "winlog.api": "histogram"
         }
       },
       "id": "HTTP-error-codes-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:26.207Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -313,16 +313,16 @@
                   "negate": false,
                   "params": {
                     "query": "http",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "http"
                 },
                 "query": {
                   "match": {
                     "network.protocol": {
                       "query": "http",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -341,7 +341,7 @@
                     "gte": 200,
                     "lt": 299
                   },
-                  "type": "range",
+                  "winlog.api": "range",
                   "value": "200 to 299"
                 },
                 "range": {
@@ -372,7 +372,7 @@
         },
         "title": "HTTP error codes evolution [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -380,7 +380,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -395,7 +395,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             },
             {
               "enabled": true,
@@ -412,7 +412,7 @@
                 "size": 5
               },
               "schema": "group",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -428,12 +428,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -460,7 +460,7 @@
                 "radiusRatio": 9,
                 "show": "true",
                 "showCircles": true,
-                "type": "line",
+                "winlog.api": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -469,7 +469,7 @@
             "showCircles": true,
             "smoothLines": false,
             "times": [],
-            "type": "line",
+            "winlog.api": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -485,26 +485,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "HTTP error codes evolution [Packetbeat] ECS",
-          "type": "line"
+          "winlog.api": "line"
         }
       },
       "id": "HTTP-error-codes-evolution-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:26.207Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -525,7 +525,7 @@
         },
         "title": "Navigation [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -534,13 +534,13 @@
             "openLinksInNewTab": false
           },
           "title": "Navigation [Packetbeat] ECS",
-          "type": "markdown"
+          "winlog.api": "markdown"
         }
       },
       "id": "Navigation-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-19T00:18:59.372Z",
-      "version": 11
+      "winlog.version": 11
     },
     {
       "attributes": {
@@ -557,7 +557,7 @@
         "savedSearchId": "71908f00-88ca-11e7-ad9c-db80de0bf8d3-ecs",
         "title": "Total number of HTTP transactions [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -565,7 +565,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             }
           ],
           "params": {
@@ -596,16 +596,16 @@
               },
               "useRanges": false
             },
-            "type": "metric"
+            "winlog.api": "metric"
           },
           "title": "Total number of HTTP transactions [Packetbeat] ECS",
-          "type": "metric"
+          "winlog.api": "metric"
         }
       },
       "id": "Total-number-of-HTTP-transactions-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:26.207Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -622,7 +622,7 @@
         "savedSearchId": "71908f00-88ca-11e7-ad9c-db80de0bf8d3-ecs",
         "title": "HTTP status codes for the top queries [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -630,7 +630,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -648,7 +648,7 @@
                 "size": 5
               },
               "schema": "split",
-              "type": "terms"
+              "winlog.api": "terms"
             },
             {
               "enabled": true,
@@ -665,7 +665,7 @@
                 "size": 10
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -680,16 +680,16 @@
             },
             "legendPosition": "right",
             "shareYAxis": true,
-            "type": "pie"
+            "winlog.api": "pie"
           },
           "title": "HTTP status codes for the top queries [Packetbeat] ECS",
-          "type": "pie"
+          "winlog.api": "pie"
         }
       },
       "id": "HTTP-codes-for-the-top-queries-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:26.207Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -715,7 +715,7 @@
             }
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -723,7 +723,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -739,7 +739,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -754,13 +754,13 @@
             "totalFunc": "sum"
           },
           "title": "Top 10 HTTP requests [Packetbeat] ECS",
-          "type": "table"
+          "winlog.api": "table"
         }
       },
       "id": "Top-10-HTTP-requests-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:26.207Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -784,16 +784,16 @@
                   "negate": false,
                   "params": {
                     "query": "http",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "http"
                 },
                 "query": {
                   "match": {
                     "network.protocol": {
                       "query": "http",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -805,7 +805,7 @@
               "language": "lucene",
               "query": "*"
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
@@ -813,12 +813,12 @@
           "desc"
         ],
         "title": "HTTP Transactions Search [Packetbeat] ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "71908f00-88ca-11e7-ad9c-db80de0bf8d3-ecs",
-      "type": "search",
+      "winlog.api": "search",
       "updated_at": "2019-01-19T00:21:43.886Z",
-      "version": 3
+      "winlog.version": 3
     },
     {
       "attributes": {
@@ -837,7 +837,7 @@
                 }
               }
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "optionsJSON": {
@@ -854,8 +854,8 @@
             },
             "id": "Web-transactions-ecs",
             "panelIndex": "1",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -867,8 +867,8 @@
             },
             "id": "HTTP-error-codes-ecs",
             "panelIndex": "2",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -880,8 +880,8 @@
             },
             "id": "HTTP-error-codes-evolution-ecs",
             "panelIndex": "3",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -893,8 +893,8 @@
             },
             "id": "Navigation-ecs",
             "panelIndex": "4",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -913,8 +913,8 @@
             },
             "id": "Total-number-of-HTTP-transactions-ecs",
             "panelIndex": "5",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -926,8 +926,8 @@
             },
             "id": "HTTP-codes-for-the-top-queries-ecs",
             "panelIndex": "6",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -949,19 +949,19 @@
             },
             "id": "Top-10-HTTP-requests-ecs",
             "panelIndex": "7",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
         "title": "[Packetbeat] HTTP ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "Packetbeat-HTTP-ecs",
-      "type": "dashboard",
+      "winlog.api": "dashboard",
       "updated_at": "2019-01-18T23:49:26.207Z",
-      "version": 1
+      "winlog.version": 1
     }
   ],
-  "version": "7.0.0-SNAPSHOT"
+  "winlog.version": "7.0.0-SNAPSHOT"
 }

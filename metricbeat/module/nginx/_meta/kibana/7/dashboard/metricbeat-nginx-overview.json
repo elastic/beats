@@ -8,7 +8,7 @@
                 }, 
                 "title": "Request Rate [Metricbeat Nginx] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -32,12 +32,12 @@
                                     {
                                         "field": "nginx.stubstatus.requests", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "396ec980-f1a1-11e7-95d0-8ddf041d42a2", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -50,16 +50,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "Request Rate [Metricbeat Nginx] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "555df8a0-f1a1-11e7-a9ef-93c69af7b129-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-04T22:48:58.542Z", 
-            "version": 2
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -69,7 +69,7 @@
                 }, 
                 "title": "Accepts and Handled Rate [Metricbeat Nginx] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -104,12 +104,12 @@
                                     {
                                         "field": "nginx.stubstatus.accepts", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "396ec980-f1a1-11e7-95d0-8ddf041d42a2", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -132,12 +132,12 @@
                                     {
                                         "field": "nginx.stubstatus.handled", 
                                         "id": "56dd33b1-f1a3-11e7-95d0-8ddf041d42a2", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "56dd33b1-f1a3-11e7-95d0-8ddf041d42a2", 
                                         "id": "56dd33b2-f1a3-11e7-95d0-8ddf041d42a2", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -150,16 +150,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "Accepts and Handled Rate [Metricbeat Nginx] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "a1d92240-f1a1-11e7-a9ef-93c69af7b129-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-04T23:07:23.056Z", 
-            "version": 2
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -169,7 +169,7 @@
                 }, 
                 "title": "Drops Rate [Metricbeat Nginx] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -193,12 +193,12 @@
                                     {
                                         "field": "nginx.stubstatus.dropped", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "396ec980-f1a1-11e7-95d0-8ddf041d42a2", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -211,16 +211,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "Drops Rate [Metricbeat Nginx] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "d763a570-f1a1-11e7-a9ef-93c69af7b129-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-04T22:51:46.375Z", 
-            "version": 1
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -230,7 +230,7 @@
                 }, 
                 "title": "Active connections [Metricbeat Nginx] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -253,7 +253,7 @@
                                     {
                                         "field": "nginx.stubstatus.active", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -265,16 +265,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "Active connections [Metricbeat Nginx] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "47a8e0f0-f1a4-11e7-a9ef-93c69af7b129-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-04T23:09:55.944Z", 
-            "version": 2
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -284,7 +284,7 @@
                 }, 
                 "title": "Reading / Writing / Waiting Rates [Metricbeat Nginx] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -308,7 +308,7 @@
                                     {
                                         "field": "nginx.stubstatus.reading", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -329,7 +329,7 @@
                                     {
                                         "field": "nginx.stubstatus.writing", 
                                         "id": "b1773681-f1a4-11e7-95d0-8ddf041d42a2", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -350,7 +350,7 @@
                                     {
                                         "field": "nginx.stubstatus.waiting", 
                                         "id": "b68aa6c1-f1a4-11e7-95d0-8ddf041d42a2", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -362,16 +362,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "Reading / Writing / Waiting Rates [Metricbeat Nginx] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "dcbffe30-f1a4-11e7-a9ef-93c69af7b129-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-04T23:13:23.859Z", 
-            "version": 1
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -385,7 +385,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -404,8 +404,8 @@
                         }, 
                         "id": "555df8a0-f1a1-11e7-a9ef-93c69af7b129-ecs", 
                         "panelIndex": "1", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -417,8 +417,8 @@
                         }, 
                         "id": "a1d92240-f1a1-11e7-a9ef-93c69af7b129-ecs", 
                         "panelIndex": "2", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -430,8 +430,8 @@
                         }, 
                         "id": "d763a570-f1a1-11e7-a9ef-93c69af7b129-ecs", 
                         "panelIndex": "3", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -443,8 +443,8 @@
                         }, 
                         "id": "47a8e0f0-f1a4-11e7-a9ef-93c69af7b129-ecs", 
                         "panelIndex": "4", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -456,19 +456,19 @@
                         }, 
                         "id": "dcbffe30-f1a4-11e7-a9ef-93c69af7b129-ecs", 
                         "panelIndex": "5", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }
                 ], 
                 "timeRestore": false, 
                 "title": "[Metricbeat Nginx] Overview ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "023d2930-f1a5-11e7-a9ef-93c69af7b129-ecs", 
-            "type": "dashboard", 
+            "winlog.api": "dashboard", 
             "updated_at": "2018-01-04T23:14:26.755Z", 
-            "version": 1
+            "winlog.version": 1
         }
     ], 
-    "version": "6.2.4"
+    "winlog.version": "6.2.4"
 }

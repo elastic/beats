@@ -19,7 +19,7 @@
                 }, 
                 "title": "System Navigation [Metricbeat System] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -27,12 +27,12 @@
                         "markdown": "[System Overview](#/dashboard/Metricbeat-system-overview-ecs)  | [Host Overview](#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8-ecs) |\n[Containers overview](#/dashboard/CPU-slash-Memory-per-container-ecs)"
                     }, 
                     "title": "System Navigation [Metricbeat System] ECS", 
-                    "type": "markdown"
+                    "winlog.api": "markdown"
                 }
             }, 
             "id": "System-Navigation-ecs", 
-            "type": "visualization", 
-            "version": 3
+            "winlog.api": "visualization", 
+            "winlog.version": 3
         }, 
         {
             "attributes": {
@@ -60,7 +60,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -71,7 +71,7 @@
                                 "field": "host.name"
                             }, 
                             "schema": "metric", 
-                            "type": "cardinality"
+                            "winlog.api": "cardinality"
                         }
                     ], 
                     "params": {
@@ -110,19 +110,19 @@
                                 "labelColor": false, 
                                 "subText": ""
                             }, 
-                            "type": "simple", 
+                            "winlog.api": "simple", 
                             "useRange": false, 
                             "verticalSplit": false
                         }, 
-                        "type": "gauge"
+                        "winlog.api": "gauge"
                     }, 
                     "title": "Number of hosts [Metricbeat System] ECS", 
-                    "type": "metric"
+                    "winlog.api": "metric"
                 }
             }, 
             "id": "c6f2ffd0-4d17-11e7-a196-69b9a7a020a9-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -142,7 +142,7 @@
                 }, 
                 "title": "Top Hosts By Memory (Realtime) [Metricbeat System] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -186,7 +186,7 @@
                                     {
                                         "field": "system.memory.actual.used.pct", 
                                         "id": "31e5afa2-1b1c-11e7-b09e-037021c4f8df", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -201,15 +201,15 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "top_n"
+                        "winlog.api": "top_n"
                     }, 
                     "title": "Top Hosts By Memory (Realtime) [Metricbeat System] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "fe064790-1b1f-11e7-bec4-a5e9ec5cab8b-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -229,7 +229,7 @@
                 }, 
                 "title": "Top Hosts By CPU (Realtime) [Metricbeat System] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -273,7 +273,7 @@
                                     {
                                         "field": "system.cpu.user.pct", 
                                         "id": "31e5afa2-1b1c-11e7-b09e-037021c4f8df", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -288,15 +288,15 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "top_n"
+                        "winlog.api": "top_n"
                     }, 
                     "title": "Top Hosts By CPU (Realtime) [Metricbeat System] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "855899e0-1b1c-11e7-b09e-037021c4f8df-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -327,7 +327,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -338,7 +338,7 @@
                                 "field": "system.cpu.user.pct"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "enabled": true, 
@@ -351,7 +351,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -364,7 +364,7 @@
                                 "size": 20
                             }, 
                             "schema": "group", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -379,7 +379,7 @@
                         "percentageMode": false, 
                         "setColorRange": false, 
                         "times": [], 
-                        "type": "heatmap", 
+                        "winlog.api": "heatmap", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -390,20 +390,20 @@
                                 }, 
                                 "scale": {
                                     "defaultYExtents": false, 
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": false, 
-                                "type": "value"
+                                "winlog.api": "value"
                             }
                         ]
                     }, 
                     "title": "Hosts histogram by CPU usage [Metricbeat System] ECS", 
-                    "type": "heatmap"
+                    "winlog.api": "heatmap"
                 }
             }, 
             "id": "7cdb1330-4d1a-11e7-a196-69b9a7a020a9-ecs", 
-            "type": "visualization", 
-            "version": 1
+            "winlog.api": "visualization", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -423,7 +423,7 @@
                 }, 
                 "title": "Inbound Traffic [Metricbeat System] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -452,24 +452,24 @@
                                     {
                                         "field": "system.network.in.bytes", 
                                         "id": "0c761592-1b92-11e7-bec4-a5e9ec5cab8b", 
-                                        "type": "max"
+                                        "winlog.api": "max"
                                     }, 
                                     {
                                         "field": "0c761592-1b92-11e7-bec4-a5e9ec5cab8b", 
                                         "id": "1d659060-1b92-11e7-bec4-a5e9ec5cab8b", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": "1s"
                                     }, 
                                     {
                                         "field": "1d659060-1b92-11e7-bec4-a5e9ec5cab8b", 
                                         "id": "f2074f70-1b92-11e7-a416-41f5ccdba2e6", 
-                                        "type": "positive_only", 
+                                        "winlog.api": "positive_only", 
                                         "unit": ""
                                     }, 
                                     {
                                         "function": "sum", 
                                         "id": "c40e18f0-2c55-11e7-a0ad-277ce466684d", 
-                                        "type": "series_agg"
+                                        "winlog.api": "series_agg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -492,18 +492,18 @@
                                     {
                                         "field": "system.network.in.bytes", 
                                         "id": "37f72b50-1b92-11e7-bec4-a5e9ec5cab8b", 
-                                        "type": "max"
+                                        "winlog.api": "max"
                                     }, 
                                     {
                                         "field": "37f72b50-1b92-11e7-bec4-a5e9ec5cab8b", 
                                         "id": "37f72b51-1b92-11e7-bec4-a5e9ec5cab8b", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }, 
                                     {
                                         "field": "37f72b51-1b92-11e7-bec4-a5e9ec5cab8b", 
                                         "id": "f9da2dd0-1b92-11e7-a416-41f5ccdba2e6", 
-                                        "type": "positive_only", 
+                                        "winlog.api": "positive_only", 
                                         "unit": ""
                                     }, 
                                     {
@@ -511,7 +511,7 @@
                                         "function": "overall_sum", 
                                         "id": "3e63c2f0-1b92-11e7-bec4-a5e9ec5cab8b", 
                                         "sigma": "", 
-                                        "type": "series_agg"
+                                        "winlog.api": "series_agg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -525,15 +525,15 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "metric"
+                        "winlog.api": "metric"
                     }, 
                     "title": "Inbound Traffic [Metricbeat System] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "522ee670-1b92-11e7-bec4-a5e9ec5cab8b-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -553,7 +553,7 @@
                 }, 
                 "title": "Outbound Traffic [Metricbeat System] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -582,24 +582,24 @@
                                     {
                                         "field": "system.network.out.bytes", 
                                         "id": "0c761592-1b92-11e7-bec4-a5e9ec5cab8b", 
-                                        "type": "max"
+                                        "winlog.api": "max"
                                     }, 
                                     {
                                         "field": "0c761592-1b92-11e7-bec4-a5e9ec5cab8b", 
                                         "id": "1d659060-1b92-11e7-bec4-a5e9ec5cab8b", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": "1s"
                                     }, 
                                     {
                                         "field": "1d659060-1b92-11e7-bec4-a5e9ec5cab8b", 
                                         "id": "f2074f70-1b92-11e7-a416-41f5ccdba2e6", 
-                                        "type": "positive_only", 
+                                        "winlog.api": "positive_only", 
                                         "unit": ""
                                     }, 
                                     {
                                         "function": "sum", 
                                         "id": "a1737470-2c55-11e7-a0ad-277ce466684d", 
-                                        "type": "series_agg"
+                                        "winlog.api": "series_agg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -622,18 +622,18 @@
                                     {
                                         "field": "system.network.out.bytes", 
                                         "id": "37f72b50-1b92-11e7-bec4-a5e9ec5cab8b", 
-                                        "type": "max"
+                                        "winlog.api": "max"
                                     }, 
                                     {
                                         "field": "37f72b50-1b92-11e7-bec4-a5e9ec5cab8b", 
                                         "id": "37f72b51-1b92-11e7-bec4-a5e9ec5cab8b", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }, 
                                     {
                                         "field": "37f72b51-1b92-11e7-bec4-a5e9ec5cab8b", 
                                         "id": "f9da2dd0-1b92-11e7-a416-41f5ccdba2e6", 
-                                        "type": "positive_only", 
+                                        "winlog.api": "positive_only", 
                                         "unit": ""
                                     }, 
                                     {
@@ -641,7 +641,7 @@
                                         "function": "overall_sum", 
                                         "id": "3e63c2f0-1b92-11e7-bec4-a5e9ec5cab8b", 
                                         "sigma": "", 
-                                        "type": "series_agg"
+                                        "winlog.api": "series_agg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -655,15 +655,15 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "metric"
+                        "winlog.api": "metric"
                     }, 
                     "title": "Outbound Traffic [Metricbeat System] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "1aae9140-1b93-11e7-8ada-3df93aab833e-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -683,7 +683,7 @@
                 }, 
                 "title": "Disk used [Metricbeat System] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -731,17 +731,17 @@
                                     {
                                         "field": "system.fsstat.total_size.used", 
                                         "id": "4e4dee91-4d1d-11e7-b5f2-2b7c1895bf32", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "system.fsstat.total_size.total", 
                                         "id": "57c96ee0-4d54-11e7-b5f2-2b7c1895bf32", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "id": "6304cca0-4d54-11e7-b5f2-2b7c1895bf32", 
                                         "script": "params.total != null && params.total > 0 ? params.used/params.total : null", 
-                                        "type": "calculation", 
+                                        "winlog.api": "calculation", 
                                         "variables": [
                                             {
                                                 "field": "4e4dee91-4d1d-11e7-b5f2-2b7c1895bf32", 
@@ -765,15 +765,15 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "gauge"
+                        "winlog.api": "gauge"
                     }, 
                     "title": "Disk used [Metricbeat System] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "825fdb80-4d1d-11e7-b5f2-2b7c1895bf32-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -793,7 +793,7 @@
                 }, 
                 "title": "Memory Usage Gauge [Metricbeat System] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -841,7 +841,7 @@
                                     {
                                         "field": "system.memory.actual.used.pct", 
                                         "id": "9f51b732-1b91-11e7-bec4-a5e9ec5cab8b", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -853,15 +853,15 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "gauge"
+                        "winlog.api": "gauge"
                     }, 
                     "title": "Memory Usage Gauge [Metricbeat System] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "d3166e80-1b91-11e7-bec4-a5e9ec5cab8b-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -881,7 +881,7 @@
                 }, 
                 "title": "CPU Usage Gauge [Metricbeat System] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -929,22 +929,22 @@
                                     {
                                         "field": "system.cpu.user.pct", 
                                         "id": "4c9e2552-1b91-11e7-bec4-a5e9ec5cab8b", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "system.cpu.system.pct", 
                                         "id": "225c2140-5fd7-11e7-a63a-a937b7c1a7e1", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "system.cpu.cores", 
                                         "id": "837a30c0-5fd7-11e7-a63a-a937b7c1a7e1", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "id": "587aa510-1b91-11e7-bec4-a5e9ec5cab8b", 
                                         "script": "params.n > 0 ? (params.user+params.system)/params.n : null", 
-                                        "type": "calculation", 
+                                        "winlog.api": "calculation", 
                                         "variables": [
                                             {
                                                 "field": "4c9e2552-1b91-11e7-bec4-a5e9ec5cab8b", 
@@ -973,15 +973,15 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "gauge"
+                        "winlog.api": "gauge"
                     }, 
                     "title": "CPU Usage Gauge [Metricbeat System] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "83e12df0-1b91-11e7-bec4-a5e9ec5cab8b-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -1000,7 +1000,7 @@
                                 }
                             }
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -1014,7 +1014,7 @@
                         "row": 1, 
                         "size_x": 12, 
                         "size_y": 1, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -1023,7 +1023,7 @@
                         "row": 2, 
                         "size_x": 2, 
                         "size_y": 2, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 7, 
@@ -1032,7 +1032,7 @@
                         "row": 4, 
                         "size_x": 6, 
                         "size_y": 5, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -1041,7 +1041,7 @@
                         "row": 4, 
                         "size_x": 6, 
                         "size_y": 5, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -1050,7 +1050,7 @@
                         "row": 9, 
                         "size_x": 12, 
                         "size_y": 6, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 9, 
@@ -1059,7 +1059,7 @@
                         "row": 2, 
                         "size_x": 2, 
                         "size_y": 2, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 11, 
@@ -1068,7 +1068,7 @@
                         "row": 2, 
                         "size_x": 2, 
                         "size_y": 2, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 7, 
@@ -1077,7 +1077,7 @@
                         "row": 2, 
                         "size_x": 2, 
                         "size_y": 2, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 5, 
@@ -1086,7 +1086,7 @@
                         "row": 2, 
                         "size_x": 2, 
                         "size_y": 2, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 3, 
@@ -1095,7 +1095,7 @@
                         "row": 2, 
                         "size_x": 2, 
                         "size_y": 2, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
@@ -1147,12 +1147,12 @@
                         }
                     }
                 }, 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "Metricbeat-system-overview-ecs", 
-            "type": "dashboard", 
-            "version": 2
+            "winlog.api": "dashboard", 
+            "winlog.version": 2
         }
     ], 
-    "version": "6.0.0-rc1-SNAPSHOT"
+    "winlog.version": "6.0.0-rc1-SNAPSHOT"
 }

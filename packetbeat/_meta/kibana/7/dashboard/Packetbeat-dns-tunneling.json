@@ -18,7 +18,7 @@
             }
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -29,7 +29,7 @@
                 "field": "dns.question.name"
               },
               "schema": "metric",
-              "type": "cardinality"
+              "winlog.api": "cardinality"
             },
             {
               "enabled": true,
@@ -42,7 +42,7 @@
                 "size": 20
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "listeners": {},
@@ -60,13 +60,13 @@
             "yAxis": {}
           },
           "title": "Unique FQDNs per eTLD+1 ECS",
-          "type": "histogram"
+          "winlog.api": "histogram"
         }
       },
       "id": "Unique-FQDNs-per-eTLD 1-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:23.036Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -88,7 +88,7 @@
             }
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -98,7 +98,7 @@
                 "customLabel": ""
               },
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -111,7 +111,7 @@
                 "size": 20
               },
               "schema": "bucket",
-              "type": "terms"
+              "winlog.api": "terms"
             },
             {
               "enabled": true,
@@ -121,7 +121,7 @@
                 "field": "dns.question.name"
               },
               "schema": "metric",
-              "type": "cardinality"
+              "winlog.api": "cardinality"
             }
           ],
           "listeners": {},
@@ -137,13 +137,13 @@
             "totalFunc": "sum"
           },
           "title": "Unique FQDNs per eTLD+1 Table ECS",
-          "type": "table"
+          "winlog.api": "table"
         }
       },
       "id": "Unique-FQDNs-per-eTLD 1-Table-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:23.036Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -169,7 +169,7 @@
             }
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -180,7 +180,7 @@
                 "field": "destination.bytes"
               },
               "schema": "metric",
-              "type": "sum"
+              "winlog.api": "sum"
             },
             {
               "enabled": true,
@@ -197,7 +197,7 @@
                 "size": 20
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             },
             {
               "enabled": true,
@@ -207,7 +207,7 @@
                 "field": "source.bytes"
               },
               "schema": "metric",
-              "type": "sum"
+              "winlog.api": "sum"
             }
           ],
           "params": {
@@ -223,12 +223,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": true,
@@ -249,7 +249,7 @@
                 },
                 "mode": "normal",
                 "show": "true",
-                "type": "histogram",
+                "winlog.api": "histogram",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -259,14 +259,14 @@
                 },
                 "mode": "normal",
                 "show": true,
-                "type": "histogram",
+                "winlog.api": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "setYExtents": false,
             "shareYAxis": true,
             "times": [],
-            "type": "histogram",
+            "winlog.api": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -282,26 +282,26 @@
                   "defaultYExtents": true,
                   "mode": "grouped",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "Bytes Transferred per Domain ECS",
-          "type": "histogram"
+          "winlog.api": "histogram"
         }
       },
       "id": "Bytes-Transferred-per-Domain-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:23.036Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -315,7 +315,7 @@
               "query": {
                 "query_string": {
                   "analyze_wildcard": true,
-                  "query": "type:dns"
+                  "query": "winlog.api:dns"
                 }
               }
             }
@@ -332,7 +332,7 @@
             }
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -343,7 +343,7 @@
                 "field": "source.bytes"
               },
               "schema": "metric",
-              "type": "sum"
+              "winlog.api": "sum"
             },
             {
               "enabled": true,
@@ -360,7 +360,7 @@
                 "size": 20
               },
               "schema": "bucket",
-              "type": "terms"
+              "winlog.api": "terms"
             },
             {
               "enabled": true,
@@ -370,7 +370,7 @@
                 "field": "destination.bytes"
               },
               "schema": "metric",
-              "type": "sum"
+              "winlog.api": "sum"
             }
           ],
           "params": {
@@ -385,13 +385,13 @@
             "totalFunc": "sum"
           },
           "title": "Top Domains by Data Volume ECS",
-          "type": "table"
+          "winlog.api": "table"
         }
       },
       "id": "dc743240-1665-11e7-a6de-cbac1a3d0a7d-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:23.036Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -418,16 +418,16 @@
                   "negate": false,
                   "params": {
                     "query": "dns",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "dns"
                 },
                 "query": {
                   "match": {
                     "network.protocol": {
                       "query": "dns",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -452,7 +452,7 @@
               "language": "lucene",
               "query": ""
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
@@ -460,12 +460,12 @@
           "desc"
         ],
         "title": "DNS Protocol [Packetbeat] ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
-      "type": "search",
+      "winlog.api": "search",
       "updated_at": "2019-01-18T23:49:24.089Z",
-      "version": 2
+      "winlog.version": 2
     },
     {
       "attributes": {
@@ -477,9 +477,9 @@
             "highlightAll": true,
             "query": {
               "language": "lucene",
-              "query": "NOT dns.question.type:PTR"
+              "query": "NOT dns.question.winlog.api:PTR"
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "optionsJSON": {
@@ -512,8 +512,8 @@
             },
             "id": "Unique-FQDNs-per-eTLD 1-ecs",
             "panelIndex": "1",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -535,8 +535,8 @@
             },
             "id": "Unique-FQDNs-per-eTLD 1-Table-ecs",
             "panelIndex": "2",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -553,8 +553,8 @@
             },
             "id": "Bytes-Transferred-per-Domain-ecs",
             "panelIndex": "4",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -576,19 +576,19 @@
             },
             "id": "dc743240-1665-11e7-a6de-cbac1a3d0a7d-ecs",
             "panelIndex": "5",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
         "title": "[Packetbeat] DNS Tunneling ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "DNS-Unique-Domains-ecs",
-      "type": "dashboard",
+      "winlog.api": "dashboard",
       "updated_at": "2019-01-18T23:49:23.036Z",
-      "version": 1
+      "winlog.version": 1
     }
   ],
-  "version": "7.0.0-SNAPSHOT"
+  "winlog.version": "7.0.0-SNAPSHOT"
 }

@@ -19,7 +19,7 @@
         },
         "title": "Navigation [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -28,13 +28,13 @@
             "openLinksInNewTab": false
           },
           "title": "Navigation [Packetbeat] ECS",
-          "type": "markdown"
+          "winlog.api": "markdown"
         }
       },
       "id": "Navigation-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-19T00:18:59.372Z",
-      "version": 11
+      "winlog.version": 11
     },
     {
       "attributes": {
@@ -51,7 +51,7 @@
         "savedSearchId": "PgSQL-errors-ecs",
         "title": "PgSQL Errors [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -59,7 +59,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -74,7 +74,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             }
           ],
           "params": {
@@ -90,12 +90,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -118,7 +118,7 @@
                 "interpolate": "linear",
                 "mode": "stacked",
                 "show": "true",
-                "type": "area",
+                "winlog.api": "area",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -126,7 +126,7 @@
             "shareYAxis": true,
             "smoothLines": false,
             "times": [],
-            "type": "area",
+            "winlog.api": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -142,26 +142,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "PgSQL Errors [Packetbeat] ECS",
-          "type": "area"
+          "winlog.api": "area"
         }
       },
       "id": "PgSQL-Errors-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:31.386Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -178,7 +178,7 @@
         "savedSearchId": "PgSQL-transactions-ecs",
         "title": "PgSQL Methods [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -186,7 +186,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -201,7 +201,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             },
             {
               "enabled": true,
@@ -217,7 +217,7 @@
                 "size": 5
               },
               "schema": "group",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -233,12 +233,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -261,7 +261,7 @@
                 "interpolate": "linear",
                 "mode": "stacked",
                 "show": "true",
-                "type": "area",
+                "winlog.api": "area",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -269,7 +269,7 @@
             "shareYAxis": true,
             "smoothLines": false,
             "times": [],
-            "type": "area",
+            "winlog.api": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -285,26 +285,26 @@
                   "defaultYExtents": false,
                   "mode": "wiggle",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "PgSQL Methods [Packetbeat] ECS",
-          "type": "area"
+          "winlog.api": "area"
         }
       },
       "id": "PgSQL-Methods-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:31.386Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -321,7 +321,7 @@
         "savedSearchId": "PgSQL-transactions-ecs",
         "title": "PgSQL response times percentiles [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -336,7 +336,7 @@
                 ]
               },
               "schema": "metric",
-              "type": "percentiles"
+              "winlog.api": "percentiles"
             },
             {
               "enabled": true,
@@ -351,7 +351,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             }
           ],
           "params": {
@@ -367,12 +367,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -391,13 +391,13 @@
                 },
                 "mode": "normal",
                 "show": "true",
-                "type": "line",
+                "winlog.api": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "shareYAxis": true,
             "times": [],
-            "type": "line",
+            "winlog.api": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -413,25 +413,25 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Percentiles of event.duration"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ]
           },
           "title": "PgSQL response times percentiles [Packetbeat] ECS",
-          "type": "line"
+          "winlog.api": "line"
         }
       },
       "id": "PgSQL-response-times-percentiles-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:31.386Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -448,7 +448,7 @@
         "savedSearchId": "PgSQL-transactions-ecs",
         "title": "PgSQL Throughput [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -458,7 +458,7 @@
                 "field": "destination.bytes"
               },
               "schema": "metric",
-              "type": "sum"
+              "winlog.api": "sum"
             },
             {
               "enabled": true,
@@ -467,7 +467,7 @@
                 "field": "source.bytes"
               },
               "schema": "metric",
-              "type": "sum"
+              "winlog.api": "sum"
             },
             {
               "enabled": true,
@@ -482,7 +482,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             }
           ],
           "params": {
@@ -498,12 +498,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -522,7 +522,7 @@
                 },
                 "mode": "normal",
                 "show": "true",
-                "type": "line",
+                "winlog.api": "line",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -532,13 +532,13 @@
                 },
                 "mode": "normal",
                 "show": true,
-                "type": "line",
+                "winlog.api": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "shareYAxis": true,
             "times": [],
-            "type": "line",
+            "winlog.api": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -554,25 +554,25 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ]
           },
           "title": "PgSQL Throughput [Packetbeat] ECS",
-          "type": "line"
+          "winlog.api": "line"
         }
       },
       "id": "PgSQL-throughput-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:31.386Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -589,7 +589,7 @@
         "savedSearchId": "PgSQL-transactions-ecs",
         "title": "PgSQL Reads vs Writes [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -597,7 +597,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -612,7 +612,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             },
             {
               "enabled": true,
@@ -637,7 +637,7 @@
                 ]
               },
               "schema": "group",
-              "type": "filters"
+              "winlog.api": "filters"
             }
           ],
           "params": {
@@ -653,14 +653,14 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "@timestamp per 30 seconds"
                 },
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -685,7 +685,7 @@
                 "mode": "stacked",
                 "show": "true",
                 "showCircles": true,
-                "type": "area",
+                "winlog.api": "area",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -693,7 +693,7 @@
             "shareYAxis": true,
             "smoothLines": false,
             "times": [],
-            "type": "area",
+            "winlog.api": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -707,26 +707,26 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "PgSQL Reads vs Writes [Packetbeat] ECS",
-          "type": "area"
+          "winlog.api": "area"
         }
       },
       "id": "PgSQL-Reads-vs-Writes-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:31.386Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -752,7 +752,7 @@
             }
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -760,7 +760,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -776,7 +776,7 @@
                 "size": 10
               },
               "schema": "bucket",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -791,13 +791,13 @@
             "totalFunc": "sum"
           },
           "title": "Most frequent PgSQL queries [Packetbeat] ECS",
-          "type": "table"
+          "winlog.api": "table"
         }
       },
       "id": "Most-frequent-PgSQL-queries-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:31.386Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -823,7 +823,7 @@
             }
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -834,7 +834,7 @@
                 "field": "event.duration"
               },
               "schema": "metric",
-              "type": "avg"
+              "winlog.api": "avg"
             },
             {
               "enabled": true,
@@ -850,7 +850,7 @@
                 "size": 10
               },
               "schema": "bucket",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -865,19 +865,19 @@
             "totalFunc": "sum"
           },
           "title": "Slowest PgSQL Queries [Packetbeat] ECS",
-          "type": "table"
+          "winlog.api": "table"
         }
       },
       "id": "Slowest-PgSQL-queries-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:31.386Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
         "columns": [
           "method",
-          "type",
+          "winlog.api",
           "path",
           "event.duration",
           "status"
@@ -899,16 +899,16 @@
                   "negate": true,
                   "params": {
                     "query": "OK",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "OK"
                 },
                 "query": {
                   "match": {
                     "status": {
                       "query": "OK",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -925,16 +925,16 @@
                   "negate": false,
                   "params": {
                     "query": "pgsql",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "pgsql"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "pgsql",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -957,7 +957,7 @@
               "language": "lucene",
               "query": "*"
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
@@ -965,18 +965,18 @@
           "desc"
         ],
         "title": "PgSQL Errors Search [Packetbeat] ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "PgSQL-errors-ecs",
-      "type": "search",
+      "winlog.api": "search",
       "updated_at": "2019-01-18T23:49:31.386Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
         "columns": [
           "method",
-          "type",
+          "winlog.api",
           "path",
           "event.duration",
           "status"
@@ -998,16 +998,16 @@
                   "negate": false,
                   "params": {
                     "query": "pgsql",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "pgsql"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "pgsql",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1035,7 +1035,7 @@
                 }
               }
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
@@ -1043,12 +1043,12 @@
           "desc"
         ],
         "title": "PgSQL Transactions [Packetbeat] ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "PgSQL-transactions-ecs",
-      "type": "search",
+      "winlog.api": "search",
       "updated_at": "2019-01-18T23:49:31.386Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -1067,7 +1067,7 @@
                 }
               }
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "optionsJSON": {
@@ -1084,8 +1084,8 @@
             },
             "id": "Navigation-ecs",
             "panelIndex": "1",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1097,8 +1097,8 @@
             },
             "id": "PgSQL-Errors-ecs",
             "panelIndex": "2",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1110,8 +1110,8 @@
             },
             "id": "PgSQL-Methods-ecs",
             "panelIndex": "3",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1123,8 +1123,8 @@
             },
             "id": "PgSQL-response-times-percentiles-ecs",
             "panelIndex": "4",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1136,8 +1136,8 @@
             },
             "id": "PgSQL-throughput-ecs",
             "panelIndex": "5",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1149,8 +1149,8 @@
             },
             "id": "PgSQL-Reads-vs-Writes-ecs",
             "panelIndex": "6",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -1172,8 +1172,8 @@
             },
             "id": "Most-frequent-PgSQL-queries-ecs",
             "panelIndex": "7",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -1195,19 +1195,19 @@
             },
             "id": "Slowest-PgSQL-queries-ecs",
             "panelIndex": "8",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
         "title": "[Packetbeat] PgSQL performance ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "Packetbeat-PgSQL-performance-ecs",
-      "type": "dashboard",
+      "winlog.api": "dashboard",
       "updated_at": "2019-01-18T23:49:31.386Z",
-      "version": 1
+      "winlog.version": 1
     }
   ],
-  "version": "7.0.0-SNAPSHOT"
+  "winlog.version": "7.0.0-SNAPSHOT"
 }

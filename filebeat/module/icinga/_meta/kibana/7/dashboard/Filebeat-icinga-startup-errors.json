@@ -17,7 +17,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -25,7 +25,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -38,7 +38,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }
                     ], 
                     "listeners": {}, 
@@ -54,12 +54,12 @@
                         "times": []
                     }, 
                     "title": "Icinga Startup Errors ECS", 
-                    "type": "histogram"
+                    "winlog.api": "histogram"
                 }
             }, 
             "id": "a59b5e00-2417-11e7-a83b-d5f4cebac9ff-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -84,7 +84,7 @@
                                 }
                             }
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "sort": [
@@ -92,11 +92,11 @@
                     "desc"
                 ], 
                 "title": "Startup Errors [Filebeat Icinga] ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "710043e0-2417-11e7-a83b-d5f4cebac9ff-ecs", 
-            "type": "search", 
-            "version": 2
+            "winlog.api": "search", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -115,7 +115,7 @@
                                 }
                             }
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -129,7 +129,7 @@
                         "row": 1, 
                         "size_x": 12, 
                         "size_y": 2, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -147,18 +147,18 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "type": "search"
+                        "winlog.api": "search"
                     }
                 ], 
                 "timeRestore": false, 
                 "title": "[Filebeat Icinga] Startup Errors ECS", 
                 "uiStateJSON": {}, 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "b9163ea0-2417-11e7-a83b-d5f4cebac9ff-ecs", 
-            "type": "dashboard", 
-            "version": 2
+            "winlog.api": "dashboard", 
+            "winlog.version": 2
         }
     ], 
-    "version": "6.0.0-beta1-SNAPSHOT"
+    "winlog.version": "6.0.0-beta1-SNAPSHOT"
 }

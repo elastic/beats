@@ -9,7 +9,7 @@
                 "savedSearchId": "ML-Filebeat-Traefik-Access-ecs", 
                 "title": "Unique Count URL Timechart [Filebeat Traefik] [ML] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -19,7 +19,7 @@
                                 "field": "url.original"
                             }, 
                             "schema": "metric", 
-                            "type": "cardinality"
+                            "winlog.api": "cardinality"
                         }, 
                         {
                             "enabled": true, 
@@ -32,7 +32,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }
                     ], 
                     "listeners": {}, 
@@ -49,14 +49,14 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "@timestamp per day"
                                 }, 
-                                "type": "category"
+                                "winlog.api": "category"
                             }
                         ], 
                         "defaultYExtents": false, 
@@ -83,7 +83,7 @@
                                 "mode": "normal", 
                                 "show": true, 
                                 "showCircles": true, 
-                                "type": "line", 
+                                "winlog.api": "line", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
@@ -103,24 +103,24 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Unique count of traefik.access.url"
                                 }, 
-                                "type": "value"
+                                "winlog.api": "value"
                             }
                         ]
                     }, 
                     "title": "ML Traefik Access Unique Count URL Timechart ECS", 
-                    "type": "line"
+                    "winlog.api": "line"
                 }
             }, 
             "id": "ML-Traefik-Access-Unique-Count-URL-Timechart-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -140,7 +140,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -148,7 +148,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -161,7 +161,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -173,7 +173,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -191,12 +191,12 @@
                         "yAxis": {}
                     }, 
                     "title": "ML Traefik Access Response Code Timechart ECS", 
-                    "type": "histogram"
+                    "winlog.api": "histogram"
                 }
             }, 
             "id": "ML-Traefik-Access-Response-Code-Timechart-ecs", 
-            "type": "visualization", 
-            "version": 3
+            "winlog.api": "visualization", 
+            "winlog.version": 3
         }, 
         {
             "attributes": {
@@ -216,7 +216,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -224,7 +224,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -236,7 +236,7 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -252,12 +252,12 @@
                         "totalFunc": "sum"
                     }, 
                     "title": "ML Traefik Access Top Remote IPs Table ECS", 
-                    "type": "table"
+                    "winlog.api": "table"
                 }
             }, 
             "id": "ML-Traefik-Access-Top-Remote-IPs-Table-ecs", 
-            "type": "visualization", 
-            "version": 3
+            "winlog.api": "visualization", 
+            "winlog.version": 3
         }, 
         {
             "attributes": {
@@ -275,7 +275,7 @@
                         -0.17578125
                     ]
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -283,7 +283,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -293,7 +293,7 @@
                                 "field": "source.geo.location"
                             }, 
                             "schema": "segment", 
-                            "type": "geohash_grid"
+                            "winlog.api": "geohash_grid"
                         }
                     ], 
                     "listeners": {}, 
@@ -320,18 +320,18 @@
                                 "layers": "0", 
                                 "styles": "", 
                                 "transparent": true, 
-                                "version": "1.3.0"
+                                "winlog.version": "1.3.0"
                             }, 
                             "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
                         }
                     }, 
                     "title": "ML Traefik Access Map ECS", 
-                    "type": "tile_map"
+                    "winlog.api": "tile_map"
                 }
             }, 
             "id": "ML-Traefik-Access-Map-ecs", 
-            "type": "visualization", 
-            "version": 3
+            "winlog.api": "visualization", 
+            "winlog.version": 3
         }, 
         {
             "attributes": {
@@ -351,7 +351,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -359,7 +359,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -371,7 +371,7 @@
                                 "size": 1000
                             }, 
                             "schema": "bucket", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -387,12 +387,12 @@
                         "totalFunc": "sum"
                     }, 
                     "title": "ML Traefik Access Top URLs Table ECS", 
-                    "type": "table"
+                    "winlog.api": "table"
                 }
             }, 
             "id": "ML-Traefik-Access-Top-URLs-Table-ecs", 
-            "type": "visualization", 
-            "version": 3
+            "winlog.api": "visualization", 
+            "winlog.version": 3
         }, 
         {
             "attributes": {
@@ -431,11 +431,11 @@
                     "desc"
                 ], 
                 "title": "ML Access Data [Filebeat Traefik] ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "ML-Filebeat-Traefik-Access-ecs", 
-            "type": "search", 
-            "version": 3
+            "winlog.api": "search", 
+            "winlog.version": 3
         }, 
         {
             "attributes": {
@@ -454,7 +454,7 @@
                             }
                         ], 
                         "highlightAll": true, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -468,7 +468,7 @@
                         "row": 1, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 7, 
@@ -477,7 +477,7 @@
                         "row": 1, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -486,7 +486,7 @@
                         "row": 4, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 7, 
@@ -495,7 +495,7 @@
                         "row": 4, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -504,7 +504,7 @@
                         "row": 7, 
                         "size_x": 12, 
                         "size_y": 8, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
@@ -541,12 +541,12 @@
                         }
                     }
                 }, 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "ML-Traefik-Remote-IP-URL-Explorer-ecs", 
-            "type": "dashboard", 
-            "version": 4
+            "winlog.api": "dashboard", 
+            "winlog.version": 4
         }
     ], 
-    "version": "6.0.0-beta1-SNAPSHOT"
+    "winlog.version": "6.0.0-beta1-SNAPSHOT"
 }

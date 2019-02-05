@@ -8,7 +8,7 @@
                 }, 
                 "title": "Kubernetes API Server: Top clients by number of requests ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -37,12 +37,12 @@
                                     {
                                         "field": "kubernetes.apiserver.request.count", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "0e6ff4a0-5792-11e8-8bd0-2180975e72dd", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -64,16 +64,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "top_n"
+                        "winlog.api": "top_n"
                     }, 
                     "title": "Kubernetes API Server: Top clients by number of requests ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "7cbeb750-5794-11e8-afa2-e9067ea62228-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-05-14T18:23:10.501Z", 
-            "version": 5
+            "winlog.version": 5
         }, 
         {
             "attributes": {
@@ -83,7 +83,7 @@
                 }, 
                 "title": "Kubernetes API Server: Requests ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -107,17 +107,17 @@
                                     {
                                         "field": "kubernetes.apiserver.request.latency.sum", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }, 
                                     {
                                         "field": "kubernetes.apiserver.request.count", 
                                         "id": "a2185e50-57a0-11e8-af57-a1d645d2b569", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }, 
                                     {
                                         "id": "b09133d0-57a0-11e8-af57-a1d645d2b569", 
                                         "script": "params.sum / params.count", 
-                                        "type": "calculation", 
+                                        "winlog.api": "calculation", 
                                         "variables": [
                                             {
                                                 "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
@@ -151,12 +151,12 @@
                                     {
                                         "field": "kubernetes.apiserver.request.count", 
                                         "id": "c001ba50-57a1-11e8-a049-ff54cef064a2", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }, 
                                     {
                                         "field": "c001ba50-57a1-11e8-a049-ff54cef064a2", 
                                         "id": "dc83b390-57a1-11e8-a049-ff54cef064a2", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -169,16 +169,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "Kubernetes API Server: Requests ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "ec360ff0-57a0-11e8-afa2-e9067ea62228-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-05-14T18:21:27.515Z", 
-            "version": 4
+            "winlog.version": 4
         }, 
         {
             "attributes": {
@@ -188,7 +188,7 @@
                 }, 
                 "title": "Kubernetes API Server: Top clients by resource ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -217,12 +217,12 @@
                                     {
                                         "field": "kubernetes.apiserver.request.count", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "0e6ff4a0-5792-11e8-8bd0-2180975e72dd", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -246,16 +246,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "top_n"
+                        "winlog.api": "top_n"
                     }, 
                     "title": "Kubernetes API Server: Top clients by resource ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "95a7f110-57a2-11e8-afa2-e9067ea62228-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-05-14T18:23:50.093Z", 
-            "version": 4
+            "winlog.version": 4
         }, 
         {
             "attributes": {
@@ -269,7 +269,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -289,8 +289,8 @@
                         }, 
                         "id": "7cbeb750-5794-11e8-afa2-e9067ea62228-ecs", 
                         "panelIndex": "1", 
-                        "type": "visualization", 
-                        "version": "6.3.0"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.3.0"
                     }, 
                     {
                         "embeddableConfig": {}, 
@@ -303,8 +303,8 @@
                         }, 
                         "id": "ec360ff0-57a0-11e8-afa2-e9067ea62228-ecs", 
                         "panelIndex": "3", 
-                        "type": "visualization", 
-                        "version": "6.3.0"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.3.0"
                     }, 
                     {
                         "embeddableConfig": {}, 
@@ -317,19 +317,19 @@
                         }, 
                         "id": "95a7f110-57a2-11e8-afa2-e9067ea62228-ecs", 
                         "panelIndex": "4", 
-                        "type": "visualization", 
-                        "version": "6.3.0"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.3.0"
                     }
                 ], 
                 "timeRestore": false, 
                 "title": "[Metricbeat Kubernetes] API server ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "af7225b0-5794-11e8-afa2-e9067ea62228-ecs", 
-            "type": "dashboard", 
+            "winlog.api": "dashboard", 
             "updated_at": "2018-05-14T18:23:55.202Z", 
-            "version": 5
+            "winlog.version": 5
         }
     ], 
-    "version": "6.3.0"
+    "winlog.version": "6.3.0"
 }

@@ -12,7 +12,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -31,8 +31,8 @@
                         }, 
                         "id": "a64b4fd0-471c-11e8-bc13-1397384faad3-ecs", 
                         "panelIndex": "2", 
-                        "type": "visualization", 
-                        "version": "6.2.2"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -44,19 +44,19 @@
                         }, 
                         "id": "86159190-47c5-11e8-bc13-1397384faad3-ecs", 
                         "panelIndex": "3", 
-                        "type": "visualization", 
-                        "version": "6.2.2"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.2"
                     }
                 ], 
                 "timeRestore": false, 
                 "title": "[Metricbeat HAProxy] Frontend ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "d5878d00-47c5-11e8-bc13-1397384faad3-ecs", 
-            "type": "dashboard", 
+            "winlog.api": "dashboard", 
             "updated_at": "2018-04-24T18:32:51.945Z", 
-            "version": 5
+            "winlog.version": 5
         }
     ], 
-    "version": "6.2.2"
+    "winlog.version": "6.2.2"
 }

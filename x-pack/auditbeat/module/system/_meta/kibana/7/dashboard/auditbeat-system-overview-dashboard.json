@@ -18,16 +18,16 @@
                   "negate": false,
                   "params": {
                     "query": "system",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "system"
                 },
                 "query": {
                   "match": {
                     "event.module": {
                       "query": "system",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -40,9 +40,9 @@
             }
           }
         },
-        "title": "Host Count [Auditbeat System]",
+        "title": "Host Count [Auditbeat System] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -53,7 +53,7 @@
                 "field": "host.id"
               },
               "schema": "metric",
-              "type": "cardinality"
+              "winlog.api": "cardinality"
             }
           ],
           "params": {
@@ -82,16 +82,16 @@
               },
               "useRanges": false
             },
-            "type": "metric"
+            "winlog.api": "metric"
           },
-          "title": "Host Count [Auditbeat System]",
-          "type": "metric"
+          "title": "Host Count [Auditbeat System] ECS",
+          "winlog.api": "metric"
         }
       },
-      "id": "cf8aa0a0-18ca-11e9-9094-c50574723088",
-      "type": "visualization",
+      "id": "cf8aa0a0-18ca-11e9-9094-c50574723088-ecs",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-03T20:37:18.796Z",
-      "version": 22
+      "winlog.version": 22
     },
     {
       "attributes": {
@@ -111,16 +111,16 @@
                   "negate": false,
                   "params": {
                     "query": "process",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "process"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "process",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -133,9 +133,9 @@
             }
           }
         },
-        "title": "Process Count [Auditbeat System]",
+        "title": "Process Count [Auditbeat System] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -146,7 +146,7 @@
                 "field": "process.entity_id"
               },
               "schema": "metric",
-              "type": "cardinality"
+              "winlog.api": "cardinality"
             }
           ],
           "params": {
@@ -175,16 +175,16 @@
               },
               "useRanges": false
             },
-            "type": "metric"
+            "winlog.api": "metric"
           },
-          "title": "Process Count [Auditbeat System]",
-          "type": "metric"
+          "title": "Process Count [Auditbeat System] ECS",
+          "winlog.api": "metric"
         }
       },
-      "id": "bb0d1870-27f1-11e9-89af-fd12d59dac90",
-      "type": "visualization",
+      "id": "bb0d1870-27f1-11e9-89af-fd12d59dac90-ecs",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-03T20:24:39.030Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -204,16 +204,16 @@
                   "negate": false,
                   "params": {
                     "query": "socket",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "socket"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "socket",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -226,9 +226,9 @@
             }
           }
         },
-        "title": "Socket Count [Auditbeat System]",
+        "title": "Socket Count [Auditbeat System] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -239,7 +239,7 @@
                 "field": "socket.entity_id"
               },
               "schema": "metric",
-              "type": "cardinality"
+              "winlog.api": "cardinality"
             }
           ],
           "params": {
@@ -268,16 +268,16 @@
               },
               "useRanges": false
             },
-            "type": "metric"
+            "winlog.api": "metric"
           },
-          "title": "Socket Count [Auditbeat System]",
-          "type": "metric"
+          "title": "Socket Count [Auditbeat System] ECS",
+          "winlog.api": "metric"
         }
       },
-      "id": "7323dd90-27f2-11e9-89af-fd12d59dac90",
-      "type": "visualization",
+      "id": "7323dd90-27f2-11e9-89af-fd12d59dac90-ecs",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-03T20:29:47.881Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -297,16 +297,16 @@
                   "negate": false,
                   "params": {
                     "query": "user",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "user"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "user",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -319,9 +319,9 @@
             }
           }
         },
-        "title": "User Count [Auditbeat System]",
+        "title": "User Count [Auditbeat System] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -332,7 +332,7 @@
                 "field": "user.entity_id"
               },
               "schema": "metric",
-              "type": "cardinality"
+              "winlog.api": "cardinality"
             }
           ],
           "params": {
@@ -361,16 +361,16 @@
               },
               "useRanges": false
             },
-            "type": "metric"
+            "winlog.api": "metric"
           },
-          "title": "User Count [Auditbeat System]",
-          "type": "metric"
+          "title": "User Count [Auditbeat System] ECS",
+          "winlog.api": "metric"
         }
       },
-      "id": "e9225120-27f2-11e9-89af-fd12d59dac90",
-      "type": "visualization",
+      "id": "e9225120-27f2-11e9-89af-fd12d59dac90-ecs",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-03T20:35:48.640Z",
-      "version": 2
+      "winlog.version": 2
     },
     {
       "attributes": {
@@ -390,16 +390,16 @@
                   "negate": false,
                   "params": {
                     "query": "package",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "package"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "package",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -412,9 +412,9 @@
             }
           }
         },
-        "title": "Package Count [Auditbeat System]",
+        "title": "Package Count [Auditbeat System] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -425,7 +425,7 @@
                 "field": "system.audit.package.entity_id"
               },
               "schema": "metric",
-              "type": "cardinality"
+              "winlog.api": "cardinality"
             }
           ],
           "params": {
@@ -454,16 +454,16 @@
               },
               "useRanges": false
             },
-            "type": "metric"
+            "winlog.api": "metric"
           },
-          "title": "Package Count [Auditbeat System]",
-          "type": "metric"
+          "title": "Package Count [Auditbeat System] ECS",
+          "winlog.api": "metric"
         }
       },
-      "id": "f664fb20-27f3-11e9-89af-fd12d59dac90",
-      "type": "visualization",
+      "id": "f664fb20-27f3-11e9-89af-fd12d59dac90-ecs",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-03T20:40:37.585Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -483,16 +483,16 @@
                   "negate": false,
                   "params": {
                     "query": "login",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "login"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "login",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -505,9 +505,9 @@
             }
           }
         },
-        "title": "Login Count [Auditbeat System]",
+        "title": "Login Count [Auditbeat System] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -517,7 +517,7 @@
                 "customLabel": "Login Events"
               },
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             }
           ],
           "params": {
@@ -546,16 +546,16 @@
               },
               "useRanges": false
             },
-            "type": "metric"
+            "winlog.api": "metric"
           },
-          "title": "Login Count [Auditbeat System]",
-          "type": "metric"
+          "title": "Login Count [Auditbeat System] ECS",
+          "winlog.api": "metric"
         }
       },
-      "id": "8d63c420-27f4-11e9-89af-fd12d59dac90",
-      "type": "visualization",
+      "id": "8d63c420-27f4-11e9-89af-fd12d59dac90-ecs",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-03T20:44:50.914Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -575,16 +575,16 @@
                   "negate": false,
                   "params": {
                     "query": "host",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "host"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "host",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -597,9 +597,9 @@
             }
           }
         },
-        "title": "OS Distribution [Auditbeat System]",
+        "title": "OS Distribution [Auditbeat System] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -609,7 +609,7 @@
                 "field": "system.audit.host.id"
               },
               "schema": "metric",
-              "type": "cardinality"
+              "winlog.api": "cardinality"
             },
             {
               "enabled": true,
@@ -626,7 +626,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             },
             {
               "enabled": true,
@@ -642,7 +642,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -656,16 +656,16 @@
               "values": true
             },
             "legendPosition": "right",
-            "type": "pie"
+            "winlog.api": "pie"
           },
-          "title": "OS Distribution [Auditbeat System]",
-          "type": "pie"
+          "title": "OS Distribution [Auditbeat System] ECS",
+          "winlog.api": "pie"
         }
       },
-      "id": "9dd991a0-18cb-11e9-9094-c50574723088",
-      "type": "visualization",
+      "id": "9dd991a0-18cb-11e9-9094-c50574723088-ecs",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-21T11:37:35.796Z",
-      "version": 24
+      "winlog.version": 24
     },
     {
       "attributes": {
@@ -685,16 +685,16 @@
                   "negate": false,
                   "params": {
                     "query": "login",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "login"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "login",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -707,9 +707,9 @@
             }
           }
         },
-        "title": "Login Actions [Auditbeat System]",
+        "title": "Login Actions [Auditbeat System] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -717,7 +717,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -733,7 +733,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -747,16 +747,16 @@
               "values": true
             },
             "legendPosition": "right",
-            "type": "pie"
+            "winlog.api": "pie"
           },
-          "title": "Login Actions [Auditbeat System]",
-          "type": "pie"
+          "title": "Login Actions [Auditbeat System] ECS",
+          "winlog.api": "pie"
         }
       },
-      "id": "593df9b0-27f7-11e9-89af-fd12d59dac90",
-      "type": "visualization",
+      "id": "593df9b0-27f7-11e9-89af-fd12d59dac90-ecs",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-03T21:04:51.914Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -776,16 +776,16 @@
                   "negate": false,
                   "params": {
                     "query": "user",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "user"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "user",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -802,16 +802,16 @@
                   "negate": true,
                   "params": {
                     "query": "existing_user",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "existing_user"
                 },
                 "query": {
                   "match": {
                     "event.action": {
                       "query": "existing_user",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -824,9 +824,9 @@
             }
           }
         },
-        "title": "User Changes [Auditbeat System]",
+        "title": "User Changes [Auditbeat System] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -836,7 +836,7 @@
                 "customLabel": "User Changes"
               },
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             }
           ],
           "params": {
@@ -865,16 +865,16 @@
               },
               "useRanges": false
             },
-            "type": "metric"
+            "winlog.api": "metric"
           },
-          "title": "User Changes [Auditbeat System]",
-          "type": "metric"
+          "title": "User Changes [Auditbeat System] ECS",
+          "winlog.api": "metric"
         }
       },
-      "id": "00fa0d20-27fc-11e9-89af-fd12d59dac90",
-      "type": "visualization",
+      "id": "00fa0d20-27fc-11e9-89af-fd12d59dac90-ecs",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-03T21:38:11.314Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -894,16 +894,16 @@
                   "negate": false,
                   "params": {
                     "query": "process",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "process"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "process",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -920,16 +920,16 @@
                   "negate": false,
                   "params": {
                     "query": "process_started",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "process_started"
                 },
                 "query": {
                   "match": {
                     "event.action": {
                       "query": "process_started",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -942,9 +942,9 @@
             }
           }
         },
-        "title": "Process Starts [Auditbeat System]",
+        "title": "Process Starts [Auditbeat System] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -954,7 +954,7 @@
                 "customLabel": "Started"
               },
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             }
           ],
           "params": {
@@ -983,16 +983,16 @@
               },
               "useRanges": false
             },
-            "type": "metric"
+            "winlog.api": "metric"
           },
-          "title": "Process Starts [Auditbeat System]",
-          "type": "metric"
+          "title": "Process Starts [Auditbeat System] ECS",
+          "winlog.api": "metric"
         }
       },
-      "id": "0db90830-27fd-11e9-89af-fd12d59dac90",
-      "type": "visualization",
+      "id": "0db90830-27fd-11e9-89af-fd12d59dac90-ecs",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-03T21:45:42.195Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -1012,16 +1012,16 @@
                   "negate": false,
                   "params": {
                     "query": "process_stopped",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "process_stopped"
                 },
                 "query": {
                   "match": {
                     "event.action": {
                       "query": "process_stopped",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1038,16 +1038,16 @@
                   "negate": false,
                   "params": {
                     "query": "process",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "process"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "process",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1060,9 +1060,9 @@
             }
           }
         },
-        "title": "Process Stops [Auditbeat System]",
+        "title": "Process Stops [Auditbeat System] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -1072,7 +1072,7 @@
                 "customLabel": "Stopped"
               },
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             }
           ],
           "params": {
@@ -1101,16 +1101,16 @@
               },
               "useRanges": false
             },
-            "type": "metric"
+            "winlog.api": "metric"
           },
-          "title": "Process Stops [Auditbeat System]",
-          "type": "metric"
+          "title": "Process Stops [Auditbeat System] ECS",
+          "winlog.api": "metric"
         }
       },
-      "id": "b885dae0-27fd-11e9-89af-fd12d59dac90",
-      "type": "visualization",
+      "id": "b885dae0-27fd-11e9-89af-fd12d59dac90-ecs",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-03T21:50:28.750Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -1130,16 +1130,16 @@
                   "negate": false,
                   "params": {
                     "query": "socket",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "socket"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "socket",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1156,16 +1156,16 @@
                   "negate": false,
                   "params": {
                     "query": "socket_opened",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "socket_opened"
                 },
                 "query": {
                   "match": {
                     "event.action": {
                       "query": "socket_opened",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1178,9 +1178,9 @@
             }
           }
         },
-        "title": "Sockets Opened [Auditbeat System]",
+        "title": "Sockets Opened [Auditbeat System] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -1190,7 +1190,7 @@
                 "customLabel": "Opened"
               },
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             }
           ],
           "params": {
@@ -1219,16 +1219,16 @@
               },
               "useRanges": false
             },
-            "type": "metric"
+            "winlog.api": "metric"
           },
-          "title": "Sockets Opened [Auditbeat System]",
-          "type": "metric"
+          "title": "Sockets Opened [Auditbeat System] ECS",
+          "winlog.api": "metric"
         }
       },
-      "id": "295905e0-27fd-11e9-89af-fd12d59dac90",
-      "type": "visualization",
+      "id": "295905e0-27fd-11e9-89af-fd12d59dac90-ecs",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-03T21:47:58.605Z",
-      "version": 2
+      "winlog.version": 2
     },
     {
       "attributes": {
@@ -1248,16 +1248,16 @@
                   "negate": false,
                   "params": {
                     "query": "socket",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "socket"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "socket",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1274,16 +1274,16 @@
                   "negate": false,
                   "params": {
                     "query": "socket_closed",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "socket_closed"
                 },
                 "query": {
                   "match": {
                     "event.action": {
                       "query": "socket_closed",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1296,9 +1296,9 @@
             }
           }
         },
-        "title": "Sockets Closed [Auditbeat System]",
+        "title": "Sockets Closed [Auditbeat System] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -1308,7 +1308,7 @@
                 "customLabel": "Closed"
               },
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             }
           ],
           "params": {
@@ -1337,16 +1337,16 @@
               },
               "useRanges": false
             },
-            "type": "metric"
+            "winlog.api": "metric"
           },
-          "title": "Sockets Closed [Auditbeat System]",
-          "type": "metric"
+          "title": "Sockets Closed [Auditbeat System] ECS",
+          "winlog.api": "metric"
         }
       },
-      "id": "82d46ec0-27fd-11e9-89af-fd12d59dac90",
-      "type": "visualization",
+      "id": "82d46ec0-27fd-11e9-89af-fd12d59dac90-ecs",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-03T21:48:58.668Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -1366,16 +1366,16 @@
                   "negate": false,
                   "params": {
                     "query": "package",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "package"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "package",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1392,16 +1392,16 @@
                   "negate": true,
                   "params": {
                     "query": "existing_package",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "existing_package"
                 },
                 "query": {
                   "match": {
                     "event.action": {
                       "query": "existing_package",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1414,9 +1414,9 @@
             }
           }
         },
-        "title": "Package Changes [Auditbeat System]",
+        "title": "Package Changes [Auditbeat System] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -1426,7 +1426,7 @@
                 "customLabel": "Changes"
               },
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             }
           ],
           "params": {
@@ -1455,16 +1455,16 @@
               },
               "useRanges": false
             },
-            "type": "metric"
+            "winlog.api": "metric"
           },
-          "title": "Package Changes [Auditbeat System]",
-          "type": "metric"
+          "title": "Package Changes [Auditbeat System] ECS",
+          "winlog.api": "metric"
         }
       },
-      "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519",
-      "type": "visualization",
+      "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519-ecs",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-04T10:44:06.826Z",
-      "version": 2
+      "winlog.version": 2
     },
     {
       "attributes": {
@@ -1484,16 +1484,16 @@
                   "negate": false,
                   "params": {
                     "query": "system",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "system"
                 },
                 "query": {
                   "match": {
                     "event.module": {
                       "query": "system",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1510,16 +1510,16 @@
                   "negate": false,
                   "params": {
                     "query": "event",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "event"
                 },
                 "query": {
                   "match": {
                     "event.kind": {
                       "query": "event",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1532,9 +1532,9 @@
             }
           }
         },
-        "title": "System Event Histogram [Auditbeat System]",
+        "title": "System Event Histogram [Auditbeat System] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -1542,7 +1542,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -1558,7 +1558,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             }
           ],
           "params": {
@@ -1574,12 +1574,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "grid": {
@@ -1599,12 +1599,12 @@
                 "mode": "stacked",
                 "show": "true",
                 "showCircles": true,
-                "type": "histogram",
+                "winlog.api": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "type": "histogram",
+            "winlog.api": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -1618,25 +1618,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ]
           },
-          "title": "System Event Histogram [Auditbeat System]",
-          "type": "histogram"
+          "title": "System Event Histogram [Auditbeat System] ECS",
+          "winlog.api": "histogram"
         }
       },
-      "id": "54135e50-27ff-11e9-805f-43bf57dfa519",
-      "type": "visualization",
+      "id": "54135e50-27ff-11e9-805f-43bf57dfa519-ecs",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-03T22:01:59.221Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -1656,16 +1656,16 @@
                   "negate": false,
                   "params": {
                     "query": "host",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "host"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "host",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1678,7 +1678,7 @@
             }
           }
         },
-        "title": "Host List [Auditbeat System]",
+        "title": "Host List [Auditbeat System] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -1689,7 +1689,7 @@
             }
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -1707,7 +1707,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "type": "terms"
+              "winlog.api": "terms"
             },
             {
               "enabled": true,
@@ -1721,7 +1721,7 @@
                 "sortOrder": "desc"
               },
               "schema": "metric",
-              "type": "top_hits"
+              "winlog.api": "top_hits"
             },
             {
               "enabled": true,
@@ -1735,7 +1735,7 @@
                 "sortOrder": "desc"
               },
               "schema": "metric",
-              "type": "top_hits"
+              "winlog.api": "top_hits"
             },
             {
               "enabled": true,
@@ -1749,7 +1749,7 @@
                 "sortOrder": "desc"
               },
               "schema": "metric",
-              "type": "top_hits"
+              "winlog.api": "top_hits"
             },
             {
               "enabled": true,
@@ -1763,7 +1763,7 @@
                 "sortOrder": "desc"
               },
               "schema": "metric",
-              "type": "top_hits"
+              "winlog.api": "top_hits"
             },
             {
               "enabled": true,
@@ -1777,7 +1777,7 @@
                 "sortOrder": "desc"
               },
               "schema": "metric",
-              "type": "top_hits"
+              "winlog.api": "top_hits"
             }
           ],
           "params": {
@@ -1791,14 +1791,14 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Host List [Auditbeat System]",
-          "type": "table"
+          "title": "Host List [Auditbeat System] ECS",
+          "winlog.api": "table"
         }
       },
-      "id": "91962a30-1901-11e9-9094-c50574723088",
-      "type": "visualization",
+      "id": "91962a30-1901-11e9-9094-c50574723088-ecs",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-21T11:58:22.519Z",
-      "version": 25
+      "winlog.version": 25
     },
     {
       "attributes": {
@@ -1825,16 +1825,16 @@
                   "negate": false,
                   "params": {
                     "query": "system",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "system"
                 },
                 "query": {
                   "match": {
                     "event.module": {
                       "query": "system",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1851,16 +1851,16 @@
                   "negate": false,
                   "params": {
                     "query": "event",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "event"
                 },
                 "query": {
                   "match": {
                     "event.kind": {
                       "query": "event",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1872,20 +1872,20 @@
               "language": "lucene",
               "query": ""
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
           "@timestamp",
           "desc"
         ],
-        "title": "System Events [Auditbeat System]",
-        "version": 1
+        "title": "System Events [Auditbeat System] ECS",
+        "winlog.version": 1
       },
-      "id": "d08ebd30-27ff-11e9-805f-43bf57dfa519",
-      "type": "search",
+      "id": "d08ebd30-27ff-11e9-805f-43bf57dfa519-ecs",
+      "winlog.api": "search",
       "updated_at": "2019-02-03T22:17:10.090Z",
-      "version": 2
+      "winlog.version": 2
     },
     {
       "attributes": {
@@ -1899,24 +1899,24 @@
             }
           }
         },
-        "title": "Dashboard Links [Auditbeat System]",
+        "title": "Dashboard Links [Auditbeat System] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 12,
-            "markdown": "**Dashboards**: [System Overview](#/dashboard/2be46cb0-27f2-11e9-89af-fd12d59dac90) | [Hosts](#/dashboard/dfe62590-18da-11e9-9094-c50574723088) | [Logins](#/dashboard/2a17f200-285e-11e9-805f-43bf57dfa519) | [Users](#/dashboard/ae96a660-2864-11e9-97cb-474beda9f119) | [Processes](#/dashboard/4c68f110-2863-11e9-97cb-474beda9f119) | [Sockets](#/dashboard/957a3ef0-2867-11e9-9d21-0be348776e6c) | [Packages](#/dashboard/137c52f0-286a-11e9-9d21-0be348776e6c)",
+            "markdown": "**Dashboards**: [System Overview](#/dashboard/2be46cb0-27f2-11e9-89af-fd12d59dac90-ecs) | [Hosts](#/dashboard/dfe62590-18da-11e9-9094-c50574723088-ecs) | [Logins](#/dashboard/2a17f200-285e-11e9-805f-43bf57dfa519-ecs) | [Users](#/dashboard/ae96a660-2864-11e9-97cb-474beda9f119-ecs) | [Processes](#/dashboard/4c68f110-2863-11e9-97cb-474beda9f119-ecs) | [Sockets](#/dashboard/957a3ef0-2867-11e9-9d21-0be348776e6c-ecs) | [Packages](#/dashboard/137c52f0-286a-11e9-9d21-0be348776e6c-ecs)",
             "openLinksInNewTab": false
           },
-          "title": "Dashboard Links [Auditbeat System]",
-          "type": "markdown"
+          "title": "Dashboard Links [Auditbeat System] ECS",
+          "winlog.api": "markdown"
         }
       },
-      "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90",
-      "type": "visualization",
+      "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90-ecs",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-04T11:37:25.234Z",
-      "version": 3
+      "winlog.version": 3
     },
     {
       "attributes": {
@@ -1937,16 +1937,16 @@
                   "negate": false,
                   "params": {
                     "query": "host",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "host"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "host",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1963,16 +1963,16 @@
                   "negate": false,
                   "params": {
                     "query": "login",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "login"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "login",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1989,16 +1989,16 @@
                   "negate": false,
                   "params": {
                     "query": "user",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "user"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "user",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -2015,16 +2015,16 @@
                   "negate": false,
                   "params": {
                     "query": "process",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "process"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "process",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -2041,16 +2041,16 @@
                   "negate": false,
                   "params": {
                     "query": "socket",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "socket"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "socket",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -2067,16 +2067,16 @@
                   "negate": false,
                   "params": {
                     "query": "package",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "package"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "package",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -2103,10 +2103,10 @@
               "x": 0,
               "y": 4
             },
-            "id": "cf8aa0a0-18ca-11e9-9094-c50574723088",
+            "id": "cf8aa0a0-18ca-11e9-9094-c50574723088-ecs",
             "panelIndex": "1",
-            "type": "visualization",
-            "version": "7.0.0"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -2117,10 +2117,10 @@
               "x": 24,
               "y": 4
             },
-            "id": "bb0d1870-27f1-11e9-89af-fd12d59dac90",
+            "id": "bb0d1870-27f1-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "2",
-            "type": "visualization",
-            "version": "7.0.0"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -2131,10 +2131,10 @@
               "x": 32,
               "y": 4
             },
-            "id": "7323dd90-27f2-11e9-89af-fd12d59dac90",
+            "id": "7323dd90-27f2-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "3",
-            "type": "visualization",
-            "version": "7.0.0"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -2145,10 +2145,10 @@
               "x": 16,
               "y": 4
             },
-            "id": "e9225120-27f2-11e9-89af-fd12d59dac90",
+            "id": "e9225120-27f2-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "4",
-            "type": "visualization",
-            "version": "7.0.0"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -2159,10 +2159,10 @@
               "x": 40,
               "y": 4
             },
-            "id": "f664fb20-27f3-11e9-89af-fd12d59dac90",
+            "id": "f664fb20-27f3-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "5",
-            "type": "visualization",
-            "version": "7.0.0"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -2173,10 +2173,10 @@
               "x": 8,
               "y": 4
             },
-            "id": "8d63c420-27f4-11e9-89af-fd12d59dac90",
+            "id": "8d63c420-27f4-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "6",
-            "type": "visualization",
-            "version": "7.0.0"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -2187,10 +2187,10 @@
               "x": 0,
               "y": 12
             },
-            "id": "9dd991a0-18cb-11e9-9094-c50574723088",
+            "id": "9dd991a0-18cb-11e9-9094-c50574723088-ecs",
             "panelIndex": "8",
-            "type": "visualization",
-            "version": "7.0.0"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -2201,10 +2201,10 @@
               "x": 8,
               "y": 12
             },
-            "id": "593df9b0-27f7-11e9-89af-fd12d59dac90",
+            "id": "593df9b0-27f7-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "9",
-            "type": "visualization",
-            "version": "7.0.0"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -2215,10 +2215,10 @@
               "x": 16,
               "y": 12
             },
-            "id": "00fa0d20-27fc-11e9-89af-fd12d59dac90",
+            "id": "00fa0d20-27fc-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "10",
-            "type": "visualization",
-            "version": "7.0.0"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -2229,10 +2229,10 @@
               "x": 24,
               "y": 12
             },
-            "id": "0db90830-27fd-11e9-89af-fd12d59dac90",
+            "id": "0db90830-27fd-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "11",
-            "type": "visualization",
-            "version": "7.0.0"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -2243,10 +2243,10 @@
               "x": 24,
               "y": 19
             },
-            "id": "b885dae0-27fd-11e9-89af-fd12d59dac90",
+            "id": "b885dae0-27fd-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "12",
-            "type": "visualization",
-            "version": "7.0.0"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -2257,10 +2257,10 @@
               "x": 32,
               "y": 12
             },
-            "id": "295905e0-27fd-11e9-89af-fd12d59dac90",
+            "id": "295905e0-27fd-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "13",
-            "type": "visualization",
-            "version": "7.0.0"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -2271,10 +2271,10 @@
               "x": 32,
               "y": 19
             },
-            "id": "82d46ec0-27fd-11e9-89af-fd12d59dac90",
+            "id": "82d46ec0-27fd-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "14",
-            "type": "visualization",
-            "version": "7.0.0"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -2285,10 +2285,10 @@
               "x": 40,
               "y": 12
             },
-            "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519",
+            "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519-ecs",
             "panelIndex": "15",
-            "type": "visualization",
-            "version": "7.0.0"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -2299,10 +2299,10 @@
               "x": 0,
               "y": 26
             },
-            "id": "54135e50-27ff-11e9-805f-43bf57dfa519",
+            "id": "54135e50-27ff-11e9-805f-43bf57dfa519-ecs",
             "panelIndex": "16",
-            "type": "visualization",
-            "version": "7.0.0"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -2313,10 +2313,10 @@
               "x": 0,
               "y": 34
             },
-            "id": "91962a30-1901-11e9-9094-c50574723088",
+            "id": "91962a30-1901-11e9-9094-c50574723088-ecs",
             "panelIndex": "17",
-            "type": "visualization",
-            "version": "7.0.0"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -2327,10 +2327,10 @@
               "x": 24,
               "y": 34
             },
-            "id": "d08ebd30-27ff-11e9-805f-43bf57dfa519",
+            "id": "d08ebd30-27ff-11e9-805f-43bf57dfa519-ecs",
             "panelIndex": "18",
-            "type": "search",
-            "version": "7.0.0"
+            "winlog.api": "search",
+            "winlog.version": "7.0.0"
           },
           {
             "embeddableConfig": {},
@@ -2341,21 +2341,21 @@
               "x": 0,
               "y": 0
             },
-            "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90",
+            "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "19",
-            "type": "visualization",
-            "version": "7.0.0"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0"
           }
         ],
         "timeRestore": false,
-        "title": "[Auditbeat System] System Overview",
-        "version": 1
+        "title": "[Auditbeat System] System Overview ECS",
+        "winlog.version": 1
       },
-      "id": "2be46cb0-27f2-11e9-89af-fd12d59dac90",
-      "type": "dashboard",
+      "id": "2be46cb0-27f2-11e9-89af-fd12d59dac90-ecs",
+      "winlog.api": "dashboard",
       "updated_at": "2019-02-04T09:32:32.325Z",
-      "version": 9
+      "winlog.version": 9
     }
   ],
-  "version": "7.0.0"
+  "winlog.version": "7.0.0"
 }

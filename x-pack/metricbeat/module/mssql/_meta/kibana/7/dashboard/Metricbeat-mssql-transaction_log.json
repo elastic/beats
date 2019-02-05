@@ -14,7 +14,7 @@
         },
         "title": "Recovery size of transaction log [Metricbeat MSSQL] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -38,7 +38,7 @@
                   {
                     "field": "mssql.transaction_log.stats.recovery_size.bytes",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "avg"
+                    "winlog.api": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -57,19 +57,19 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "type": "timeseries"
+            "winlog.api": "timeseries"
           },
           "title": "Recovery size of transaction log [Metricbeat MSSQL] ECS",
-          "type": "metrics"
+          "winlog.api": "metrics"
         }
       },
       "id": "e9654a40-1fb2-11e9-8a4d-eb34d2834f6b-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-01T10:13:18.406Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -85,7 +85,7 @@
         },
         "title": "Transaction log size since last checkpoint [Metricbeat MSSQL] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -109,7 +109,7 @@
                   {
                     "field": "mssql.transaction_log.stats.since_last_checkpoint.bytes",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "avg"
+                    "winlog.api": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -122,19 +122,19 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "type": "timeseries"
+            "winlog.api": "timeseries"
           },
           "title": "Transaction log size since last checkpoint [Metricbeat MSSQL] ECS",
-          "type": "metrics"
+          "winlog.api": "metrics"
         }
       },
       "id": "1757d530-1fb3-11e9-8a4d-eb34d2834f6b-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-01T10:13:18.406Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -150,7 +150,7 @@
         },
         "title": "Percentage of used space of transaction log [Metricbeat MSSQL] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -174,7 +174,7 @@
                   {
                     "field": "mssql.transaction_log.space_usage.used.pct",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "avg"
+                    "winlog.api": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -187,19 +187,19 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "type": "timeseries"
+            "winlog.api": "timeseries"
           },
           "title": "Percentage of used space of transaction log [Metricbeat MSSQL] ECS",
-          "type": "metrics"
+          "winlog.api": "metrics"
         }
       },
       "id": "a55bb000-1fb2-11e9-8a4d-eb34d2834f6b-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-01T10:13:18.406Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -215,7 +215,7 @@
         },
         "title": "Log space size since last backup [Metricbeat MSSQL] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -239,7 +239,7 @@
                   {
                     "field": "mssql.transaction_log.space_usage.since_last_backup.bytes",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "avg"
+                    "winlog.api": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -252,19 +252,19 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "type": "timeseries"
+            "winlog.api": "timeseries"
           },
           "title": "Log space size since last backup [Metricbeat MSSQL] ECS",
-          "type": "metrics"
+          "winlog.api": "metrics"
         }
       },
       "id": "edb7a0c0-1f2b-11e9-8a4d-eb34d2834f6b-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-01T10:13:18.406Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -280,7 +280,7 @@
         },
         "title": "Active size of transaction log [Metricbeat MSSQL] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -304,7 +304,7 @@
                   {
                     "field": "mssql.transaction_log.stats.active_size.bytes",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "avg"
+                    "winlog.api": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -317,19 +317,19 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "type": "timeseries"
+            "winlog.api": "timeseries"
           },
           "title": "Active size of transaction log [Metricbeat MSSQL] ECS",
-          "type": "metrics"
+          "winlog.api": "metrics"
         }
       },
       "id": "c9ead180-1fb2-11e9-8a4d-eb34d2834f6b-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-01T10:13:18.406Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -345,7 +345,7 @@
         },
         "title": "Used space of transaction log [Metricbeat MSSQL] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -369,7 +369,7 @@
                   {
                     "field": "mssql.transaction_log.space_usage.used.bytes",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "avg"
+                    "winlog.api": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -382,19 +382,19 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "type": "timeseries"
+            "winlog.api": "timeseries"
           },
           "title": "Used space of transaction log [Metricbeat MSSQL] ECS",
-          "type": "metrics"
+          "winlog.api": "metrics"
         }
       },
       "id": "68fa61b0-1fb2-11e9-8a4d-eb34d2834f6b-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-01T10:13:18.406Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -410,7 +410,7 @@
         },
         "title": "Total log space usage [Metricbeat MSSQL] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -434,7 +434,7 @@
                   {
                     "field": "mssql.transaction_log.space_usage.total.bytes",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "avg"
+                    "winlog.api": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -447,19 +447,19 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "type": "timeseries"
+            "winlog.api": "timeseries"
           },
           "title": "Total log space usage [Metricbeat MSSQL] ECS",
-          "type": "metrics"
+          "winlog.api": "metrics"
         }
       },
       "id": "6710ff20-1f2c-11e9-8a4d-eb34d2834f6b-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-01T10:13:18.406Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -475,7 +475,7 @@
         },
         "title": "Database selector [Metricbeat MSSQL] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -490,10 +490,10 @@
                   "multiselect": true,
                   "order": "desc",
                   "size": 5,
-                  "type": "terms"
+                  "winlog.api": "terms"
                 },
                 "parent": "",
-                "type": "list"
+                "winlog.api": "list"
               }
             ],
             "pinFilters": false,
@@ -501,16 +501,16 @@
             "useTimeFilter": false
           },
           "title": "Database selector [Metricbeat MSSQL] ECS",
-          "type": "input_control_vis"
+          "winlog.api": "input_control_vis"
         }
       },
       "id": "82bf9480-260b-11e9-a46a-471d2a76b305-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-01T10:24:09.159Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -543,8 +543,8 @@
             "id": "e9654a40-1fb2-11e9-8a4d-eb34d2834f6b-ecs",
             "panelIndex": "1",
             "title": "Recovery size of transaction log",
-            "type": "visualization",
-            "version": "7.0.0-alpha2"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-alpha2"
           },
           {
             "embeddableConfig": {},
@@ -558,8 +558,8 @@
             "id": "1757d530-1fb3-11e9-8a4d-eb34d2834f6b-ecs",
             "panelIndex": "2",
             "title": "Transaction log size since last checkpoint",
-            "type": "visualization",
-            "version": "7.0.0-alpha2"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-alpha2"
           },
           {
             "embeddableConfig": {},
@@ -573,8 +573,8 @@
             "id": "a55bb000-1fb2-11e9-8a4d-eb34d2834f6b-ecs",
             "panelIndex": "3",
             "title": "Percentage of used space of transaction log",
-            "type": "visualization",
-            "version": "7.0.0-alpha2"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-alpha2"
           },
           {
             "embeddableConfig": {},
@@ -588,8 +588,8 @@
             "id": "edb7a0c0-1f2b-11e9-8a4d-eb34d2834f6b-ecs",
             "panelIndex": "4",
             "title": "Log space size since last backup",
-            "type": "visualization",
-            "version": "7.0.0-alpha2"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-alpha2"
           },
           {
             "embeddableConfig": {},
@@ -603,8 +603,8 @@
             "id": "c9ead180-1fb2-11e9-8a4d-eb34d2834f6b-ecs",
             "panelIndex": "5",
             "title": "Active size of transaction log",
-            "type": "visualization",
-            "version": "7.0.0-alpha2"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-alpha2"
           },
           {
             "embeddableConfig": {},
@@ -618,8 +618,8 @@
             "id": "68fa61b0-1fb2-11e9-8a4d-eb34d2834f6b-ecs",
             "panelIndex": "6",
             "title": "Used space of transaction log",
-            "type": "visualization",
-            "version": "7.0.0-alpha2"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-alpha2"
           },
           {
             "embeddableConfig": {},
@@ -633,8 +633,8 @@
             "id": "6710ff20-1f2c-11e9-8a4d-eb34d2834f6b-ecs",
             "panelIndex": "7",
             "title": "Total log space usage",
-            "type": "visualization",
-            "version": "7.0.0-alpha2"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-alpha2"
           },
           {
             "embeddableConfig": {},
@@ -647,19 +647,19 @@
             },
             "id": "82bf9480-260b-11e9-a46a-471d2a76b305-ecs",
             "panelIndex": "8",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
         "title": "[Metricbeat MSSQL] Transaction log ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "18d66970-1fb4-11e9-8a4d-eb34d2834f6b-ecs",
-      "type": "dashboard",
+      "winlog.api": "dashboard",
       "updated_at": "2019-02-01T10:39:36.585Z",
-      "version": 3
+      "winlog.version": 3
     }
   ],
-  "version": "7.0.0-SNAPSHOT"
+  "winlog.version": "7.0.0-SNAPSHOT"
 }

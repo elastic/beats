@@ -12,7 +12,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -31,8 +31,8 @@
                         }, 
                         "id": "a64b4fd0-471c-11e8-bc13-1397384faad3-ecs", 
                         "panelIndex": "1", 
-                        "type": "visualization", 
-                        "version": "6.2.2"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -44,8 +44,8 @@
                         }, 
                         "id": "794b6cd0-471d-11e8-bc13-1397384faad3-ecs", 
                         "panelIndex": "2", 
-                        "type": "visualization", 
-                        "version": "6.2.2"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -57,8 +57,8 @@
                         }, 
                         "id": "bb0ab500-4735-11e8-bc13-1397384faad3-ecs", 
                         "panelIndex": "3", 
-                        "type": "visualization", 
-                        "version": "6.2.2"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -70,8 +70,8 @@
                         }, 
                         "id": "40bed190-473b-11e8-bc13-1397384faad3-ecs", 
                         "panelIndex": "4", 
-                        "type": "visualization", 
-                        "version": "6.2.2"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -83,8 +83,8 @@
                         }, 
                         "id": "0751ed00-479c-11e8-bc13-1397384faad3-ecs", 
                         "panelIndex": "5", 
-                        "type": "visualization", 
-                        "version": "6.2.2"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -96,8 +96,8 @@
                         }, 
                         "id": "b3463670-47a1-11e8-bc13-1397384faad3-ecs", 
                         "panelIndex": "6", 
-                        "type": "visualization", 
-                        "version": "6.2.2"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -109,8 +109,8 @@
                         }, 
                         "id": "fcbdfa60-47bd-11e8-bc13-1397384faad3-ecs", 
                         "panelIndex": "7", 
-                        "type": "visualization", 
-                        "version": "6.2.2"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.2"
                     }, 
                     {
                         "gridData": {
@@ -122,19 +122,19 @@
                         }, 
                         "id": "981d1040-47be-11e8-bc13-1397384faad3-ecs", 
                         "panelIndex": "8", 
-                        "type": "visualization", 
-                        "version": "6.2.2"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.2"
                     }
                 ], 
                 "timeRestore": false, 
                 "title": "[Metricbeat HAProxy] HTTP backend ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "0836a4b0-47bd-11e8-bc13-1397384faad3-ecs", 
-            "type": "dashboard", 
+            "winlog.api": "dashboard", 
             "updated_at": "2018-04-24T18:33:28.791Z", 
-            "version": 6
+            "winlog.version": 6
         }
     ], 
-    "version": "6.2.2"
+    "winlog.version": "6.2.2"
 }

@@ -19,7 +19,7 @@
                 }, 
                 "title": "Heap Summary [Metricbeat Golang] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -27,12 +27,12 @@
                         "interval": "10s"
                     }, 
                     "title": "Heap Summary [Metricbeat Golang] ECS", 
-                    "type": "timelion"
+                    "winlog.api": "timelion"
                 }
             }, 
             "id": "58000780-f529-11e6-844d-b170e2f0a07e-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -53,7 +53,7 @@
                 }, 
                 "title": "Heap [Metricbeat Golang] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -61,12 +61,12 @@
                         "interval": "10s"
                     }, 
                     "title": "Heap [Metricbeat Golang] ECS", 
-                    "type": "timelion"
+                    "winlog.api": "timelion"
                 }
             }, 
             "id": "95388680-f52a-11e6-969c-518c48c913e4-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -87,7 +87,7 @@
                 }, 
                 "title": "Objects [Metricbeat Golang] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -95,12 +95,12 @@
                         "interval": "10s"
                     }, 
                     "title": "Objects [Metricbeat Golang] ECS", 
-                    "type": "timelion"
+                    "winlog.api": "timelion"
                 }
             }, 
             "id": "b59a5200-f52a-11e6-969c-518c48c913e4-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -121,7 +121,7 @@
                 }, 
                 "title": "System [Metricbeat Golang] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -129,12 +129,12 @@
                         "interval": "10s"
                     }, 
                     "title": "System  [Metricbeat Golang] ECS", 
-                    "type": "timelion"
+                    "winlog.api": "timelion"
                 }
             }, 
             "id": "9a9a8bf0-f52a-11e6-969c-518c48c913e4-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -155,7 +155,7 @@
                 }, 
                 "title": "GC count [Metricbeat Golang] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -163,12 +163,12 @@
                         "interval": "10s"
                     }, 
                     "title": "GC count [Metricbeat Golang] ECS", 
-                    "type": "timelion"
+                    "winlog.api": "timelion"
                 }
             }, 
             "id": "b046cb80-f52a-11e6-969c-518c48c913e4-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -189,7 +189,7 @@
                 }, 
                 "title": "GC durations [Metricbeat Golang] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -197,12 +197,12 @@
                         "interval": "10s"
                     }, 
                     "title": "GC durations [Metricbeat Golang] ECS", 
-                    "type": "timelion"
+                    "winlog.api": "timelion"
                 }
             }, 
             "id": "ab226b50-f52a-11e6-969c-518c48c913e4-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -221,7 +221,7 @@
                                 }
                             }
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -235,7 +235,7 @@
                         "row": 1, 
                         "size_x": 12, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -244,7 +244,7 @@
                         "row": 4, 
                         "size_x": 4, 
                         "size_y": 4, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 9, 
@@ -253,7 +253,7 @@
                         "row": 4, 
                         "size_x": 4, 
                         "size_y": 4, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 5, 
@@ -262,7 +262,7 @@
                         "row": 4, 
                         "size_x": 4, 
                         "size_y": 4, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 7, 
@@ -271,7 +271,7 @@
                         "row": 8, 
                         "size_x": 6, 
                         "size_y": 4, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -280,18 +280,18 @@
                         "row": 8, 
                         "size_x": 6, 
                         "size_y": 4, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
                 "title": "[Metricbeat Golang] Overview ECS", 
                 "uiStateJSON": {}, 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "f2dc7320-f519-11e6-a3c9-9d1f7c42b045-ecs", 
-            "type": "dashboard", 
-            "version": 3
+            "winlog.api": "dashboard", 
+            "winlog.version": 3
         }
     ], 
-    "version": "6.0.0-beta1-SNAPSHOT"
+    "winlog.version": "6.0.0-beta1-SNAPSHOT"
 }

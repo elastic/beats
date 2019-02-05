@@ -11,7 +11,7 @@
                 "savedSearchId": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a-ecs", 
                 "title": "Sudo commands by user [Filebeat System] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -19,7 +19,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -32,7 +32,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -44,7 +44,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -60,12 +60,12 @@
                         "times": []
                     }, 
                     "title": "Sudo commands by user ECS", 
-                    "type": "histogram"
+                    "winlog.api": "histogram"
                 }
             }, 
             "id": "5c7af030-fa2a-11e6-bbd3-29c986c96e5a-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -85,7 +85,7 @@
                 }, 
                 "title": "Sudo errors [Filebeat System] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -93,7 +93,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -106,7 +106,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -118,7 +118,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -134,12 +134,12 @@
                         "times": []
                     }, 
                     "title": "Sudo errors ECS", 
-                    "type": "histogram"
+                    "winlog.api": "histogram"
                 }
             }, 
             "id": "51164310-fa2b-11e6-bbd3-29c986c96e5a-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -161,7 +161,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -169,7 +169,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -181,7 +181,7 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -193,7 +193,7 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -209,12 +209,12 @@
                         "totalFunc": "sum"
                     }, 
                     "title": "Top sudo commands ECS", 
-                    "type": "table"
+                    "winlog.api": "table"
                 }
             }, 
             "id": "dc589770-fa2b-11e6-bbd3-29c986c96e5a-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -224,7 +224,7 @@
                 }, 
                 "title": "Dashboards [Filebeat System] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -232,12 +232,12 @@
                         "markdown": "[Syslog](#/dashboard/Filebeat-syslog-dashboard-ecs) | [Sudo commands](#/dashboard/277876d0-fa2c-11e6-bbd3-29c986c96e5a-ecs) | [SSH logins](#/dashboard/5517a150-f9ce-11e6-8115-a7c18106d86a-ecs) | [New users and groups](#/dashboard/0d3f2380-fa78-11e6-ae9b-81e5311e8cab-ecs)"
                     }, 
                     "title": "Dashboards [Filebeat System] ECS", 
-                    "type": "markdown"
+                    "winlog.api": "markdown"
                 }
             }, 
             "id": "327417e0-8462-11e7-bab8-bd2f0fb42c54-ecs", 
-            "type": "visualization", 
-            "version": 1
+            "winlog.api": "visualization", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -267,11 +267,11 @@
                     "desc"
                 ], 
                 "title": "Sudo commands [Filebeat System] ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "b6f321e0-fa25-11e6-bbd3-29c986c96e5a-ecs", 
-            "type": "search", 
-            "version": 2
+            "winlog.api": "search", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -290,7 +290,7 @@
                                 }
                             }
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -304,7 +304,7 @@
                         "row": 6, 
                         "size_x": 12, 
                         "size_y": 4, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -313,7 +313,7 @@
                         "row": 10, 
                         "size_x": 12, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -322,7 +322,7 @@
                         "row": 2, 
                         "size_x": 12, 
                         "size_y": 4, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -331,7 +331,7 @@
                         "row": 1, 
                         "size_x": 12, 
                         "size_y": 1, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
@@ -348,12 +348,12 @@
                         }
                     }
                 }, 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "277876d0-fa2c-11e6-bbd3-29c986c96e5a-ecs", 
-            "type": "dashboard", 
-            "version": 6
+            "winlog.api": "dashboard", 
+            "winlog.version": 6
         }
     ], 
-    "version": "6.0.0-beta1-SNAPSHOT"
+    "winlog.version": "6.0.0-beta1-SNAPSHOT"
 }

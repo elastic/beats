@@ -20,7 +20,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -28,7 +28,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -40,7 +40,7 @@
                                 "size": 12
                             }, 
                             "schema": "bucket", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -55,12 +55,12 @@
                         "totalFunc": "sum"
                     }, 
                     "title": "Log Level Count [Filebeat PostgreSQL] ECS", 
-                    "type": "table"
+                    "winlog.api": "table"
                 }
             }, 
             "id": "PostgreSQL Log Level Count-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -88,16 +88,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "postgresql", 
-                                        "type": "phrase"
+                                        "winlog.api": "phrase"
                                     }, 
-                                    "type": "phrase", 
+                                    "winlog.api": "phrase", 
                                     "value": "postgresql"
                                 }, 
                                 "query": {
                                     "match": {
                                         "event.module": {
                                             "query": "postgresql", 
-                                            "type": "phrase"
+                                            "winlog.api": "phrase"
                                         }
                                     }
                                 }
@@ -109,7 +109,7 @@
                             "language": "lucene", 
                             "query": "*"
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "sort": [
@@ -117,11 +117,11 @@
                     "desc"
                 ], 
                 "title": "All Logs [Filebeat PostgreSQL] ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "PostgreSQL All Logs-ecs", 
-            "type": "search", 
-            "version": 1
+            "winlog.api": "search", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -134,7 +134,7 @@
                 "savedSearchId": "PostgreSQL All Logs-ecs", 
                 "title": "Logs by level over time [Filebeat PostgreSQL] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -142,7 +142,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -155,7 +155,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -167,7 +167,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -183,14 +183,14 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "@timestamp per month"
                                 }, 
-                                "type": "category"
+                                "winlog.api": "category"
                             }
                         ], 
                         "grid": {
@@ -210,12 +210,12 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "type": "histogram", 
+                                "winlog.api": "histogram", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
                         "times": [], 
-                        "type": "histogram", 
+                        "winlog.api": "histogram", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -229,24 +229,24 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "type": "value"
+                                "winlog.api": "value"
                             }
                         ]
                     }, 
                     "title": "Logs by level over time [Filebeat PostgreSQL] ECS", 
-                    "type": "histogram"
+                    "winlog.api": "histogram"
                 }
             }, 
             "id": "3dbd5370-87f3-11e7-ad9c-db80de0bf8d3-ecs", 
-            "type": "visualization", 
-            "version": 1
+            "winlog.api": "visualization", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -260,7 +260,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -274,7 +274,7 @@
                         "row": 1, 
                         "size_x": 3, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -294,7 +294,7 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "type": "search"
+                        "winlog.api": "search"
                     }, 
                     {
                         "col": 4, 
@@ -303,7 +303,7 @@
                         "row": 1, 
                         "size_x": 9, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
@@ -320,12 +320,12 @@
                         }
                     }
                 }, 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "158be870-87f4-11e7-ad9c-db80de0bf8d3-ecs", 
-            "type": "dashboard", 
-            "version": 1
+            "winlog.api": "dashboard", 
+            "winlog.version": 1
         }
     ], 
-    "version": "6.0.0-beta1-SNAPSHOT"
+    "winlog.version": "6.0.0-beta1-SNAPSHOT"
 }

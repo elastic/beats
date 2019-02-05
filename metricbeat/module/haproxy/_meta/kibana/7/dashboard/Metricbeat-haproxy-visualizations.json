@@ -8,7 +8,7 @@
                 }, 
                 "title": "Connections [Metricbeat HAProxy] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -24,7 +24,7 @@
                                 "id": "69899960-4719-11e8-a520-3f46123ab5eb"
                             }
                         ], 
-                        "filter": "haproxy.stat.component_type:(0 OR 1)", 
+                        "filter": "haproxy.stat.component_winlog.api:(0 OR 1)", 
                         "gauge_color_rules": [
                             {
                                 "id": "6f171ba0-4719-11e8-a520-3f46123ab5eb"
@@ -51,18 +51,18 @@
                                     {
                                         "field": "haproxy.stat.connection.total", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "41ff3940-4719-11e8-a520-3f46123ab5eb", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }, 
                                     {
                                         "field": "41ff3940-4719-11e8-a520-3f46123ab5eb", 
                                         "id": "456a5fa0-4738-11e8-8633-8f8b3acf1566", 
-                                        "type": "positive_only", 
+                                        "winlog.api": "positive_only", 
                                         "unit": ""
                                     }
                                 ], 
@@ -84,16 +84,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "HAProxy connections ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "a64b4fd0-471c-11e8-bc13-1397384faad3-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-04-23T20:54:01.082Z", 
-            "version": 3
+            "winlog.version": 3
         }, 
         {
             "attributes": {
@@ -103,7 +103,7 @@
                 }, 
                 "title": "Active servers in backend [Metricbeat HAProxy] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -122,7 +122,7 @@
                                 "id": "297160c0-471d-11e8-9876-09cc6c85f5f2"
                             }
                         ], 
-                        "filter": "haproxy.stat.component_type:(2 OR 3)", 
+                        "filter": "haproxy.stat.component_winlog.api:(2 OR 3)", 
                         "gauge_color_rules": [
                             {
                                 "gauge": "rgba(255,0,5,1)", 
@@ -164,7 +164,7 @@
                                         "metric_agg": "count", 
                                         "numerator": "*", 
                                         "script": "params.up / (params.down + params.up)", 
-                                        "type": "cardinality", 
+                                        "winlog.api": "cardinality", 
                                         "variables": [
                                             {
                                                 "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
@@ -198,7 +198,7 @@
                                     {
                                         "field": "haproxy.stat.server.id", 
                                         "id": "2cba9421-4724-11e8-b854-2f6d2b452362", 
-                                        "type": "cardinality"
+                                        "winlog.api": "cardinality"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -210,16 +210,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "metric"
+                        "winlog.api": "metric"
                     }, 
                     "title": "HAProxy active servers in backend ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "794b6cd0-471d-11e8-bc13-1397384faad3-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-04-23T21:36:57.634Z", 
-            "version": 8
+            "winlog.version": 8
         }, 
         {
             "attributes": {
@@ -229,7 +229,7 @@
                 }, 
                 "title": "Connections per server [Metricbeat HAProxy] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -240,8 +240,8 @@
                                 "id": "978f2660-4735-11e8-b619-8f82b8185e96"
                             }
                         ], 
-                        "drilldown_url": "../app/kibana#/dashboard/8cc50a50-47e0-11e8-bc13-1397384faad3-ecs?_a=(query:(language:lucene,query:'process.name:\"{{ key }}\"'))", 
-                        "filter": "haproxy.stat.component_type:(2 OR 3)", 
+                        "drilldown_url": "../app/kibana#/dashboard/8cc50a50-47e0-11e8-bc13-1397384faad3-ecs?_a=(query:(language:lucene,query:'haproxy.stat.service_name:\"{{ key }}\"'))", 
+                        "filter": "haproxy.stat.component_winlog.api:(2 OR 3)", 
                         "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
                         "index_pattern": "metricbeat-*", 
                         "interval": "auto", 
@@ -259,12 +259,12 @@
                                     {
                                         "field": "haproxy.stat.connection.total", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "3ea29000-4735-11e8-b619-8f82b8185e96", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -272,22 +272,22 @@
                                 "seperate_axis": 0, 
                                 "split_mode": "terms", 
                                 "stacked": "none", 
-                                "terms_field": "process.name"
+                                "terms_field": "haproxy.stat.service_name"
                             }
                         ], 
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "top_n"
+                        "winlog.api": "top_n"
                     }, 
                     "title": "HAProxy connections per server ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "bb0ab500-4735-11e8-bc13-1397384faad3-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-04-24T17:12:35.298Z", 
-            "version": 3
+            "winlog.version": 3
         }, 
         {
             "attributes": {
@@ -297,7 +297,7 @@
                 }, 
                 "title": "Downtime seconds [Metricbeat HAProxy] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -308,7 +308,7 @@
                                 "id": "c86b8e00-4739-11e8-8953-55bbe33e1362"
                             }
                         ], 
-                        "filter": "haproxy.stat.component_type:1", 
+                        "filter": "haproxy.stat.component_winlog.api:1", 
                         "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
                         "index_pattern": "metricbeat-*", 
                         "interval": "auto", 
@@ -326,19 +326,19 @@
                                     {
                                         "field": "haproxy.stat.downtime", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "91aa6a20-473a-11e8-8953-55bbe33e1362", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }, 
                                     {
                                         "field": "91aa6a20-473a-11e8-8953-55bbe33e1362", 
                                         "id": "a8ce7ca0-473a-11e8-8953-55bbe33e1362", 
                                         "sigma": "", 
-                                        "type": "sum_bucket"
+                                        "winlog.api": "sum_bucket"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -352,16 +352,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "metric"
+                        "winlog.api": "metric"
                     }, 
                     "title": "HAProxy downtime seconds ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "40bed190-473b-11e8-bc13-1397384faad3-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-04-23T21:29:04.708Z", 
-            "version": 3
+            "winlog.version": 3
         }, 
         {
             "attributes": {
@@ -371,7 +371,7 @@
                 }, 
                 "title": "Average time in queue [Metricbeat HAProxy] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -394,7 +394,7 @@
                                     {
                                         "field": "haproxy.stat.queue.time.avg", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -406,16 +406,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "HAProxy average time in queue ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "b3463670-47a1-11e8-bc13-1397384faad3-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-04-24T09:27:25.783Z", 
-            "version": 1
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -425,7 +425,7 @@
                 }, 
                 "title": "Traffic volume [Metricbeat HAProxy] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -448,12 +448,12 @@
                                     {
                                         "field": "haproxy.stat.in.bytes", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "9814c420-47c4-11e8-994c-81d2daeb7c86", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -475,12 +475,12 @@
                                     {
                                         "field": "haproxy.stat.out.bytes", 
                                         "id": "c89d6340-47c4-11e8-994c-81d2daeb7c86", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }, 
                                     {
                                         "field": "c89d6340-47c4-11e8-994c-81d2daeb7c86", 
                                         "id": "c89d6341-47c4-11e8-994c-81d2daeb7c86", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -494,16 +494,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "HAProxy traffic volume ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "86159190-47c5-11e8-bc13-1397384faad3-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-04-24T14:43:27.616Z", 
-            "version": 3
+            "winlog.version": 3
         }, 
         {
             "attributes": {
@@ -513,7 +513,7 @@
                 }, 
                 "title": "HTTP response codes [Metricbeat HAProxy] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -536,18 +536,18 @@
                                     {
                                         "field": "haproxy.stat.response.http.2xx", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "973a6de0-47bd-11e8-b7ab-dff70b15977c", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }, 
                                     {
                                         "field": "973a6de0-47bd-11e8-b7ab-dff70b15977c", 
                                         "id": "4971d580-47e5-11e8-b45e-f10c3845381c", 
-                                        "type": "positive_only", 
+                                        "winlog.api": "positive_only", 
                                         "unit": ""
                                     }
                                 ], 
@@ -569,12 +569,12 @@
                                     {
                                         "field": "haproxy.stat.response.http.3xx", 
                                         "id": "aafd05e1-47bd-11e8-b7ab-dff70b15977c", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }, 
                                     {
                                         "field": "aafd05e1-47bd-11e8-b7ab-dff70b15977c", 
                                         "id": "aafd05e2-47bd-11e8-b7ab-dff70b15977c", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -596,12 +596,12 @@
                                     {
                                         "field": "haproxy.stat.response.http.4xx", 
                                         "id": "c77191a1-47bd-11e8-b7ab-dff70b15977c", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }, 
                                     {
                                         "field": "c77191a1-47bd-11e8-b7ab-dff70b15977c", 
                                         "id": "c77191a2-47bd-11e8-b7ab-dff70b15977c", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -623,12 +623,12 @@
                                     {
                                         "field": "haproxy.stat.response.http.5xx", 
                                         "id": "d574e901-47bd-11e8-b7ab-dff70b15977c", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }, 
                                     {
                                         "field": "d574e901-47bd-11e8-b7ab-dff70b15977c", 
                                         "id": "d5753720-47bd-11e8-b7ab-dff70b15977c", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -650,12 +650,12 @@
                                     {
                                         "field": "haproxy.stat.response.http.other", 
                                         "id": "e3b8a4c1-47bd-11e8-b7ab-dff70b15977c", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }, 
                                     {
                                         "field": "e3b8a4c1-47bd-11e8-b7ab-dff70b15977c", 
                                         "id": "e3b8a4c2-47bd-11e8-b7ab-dff70b15977c", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -677,12 +677,12 @@
                                     {
                                         "field": "haproxy.stat.response.errors", 
                                         "id": "f9217d41-47be-11e8-b7ab-dff70b15977c", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }, 
                                     {
                                         "field": "f9217d41-47be-11e8-b7ab-dff70b15977c", 
                                         "id": "1b7d4400-47bf-11e8-b7ab-dff70b15977c", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -695,16 +695,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "HAProxy HTTP response codes ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "fcbdfa60-47bd-11e8-bc13-1397384faad3-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-04-24T17:31:30.169Z", 
-            "version": 4
+            "winlog.version": 4
         }, 
         {
             "attributes": {
@@ -714,7 +714,7 @@
                 }, 
                 "title": "Average response time [Metricbeat HAProxy] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -737,7 +737,7 @@
                                     {
                                         "field": "haproxy.stat.response.time.avg", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -750,16 +750,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "HAProxy average response time ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "981d1040-47be-11e8-bc13-1397384faad3-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-04-24T13:01:49.811Z", 
-            "version": 2
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -769,7 +769,7 @@
                 }, 
                 "title": "Requests [Metricbeat HAProxy] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -792,18 +792,18 @@
                                     {
                                         "field": "haproxy.stat.request.total", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "max"
+                                        "winlog.api": "max"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "ad38e2c0-47d6-11e8-994c-81d2daeb7c86", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }, 
                                     {
                                         "field": "ad38e2c0-47d6-11e8-994c-81d2daeb7c86", 
                                         "id": "b1ca03a0-47d6-11e8-994c-81d2daeb7c86", 
-                                        "type": "positive_only", 
+                                        "winlog.api": "positive_only", 
                                         "unit": ""
                                     }
                                 ], 
@@ -825,18 +825,18 @@
                                     {
                                         "field": "haproxy.stat.request.errors", 
                                         "id": "c2f30501-47d6-11e8-994c-81d2daeb7c86", 
-                                        "type": "max"
+                                        "winlog.api": "max"
                                     }, 
                                     {
                                         "field": "c2f30501-47d6-11e8-994c-81d2daeb7c86", 
                                         "id": "c2f30502-47d6-11e8-994c-81d2daeb7c86", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }, 
                                     {
                                         "field": "c2f30502-47d6-11e8-994c-81d2daeb7c86", 
                                         "id": "c2f30503-47d6-11e8-994c-81d2daeb7c86", 
-                                        "type": "positive_only", 
+                                        "winlog.api": "positive_only", 
                                         "unit": ""
                                     }
                                 ], 
@@ -858,18 +858,18 @@
                                     {
                                         "field": "haproxy.stat.request.denied", 
                                         "id": "11968ce1-47d7-11e8-994c-81d2daeb7c86", 
-                                        "type": "max"
+                                        "winlog.api": "max"
                                     }, 
                                     {
                                         "field": "11968ce1-47d7-11e8-994c-81d2daeb7c86", 
                                         "id": "11968ce2-47d7-11e8-994c-81d2daeb7c86", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }, 
                                     {
                                         "field": "11968ce2-47d7-11e8-994c-81d2daeb7c86", 
                                         "id": "11968ce3-47d7-11e8-994c-81d2daeb7c86", 
-                                        "type": "positive_only", 
+                                        "winlog.api": "positive_only", 
                                         "unit": ""
                                     }
                                 ], 
@@ -882,16 +882,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "HAProxy requests ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "30956d00-47d7-11e8-bc13-1397384faad3-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-04-24T15:50:19.344Z", 
-            "version": 1
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -901,7 +901,7 @@
                 }, 
                 "title": "Average connection time [Metricbeat HAProxy] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -947,7 +947,7 @@
                                                 "value": "50"
                                             }
                                         ], 
-                                        "type": "percentile"
+                                        "winlog.api": "percentile"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -955,22 +955,22 @@
                                 "split_color_mode": "gradient", 
                                 "split_mode": "everything", 
                                 "stacked": "none", 
-                                "terms_field": "process.name"
+                                "terms_field": "haproxy.stat.service_name"
                             }
                         ], 
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "HAProxy average connection time ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "0751ed00-479c-11e8-bc13-1397384faad3-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-04-24T08:51:34.252Z", 
-            "version": 4
+            "winlog.version": 4
         }, 
         {
             "attributes": {
@@ -980,7 +980,7 @@
                 }, 
                 "title": "Number of server connections [Metricbeat HAProxy] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -995,7 +995,7 @@
                                 "chart_type": "line", 
                                 "color": "#68BC00", 
                                 "fill": 0.5, 
-                                "filter": "haproxy.stat.component_type:(2 OR 3)", 
+                                "filter": "haproxy.stat.component_winlog.api:(2 OR 3)", 
                                 "formatter": "number", 
                                 "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
                                 "label": "Number of connections", 
@@ -1004,18 +1004,18 @@
                                     {
                                         "field": "haproxy.stat.connection.total", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "22668d40-47e1-11e8-96ee-d767c73d008a", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }, 
                                     {
                                         "field": "22668d40-47e1-11e8-96ee-d767c73d008a", 
                                         "id": "2a1d0a00-47e1-11e8-96ee-d767c73d008a", 
-                                        "type": "positive_only", 
+                                        "winlog.api": "positive_only", 
                                         "unit": ""
                                     }
                                 ], 
@@ -1023,22 +1023,22 @@
                                 "seperate_axis": 0, 
                                 "split_mode": "terms", 
                                 "stacked": "none", 
-                                "terms_field": "process.name"
+                                "terms_field": "haproxy.stat.service_name"
                             }
                         ], 
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "HAProxy number of server connections ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "72e84b00-47e1-11e8-bc13-1397384faad3-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-04-24T17:05:00.128Z", 
-            "version": 2
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -1048,7 +1048,7 @@
                 }, 
                 "title": "Healthcheck [Metricbeat HAProxy] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -1071,25 +1071,25 @@
                                     {
                                         "field": "haproxy.stat.downtime", 
                                         "id": "198f56e1-47e4-11e8-b45e-f10c3845381c", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }, 
                                     {
                                         "field": "198f56e1-47e4-11e8-b45e-f10c3845381c", 
                                         "id": "dbf38560-47e6-11e8-b45e-f10c3845381c", 
                                         "sigma": "", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }, 
                                     {
                                         "field": "dbf38560-47e6-11e8-b45e-f10c3845381c", 
                                         "id": "62274b80-47e7-11e8-b45e-f10c3845381c", 
-                                        "type": "positive_only", 
+                                        "winlog.api": "positive_only", 
                                         "unit": ""
                                     }, 
                                     {
                                         "id": "7b7a7300-47e7-11e8-b45e-f10c3845381c", 
                                         "script": "(params.down > 0) ? 1 : 0", 
-                                        "type": "calculation", 
+                                        "winlog.api": "calculation", 
                                         "variables": [
                                             {
                                                 "field": "62274b80-47e7-11e8-b45e-f10c3845381c", 
@@ -1117,7 +1117,7 @@
                                     {
                                         "field": "haproxy.stat.check.duration", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -1129,16 +1129,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "HAProxy healthcheck ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "976b0910-47e4-11e8-bc13-1397384faad3-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-04-24T17:49:15.393Z", 
-            "version": 5
+            "winlog.version": 5
         }, 
         {
             "attributes": {
@@ -1148,7 +1148,7 @@
                 }, 
                 "title": "Servers per connection [Metricbeat HAProxy] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -1159,7 +1159,7 @@
                                 "id": "50830800-47d9-11e8-9db9-274c7a5e25e4"
                             }
                         ], 
-                        "drilldown_url": "../app/kibana#/dashboard/8cc50a50-47e0-11e8-bc13-1397384faad3-ecs?_a=(query:(language:lucene,query:'process.name:\"{{ key }}\"'))", 
+                        "drilldown_url": "../app/kibana#/dashboard/8cc50a50-47e0-11e8-bc13-1397384faad3-ecs?_a=(query:(language:lucene,query:'haproxy.stat.service_name:\"{{ key }}\"'))", 
                         "filter": "", 
                         "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
                         "ignore_global_filter": 0, 
@@ -1172,7 +1172,7 @@
                                 "chart_type": "line", 
                                 "color": "#68BC00", 
                                 "fill": 0.5, 
-                                "filter": "haproxy.stat.component_type:(2 OR 3)", 
+                                "filter": "haproxy.stat.component_winlog.api:(2 OR 3)", 
                                 "formatter": "number", 
                                 "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
                                 "label": "Servers", 
@@ -1181,14 +1181,14 @@
                                     {
                                         "field": "haproxy.stat.connection.total", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }
                                 ], 
                                 "point_size": 1, 
                                 "seperate_axis": 0, 
                                 "split_mode": "terms", 
                                 "stacked": "none", 
-                                "terms_field": "process.name", 
+                                "terms_field": "haproxy.stat.service_name", 
                                 "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                 "terms_size": "20", 
                                 "var_name": ""
@@ -1197,16 +1197,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "top_n"
+                        "winlog.api": "top_n"
                     }, 
                     "title": "HAProxy servers per connection ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "79350d50-47db-11e8-bc13-1397384faad3-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-04-24T17:11:53.619Z", 
-            "version": 7
+            "winlog.version": 7
         }, 
         {
             "attributes": {
@@ -1216,7 +1216,7 @@
                 }, 
                 "title": "Backends per connection [Metricbeat HAProxy] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -1237,7 +1237,7 @@
                                 "chart_type": "line", 
                                 "color": "#68BC00", 
                                 "fill": 0.5, 
-                                "filter": "haproxy.stat.component_type:1", 
+                                "filter": "haproxy.stat.component_winlog.api:1", 
                                 "formatter": "number", 
                                 "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
                                 "label": "Backends", 
@@ -1246,7 +1246,7 @@
                                     {
                                         "field": "haproxy.stat.connection.total", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -1261,16 +1261,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "top_n"
+                        "winlog.api": "top_n"
                     }, 
                     "title": "HAProxy backends per connection ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "8c8f0300-47dc-11e8-bc13-1397384faad3-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-04-24T16:46:24.802Z", 
-            "version": 2
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -1280,7 +1280,7 @@
                 }, 
                 "title": "Frontends per connection [Metricbeat HAProxy] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -1301,7 +1301,7 @@
                                 "chart_type": "line", 
                                 "color": "#68BC00", 
                                 "fill": 0.5, 
-                                "filter": "haproxy.stat.component_type:0", 
+                                "filter": "haproxy.stat.component_winlog.api:0", 
                                 "formatter": "number", 
                                 "id": "61ca57f1-469d-11e7-af02-69e470af7417", 
                                 "label": "Frontends", 
@@ -1310,7 +1310,7 @@
                                     {
                                         "field": "haproxy.stat.connection.total", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -1325,17 +1325,17 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "top_n"
+                        "winlog.api": "top_n"
                     }, 
                     "title": "HAProxy frontends per connection ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "f1e27ed0-47dc-11e8-bc13-1397384faad3-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-04-24T16:54:16.639Z", 
-            "version": 3
+            "winlog.version": 3
         }
     ], 
-    "version": "6.2.2"
+    "winlog.version": "6.2.2"
 }

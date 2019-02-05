@@ -29,7 +29,7 @@
             },
             "panelIndex": "1",
             "panelRefName": "panel_0",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -41,7 +41,7 @@
             },
             "panelIndex": "3",
             "panelRefName": "panel_1",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -63,7 +63,7 @@
             },
             "panelIndex": "4",
             "panelRefName": "panel_2",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -75,7 +75,7 @@
             },
             "panelIndex": "5",
             "panelRefName": "panel_3",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -87,48 +87,47 @@
             },
             "panelIndex": "6",
             "panelRefName": "panel_4",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
-        "title": "Winlogbeat Dashboard",
-        "version": 1
+        "title": "Winlogbeat Dashboard ECS",
+        "winlog.version": 1
       },
-      "id": "Winlogbeat-Dashboard",
+      "id": "Winlogbeat-Dashboard-ecs",
       "migrationVersion": {
         "dashboard": "7.0.0"
       },
       "references": [
         {
-<<<<<<< HEAD
-          "id": "Number-of-Events-Over-Time-By-Event-Log",
+          "id": "Number-of-Events-Over-Time-By-Event-Log-ecs",
           "name": "panel_0",
-          "type": "visualization"
+          "winlog.api": "visualization"
         },
         {
-          "id": "Number-of-Events",
+          "id": "Number-of-Events-ecs",
           "name": "panel_1",
-          "type": "visualization"
+          "winlog.api": "visualization"
         },
         {
-          "id": "Top-Event-IDs",
+          "id": "Top-Event-IDs-ecs",
           "name": "panel_2",
-          "type": "visualization"
+          "winlog.api": "visualization"
         },
         {
-          "id": "Event-Levels",
+          "id": "Event-Levels-ecs",
           "name": "panel_3",
-          "type": "visualization"
+          "winlog.api": "visualization"
         },
         {
-          "id": "Sources",
+          "id": "Sources-ecs",
           "name": "panel_4",
-          "type": "visualization"
+          "winlog.api": "visualization"
         }
       ],
-      "type": "dashboard",
+      "winlog.api": "dashboard",
       "updated_at": "2019-02-05T19:56:19.932Z",
-      "version": 7
+      "winlog.version": 7
     },
     {
       "attributes": {
@@ -143,9 +142,9 @@
             }
           }
         },
-        "title": "Number of Events Over Time By Channel",
+        "title": "Number of Events Over Time By Channel ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -153,7 +152,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -174,7 +173,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             },
             {
               "enabled": true,
@@ -191,7 +190,7 @@
                 "size": 6
               },
               "schema": "group",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -207,12 +206,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -279,14 +278,14 @@
                 },
                 "mode": "stacked",
                 "show": "true",
-                "type": "histogram",
+                "winlog.api": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "setYExtents": false,
             "shareYAxis": true,
             "times": [],
-            "type": "histogram",
+            "winlog.api": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -302,23 +301,23 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
-          "title": "Number of Events Over Time By Channel",
-          "type": "histogram"
+          "title": "Number of Events Over Time By Channel ECS",
+          "winlog.api": "histogram"
         }
       },
-      "id": "Number-of-Events-Over-Time-By-Event-Log",
+      "id": "Number-of-Events-Over-Time-By-Event-Log-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
@@ -326,373 +325,12 @@
         {
           "id": "winlogbeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-=======
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [], 
-                        "index": "winlogbeat-*", 
-                        "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
-                        }
-                    }
-                }, 
-                "title": "Number of Events Over Time By Event Log ECS", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }, 
-                        {
-                            "id": "2", 
-                            "params": {
-                                "customInterval": "2h", 
-                                "extended_bounds": {}, 
-                                "field": "@timestamp", 
-                                "interval": "auto", 
-                                "min_doc_count": 1
-                            }, 
-                            "schema": "segment", 
-                            "type": "date_histogram"
-                        }, 
-                        {
-                            "id": "3", 
-                            "params": {
-                                "field": "log_name", 
-                                "order": "desc", 
-                                "orderBy": "1", 
-                                "size": 6
-                            }, 
-                            "schema": "group", 
-                            "type": "terms"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "addLegend": true, 
-                        "addTimeMarker": false, 
-                        "addTooltip": true, 
-                        "defaultYExtents": false, 
-                        "mode": "stacked", 
-                        "scale": "linear", 
-                        "setYExtents": false, 
-                        "shareYAxis": true, 
-                        "times": [], 
-                        "yAxis": {}
-                    }, 
-                    "type": "histogram"
-                }
-            }, 
-            "id": "Number-of-Events-Over-Time-By-Event-Log-ecs", 
-            "type": "visualization", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [], 
-                        "index": "winlogbeat-*", 
-                        "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
-                        }
-                    }
-                }, 
-                "title": "Number of Events ECS", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "fontSize": 60
-                    }, 
-                    "type": "metric"
-                }
-            }, 
-            "id": "Number-of-Events-ecs", 
-            "type": "visualization", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [], 
-                        "index": "winlogbeat-*", 
-                        "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
-                        }
-                    }
-                }, 
-                "title": "Top Event IDs ECS", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }, 
-                        {
-                            "id": "2", 
-                            "params": {
-                                "field": "event_id", 
-                                "order": "desc", 
-                                "orderBy": "1", 
-                                "size": 5
-                            }, 
-                            "schema": "bucket", 
-                            "type": "terms"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "perPage": 10, 
-                        "showMeticsAtAllLevels": false, 
-                        "showPartialRows": false
-                    }, 
-                    "type": "table"
-                }
-            }, 
-            "id": "Top-Event-IDs-ecs", 
-            "type": "visualization", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [], 
-                        "index": "winlogbeat-*", 
-                        "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
-                        }
-                    }
-                }, 
-                "title": "Event Levels ECS", 
-                "uiStateJSON": {
-                    "vis": {
-                        "params": {
-                            "sort": {
-                                "columnIndex": null, 
-                                "direction": null
-                            }
-                        }
-                    }
-                }, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "enabled": true, 
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }, 
-                        {
-                            "enabled": true, 
-                            "id": "2", 
-                            "params": {
-                                "field": "level", 
-                                "order": "desc", 
-                                "orderBy": "1", 
-                                "size": 5
-                            }, 
-                            "schema": "bucket", 
-                            "type": "terms"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "perPage": 10, 
-                        "showMeticsAtAllLevels": false, 
-                        "showPartialRows": false, 
-                        "showTotal": false, 
-                        "sort": {
-                            "columnIndex": null, 
-                            "direction": null
-                        }, 
-                        "totalFunc": "sum"
-                    }, 
-                    "title": "Event Levels ECS", 
-                    "type": "table"
-                }
-            }, 
-            "id": "Event-Levels-ecs", 
-            "type": "visualization", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [], 
-                        "index": "winlogbeat-*", 
-                        "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
-                        }
-                    }
-                }, 
-                "title": "Sources-ecs ECS", 
-                "uiStateJSON": {}, 
-                "version": 1, 
-                "visState": {
-                    "aggs": [
-                        {
-                            "enabled": true, 
-                            "id": "1", 
-                            "params": {}, 
-                            "schema": "metric", 
-                            "type": "count"
-                        }, 
-                        {
-                            "enabled": true, 
-                            "id": "2", 
-                            "params": {
-                                "field": "source_name", 
-                                "order": "desc", 
-                                "orderBy": "1", 
-                                "size": 7
-                            }, 
-                            "schema": "segment", 
-                            "type": "terms"
-                        }
-                    ], 
-                    "listeners": {}, 
-                    "params": {
-                        "addLegend": true, 
-                        "addTooltip": true, 
-                        "isDonut": false, 
-                        "legendPosition": "right", 
-                        "shareYAxis": true
-                    }, 
-                    "title": "Sources-ecs ECS", 
-                    "type": "pie"
-                }
-            }, 
-            "id": "Sources-ecs ECS", 
-            "type": "visualization", 
-            "version": 1
-        }, 
-        {
-            "attributes": {
-                "description": "", 
-                "hits": 0, 
-                "kibanaSavedObjectMeta": {
-                    "searchSourceJSON": {
-                        "filter": [
-                            {
-                                "query": {
-                                    "query_string": {
-                                        "analyze_wildcard": true, 
-                                        "query": "*"
-                                    }
-                                }
-                            }
-                        ]
-                    }
-                }, 
-                "optionsJSON": {
-                    "darkTheme": false
-                }, 
-                "panelsJSON": [
-                    {
-                        "col": 4, 
-                        "id": "Number-of-Events-Over-Time-By-Event-Log-ecs", 
-                        "panelIndex": 1, 
-                        "row": 1, 
-                        "size_x": 9, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 1, 
-                        "id": "Number-of-Events-ecs", 
-                        "panelIndex": 3, 
-                        "row": 1, 
-                        "size_x": 3, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 5, 
-                        "id": "Top-Event-IDs-ecs", 
-                        "panelIndex": 4, 
-                        "row": 5, 
-                        "size_x": 4, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 9, 
-                        "id": "Event-Levels-ecs", 
-                        "panelIndex": 5, 
-                        "row": 5, 
-                        "size_x": 4, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }, 
-                    {
-                        "col": 1, 
-                        "id": "Sources-ecs ECS", 
-                        "panelIndex": 6, 
-                        "row": 5, 
-                        "size_x": 4, 
-                        "size_y": 4, 
-                        "type": "visualization"
-                    }
-                ], 
-                "timeRestore": false, 
-                "title": "Winlogbeat Dashboard ECS", 
-                "uiStateJSON": {}, 
-                "version": 1
-            }, 
-            "id": "Winlogbeat-Dashboard-ecs", 
-            "type": "dashboard", 
-            "version": 1
->>>>>>> Introduce migration script for data in Kibana files
+          "winlog.api": "index-pattern"
         }
       ],
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-05T19:56:19.932Z",
-      "version": 7
+      "winlog.version": 7
     },
     {
       "attributes": {
@@ -709,26 +347,26 @@
             }
           }
         },
-        "title": "Number of Events",
+        "title": "Number of Events ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             }
           ],
           "listeners": {},
           "params": {
             "fontSize": 60
           },
-          "type": "metric"
+          "winlog.api": "metric"
         }
       },
-      "id": "Number-of-Events",
+      "id": "Number-of-Events-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
@@ -736,12 +374,12 @@
         {
           "id": "winlogbeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
+          "winlog.api": "index-pattern"
         }
       ],
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-05T19:56:19.932Z",
-      "version": 7
+      "winlog.version": 7
     },
     {
       "attributes": {
@@ -761,7 +399,7 @@
             }
           }
         },
-        "title": "Top Event IDs",
+        "title": "Top Event IDs ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -772,7 +410,7 @@
             }
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -780,7 +418,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -797,7 +435,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -838,11 +476,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top Event IDs",
-          "type": "table"
+          "title": "Top Event IDs ECS",
+          "winlog.api": "table"
         }
       },
-      "id": "Top-Event-IDs",
+      "id": "Top-Event-IDs-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
@@ -850,12 +488,12 @@
         {
           "id": "winlogbeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
+          "winlog.api": "index-pattern"
         }
       ],
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-05T19:56:19.932Z",
-      "version": 7
+      "winlog.version": 7
     },
     {
       "attributes": {
@@ -875,7 +513,7 @@
             }
           }
         },
-        "title": "Event Levels",
+        "title": "Event Levels ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -886,7 +524,7 @@
             }
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -894,7 +532,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -911,7 +549,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -952,11 +590,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Event Levels",
-          "type": "table"
+          "title": "Event Levels ECS",
+          "winlog.api": "table"
         }
       },
-      "id": "Event-Levels",
+      "id": "Event-Levels-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
@@ -964,12 +602,12 @@
         {
           "id": "winlogbeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
+          "winlog.api": "index-pattern"
         }
       ],
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-05T19:56:19.932Z",
-      "version": 7
+      "winlog.version": 7
     },
     {
       "attributes": {
@@ -989,9 +627,9 @@
             }
           }
         },
-        "title": "Sources (Provider Names)",
+        "title": "Sources (Provider Names) ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -999,7 +637,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -1015,7 +653,7 @@
                 "size": 7
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -1030,13 +668,13 @@
             },
             "legendPosition": "right",
             "shareYAxis": true,
-            "type": "pie"
+            "winlog.api": "pie"
           },
-          "title": "Sources (Provider Names)",
-          "type": "pie"
+          "title": "Sources (Provider Names) ECS",
+          "winlog.api": "pie"
         }
       },
-      "id": "Sources",
+      "id": "Sources-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
@@ -1044,13 +682,13 @@
         {
           "id": "winlogbeat-*",
           "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
+          "winlog.api": "index-pattern"
         }
       ],
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-02-05T19:56:19.932Z",
-      "version": 7
+      "winlog.version": 7
     }
   ],
-  "version": "7.0.0-SNAPSHOT"
+  "winlog.version": "7.0.0-SNAPSHOT"
 }

@@ -28,7 +28,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -38,7 +38,7 @@
                                 "customLabel": ""
                             }, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -51,7 +51,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -91,20 +91,20 @@
                                 "labelColor": false, 
                                 "subText": ""
                             }, 
-                            "type": "simple", 
+                            "winlog.api": "simple", 
                             "useRange": false, 
                             "verticalSplit": true
                         }, 
-                        "type": "gauge"
+                        "winlog.api": "gauge"
                     }, 
                     "title": "Actions [Auditbeat File Integrity] ECS", 
-                    "type": "metric"
+                    "winlog.api": "metric"
                 }
             }, 
             "id": "AV0tVcg6g1PYniApZa-v-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
-            "version": 6
+            "winlog.version": 6
         }, 
         {
             "attributes": {
@@ -128,7 +128,7 @@
                 "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
                 "title": "Events Over Time [Auditbeat File Integrity] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -136,7 +136,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -149,7 +149,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -162,7 +162,7 @@
                                 "size": 10
                             }, 
                             "schema": "group", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -178,14 +178,14 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "@timestamp per 5 minutes"
                                 }, 
-                                "type": "category"
+                                "winlog.api": "category"
                             }
                         ], 
                         "grid": {
@@ -205,12 +205,12 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "type": "histogram", 
+                                "winlog.api": "histogram", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
                         "times": [], 
-                        "type": "histogram", 
+                        "winlog.api": "histogram", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -225,25 +225,25 @@
                                 "scale": {
                                     "defaultYExtents": true, 
                                     "mode": "normal", 
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "type": "value"
+                                "winlog.api": "value"
                             }
                         ]
                     }, 
                     "title": "Events Over Time [Auditbeat File Integrity] ECS", 
-                    "type": "histogram"
+                    "winlog.api": "histogram"
                 }
             }, 
             "id": "AV0tV05vg1PYniApZbA2-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
-            "version": 6
+            "winlog.version": 6
         }, 
         {
             "attributes": {
@@ -267,7 +267,7 @@
                 "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
                 "title": "Top owners [Auditbeat File Integrity] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -275,7 +275,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -288,7 +288,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -296,16 +296,16 @@
                         "addTooltip": true, 
                         "isDonut": true, 
                         "legendPosition": "right", 
-                        "type": "pie"
+                        "winlog.api": "pie"
                     }, 
                     "title": "Top owners [Auditbeat File Integrity] ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "id": "AV0tWL-Yg1PYniApZbCs-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
-            "version": 6
+            "winlog.version": 6
         }, 
         {
             "attributes": {
@@ -329,7 +329,7 @@
                 "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
                 "title": "Top groups [Auditbeat File Integrity] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -337,7 +337,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -350,7 +350,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -358,16 +358,16 @@
                         "addTooltip": true, 
                         "isDonut": true, 
                         "legendPosition": "right", 
-                        "type": "pie"
+                        "winlog.api": "pie"
                     }, 
                     "title": "Top groups [Auditbeat File Integrity] ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "id": "AV0tWSdXg1PYniApZbDU-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
-            "version": 6
+            "winlog.version": 6
         }, 
         {
             "attributes": {
@@ -391,7 +391,7 @@
                 "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
                 "title": "Top updated [Auditbeat File Integrity] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -399,7 +399,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -412,7 +412,7 @@
                                 "size": 10
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -420,16 +420,16 @@
                         "addTooltip": true, 
                         "isDonut": false, 
                         "legendPosition": "right", 
-                        "type": "pie"
+                        "winlog.api": "pie"
                     }, 
                     "title": "Top updated [Auditbeat File Integrity] ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "id": "AV0tW0djg1PYniApZbGL-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
-            "version": 6
+            "winlog.version": 6
         }, 
         {
             "attributes": {
@@ -440,7 +440,7 @@
                         "index": "auditbeat-*", 
                         "query": {
                             "language": "lucene", 
-                            "query": "file.mode:/0..[2367]/ NOT file.type:symlink"
+                            "query": "file.mode:/0..[2367]/ NOT file.winlog.api:symlink"
                         }
                     }
                 }, 
@@ -453,7 +453,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -464,7 +464,7 @@
                                 "field": "file.inode"
                             }, 
                             "schema": "metric", 
-                            "type": "cardinality"
+                            "winlog.api": "cardinality"
                         }
                     ], 
                     "params": {
@@ -494,16 +494,16 @@
                             }, 
                             "useRange": false
                         }, 
-                        "type": "metric"
+                        "winlog.api": "metric"
                     }, 
                     "title": "World Writable File Count [Auditbeat File Integrity] ECS", 
-                    "type": "metric"
+                    "winlog.api": "metric"
                 }
             }, 
             "id": "AV0tY6jwg1PYniApZbRY-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-22T17:48:29.232Z", 
-            "version": 7
+            "winlog.version": 7
         }, 
         {
             "attributes": {
@@ -523,16 +523,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "file", 
-                                        "type": "phrase"
+                                        "winlog.api": "phrase"
                                     }, 
-                                    "type": "phrase", 
+                                    "winlog.api": "phrase", 
                                     "value": "file"
                                 }, 
                                 "query": {
                                     "match": {
                                         "file.type": {
                                             "query": "file", 
-                                            "type": "phrase"
+                                            "winlog.api": "phrase"
                                         }
                                     }
                                 }
@@ -554,7 +554,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -564,7 +564,7 @@
                                 "customLabel": "Most changed file by count"
                             }, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -577,7 +577,7 @@
                                 "size": 1
                             }, 
                             "schema": "group", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -616,20 +616,20 @@
                                 "labelColor": false, 
                                 "subText": ""
                             }, 
-                            "type": "simple", 
+                            "winlog.api": "simple", 
                             "useRange": false, 
                             "verticalSplit": false
                         }, 
-                        "type": "gauge"
+                        "winlog.api": "gauge"
                     }, 
                     "title": "Most changed file by count [Auditbeat File Integrity] ECS", 
-                    "type": "metric"
+                    "winlog.api": "metric"
                 }
             }, 
             "id": "AV0tav8Ag1PYniApZbbK-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
-            "version": 6
+            "winlog.version": 6
         }, 
         {
             "attributes": {
@@ -659,7 +659,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -669,7 +669,7 @@
                                 "customLabel": "Most common mode by count"
                             }, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -682,7 +682,7 @@
                                 "size": 1
                             }, 
                             "schema": "group", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -721,20 +721,20 @@
                                 "labelColor": false, 
                                 "subText": ""
                             }, 
-                            "type": "simple", 
+                            "winlog.api": "simple", 
                             "useRange": false, 
                             "verticalSplit": false
                         }, 
-                        "type": "gauge"
+                        "winlog.api": "gauge"
                     }, 
                     "title": "Most common mode by count [Auditbeat File Integrity] ECS", 
-                    "type": "metric"
+                    "winlog.api": "metric"
                 }
             }, 
             "id": "AV0tbcUdg1PYniApZbe1-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
-            "version": 6
+            "winlog.version": 6
         }, 
         {
             "attributes": {
@@ -767,7 +767,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -777,7 +777,7 @@
                                 "customLabel": "Total Events"
                             }, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -790,7 +790,7 @@
                                 "size": 50
                             }, 
                             "schema": "bucket", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -804,7 +804,7 @@
                                 "sortOrder": "desc"
                             }, 
                             "schema": "metric", 
-                            "type": "top_hits"
+                            "winlog.api": "top_hits"
                         }
                     ], 
                     "params": {
@@ -819,13 +819,13 @@
                         "totalFunc": "sum"
                     }, 
                     "title": "File Event Summary By Host [Auditbeat File Integrity] ECS", 
-                    "type": "table"
+                    "winlog.api": "table"
                 }
             }, 
             "id": "AV0tc_xZg1PYniApZbnL-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
-            "version": 6
+            "winlog.version": 6
         }, 
         {
             "attributes": {
@@ -849,7 +849,7 @@
                 "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
                 "title": "Top deleted [Auditbeat File Integrity] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -857,7 +857,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -870,7 +870,7 @@
                                 "size": 10
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -878,16 +878,16 @@
                         "addTooltip": true, 
                         "isDonut": false, 
                         "legendPosition": "right", 
-                        "type": "pie"
+                        "winlog.api": "pie"
                     }, 
                     "title": "Top deleted [Auditbeat File Integrity] ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "id": "AV0tes4Eg1PYniApZbwV-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
-            "version": 6
+            "winlog.version": 6
         }, 
         {
             "attributes": {
@@ -911,7 +911,7 @@
                 "savedSearchId": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
                 "title": "Top created [Auditbeat File Integrity] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -919,7 +919,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -932,7 +932,7 @@
                                 "size": 10
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -940,16 +940,16 @@
                         "addTooltip": true, 
                         "isDonut": false, 
                         "legendPosition": "right", 
-                        "type": "pie"
+                        "winlog.api": "pie"
                     }, 
                     "title": "Top created [Auditbeat File Integrity] ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "id": "AV0te0TCg1PYniApZbw9-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
-            "version": 6
+            "winlog.version": 6
         }, 
         {
             "attributes": {
@@ -974,16 +974,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "file_integrity", 
-                                        "type": "phrase"
+                                        "winlog.api": "phrase"
                                     }, 
-                                    "type": "phrase", 
+                                    "winlog.api": "phrase", 
                                     "value": "file_integrity"
                                 }, 
                                 "query": {
                                     "match": {
                                         "event.module": {
                                             "query": "file_integrity", 
-                                            "type": "phrase"
+                                            "winlog.api": "phrase"
                                         }
                                     }
                                 }
@@ -995,7 +995,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "sort": [
@@ -1003,12 +1003,12 @@
                     "desc"
                 ], 
                 "title": "File Integrity Events [Auditbeat File Integrity] ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "a380a060-cb44-11e7-9835-2f31fe08873b-ecs", 
-            "type": "search", 
+            "winlog.api": "search", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
-            "version": 6
+            "winlog.version": 6
         }, 
         {
             "attributes": {
@@ -1027,7 +1027,7 @@
                                 }
                             }
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -1045,8 +1045,8 @@
                         }, 
                         "id": "AV0tVcg6g1PYniApZa-v-ecs", 
                         "panelIndex": "1", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -1058,8 +1058,8 @@
                         }, 
                         "id": "AV0tV05vg1PYniApZbA2-ecs", 
                         "panelIndex": "2", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -1071,8 +1071,8 @@
                         }, 
                         "id": "AV0tWL-Yg1PYniApZbCs-ecs", 
                         "panelIndex": "3", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -1084,8 +1084,8 @@
                         }, 
                         "id": "AV0tWSdXg1PYniApZbDU-ecs", 
                         "panelIndex": "4", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -1097,8 +1097,8 @@
                         }, 
                         "id": "AV0tW0djg1PYniApZbGL-ecs", 
                         "panelIndex": "5", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -1110,8 +1110,8 @@
                         }, 
                         "id": "AV0tY6jwg1PYniApZbRY-ecs", 
                         "panelIndex": "6", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -1123,8 +1123,8 @@
                         }, 
                         "id": "AV0tav8Ag1PYniApZbbK-ecs", 
                         "panelIndex": "7", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -1136,8 +1136,8 @@
                         }, 
                         "id": "AV0tbcUdg1PYniApZbe1-ecs", 
                         "panelIndex": "8", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -1149,8 +1149,8 @@
                         }, 
                         "id": "AV0tc_xZg1PYniApZbnL-ecs", 
                         "panelIndex": "9", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -1162,8 +1162,8 @@
                         }, 
                         "id": "AV0tes4Eg1PYniApZbwV-ecs", 
                         "panelIndex": "10", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -1175,8 +1175,8 @@
                         }, 
                         "id": "AV0te0TCg1PYniApZbw9-ecs", 
                         "panelIndex": "11", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "columns": [
@@ -1196,19 +1196,19 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "type": "search", 
-                        "version": "6.2.4"
+                        "winlog.api": "search", 
+                        "winlog.version": "6.2.4"
                     }
                 ], 
                 "timeRestore": false, 
                 "title": "[Auditbeat File Integrity] Overview ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "AV0tXkjYg1PYniApZbKP-ecs", 
-            "type": "dashboard", 
+            "winlog.api": "dashboard", 
             "updated_at": "2018-01-22T15:54:25.278Z", 
-            "version": 6
+            "winlog.version": 6
         }
     ], 
-    "version": "6.1.2"
+    "winlog.version": "6.1.2"
 }

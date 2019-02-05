@@ -15,7 +15,7 @@
                 "savedSearchId": "d382f5b0-c1c6-11e7-8995-936807a28b16-ecs", 
                 "title": "Error Codes [Auditbeat Auditd Executions] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -23,7 +23,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -36,7 +36,7 @@
                                 "size": 10
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -44,16 +44,16 @@
                         "addTooltip": true, 
                         "isDonut": true, 
                         "legendPosition": "right", 
-                        "type": "pie"
+                        "winlog.api": "pie"
                     }, 
                     "title": "Error Codes [Auditbeat Auditd Executions] ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "id": "20a8e8d0-c1c8-11e7-8995-936807a28b16-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-16T22:10:23.921Z", 
-            "version": 4
+            "winlog.version": 4
         }, 
         {
             "attributes": {
@@ -70,7 +70,7 @@
                 }, 
                 "title": "Primary Username Tag Cloud [Auditbeat Auditd] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -78,7 +78,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -90,7 +90,7 @@
                                 "size": 10
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -100,13 +100,13 @@
                         "scale": "linear"
                     }, 
                     "title": "Primary Username Tag Cloud [Auditbeat Auditd] ECS", 
-                    "type": "tagcloud"
+                    "winlog.api": "tagcloud"
                 }
             }, 
             "id": "f81a6de0-c1c1-11e7-8995-936807a28b16-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-16T22:12:18.730Z", 
-            "version": 3
+            "winlog.version": 3
         }, 
         {
             "attributes": {
@@ -123,7 +123,7 @@
                 "savedSearchId": "d382f5b0-c1c6-11e7-8995-936807a28b16-ecs", 
                 "title": "Exe Name Tag Cloud [Auditbeat Auditd Executions] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -131,7 +131,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -143,7 +143,7 @@
                                 "size": 10
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -153,13 +153,13 @@
                         "scale": "linear"
                     }, 
                     "title": "Exe Name Tag Cloud [Auditbeat Auditd Executions] ECS", 
-                    "type": "tagcloud"
+                    "winlog.api": "tagcloud"
                 }
             }, 
             "id": "2efac370-c1ca-11e7-8995-936807a28b16-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-16T22:57:41.411Z", 
-            "version": 4
+            "winlog.version": 4
         }, 
         {
             "attributes": {
@@ -187,16 +187,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "auditd", 
-                                        "type": "phrase"
+                                        "winlog.api": "phrase"
                                     }, 
-                                    "type": "phrase", 
+                                    "winlog.api": "phrase", 
                                     "value": "auditd"
                                 }, 
                                 "query": {
                                     "match": {
                                         "event.module": {
                                             "query": "auditd", 
-                                            "type": "phrase"
+                                            "winlog.api": "phrase"
                                         }
                                     }
                                 }
@@ -213,16 +213,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "executed", 
-                                        "type": "phrase"
+                                        "winlog.api": "phrase"
                                     }, 
-                                    "type": "phrase", 
+                                    "winlog.api": "phrase", 
                                     "value": "executed"
                                 }, 
                                 "query": {
                                     "match": {
                                         "event.action": {
                                             "query": "executed", 
-                                            "type": "phrase"
+                                            "winlog.api": "phrase"
                                         }
                                     }
                                 }
@@ -234,7 +234,7 @@
                             "language": "lucene", 
                             "query": "*"
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "sort": [
@@ -242,12 +242,12 @@
                     "desc"
                 ], 
                 "title": "Process Executions [Auditbeat Auditd] ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "d382f5b0-c1c6-11e7-8995-936807a28b16-ecs", 
-            "type": "search", 
+            "winlog.api": "search", 
             "updated_at": "2018-01-16T22:26:35.050Z", 
-            "version": 5
+            "winlog.version": 5
         }, 
         {
             "attributes": {
@@ -261,7 +261,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -279,8 +279,8 @@
                         }, 
                         "id": "20a8e8d0-c1c8-11e7-8995-936807a28b16-ecs", 
                         "panelIndex": "1", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -292,8 +292,8 @@
                         }, 
                         "id": "f81a6de0-c1c1-11e7-8995-936807a28b16-ecs", 
                         "panelIndex": "3", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -305,8 +305,8 @@
                         }, 
                         "id": "2efac370-c1ca-11e7-8995-936807a28b16-ecs", 
                         "panelIndex": "5", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -318,19 +318,19 @@
                         }, 
                         "id": "d382f5b0-c1c6-11e7-8995-936807a28b16-ecs", 
                         "panelIndex": "6", 
-                        "type": "search", 
-                        "version": "6.2.4"
+                        "winlog.api": "search", 
+                        "winlog.version": "6.2.4"
                     }
                 ], 
                 "timeRestore": false, 
                 "title": "[Auditbeat Auditd] Executions ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "7de391b0-c1ca-11e7-8995-936807a28b16-ecs", 
-            "type": "dashboard", 
+            "winlog.api": "dashboard", 
             "updated_at": "2018-01-16T22:58:11.243Z", 
-            "version": 5
+            "winlog.version": 5
         }
     ], 
-    "version": "6.2.4"
+    "winlog.version": "6.2.4"
 }

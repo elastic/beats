@@ -15,7 +15,7 @@
         "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
         "title": "Activity Types over Time [Suricata] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -23,7 +23,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -36,7 +36,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             },
             {
               "enabled": true,
@@ -52,7 +52,7 @@
                 "size": 20
               },
               "schema": "group",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -68,12 +68,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "grid": {
@@ -93,12 +93,12 @@
                 "mode": "stacked",
                 "show": "true",
                 "showCircles": true,
-                "type": "histogram",
+                "winlog.api": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "type": "histogram",
+            "winlog.api": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -112,25 +112,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ]
           },
           "title": "Activity Types over Time [Suricata] ECS",
-          "type": "histogram"
+          "winlog.api": "histogram"
         }
       },
       "id": "c7d46c60-86da-11e8-b59d-21efb914e65c-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -147,7 +147,7 @@
         "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
         "title": "Event Types [Suricata] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -155,7 +155,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -171,7 +171,7 @@
                 "size": 20
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -185,16 +185,16 @@
               "values": true
             },
             "legendPosition": "bottom",
-            "type": "pie"
+            "winlog.api": "pie"
           },
           "title": "Event Types [Suricata] ECS",
-          "type": "pie"
+          "winlog.api": "pie"
         }
       },
       "id": "0a0aa630-86db-11e8-b59d-21efb914e65c-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -211,7 +211,7 @@
         "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
         "title": "Top Application Protocols [Suricata] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -219,7 +219,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -235,7 +235,7 @@
                 "size": 10
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -249,16 +249,16 @@
               "values": true
             },
             "legendPosition": "bottom",
-            "type": "pie"
+            "winlog.api": "pie"
           },
           "title": "Top Application Protocols [Suricata] ECS",
-          "type": "pie"
+          "winlog.api": "pie"
         }
       },
       "id": "728f64c0-86db-11e8-b59d-21efb914e65c-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -275,7 +275,7 @@
         "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
         "title": "Top Hosts Generating Events [Suricata] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -283,7 +283,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -296,7 +296,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             },
             {
               "enabled": true,
@@ -312,7 +312,7 @@
                 "size": 10
               },
               "schema": "group",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -328,12 +328,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "grid": {
@@ -353,12 +353,12 @@
                 "mode": "stacked",
                 "show": "true",
                 "showCircles": true,
-                "type": "histogram",
+                "winlog.api": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "type": "histogram",
+            "winlog.api": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -372,25 +372,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ]
           },
           "title": "Top Hosts Generating Events [Suricata] ECS",
-          "type": "histogram"
+          "winlog.api": "histogram"
         }
       },
       "id": "9d5b5b50-86db-11e8-b59d-21efb914e65c-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -423,16 +423,16 @@
                   "negate": true,
                   "params": {
                     "query": "stats",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "stats"
                 },
                 "query": {
                   "match": {
                     "suricata.eve.event_type": {
                       "query": "stats",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -449,16 +449,16 @@
                   "negate": false,
                   "params": {
                     "query": "suricata",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "suricata"
                 },
                 "query": {
                   "match": {
                     "event.module": {
                       "query": "suricata",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -470,7 +470,7 @@
               "language": "kuery",
               "query": ""
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
@@ -478,12 +478,12 @@
           "desc"
         ],
         "title": "Events [Suricata] ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
-      "type": "search",
+      "winlog.api": "search",
       "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -500,7 +500,7 @@
         "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
         "title": "Top Connection Source Countries [Suricata] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -508,7 +508,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -525,7 +525,7 @@
                 "size": 10
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -536,13 +536,13 @@
             "showLabel": true
           },
           "title": "Top Connection Source Countries [Suricata] ECS",
-          "type": "tagcloud"
+          "winlog.api": "tagcloud"
         }
       },
       "id": "5f99eb50-86dc-11e8-b59d-21efb914e65c-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -559,7 +559,7 @@
         "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
         "title": "Top Connection Destination Countries [Suricata] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -567,7 +567,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -584,7 +584,7 @@
                 "size": 10
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -595,13 +595,13 @@
             "showLabel": true
           },
           "title": "Top Connection Destination Countries [Suricata] ECS",
-          "type": "tagcloud"
+          "winlog.api": "tagcloud"
         }
       },
       "id": "8e7f88d0-86dc-11e8-b59d-21efb914e65c-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -618,7 +618,7 @@
         "savedSearchId": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
         "title": "Top Network Protocols [Suricata] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -626,7 +626,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -642,7 +642,7 @@
                 "size": 10
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -656,16 +656,16 @@
               "values": true
             },
             "legendPosition": "bottom",
-            "type": "pie"
+            "winlog.api": "pie"
           },
           "title": "Top Network Protocols [Suricata] ECS",
-          "type": "pie"
+          "winlog.api": "pie"
         }
       },
       "id": "0a363820-86dd-11e8-b59d-21efb914e65c-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -695,16 +695,16 @@
                   "negate": false,
                   "params": {
                     "query": "stats",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "stats"
                 },
                 "query": {
                   "match": {
                     "suricata.eve.event_type": {
                       "query": "stats",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -721,16 +721,16 @@
                   "negate": false,
                   "params": {
                     "query": "suricata",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "suricata"
                 },
                 "query": {
                   "match": {
                     "event.module": {
                       "query": "suricata",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -742,7 +742,7 @@
               "language": "kuery",
               "query": ""
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
@@ -750,12 +750,12 @@
           "desc"
         ],
         "title": "Host Stats [Suricata] ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "d57a2db0-86ca-11e8-b59d-21efb914e65c-ecs",
-      "type": "search",
+      "winlog.api": "search",
       "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -769,7 +769,7 @@
               "language": "kuery",
               "query": ""
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "optionsJSON": {
@@ -789,8 +789,8 @@
             },
             "id": "c7d46c60-86da-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "1",
-            "type": "visualization",
-            "version": "6.3.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -803,8 +803,8 @@
             },
             "id": "0a0aa630-86db-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "2",
-            "type": "visualization",
-            "version": "6.3.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -817,8 +817,8 @@
             },
             "id": "728f64c0-86db-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "3",
-            "type": "visualization",
-            "version": "6.3.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -831,8 +831,8 @@
             },
             "id": "9d5b5b50-86db-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "4",
-            "type": "visualization",
-            "version": "6.3.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -845,8 +845,8 @@
             },
             "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "5",
-            "type": "search",
-            "version": "6.3.0"
+            "winlog.api": "search",
+            "winlog.version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -859,8 +859,8 @@
             },
             "id": "5f99eb50-86dc-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "6",
-            "type": "visualization",
-            "version": "6.3.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -873,8 +873,8 @@
             },
             "id": "8e7f88d0-86dc-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "7",
-            "type": "visualization",
-            "version": "6.3.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -887,8 +887,8 @@
             },
             "id": "0a363820-86dd-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "8",
-            "type": "visualization",
-            "version": "6.3.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -901,19 +901,19 @@
             },
             "id": "d57a2db0-86ca-11e8-b59d-21efb914e65c-ecs",
             "panelIndex": "9",
-            "type": "search",
-            "version": "6.3.0"
+            "winlog.api": "search",
+            "winlog.version": "6.3.0"
           }
         ],
         "timeRestore": false,
         "title": "[Suricata] Events Overview ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "78289c40-86da-11e8-b59d-21efb914e65c-ecs",
-      "type": "dashboard",
+      "winlog.api": "dashboard",
       "updated_at": "2018-11-07T22:56:24.962Z",
-      "version": 1
+      "winlog.version": 1
     }
   ],
-  "version": "6.4.3"
+  "winlog.version": "6.4.3"
 }

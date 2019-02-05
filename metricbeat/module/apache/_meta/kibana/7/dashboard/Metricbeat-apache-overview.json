@@ -11,7 +11,7 @@
                 "savedSearchId": "Apache-HTTPD-ecs", 
                 "title": "CPU usage [Metricbeat Apache] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -21,7 +21,7 @@
                                 "field": "apache.status.cpu.load"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "2", 
@@ -33,7 +33,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "id": "3", 
@@ -45,7 +45,7 @@
                                 "size": 5
                             }, 
                             "schema": "split", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "id": "4", 
@@ -54,7 +54,7 @@
                                 "field": "apache.status.cpu.user"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "5", 
@@ -63,7 +63,7 @@
                                 "field": "apache.status.cpu.system"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "6", 
@@ -72,7 +72,7 @@
                                 "field": "apache.status.cpu.children_user"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "7", 
@@ -81,7 +81,7 @@
                                 "field": "apache.status.cpu.children_system"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }
                     ], 
                     "listeners": {}, 
@@ -102,12 +102,12 @@
                         "yAxis": {}
                     }, 
                     "title": "Apache HTTPD - CPU ECS", 
-                    "type": "line"
+                    "winlog.api": "line"
                 }
             }, 
             "id": "Apache-HTTPD-CPU-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -129,7 +129,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -138,7 +138,7 @@
                                 "customLabel": "Events count"
                             }, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "id": "2", 
@@ -150,7 +150,7 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -164,12 +164,12 @@
                         }
                     }, 
                     "title": "Apache HTTPD - Hostname list ECS", 
-                    "type": "table"
+                    "winlog.api": "table"
                 }
             }, 
             "id": "Apache-HTTPD-Hostname-list-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -182,7 +182,7 @@
                 "savedSearchId": "Apache-HTTPD-ecs", 
                 "title": "Load1/5/15 [Metricbeat Apache] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -192,7 +192,7 @@
                                 "field": "apache.status.load.5"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "2", 
@@ -204,7 +204,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "id": "3", 
@@ -213,7 +213,7 @@
                                 "field": "apache.status.load.1"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "4", 
@@ -222,7 +222,7 @@
                                 "field": "apache.status.load.15"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "5", 
@@ -235,7 +235,7 @@
                                 "size": 5
                             }, 
                             "schema": "split", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -256,12 +256,12 @@
                         "yAxis": {}
                     }, 
                     "title": "Apache HTTPD - Load1/5/15 ECS", 
-                    "type": "line"
+                    "winlog.api": "line"
                 }
             }, 
             "id": "Apache-HTTPD-Load1-slash-5-slash-15-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -274,7 +274,7 @@
                 "savedSearchId": "Apache-HTTPD-ecs", 
                 "title": "Scoreboard [Metricbeat Apache] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -284,7 +284,7 @@
                                 "field": "apache.status.scoreboard.closing_connection"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "2", 
@@ -296,7 +296,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "id": "3", 
@@ -309,7 +309,7 @@
                                 "size": 5
                             }, 
                             "schema": "split", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "id": "4", 
@@ -318,7 +318,7 @@
                                 "field": "apache.status.scoreboard.dns_lookup"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "5", 
@@ -327,7 +327,7 @@
                                 "field": "apache.status.scoreboard.gracefully_finishing"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "6", 
@@ -336,7 +336,7 @@
                                 "field": "apache.status.scoreboard.idle_cleanup"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "7", 
@@ -345,7 +345,7 @@
                                 "field": "apache.status.scoreboard.keepalive"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "8", 
@@ -354,7 +354,7 @@
                                 "field": "apache.status.scoreboard.logging"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "9", 
@@ -363,7 +363,7 @@
                                 "field": "apache.status.scoreboard.open_slot"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "10", 
@@ -372,7 +372,7 @@
                                 "field": "apache.status.scoreboard.reading_request"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "11", 
@@ -381,7 +381,7 @@
                                 "field": "apache.status.scoreboard.sending_reply"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "12", 
@@ -390,7 +390,7 @@
                                 "field": "apache.status.scoreboard.starting_up"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "13", 
@@ -399,7 +399,7 @@
                                 "field": "apache.status.scoreboard.total"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "14", 
@@ -408,7 +408,7 @@
                                 "field": "apache.status.scoreboard.waiting_for_connection"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }
                     ], 
                     "listeners": {}, 
@@ -429,12 +429,12 @@
                         "yAxis": {}
                     }, 
                     "title": "Apache HTTPD - Scoreboard ECS", 
-                    "type": "line"
+                    "winlog.api": "line"
                 }
             }, 
             "id": "Apache-HTTPD-Scoreboard-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -447,7 +447,7 @@
                 "savedSearchId": "Apache-HTTPD-ecs", 
                 "title": "Total accesses and kbytes [Metricbeat Apache] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -457,7 +457,7 @@
                                 "field": "apache.status.total_kbytes"
                             }, 
                             "schema": "metric", 
-                            "type": "max"
+                            "winlog.api": "max"
                         }, 
                         {
                             "id": "2", 
@@ -466,7 +466,7 @@
                                 "field": "apache.status.total_accesses"
                             }, 
                             "schema": "metric", 
-                            "type": "max"
+                            "winlog.api": "max"
                         }
                     ], 
                     "listeners": {}, 
@@ -475,12 +475,12 @@
                         "handleNoResults": true
                     }, 
                     "title": "Apache HTTPD - Total accesses and kbytes ECS", 
-                    "type": "metric"
+                    "winlog.api": "metric"
                 }
             }, 
             "id": "Apache-HTTPD-Total-accesses-and-kbytes-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -493,7 +493,7 @@
                 "savedSearchId": "Apache-HTTPD-ecs", 
                 "title": "Uptime [Metricbeat Apache] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -503,7 +503,7 @@
                                 "field": "apache.status.uptime.uptime"
                             }, 
                             "schema": "metric", 
-                            "type": "max"
+                            "winlog.api": "max"
                         }, 
                         {
                             "id": "2", 
@@ -512,7 +512,7 @@
                                 "field": "apache.status.uptime.server_uptime"
                             }, 
                             "schema": "metric", 
-                            "type": "max"
+                            "winlog.api": "max"
                         }
                     ], 
                     "listeners": {}, 
@@ -521,12 +521,12 @@
                         "handleNoResults": true
                     }, 
                     "title": "Apache HTTPD - Uptime ECS", 
-                    "type": "metric"
+                    "winlog.api": "metric"
                 }
             }, 
             "id": "Apache-HTTPD-Uptime-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -539,7 +539,7 @@
                 "savedSearchId": "Apache-HTTPD-ecs", 
                 "title": "Workers [Metricbeat Apache] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -549,7 +549,7 @@
                                 "field": "apache.status.workers.busy"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }, 
                         {
                             "id": "2", 
@@ -561,7 +561,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "id": "3", 
@@ -574,7 +574,7 @@
                                 "size": 5
                             }, 
                             "schema": "split", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "id": "4", 
@@ -583,7 +583,7 @@
                                 "field": "apache.status.workers.idle"
                             }, 
                             "schema": "metric", 
-                            "type": "avg"
+                            "winlog.api": "avg"
                         }
                     ], 
                     "listeners": {}, 
@@ -604,12 +604,12 @@
                         "yAxis": {}
                     }, 
                     "title": "Apache HTTPD - Workers ECS", 
-                    "type": "line"
+                    "winlog.api": "line"
                 }
             }, 
             "id": "Apache-HTTPD-Workers-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -648,11 +648,11 @@
                     "desc"
                 ], 
                 "title": "Apache HTTPD ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "Apache-HTTPD-ecs", 
-            "type": "search", 
-            "version": 1
+            "winlog.api": "search", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -671,7 +671,7 @@
                                 }
                             }
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -685,7 +685,7 @@
                         "row": 10, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -694,7 +694,7 @@
                         "row": 1, 
                         "size_x": 3, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -703,7 +703,7 @@
                         "row": 10, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -712,7 +712,7 @@
                         "row": 7, 
                         "size_x": 12, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 7, 
@@ -721,7 +721,7 @@
                         "row": 1, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 4, 
@@ -730,7 +730,7 @@
                         "row": 1, 
                         "size_x": 3, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -739,7 +739,7 @@
                         "row": 4, 
                         "size_x": 12, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
@@ -770,12 +770,12 @@
                         }
                     }
                 }, 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "Metricbeat-Apache-HTTPD-server-status-ecs", 
-            "type": "dashboard", 
-            "version": 3
+            "winlog.api": "dashboard", 
+            "winlog.version": 3
         }
     ], 
-    "version": "6.0.0-beta1-SNAPSHOT"
+    "winlog.version": "6.0.0-beta1-SNAPSHOT"
 }

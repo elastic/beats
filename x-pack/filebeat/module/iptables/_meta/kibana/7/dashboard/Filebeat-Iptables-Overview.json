@@ -15,7 +15,7 @@
         "savedSearchId": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3-ecs",
         "title": "Events Timeline [Filebeat Iptables] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -23,7 +23,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -39,7 +39,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             }
           ],
           "params": {
@@ -55,12 +55,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "grid": {
@@ -81,12 +81,12 @@
                 "mode": "stacked",
                 "show": "true",
                 "showCircles": true,
-                "type": "area",
+                "winlog.api": "area",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "type": "area",
+            "winlog.api": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -100,25 +100,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ]
           },
           "title": "Events Timeline [Filebeat Iptables] ECS",
-          "type": "area"
+          "winlog.api": "area"
         }
       },
       "id": "4c913eb0-1f51-11e9-93ed-f7e068f4aebb-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-23T20:56:04.891Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -144,7 +144,7 @@
             }
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -152,7 +152,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -169,7 +169,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -184,13 +184,13 @@
             "totalFunc": "sum"
           },
           "title": "Top Source Countries [Filebeat Iptables] ECS",
-          "type": "table"
+          "winlog.api": "table"
         }
       },
       "id": "2599f5e0-1e98-11e9-8ec4-cf5d91a864b3-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-23T20:51:02.293Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -213,7 +213,7 @@
           ],
           "mapZoom": 3
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -221,7 +221,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -239,7 +239,7 @@
                 "useGeocentroid": true
               },
               "schema": "segment",
-              "type": "geohash_grid"
+              "winlog.api": "geohash_grid"
             }
           ],
           "params": {
@@ -270,13 +270,13 @@
             }
           },
           "title": "Source Map [Filebeat Iptables] ECS",
-          "type": "tile_map"
+          "winlog.api": "tile_map"
         }
       },
       "id": "c4394ec0-1efd-11e9-8ec4-cf5d91a864b3-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-23T20:51:02.293Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -293,7 +293,7 @@
         "savedSearchId": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3-ecs",
         "title": "Destination Map [Filebeat Iptables] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -301,7 +301,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -319,7 +319,7 @@
                 "useGeocentroid": true
               },
               "schema": "segment",
-              "type": "geohash_grid"
+              "winlog.api": "geohash_grid"
             }
           ],
           "params": {
@@ -350,13 +350,13 @@
             }
           },
           "title": "Destination Map [Filebeat Iptables] ECS",
-          "type": "tile_map"
+          "winlog.api": "tile_map"
         }
       },
       "id": "d8cea010-1efd-11e9-8ec4-cf5d91a864b3-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-23T20:51:02.293Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -377,7 +377,7 @@
             "legendOpen": false
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -385,7 +385,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -401,7 +401,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -415,16 +415,16 @@
               "values": true
             },
             "legendPosition": "right",
-            "type": "pie"
+            "winlog.api": "pie"
           },
           "title": "Network Type Breakdown [Filebeat Iptables] ECS",
-          "type": "pie"
+          "winlog.api": "pie"
         }
       },
       "id": "b57b7370-1f1d-11e9-8ec4-cf5d91a864b3-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-23T20:51:02.293Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -445,7 +445,7 @@
             "legendOpen": false
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -453,7 +453,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -469,7 +469,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -483,16 +483,16 @@
               "values": true
             },
             "legendPosition": "right",
-            "type": "pie"
+            "winlog.api": "pie"
           },
           "title": "Network Transport Breakdown [Filebeat Iptables] ECS",
-          "type": "pie"
+          "winlog.api": "pie"
         }
       },
       "id": "35fe0910-1f26-11e9-8ec4-cf5d91a864b3-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-23T20:51:02.293Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -518,7 +518,7 @@
             }
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -526,7 +526,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -543,7 +543,7 @@
                 "size": 5
               },
               "schema": "bucket",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -558,13 +558,13 @@
             "totalFunc": "sum"
           },
           "title": "Top Destination Ports [Filebeat Iptables] ECS",
-          "type": "table"
+          "winlog.api": "table"
         }
       },
       "id": "683402b0-1f29-11e9-8ec4-cf5d91a864b3-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-23T20:51:02.293Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -582,7 +582,7 @@
               "language": "kuery",
               "query": "iptables.length :*"
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
@@ -590,12 +590,12 @@
           "desc"
         ],
         "title": "Events Search [Filebeat Iptables] ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3-ecs",
-      "type": "search",
+      "winlog.api": "search",
       "updated_at": "2019-01-23T20:51:02.293Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -631,8 +631,8 @@
             },
             "id": "4c913eb0-1f51-11e9-93ed-f7e068f4aebb-ecs",
             "panelIndex": "1",
-            "type": "visualization",
-            "version": "6.6.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.6.0"
           },
           {
             "embeddableConfig": {},
@@ -645,8 +645,8 @@
             },
             "id": "2599f5e0-1e98-11e9-8ec4-cf5d91a864b3-ecs",
             "panelIndex": "2",
-            "type": "visualization",
-            "version": "6.6.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.6.0"
           },
           {
             "embeddableConfig": {
@@ -665,8 +665,8 @@
             },
             "id": "c4394ec0-1efd-11e9-8ec4-cf5d91a864b3-ecs",
             "panelIndex": "3",
-            "type": "visualization",
-            "version": "6.6.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.6.0"
           },
           {
             "embeddableConfig": {
@@ -685,8 +685,8 @@
             },
             "id": "d8cea010-1efd-11e9-8ec4-cf5d91a864b3-ecs",
             "panelIndex": "4",
-            "type": "visualization",
-            "version": "6.6.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.6.0"
           },
           {
             "embeddableConfig": {},
@@ -699,8 +699,8 @@
             },
             "id": "b57b7370-1f1d-11e9-8ec4-cf5d91a864b3-ecs",
             "panelIndex": "5",
-            "type": "visualization",
-            "version": "6.6.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.6.0"
           },
           {
             "embeddableConfig": {},
@@ -713,8 +713,8 @@
             },
             "id": "35fe0910-1f26-11e9-8ec4-cf5d91a864b3-ecs",
             "panelIndex": "6",
-            "type": "visualization",
-            "version": "6.6.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.6.0"
           },
           {
             "embeddableConfig": {},
@@ -727,8 +727,8 @@
             },
             "id": "683402b0-1f29-11e9-8ec4-cf5d91a864b3-ecs",
             "panelIndex": "7",
-            "type": "visualization",
-            "version": "6.6.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.6.0"
           },
           {
             "embeddableConfig": {},
@@ -741,19 +741,19 @@
             },
             "id": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3-ecs",
             "panelIndex": "8",
-            "type": "search",
-            "version": "6.6.0"
+            "winlog.api": "search",
+            "winlog.version": "6.6.0"
           }
         ],
         "timeRestore": false,
         "title": "[Filebeat Iptables] Overview ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "ceefb9e0-1f51-11e9-93ed-f7e068f4aebb-ecs",
-      "type": "dashboard",
+      "winlog.api": "dashboard",
       "updated_at": "2019-01-23T20:59:43.614Z",
-      "version": 1
+      "winlog.version": 1
     }
   ],
-  "version": "6.6.0"
+  "winlog.version": "6.6.0"
 }

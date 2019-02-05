@@ -8,7 +8,7 @@
         },
         "title": "Message Types over Time [Packetbeat DHCPv4] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -20,7 +20,7 @@
               }
             ],
             "drop_last_bucket": 1,
-            "filter": "type:dhcpv4",
+            "filter": "winlog.api:dhcpv4",
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "ignore_global_filter": 0,
             "index_pattern": "packetbeat-*",
@@ -31,7 +31,7 @@
                 "chart_type": "line",
                 "color": "#68BC00",
                 "fill": 0.5,
-                "filter": "NOT dhcpv4.option.message_type:nak NOT dhcpv4.option.message_type:decline",
+                "filter": "NOT dhcpv4.option.message_winlog.api:nak NOT dhcpv4.option.message_winlog.api:decline",
                 "formatter": "number",
                 "id": "8abe6eb0-8ba9-11e8-ae15-bdcba81344e6",
                 "label": "Response",
@@ -39,7 +39,7 @@
                 "metrics": [
                   {
                     "id": "8abe6eb1-8ba9-11e8-ae15-bdcba81344e6",
-                    "type": "count"
+                    "winlog.api": "count"
                   }
                 ],
                 "point_size": 1,
@@ -53,7 +53,7 @@
                 "chart_type": "line",
                 "color": "rgba(244,78,59,1)",
                 "fill": 0.5,
-                "filter": "dhcpv4.option.message_type:nak",
+                "filter": "dhcpv4.option.message_winlog.api:nak",
                 "formatter": "number",
                 "id": "ae5610d0-8ba9-11e8-ae15-bdcba81344e6",
                 "label": "nak",
@@ -61,7 +61,7 @@
                 "metrics": [
                   {
                     "id": "ae5610d1-8ba9-11e8-ae15-bdcba81344e6",
-                    "type": "count"
+                    "winlog.api": "count"
                   }
                 ],
                 "point_size": "3",
@@ -75,7 +75,7 @@
                 "chart_type": "line",
                 "color": "rgba(244,78,59,1)",
                 "fill": 0.5,
-                "filter": "dhcpv4.option.message_type:decline",
+                "filter": "dhcpv4.option.message_winlog.api:decline",
                 "formatter": "number",
                 "id": "cf7ba180-8ba9-11e8-ae15-bdcba81344e6",
                 "label": "decline",
@@ -83,7 +83,7 @@
                 "metrics": [
                   {
                     "id": "cf7ba181-8ba9-11e8-ae15-bdcba81344e6",
-                    "type": "count"
+                    "winlog.api": "count"
                   }
                 ],
                 "point_size": "3",
@@ -96,16 +96,16 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "type": "timeseries"
+            "winlog.api": "timeseries"
           },
           "title": "Message Types over Time [Packetbeat DHCPv4] ECS",
-          "type": "metrics"
+          "winlog.api": "metrics"
         }
       },
       "id": "8460fcd0-8baa-11e8-9676-ef67484126fb-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:22.006Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -115,14 +115,14 @@
             "filter": [],
             "query": {
               "language": "kuery",
-              "query": "dhcpv4.option.message_type:nak OR dhcpv4.option.message_type:decline"
+              "query": "dhcpv4.option.message_winlog.api:nak OR dhcpv4.option.message_winlog.api:decline"
             }
           }
         },
         "savedSearchId": "b8992150-8ba8-11e8-9676-ef67484126fb-ecs",
         "title": "NAK and Decline Count [Packetbeat DHCPv4] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -130,7 +130,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             }
           ],
           "params": {
@@ -159,16 +159,16 @@
               },
               "useRanges": false
             },
-            "type": "metric"
+            "winlog.api": "metric"
           },
           "title": "NAK and Decline Count [Packetbeat DHCPv4] ECS",
-          "type": "metric"
+          "winlog.api": "metric"
         }
       },
       "id": "4ad9db20-8bab-11e8-9676-ef67484126fb-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:22.006Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -185,7 +185,7 @@
         "savedSearchId": "b8992150-8ba8-11e8-9676-ef67484126fb-ecs",
         "title": "Message Types [Packetbeat DHCPv4] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -193,7 +193,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -210,7 +210,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             },
             {
               "enabled": true,
@@ -227,7 +227,7 @@
                 "size": 5
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -241,16 +241,16 @@
               "values": true
             },
             "legendPosition": "right",
-            "type": "pie"
+            "winlog.api": "pie"
           },
           "title": "Message Types [Packetbeat DHCPv4] ECS",
-          "type": "pie"
+          "winlog.api": "pie"
         }
       },
       "id": "418dfbe0-8bac-11e8-9676-ef67484126fb-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:22.006Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -281,16 +281,16 @@
                   "negate": false,
                   "params": {
                     "query": "dhcpv4",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "dhcpv4"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "dhcpv4",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -302,7 +302,7 @@
               "language": "lucene",
               "query": ""
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
@@ -310,12 +310,12 @@
           "desc"
         ],
         "title": "DHCPv4 [Packetbeat] ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "b8992150-8ba8-11e8-9676-ef67484126fb-ecs",
-      "type": "search",
+      "winlog.api": "search",
       "updated_at": "2019-01-18T23:49:22.006Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -332,7 +332,7 @@
         "savedSearchId": "b8992150-8ba8-11e8-9676-ef67484126fb-ecs",
         "title": "Transaction Count [Packetbeat DHCPv4] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -343,7 +343,7 @@
                 "field": "dhcpv4.transaction_id"
               },
               "schema": "metric",
-              "type": "cardinality"
+              "winlog.api": "cardinality"
             }
           ],
           "params": {
@@ -372,16 +372,16 @@
               },
               "useRanges": false
             },
-            "type": "metric"
+            "winlog.api": "metric"
           },
           "title": "Transaction Count [Packetbeat DHCPv4] ECS",
-          "type": "metric"
+          "winlog.api": "metric"
         }
       },
       "id": "d0120dc0-8bac-11e8-9676-ef67484126fb-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:22.006Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -398,7 +398,7 @@
         "savedSearchId": "b8992150-8ba8-11e8-9676-ef67484126fb-ecs",
         "title": "Client Count [Packetbeat DHCPv4] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -409,7 +409,7 @@
                 "field": "dhcpv4.client_mac"
               },
               "schema": "metric",
-              "type": "cardinality"
+              "winlog.api": "cardinality"
             }
           ],
           "params": {
@@ -438,16 +438,16 @@
               },
               "useRanges": false
             },
-            "type": "metric"
+            "winlog.api": "metric"
           },
           "title": "Client Count [Packetbeat DHCPv4] ECS",
-          "type": "metric"
+          "winlog.api": "metric"
         }
       },
       "id": "11d33ea0-8bad-11e8-9676-ef67484126fb-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:22.006Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -464,7 +464,7 @@
         "savedSearchId": "b8992150-8ba8-11e8-9676-ef67484126fb-ecs",
         "title": "Data Transfer [Packetbeat DHCPv4] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -475,7 +475,7 @@
                 "field": "client.bytes"
               },
               "schema": "metric",
-              "type": "sum"
+              "winlog.api": "sum"
             },
             {
               "enabled": true,
@@ -485,7 +485,7 @@
                 "field": "server.bytes"
               },
               "schema": "metric",
-              "type": "sum"
+              "winlog.api": "sum"
             }
           ],
           "params": {
@@ -514,16 +514,16 @@
               },
               "useRanges": false
             },
-            "type": "metric"
+            "winlog.api": "metric"
           },
           "title": "Data Transfer [Packetbeat DHCPv4] ECS",
-          "type": "metric"
+          "winlog.api": "metric"
         }
       },
       "id": "f43a8f20-8bb5-11e8-9676-ef67484126fb-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:22.006Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -537,7 +537,7 @@
               "language": "lucene",
               "query": ""
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "optionsJSON": {
@@ -557,8 +557,8 @@
             },
             "id": "8460fcd0-8baa-11e8-9676-ef67484126fb-ecs",
             "panelIndex": "1",
-            "type": "visualization",
-            "version": "6.3.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -571,8 +571,8 @@
             },
             "id": "4ad9db20-8bab-11e8-9676-ef67484126fb-ecs",
             "panelIndex": "2",
-            "type": "visualization",
-            "version": "6.3.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -585,8 +585,8 @@
             },
             "id": "418dfbe0-8bac-11e8-9676-ef67484126fb-ecs",
             "panelIndex": "3",
-            "type": "visualization",
-            "version": "6.3.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -599,8 +599,8 @@
             },
             "id": "b8992150-8ba8-11e8-9676-ef67484126fb-ecs",
             "panelIndex": "5",
-            "type": "search",
-            "version": "6.3.0"
+            "winlog.api": "search",
+            "winlog.version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -613,8 +613,8 @@
             },
             "id": "d0120dc0-8bac-11e8-9676-ef67484126fb-ecs",
             "panelIndex": "6",
-            "type": "visualization",
-            "version": "6.3.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -627,8 +627,8 @@
             },
             "id": "11d33ea0-8bad-11e8-9676-ef67484126fb-ecs",
             "panelIndex": "7",
-            "type": "visualization",
-            "version": "6.3.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.3.0"
           },
           {
             "embeddableConfig": {},
@@ -641,19 +641,19 @@
             },
             "id": "f43a8f20-8bb5-11e8-9676-ef67484126fb-ecs",
             "panelIndex": "8",
-            "type": "visualization",
-            "version": "6.3.0"
+            "winlog.api": "visualization",
+            "winlog.version": "6.3.0"
           }
         ],
         "timeRestore": false,
         "title": "[Packetbeat] DHCPv4 ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "a7b35890-8baa-11e8-9676-ef67484126fb-ecs",
-      "type": "dashboard",
+      "winlog.api": "dashboard",
       "updated_at": "2019-01-18T23:49:22.006Z",
-      "version": 1
+      "winlog.version": 1
     }
   ],
-  "version": "7.0.0-SNAPSHOT"
+  "winlog.version": "7.0.0-SNAPSHOT"
 }

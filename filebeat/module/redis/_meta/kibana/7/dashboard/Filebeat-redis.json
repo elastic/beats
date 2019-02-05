@@ -17,12 +17,12 @@
                                 }
                             }
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "title": "Log levels and roles breakdown [Filebeat Redis] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -30,7 +30,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -42,7 +42,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -55,7 +55,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -63,15 +63,15 @@
                         "addTooltip": true, 
                         "isDonut": false, 
                         "legendPosition": "bottom", 
-                        "type": "pie"
+                        "winlog.api": "pie"
                     }, 
                     "title": "Log levels and roles breakdown [Filebeat Redis] ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "id": "78b9afe0-478f-11e7-b1f0-cb29bac6bf8b-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -90,7 +90,7 @@
                                 }
                             }
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "title": "Logs over time [Filebeat Redis] ECS", 
@@ -102,7 +102,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -110,7 +110,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -123,7 +123,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -135,7 +135,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -151,14 +151,14 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "@timestamp per month"
                                 }, 
-                                "type": "category"
+                                "winlog.api": "category"
                             }
                         ], 
                         "defaultYExtents": false, 
@@ -183,14 +183,14 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "type": "histogram", 
+                                "winlog.api": "histogram", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
                         "setYExtents": false, 
                         "showCircles": true, 
                         "times": [], 
-                        "type": "histogram", 
+                        "winlog.api": "histogram", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -204,24 +204,24 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "type": "value"
+                                "winlog.api": "value"
                             }
                         ]
                     }, 
                     "title": "Logs over time [Filebeat Redis] ECS", 
-                    "type": "histogram"
+                    "winlog.api": "histogram"
                 }
             }, 
             "id": "d2864600-478f-11e7-be88-2ddb32f3df97-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -248,16 +248,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "redis", 
-                                        "type": "phrase"
+                                        "winlog.api": "phrase"
                                     }, 
-                                    "type": "phrase", 
+                                    "winlog.api": "phrase", 
                                     "value": "redis"
                                 }, 
                                 "query": {
                                     "match": {
                                         "event.module": {
                                             "query": "redis", 
-                                            "type": "phrase"
+                                            "winlog.api": "phrase"
                                         }
                                     }
                                 }
@@ -274,16 +274,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "log", 
-                                        "type": "phrase"
+                                        "winlog.api": "phrase"
                                     }, 
-                                    "type": "phrase", 
+                                    "winlog.api": "phrase", 
                                     "value": "log"
                                 }, 
                                 "query": {
                                     "match": {
                                         "fileset.name": {
                                             "query": "log", 
-                                            "type": "phrase"
+                                            "winlog.api": "phrase"
                                         }
                                     }
                                 }
@@ -295,7 +295,7 @@
                             "language": "lucene", 
                             "query": "*"
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "sort": [
@@ -303,11 +303,11 @@
                     "desc"
                 ], 
                 "title": "Logs [Filebeat Redis] ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "73613570-4791-11e7-be88-2ddb32f3df97-ecs", 
-            "type": "search", 
-            "version": 2
+            "winlog.api": "search", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -320,7 +320,7 @@
                 "savedSearchId": "0ab87b80-478e-11e7-b1f0-cb29bac6bf8b-ecs", 
                 "title": "Top slowest commands [Filebeat Redis] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -331,7 +331,7 @@
                                 "field": "redis.slowlog.duration.us"
                             }, 
                             "schema": "metric", 
-                            "type": "max"
+                            "winlog.api": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -344,7 +344,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -362,14 +362,14 @@
                                 }, 
                                 "position": "left", 
                                 "scale": {
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Duration (microseconds)"
                                 }, 
-                                "type": "category"
+                                "winlog.api": "category"
                             }
                         ], 
                         "defaultYExtents": false, 
@@ -394,14 +394,14 @@
                                 "mode": "normal", 
                                 "show": true, 
                                 "showCircles": true, 
-                                "type": "histogram", 
+                                "winlog.api": "histogram", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
                         "setYExtents": false, 
                         "showCircles": true, 
                         "times": [], 
-                        "type": "histogram", 
+                        "winlog.api": "histogram", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -415,24 +415,24 @@
                                 "position": "bottom", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Command"
                                 }, 
-                                "type": "value"
+                                "winlog.api": "value"
                             }
                         ]
                     }, 
                     "title": "Top slowest commands [Filebeat Redis] ECS", 
-                    "type": "histogram"
+                    "winlog.api": "histogram"
                 }
             }, 
             "id": "dcccaa80-4791-11e7-be88-2ddb32f3df97-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -458,7 +458,7 @@
                                 }
                             }
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "sort": [
@@ -466,11 +466,11 @@
                     "desc"
                 ], 
                 "title": "Slow logs [Filebeat Redis] ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "0ab87b80-478e-11e7-b1f0-cb29bac6bf8b-ecs", 
-            "type": "search", 
-            "version": 2
+            "winlog.api": "search", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -489,7 +489,7 @@
                                 }
                             }
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -503,7 +503,7 @@
                         "row": 5, 
                         "size_x": 3, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 4, 
@@ -512,7 +512,7 @@
                         "row": 5, 
                         "size_x": 9, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -531,7 +531,7 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "type": "search"
+                        "winlog.api": "search"
                     }, 
                     {
                         "col": 7, 
@@ -540,7 +540,7 @@
                         "row": 1, 
                         "size_x": 6, 
                         "size_y": 4, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -559,7 +559,7 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "type": "search"
+                        "winlog.api": "search"
                     }
                 ], 
                 "timeRestore": false, 
@@ -571,12 +571,12 @@
                         }
                     }
                 }, 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "7fea2930-478e-11e7-b1f0-cb29bac6bf8b-ecs", 
-            "type": "dashboard", 
-            "version": 4
+            "winlog.api": "dashboard", 
+            "winlog.version": 4
         }
     ], 
-    "version": "6.0.0-beta1-SNAPSHOT"
+    "winlog.version": "6.0.0-beta1-SNAPSHOT"
 }

@@ -15,7 +15,7 @@
         "savedSearchId": "71908f00-88ca-11e7-ad9c-db80de0bf8d3-ecs",
         "title": "HTTP Transactions [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -23,7 +23,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -38,7 +38,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             }
           ],
           "params": {
@@ -54,12 +54,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -80,14 +80,14 @@
                 },
                 "mode": "stacked",
                 "show": "true",
-                "type": "histogram",
+                "winlog.api": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "setYExtents": false,
             "shareYAxis": true,
             "times": [],
-            "type": "histogram",
+            "winlog.api": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -103,26 +103,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "HTTP Transactions [Packetbeat] ECS",
-          "type": "histogram"
+          "winlog.api": "histogram"
         }
       },
       "id": "Web-transactions-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-19T00:21:31.922Z",
-      "version": 3
+      "winlog.version": 3
     },
     {
       "attributes": {
@@ -142,16 +142,16 @@
                   "negate": true,
                   "params": {
                     "query": "flow",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "flow"
                 },
                 "query": {
                   "match": {
                     "event.type": {
                       "query": "flow",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -166,7 +166,7 @@
         },
         "title": "Transaction Types [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -174,7 +174,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -189,7 +189,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             },
             {
               "enabled": true,
@@ -205,7 +205,7 @@
                 "size": 5
               },
               "schema": "group",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -221,12 +221,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -247,14 +247,14 @@
                 },
                 "mode": "stacked",
                 "show": "true",
-                "type": "histogram",
+                "winlog.api": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "setYExtents": false,
             "shareYAxis": true,
             "times": [],
-            "type": "histogram",
+            "winlog.api": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -270,26 +270,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "Transaction Types [Packetbeat] ECS",
-          "type": "histogram"
+          "winlog.api": "histogram"
         }
       },
       "id": "DB-transactions-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-19T00:20:54.634Z",
-      "version": 3
+      "winlog.version": 3
     },
     {
       "attributes": {
@@ -306,7 +306,7 @@
         "savedSearchId": "Packetbeat-Search-ecs",
         "title": "Response times percentiles [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -321,7 +321,7 @@
                 ]
               },
               "schema": "metric",
-              "type": "percentiles"
+              "winlog.api": "percentiles"
             },
             {
               "enabled": true,
@@ -336,7 +336,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             }
           ],
           "params": {
@@ -352,12 +352,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -384,7 +384,7 @@
                 "radiusRatio": 9,
                 "show": "true",
                 "showCircles": true,
-                "type": "line",
+                "winlog.api": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -393,7 +393,7 @@
             "showCircles": true,
             "smoothLines": true,
             "times": [],
-            "type": "line",
+            "winlog.api": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -409,26 +409,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Percentiles of event.duration"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "Response times percentiles [Packetbeat] ECS",
-          "type": "line"
+          "winlog.api": "line"
         }
       },
       "id": "Response-times-percentiles-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-19T00:01:49.340Z",
-      "version": 2
+      "winlog.version": 2
     },
     {
       "attributes": {
@@ -441,14 +441,14 @@
         "savedSearchId": "Transactions-errors-ecs",
         "title": "Errors count over time ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "id": "2",
@@ -460,18 +460,18 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             },
             {
               "id": "3",
               "params": {
-                "field": "type",
+                "field": "winlog.api",
                 "order": "desc",
                 "orderBy": "1",
                 "size": 5
               },
               "schema": "group",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "listeners": {},
@@ -488,13 +488,13 @@
             "yAxis": {}
           },
           "title": "New Visualization ECS",
-          "type": "histogram"
+          "winlog.api": "histogram"
         }
       },
       "id": "Errors-count-over-time-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:30.350Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -511,7 +511,7 @@
         "savedSearchId": "Packetbeat-Search-ecs",
         "title": "Errors vs successful transactions [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -519,7 +519,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -534,7 +534,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             },
             {
               "enabled": true,
@@ -550,7 +550,7 @@
                 "size": 5
               },
               "schema": "group",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -566,12 +566,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -592,14 +592,14 @@
                 },
                 "mode": "stacked",
                 "show": "true",
-                "type": "histogram",
+                "winlog.api": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "setYExtents": false,
             "shareYAxis": true,
             "times": [],
-            "type": "histogram",
+            "winlog.api": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -615,26 +615,26 @@
                   "defaultYExtents": false,
                   "mode": "percentage",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "Errors vs successful transactions [Packetbeat] ECS",
-          "type": "histogram"
+          "winlog.api": "histogram"
         }
       },
       "id": "Errors-vs-successful-transactions-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-19T00:02:24.071Z",
-      "version": 2
+      "winlog.version": 2
     },
     {
       "attributes": {
@@ -651,7 +651,7 @@
         "savedSearchId": "Packetbeat-Search-ecs",
         "title": "Latency Histogram [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -659,7 +659,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -670,7 +670,7 @@
                 "interval": 10000000
               },
               "schema": "segment",
-              "type": "histogram"
+              "winlog.api": "histogram"
             }
           ],
           "params": {
@@ -686,12 +686,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -714,7 +714,7 @@
                 "interpolate": "cardinal",
                 "mode": "stacked",
                 "show": "true",
-                "type": "area",
+                "winlog.api": "area",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -722,7 +722,7 @@
             "shareYAxis": true,
             "smoothLines": true,
             "times": [],
-            "type": "area",
+            "winlog.api": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -738,26 +738,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "Latency Histogram [Packetbeat] ECS",
-          "type": "area"
+          "winlog.api": "area"
         }
       },
       "id": "Latency-histogram-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-19T00:03:54.084Z",
-      "version": 2
+      "winlog.version": 2
     },
     {
       "attributes": {
@@ -784,7 +784,7 @@
             -0.17578125
           ]
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -792,7 +792,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -820,7 +820,7 @@
                 "useGeocentroid": true
               },
               "schema": "segment",
-              "type": "geohash_grid"
+              "winlog.api": "geohash_grid"
             }
           ],
           "params": {
@@ -848,7 +848,7 @@
                 "layers": "0",
                 "styles": "",
                 "transparent": true,
-                "version": "1.3.0"
+                "winlog.version": "1.3.0"
               },
               "selectedTmsLayer": {
                 "attribution": "\u003cp\u003e\u0026#169; \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors | \u003ca href=\"https://www.elastic.co/elastic-maps-service\"\u003eElastic Maps Service\u003c/a\u003e\u003c/p\u003e\u0026#10;",
@@ -861,13 +861,13 @@
             }
           },
           "title": "Client IP Locations (requires GeoIP enrichment) [Packetbeat] ECS",
-          "type": "tile_map"
+          "winlog.api": "tile_map"
         }
       },
       "id": "Client-locations-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:52:42.404Z",
-      "version": 2
+      "winlog.version": 2
     },
     {
       "attributes": {
@@ -884,7 +884,7 @@
         "savedSearchId": "Packetbeat-Search-ecs",
         "title": "Response times repartition [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -892,7 +892,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -907,7 +907,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             },
             {
               "enabled": true,
@@ -918,7 +918,7 @@
                 "interval": 10000000
               },
               "schema": "group",
-              "type": "histogram"
+              "winlog.api": "histogram"
             }
           ],
           "params": {
@@ -934,12 +934,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -960,14 +960,14 @@
                 },
                 "mode": "stacked",
                 "show": "true",
-                "type": "histogram",
+                "winlog.api": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "setYExtents": false,
             "shareYAxis": true,
             "times": [],
-            "type": "histogram",
+            "winlog.api": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -983,26 +983,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "Response times repartition [Packetbeat] ECS",
-          "type": "histogram"
+          "winlog.api": "histogram"
         }
       },
       "id": "Response-times-repartition-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-19T00:00:32.530Z",
-      "version": 2
+      "winlog.version": 2
     },
     {
       "attributes": {
@@ -1023,7 +1023,7 @@
         },
         "title": "Navigation [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -1032,13 +1032,13 @@
             "openLinksInNewTab": false
           },
           "title": "Navigation [Packetbeat] ECS",
-          "type": "markdown"
+          "winlog.api": "markdown"
         }
       },
       "id": "Navigation-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-19T00:18:59.372Z",
-      "version": 11
+      "winlog.version": 11
     },
     {
       "attributes": {
@@ -1055,7 +1055,7 @@
         "savedSearchId": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
         "title": "DNS Transactions [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -1066,7 +1066,7 @@
                 "field": "event.duration"
               },
               "schema": "metric",
-              "type": "avg"
+              "winlog.api": "avg"
             },
             {
               "enabled": true,
@@ -1081,14 +1081,14 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             },
             {
               "enabled": true,
               "id": "3",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             }
           ],
           "params": {
@@ -1104,12 +1104,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "grid": {
@@ -1130,7 +1130,7 @@
                 "mode": "stacked",
                 "show": "true",
                 "showCircles": true,
-                "type": "area",
+                "winlog.api": "area",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -1144,12 +1144,12 @@
                 "mode": "stacked",
                 "show": true,
                 "showCircles": true,
-                "type": "line",
+                "winlog.api": "line",
                 "valueAxis": "ValueAxis-2"
               }
             ],
             "times": [],
-            "type": "area",
+            "winlog.api": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -1163,14 +1163,14 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Avg Response Time"
                 },
-                "type": "value"
+                "winlog.api": "value"
               },
               {
                 "id": "ValueAxis-2",
@@ -1184,25 +1184,25 @@
                 "position": "right",
                 "scale": {
                   "mode": "normal",
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ]
           },
           "title": "DNS Transactions [Packetbeat] ECS",
-          "type": "area"
+          "winlog.api": "area"
         }
       },
       "id": "e3f09730-1b80-11e9-83df-75eebb35951e-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-19T00:29:49.161Z",
-      "version": 3
+      "winlog.version": 3
     },
     {
       "attributes": {
@@ -1227,7 +1227,7 @@
             "legendOpen": false
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -1235,7 +1235,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -1249,7 +1249,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             },
             {
               "enabled": true,
@@ -1263,7 +1263,7 @@
                 "size": 5
               },
               "schema": "group",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -1279,12 +1279,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "grid": {
@@ -1305,12 +1305,12 @@
                 "mode": "stacked",
                 "show": "true",
                 "showCircles": true,
-                "type": "histogram",
+                "winlog.api": "histogram",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "times": [],
-            "type": "histogram",
+            "winlog.api": "histogram",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -1324,25 +1324,25 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ]
           },
           "title": "TLS Sessions ECS",
-          "type": "histogram"
+          "winlog.api": "histogram"
         }
       },
       "id": "059fe5e0-d2dd-11e7-9914-4982455b3063-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -1366,16 +1366,16 @@
                   "negate": false,
                   "params": {
                     "query": "http",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "http"
                 },
                 "query": {
                   "match": {
                     "network.protocol": {
                       "query": "http",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1387,7 +1387,7 @@
               "language": "lucene",
               "query": "*"
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
@@ -1395,12 +1395,12 @@
           "desc"
         ],
         "title": "HTTP Transactions Search [Packetbeat] ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "71908f00-88ca-11e7-ad9c-db80de0bf8d3-ecs",
-      "type": "search",
+      "winlog.api": "search",
       "updated_at": "2019-01-19T00:21:43.886Z",
-      "version": 3
+      "winlog.version": 3
     },
     {
       "attributes": {
@@ -1432,16 +1432,16 @@
                   "negate": true,
                   "params": {
                     "query": "flow",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "flow"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "flow",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1466,7 +1466,7 @@
               "language": "lucene",
               "query": ""
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
@@ -1474,12 +1474,12 @@
           "desc"
         ],
         "title": "Packetbeat Search ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "Packetbeat-Search-ecs",
-      "type": "search",
+      "winlog.api": "search",
       "updated_at": "2019-01-19T00:01:10.720Z",
-      "version": 2
+      "winlog.version": 2
     },
     {
       "attributes": {
@@ -1511,16 +1511,16 @@
                   "negate": true,
                   "params": {
                     "query": "flow",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "flow"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "flow",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1537,16 +1537,16 @@
                   "negate": true,
                   "params": {
                     "query": "OK",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "OK"
                 },
                 "query": {
                   "match": {
                     "status": {
                       "query": "OK",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1571,7 +1571,7 @@
               "language": "lucene",
               "query": ""
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
@@ -1579,12 +1579,12 @@
           "desc"
         ],
         "title": "Transactions Errors Search [Packetbeat] ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "Transactions-errors-ecs",
-      "type": "search",
+      "winlog.api": "search",
       "updated_at": "2019-01-19T00:05:18.965Z",
-      "version": 3
+      "winlog.version": 3
     },
     {
       "attributes": {
@@ -1611,16 +1611,16 @@
                   "negate": false,
                   "params": {
                     "query": "dns",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "dns"
                 },
                 "query": {
                   "match": {
                     "network.protocol": {
                       "query": "dns",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1645,7 +1645,7 @@
               "language": "lucene",
               "query": ""
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
@@ -1653,12 +1653,12 @@
           "desc"
         ],
         "title": "DNS Protocol [Packetbeat] ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "d19e8485-7df5-47ce-8009-9dc3c42bcf17-ecs",
-      "type": "search",
+      "winlog.api": "search",
       "updated_at": "2019-01-18T23:49:24.089Z",
-      "version": 2
+      "winlog.version": 2
     },
     {
       "attributes": {
@@ -1683,7 +1683,7 @@
                   "index": "packetbeat-*",
                   "key": "tls.handshake_completed",
                   "negate": false,
-                  "type": "exists",
+                  "winlog.api": "exists",
                   "value": "exists"
                 }
               }
@@ -1699,7 +1699,7 @@
                 }
               }
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
@@ -1707,12 +1707,12 @@
           "desc"
         ],
         "title": "TLS Sessions [Packetbeat] ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
-      "type": "search",
+      "winlog.api": "search",
       "updated_at": "2019-01-18T23:49:33.441Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -1726,7 +1726,7 @@
               "language": "lucene",
               "query": "*"
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "optionsJSON": {
@@ -1743,8 +1743,8 @@
             },
             "id": "Web-transactions-ecs",
             "panelIndex": "1",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1756,8 +1756,8 @@
             },
             "id": "DB-transactions-ecs",
             "panelIndex": "2",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1769,8 +1769,8 @@
             },
             "id": "Response-times-percentiles-ecs",
             "panelIndex": "5",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1782,8 +1782,8 @@
             },
             "id": "Errors-count-over-time-ecs",
             "panelIndex": "6",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1795,8 +1795,8 @@
             },
             "id": "Errors-vs-successful-transactions-ecs",
             "panelIndex": "7",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1808,8 +1808,8 @@
             },
             "id": "Latency-histogram-ecs",
             "panelIndex": "8",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -1845,8 +1845,8 @@
             },
             "id": "Client-locations-ecs",
             "panelIndex": "9",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1858,8 +1858,8 @@
             },
             "id": "Response-times-repartition-ecs",
             "panelIndex": "10",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1871,8 +1871,8 @@
             },
             "id": "Navigation-ecs",
             "panelIndex": "11",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {},
@@ -1885,8 +1885,8 @@
             },
             "id": "e3f09730-1b80-11e9-83df-75eebb35951e-ecs",
             "panelIndex": "12",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {},
@@ -1899,19 +1899,19 @@
             },
             "id": "059fe5e0-d2dd-11e7-9914-4982455b3063-ecs",
             "panelIndex": "13",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
         "title": "[Packetbeat] Overview ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "Packetbeat-Dashboard-ecs",
-      "type": "dashboard",
+      "winlog.api": "dashboard",
       "updated_at": "2019-01-19T00:31:53.357Z",
-      "version": 5
+      "winlog.version": 5
     }
   ],
-  "version": "7.0.0-SNAPSHOT"
+  "winlog.version": "7.0.0-SNAPSHOT"
 }

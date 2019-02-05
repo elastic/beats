@@ -14,7 +14,7 @@
         },
         "title": "Approximate data size [Metricbeat Zookeeper] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -39,7 +39,7 @@
                   {
                     "field": "zookeeper.mntr.approximate_data_size",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "avg"
+                    "winlog.api": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -51,16 +51,16 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "type": "timeseries"
+            "winlog.api": "timeseries"
           },
           "title": "Approximate data size [Metricbeat Zookeeper] ECS",
-          "type": "metrics"
+          "winlog.api": "metrics"
         }
       },
       "id": "8d3b7770-2319-11e9-bb66-8baac426dfd4-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-30T13:29:19.163Z",
-      "version": 2
+      "winlog.version": 2
     },
     {
       "attributes": {
@@ -76,7 +76,7 @@
         },
         "title": "Latency [Metricbeat Zookeeper] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -101,7 +101,7 @@
                   {
                     "field": "zookeeper.mntr.latency.avg",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "avg"
+                    "winlog.api": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -113,16 +113,16 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "type": "timeseries"
+            "winlog.api": "timeseries"
           },
           "title": "Latency [Metricbeat Zookeeper] ECS",
-          "type": "metrics"
+          "winlog.api": "metrics"
         }
       },
       "id": "c0be43c0-2319-11e9-bb66-8baac426dfd4-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-30T13:29:05.974Z",
-      "version": 2
+      "winlog.version": 2
     },
     {
       "attributes": {
@@ -138,7 +138,7 @@
         },
         "title": "Alive Connections [Metricbeat Zookeeper] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -163,7 +163,7 @@
                   {
                     "field": "zookeeper.mntr.num_alive_connections",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "avg"
+                    "winlog.api": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -175,16 +175,16 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "type": "timeseries"
+            "winlog.api": "timeseries"
           },
           "title": "Alive Connections [Metricbeat Zookeeper] ECS",
-          "type": "metrics"
+          "winlog.api": "metrics"
         }
       },
       "id": "1c2f8930-231a-11e9-bb66-8baac426dfd4-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-30T13:28:52.034Z",
-      "version": 3
+      "winlog.version": 3
     },
     {
       "attributes": {
@@ -200,7 +200,7 @@
         },
         "title": "Used file descriptors [Metricbeat Zookeeper] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -226,17 +226,17 @@
                     "field": "zookeeper.mntr.open_file_descriptor_count",
                     "id": "b92e4550-231a-11e9-9e57-679640dc0c7c",
                     "metric_agg": "avg",
-                    "type": "avg"
+                    "winlog.api": "avg"
                   },
                   {
                     "field": "zookeeper.mntr.max_file_descriptor_count",
                     "id": "918d0c60-231b-11e9-9e57-679640dc0c7c",
-                    "type": "avg"
+                    "winlog.api": "avg"
                   },
                   {
                     "id": "7e4d11e0-231b-11e9-9e57-679640dc0c7c",
                     "script": "params.a/params.b",
-                    "type": "math",
+                    "winlog.api": "math",
                     "variables": [
                       {
                         "field": "b92e4550-231a-11e9-9e57-679640dc0c7c",
@@ -271,7 +271,7 @@
                   {
                     "field": "zookeeper.mntr.open_file_descriptor_count",
                     "id": "dffaffe1-23cc-11e9-b1ff-37c851471450",
-                    "type": "avg"
+                    "winlog.api": "avg"
                   }
                 ],
                 "point_size": 1,
@@ -283,16 +283,16 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "type": "timeseries"
+            "winlog.api": "timeseries"
           },
           "title": "Used file descriptors [Metricbeat Zookeeper] ECS",
-          "type": "metrics"
+          "winlog.api": "metrics"
         }
       },
       "id": "ddb13c60-231b-11e9-bb66-8baac426dfd4-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-30T13:28:22.583Z",
-      "version": 5
+      "winlog.version": 5
     },
     {
       "attributes": {
@@ -308,7 +308,7 @@
         },
         "title": "Packets received / sent [Metricbeat Zookeeper] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -333,12 +333,12 @@
                   {
                     "field": "zookeeper.mntr.packets.received",
                     "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "avg"
+                    "winlog.api": "avg"
                   },
                   {
                     "field": "61ca57f2-469d-11e7-af02-69e470af7417",
                     "id": "34949540-231c-11e9-9707-f128cdaa3bf2",
-                    "type": "derivative",
+                    "winlog.api": "derivative",
                     "unit": ""
                   }
                 ],
@@ -366,12 +366,12 @@
                   {
                     "field": "zookeeper.mntr.packets.sent",
                     "id": "753b2e61-231c-11e9-9707-f128cdaa3bf2",
-                    "type": "avg"
+                    "winlog.api": "avg"
                   },
                   {
                     "field": "753b2e61-231c-11e9-9707-f128cdaa3bf2",
                     "id": "7ed33c60-231c-11e9-9707-f128cdaa3bf2",
-                    "type": "derivative",
+                    "winlog.api": "derivative",
                     "unit": ""
                   }
                 ],
@@ -384,16 +384,16 @@
             "show_grid": 1,
             "show_legend": 1,
             "time_field": "@timestamp",
-            "type": "timeseries"
+            "winlog.api": "timeseries"
           },
           "title": "Packets received / sent [Metricbeat Zookeeper] ECS",
-          "type": "metrics"
+          "winlog.api": "metrics"
         }
       },
       "id": "d2f52b50-231c-11e9-bb66-8baac426dfd4-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-30T13:26:42.583Z",
-      "version": 3
+      "winlog.version": 3
     },
     {
       "attributes": {
@@ -426,8 +426,8 @@
             "id": "8d3b7770-2319-11e9-bb66-8baac426dfd4-ecs",
             "panelIndex": "1",
             "title": "Approximate data size",
-            "type": "visualization",
-            "version": "7.0.0-alpha2"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-alpha2"
           },
           {
             "embeddableConfig": {},
@@ -441,8 +441,8 @@
             "id": "c0be43c0-2319-11e9-bb66-8baac426dfd4-ecs",
             "panelIndex": "2",
             "title": "Latency",
-            "type": "visualization",
-            "version": "7.0.0-alpha2"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-alpha2"
           },
           {
             "embeddableConfig": {},
@@ -456,8 +456,8 @@
             "id": "1c2f8930-231a-11e9-bb66-8baac426dfd4-ecs",
             "panelIndex": "3",
             "title": "Alive Connections",
-            "type": "visualization",
-            "version": "7.0.0-alpha2"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-alpha2"
           },
           {
             "embeddableConfig": {},
@@ -471,8 +471,8 @@
             "id": "ddb13c60-231b-11e9-bb66-8baac426dfd4-ecs",
             "panelIndex": "4",
             "title": "Used file descriptors",
-            "type": "visualization",
-            "version": "7.0.0-alpha2"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-alpha2"
           },
           {
             "embeddableConfig": {},
@@ -486,19 +486,19 @@
             "id": "d2f52b50-231c-11e9-bb66-8baac426dfd4-ecs",
             "panelIndex": "5",
             "title": "Packets received / sent",
-            "type": "visualization",
-            "version": "7.0.0-alpha2"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-alpha2"
           }
         ],
         "timeRestore": false,
         "title": "[Metricbeat Zookeeper] Overview ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "467207a0-231e-11e9-bb66-8baac426dfd4-ecs",
-      "type": "dashboard",
+      "winlog.api": "dashboard",
       "updated_at": "2019-01-30T13:34:01.235Z",
-      "version": 6
+      "winlog.version": 6
     }
   ],
-  "version": "7.0.0-alpha2"
+  "winlog.version": "7.0.0-alpha2"
 }

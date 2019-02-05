@@ -24,7 +24,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -39,7 +39,7 @@
                                 "sortOrder": "desc"
                             }, 
                             "schema": "metric", 
-                            "type": "top_hits"
+                            "winlog.api": "top_hits"
                         }, 
                         {
                             "enabled": true, 
@@ -52,7 +52,7 @@
                                 "size": 100
                             }, 
                             "schema": "bucket", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -65,7 +65,7 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -105,13 +105,13 @@
                                         "params": [], 
                                         "title": "Order Agg"
                                     }, 
-                                    "type": "max"
+                                    "winlog.api": "max"
                                 }, 
                                 "orderBy": "custom", 
                                 "size": 1
                             }, 
                             "schema": "bucket", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -151,13 +151,13 @@
                                         "params": [], 
                                         "title": "Order Agg"
                                     }, 
-                                    "type": "max"
+                                    "winlog.api": "max"
                                 }, 
                                 "orderBy": "custom", 
                                 "size": 1
                             }, 
                             "schema": "bucket", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -172,12 +172,12 @@
                         "totalFunc": "sum"
                     }, 
                     "title": "Service States [Metricbeat Windows] ECS", 
-                    "type": "table"
+                    "winlog.api": "table"
                 }
             }, 
             "id": "eb8277d0-c98c-11e7-9835-2f31fe08873b-ecs", 
-            "type": "visualization", 
-            "version": 1
+            "winlog.api": "visualization", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -203,7 +203,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -214,7 +214,7 @@
                                 "field": "windows.service.id"
                             }, 
                             "schema": "metric", 
-                            "type": "cardinality"
+                            "winlog.api": "cardinality"
                         }, 
                         {
                             "enabled": true, 
@@ -227,7 +227,7 @@
                                 "size": 100
                             }, 
                             "schema": "bucket", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -242,12 +242,12 @@
                         "totalFunc": "sum"
                     }, 
                     "title": "Hosts [Metricbeat Windows] ECS", 
-                    "type": "table"
+                    "winlog.api": "table"
                 }
             }, 
             "id": "23a5fff0-c98e-11e7-9835-2f31fe08873b-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -264,7 +264,7 @@
                 "savedSearchId": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b-ecs", 
                 "title": "Startup States [Metricbeat Windows] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -275,7 +275,7 @@
                                 "field": "windows.service.id"
                             }, 
                             "schema": "metric", 
-                            "type": "cardinality"
+                            "winlog.api": "cardinality"
                         }, 
                         {
                             "enabled": true, 
@@ -288,7 +288,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -301,7 +301,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -309,15 +309,15 @@
                         "addTooltip": true, 
                         "isDonut": true, 
                         "legendPosition": "right", 
-                        "type": "pie"
+                        "winlog.api": "pie"
                     }, 
                     "title": "Startup States [Metricbeat Windows] ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "id": "830c45f0-c991-11e7-9835-2f31fe08873b-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -340,7 +340,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -351,7 +351,7 @@
                                 "field": "windows.service.id"
                             }, 
                             "schema": "metric", 
-                            "type": "cardinality"
+                            "winlog.api": "cardinality"
                         }
                     ], 
                     "params": {
@@ -389,19 +389,19 @@
                                 "labelColor": false, 
                                 "subText": ""
                             }, 
-                            "type": "simple", 
+                            "winlog.api": "simple", 
                             "useRange": false, 
                             "verticalSplit": false
                         }, 
-                        "type": "gauge"
+                        "winlog.api": "gauge"
                     }, 
                     "title": "Unique Services [Metricbeat Windows] ECS", 
-                    "type": "metric"
+                    "winlog.api": "metric"
                 }
             }, 
             "id": "35f5ad60-c996-11e7-9835-2f31fe08873b-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -422,7 +422,7 @@
                                     "index": "metricbeat-*", 
                                     "key": "windows.service.exit_code", 
                                     "negate": false, 
-                                    "type": "exists", 
+                                    "winlog.api": "exists", 
                                     "value": "exists"
                                 }
                             }, 
@@ -438,16 +438,16 @@
                                     "negate": true, 
                                     "params": {
                                         "query": "0", 
-                                        "type": "phrase"
+                                        "winlog.api": "phrase"
                                     }, 
-                                    "type": "phrase", 
+                                    "winlog.api": "phrase", 
                                     "value": "0"
                                 }, 
                                 "query": {
                                     "match": {
                                         "windows.service.exit_code": {
                                             "query": "0", 
-                                            "type": "phrase"
+                                            "winlog.api": "phrase"
                                         }
                                     }
                                 }
@@ -464,16 +464,16 @@
                                     "negate": true, 
                                     "params": {
                                         "query": "ERROR_SERVICE_NEVER_STARTED", 
-                                        "type": "phrase"
+                                        "winlog.api": "phrase"
                                     }, 
-                                    "type": "phrase", 
+                                    "winlog.api": "phrase", 
                                     "value": "ERROR_SERVICE_NEVER_STARTED"
                                 }, 
                                 "query": {
                                     "match": {
                                         "windows.service.exit_code": {
                                             "query": "ERROR_SERVICE_NEVER_STARTED", 
-                                            "type": "phrase"
+                                            "winlog.api": "phrase"
                                         }
                                     }
                                 }
@@ -494,7 +494,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -505,7 +505,7 @@
                                 "field": "windows.service.id"
                             }, 
                             "schema": "metric", 
-                            "type": "cardinality"
+                            "winlog.api": "cardinality"
                         }
                     ], 
                     "params": {
@@ -543,19 +543,19 @@
                                 "labelColor": false, 
                                 "subText": ""
                             }, 
-                            "type": "simple", 
+                            "winlog.api": "simple", 
                             "useRange": false, 
                             "verticalSplit": false
                         }, 
-                        "type": "gauge"
+                        "winlog.api": "gauge"
                     }, 
                     "title": "Non-zero Service Exit Codes [Metricbeat Windows] ECS", 
-                    "type": "metric"
+                    "winlog.api": "metric"
                 }
             }, 
             "id": "c36b2ba0-ca29-11e7-9835-2f31fe08873b-ecs", 
-            "type": "visualization", 
-            "version": 1
+            "winlog.api": "visualization", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -585,16 +585,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "windows", 
-                                        "type": "phrase"
+                                        "winlog.api": "phrase"
                                     }, 
-                                    "type": "phrase", 
+                                    "winlog.api": "phrase", 
                                     "value": "windows"
                                 }, 
                                 "query": {
                                     "match": {
                                         "event.module": {
                                             "query": "windows", 
-                                            "type": "phrase"
+                                            "winlog.api": "phrase"
                                         }
                                     }
                                 }
@@ -611,16 +611,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "service", 
-                                        "type": "phrase"
+                                        "winlog.api": "phrase"
                                     }, 
-                                    "type": "phrase", 
+                                    "winlog.api": "phrase", 
                                     "value": "service"
                                 }, 
                                 "query": {
                                     "match": {
                                         "metricset.name": {
                                             "query": "service", 
-                                            "type": "phrase"
+                                            "winlog.api": "phrase"
                                         }
                                     }
                                 }
@@ -632,7 +632,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "sort": [
@@ -640,11 +640,11 @@
                     "desc"
                 ], 
                 "title": "Services [Metricbeat Windows] ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b-ecs", 
-            "type": "search", 
-            "version": 2
+            "winlog.api": "search", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -658,7 +658,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -672,7 +672,7 @@
                         "row": 4, 
                         "size_x": 9, 
                         "size_y": 5, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -681,7 +681,7 @@
                         "row": 4, 
                         "size_x": 3, 
                         "size_y": 5, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -690,7 +690,7 @@
                         "row": 1, 
                         "size_x": 4, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 5, 
@@ -699,7 +699,7 @@
                         "row": 1, 
                         "size_x": 4, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 9, 
@@ -708,7 +708,7 @@
                         "row": 1, 
                         "size_x": 4, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
@@ -749,12 +749,12 @@
                         }
                     }
                 }, 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "d9eba730-c991-11e7-9835-2f31fe08873b-ecs", 
-            "type": "dashboard", 
-            "version": 6
+            "winlog.api": "dashboard", 
+            "winlog.version": 6
         }
     ], 
-    "version": "6.0.0"
+    "winlog.version": "6.0.0"
 }

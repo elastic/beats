@@ -8,19 +8,19 @@
                 }, 
                 "title": "Overview [Metricbeat uWSGI] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "params": {
                         "expression": ".es(metric=avg:uwsgi.status.total.requests).derivative().label('Requests').title('Overview of requests per period'),\n.es(metric=avg:uwsgi.status.total.exceptions).derivative().label('Exceptions'),\n.es(metric=max:uwsgi.status.worker.avg_rt).label('Average response time').yaxis(2)", 
                         "interval": "15s"
                     }, 
                     "title": "Overview [Metricbeat uWSGI] ECS", 
-                    "type": "timelion"
+                    "winlog.api": "timelion"
                 }
             }, 
             "id": "a5058e70-f0ae-11e7-b9ff-9f96241065de-ecs", 
-            "type": "visualization", 
-            "version": 1
+            "winlog.api": "visualization", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -30,19 +30,19 @@
                 }, 
                 "title": "Memory usage [Metricbeat uWSGI] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "params": {
                         "expression": ".es(metric=max:uwsgi.status.worker.rss).label('Currently used (rss)').title('Memory usage'),\n.es(metric=max:uwsgi.status.worker.vsz).label('Assigned (vsz)').yaxis(2)", 
                         "interval": "15s"
                     }, 
                     "title": "Memory usage [Metricbeat uWSGI] ECS", 
-                    "type": "timelion"
+                    "winlog.api": "timelion"
                 }
             }, 
             "id": "ac7194b0-f0ae-11e7-b9ff-9f96241065de-ecs", 
-            "type": "visualization", 
-            "version": 1
+            "winlog.api": "visualization", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -52,19 +52,19 @@
                 }, 
                 "title": "Workers [Metricbeat uWSGI] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "params": {
                         "expression": ".es(split=uwsgi.status.core.id:16,metric=max:uwsgi.status.core.requests.total).derivative().bars().title('Requests handled by each thread (core) per period')", 
                         "interval": "15s"
                     }, 
                     "title": "Workers [Metricbeat uWSGI] ECS", 
-                    "type": "timelion"
+                    "winlog.api": "timelion"
                 }
             }, 
             "id": "8c5f96e0-f0ae-11e7-b9ff-9f96241065de-ecs", 
-            "type": "visualization", 
-            "version": 1
+            "winlog.api": "visualization", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -74,19 +74,19 @@
                 }, 
                 "title": "Errors [Metricbeat uWSGI] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "params": {
                         "expression": ".es(metric=max:uwsgi.status.total.read_errors).label('Read errors').title('Errors'),\n.es(metric=max:uwsgi.status.total.write_errors).label('Write errors'),\n.es(metric=max:uwsgi.status.worker.harakiri_count).label('Timeouted requests')", 
                         "interval": "15s"
                     }, 
                     "title": "Errors [Metricbeat uWSGI] ECS", 
-                    "type": "timelion"
+                    "winlog.api": "timelion"
                 }
             }, 
             "id": "ba4a80b0-f0ae-11e7-b9ff-9f96241065de-ecs", 
-            "type": "visualization", 
-            "version": 1
+            "winlog.api": "visualization", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -104,7 +104,7 @@
                             "language": "lucene", 
                             "query": "event.module: uwsgi"
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "sort": [
@@ -112,11 +112,11 @@
                     "desc"
                 ], 
                 "title": "Metricbeat uWSGI status-ecs ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "Metricbeat uWSGI status-ecs ECS", 
-            "type": "search", 
-            "version": 1
+            "winlog.api": "search", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -130,7 +130,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -144,7 +144,7 @@
                         "row": 1, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 7, 
@@ -153,7 +153,7 @@
                         "row": 1, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -162,7 +162,7 @@
                         "row": 4, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 7, 
@@ -171,18 +171,18 @@
                         "row": 4, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
                 "title": "[Metricbeat uWSGI] Overview ECS", 
                 "uiStateJSON": {}, 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "32fca290-f0af-11e7-b9ff-9f96241065de-ecs", 
-            "type": "dashboard", 
-            "version": 1
+            "winlog.api": "dashboard", 
+            "winlog.version": 1
         }
     ], 
-    "version": "6.0.0-rc1"
+    "winlog.version": "6.0.0-rc1"
 }

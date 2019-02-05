@@ -15,7 +15,7 @@
                 }, 
                 "title": "Access map [Filebeat IIS] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -23,7 +23,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -36,7 +36,7 @@
                                 "useGeocentroid": true
                             }, 
                             "schema": "segment", 
-                            "type": "geohash_grid"
+                            "winlog.api": "geohash_grid"
                         }
                     ], 
                     "params": {
@@ -59,13 +59,13 @@
                         }
                     }, 
                     "title": "Access map [Filebeat IIS] ECS", 
-                    "type": "tile_map"
+                    "winlog.api": "tile_map"
                 }
             }, 
             "id": "eb2db5b0-fe11-11e7-a3b0-d13028918f9f-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-20T18:44:17.162Z", 
-            "version": 1
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -82,7 +82,7 @@
                 }, 
                 "title": "Response codes over time [Filebeat IIS] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -90,7 +90,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -103,7 +103,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -115,7 +115,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -131,12 +131,12 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {}, 
-                                "type": "category"
+                                "winlog.api": "category"
                             }
                         ], 
                         "grid": {
@@ -156,12 +156,12 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "type": "histogram", 
+                                "winlog.api": "histogram", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
                         "times": [], 
-                        "type": "histogram", 
+                        "winlog.api": "histogram", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -175,25 +175,25 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "type": "value"
+                                "winlog.api": "value"
                             }
                         ]
                     }, 
                     "title": "Response codes over time [Filebeat IIS] ECS", 
-                    "type": "histogram"
+                    "winlog.api": "histogram"
                 }
             }, 
             "id": "f31414b0-fe14-11e7-a3b0-d13028918f9f-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-20T19:05:58.905Z", 
-            "version": 1
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -210,7 +210,7 @@
                 }, 
                 "title": "Browsers breakdown [Filebeat IIS] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -218,7 +218,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -230,7 +230,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -242,7 +242,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -256,16 +256,16 @@
                             "values": true
                         }, 
                         "legendPosition": "right", 
-                        "type": "pie"
+                        "winlog.api": "pie"
                     }, 
                     "title": "Browsers breakdown [Filebeat IIS] ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "id": "63129c80-fe12-11e7-a3b0-d13028918f9f-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-20T18:47:38.312Z", 
-            "version": 1
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -282,7 +282,7 @@
                 }, 
                 "title": "Operating systems breakdown [Filebeat IIS] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -290,7 +290,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -302,7 +302,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -314,7 +314,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -328,16 +328,16 @@
                             "values": true
                         }, 
                         "legendPosition": "right", 
-                        "type": "pie"
+                        "winlog.api": "pie"
                     }, 
                     "title": "Operating systems breakdown [Filebeat IIS] ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "id": "ccd3f9c0-fe12-11e7-a3b0-d13028918f9f-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-20T18:51:54.619Z", 
-            "version": 2
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -354,7 +354,7 @@
                 }, 
                 "title": "Error logs over time [Filebeat IIS] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -362,7 +362,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -375,7 +375,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -387,7 +387,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -403,12 +403,12 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {}, 
-                                "type": "category"
+                                "winlog.api": "category"
                             }
                         ], 
                         "grid": {
@@ -428,12 +428,12 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "type": "histogram", 
+                                "winlog.api": "histogram", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
                         "times": [], 
-                        "type": "histogram", 
+                        "winlog.api": "histogram", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -447,25 +447,25 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "type": "value"
+                                "winlog.api": "value"
                             }
                         ]
                     }, 
                     "title": "Error logs over time [Filebeat IIS] ECS", 
-                    "type": "histogram"
+                    "winlog.api": "histogram"
                 }
             }, 
             "id": "41f38230-fe17-11e7-a3b0-d13028918f9f-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-20T19:22:30.227Z", 
-            "version": 1
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -482,7 +482,7 @@
                 }, 
                 "title": "Top URLs by response code [Filebeat IIS] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -490,7 +490,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -504,7 +504,7 @@
                                 "size": 5
                             }, 
                             "schema": "split", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -516,7 +516,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -530,16 +530,16 @@
                             "values": true
                         }, 
                         "legendPosition": "right", 
-                        "type": "pie"
+                        "winlog.api": "pie"
                     }, 
                     "title": "Top URLs by response code [Filebeat IIS] ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "id": "c0d02cd0-fe1b-11e7-a3b0-d13028918f9f-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-20T19:58:24.005Z", 
-            "version": 2
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -553,7 +553,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -572,8 +572,8 @@
                         }, 
                         "id": "eb2db5b0-fe11-11e7-a3b0-d13028918f9f-ecs", 
                         "panelIndex": "1", 
-                        "type": "visualization", 
-                        "version": "6.1.2"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.1.2"
                     }, 
                     {
                         "gridData": {
@@ -585,8 +585,8 @@
                         }, 
                         "id": "f31414b0-fe14-11e7-a3b0-d13028918f9f-ecs", 
                         "panelIndex": "2", 
-                        "type": "visualization", 
-                        "version": "6.1.2"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.1.2"
                     }, 
                     {
                         "gridData": {
@@ -598,8 +598,8 @@
                         }, 
                         "id": "63129c80-fe12-11e7-a3b0-d13028918f9f-ecs", 
                         "panelIndex": "4", 
-                        "type": "visualization", 
-                        "version": "6.1.2"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.1.2"
                     }, 
                     {
                         "gridData": {
@@ -611,8 +611,8 @@
                         }, 
                         "id": "ccd3f9c0-fe12-11e7-a3b0-d13028918f9f-ecs", 
                         "panelIndex": "5", 
-                        "type": "visualization", 
-                        "version": "6.1.2"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.1.2"
                     }, 
                     {
                         "gridData": {
@@ -624,8 +624,8 @@
                         }, 
                         "id": "41f38230-fe17-11e7-a3b0-d13028918f9f-ecs", 
                         "panelIndex": "6", 
-                        "type": "visualization", 
-                        "version": "6.1.2"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.1.2"
                     }, 
                     {
                         "gridData": {
@@ -637,20 +637,20 @@
                         }, 
                         "id": "c0d02cd0-fe1b-11e7-a3b0-d13028918f9f-ecs", 
                         "panelIndex": "7", 
-                        "type": "visualization", 
-                        "version": "6.1.2"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.1.2"
                     }
                 ], 
                 "timeRestore": false, 
                 "title": "[Filebeat IIS] Access and error logs ECS", 
                 "uiStateJSON": {}, 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "4278ad30-fe16-11e7-a3b0-d13028918f9f-ecs", 
-            "type": "dashboard", 
+            "winlog.api": "dashboard", 
             "updated_at": "2018-01-20T19:57:50.287Z", 
-            "version": 4
+            "winlog.version": 4
         }
     ], 
-    "version": "6.1.2"
+    "winlog.version": "6.1.2"
 }

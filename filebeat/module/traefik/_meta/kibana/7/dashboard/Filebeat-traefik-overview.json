@@ -17,7 +17,7 @@
                 }, 
                 "title": "Browsers breakdown [Filebeat Traefik] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -25,7 +25,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -37,7 +37,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -49,7 +49,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -61,12 +61,12 @@
                         "shareYAxis": true
                     }, 
                     "title": "Traefik Access Browsers ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "id": "Traefik-Access-Browsers-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -85,7 +85,7 @@
                 }, 
                 "title": "Operating systems breakdown [Filebeat Traefik] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -93,7 +93,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -105,7 +105,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -117,7 +117,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -129,12 +129,12 @@
                         "shareYAxis": true
                     }, 
                     "title": "Traefik Access OSes ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "id": "Traefik-Access-OSes-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -154,7 +154,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -162,7 +162,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -175,7 +175,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -187,7 +187,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -205,12 +205,12 @@
                         "yAxis": {}
                     }, 
                     "title": "New Visualization ECS", 
-                    "type": "histogram"
+                    "winlog.api": "histogram"
                 }
             }, 
             "id": "New-Visualization-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -236,7 +236,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -244,7 +244,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -257,7 +257,7 @@
                                 "size": 5
                             }, 
                             "schema": "split", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -269,7 +269,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -281,12 +281,12 @@
                         "shareYAxis": true
                     }, 
                     "title": "Traefik Access Response codes by top URLs ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "id": "Traefik-Access-Response-codes-by-top-URLs-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -318,7 +318,7 @@
                 }, 
                 "title": "Sent Byte Size [Filebeat Traefik] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -329,7 +329,7 @@
                                 "field": "http.response.body.bytes"
                             }, 
                             "schema": "metric", 
-                            "type": "sum"
+                            "winlog.api": "sum"
                         }, 
                         {
                             "enabled": true, 
@@ -342,14 +342,14 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
                             "id": "3", 
                             "params": {}, 
                             "schema": "radius", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }
                     ], 
                     "listeners": {}, 
@@ -371,12 +371,12 @@
                         "yAxis": {}
                     }, 
                     "title": "Sent sizes ECS", 
-                    "type": "line"
+                    "winlog.api": "line"
                 }
             }, 
             "id": "Sent-sizes-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -394,7 +394,7 @@
                         -0.17578125
                     ]
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -402,7 +402,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -412,7 +412,7 @@
                                 "field": "source.geo.location"
                             }, 
                             "schema": "segment", 
-                            "type": "geohash_grid"
+                            "winlog.api": "geohash_grid"
                         }
                     ], 
                     "listeners": {}, 
@@ -439,18 +439,18 @@
                                 "layers": "0", 
                                 "styles": "", 
                                 "transparent": true, 
-                                "version": "1.3.0"
+                                "winlog.version": "1.3.0"
                             }, 
                             "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
                         }
                     }, 
                     "title": "Traefik Access Map ECS", 
-                    "type": "tile_map"
+                    "winlog.api": "tile_map"
                 }
             }, 
             "id": "Traefik-Access-Map-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -489,11 +489,11 @@
                     "desc"
                 ], 
                 "title": "Traefik logs [Filebeat Traefik] ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "Filebeat-Traefik-module-ecs", 
-            "type": "search", 
-            "version": 2
+            "winlog.api": "search", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -524,7 +524,7 @@
                         "row": 10, 
                         "size_x": 4, 
                         "size_y": 4, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 5, 
@@ -533,7 +533,7 @@
                         "row": 10, 
                         "size_x": 4, 
                         "size_y": 4, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -542,7 +542,7 @@
                         "row": 4, 
                         "size_x": 12, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -551,7 +551,7 @@
                         "row": 7, 
                         "size_x": 12, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 9, 
@@ -560,7 +560,7 @@
                         "row": 10, 
                         "size_x": 4, 
                         "size_y": 4, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -569,7 +569,7 @@
                         "row": 1, 
                         "size_x": 12, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
@@ -587,12 +587,12 @@
                         ]
                     }
                 }, 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "Filebeat-Traefik-Dashboard-ecs", 
-            "type": "dashboard", 
-            "version": 3
+            "winlog.api": "dashboard", 
+            "winlog.version": 3
         }
     ], 
-    "version": "6.0.0-beta1-SNAPSHOT"
+    "winlog.version": "6.0.0-beta1-SNAPSHOT"
 }

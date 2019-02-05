@@ -8,7 +8,7 @@
                 }, 
                 "title": "Event Actions [Auditbeat Auditd Overview] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -50,7 +50,7 @@
                                 "metrics": [
                                     {
                                         "id": "6b9fb2d0-c1bc-11e7-938f-ab0645b6c431", 
-                                        "type": "count"
+                                        "winlog.api": "count"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -63,16 +63,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "Event Actions [Auditbeat Auditd Overview] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "97680df0-c1c0-11e7-8995-936807a28b16-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-16T22:11:01.438Z", 
-            "version": 3
+            "winlog.version": 3
         }, 
         {
             "attributes": {
@@ -90,7 +90,7 @@
                 "savedSearchId": "0f10c430-c1c3-11e7-8995-936807a28b16-ecs", 
                 "title": "Event Categories [Auditbeat Auditd] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -98,7 +98,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -111,7 +111,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -124,7 +124,7 @@
                                 "size": 20
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "params": {
@@ -132,16 +132,16 @@
                         "addTooltip": true, 
                         "isDonut": true, 
                         "legendPosition": "right", 
-                        "type": "pie"
+                        "winlog.api": "pie"
                     }, 
                     "title": "Event Categories [Auditbeat Auditd] ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "id": "08679220-c25a-11e7-8692-232bd1143e8a-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-16T22:54:10.330Z", 
-            "version": 4
+            "winlog.version": 4
         }, 
         {
             "attributes": {
@@ -173,16 +173,16 @@
                                     "negate": false, 
                                     "params": {
                                         "query": "auditd", 
-                                        "type": "phrase"
+                                        "winlog.api": "phrase"
                                     }, 
-                                    "type": "phrase", 
+                                    "winlog.api": "phrase", 
                                     "value": "auditd"
                                 }, 
                                 "query": {
                                     "match": {
                                         "event.module": {
                                             "query": "auditd", 
-                                            "type": "phrase"
+                                            "winlog.api": "phrase"
                                         }
                                     }
                                 }
@@ -194,7 +194,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "sort": [
@@ -202,12 +202,12 @@
                     "desc"
                 ], 
                 "title": "Audit Event Table [Auditbeat Auditd] ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "0f10c430-c1c3-11e7-8995-936807a28b16-ecs", 
-            "type": "search", 
+            "winlog.api": "search", 
             "updated_at": "2018-01-16T22:51:24.572Z", 
-            "version": 4
+            "winlog.version": 4
         }, 
         {
             "attributes": {
@@ -221,7 +221,7 @@
                             "language": "lucene", 
                             "query": ""
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -239,8 +239,8 @@
                         }, 
                         "id": "97680df0-c1c0-11e7-8995-936807a28b16-ecs", 
                         "panelIndex": "1", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -252,8 +252,8 @@
                         }, 
                         "id": "08679220-c25a-11e7-8692-232bd1143e8a-ecs", 
                         "panelIndex": "4", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -265,19 +265,19 @@
                         }, 
                         "id": "0f10c430-c1c3-11e7-8995-936807a28b16-ecs", 
                         "panelIndex": "5", 
-                        "type": "search", 
-                        "version": "6.2.4"
+                        "winlog.api": "search", 
+                        "winlog.version": "6.2.4"
                     }
                 ], 
                 "timeRestore": false, 
                 "title": "[Auditbeat Auditd] Overview ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "c0ac2c00-c1c0-11e7-8995-936807a28b16-ecs", 
-            "type": "dashboard", 
+            "winlog.api": "dashboard", 
             "updated_at": "2018-01-16T22:55:17.775Z", 
-            "version": 5
+            "winlog.version": 5
         }
     ], 
-    "version": "6.2.4"
+    "winlog.version": "6.2.4"
 }

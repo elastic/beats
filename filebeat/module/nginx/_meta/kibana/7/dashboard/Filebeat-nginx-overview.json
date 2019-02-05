@@ -17,7 +17,7 @@
                 }, 
                 "title": "Browsers breakdown [Filebeat Nginx] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -25,7 +25,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -37,7 +37,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -49,7 +49,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -61,12 +61,12 @@
                         "shareYAxis": true
                     }, 
                     "title": "Nginx Access Browsers ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "id": "Nginx-Access-Browsers-ecs", 
-            "type": "visualization", 
-            "version": 1
+            "winlog.api": "visualization", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -85,7 +85,7 @@
                 }, 
                 "title": "Operating systems breakdown [Filebeat Nginx] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -93,7 +93,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -105,7 +105,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -117,7 +117,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -129,12 +129,12 @@
                         "shareYAxis": true
                     }, 
                     "title": "Nginx Access OSes ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "id": "Nginx-Access-OSes-ecs", 
-            "type": "visualization", 
-            "version": 1
+            "winlog.api": "visualization", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -152,7 +152,7 @@
                         -0.17578125
                     ]
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -160,7 +160,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -170,7 +170,7 @@
                                 "field": "source.geo.location"
                             }, 
                             "schema": "segment", 
-                            "type": "geohash_grid"
+                            "winlog.api": "geohash_grid"
                         }
                     ], 
                     "listeners": {}, 
@@ -197,18 +197,18 @@
                                 "layers": "0", 
                                 "styles": "", 
                                 "transparent": true, 
-                                "version": "1.3.0"
+                                "winlog.version": "1.3.0"
                             }, 
                             "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
                         }
                     }, 
                     "title": "Nginx Access Map ECS", 
-                    "type": "tile_map"
+                    "winlog.api": "tile_map"
                 }
             }, 
             "id": "Nginx-Access-Map-ecs", 
-            "type": "visualization", 
-            "version": 1
+            "winlog.api": "visualization", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -218,7 +218,7 @@
                 }, 
                 "title": "Response codes over time [Filebeat Nginx] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -242,7 +242,7 @@
                                 "metrics": [
                                     {
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "count"
+                                        "winlog.api": "count"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -282,15 +282,15 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "Response codes over time [Filebeat Nginx] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "b70b1b20-a1f4-11e7-928f-5dbe6f6f5519-ecs", 
-            "type": "visualization", 
-            "version": 7
+            "winlog.api": "visualization", 
+            "winlog.version": 7
         }, 
         {
             "attributes": {
@@ -300,7 +300,7 @@
                 }, 
                 "title": "Top pages [Filebeat Nginx] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -327,7 +327,7 @@
                                 "metrics": [
                                     {
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "count"
+                                        "winlog.api": "count"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -342,15 +342,15 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "top_n"
+                        "winlog.api": "top_n"
                     }, 
                     "title": "Top pages [Filebeat Nginx] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "9184fa00-a1f5-11e7-928f-5dbe6f6f5519-ecs", 
-            "type": "visualization", 
-            "version": 3
+            "winlog.api": "visualization", 
+            "winlog.version": 3
         }, 
         {
             "attributes": {
@@ -360,7 +360,7 @@
                 }, 
                 "title": "Errors over time [Filebeat Nginx] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -383,7 +383,7 @@
                                 "metrics": [
                                     {
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "count"
+                                        "winlog.api": "count"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -397,15 +397,15 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "Errors over time [Filebeat Nginx] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "46322e50-a1f6-11e7-928f-5dbe6f6f5519-ecs", 
-            "type": "visualization", 
-            "version": 5
+            "winlog.api": "visualization", 
+            "winlog.version": 5
         }, 
         {
             "attributes": {
@@ -415,7 +415,7 @@
                 }, 
                 "title": "Data Volume [Filebeat Nginx] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -440,7 +440,7 @@
                                     {
                                         "field": "http.response.body.bytes", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "sum"
+                                        "winlog.api": "sum"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -461,15 +461,15 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "Data Volume [Filebeat Nginx] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "0dd6f320-a29f-11e7-928f-5dbe6f6f5519-ecs", 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -479,7 +479,7 @@
                 }, 
                 "title": "Dashboards [Filebeat Nginx] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -487,12 +487,12 @@
                         "markdown": "[Nginx logs overview](#/dashboard/55a9e6e0-a29e-11e7-928f-5dbe6f6f5519-ecs) | [Nginx access and error logs](#/dashboard/046212a0-a2a1-11e7-928f-5dbe6f6f5519-ecs)"
                     }, 
                     "title": "Dashboards [Filebeat Nginx] ECS", 
-                    "type": "markdown"
+                    "winlog.api": "markdown"
                 }
             }, 
             "id": "97109780-a2a5-11e7-928f-5dbe6f6f5519-ecs", 
-            "type": "visualization", 
-            "version": 1
+            "winlog.api": "visualization", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -532,7 +532,7 @@
                                 }
                             }
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "sort": [
@@ -540,11 +540,11 @@
                     "desc"
                 ], 
                 "title": "Nginx logs [Filebeat Nginx] ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "Filebeat-Nginx-module-ecs", 
-            "type": "search", 
-            "version": 2
+            "winlog.api": "search", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -563,7 +563,7 @@
                                 }
                             }
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -577,7 +577,7 @@
                         "row": 12, 
                         "size_x": 3, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 7, 
@@ -586,7 +586,7 @@
                         "row": 12, 
                         "size_x": 3, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -595,7 +595,7 @@
                         "row": 2, 
                         "size_x": 12, 
                         "size_y": 4, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -604,7 +604,7 @@
                         "row": 6, 
                         "size_x": 12, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 7, 
@@ -613,7 +613,7 @@
                         "row": 9, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -622,7 +622,7 @@
                         "row": 9, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -631,7 +631,7 @@
                         "row": 12, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -640,7 +640,7 @@
                         "row": 1, 
                         "size_x": 12, 
                         "size_y": 1, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
@@ -680,12 +680,12 @@
                         "mapZoom": 2
                     }
                 }, 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "55a9e6e0-a29e-11e7-928f-5dbe6f6f5519-ecs", 
-            "type": "dashboard", 
-            "version": 6
+            "winlog.api": "dashboard", 
+            "winlog.version": 6
         }
     ], 
-    "version": "6.0.0-beta2"
+    "winlog.version": "6.0.0-beta2"
 }

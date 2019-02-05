@@ -15,7 +15,7 @@
         "savedSearchId": "MySQL-errors-ecs",
         "title": "MySQL Errors [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -23,7 +23,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -38,7 +38,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             }
           ],
           "params": {
@@ -54,12 +54,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -82,7 +82,7 @@
                 "interpolate": "linear",
                 "mode": "stacked",
                 "show": "true",
-                "type": "area",
+                "winlog.api": "area",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -90,7 +90,7 @@
             "shareYAxis": true,
             "smoothLines": false,
             "times": [],
-            "type": "area",
+            "winlog.api": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -106,26 +106,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "MySQL Errors [Packetbeat] ECS",
-          "type": "area"
+          "winlog.api": "area"
         }
       },
       "id": "MySQL-Errors-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:28.266Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -142,7 +142,7 @@
         "savedSearchId": "MySQL-Transactions-ecs",
         "title": "MySQL Methods [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -150,7 +150,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -165,7 +165,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             },
             {
               "enabled": true,
@@ -181,7 +181,7 @@
                 "size": 20
               },
               "schema": "group",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -197,12 +197,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -225,7 +225,7 @@
                 "interpolate": "linear",
                 "mode": "stacked",
                 "show": "true",
-                "type": "area",
+                "winlog.api": "area",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -233,7 +233,7 @@
             "shareYAxis": true,
             "smoothLines": false,
             "times": [],
-            "type": "area",
+            "winlog.api": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -249,26 +249,26 @@
                   "defaultYExtents": false,
                   "mode": "wiggle",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "MySQL Methods [Packetbeat] ECS",
-          "type": "area"
+          "winlog.api": "area"
         }
       },
       "id": "MySQL-Methods-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:28.266Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -289,7 +289,7 @@
         },
         "title": "Navigation [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -298,13 +298,13 @@
             "openLinksInNewTab": false
           },
           "title": "Navigation [Packetbeat] ECS",
-          "type": "markdown"
+          "winlog.api": "markdown"
         }
       },
       "id": "Navigation-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-19T00:18:59.372Z",
-      "version": 11
+      "winlog.version": 11
     },
     {
       "attributes": {
@@ -321,7 +321,7 @@
         "savedSearchId": "MySQL-Transactions-ecs",
         "title": "MySQL throughput [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -331,7 +331,7 @@
                 "field": "destination.bytes"
               },
               "schema": "metric",
-              "type": "sum"
+              "winlog.api": "sum"
             },
             {
               "enabled": true,
@@ -340,7 +340,7 @@
                 "field": "source.bytes"
               },
               "schema": "metric",
-              "type": "sum"
+              "winlog.api": "sum"
             },
             {
               "enabled": true,
@@ -355,7 +355,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             }
           ],
           "params": {
@@ -371,12 +371,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -395,7 +395,7 @@
                 },
                 "mode": "normal",
                 "show": "true",
-                "type": "line",
+                "winlog.api": "line",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -405,13 +405,13 @@
                 },
                 "mode": "normal",
                 "show": true,
-                "type": "line",
+                "winlog.api": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "shareYAxis": true,
             "times": [],
-            "type": "line",
+            "winlog.api": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -427,25 +427,25 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ]
           },
           "title": "MySQL throughput [Packetbeat] ECS",
-          "type": "line"
+          "winlog.api": "line"
         }
       },
       "id": "MySQL-throughput-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:28.266Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -458,14 +458,14 @@
         "savedSearchId": "MySQL-Transactions-ecs",
         "title": "Most frequent MySQL queries ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "id": "2",
@@ -476,7 +476,7 @@
                 "size": 10
               },
               "schema": "bucket",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "listeners": {},
@@ -486,13 +486,13 @@
             "showPartialRows": false
           },
           "title": "Most frequent MySQL queries ECS",
-          "type": "table"
+          "winlog.api": "table"
         }
       },
       "id": "Most-frequent-MySQL-queries-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:28.266Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -518,7 +518,7 @@
             }
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -529,7 +529,7 @@
                 "field": "event.duration"
               },
               "schema": "metric",
-              "type": "avg"
+              "winlog.api": "avg"
             },
             {
               "enabled": true,
@@ -545,7 +545,7 @@
                 "size": 10
               },
               "schema": "bucket",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -560,13 +560,13 @@
             "totalFunc": "sum"
           },
           "title": "Slowest MySQL queries ECS",
-          "type": "table"
+          "winlog.api": "table"
         }
       },
       "id": "Slowest-MySQL-queries-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:28.266Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -583,7 +583,7 @@
         "savedSearchId": "MySQL-Transactions-ecs",
         "title": "Mysql response times percentiles [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -598,7 +598,7 @@
                 ]
               },
               "schema": "metric",
-              "type": "percentiles"
+              "winlog.api": "percentiles"
             },
             {
               "enabled": true,
@@ -613,7 +613,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             }
           ],
           "params": {
@@ -629,12 +629,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -653,13 +653,13 @@
                 },
                 "mode": "normal",
                 "show": "true",
-                "type": "line",
+                "winlog.api": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
             "shareYAxis": true,
             "times": [],
-            "type": "line",
+            "winlog.api": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -675,25 +675,25 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Percentiles of event.duration"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ]
           },
           "title": "Mysql response times percentiles [Packetbeat] ECS",
-          "type": "line"
+          "winlog.api": "line"
         }
       },
       "id": "Mysql-response-times-percentiles-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:28.266Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -710,7 +710,7 @@
         "savedSearchId": "MySQL-Transactions-ecs",
         "title": "MySQL Reads vs Writes [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -718,7 +718,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -733,7 +733,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             },
             {
               "enabled": true,
@@ -758,7 +758,7 @@
                 ]
               },
               "schema": "group",
-              "type": "filters"
+              "winlog.api": "filters"
             }
           ],
           "params": {
@@ -774,14 +774,14 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "@timestamp per 30 seconds"
                 },
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -806,7 +806,7 @@
                 "mode": "stacked",
                 "show": "true",
                 "showCircles": true,
-                "type": "area",
+                "winlog.api": "area",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -814,7 +814,7 @@
             "shareYAxis": true,
             "smoothLines": false,
             "times": [],
-            "type": "area",
+            "winlog.api": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -828,32 +828,32 @@
                 "position": "left",
                 "scale": {
                   "mode": "normal",
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "MySQL Reads vs Writes [Packetbeat] ECS",
-          "type": "area"
+          "winlog.api": "area"
         }
       },
       "id": "MySQL-Reads-vs-Writes-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:28.266Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
         "columns": [
           "method",
-          "type",
+          "winlog.api",
           "path",
           "event.duration",
           "status"
@@ -875,16 +875,16 @@
                   "negate": true,
                   "params": {
                     "query": "OK",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "OK"
                 },
                 "query": {
                   "match": {
                     "status": {
                       "query": "OK",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -901,16 +901,16 @@
                   "negate": false,
                   "params": {
                     "query": "mysql",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "mysql"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "mysql",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -938,7 +938,7 @@
                 }
               }
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
@@ -946,18 +946,18 @@
           "desc"
         ],
         "title": "MySQL Errors Search [Packetbeat] ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "MySQL-errors-ecs",
-      "type": "search",
+      "winlog.api": "search",
       "updated_at": "2019-01-18T23:49:28.266Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
         "columns": [
           "method",
-          "type",
+          "winlog.api",
           "path",
           "event.duration",
           "status"
@@ -975,20 +975,20 @@
                   "alias": null,
                   "disabled": false,
                   "index": "packetbeat-*",
-                  "key": "type",
+                  "key": "winlog.api",
                   "negate": false,
                   "params": {
                     "query": "mysql",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "mysql"
                 },
                 "query": {
                   "match": {
-                    "type": {
+                    "winlog.api": {
                       "query": "mysql",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1016,7 +1016,7 @@
                 }
               }
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
@@ -1024,12 +1024,12 @@
           "desc"
         ],
         "title": "MySQL Transactions [Packetbeat] ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "MySQL-Transactions-ecs",
-      "type": "search",
+      "winlog.api": "search",
       "updated_at": "2019-01-18T23:49:28.266Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -1048,7 +1048,7 @@
                 }
               }
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "optionsJSON": {
@@ -1065,8 +1065,8 @@
             },
             "id": "MySQL-Errors-ecs",
             "panelIndex": "1",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1078,8 +1078,8 @@
             },
             "id": "MySQL-Methods-ecs",
             "panelIndex": "2",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1091,8 +1091,8 @@
             },
             "id": "Navigation-ecs",
             "panelIndex": "3",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1104,8 +1104,8 @@
             },
             "id": "MySQL-throughput-ecs",
             "panelIndex": "4",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -1127,8 +1127,8 @@
             },
             "id": "Most-frequent-MySQL-queries-ecs",
             "panelIndex": "5",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -1150,8 +1150,8 @@
             },
             "id": "Slowest-MySQL-queries-ecs",
             "panelIndex": "6",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1163,8 +1163,8 @@
             },
             "id": "Mysql-response-times-percentiles-ecs",
             "panelIndex": "7",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1176,19 +1176,19 @@
             },
             "id": "MySQL-Reads-vs-Writes-ecs",
             "panelIndex": "8",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
         "title": "[Packetbeat] MySQL performance ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "Packetbeat-MySQL-performance-ecs",
-      "type": "dashboard",
+      "winlog.api": "dashboard",
       "updated_at": "2019-01-18T23:49:28.266Z",
-      "version": 1
+      "winlog.version": 1
     }
   ],
-  "version": "7.0.0-SNAPSHOT"
+  "winlog.version": "7.0.0-SNAPSHOT"
 }

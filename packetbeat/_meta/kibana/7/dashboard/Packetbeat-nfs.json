@@ -15,7 +15,7 @@
         "savedSearchId": "nfs-ecs",
         "title": "NFS clients pie chart [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -23,7 +23,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -39,7 +39,7 @@
                 "size": 16
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -54,16 +54,16 @@
             },
             "legendPosition": "right",
             "shareYAxis": true,
-            "type": "pie"
+            "winlog.api": "pie"
           },
           "title": "NFS clients pie chart [Packetbeat] ECS",
-          "type": "pie"
+          "winlog.api": "pie"
         }
       },
       "id": "NFS-clients-pie-chart-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:29.316Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -76,14 +76,14 @@
         "savedSearchId": "nfs-ecs",
         "title": "NFS operations area chart ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "id": "2",
@@ -94,7 +94,7 @@
                 "size": 16
               },
               "schema": "group",
-              "type": "terms"
+              "winlog.api": "terms"
             },
             {
               "id": "3",
@@ -106,7 +106,7 @@
                 "min_doc_count": 1
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             }
           ],
           "listeners": {},
@@ -125,13 +125,13 @@
             "yAxis": {}
           },
           "title": "NFS operations area chart ECS",
-          "type": "area"
+          "winlog.api": "area"
         }
       },
       "id": "NFS-operations-area-chart-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:29.316Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -148,7 +148,7 @@
         "savedSearchId": "nfs-ecs",
         "title": "NFS top group pie chart [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -156,7 +156,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -172,7 +172,7 @@
                 "size": 16
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -187,16 +187,16 @@
             },
             "legendPosition": "right",
             "shareYAxis": true,
-            "type": "pie"
+            "winlog.api": "pie"
           },
           "title": "NFS top group pie chart [Packetbeat] ECS",
-          "type": "pie"
+          "winlog.api": "pie"
         }
       },
       "id": "NFS-top-group-pie-chart-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:29.316Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -213,7 +213,7 @@
         "savedSearchId": "nfs-ecs",
         "title": "NFS top users pie chart [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -221,7 +221,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -237,7 +237,7 @@
                 "size": 16
               },
               "schema": "segment",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -252,16 +252,16 @@
             },
             "legendPosition": "right",
             "shareYAxis": true,
-            "type": "pie"
+            "winlog.api": "pie"
           },
           "title": "NFS top users pie chart [Packetbeat] ECS",
-          "type": "pie"
+          "winlog.api": "pie"
         }
       },
       "id": "NFS-top-users-pie-chart-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:29.316Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -278,7 +278,7 @@
         "savedSearchId": "nfs-ecs",
         "title": "NFS response times [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -291,7 +291,7 @@
                 ]
               },
               "schema": "metric",
-              "type": "median"
+              "winlog.api": "median"
             },
             {
               "enabled": true,
@@ -306,7 +306,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             }
           ],
           "params": {
@@ -322,12 +322,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": true,
@@ -354,7 +354,7 @@
                 "radiusRatio": "9",
                 "show": "true",
                 "showCircles": true,
-                "type": "line",
+                "winlog.api": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -363,7 +363,7 @@
             "showCircles": true,
             "smoothLines": true,
             "times": [],
-            "type": "line",
+            "winlog.api": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -379,26 +379,26 @@
                   "defaultYExtents": true,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Median event.duration"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "NFS response times [Packetbeat] ECS",
-          "type": "line"
+          "winlog.api": "line"
         }
       },
       "id": "NFS-response-times-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:29.316Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -415,7 +415,7 @@
         "savedSearchId": "NFS-errors-search-ecs",
         "title": "NFS errors [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -423,7 +423,7 @@
               "id": "1",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             },
             {
               "enabled": true,
@@ -438,7 +438,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             },
             {
               "enabled": true,
@@ -454,7 +454,7 @@
                 "size": 12
               },
               "schema": "group",
-              "type": "terms"
+              "winlog.api": "terms"
             }
           ],
           "params": {
@@ -470,12 +470,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -498,7 +498,7 @@
                 "interpolate": "linear",
                 "mode": "stacked",
                 "show": "true",
-                "type": "area",
+                "winlog.api": "area",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -506,7 +506,7 @@
             "shareYAxis": true,
             "smoothLines": false,
             "times": [],
-            "type": "area",
+            "winlog.api": "area",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -522,26 +522,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "NFS errors [Packetbeat] ECS",
-          "type": "area"
+          "winlog.api": "area"
         }
       },
       "id": "NFS-errors-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:29.316Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -567,7 +567,7 @@
             }
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -578,7 +578,7 @@
                 "field": "event.duration"
               },
               "schema": "metric",
-              "type": "avg"
+              "winlog.api": "avg"
             },
             {
               "enabled": true,
@@ -595,14 +595,14 @@
                 "size": 16
               },
               "schema": "bucket",
-              "type": "terms"
+              "winlog.api": "terms"
             },
             {
               "enabled": true,
               "id": "3",
               "params": {},
               "schema": "metric",
-              "type": "count"
+              "winlog.api": "count"
             }
           ],
           "params": {
@@ -617,13 +617,13 @@
             "totalFunc": "sum"
           },
           "title": "NFS operation table [Packetbeat] ECS",
-          "type": "table"
+          "winlog.api": "table"
         }
       },
       "id": "NFS-operation-table-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:29.316Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -646,7 +646,7 @@
             }
           }
         },
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [
             {
@@ -657,7 +657,7 @@
                 "field": "source.bytes"
               },
               "schema": "metric",
-              "type": "sum"
+              "winlog.api": "sum"
             },
             {
               "enabled": true,
@@ -667,7 +667,7 @@
                 "field": "destination.bytes"
               },
               "schema": "metric",
-              "type": "sum"
+              "winlog.api": "sum"
             },
             {
               "enabled": true,
@@ -682,7 +682,7 @@
                 "useNormalizedEsInterval": true
               },
               "schema": "segment",
-              "type": "date_histogram"
+              "winlog.api": "date_histogram"
             }
           ],
           "params": {
@@ -698,12 +698,12 @@
                 },
                 "position": "bottom",
                 "scale": {
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {},
-                "type": "category"
+                "winlog.api": "category"
               }
             ],
             "defaultYExtents": false,
@@ -730,7 +730,7 @@
                 "radiusRatio": 9,
                 "show": "true",
                 "showCircles": true,
-                "type": "line",
+                "winlog.api": "line",
                 "valueAxis": "ValueAxis-1"
               },
               {
@@ -743,7 +743,7 @@
                 "mode": "normal",
                 "show": true,
                 "showCircles": true,
-                "type": "line",
+                "winlog.api": "line",
                 "valueAxis": "ValueAxis-1"
               }
             ],
@@ -752,7 +752,7 @@
             "showCircles": true,
             "smoothLines": false,
             "times": [],
-            "type": "line",
+            "winlog.api": "line",
             "valueAxes": [
               {
                 "id": "ValueAxis-1",
@@ -768,26 +768,26 @@
                   "defaultYExtents": false,
                   "mode": "normal",
                   "setYExtents": false,
-                  "type": "linear"
+                  "winlog.api": "linear"
                 },
                 "show": true,
                 "style": {},
                 "title": {
                   "text": "Count"
                 },
-                "type": "value"
+                "winlog.api": "value"
               }
             ],
             "yAxis": {}
           },
           "title": "NFS Request / Response Sizes [Packetbeat] ECS",
-          "type": "line"
+          "winlog.api": "line"
         }
       },
       "id": "NFS-bytes-in-slash-out-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-18T23:49:29.316Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -808,7 +808,7 @@
         },
         "title": "Navigation [Packetbeat] ECS",
         "uiStateJSON": {},
-        "version": 1,
+        "winlog.version": 1,
         "visState": {
           "aggs": [],
           "params": {
@@ -817,13 +817,13 @@
             "openLinksInNewTab": false
           },
           "title": "Navigation [Packetbeat] ECS",
-          "type": "markdown"
+          "winlog.api": "markdown"
         }
       },
       "id": "Navigation-ecs",
-      "type": "visualization",
+      "winlog.api": "visualization",
       "updated_at": "2019-01-19T00:18:59.372Z",
-      "version": 11
+      "winlog.version": 11
     },
     {
       "attributes": {
@@ -847,16 +847,16 @@
                   "negate": false,
                   "params": {
                     "query": "nfs-ecs",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "nfs-ecs"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "nfs-ecs",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -886,7 +886,7 @@
                 }
               }
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
@@ -894,12 +894,12 @@
           "desc"
         ],
         "title": "NFS Search [Packetbeat] ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "nfs-ecs",
-      "type": "search",
+      "winlog.api": "search",
       "updated_at": "2019-01-18T23:49:29.316Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -923,16 +923,16 @@
                   "negate": true,
                   "params": {
                     "query": "NFSERR_NOENT",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "NFSERR_NOENT"
                 },
                 "query": {
                   "match": {
                     "nfs.status": {
                       "query": "NFSERR_NOENT",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -949,16 +949,16 @@
                   "negate": true,
                   "params": {
                     "query": "NFS_OK",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "NFS_OK"
                 },
                 "query": {
                   "match": {
                     "nfs.status": {
                       "query": "NFS_OK",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -975,16 +975,16 @@
                   "negate": false,
                   "params": {
                     "query": "nfs-ecs",
-                    "type": "phrase"
+                    "winlog.api": "phrase"
                   },
-                  "type": "phrase",
+                  "winlog.api": "phrase",
                   "value": "nfs-ecs"
                 },
                 "query": {
                   "match": {
                     "event.dataset": {
                       "query": "nfs-ecs",
-                      "type": "phrase"
+                      "winlog.api": "phrase"
                     }
                   }
                 }
@@ -1014,7 +1014,7 @@
                 }
               }
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "sort": [
@@ -1022,12 +1022,12 @@
           "desc"
         ],
         "title": "NFS Error Search [Packetbeat] ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "NFS-errors-search-ecs",
-      "type": "search",
+      "winlog.api": "search",
       "updated_at": "2019-01-18T23:49:29.316Z",
-      "version": 1
+      "winlog.version": 1
     },
     {
       "attributes": {
@@ -1041,7 +1041,7 @@
               "language": "lucene",
               "query": "*"
             },
-            "version": true
+            "winlog.version": true
           }
         },
         "optionsJSON": {
@@ -1063,8 +1063,8 @@
             },
             "id": "NFS-clients-pie-chart-ecs",
             "panelIndex": "1",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1076,8 +1076,8 @@
             },
             "id": "NFS-operations-area-chart-ecs",
             "panelIndex": "3",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -1100,8 +1100,8 @@
             },
             "id": "NFS-top-group-pie-chart-ecs",
             "panelIndex": "4",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -1118,8 +1118,8 @@
             },
             "id": "NFS-top-users-pie-chart-ecs",
             "panelIndex": "5",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -1136,8 +1136,8 @@
             },
             "id": "NFS-response-times-ecs",
             "panelIndex": "6",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1149,8 +1149,8 @@
             },
             "id": "NFS-errors-ecs",
             "panelIndex": "7",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -1172,8 +1172,8 @@
             },
             "id": "NFS-operation-table-ecs",
             "panelIndex": "8",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "embeddableConfig": {
@@ -1190,8 +1190,8 @@
             },
             "id": "NFS-bytes-in-slash-out-ecs",
             "panelIndex": "9",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           },
           {
             "gridData": {
@@ -1203,19 +1203,19 @@
             },
             "id": "Navigation-ecs",
             "panelIndex": "10",
-            "type": "visualization",
-            "version": "7.0.0-SNAPSHOT"
+            "winlog.api": "visualization",
+            "winlog.version": "7.0.0-SNAPSHOT"
           }
         ],
         "timeRestore": false,
         "title": "[Packetbeat] NFS ECS",
-        "version": 1
+        "winlog.version": 1
       },
       "id": "Packetbeat-NFS-ecs",
-      "type": "dashboard",
+      "winlog.api": "dashboard",
       "updated_at": "2019-01-18T23:49:29.316Z",
-      "version": 1
+      "winlog.version": 1
     }
   ],
-  "version": "7.0.0-SNAPSHOT"
+  "winlog.version": "7.0.0-SNAPSHOT"
 }

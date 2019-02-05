@@ -8,7 +8,7 @@
                 }, 
                 "title": "Connections rate [Metricbeat MySQL] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -32,12 +32,12 @@
                                     {
                                         "field": "mysql.status.connections", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "aee9bbf0-f1f3-11e7-a752-236fe3270d99", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -50,16 +50,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "Connections rate [Metricbeat MySQL] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "d7e6bee0-f1f3-11e7-85ab-594b1652e0d1-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
-            "version": 2
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -69,7 +69,7 @@
                 }, 
                 "title": "Command rates [Metricbeat MySQL] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -92,12 +92,12 @@
                                     {
                                         "field": "mysql.status.command.select", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "2d149f90-f1f4-11e7-a752-236fe3270d99", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -119,12 +119,12 @@
                                     {
                                         "field": "mysql.status.command.insert", 
                                         "id": "3c2a2a41-f1f4-11e7-a752-236fe3270d99", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "3c2a2a41-f1f4-11e7-a752-236fe3270d99", 
                                         "id": "3c2a2a42-f1f4-11e7-a752-236fe3270d99", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -146,12 +146,12 @@
                                     {
                                         "field": "mysql.status.command.update", 
                                         "id": "485ce051-f1f4-11e7-a752-236fe3270d99", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "485ce051-f1f4-11e7-a752-236fe3270d99", 
                                         "id": "485ce052-f1f4-11e7-a752-236fe3270d99", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -173,12 +173,12 @@
                                     {
                                         "field": "mysql.status.command.delete", 
                                         "id": "543a4a71-f1f4-11e7-a752-236fe3270d99", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "543a4a71-f1f4-11e7-a752-236fe3270d99", 
                                         "id": "543a4a72-f1f4-11e7-a752-236fe3270d99", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -191,16 +191,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "Command rates [Metricbeat MySQL] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "695a4f90-f1f4-11e7-85ab-594b1652e0d1-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
-            "version": 2
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -210,7 +210,7 @@
                 }, 
                 "title": "Running threads [Metricbeat MySQL] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -234,7 +234,7 @@
                                     {
                                         "field": "mysql.status.threads.running", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -246,16 +246,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "Running threads [Metricbeat MySQL] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "124dce60-f1f5-11e7-85ab-594b1652e0d1-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
-            "version": 2
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -265,7 +265,7 @@
                 }, 
                 "title": "Opened tables rate [Metricbeat MySQL] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -289,12 +289,12 @@
                                     {
                                         "field": "mysql.status.opened_tables", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "9972d250-f1f5-11e7-a752-236fe3270d99", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -307,16 +307,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "Opened tables rate [Metricbeat MySQL] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "aaa326b0-f1f5-11e7-85ab-594b1652e0d1-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
-            "version": 3
+            "winlog.version": 3
         }, 
         {
             "attributes": {
@@ -326,7 +326,7 @@
                 }, 
                 "title": "Threads created rate [Metricbeat MySQL] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -350,12 +350,12 @@
                                     {
                                         "field": "mysql.status.threads.created", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "9972d250-f1f5-11e7-a752-236fe3270d99", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -368,16 +368,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "Threads created rate [Metricbeat MySQL] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "fb1f3f20-f1f5-11e7-85ab-594b1652e0d1-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
-            "version": 2
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -387,7 +387,7 @@
                 }, 
                 "title": "Open files [Metricbeat MySQL] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -411,7 +411,7 @@
                                     {
                                         "field": "mysql.status.open.files", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }
                                 ], 
                                 "point_size": 1, 
@@ -423,16 +423,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "Open files [Metricbeat MySQL] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "f5b35930-f1f6-11e7-85ab-594b1652e0d1-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
-            "version": 2
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -442,7 +442,7 @@
                 }, 
                 "title": "Sent and received bytes rates [Metricbeat MySQL] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [], 
                     "params": {
@@ -466,12 +466,12 @@
                                     {
                                         "field": "mysql.status.bytes.received", 
                                         "id": "2b1c2391-f1f7-11e7-a752-236fe3270d99", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "2b1c2391-f1f7-11e7-a752-236fe3270d99", 
                                         "id": "2b1c2392-f1f7-11e7-a752-236fe3270d99", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -493,12 +493,12 @@
                                     {
                                         "field": "mysql.status.bytes.sent", 
                                         "id": "61ca57f2-469d-11e7-af02-69e470af7417", 
-                                        "type": "avg"
+                                        "winlog.api": "avg"
                                     }, 
                                     {
                                         "field": "61ca57f2-469d-11e7-af02-69e470af7417", 
                                         "id": "23cfda50-f1f7-11e7-a752-236fe3270d99", 
-                                        "type": "derivative", 
+                                        "winlog.api": "derivative", 
                                         "unit": ""
                                     }
                                 ], 
@@ -511,16 +511,16 @@
                         "show_grid": 1, 
                         "show_legend": 1, 
                         "time_field": "@timestamp", 
-                        "type": "timeseries"
+                        "winlog.api": "timeseries"
                     }, 
                     "title": "Sent and received bytes rates [Metricbeat MySQL] ECS", 
-                    "type": "metrics"
+                    "winlog.api": "metrics"
                 }
             }, 
             "id": "7404feb0-f1f7-11e7-85ab-594b1652e0d1-ecs", 
-            "type": "visualization", 
+            "winlog.api": "visualization", 
             "updated_at": "2018-01-05T09:15:49.714Z", 
-            "version": 3
+            "winlog.version": 3
         }, 
         {
             "attributes": {
@@ -539,7 +539,7 @@
                                 }
                             }
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -557,8 +557,8 @@
                         }, 
                         "id": "d7e6bee0-f1f3-11e7-85ab-594b1652e0d1-ecs", 
                         "panelIndex": "10", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -570,8 +570,8 @@
                         }, 
                         "id": "695a4f90-f1f4-11e7-85ab-594b1652e0d1-ecs", 
                         "panelIndex": "11", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -583,8 +583,8 @@
                         }, 
                         "id": "124dce60-f1f5-11e7-85ab-594b1652e0d1-ecs", 
                         "panelIndex": "13", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -596,8 +596,8 @@
                         }, 
                         "id": "aaa326b0-f1f5-11e7-85ab-594b1652e0d1-ecs", 
                         "panelIndex": "14", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -609,8 +609,8 @@
                         }, 
                         "id": "fb1f3f20-f1f5-11e7-85ab-594b1652e0d1-ecs", 
                         "panelIndex": "15", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -622,8 +622,8 @@
                         }, 
                         "id": "f5b35930-f1f6-11e7-85ab-594b1652e0d1-ecs", 
                         "panelIndex": "16", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }, 
                     {
                         "gridData": {
@@ -635,19 +635,19 @@
                         }, 
                         "id": "7404feb0-f1f7-11e7-85ab-594b1652e0d1-ecs", 
                         "panelIndex": "17", 
-                        "type": "visualization", 
-                        "version": "6.2.4"
+                        "winlog.api": "visualization", 
+                        "winlog.version": "6.2.4"
                     }
                 ], 
                 "timeRestore": false, 
                 "title": "[Metricbeat MySQL] Overview ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "66881e90-0006-11e7-bf7f-c9acc3d3e306-ecs", 
-            "type": "dashboard", 
+            "winlog.api": "dashboard", 
             "updated_at": "2018-01-05T09:14:45.934Z", 
-            "version": 3
+            "winlog.version": 3
         }
     ], 
-    "version": "6.2.4"
+    "winlog.version": "6.2.4"
 }

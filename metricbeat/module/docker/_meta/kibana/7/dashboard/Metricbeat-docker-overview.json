@@ -20,7 +20,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -34,7 +34,7 @@
                                 "size": 5
                             }, 
                             "schema": "bucket", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -44,7 +44,7 @@
                                 "field": "docker.cpu.total.pct"
                             }, 
                             "schema": "metric", 
-                            "type": "max"
+                            "winlog.api": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -54,7 +54,7 @@
                                 "field": "docker.diskio.total"
                             }, 
                             "schema": "metric", 
-                            "type": "max"
+                            "winlog.api": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -64,7 +64,7 @@
                                 "field": "docker.memory.usage.pct"
                             }, 
                             "schema": "metric", 
-                            "type": "max"
+                            "winlog.api": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -74,7 +74,7 @@
                                 "field": "docker.memory.rss.total"
                             }, 
                             "schema": "metric", 
-                            "type": "max"
+                            "winlog.api": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -84,7 +84,7 @@
                                 "field": "container.id"
                             }, 
                             "schema": "metric", 
-                            "type": "cardinality"
+                            "winlog.api": "cardinality"
                         }
                     ], 
                     "listeners": {}, 
@@ -100,7 +100,7 @@
                         "totalFunc": "sum"
                     }, 
                     "title": "Docker containers [Metricbeat Docker] ECS", 
-                    "type": "table"
+                    "winlog.api": "table"
                 }
             }, 
             "col": 1, 
@@ -109,8 +109,8 @@
             "row": 1, 
             "size_x": 7, 
             "size_y": 5, 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -129,7 +129,7 @@
                         }
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -140,7 +140,7 @@
                                 "field": "docker.info.containers.running"
                             }, 
                             "schema": "metric", 
-                            "type": "max"
+                            "winlog.api": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -150,7 +150,7 @@
                                 "field": "docker.info.containers.paused"
                             }, 
                             "schema": "metric", 
-                            "type": "max"
+                            "winlog.api": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -160,7 +160,7 @@
                                 "field": "docker.info.containers.stopped"
                             }, 
                             "schema": "metric", 
-                            "type": "max"
+                            "winlog.api": "max"
                         }
                     ], 
                     "listeners": {}, 
@@ -200,15 +200,15 @@
                                 "labelColor": false, 
                                 "subText": ""
                             }, 
-                            "type": "simple", 
+                            "winlog.api": "simple", 
                             "useRange": false, 
                             "verticalSplit": false
                         }, 
                         "handleNoResults": true, 
-                        "type": "gauge"
+                        "winlog.api": "gauge"
                     }, 
                     "title": "Number of Containers [Metricbeat Docker] ECS", 
-                    "type": "metric"
+                    "winlog.api": "metric"
                 }
             }, 
             "col": 8, 
@@ -217,8 +217,8 @@
             "row": 1, 
             "size_x": 5, 
             "size_y": 2, 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -231,7 +231,7 @@
                 "savedSearchId": "Metricbeat-Docker-ecs", 
                 "title": "Docker containers per host [Metricbeat Docker] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -242,7 +242,7 @@
                                 "field": "container.id"
                             }, 
                             "schema": "metric", 
-                            "type": "cardinality"
+                            "winlog.api": "cardinality"
                         }, 
                         {
                             "enabled": true, 
@@ -255,7 +255,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -267,7 +267,7 @@
                         "shareYAxis": true
                     }, 
                     "title": "Docker containers per host [Metricbeat Docker] ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "col": 8, 
@@ -276,8 +276,8 @@
             "row": 3, 
             "size_x": 2, 
             "size_y": 3, 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -290,7 +290,7 @@
                 "savedSearchId": "Metricbeat-Docker-ecs", 
                 "title": "Docker images and names [Metricbeat Docker] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -298,7 +298,7 @@
                             "id": "1", 
                             "params": {}, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -310,7 +310,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -322,7 +322,7 @@
                                 "size": 5
                             }, 
                             "schema": "segment", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -334,7 +334,7 @@
                         "shareYAxis": true
                     }, 
                     "title": "Docker images and names [Metricbeat Docker] ECS", 
-                    "type": "pie"
+                    "winlog.api": "pie"
                 }
             }, 
             "col": 10, 
@@ -343,8 +343,8 @@
             "row": 3, 
             "size_x": 3, 
             "size_y": 3, 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -376,7 +376,7 @@
                 }, 
                 "title": "CPU usage [Metricbeat Docker] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -390,7 +390,7 @@
                                 ]
                             }, 
                             "schema": "metric", 
-                            "type": "percentiles"
+                            "winlog.api": "percentiles"
                         }, 
                         {
                             "enabled": true, 
@@ -403,7 +403,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -416,7 +416,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -433,12 +433,12 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {}, 
-                                "type": "category"
+                                "winlog.api": "category"
                             }
                         ], 
                         "defaultYExtents": false, 
@@ -463,7 +463,7 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "type": "area", 
+                                "winlog.api": "area", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
@@ -484,20 +484,20 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "type": "value"
+                                "winlog.api": "value"
                             }
                         ], 
                         "yAxis": {}
                     }, 
                     "title": "CPU usage [Metricbeat Docker] ECS", 
-                    "type": "area"
+                    "winlog.api": "area"
                 }
             }, 
             "col": 1, 
@@ -506,8 +506,8 @@
             "row": 6, 
             "size_x": 6, 
             "size_y": 3, 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -539,7 +539,7 @@
                 }, 
                 "title": "Memory usage [Metricbeat Docker] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -550,7 +550,7 @@
                                 "field": "docker.memory.usage.total"
                             }, 
                             "schema": "metric", 
-                            "type": "max"
+                            "winlog.api": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -563,7 +563,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -576,7 +576,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }
                     ], 
                     "listeners": {}, 
@@ -593,12 +593,12 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {}, 
-                                "type": "category"
+                                "winlog.api": "category"
                             }
                         ], 
                         "defaultYExtents": false, 
@@ -623,7 +623,7 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "type": "area", 
+                                "winlog.api": "area", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
@@ -644,20 +644,20 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "type": "value"
+                                "winlog.api": "value"
                             }
                         ], 
                         "yAxis": {}
                     }, 
                     "title": "Memory usage [Metricbeat Docker] ECS", 
-                    "type": "area"
+                    "winlog.api": "area"
                 }
             }, 
             "col": 7, 
@@ -666,8 +666,8 @@
             "row": 6, 
             "size_x": 6, 
             "size_y": 3, 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -699,7 +699,7 @@
                 }, 
                 "title": "Network IO [Metricbeat Docker] ECS", 
                 "uiStateJSON": {}, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -710,7 +710,7 @@
                                 "field": "docker.network.in.bytes"
                             }, 
                             "schema": "metric", 
-                            "type": "max"
+                            "winlog.api": "max"
                         }, 
                         {
                             "enabled": true, 
@@ -723,7 +723,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -736,7 +736,7 @@
                                 "size": 5
                             }, 
                             "schema": "group", 
-                            "type": "terms"
+                            "winlog.api": "terms"
                         }, 
                         {
                             "enabled": true, 
@@ -746,7 +746,7 @@
                                 "field": "docker.network.out.bytes"
                             }, 
                             "schema": "metric", 
-                            "type": "max"
+                            "winlog.api": "max"
                         }
                     ], 
                     "listeners": {}, 
@@ -763,12 +763,12 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {}, 
-                                "type": "category"
+                                "winlog.api": "category"
                             }
                         ], 
                         "defaultYExtents": false, 
@@ -793,7 +793,7 @@
                                 "mode": "stacked", 
                                 "show": "true", 
                                 "showCircles": true, 
-                                "type": "area", 
+                                "winlog.api": "area", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
@@ -814,20 +814,20 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "Count"
                                 }, 
-                                "type": "value"
+                                "winlog.api": "value"
                             }
                         ], 
                         "yAxis": {}
                     }, 
                     "title": "Network IO [Metricbeat Docker] ECS", 
-                    "type": "area"
+                    "winlog.api": "area"
                 }
             }, 
             "col": 1, 
@@ -836,8 +836,8 @@
             "row": 9, 
             "size_x": 12, 
             "size_y": 3, 
-            "type": "visualization", 
-            "version": 2
+            "winlog.api": "visualization", 
+            "winlog.version": 2
         }, 
         {
             "attributes": {
@@ -876,11 +876,11 @@
                     "desc"
                 ], 
                 "title": "Metricbeat Docker ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "Metricbeat-Docker-ecs", 
-            "type": "search", 
-            "version": 4
+            "winlog.api": "search", 
+            "winlog.version": 4
         }, 
         {
             "attributes": {
@@ -899,7 +899,7 @@
                             }
                         ], 
                         "highlightAll": true, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -913,7 +913,7 @@
                         "row": 1, 
                         "size_x": 7, 
                         "size_y": 5, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 8, 
@@ -922,7 +922,7 @@
                         "row": 1, 
                         "size_x": 5, 
                         "size_y": 2, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 8, 
@@ -931,7 +931,7 @@
                         "row": 3, 
                         "size_x": 2, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 10, 
@@ -940,7 +940,7 @@
                         "row": 3, 
                         "size_x": 3, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -949,7 +949,7 @@
                         "row": 6, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 7, 
@@ -958,7 +958,7 @@
                         "row": 6, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 1, 
@@ -967,7 +967,7 @@
                         "row": 9, 
                         "size_x": 12, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }
                 ], 
                 "timeRestore": false, 
@@ -1006,12 +1006,12 @@
                         }
                     }
                 }, 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "AV4REOpp5NkDleZmzKkE-ecs", 
-            "type": "dashboard", 
-            "version": 3
+            "winlog.api": "dashboard", 
+            "winlog.version": 3
         }
     ], 
-    "version": "5.6.0-SNAPSHOT"
+    "winlog.version": "5.6.0-SNAPSHOT"
 }

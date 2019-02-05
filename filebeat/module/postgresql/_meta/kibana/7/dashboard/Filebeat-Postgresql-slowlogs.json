@@ -22,7 +22,7 @@
                         "legendOpen": true
                     }
                 }, 
-                "version": 1, 
+                "winlog.version": 1, 
                 "visState": {
                     "aggs": [
                         {
@@ -36,7 +36,7 @@
                                 "min_doc_count": 1
                             }, 
                             "schema": "segment", 
-                            "type": "date_histogram"
+                            "winlog.api": "date_histogram"
                         }, 
                         {
                             "enabled": true, 
@@ -45,7 +45,7 @@
                                 "customLabel": "Number of queries"
                             }, 
                             "schema": "metric", 
-                            "type": "count"
+                            "winlog.api": "count"
                         }, 
                         {
                             "enabled": true, 
@@ -55,7 +55,7 @@
                                 "field": "postgresql.log.duration"
                             }, 
                             "schema": "metric", 
-                            "type": "sum"
+                            "winlog.api": "sum"
                         }
                     ], 
                     "params": {
@@ -71,14 +71,14 @@
                                 }, 
                                 "position": "bottom", 
                                 "scale": {
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": "@timestamp per 3 hours"
                                 }, 
-                                "type": "category"
+                                "winlog.api": "category"
                             }
                         ], 
                         "grid": {
@@ -100,7 +100,7 @@
                                 "mode": "normal", 
                                 "show": true, 
                                 "showCircles": true, 
-                                "type": "histogram", 
+                                "winlog.api": "histogram", 
                                 "valueAxis": "ValueAxis-1"
                             }, 
                             {
@@ -114,12 +114,12 @@
                                 "mode": "normal", 
                                 "show": true, 
                                 "showCircles": true, 
-                                "type": "histogram", 
+                                "winlog.api": "histogram", 
                                 "valueAxis": "ValueAxis-1"
                             }
                         ], 
                         "times": [], 
-                        "type": "histogram", 
+                        "winlog.api": "histogram", 
                         "valueAxes": [
                             {
                                 "id": "ValueAxis-1", 
@@ -133,24 +133,24 @@
                                 "position": "left", 
                                 "scale": {
                                     "mode": "normal", 
-                                    "type": "linear"
+                                    "winlog.api": "linear"
                                 }, 
                                 "show": true, 
                                 "style": {}, 
                                 "title": {
                                     "text": ""
                                 }, 
-                                "type": "value"
+                                "winlog.api": "value"
                             }
                         ]
                     }, 
                     "title": "Query count and cumulated duration [Filebeat PostgreSQL] ECS", 
-                    "type": "histogram"
+                    "winlog.api": "histogram"
                 }
             }, 
             "id": "PostgreSQL Query Count and Duration-ecs", 
-            "type": "visualization", 
-            "version": 1
+            "winlog.api": "visualization", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -171,7 +171,7 @@
                             "language": "lucene", 
                             "query": "postgresql.log.duration:>30"
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "sort": [
@@ -179,11 +179,11 @@
                     "desc"
                 ], 
                 "title": "Slow Queries [Filebeat PostgreSQL] ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "Slow PostgreSQL Queries-ecs", 
-            "type": "search", 
-            "version": 1
+            "winlog.api": "search", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -204,7 +204,7 @@
                             "language": "lucene", 
                             "query": "postgresql.log.duration:*"
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "sort": [
@@ -212,11 +212,11 @@
                     "desc"
                 ], 
                 "title": "Query Durations [Filebeat PostgreSQL] ECS", 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "PostgreSQL Query Durations-ecs", 
-            "type": "search", 
-            "version": 1
+            "winlog.api": "search", 
+            "winlog.version": 1
         }, 
         {
             "attributes": {
@@ -230,7 +230,7 @@
                             "language": "lucene", 
                             "query": "postgresql.log.query:*"
                         }, 
-                        "version": true
+                        "winlog.version": true
                     }
                 }, 
                 "optionsJSON": {
@@ -244,7 +244,7 @@
                         "row": 1, 
                         "size_x": 6, 
                         "size_y": 3, 
-                        "type": "visualization"
+                        "winlog.api": "visualization"
                     }, 
                     {
                         "col": 7, 
@@ -263,7 +263,7 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "type": "search"
+                        "winlog.api": "search"
                     }, 
                     {
                         "col": 1, 
@@ -282,18 +282,18 @@
                             "@timestamp", 
                             "desc"
                         ], 
-                        "type": "search"
+                        "winlog.api": "search"
                     }
                 ], 
                 "timeRestore": false, 
                 "title": "[Filebeat PostgreSQL] Query Duration Overview ECS", 
                 "uiStateJSON": {}, 
-                "version": 1
+                "winlog.version": 1
             }, 
             "id": "e4c5f230-87f3-11e7-ad9c-db80de0bf8d3-ecs", 
-            "type": "dashboard", 
-            "version": 1
+            "winlog.api": "dashboard", 
+            "winlog.version": 1
         }
     ], 
-    "version": "6.0.0-beta1-SNAPSHOT"
+    "winlog.version": "6.0.0-beta1-SNAPSHOT"
 }
