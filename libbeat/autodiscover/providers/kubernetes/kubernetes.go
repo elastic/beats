@@ -114,8 +114,8 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 		},
 		UpdateFunc: func(obj kubernetes.Resource) {
 			logp.Debug("kubernetes", "Watcher Pod update: %+v", obj)
-			p.emit(obj.(*kubernetes.Pod), "start")
 			p.emit(obj.(*kubernetes.Pod), "stop")
+			p.emit(obj.(*kubernetes.Pod), "start")
 		},
 		DeleteFunc: func(obj kubernetes.Resource) {
 			logp.Debug("kubernetes", "Watcher Pod delete: %+v", obj)
