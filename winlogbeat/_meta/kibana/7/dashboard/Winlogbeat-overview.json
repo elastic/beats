@@ -91,36 +91,36 @@
           }
         ],
         "timeRestore": false,
-        "title": "Winlogbeat Dashboard",
+        "title": "Winlogbeat Dashboard ECS",
         "version": 1
       },
-      "id": "Winlogbeat-Dashboard",
+      "id": "Winlogbeat-Dashboard-ecs",
       "migrationVersion": {
         "dashboard": "7.0.0"
       },
       "references": [
         {
-          "id": "Number-of-Events-Over-Time-By-Event-Log",
+          "id": "Number-of-Events-Over-Time-By-Event-Log-ecs",
           "name": "panel_0",
           "type": "visualization"
         },
         {
-          "id": "Number-of-Events",
+          "id": "Number-of-Events-ecs",
           "name": "panel_1",
           "type": "visualization"
         },
         {
-          "id": "Top-Event-IDs",
+          "id": "Top-Event-IDs-ecs",
           "name": "panel_2",
           "type": "visualization"
         },
         {
-          "id": "Event-Levels",
+          "id": "Event-Levels-ecs",
           "name": "panel_3",
           "type": "visualization"
         },
         {
-          "id": "Sources",
+          "id": "Sources-ecs",
           "name": "panel_4",
           "type": "visualization"
         }
@@ -142,7 +142,7 @@
             }
           }
         },
-        "title": "Number of Events Over Time By Channel",
+        "title": "Number of Events Over Time By Channel ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -313,11 +313,11 @@
             ],
             "yAxis": {}
           },
-          "title": "Number of Events Over Time By Channel",
+          "title": "Number of Events Over Time By Channel ECS",
           "type": "histogram"
         }
       },
-      "id": "Number-of-Events-Over-Time-By-Event-Log",
+      "id": "Number-of-Events-Over-Time-By-Event-Log-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
@@ -347,7 +347,7 @@
             }
           }
         },
-        "title": "Number of Events",
+        "title": "Number of Events ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -366,7 +366,7 @@
           "type": "metric"
         }
       },
-      "id": "Number-of-Events",
+      "id": "Number-of-Events-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
@@ -399,7 +399,7 @@
             }
           }
         },
-        "title": "Top Event IDs",
+        "title": "Top Event IDs ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -476,11 +476,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top Event IDs",
+          "title": "Top Event IDs ECS",
           "type": "table"
         }
       },
-      "id": "Top-Event-IDs",
+      "id": "Top-Event-IDs-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
@@ -513,7 +513,7 @@
             }
           }
         },
-        "title": "Event Levels",
+        "title": "Event Levels ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -590,11 +590,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Event Levels",
+          "title": "Event Levels ECS",
           "type": "table"
         }
       },
-      "id": "Event-Levels",
+      "id": "Event-Levels-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },
@@ -627,7 +627,7 @@
             }
           }
         },
-        "title": "Sources (Provider Names)",
+        "title": "Sources (Provider Names) ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -670,11 +670,11 @@
             "shareYAxis": true,
             "type": "pie"
           },
-          "title": "Sources (Provider Names)",
+          "title": "Sources (Provider Names) ECS",
           "type": "pie"
         }
       },
-      "id": "Sources",
+      "id": "Sources-ecs",
       "migrationVersion": {
         "visualization": "7.0.0"
       },

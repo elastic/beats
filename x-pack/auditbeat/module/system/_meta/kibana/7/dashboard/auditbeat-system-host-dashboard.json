@@ -40,7 +40,7 @@
             }
           }
         },
-        "title": "Host Count [Auditbeat System]",
+        "title": "Host Count [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -84,11 +84,11 @@
             },
             "type": "metric"
           },
-          "title": "Host Count [Auditbeat System]",
+          "title": "Host Count [Auditbeat System] ECS",
           "type": "metric"
         }
       },
-      "id": "cf8aa0a0-18ca-11e9-9094-c50574723088",
+      "id": "cf8aa0a0-18ca-11e9-9094-c50574723088-ecs",
       "type": "visualization",
       "updated_at": "2019-02-03T20:37:18.796Z",
       "version": 22
@@ -133,7 +133,7 @@
             }
           }
         },
-        "title": "OS Distribution [Auditbeat System]",
+        "title": "OS Distribution [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -194,11 +194,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "OS Distribution [Auditbeat System]",
+          "title": "OS Distribution [Auditbeat System] ECS",
           "type": "pie"
         }
       },
-      "id": "9dd991a0-18cb-11e9-9094-c50574723088",
+      "id": "9dd991a0-18cb-11e9-9094-c50574723088-ecs",
       "type": "visualization",
       "updated_at": "2019-01-21T11:37:35.796Z",
       "version": 24
@@ -243,7 +243,7 @@
             }
           }
         },
-        "title": "Average Uptime [Auditbeat System]",
+        "title": "Average Uptime [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -287,11 +287,11 @@
             },
             "type": "metric"
           },
-          "title": "Average Uptime [Auditbeat System]",
+          "title": "Average Uptime [Auditbeat System] ECS",
           "type": "metric"
         }
       },
-      "id": "4d0485f0-18da-11e9-9094-c50574723088",
+      "id": "4d0485f0-18da-11e9-9094-c50574723088-ecs",
       "type": "visualization",
       "updated_at": "2019-01-21T11:57:55.023Z",
       "version": 23
@@ -336,7 +336,7 @@
             }
           }
         },
-        "title": "Host Documents [Auditbeat System]",
+        "title": "Host Documents [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -435,11 +435,11 @@
               }
             ]
           },
-          "title": "Host Documents [Auditbeat System]",
+          "title": "Host Documents [Auditbeat System] ECS",
           "type": "histogram"
         }
       },
-      "id": "eea92ad0-18d7-11e9-9094-c50574723088",
+      "id": "eea92ad0-18d7-11e9-9094-c50574723088-ecs",
       "type": "visualization",
       "updated_at": "2019-02-04T09:26:47.877Z",
       "version": 22
@@ -484,7 +484,7 @@
             }
           }
         },
-        "title": "Host List [Auditbeat System]",
+        "title": "Host List [Auditbeat System] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -597,11 +597,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Host List [Auditbeat System]",
+          "title": "Host List [Auditbeat System] ECS",
           "type": "table"
         }
       },
-      "id": "91962a30-1901-11e9-9094-c50574723088",
+      "id": "91962a30-1901-11e9-9094-c50574723088-ecs",
       "type": "visualization",
       "updated_at": "2019-01-21T11:58:22.519Z",
       "version": 25
@@ -658,10 +658,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Host Events [Auditbeat System]",
+        "title": "Host Events [Auditbeat System] ECS",
         "version": 1
       },
-      "id": "abe78cd0-18ca-11e9-9094-c50574723088",
+      "id": "abe78cd0-18ca-11e9-9094-c50574723088-ecs",
       "type": "search",
       "updated_at": "2019-02-04T09:31:20.533Z",
       "version": 6
@@ -678,21 +678,21 @@
             }
           }
         },
-        "title": "Dashboard Links [Auditbeat System]",
+        "title": "Dashboard Links [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 12,
-            "markdown": "**Dashboards**: [System Overview](#/dashboard/2be46cb0-27f2-11e9-89af-fd12d59dac90) | [Hosts](#/dashboard/dfe62590-18da-11e9-9094-c50574723088) | [Logins](#/dashboard/2a17f200-285e-11e9-805f-43bf57dfa519) | [Users](#/dashboard/ae96a660-2864-11e9-97cb-474beda9f119) | [Processes](#/dashboard/4c68f110-2863-11e9-97cb-474beda9f119) | [Sockets](#/dashboard/957a3ef0-2867-11e9-9d21-0be348776e6c) | [Packages](#/dashboard/137c52f0-286a-11e9-9d21-0be348776e6c)",
+            "markdown": "**Dashboards**: [System Overview](#/dashboard/2be46cb0-27f2-11e9-89af-fd12d59dac90-ecs) | [Hosts](#/dashboard/dfe62590-18da-11e9-9094-c50574723088-ecs) | [Logins](#/dashboard/2a17f200-285e-11e9-805f-43bf57dfa519-ecs) | [Users](#/dashboard/ae96a660-2864-11e9-97cb-474beda9f119-ecs) | [Processes](#/dashboard/4c68f110-2863-11e9-97cb-474beda9f119-ecs) | [Sockets](#/dashboard/957a3ef0-2867-11e9-9d21-0be348776e6c-ecs) | [Packages](#/dashboard/137c52f0-286a-11e9-9d21-0be348776e6c-ecs)",
             "openLinksInNewTab": false
           },
-          "title": "Dashboard Links [Auditbeat System]",
+          "title": "Dashboard Links [Auditbeat System] ECS",
           "type": "markdown"
         }
       },
-      "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90",
+      "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-04T11:37:25.234Z",
       "version": 3
@@ -725,7 +725,7 @@
               "x": 0,
               "y": 4
             },
-            "id": "cf8aa0a0-18ca-11e9-9094-c50574723088",
+            "id": "cf8aa0a0-18ca-11e9-9094-c50574723088-ecs",
             "panelIndex": "1",
             "type": "visualization",
             "version": "7.0.0"
@@ -739,7 +739,7 @@
               "x": 31,
               "y": 4
             },
-            "id": "9dd991a0-18cb-11e9-9094-c50574723088",
+            "id": "9dd991a0-18cb-11e9-9094-c50574723088-ecs",
             "panelIndex": "2",
             "type": "visualization",
             "version": "7.0.0"
@@ -753,7 +753,7 @@
               "x": 15,
               "y": 4
             },
-            "id": "4d0485f0-18da-11e9-9094-c50574723088",
+            "id": "4d0485f0-18da-11e9-9094-c50574723088-ecs",
             "panelIndex": "4",
             "type": "visualization",
             "version": "7.0.0"
@@ -767,7 +767,7 @@
               "x": 0,
               "y": 14
             },
-            "id": "eea92ad0-18d7-11e9-9094-c50574723088",
+            "id": "eea92ad0-18d7-11e9-9094-c50574723088-ecs",
             "panelIndex": "5",
             "type": "visualization",
             "version": "7.0.0"
@@ -781,7 +781,7 @@
               "x": 0,
               "y": 21
             },
-            "id": "91962a30-1901-11e9-9094-c50574723088",
+            "id": "91962a30-1901-11e9-9094-c50574723088-ecs",
             "panelIndex": "6",
             "type": "visualization",
             "version": "7.0.0"
@@ -795,7 +795,7 @@
               "x": 0,
               "y": 33
             },
-            "id": "abe78cd0-18ca-11e9-9094-c50574723088",
+            "id": "abe78cd0-18ca-11e9-9094-c50574723088-ecs",
             "panelIndex": "7",
             "type": "search",
             "version": "7.0.0"
@@ -809,17 +809,17 @@
               "x": 0,
               "y": 0
             },
-            "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90",
+            "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "8",
             "type": "visualization",
             "version": "7.0.0"
           }
         ],
         "timeRestore": false,
-        "title": "[Auditbeat System] Host Dashboard",
+        "title": "[Auditbeat System] Host Dashboard ECS",
         "version": 1
       },
-      "id": "dfe62590-18da-11e9-9094-c50574723088",
+      "id": "dfe62590-18da-11e9-9094-c50574723088-ecs",
       "type": "dashboard",
       "updated_at": "2019-02-04T11:25:58.146Z",
       "version": 28

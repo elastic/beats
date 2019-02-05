@@ -2104,6 +2104,7 @@
   to: winlog.api
   alias: true
   beat: winlogbeat
+  rename: false
 
 - from: log_name
   to: winlog.channel
@@ -2196,3 +2197,4 @@
   to: winlog.version
   alias: true
   beat: winlogbeat
+  rename: false

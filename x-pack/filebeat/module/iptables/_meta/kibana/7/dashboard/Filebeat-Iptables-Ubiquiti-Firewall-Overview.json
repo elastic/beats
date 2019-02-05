@@ -12,8 +12,8 @@
             }
           }
         },
-        "savedSearchId": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e",
-        "title": "Ubiquiti Firewall Event Timeline [Filebeat Iptables]",
+        "savedSearchId": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e-ecs",
+        "title": "Ubiquiti Firewall Event Timeline [Filebeat Iptables] ECS",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -138,11 +138,11 @@
               }
             ]
           },
-          "title": "Ubiquiti Firewall Event Timeline [Filebeat Iptables]",
+          "title": "Ubiquiti Firewall Event Timeline [Filebeat Iptables] ECS",
           "type": "histogram"
         }
       },
-      "id": "758b3620-1fda-11e9-ae2a-939083c6a64e",
+      "id": "758b3620-1fda-11e9-ae2a-939083c6a64e-ecs",
       "type": "visualization",
       "updated_at": "2019-01-24T16:37:11.788Z",
       "version": 2
@@ -159,8 +159,8 @@
             }
           }
         },
-        "savedSearchId": "9f7d97c0-1fe9-11e9-ae2a-939083c6a64e",
-        "title": "Ubiquiti Firewall Top Blocked IPs [Filebeat Iptables]",
+        "savedSearchId": "9f7d97c0-1fe9-11e9-ae2a-939083c6a64e-ecs",
+        "title": "Ubiquiti Firewall Top Blocked IPs [Filebeat Iptables] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -210,11 +210,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Ubiquiti Firewall Top Blocked IPs [Filebeat Iptables]",
+          "title": "Ubiquiti Firewall Top Blocked IPs [Filebeat Iptables] ECS",
           "type": "table"
         }
       },
-      "id": "1ba82fd0-1ff0-11e9-ae2a-939083c6a64e",
+      "id": "1ba82fd0-1ff0-11e9-ae2a-939083c6a64e-ecs",
       "type": "visualization",
       "updated_at": "2019-01-24T16:06:20.635Z",
       "version": 2
@@ -231,8 +231,8 @@
             }
           }
         },
-        "savedSearchId": "7862cab0-1fdb-11e9-ae2a-939083c6a64e",
-        "title": "Ubiquiti Firewall Allowed Traffic Map [Filebeat Iptables]",
+        "savedSearchId": "7862cab0-1fdb-11e9-ae2a-939083c6a64e-ecs",
+        "title": "Ubiquiti Firewall Allowed Traffic Map [Filebeat Iptables] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -290,11 +290,11 @@
               }
             }
           },
-          "title": "Ubiquiti Firewall Allowed Traffic Map [Filebeat Iptables]",
+          "title": "Ubiquiti Firewall Allowed Traffic Map [Filebeat Iptables] ECS",
           "type": "tile_map"
         }
       },
-      "id": "5bd53050-1fe9-11e9-ae2a-939083c6a64e",
+      "id": "5bd53050-1fe9-11e9-ae2a-939083c6a64e-ecs",
       "type": "visualization",
       "updated_at": "2019-01-24T15:04:34.005Z",
       "version": 1
@@ -311,8 +311,8 @@
             }
           }
         },
-        "savedSearchId": "9f7d97c0-1fe9-11e9-ae2a-939083c6a64e",
-        "title": "Ubiquiti Firewall Blocked Traffic Map [Filebeat Iptables]",
+        "savedSearchId": "9f7d97c0-1fe9-11e9-ae2a-939083c6a64e-ecs",
+        "title": "Ubiquiti Firewall Blocked Traffic Map [Filebeat Iptables] ECS",
         "uiStateJSON": {
           "mapCenter": [
             19.228176737766262,
@@ -376,11 +376,11 @@
               }
             }
           },
-          "title": "Ubiquiti Firewall Blocked Traffic Map [Filebeat Iptables]",
+          "title": "Ubiquiti Firewall Blocked Traffic Map [Filebeat Iptables] ECS",
           "type": "tile_map"
         }
       },
-      "id": "8853aa20-1fef-11e9-ae2a-939083c6a64e",
+      "id": "8853aa20-1fef-11e9-ae2a-939083c6a64e-ecs",
       "type": "visualization",
       "updated_at": "2019-01-24T15:50:31.689Z",
       "version": 2
@@ -397,8 +397,8 @@
             }
           }
         },
-        "savedSearchId": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e",
-        "title": "Ubiquiti Firewall Traffic Breakdown [Filebeat Iptables]",
+        "savedSearchId": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e-ecs",
+        "title": "Ubiquiti Firewall Traffic Breakdown [Filebeat Iptables] ECS",
         "uiStateJSON": {
           "vis": {
             "colors": {
@@ -484,11 +484,11 @@
             "legendPosition": "top",
             "type": "pie"
           },
-          "title": "Ubiquiti Firewall Traffic Breakdown [Filebeat Iptables]",
+          "title": "Ubiquiti Firewall Traffic Breakdown [Filebeat Iptables] ECS",
           "type": "pie"
         }
       },
-      "id": "fdea1ad0-1ff4-11e9-ae2a-939083c6a64e",
+      "id": "fdea1ad0-1ff4-11e9-ae2a-939083c6a64e-ecs",
       "type": "visualization",
       "updated_at": "2019-01-24T16:27:50.397Z",
       "version": 1
@@ -516,10 +516,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Ubiquiti Firewall Events [Filebeat Iptables]",
+        "title": "Ubiquiti Firewall Events [Filebeat Iptables] ECS",
         "version": 1
       },
-      "id": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e",
+      "id": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e-ecs",
       "type": "search",
       "updated_at": "2019-01-24T12:37:10.858Z",
       "version": 1
@@ -536,8 +536,8 @@
             }
           }
         },
-        "savedSearchId": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e",
-        "title": "Ubiquiti Firewall Traffic by Port [Filebeat Iptables]",
+        "savedSearchId": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e-ecs",
+        "title": "Ubiquiti Firewall Traffic by Port [Filebeat Iptables] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -605,11 +605,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Ubiquiti Firewall Traffic by Port [Filebeat Iptables]",
+          "title": "Ubiquiti Firewall Traffic by Port [Filebeat Iptables] ECS",
           "type": "table"
         }
       },
-      "id": "190bcb50-1ff6-11e9-ae2a-939083c6a64e",
+      "id": "190bcb50-1ff6-11e9-ae2a-939083c6a64e-ecs",
       "type": "visualization",
       "updated_at": "2019-01-24T16:35:45.413Z",
       "version": 1
@@ -637,10 +637,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Ubiquiti Firewall Blocked Events [Filebeat Iptables]",
+        "title": "Ubiquiti Firewall Blocked Events [Filebeat Iptables] ECS",
         "version": 1
       },
-      "id": "9f7d97c0-1fe9-11e9-ae2a-939083c6a64e",
+      "id": "9f7d97c0-1fe9-11e9-ae2a-939083c6a64e-ecs",
       "type": "search",
       "updated_at": "2019-01-24T15:35:33.942Z",
       "version": 2
@@ -668,10 +668,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Ubiquiti Firewall Allowed Events [Filebeat Iptables]",
+        "title": "Ubiquiti Firewall Allowed Events [Filebeat Iptables] ECS",
         "version": 1
       },
-      "id": "7862cab0-1fdb-11e9-ae2a-939083c6a64e",
+      "id": "7862cab0-1fdb-11e9-ae2a-939083c6a64e-ecs",
       "type": "search",
       "updated_at": "2019-01-24T15:04:12.010Z",
       "version": 3
@@ -712,7 +712,7 @@
               "x": 0,
               "y": 0
             },
-            "id": "758b3620-1fda-11e9-ae2a-939083c6a64e",
+            "id": "758b3620-1fda-11e9-ae2a-939083c6a64e-ecs",
             "panelIndex": "1",
             "title": "Event Timeline",
             "type": "visualization",
@@ -727,7 +727,7 @@
               "x": 33,
               "y": 0
             },
-            "id": "1ba82fd0-1ff0-11e9-ae2a-939083c6a64e",
+            "id": "1ba82fd0-1ff0-11e9-ae2a-939083c6a64e-ecs",
             "panelIndex": "2",
             "title": "Top Blocked by source IP",
             "type": "visualization",
@@ -748,7 +748,7 @@
               "x": 0,
               "y": 15
             },
-            "id": "5bd53050-1fe9-11e9-ae2a-939083c6a64e",
+            "id": "5bd53050-1fe9-11e9-ae2a-939083c6a64e-ecs",
             "panelIndex": "3",
             "title": "Allowed Traffic Map",
             "type": "visualization",
@@ -769,7 +769,7 @@
               "x": 24,
               "y": 15
             },
-            "id": "8853aa20-1fef-11e9-ae2a-939083c6a64e",
+            "id": "8853aa20-1fef-11e9-ae2a-939083c6a64e-ecs",
             "panelIndex": "4",
             "title": "Blocked Traffic Map",
             "type": "visualization",
@@ -797,7 +797,7 @@
               "x": 0,
               "y": 30
             },
-            "id": "fdea1ad0-1ff4-11e9-ae2a-939083c6a64e",
+            "id": "fdea1ad0-1ff4-11e9-ae2a-939083c6a64e-ecs",
             "panelIndex": "5",
             "title": "Traffic Breakdown by Protocol",
             "type": "visualization",
@@ -812,7 +812,7 @@
               "x": 0,
               "y": 48
             },
-            "id": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e",
+            "id": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e-ecs",
             "panelIndex": "6",
             "title": "Event View",
             "type": "search",
@@ -827,7 +827,7 @@
               "x": 24,
               "y": 30
             },
-            "id": "190bcb50-1ff6-11e9-ae2a-939083c6a64e",
+            "id": "190bcb50-1ff6-11e9-ae2a-939083c6a64e-ecs",
             "panelIndex": "7",
             "title": "Traffic Breakdown by Port",
             "type": "visualization",
@@ -835,10 +835,10 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Filebeat Iptables] Ubiquiti Firewall Overview",
+        "title": "[Filebeat Iptables] Ubiquiti Firewall Overview ECS",
         "version": 1
       },
-      "id": "d39f0980-1ff3-11e9-ae2a-939083c6a64e",
+      "id": "d39f0980-1ff3-11e9-ae2a-939083c6a64e-ecs",
       "type": "dashboard",
       "updated_at": "2019-01-24T16:38:35.174Z",
       "version": 4
