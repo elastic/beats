@@ -362,6 +362,13 @@ Annotations of messages containing coredumps from user units.
 [float]
 == journald fields
 
+Fields provided by journald.
+
+
+
+[float]
+== object fields
+
 Fields to log on behalf of a different program.
 
 
@@ -373,7 +380,7 @@ Audit fields of event.
 
 
 
-*`journald.audit.loginuid`*::
+*`journald.object.audit.login_uid`*::
 +
 --
 type: long
@@ -382,12 +389,12 @@ example: 1000
 
 required: False
 
-The login UID of the source process.
+The login UID of the object process.
 
 
 --
 
-*`journald.audit.session`*::
+*`journald.object.audit.session`*::
 +
 --
 type: long
@@ -396,12 +403,12 @@ example: 3
 
 required: False
 
-The audit session of the source process.
+The audit session of the object process.
 
 
 --
 
-*`journald.cmd`*::
+*`journald.object.cmd`*::
 +
 --
 type: keyword
@@ -415,7 +422,7 @@ The command line of the process.
 
 --
 
-*`journald.name`*::
+*`journald.object.name`*::
 +
 --
 type: keyword
@@ -429,7 +436,7 @@ Name of the executable.
 
 --
 
-*`journald.executable`*::
+*`journald.object.executable`*::
 +
 --
 type: keyword
@@ -443,7 +450,298 @@ Path to the the executable.
 
 --
 
-*`journald.pid`*::
+*`journald.object.uid`*::
++
+--
+type: long
+
+required: False
+
+UID of the object process.
+
+
+--
+
+*`journald.object.gid`*::
++
+--
+type: long
+
+required: False
+
+GID of the object process.
+
+
+--
+
+*`journald.object.pid`*::
++
+--
+type: long
+
+required: False
+
+PID of the object process.
+
+
+--
+
+[float]
+== systemd fields
+
+Systemd fields of event.
+
+
+
+*`journald.object.systemd.owner_uid`*::
++
+--
+type: long
+
+required: False
+
+The UID of the owner.
+
+
+--
+
+*`journald.object.systemd.session`*::
++
+--
+type: keyword
+
+required: False
+
+The ID of the systemd session.
+
+
+--
+
+*`journald.object.systemd.unit`*::
++
+--
+type: keyword
+
+required: False
+
+The name of the systemd unit.
+
+
+--
+
+*`journald.object.systemd.user_unit`*::
++
+--
+type: keyword
+
+required: False
+
+The name of the systemd user unit.
+
+
+--
+
+[float]
+== kernel fields
+
+Fields to log on behalf of a different program.
+
+
+
+*`journald.kernel.device`*::
++
+--
+type: keyword
+
+required: False
+
+The kernel device name.
+
+
+--
+
+*`journald.kernel.subsystem`*::
++
+--
+type: keyword
+
+required: False
+
+The kernel subsystem name.
+
+
+--
+
+*`journald.kernel.device_symlinks`*::
++
+--
+type: text
+
+required: False
+
+Additional symlink names pointing to the device node in /dev.
+
+
+--
+
+*`journald.kernel.device_node_path`*::
++
+--
+type: text
+
+required: False
+
+The device node path of this device in /dev.
+
+
+--
+
+*`journald.kernel.device_name`*::
++
+--
+type: text
+
+required: False
+
+The kernel device name as it shows up in the device tree below /sys.
+
+
+--
+
+[float]
+== code fields
+
+Fields of the code generating the event.
+
+
+
+*`journald.code.file`*::
++
+--
+type: text
+
+example: ../src/core/manager.c
+
+required: False
+
+The name of the source file where the log is generated.
+
+
+--
+
+*`journald.code.function`*::
++
+--
+type: text
+
+example: job_log_status_message
+
+required: False
+
+The name of the function which generated the log message.
+
+
+--
+
+*`journald.code.line`*::
++
+--
+type: long
+
+example: 123
+
+required: False
+
+The line number of the code which generated the log message.
+
+
+--
+
+[float]
+== process fields
+
+Fields to log on behalf of a different program.
+
+
+
+[float]
+== audit fields
+
+Audit fields of event.
+
+
+
+*`journald.process.audit.loginuid`*::
++
+--
+type: long
+
+example: 1000
+
+required: False
+
+The login UID of the source process.
+
+
+--
+
+*`journald.process.audit.session`*::
++
+--
+type: long
+
+example: 3
+
+required: False
+
+The audit session of the source process.
+
+
+--
+
+*`journald.process.cmd`*::
++
+--
+type: keyword
+
+example: /lib/systemd/systemd --user
+
+required: False
+
+The command line of the process.
+
+
+--
+
+*`journald.process.name`*::
++
+--
+type: keyword
+
+example: /lib/systemd/systemd
+
+required: False
+
+Name of the executable.
+
+
+--
+
+*`journald.process.executable`*::
++
+--
+type: keyword
+
+example: /lib/systemd/systemd
+
+required: False
+
+Path to the the executable.
+
+
+--
+
+*`journald.process.pid`*::
 +
 --
 type: long
@@ -457,7 +755,7 @@ The ID of the process which logged the message.
 
 --
 
-*`journald.gid`*::
+*`journald.process.gid`*::
 +
 --
 type: long
@@ -471,7 +769,7 @@ The ID of the group which runs the process.
 
 --
 
-*`journald.uid`*::
+*`journald.process.uid`*::
 +
 --
 type: long
@@ -485,7 +783,7 @@ The ID of the user which runs the process.
 
 --
 
-*`journald.capabilites`*::
+*`journald.process.capabilites`*::
 +
 --
 required: False
