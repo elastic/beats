@@ -124,7 +124,6 @@
         {
             "lowercase": {
                 "field": "suricata.eve.event_type",
-                "target_field": "event.type",
                 "ignore_missing": true
             }
         },
@@ -244,7 +243,6 @@
             "remove": {
                 "field": [
                     "suricata.eve.app_proto",
-                    "suricata.eve.event_type",
                     "suricata.eve.flow.end",
                     "suricata.eve.flow.start",
                     "suricata.eve.http.http_method",
@@ -253,6 +251,12 @@
                     "suricata.eve.http.http_user_agent"
                 ],
                 "ignore_missing": true
+            }
+        },
+        {
+            "set": {
+                "field": "event.kind",
+                "value": "event"
             }
         }
     ],

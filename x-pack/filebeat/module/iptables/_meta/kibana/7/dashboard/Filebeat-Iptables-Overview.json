@@ -12,8 +12,8 @@
             }
           }
         },
-        "savedSearchId": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3",
-        "title": "Events Timeline [Filebeat Iptables]",
+        "savedSearchId": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3-ecs",
+        "title": "Events Timeline [Filebeat Iptables] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -111,11 +111,11 @@
               }
             ]
           },
-          "title": "Events Timeline [Filebeat Iptables]",
+          "title": "Events Timeline [Filebeat Iptables] ECS",
           "type": "area"
         }
       },
-      "id": "4c913eb0-1f51-11e9-93ed-f7e068f4aebb",
+      "id": "4c913eb0-1f51-11e9-93ed-f7e068f4aebb-ecs",
       "type": "visualization",
       "updated_at": "2019-01-23T20:56:04.891Z",
       "version": 1
@@ -132,8 +132,8 @@
             }
           }
         },
-        "savedSearchId": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3",
-        "title": "Top Source Countries [Filebeat Iptables]",
+        "savedSearchId": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3-ecs",
+        "title": "Top Source Countries [Filebeat Iptables] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -183,11 +183,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top Source Countries [Filebeat Iptables]",
+          "title": "Top Source Countries [Filebeat Iptables] ECS",
           "type": "table"
         }
       },
-      "id": "2599f5e0-1e98-11e9-8ec4-cf5d91a864b3",
+      "id": "2599f5e0-1e98-11e9-8ec4-cf5d91a864b3-ecs",
       "type": "visualization",
       "updated_at": "2019-01-23T20:51:02.293Z",
       "version": 1
@@ -204,8 +204,8 @@
             }
           }
         },
-        "savedSearchId": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3",
-        "title": "Source Map [Filebeat Iptables]",
+        "savedSearchId": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3-ecs",
+        "title": "Source Map [Filebeat Iptables] ECS",
         "uiStateJSON": {
           "mapCenter": [
             45.02695045318546,
@@ -269,11 +269,11 @@
               }
             }
           },
-          "title": "Source Map [Filebeat Iptables]",
+          "title": "Source Map [Filebeat Iptables] ECS",
           "type": "tile_map"
         }
       },
-      "id": "c4394ec0-1efd-11e9-8ec4-cf5d91a864b3",
+      "id": "c4394ec0-1efd-11e9-8ec4-cf5d91a864b3-ecs",
       "type": "visualization",
       "updated_at": "2019-01-23T20:51:02.293Z",
       "version": 1
@@ -290,8 +290,8 @@
             }
           }
         },
-        "savedSearchId": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3",
-        "title": "Destination Map [Filebeat Iptables]",
+        "savedSearchId": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3-ecs",
+        "title": "Destination Map [Filebeat Iptables] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -349,11 +349,11 @@
               }
             }
           },
-          "title": "Destination Map [Filebeat Iptables]",
+          "title": "Destination Map [Filebeat Iptables] ECS",
           "type": "tile_map"
         }
       },
-      "id": "d8cea010-1efd-11e9-8ec4-cf5d91a864b3",
+      "id": "d8cea010-1efd-11e9-8ec4-cf5d91a864b3-ecs",
       "type": "visualization",
       "updated_at": "2019-01-23T20:51:02.293Z",
       "version": 1
@@ -370,8 +370,8 @@
             }
           }
         },
-        "savedSearchId": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3",
-        "title": "Network Type Breakdown [Filebeat Iptables]",
+        "savedSearchId": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3-ecs",
+        "title": "Network Type Breakdown [Filebeat Iptables] ECS",
         "uiStateJSON": {
           "vis": {
             "legendOpen": false
@@ -417,11 +417,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Network Type Breakdown [Filebeat Iptables]",
+          "title": "Network Type Breakdown [Filebeat Iptables] ECS",
           "type": "pie"
         }
       },
-      "id": "b57b7370-1f1d-11e9-8ec4-cf5d91a864b3",
+      "id": "b57b7370-1f1d-11e9-8ec4-cf5d91a864b3-ecs",
       "type": "visualization",
       "updated_at": "2019-01-23T20:51:02.293Z",
       "version": 1
@@ -438,8 +438,8 @@
             }
           }
         },
-        "savedSearchId": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3",
-        "title": "Network Transport Breakdown [Filebeat Iptables]",
+        "savedSearchId": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3-ecs",
+        "title": "Network Transport Breakdown [Filebeat Iptables] ECS",
         "uiStateJSON": {
           "vis": {
             "legendOpen": false
@@ -485,11 +485,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Network Transport Breakdown [Filebeat Iptables]",
+          "title": "Network Transport Breakdown [Filebeat Iptables] ECS",
           "type": "pie"
         }
       },
-      "id": "35fe0910-1f26-11e9-8ec4-cf5d91a864b3",
+      "id": "35fe0910-1f26-11e9-8ec4-cf5d91a864b3-ecs",
       "type": "visualization",
       "updated_at": "2019-01-23T20:51:02.293Z",
       "version": 1
@@ -506,8 +506,8 @@
             }
           }
         },
-        "savedSearchId": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3",
-        "title": "Top Destination Ports [Filebeat Iptables]",
+        "savedSearchId": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3-ecs",
+        "title": "Top Destination Ports [Filebeat Iptables] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -557,11 +557,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Top Destination Ports [Filebeat Iptables]",
+          "title": "Top Destination Ports [Filebeat Iptables] ECS",
           "type": "table"
         }
       },
-      "id": "683402b0-1f29-11e9-8ec4-cf5d91a864b3",
+      "id": "683402b0-1f29-11e9-8ec4-cf5d91a864b3-ecs",
       "type": "visualization",
       "updated_at": "2019-01-23T20:51:02.293Z",
       "version": 1
@@ -589,10 +589,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Events Search [Filebeat Iptables]",
+        "title": "Events Search [Filebeat Iptables] ECS",
         "version": 1
       },
-      "id": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3",
+      "id": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3-ecs",
       "type": "search",
       "updated_at": "2019-01-23T20:51:02.293Z",
       "version": 1
@@ -629,7 +629,7 @@
               "x": 0,
               "y": 0
             },
-            "id": "4c913eb0-1f51-11e9-93ed-f7e068f4aebb",
+            "id": "4c913eb0-1f51-11e9-93ed-f7e068f4aebb-ecs",
             "panelIndex": "1",
             "type": "visualization",
             "version": "6.6.0"
@@ -643,7 +643,7 @@
               "x": 37,
               "y": 0
             },
-            "id": "2599f5e0-1e98-11e9-8ec4-cf5d91a864b3",
+            "id": "2599f5e0-1e98-11e9-8ec4-cf5d91a864b3-ecs",
             "panelIndex": "2",
             "type": "visualization",
             "version": "6.6.0"
@@ -663,7 +663,7 @@
               "x": 0,
               "y": 15
             },
-            "id": "c4394ec0-1efd-11e9-8ec4-cf5d91a864b3",
+            "id": "c4394ec0-1efd-11e9-8ec4-cf5d91a864b3-ecs",
             "panelIndex": "3",
             "type": "visualization",
             "version": "6.6.0"
@@ -683,7 +683,7 @@
               "x": 24,
               "y": 15
             },
-            "id": "d8cea010-1efd-11e9-8ec4-cf5d91a864b3",
+            "id": "d8cea010-1efd-11e9-8ec4-cf5d91a864b3-ecs",
             "panelIndex": "4",
             "type": "visualization",
             "version": "6.6.0"
@@ -697,7 +697,7 @@
               "x": 0,
               "y": 30
             },
-            "id": "b57b7370-1f1d-11e9-8ec4-cf5d91a864b3",
+            "id": "b57b7370-1f1d-11e9-8ec4-cf5d91a864b3-ecs",
             "panelIndex": "5",
             "type": "visualization",
             "version": "6.6.0"
@@ -711,7 +711,7 @@
               "x": 19,
               "y": 30
             },
-            "id": "35fe0910-1f26-11e9-8ec4-cf5d91a864b3",
+            "id": "35fe0910-1f26-11e9-8ec4-cf5d91a864b3-ecs",
             "panelIndex": "6",
             "type": "visualization",
             "version": "6.6.0"
@@ -725,7 +725,7 @@
               "x": 37,
               "y": 30
             },
-            "id": "683402b0-1f29-11e9-8ec4-cf5d91a864b3",
+            "id": "683402b0-1f29-11e9-8ec4-cf5d91a864b3-ecs",
             "panelIndex": "7",
             "type": "visualization",
             "version": "6.6.0"
@@ -739,17 +739,17 @@
               "x": 0,
               "y": 45
             },
-            "id": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3",
+            "id": "b3f1b010-1f26-11e9-8ec4-cf5d91a864b3-ecs",
             "panelIndex": "8",
             "type": "search",
             "version": "6.6.0"
           }
         ],
         "timeRestore": false,
-        "title": "[Filebeat Iptables] Overview",
+        "title": "[Filebeat Iptables] Overview ECS",
         "version": 1
       },
-      "id": "ceefb9e0-1f51-11e9-93ed-f7e068f4aebb",
+      "id": "ceefb9e0-1f51-11e9-93ed-f7e068f4aebb-ecs",
       "type": "dashboard",
       "updated_at": "2019-01-23T20:59:43.614Z",
       "version": 1

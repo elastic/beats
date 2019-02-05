@@ -13,6 +13,9 @@
         "name": "queue"
     },
     "rabbitmq": {
+        "node": {
+            "name": "rabbit@localhost"
+        },
         "queue": {
             "arguments": {
                 "max_priority": 9
@@ -61,13 +64,12 @@
                 }
             },
             "name": "queuenamehere",
-            "node": "rabbit@localhost",
-            "state": "running",
-            "vhost": "/"
-        }
+            "state": "running"
+        },
+        "vhost": "/"
     },
     "service": {
-        "address": "127.0.0.1:55326",
+        "address": "127.0.0.1:53995",
         "type": "rabbitmq"
     }
 }

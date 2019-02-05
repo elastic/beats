@@ -83,7 +83,7 @@ var (
 		"CONTAINER_ID":              fieldConversion{"container.id_truncated", false, false},
 		"CONTAINER_ID_FULL":         fieldConversion{"container.id", false, false},
 		"CONTAINER_NAME":            fieldConversion{"container.name", false, false},
-		"CONTAINER_TAG":             fieldConversion{"container.image.tag", false, false},
+		"CONTAINER_TAG":             fieldConversion{"container.log.tag", false, false},
 		"CONTAINER_PARTIAL_MESSAGE": fieldConversion{"container.partial", false, false},
 
 		// dropped fields

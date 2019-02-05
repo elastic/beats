@@ -108,12 +108,6 @@
   alias: true
   beat: filebeat
 
-- from: fileset.name
-  to: event.dataset
-  alias6: true
-  alias: true
-  beat: filebeat
-
 - from: fileset.module
   to: event.module
   alias6: true
@@ -349,11 +343,6 @@
   alias: true
   beat: filebeat
 
-- from: suricata.eve.event_type
-  to: event.type
-  alias: true
-  beat: filebeat
-
 - from: suricata.eve.fileinfo.filename
   to: file.path
   alias: true
@@ -443,6 +432,12 @@
   to: '@timestamp'
   alias: true
   beat: filebeat
+
+- from: event.type
+  to: suricata.eve.event_type
+  alias: false
+  beat: auditbeat
+  comment: event.type is reserved for future use by ECS.
 
 ## System module
 
@@ -1508,6 +1503,16 @@
 # Auditbeat
 
 ## From Auditbeat's auditd module.
+- from: auditd.messages
+  to: event.original
+  alias: true
+  beat: auditbeat
+
+- from: auditd.warnings
+  to: error.message
+  alias: true
+  beat: auditbeat
+
 - from: source.hostname
   to: source.domain
   alias: true
@@ -1622,13 +1627,6 @@
 # Metricbeat
 
 ## Metricbeat base fields
-- from: metricset.name
-  to: event.dataset
-  alias: false
-  comment: Data structure of field changed, old field will stay around
-  breaking: true
-  beat: metricbeat
-
 - from: metricset.module
   to: event.module
   alias: true
@@ -1661,11 +1659,6 @@
   alias: true
   beat: metricbeat
 
-- from: haproxy.stat.service_name
-  to: process.name
-  alias: true
-  beat: metricbeat
-
 - from: haproxy.info.pid
   to: process.pid
   alias: true
@@ -1682,6 +1675,44 @@
   to: process.name
   alias: true
   beat: metricbeat
+
+### Rabbitmq
+
+- from: rabbitmq.connection.node
+  to: rabbitmq.node.name
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.connection.vhost
+  to: rabbitmq.vhost
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.connection.user
+  to: user.name
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.exchange.vhost
+  to: rabbitmq.vhost
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.exchange.user
+  to: user.name
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.queue.node
+  to: rabbitmq.node.name
+  alias: true
+  beat: metricbeat
+
+- from: rabbitmq.queue.vhost
+  to: rabbitmq.vhost
+  alias: true
+  beat: metricbeat
+
 
 ### Redis
 
@@ -2043,6 +2074,7 @@
   alias: false
   beat: journalbeat
   comment: This field should not be renamed as it would cause issue some Beats and Journalbeat does not have dashboards
+  # This field should not be renamed as it would cause issue some Beats and Journalbeat does not have dashboards
   rename: false
 
 - from: read_timestamp
@@ -2072,6 +2104,7 @@
   to: winlog.api
   alias: true
   beat: winlogbeat
+  rename: false
 
 - from: log_name
   to: winlog.channel
@@ -2164,3 +2197,4 @@
   to: winlog.version
   alias: true
   beat: winlogbeat
+  rename: false

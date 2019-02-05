@@ -4,8 +4,7 @@
     Fields exported by the EVE JSON logs
   fields:
     - name: event_type
-      type: alias
-      path: event.type
+      type: keyword
 
     - name: app_proto_orig
       type: keyword

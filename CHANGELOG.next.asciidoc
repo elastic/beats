@@ -41,6 +41,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Field `file.origin` changed type from `text` to `keyword`. {pull}10544[10544]
 - Rename user fields to ECS in auditd module. {pull}10456[10456]
 - Rename `event.type` to `auditd.message_type` in auditd module because event.type is reserved for future use by ECS. {pull}10536[10536]
+- Rename `auditd.messages` to `event.original` and `auditd.warnings` to `error.message`. {pull}10577[10577]
 
 *Filebeat*
 
@@ -83,7 +84,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Address add_kubernetes_metadata processor issue where old source field is 
   still used for matcher. {issue}10505[10505] {pull}10506[10506]
 - Change type of haproxy.source from text to keyword. {pull}10506[10506]
-- Populate more ECS fields in the Suricata module. {pull}10006[10006]
+- Rename `event.type` to `suricata.eve.event_type` in Suricata module because event.type is reserved for future use by ECS. {pull}10575[10575]
 
 *Heartbeat*
 
@@ -97,6 +98,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename read_timestamp to event.created to align with ECS. {pull}10043[10043], {pull}10139[10139]
 - Rename host.name to host.hostname to align with ECS. {pull}10043[10043]
 - Fix typo in the field name `container.id_truncated`. {pull}10525[10525]
+- Rename `container.image.tag` to `container.log.tag`. {pull}10561[10561]
 
 *Metricbeat*
 
@@ -124,6 +126,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update a few elasticsearch.* fields to map to ECS. {pull}10350[10350]
 - Update a few logstash.* fields to map to ECS. {pull}10350[10350]
 - Update a few kibana.* fields to map to ECS. {pull}10350[10350]
+- Update rabbitmq.* fields to map to ECS. {pull}10563[10563]
 - Update haproxy.* fields to map to ECS. {pull}10558[10558] {pull}10568[10568]
 
 *Packetbeat*
@@ -139,6 +142,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adjust Winlogbeat fields to map to ECS. {pull}10333[10333]
 
 *Functionbeat*
+
+- Mark Functionbeat  as GA. {pull}10564[10564]
 
 - Correctly normalize Cloudformation resource name. {issue}10087[10087]
 - Functionbeat can now deploy a function for Kinesis. {10116}10116[10116]
@@ -233,6 +238,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add system `package` dataset. {pull}10225[10225]
 - Add system module `login` dataset. {pull}9327[9327]
 - Add `entity_id` fields. {pull}10500[10500]
+- Add seven dashboards for the system module. {pull}10511[10511]
 
 *Filebeat*
 
@@ -256,6 +262,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added support for ingesting structured Elasticsearch deprecation logs {pull}10445[10445]
 - New iptables module that receives iptables/ip6tables logs over syslog or file. Supports Ubiquiti Firewall extensions. {issue}8781[8781] {pull}10176[10176]
 - Added support for ingesting structured Elasticsearch server logs {pull}10428[10428]
+- Populate more ECS fields in the Suricata module. {pull}10006[10006]
 
 *Heartbeat*
 
@@ -298,6 +305,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release http.server metricset as GA. {pull}10240[10240]
 - Release Nats module as GA. {pull}10281[10281]
 - Release munin module as GA. {pull}10311[10311]
+- Release Golang module as GA. {pull}10312[10312]
 - Release use of xpack.enabled: true flag in Elasticsearch and Kibana modules as GA. {pull}10222[10222]
 - Add support for MySQL 8.0 and tests also for Percona and MariaDB. {pull}10261[10261]
 - Rename 'db' Metricset to 'transaction_log' in MSSQL Metricbeat module {pull}10109[10109]

@@ -6,8 +6,8 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "savedSearchId": "ML-Filebeat-Nginx-Access", 
-                "title": "Remote IP Timechart [Filebeat Nginx] [ML]", 
+                "savedSearchId": "ML-Filebeat-Nginx-Access-ecs", 
+                "title": "Remote IP Timechart [Filebeat Nginx] [ML] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "legendOpen": false
@@ -125,11 +125,11 @@
                             }
                         ]
                     }, 
-                    "title": "ML Nginx Access Remote IP Timechart", 
+                    "title": "ML Nginx Access Remote IP Timechart ECS", 
                     "type": "area"
                 }
             }, 
-            "id": "ML-Nginx-Access-Remote-IP-Timechart", 
+            "id": "ML-Nginx-Access-Remote-IP-Timechart-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -141,8 +141,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "ML-Filebeat-Nginx-Access", 
-                "title": "Response Code Timechart [Filebeat Nginx] [ML]", 
+                "savedSearchId": "ML-Filebeat-Nginx-Access-ecs", 
+                "title": "Response Code Timechart [Filebeat Nginx] [ML] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "colors": {
@@ -178,7 +178,7 @@
                             "enabled": true, 
                             "id": "3", 
                             "params": {
-                                "field": "nginx.access.response_code", 
+                                "field": "http.response.status_code", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 5
@@ -201,11 +201,11 @@
                         "times": [], 
                         "yAxis": {}
                     }, 
-                    "title": "ML Nginx Access Response Code Timechart", 
+                    "title": "ML Nginx Access Response Code Timechart ECS", 
                     "type": "histogram"
                 }
             }, 
-            "id": "ML-Nginx-Access-Response-Code-Timechart", 
+            "id": "ML-Nginx-Access-Response-Code-Timechart-ecs", 
             "type": "visualization", 
             "version": 3
         }, 
@@ -215,8 +215,8 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "savedSearchId": "ML-Filebeat-Nginx-Access", 
-                "title": "Top Remote IPs [Filebeat Nginx] [ML]", 
+                "savedSearchId": "ML-Filebeat-Nginx-Access-ecs", 
+                "title": "Top Remote IPs [Filebeat Nginx] [ML] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -262,11 +262,11 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "ML Nginx Access Top Remote IPs Table", 
+                    "title": "ML Nginx Access Top Remote IPs Table ECS", 
                     "type": "table"
                 }
             }, 
-            "id": "ML-Nginx-Access-Top-Remote-IPs-Table", 
+            "id": "ML-Nginx-Access-Top-Remote-IPs-Table-ecs", 
             "type": "visualization", 
             "version": 3
         }, 
@@ -278,8 +278,8 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "ML-Filebeat-Nginx-Access", 
-                "title": "Access Map [Filebeat Nginx] [ML]", 
+                "savedSearchId": "ML-Filebeat-Nginx-Access-ecs", 
+                "title": "Access Map [Filebeat Nginx] [ML] ECS", 
                 "uiStateJSON": {
                     "mapCenter": [
                         12.039320557540572, 
@@ -301,7 +301,7 @@
                             "id": "2", 
                             "params": {
                                 "autoPrecision": true, 
-                                "field": "nginx.access.geoip.location"
+                                "field": "source.geo.location"
                             }, 
                             "schema": "segment", 
                             "type": "geohash_grid"
@@ -336,11 +336,11 @@
                             "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
                         }
                     }, 
-                    "title": "ML Nginx Access Map", 
+                    "title": "ML Nginx Access Map ECS", 
                     "type": "tile_map"
                 }
             }, 
-            "id": "ML-Nginx-Access-Map", 
+            "id": "ML-Nginx-Access-Map-ecs", 
             "type": "visualization", 
             "version": 3
         }, 
@@ -350,8 +350,8 @@
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {}
                 }, 
-                "savedSearchId": "ML-Filebeat-Nginx-Access", 
-                "title": "Top URLs [Filebeat Nginx] [ML]", 
+                "savedSearchId": "ML-Filebeat-Nginx-Access-ecs", 
+                "title": "Top URLs [Filebeat Nginx] [ML] ECS", 
                 "uiStateJSON": {
                     "vis": {
                         "params": {
@@ -376,7 +376,7 @@
                             "enabled": true, 
                             "id": "2", 
                             "params": {
-                                "field": "nginx.access.url", 
+                                "field": "url.original", 
                                 "order": "desc", 
                                 "orderBy": "1", 
                                 "size": 1000
@@ -397,11 +397,11 @@
                         }, 
                         "totalFunc": "sum"
                     }, 
-                    "title": "ML Nginx Access Top URLs Table", 
+                    "title": "ML Nginx Access Top URLs Table ECS", 
                     "type": "table"
                 }
             }, 
-            "id": "ML-Nginx-Access-Top-URLs-Table", 
+            "id": "ML-Nginx-Access-Top-URLs-Table-ecs", 
             "type": "visualization", 
             "version": 3
         }, 
@@ -441,10 +441,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "ML Access Data [Filebeat Nginx]", 
+                "title": "ML Access Data [Filebeat Nginx] ECS", 
                 "version": 1
             }, 
-            "id": "ML-Filebeat-Nginx-Access", 
+            "id": "ML-Filebeat-Nginx-Access-ecs", 
             "type": "search", 
             "version": 3
         }, 
@@ -474,7 +474,7 @@
                 "panelsJSON": [
                     {
                         "col": 1, 
-                        "id": "ML-Nginx-Access-Remote-IP-Timechart", 
+                        "id": "ML-Nginx-Access-Remote-IP-Timechart-ecs", 
                         "panelIndex": 1, 
                         "row": 1, 
                         "size_x": 6, 
@@ -483,7 +483,7 @@
                     }, 
                     {
                         "col": 7, 
-                        "id": "ML-Nginx-Access-Response-Code-Timechart", 
+                        "id": "ML-Nginx-Access-Response-Code-Timechart-ecs", 
                         "panelIndex": 2, 
                         "row": 1, 
                         "size_x": 6, 
@@ -492,7 +492,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "ML-Nginx-Access-Top-Remote-IPs-Table", 
+                        "id": "ML-Nginx-Access-Top-Remote-IPs-Table-ecs", 
                         "panelIndex": 3, 
                         "row": 4, 
                         "size_x": 6, 
@@ -501,7 +501,7 @@
                     }, 
                     {
                         "col": 7, 
-                        "id": "ML-Nginx-Access-Map", 
+                        "id": "ML-Nginx-Access-Map-ecs", 
                         "panelIndex": 4, 
                         "row": 4, 
                         "size_x": 6, 
@@ -510,7 +510,7 @@
                     }, 
                     {
                         "col": 1, 
-                        "id": "ML-Nginx-Access-Top-URLs-Table", 
+                        "id": "ML-Nginx-Access-Top-URLs-Table-ecs", 
                         "panelIndex": 5, 
                         "row": 7, 
                         "size_x": 12, 
@@ -519,7 +519,7 @@
                     }
                 ], 
                 "timeRestore": false, 
-                "title": "[Filebeat Nginx] [ML]  Remote IP Count Explorer", 
+                "title": "[Filebeat Nginx] [ML]  Remote IP Count Explorer ECS", 
                 "uiStateJSON": {
                     "P-3": {
                         "vis": {
@@ -544,7 +544,7 @@
                 }, 
                 "version": 1
             }, 
-            "id": "ML-Nginx-Access-Remote-IP-Count-Explorer", 
+            "id": "ML-Nginx-Access-Remote-IP-Count-Explorer-ecs", 
             "type": "dashboard", 
             "version": 3
         }

@@ -43,12 +43,10 @@ func TestFetchEventContents(t *testing.T) {
 	event := ee.(common.MapStr)
 
 	assert.EqualValues(t, "queuenamehere", event["name"])
-	assert.EqualValues(t, "/", event["vhost"])
 	assert.EqualValues(t, true, event["durable"])
 	assert.EqualValues(t, false, event["auto_delete"])
 	assert.EqualValues(t, false, event["exclusive"])
 	assert.EqualValues(t, "running", event["state"])
-	assert.EqualValues(t, "rabbit@localhost", event["node"])
 
 	arguments := event["arguments"].(common.MapStr)
 	assert.EqualValues(t, 9, arguments["max_priority"])
