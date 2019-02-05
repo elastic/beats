@@ -43,9 +43,6 @@ func TestFetchEventContents(t *testing.T) {
 	event := ee.(common.MapStr)
 
 	assert.EqualValues(t, "[::1]:60938 -> [::1]:5672", event["name"])
-	assert.EqualValues(t, "/", event["vhost"])
-	assert.EqualValues(t, "guest", event["user"])
-	assert.EqualValues(t, "nodename", event["node"])
 	assert.EqualValues(t, 8, event["channels"])
 	assert.EqualValues(t, 65535, event["channel_max"])
 	assert.EqualValues(t, 131072, event["frame_max"])

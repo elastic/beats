@@ -40,7 +40,7 @@
             }
           }
         },
-        "title": "Host Count [Auditbeat System]",
+        "title": "Host Count [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -84,11 +84,11 @@
             },
             "type": "metric"
           },
-          "title": "Host Count [Auditbeat System]",
+          "title": "Host Count [Auditbeat System] ECS",
           "type": "metric"
         }
       },
-      "id": "cf8aa0a0-18ca-11e9-9094-c50574723088",
+      "id": "cf8aa0a0-18ca-11e9-9094-c50574723088-ecs",
       "type": "visualization",
       "updated_at": "2019-02-03T20:37:18.796Z",
       "version": 22
@@ -133,7 +133,7 @@
             }
           }
         },
-        "title": "Process Count [Auditbeat System]",
+        "title": "Process Count [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -177,11 +177,11 @@
             },
             "type": "metric"
           },
-          "title": "Process Count [Auditbeat System]",
+          "title": "Process Count [Auditbeat System] ECS",
           "type": "metric"
         }
       },
-      "id": "bb0d1870-27f1-11e9-89af-fd12d59dac90",
+      "id": "bb0d1870-27f1-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-03T20:24:39.030Z",
       "version": 1
@@ -226,7 +226,7 @@
             }
           }
         },
-        "title": "Socket Count [Auditbeat System]",
+        "title": "Socket Count [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -270,11 +270,11 @@
             },
             "type": "metric"
           },
-          "title": "Socket Count [Auditbeat System]",
+          "title": "Socket Count [Auditbeat System] ECS",
           "type": "metric"
         }
       },
-      "id": "7323dd90-27f2-11e9-89af-fd12d59dac90",
+      "id": "7323dd90-27f2-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-03T20:29:47.881Z",
       "version": 1
@@ -319,7 +319,7 @@
             }
           }
         },
-        "title": "User Count [Auditbeat System]",
+        "title": "User Count [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -363,11 +363,11 @@
             },
             "type": "metric"
           },
-          "title": "User Count [Auditbeat System]",
+          "title": "User Count [Auditbeat System] ECS",
           "type": "metric"
         }
       },
-      "id": "e9225120-27f2-11e9-89af-fd12d59dac90",
+      "id": "e9225120-27f2-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-03T20:35:48.640Z",
       "version": 2
@@ -412,7 +412,7 @@
             }
           }
         },
-        "title": "Package Count [Auditbeat System]",
+        "title": "Package Count [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -456,11 +456,11 @@
             },
             "type": "metric"
           },
-          "title": "Package Count [Auditbeat System]",
+          "title": "Package Count [Auditbeat System] ECS",
           "type": "metric"
         }
       },
-      "id": "f664fb20-27f3-11e9-89af-fd12d59dac90",
+      "id": "f664fb20-27f3-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-03T20:40:37.585Z",
       "version": 1
@@ -505,7 +505,7 @@
             }
           }
         },
-        "title": "Login Count [Auditbeat System]",
+        "title": "Login Count [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -548,11 +548,11 @@
             },
             "type": "metric"
           },
-          "title": "Login Count [Auditbeat System]",
+          "title": "Login Count [Auditbeat System] ECS",
           "type": "metric"
         }
       },
-      "id": "8d63c420-27f4-11e9-89af-fd12d59dac90",
+      "id": "8d63c420-27f4-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-03T20:44:50.914Z",
       "version": 1
@@ -597,7 +597,7 @@
             }
           }
         },
-        "title": "OS Distribution [Auditbeat System]",
+        "title": "OS Distribution [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -658,11 +658,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "OS Distribution [Auditbeat System]",
+          "title": "OS Distribution [Auditbeat System] ECS",
           "type": "pie"
         }
       },
-      "id": "9dd991a0-18cb-11e9-9094-c50574723088",
+      "id": "9dd991a0-18cb-11e9-9094-c50574723088-ecs",
       "type": "visualization",
       "updated_at": "2019-01-21T11:37:35.796Z",
       "version": 24
@@ -707,7 +707,7 @@
             }
           }
         },
-        "title": "Login Actions [Auditbeat System]",
+        "title": "Login Actions [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -749,11 +749,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Login Actions [Auditbeat System]",
+          "title": "Login Actions [Auditbeat System] ECS",
           "type": "pie"
         }
       },
-      "id": "593df9b0-27f7-11e9-89af-fd12d59dac90",
+      "id": "593df9b0-27f7-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-03T21:04:51.914Z",
       "version": 1
@@ -824,7 +824,7 @@
             }
           }
         },
-        "title": "User Changes [Auditbeat System]",
+        "title": "User Changes [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -867,11 +867,11 @@
             },
             "type": "metric"
           },
-          "title": "User Changes [Auditbeat System]",
+          "title": "User Changes [Auditbeat System] ECS",
           "type": "metric"
         }
       },
-      "id": "00fa0d20-27fc-11e9-89af-fd12d59dac90",
+      "id": "00fa0d20-27fc-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-03T21:38:11.314Z",
       "version": 1
@@ -942,7 +942,7 @@
             }
           }
         },
-        "title": "Process Starts [Auditbeat System]",
+        "title": "Process Starts [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -985,11 +985,11 @@
             },
             "type": "metric"
           },
-          "title": "Process Starts [Auditbeat System]",
+          "title": "Process Starts [Auditbeat System] ECS",
           "type": "metric"
         }
       },
-      "id": "0db90830-27fd-11e9-89af-fd12d59dac90",
+      "id": "0db90830-27fd-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-03T21:45:42.195Z",
       "version": 1
@@ -1060,7 +1060,7 @@
             }
           }
         },
-        "title": "Process Stops [Auditbeat System]",
+        "title": "Process Stops [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1103,11 +1103,11 @@
             },
             "type": "metric"
           },
-          "title": "Process Stops [Auditbeat System]",
+          "title": "Process Stops [Auditbeat System] ECS",
           "type": "metric"
         }
       },
-      "id": "b885dae0-27fd-11e9-89af-fd12d59dac90",
+      "id": "b885dae0-27fd-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-03T21:50:28.750Z",
       "version": 1
@@ -1178,7 +1178,7 @@
             }
           }
         },
-        "title": "Sockets Opened [Auditbeat System]",
+        "title": "Sockets Opened [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1221,11 +1221,11 @@
             },
             "type": "metric"
           },
-          "title": "Sockets Opened [Auditbeat System]",
+          "title": "Sockets Opened [Auditbeat System] ECS",
           "type": "metric"
         }
       },
-      "id": "295905e0-27fd-11e9-89af-fd12d59dac90",
+      "id": "295905e0-27fd-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-03T21:47:58.605Z",
       "version": 2
@@ -1296,7 +1296,7 @@
             }
           }
         },
-        "title": "Sockets Closed [Auditbeat System]",
+        "title": "Sockets Closed [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1339,11 +1339,11 @@
             },
             "type": "metric"
           },
-          "title": "Sockets Closed [Auditbeat System]",
+          "title": "Sockets Closed [Auditbeat System] ECS",
           "type": "metric"
         }
       },
-      "id": "82d46ec0-27fd-11e9-89af-fd12d59dac90",
+      "id": "82d46ec0-27fd-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-03T21:48:58.668Z",
       "version": 1
@@ -1414,7 +1414,7 @@
             }
           }
         },
-        "title": "Package Changes [Auditbeat System]",
+        "title": "Package Changes [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1457,11 +1457,11 @@
             },
             "type": "metric"
           },
-          "title": "Package Changes [Auditbeat System]",
+          "title": "Package Changes [Auditbeat System] ECS",
           "type": "metric"
         }
       },
-      "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519",
+      "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519-ecs",
       "type": "visualization",
       "updated_at": "2019-02-04T10:44:06.826Z",
       "version": 2
@@ -1532,7 +1532,7 @@
             }
           }
         },
-        "title": "System Event Histogram [Auditbeat System]",
+        "title": "System Event Histogram [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1629,11 +1629,11 @@
               }
             ]
           },
-          "title": "System Event Histogram [Auditbeat System]",
+          "title": "System Event Histogram [Auditbeat System] ECS",
           "type": "histogram"
         }
       },
-      "id": "54135e50-27ff-11e9-805f-43bf57dfa519",
+      "id": "54135e50-27ff-11e9-805f-43bf57dfa519-ecs",
       "type": "visualization",
       "updated_at": "2019-02-03T22:01:59.221Z",
       "version": 1
@@ -1678,7 +1678,7 @@
             }
           }
         },
-        "title": "Host List [Auditbeat System]",
+        "title": "Host List [Auditbeat System] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -1791,11 +1791,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Host List [Auditbeat System]",
+          "title": "Host List [Auditbeat System] ECS",
           "type": "table"
         }
       },
-      "id": "91962a30-1901-11e9-9094-c50574723088",
+      "id": "91962a30-1901-11e9-9094-c50574723088-ecs",
       "type": "visualization",
       "updated_at": "2019-01-21T11:58:22.519Z",
       "version": 25
@@ -1879,10 +1879,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "System Events [Auditbeat System]",
+        "title": "System Events [Auditbeat System] ECS",
         "version": 1
       },
-      "id": "d08ebd30-27ff-11e9-805f-43bf57dfa519",
+      "id": "d08ebd30-27ff-11e9-805f-43bf57dfa519-ecs",
       "type": "search",
       "updated_at": "2019-02-03T22:17:10.090Z",
       "version": 2
@@ -1899,21 +1899,21 @@
             }
           }
         },
-        "title": "Dashboard Links [Auditbeat System]",
+        "title": "Dashboard Links [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 12,
-            "markdown": "**Dashboards**: [System Overview](#/dashboard/2be46cb0-27f2-11e9-89af-fd12d59dac90) | [Hosts](#/dashboard/dfe62590-18da-11e9-9094-c50574723088) | [Logins](#/dashboard/2a17f200-285e-11e9-805f-43bf57dfa519) | [Users](#/dashboard/ae96a660-2864-11e9-97cb-474beda9f119) | [Processes](#/dashboard/4c68f110-2863-11e9-97cb-474beda9f119) | [Sockets](#/dashboard/957a3ef0-2867-11e9-9d21-0be348776e6c) | [Packages](#/dashboard/137c52f0-286a-11e9-9d21-0be348776e6c)",
+            "markdown": "**Dashboards**: [System Overview](#/dashboard/2be46cb0-27f2-11e9-89af-fd12d59dac90-ecs) | [Hosts](#/dashboard/dfe62590-18da-11e9-9094-c50574723088-ecs) | [Logins](#/dashboard/2a17f200-285e-11e9-805f-43bf57dfa519-ecs) | [Users](#/dashboard/ae96a660-2864-11e9-97cb-474beda9f119-ecs) | [Processes](#/dashboard/4c68f110-2863-11e9-97cb-474beda9f119-ecs) | [Sockets](#/dashboard/957a3ef0-2867-11e9-9d21-0be348776e6c-ecs) | [Packages](#/dashboard/137c52f0-286a-11e9-9d21-0be348776e6c-ecs)",
             "openLinksInNewTab": false
           },
-          "title": "Dashboard Links [Auditbeat System]",
+          "title": "Dashboard Links [Auditbeat System] ECS",
           "type": "markdown"
         }
       },
-      "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90",
+      "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-04T11:37:25.234Z",
       "version": 3
@@ -2103,7 +2103,7 @@
               "x": 0,
               "y": 4
             },
-            "id": "cf8aa0a0-18ca-11e9-9094-c50574723088",
+            "id": "cf8aa0a0-18ca-11e9-9094-c50574723088-ecs",
             "panelIndex": "1",
             "type": "visualization",
             "version": "7.0.0"
@@ -2117,7 +2117,7 @@
               "x": 24,
               "y": 4
             },
-            "id": "bb0d1870-27f1-11e9-89af-fd12d59dac90",
+            "id": "bb0d1870-27f1-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "2",
             "type": "visualization",
             "version": "7.0.0"
@@ -2131,7 +2131,7 @@
               "x": 32,
               "y": 4
             },
-            "id": "7323dd90-27f2-11e9-89af-fd12d59dac90",
+            "id": "7323dd90-27f2-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "3",
             "type": "visualization",
             "version": "7.0.0"
@@ -2145,7 +2145,7 @@
               "x": 16,
               "y": 4
             },
-            "id": "e9225120-27f2-11e9-89af-fd12d59dac90",
+            "id": "e9225120-27f2-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "4",
             "type": "visualization",
             "version": "7.0.0"
@@ -2159,7 +2159,7 @@
               "x": 40,
               "y": 4
             },
-            "id": "f664fb20-27f3-11e9-89af-fd12d59dac90",
+            "id": "f664fb20-27f3-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "5",
             "type": "visualization",
             "version": "7.0.0"
@@ -2173,7 +2173,7 @@
               "x": 8,
               "y": 4
             },
-            "id": "8d63c420-27f4-11e9-89af-fd12d59dac90",
+            "id": "8d63c420-27f4-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "6",
             "type": "visualization",
             "version": "7.0.0"
@@ -2187,7 +2187,7 @@
               "x": 0,
               "y": 12
             },
-            "id": "9dd991a0-18cb-11e9-9094-c50574723088",
+            "id": "9dd991a0-18cb-11e9-9094-c50574723088-ecs",
             "panelIndex": "8",
             "type": "visualization",
             "version": "7.0.0"
@@ -2201,7 +2201,7 @@
               "x": 8,
               "y": 12
             },
-            "id": "593df9b0-27f7-11e9-89af-fd12d59dac90",
+            "id": "593df9b0-27f7-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "9",
             "type": "visualization",
             "version": "7.0.0"
@@ -2215,7 +2215,7 @@
               "x": 16,
               "y": 12
             },
-            "id": "00fa0d20-27fc-11e9-89af-fd12d59dac90",
+            "id": "00fa0d20-27fc-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "10",
             "type": "visualization",
             "version": "7.0.0"
@@ -2229,7 +2229,7 @@
               "x": 24,
               "y": 12
             },
-            "id": "0db90830-27fd-11e9-89af-fd12d59dac90",
+            "id": "0db90830-27fd-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "11",
             "type": "visualization",
             "version": "7.0.0"
@@ -2243,7 +2243,7 @@
               "x": 24,
               "y": 19
             },
-            "id": "b885dae0-27fd-11e9-89af-fd12d59dac90",
+            "id": "b885dae0-27fd-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "12",
             "type": "visualization",
             "version": "7.0.0"
@@ -2257,7 +2257,7 @@
               "x": 32,
               "y": 12
             },
-            "id": "295905e0-27fd-11e9-89af-fd12d59dac90",
+            "id": "295905e0-27fd-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "13",
             "type": "visualization",
             "version": "7.0.0"
@@ -2271,7 +2271,7 @@
               "x": 32,
               "y": 19
             },
-            "id": "82d46ec0-27fd-11e9-89af-fd12d59dac90",
+            "id": "82d46ec0-27fd-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "14",
             "type": "visualization",
             "version": "7.0.0"
@@ -2285,7 +2285,7 @@
               "x": 40,
               "y": 12
             },
-            "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519",
+            "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519-ecs",
             "panelIndex": "15",
             "type": "visualization",
             "version": "7.0.0"
@@ -2299,7 +2299,7 @@
               "x": 0,
               "y": 26
             },
-            "id": "54135e50-27ff-11e9-805f-43bf57dfa519",
+            "id": "54135e50-27ff-11e9-805f-43bf57dfa519-ecs",
             "panelIndex": "16",
             "type": "visualization",
             "version": "7.0.0"
@@ -2313,7 +2313,7 @@
               "x": 0,
               "y": 34
             },
-            "id": "91962a30-1901-11e9-9094-c50574723088",
+            "id": "91962a30-1901-11e9-9094-c50574723088-ecs",
             "panelIndex": "17",
             "type": "visualization",
             "version": "7.0.0"
@@ -2327,7 +2327,7 @@
               "x": 24,
               "y": 34
             },
-            "id": "d08ebd30-27ff-11e9-805f-43bf57dfa519",
+            "id": "d08ebd30-27ff-11e9-805f-43bf57dfa519-ecs",
             "panelIndex": "18",
             "type": "search",
             "version": "7.0.0"
@@ -2341,17 +2341,17 @@
               "x": 0,
               "y": 0
             },
-            "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90",
+            "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "19",
             "type": "visualization",
             "version": "7.0.0"
           }
         ],
         "timeRestore": false,
-        "title": "[Auditbeat System] System Overview",
+        "title": "[Auditbeat System] System Overview ECS",
         "version": 1
       },
-      "id": "2be46cb0-27f2-11e9-89af-fd12d59dac90",
+      "id": "2be46cb0-27f2-11e9-89af-fd12d59dac90-ecs",
       "type": "dashboard",
       "updated_at": "2019-02-04T09:32:32.325Z",
       "version": 9

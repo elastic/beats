@@ -22,6 +22,7 @@ import (
 
 	"github.com/joeshaw/multierror"
 
+	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/libbeat/logp"
@@ -84,8 +85,23 @@ func eventMapping(exchange map[string]interface{}, r mb.ReporterV2) error {
 		return err
 	}
 
-	event := mb.Event{}
-	event.MetricSetFields = fields
+	rootFields := common.MapStr{}
+	if v, err := fields.GetValue("user"); err == nil {
+		rootFields.Put("user.name", v)
+		fields.Delete("user")
+	}
+
+	moduleFields := common.MapStr{}
+	if v, err := fields.GetValue("vhost"); err == nil {
+		moduleFields.Put("vhost", v)
+		fields.Delete("vhost")
+	}
+
+	event := mb.Event{
+		MetricSetFields: fields,
+		RootFields:      rootFields,
+		ModuleFields:    moduleFields,
+	}
 	r.Event(event)
 	return nil
 }

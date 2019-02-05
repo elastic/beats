@@ -13,7 +13,7 @@
             }
           }
         },
-        "title": "Destination Geo [SIEM Zeek]",
+        "title": "Destination Geo [SIEM Zeek] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -72,11 +72,11 @@
               }
             }
           },
-          "title": "Destination Geo [SIEM Zeek]",
+          "title": "Destination Geo [SIEM Zeek] ECS",
           "type": "tile_map"
         }
       },
-      "id": "5d95a3e0-1a29-11e9-84b1-a12c578fa9e8",
+      "id": "5d95a3e0-1a29-11e9-84b1-a12c578fa9e8-ecs",
       "type": "visualization",
       "updated_at": "2019-01-17T07:27:37.758Z",
       "version": 1
@@ -94,7 +94,7 @@
             }
           }
         },
-        "title": "Network Transport [SIEM Zeek]",
+        "title": "Network Transport [SIEM Zeek] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -136,11 +136,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Network Transport [SIEM Zeek]",
+          "title": "Network Transport [SIEM Zeek] ECS",
           "type": "pie"
         }
       },
-      "id": "c337dbf0-1a29-11e9-84b1-a12c578fa9e8",
+      "id": "c337dbf0-1a29-11e9-84b1-a12c578fa9e8-ecs",
       "type": "visualization",
       "updated_at": "2019-01-17T07:30:28.271Z",
       "version": 1
@@ -158,7 +158,7 @@
             }
           }
         },
-        "title": "Network Application [SIEM Zeek]",
+        "title": "Network Application [SIEM Zeek] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -200,11 +200,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Network Application [SIEM Zeek]",
+          "title": "Network Application [SIEM Zeek] ECS",
           "type": "pie"
         }
       },
-      "id": "f054ee70-1a29-11e9-84b1-a12c578fa9e8",
+      "id": "f054ee70-1a29-11e9-84b1-a12c578fa9e8-ecs",
       "type": "visualization",
       "updated_at": "2019-01-17T07:31:43.959Z",
       "version": 1
@@ -222,7 +222,7 @@
             }
           }
         },
-        "title": "Network Traffic Direction [SIEM Zeek]",
+        "title": "Network Traffic Direction [SIEM Zeek] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -264,11 +264,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Network Traffic Direction [SIEM Zeek]",
+          "title": "Network Traffic Direction [SIEM Zeek] ECS",
           "type": "pie"
         }
       },
-      "id": "15922a40-1a2a-11e9-84b1-a12c578fa9e8",
+      "id": "15922a40-1a2a-11e9-84b1-a12c578fa9e8-ecs",
       "type": "visualization",
       "updated_at": "2019-01-17T07:32:46.436Z",
       "version": 1
@@ -286,7 +286,7 @@
             }
           }
         },
-        "title": "Top DNS Domains [SIEM Zeek]",
+        "title": "Top DNS Domains [SIEM Zeek] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -328,11 +328,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Top DNS Domains [SIEM Zeek]",
+          "title": "Top DNS Domains [SIEM Zeek] ECS",
           "type": "pie"
         }
       },
-      "id": "b3705f00-1a2c-11e9-84b1-a12c578fa9e8",
+      "id": "b3705f00-1a2c-11e9-84b1-a12c578fa9e8-ecs",
       "type": "visualization",
       "updated_at": "2019-01-17T07:51:30.288Z",
       "version": 1
@@ -350,7 +350,7 @@
             }
           }
         },
-        "title": "Top URL Domain [SIEM Zeek]",
+        "title": "Top URL Domain [SIEM Zeek] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -392,11 +392,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Top URL Domain [SIEM Zeek]",
+          "title": "Top URL Domain [SIEM Zeek] ECS",
           "type": "pie"
         }
       },
-      "id": "ef0cfdc0-1a2c-11e9-84b1-a12c578fa9e8",
+      "id": "ef0cfdc0-1a2c-11e9-84b1-a12c578fa9e8-ecs",
       "type": "visualization",
       "updated_at": "2019-01-17T07:53:10.300Z",
       "version": 1
@@ -414,7 +414,7 @@
             }
           }
         },
-        "title": "Top SSL Server [SIEM Zeek]",
+        "title": "Top SSL Server [SIEM Zeek] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -456,11 +456,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Top SSL Server [SIEM Zeek]",
+          "title": "Top SSL Server [SIEM Zeek] ECS",
           "type": "pie"
         }
       },
-      "id": "13454cb0-1a2d-11e9-84b1-a12c578fa9e8",
+      "id": "13454cb0-1a2d-11e9-84b1-a12c578fa9e8-ecs",
       "type": "visualization",
       "updated_at": "2019-01-17T07:54:11.067Z",
       "version": 1
@@ -477,7 +477,7 @@
             }
           }
         },
-        "title": "Time Series Count [SIEM Zeek]",
+        "title": "Time Series Count [SIEM Zeek] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -534,11 +534,11 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Time Series Count [SIEM Zeek]",
+          "title": "Time Series Count [SIEM Zeek] ECS",
           "type": "metrics"
         }
       },
-      "id": "fad258c0-1078-11e9-b27a-69e6e8b80a25",
+      "id": "fad258c0-1078-11e9-b27a-69e6e8b80a25-ecs",
       "type": "visualization",
       "updated_at": "2019-01-17T07:56:26.486Z",
       "version": 74
@@ -577,7 +577,7 @@
               "x": 0,
               "y": 0
             },
-            "id": "5d95a3e0-1a29-11e9-84b1-a12c578fa9e8",
+            "id": "5d95a3e0-1a29-11e9-84b1-a12c578fa9e8-ecs",
             "panelIndex": "1",
             "type": "visualization",
             "version": "6.5.4"
@@ -595,7 +595,7 @@
               "x": 0,
               "y": 18
             },
-            "id": "c337dbf0-1a29-11e9-84b1-a12c578fa9e8",
+            "id": "c337dbf0-1a29-11e9-84b1-a12c578fa9e8-ecs",
             "panelIndex": "2",
             "type": "visualization",
             "version": "6.5.4"
@@ -613,7 +613,7 @@
               "x": 16,
               "y": 18
             },
-            "id": "f054ee70-1a29-11e9-84b1-a12c578fa9e8",
+            "id": "f054ee70-1a29-11e9-84b1-a12c578fa9e8-ecs",
             "panelIndex": "3",
             "type": "visualization",
             "version": "6.5.4"
@@ -631,7 +631,7 @@
               "x": 33,
               "y": 18
             },
-            "id": "15922a40-1a2a-11e9-84b1-a12c578fa9e8",
+            "id": "15922a40-1a2a-11e9-84b1-a12c578fa9e8-ecs",
             "panelIndex": "4",
             "type": "visualization",
             "version": "6.5.4"
@@ -645,7 +645,7 @@
               "x": 0,
               "y": 28
             },
-            "id": "b3705f00-1a2c-11e9-84b1-a12c578fa9e8",
+            "id": "b3705f00-1a2c-11e9-84b1-a12c578fa9e8-ecs",
             "panelIndex": "5",
             "type": "visualization",
             "version": "6.5.4"
@@ -659,7 +659,7 @@
               "x": 16,
               "y": 28
             },
-            "id": "ef0cfdc0-1a2c-11e9-84b1-a12c578fa9e8",
+            "id": "ef0cfdc0-1a2c-11e9-84b1-a12c578fa9e8-ecs",
             "panelIndex": "6",
             "type": "visualization",
             "version": "6.5.4"
@@ -673,7 +673,7 @@
               "x": 33,
               "y": 28
             },
-            "id": "13454cb0-1a2d-11e9-84b1-a12c578fa9e8",
+            "id": "13454cb0-1a2d-11e9-84b1-a12c578fa9e8-ecs",
             "panelIndex": "7",
             "type": "visualization",
             "version": "6.5.4"
@@ -687,17 +687,17 @@
               "x": 0,
               "y": 39
             },
-            "id": "fad258c0-1078-11e9-b27a-69e6e8b80a25",
+            "id": "fad258c0-1078-11e9-b27a-69e6e8b80a25-ecs",
             "panelIndex": "8",
             "type": "visualization",
             "version": "6.5.4"
           }
         ],
         "timeRestore": false,
-        "title": "Zeek Overview Dashboard [SIEM]",
+        "title": "Zeek Overview Dashboard [SIEM] ECS",
         "version": 1
       },
-      "id": "87b0c430-1a2d-11e9-84b1-a12c578fa9e8",
+      "id": "87b0c430-1a2d-11e9-84b1-a12c578fa9e8-ecs",
       "type": "dashboard",
       "updated_at": "2019-01-17T07:57:50.613Z",
       "version": 2

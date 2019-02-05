@@ -12,21 +12,21 @@
             }
           }
         },
-        "title": "Dashboard Links [Auditbeat System]",
+        "title": "Dashboard Links [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
           "aggs": [],
           "params": {
             "fontSize": 12,
-            "markdown": "**Dashboards**: [System Overview](#/dashboard/2be46cb0-27f2-11e9-89af-fd12d59dac90) | [Hosts](#/dashboard/dfe62590-18da-11e9-9094-c50574723088) | [Logins](#/dashboard/2a17f200-285e-11e9-805f-43bf57dfa519) | [Users](#/dashboard/ae96a660-2864-11e9-97cb-474beda9f119) | [Processes](#/dashboard/4c68f110-2863-11e9-97cb-474beda9f119) | [Sockets](#/dashboard/957a3ef0-2867-11e9-9d21-0be348776e6c) | [Packages](#/dashboard/137c52f0-286a-11e9-9d21-0be348776e6c)",
+            "markdown": "**Dashboards**: [System Overview](#/dashboard/2be46cb0-27f2-11e9-89af-fd12d59dac90-ecs) | [Hosts](#/dashboard/dfe62590-18da-11e9-9094-c50574723088-ecs) | [Logins](#/dashboard/2a17f200-285e-11e9-805f-43bf57dfa519-ecs) | [Users](#/dashboard/ae96a660-2864-11e9-97cb-474beda9f119-ecs) | [Processes](#/dashboard/4c68f110-2863-11e9-97cb-474beda9f119-ecs) | [Sockets](#/dashboard/957a3ef0-2867-11e9-9d21-0be348776e6c-ecs) | [Packages](#/dashboard/137c52f0-286a-11e9-9d21-0be348776e6c-ecs)",
             "openLinksInNewTab": false
           },
-          "title": "Dashboard Links [Auditbeat System]",
+          "title": "Dashboard Links [Auditbeat System] ECS",
           "type": "markdown"
         }
       },
-      "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90",
+      "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-04T11:37:25.234Z",
       "version": 3
@@ -71,7 +71,7 @@
             }
           }
         },
-        "title": "Package Count [Auditbeat System]",
+        "title": "Package Count [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -115,11 +115,11 @@
             },
             "type": "metric"
           },
-          "title": "Package Count [Auditbeat System]",
+          "title": "Package Count [Auditbeat System] ECS",
           "type": "metric"
         }
       },
-      "id": "f664fb20-27f3-11e9-89af-fd12d59dac90",
+      "id": "f664fb20-27f3-11e9-89af-fd12d59dac90-ecs",
       "type": "visualization",
       "updated_at": "2019-02-03T20:40:37.585Z",
       "version": 1
@@ -190,7 +190,7 @@
             }
           }
         },
-        "title": "Package Changes [Auditbeat System]",
+        "title": "Package Changes [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -233,11 +233,11 @@
             },
             "type": "metric"
           },
-          "title": "Package Changes [Auditbeat System]",
+          "title": "Package Changes [Auditbeat System] ECS",
           "type": "metric"
         }
       },
-      "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519",
+      "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519-ecs",
       "type": "visualization",
       "updated_at": "2019-02-04T10:44:06.826Z",
       "version": 2
@@ -282,7 +282,7 @@
             }
           }
         },
-        "title": "Package OS Distribution [Auditbeat System]",
+        "title": "Package OS Distribution [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -343,11 +343,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Package OS Distribution [Auditbeat System]",
+          "title": "Package OS Distribution [Auditbeat System] ECS",
           "type": "pie"
         }
       },
-      "id": "6ed51940-2868-11e9-9d21-0be348776e6c",
+      "id": "6ed51940-2868-11e9-9d21-0be348776e6c-ecs",
       "type": "visualization",
       "updated_at": "2019-02-04T10:34:21.268Z",
       "version": 1
@@ -418,7 +418,7 @@
             }
           }
         },
-        "title": "Package Change Actions [Auditbeat System]",
+        "title": "Package Change Actions [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -460,11 +460,11 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Package Change Actions [Auditbeat System]",
+          "title": "Package Change Actions [Auditbeat System] ECS",
           "type": "pie"
         }
       },
-      "id": "fe23f530-2868-11e9-9d21-0be348776e6c",
+      "id": "fe23f530-2868-11e9-9d21-0be348776e6c-ecs",
       "type": "visualization",
       "updated_at": "2019-02-04T10:38:21.699Z",
       "version": 1
@@ -509,7 +509,7 @@
             }
           }
         },
-        "title": "Package Document Histogram [Auditbeat System]",
+        "title": "Package Document Histogram [Auditbeat System] ECS",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -606,11 +606,11 @@
               }
             ]
           },
-          "title": "Package Document Histogram [Auditbeat System]",
+          "title": "Package Document Histogram [Auditbeat System] ECS",
           "type": "histogram"
         }
       },
-      "id": "4e7701d0-2869-11e9-9d21-0be348776e6c",
+      "id": "4e7701d0-2869-11e9-9d21-0be348776e6c-ecs",
       "type": "visualization",
       "updated_at": "2019-02-04T10:40:36.461Z",
       "version": 1
@@ -667,10 +667,10 @@
           "@timestamp",
           "desc"
         ],
-        "title": "Package Documents [Auditbeat System]",
+        "title": "Package Documents [Auditbeat System] ECS",
         "version": 1
       },
-      "id": "391ef230-2868-11e9-9d21-0be348776e6c",
+      "id": "391ef230-2868-11e9-9d21-0be348776e6c-ecs",
       "type": "search",
       "updated_at": "2019-02-04T10:32:51.155Z",
       "version": 1
@@ -715,7 +715,7 @@
             }
           }
         },
-        "title": "Package Names [Auditbeat System]",
+        "title": "Package Names [Auditbeat System] ECS",
         "uiStateJSON": {
           "vis": {
             "params": {
@@ -764,11 +764,11 @@
             },
             "totalFunc": "sum"
           },
-          "title": "Package Names [Auditbeat System]",
+          "title": "Package Names [Auditbeat System] ECS",
           "type": "table"
         }
       },
-      "id": "8dc55df0-2869-11e9-9d21-0be348776e6c",
+      "id": "8dc55df0-2869-11e9-9d21-0be348776e6c-ecs",
       "type": "visualization",
       "updated_at": "2019-02-04T10:45:22.440Z",
       "version": 2
@@ -801,7 +801,7 @@
               "x": 0,
               "y": 0
             },
-            "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90",
+            "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "1",
             "type": "visualization",
             "version": "7.0.0"
@@ -815,7 +815,7 @@
               "x": 0,
               "y": 4
             },
-            "id": "f664fb20-27f3-11e9-89af-fd12d59dac90",
+            "id": "f664fb20-27f3-11e9-89af-fd12d59dac90-ecs",
             "panelIndex": "2",
             "type": "visualization",
             "version": "7.0.0"
@@ -829,7 +829,7 @@
               "x": 6,
               "y": 4
             },
-            "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519",
+            "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519-ecs",
             "panelIndex": "3",
             "type": "visualization",
             "version": "7.0.0"
@@ -843,7 +843,7 @@
               "x": 24,
               "y": 4
             },
-            "id": "6ed51940-2868-11e9-9d21-0be348776e6c",
+            "id": "6ed51940-2868-11e9-9d21-0be348776e6c-ecs",
             "panelIndex": "4",
             "type": "visualization",
             "version": "7.0.0"
@@ -857,7 +857,7 @@
               "x": 11,
               "y": 4
             },
-            "id": "fe23f530-2868-11e9-9d21-0be348776e6c",
+            "id": "fe23f530-2868-11e9-9d21-0be348776e6c-ecs",
             "panelIndex": "5",
             "type": "visualization",
             "version": "7.0.0"
@@ -871,7 +871,7 @@
               "x": 0,
               "y": 15
             },
-            "id": "4e7701d0-2869-11e9-9d21-0be348776e6c",
+            "id": "4e7701d0-2869-11e9-9d21-0be348776e6c-ecs",
             "panelIndex": "6",
             "type": "visualization",
             "version": "7.0.0"
@@ -885,7 +885,7 @@
               "x": 0,
               "y": 23
             },
-            "id": "391ef230-2868-11e9-9d21-0be348776e6c",
+            "id": "391ef230-2868-11e9-9d21-0be348776e6c-ecs",
             "panelIndex": "7",
             "type": "search",
             "version": "7.0.0"
@@ -899,17 +899,17 @@
               "x": 37,
               "y": 4
             },
-            "id": "8dc55df0-2869-11e9-9d21-0be348776e6c",
+            "id": "8dc55df0-2869-11e9-9d21-0be348776e6c-ecs",
             "panelIndex": "8",
             "type": "visualization",
             "version": "7.0.0"
           }
         ],
         "timeRestore": false,
-        "title": "[Auditbeat System] Package Dashboard",
+        "title": "[Auditbeat System] Package Dashboard ECS",
         "version": 1
       },
-      "id": "137c52f0-286a-11e9-9d21-0be348776e6c",
+      "id": "137c52f0-286a-11e9-9d21-0be348776e6c-ecs",
       "type": "dashboard",
       "updated_at": "2019-02-04T11:03:23.945Z",
       "version": 2
