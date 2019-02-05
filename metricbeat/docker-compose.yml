@@ -20,6 +20,7 @@ services:
       - ./module/elasticsearch/_meta/env
       - ./module/envoyproxy/_meta/env
       - ./module/etcd/_meta/env
+      - ./module/golang/_meta/env
       - ./module/haproxy/_meta/env
       - ./module/http/_meta/env
       - ./module/jolokia/_meta/env
@@ -86,6 +87,9 @@ services:
       context: ./module/etcd/_meta
       args:
         ETCD_VERSION: v3.2.25
+
+  golang:
+    build: ./module/golang/_meta
 
   haproxy:
     build: ./module/haproxy/_meta
