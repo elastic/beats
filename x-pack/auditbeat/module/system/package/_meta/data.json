@@ -7,7 +7,7 @@
     "event": {
         "action": "existing_package",
         "dataset": "package",
-        "id": "9ac4ea4c-5a0c-475f-b4c9-ec9d981ff11b",
+        "id": "ed069c3f-1d30-4e17-845b-cc915cf108b4",
         "kind": "state",
         "module": "system"
     },
@@ -18,6 +18,7 @@
     "system": {
         "audit": {
             "package": {
+                "entity_id": "c2c455d9f99375d9fefc61da52fa93778976d54b1964164778058980531d77dc",
                 "installtime": "2018-08-30T18:41:23.85657356+01:00",
                 "name": "zstd",
                 "summary": "Zstandard is a real-time compression algorithm",

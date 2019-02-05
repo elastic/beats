@@ -27,6 +27,9 @@
     "service": {
         "type": "system"
     },
+    "socket": {
+        "entity_id": "d85bf25935c0ebbabc053024d4954ddd78979bd1390364ac46395c390ed7a6df"
+    },
     "source": {
         "ip": "10.0.2.2",
         "port": 55270
