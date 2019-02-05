@@ -458,8 +458,8 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	auditEvent, err := aucoalesce.CoalesceMessages(msgs)
 	if err != nil {
 		// Add messages on error so that it's possible to debug the problem.
-		out := mb.Event{MetricSetFields: common.MapStr{}}
-		addMessages(msgs, out.MetricSetFields)
+		out := mb.Event{RootFields: common.MapStr{}}
+		addEventOriginal(msgs, out.RootFields)
 		return out
 	}
 
@@ -494,6 +494,17 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	if len(auditEvent.Tags) > 0 {
 		out.RootFields.Put("tags", auditEvent.Tags)
 	}
+	if config.Warnings && len(auditEvent.Warnings) > 0 {
+		warnings := make([]string, 0, len(auditEvent.Warnings))
+		for _, err := range auditEvent.Warnings {
+			warnings = append(warnings, err.Error())
+		}
+		out.RootFields.Put("error.message", warnings)
+		addEventOriginal(msgs, out.RootFields)
+	}
+	if config.RawMessage {
+		addEventOriginal(msgs, out.RootFields)
+	}
 
 	// Add module fields.
 	m := out.ModuleFields
@@ -517,17 +528,6 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	}
 	if len(auditEvent.Paths) > 0 {
 		m.Put("paths", auditEvent.Paths)
-	}
-	if config.Warnings && len(auditEvent.Warnings) > 0 {
-		warnings := make([]string, 0, len(auditEvent.Warnings))
-		for _, err := range auditEvent.Warnings {
-			warnings = append(warnings, err.Error())
-		}
-		m.Put("warnings", warnings)
-		addMessages(msgs, m)
-	}
-	if config.RawMessage {
-		addMessages(msgs, m)
 	}
 
 	return out
@@ -694,15 +694,20 @@ func addNetwork(net *aucoalesce.Network, m common.MapStr) {
 	m.Put("network", network)
 }
 
-func addMessages(msgs []*auparse.AuditMessage, m common.MapStr) {
-	_, added := m["messages"]
-	if !added && len(msgs) > 0 {
-		rawMsgs := make([]string, 0, len(msgs))
-		for _, msg := range msgs {
-			rawMsgs = append(rawMsgs, "type="+msg.RecordType.String()+" msg="+msg.RawData)
-		}
-		m["messages"] = rawMsgs
+func addEventOriginal(msgs []*auparse.AuditMessage, m common.MapStr) {
+	const key = "event.original"
+	if len(msgs) == 0 {
+		return
 	}
+	original, _ := m.GetValue(key)
+	if original != nil {
+		return
+	}
+	rawMsgs := make([]string, 0, len(msgs))
+	for _, msg := range msgs {
+		rawMsgs = append(rawMsgs, "type="+msg.RecordType.String()+" msg="+msg.RawData)
+	}
+	m.Put(key, rawMsgs)
 }
 
 func createAuditdData(data map[string]string) common.MapStr {

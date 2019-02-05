@@ -7,6 +7,8 @@ In version 7.0 the following fields were renamed.
 [frame="topbot",options="header"]
 |======================
 |Old Field|New Field
+|`auditd.messages`        |`event.original`
+|`auditd.warnings`        |`error.message`
 |`event.type`             |`auditd.message_type`
 |`process.cwd`            |`process.working_directory`
 |`source.hostname`        |`source.domain`
