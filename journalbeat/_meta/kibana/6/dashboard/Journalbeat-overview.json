@@ -38,7 +38,7 @@
       "attributes": {
         "columns": [
           "@timestamp",
-          "host.hostname",
+          "host.name",
           "process.name",
           "message"
         ],
