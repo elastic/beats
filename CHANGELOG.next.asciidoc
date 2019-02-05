@@ -270,6 +270,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Journalbeat*
 
+- Migrate registry from previously incorrect path. {pull}10486[10486]
+
 *Metricbeat*
 
 - Add `key` metricset to the Redis module. {issue}9582[9582] {pull}9657[9657] {pull}9746[9746]
