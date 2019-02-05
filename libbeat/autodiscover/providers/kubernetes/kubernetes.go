@@ -18,6 +18,7 @@
 package kubernetes
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -117,16 +118,6 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 
 			p.emit(pod, "stop")
 			p.emit(pod, "start")
-
-			// Waiting for delete to schedule modules stop can be too late
-			// as some of the containers of the pod can be already stopped,
-			// so schedule stop as soon as the pod is marked for termination.
-			if terminating, countdown := podTerminating(pod); terminating {
-				gracePeriod := time.Duration(countdown)*time.Second + config.CleanupTimeout
-				logp.Debug("kubernetes", "Pod %s terminated, scheduling module stop in %v", *pod.Metadata.Name, gracePeriod)
-				time.AfterFunc(gracePeriod, func() { p.emit(pod, "stop") })
-				return
-			}
 		},
 		DeleteFunc: func(obj kubernetes.Resource) {
 			logp.Debug("kubernetes", "Watcher Pod delete: %+v", obj)
@@ -135,28 +126,6 @@ func AutodiscoverBuilder(bus bus.Bus, uuid uuid.UUID, c *common.Config) (autodis
 	})
 
 	return p, nil
-}
-
-func podTerminating(pod *kubernetes.Pod) (terminating bool, countdown int64) {
-	if pod == nil || pod.Metadata == nil {
-		return
-	}
-
-	// DeletionTimestamp is protected and can only be set by kubernetes itself.
-	// While this premise is true, we can safely assume that a pod is being
-	// terminated if this field is set.
-	// DeletionTimestamp is the time when the pod will be definitely terminated
-	// (including grace period)
-	timestamp := pod.Metadata.DeletionTimestamp
-	if timestamp == nil {
-		return
-	}
-	terminating = true
-	countdown = timestamp.GetSeconds() - time.Now().Unix()
-	if countdown <= 0 {
-		countdown = 0
-	}
-	return
 }
 
 // Start for Runner interface.
@@ -179,28 +148,21 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 	host := pod.Status.GetPodIP()
 
 	// Do not emit events without host (container is still being configured)
-	if host == "" {
+	if host == "" && flag != "stop" {
 		return
 	}
 
-	// Collect all container IDs and runtimes from status information.
-	containerIDs := map[string]string{}
+	// Collect all runtimes from status information.
 	runtimes := map[string]string{}
 	for _, c := range containerstatuses {
-		cid, runtime := kubernetes.ContainerIDWithRuntime(c)
-		containerIDs[c.GetName()] = cid
+		_, runtime := kubernetes.ContainerIDWithRuntime(c)
 		runtimes[c.GetName()] = runtime
 	}
 
 	// Emit container and port information
 	for _, c := range containers {
-		cid := containerIDs[c.GetName()]
+		cid := fmt.Sprintf("%s.%s", pod.Metadata.GetName(), c.GetName())
 
-		// If there is a container ID that is empty then ignore it. It either means that the container is still starting
-		// up or the container is shutting down.
-		if cid == "" {
-			continue
-		}
 		cmeta := common.MapStr{
 			"id":      cid,
 			"name":    c.GetName(),
