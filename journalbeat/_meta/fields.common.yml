@@ -158,67 +158,67 @@
               description: >
                 The line number of the code which generated the log message.
         - name: process
-      type: group
-      description: >
-          Fields to log on behalf of a different program.
-      fields:
-        - name: audit
           type: group
           description: >
-              Audit fields of event.
+              Fields to log on behalf of a different program.
           fields:
-            - name: loginuid
+            - name: audit
+              type: group
+              description: >
+                  Audit fields of event.
+              fields:
+                - name: loginuid
+                  type: long
+                  required: false
+                  example: 1000
+                  description: >
+                    The login UID of the source process.
+                - name: session
+                  type: long
+                  required: false
+                  example: 3
+                  description: >
+                    The audit session of the source process.
+            - name: cmd
+              type: keyword
+              required: false
+              example: "/lib/systemd/systemd --user"
+              description: >
+                The command line of the process.
+            - name: name
+              type: keyword
+              required: false
+              example: "/lib/systemd/systemd"
+              description: >
+                Name of the executable.
+            - name: executable
+              type: keyword
+              required: false
+              description: >
+                Path to the the executable.
+              example: "/lib/systemd/systemd"
+            - name: pid
               type: long
               required: false
-              example: 1000
+              example: 1
               description: >
-                The login UID of the source process.
-            - name: session
+                The ID of the process which logged the message.
+            - name: gid
               type: long
               required: false
-              example: 3
+              example: 1
               description: >
-                The audit session of the source process.
-        - name: cmd
-          type: keyword
-          required: false
-          example: "/lib/systemd/systemd --user"
-          description: >
-            The command line of the process.
-        - name: name
-          type: keyword
-          required: false
-          example: "/lib/systemd/systemd"
-          description: >
-            Name of the executable.
-        - name: executable
-          type: keyword
-          required: false
-          description: >
-            Path to the the executable.
-          example: "/lib/systemd/systemd"
-        - name: pid
-          type: long
-          required: false
-          example: 1
-          description: >
-            The ID of the process which logged the message.
-        - name: gid
-          type: long
-          required: false
-          example: 1
-          description: >
-            The ID of the group which runs the process.
-        - name: uid
-          type: long
-          required: false
-          example: 1
-          description: >
-            The ID of the user which runs the process.
-        - name: capabilites
-          required: false
-          description: >
-            The effective capabilites of the process.
+                The ID of the group which runs the process.
+            - name: uid
+              type: long
+              required: false
+              example: 1
+              description: >
+                The ID of the user which runs the process.
+            - name: capabilites
+              required: false
+              description: >
+                The effective capabilites of the process.
     - name: systemd
       type: group
       description: >
