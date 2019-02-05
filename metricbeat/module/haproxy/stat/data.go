@@ -143,8 +143,8 @@ func eventMapping(info []*haproxy.Stat, r mb.ReporterV2) {
 			RootFields: common.MapStr{},
 		}
 
-		if processId, err := fields.GetValue("process_id"); err == nil {
-			event.RootFields.Put("process.pid", processId)
+		if processID, err := fields.GetValue("process_id"); err == nil {
+			event.RootFields.Put("process.pid", processID)
 			fields.Delete("process_id")
 		}
 
