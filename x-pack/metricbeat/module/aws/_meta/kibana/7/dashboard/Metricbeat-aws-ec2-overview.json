@@ -76,8 +76,8 @@
       },
       "id": "fed59380-f7f8-11e8-af03-c999c9dea608",
       "type": "visualization",
-      "updated_at": "2019-02-05T21:53:28.769Z",
-      "version": 6
+      "updated_at": "2019-02-05T22:19:02.492Z",
+      "version": 7
     },
     {
       "attributes": {
@@ -157,8 +157,8 @@
       },
       "id": "9e8c6030-f7f8-11e8-af03-c999c9dea608",
       "type": "visualization",
-      "updated_at": "2019-02-05T21:53:28.769Z",
-      "version": 5
+      "updated_at": "2019-02-05T22:19:02.492Z",
+      "version": 6
     },
     {
       "attributes": {
@@ -236,8 +236,8 @@
       },
       "id": "15818fd0-f7f9-11e8-af03-c999c9dea608",
       "type": "visualization",
-      "updated_at": "2019-02-05T21:53:28.769Z",
-      "version": 6
+      "updated_at": "2019-02-05T22:19:02.492Z",
+      "version": 7
     },
     {
       "attributes": {
@@ -315,8 +315,8 @@
       },
       "id": "233b3400-f7f9-11e8-af03-c999c9dea608",
       "type": "visualization",
-      "updated_at": "2019-02-05T21:53:28.769Z",
-      "version": 6
+      "updated_at": "2019-02-05T22:19:02.492Z",
+      "version": 7
     },
     {
       "attributes": {
@@ -394,8 +394,8 @@
       },
       "id": "f1db6ec0-f7f8-11e8-af03-c999c9dea608",
       "type": "visualization",
-      "updated_at": "2019-02-05T21:53:28.769Z",
-      "version": 6
+      "updated_at": "2019-02-05T22:19:02.492Z",
+      "version": 7
     },
     {
       "attributes": {
@@ -473,8 +473,8 @@
       },
       "id": "be8828d0-f7f6-11e8-af03-c999c9dea608",
       "type": "visualization",
-      "updated_at": "2019-02-05T21:53:28.769Z",
-      "version": 6
+      "updated_at": "2019-02-05T22:19:02.492Z",
+      "version": 7
     },
     {
       "attributes": {
@@ -1093,7 +1093,7 @@
               }
             ],
             "pinFilters": false,
-            "updateFiltersOnChange": false,
+            "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
           "title": "AWS filter by region",
@@ -1102,8 +1102,8 @@
       },
       "id": "deab0260-2981-11e9-86eb-a3a07a77f530",
       "type": "visualization",
-      "updated_at": "2019-02-05T22:04:33.212Z",
-      "version": 2
+      "updated_at": "2019-02-05T22:41:00.567Z",
+      "version": 4
     },
     {
       "attributes": {
@@ -1125,21 +1125,6 @@
           "params": {
             "controls": [
               {
-                "fieldName": "",
-                "id": "1549404039429",
-                "indexPattern": "",
-                "label": "",
-                "options": {
-                  "dynamicOptions": true,
-                  "multiselect": true,
-                  "order": "desc",
-                  "size": 5,
-                  "type": "terms"
-                },
-                "parent": "",
-                "type": "list"
-              },
-              {
                 "fieldName": "cloud.machine.type",
                 "id": "1549404124735",
                 "indexPattern": "metricbeat-*",
@@ -1156,7 +1141,7 @@
               }
             ],
             "pinFilters": false,
-            "updateFiltersOnChange": false,
+            "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
           "title": "AWS filter by machine type",
@@ -1165,8 +1150,8 @@
       },
       "id": "be8f4d50-2991-11e9-86eb-a3a07a77f530",
       "type": "visualization",
-      "updated_at": "2019-02-05T22:04:13.249Z",
-      "version": 2
+      "updated_at": "2019-02-05T22:41:21.470Z",
+      "version": 4
     },
     {
       "attributes": {
@@ -1204,7 +1189,7 @@
               }
             ],
             "pinFilters": false,
-            "updateFiltersOnChange": false,
+            "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
           "title": "AWS filter by availability zone",
@@ -1213,8 +1198,8 @@
       },
       "id": "322ec240-2992-11e9-86eb-a3a07a77f530",
       "type": "visualization",
-      "updated_at": "2019-02-05T22:05:49.540Z",
-      "version": 1
+      "updated_at": "2019-02-05T22:41:34.235Z",
+      "version": 3
     },
     {
       "attributes": {
@@ -1368,8 +1353,8 @@
       },
       "id": "c5846400-f7fb-11e8-af03-c999c9dea608",
       "type": "dashboard",
-      "updated_at": "2019-02-05T22:07:36.041Z",
-      "version": 10
+      "updated_at": "2019-02-05T22:46:13.810Z",
+      "version": 12
     }
   ],
   "version": "6.6.0"
