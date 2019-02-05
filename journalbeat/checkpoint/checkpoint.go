@@ -161,19 +161,16 @@ func (c *Checkpoint) findRegistryFile() error {
 		return fmt.Errorf("error while syncing new registry file to disk: %+v", err)
 	}
 
+	c.file = migratedPath
+
 	p := filepath.Dir(migratedPath)
-	pf, err := os.Open(p)
+	pf, _ := os.Open(p)
 	if err != nil {
-		return fmt.Errorf("error while opening parent dir: %+v")
+		return nil
 	}
 	defer pf.Close()
+	pf.Sync()
 
-	err = pf.Sync()
-	if err != nil {
-		return fmt.Errorf("error while syncing data of parent dir: %+v")
-	}
-
-	c.file = migratedPath
 	return nil
 }
 
