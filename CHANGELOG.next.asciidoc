@@ -152,6 +152,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - System module `process` dataset: Add user information to processes. {pull}9963[9963]
 - Add system `package` dataset. {pull}10225[10225]
 - Add system module `login` dataset. {pull}9327[9327]
+- Add `entity_id` fields. {pull}10500[10500]
 
 *Filebeat*
 

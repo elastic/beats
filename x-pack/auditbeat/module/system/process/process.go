@@ -5,6 +5,7 @@
 package process
 
 import (
+	"encoding/binary"
 	"fmt"
 	"os"
 	"os/user"
@@ -21,6 +22,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/auditbeat/cache"
+	"github.com/elastic/beats/x-pack/auditbeat/module/system"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -71,7 +73,7 @@ func init() {
 
 // MetricSet collects data about the host.
 type MetricSet struct {
-	mb.BaseMetricSet
+	system.SystemMetricSet
 	config    Config
 	cache     *cache.Cache
 	log       *logp.Logger
@@ -111,6 +113,15 @@ func (p Process) toMapStr() common.MapStr {
 	}
 }
 
+// entityID creates an ID that uniquely identifies this process across machines.
+func (p Process) entityID(hostID string) string {
+	h := system.NewEntityHash()
+	h.Write([]byte(hostID))
+	binary.Write(h, binary.LittleEndian, int64(p.Info.PID))
+	binary.Write(h, binary.LittleEndian, int64(p.Info.StartTime.Nanosecond()))
+	return h.Sum()
+}
+
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The %v/%v dataset is experimental", moduleName, metricsetName)
@@ -126,11 +137,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	ms := &MetricSet{
-		BaseMetricSet: base,
-		config:        config,
-		log:           logp.NewLogger(metricsetName),
-		cache:         cache.New(),
-		bucket:        bucket,
+		SystemMetricSet: system.NewSystemMetricSet(base),
+		config:          config,
+		log:             logp.NewLogger(metricsetName),
+		cache:           cache.New(),
+		bucket:          bucket,
 	}
 
 	// Load from disk: Time when state was last sent
@@ -204,12 +215,12 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 	}
 	for _, p := range processes {
 		if p.Error == nil {
-			event := processEvent(p, eventTypeState, eventActionExistingProcess)
+			event := ms.processEvent(p, eventTypeState, eventActionExistingProcess)
 			event.RootFields.Put("event.id", stateID.String())
 			report.Event(event)
 		} else {
 			ms.log.Warn(p.Error)
-			report.Event(processEvent(p, eventTypeError, eventActionProcessError))
+			report.Event(ms.processEvent(p, eventTypeError, eventActionProcessError))
 		}
 	}
 
@@ -245,10 +256,10 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 		p := cacheValue.(*Process)
 
 		if p.Error == nil {
-			report.Event(processEvent(p, eventTypeEvent, eventActionProcessStarted))
+			report.Event(ms.processEvent(p, eventTypeEvent, eventActionProcessStarted))
 		} else {
 			ms.log.Warn(p.Error)
-			report.Event(processEvent(p, eventTypeError, eventActionProcessError))
+			report.Event(ms.processEvent(p, eventTypeError, eventActionProcessError))
 		}
 	}
 
@@ -256,14 +267,14 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 		p := cacheValue.(*Process)
 
 		if p.Error == nil {
-			report.Event(processEvent(p, eventTypeEvent, eventActionProcessStopped))
+			report.Event(ms.processEvent(p, eventTypeEvent, eventActionProcessStopped))
 		}
 	}
 
 	return nil
 }
 
-func processEvent(process *Process, eventType string, action eventAction) mb.Event {
+func (ms *MetricSet) processEvent(process *Process, eventType string, action eventAction) mb.Event {
 	event := mb.Event{
 		RootFields: common.MapStr{
 			"event": common.MapStr{
@@ -301,6 +312,8 @@ func processEvent(process *Process, eventType string, action eventAction) mb.Eve
 	if process.Error != nil {
 		event.RootFields.Put("error.message", process.Error.Error())
 	}
+
+	event.RootFields.Put("process.entity_id", process.entityID(ms.HostID()))
 
 	return event
 }
