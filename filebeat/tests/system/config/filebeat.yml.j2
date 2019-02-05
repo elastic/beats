@@ -91,6 +91,7 @@ filebeat.{{input_config | default("inputs")}}:
 {% endif %}
 
 filebeat.shutdown_timeout: {{ shutdown_timeout|default(0) }}
+
 {% if not skip_registry_config %}
 filebeat.registry:
   path: {{ beat.working_dir + '/' }}{{ registry_home|default("registry")}}

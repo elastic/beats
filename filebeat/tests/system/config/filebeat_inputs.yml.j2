@@ -5,7 +5,15 @@ filebeat.inputs:
   scan_frequency: 0.5s
   encoding: {{input.encoding | default("plain") }}
 {% endfor %}
-filebeat.registry_file: {{ beat.working_dir + '/' }}{{ registryFile|default("registry")}}
+
+{% if not skip_registry_config %}
+filebeat.registry:
+  path: {{ beat.working_dir + '/' }}{{ registry_home|default("registry")}}
+  file_permissions: {{ registry_file_permissions|default("0600") }}
+  {% if registry_migrate_file %}
+  migrate_file: {{ beat.working_dir + '/' + registry_migrate_file }}
+  {% endif %}
+{%endif%}
 
 {% if ilm %}
 setup.ilm:
