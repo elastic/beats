@@ -22,7 +22,7 @@ jobs:
     # General checks
     - os: linux
       env: TARGETS="check"
-      go: $GO_VERSION
+      go: 1.11.5
       stage: check
 
     # Filebeat
