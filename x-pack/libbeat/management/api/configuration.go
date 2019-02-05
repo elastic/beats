@@ -14,8 +14,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common/reload"
 
-	"github.com/gofrs/uuid"
-
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -79,15 +77,12 @@ func (c *configResponse) UnmarshalJSON(b []byte) error {
 }
 
 // Configuration retrieves the list of configuration blocks from Kibana
-func (c *Client) Configuration(accessToken string, beatUUID uuid.UUID, configOK bool) (ConfigBlocks, error) {
-	headers := http.Header{}
-	headers.Set("kbn-beats-access-token", accessToken)
-
+func (c *AuthClient) Configuration() (ConfigBlocks, error) {
 	resp := struct {
 		ConfigBlocks []*configResponse `json:"configuration_blocks"`
 	}{}
-	url := fmt.Sprintf("/api/beats/agent/%s/configuration?validSetting=%t", beatUUID, configOK)
-	statusCode, err := c.request("GET", url, nil, headers, &resp)
+	url := fmt.Sprintf("/api/beats/agent/%s/configuration", c.BeatUUID)
+	statusCode, err := c.Client.request("GET", url, nil, c.headers(), &resp)
 	if statusCode == http.StatusNotFound {
 		return nil, errConfigurationNotFound
 	}

@@ -42,6 +42,8 @@ func getConfig() map[string]interface{} {
 }
 
 func TestProcessEvent(t *testing.T) {
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig()).(*MetricSet)
+
 	process := Process{
 		Info: types.ProcessInfo{
 			Name:      "zsh",
@@ -72,7 +74,7 @@ func TestProcessEvent(t *testing.T) {
 	eventType := eventTypeEvent
 	eventAction := eventActionProcessStarted
 
-	event := processEvent(&process, eventType, eventAction)
+	event := ms.processEvent(&process, eventType, eventAction)
 
 	containsError, err := event.RootFields.HasKey("error")
 	if assert.NoError(t, err) {

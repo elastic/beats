@@ -37,6 +37,14 @@ The frequency of these polls is controlled by the `period` configuration
 parameter.
 
 [float]
+==== Example dashboard
+
+The module comes with a sample dashboard:
+
+[role="screenshot"]
+image:./images/auditbeat-system-overview-dashboard.png[Auditbeat System Overview Dashboard]
+
+[float]
 === Configuration options
 
 This module has some configuration options for controlling its behavior. The

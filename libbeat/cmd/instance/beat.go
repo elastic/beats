@@ -28,7 +28,6 @@ import (
 	"math/big"
 	"math/rand"
 	"os"
-	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
@@ -565,10 +564,7 @@ func (b *Beat) configure(settings Settings) error {
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
-	keystoreCfg, _ := cfg.Child("keystore", -1)
-	defaultPathConfig, _ := cfg.String("path.config", -1)
-	defaultPathConfig = filepath.Join(defaultPathConfig, fmt.Sprintf("%s.keystore", b.Info.Beat))
-	store, err := keystore.Factory(keystoreCfg, defaultPathConfig)
+	store, err := LoadKeystore(cfg, b.Info.Beat)
 	if err != nil {
 		return fmt.Errorf("could not initialize the keystore: %v", err)
 	}
@@ -1001,4 +997,11 @@ func obfuscateConfigOpts() []ucfg.Option {
 		ucfg.PathSep("."),
 		ucfg.ResolveNOOP,
 	}
+}
+
+// LoadKeystore returns the appropriate keystore based on the configuration.
+func LoadKeystore(cfg *common.Config, name string) (keystore.Keystore, error) {
+	keystoreCfg, _ := cfg.Child("keystore", -1)
+	defaultPathConfig := paths.Resolve(paths.Data, fmt.Sprintf("%s.keystore", name))
+	return keystore.Factory(keystoreCfg, defaultPathConfig)
 }
