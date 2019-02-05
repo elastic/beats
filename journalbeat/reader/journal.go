@@ -259,7 +259,7 @@ func (r *Reader) readEvent() (*beat.Event, error) {
 		return nil, err
 	}
 
-	for n == 1 {
+	if n == 1 {
 		entry, err := r.journal.GetEntry()
 		if err != nil {
 			return nil, err
