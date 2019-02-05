@@ -153,6 +153,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Add system `package` dataset. {pull}10225[10225]
 - Add system module `login` dataset. {pull}9327[9327]
 - Add `entity_id` fields. {pull}10500[10500]
+- Add seven dashboards for the system module. {pull}10511[10511]
 
 *Filebeat*
 
