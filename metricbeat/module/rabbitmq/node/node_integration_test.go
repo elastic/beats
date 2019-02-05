@@ -37,6 +37,19 @@ func TestData(t *testing.T) {
 	}
 }
 
+func TestFetch(t *testing.T) {
+	t.Skip("Skipping test as it was not stable. Probably first event is empty.")
+	compose.EnsureUp(t, "rabbitmq")
+
+	reporter := &mbtest.CapturingReporterV2{}
+
+	metricSet := mbtest.NewReportingMetricSetV2(t, getConfig())
+	metricSet.Fetch(reporter)
+
+	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
+	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
+}
+
 func getConfig() map[string]interface{} {
 	config := mtest.GetIntegrationConfig()
 	config["metricsets"] = []string{"node"}

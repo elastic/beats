@@ -472,15 +472,15 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 		RootFields: common.MapStr{
 			"event": common.MapStr{
 				"category": auditEvent.Category.String(),
-				"type":     strings.ToLower(auditEvent.Type.String()),
 				"action":   auditEvent.Summary.Action,
 			},
 		},
 		ModuleFields: common.MapStr{
-			"sequence": auditEvent.Sequence,
-			"result":   auditEvent.Result,
-			"session":  auditEvent.Session,
-			"data":     createAuditdData(auditEvent.Data),
+			"message_type": strings.ToLower(auditEvent.Type.String()),
+			"sequence":     auditEvent.Sequence,
+			"result":       auditEvent.Result,
+			"session":      auditEvent.Session,
+			"data":         createAuditdData(auditEvent.Data),
 		},
 	}
 
