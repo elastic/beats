@@ -148,11 +148,6 @@ func eventMapping(info []*haproxy.Stat, r mb.ReporterV2) {
 			fields.Delete("process_id")
 		}
 
-		if processName, err := fields.GetValue("service_name"); err == nil {
-			event.RootFields.Put("process.name", processName)
-			fields.Delete("service_name")
-		}
-
 		event.MetricSetFields = fields
 		r.Event(event)
 	}

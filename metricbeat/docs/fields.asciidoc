@@ -9916,9 +9916,7 @@ Process ID (0 for first instance, 1 for second, and so on).
 *`haproxy.stat.service_name`*::
 +
 --
-type: alias
-
-alias to: process.name
+type: keyword
 
 Service name (FRONTEND for frontend, BACKEND for backend, or any name for server/listener).
 
