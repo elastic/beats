@@ -6,6 +6,10 @@
   fields:
   - name: uptime
     type: long
+    format: duration
+    input_format: nanoseconds
+    output_format: asDays
+    output_precision: 1
     description: >
         Uptime in nanoseconds.
   - name: boottime
