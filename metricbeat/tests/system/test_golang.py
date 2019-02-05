@@ -7,7 +7,6 @@ GOLANG_FIELDS = metricbeat.COMMON_FIELDS + ["golang"]
 
 class Test(metricbeat.BaseTest):
 
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_stats(self):
         """
         golang heap test
@@ -15,13 +14,11 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "golang",
             "metricsets": ["heap"],
-            "hosts": self.get_hosts(),
+            "hosts": ["http://localhost:6060"],
             "period": "1s"
         }])
         proc = self.start_beat(
-            extra_args=[
-                "-httpprof",
-                "localhost:" + os.getenv('GOLANG_PORT', '6060')])
+            extra_args=["-httpprof", "localhost:6060"])
 
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
@@ -34,7 +31,3 @@ class Test(metricbeat.BaseTest):
         assert evt["golang"]["heap"]["allocations"]["total"] > 0
 
         self.assert_fields_are_documented(evt)
-
-    def get_hosts(self):
-        return ["http://" + os.getenv('GOLANG_HOST', 'localhost') + ':' +
-                os.getenv('GOLANG_PORT', '6060')]
