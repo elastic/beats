@@ -66,17 +66,22 @@ func TestFetch(t *testing.T) {
 	err := createIndex(host)
 	assert.NoError(t, err)
 
-	err = enableTrialLicense(host)
+	version, err := getElasticsearchVersion(host)
+	if err != nil {
+		t.Fatal("getting elasticsearch version", err)
+	}
+
+	err = enableTrialLicense(host, version)
 	assert.NoError(t, err)
 
-	err = createMLJob(host)
+	err = createMLJob(host, version)
 	assert.NoError(t, err)
 
 	err = createCCRStats(host)
 	assert.NoError(t, err)
 
 	for _, metricSet := range metricSets {
-		checkSkip(t, metricSet, host)
+		checkSkip(t, metricSet, version)
 		t.Run(metricSet, func(t *testing.T) {
 			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
 			events, errs := mbtest.ReportingFetchV2(f)
@@ -95,8 +100,14 @@ func TestData(t *testing.T) {
 	compose.EnsureUp(t, "elasticsearch")
 
 	host := net.JoinHostPort(getEnvHost(), getEnvPort())
+
+	version, err := getElasticsearchVersion(host)
+	if err != nil {
+		t.Fatal("getting elasticsearch version", err)
+	}
+
 	for _, metricSet := range metricSets {
-		checkSkip(t, metricSet, host)
+		checkSkip(t, metricSet, version)
 		t.Run(metricSet, func(t *testing.T) {
 			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
 			err := mbtest.WriteEventsReporterV2(f, t, metricSet)
@@ -164,10 +175,15 @@ func createIndex(host string) error {
 }
 
 // createIndex creates and elasticsearch index in case it does not exit yet
-func enableTrialLicense(host string) error {
+func enableTrialLicense(host string, version *common.Version) error {
 	client := &http.Client{}
 
-	enableXPackURL := "/_xpack/license/start_trial?acknowledge=true"
+	var enableXPackURL string
+	if version.Major < 7 {
+		enableXPackURL = "/_xpack/license/start_trial?acknowledge=true"
+	} else {
+		enableXPackURL = "/_license/start_trial?acknowledge=true"
+	}
 
 	req, err := http.NewRequest("POST", "http://"+host+enableXPackURL, nil)
 	if err != nil {
@@ -191,14 +207,19 @@ func enableTrialLicense(host string) error {
 	return nil
 }
 
-func createMLJob(host string) error {
+func createMLJob(host string, version *common.Version) error {
 
 	mlJob, err := ioutil.ReadFile("ml_job/_meta/test/test_job.json")
 	if err != nil {
 		return err
 	}
 
-	jobURL := "/_xpack/ml/anomaly_detectors/total-requests"
+	var jobURL string
+	if version.Major < 7 {
+		jobURL = "/_xpack/ml/anomaly_detectors/total-requests"
+	} else {
+		jobURL = "/_ml/anomaly_detectors/total-requests"
+	}
 
 	if checkExists("http://" + host + jobURL) {
 		return nil
@@ -279,14 +300,9 @@ func checkExists(url string) bool {
 	return false
 }
 
-func checkSkip(t *testing.T, metricset string, host string) {
+func checkSkip(t *testing.T, metricset string, version *common.Version) {
 	if metricset != "ccr" {
 		return
-	}
-
-	version, err := getElasticsearchVersion(host)
-	if err != nil {
-		t.Fatal("getting elasticsearch version", err)
 	}
 
 	isCCRStatsAPIAvailable := elastic.IsFeatureAvailable(version, elasticsearch.CCRStatsAPIAvailableVersion)

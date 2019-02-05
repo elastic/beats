@@ -42,6 +42,7 @@
         }
     },
     "user": {
+        "entity_id": "4a80efe9ab38d1bb28aaa207d03ef24a702602d0ae55cc4661946fa1d8eee6b5",
         "id": "1002",
         "name": "elastic"
     }

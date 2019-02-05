@@ -135,6 +135,11 @@
   - name: auditd
     type: group
     fields:
+    - name: message_type
+      type: keyword
+      example: syscall
+      description: >
+        The audit message type (e.g. syscall or apparmor_denied).
     - name: sequence
       type: long
       description: >

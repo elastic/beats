@@ -9902,7 +9902,9 @@ Component type (0=frontend, 1=backend, 2=server, or 3=socket/listener).
 *`haproxy.stat.process_id`*::
 +
 --
-type: integer
+type: alias
+
+alias to: process.pid
 
 Process ID (0 for first instance, 1 for second, and so on).
 
@@ -9912,7 +9914,9 @@ Process ID (0 for first instance, 1 for second, and so on).
 *`haproxy.stat.service_name`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: process.name
 
 Service name (FRONTEND for frontend, BACKEND for backend, or any name for server/listener).
 

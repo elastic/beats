@@ -4381,18 +4381,9 @@ The name of the action that was executed
 *`elasticsearch.audit.url.params`*::
 +
 --
-type: keyword
-
 example: {username=jacknich2}
 
 REST URI parameters
-
-*`elasticsearch.audit.url.params.text`*::
-+
---
-type: text
-
---
 
 --
 
@@ -5055,7 +5046,7 @@ Error message logged by HAProxy in case of error.
 *`haproxy.source`*::
 +
 --
-type: text
+type: keyword
 
 The HAProxy source of the log
 

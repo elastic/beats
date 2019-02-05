@@ -11,6 +11,7 @@
             "syscall": "execve",
             "tty": "pts0"
         },
+        "message_type": "syscall",
         "paths": [
             {
                 "dev": "08:01",
@@ -53,8 +54,7 @@
     "event": {
         "action": "executed",
         "category": "audit-rule",
-        "module": "auditd",
-        "type": "syscall"
+        "module": "auditd"
     },
     "file": {
         "device": "00:00",
