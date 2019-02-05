@@ -20,10 +20,9 @@ package connection
 import (
 	"encoding/json"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/joeshaw/multierror"
 
+	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/libbeat/logp"
