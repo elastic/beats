@@ -32,7 +32,6 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	helper "github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/paths"
 )
@@ -145,28 +144,33 @@ func (c *Checkpoint) findRegistryFile() error {
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 
 	target, err := os.OpenFile(migratedPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, fs.Mode())
 	if err != nil {
 		return err
 	}
+	defer target.Close()
 
 	if _, err := io.Copy(target, f); err != nil {
 		return err
 	}
 
-	err = f.Close()
+	err = target.Sync()
 	if err != nil {
-		return fmt.Errorf("error closing old registry file: %+v", err)
-	}
-	err = target.Close()
-	if err != nil {
-		return fmt.Errorf("error closing new registry file: %+v", err)
+		return fmt.Errorf("error while syncing new registry file to disk: %+v", err)
 	}
 
-	err = helper.SafeFileRotate(c.file, c.file+".bak")
+	p := filepath.Dir(migratedPath)
+	pf, err := os.Open(p)
 	if err != nil {
-		return fmt.Errorf("error backuping old registry: %+v", err)
+		return fmt.Errorf("error while opening parent dir: %+v")
+	}
+	defer pf.Close()
+
+	err = pf.Sync()
+	if err != nil {
+		return fmt.Errorf("error while syncing data of parent dir: %+v")
 	}
 
 	c.file = migratedPath
