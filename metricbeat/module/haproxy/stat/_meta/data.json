@@ -28,7 +28,6 @@
             },
             "in.bytes": 0,
             "out.bytes": 0,
-            "process_id": 1,
             "proxy": {
                 "id": 2,
                 "name": "stat"
@@ -57,7 +56,6 @@
             "server": {
                 "id": 0
             },
-            "service_name": "FRONTEND",
             "session": {
                 "current": 0,
                 "limit": 25000,
@@ -73,6 +71,10 @@
     },
     "metricset": {
         "name": "stat"
+    },
+    "process": {
+        "name": "FRONTEND",
+        "pid": 1
     },
     "service": {
         "address": "127.0.0.1:14567",
