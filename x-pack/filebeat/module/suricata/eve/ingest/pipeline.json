@@ -252,6 +252,12 @@
                 ],
                 "ignore_missing": true
             }
+        },
+        {
+            "set": {
+                "field": "event.kind",
+                "value": "event"
+            }
         }
     ],
     "on_failure": [
