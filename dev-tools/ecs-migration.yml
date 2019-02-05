@@ -349,11 +349,6 @@
   alias: true
   beat: filebeat
 
-- from: suricata.eve.event_type
-  to: event.type
-  alias: true
-  beat: filebeat
-
 - from: suricata.eve.fileinfo.filename
   to: file.path
   alias: true
