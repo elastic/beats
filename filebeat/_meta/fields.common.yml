@@ -150,10 +150,33 @@
         @timestamp is the processed timestamp from the log line. If both are identical
         only @timestamp should be used.
 
+    - name: event.duration
+      type: long
+      format: duration
+      input_format: nanoseconds
+      description: >
+        Duration of the event in nanoseconds.
+
+        If event.start and event.end are known this value should be the
+        difference between the end and start time.
+
+    - name: event.end
+      type: date
+      description: >
+        event.end contains the date when the event ended or when the activity
+        was last observed.
+
     - name: event.type
       type: keyword
       description: >
         A type given to this kind of event which can be used for grouping.
+
+    - name: event.start
+      level: extended
+      type: date
+      description: >
+        event.start contains the date when the event started or when the
+        activity was first observed.
 
     - name: http.response.status_code
       type: long
@@ -165,6 +188,12 @@
       type: long
       description: >
         Elapsed time between request and response in milli seconds.
+
+    - name: http.response.body.bytes
+      type: long
+      format: bytes
+      description: >
+        Size in bytes of the response body.
 
     - name: http.response.content_length
       type: long
@@ -179,6 +208,12 @@
     - name: source_ecs
       type: group
       fields:
+      - name: bytes
+        type: long
+        format: bytes
+        description: >
+          Bytes sent from the source to the destination.
+
       - name: ip
         type: ip
         description: >
@@ -191,6 +226,12 @@
         type: keyword
         description: >
           MAC address of the source.
+
+      - name: packets
+        level: core
+        type: long
+        description: >
+          Packets sent from the client to the server.
 
       - name: port
         type: long
@@ -235,6 +276,19 @@
     - name: destination
       type: group
       fields:
+        - name: bytes
+          level: core
+          type: long
+          format: bytes
+          description: >
+            Bytes sent from the destination to the source.
+
+        - name: domain
+          level: core
+          type: keyword
+          description: >
+            Destination domain.
+
         - name: ip
           type: ip
           description: >
@@ -247,6 +301,12 @@
           type: keyword
           description: >
             MAC address of the destination.
+
+        - name: packets
+          level: core
+          type: long
+          description: >
+            Packets sent from the destination to the source.
 
         - name: port
           type: long
@@ -376,12 +436,28 @@
 
       type: group
       fields:
+
+      - name: domain
+        level: extended
+        type: keyword
+        description: >
+          Domain of the request, such as "www.elastic.co".
+
+          In some cases a URL may refer to an IP and/or port directly, without a
+          domain name. In this case, the IP address would go to the `domain` field.
+
       - name: hostname
         type: keyword
         description: >
           Hostname of the request, such as "elastic.co".
           In some cases a URL may refer to an IP and/or port directly, without a
           domain name. In this case, the IP address would go to the `hostname` field.
+
+      - name: path
+        level: extended
+        type: keyword
+        description: >
+          Path of the request, such as "/search".
 
     - name: file
       description: >
@@ -406,6 +482,29 @@
         details about the network activity associated with an event.
       type: group
       fields:
+      - name: bytes
+        level: core
+        type: long
+        format: bytes
+        description: >
+          Total bytes transferred in both directions.
+          If `source.bytes` and `destination.bytes` are known, `network.bytes` is their sum.
+
+      - name: packets
+        level: core
+        type: long
+        description: >
+          Total packets transferred in both directions.
+          If `source.packets` and `destination.packets` are known, `network.packets` is their sum.
+
+      - name: protocol
+        level: core
+        type: keyword
+        description: >
+          L7 Network protocol name. ex. http, lumberjack, transport protocol.
+
+          The field value must be normalized to lowercase for querying. See
+          "Lowercase Capitalization" in the "Implementing ECS" section.
 
       - name: transport
         level: core
