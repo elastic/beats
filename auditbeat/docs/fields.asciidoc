@@ -302,6 +302,18 @@ This is the path associated with a unix socket.
 --
 
 
+*`auditd.message_type`*::
++
+--
+type: keyword
+
+example: syscall
+
+The audit message type (e.g. syscall or apparmor_denied).
+
+
+--
+
 *`auditd.sequence`*::
 +
 --
