@@ -66,6 +66,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - The backing off now implements jitter to better distribute the load. {issue}10172[10172]
 - Fix TLS certificate DoS vulnerability. {pull}10303[10303]
 - Fix panic and file unlock in spool on atomic operation (arm, x86-32). File lock was not released when panic occurs, leading to the beat deadlocking on startup. {pull}10289[10289]
+- Adding logging traces at debug level when the pipeline client receives the following events: onFilteredOut, onDroppedOnPublish. {pull}9016[9016]
 - Do not panic when no tokenizer string is configured for a dissect processor. {issue}8895[8895]
 
 *Auditbeat*
