@@ -1859,32 +1859,32 @@
 		{
 			"checksumSHA1": "M0S9278lG9Fztu+ZUsLUi40GDJU=",
 			"path": "github.com/tsg/gopacket",
-			"revision": "f289b3ea3e41a01b2822be9caf5f40c01fdda05c",
-			"revisionTime": "2018-03-16T21:03:30Z"
+			"revision": "7c5392a5f2b5c5fa393c71e1f9064e22b5408995",
+			"revisionTime": "2019-01-31T17:02:46Z"
 		},
 		{
-			"checksumSHA1": "STY8i3sZLdZfFcKiyOdpV852nls=",
+			"checksumSHA1": "OQEk9avpNRDRyZVvYy08R+PEuFA=",
 			"path": "github.com/tsg/gopacket/afpacket",
-			"revision": "8e703b9968693c15f25cabb6ba8be4370cf431d0",
-			"revisionTime": "2016-08-17T18:24:57Z"
+			"revision": "7c5392a5f2b5c5fa393c71e1f9064e22b5408995",
+			"revisionTime": "2019-01-31T17:02:46Z"
 		},
 		{
-			"checksumSHA1": "+NwKULkolGgMn67wFYf+n0wz+a8=",
+			"checksumSHA1": "hXo0d2jF8bqVFHq37TfqpKvRO5M=",
 			"path": "github.com/tsg/gopacket/layers",
-			"revision": "8e703b9968693c15f25cabb6ba8be4370cf431d0",
-			"revisionTime": "2016-08-17T18:24:57Z"
+			"revision": "7c5392a5f2b5c5fa393c71e1f9064e22b5408995",
+			"revisionTime": "2019-01-31T17:02:46Z"
 		},
 		{
-			"checksumSHA1": "pDfiWUxZQdXap4CR6ASDvblChLU=",
+			"checksumSHA1": "C1AMG/E1pIW6kHrxi4+iNm1Fa9Y=",
 			"path": "github.com/tsg/gopacket/pcap",
-			"revision": "8e703b9968693c15f25cabb6ba8be4370cf431d0",
-			"revisionTime": "2016-08-17T18:24:57Z"
+			"revision": "7c5392a5f2b5c5fa393c71e1f9064e22b5408995",
+			"revisionTime": "2019-01-31T17:02:46Z"
 		},
 		{
 			"checksumSHA1": "nGCIgH3ohqLru6ivQSSiY6YWEow=",
 			"path": "github.com/tsg/gopacket/pfring",
-			"revision": "8e703b9968693c15f25cabb6ba8be4370cf431d0",
-			"revisionTime": "2016-08-17T18:24:57Z"
+			"revision": "7c5392a5f2b5c5fa393c71e1f9064e22b5408995",
+			"revisionTime": "2019-01-31T17:02:46Z"
 		},
 		{
 			"checksumSHA1": "H7tCgNt2ajKK4FBJIDNlevu9MAc=",
