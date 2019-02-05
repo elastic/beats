@@ -349,11 +349,6 @@
   alias: true
   beat: filebeat
 
-- from: suricata.eve.event_type
-  to: event.type
-  alias: true
-  beat: filebeat
-
 - from: suricata.eve.fileinfo.filename
   to: file.path
   alias: true
@@ -443,6 +438,12 @@
   to: '@timestamp'
   alias: true
   beat: filebeat
+
+- from: event.type
+  to: suricata.eve.event_type
+  alias: false
+  beat: auditbeat
+  comment: event.type is reserved for future use by ECS.
 
 ## System module
 

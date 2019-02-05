@@ -246,7 +246,7 @@
                   "alias": null,
                   "disabled": false,
                   "index": "filebeat-*",
-                  "key": "event.type",
+                  "key": "suricata.eve.event_type",
                   "negate": false,
                   "params": {
                     "query": "alert",
@@ -257,7 +257,7 @@
                 },
                 "query": {
                   "match": {
-                    "event.type": {
+                    "suricata.eve.event_type": {
                       "query": "alert",
                       "type": "phrase"
                     }
