@@ -52,7 +52,6 @@
           description: Error message logged by HAProxy in case of error.
           type: text
 
-        # Should be keyword?
         - name: source
           type: text
           description: The HAProxy source of the log
