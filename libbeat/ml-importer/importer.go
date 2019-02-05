@@ -35,11 +35,11 @@ import (
 )
 
 var (
-	esDataFeedURL        = "/_xpack/ml/datafeeds/datafeed-%s"
-	esJobURL             = "/_xpack/ml/anomaly_detectors/%s"
-	kibanaGetModuleURL   = "/api/ml/modules/get_module/%s"
-	kibanaRecognizeURL   = "/api/ml/modules/recognize/%s"
-	kibanaSetupModuleURL = "/api/ml/modules/setup/%s"
+	esMLDataFeedURLSuffix = "/datafeeds/datafeed-%s"
+	esMLJobURLSuffix      = "/anomaly_detectors/%s"
+	kibanaGetModuleURL    = "/api/ml/modules/get_module/%s"
+	kibanaRecognizeURL    = "/api/ml/modules/recognize/%s"
+	kibanaSetupModuleURL  = "/api/ml/modules/setup/%s"
 )
 
 // MLConfig contains the required configuration for loading one job and the associated
@@ -121,11 +121,11 @@ func readJSONFile(path string) (common.MapStr, error) {
 
 // ImportMachineLearningJob uploads the job and datafeed configuration to ES/xpack.
 func ImportMachineLearningJob(esClient MLLoader, cfg *MLConfig) error {
-	jobURL := fmt.Sprintf(esJobURL, cfg.ID)
-	datafeedURL := fmt.Sprintf(esDataFeedURL, cfg.ID)
+	esVersion := esClient.GetVersion()
+	jobURL := makeMLURLPerESVersion(esVersion, fmt.Sprintf(esMLJobURLSuffix, cfg.ID))
+	datafeedURL := makeMLURLPerESVersion(esVersion, fmt.Sprintf(esMLDataFeedURLSuffix, cfg.ID))
 
 	if len(cfg.MinVersion) > 0 {
-		esVersion := esClient.GetVersion()
 		if !esVersion.IsValid() {
 			return errors.New("Invalid Elasticsearch version")
 		}
@@ -274,4 +274,11 @@ func checkResponse(r []byte) error {
 	}
 
 	return errs.Err()
+}
+
+func makeMLURLPerESVersion(esVersion common.Version, mlURLPathSuffix string) string {
+	if esVersion.Major < 7 {
+		return "_xpack/ml/" + mlURLPathSuffix
+	}
+	return "_ml" + mlURLPathSuffix
 }
