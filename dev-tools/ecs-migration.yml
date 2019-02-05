@@ -1613,6 +1613,12 @@
   alias: true
   beat: auditbeat
 
+- from: event.type
+  to: auditd.message_type
+  alias: false
+  beat: auditbeat
+  comment: event.type is reserved for future use by ECS.
+
 # Metricbeat
 
 ## Metricbeat base fields

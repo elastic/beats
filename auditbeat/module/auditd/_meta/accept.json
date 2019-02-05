@@ -15,6 +15,7 @@
             "syscall": "accept",
             "tty": "(none)"
         },
+        "message_type": "syscall",
         "result": "success",
         "sequence": 8832,
         "session": "unset",
@@ -34,8 +35,7 @@
     "event": {
         "action": "accepted-connection-from",
         "category": "audit-rule",
-        "module": "auditd",
-        "type": "syscall"
+        "module": "auditd"
     },
     "network": {
         "direction": "incoming"
