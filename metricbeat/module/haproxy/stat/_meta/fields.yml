@@ -34,9 +34,7 @@
         Process ID (0 for first instance, 1 for second, and so on).
 
     - name: service_name
-      type: alias
-      path: process.name
-      migration: true
+      type: keyword
       description: >
         Service name (FRONTEND for frontend, BACKEND for backend, or any name for server/listener).
 
