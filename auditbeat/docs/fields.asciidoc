@@ -3809,6 +3809,8 @@ ID uniquely identifying the socket. It is computed as a SHA-256 hash of the host
 --
 type: long
 
+format: duration
+
 Uptime in nanoseconds.
 
 
