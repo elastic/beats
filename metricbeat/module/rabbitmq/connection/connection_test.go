@@ -31,20 +31,16 @@ func TestFetchEventContents(t *testing.T) {
 	server := mtest.Server(t, mtest.DefaultServerConfig)
 	defer server.Close()
 
-	config := map[string]interface{}{
-		"module":     "rabbitmq",
-		"metricsets": []string{"connection"},
-		"hosts":      []string{server.URL},
-	}
+	reporter := &mbtest.CapturingReporterV2{}
 
-	f := mbtest.NewEventsFetcher(t, config)
-	events, err := f.Fetch()
-	event := events[0]
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
+	metricSet := mbtest.NewReportingMetricSetV2(t, getConfig(server.URL))
+	metricSet.Fetch(reporter)
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
+	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
+	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
+
+	ee, _ := e.Fields.GetValue("rabbitmq.connection")
+	event := ee.(common.MapStr)
 
 	assert.EqualValues(t, "[::1]:60938 -> [::1]:5672", event["name"])
 	assert.EqualValues(t, "/", event["vhost"])
@@ -70,4 +66,23 @@ func TestFetchEventContents(t *testing.T) {
 	peer := event["peer"].(common.MapStr)
 	assert.EqualValues(t, "::1", peer["host"])
 	assert.EqualValues(t, 60938, peer["port"])
+}
+
+func TestData(t *testing.T) {
+	server := mtest.Server(t, mtest.DefaultServerConfig)
+	defer server.Close()
+
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig(server.URL))
+	err := mbtest.WriteEventsReporterV2(ms, t, "")
+	if err != nil {
+		t.Fatal("write", err)
+	}
+}
+
+func getConfig(url string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":     "rabbitmq",
+		"metricsets": []string{"connection"},
+		"hosts":      []string{url},
+	}
 }
