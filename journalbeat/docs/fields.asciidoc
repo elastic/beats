@@ -551,6 +551,18 @@ alias to: event.created
 
 --
 
+
+
+*`container.log.tag`*::
++
+--
+type: keyword
+
+User defined tag of a container.
+
+
+--
+
 [[exported-fields-docker-processor]]
 == Docker fields
 

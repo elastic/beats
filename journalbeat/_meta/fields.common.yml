@@ -317,3 +317,13 @@
       path: event.created
       migration: true
 
+    - name: container
+      type: group
+      fields:
+        - name: log
+          type: group
+          fields:
+            - name: tag
+              type: keyword
+              description: >
+                User defined tag of a container.
