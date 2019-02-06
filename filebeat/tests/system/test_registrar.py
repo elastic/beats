@@ -908,11 +908,12 @@ class Test(BaseTest):
         else:
             assert data[0]["offset"] == len("make sure registry is written\n" + "2\n")
 
-    @unittest.skipIf(os.name == 'nt', 'flaky test https://github.com/elastic/beats/issues/9215')
+    @unittest.skip('flaky test https://github.com/elastic/beats/issues/9215')
     def test_clean_removed_with_clean_inactive(self):
         """
         Checks that files which were removed, the state is removed
         """
+
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
             scan_frequency="0.1s",
