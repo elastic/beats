@@ -160,6 +160,7 @@ func TestEmitEvent(t *testing.T) {
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	containerImage := "elastic/filebeat:6.3.0"
 	node := "node"
+	cid := "005f3b90-4b9d-12f8-acf0-31020a840133.filebeat"
 	UUID, err := uuid.NewV4()
 	if err != nil {
 		t.Fatal(err)
@@ -204,7 +205,7 @@ func TestEmitEvent(t *testing.T) {
 			Expected: bus.Event{
 				"start":    true,
 				"host":     "127.0.0.1",
-				"id":       "foobar",
+				"id":       cid,
 				"provider": UUID,
 				"kubernetes": common.MapStr{
 					"container": common.MapStr{

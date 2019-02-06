@@ -168,13 +168,14 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 		// If it doesn't have an ID, container doesn't exist in
 		// the runtime, emit only an event if we are stopping, so
 		// we are sure of cleaning up configurations.
-		if id := containerIDs[c.GetName()]; id == "" && flag != "stop" {
+		cid := containerIDs[c.GetName()]
+		if cid == "" && flag != "stop" {
 			continue
 		}
 
 		// This must be an id that doesn't depend on the state of the container
 		// so it works also on `stop` if containers have been already deleted.
-		cid := fmt.Sprintf("%s.%s", pod.Metadata.GetUid(), c.GetName())
+		eventId := fmt.Sprintf("%s.%s", pod.Metadata.GetUid(), c.GetName())
 
 		cmeta := common.MapStr{
 			"id":      cid,
@@ -199,7 +200,7 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 		if len(c.Ports) == 0 {
 			event := bus.Event{
 				"provider":   p.uuid,
-				"id":         cid,
+				"id":         eventId,
 				flag:         true,
 				"host":       host,
 				"kubernetes": kubemeta,
@@ -213,7 +214,7 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 		for _, port := range c.Ports {
 			event := bus.Event{
 				"provider":   p.uuid,
-				"id":         cid,
+				"id":         eventId,
 				flag:         true,
 				"host":       host,
 				"port":       port.GetContainerPort(),
