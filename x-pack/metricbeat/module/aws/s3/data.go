@@ -20,9 +20,17 @@ var (
 			"size": s.Object{
 				"bytes": c.Float("BucketSizeBytes", s.Optional),
 			},
+			"head_requests":         c.Int("HeadRequests", s.Optional),
+			"all_requests":          c.Int("AllRequests", s.Optional),
+			"4xx_errors":            c.Int("4xxErrors", s.Optional),
+			"5xx_errors":            c.Int("5xxErrors", s.Optional),
+			"first_byte_latency":    c.Float("FirstByteLatency", s.Optional),
+			"list_requests":         c.Int("ListRequests", s.Optional),
+			"bytes_downloaded":      c.Float("BytesDownloaded", s.Optional),
+			"total_request_latency": c.Float("TotalRequestLatency", s.Optional),
 		},
 		"object": s.Object{
-			"count": c.Float("NumberOfObjects", s.Optional),
+			"count": c.Int("NumberOfObjects", s.Optional),
 		},
 	}
 )

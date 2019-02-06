@@ -84,7 +84,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	namespace := "AWS/S3"
 	// Get startTime and endTime
-	startTime, endTime, err := getStartTimeEndTime(m.MetricSet.DurationString)
+	startTime, endTime, err := getStartTimeEndTime()
 	if err != nil {
 		logp.Error(errors.Wrap(err, "Error ParseDuration"))
 		m.logger.Error(err.Error())
@@ -145,9 +145,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	}
 }
 
-func getStartTimeEndTime(durationString string) (startTime time.Time, endTime time.Time, err error) {
+func getStartTimeEndTime() (startTime time.Time, endTime time.Time, err error) {
 	endTime = time.Now()
-	duration, err := time.ParseDuration(durationString)
+	duration, err := time.ParseDuration("-24h")
 	if err != nil {
 		return
 	}

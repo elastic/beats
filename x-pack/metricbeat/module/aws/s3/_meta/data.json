@@ -7,21 +7,27 @@
     "aws": {
         "s3": {
             "bucket": {
+                "4xx_errors": 0,
+                "5xx_errors": 0,
+                "all_requests": 1,
+                "bytes_downloaded": 265,
+                "first_byte_latency": 1.75,
+                "list_requests": 1,
                 "name": "test-s3-ks",
                 "size": {
-                    "bytes": 696445
+                    "bytes": 969165
                 },
                 "storage": {
-                    "type": "StandardStorage"
-                }
+                    "type": ""
+                },
+                "total_request_latency": 1.75
             },
             "object": {
-                "count": 1
+                "count": 2
             }
         }
     },
     "cloud": {
-        "provider": "s3",
         "region": "ap-southeast-1"
     },
     "event": {

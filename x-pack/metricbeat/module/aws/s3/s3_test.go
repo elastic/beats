@@ -16,13 +16,8 @@ import (
 var regionName = "us-west-1"
 
 func TestGetStartTimeEndTime(t *testing.T) {
-	duration := "300s"
-	_, _, err := getStartTimeEndTime(duration)
+	_, _, err := getStartTimeEndTime()
 	assert.NoError(t, err)
-
-	duration = "300ss"
-	_, _, err = getStartTimeEndTime(duration)
-	assert.Error(t, err)
 }
 
 func TestConstructMetricQueries(t *testing.T) {
