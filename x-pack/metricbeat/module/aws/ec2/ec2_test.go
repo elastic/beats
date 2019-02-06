@@ -33,7 +33,27 @@ type MockCloudWatchClient struct {
 	cloudwatchiface.CloudWatchAPI
 }
 
-var regionName = "us-west-1"
+var (
+	regionName = "us-west-1"
+	instanceId = "i-123"
+	namespace  = "AWS/EC2"
+
+	id1         = "cpu1"
+	metricName1 = "CPUUtilization"
+	label1      = instanceId + " " + metricName1
+
+	id2         = "status1"
+	metricName2 = "StatusCheckFailed"
+	label2      = instanceId + " " + metricName2
+
+	id3         = "status2"
+	metricName3 = "StatusCheckFailed_System"
+	label3      = instanceId + " " + metricName3
+
+	id4         = "status3"
+	metricName4 = "StatusCheckFailed_Instance"
+	label4      = instanceId + " " + metricName4
+)
 
 func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) ec2.DescribeRegionsRequest {
 	return ec2.DescribeRegionsRequest{
@@ -59,7 +79,7 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 	privateIP := "5.6.7.8"
 
 	instance := ec2.Instance{
-		InstanceId:   awssdk.String("i-123"),
+		InstanceId:   awssdk.String(instanceId),
 		InstanceType: ec2.InstanceTypeT2Medium,
 		Placement: &ec2.Placement{
 			AvailabilityZone: awssdk.String("us-west-1a"),
@@ -93,20 +113,9 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 }
 
 func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricDataInput) cloudwatch.GetMetricDataRequest {
-	id1 := "cpu1"
-	label1 := "CPUUtilization"
 	value1 := 0.25
-
-	id2 := "status1"
-	label2 := "StatusCheckFailed"
 	value2 := 0.0
-
-	id3 := "status2"
-	label3 := "StatusCheckFailed_System"
 	value3 := 0.0
-
-	id4 := "status3"
-	label4 := "StatusCheckFailed_Instance"
 	value4 := 0.0
 
 	return cloudwatch.GetMetricDataRequest{
@@ -150,34 +159,36 @@ func TestGetInstanceIDs(t *testing.T) {
 	assert.Equal(t, 1, len(instanceIDs))
 	assert.Equal(t, 1, len(instancesOutputs))
 
-	assert.Equal(t, "i-123", instanceIDs[0])
-	assert.Equal(t, ec2.InstanceType("t2.medium"), instancesOutputs["i-123"].InstanceType)
-	assert.Equal(t, awssdk.String("image-123"), instancesOutputs["i-123"].ImageId)
-	assert.Equal(t, awssdk.String("us-west-1a"), instancesOutputs["i-123"].Placement.AvailabilityZone)
+	assert.Equal(t, instanceId, instanceIDs[0])
+	assert.Equal(t, ec2.InstanceType("t2.medium"), instancesOutputs[instanceId].InstanceType)
+	assert.Equal(t, awssdk.String("image-123"), instancesOutputs[instanceId].ImageId)
+	assert.Equal(t, awssdk.String("us-west-1a"), instancesOutputs[instanceId].Placement.AvailabilityZone)
 }
 
 func TestGetMetricDataPerRegion(t *testing.T) {
 	mockSvc := &MockCloudWatchClient{}
-	getMetricDataOutput, err := getMetricDataPerRegion("-10m", 300, "i-123", nil, mockSvc)
+	metricDataQueries := []cloudwatch.MetricDataQuery{}
+	getMetricDataOutput, err := getMetricDataPerRegion(metricDataQueries, "-10m", nil, mockSvc)
 	if err != nil {
 		fmt.Println("failed getMetricDataPerRegion: ", err)
 		t.FailNow()
 	}
+
 	assert.Equal(t, 4, len(getMetricDataOutput.MetricDataResults))
-	assert.Equal(t, "cpu1", *getMetricDataOutput.MetricDataResults[0].Id)
-	assert.Equal(t, "CPUUtilization", *getMetricDataOutput.MetricDataResults[0].Label)
+	assert.Equal(t, id1, *getMetricDataOutput.MetricDataResults[0].Id)
+	assert.Equal(t, label1, *getMetricDataOutput.MetricDataResults[0].Label)
 	assert.Equal(t, 0.25, getMetricDataOutput.MetricDataResults[0].Values[0])
 
-	assert.Equal(t, "status1", *getMetricDataOutput.MetricDataResults[1].Id)
-	assert.Equal(t, "StatusCheckFailed", *getMetricDataOutput.MetricDataResults[1].Label)
+	assert.Equal(t, id2, *getMetricDataOutput.MetricDataResults[1].Id)
+	assert.Equal(t, label2, *getMetricDataOutput.MetricDataResults[1].Label)
 	assert.Equal(t, 0.0, getMetricDataOutput.MetricDataResults[1].Values[0])
 
-	assert.Equal(t, "status2", *getMetricDataOutput.MetricDataResults[2].Id)
-	assert.Equal(t, "StatusCheckFailed_System", *getMetricDataOutput.MetricDataResults[2].Label)
+	assert.Equal(t, id3, *getMetricDataOutput.MetricDataResults[2].Id)
+	assert.Equal(t, label3, *getMetricDataOutput.MetricDataResults[2].Label)
 	assert.Equal(t, 0.0, getMetricDataOutput.MetricDataResults[2].Values[0])
 
-	assert.Equal(t, "status3", *getMetricDataOutput.MetricDataResults[3].Id)
-	assert.Equal(t, "StatusCheckFailed_Instance", *getMetricDataOutput.MetricDataResults[3].Label)
+	assert.Equal(t, id4, *getMetricDataOutput.MetricDataResults[3].Id)
+	assert.Equal(t, label4, *getMetricDataOutput.MetricDataResults[3].Label)
 	assert.Equal(t, 0.0, getMetricDataOutput.MetricDataResults[3].Values[0])
 }
 
@@ -224,20 +235,95 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(instanceIDs))
 	instanceID := instanceIDs[0]
-	assert.Equal(t, "i-123", instanceID)
+	assert.Equal(t, instanceId, instanceID)
+
+	dimName := "InstanceId"
+	dimension := cloudwatch.Dimension{
+		Name:  &dimName,
+		Value: &instanceId,
+	}
+
+	metricDataQuery1 := cloudwatch.MetricDataQuery{
+		Id:    &id1,
+		Label: &label1,
+		MetricStat: &cloudwatch.MetricStat{
+			Metric: &cloudwatch.Metric{
+				Dimensions: []cloudwatch.Dimension{dimension},
+				MetricName: &metricName1,
+				Namespace:  &namespace,
+			},
+		},
+	}
+	metricDataQuery2 := cloudwatch.MetricDataQuery{
+		Id:    &id2,
+		Label: &label2,
+		MetricStat: &cloudwatch.MetricStat{
+			Metric: &cloudwatch.Metric{
+				Dimensions: []cloudwatch.Dimension{dimension},
+				MetricName: &metricName2,
+				Namespace:  &namespace,
+			},
+		},
+	}
+	metricDataQuery3 := cloudwatch.MetricDataQuery{
+		Id:    &id3,
+		Label: &label3,
+		MetricStat: &cloudwatch.MetricStat{
+			Metric: &cloudwatch.Metric{
+				Dimensions: []cloudwatch.Dimension{dimension},
+				MetricName: &metricName3,
+				Namespace:  &namespace,
+			},
+		},
+	}
+	metricDataQuery4 := cloudwatch.MetricDataQuery{
+		Id:    &id4,
+		Label: &label4,
+		MetricStat: &cloudwatch.MetricStat{
+			Metric: &cloudwatch.Metric{
+				Dimensions: []cloudwatch.Dimension{dimension},
+				MetricName: &metricName4,
+				Namespace:  &namespace,
+			},
+		},
+	}
+	metricDataQuaries := []cloudwatch.MetricDataQuery{metricDataQuery1, metricDataQuery2, metricDataQuery3, metricDataQuery4}
 
 	svcCloudwatchMock := &MockCloudWatchClient{}
-	getMetricDataOutput, err := getMetricDataPerRegion("-600s", 300, instanceID, nil, svcCloudwatchMock)
+	getMetricDataOutput, err := getMetricDataPerRegion(metricDataQuaries, "-10m", nil, svcCloudwatchMock)
 	assert.NoError(t, err)
+
 	assert.Equal(t, 4, len(getMetricDataOutput.MetricDataResults))
-	assert.Equal(t, "cpu1", *getMetricDataOutput.MetricDataResults[0].Id)
-	assert.Equal(t, "CPUUtilization", *getMetricDataOutput.MetricDataResults[0].Label)
+	assert.Equal(t, id1, *getMetricDataOutput.MetricDataResults[0].Id)
+	assert.Equal(t, label1, *getMetricDataOutput.MetricDataResults[0].Label)
 	assert.Equal(t, 0.25, getMetricDataOutput.MetricDataResults[0].Values[0])
 
-	event, info, err := createCloudWatchEvents(getMetricDataOutput, instanceID, instancesOutputs[instanceID], mockModuleConfig.DefaultRegion)
+	event, info, err := createCloudWatchEvents(getMetricDataOutput.MetricDataResults, instanceID, instancesOutputs[instanceID], mockModuleConfig.DefaultRegion)
 	assert.NoError(t, err)
 	assert.Equal(t, "", info)
 	assert.Equal(t, expectedEvent.RootFields, event.RootFields)
 	assert.Equal(t, expectedEvent.MetricSetFields["cpu"], event.MetricSetFields["cpu"])
 	assert.Equal(t, expectedEvent.MetricSetFields["instance"], event.MetricSetFields["instance"])
+}
+
+func TestConstructMetricQueries(t *testing.T) {
+	name := "InstanceId"
+	dim := cloudwatch.Dimension{
+		Name:  &name,
+		Value: &instanceId,
+	}
+
+	listMetric := cloudwatch.Metric{
+		Dimensions: []cloudwatch.Dimension{dim},
+		MetricName: &metricName1,
+		Namespace:  &namespace,
+	}
+
+	listMetricsOutput := []cloudwatch.Metric{listMetric}
+	metricDataQuery := constructMetricQueries(listMetricsOutput, instanceId, 300)
+	assert.Equal(t, 1, len(metricDataQuery))
+	assert.Equal(t, "i-123 CPUUtilization", *metricDataQuery[0].Label)
+	assert.Equal(t, "Average", *metricDataQuery[0].MetricStat.Stat)
+	assert.Equal(t, metricName1, *metricDataQuery[0].MetricStat.Metric.MetricName)
+	assert.Equal(t, namespace, *metricDataQuery[0].MetricStat.Metric.Namespace)
 }

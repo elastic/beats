@@ -14,37 +14,37 @@ var (
 	schemaMetricSetFields = s.Schema{
 		"cpu": s.Object{
 			"total": s.Object{
-				"pct": c.Float("cpu.total.pct", s.Optional),
+				"pct": c.Float("CPUUtilization", s.Optional),
 			},
-			"credit_usage":            c.Float("cpu.credit_usage", s.Optional),
-			"credit_balance":          c.Float("cpu.credit_balance", s.Optional),
-			"surplus_credit_balance":  c.Float("cpu.surplus_credit_balance", s.Optional),
-			"surplus_credits_charged": c.Float("cpu.surplus_credits_charged", s.Optional),
+			"credit_usage":            c.Float("CPUCreditUsage", s.Optional),
+			"credit_balance":          c.Float("CPUCreditBalance", s.Optional),
+			"surplus_credit_balance":  c.Float("CPUSurplusCreditBalance", s.Optional),
+			"surplus_credits_charged": c.Float("CPUSurplusCreditsCharged", s.Optional),
 		},
 		"diskio": s.Object{
 			"read": s.Object{
-				"bytes": c.Float("diskio.read.bytes", s.Optional),
-				"count": c.Float("diskio.read.count", s.Optional),
+				"bytes": c.Float("DiskReadBytes", s.Optional),
+				"count": c.Float("DiskReadOps", s.Optional),
 			},
 			"write": s.Object{
-				"bytes": c.Float("diskio.write.bytes", s.Optional),
-				"count": c.Float("diskio.write.count", s.Optional),
+				"bytes": c.Float("DiskWriteBytes", s.Optional),
+				"count": c.Float("DiskWriteOps", s.Optional),
 			},
 		},
 		"network": s.Object{
 			"in": s.Object{
-				"bytes":   c.Float("network.in.bytes", s.Optional),
-				"packets": c.Float("network.in.packets", s.Optional),
+				"bytes":   c.Float("NetworkIn", s.Optional),
+				"packets": c.Float("NetworkPacketsIn", s.Optional),
 			},
 			"out": s.Object{
-				"bytes":   c.Float("network.out.bytes", s.Optional),
-				"packets": c.Float("network.out.packets", s.Optional),
+				"bytes":   c.Float("NetworkOut", s.Optional),
+				"packets": c.Float("NetworkPacketsOut", s.Optional),
 			},
 		},
 		"status": s.Object{
-			"check_failed":          c.Int("status.check_failed", s.Optional),
-			"check_failed_instance": c.Int("status.check_failed_instance", s.Optional),
-			"check_failed_system":   c.Int("status.check_failed_system", s.Optional),
+			"check_failed":          c.Int("StatusCheckFailed", s.Optional),
+			"check_failed_instance": c.Int("StatusCheckFailed_Instance", s.Optional),
+			"check_failed_system":   c.Int("StatusCheckFailed_System", s.Optional),
 		},
 		"instance": s.Object{
 			"image": s.Object{
