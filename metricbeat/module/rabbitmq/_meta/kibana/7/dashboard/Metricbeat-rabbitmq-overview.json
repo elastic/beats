@@ -8,7 +8,7 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Metricbeat-Rabbitmq-ecs ECS", 
+                "savedSearchId": "Metricbeat-Rabbitmq-ecs", 
                 "title": "Memory Usage [Metricbeat RabbitMQ] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
@@ -86,7 +86,7 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Metricbeat-Rabbitmq-ecs ECS", 
+                "savedSearchId": "Metricbeat-Rabbitmq-ecs", 
                 "title": "Number of Nodes [Metricbeat RabbitMQ] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
@@ -108,11 +108,11 @@
                         "fontSize": 60, 
                         "handleNoResults": true
                     }, 
-                    "title": "Rabbitmq-Number-of-Nodes-ecs ECS", 
+                    "title": "Rabbitmq Number of Nodes ECS",
                     "type": "metric"
                 }
             }, 
-            "id": "Rabbitmq-Number-of-Nodes-ecs ECS", 
+            "id": "Rabbitmq-Number-of-Nodes-ecs", 
             "type": "visualization", 
             "version": 2
         }, 
@@ -124,7 +124,7 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Metricbeat-Rabbitmq-ecs ECS", 
+                "savedSearchId": "Metricbeat-Rabbitmq-ecs", 
                 "title": "Erlang Process Usage [Metricbeat RabbitMQ] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
@@ -201,7 +201,7 @@
                         "filter": []
                     }
                 }, 
-                "savedSearchId": "Metricbeat-Rabbitmq-ecs ECS", 
+                "savedSearchId": "Metricbeat-Rabbitmq-ecs", 
                 "title": "Queue Index Operations [Metricbeat RabbitMQ] ECS", 
                 "uiStateJSON": {}, 
                 "version": 1, 
@@ -370,10 +370,10 @@
                     "@timestamp", 
                     "desc"
                 ], 
-                "title": "Metricbeat-Rabbitmq-ecs ECS", 
+                "title": "Metricbeat Rabbitmq ECS",
                 "version": 1
             }, 
-            "id": "Metricbeat-Rabbitmq-ecs ECS", 
+            "id": "Metricbeat-Rabbitmq-ecs", 
             "type": "search", 
             "version": 1
         }, 
@@ -412,7 +412,7 @@
                     }, 
                     {
                         "col": 8, 
-                        "id": "Rabbitmq-Number-of-Nodes-ecs ECS", 
+                        "id": "Rabbitmq-Number-of-Nodes-ecs", 
                         "panelIndex": 2, 
                         "row": 1, 
                         "size_x": 3, 

@@ -52,7 +52,7 @@
                             "id": "2", 
                             "params": {
                                 "customLabel": "Sum of query duration", 
-                                "field": "postgresql.log.duration"
+                                "field": "event.duration"
                             }, 
                             "schema": "metric", 
                             "type": "sum"
@@ -157,7 +157,7 @@
                 "columns": [
                     "user.name", 
                     "postgresql.log.database", 
-                    "postgresql.log.duration", 
+                    "event.duration",
                     "postgresql.log.query"
                 ], 
                 "description": "", 
@@ -169,7 +169,7 @@
                         "index": "filebeat-*", 
                         "query": {
                             "language": "lucene", 
-                            "query": "postgresql.log.duration:>30"
+                            "query": "event.duration:>30000000"
                         }, 
                         "version": true
                     }
@@ -190,7 +190,7 @@
                 "columns": [
                     "user.name", 
                     "postgresql.log.database", 
-                    "postgresql.log.duration", 
+                    "event.duration",
                     "postgresql.log.query"
                 ], 
                 "description": "", 
@@ -202,7 +202,7 @@
                         "index": "filebeat-*", 
                         "query": {
                             "language": "lucene", 
-                            "query": "postgresql.log.duration:*"
+                            "query": "event.duration:*"
                         }, 
                         "version": true
                     }
@@ -251,7 +251,7 @@
                         "columns": [
                             "user.name", 
                             "postgresql.log.database", 
-                            "postgresql.log.duration", 
+                            "event.duration",
                             "postgresql.log.query"
                         ], 
                         "id": "Slow PostgreSQL Queries-ecs", 
@@ -270,7 +270,7 @@
                         "columns": [
                             "user.name", 
                             "postgresql.log.database", 
-                            "postgresql.log.duration", 
+                            "event.duration",
                             "postgresql.log.query"
                         ], 
                         "id": "PostgreSQL Query Durations-ecs", 

@@ -839,20 +839,20 @@ filebeat.inputs:
 
 #========================= Filebeat global options ============================
 
-# Name of the registry file. If a relative path is used, it is considered relative to the
+# Registry data path. If a relative path is used, it is considered relative to the
 # data path.
-#filebeat.registry_file: ${path.data}/registry
+#filebeat.registry.path: ${path.data}/registry
 
-# The permissions mask to apply on registry file. The default value is 0600.
-# Must be a valid Unix-style file permissions mask expressed in octal notation.
-# This option is not supported on Windows.
-#filebeat.registry_file_permissions: 0600
+# The permissions mask to apply on registry data, and meta files. The default
+# value is 0600.  Must be a valid Unix-style file permissions mask expressed in
+# octal notation.  This option is not supported on Windows.
+#filebeat.registry.file_permissions: 0600
 
 # The timeout value that controls when registry entries are written to disk
-# (flushed). When an unwritten update exceeds this value, it triggers a write to
-# disk. When registry_flush is set to 0s, the registry is written to disk after
-# each batch of events has been published successfully. The default value is 0s.
-#filebeat.registry_flush: 0s
+# (flushed). When an unwritten update exceeds this value, it triggers a write
+# to disk. When flush is set to 0s, the registry is written to disk after each
+# batch of events has been published successfully. The default value is 0s.
+#filebeat.registry.flush: 0s
 
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines
