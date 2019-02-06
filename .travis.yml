@@ -14,6 +14,7 @@ env:
     - GOX_FLAGS="-arch amd64"
     - DOCKER_COMPOSE_VERSION=1.21.0
     - GO_VERSION=$(cat .go-version)
+    - GIMME_GO_VERSION=$(cat .go-version)
     # Newer versions of minikube fail on travis, see: https://github.com/kubernetes/minikube/issues/2704
     - TRAVIS_MINIKUBE_VERSION=v0.25.2
 
@@ -22,13 +23,13 @@ jobs:
     # General checks
     - os: linux
       env: TARGETS="check"
-      go: ${GO_VERSION}
+      go: 1.11.5
       stage: check
 
     # Filebeat
     - os: linux
       env: TARGETS="-C filebeat testsuite"
-      go: $GO_VERSION
+      go: $GIMME_GO_VERSION
       stage: test
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C filebeat testsuite"
@@ -36,7 +37,7 @@ jobs:
       stage: test
     - os: linux
       env: TARGETS="-C x-pack/filebeat testsuite"
-      go: $GO_VERSION
+      go: $(GO_VERSION)
       stage: test
 
     # Heartbeat
