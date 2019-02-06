@@ -99,6 +99,34 @@ func TestConfigBlocksEqual(t *testing.T) {
 			equal: true,
 		},
 		{
+			name: "single element with slices",
+			a: ConfigBlocks{
+				ConfigBlocksWithType{
+					Type: "metricbeat.modules",
+					Blocks: []*ConfigBlock{
+						&ConfigBlock{
+							Raw: map[string]interface{}{
+								"foo": []string{"foo", "bar"},
+							},
+						},
+					},
+				},
+			},
+			b: ConfigBlocks{
+				ConfigBlocksWithType{
+					Type: "metricbeat.modules",
+					Blocks: []*ConfigBlock{
+						&ConfigBlock{
+							Raw: map[string]interface{}{
+								"foo": []string{"foo", "bar"},
+							},
+						},
+					},
+				},
+			},
+			equal: true,
+		},
+		{
 			name: "different number of blocks",
 			a: ConfigBlocks{
 				ConfigBlocksWithType{
@@ -137,7 +165,6 @@ func TestConfigBlocksEqual(t *testing.T) {
 				ConfigBlocksWithType{
 					Type: "metricbeat.modules",
 					Blocks: []*ConfigBlock{
-
 						&ConfigBlock{
 							Raw: map[string]interface{}{
 								"baz": "buzz",
@@ -150,7 +177,6 @@ func TestConfigBlocksEqual(t *testing.T) {
 				ConfigBlocksWithType{
 					Type: "metricbeat.modules",
 					Blocks: []*ConfigBlock{
-
 						&ConfigBlock{
 							Raw: map[string]interface{}{
 								"foo": "bar",
@@ -165,7 +191,11 @@ func TestConfigBlocksEqual(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			assert.Equal(t, test.equal, ConfigBlocksEqual(test.a, test.b))
+			check, err := ConfigBlocksEqual(test.a, test.b)
+			if !assert.NoError(t, err) {
+				return
+			}
+			assert.Equal(t, test.equal, check)
 		})
 	}
 }
