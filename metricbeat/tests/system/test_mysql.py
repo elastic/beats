@@ -46,14 +46,16 @@ class Test(metricbeat.BaseTest):
         return ['root:test@tcp({}:3306)/'.format(self.compose_hosts()[0])]
 
 
-# class TestMysql80(Test):
-#    COMPOSE_SERVICES = ['mysql_8_0']
+@unittest.skip("Flaky test, see https://github.com/elastic/beats/issues/10608")
+class TestMysql80(Test):
+    COMPOSE_SERVICES = ['mysql_8_0']
 
 
 class TestPercona57(Test):
     COMPOSE_SERVICES = ['percona_5_7']
 
 
+@unittest.skip("Flaky test, see https://github.com/elastic/beats/issues/10608")
 class TestPercona80(Test):
     COMPOSE_SERVICES = ['percona_8_0']
 
