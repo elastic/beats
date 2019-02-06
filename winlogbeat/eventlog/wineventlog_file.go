@@ -82,22 +82,30 @@ func (l *winEventFileLog) Open(state checkpoint.EventLogState) error {
 	}
 	l.subscription = queryHandle
 	err = win.EvtSeek(l.subscription, 0, bookmark)
-	// An error here occurrs if the bookmark was for an old log file that has been rotated.
-	if err != nil {
-		state.Bookmark = ""
-		state.RecordNumber = 0
+	// For logs that do not correctly use record IDs, a new log will start at ID 0, and we need to reset the current record counter.
+	if err == win.ERROR_NOT_FOUND {
+		l.lastRead.Bookmark = ""
+		l.lastRead.RecordNumber = 0
+		err = l.Close()
+		if err != nil {
+			return err
+		}
+		err = l.Open(l.lastRead)
 	}
 
-	return nil
+	return err
 }
 
 func (l *winEventFileLog) Read() ([]Record, error) {
 	var handles, err = l.winEventLog.Read()
-	if len(handles) == 0 {
+	if err != nil && len(handles) == 0 {
 		// If we have read everything from this log file, give other applications the ability to rotate log files if required.
-		l.Close()
-		time.Sleep(time.Second)
-		l.Open(l.lastRead)
+		err = l.Close()
+		if err != nil {
+			return handles, err
+		}
+		time.Sleep(time.Second * 30)
+		err = l.Open(l.lastRead)
 	}
 	return handles, err
 }

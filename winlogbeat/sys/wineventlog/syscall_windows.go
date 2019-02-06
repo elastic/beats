@@ -30,6 +30,7 @@ const (
 	ERROR_INVALID_HANDLE                  syscall.Errno = 6
 	ERROR_INSUFFICIENT_BUFFER             syscall.Errno = 122
 	ERROR_NO_MORE_ITEMS                   syscall.Errno = 259
+	ERROR_NOT_FOUND                       syscall.Errno = 1168
 	ERROR_NONE_MAPPED                     syscall.Errno = 1332
 	ERROR_TIMEOUT                         syscall.Errno = 1460
 	RPC_S_INVALID_BOUND                   syscall.Errno = 1734
