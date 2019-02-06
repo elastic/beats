@@ -35,24 +35,24 @@ type MockCloudWatchClient struct {
 
 var (
 	regionName = "us-west-1"
-	instanceId = "i-123"
+	instanceID = "i-123"
 	namespace  = "AWS/EC2"
 
 	id1         = "cpu1"
 	metricName1 = "CPUUtilization"
-	label1      = instanceId + " " + metricName1
+	label1      = instanceID + " " + metricName1
 
 	id2         = "status1"
 	metricName2 = "StatusCheckFailed"
-	label2      = instanceId + " " + metricName2
+	label2      = instanceID + " " + metricName2
 
 	id3         = "status2"
 	metricName3 = "StatusCheckFailed_System"
-	label3      = instanceId + " " + metricName3
+	label3      = instanceID + " " + metricName3
 
 	id4         = "status3"
 	metricName4 = "StatusCheckFailed_Instance"
-	label4      = instanceId + " " + metricName4
+	label4      = instanceID + " " + metricName4
 )
 
 func (m *MockEC2Client) DescribeRegionsRequest(input *ec2.DescribeRegionsInput) ec2.DescribeRegionsRequest {
@@ -79,7 +79,7 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 	privateIP := "5.6.7.8"
 
 	instance := ec2.Instance{
-		InstanceId:   awssdk.String(instanceId),
+		InstanceId:   awssdk.String(instanceID),
 		InstanceType: ec2.InstanceTypeT2Medium,
 		Placement: &ec2.Placement{
 			AvailabilityZone: awssdk.String("us-west-1a"),
@@ -148,7 +148,7 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 	}
 }
 
-func TestGetInstanceIDs(t *testing.T) {
+func TestGetinstanceIDs(t *testing.T) {
 	mockSvc := &MockEC2Client{}
 	instanceIDs, instancesOutputs, err := getInstancesPerRegion(mockSvc)
 	if err != nil {
@@ -159,10 +159,10 @@ func TestGetInstanceIDs(t *testing.T) {
 	assert.Equal(t, 1, len(instanceIDs))
 	assert.Equal(t, 1, len(instancesOutputs))
 
-	assert.Equal(t, instanceId, instanceIDs[0])
-	assert.Equal(t, ec2.InstanceType("t2.medium"), instancesOutputs[instanceId].InstanceType)
-	assert.Equal(t, awssdk.String("image-123"), instancesOutputs[instanceId].ImageId)
-	assert.Equal(t, awssdk.String("us-west-1a"), instancesOutputs[instanceId].Placement.AvailabilityZone)
+	assert.Equal(t, instanceID, instanceIDs[0])
+	assert.Equal(t, ec2.InstanceType("t2.medium"), instancesOutputs[instanceID].InstanceType)
+	assert.Equal(t, awssdk.String("image-123"), instancesOutputs[instanceID].ImageId)
+	assert.Equal(t, awssdk.String("us-west-1a"), instancesOutputs[instanceID].Placement.AvailabilityZone)
 }
 
 func TestGetMetricDataPerRegion(t *testing.T) {
@@ -235,12 +235,12 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(instanceIDs))
 	instanceID := instanceIDs[0]
-	assert.Equal(t, instanceId, instanceID)
+	assert.Equal(t, instanceID, instanceID)
 
-	dimName := "InstanceId"
+	dimName := "instanceID"
 	dimension := cloudwatch.Dimension{
 		Name:  &dimName,
-		Value: &instanceId,
+		Value: &instanceID,
 	}
 
 	metricDataQuery1 := cloudwatch.MetricDataQuery{
@@ -310,7 +310,7 @@ func TestConstructMetricQueries(t *testing.T) {
 	name := "InstanceId"
 	dim := cloudwatch.Dimension{
 		Name:  &name,
-		Value: &instanceId,
+		Value: &instanceID,
 	}
 
 	listMetric := cloudwatch.Metric{
@@ -320,7 +320,7 @@ func TestConstructMetricQueries(t *testing.T) {
 	}
 
 	listMetricsOutput := []cloudwatch.Metric{listMetric}
-	metricDataQuery := constructMetricQueries(listMetricsOutput, instanceId, 300)
+	metricDataQuery := constructMetricQueries(listMetricsOutput, instanceID, 300)
 	assert.Equal(t, 1, len(metricDataQuery))
 	assert.Equal(t, "i-123 CPUUtilization", *metricDataQuery[0].Label)
 	assert.Equal(t, "Average", *metricDataQuery[0].MetricStat.Stat)
