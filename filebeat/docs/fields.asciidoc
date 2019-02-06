@@ -7400,13 +7400,7 @@ Fields from NATS logs.
 
 
 
-[float]
-== log fields
-
-Please add description
-
-
-*`nats.log.pid`*::
+*`nats.pid`*::
 +
 --
 type: long
@@ -7417,7 +7411,7 @@ Please add description
 
 --
 
-*`nats.log.level`*::
+*`nats.level`*::
 +
 --
 example: Please add example
@@ -7426,7 +7420,7 @@ Please add description
 
 --
 
-*`nats.log.context`*::
+*`nats.message`*::
 +
 --
 type: text

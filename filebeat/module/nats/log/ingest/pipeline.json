@@ -4,7 +4,7 @@
             "grok": {
                 "field": "message",
                 "patterns":[
-                    "\\[%{POSINT:nats.log.pid}\\]( %{NATSTIME:nats.log.timestamp})? \\[%{NATSLOGLEVEL:nats.log.level}\\] %{GREEDYDATA:nats.log.context}"
+                    "\\[%{POSINT:process.pid}\\]( %{NATSTIME:nats.log.timestamp})? \\[%{NATSLOGLEVEL:log.level}\\] %{GREEDYDATA:message}"
                 ],
                 "pattern_definitions": {
                     "NATSTIME": "%{YEAR}/%{MONTHNUM}/%{MONTHDAY} %{TIME}",
@@ -16,7 +16,7 @@
         {
             "script": {
                 "lang": "painless",
-                "source": "if (ctx.nats.log.level == params.inf) {\n          ctx.nats.log.level = params.info;\n        } else if (ctx.nats.log.level == params.dbg) {\n          ctx.nats.log.level = params.debug;\n        } else if (ctx.nats.log.level == params.wrn) {\n          ctx.nats.log.level = params.warning;\n        } else if (ctx.nats.log.level == params.err) {\n          ctx.nats.log.level = params.error;\n        } else if (ctx.nats.log.level == params.ftl) {\n          ctx.nats.log.level = params.fatal;\n        } else if (ctx.nats.log.level == params.trc) {\n          ctx.nats.log.level = params.trace;\n        }",
+                "source": "if (ctx.log.level == params.inf) {\n          ctx.log.level = params.info;\n        } else if (ctx.log.level == params.dbg) {\n          ctx.log.level = params.debug;\n        } else if (ctx.log.level == params.wrn) {\n          ctx.log.level = params.warning;\n        } else if (ctx.log.level == params.err) {\n          ctx.log.level = params.error;\n        } else if (ctx.log.level == params.ftl) {\n          ctx.log.level = params.fatal;\n        } else if (ctx.log.level == params.trc) {\n          ctx.log.level = params.trace;\n        }",
                 "params": {
                     "inf": "INF",
                     "info": "info",
@@ -49,11 +49,6 @@
         {
             "remove": {
                 "field": "nats.log.timestamp"
-            }
-        },
-        {
-            "remove": {
-                "field": "message"
             }
         }],
     "on_failure" : [{

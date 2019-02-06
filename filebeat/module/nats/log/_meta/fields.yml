@@ -1,16 +1,11 @@
-- name: log
+- name: pid
   description: Please add description
   example: Please add example
-  type: group
-  fields:
-  - name: pid
-    description: Please add description
-    example: Please add example
-    type: long
-  - name: level
-    description: Please add description
-    example: Please add example
-  - name: context
-    description: Please add description
-    example: Please add example
-    type: text
+  type: long
+- name: level
+  description: Please add description
+  example: Please add example
+- name: message
+  description: Please add description
+  example: Please add example
+  type: text
