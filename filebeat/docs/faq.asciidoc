@@ -53,7 +53,7 @@ Make sure that you read the documentation for these configuration options before
 [[reduce-registry-size]]
 === Registry file is too large?
 
-{beatname_uc} keeps the state of each file and persists the state to disk in the `registry_file`. The file state is used to continue file reading at a previous position when {beatname_uc} is restarted. If a large number of new files are produced every day, the registry file might grow to be too large. To reduce the size of the registry file, there are two configuration options available: <<{beatname_lc}-input-log-clean-removed,`clean_removed`>> and <<{beatname_lc}-input-log-clean-inactive,`clean_inactive`>>.
+{beatname_uc} keeps the state of each file and persists the state to disk in the registry file. The file state is used to continue file reading at a previous position when {beatname_uc} is restarted. If a large number of new files are produced every day, the registry file might grow to be too large. To reduce the size of the registry file, there are two configuration options available: <<{beatname_lc}-input-log-clean-removed,`clean_removed`>> and <<{beatname_lc}-input-log-clean-inactive,`clean_inactive`>>.
 
 For old files that you no longer touch and are ignored (see <<{beatname_lc}-input-log-ignore-older,`ignore_older`>>), we recommended that you use `clean_inactive`. If old files get removed from disk, then use the `clean_removed` option.
 
