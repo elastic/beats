@@ -19,6 +19,7 @@ package elasticsearch
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -49,6 +50,7 @@ type Client struct {
 	timeout  time.Duration
 
 	// buffered bulk requests
+	ctx      clientContext
 	bulkRequ *bulkRequest
 
 	// buffered json response reader
@@ -59,6 +61,11 @@ type Client struct {
 	proxyURL         *url.URL
 
 	observer outputs.Observer
+}
+
+type clientContext struct {
+	ctx    context.Context
+	cancel context.CancelFunc
 }
 
 // ClientSettings contains the settings for a client.
@@ -680,6 +687,20 @@ func (client *Client) String() string {
 // Connect connects the client. It runs a GET request against the root URL of
 // the configured host, updates the known Elasticsearch version and calls
 // globally configured handlers.
+func (client *Client) Connect() error {
+	err := client.Connection.Connect()
+	if err != nil {
+		return err
+	}
+
+	client.ctx.init()
+	client.bulkRequ.requ = client.bulkRequ.requ.WithContext(client.ctx.Context())
+	return nil
+}
+
+// Connect connects the client. It runs a GET request against the root URL of
+// the configured host, updates the known Elasticsearch version and calls
+// globally configured handlers.
 func (conn *Connection) Connect() error {
 	versionString, err := conn.Ping()
 	if err != nil {
@@ -730,8 +751,19 @@ func (conn *Connection) Ping() (string, error) {
 	return response.Version.Number, nil
 }
 
+// Close closes idle connections and can cancel active requests.
+func (client *Client) Close() error {
+	client.ctx.close() // cancel active requests using the client context
+	client.Connection.Close()
+	return nil
+}
+
 // Close closes a connection.
 func (conn *Connection) Close() error {
+	t := conn.http.Transport
+	if ci, ok := t.(interface{ CloseIdleConnections() }); ok {
+		ci.CloseIdleConnections()
+	}
 	return nil
 }
 
@@ -830,4 +862,17 @@ func closing(c io.Closer) {
 	if err != nil {
 		logp.Warn("Close failed with: %v", err)
 	}
+}
+
+func (c *clientContext) init() {
+	c.ctx, c.cancel = context.WithCancel(context.Background())
+}
+
+func (c *clientContext) close() {
+	c.cancel()
+	c.cancel = func() {}
+}
+
+func (c *clientContext) Context() context.Context {
+	return c.ctx
 }
