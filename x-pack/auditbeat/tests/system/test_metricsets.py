@@ -42,8 +42,8 @@ class Test(AuditbeatXPackTest):
         self.check_metricset("system", "login", COMMON_FIELDS + fields, config, warnings_allowed=True)
 
     @unittest.skipIf(sys.platform == "win32", "Not implemented for Windows")
-    @unittest.skipIf(sys.platform == "linux2" and platform.linux_distribution()[0] != "debian",
-                     "Only implemented for Debian")
+    @unittest.skipIf(sys.platform == "linux2" and not (os.path.isdir("/var/lib/dpkg") or os.path.isdir("/var/lib/rpm")),
+                     "Only implemented for dpkg and rpm")
     def test_metricset_package(self):
         """
         package metricset collects information about installed packages on a system.
