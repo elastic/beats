@@ -145,22 +145,35 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 	containerstatuses []*kubernetes.PodContainerStatus) {
 	host := pod.Status.GetPodIP()
 
-	// Do not emit events without host (container is still being configured)
+	// If the container doesn't exist in the runtime or its network
+	// is not configured, it won't have an IP. Skip it as we cannot
+	// generate configs without host, and an update will arrive when
+	// the container is ready.
+	// If stopping, emit the event in any case to ensure cleanup.
 	if host == "" && flag != "stop" {
 		return
 	}
 
 	// Collect all runtimes from status information.
+	containerIDs := map[string]string{}
 	runtimes := map[string]string{}
 	for _, c := range containerstatuses {
-		_, runtime := kubernetes.ContainerIDWithRuntime(c)
+		cid, runtime := kubernetes.ContainerIDWithRuntime(c)
+		containerIDs[c.GetName()] = cid
 		runtimes[c.GetName()] = runtime
 	}
 
 	// Emit container and port information
 	for _, c := range containers {
+		// If it doesn't have an ID, container doesn't exist in
+		// the runtime, emit only an event if we are stopping, so
+		// we are sure of cleaning up configurations.
+		if id := containerIDs[c.GetName()]; id == "" && flag != "stop" {
+			continue
+		}
+
 		// This must be an id that doesn't depend on the state of the container
-		// so it works also on `stop` if containers have been already stopped.
+		// so it works also on `stop` if containers have been already deleted.
 		cid := fmt.Sprintf("%s.%s", pod.Metadata.GetUid(), c.GetName())
 
 		cmeta := common.MapStr{
