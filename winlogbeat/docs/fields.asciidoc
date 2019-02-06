@@ -3590,7 +3590,7 @@ All fields specific to the Windows Event Log are defined here.
 
 
 
-*`winlog.type`*::
+*`winlog.api`*::
 +
 --
 required: True
