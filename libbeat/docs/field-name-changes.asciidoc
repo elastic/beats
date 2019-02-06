@@ -2,6 +2,8 @@
 [frame="topbot",options="header"]
 |======================
 |Old Field|New Field
+|`auditd.messages`            |`event.original`
+|`auditd.warnings`            |`error.message`
 |`beat.hostname`            |`agent.hostname`
 |`beat.name`            |`host.name`
 |`beat.timezone`            |`event.timezone`
@@ -10,6 +12,7 @@
 |`docker.container.image`            |`container.image.name`
 |`docker.container.labels`            |`container.labels`
 |`docker.container.name`            |`container.name`
+|`event.type`            |`auditd.message_type`
 |`meta.cloud.availability_zone`            |`cloud.availability_zone`
 |`meta.cloud.instance_id`            |`cloud.instance.id`
 |`meta.cloud.instance_name`            |`cloud.instance.name`
@@ -20,6 +23,24 @@
 |`process.cwd`            |`process.working_directory`
 |`process.exe`            |`process.executable`
 |`source.hostname`            |`source.domain`
+|`user.auid`            |`user.audit.id`
+|`user.egid`            |`user.effective.group.id`
+|`user.euid`            |`user.effective.id`
+|`user.fsgid`            |`user.filesystem.group.id`
+|`user.fsuid`            |`user.filesystem.id`
+|`user.gid`            |`user.group.id`
+|`user.name_map.auid`            |`user.audit.name`
+|`user.name_map.egid`            |`user.effective.group.name`
+|`user.name_map.euid`            |`user.effective.name`
+|`user.name_map.fsgid`            |`user.filesystem.group.name`
+|`user.name_map.fsuid`            |`user.filesystem.name`
+|`user.name_map.gid`            |`user.group.name`
+|`user.name_map.sgid`            |`user.saved.group.name`
+|`user.name_map.suid`            |`user.saved.name`
+|`user.name_map.uid`            |`user.name`
+|`user.sgid`            |`user.saved.group.id`
+|`user.suid`            |`user.saved.id`
+|`user.uid`            |`user.id`
 |======================
 
 .Filebeat renamed fields in 7.0
@@ -102,7 +123,6 @@
 |`elasticsearch.audit.uri`            |`url.original`
 |`elasticsearch.slowlog.took_millis`            |`event.duration`
 |`fileset.module`            |`event.module`
-|`fileset.name`            |`event.dataset`
 |`haproxy.client.ip`            |`source.address`
 |`haproxy.client.port`            |`source.port`
 |`haproxy.destination.ip`            |`destination.ip`
@@ -253,7 +273,6 @@
 |`suricata.eve.app_proto`            |`network.protocol`
 |`suricata.eve.dest_ip`            |`destination.ip`
 |`suricata.eve.dest_port`            |`destination.port`
-|`suricata.eve.event_type`            |`event.type`
 |`suricata.eve.fileinfo.filename`            |`file.path`
 |`suricata.eve.fileinfo.size`            |`file.size`
 |`suricata.eve.flow.bytes_toclient`            |`destination.bytes`
@@ -383,6 +402,8 @@
 |`docker.container.image`            |`container.image.name`
 |`docker.container.labels`            |`container.labels`
 |`docker.container.name`            |`container.name`
+|`haproxy.info.pid`            |`process.pid`
+|`haproxy.stat.process_id`            |`process.pid`
 |`http.request.body`            |`http.request.body.content`
 |`kibana.stats.transport_address`            |`service.address`
 |`kibana.stats.uuid`            |`service.id`
@@ -401,7 +422,6 @@
 |`meta.cloud.region`            |`cloud.region`
 |`metricset.host`            |`service.address`
 |`metricset.module`            |`event.module`
-|`metricset.name`            |`event.dataset`
 |`metricset.namespace`            |`event.dataset`
 |`metricset.rrt`            |`event.duration`
 |`mongodb.status.process`            |`process.name`
@@ -412,6 +432,13 @@
 |`php_fpm.status.request_uri`            |`url.original`
 |`php_fpm.status.user`            |`http.response.user.name`
 |`process.exe`            |`process.executable`
+|`rabbitmq.connection.node`            |`rabbitmq.node.name`
+|`rabbitmq.connection.user`            |`user.name`
+|`rabbitmq.connection.vhost`            |`rabbitmq.vhost`
+|`rabbitmq.exchange.user`            |`user.name`
+|`rabbitmq.exchange.vhost`            |`rabbitmq.vhost`
+|`rabbitmq.queue.node`            |`rabbitmq.node.name`
+|`rabbitmq.queue.vhost`            |`rabbitmq.vhost`
 |`redis.info.server.os`            |`os.full`
 |`redis.info.server.process_id`            |`process.pid`
 |`redis.info.server.version`            |`service.version`
@@ -421,6 +448,13 @@
 |`system.process.pid`            |`process.pid`
 |`system.process.ppid`            |`process.ppid`
 |`system.process.username`            |`user.name`
+|`system.socket.direction`            |`network.direction`
+|`system.socket.family`            |`network.type`
+|`system.socket.process.command`            |`process.name`
+|`system.socket.process.exe`            |`process.executable`
+|`system.socket.process.pid`            |`process.pid`
+|`system.socket.user.id`            |`user.id`
+|`system.socket.user.name`            |`user.full_name`
 |`zookeeper.mntr.version`            |`service.version`
 |======================
 
@@ -476,14 +510,21 @@
 [frame="topbot",options="header"]
 |======================
 |Old Field|New Field
+|`activity_id`            |`winlog.activity_id`
 |`beat.hostname`            |`agent.hostname`
 |`beat.name`            |`host.name`
 |`beat.timezone`            |`event.timezone`
 |`beat.version`            |`agent.version`
+|`computer_name`            |`winlog.computer_name`
 |`docker.container.id`            |`container.id`
 |`docker.container.image`            |`container.image.name`
 |`docker.container.labels`            |`container.labels`
 |`docker.container.name`            |`container.name`
+|`event_id`            |`winlog.event_id`
+|`keywords`            |`winlog.keywords`
+|`level`            |`log.level`
+|`log_name`            |`winlog.channel`
+|`message_error`            |`error.message`
 |`meta.cloud.availability_zone`            |`cloud.availability_zone`
 |`meta.cloud.instance_id`            |`cloud.instance.id`
 |`meta.cloud.instance_name`            |`cloud.instance.name`
@@ -491,6 +532,20 @@
 |`meta.cloud.project_id`            |`cloud.project.id`
 |`meta.cloud.provider`            |`cloud.provider`
 |`meta.cloud.region`            |`cloud.region`
+|`opcode`            |`winlog.opcode`
 |`process.exe`            |`process.executable`
+|`process_id`            |`winlog.process.pid`
+|`provider_guid`            |`winlog.provider_guid`
+|`record_number`            |`winlog.record_id`
+|`related_activity_id`            |`winlog.related_activity_id`
+|`source_name`            |`winlog.provider_name`
+|`task`            |`winlog.task`
+|`thread_id`            |`winlog.process.thread.id`
+|`type`            |`winlog.api`
+|`user.domain`            |`winlog.user.domain`
+|`user.identifier`            |`winlog.user.identifier`
+|`user.type`            |`winlog.user.type`
+|`version`            |`winlog.version`
+|`xml`            |`event.original`
 |======================
 
