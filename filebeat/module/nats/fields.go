@@ -32,5 +32,5 @@ func init() {
 // AssetNats returns asset data.
 // This is the base64 encoded gzipped contents of module/nats.
 func AssetNats() string {
-	return "eJy8kE1ORCEQhPecojL78QAsTNy405joBYgUhNj8hGbMzO0Nz/GFqFutHV+K/qCPeOPForihBhhpCC0O83gwgKe+9tRGqsXi1gDAQ/UnIULtaK5rKhGPdy/PkBoRklBvDBASxavdLhxRXOaumBmXRovY66ldyS+imfttDkKvebdsgplVsopa8jv7NvlJ6JRw3q98afPscpsrWJpXtrQ+3y+1xB9y4TvlT/VfpkxVF/kvXx08D/MRAAD//xMVoVs="
+	return "eJyEkD9PwzAUxPd8ilP3RE2LoPJQCYZKDHRpmRCDSZ4TC8fPst0/+fbIKYoiWpXbfLbvd+/l+KZewMoYMiDqaEhglo6zDKgpVF67qNkKrDMAeOP6YAiKPZz0QdsG2+f9DoYbKG0oFBmgNJk6iOFDDis7GhFJsXck0Hg+uF/nBihpM+RAee5GygBImkKmIKfr0fuTvG8pXYPVUAfOc0Uh4KvHqdVVi9gS6Eg24iQDKk8y0jSNzrJzaUUPi4l7mcewba7KGDqSuVcn0JG8jv3lZWo2drjFfd1urhgdhSAbukep2EY6x3/jy6dFUa6KeVGK5epxOUeOSteiRI58vcbH7v0FihkoP6/mT4DsJwAA//+NfqdD"
 }

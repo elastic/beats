@@ -7405,18 +7405,18 @@ Fields from NATS logs.
 --
 type: long
 
-example: Please add example
+example: 42
 
-Please add description
+The pid of nats process by which the event was created
 
 --
 
 *`nats.level`*::
 +
 --
-example: Please add example
+example: INF
 
-Please add description
+The severity level of the event
 
 --
 
@@ -7425,9 +7425,9 @@ Please add description
 --
 type: text
 
-example: Please add example
+example: 172.18.0.1:38630 - cid:1 - ->> [SUB foo  1]
 
-Please add description
+The context of the event
 
 --
 

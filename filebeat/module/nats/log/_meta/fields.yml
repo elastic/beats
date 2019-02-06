@@ -1,11 +1,11 @@
 - name: pid
-  description: Please add description
-  example: Please add example
+  description: The pid of nats process by which the event was created
+  example: 42
   type: long
 - name: level
-  description: Please add description
-  example: Please add example
+  description: The severity level of the event
+  example: INF
 - name: message
-  description: Please add description
-  example: Please add example
+  description: The context of the event
+  example: 172.18.0.1:38630 - cid:1 - ->> [SUB foo  1]
   type: text
