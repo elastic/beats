@@ -29,7 +29,7 @@
         All fields specific to the Windows Event Log are defined here.
       fields:
 
-        - name: type
+        - name: api
           required: true
           description: >
             The event log API type used to read the record. The possible values are
