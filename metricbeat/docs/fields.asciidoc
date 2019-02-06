@@ -5233,12 +5233,16 @@ The number of failed and successful Raft RPC requests.
 --
 type: integer
 
+successful Raft RPC requests
+
 --
 
 *`etcd.leader.followers.counts.followers.counts.fail`*::
 +
 --
 type: integer
+
+failed Raft RPC requests
 
 --
 
@@ -5289,6 +5293,8 @@ type: scaled_float
 --
 type: keyword
 
+ID of actual leader
+
 --
 
 [float]
@@ -5323,6 +5329,9 @@ id of the current leader member
 --
 type: keyword
 
+the time when this node was started
+
+
 --
 
 *`etcd.self.leaderinfo.uptime`*::
@@ -5330,7 +5339,7 @@ type: keyword
 --
 type: keyword
 
-id of the current leader member
+amount of time the leader has been leader
 
 
 --
