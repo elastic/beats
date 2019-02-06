@@ -13,13 +13,13 @@ import (
 var Bundle = provider.MustCreate(
 	"aws",
 	provider.NewDefaultProvider("aws", NewCLI),
-	feature.NewDetails("AWS Lambda", "listen to events on AWS lambda", feature.Experimental),
+	feature.NewDetails("AWS Lambda", "listen to events on AWS lambda", feature.Stable),
 ).MustAddFunction("cloudwatch_logs",
 	NewCloudwatchLogs,
 	feature.NewDetails(
 		"Cloudwatch Logs trigger",
 		"receive events from cloudwatch logs.",
-		feature.Experimental,
+		feature.Stable,
 	),
 ).MustAddFunction("api_gateway_proxy",
 	NewAPIGatewayProxy,
@@ -33,13 +33,13 @@ var Bundle = provider.MustCreate(
 	feature.NewDetails(
 		"Kinesis trigger",
 		"receive events from a Kinesis stream",
-		feature.Experimental,
+		feature.Stable,
 	),
 ).MustAddFunction("sqs",
 	NewSQS,
 	feature.NewDetails(
 		"SQS trigger",
 		"receive events from a SQS queue",
-		feature.Experimental,
+		feature.Stable,
 	),
 ).Bundle()

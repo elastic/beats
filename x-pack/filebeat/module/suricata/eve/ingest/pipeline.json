@@ -33,11 +33,10 @@
       ,"ignore_missing": true
       }
     }
-  , {"convert":
-      {"field": "suricata.eve.http.http_method"
-      ,"target_field": "http.request.method"
-      ,"type": "string"
-      ,"ignore_missing": true
+  , {"lowercase":
+       {"field": "suricata.eve.http.http_method"
+       ,"target_field": "http.request.method"
+       ,"ignore_missing": true
       }
     }
   , {"convert":
@@ -49,8 +48,40 @@
     }
   , {"convert":
       {"field": "suricata.eve.http.hostname"
-      ,"target_field": "url.hostname"
+      ,"target_field": "url.domain"
       ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+  , { "grok":
+      { "field": "suricata.eve.http.url"
+      , "patterns": ["%{PATH:url.path}(?:\\?%{QUERY:url.query})?(?:#%{ANY:url.fragment})?"]
+      , "ignore_missing": true
+      , "pattern_definitions":
+        { "PATH": "[^?#]*"
+        , "QUERY": "[^#]*"
+        , "ANY": ".*"
+        }
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.http.hostname"
+      ,"target_field": "destination.domain"
+      ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.http.http_refer"
+      ,"target_field": "http.request.referrer"
+      ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.http.length"
+      ,"target_field": "http.response.body.bytes"
+      ,"type": "integer"
       ,"ignore_missing": true
       }
     }
@@ -85,15 +116,93 @@
 
   , { "lowercase":
       { "field": "suricata.eve.event_type"
+      , "target_field": "event.type"
       , "ignore_missing": true
       }
     }
-  , { "set":
-      { "field": "event.type"
-      , "value": "{{suricata.eve.event_type}}"
+  , {"convert":
+      {"field": "suricata.eve.alert.category"
+      ,"target_field": "message"
+      ,"type": "string"
+      ,"ignore_missing": true
       }
     }
-
+  , {"convert":
+      {"field": "suricata.eve.alert.action"
+      ,"target_field": "event.outcome"
+      ,"type": "string"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.alert.severity"
+      ,"target_field": "event.severity"
+      ,"type": "integer"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.flow.pkts_toclient"
+      ,"target_field": "destination.packets"
+      ,"type": "integer"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.flow.pkts_toserver"
+      ,"target_field": "source_ecs.packets"
+      ,"type": "integer"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.flow.bytes_toclient"
+      ,"target_field": "destination.bytes"
+      ,"type": "integer"
+      ,"ignore_missing": true
+      }
+    }
+  , {"convert":
+      {"field": "suricata.eve.flow.bytes_toserver"
+      ,"target_field": "source_ecs.bytes"
+      ,"type": "integer"
+      ,"ignore_missing": true
+      }
+    }
+  , { "script":
+      { "lang": "painless"
+      , "source": "long getOrZero(def map, def key) { if(map!=null && map[key]!=null) { return map[key]; } return 0; } def network=ctx['network'], source=ctx['source_ecs'], dest=ctx['destination']; def sp=getOrZero(source,'packets'), sb=getOrZero(source,'bytes'), dp=getOrZero(dest,'packets'), db=getOrZero(dest,'bytes'); if(sb+db+sp+dp > 0){if (network==null){network=new HashMap(); ctx['network']=network; } if(sb+db>0) network['bytes'] = sb+db; if(sp+dp>0) network['packets'] = sp+dp; }"
+      }
+    }
+  , {"date":
+      {"field": "suricata.eve.flow.start"
+      ,"target_field": "event.start"
+      ,"formats": ["ISO8601"]
+      ,"ignore_failure": true
+      }
+    }
+  , {"set":
+      {"field": "event.end"
+      ,"value": "{{@timestamp}}"
+      }
+    }
+  , { "script":
+      { "lang": "painless"
+      , "source": "Instant ins(def d){try{return Instant.parse(d);}catch(Exception e){return null;}}def ev=ctx['event'];if(ev!=null){def start=ins(ev['start']); def end=ins(ev['end']); if(start!=null && end!=null && !start.isAfter(end)) {ev['duration'] = Duration.between(start,end).toNanos();}}"
+      }
+    }
+  , { "lowercase":
+      { "field": "suricata.eve.proto"
+      , "target_field": "network.transport"
+      , "ignore_missing": true
+      }
+    }
+  , { "lowercase":
+      { "field": "suricata.eve.app_proto"
+      , "target_field": "network.protocol"
+      , "ignore_missing": true
+      }
+    }
   , { "user_agent":
       { "field": "user_agent.original"
       , "target_field": "user_agent"

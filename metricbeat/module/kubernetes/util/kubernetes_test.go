@@ -20,7 +20,7 @@ package util
 import (
 	"testing"
 
-	"github.com/ericchiang/k8s/apis/meta/v1"
+	v1 "github.com/ericchiang/k8s/apis/meta/v1"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"

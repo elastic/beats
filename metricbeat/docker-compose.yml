@@ -154,7 +154,40 @@ services:
     build: ./module/munin/_meta
 
   mysql:
-    build: ./module/mysql/_meta
+    build:
+      context: ./module/mysql/_meta
+      args:
+        MYSQL_IMAGE: mysql:5.7.24
+
+  mysql_8_0:
+    build:
+      context: ./module/mysql/_meta
+      args:
+        MYSQL_IMAGE: mysql:8.0.13
+
+  percona_5_7:
+    build:
+      context: ./module/mysql/_meta
+      args:
+        MYSQL_IMAGE: percona:5.7.24
+
+  percona_8_0:
+    build:
+      context: ./module/mysql/_meta
+      args:
+        MYSQL_IMAGE: percona:8.0.13-4
+
+  mariadb_10_2:
+    build:
+      context: ./module/mysql/_meta
+      args:
+        MYSQL_IMAGE: mariadb:10.2.17
+
+  mariadb_10_3:
+    build:
+      context: ./module/mysql/_meta
+      args:
+        MYSQL_IMAGE: mariadb:10.3.12
 
   nginx:
     build: ./module/nginx/_meta
