@@ -117,17 +117,17 @@
               description: >
                 The kernel subsystem name.
             - name: device_symlinks
-              type: text
+              type: keyword
               required: false
               description: >
                 Additional symlink names pointing to the device node in /dev.
             - name: device_node_path
-              type: text
+              type: keyword
               required: false
               description: >
                 The device node path of this device in /dev.
             - name: device_name
-              type: text
+              type: keyword
               required: false
               description: >
                 The kernel device name as it shows up in the device tree below /sys.
@@ -137,13 +137,13 @@
               Fields of the code generating the event.
           fields:
             - name: file
-              type: text
+              type: keyword
               required: false
               example: "../src/core/manager.c"
               description: >
                 The name of the source file where the log is generated.
             - name: function
-              type: text
+              type: keyword
               required: false
               example: "job_log_status_message"
               description: >
@@ -155,67 +155,67 @@
               description: >
                 The line number of the code which generated the log message.
         - name: process
-      type: group
-      description: >
-          Fields to log on behalf of a different program.
-      fields:
-        - name: audit
           type: group
           description: >
-              Audit fields of event.
+              Fields to log on behalf of a different program.
           fields:
-            - name: loginuid
+            - name: audit
+              type: group
+              description: >
+                  Audit fields of event.
+              fields:
+                - name: loginuid
+                  type: long
+                  required: false
+                  example: 1000
+                  description: >
+                    The login UID of the source process.
+                - name: session
+                  type: long
+                  required: false
+                  example: 3
+                  description: >
+                    The audit session of the source process.
+            - name: cmd
+              type: keyword
+              required: false
+              example: "/lib/systemd/systemd --user"
+              description: >
+                The command line of the process.
+            - name: name
+              type: keyword
+              required: false
+              example: "/lib/systemd/systemd"
+              description: >
+                Name of the executable.
+            - name: executable
+              type: keyword
+              required: false
+              description: >
+                Path to the the executable.
+              example: "/lib/systemd/systemd"
+            - name: pid
               type: long
               required: false
-              example: 1000
+              example: 1
               description: >
-                The login UID of the source process.
-            - name: session
+                The ID of the process which logged the message.
+            - name: gid
               type: long
               required: false
-              example: 3
+              example: 1
               description: >
-                The audit session of the source process.
-        - name: cmd
-          type: keyword
-          required: false
-          example: "/lib/systemd/systemd --user"
-          description: >
-            The command line of the process.
-        - name: name
-          type: keyword
-          required: false
-          example: "/lib/systemd/systemd"
-          description: >
-            Name of the executable.
-        - name: executable
-          type: keyword
-          required: false
-          description: >
-            Path to the the executable.
-          example: "/lib/systemd/systemd"
-        - name: pid
-          type: long
-          required: false
-          example: 1
-          description: >
-            The ID of the process which logged the message.
-        - name: gid
-          type: long
-          required: false
-          example: 1
-          description: >
-            The ID of the group which runs the process.
-        - name: uid
-          type: long
-          required: false
-          example: 1
-          description: >
-            The ID of the user which runs the process.
-        - name: capabilites
-          required: false
-          description: >
-            The effective capabilites of the process.
+                The ID of the group which runs the process.
+            - name: uid
+              type: long
+              required: false
+              example: 1
+              description: >
+                The ID of the user which runs the process.
+            - name: capabilites
+              required: false
+              description: >
+                The effective capabilites of the process.
     - name: systemd
       type: group
       description: >
@@ -278,7 +278,7 @@
           Fields of the host.
       fields:
         - name: boot_id
-          type: text
+          type: keyword
           required: false
           example: "dd8c974asdf01dbe2ef26d7fasdf264c9"
           description: >
@@ -301,7 +301,7 @@
           description: >
             The facility of the message. A syslog compatibility field.
         - name: identifier
-          type: text
+          type: keyword
           required: false
           example: "su"
           description: >

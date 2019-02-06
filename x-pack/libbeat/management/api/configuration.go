@@ -8,9 +8,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"reflect"
+	"sort"
 
-	"errors"
+	"github.com/mitchellh/hashstructure"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/reload"
 
@@ -96,8 +97,16 @@ func (c *AuthClient) Configuration() (ConfigBlocks, error) {
 		blocks[block.Type] = append(blocks[block.Type], &ConfigBlock{Raw: block.Raw})
 	}
 
+	// keep the ordering consistent while grouping the items.
+	keys := make([]string, 0, len(blocks))
+	for k := range blocks {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
 	res := ConfigBlocks{}
-	for t, b := range blocks {
+	for _, t := range keys {
+		b := blocks[t]
 		res = append(res, ConfigBlocksWithType{Type: t, Blocks: b})
 	}
 
@@ -105,16 +114,19 @@ func (c *AuthClient) Configuration() (ConfigBlocks, error) {
 }
 
 // ConfigBlocksEqual returns true if the given config blocks are equal, false if not
-func ConfigBlocksEqual(a, b ConfigBlocks) bool {
-	if len(a) != len(b) {
-		return false
+func ConfigBlocksEqual(a, b ConfigBlocks) (bool, error) {
+	// If there is an errors when hashing the config blocks its because the format changed.
+	aHash, err := hashstructure.Hash(a, nil)
+	if err != nil {
+		return false, errors.Wrap(err, "could not hash config blocks")
 	}
 
-	if len(a) == 0 {
-		return true
+	bHash, err := hashstructure.Hash(b, nil)
+	if err != nil {
+		return false, errors.Wrap(err, "could not hash config blocks")
 	}
 
-	return reflect.DeepEqual(a, b)
+	return aHash == bHash, nil
 }
 
 // IsConfigurationNotFound returns true if the configuration was not found.
