@@ -75,6 +75,8 @@ https://github.com/elastic/beats/compare/1035569addc4a3b29ffa14f8a08c27c1ace16ef
 
 *Journalbeat*
 
+- Migrate registry from previously incorrect path. {pull}10486[10486]
+
 *Metricbeat*
 
 *Packetbeat*
