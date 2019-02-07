@@ -63,16 +63,16 @@ class Test(BaseTest):
         os.mkdir(self.working_dir + "/log/")
 
         testfile = self.working_dir + "/log/test.log"
-        file = open(testfile, 'w', 0)
+        file = open(testfile, 'wb', 0)
 
         iterations = 80
         for n in range(0, iterations):
-            file.write("hello world" + str(n))
-            file.write("\n")
+            file.write(b"hello world" + bytes([n]))
+            file.write(b"\n")
 
         # An additional line is written to the log file. This line should not
         # be read as there is no finishing \n or \r
-        file.write("unfinished line")
+        file.write(b"unfinished line")
 
         filebeat = self.start_beat()
 
@@ -90,13 +90,13 @@ class Test(BaseTest):
         assert iterations == len(output)
 
         # Complete line so it can be picked up
-        file.write("\n")
+        file.write(b"\n")
         self.wait_until(
             lambda: self.output_has(lines=81),
             max_timeout=15)
 
         # Add one more line to make sure it keeps reading
-        file.write("HelloWorld \n")
+        file.write(b"HelloWorld \n")
         file.close()
 
         self.wait_until(
@@ -121,12 +121,12 @@ class Test(BaseTest):
         os.mkdir(self.working_dir + "/log/")
 
         testfile = self.working_dir + "/log/test.log"
-        file = open(testfile, 'w', 0)
+        file = open(testfile, 'wb', 0)
 
         # An additional line is written to the log file. This line should not
         # be read as there is no finishing \n or \r
-        file.write("complete line\n")
-        file.write("unfinished line ")
+        file.write(b"complete line\n")
+        file.write(b"unfinished line ")
 
         filebeat = self.start_beat()
 
@@ -135,7 +135,7 @@ class Test(BaseTest):
             lambda: self.output_has(lines=1),
             max_timeout=15)
 
-        file.write("extend unfinished line")
+        file.write(b"extend unfinished line")
         time.sleep(1)
 
         # Check that unfinished line is still not read
@@ -143,14 +143,14 @@ class Test(BaseTest):
             lambda: self.output_has(lines=1),
             max_timeout=15)
 
-        file.write("\n")
+        file.write(b"\n")
 
         # Check that unfinished line is now read
         self.wait_until(
             lambda: self.output_has(lines=2),
             max_timeout=15)
 
-        file.write("hello world\n")
+        file.write(b"hello world\n")
 
         # Check that new line is read
         self.wait_until(
@@ -522,7 +522,7 @@ class Test(BaseTest):
             # Write lines before registrar started
 
             # Special encoding needed?!?
-            f.write("ニコラスRuflin".decode("utf-8") + "\n")
+            f.write(b"ニコラスRuflin".decode("utf-8") + b"\n")
             f.flush()
 
             self.wait_until(
@@ -552,19 +552,19 @@ class Test(BaseTest):
         # Sample texts are from http://www.columbia.edu/~kermit/utf8.html
         encodings = [
             # golang, python, sample text
-            ("plain", "ascii", u"I can eat glass"),
+            ("plain", "ascii", "I can eat glass"),
             ("utf-8", "utf_8",
-             u"ὕαλον ϕαγεῖν δύναμαι· τοῦτο οὔ με βλάπτει."),
+             "ὕαλον ϕαγεῖν δύναμαι· τοῦτο οὔ με βλάπτει."),
             ("utf-16be", "utf_16_be",
-             u"Pot să mănânc sticlă și ea nu mă rănește."),
+             "Pot să mănânc sticlă și ea nu mă rănește."),
             ("utf-16le", "utf_16_le",
-             u"काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥"),
+             "काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥"),
             ("latin1", "latin1",
-             u"I kå Glas frässa, ond des macht mr nix!"),
-            ("BIG5", "big5", u"我能吞下玻璃而不傷身體。"),
-            ("gb18030", "gb18030", u"我能吞下玻璃而不傷身。體"),
-            ("euc-kr", "euckr", u" 나는 유리를 먹을 수 있어요. 그래도 아프지 않아요"),
-            ("euc-jp", "eucjp", u"私はガラスを食べられます。それは私を傷つけません。")
+             "I kå Glas frässa, ond des macht mr nix!"),
+            ("BIG5", "big5", "我能吞下玻璃而不傷身體。"),
+            ("gb18030", "gb18030", "我能吞下玻璃而不傷身。體"),
+            ("euc-kr", "euckr", " 나는 유리를 먹을 수 있어요. 그래도 아프지 않아요"),
+            ("euc-jp", "eucjp", "私はガラスを食べられます。それは私を傷つけません。")
         ]
 
         # create a file in each encoding

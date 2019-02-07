@@ -28,7 +28,7 @@ class Test(BaseTest):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
 
         for n in range(0, 2):
-            sock.sendto("Hello World: " + str(n), (host, port))
+            sock.sendto(b"Hello World: " + bytes(n), (host, port))
 
         self.wait_until(lambda: self.output_count(lambda x: x >= 2))
 

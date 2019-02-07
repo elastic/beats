@@ -49,8 +49,8 @@ class Test(BaseTest):
 
         os.rename(testfile1, testfile2)
 
-        file = open(testfile1, 'w', 0)
-        file.write("Hello World\n")
+        file = open(testfile1, 'wb', 0)
+        file.write(b"Hello World\n")
         file.close()
 
         # Wait until error shows up
@@ -793,14 +793,14 @@ class Test(BaseTest):
         logfile = self.working_dir + "/log/test.log"
 
         with io.open(logfile, 'w', encoding="utf-16") as file:
-            file.write(u'hello world1')
-            file.write(u"\n")
+            file.write('hello world1')
+            file.write("\n")
         with io.open(logfile, 'a', encoding="utf-16") as file:
-            file.write(u"\U00012345=Ra")
+            file.write("\U00012345=Ra")
         with io.open(logfile, 'a', encoding="utf-16") as file:
-            file.write(u"\n")
-            file.write(u"hello world2")
-            file.write(u"\n")
+            file.write("\n")
+            file.write("hello world2")
+            file.write("\n")
 
         filebeat = self.start_beat()
 
@@ -835,15 +835,15 @@ class Test(BaseTest):
 
         logfile = self.working_dir + "/log/test.log"
 
-        file = open(logfile, 'w', 0)
-        file.write("hello world1")
-        file.write("\n")
-        file.write("\x00\x00\x00\x00")
-        file.write("\n")
-        file.write("hello world2")
-        file.write("\n")
-        file.write("\x00\x00\x00\x00")
-        file.write("Hello World\n")
+        file = open(logfile, 'wb', 0)
+        file.write(b"hello world1")
+        file.write(b"\n")
+        file.write(b"\x00\x00\x00\x00")
+        file.write(b"\n")
+        file.write(b"hello world2")
+        file.write(b"\n")
+        file.write(b"\x00\x00\x00\x00")
+        file.write(b"Hello World\n")
         # Write some more data to hit the 16k min buffer size.
         # Make it web safe.
         file.write(base64.b64encode(os.urandom(16 * 1024)))

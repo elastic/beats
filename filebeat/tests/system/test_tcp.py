@@ -11,19 +11,19 @@ class Test(BaseTest):
         """
         Test TCP input with a new line delimiter
         """
-        self.send_events_with_delimiter("\n")
+        self.send_events_with_delimiter(b"\n")
 
     def test_tcp_with_custom_char_delimiter(self):
         """
         Test TCP input with a custom single char delimiter
         """
-        self.send_events_with_delimiter(";")
+        self.send_events_with_delimiter(b";")
 
     def test_tcp_with_custom_word_delimiter(self):
         """
         Test TCP input with a custom single char delimiter
         """
-        self.send_events_with_delimiter("<END>")
+        self.send_events_with_delimiter(b"<END>")
 
     def send_events_with_delimiter(self, delimiter):
         host = "127.0.0.1"
@@ -53,7 +53,7 @@ class Test(BaseTest):
         sock.connect((host, port))
 
         for n in range(0, 2):
-            sock.send("Hello World: " + str(n) + delimiter)
+            sock.send(b"Hello World: " + bytes(n) + delimiter)
 
         self.wait_until(lambda: self.output_count(lambda x: x >= 2))
 

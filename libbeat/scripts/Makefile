@@ -249,13 +249,17 @@ load-tests: ## @testing Runs load tests
 
 # Sets up the virtual python environment
 .PHONY: python-env
-python-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
-	@test -d ${PYTHON_ENV} || virtualenv ${VIRTUALENV_PARAMS} ${PYTHON_ENV}
-	@. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -q --upgrade pip ; \
+python-env: python3-env
+
+# Sets up the virtual python environment
+.PHONY: python3-env
+python3-env: ${ES_BEATS}/libbeat/tests/system/requirements.txt
+	@test -d ${PYTHON_ENV} || virtualenv -p python3 ${PYTHON_ENV}
+	@. ${PYTHON_ENV}/bin/activate && pip3 install ${PIP_INSTALL_PARAMS} -q --upgrade pip; \
 	if [ -a ./tests/system/requirements.txt ] && [ ! ${ES_BEATS}/libbeat/tests/system/requirements.txt -ef ./tests/system/requirements.txt ] ; then \
-		. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt -Ur ./tests/system/requirements.txt ; \
+		. ${PYTHON_ENV}/bin/activate && pip3 install ${PIP_INSTALL_PARAMS} -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt -Ur ./tests/system/requirements.txt ; \
 	else \
-		. ${PYTHON_ENV}/bin/activate && pip install ${PIP_INSTALL_PARAMS} -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt ; \
+		. ${PYTHON_ENV}/bin/activate && pip3 install ${PIP_INSTALL_PARAMS} -qUr ${ES_BEATS}/libbeat/tests/system/requirements.txt ; \
 	fi
 	@# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
 	@find ${PYTHON_ENV} -type d -name 'dist-packages' -exec sh -c "echo dist-packages > {}.pth" ';'

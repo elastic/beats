@@ -72,7 +72,7 @@ class Test(BaseTest):
         tls.connect((config.get('host'), config.get('port')))
 
         for n in range(0, NUMBER_OF_EVENTS):
-            tls.send("Hello World: " + str(n) + "\n")
+            tls.send(b"Hello World: " + bytes(n) + b"\n")
 
         self.wait_until(lambda: self.output_count(
             lambda x: x >= NUMBER_OF_EVENTS))
@@ -208,7 +208,7 @@ class Test(BaseTest):
         tls.connect((config.get('host'), config.get('port')))
 
         for n in range(0, NUMBER_OF_EVENTS):
-            tls.send("Hello World: " + str(n) + "\n")
+            tls.send(b"Hello World: " + bytes(n) + b"\n")
 
         self.wait_until(lambda: self.output_count(
             lambda x: x >= NUMBER_OF_EVENTS))
@@ -261,7 +261,7 @@ class Test(BaseTest):
         # no events should be written on disk.
         with assert_raises(IOError):
             for n in range(0, 100000):
-                sock.send("Hello World: " + str(n) + "\n")
+                sock.send(b"Hello World: " + bytes(n) + b"\n")
 
         filebeat.check_kill_and_wait()
 

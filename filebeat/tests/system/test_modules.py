@@ -61,7 +61,7 @@ class Test(BaseTest):
 
     def init(self):
         self.elasticsearch_url = self.get_elasticsearch_url()
-        print("Using elasticsearch: {}".format(self.elasticsearch_url))
+        print(("Using elasticsearch: {}".format(self.elasticsearch_url)))
         self.es = Elasticsearch([self.elasticsearch_url])
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
@@ -106,7 +106,7 @@ class Test(BaseTest):
             cfgfile=cfgfile)
 
     def run_on_file(self, module, fileset, test_file, cfgfile):
-        print("Testing {}/{} on {}".format(module, fileset, test_file))
+        print(("Testing {}/{} on {}".format(module, fileset, test_file)))
 
         try:
             self.es.indices.delete(index=self.index_name)

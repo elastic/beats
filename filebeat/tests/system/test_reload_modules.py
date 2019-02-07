@@ -91,7 +91,7 @@ class Test(BaseTest):
 
         # Check pipeline is present
         self.wait_until(lambda: any(re.match("filebeat-.*-test-test-default", key)
-                                    for key in self.es.transport.perform_request("GET", "/_ingest/pipeline/").keys()))
+                                    for key in list(self.es.transport.perform_request("GET", "/_ingest/pipeline/").keys())))
         proc.check_kill_and_wait()
 
     def test_no_es_connection(self):
@@ -143,7 +143,7 @@ class Test(BaseTest):
             f.write("Hello world\n")
 
         self.wait_until(lambda: self.output_lines() == 1, max_timeout=10)
-        print(self.output_lines())
+        print((self.output_lines()))
 
         # Remove input
         with open(self.working_dir + "/configs/system.yml", 'w') as f:

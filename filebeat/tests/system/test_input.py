@@ -93,7 +93,7 @@ class Test(BaseTest):
         rotations = 2
         iterations = 3
         for r in range(rotations):
-            with open(testfile, 'w', 0) as file:
+            with open(testfile, 'wb', 0) as file:
                 for n in range(iterations):
                     file.write("hello world {}\n".format(r * iterations + n))
                     time.sleep(0.1)
