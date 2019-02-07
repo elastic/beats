@@ -41,6 +41,7 @@ class Test(AuditbeatXPackTest):
         # Metricset is experimental and that generates a warning, TODO: remove later
         self.check_metricset("system", "login", COMMON_FIELDS + fields, config, warnings_allowed=True)
 
+    @unittest.skip("Flaky test, see https://github.com/elastic/beats/issues/10633")
     @unittest.skipIf(sys.platform == "win32", "Not implemented for Windows")
     @unittest.skipIf(sys.platform == "linux2" and not (os.path.isdir("/var/lib/dpkg") or os.path.isdir("/var/lib/rpm")),
                      "Only implemented for dpkg and rpm")
