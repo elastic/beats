@@ -433,7 +433,7 @@ func GetLabel(name string) string {
 	if err != nil {
 		return ""
 	} else {
-		return string(dmname)
+		return strings.TrimSpace(string(dmname))
 	}
 }
 
