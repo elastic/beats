@@ -154,6 +154,15 @@ metricbeat.modules:
   hosts: ["localhost:5000"]
   enabled: true
 
+#------------------------------- consul Module -------------------------------
+- module: consul
+  metricsets:
+  - agent
+  enabled: true
+  period: 10s
+  hosts: ["localhost:8500"]
+
+
 #------------------------------ Couchbase Module -----------------------------
 - module: couchbase
   metricsets: ["bucket", "cluster", "node"]
