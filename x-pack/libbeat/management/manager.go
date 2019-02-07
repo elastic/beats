@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common/reload"
+	"github.com/elastic/beats/libbeat/common/wait"
 	"github.com/elastic/beats/libbeat/feature"
 
 	"github.com/gofrs/uuid"
@@ -25,6 +26,7 @@ import (
 )
 
 var errEmptyAccessToken = errors.New("access_token is empty, you must reenroll your Beat")
+var managerJitter = 2 * time.Second
 
 func init() {
 	management.Register("x-pack", NewConfigManager, feature.Beta)
@@ -155,12 +157,21 @@ func (cm *ConfigManager) CheckRawConfig(cfg *common.Config) error {
 	return nil
 }
 
+// nextFetch takes the period and add some jitter to delay any requests.
+func (cm *ConfigManager) nextFetch() time.Duration {
+	return cm.config.Period + time.Duration(int64(managerJitter))
+}
+
 func (cm *ConfigManager) worker() {
 	defer cm.wg.Done()
 
 	// Initial fetch && apply (even if errors happen while fetching)
 	firstRun := true
-	period := 0 * time.Second
+
+	waiter := wait.New(
+		wait.RandomDelay(cm.config.Period),
+		wait.MinWaitAndJitter(cm.config.Period, managerJitter),
+	)
 
 	cm.updateState(Starting)
 
@@ -169,7 +180,7 @@ func (cm *ConfigManager) worker() {
 		select {
 		case <-cm.done:
 			return
-		case <-time.After(period):
+		case <-waiter.Wait():
 		}
 
 		changed := cm.fetch()
@@ -195,7 +206,6 @@ func (cm *ConfigManager) worker() {
 		}
 
 		if firstRun {
-			period = cm.config.Period
 			firstRun = false
 		}
 	}

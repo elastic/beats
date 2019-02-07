@@ -10,10 +10,14 @@ import (
 
 	"github.com/joeshaw/multierror"
 
+	"github.com/elastic/beats/libbeat/common/wait"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-var debugK = "event_reporter"
+var (
+	debugK       = "event_reporter"
+	reportJitter = 2 * time.Second
+)
 
 // EventReporter is an object that will periodically send asyncronously events to the
 // CM events endpoints.
@@ -61,15 +65,17 @@ func (e *EventReporter) Stop() {
 
 func (e *EventReporter) worker() {
 	defer e.wg.Done()
-	ticker := time.NewTicker(e.period)
-	defer ticker.Stop()
+	wait := wait.New(
+		wait.MinWaitAndJitter(e.period, reportJitter),
+		wait.MinWaitAndJitter(e.period, reportJitter),
+	)
 
 	var done bool
 	for !done {
 		select {
 		case <-e.done:
 			done = true
-		case <-ticker.C:
+		case <-wait.Wait():
 		}
 
 		var buf []Event

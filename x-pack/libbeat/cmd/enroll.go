@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -13,8 +14,13 @@ import (
 	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cli"
+	"github.com/elastic/beats/libbeat/common/wait"
 	"github.com/elastic/beats/x-pack/libbeat/management"
 	"github.com/elastic/beats/x-pack/libbeat/management/api"
+)
+
+var (
+	jitter = 1 * time.Second
 )
 
 func getBeat(name, version string) (*instance.Beat, error) {
@@ -94,12 +100,14 @@ func genEnrollCmd(name, version string) *cobra.Command {
 					if err != nil {
 						return err
 					}
+					wait.Jitter(0, jitter)
 					enrollmentToken, err = client.CreateEnrollmentToken()
 					if err != nil {
 						return errors.Wrap(err, "Error creating a new enrollment token")
 					}
 				}
 
+				wait.Jitter(0, jitter)
 				err = management.Enroll(beat, config, enrollmentToken)
 				if err != nil {
 					return errors.Wrap(err, "Error while enrolling")
