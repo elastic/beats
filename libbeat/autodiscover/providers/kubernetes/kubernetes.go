@@ -18,6 +18,7 @@
 package kubernetes
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -144,12 +145,16 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 	containerstatuses []*kubernetes.PodContainerStatus) {
 	host := pod.Status.GetPodIP()
 
-	// Do not emit events without host (container is still being configured)
-	if host == "" {
+	// If the container doesn't exist in the runtime or its network
+	// is not configured, it won't have an IP. Skip it as we cannot
+	// generate configs without host, and an update will arrive when
+	// the container is ready.
+	// If stopping, emit the event in any case to ensure cleanup.
+	if host == "" && flag != "stop" {
 		return
 	}
 
-	// Collect all container IDs and runtimes from status information.
+	// Collect all runtimes from status information.
 	containerIDs := map[string]string{}
 	runtimes := map[string]string{}
 	for _, c := range containerstatuses {
@@ -160,13 +165,18 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 
 	// Emit container and port information
 	for _, c := range containers {
+		// If it doesn't have an ID, container doesn't exist in
+		// the runtime, emit only an event if we are stopping, so
+		// we are sure of cleaning up configurations.
 		cid := containerIDs[c.GetName()]
-
-		// If there is a container ID that is empty then ignore it. It either means that the container is still starting
-		// up or the container is shutting down.
-		if cid == "" {
+		if cid == "" && flag != "stop" {
 			continue
 		}
+
+		// This must be an id that doesn't depend on the state of the container
+		// so it works also on `stop` if containers have been already deleted.
+		eventID := fmt.Sprintf("%s.%s", pod.Metadata.GetUid(), c.GetName())
+
 		cmeta := common.MapStr{
 			"id":      cid,
 			"name":    c.GetName(),
@@ -190,7 +200,7 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 		if len(c.Ports) == 0 {
 			event := bus.Event{
 				"provider":   p.uuid,
-				"id":         cid,
+				"id":         eventID,
 				flag:         true,
 				"host":       host,
 				"kubernetes": kubemeta,
@@ -204,7 +214,7 @@ func (p *Provider) emitEvents(pod *kubernetes.Pod, flag string, containers []*ku
 		for _, port := range c.Ports {
 			event := bus.Event{
 				"provider":   p.uuid,
-				"id":         cid,
+				"id":         eventID,
 				flag:         true,
 				"host":       host,
 				"port":       port.GetContainerPort(),

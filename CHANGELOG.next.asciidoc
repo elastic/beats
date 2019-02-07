@@ -32,6 +32,8 @@ https://github.com/elastic/beats/compare/1035569addc4a3b29ffa14f8a08c27c1ace16ef
 
 *Affecting all Beats*
 
+- Fix stopping of modules started by kubernetes autodiscover. {pull}10476[10476]
+
 *Auditbeat*
 
 - Enable System module config on Windows. {pull}10237[10237]
