@@ -127,7 +127,7 @@ func (s Socket) toMapStr() common.MapStr {
 	mapstr := common.MapStr{
 		"network": common.MapStr{
 			"type":      s.Family.String(),
-			"direction": ecsDirectionString(s.Direction),
+			"direction": s.Direction.String(),
 		},
 		"user": common.MapStr{
 			"id": s.UID,
@@ -188,21 +188,6 @@ func (s Socket) entityID(hostID string) string {
 	binary.Write(h, binary.LittleEndian, int64(s.LocalPort))
 	binary.Write(h, binary.LittleEndian, int64(s.RemotePort))
 	return h.Sum()
-}
-
-// ecsDirectionString is a custom alternative to the existing String()
-// to be compatible with recommended ECS values for network.direction.
-func ecsDirectionString(direction sock.Direction) string {
-	switch direction {
-	case sock.Inbound:
-		return "inbound"
-	case sock.Outbound:
-		return "outbound"
-	case sock.Listening:
-		return "listening"
-	default:
-		return "unknown"
-	}
 }
 
 // New constructs a new MetricSet.
@@ -357,7 +342,7 @@ func socketMessage(socket *Socket, action eventAction) string {
 	}
 
 	return fmt.Sprintf("%v socket (%v) %v by process %v (PID: %d) and user %v (UID: %d)",
-		strings.Title(ecsDirectionString(socket.Direction)), endpointString, actionString,
+		strings.Title(socket.Direction.String()), endpointString, actionString,
 		socket.ProcessName, socket.ProcessPID, socket.Username, socket.UID)
 }
 
