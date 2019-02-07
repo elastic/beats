@@ -29,7 +29,7 @@ import (
 
 func init() {
 	beat.MustRegisterPolicy(&seccomp.Policy{
-		DefaultAction: seccomp.ActionErrno,
+		DefaultAction: seccomp.ActionLog,
 		Syscalls: []seccomp.SyscallGroup{
 			{
 				Action: seccomp.ActionAllow,

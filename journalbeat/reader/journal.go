@@ -42,12 +42,11 @@ import (
 
 // Reader reads entries from journal(s).
 type Reader struct {
-	journal     *sdjournal.Journal
-	config      Config
-	done        chan struct{}
-	logger      *logp.Logger
-	backoff     backoff.Backoff
-	changesChan chan int
+	journal *sdjournal.Journal
+	config  Config
+	done    chan struct{}
+	logger  *logp.Logger
+	backoff backoff.Backoff
 }
 
 // New creates a new journal reader and moves the FP to the configured position.
@@ -97,20 +96,15 @@ func newReader(logger *logp.Logger, done chan struct{}, c Config, journal *sdjou
 	}
 
 	r := &Reader{
-		journal:     journal,
-		config:      c,
-		done:        done,
-		logger:      logger,
-		backoff:     backoff.NewExpBackoff(done, c.Backoff, c.MaxBackoff),
-		changesChan: make(chan int),
+		journal: journal,
+		config:  c,
+		done:    done,
+		logger:  logger,
+		backoff: backoff.NewExpBackoff(done, c.Backoff, c.MaxBackoff),
 	}
 	r.seek(state.Cursor)
 
 	instance.AddJournalToMonitor(c.Path, journal)
-
-	// waiting for journal changes are done in a separate gorountine
-	// when the reader is closed, it is stopped
-	go r.waitForChange()
 
 	return r, nil
 }
@@ -188,36 +182,31 @@ func (r *Reader) seek(cursor string) {
 // Next waits until a new event shows up and returns it.
 // It blocks until an event is returned or an error occurs.
 func (r *Reader) Next() (*beat.Event, error) {
-	event, err := r.readEvent()
-	if err != nil {
-		return nil, err
-	}
-	if event != nil {
-		return event, nil
-	}
-
-	return r.waitUntilNewEventOrError()
-}
-
-func (r *Reader) waitUntilNewEventOrError() (*beat.Event, error) {
 	for {
 		select {
 		case <-r.done:
 			return nil, nil
-		case c := <-r.changesChan:
+		default:
+		}
+
+		c, err := r.journal.Next()
+		if err != nil && err != io.EOF {
+			return nil, err
+		}
+
+		// error while reading next entry
+		if c < 0 {
+			return nil, fmt.Errorf("error while reading next entry %+v", syscall.Errno(-c))
+		}
+
+		// no new entry, so wait
+		if c == 0 {
+			c := r.journal.Wait(100 * time.Millisecond)
 			switch c {
+			case sdjournal.SD_JOURNAL_NOP:
+				continue
 			// new entries are added or the journal has changed (e.g. vacuum, rotate)
 			case sdjournal.SD_JOURNAL_APPEND, sdjournal.SD_JOURNAL_INVALIDATE:
-				event, err := r.readEvent()
-				if err != nil {
-					return nil, err
-				}
-
-				if event == nil {
-					continue
-				}
-
-				return event, nil
 			default:
 				if c < 0 {
 					return nil, fmt.Errorf("error while waiting for event: %+v", syscall.Errno(-c))
@@ -226,48 +215,15 @@ func (r *Reader) waitUntilNewEventOrError() (*beat.Event, error) {
 				r.logger.Errorf("Unknown return code from Wait: %d\n", c)
 			}
 		}
-	}
-}
 
-func (r *Reader) waitForChange() {
-	for {
-		// try to return before waiting for event
-		select {
-		case <-r.done:
-			return
-		default:
-		}
-
-		c := r.journal.Wait(100 * time.Millisecond)
-		if c == sdjournal.SD_JOURNAL_NOP {
-			r.backoff.Wait()
-			continue
-		}
-		r.backoff.Reset()
-
-		select {
-		case <-r.done:
-			return
-		case r.changesChan <- c:
-		}
-	}
-}
-
-func (r *Reader) readEvent() (*beat.Event, error) {
-	n, err := r.journal.Next()
-	if err != nil && err != io.EOF {
-		return nil, err
-	}
-
-	if n == 1 {
 		entry, err := r.journal.GetEntry()
 		if err != nil {
 			return nil, err
 		}
 		event := r.toEvent(entry)
+
 		return event, nil
 	}
-	return nil, nil
 }
 
 // toEvent creates a beat.Event from journal entries.
@@ -323,5 +279,4 @@ func (r *Reader) convertNamedField(fc fieldConversion, value string) interface{}
 func (r *Reader) Close() {
 	instance.StopMonitoringJournal(r.config.Path)
 	r.journal.Close()
-	close(r.changesChan)
 }
