@@ -76,8 +76,8 @@
       },
       "id": "fed59380-f7f8-11e8-af03-c999c9dea608",
       "type": "visualization",
-      "updated_at": "2019-02-05T22:19:02.492Z",
-      "version": 7
+      "updated_at": "2019-02-07T03:59:12.360Z",
+      "version": 4
     },
     {
       "attributes": {
@@ -157,8 +157,8 @@
       },
       "id": "9e8c6030-f7f8-11e8-af03-c999c9dea608",
       "type": "visualization",
-      "updated_at": "2019-02-05T22:19:02.492Z",
-      "version": 6
+      "updated_at": "2019-02-07T03:59:12.360Z",
+      "version": 4
     },
     {
       "attributes": {
@@ -236,8 +236,8 @@
       },
       "id": "15818fd0-f7f9-11e8-af03-c999c9dea608",
       "type": "visualization",
-      "updated_at": "2019-02-05T22:19:02.492Z",
-      "version": 7
+      "updated_at": "2019-02-07T03:59:12.360Z",
+      "version": 4
     },
     {
       "attributes": {
@@ -315,8 +315,8 @@
       },
       "id": "233b3400-f7f9-11e8-af03-c999c9dea608",
       "type": "visualization",
-      "updated_at": "2019-02-05T22:19:02.492Z",
-      "version": 7
+      "updated_at": "2019-02-07T03:59:12.360Z",
+      "version": 4
     },
     {
       "attributes": {
@@ -394,8 +394,8 @@
       },
       "id": "f1db6ec0-f7f8-11e8-af03-c999c9dea608",
       "type": "visualization",
-      "updated_at": "2019-02-05T22:19:02.492Z",
-      "version": 7
+      "updated_at": "2019-02-07T03:59:12.360Z",
+      "version": 4
     },
     {
       "attributes": {
@@ -473,8 +473,8 @@
       },
       "id": "be8828d0-f7f6-11e8-af03-c999c9dea608",
       "type": "visualization",
-      "updated_at": "2019-02-05T22:19:02.492Z",
-      "version": 7
+      "updated_at": "2019-02-07T03:59:12.360Z",
+      "version": 4
     },
     {
       "attributes": {
@@ -488,7 +488,7 @@
             }
           }
         },
-        "title": "AWS filter by region",
+        "title": "AWS filters",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -1090,91 +1090,10 @@
 =======
                 "parent": "",
                 "type": "list"
-              }
-            ],
-            "pinFilters": false,
-            "updateFiltersOnChange": true,
-            "useTimeFilter": false
-          },
-          "title": "AWS filter by region",
-          "type": "input_control_vis"
-        }
-      },
-      "id": "deab0260-2981-11e9-86eb-a3a07a77f530",
-      "type": "visualization",
-      "updated_at": "2019-02-05T22:41:00.567Z",
-      "version": 4
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "AWS filter by machine type",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "controls": [
-              {
-                "fieldName": "cloud.machine.type",
-                "id": "1549404124735",
-                "indexPattern": "metricbeat-*",
-                "label": "EC2 machine type",
-                "options": {
-                  "dynamicOptions": true,
-                  "multiselect": true,
-                  "order": "desc",
-                  "size": 5,
-                  "type": "terms"
-                },
-                "parent": "",
-                "type": "list"
-              }
-            ],
-            "pinFilters": false,
-            "updateFiltersOnChange": true,
-            "useTimeFilter": false
-          },
-          "title": "AWS filter by machine type",
-          "type": "input_control_vis"
-        }
-      },
-      "id": "be8f4d50-2991-11e9-86eb-a3a07a77f530",
-      "type": "visualization",
-      "updated_at": "2019-02-05T22:41:21.470Z",
-      "version": 4
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "AWS filter by availability zone",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "controls": [
+              },
               {
                 "fieldName": "cloud.availability_zone",
-                "id": "1549404304389",
+                "id": "1549512126406",
                 "indexPattern": "metricbeat-*",
                 "label": "availability zone",
                 "options": {
@@ -1186,20 +1105,35 @@
                 },
                 "parent": "",
                 "type": "list"
+              },
+              {
+                "fieldName": "cloud.machine.type",
+                "id": "1549512142947",
+                "indexPattern": "metricbeat-*",
+                "label": "machine type",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "",
+                "type": "list"
               }
             ],
             "pinFilters": false,
             "updateFiltersOnChange": true,
             "useTimeFilter": false
           },
-          "title": "AWS filter by availability zone",
+          "title": "AWS filters",
           "type": "input_control_vis"
         }
       },
-      "id": "322ec240-2992-11e9-86eb-a3a07a77f530",
+      "id": "deab0260-2981-11e9-86eb-a3a07a77f530",
       "type": "visualization",
-      "updated_at": "2019-02-05T22:41:34.235Z",
-      "version": 3
+      "updated_at": "2019-02-07T04:02:59.282Z",
+      "version": 11
     },
     {
       "attributes": {
@@ -1309,40 +1243,12 @@
             "gridData": {
               "h": 8,
               "i": "18",
-              "w": 13,
+              "w": 40,
               "x": 0,
               "y": 0
             },
             "id": "deab0260-2981-11e9-86eb-a3a07a77f530",
             "panelIndex": "18",
-            "type": "visualization",
-            "version": "6.6.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 8,
-              "i": "19",
-              "w": 12,
-              "x": 14,
-              "y": 0
-            },
-            "id": "be8f4d50-2991-11e9-86eb-a3a07a77f530",
-            "panelIndex": "19",
-            "type": "visualization",
-            "version": "6.6.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 8,
-              "i": "21",
-              "w": 12,
-              "x": 27,
-              "y": 0
-            },
-            "id": "322ec240-2992-11e9-86eb-a3a07a77f530",
-            "panelIndex": "21",
             "type": "visualization",
             "version": "6.6.0"
           }
@@ -1353,8 +1259,8 @@
       },
       "id": "c5846400-f7fb-11e8-af03-c999c9dea608",
       "type": "dashboard",
-      "updated_at": "2019-02-05T22:46:13.810Z",
-      "version": 12
+      "updated_at": "2019-02-07T04:03:53.480Z",
+      "version": 5
     }
   ],
   "version": "6.6.0"
