@@ -5,25 +5,18 @@
         "name": "host.example.com"
     },
     "aws": {
-        "s3": {
+        "s3_request": {
             "bucket": {
                 "4xx_errors": 0,
                 "5xx_errors": 0,
                 "all_requests": 1,
-                "bytes_downloaded": 265,
-                "first_byte_latency": 1.75,
+                "bytes_downloaded": 910.6666666666666,
+                "filter_id": "EntireBucket",
+                "first_byte_latency": 407.25,
+                "head_requests": 1,
                 "list_requests": 1,
                 "name": "test-s3-ks",
-                "size": {
-                    "bytes": 969165
-                },
-                "storage": {
-                    "type": ""
-                },
-                "total_request_latency": 1.75
-            },
-            "object": {
-                "count": 2
+                "total_request_latency": 215.875
             }
         }
     },
@@ -31,15 +24,15 @@
         "region": "ap-southeast-1"
     },
     "event": {
-        "dataset": "aws.s3",
+        "dataset": "aws.s3_request",
         "duration": 115000,
         "module": "aws"
     },
     "metricset": {
-        "name": "s3"
+        "name": "s3_request"
     },
     "service": {
-        "name": "s3",
-        "type": "s3"
+        "name": "s3_request",
+        "type": "s3_request"
     }
 }

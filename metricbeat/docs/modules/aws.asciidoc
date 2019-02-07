@@ -84,7 +84,24 @@ metricbeat.modules:
   period: 300s
   metricsets:
     - "ec2"
-    - "s3"
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
+
+- module: aws
+  period: 86400s
+  metricsets:
+    - "s3_daily_storage"
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
+
+- module: aws
+  period: 60s
+  metricsets:
+    - "s3_request"
   access_key_id: '${AWS_ACCESS_KEY_ID:""}'
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
@@ -98,9 +115,13 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-aws-ec2,ec2>>
 
-* <<metricbeat-metricset-aws-s3,s3>>
+* <<metricbeat-metricset-aws-s3_daily_storage,s3_daily_storage>>
+
+* <<metricbeat-metricset-aws-s3_request,s3_request>>
 
 include::aws/ec2.asciidoc[]
 
-include::aws/s3.asciidoc[]
+include::aws/s3_daily_storage.asciidoc[]
+
+include::aws/s3_request.asciidoc[]
 

@@ -4,7 +4,7 @@
 
 // +build integration
 
-package s3
+package s3_daily_storage
 
 import (
 	"os"
@@ -12,8 +12,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
+	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
 
 func TestFetch(t *testing.T) {
@@ -29,8 +29,8 @@ func TestFetch(t *testing.T) {
 	} else {
 		tempCreds := map[string]interface{}{
 			"module":            "aws",
-			"period":            "300s",
-			"metricsets":        []string{"s3"},
+			"period":            "86400s",
+			"metricsets":        []string{"s3_daily_storage"},
 			"access_key_id":     accessKeyID,
 			"secret_access_key": secretAccessKey,
 			"default_region":    defaultRegion,
@@ -55,46 +55,19 @@ func TestFetch(t *testing.T) {
 		t.Logf("Module: %s Metricset: %s", s3MetricSet.Module().Name(), s3MetricSet.Name())
 		for _, event := range events {
 			// RootField
-			checkEventField("service.name", "string", event, t)
-			checkEventField("cloud.provider", "string", event, t)
-			checkEventField("cloud.region", "string", event, t)
+			aws.CheckEventField("service.name", "string", event, t)
+			aws.CheckEventField("cloud.provider", "string", event, t)
+			aws.CheckEventField("cloud.region", "string", event, t)
 			// MetricSetField
-			checkEventField("bucket.name", "string", event, t)
-			checkEventField("bucket.storage.type", "string", event, t)
-			checkEventField("bucket.size.bytes", "float", event, t)
-			checkEventField("object.count", "int", event, t)
+			aws.CheckEventField("bucket.name", "string", event, t)
+			aws.CheckEventField("bucket.storage.type", "string", event, t)
+			aws.CheckEventField("bucket.size.bytes", "float", event, t)
+			aws.CheckEventField("object.count", "int", event, t)
 		}
 
 		errs := mbtest.WriteEventsReporterV2(s3MetricSet, t, "/")
 		if errs != nil {
 			t.Fatal("write", err)
 		}
-	}
-}
-
-func checkEventField(metricName string, expectedType string, event mb.Event, t *testing.T) {
-	if ok, err := event.MetricSetFields.HasKey(metricName); ok {
-		assert.NoError(t, err)
-		metricValue, err := event.MetricSetFields.GetValue(metricName)
-		assert.NoError(t, err)
-
-		switch metricValue.(type) {
-		case float64:
-			if expectedType != "float" {
-				t.Log("Failed: Field " + metricName + " is not in type " + expectedType)
-				t.Fail()
-			}
-		case string:
-			if expectedType != "string" {
-				t.Log("Failed: Field " + metricName + " is not in type " + expectedType)
-				t.Fail()
-			}
-		case int64:
-			if expectedType != "int" {
-				t.Log("Failed: Field " + metricName + " is not in type " + expectedType)
-				t.Fail()
-			}
-		}
-		t.Log("Succeed: Field " + metricName + " matches type " + expectedType)
 	}
 }

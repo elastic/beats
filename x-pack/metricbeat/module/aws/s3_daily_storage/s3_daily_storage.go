@@ -2,26 +2,19 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package s3
+package s3_daily_storage
 
 import (
-	"fmt"
-	"strconv"
-	"strings"
-	"time"
-
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 )
 
-var metricsetName = "s3"
+var metricsetName = "s3_daily_storage"
 
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
@@ -84,7 +77,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	namespace := "AWS/S3"
 	// Get startTime and endTime
-	startTime, endTime, err := getStartTimeEndTime()
+	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
 	if err != nil {
 		logp.Error(errors.Wrap(err, "Error ParseDuration"))
 		m.logger.Error(err.Error())
@@ -113,13 +106,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 			continue
 		}
 
-		metricDataQueries := constructMetricQueries(listMetricsOutput.Metrics)
+		metricDataQueries := constructMetricQueries(listMetricsOutput.Metrics, int64(m.PeriodInSec))
 
 		init := true
 		getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 		for init || getMetricDataOutput.NextToken != nil {
 			init = false
-			output, err := getMetricDataPerRegion(metricDataQueries, getMetricDataOutput.NextToken, svcCloudwatch, startTime, endTime)
+			output, err := aws.GetMetricDataPerRegion(metricDataQueries, getMetricDataOutput.NextToken, svcCloudwatch, startTime, endTime)
 			if err != nil {
 				err = errors.Wrap(err, "getMetricDataPerRegion failed, skipping region "+regionName)
 				m.logger.Error(err.Error())
@@ -130,7 +123,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		}
 
 		// Create Cloudwatch Events for S3
-		event, info, err := createCloudWatchEvents(getMetricDataOutput.MetricDataResults, regionName)
+		event, info, err := aws.CreateS3Events(getMetricDataOutput.MetricDataResults, metricsetName, regionName, schemaRootFields, schemaMetricSetFields)
 		if info != "" {
 			m.logger.Info(info)
 		}
@@ -145,102 +138,15 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	}
 }
 
-func getStartTimeEndTime() (startTime time.Time, endTime time.Time, err error) {
-	endTime = time.Now()
-	duration, err := time.ParseDuration("-24h")
-	if err != nil {
-		return
-	}
-	startTime = endTime.Add(duration)
-	return startTime, endTime, nil
-}
-
-func constructMetricQueries(listMetricsOutput []cloudwatch.Metric) []cloudwatch.MetricDataQuery {
+func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period int64) []cloudwatch.MetricDataQuery {
 	metricDataQueries := []cloudwatch.MetricDataQuery{}
+	metricNames := []string{"NumberOfObjects", "BucketSizeBytes"}
 	for i, listMetric := range listMetricsOutput {
-		metricDataQuery := createMetricDataQuery(listMetric, i)
+		if !aws.StringInSlice(*listMetric.MetricName, metricNames) {
+			continue
+		}
+		metricDataQuery := aws.CreateMetricDataQuery(listMetric, i, period)
 		metricDataQueries = append(metricDataQueries, metricDataQuery)
 	}
 	return metricDataQueries
-}
-
-func getMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, nextToken *string, svc cloudwatchiface.CloudWatchAPI, startTime time.Time, endTime time.Time) (*cloudwatch.GetMetricDataOutput, error) {
-	getMetricDataInput := &cloudwatch.GetMetricDataInput{
-		NextToken:         nextToken,
-		StartTime:         &startTime,
-		EndTime:           &endTime,
-		MetricDataQueries: metricDataQueries,
-	}
-
-	reqGetMetricData := svc.GetMetricDataRequest(getMetricDataInput)
-	getMetricDataOutput, err := reqGetMetricData.Send()
-	if err != nil {
-		logp.Error(errors.Wrap(err, "Error GetMetricDataInput"))
-		return nil, err
-	}
-	return getMetricDataOutput, nil
-}
-
-func createMetricDataQuery(metric cloudwatch.Metric, index int) (metricDataQuery cloudwatch.MetricDataQuery) {
-	statistic := "Average"
-	// period has to be 1day
-	period := int64(86400)
-	id := "d" + strconv.Itoa(index)
-	metricDims := metric.Dimensions
-	bucketName := ""
-	storageType := ""
-	for _, dim := range metricDims {
-		if *dim.Name == "BucketName" {
-			bucketName = *dim.Value
-		} else if *dim.Name == "StorageType" {
-			storageType = *dim.Value
-		}
-	}
-	metricName := *metric.MetricName
-	label := bucketName + " " + storageType + " " + metricName
-
-	metricDataQuery = cloudwatch.MetricDataQuery{
-		Id: &id,
-		MetricStat: &cloudwatch.MetricStat{
-			Period: &period,
-			Stat:   &statistic,
-			Metric: &metric,
-		},
-		Label: &label,
-	}
-	return
-}
-
-func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, regionName string) (event mb.Event, info string, err error) {
-	event.Service = metricsetName
-	event.RootFields = common.MapStr{}
-	mapOfRootFieldsResults := make(map[string]interface{})
-	mapOfRootFieldsResults["service.name"] = metricsetName
-	mapOfRootFieldsResults["cloud.region"] = regionName
-
-	resultRootFields, err := eventMapping(mapOfRootFieldsResults, schemaRootFields)
-	if err != nil {
-		err = errors.Wrap(err, "Error trying to apply schema schemaRootFields in AWS S3 metricbeat module.")
-		return
-	}
-	event.RootFields = resultRootFields
-
-	mapOfMetricSetFieldResults := make(map[string]interface{})
-	for _, output := range getMetricDataResults {
-		if len(output.Values) == 0 {
-			continue
-		}
-		labels := strings.Split(*output.Label, " ")
-		mapOfMetricSetFieldResults["bucket.name"] = labels[0]
-		mapOfMetricSetFieldResults["bucket.storage.type"] = labels[1]
-		mapOfMetricSetFieldResults[labels[2]] = fmt.Sprint(output.Values[0])
-	}
-
-	resultMetricSetFields, err := eventMapping(mapOfMetricSetFieldResults, schemaMetricSetFields)
-	if err != nil {
-		err = errors.Wrap(err, "Error trying to apply schema schemaMetricSetFields in AWS S3 metricbeat module.")
-		return
-	}
-	event.MetricSetFields = resultMetricSetFields
-	return
 }

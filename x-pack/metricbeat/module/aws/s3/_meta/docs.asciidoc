@@ -1,9 +1,0 @@
-The s3 metricset of aws module allows you to monitor your AWS S3 buckets. `s3` metricset fetches a set of values from
-https://docs.aws.amazon.com/AmazonS3/latest/dev/cloudwatch-monitoring.html[Cloudwatch AWS S3 Metrics].
-
-=== AWS Permissions
-Some specific AWS permissions are required for IAM user to collect AWS S3 metrics.
-----
-ec2:DescribeRegions
-cloudwatch:GetMetricData
-----
