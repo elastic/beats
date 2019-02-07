@@ -151,3 +151,5 @@ processors:
 
 # This allows to enable migration aliases
 #migration.enabled: false
+
+xpack.monitoring.enabled: true

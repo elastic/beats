@@ -102,4 +102,10 @@ logging.metrics.period: {{ metrics_period }}
 keystore.path: {{keystore_path}}
 {% endif %}
 
+{% if xpack and xpack.monitoring -%}
+#================================ X-Pack Monitoring =====================================
+xpack.monitoring.elasticsearch.hosts: {{xpack.monitoring.elasticsearch.hosts}}
+{% endif -%}
+
 # vim: set ft=jinja:
+

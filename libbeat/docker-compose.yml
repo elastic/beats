@@ -18,6 +18,8 @@ services:
       - KAFKA_PORT=9092
       - KIBANA_HOST=kibana
       - KIBANA_PORT=5601
+      - ES_MONITORING_HOST=elasticsearch_monitoring
+      - ES_MONITORING_PORT=9210
     env_file:
       - ${PWD}/build/test.env
     volumes:
