@@ -1,5 +1,5 @@
 :modulename: nats
-:has-dashboards: true
+:has-dashboards: false
 
 == nats module
 
@@ -10,7 +10,7 @@ include::../include/what-happens.asciidoc[]
 [float]
 === Compatibility
 
-TODO: document with what versions of the software is this tested
+The +{modulename}+ module was tested with logs from version v1.4.0.
 
 
 include::../include/running-modules.asciidoc[]
@@ -18,25 +18,17 @@ include::../include/running-modules.asciidoc[]
 [float]
 === Example dashboard
 
-This module comes with a sample dashboard. For example:
-
-TODO: include an image of a sample dashboard. If you do not include a dashboard,
-remove this section and set `:has-dashboards: false` at the top of this file.
 
 include::../include/configuring-intro.asciidoc[]
 
-TODO: provide an example configuration
 
-:fileset_ex: {fileset}
+:fileset_ex: log
 
 include::../include/config-option-intro.asciidoc[]
 
-TODO: document the variables from each fileset. If you're describing a variable
-that's common to other modules, you can reuse shared descriptions by including
-the relevant file. For example:
 
 [float]
-==== `{fileset}` log fileset settings
+==== `log` log fileset settings
 
 include::../include/var-paths.asciidoc[]
 

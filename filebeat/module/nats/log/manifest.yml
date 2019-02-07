@@ -4,8 +4,6 @@ var:
   - name: paths
     default:
       - /var/log/nats/nats.log
-#    os.windows:
-#      - c:\data\log\mongod.log
 
 ingest_pipeline: ingest/pipeline.json
 input: config/log.yml
