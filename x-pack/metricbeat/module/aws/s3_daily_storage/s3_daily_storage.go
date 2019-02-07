@@ -89,24 +89,19 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	for _, regionName := range m.MetricSet.RegionsList {
 		m.MetricSet.AwsConfig.Region = regionName
 		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
-		listMetricsInput := &cloudwatch.ListMetricsInput{Namespace: &namespace}
-		reqListMetrics := svcCloudwatch.ListMetricsRequest(listMetricsInput)
-
-		// List metrics of S3 for each region
-		listMetricsOutput, err := reqListMetrics.Send()
+		listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
-			err = errors.Wrap(err, "ListMetricsRequest failed, skipping region "+regionName)
 			m.logger.Error(err.Error())
 			report.Error(err)
 			continue
 		}
 
-		if listMetricsOutput.Metrics == nil || len(listMetricsOutput.Metrics) == 0 {
-			// No S3 buckets in this region
+		if listMetricsOutput == nil || len(listMetricsOutput) == 0 {
 			continue
 		}
 
-		metricDataQueries := constructMetricQueries(listMetricsOutput.Metrics, int64(m.PeriodInSec))
+		dailyStorageMetricNames := []string{"NumberOfObjects", "BucketSizeBytes"}
+		metricDataQueries := aws.ConstructMetricQueries(listMetricsOutput, int64(m.PeriodInSec), dailyStorageMetricNames, nil)
 
 		init := true
 		getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
@@ -136,17 +131,4 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		}
 		report.Event(event)
 	}
-}
-
-func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period int64) []cloudwatch.MetricDataQuery {
-	metricDataQueries := []cloudwatch.MetricDataQuery{}
-	metricNames := []string{"NumberOfObjects", "BucketSizeBytes"}
-	for i, listMetric := range listMetricsOutput {
-		if !aws.StringInSlice(*listMetric.MetricName, metricNames) {
-			continue
-		}
-		metricDataQuery := aws.CreateMetricDataQuery(listMetric, i, period)
-		metricDataQueries = append(metricDataQueries, metricDataQuery)
-	}
-	return metricDataQueries
 }

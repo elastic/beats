@@ -42,11 +42,16 @@ func TestConstructMetricQueries(t *testing.T) {
 
 	period := int64(300)
 	listMetricsOutput := []cloudwatch.Metric{listMetric}
-	metricDataQuery := ConstructMetricQueries(listMetricsOutput, period)
-	assert.Equal(t, 1, len(metricDataQuery))
-	assert.Equal(t, "test-s3-bucket AllStorageTypes NumberOfObjects", *metricDataQuery[0].Label)
-	assert.Equal(t, "Average", *metricDataQuery[0].MetricStat.Stat)
-	assert.Equal(t, period, *metricDataQuery[0].MetricStat.Period)
-	assert.Equal(t, "NumberOfObjects", *metricDataQuery[0].MetricStat.Metric.MetricName)
-	assert.Equal(t, "AWS/S3", *metricDataQuery[0].MetricStat.Metric.Namespace)
+	whiteList := []string{"NumberOfObjects"}
+	metricDataQuery1 := ConstructMetricQueries(listMetricsOutput, period, whiteList, nil)
+	assert.Equal(t, 1, len(metricDataQuery1))
+	assert.Equal(t, "test-s3-bucket AllStorageTypes  NumberOfObjects", *metricDataQuery1[0].Label)
+	assert.Equal(t, "Average", *metricDataQuery1[0].MetricStat.Stat)
+	assert.Equal(t, period, *metricDataQuery1[0].MetricStat.Period)
+	assert.Equal(t, "NumberOfObjects", *metricDataQuery1[0].MetricStat.Metric.MetricName)
+	assert.Equal(t, "AWS/S3", *metricDataQuery1[0].MetricStat.Metric.Namespace)
+
+	blackList := []string{"NumberOfObjects"}
+	metricDataQuery2 := ConstructMetricQueries(listMetricsOutput, period, nil, blackList)
+	assert.Equal(t, 0, len(metricDataQuery2))
 }
