@@ -7,6 +7,7 @@ import unittest
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
+
 class Test(BaseTest):
 
     # production cluster: 9200
@@ -30,7 +31,7 @@ class Test(BaseTest):
             xpack={
                 "monitoring": {
                     "elasticsearch": {
-                        "hosts": [ self.get_elasticsearch_url() ]
+                        "hosts": [self.get_elasticsearch_url()]
                     }
                 }
             }
@@ -41,7 +42,8 @@ class Test(BaseTest):
         proc = self.start_beat(config="mockbeat.yml")
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         self.wait_until(lambda: self.log_contains(re.compile("\[monitoring\].*Publish event")))
-        self.wait_until(lambda: self.log_contains(re.compile("Connection to .*elasticsearch\(http://localhost:9200\).* established")))
+        self.wait_until(lambda: self.log_contains(re.compile(
+            "Connection to .*elasticsearch\(http://localhost:9200\).* established")))
 
     def clean(self):
         # Setup remote exporter
@@ -49,7 +51,7 @@ class Test(BaseTest):
             "transient": {
                 "xpack.monitoring.exporters.my_remote": {
                     "type": "http",
-                    "host": [ self.get_elasticsearch_monitoring_url() ]
+                    "host": [self.get_elasticsearch_monitoring_url()]
                 }
             }
         })
@@ -67,7 +69,6 @@ class Test(BaseTest):
         self.es_monitoring.indices.delete(index=".monitoring-beats-*", ignore=[404])
         # except:
         #     pass
-
 
     def get_elasticsearch_monitoring_url(self):
         return "http://{host}:{port}".format(
