@@ -7,7 +7,6 @@
 package ec2
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -44,7 +43,6 @@ func TestFetch(t *testing.T) {
 		ec2MetricSet := mbtest.NewReportingMetricSetV2(t, tempCreds)
 		events, errs := mbtest.ReportingFetchV2(ec2MetricSet)
 		if errs != nil {
-			fmt.Println("error = ", errs)
 			t.Skip("Skipping TestFetch: failed to make api calls. Please check $AWS_ACCESS_KEY_ID, " +
 				"$AWS_SECRET_ACCESS_KEY and $AWS_SESSION_TOKEN in config.yml")
 		}

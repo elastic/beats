@@ -152,7 +152,6 @@ func TestGetinstanceIDs(t *testing.T) {
 	mockSvc := &MockEC2Client{}
 	instanceIDs, instancesOutputs, err := getInstancesPerRegion(mockSvc)
 	if err != nil {
-		fmt.Println("failed getInstancesPerRegion: ", err)
 		t.FailNow()
 	}
 
@@ -287,10 +286,10 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 			},
 		},
 	}
-	metricDataQuaries := []cloudwatch.MetricDataQuery{metricDataQuery1, metricDataQuery2, metricDataQuery3, metricDataQuery4}
+	metricDataQueries := []cloudwatch.MetricDataQuery{metricDataQuery1, metricDataQuery2, metricDataQuery3, metricDataQuery4}
 
 	svcCloudwatchMock := &MockCloudWatchClient{}
-	getMetricDataOutput, err := getMetricDataPerRegion(metricDataQuaries, "-10m", nil, svcCloudwatchMock)
+	getMetricDataOutput, err := getMetricDataPerRegion(metricDataQueries, "-10m", nil, svcCloudwatchMock)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 4, len(getMetricDataOutput.MetricDataResults))

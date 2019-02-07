@@ -96,25 +96,19 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 
 		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
 		namespace := "AWS/EC2"
-		listMetricsInput := &cloudwatch.ListMetricsInput{Namespace: &namespace}
-		reqListMetrics := svcCloudwatch.ListMetricsRequest(listMetricsInput)
-
-		// List metrics of EC2 for each region
-		listMetricsOutput, err := reqListMetrics.Send()
+		listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
-			err = errors.Wrap(err, "ListMetricsRequest failed, skipping region "+regionName)
 			m.logger.Error(err.Error())
 			report.Error(err)
 			continue
 		}
 
-		if listMetricsOutput.Metrics == nil || len(listMetricsOutput.Metrics) == 0 {
-			// No EC2 buckets in this region
+		if listMetricsOutput == nil || len(listMetricsOutput) == 0 {
 			continue
 		}
 
 		for _, instanceID := range instanceIDs {
-			metricDataQueries := constructMetricQueries(listMetricsOutput.Metrics, instanceID, m.PeriodInSec)
+			metricDataQueries := constructMetricQueries(listMetricsOutput, instanceID, m.PeriodInSec)
 			init := true
 			getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 			for init || getMetricDataOutput.NextToken != nil {
@@ -295,21 +289,19 @@ func createMetricDataQuery(metric cloudwatch.Metric, instanceID string, index in
 	metricDims := metric.Dimensions
 
 	for _, dim := range metricDims {
-		if *dim.Name == "InstanceId" {
-			if instanceID == *dim.Value {
-				metricName := *metric.MetricName
-				label := instanceID + " " + metricName
-				metricDataQuery = cloudwatch.MetricDataQuery{
-					Id: &id,
-					MetricStat: &cloudwatch.MetricStat{
-						Period: &period,
-						Stat:   &statistic,
-						Metric: &metric,
-					},
-					Label: &label,
-				}
-				return
+		if *dim.Name == "InstanceId" && *dim.Value == instanceID {
+			metricName := *metric.MetricName
+			label := instanceID + " " + metricName
+			metricDataQuery = cloudwatch.MetricDataQuery{
+				Id: &id,
+				MetricStat: &cloudwatch.MetricStat{
+					Period: &period,
+					Stat:   &statistic,
+					Metric: &metric,
+				},
+				Label: &label,
 			}
+			return
 		}
 	}
 	return
