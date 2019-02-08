@@ -22,6 +22,7 @@ import (
 #include <rpm/header.h>
 #include <rpm/rpmts.h>
 #include <rpm/rpmdb.h>
+#include <rpm/rpmsq.h>
 
 rpmts
 my_rpmtsCreate(void *f) {
@@ -100,7 +101,31 @@ my_rpmtsFree(void *f, rpmts ts) {
   rpmtsFree = (rpmts (*)(rpmts))f;
 
   rpmtsFree(ts);
-}*/
+}
+
+// By default, librpm is going to trap SIGINT and SIGTERM,
+// which will prevent Beats from shutting down correctly.
+//
+// This disables that behavior. We should be very dilligent in
+// cleaning up in our use of librpm.
+//
+// More recent versions of librpm have a new function rpmsqSetInterruptSafety()
+// to do this.
+//
+// See also:
+// - librpm traps signals and calls exit(1) to terminate the whole process incl. our Go code: https://github.com/rpm-software-management/rpm/blob/rpm-4.11.3-release/lib/rpmdb.c#L640
+// - has caused problems for gdb before, calling rpmsqEnable(_, NULL) is the workaround they also use: https://bugzilla.redhat.com/show_bug.cgi?id=643031
+// - the new rpmsqSetInterruptSafety(), unfortunately only available in librpm>=4.14.2.1 (CentOS 7 has 4.11.3): https://github.com/rpm-software-management/rpm/commit/56f49d7f5af7c1c8a3eb478431356195adbfdd25
+void
+my_disableLibrpmSignalTraps(void *f) {
+	int (*rpmsqEnable)(int, rpmsqAction_t);
+	rpmsqEnable = (int (*)(int, rpmsqAction_t))f;
+
+	// Disable traps
+	rpmsqEnable(-SIGTERM, NULL);
+	rpmsqEnable(-SIGINT, NULL);
+}
+*/
 import "C"
 
 // Constants in sync with /usr/include/rpm/rpmtag.h
@@ -126,6 +151,7 @@ type cFunctions struct {
 	headerFree         unsafe.Pointer
 	rpmdbFreeIterator  unsafe.Pointer
 	rpmtsFree          unsafe.Pointer
+	rpmsqEnable        unsafe.Pointer
 }
 
 var cFun *cFunctions
@@ -137,6 +163,11 @@ func dlopenCFunctions() (*cFunctions, error) {
 	var cFun cFunctions
 
 	librpm, err := dlopen.GetHandle(librpmNames)
+	if err != nil {
+		return nil, err
+	}
+
+	cFun.rpmsqEnable, err = librpm.GetSymbolPointer("rpmsqEnable")
 	if err != nil {
 		return nil, err
 	}
@@ -212,6 +243,7 @@ func listRPMPackages() ([]*Package, error) {
 	if mi == nil {
 		return nil, fmt.Errorf("Failed to get match iterator")
 	}
+	C.my_disableLibrpmSignalTraps(cFun.rpmsqEnable)
 	defer C.my_rpmdbFreeIterator(cFun.rpmdbFreeIterator, mi)
 
 	var packages []*Package
