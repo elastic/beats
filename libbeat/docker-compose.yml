@@ -34,12 +34,13 @@ services:
   proxy_dep:
     image: busybox
     depends_on:
-      elasticsearch: { condition: service_healthy }
-      logstash:      { condition: service_healthy }
-      kafka:         { condition: service_healthy }
-      redis:         { condition: service_healthy }
-      sredis:        { condition: service_healthy }
-      kibana:        { condition: service_healthy }
+      elasticsearch:            { condition: service_healthy }
+      elasticsearch_monitoring: { condition: service_healthy }
+      logstash:                 { condition: service_healthy }
+      kafka:                    { condition: service_healthy }
+      redis:                    { condition: service_healthy }
+      sredis:                   { condition: service_healthy }
+      kibana:                   { condition: service_healthy }
     healthcheck:
       interval: 1s
       retries: 1200
@@ -48,6 +49,15 @@ services:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
+
+  elasticsearch_monitoring:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: elasticsearch
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9210"]
+    environment:
+      - "http.port=9210"
 
   # This host name is static because of the certificate.
   logstash:
