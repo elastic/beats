@@ -7,12 +7,12 @@
     "aws": {
         "ec2": {
             "cpu": {
-                "credit_balance": 158.44315,
-                "credit_usage": 0.002116,
+                "credit_balance": 157.304419,
+                "credit_usage": 0.002421,
                 "surplus_credit_balance": 0,
                 "surplus_credits_charged": 0,
                 "total": {
-                    "pct": 0.033333333333341
+                    "pct": 0.033898305084715
                 }
             },
             "diskio": {
@@ -27,10 +27,7 @@
             },
             "instance": {
                 "core": {
-                    "count": 1
-                },
-                "image": {
-                    "id": "ami-05b3bcf7f311194b3"
+                    "count": "1"
                 },
                 "monitoring": {
                     "state": "disabled"
@@ -44,19 +41,19 @@
                     "ip": "18.136.198.93"
                 },
                 "state": {
-                    "code": 16,
+                    "code": "16",
                     "name": "running"
                 },
-                "threads_per_core": 1
+                "threads_per_core": "1"
             },
             "network": {
                 "in": {
-                    "bytes": 564.8,
-                    "packets": 4.6
+                    "bytes": 669.4,
+                    "packets": 5.4
                 },
                 "out": {
-                    "bytes": 747,
-                    "packets": 5
+                    "bytes": 1060.8,
+                    "packets": 6.2
                 }
             },
             "status": {

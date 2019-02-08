@@ -46,50 +46,6 @@ var (
 			"check_failed_instance": c.Int("StatusCheckFailed_Instance", s.Optional),
 			"check_failed_system":   c.Int("StatusCheckFailed_System", s.Optional),
 		},
-		"instance": s.Object{
-			"image": s.Object{
-				"id": c.Str("instance.image.id", s.Optional),
-			},
-			"state": s.Object{
-				"name": c.Str("instance.state.name", s.Optional),
-				"code": c.Int("instance.state.code", s.Optional),
-			},
-			"monitoring": s.Object{
-				"state": c.Str("instance.monitoring.state", s.Optional),
-			},
-			"core": s.Object{
-				"count": c.Int("instance.core.count", s.Optional),
-			},
-			"threads_per_core": c.Int("instance.threads_per_core", s.Optional),
-			"public": s.Object{
-				"ip":       c.Str("instance.public.ip", s.Optional),
-				"dns_name": c.Str("instance.public.dns_name", s.Optional),
-			},
-			"private": s.Object{
-				"ip":       c.Str("instance.private.ip", s.Optional),
-				"dns_name": c.Str("instance.private.dns_name", s.Optional),
-			},
-		},
-	}
-)
-
-var (
-	schemaRootFields = s.Schema{
-		"service": s.Object{
-			"name": c.Str("service.name", s.Optional),
-		},
-		"cloud": s.Object{
-			"provider":          c.Str("cloud.provider", s.Optional),
-			"availability_zone": c.Str("cloud.availability_zone", s.Optional),
-			"region":            c.Str("cloud.region", s.Optional),
-			"instance": s.Object{
-				"id":   c.Str("cloud.instance.id", s.Optional),
-				"name": c.Str("cloud.instance.name", s.Optional),
-			},
-			"machine": s.Object{
-				"type": c.Str("cloud.machine.type", s.Optional),
-			},
-		},
 	}
 )
 
