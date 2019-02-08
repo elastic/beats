@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"time"
 
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
@@ -232,15 +231,7 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instances
 	init := true
 	for init || output.NextToken != nil {
 		init = false
-		describeInstanceInput := &ec2.DescribeInstancesInput{
-			Filters: []ec2.Filter{
-				{
-					Name:   awssdk.String("instance-state-name"),
-					Values: []string{"running"},
-				},
-			},
-		}
-
+		describeInstanceInput := &ec2.DescribeInstancesInput{}
 		req := svc.DescribeInstancesRequest(describeInstanceInput)
 		output, err := req.Send()
 		if err != nil {
