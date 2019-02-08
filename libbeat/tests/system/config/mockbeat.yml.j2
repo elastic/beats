@@ -105,6 +105,8 @@ keystore.path: {{keystore_path}}
 {% if xpack and xpack.monitoring -%}
 #================================ X-Pack Monitoring =====================================
 xpack.monitoring.elasticsearch.hosts: {{xpack.monitoring.elasticsearch.hosts}}
+xpack.monitoring.elasticsearch.metrics.period: 2s    # to speed up tests
+xpack.monitoring.elasticsearch.state.period: 3s      # to speed up tests
 {% endif -%}
 
 # vim: set ft=jinja:

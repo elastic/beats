@@ -44,6 +44,33 @@ class Test(BaseTest):
         self.wait_until(lambda: self.log_contains(re.compile("\[monitoring\].*Publish event")))
         self.wait_until(lambda: self.log_contains(re.compile(
             "Connection to .*elasticsearch\(http://localhost:9200\).* established")))
+        self.wait_until(lambda: self.monitoring_doc_exists('beats_stats'))
+        self.wait_until(lambda: self.monitoring_doc_exists('beats_state'))
+
+        for monitoring_doc_type in ['beats_stats', 'beats_state']:
+            field_names = ['cluster_uuid', 'timestamp', 'interval_ms', 'type', 'source_node', monitoring_doc_type]
+            self.assert_monitoring_doc_contains_fields(monitoring_doc_type, field_names)
+
+    def monitoring_doc_exists(self, monitoring_type):
+        results = self.es_monitoring.search(
+            index='.monitoring-beats-*',
+            q='type:'+monitoring_type,
+            size=1
+        )
+        hits = results['hits']['hits']
+        return len(hits) == 1
+
+    def assert_monitoring_doc_contains_fields(self, monitoring_type, field_names):
+        results = self.es_monitoring.search(
+            index='.monitoring-beats-*',
+            q='type:'+monitoring_type,
+            size=1
+        )
+        hits = results['hits']['hits']
+        source = hits[0]['_source']
+
+        for field_name in field_names:
+            assert field_name in source
 
     def clean(self):
         # Setup remote exporter
@@ -57,7 +84,6 @@ class Test(BaseTest):
         })
 
         # Enable collection
-        # try:
         self.es.cluster.put_settings(body={
             "transient": {
                 "xpack.monitoring.collection.enabled": True
@@ -65,10 +91,7 @@ class Test(BaseTest):
         })
 
         # Delete any old beats monitoring data
-        # try:
         self.es_monitoring.indices.delete(index=".monitoring-beats-*", ignore=[404])
-        # except:
-        #     pass
 
     def get_elasticsearch_monitoring_url(self):
         return "http://{host}:{port}".format(
