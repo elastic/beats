@@ -6,13 +6,14 @@ package aws
 
 import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/pkg/errors"
 )
 
 // GetListMetricsOutput function gets listMetrics results from cloudwatch per namespace for each region.
 // ListMetrics Cloudwatch API is used to list the specified metrics. The returned metrics can be used with GetMetricData
 // to obtain statistical data.
-func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch *cloudwatch.CloudWatch) ([]cloudwatch.Metric, error) {
+func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch cloudwatchiface.CloudWatchAPI) ([]cloudwatch.Metric, error) {
 	listMetricsInput := &cloudwatch.ListMetricsInput{Namespace: &namespace}
 	reqListMetrics := svcCloudwatch.ListMetricsRequest(listMetricsInput)
 
