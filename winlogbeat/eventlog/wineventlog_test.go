@@ -53,7 +53,7 @@ func TestWinEventLogBatchReadSize(t *testing.T) {
 	eventlog, teardown := setupWinEventLog(t, 0, map[string]interface{}{"name": providerName, "batch_read_size": batchReadSize})
 	defer teardown()
 
-	records, err := eventlog.Read()
+	records, err := eventlog[0].Read()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -93,7 +93,7 @@ func TestReadLargeBatchSize(t *testing.T) {
 
 	var eventCount int
 	for eventCount < totalEvents {
-		records, err := eventlog.Read()
+		records, err := eventlog[0].Read()
 		if err != nil {
 			t.Fatal("read error", err)
 		}
@@ -105,7 +105,7 @@ func TestReadLargeBatchSize(t *testing.T) {
 
 	t.Logf("number of records returned: %v", eventCount)
 
-	wineventlog := eventlog.(*winEventLog)
+	wineventlog := eventlog[0].(*winEventLog)
 	assert.Equal(t, 1024, wineventlog.maxRead)
 
 	expvar.Do(func(kv expvar.KeyValue) {
@@ -115,6 +115,6 @@ func TestReadLargeBatchSize(t *testing.T) {
 	})
 }
 
-func setupWinEventLog(t *testing.T, recordID uint64, options map[string]interface{}) (EventLog, func()) {
+func setupWinEventLog(t *testing.T, recordID uint64, options map[string]interface{}) ([]EventLog, func()) {
 	return setupEventLog(t, newWinEventLog, recordID, options)
 }

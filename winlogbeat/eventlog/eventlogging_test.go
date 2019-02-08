@@ -96,7 +96,7 @@ func configureLogp() {
 	oneTimeLogpInit.Do(func() {
 		if testing.Verbose() {
 			logp.DevelopmentSetup(logp.WithSelectors("eventlog"))
-			logp.Info("DEBUG enabled for eventlog.")
+			logp.Info("DEBUG enabled for eventlog[0].")
 		} else {
 			logp.DevelopmentSetup(logp.WithLevel(logp.WarnLevel))
 		}
@@ -200,7 +200,7 @@ func TestRead(t *testing.T) {
 	eventlog, teardown := setupEventLogging(t, 0, map[string]interface{}{"name": providerName})
 	defer teardown()
 
-	records, err := eventlog.Read()
+	records, err := eventlog[0].Read()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -258,7 +258,7 @@ func TestFormatMessageWithLargeMessage(t *testing.T) {
 	})
 	defer teardown()
 
-	records, err := eventlog.Read()
+	records, err := eventlog[0].Read()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -297,7 +297,7 @@ func TestReadUnknownEventId(t *testing.T) {
 	eventlog, teardown := setupEventLogging(t, 0, map[string]interface{}{"name": providerName})
 	defer teardown()
 
-	records, err := eventlog.Read()
+	records, err := eventlog[0].Read()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -342,7 +342,7 @@ func TestReadTriesMultipleEventMsgFiles(t *testing.T) {
 	eventlog, teardown := setupEventLogging(t, 0, map[string]interface{}{"name": providerName})
 	defer teardown()
 
-	records, err := eventlog.Read()
+	records, err := eventlog[0].Read()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -386,7 +386,7 @@ func TestReadMultiParameterMsg(t *testing.T) {
 	eventlog, teardown := setupEventLogging(t, 0, map[string]interface{}{"name": providerName})
 	defer teardown()
 
-	records, err := eventlog.Read()
+	records, err := eventlog[0].Read()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -407,9 +407,9 @@ func TestOpenInvalidProvider(t *testing.T) {
 	configureLogp()
 
 	el := newTestEventLogging(t, map[string]interface{}{"name": "nonExistentProvider"})
-	assert.NoError(t, el.Open(checkpoint.EventLogState{}), "Calling Open() on an unknown provider "+
+	assert.NoError(t, el[0].Open(checkpoint.EventLogState{}), "Calling Open() on an unknown provider "+
 		"should automatically open Application.")
-	_, err := el.Read()
+	_, err := el[0].Read()
 	assert.NoError(t, err)
 }
 
@@ -439,7 +439,7 @@ func TestReadNoParameterMsg(t *testing.T) {
 	eventlog, teardown := setupEventLogging(t, 0, map[string]interface{}{"name": providerName})
 	defer teardown()
 
-	records, err := eventlog.Read()
+	records, err := eventlog[0].Read()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -474,17 +474,17 @@ func TestReadWhileCleared(t *testing.T) {
 
 	log.Info(1, "Message 1")
 	log.Info(2, "Message 2")
-	lr, err := eventlog.Read()
+	lr, err := eventlog[0].Read()
 	assert.NoError(t, err, "Expected 2 messages but received error")
 	assert.Len(t, lr, 2, "Expected 2 messages")
 
 	assert.NoError(t, eventlogging.ClearEventLog(eventlogging.Handle(log.Handle), ""))
-	lr, err = eventlog.Read()
+	lr, err = eventlog[0].Read()
 	assert.NoError(t, err, "Expected 0 messages but received error")
 	assert.Len(t, lr, 0, "Expected 0 message")
 
 	log.Info(3, "Message 3")
-	lr, err = eventlog.Read()
+	lr, err = eventlog[0].Read()
 	assert.NoError(t, err, "Expected 1 message but received error")
 	assert.Len(t, lr, 1, "Expected 1 message")
 	if len(lr) > 0 {
@@ -520,7 +520,7 @@ func TestReadMissingParameters(t *testing.T) {
 	eventlog, teardown := setupEventLogging(t, 0, map[string]interface{}{"name": providerName})
 	defer teardown()
 
-	records, err := eventlog.Read()
+	records, err := eventlog[0].Read()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -535,11 +535,11 @@ func TestReadMissingParameters(t *testing.T) {
 		strings.TrimRight(records[0].Message, "\r\n"))
 }
 
-func newTestEventLogging(t *testing.T, options map[string]interface{}) EventLog {
+func newTestEventLogging(t *testing.T, options map[string]interface{}) []EventLog {
 	return newTestEventLog(t, newEventLogging, options)
 }
 
-func setupEventLogging(t *testing.T, recordID uint64, options map[string]interface{}) (EventLog, func()) {
+func setupEventLogging(t *testing.T, recordID uint64, options map[string]interface{}) ([]EventLog, func()) {
 	return setupEventLog(t, newEventLogging, recordID, options)
 }
 
