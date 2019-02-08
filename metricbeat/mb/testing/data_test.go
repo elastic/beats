@@ -1,0 +1,164 @@
+package testing
+
+import (
+	"encoding/json"
+	"flag"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"net/http/httptest"
+	"path/filepath"
+	"strings"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v2"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/metricbeat/mb"
+
+	// TODO: generate include file for these tests automatically moving forward
+	_ "github.com/elastic/beats/metricbeat/module/kibana/status"
+	_ "github.com/elastic/beats/metricbeat/module/rabbitmq/connection"
+	_ "github.com/elastic/beats/metricbeat/module/traefik/health"
+)
+
+var (
+	// Use `go test -generate` to update files.
+	generateFlag = flag.Bool("generate", false, "Write golden files")
+)
+
+type Config struct {
+	Type string
+	URL  string
+}
+
+func TestAll(t *testing.T) {
+
+	configFiles, _ := filepath.Glob("../../module/*/*/_meta/testdata/config.yml")
+
+	for _, f := range configFiles {
+		// get module and metricset name from path
+		s := strings.Split(f, "/")
+		moduleName := s[3]
+		metricSetName := s[4]
+
+		configFile, err := ioutil.ReadFile(f)
+		if err != nil {
+			log.Printf("yamlFile.Get err   #%v ", err)
+		}
+		var config Config
+		err = yaml.Unmarshal(configFile, &config)
+		if err != nil {
+			log.Fatalf("Unmarshal: %v", err)
+		}
+
+		getTestdataFiles(t, config.URL, moduleName, metricSetName)
+	}
+}
+
+func getTestdataFiles(t *testing.T, url, module, metricSet string) {
+
+	ff, _ := filepath.Glob("../../module/" + module + "/" + metricSet + "/_meta/testdata/*.json")
+	var files []string
+	for _, f := range ff {
+		// Exclude all the expected files
+		if strings.HasSuffix(f, "-expected.json") {
+			continue
+		}
+		files = append(files, f)
+	}
+
+	for _, f := range files {
+		t.Run(f, func(t *testing.T) {
+			runTest(t, f, module, metricSet, url)
+		})
+	}
+}
+
+func runTest(t *testing.T, file string, module, metricSetName, url string) {
+
+	// starts a server serving the given file under the given url
+	s := server(t, file, url)
+	defer s.Close()
+
+	metricSet := NewReportingMetricSetV2(t, getConfig(module, metricSetName, s.URL))
+	events, errs := ReportingFetchV2(metricSet)
+
+	// Gather errors to build also error events
+	for _, e := range errs {
+		// TODO: for errors strip out and standardise the URL error as it would create a different diff every time
+		events = append(events, mb.Event{Error: e})
+	}
+
+	var data []common.MapStr
+
+	for _, e := range events {
+		beatEvent := StandardizeEvent(metricSet, e, mb.AddMetricSetInfo)
+		// Overwrite service.address as the port changes every time
+		beatEvent.Fields.Put("service.address", "127.0.0.1:55555")
+		data = append(data, beatEvent.Fields)
+	}
+
+	output, err := json.MarshalIndent(&data, "", "    ")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Overwrites the golden files if run with -generate
+	if *generateFlag {
+		if err = ioutil.WriteFile(file+"-expected.json", output, 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// Read expected file
+	expected, err := ioutil.ReadFile(file + "-expected.json")
+	if err != nil {
+		t.Fatalf("could not read file: %s", err)
+	}
+
+	assert.Equal(t, string(expected), string(output))
+
+	if strings.HasSuffix(file, "docs.json") {
+		writeDataJSON(t, data[0], module, metricSetName)
+	}
+}
+
+func writeDataJSON(t *testing.T, data common.MapStr, module, metricSet string) {
+	// Add hardcoded timestamp
+	data.Put("@timestamp", "2019-03-01T08:05:34.853Z")
+	output, err := json.MarshalIndent(&data, "", "    ")
+	if err = ioutil.WriteFile("../../module/"+module+"/"+metricSet+"/_meta/data.json", output, 0644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// GetConfig returns config for elasticsearch module
+func getConfig(module, metricSet, url string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":     module,
+		"metricsets": []string{metricSet},
+		"hosts":      []string{url},
+	}
+}
+
+// server starts a server with a mock output
+func server(t *testing.T, path string, url string) *httptest.Server {
+
+	body, err := ioutil.ReadFile(path)
+	if err != nil {
+		t.Fatalf("could not read file: %s", err)
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == url {
+			w.Header().Set("Content-Type", "application/json;")
+			w.WriteHeader(200)
+			w.Write(body)
+		} else {
+			w.WriteHeader(404)
+		}
+	}))
+	return server
+}
