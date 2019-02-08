@@ -1,11 +1,17 @@
-- name: pid
-  description: The pid of nats process by which the event was created
-  example: 42
-  type: long
-- name: level
-  description: The severity level of the event
-  example: INF
-- name: message
-  description: The context of the event
-  example: 172.18.0.1:38630 - cid:1 - ->> [SUB foo  1]
-  type: text
+- name: log
+  type: group
+  description: >
+    Nats log files
+  fields:
+    - name: pid
+      type: alias
+      path: process.pid
+      migration: true
+    - name: level
+      type: alias
+      path: log.level
+      migration: true
+    - name: message
+      type: alias
+      path: message
+      migration: true

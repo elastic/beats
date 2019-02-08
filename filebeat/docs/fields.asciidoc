@@ -7400,34 +7400,37 @@ Fields from NATS logs.
 
 
 
-*`nats.pid`*::
+[float]
+== log fields
+
+Nats log files
+
+
+
+*`nats.log.pid`*::
 +
 --
-type: long
+type: alias
 
-example: 42
-
-The pid of nats process by which the event was created
+alias to: process.pid
 
 --
 
-*`nats.level`*::
+*`nats.log.level`*::
 +
 --
-example: INF
+type: alias
 
-The severity level of the event
+alias to: log.level
 
 --
 
-*`nats.message`*::
+*`nats.log.message`*::
 +
 --
-type: text
+type: alias
 
-example: 172.18.0.1:38630 - cid:1 - ->> [SUB foo  1]
-
-The context of the event
+alias to: message
 
 --
 
