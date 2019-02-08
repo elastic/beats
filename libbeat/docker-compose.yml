@@ -56,8 +56,8 @@ services:
       service: elasticsearch
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9210"]
-    environment:
-      - "http.port=9210"
+    ports:
+      - "9210:9200"
 
   # This host name is static because of the certificate.
   logstash:
