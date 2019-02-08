@@ -20,6 +20,7 @@ package agent
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -87,10 +88,7 @@ func metricApply(labels map[string]common.MapStr, m consulMetric, v interface{})
 		return
 	}
 
-	labelsCombination := ""
-	for k, v := range m.Labels {
-		labelsCombination = fmt.Sprintf("%s%s%s", labelsCombination, k, v)
-	}
+	labelsCombination := uniqueKeyForLabelMap(m.Labels)
 
 	temp := common.MapStr{}
 	if len(m.Labels) != 0 {
@@ -130,4 +128,21 @@ func prettyName(s string) *valueHelper {
 	}
 
 	return nil
+}
+
+// Create a simple unique value for a map of labels without using a hash function
+func uniqueKeyForLabelMap(m map[string]string) string {
+	// In labels terms a:b, c:d should be the same than c:d, a:d, order should not affect, that's why we extract labels first and then we order them
+	labelsArray := make([]string, 0)
+	for k, v := range m {
+		labelsArray = append(labelsArray, fmt.Sprintf("%s%s", k, v))
+	}
+
+	sort.Strings(labelsArray)
+	labelsCombination := ""
+	for _, v := range labelsArray {
+		labelsArray = append(labelsArray, v)
+	}
+
+	return labelsCombination
 }

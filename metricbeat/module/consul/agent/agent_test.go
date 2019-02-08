@@ -286,3 +286,59 @@ func TestEventMapping(t *testing.T) {
 	assert.True(t, goroutinesFound)
 	assert.True(t, heapObjectsFound)
 }
+
+func TestUniqueKeyForLabelMap(t *testing.T) {
+	input := []map[string]string{
+		{
+			"a": "b",
+			"g": "h",
+			"c": "d",
+			"e": "f",
+			"i": "j",
+		},
+		{
+			"a": "b",
+			"e": "f",
+			"c": "d",
+			"g": "h",
+			"i": "j",
+		},
+		{
+			"c": "d",
+			"a": "b",
+			"g": "h",
+			"e": "f",
+			"i": "j",
+		},
+		{
+			"c": "d",
+			"e": "f",
+			"i": "j",
+			"a": "b",
+			"g": "h",
+		},
+		{
+			"e": "f",
+			"a": "b",
+			"c": "d",
+			"g": "h",
+			"i": "j",
+		},
+		{
+			"e": "f",
+			"i": "j",
+			"c": "d",
+			"a": "b",
+			"g": "h",
+		},
+	}
+
+	keys := make([]string, 0)
+	for _, i := range input {
+		keys = append(keys, uniqueKeyForLabelMap(i))
+	}
+
+	for i := 1; i < len(keys); i++ {
+		assert.True(t, keys[i-1] == keys[i])
+	}
+}
