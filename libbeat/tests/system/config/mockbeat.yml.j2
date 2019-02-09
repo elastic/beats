@@ -109,5 +109,12 @@ xpack.monitoring.elasticsearch.metrics.period: 2s    # to speed up tests
 xpack.monitoring.elasticsearch.state.period: 3s      # to speed up tests
 {% endif -%}
 
+{% if monitoring -%}
+#================================ X-Pack Monitoring (direct) =====================================
+monitoring.elasticsearch.hosts: {{xpack.monitoring.elasticsearch.hosts}}
+monitoring.elasticsearch.metrics.period: 2s    # to speed up tests
+monitoring.elasticsearch.state.period: 3s      # to speed up tests
+{% endif -%}
+
 # vim: set ft=jinja:
 

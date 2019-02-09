@@ -49,6 +49,38 @@ class Test(BaseTest):
             field_names = ['cluster_uuid', 'timestamp', 'interval_ms', 'type', 'source_node', monitoring_doc_type]
             self.assert_monitoring_doc_contains_fields(monitoring_doc_type, field_names)
 
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_direct_to_monitoring_cluster(self):
+        """
+        Test shipping monitoring data directly to the monitoring cluster.
+        Make sure expected documents are indexed in monitoring cluster.
+        """
+
+        self.render_config_template(
+            "mockbeat",
+            monitoring={
+                "elasticsearch": {
+                    "hosts": [self.get_elasticsearch_monitoring_url()]
+                }
+            }
+        )
+
+        self.clean()
+
+        proc = self.start_beat(config="mockbeat.yml")
+        self.wait_until(lambda: self.log_contains("mockbeat start running."))
+        self.wait_until(lambda: self.log_contains(re.compile("\[monitoring\].*Publish event")))
+        self.wait_until(lambda: self.log_contains(re.compile(
+            "Connection to .*elasticsearch\("+self.get_elasticsearch_monitoring_url()+"\).* established")))
+        self.wait_until(lambda: self.monitoring_doc_exists('beats_stats'))
+        self.wait_until(lambda: self.monitoring_doc_exists('beats_state'))
+
+        for monitoring_doc_type in ['beats_stats', 'beats_state']:
+            field_names = ['cluster_uuid', 'timestamp', 'interval_ms', 'type', monitoring_doc_type]
+            self.assert_monitoring_doc_contains_fields(monitoring_doc_type, field_names)
+
+
     def monitoring_doc_exists(self, monitoring_type):
         results = self.es_monitoring.search(
             index='.monitoring-beats-*',
