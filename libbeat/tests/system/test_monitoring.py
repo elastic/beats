@@ -39,8 +39,8 @@ class Test(BaseTest):
             }
         )
 
-        self.clean_output_cluster()
-        self.clean_monitoring_cluster()
+        self.init_output_cluster()
+        self.init_monitoring_cluster()
 
         self.proc = self.start_beat(config="mockbeat.yml")
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
@@ -71,7 +71,7 @@ class Test(BaseTest):
             }
         )
 
-        self.clean_monitoring_cluster()
+        self.init_monitoring_cluster()
 
         self.proc = self.start_beat(config="mockbeat.yml")
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
@@ -103,8 +103,8 @@ class Test(BaseTest):
             }
         )
 
-        self.clean_output_cluster()
-        self.clean_monitoring_cluster()
+        self.init_output_cluster()
+        self.init_monitoring_cluster()
 
         self.proc = self.start_beat(config="mockbeat.yml")
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
@@ -128,7 +128,7 @@ class Test(BaseTest):
             }
         )
 
-        self.clean_monitoring_cluster()
+        self.init_monitoring_cluster()
 
         self.proc = self.start_beat(config="mockbeat.yml")
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
@@ -165,7 +165,7 @@ class Test(BaseTest):
         for field_name in field_names:
             assert field_name in source
 
-    def clean_output_cluster(self):
+    def init_output_cluster(self):
         # Setup remote exporter
         self.es.cluster.put_settings(body={
             "transient": {
@@ -183,7 +183,7 @@ class Test(BaseTest):
             }
         })
 
-    def clean_monitoring_cluster(self):
+    def init_monitoring_cluster(self):
         # Delete any old beats monitoring data
         self.es_monitoring.indices.delete(index=".monitoring-beats-*", ignore=[404])
 
