@@ -144,7 +144,7 @@ class Test(BaseTest):
 
         proc.check_kill_and_wait()
 
-         # TODO: Get a beats_stats doc
+        # TODO: Get a beats_stats doc
         # TODO: Get a beats_state doc
 
         # TODO: compare the two beats_stats docs, making sure same keys exist under `beats_stats` field
