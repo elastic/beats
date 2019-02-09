@@ -55,7 +55,7 @@ services:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9210"]
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
     ports:
       - "9210:9200"
 
