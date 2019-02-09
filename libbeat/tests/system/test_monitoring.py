@@ -16,6 +16,10 @@ class Test(BaseTest):
         self.es = Elasticsearch([self.get_elasticsearch_url()])
         self.es_monitoring = Elasticsearch([self.get_elasticsearch_monitoring_url()])
 
+    def tearDown(self):
+        if self.proc:
+            self.proc.check_kill_and_wait()
+
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @attr('integration')
     def test_via_output_cluster(self):
@@ -35,9 +39,10 @@ class Test(BaseTest):
             }
         )
 
-        self.clean()
+        self.clean_output_cluster()
+        self.clean_monitoring_cluster()
 
-        proc = self.start_beat(config="mockbeat.yml")
+        self.proc = self.start_beat(config="mockbeat.yml")
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         self.wait_until(lambda: self.log_contains(re.compile("\[monitoring\].*Publish event")))
         self.wait_until(lambda: self.log_contains(re.compile(
@@ -66,9 +71,9 @@ class Test(BaseTest):
             }
         )
 
-        self.clean()
+        self.clean_monitoring_cluster()
 
-        proc = self.start_beat(config="mockbeat.yml")
+        self.proc = self.start_beat(config="mockbeat.yml")
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         self.wait_until(lambda: self.log_contains(re.compile("\[monitoring\].*Publish event")))
         self.wait_until(lambda: self.log_contains(re.compile(
@@ -79,7 +84,6 @@ class Test(BaseTest):
         for monitoring_doc_type in ['beats_stats', 'beats_state']:
             field_names = ['cluster_uuid', 'timestamp', 'interval_ms', 'type', monitoring_doc_type]
             self.assert_monitoring_doc_contains_fields(monitoring_doc_type, field_names)
-
 
     def monitoring_doc_exists(self, monitoring_type):
         results = self.es_monitoring.search(
@@ -102,7 +106,7 @@ class Test(BaseTest):
         for field_name in field_names:
             assert field_name in source
 
-    def clean(self):
+    def clean_output_cluster(self):
         # Setup remote exporter
         self.es.cluster.put_settings(body={
             "transient": {
@@ -120,6 +124,7 @@ class Test(BaseTest):
             }
         })
 
+    def clean_monitoring_cluster(self):
         # Delete any old beats monitoring data
         self.es_monitoring.indices.delete(index=".monitoring-beats-*", ignore=[404])
 
