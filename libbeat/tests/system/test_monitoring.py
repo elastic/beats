@@ -10,8 +10,6 @@ INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 class Test(BaseTest):
 
-    # production cluster: 9200
-    # monitoring cluster: 9210
     def setUp(self):
         super(BaseTest, self).setUp()
 
