@@ -1,6 +1,6 @@
 - key: {module}
   title: "{module}"
-  release: experimental
+  release: beta
   description: >
     {module} module
   fields:
