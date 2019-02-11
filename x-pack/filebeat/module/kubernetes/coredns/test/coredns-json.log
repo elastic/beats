@@ -1,0 +1,1 @@
+{"log":"2019-02-08T21:55:33.982Z [INFO] 172.17.0.5:59342 - 53784 \"PTR IN 12.0.17.172.in-addr.arpa. udp 42 false 512\" NOERROR qr,aa,rd,ra 144 0.000122012s\n","stream":"stdout","time":"2019-02-08T21:55:33.982715008Z"}

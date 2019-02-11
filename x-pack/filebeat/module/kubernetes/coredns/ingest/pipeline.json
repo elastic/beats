@@ -1,0 +1,23 @@
+{
+  "description": "Pipeline for normalizing Kubernetes coredns logs",
+  "processors": [
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['coredns']['timestamp']; ctx.coredns.remove('timestamp');"
+      }
+    },
+    {
+      "set": {
+        "field": "source.ip",
+        "value": "{{coredns.client}}"
+      }
+    },
+    {
+      "geoip": {
+        "field": "source.ip",
+        "target_field": "source.geo"
+      }
+    }
+  ]
+}

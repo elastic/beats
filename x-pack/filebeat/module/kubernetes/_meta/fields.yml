@@ -1,0 +1,55 @@
+- key: kubernetes
+  title: Kubernetes
+  description: >
+    Module for handling logs produced by Kubenetes pods
+  fields:
+  - name: coredns
+    type: group
+    description: >
+      Fields from coredns logs after normalization
+    fields:
+    - name: duration
+      type: double
+
+    - name: client
+      type: ip
+
+    - name: size
+      type: integer
+
+    - name: dnssec_ok
+      type: boolean
+
+    - name: proto
+      type: keyword 
+
+    - name: qclass
+      type: keyword
+
+    - name: rsize
+      type: integer
+
+    - name: log_level
+      type: keyword
+
+    - name: id
+      type: keyword
+
+    - name: rcode
+      type: keyword
+
+    - name: port
+      type: integer
+
+    - name: bufsize
+      type: integer
+
+    - name: qtype
+      type: keyword
+
+    - name: rflags
+      type: keyword
+
+    - name: name
+      type: keyword
+
