@@ -84,8 +84,8 @@ var (
 		"consul.runtime.malloc_count":      &noConversionValue{valueHelper{renamedTo: "runtime.malloc_count"}},
 	}
 	allowedDetailedValues = map[string]inputConverter{
-		"consul.raft.apply":      &noConversionValue{valueHelper{renamedTo: "raft.apply"}},
-		"consul.raft.commitTime": &noConversionValue{valueHelper{renamedTo: "raft.commit_time", unit: "ms"}},
+		//"consul.raft.apply":      &noConversionValue{valueHelper{renamedTo: "raft.apply"}},
+		//"consul.raft.commitTime": &noConversionValue{valueHelper{renamedTo: "raft.commit_time", unit: "ms"}},
 	}
 )
 
