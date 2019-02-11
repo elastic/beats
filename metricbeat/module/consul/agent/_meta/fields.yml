@@ -4,18 +4,6 @@
   description: >
     Agent Metricset fetches metrics information from a Consul instance running as Agent
   fields:
-    - name: raft
-      type: group
-      fields:
-        - name: commit_time
-          type: group
-          fields:
-            - name: ms
-              type: long
-              description: Average time in milliseconds it takes to commit a new entry to the transaction log of the leader
-        - name: apply
-          type: long
-          description: Number of logs committed since the last interval.
     - name: autopilot
       type: group
       fields:
