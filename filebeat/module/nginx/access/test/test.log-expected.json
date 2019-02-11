@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2016-12-07T11:05:07.000Z",
+        "@timestamp": "2016-12-07T10:05:07.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
@@ -58,7 +58,7 @@
         "user_agent.version": "15.0.a2"
     },
     {
-        "@timestamp": "2016-12-07T11:05:07.000Z",
+        "@timestamp": "2016-12-07T10:05:07.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
@@ -96,7 +96,7 @@
         "user_agent.version": "49.0"
     },
     {
-        "@timestamp": "2016-12-07T11:05:07.000Z",
+        "@timestamp": "2016-12-07T10:05:07.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
@@ -199,7 +199,7 @@
         "user_agent.version": "1.0"
     },
     {
-        "@timestamp": "2018-04-12T09:48:40.000Z",
+        "@timestamp": "2018-04-12T07:48:40.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "nginx.access",
         "event.module": "nginx",
