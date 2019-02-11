@@ -35,13 +35,13 @@ type consulSimpleValue struct {
 
 type consulDetailedValue struct {
 	consulMetric
-	Count  int     `json:"-"`
-	Rate   float64 `json:"-"`
-	Sum    float64 `json:"-"`
-	Min    float64 `json:"-"`
-	Max    float64 `json:"-"`
+	Count  int     `json:"Count"`
+	Rate   float64 `json:"Rate"`
+	Sum    float64 `json:"Sum"`
+	Min    float64 `json:"Min"`
+	Max    float64 `json:"Max"`
 	Mean   float64 `json:"Mean"`
-	Stddev float64 `json:"-"`
+	Stddev float64 `json:"Stddev"`
 }
 
 type point consulSimpleValue
