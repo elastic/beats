@@ -165,6 +165,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix TLS certificate DoS vulnerability. {pull}10302[10302]
 - Fix panic and file unlock in spool on atomic operation (arm, x86-32). File lock was not released when panic occurs, leading to the beat deadlocking on startup. {pull}10289[10289]
 - Fix encoding of timestamps when using disk spool. {issue}10099[10099]
+- Fix stopping of modules started by kubernetes autodiscover. {pull}10476[10476]
 - Fix a issue when remote and local configuration didn't match when fetching configuration from Central Management. {issue}10587[10587]
 
 *Auditbeat*
