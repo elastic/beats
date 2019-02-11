@@ -204,10 +204,10 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 	}
 	resultMetricSetFields.Put("instance.image.id", *instanceOutput.ImageId)
 	resultMetricSetFields.Put("instance.state.name", instanceStateName)
-	resultMetricSetFields.Put("instance.state.code", fmt.Sprint(*instanceOutput.State.Code))
+	resultMetricSetFields.Put("instance.state.code", *instanceOutput.State.Code)
 	resultMetricSetFields.Put("instance.monitoring.state", monitoringState)
-	resultMetricSetFields.Put("instance.core.count", fmt.Sprint(*instanceOutput.CpuOptions.CoreCount))
-	resultMetricSetFields.Put("instance.threads_per_core", fmt.Sprint(*instanceOutput.CpuOptions.ThreadsPerCore))
+	resultMetricSetFields.Put("instance.core.count", *instanceOutput.CpuOptions.CoreCount)
+	resultMetricSetFields.Put("instance.threads_per_core", *instanceOutput.CpuOptions.ThreadsPerCore)
 	publicIP := instanceOutput.PublicIpAddress
 	if publicIP != nil {
 		resultMetricSetFields.Put("instance.public.ip", *publicIP)
