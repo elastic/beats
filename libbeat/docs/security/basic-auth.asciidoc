@@ -40,6 +40,7 @@ POST _xpack/security/role/{beat_default_index_prefix}_writer
   ]
 }
 ---------------------------------------------------------------
+// CONSOLE
 <1> If you use a custom {beatname_uc} index pattern, specify that pattern
 instead of the default ++{beat_default_index_prefix}-*++ pattern.
 endif::[]
@@ -64,6 +65,34 @@ POST _xpack/security/role/{beat_default_index_prefix}_writer
 instead of the default ++{beat_default_index_prefix}-*++ pattern.
 endif::[]
 --
+
+ifndef::no_ilm[]
+. If you plan to use {ref}/getting-started-index-lifecycle-management.html[index
+lifecycle management], create a role that has the following privileges. These
+privileges are required to load index lifecycle policies and create and manage
+rollover indices:
++
+* *Cluster:* `manage_ilm`
+* *Index:* `write`, `create_index`, `manage`, and `manage_ilm` on the 
+{beatname_uc} indices
++
+--
+["source","sh",subs="attributes"]
+---------------------------------------------------------------
+POST _xpack/security/role/{beatname_lc}_ilm
+{
+  "cluster": ["manage_ilm"],
+  "indices": [
+    {
+      "names": [ "{beatname_lc}-*","shrink-{beatname_lc}-*"],
+      "privileges": ["write","create_index","manage","manage_ilm"]
+    }
+  ]
+}
+---------------------------------------------------------------
+// CONSOLE
+--
+endif::no_ilm[]
 
 . Assign the writer role to the user that {beatname_uc} will use to connect to
 {es}. Make sure you also assign any roles that are required for specific
