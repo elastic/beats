@@ -20,8 +20,9 @@
 package agent
 
 import (
-	"github.com/elastic/beats/metricbeat/module/consul"
 	"testing"
+
+	"github.com/elastic/beats/metricbeat/module/consul"
 
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/stretchr/testify/assert"

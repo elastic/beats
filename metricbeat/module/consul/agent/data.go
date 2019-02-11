@@ -20,6 +20,7 @@ package agent
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/elastic/beats/libbeat/common"
 )
 
