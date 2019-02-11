@@ -83,10 +83,7 @@ var (
 		"consul.runtime.sys_bytes":         &noConversionValue{valueHelper{renamedTo: "runtime.sys", unit: "bytes"}},
 		"consul.runtime.malloc_count":      &noConversionValue{valueHelper{renamedTo: "runtime.malloc_count"}},
 	}
-	allowedDetailedValues = map[string]inputConverter{
-		//"consul.raft.apply":      &noConversionValue{valueHelper{renamedTo: "raft.apply"}},
-		//"consul.raft.commitTime": &noConversionValue{valueHelper{renamedTo: "raft.commit_time", unit: "ms"}},
-	}
+	allowedDetailedValues = map[string]inputConverter{}
 )
 
 func eventMapping(content []byte) ([]common.MapStr, error) {
