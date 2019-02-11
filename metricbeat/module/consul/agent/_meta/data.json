@@ -7,23 +7,28 @@
     "consul": {
         "agent": {
             "autopilot": {
-                "healthy": 1
+                "healthy": true
+            },
+            "raft": {
+                "commit_time": {
+                    "ms": 0.04560700058937073
+                }
             },
             "runtime": {
                 "alloc": {
-                    "bytes": 9654896
+                    "bytes": 6900784
                 },
                 "garbage_collector": {
                     "pause": {
                         "total": {
-                            "ns": 33816372
+                            "ns": 99490250
                         }
                     },
-                    "runs": 105
+                    "runs": 287
                 },
                 "goroutines": 77,
-                "heap_objects": 51099,
-                "malloc_count": 2918194,
+                "heap_objects": 42590,
+                "malloc_count": 7087169,
                 "sys": {
                     "bytes": 74119416
                 }

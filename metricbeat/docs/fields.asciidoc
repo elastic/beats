@@ -2125,9 +2125,9 @@ Agent Metricset fetches metrics information from a Consul instance running as Ag
 *`consul.agent.autopilot.healthy`*::
 +
 --
-type: long
+type: boolean
 
-Overall health of the local server cluster. If all servers are considered healthy by Autopilot, this will be set to 1. If any are unhealthy, this will be 0.
+Overall health of the local server cluster
 
 --
 

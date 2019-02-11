@@ -24,26 +24,68 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+type valueConverter interface {
+	GetValue(i interface{}) interface{}
+}
+
+type keyRenamer interface {
+	Key() string
+}
+
+type inputConverter interface {
+	valueConverter
+	keyRenamer
+}
+
 type valueHelper struct {
-	Value string
-	Unit  string
+	renamedTo string
+	unit      string
+}
+
+func (v *valueHelper) Key() string {
+	if v.unit == "" {
+		return v.renamedTo
+	}
+
+	return fmt.Sprintf("%s.%s", v.renamedTo, v.unit)
+}
+
+type convertToBooleanValue struct {
+	valueHelper
+}
+
+func (v *convertToBooleanValue) GetValue(i interface{}) interface{} {
+	value, ok := i.(float64)
+	if !ok {
+		return nil
+	}
+
+	return value == 1
+}
+
+type noConversionValue struct {
+	valueHelper
+}
+
+func (v *noConversionValue) GetValue(i interface{}) interface{} {
+	return i
 }
 
 var (
-	allowedValues = map[string]valueHelper{
-		"consul.autopilot.healthy":         {Value: "autopilot.healthy"},
-		"consul.runtime.alloc_bytes":       {Value: "runtime.alloc", Unit: ".bytes"},
-		"consul.runtime.total_gc_pause_ns": {Value: "runtime.garbage_collector.pause.total", Unit: ".ns"},
-		"consul.runtime.gc_pause_ns":       {Value: "runtime.garbage_collector.pause.current", Unit: ".ns"},
-		"consul.runtime.total_gc_runs":     {Value: "runtime.garbage_collector.runs"},
-		"consul.runtime.num_goroutines":    {Value: "runtime.goroutines"},
-		"consul.runtime.heap_objects":      {Value: "runtime.heap_objects"},
-		"consul.runtime.sys_bytes":         {Value: "runtime.sys", Unit: ".bytes"},
-		"consul.runtime.malloc_count":      {Value: "runtime.malloc_count"},
+	allowedValues = map[string]inputConverter{
+		"consul.autopilot.healthy":         &convertToBooleanValue{valueHelper{renamedTo: "autopilot.healthy"}},
+		"consul.runtime.alloc_bytes":       &noConversionValue{valueHelper{renamedTo: "runtime.alloc", unit: "bytes"}},
+		"consul.runtime.total_gc_pause_ns": &noConversionValue{valueHelper{renamedTo: "runtime.garbage_collector.pause.total", unit: "ns"}},
+		"consul.runtime.gc_pause_ns":       &noConversionValue{valueHelper{renamedTo: "runtime.garbage_collector.pause.current", unit: "ns"}},
+		"consul.runtime.total_gc_runs":     &noConversionValue{valueHelper{renamedTo: "runtime.garbage_collector.runs"}},
+		"consul.runtime.num_goroutines":    &noConversionValue{valueHelper{renamedTo: "runtime.goroutines"}},
+		"consul.runtime.heap_objects":      &noConversionValue{valueHelper{renamedTo: "runtime.heap_objects"}},
+		"consul.runtime.sys_bytes":         &noConversionValue{valueHelper{renamedTo: "runtime.sys", unit: "bytes"}},
+		"consul.runtime.malloc_count":      &noConversionValue{valueHelper{renamedTo: "runtime.malloc_count"}},
 	}
-	allowedDetailedValues = map[string]valueHelper{
-		//"consul.raft.apply":      {Value: "raft.apply"},
-		//"consul.raft.commitTime": {Value: "raft.commit_time", Unit: ".ms"},
+	allowedDetailedValues = map[string]inputConverter{
+		"consul.raft.apply":      &noConversionValue{valueHelper{renamedTo: "raft.apply"}},
+		"consul.raft.commitTime": &noConversionValue{valueHelper{renamedTo: "raft.commit_time", unit: "ms"}},
 	}
 )
 
@@ -93,7 +135,6 @@ func metricApply(labels map[string]common.MapStr, m consulMetric, v interface{})
 	if len(m.Labels) != 0 {
 		temp.Put("labels", m.Labels)
 	}
-	key := fmt.Sprintf("%s%s", prettyName.Value, prettyName.Unit)
 
 	var value interface{}
 	switch v := v.(type) {
@@ -104,25 +145,25 @@ func metricApply(labels map[string]common.MapStr, m consulMetric, v interface{})
 	}
 
 	if _, ok := labels[labelsCombination]; !ok {
-		temp.Put(key, value)
+		temp.Put(prettyName.Key(), prettyName.GetValue(value))
 		labels[labelsCombination] = temp
 	} else {
-		labels[labelsCombination].Put(key, value)
+		labels[labelsCombination].Put(prettyName.Key(), prettyName.GetValue(value))
 	}
 }
 
 // prettyName is used to translate a name in Consul metrics to a metric name that follows ES naming conventions
 // https://www.elastic.co/guide/en/beats/devguide/current/event-conventions.html
-func prettyName(s string) *valueHelper {
+func prettyName(s string) inputConverter {
 	for k, v := range allowedValues {
 		if s == k {
-			return &v
+			return v
 		}
 	}
 
 	for k, v := range allowedDetailedValues {
 		if s == k {
-			return &v
+			return v
 		}
 	}
 

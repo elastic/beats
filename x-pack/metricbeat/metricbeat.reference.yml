@@ -165,8 +165,9 @@ metricbeat.modules:
 
 #-------------------------------- Consul Module --------------------------------
 - module: consul
-  metricsets: ["agent"]
-  enabled: false
+  metricsets:
+  - agent
+  enabled: true
   period: 10s
   hosts: ["localhost:8500"]
 

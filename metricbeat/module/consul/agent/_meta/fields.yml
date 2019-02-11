@@ -8,8 +8,8 @@
       type: group
       fields:
         - name: healthy
-          type: long
-          description: Overall health of the local server cluster. If all servers are considered healthy by Autopilot, this will be set to 1. If any are unhealthy, this will be 0.
+          type: boolean
+          description: Overall health of the local server cluster
     - name: runtime
       type: group
       description: Runtime related metrics
