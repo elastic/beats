@@ -20,8 +20,6 @@ package agent
 import (
 	"encoding/json"
 	"fmt"
-	"sort"
-
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -43,8 +41,8 @@ var (
 		"consul.runtime.malloc_count":      {Value: "runtime.malloc_count"},
 	}
 	allowedDetailedValues = map[string]valueHelper{
-		"consul.raft.apply":      {Value: "raft.apply"},
-		"consul.raft.commitTime": {Value: "raft.commit_time", Unit: ".ms"},
+		//"consul.raft.apply":      {Value: "raft.apply"},
+		//"consul.raft.commitTime": {Value: "raft.commit_time", Unit: ".ms"},
 	}
 )
 
@@ -132,17 +130,10 @@ func prettyName(s string) *valueHelper {
 
 // Create a simple unique value for a map of labels without using a hash function
 func uniqueKeyForLabelMap(m map[string]string) string {
-	// In labels terms a:b, c:d should be the same than c:d, a:d, order should not affect, that's why we extract labels first and then we order them
-	labelsArray := make([]string, 0)
+	mm := common.MapStr{}
 	for k, v := range m {
-		labelsArray = append(labelsArray, fmt.Sprintf("%s%s", k, v))
+		mm[k] = v
 	}
 
-	sort.Strings(labelsArray)
-	labelsCombination := ""
-	for _, v := range labelsArray {
-		labelsArray = append(labelsArray, v)
-	}
-
-	return labelsCombination
+	return mm.String()
 }
