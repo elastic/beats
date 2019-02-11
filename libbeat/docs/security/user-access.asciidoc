@@ -2,7 +2,6 @@
 [[beats-user-access]]
 === Grant users access to {beatname_uc} indices
 
-:person: user
 :role_name: reader
 
 To enable users to access the indices {beatname_uc} creates, grant them `read`
@@ -10,7 +9,6 @@ and `view_index_metadata` privileges on the {beatname_uc} indices. If they're
 using {kib}, they also need the `kibana_user` role.
 
 ifdef::apm-server[]
-:person: account
 :role_name: user
 X-Pack security provides a built-in role called `apm_user` that you can explicitly assign to users.
 This role grants them the necessary `read` and `view_index_metadata` privileges on the {beatname_uc} indices.
@@ -50,17 +48,17 @@ also assign the `kibana_user` role:
 
 .. If you're using the `native` realm, you can assign roles with the
 **Management > Users** UI in {kib} or through the `user` API. For example, the
-following request grants ++{beat_default_index_prefix}_{person}++ the
+following request grants ++{beat_default_index_prefix}_account++ the
 ++{beat_default_index_prefix}_{role_name}++ and `kibana_user` roles:
 +
 --
 ["source", "sh", subs="attributes,callouts"]
 ---------------------------------------------------------------
-POST /_xpack/security/user/{beat_default_index_prefix}_{person}
+POST /_xpack/security/user/{beat_default_index_prefix}_account
 {
   "password" : "{pwd}",
   "roles" : [ "{beat_default_index_prefix}_{role_name}","kibana_user"],
-  "full_name" : "{beatname_uc} {person}"
+  "full_name" : "{beatname_uc} account"
 }
 ---------------------------------------------------------------
 // CONSOLE
@@ -68,16 +66,16 @@ POST /_xpack/security/user/{beat_default_index_prefix}_{person}
 .. If you're using the LDAP, Active Directory, or PKI realms,
 you assign the roles in the `role_mapping.yml` configuration file.
 For example, the following snippet grants
-++{beat_default_index_prefix} {person}++ the
+++{beat_default_index_prefix} account++ the
 ++{beat_default_index_prefix}_{role_name}++ and `kibana_user` roles:
 +
 --
 ["source", "yaml", subs="attributes,callouts"]
 ---------------------------------------------------------------
 {beat_default_index_prefix}_{role_name}:
-  - "cn={beatname_uc} {person},dc=example,dc=com"
+  - "cn={beatname_uc} account,dc=example,dc=com"
 kibana_user:
-  - "cn={beatname_uc} {person},dc=example,dc=com"
+  - "cn={beatname_uc} account,dc=example,dc=com"
 ---------------------------------------------------------------
 
 For more information, see
