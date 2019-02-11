@@ -20,8 +20,9 @@
 package instance
 
 import (
-	"github.com/elastic/beats/libbeat/cfgfile"
 	"testing"
+
+	"github.com/elastic/beats/libbeat/cfgfile"
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
