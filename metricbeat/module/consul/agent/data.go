@@ -25,11 +25,11 @@ import (
 )
 
 type valueConverter interface {
-	GetValue(i interface{}) interface{}
+	Convert(i interface{}) interface{}
 }
 
 type keyRenamer interface {
-	Key() string
+	Rename() string
 }
 
 type inputConverter interface {
@@ -42,7 +42,7 @@ type valueHelper struct {
 	unit      string
 }
 
-func (v *valueHelper) Key() string {
+func (v *valueHelper) Rename() string {
 	if v.unit == "" {
 		return v.renamedTo
 	}
@@ -50,11 +50,11 @@ func (v *valueHelper) Key() string {
 	return fmt.Sprintf("%s.%s", v.renamedTo, v.unit)
 }
 
-type convertToBooleanValue struct {
+type boolValue struct {
 	valueHelper
 }
 
-func (v *convertToBooleanValue) GetValue(i interface{}) interface{} {
+func (v *boolValue) Convert(i interface{}) interface{} {
 	value, ok := i.(float64)
 	if !ok {
 		return nil
@@ -67,13 +67,13 @@ type noConversionValue struct {
 	valueHelper
 }
 
-func (v *noConversionValue) GetValue(i interface{}) interface{} {
+func (v *noConversionValue) Convert(i interface{}) interface{} {
 	return i
 }
 
 var (
 	allowedValues = map[string]inputConverter{
-		"consul.autopilot.healthy":         &convertToBooleanValue{valueHelper{renamedTo: "autopilot.healthy"}},
+		"consul.autopilot.healthy":         &boolValue{valueHelper{renamedTo: "autopilot.healthy"}},
 		"consul.runtime.alloc_bytes":       &noConversionValue{valueHelper{renamedTo: "runtime.alloc", unit: "bytes"}},
 		"consul.runtime.total_gc_pause_ns": &noConversionValue{valueHelper{renamedTo: "runtime.garbage_collector.pause.total", unit: "ns"}},
 		"consul.runtime.gc_pause_ns":       &noConversionValue{valueHelper{renamedTo: "runtime.garbage_collector.pause.current", unit: "ns"}},
@@ -145,10 +145,10 @@ func metricApply(labels map[string]common.MapStr, m consulMetric, v interface{})
 	}
 
 	if _, ok := labels[labelsCombination]; !ok {
-		temp.Put(prettyName.Key(), prettyName.GetValue(value))
+		temp.Put(prettyName.Rename(), prettyName.Convert(value))
 		labels[labelsCombination] = temp
 	} else {
-		labels[labelsCombination].Put(prettyName.Key(), prettyName.GetValue(value))
+		labels[labelsCombination].Put(prettyName.Rename(), prettyName.Convert(value))
 	}
 }
 
