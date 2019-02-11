@@ -20,7 +20,7 @@ import (
 )
 
 var (
-	jitter = 1 * time.Second
+	jitter = 300 * time.Millisecond
 )
 
 func getBeat(name, version string) (*instance.Beat, error) {

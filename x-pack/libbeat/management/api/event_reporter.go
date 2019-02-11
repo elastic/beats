@@ -16,7 +16,7 @@ import (
 
 var (
 	debugK       = "event_reporter"
-	reportJitter = 2 * time.Second
+	reportJitter = 300 * time.Millisecond
 )
 
 // EventReporter is an object that will periodically send asyncronously events to the

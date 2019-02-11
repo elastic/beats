@@ -26,7 +26,7 @@ import (
 )
 
 var errEmptyAccessToken = errors.New("access_token is empty, you must reenroll your Beat")
-var managerJitter = 2 * time.Second
+var managerJitter = 300 * time.Millisecond
 
 func init() {
 	management.Register("x-pack", NewConfigManager, feature.Beta)
