@@ -2122,26 +2122,6 @@ Agent Metricset fetches metrics information from a Consul instance running as Ag
 
 
 
-
-*`consul.agent.raft.commit_time.ms`*::
-+
---
-type: long
-
-Average time in milliseconds it takes to commit a new entry to the transaction log of the leader
-
---
-
-*`consul.agent.raft.apply`*::
-+
---
-type: long
-
-Number of logs committed since the last interval.
-
---
-
-
 *`consul.agent.autopilot.healthy`*::
 +
 --
