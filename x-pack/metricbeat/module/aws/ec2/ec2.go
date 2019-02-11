@@ -202,6 +202,7 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 		err = errors.Wrap(err, "instance.Monitoring.State.MarshalValue failed")
 		return
 	}
+
 	resultMetricSetFields.Put("instance.image.id", *instanceOutput.ImageId)
 	resultMetricSetFields.Put("instance.state.name", instanceStateName)
 	resultMetricSetFields.Put("instance.state.code", *instanceOutput.State.Code)

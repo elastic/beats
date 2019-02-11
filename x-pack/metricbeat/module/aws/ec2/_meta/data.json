@@ -7,56 +7,52 @@
     "aws": {
         "ec2": {
             "cpu": {
-                "credit_balance": 153.320946,
-                "credit_usage": 0.002119,
-                "surplus_credit_balance": 0,
-                "surplus_credits_charged": 0,
                 "total": {
-                    "pct": 0.033333333333303
+                    "pct": 4.316666666670541
                 }
             },
             "diskio": {
                 "read": {
-                    "bytes": 0,
-                    "count": 0
+                    "bytes": 158924.8,
+                    "count": 6
                 },
                 "write": {
-                    "bytes": 0,
-                    "count": 0
+                    "bytes": 15684403.2,
+                    "count": 1369.6
                 }
             },
             "instance": {
                 "core": {
-                    "count": 1
+                    "count": 8
                 },
                 "image": {
-                    "id": "ami-05b3bcf7f311194b3"
+                    "id": "ami-556ef13a"
                 },
                 "monitoring": {
                     "state": "disabled"
                 },
                 "private": {
-                    "dns_name": "ip-172-31-10-23.ap-southeast-1.compute.internal",
-                    "ip": "172.31.10.23"
+                    "dns_name": "ip-172-31-19-26.eu-central-1.compute.internal",
+                    "ip": "172.31.19.26"
                 },
                 "public": {
-                    "dns_name": "ec2-18-136-198-93.ap-southeast-1.compute.amazonaws.com",
-                    "ip": "18.136.198.93"
+                    "dns_name": "ec2-18-185-139-162.eu-central-1.compute.amazonaws.com",
+                    "ip": "18.185.139.162"
                 },
                 "state": {
                     "code": 16,
                     "name": "running"
                 },
-                "threads_per_core": 1
+                "threads_per_core": 2
             },
             "network": {
                 "in": {
-                    "bytes": 1134,
-                    "packets": 10
+                    "bytes": 86.4,
+                    "packets": 1.6
                 },
                 "out": {
-                    "bytes": 1553.8,
-                    "packets": 10.2
+                    "bytes": 64,
+                    "packets": 1.6
                 }
             },
             "status": {
@@ -67,15 +63,15 @@
         }
     },
     "cloud": {
-        "availability_zone": "ap-southeast-1b",
+        "availability_zone": "eu-central-1b",
         "instance": {
-            "id": "i-0c68eeb552231a8d0"
+            "id": "i-08027f3dcddb9a976"
         },
         "machine": {
-            "type": "t2.micro"
+            "type": "i3.4xlarge"
         },
         "provider": "ec2",
-        "region": "ap-southeast-1"
+        "region": "eu-central-1"
     },
     "event": {
         "dataset": "aws.ec2",
