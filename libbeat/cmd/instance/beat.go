@@ -701,6 +701,18 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 			kibanaConfig = common.NewConfig()
 		}
 
+		if esConfig.Enabled() {
+			username, _ := esConfig.String("username", -1)
+			password, _ := esConfig.String("password", -1)
+
+			if !kibanaConfig.HasField("username") && username != "" {
+				kibanaConfig.SetString("username", -1, username)
+			}
+			if !kibanaConfig.HasField("password") && password != "" {
+				kibanaConfig.SetString("password", -1, password)
+			}
+		}
+
 		client, err := kibana.NewKibanaClient(kibanaConfig)
 		if err != nil {
 			return fmt.Errorf("error connecting to Kibana: %v", err)
@@ -720,7 +732,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 		}
 
 		err = dashboards.ImportDashboards(ctx, b.Info, paths.Resolve(paths.Home, ""),
-			kibanaConfig, esConfig, b.Config.Dashboards, nil, pattern)
+			kibanaConfig, b.Config.Dashboards, nil, pattern)
 		if err != nil {
 			return errw.Wrap(err, "Error importing Kibana dashboards")
 		}
