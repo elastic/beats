@@ -9,27 +9,21 @@
             "autopilot": {
                 "healthy": 1
             },
-            "raft": {
-                "apply": 1,
-                "commit_time": {
-                    "ms": 0.01523400004953146
-                }
-            },
             "runtime": {
                 "alloc": {
-                    "bytes": 8543432
+                    "bytes": 9654896
                 },
                 "garbage_collector": {
                     "pause": {
                         "total": {
-                            "ns": 43749010
+                            "ns": 33816372
                         }
                     },
-                    "runs": 101
+                    "runs": 105
                 },
-                "goroutines": 76,
-                "heap_objects": 48889,
-                "malloc_count": 3200832,
+                "goroutines": 77,
+                "heap_objects": 51099,
+                "malloc_count": 2918194,
                 "sys": {
                     "bytes": 74119416
                 }
