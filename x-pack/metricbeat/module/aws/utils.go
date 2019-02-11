@@ -6,13 +6,12 @@ package aws
 
 import (
 	"time"
-
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // GetStartTimeEndTime function uses durationString to create startTime and endTime for queries.
@@ -26,10 +25,28 @@ func GetStartTimeEndTime(durationString string) (startTime time.Time, endTime ti
 	return startTime, endTime, nil
 }
 
+// GetMetricDataPerRegion function uses MetricDataQueries to get metric data output.
+func GetMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, nextToken *string, svc cloudwatchiface.CloudWatchAPI, startTime time.Time, endTime time.Time) (*cloudwatch.GetMetricDataOutput, error) {
+	getMetricDataInput := &cloudwatch.GetMetricDataInput{
+		NextToken:         nextToken,
+		StartTime:         &startTime,
+		EndTime:           &endTime,
+		MetricDataQueries: metricDataQueries,
+	}
+
+	reqGetMetricData := svc.GetMetricDataRequest(getMetricDataInput)
+	getMetricDataOutput, err := reqGetMetricData.Send()
+	if err != nil {
+		logp.Error(errors.Wrap(err, "Error GetMetricDataInput"))
+		return nil, err
+	}
+	return getMetricDataOutput, nil
+}
+
 // GetListMetricsOutput function gets listMetrics results from cloudwatch per namespace for each region.
 // ListMetrics Cloudwatch API is used to list the specified metrics. The returned metrics can be used with GetMetricData
 // to obtain statistical data.
-func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch cloudwatchiface.CloudWatchAPI) ([]cloudwatch.Metric, error) {
+func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch *cloudwatch.CloudWatch) ([]cloudwatch.Metric, error) {
 	listMetricsInput := &cloudwatch.ListMetricsInput{Namespace: &namespace}
 	reqListMetrics := svcCloudwatch.ListMetricsRequest(listMetricsInput)
 
