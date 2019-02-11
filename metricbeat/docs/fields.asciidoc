@@ -2571,30 +2571,166 @@ Nanoseconds consumed by stop-the-world garbage collection pauses since Consul st
 [[exported-fields-coredns]]
 == coredns fields
 
-experimental[]
-coredns module
+coredns Module
 
 
 
 [float]
 == coredns fields
 
+`coredns` contains statistics that were read from coreDNS
 
 
 
 [float]
 == metrics fields
 
-metrics
+Contains statistics related to the coreDNS service
 
 
 
-*`coredns.metrics.example`*::
+*`coredns.metrics.panic.count.total`*::
++
+--
+type: long
+
+Total number of panics
+
+
+--
+
+*`coredns.metrics.dns.request.count.total`*::
++
+--
+type: long
+
+Total query count
+
+
+--
+
+*`coredns.metrics.dns.request.duration.seconds`*::
++
+--
+type: long
+
+format: duration
+
+Duration to process each query
+
+
+--
+
+*`coredns.metrics.dns.request.size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Size of requests in bytes
+
+
+--
+
+*`coredns.metrics.dns.request.do.count.total`*::
++
+--
+type: long
+
+Number of queries that have the DO bit set
+
+
+--
+
+*`coredns.metrics.dns.request.type.count.total`*::
++
+--
+type: long
+
+Counter of queries per zone and type
+
+
+--
+
+*`coredns.metrics.dns.request.type`*::
 +
 --
 type: keyword
 
-Example field
+Holds the query type of the request
+
+
+--
+
+*`coredns.metrics.dns.response.rcode`*::
++
+--
+type: keyword
+
+Holds the rcode of the response
+
+
+--
+
+*`coredns.metrics.dns.request.family`*::
++
+--
+type: keyword
+
+The address family of the transport (1 = IP (IP version 4), 2 = IP6 (IP version 6))
+
+
+--
+
+*`coredns.metrics.dns.response.size.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Response size in bytes
+
+
+--
+
+*`coredns.metrics.dns.response.rcode.count.total`*::
++
+--
+type: long
+
+Counter of responses per zone and rcode
+
+
+--
+
+*`coredns.metrics.server`*::
++
+--
+type: keyword
+
+The server responsible for the request
+
+
+--
+
+*`coredns.metrics.zone`*::
++
+--
+type: keyword
+
+The zonename used for the request/response
+
+
+--
+
+*`coredns.metrics.proto`*::
++
+--
+type: keyword
+
+The transport of the response ("udp" or "tcp")
 
 --
 

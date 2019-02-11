@@ -5,7 +5,7 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-coredns-stats]]
 === coredns stats metricset
 
-experimental[]
+beta[]
 
 include::../../../module/coredns/stats/_meta/docs.asciidoc[]
 

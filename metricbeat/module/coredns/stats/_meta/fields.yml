@@ -1,9 +1,65 @@
 - name: metrics
   type: group
   description: >
-    metrics
+    Contains statistics related to the coreDNS service
+  release: beta
   fields:
-    - name: example
+    - name: panic.count.total
+      type: long
+      description: >
+         Total number of panics
+    - name: dns.request.count.total
+      type: long
+      description: >
+         Total query count
+    - name: dns.request.duration.seconds
+      type: long
+      format: duration
+      description: >
+         Duration to process each query
+    - name: dns.request.size.bytes
+      type: long
+      format: bytes
+      description: >
+         Size of requests in bytes
+    - name: dns.request.do.count.total
+      type: long
+      description: >
+         Number of queries that have the DO bit set
+    - name: dns.request.type.count.total
+      type: long
+      description: >
+          Counter of queries per zone and type
+    - name: dns.request.type
       type: keyword
       description: >
-        Example field
+        Holds the query type of the request
+    - name: dns.response.rcode
+      type: keyword
+      description: >
+        Holds the rcode of the response
+    - name: dns.request.family
+      type: keyword
+      description: >
+        The address family of the transport (1 = IP (IP version 4), 2 = IP6 (IP version 6))
+    - name: dns.response.size.bytes
+      type: long
+      format: bytes
+      description: >
+          Response size in bytes
+    - name: dns.response.rcode.count.total
+      type: long
+      description: >
+          Counter of responses per zone and rcode
+    - name: server
+      type: keyword
+      description: >
+        The server responsible for the request
+    - name: zone
+      type: keyword
+      description: >
+        The zonename used for the request/response
+    - name: proto
+      type: keyword
+      description: >
+        The transport of the response ("udp" or "tcp")
