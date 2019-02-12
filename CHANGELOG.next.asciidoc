@@ -51,6 +51,8 @@ https://github.com/elastic/beats/compare/1035569addc4a3b29ffa14f8a08c27c1ace16ef
 
 *Metricbeat*
 
+- Fix issue with `elasticsearch/node_stats` metricset (x-pack) not indexing `source_node` field. {pull}10639[10639]
+
 *Packetbeat*
 
 - Fixed a crash when using af_packet capture {pull}10477[10477]
