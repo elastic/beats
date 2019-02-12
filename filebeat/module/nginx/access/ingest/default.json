@@ -73,7 +73,8 @@
         {
             "user_agent": {
                 "field": "nginx.access.agent",
-                "target_field": "nginx.access.user_agent"
+                "target_field": "nginx.access.user_agent",
+                "ecs": false
             }
         },
         {
