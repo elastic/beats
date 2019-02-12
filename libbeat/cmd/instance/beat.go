@@ -909,9 +909,9 @@ func initKibanaConfig(beatConfig beatConfig) (*common.Config, error) {
 }
 
 func initPaths(cfg *common.Config) error {
-	// To Fix the chicken-egg problem with the Keystore initial and the loading of the configuration
-	// file we are doing a partial unpack of the configuration file and only take into consideration
-	// the configured path. After we will unpack the complete configuration and keystore reference
+	// To Fix the chicken-egg problem with the Keystore and the loading of the configuration
+	// files we are doing a partial unpack of the configuration file and only take into consideration
+	// the paths field. After we will unpack the complete configuration and keystore reference
 	// will be correctly replaced.
 	partialConfig := struct {
 		Path paths.Path `config:"path"`
