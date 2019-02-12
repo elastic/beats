@@ -40,6 +40,10 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/traefik/health"
 )
 
+const (
+	expectedExtension = "-expected.json"
+)
+
 var (
 	// Use `go test -generate` to update files.
 	generateFlag = flag.Bool("generate", false, "Write golden files")
@@ -52,11 +56,11 @@ type Config struct {
 
 func TestAll(t *testing.T) {
 
-	configFiles, _ := filepath.Glob("../../module/*/*/_meta/testdata/config.yml")
+	configFiles, _ := filepath.Glob(getModulesPath() + "/*/*/_meta/testdata/config.yml")
 
 	for _, f := range configFiles {
 		// get module and metricset name from path
-		s := strings.Split(f, "/")
+		s := strings.Split(f, filepath.ToSlash("/"))
 		moduleName := s[3]
 		metricSetName := s[4]
 
@@ -76,11 +80,11 @@ func TestAll(t *testing.T) {
 
 func getTestdataFiles(t *testing.T, url, module, metricSet string) {
 
-	ff, _ := filepath.Glob("../../module/" + module + "/" + metricSet + "/_meta/testdata/*.json")
+	ff, _ := filepath.Glob(getMetricsetPath(module, metricSet) + "/_meta/testdata/*.json")
 	var files []string
 	for _, f := range ff {
 		// Exclude all the expected files
-		if strings.HasSuffix(f, "-expected.json") {
+		if strings.HasSuffix(f, expectedExtension) {
 			continue
 		}
 		files = append(files, f)
@@ -124,13 +128,13 @@ func runTest(t *testing.T, file string, module, metricSetName, url string) {
 
 	// Overwrites the golden files if run with -generate
 	if *generateFlag {
-		if err = ioutil.WriteFile(file+"-expected.json", output, 0644); err != nil {
+		if err = ioutil.WriteFile(file+expectedExtension, output, 0644); err != nil {
 			t.Fatal(err)
 		}
 	}
 
 	// Read expected file
-	expected, err := ioutil.ReadFile(file + "-expected.json")
+	expected, err := ioutil.ReadFile(file + expectedExtension)
 	if err != nil {
 		t.Fatalf("could not read file: %s", err)
 	}
@@ -146,7 +150,7 @@ func writeDataJSON(t *testing.T, data common.MapStr, module, metricSet string) {
 	// Add hardcoded timestamp
 	data.Put("@timestamp", "2019-03-01T08:05:34.853Z")
 	output, err := json.MarshalIndent(&data, "", "    ")
-	if err = ioutil.WriteFile("../../module/"+module+"/"+metricSet+"/_meta/data.json", output, 0644); err != nil {
+	if err = ioutil.WriteFile(getMetricsetPath(module, metricSet)+"/_meta/data.json", output, 0644); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -178,4 +182,16 @@ func server(t *testing.T, path string, url string) *httptest.Server {
 		}
 	}))
 	return server
+}
+
+func getModulesPath() string {
+	return "../../module"
+}
+
+func getModulePath(module string) string {
+	return getModulePath() + "/" + module
+}
+
+func getMetricsetPath(module, metricSet string) string {
+	return getModulePath(module) + "/" + metricSet
 }
