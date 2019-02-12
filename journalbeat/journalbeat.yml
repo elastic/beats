@@ -24,7 +24,7 @@ journalbeat.inputs:
   #max_backoff: 20s
 
   # Position to start reading from journal. Valid values: head, tail, cursor
-  seek: tail
+  seek: cursor
   # Fallback position if no cursor data is available.
   #cursor_seek_fallback: head
 
@@ -120,8 +120,8 @@ output.elasticsearch:
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
-  username: "elastic"
-  password: "changeme"
+  #username: "elastic"
+  #password: "changeme"
 
 #----------------------------- Logstash output --------------------------------
 #output.logstash:
