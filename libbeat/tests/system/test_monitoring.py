@@ -119,8 +119,8 @@ class Test(BaseTest):
 
         proc.check_kill_and_wait()
 
-        # TODO: Get a beats_stats doc
-        # TODO: Get a beats_state doc
+        indirect_beats_stats_doc = self.get_monitoring_doc('beats_stats')
+        indirect_beats_state_doc = self.get_monitoring_doc('beats_state')
 
         self.render_config_template(
             "mockbeat",
@@ -144,20 +144,29 @@ class Test(BaseTest):
 
         proc.check_kill_and_wait()
 
-        # TODO: Get a beats_stats doc
-        # TODO: Get a beats_state doc
+        direct_beats_stats_doc = self.get_monitoring_doc('beats_stats')
+        direct_beats_state_doc = self.get_monitoring_doc('beats_state')
 
-        # TODO: compare the two beats_stats docs, making sure same keys exist under `beats_stats` field
-        # TODO: compare the two beats_state docs, making sure same keys exist under `beats_state` field
+        self.assert_same_structure(indirect_beats_state_doc['beats_state'], direct_beats_state_doc['beats_state'])
+        self.assert_same_structure(indirect_beats_stats_doc['beats_stats'], direct_beats_stats_doc['beats_stats'])
 
-    def monitoring_doc_exists(self, monitoring_type):
+    def search_monitoring_doc(self, monitoring_type):
         results = self.es_monitoring.search(
             index='.monitoring-beats-*',
             q='type:'+monitoring_type,
             size=1
         )
-        hits = results['hits']['hits']
+        return results['hits']['hits']
+
+    def monitoring_doc_exists(self, monitoring_type):
+        hits = self.search_monitoring_doc(monitoring_type)
         return len(hits) == 1
+
+    def get_monitoring_doc(self, monitoring_type):
+        hits = self.search_monitoring_doc(monitoring_type)
+        if len(hits) != 1:
+            return None
+        return hits[0]['_source']
 
     def assert_monitoring_doc_contains_fields(self, monitoring_type, field_names):
         results = self.es_monitoring.search(
@@ -169,7 +178,19 @@ class Test(BaseTest):
         source = hits[0]['_source']
 
         for field_name in field_names:
-            assert field_name in source
+            self.assertIn(field_name, source)
+
+    def assert_same_structure(self, dict1, dict2):
+        dict1_keys = dict1.keys()
+        dict2_keys = dict2.keys()
+
+        self.assertEqual(len(dict1_keys), len(dict2_keys))
+        for key in dict1_keys:
+            dict1_val = dict1[key]
+            dict2_val = dict2[key]
+            self.assertEqual(type(dict1_val), type(dict2_val))
+            if type(dict1_val) is dict:
+                self.assert_same_structure(dict1_val, dict2_val)
 
     def clean_output_cluster(self):
         # Remove all exporters
