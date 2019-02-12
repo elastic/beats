@@ -4,7 +4,20 @@
     {
       "script": {
         "lang": "painless",
-        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = ctx['coredns']['timestamp']; ctx.coredns.remove('timestamp');"
+        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = ctx['envoy']['timestamp']; ctx.envoy.remove('timestamp');"
+      }
+    },
+    {
+      "set": {
+        "field": "user_agent.original",
+        "value": "{{envoy.http_user_agent}}",
+        "ignore_failure": true
+      }
+    },
+    {
+      "user_agent": {
+        "field": "envoy.http_user_agent",
+        "ignore_missing": true
       }
     }
   ]

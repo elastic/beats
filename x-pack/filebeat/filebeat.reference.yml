@@ -251,7 +251,7 @@ filebeat.modules:
   coredns: 
     enabled: true
   envoy:
-    enabled: false
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.

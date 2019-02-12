@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2019-02-12T00:27:28.903Z",
+        "@timestamp": "2019-02-12T00:27:28.903433597Z",
         "coredns.bufsize": "512",
         "coredns.client": "172.17.0.4",
         "coredns.dnssec_ok": "false",

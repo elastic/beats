@@ -6632,9 +6632,40 @@ type: keyword
 --
 type: keyword
 
+coredns response flags
+
+
 --
 
-*`coredns.name`*::
+*`coredns.qname`*::
++
+--
+type: keyword
+
+coredns query name
+
+
+--
+
+*`coredns.message`*::
++
+--
+type: text
+
+coredns original log message
+
+
+--
+
+[float]
+== kubernetes fields
+
+Kubernetes meta fields
+
+
+
+
+*`kubernetes.replicaset.name`*::
 +
 --
 type: keyword

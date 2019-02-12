@@ -72,3 +72,63 @@
       fields:
       - name: name
         type: keyword
+
+  - name: envoy
+    type: group
+    description: >
+      Fields from envoy proxy logs after normalization
+    fields:
+    - name: log_type
+      type: keyword
+      description: >
+        Envoy log type, normally ACCESS
+
+    - name: method
+      type: keyword
+
+    - name: path
+      type: keyword
+
+    - name: proto 
+      type: keyword
+
+    - name: response_code
+      type: integer
+
+    - name: response_flags
+      type: keyword
+
+    - name: bytes_received
+      type: long
+
+    - name: bytes_sent
+      type: long
+
+    - name: duration
+      type: double 
+
+    - name: upstream_service_time
+      type: double
+
+    - name: forwarded_for
+      type: keyword
+
+    - name: http_user_agent
+      type: keyword
+
+    - name: request_id
+      type: keyword
+
+    - name: authority
+      type: keyword
+
+    - name: upstream_host 
+      type: ip
+
+    - name: upstream_port
+      type: integer
+
+    - name: message
+      type: text
+      description: >
+        envoy original log message
