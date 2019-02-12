@@ -26,10 +26,13 @@
                     "count": 0
                 },
                 "visible": {
-                    "count": 44
+                    "count": 60
                 }
             },
-            "oldest_message_age": 86347
+            "oldest_message_age": {
+                "sec": 82356
+            },
+            "sent_message_size": {}
         }
     },
     "cloud": {

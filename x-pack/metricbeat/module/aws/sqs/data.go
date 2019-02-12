@@ -11,7 +11,9 @@ import (
 
 var (
 	schemaRequestFields = s.Schema{
-		"oldest_message_age": c.Float("ApproximateAgeOfOldestMessage"),
+		"oldest_message_age": s.Object{
+			"sec": c.Float("ApproximateAgeOfOldestMessage"),
+		},
 		"messages": s.Object{
 			"delayed": s.Object{
 				"count": c.Int("ApproximateNumberOfMessagesDelayed"),
@@ -35,6 +37,8 @@ var (
 		"empty_receives": s.Object{
 			"count": c.Int("NumberOfEmptyReceives"),
 		},
-		"sent_message_size": c.Float("SentMessageSize"),
+		"sent_message_size": s.Object{
+			"bytes": c.Float("SentMessageSize"),
+		},
 	}
 )

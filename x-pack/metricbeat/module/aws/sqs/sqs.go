@@ -44,17 +44,6 @@ type MetricSet struct {
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	logger := logp.NewLogger(aws.ModuleName)
-
-	moduleConfig := aws.Config{}
-	if err := base.Module().UnpackConfig(&moduleConfig); err != nil {
-		return nil, err
-	}
-
-	if moduleConfig.Period == "" {
-		err := errors.New("period is not set in AWS module config")
-		logger.Error(err)
-	}
-
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating aws metricset")
@@ -82,8 +71,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	// Get startTime and endTime
 	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
 	if err != nil {
-		logp.Error(errors.Wrap(err, "Error ParseDuration"))
-		m.logger.Error(err.Error())
+		m.logger.Error(errors.Wrap(err, "Error ParseDuration"))
 		report.Error(err)
 		return
 	}
@@ -91,38 +79,35 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	for _, regionName := range m.MetricSet.RegionsList {
 		m.MetricSet.AwsConfig.Region = regionName
 		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
+
+		// Get listMetrics output
 		listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
 			m.logger.Error(err.Error())
 			report.Error(err)
 			continue
 		}
-
 		if listMetricsOutput == nil || len(listMetricsOutput) == 0 {
 			continue
 		}
 
+		// Construct metricDataQueries
 		metricDataQueries := constructMetricQueries(listMetricsOutput, int64(m.PeriodInSec))
 		if len(metricDataQueries) == 0 {
 			continue
 		}
 
-		init := true
-		getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
-		for init || getMetricDataOutput.NextToken != nil {
-			init = false
-			output, err := aws.GetMetricDataPerRegion(metricDataQueries, getMetricDataOutput.NextToken, svcCloudwatch, startTime, endTime)
-			if err != nil {
-				err = errors.Wrap(err, "getMetricDataPerRegion failed, skipping region "+regionName)
-				m.logger.Error(err.Error())
-				report.Error(err)
-				continue
-			}
-			getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
+		// Use metricDataQueries to make GetMetricData API calls
+		metricDataResults, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime, regionName)
+		if err != nil {
+			err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName)
+			m.logger.Error(err.Error())
+			report.Error(err)
+			continue
 		}
 
 		// Create Cloudwatch Events for SQS
-		event, err := createSQSEvents(getMetricDataOutput.MetricDataResults, metricsetName, regionName, schemaRequestFields)
+		event, err := createSQSEvents(metricDataResults, metricsetName, regionName, schemaRequestFields)
 		if err != nil {
 			m.logger.Error(err.Error())
 			event.Error = err
@@ -186,7 +171,7 @@ func createSQSEvents(getMetricDataResults []cloudwatch.MetricDataResult, metrics
 
 	resultMetricSetFields, err := aws.EventMapping(mapOfMetricSetFieldResults, schemaMetricFields)
 	if err != nil {
-		err = errors.Wrap(err, "Error trying to apply schema schemaMetricSetFields in AWS S3 metricbeat module.")
+		err = errors.Wrap(err, "Error trying to apply schemaMetricSetFields in AWS SQS metricbeat module.")
 		return
 	}
 	event.MetricSetFields = resultMetricSetFields

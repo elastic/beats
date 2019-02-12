@@ -2,14 +2,15 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build integration
+// +build !integration
 
 package sqs
 
 import (
 	"fmt"
-	"os"
 	"testing"
+
+	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
 
 	"github.com/stretchr/testify/assert"
 
@@ -17,49 +18,37 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	accessKeyID, okAccessKeyID := os.LookupEnv("AWS_ACCESS_KEY_ID")
-	secretAccessKey, okSecretAccessKey := os.LookupEnv("AWS_SECRET_ACCESS_KEY")
-	sessionToken, okSessionToken := os.LookupEnv("AWS_SESSION_TOKEN")
-	defaultRegion, _ := os.LookupEnv("AWS_REGION")
+	config, info := aws.GetConfigForTest("sqs")
+	if info != "" {
+		t.Skip("Skipping TestFetch: " + info)
+	}
 
-	if !okAccessKeyID || accessKeyID == "" {
-		t.Skip("Skipping TestFetch; $AWS_ACCESS_KEY_ID not set or set to empty")
-	} else if !okSecretAccessKey || secretAccessKey == "" {
-		t.Skip("Skipping TestFetch; $AWS_SECRET_ACCESS_KEY not set or set to empty")
-	} else {
-		tempCreds := map[string]interface{}{
-			"module":            "aws",
-			"period":            "300s",
-			"metricsets":        []string{"sqs"},
-			"access_key_id":     accessKeyID,
-			"secret_access_key": secretAccessKey,
-			"default_region":    defaultRegion,
-		}
+	sqsMetricSet := mbtest.NewReportingMetricSetV2(t, config)
+	events, err := mbtest.ReportingFetchV2(sqsMetricSet)
+	if err != nil {
+		t.Skip("Skipping TestFetch: failed to make api calls. Please check $AWS_ACCESS_KEY_ID, " +
+			"$AWS_SECRET_ACCESS_KEY and $AWS_SESSION_TOKEN in config.yml")
+	}
 
-		if okSessionToken && sessionToken != "" {
-			tempCreds["session_token"] = sessionToken
-		}
+	if !assert.NotEmpty(t, events) {
+		t.FailNow()
+	}
+	t.Logf("Module: %s Metricset: %s", sqsMetricSet.Module().Name(), sqsMetricSet.Name())
 
-		sqsMetricSet := mbtest.NewReportingMetricSetV2(t, tempCreds)
-		events, err := mbtest.ReportingFetchV2(sqsMetricSet)
-		if err != nil {
-			t.Skip("Skipping TestFetch: failed to make api calls. Please check $AWS_ACCESS_KEY_ID, " +
-				"$AWS_SECRET_ACCESS_KEY and $AWS_SESSION_TOKEN in config.yml")
-		}
+	for _, event := range events {
+		fmt.Println("event = ", event)
+	}
+}
 
-		assert.Empty(t, err)
-		if !assert.NotEmpty(t, events) {
-			t.FailNow()
-		}
-		t.Logf("Module: %s Metricset: %s", sqsMetricSet.Module().Name(), sqsMetricSet.Name())
+func TestData(t *testing.T) {
+	config, info := aws.GetConfigForTest("sqs")
+	if info != "" {
+		t.Skip("Skipping TestData: " + info)
+	}
 
-		for _, event := range events {
-			fmt.Println("event = ", event)
-		}
-
-		errs := mbtest.WriteEventsReporterV2(sqsMetricSet, t, "/")
-		if errs != nil {
-			t.Fatal("write", errs)
-		}
+	sqsMetricSet := mbtest.NewReportingMetricSetV2(t, config)
+	errs := mbtest.WriteEventsReporterV2(sqsMetricSet, t, "/")
+	if errs != nil {
+		t.Fatal("write", errs)
 	}
 }
