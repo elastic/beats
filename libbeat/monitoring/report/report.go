@@ -25,8 +25,10 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// ReportingFormat encodes the type of format to report monitoring data in
 type ReportingFormat int
 
+// Enumerations of various ReportingFormats
 const (
 	ReportingFormatUnknown ReportingFormat = iota // to protect against zero-value errors
 	ReportingFormatXPackMonitoringBulk
