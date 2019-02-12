@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2018-10-31T09:34:25.109Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.origin.type": "rest",
@@ -19,6 +20,7 @@
         "user.name": "elastic"
     },
     {
+        "@timestamp": "2018-10-31T09:34:25.207Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.origin.type": "rest",
@@ -38,6 +40,7 @@
         "user.name": "elastic"
     },
     {
+        "@timestamp": "2018-10-31T09:35:11.428Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.action": "cluster:admin/xpack/security/realm/cache/clear",
         "elasticsearch.audit.layer": "transport",
@@ -62,6 +65,7 @@
         "user.name": "_xpack_security"
     },
     {
+        "@timestamp": "2018-10-31T09:35:11.430Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.action": "cluster:admin/xpack/security/realm/cache/clear[n]",
         "elasticsearch.audit.layer": "transport",
@@ -86,6 +90,7 @@
         "user.name": "_xpack_security"
     },
     {
+        "@timestamp": "2018-10-31T09:35:12.303Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.action": "cluster:admin/xpack/security/user/change_password",
         "elasticsearch.audit.layer": "transport",
@@ -110,6 +115,7 @@
         "user.name": "elastic"
     },
     {
+        "@timestamp": "2018-10-31T09:35:12.314Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.action": "indices:admin/create",
         "elasticsearch.audit.indices": [
@@ -137,6 +143,7 @@
         "user.name": "_xpack_security"
     },
     {
+        "@timestamp": "2019-01-27T20:15:10.380Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.origin.type": "rest",
