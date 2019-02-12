@@ -232,8 +232,7 @@ func dlopenCFunctions() (*cFunctions, error) {
 		cFun.rpmsqEnable, err2 = librpm.GetSymbolPointer("rpmsqEnable")
 		if err2 != nil {
 			var errs multierror.Errors
-			errs = append(errs, err)
-			errs = append(errs, err2)
+			errs = append(errs, err, err2)
 			return nil, errs.Err()
 		}
 	} else {
