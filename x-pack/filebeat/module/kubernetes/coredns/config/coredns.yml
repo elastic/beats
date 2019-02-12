@@ -26,9 +26,9 @@ processors:
   - drop_event.when:
       or:
         - equals:
-            coredns.client: "%{client}"
+            coredns.client: %{client}
         - equals:
-            coredns.rcode: "%{rcode}"
+            coredns.rcode: %{rcode}
         - not:
             has_fields: ['coredns.client', 'coredns.rcode']
   - drop_fields:

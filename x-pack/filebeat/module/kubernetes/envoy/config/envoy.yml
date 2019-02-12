@@ -26,9 +26,9 @@ processors:
   - drop_event.when:
       or:
         - equals:
-            envoy.method: "%{method}"
+            envoy.method: %{method}
         - equals:
-            envoy.response_code: "%{response_code}"
+            envoy.response_code: %{response_code}
         - not:
             has_fields: ['envoy.method', 'envoy.response_code']  
   - drop_fields:
