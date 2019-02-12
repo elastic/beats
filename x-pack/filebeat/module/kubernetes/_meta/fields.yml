@@ -49,7 +49,26 @@
 
     - name: rflags
       type: keyword
+      description: >
+        coredns response flags
 
-    - name: name
+    - name: qname
       type: keyword
+      description: >
+        coredns query name
 
+    - name: message
+      type: text
+      description: >
+        coredns original log message
+
+  - name: kubernetes
+    type: group
+    description: >
+      Kubernetes meta fields
+    fields:
+    - name: replicaset
+      type: group
+      fields:
+      - name: name
+        type: keyword

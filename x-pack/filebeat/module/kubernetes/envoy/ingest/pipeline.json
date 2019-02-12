@@ -1,16 +1,10 @@
 {
-  "description": "Pipeline for normalizing Kubernetes coredns logs",
+  "description": "Pipeline for normalizing Kubernetes envoy logs",
   "processors": [
     {
       "script": {
         "lang": "painless",
         "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = ctx['coredns']['timestamp']; ctx.coredns.remove('timestamp');"
-      }
-    },
-    {
-      "set": {
-        "field": "source.ip",
-        "value": "{{coredns.client}}"
       }
     }
   ]

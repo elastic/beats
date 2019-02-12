@@ -1,0 +1,36 @@
+# type: docker
+# containers.ids:
+#  - "*"
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+tags: {{.tags}}
+json.keys_under_root: false
+processors:
+  - drop_fields:
+      fields: ["json.stream","json.time"]
+  - add_kubernetes_metadata:
+     in_cluster: true
+  - drop_event:
+     when:
+       not:
+        - equals:
+            json.kubernetes.labels.service: ambassador
+  - dissect:
+      tokenizer: "%{log_type} [%{timestamp}] \"%{method} %{path} %{proto}\" %{response_code} %{response_flags} %{bytes_received} %{bytes_sent} %{duration} %{upstream_service_time} \"%{forwarded_for}\" \"%{user_agent}\" \"%{request_id}\" \"%{authority}\" \"%{upstream_host}:%{upstream_port}\""
+      field: "message"
+      target_prefix: "envoy"
+  # - drop_event:
+  #    when:
+  #      not:
+  #       - equals:
+  #           log_type: "ACCESS"
+  - rename:
+      fields:
+        - from: "json.kubernetes"
+          to: "kubernetes"
+        - from: "json.log"
+          to: "envoy.message"
+  

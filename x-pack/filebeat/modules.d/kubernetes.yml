@@ -1,7 +1,0 @@
-# Module: kubernetes
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-kubernetes.html
-
-- module: kubernetes
-  # All logs
-  coredns:
-    enabled: true

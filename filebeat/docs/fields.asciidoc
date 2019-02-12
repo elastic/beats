@@ -27,6 +27,7 @@ grouped in the following categories:
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
+* <<exported-fields-kubernetes>>
 * <<exported-fields-log>>
 * <<exported-fields-logstash>>
 * <<exported-fields-mongodb>>
@@ -6518,6 +6519,125 @@ type: keyword
 
 Kubernetes container image
 
+
+--
+
+[[exported-fields-kubernetes]]
+== Kubernetes fields
+
+Module for handling logs produced by Kubenetes pods
+
+
+
+[float]
+== coredns fields
+
+Fields from coredns logs after normalization
+
+
+
+*`coredns.duration`*::
++
+--
+type: double
+
+--
+
+*`coredns.client`*::
++
+--
+type: ip
+
+--
+
+*`coredns.size`*::
++
+--
+type: integer
+
+--
+
+*`coredns.dnssec_ok`*::
++
+--
+type: boolean
+
+--
+
+*`coredns.proto`*::
++
+--
+type: keyword
+
+--
+
+*`coredns.qclass`*::
++
+--
+type: keyword
+
+--
+
+*`coredns.rsize`*::
++
+--
+type: integer
+
+--
+
+*`coredns.log_level`*::
++
+--
+type: keyword
+
+--
+
+*`coredns.id`*::
++
+--
+type: keyword
+
+--
+
+*`coredns.rcode`*::
++
+--
+type: keyword
+
+--
+
+*`coredns.port`*::
++
+--
+type: integer
+
+--
+
+*`coredns.bufsize`*::
++
+--
+type: integer
+
+--
+
+*`coredns.qtype`*::
++
+--
+type: keyword
+
+--
+
+*`coredns.rflags`*::
++
+--
+type: keyword
+
+--
+
+*`coredns.name`*::
++
+--
+type: keyword
 
 --
 

@@ -5,10 +5,10 @@ var:
     default:
       - /var/lib/docker/containers/*
   - name: tags
-    default: [coredns]
+    default: [envoy]
 
 ingest_pipeline: ingest/pipeline.json
-input: config/coredns.yml
+input: config/envoy.yml
 
 requires.processors:
 - name: geoip

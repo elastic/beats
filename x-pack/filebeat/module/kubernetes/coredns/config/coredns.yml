@@ -1,20 +1,34 @@
+# type: docker
+# containers.ids:
+#  - "*"
 type: log
-type: docker
-containers.ids:
-  - "*"
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
 tags: {{.tags}}
+json.keys_under_root: false
 processors:
-  - add_kubernetes_metadata:
-      in_cluster: true
-  - drop_event:
-     when:
-       not:
-         and:
-          - equals:
-              kubernetes.labels.k8s-app: kube-dns
-          - equals:
-              kubernetes.namespace: kube-system
+  - drop_fields:
+      fields: ["json.stream","json.time"]
+  # - add_kubernetes_metadata:
+  #    in_cluster: true
+  # - drop_event:
+  #    when:
+  #      not:
+  #        and:
+  #         - equals:
+  #             json.kubernetes.labels.k8s-app: kube-dns
+  #         - equals:
+  #             json.kubernetes.namespace: kube-system
   - dissect:
-      tokenizer: "%{timestamp} [%{log_level}] %{client}:%{port} - %{id} \"%{qtype} %{qclass} %{name} %{proto} %{size} %{dnssec_ok} %{bufsize}\" %{rcode} %{rflags} %{rsize} %{duration}"
-      field: "message"
+      tokenizer: "%{timestamp} [%{log_level}] %{client}:%{port} - %{id} \"%{qtype} %{qclass} %{qname} %{proto} %{size} %{dnssec_ok} %{bufsize}\" %{rcode} %{rflags} %{rsize} %{duration}s"
+      field: "json.log"
       target_prefix: "coredns"
+  - rename:
+      fields:
+        - from: "json.kubernetes"
+          to: "kubernetes"
+        - from: "json.log"
+          to: "coredns.message"
+  
