@@ -46,7 +46,8 @@
             "user_agent": {
                 "field": "traefik.access.agent",
                 "target_field": "traefik.access.user_agent",
-                "ignore_failure": true
+                "ignore_failure": true,
+                "ecs": false
             }
         },
         {

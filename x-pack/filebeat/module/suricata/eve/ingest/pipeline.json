@@ -207,6 +207,7 @@
       { "field": "user_agent.original"
       , "target_field": "user_agent"
       , "ignore_missing": true
+      , "ecs": false
       }
     }
   , { "rename":
