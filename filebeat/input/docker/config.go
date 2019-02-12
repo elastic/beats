@@ -27,6 +27,7 @@ var defaultConfig = config{
 }
 
 type config struct {
+	// List of containers' log files to tail
 	Containers containers `config:"containers"`
 
 	// Partial configures the input to join partial lines
@@ -40,8 +41,11 @@ type config struct {
 }
 
 type containers struct {
+	// IDs + Path to be removed in 8.0 in favor of Paths.
 	IDs  []string `config:"ids"`
 	Path string   `config:"path"`
+
+	Paths []string `config:"paths"`
 
 	// Stream can be all, stdout or stderr
 	Stream string `config:"stream"`

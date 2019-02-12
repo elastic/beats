@@ -56,6 +56,10 @@ func TestGenerateHints(t *testing.T) {
 						"name": "foobar",
 						"id":   "abc",
 					},
+					"pod": common.MapStr{
+						"name": "pod",
+					},
+					"namespace": "ns",
 				},
 				"container": common.MapStr{
 					"name": "foobar",
@@ -66,7 +70,7 @@ func TestGenerateHints(t *testing.T) {
 			result: common.MapStr{
 				"type": "docker",
 				"containers": map[string]interface{}{
-					"ids": []interface{}{"abc"},
+					"paths": []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
 				},
 				"close_timeout": "true",
 			},
@@ -80,6 +84,10 @@ func TestGenerateHints(t *testing.T) {
 						"name": "foobar",
 						"id":   "abc",
 					},
+					"pod": common.MapStr{
+						"name": "pod",
+					},
+					"namespace": "ns",
 				},
 				"container": common.MapStr{
 					"name": "foobar",
@@ -96,7 +104,7 @@ func TestGenerateHints(t *testing.T) {
 			result: common.MapStr{
 				"type": "docker",
 				"containers": map[string]interface{}{
-					"ids": []interface{}{"abc"},
+					"paths": []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
 				},
 				"include_lines": []interface{}{"^test", "^test1"},
 				"exclude_lines": []interface{}{"^test2", "^test3"},
@@ -112,6 +120,10 @@ func TestGenerateHints(t *testing.T) {
 						"name": "foobar",
 						"id":   "abc",
 					},
+					"pod": common.MapStr{
+						"name": "pod",
+					},
+					"namespace": "ns",
 				},
 				"container": common.MapStr{
 					"name": "foobar",
@@ -130,7 +142,7 @@ func TestGenerateHints(t *testing.T) {
 			result: common.MapStr{
 				"type": "docker",
 				"containers": map[string]interface{}{
-					"ids": []interface{}{"abc"},
+					"paths": []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
 				},
 				"multiline": map[string]interface{}{
 					"pattern": "^test",
@@ -148,6 +160,10 @@ func TestGenerateHints(t *testing.T) {
 						"name": "foobar",
 						"id":   "abc",
 					},
+					"pod": common.MapStr{
+						"name": "pod",
+					},
+					"namespace": "ns",
 				},
 				"container": common.MapStr{
 					"name": "foobar",
@@ -180,6 +196,10 @@ func TestGenerateHints(t *testing.T) {
 						"name": "foobar",
 						"id":   "abc",
 					},
+					"pod": common.MapStr{
+						"name": "pod",
+					},
+					"namespace": "ns",
 				},
 				"container": common.MapStr{
 					"name": "foobar",
@@ -202,7 +222,7 @@ func TestGenerateHints(t *testing.T) {
 			result: common.MapStr{
 				"type": "docker",
 				"containers": map[string]interface{}{
-					"ids": []interface{}{"abc"},
+					"paths": []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
 				},
 				"close_timeout": "true",
 				"processors": []interface{}{
@@ -226,6 +246,10 @@ func TestGenerateHints(t *testing.T) {
 						"name": "foobar",
 						"id":   "abc",
 					},
+					"pod": common.MapStr{
+						"name": "pod",
+					},
+					"namespace": "ns",
 				},
 				"container": common.MapStr{
 					"name": "foobar",
@@ -246,7 +270,7 @@ func TestGenerateHints(t *testing.T) {
 						"type": "docker",
 						"containers": map[string]interface{}{
 							"stream": "all",
-							"ids":    []interface{}{"abc"},
+							"paths":  []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
 						},
 						"close_timeout": "true",
 					},
@@ -257,7 +281,7 @@ func TestGenerateHints(t *testing.T) {
 						"type": "docker",
 						"containers": map[string]interface{}{
 							"stream": "all",
-							"ids":    []interface{}{"abc"},
+							"paths":  []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
 						},
 						"close_timeout": "true",
 					},
@@ -273,6 +297,10 @@ func TestGenerateHints(t *testing.T) {
 						"name": "foobar",
 						"id":   "abc",
 					},
+					"pod": common.MapStr{
+						"name": "pod",
+					},
+					"namespace": "ns",
 				},
 				"container": common.MapStr{
 					"name": "foobar",
@@ -294,7 +322,7 @@ func TestGenerateHints(t *testing.T) {
 						"type": "docker",
 						"containers": map[string]interface{}{
 							"stream": "all",
-							"ids":    []interface{}{"abc"},
+							"paths":  []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
 						},
 						"close_timeout": "true",
 					},
@@ -305,7 +333,7 @@ func TestGenerateHints(t *testing.T) {
 						"type": "docker",
 						"containers": map[string]interface{}{
 							"stream": "all",
-							"ids":    []interface{}{"abc"},
+							"paths":  []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
 						},
 						"close_timeout": "true",
 					},
@@ -321,6 +349,10 @@ func TestGenerateHints(t *testing.T) {
 						"name": "foobar",
 						"id":   "abc",
 					},
+					"pod": common.MapStr{
+						"name": "pod",
+					},
+					"namespace": "ns",
 				},
 				"container": common.MapStr{
 					"name": "foobar",
@@ -343,7 +375,7 @@ func TestGenerateHints(t *testing.T) {
 						"type": "docker",
 						"containers": map[string]interface{}{
 							"stream": "stdout",
-							"ids":    []interface{}{"abc"},
+							"paths":  []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
 						},
 						"close_timeout": "true",
 					},
@@ -354,7 +386,7 @@ func TestGenerateHints(t *testing.T) {
 						"type": "docker",
 						"containers": map[string]interface{}{
 							"stream": "stderr",
-							"ids":    []interface{}{"abc"},
+							"paths":  []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
 						},
 						"close_timeout": "true",
 					},
@@ -368,8 +400,8 @@ func TestGenerateHints(t *testing.T) {
 			"config": map[string]interface{}{
 				"type": "docker",
 				"containers": map[string]interface{}{
-					"ids": []string{
-						"${data.container.id}",
+					"paths": []string{
+						"/var/log/containers/${data.kubernetes.pod.name}_${data.kubernetes.namespace}_${data.container.name}-${data.container.id}.log",
 					},
 				},
 				"close_timeout": "true",

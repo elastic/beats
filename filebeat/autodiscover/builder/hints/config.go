@@ -28,8 +28,8 @@ func defaultConfig() config {
 	rawCfg := map[string]interface{}{
 		"type": "docker",
 		"containers": map[string]interface{}{
-			"ids": []string{
-				"${data.container.id}",
+			"paths": []string{
+				"/var/log/containers/${data.kubernetes.pod.name}_${data.kubernetes.namespace}_${data.container.name}-${data.container.id}.log",
 			},
 		},
 	}
