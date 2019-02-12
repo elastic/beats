@@ -7406,34 +7406,6 @@ Fields from NATS logs.
 Nats log files
 
 
-
-*`nats.log.pid`*::
-+
---
-type: alias
-
-alias to: process.pid
-
---
-
-*`nats.log.level`*::
-+
---
-type: alias
-
-alias to: log.level
-
---
-
-*`nats.log.message`*::
-+
---
-type: alias
-
-alias to: message
-
---
-
 [[exported-fields-netflow]]
 == NetFlow fields
 

@@ -1,3 +1,0 @@
-dashboards:
-- id: Filebeat-nats-log-Dashboard
-  file: Filebeat-nats-log.json
