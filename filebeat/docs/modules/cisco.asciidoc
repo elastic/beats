@@ -1,0 +1,73 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-cisco]]
+[role="xpack"]
+
+:modulename: cisco
+:has-dashboards: true
+
+== Cisco module
+
+This is a module for Cisco network device's logs. Currently supports the `asa`
+fileset for Cisco-ASA firewalls logs.
+
+When you run the module, it performs a few tasks under the hood:
+
+* Sets the default input to `syslog` and binds to `localhost` port `9001`
+  (but don’t worry, you can override the defaults).
+
+* Uses ingest node to parse and process the log lines, shaping the data into
+  a structure suitable for visualizing in Kibana.
+
+* Deploys dashboards for visualizing the log data.
+
+[float]
+=== Compatibility
+
+This module requires the {elasticsearch-plugins}/ingest-geoip.html[ingest-geoip]
+Elasticsearch plugin.
+TODO: What about user-agent plugin? If needed, update other modules too.
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with sample dashboards ---TODO--- :
+
+The module is by default configured to run via syslog on port 9011. However
+it can also be configured to read from a file path. See the following example.
+
+["source","yaml",subs="attributes"]
+-----
+- module: cisco
+  asa:
+    enabled: true
+    var.paths: ["/var/log/cisco-asa.log"]
+    var.input: "file"
+-----
+
+:fileset_ex: asa
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `asa` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-cisco,exported fields>> section.
+

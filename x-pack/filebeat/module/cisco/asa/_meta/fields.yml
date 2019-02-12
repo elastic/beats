@@ -1,0 +1,76 @@
+- name: asa
+  type: group
+  description: >
+    Fields for Cisco ASA Firewall.
+  fields:
+  - name: message_id
+    type: keyword
+    description: >
+      The Cisco ASA message identifier.
+      TODO: Maybe a long?
+
+  - name: suffix
+    type: keyword
+    description: >
+      Suffix after %ASA identifier. Usually `session`.
+
+  - name: source_interface
+    type: keyword
+    description: TODO migrate to ECS?
+
+  - name: destination_interface
+    type: keyword
+    description: TODO migrate to ECS?
+
+  - name: list_id
+    type: keyword
+    description: TODO
+
+  - name: source_username
+    type: keyword
+    description: TODO
+
+  - name: destination_username
+    type: keyword
+    description: TODO
+
+  - name: mapped_source_ip
+    type: ip
+    description: TODO
+
+  - name: mapped_source_port
+    type: long
+    description: TODO
+
+  - name: mapped_destination_ip
+    type: ip
+    description: TODO
+
+  - name: mapped_destination_port
+    type: long
+    description: TODO
+
+  - name: threat_level
+    type: keyword
+    description: TODO
+
+  - name: threat_category
+    type: keyword
+    description: TODO
+
+  - name: connection_id
+    type: keyword
+    description: TODO
+
+  - name: threat_domain
+    description: TODO
+
+  - name: icmp_type
+    type: short
+    description: >
+      ICMP type.
+
+  - name: icmp_code
+    type: short
+    description: >
+      ICMP code.

@@ -15,6 +15,7 @@ grouped in the following categories:
 * <<exported-fields-apache>>
 * <<exported-fields-auditd>>
 * <<exported-fields-beat>>
+* <<exported-fields-cisco>>
 * <<exported-fields-cloud>>
 * <<exported-fields-coredns>>
 * <<exported-fields-docker-processor>>
@@ -1045,6 +1046,47 @@ alias to: host.name
 type: alias
 
 alias to: agent.hostname
+
+--
+
+[[exported-fields-cisco]]
+== Cisco fields fields
+
+Module for handling Cisco network device logs.
+
+
+
+[float]
+== cisco fields
+
+Fields from Cisco logs.
+
+
+
+[float]
+== asa fields
+
+Fields for Cisco ASA Firewall.
+
+
+
+*`cisco.asa.message_id`*::
++
+--
+type: long
+
+The Cisco ASA message identifier.
+
+
+--
+
+*`cisco.asa.suffix`*::
++
+--
+type: keyword
+
+Suffix after %ASA identifier. Usually `session`.
+
 
 --
 
