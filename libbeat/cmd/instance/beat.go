@@ -690,6 +690,8 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 			withMigration = sub.Enabled()
 		}
 
+		// Initialize kibana config. If username and password is set in elasticsearch output config but not in kibana,
+		// initKibanaConfig will attach the ussername and password into kibana config as a part of the initialization.
 		kibanaConfig, err := initKibanaConfig(b.Config)
 		if err != nil {
 			return fmt.Errorf("error initKibanaConfig: %v", err)
