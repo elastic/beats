@@ -111,6 +111,11 @@ func NewInput(
 		return nil, errors.Wrap(err, "update input config")
 	}
 
+	// Set symlinks to true as CRI-O paths could point to symlinks instead of the actual path.
+	if err := cfg.SetBool("symlinks", -1, true); err != nil {
+		return nil, errors.Wrap(err, "update input config")
+	}
+
 	// Add stream to meta to ensure different state per stream
 	if config.Containers.Stream != "all" {
 		if context.Meta == nil {

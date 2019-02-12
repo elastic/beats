@@ -58,8 +58,8 @@ func TestGenerateHints(t *testing.T) {
 					},
 					"pod": common.MapStr{
 						"name": "pod",
+						"uid":  "12345",
 					},
-					"namespace": "ns",
 				},
 				"container": common.MapStr{
 					"name": "foobar",
@@ -70,7 +70,7 @@ func TestGenerateHints(t *testing.T) {
 			result: common.MapStr{
 				"type": "docker",
 				"containers": map[string]interface{}{
-					"paths": []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
+					"paths": []interface{}{"/var/log/pods/12345/foobar/*.log"},
 				},
 				"close_timeout": "true",
 			},
@@ -86,8 +86,8 @@ func TestGenerateHints(t *testing.T) {
 					},
 					"pod": common.MapStr{
 						"name": "pod",
+						"uid":  "12345",
 					},
-					"namespace": "ns",
 				},
 				"container": common.MapStr{
 					"name": "foobar",
@@ -104,7 +104,7 @@ func TestGenerateHints(t *testing.T) {
 			result: common.MapStr{
 				"type": "docker",
 				"containers": map[string]interface{}{
-					"paths": []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
+					"paths": []interface{}{"/var/log/pods/12345/foobar/*.log"},
 				},
 				"include_lines": []interface{}{"^test", "^test1"},
 				"exclude_lines": []interface{}{"^test2", "^test3"},
@@ -118,12 +118,12 @@ func TestGenerateHints(t *testing.T) {
 				"kubernetes": common.MapStr{
 					"container": common.MapStr{
 						"name": "foobar",
-						"id":   "abc",
+						"uid":  "12345",
 					},
 					"pod": common.MapStr{
 						"name": "pod",
+						"uid":  "12345",
 					},
-					"namespace": "ns",
 				},
 				"container": common.MapStr{
 					"name": "foobar",
@@ -142,7 +142,7 @@ func TestGenerateHints(t *testing.T) {
 			result: common.MapStr{
 				"type": "docker",
 				"containers": map[string]interface{}{
-					"paths": []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
+					"paths": []interface{}{"/var/log/pods/12345/foobar/*.log"},
 				},
 				"multiline": map[string]interface{}{
 					"pattern": "^test",
@@ -158,12 +158,10 @@ func TestGenerateHints(t *testing.T) {
 				"kubernetes": common.MapStr{
 					"container": common.MapStr{
 						"name": "foobar",
-						"id":   "abc",
 					},
 					"pod": common.MapStr{
 						"name": "pod",
 					},
-					"namespace": "ns",
 				},
 				"container": common.MapStr{
 					"name": "foobar",
@@ -198,8 +196,8 @@ func TestGenerateHints(t *testing.T) {
 					},
 					"pod": common.MapStr{
 						"name": "pod",
+						"uid":  "12345",
 					},
-					"namespace": "ns",
 				},
 				"container": common.MapStr{
 					"name": "foobar",
@@ -222,7 +220,7 @@ func TestGenerateHints(t *testing.T) {
 			result: common.MapStr{
 				"type": "docker",
 				"containers": map[string]interface{}{
-					"paths": []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
+					"paths": []interface{}{"/var/log/pods/12345/foobar/*.log"},
 				},
 				"close_timeout": "true",
 				"processors": []interface{}{
@@ -248,8 +246,8 @@ func TestGenerateHints(t *testing.T) {
 					},
 					"pod": common.MapStr{
 						"name": "pod",
+						"uid":  "12345",
 					},
-					"namespace": "ns",
 				},
 				"container": common.MapStr{
 					"name": "foobar",
@@ -270,7 +268,7 @@ func TestGenerateHints(t *testing.T) {
 						"type": "docker",
 						"containers": map[string]interface{}{
 							"stream": "all",
-							"paths":  []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
+							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
 						},
 						"close_timeout": "true",
 					},
@@ -281,7 +279,7 @@ func TestGenerateHints(t *testing.T) {
 						"type": "docker",
 						"containers": map[string]interface{}{
 							"stream": "all",
-							"paths":  []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
+							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
 						},
 						"close_timeout": "true",
 					},
@@ -299,8 +297,8 @@ func TestGenerateHints(t *testing.T) {
 					},
 					"pod": common.MapStr{
 						"name": "pod",
+						"uid":  "12345",
 					},
-					"namespace": "ns",
 				},
 				"container": common.MapStr{
 					"name": "foobar",
@@ -322,7 +320,7 @@ func TestGenerateHints(t *testing.T) {
 						"type": "docker",
 						"containers": map[string]interface{}{
 							"stream": "all",
-							"paths":  []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
+							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
 						},
 						"close_timeout": "true",
 					},
@@ -333,7 +331,7 @@ func TestGenerateHints(t *testing.T) {
 						"type": "docker",
 						"containers": map[string]interface{}{
 							"stream": "all",
-							"paths":  []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
+							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
 						},
 						"close_timeout": "true",
 					},
@@ -351,8 +349,8 @@ func TestGenerateHints(t *testing.T) {
 					},
 					"pod": common.MapStr{
 						"name": "pod",
+						"uid":  "12345",
 					},
-					"namespace": "ns",
 				},
 				"container": common.MapStr{
 					"name": "foobar",
@@ -375,7 +373,7 @@ func TestGenerateHints(t *testing.T) {
 						"type": "docker",
 						"containers": map[string]interface{}{
 							"stream": "stdout",
-							"paths":  []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
+							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
 						},
 						"close_timeout": "true",
 					},
@@ -386,7 +384,7 @@ func TestGenerateHints(t *testing.T) {
 						"type": "docker",
 						"containers": map[string]interface{}{
 							"stream": "stderr",
-							"paths":  []interface{}{"/var/log/containers/pod_ns_foobar-abc.log"},
+							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
 						},
 						"close_timeout": "true",
 					},
@@ -401,7 +399,7 @@ func TestGenerateHints(t *testing.T) {
 				"type": "docker",
 				"containers": map[string]interface{}{
 					"paths": []string{
-						"/var/log/containers/${data.kubernetes.pod.name}_${data.kubernetes.namespace}_${data.container.name}-${data.container.id}.log",
+						"/var/log/pods/${data.kubernetes.pod.uid}/${data.container.name}/*.log",
 					},
 				},
 				"close_timeout": "true",

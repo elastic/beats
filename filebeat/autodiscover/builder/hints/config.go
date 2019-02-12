@@ -29,7 +29,7 @@ func defaultConfig() config {
 		"type": "docker",
 		"containers": map[string]interface{}{
 			"paths": []string{
-				"/var/log/containers/${data.kubernetes.pod.name}_${data.kubernetes.namespace}_${data.container.name}-${data.container.id}.log",
+				"/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
 			},
 		},
 	}
