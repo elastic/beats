@@ -84,7 +84,7 @@ func (i *IndexPatternGenerator) generatePattern(attrs common.MapStr) common.MapS
 			common.MapStr{
 				"type":       "index-pattern",
 				"id":         i.indexName,
-				"version":    1,
+				"version":    "1",
 				"attributes": attrs,
 			},
 		},
