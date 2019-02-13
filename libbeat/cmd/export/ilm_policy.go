@@ -29,12 +29,12 @@ import (
 )
 
 // GenGetILMPolicyCmd is the command used to export the ilm policy.
-func GenGetILMPolicyCmd(settings instance.Settings, name, idxPrefix, version string) *cobra.Command {
+func GenGetILMPolicyCmd(settings instance.Settings) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "ilm-policy",
 		Short: "Export ILM policy",
 		Run: func(cmd *cobra.Command, args []string) {
-			b, err := instance.NewBeat(name, idxPrefix, version)
+			b, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)
