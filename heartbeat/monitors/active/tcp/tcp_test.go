@@ -202,3 +202,22 @@ func TestUnreachableEndpointJob(t *testing.T) {
 		event.Fields,
 	)
 }
+
+// TestNXDomain tests that non-existent domains are correctly pinged.
+// Note, this depends on the system having a DNS resolver that doesn't hijack NXDOMAIN Results.
+func TestNXDomain(t *testing.T) {
+	host := "notadomainatallforsure.notadomain.notatldreally"
+	port := uint16(1234)
+	event := testTCPCheck(t, host, port)
+
+	dialErr := fmt.Sprintf("lookup %s", host)
+	mapvaltest.Test(
+		t,
+		mapval.Strict(mapval.Compose(
+			tcpMonitorChecks(host, host, port, "down"),
+			hbtest.ErrorChecks(dialErr, "io"),
+			hbtest.TCPBaseChecks(port),
+		)),
+		event.Fields,
+	)
+}
