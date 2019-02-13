@@ -98,7 +98,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		}
 
 		// Use metricDataQueries to make GetMetricData API calls
-		metricDataResults, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime, regionName)
+		metricDataResults, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
 		if err != nil {
 			err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName)
 			m.logger.Error(err.Error())

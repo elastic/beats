@@ -44,14 +44,14 @@ func getMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, next
 }
 
 // GetMetricDataResults function uses MetricDataQueries to get metric data output.
-func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cloudwatchiface.CloudWatchAPI, startTime time.Time, endTime time.Time, regionName string) ([]cloudwatch.MetricDataResult, error) {
+func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cloudwatchiface.CloudWatchAPI, startTime time.Time, endTime time.Time) ([]cloudwatch.MetricDataResult, error) {
 	init := true
 	getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
 	for init || getMetricDataOutput.NextToken != nil {
 		init = false
 		output, err := getMetricDataPerRegion(metricDataQueries, getMetricDataOutput.NextToken, svc, startTime, endTime)
 		if err != nil {
-			err = errors.Wrap(err, "getMetricDataPerRegion failed, skipping region "+regionName)
+			err = errors.Wrap(err, "getMetricDataPerRegion failed")
 			return getMetricDataOutput.MetricDataResults, err
 		}
 		getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
