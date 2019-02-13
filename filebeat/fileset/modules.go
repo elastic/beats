@@ -427,6 +427,11 @@ func (reg *ModuleRegistry) SetupML(esClient PipelineLoader, kibanaClient *kibana
 	}
 
 	for module, fileset := range modules {
+		// XXX workaround to setup modules after changing the module IDs due to ECS migration
+		// the proper solution would be to query available modules, and setup the required ones
+		// related issue: https://github.com/elastic/kibana/issues/30934
+		module = module + "_ecs"
+
 		prefix := fmt.Sprintf("filebeat-%s-%s-", module, fileset)
 		err := mlimporter.SetupModule(kibanaClient, module, prefix)
 		if err != nil {
