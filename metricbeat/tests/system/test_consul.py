@@ -35,7 +35,7 @@ class ConsulAgentTest(metricbeat.BaseTest):
             "period": "10s"
         }])
         proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=30)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
