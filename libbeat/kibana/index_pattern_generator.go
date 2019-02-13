@@ -97,7 +97,7 @@ func (i *IndexPatternGenerator) generateMinVersion6(attrs common.MapStr) common.
 			common.MapStr{
 				"type":       "index-pattern",
 				"id":         i.indexName,
-				"version":    1,
+				"version":    "1",
 				"attributes": attrs,
 			},
 		},
