@@ -163,9 +163,11 @@ func (p *addHostMetadata) loadData() error {
 		}
 	}
 
+	var hostname = h.Info().Hostname
 	if p.config.Name != "" {
-		data.Put("host.name", p.config.Name)
+		hostname = p.config.Name
 	}
+	data.Put("host.name", hostname)
 	p.data.Set(data)
 	return nil
 }
