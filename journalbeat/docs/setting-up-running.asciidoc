@@ -18,7 +18,7 @@ This section includes additional information on how to set up and run
 * <<keystore>>
 * <<command-line-options>>
 * <<shutdown>>
-
+* <<running-on-docker>>
 
 //MAINTAINERS: If you add a new file to this section, make sure you update the bulleted list ^^ too.
 
@@ -27,5 +27,7 @@ include::{libbeat-dir}/docs/shared-directory-layout.asciidoc[]
 include::{libbeat-dir}/docs/keystore.asciidoc[]
 
 include::{libbeat-dir}/docs/command-reference.asciidoc[]
+
+include::./running-on-docker.asciidoc[]
 
 include::{libbeat-dir}/docs/shared-shutdown.asciidoc[]

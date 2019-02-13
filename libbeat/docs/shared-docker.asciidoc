@@ -45,7 +45,7 @@ endif::[]
 Running {beatname_uc} with the setup command will create the index pattern and
 load visualizations, dashboards, and machine learning jobs.  Run this command:
 
-ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat") or ("{beatname_lc}"=="heartbeat")]
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="metricbeat") or ("{beatname_lc}"=="heartbeat") or ("{beatname_lc}"=="journalbeat")]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
 docker run \
@@ -110,16 +110,16 @@ curl -L -O https://raw.githubusercontent.com/elastic/beats/{doc-branch}/deploy/d
 One way to configure {beatname_uc} on Docker is to provide +{beatname_lc}.docker.yml+ via a volume mount.
 With +docker run+, the volume mount can be specified like this:
 
-ifeval::["{beatname_lc}"=="filebeat"]
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="journalbeat")]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
 docker run -d \
-  --name=filebeat \
+  --name={beatname_lc} \
   --user=root \
-  --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/filebeat/filebeat.yml:ro" \
+  --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
   --volume="/var/lib/docker/containers:/var/lib/docker/containers:ro" \
   --volume="/var/run/docker.sock:/var/run/docker.sock:ro" \
-  {dockerimage} filebeat -e -strict.perms=false \
+  {dockerimage} {beatname_lc} -e -strict.perms=false \
   -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
 --------------------------------------------
 endif::[]
