@@ -201,18 +201,12 @@ func (r *Reader) Next() (*beat.Event, error) {
 
 		// no new entry, so wait
 		if c == 0 {
-			c := r.journal.Wait(100 * time.Millisecond)
-			switch c {
-			case sdjournal.SD_JOURNAL_NOP:
+			hasNewEntry, err := r.checkForNewEvents()
+			if err != nil {
+				return nil, err
+			}
+			if !hasNewEntry {
 				continue
-			// new entries are added or the journal has changed (e.g. vacuum, rotate)
-			case sdjournal.SD_JOURNAL_APPEND, sdjournal.SD_JOURNAL_INVALIDATE:
-			default:
-				if c < 0 {
-					return nil, fmt.Errorf("error while waiting for event: %+v", syscall.Errno(-c))
-				}
-
-				r.logger.Errorf("Unknown return code from Wait: %d\n", c)
 			}
 		}
 
@@ -224,6 +218,25 @@ func (r *Reader) Next() (*beat.Event, error) {
 
 		return event, nil
 	}
+}
+
+func (r *Reader) checkForNewEvents() (bool, error) {
+	c := r.journal.Wait(100 * time.Millisecond)
+	switch c {
+	case sdjournal.SD_JOURNAL_NOP:
+		return false, nil
+	// new entries are added or the journal has changed (e.g. vacuum, rotate)
+	case sdjournal.SD_JOURNAL_APPEND, sdjournal.SD_JOURNAL_INVALIDATE:
+		return true, nil
+	default:
+	}
+
+	if c < 0 {
+		return false, fmt.Errorf("error while waiting for event: %+v", syscall.Errno(-c))
+	}
+
+	r.logger.Errorf("Unknown return code from Wait: %d\n", c)
+	return false, nil
 }
 
 // toEvent creates a beat.Event from journal entries.
