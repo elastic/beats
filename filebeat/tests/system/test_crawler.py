@@ -392,7 +392,7 @@ class Test(BaseTest):
 
             self.wait_until(
                 lambda: self.output_has(1),
-                max_timeout=15)
+                max_timeout=60, poll_interval=1)
 
         lines_written = 0
 
@@ -407,7 +407,7 @@ class Test(BaseTest):
 
                 self.wait_until(
                     lambda: self.output_has(lines_written + 1),
-                    max_timeout=15)
+                    max_timeout=60, poll_interval=1)
 
         filebeat.check_kill_and_wait()
 

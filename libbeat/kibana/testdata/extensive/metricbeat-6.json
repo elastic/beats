@@ -8,7 +8,7 @@
         "timeFieldName": "@timestamp", 
         "title": "metricbeat-*"
       }, 
-      "version": 1, 
+      "version": "1",
       "type": "index-pattern", 
       "id": "metricbeat-*"
     }
