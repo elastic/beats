@@ -122,7 +122,7 @@ class Test(BaseTest):
         self.wait_until(lambda: "filebeat-nginx-access-response_code" in
                                 (df["job_id"] for df in self.es.transport.perform_request(
                                     "GET", ml_anomaly_detectors_url)["jobs"]),
-                        max_timeout=60)
+                        max_timeout=90)
         self.wait_until(lambda: "datafeed-filebeat-nginx-access-response_code" in
                                 (df["datafeed_id"] for df in self.es.transport.perform_request("GET", ml_datafeeds_url)["datafeeds"]))
 
