@@ -103,6 +103,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		}
 
 		for _, instanceID := range instanceIDs {
+			if instanceID != "i-77f84332" {
+				continue
+			}
+
 			metricDataQueries := constructMetricQueries(listMetricsOutput, instanceID, m.PeriodInSec)
 			if len(metricDataQueries) == 0 {
 				continue
@@ -173,7 +177,7 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 		mapOfMetricSetFieldResults[labels[1]] = fmt.Sprint(output.Values[0])
 	}
 
-	resultMetricSetFields, err := eventMapping(mapOfMetricSetFieldResults, schemaMetricSetFields)
+	resultMetricSetFields, err := aws.EventMapping(mapOfMetricSetFieldResults, schemaMetricSetFields)
 	if err != nil {
 		err = errors.Wrap(err, "Error trying to apply schema schemaMetricSetFields in AWS EC2 metricbeat module.")
 		return

@@ -5,7 +5,6 @@
 package ec2
 
 import (
-	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
 )
@@ -48,7 +47,3 @@ var (
 		},
 	}
 )
-
-func eventMapping(input map[string]interface{}, schema s.Schema) (common.MapStr, error) {
-	return schema.Apply(input, s.FailOnRequired)
-}
