@@ -10,7 +10,7 @@
       },
       "id": "beat-*",
       "type": "index-pattern",
-      "version": 1
+      "version": "1"
     }
   ],
   "version": "7.0.0-alpha1"
