@@ -32,6 +32,7 @@ func TestGenerateHints(t *testing.T) {
 	tests := []struct {
 		msg    string
 		event  bus.Event
+		path   string
 		len    int
 		result common.MapStr
 	}{
@@ -44,6 +45,7 @@ func TestGenerateHints(t *testing.T) {
 					},
 				},
 			},
+			path:   "/var/lib/docker/containers/${data.kubernetes.container.id}/*-json.log",
 			len:    0,
 			result: common.MapStr{},
 		},
@@ -66,11 +68,12 @@ func TestGenerateHints(t *testing.T) {
 					"id":   "abc",
 				},
 			},
-			len: 1,
+			path: "/var/lib/docker/containers/${data.kubernetes.container.id}/*-json.log",
+			len:  1,
 			result: common.MapStr{
 				"type": "docker",
 				"containers": map[string]interface{}{
-					"paths": []interface{}{"/var/log/pods/12345/foobar/*.log"},
+					"paths": []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
 				},
 				"close_timeout": "true",
 			},
@@ -100,11 +103,12 @@ func TestGenerateHints(t *testing.T) {
 					},
 				},
 			},
-			len: 1,
+			len:  1,
+			path: "/var/lib/docker/containers/${data.kubernetes.container.id}/*-json.log",
 			result: common.MapStr{
 				"type": "docker",
 				"containers": map[string]interface{}{
-					"paths": []interface{}{"/var/log/pods/12345/foobar/*.log"},
+					"paths": []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
 				},
 				"include_lines": []interface{}{"^test", "^test1"},
 				"exclude_lines": []interface{}{"^test2", "^test3"},
@@ -138,7 +142,8 @@ func TestGenerateHints(t *testing.T) {
 					},
 				},
 			},
-			len: 1,
+			len:  1,
+			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
 			result: common.MapStr{
 				"type": "docker",
 				"containers": map[string]interface{}{
@@ -173,7 +178,8 @@ func TestGenerateHints(t *testing.T) {
 					},
 				},
 			},
-			len: 1,
+			len:  1,
+			path: "",
 			result: common.MapStr{
 				"type": "docker",
 				"containers": map[string]interface{}{
@@ -216,7 +222,8 @@ func TestGenerateHints(t *testing.T) {
 					},
 				},
 			},
-			len: 1,
+			len:  1,
+			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
 			result: common.MapStr{
 				"type": "docker",
 				"containers": map[string]interface{}{
@@ -259,7 +266,8 @@ func TestGenerateHints(t *testing.T) {
 					},
 				},
 			},
-			len: 1,
+			len:  1,
+			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
 			result: common.MapStr{
 				"module": "apache2",
 				"error": map[string]interface{}{
@@ -311,7 +319,8 @@ func TestGenerateHints(t *testing.T) {
 					},
 				},
 			},
-			len: 1,
+			len:  1,
+			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
 			result: common.MapStr{
 				"module": "apache2",
 				"access": map[string]interface{}{
@@ -364,7 +373,8 @@ func TestGenerateHints(t *testing.T) {
 					},
 				},
 			},
-			len: 1,
+			len:  1,
+			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
 			result: common.MapStr{
 				"module": "apache2",
 				"access": map[string]interface{}{
@@ -399,7 +409,7 @@ func TestGenerateHints(t *testing.T) {
 				"type": "docker",
 				"containers": map[string]interface{}{
 					"paths": []string{
-						"/var/log/pods/${data.kubernetes.pod.uid}/${data.container.name}/*.log",
+						test.path,
 					},
 				},
 				"close_timeout": "true",
