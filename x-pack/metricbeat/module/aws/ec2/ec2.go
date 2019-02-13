@@ -125,8 +125,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 
 			if err != nil {
 				m.logger.Error(err.Error())
-				event.Error = err
-				report.Event(event)
+				report.Error(err)
 				continue
 			}
 			report.Event(event)
