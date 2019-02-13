@@ -95,7 +95,7 @@ jobs:
       go: $TRAVIS_GO_VERSION
       stage: test
     - os: linux
-      env: TARGETS="-C metricbeat system-tests-environment coverage-report"
+      env: TARGETS="-C metricbeat update system-tests-environment coverage-report"
       go: $TRAVIS_GO_VERSION
       stage: test
 
