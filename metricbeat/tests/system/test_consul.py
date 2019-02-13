@@ -26,7 +26,7 @@ class ConsulAgentTest(metricbeat.BaseTest):
     @attr('integration')
     def test_output(self):
         """
-        Consul mntr module outputs an event.
+        Consul agent module outputs an event.
         """
         self.render_config_template(modules=[{
             "name": "consul",
