@@ -14,6 +14,7 @@ services:
       - ./module/aerospike/_meta/env
       - ./module/apache/_meta/env
       - ./module/ceph/_meta/env
+      - ./module/consul/_meta/env
       - ./module/couchbase/_meta/env
       - ./module/couchdb/_meta/env
       - ./module/dropwizard/_meta/env
@@ -57,6 +58,9 @@ services:
 
   ceph:
     build: ./module/ceph/_meta
+
+  consul:
+    build: ./module/consul/_meta
 
   couchbase:
     build: ./module/couchbase/_meta
