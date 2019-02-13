@@ -214,9 +214,19 @@ func TestNXDomain(t *testing.T) {
 	mapvaltest.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			tcpMonitorChecks(host, host, port, "down"),
 			hbtest.ErrorChecks(dialErr, "io"),
-			hbtest.TCPBaseChecks(port),
+			mapval.MustCompile(mapval.Map{
+				"monitor": mapval.Map{
+					"status":   "down",
+					"scheme":   "tcp",
+					"host":     host,
+					"id":       fmt.Sprintf("tcp-tcp@%s:%d", host, port),
+					"duration": mapval.Map{"us": mapval.IsDuration},
+				},
+				"resolve": mapval.Map{
+					"host": host,
+				},
+			}),
 		)),
 		event.Fields,
 	)
