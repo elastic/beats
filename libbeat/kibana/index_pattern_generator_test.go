@@ -157,7 +157,7 @@ func testGenerate(t *testing.T, tests []compare, sourceFilters bool) {
 			objExisting := existing["objects"].([]interface{})[0].(map[string]interface{})
 			objCreated := test.created["objects"].([]common.MapStr)[0]
 
-			assert.Equal(t, int(objExisting["version"].(float64)), objCreated["version"])
+			assert.Equal(t, objExisting["version"], objCreated["version"])
 			assert.Equal(t, objExisting["id"], objCreated["id"])
 			assert.Equal(t, objExisting["type"], objCreated["type"])
 
