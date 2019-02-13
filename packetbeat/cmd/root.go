@@ -20,6 +20,8 @@ package cmd
 import (
 	"flag"
 
+	"github.com/elastic/beats/libbeat/cmd/instance"
+
 	"github.com/spf13/pflag"
 
 	// import protocol modules
@@ -43,6 +45,6 @@ func init() {
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("l"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("dump"))
 
-	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.New, runFlags)
+	RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{RunFlags: runFlags, Name: Name})
 	RootCmd.AddCommand(genDevicesCommand())
 }

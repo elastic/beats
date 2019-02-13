@@ -13,7 +13,7 @@ import (
 )
 
 // RootCmd to test libbeat
-var RootCmd = cmd.GenRootCmd(mock.Name, mock.Version, mock.New)
+var RootCmd = cmd.GenRootCmdWithSettings(mock.New, mock.Settings)
 
 func main() {
 	xpackcmd.AddXPack(RootCmd, mock.Name)

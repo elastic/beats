@@ -20,6 +20,8 @@ package cmd
 import (
 	"flag"
 
+	"github.com/elastic/beats/libbeat/cmd/instance"
+
 	"github.com/spf13/pflag"
 
 	cmd "github.com/elastic/beats/libbeat/cmd"
@@ -40,8 +42,7 @@ var RootCmd *cmd.BeatsRootCmd
 func init() {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
-
-	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.DefaultCreator(), runFlags)
+	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(), instance.Settings{RunFlags: runFlags, Name: Name})
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", buildModulesManager))
 	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, ""))
 }
