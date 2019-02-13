@@ -8,10 +8,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/pkg/errors"
@@ -47,17 +45,6 @@ type MetricSet struct {
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ec2Logger := logp.NewLogger(aws.ModuleName)
-
-	moduleConfig := aws.Config{}
-	if err := base.Module().UnpackConfig(&moduleConfig); err != nil {
-		return nil, err
-	}
-
-	if moduleConfig.Period == "" {
-		err := errors.New("period is not set in AWS module config")
-		ec2Logger.Error(err)
-	}
-
 	metricSet, err := aws.NewMetricSet(base)
 	if err != nil {
 		return nil, errors.Wrap(err, "error creating aws metricset")
@@ -83,6 +70,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
+	// Get startTime and endTime
+	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
+	if err != nil {
+		m.logger.Error(errors.Wrap(err, "Error ParseDuration"))
+		report.Error(err)
+		return
+	}
+
 	for _, regionName := range m.MetricSet.RegionsList {
 		m.MetricSet.AwsConfig.Region = regionName
 		svcEC2 := ec2.New(*m.MetricSet.AwsConfig)
@@ -109,22 +104,21 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 
 		for _, instanceID := range instanceIDs {
 			metricDataQueries := constructMetricQueries(listMetricsOutput, instanceID, m.PeriodInSec)
-			getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
-			if len(metricDataQueries) != 0 {
-				init := true
-				for init || getMetricDataOutput.NextToken != nil {
-					init = false
-					output, err := getMetricDataPerRegion(metricDataQueries, m.DurationString, getMetricDataOutput.NextToken, svcCloudwatch)
-					if err != nil {
-						err = errors.Wrap(err, "getMetricDataPerRegion failed, skipping instance "+instanceID+" in region "+regionName)
-						m.logger.Info(err.Error())
-						continue
-					}
-					getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
-				}
+			if len(metricDataQueries) == 0 {
+				continue
 			}
+
+			// Use metricDataQueries to make GetMetricData API calls
+			metricDataOutput, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
+			if err != nil {
+				err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName+" for instance "+instanceID)
+				m.logger.Error(err.Error())
+				report.Error(err)
+				continue
+			}
+
 			// Create Cloudwatch Events for EC2
-			event, info, err := createCloudWatchEvents(getMetricDataOutput.MetricDataResults, instanceID, instancesOutputs[instanceID], regionName)
+			event, info, err := createCloudWatchEvents(metricDataOutput, instanceID, instancesOutputs[instanceID], regionName)
 			if info != "" {
 				m.logger.Info(info)
 			}
@@ -246,32 +240,6 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instances
 		}
 	}
 	return
-}
-
-func getMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, durationString string, nextToken *string, svc cloudwatchiface.CloudWatchAPI) (*cloudwatch.GetMetricDataOutput, error) {
-	endTime := time.Now()
-	duration, err := time.ParseDuration(durationString)
-	if err != nil {
-		logp.Error(errors.Wrap(err, "Error ParseDuration"))
-		return nil, err
-	}
-
-	startTime := endTime.Add(duration)
-
-	getMetricDataInput := &cloudwatch.GetMetricDataInput{
-		NextToken:         nextToken,
-		StartTime:         &startTime,
-		EndTime:           &endTime,
-		MetricDataQueries: metricDataQueries,
-	}
-
-	req := svc.GetMetricDataRequest(getMetricDataInput)
-	getMetricDataOutput, err := req.Send()
-	if err != nil {
-		logp.Error(errors.Wrap(err, "Error GetMetricDataInput"))
-		return nil, err
-	}
-	return getMetricDataOutput, nil
 }
 
 func createMetricDataQuery(metric cloudwatch.Metric, instanceID string, index int, periodInSec int) (metricDataQuery cloudwatch.MetricDataQuery) {

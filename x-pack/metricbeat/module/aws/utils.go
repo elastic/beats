@@ -5,10 +5,23 @@
 package aws
 
 import (
+	"time"
+
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/pkg/errors"
 )
+
+// GetStartTimeEndTime function uses durationString to create startTime and endTime for queries.
+func GetStartTimeEndTime(durationString string) (startTime time.Time, endTime time.Time, err error) {
+	endTime = time.Now()
+	duration, err := time.ParseDuration(durationString)
+	if err != nil {
+		return
+	}
+	startTime = endTime.Add(duration)
+	return startTime, endTime, nil
+}
 
 // GetListMetricsOutput function gets listMetrics results from cloudwatch per namespace for each region.
 // ListMetrics Cloudwatch API is used to list the specified metrics. The returned metrics can be used with GetMetricData
@@ -29,4 +42,37 @@ func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch clo
 		return nil, nil
 	}
 	return listMetricsOutput.Metrics, nil
+}
+
+func getMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, nextToken *string, svc cloudwatchiface.CloudWatchAPI, startTime time.Time, endTime time.Time) (*cloudwatch.GetMetricDataOutput, error) {
+	getMetricDataInput := &cloudwatch.GetMetricDataInput{
+		NextToken:         nextToken,
+		StartTime:         &startTime,
+		EndTime:           &endTime,
+		MetricDataQueries: metricDataQueries,
+	}
+
+	reqGetMetricData := svc.GetMetricDataRequest(getMetricDataInput)
+	getMetricDataOutput, err := reqGetMetricData.Send()
+	if err != nil {
+		err = errors.Wrap(err, "Error GetMetricDataInput")
+		return nil, err
+	}
+	return getMetricDataOutput, nil
+}
+
+// GetMetricDataResults function uses MetricDataQueries to get metric data output.
+func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cloudwatchiface.CloudWatchAPI, startTime time.Time, endTime time.Time) ([]cloudwatch.MetricDataResult, error) {
+	init := true
+	getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
+	for init || getMetricDataOutput.NextToken != nil {
+		init = false
+		output, err := getMetricDataPerRegion(metricDataQueries, getMetricDataOutput.NextToken, svc, startTime, endTime)
+		if err != nil {
+			err = errors.Wrap(err, "getMetricDataPerRegion failed")
+			return getMetricDataOutput.MetricDataResults, err
+		}
+		getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
+	}
+	return getMetricDataOutput.MetricDataResults, nil
 }
