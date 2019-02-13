@@ -20,14 +20,13 @@ package cmd
 import (
 	"flag"
 
-	"github.com/elastic/beats/libbeat/cmd/instance"
-
 	"github.com/spf13/pflag"
 
 	// import protocol modules
 	_ "github.com/elastic/beats/packetbeat/include"
 
 	cmd "github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/packetbeat/beater"
 )
 

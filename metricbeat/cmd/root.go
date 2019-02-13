@@ -20,11 +20,10 @@ package cmd
 import (
 	"flag"
 
-	"github.com/elastic/beats/libbeat/cmd/instance"
-
 	"github.com/spf13/pflag"
 
 	cmd "github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/metricbeat/beater"
 	"github.com/elastic/beats/metricbeat/cmd/test"
 
