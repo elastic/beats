@@ -6,31 +6,17 @@
     },
     "aws": {
         "sqs": {
-            "empty_receives": {
-                "count": 0
-            },
+            "empty_receives": 0,
             "messages": {
-                "delayed": {
-                    "count": 0
-                },
-                "deleted": {
-                    "count": 0
-                },
-                "not_visible": {
-                    "count": 0
-                },
-                "received": {
-                    "count": 0
-                },
-                "sent": {
-                    "count": 0
-                },
-                "visible": {
-                    "count": 60
-                }
+                "delayed": 0,
+                "deleted": 0,
+                "not_visible": 0,
+                "received": 0,
+                "sent": 0,
+                "visible": 57
             },
             "oldest_message_age": {
-                "sec": 82356
+                "sec": 84295
             },
             "sent_message_size": {}
         }

@@ -8,31 +8,31 @@
       type: long
       description: >
         The approximate age of the oldest non-deleted message in the queue.
-    - name: message.delayed.count
+    - name: message.delayed
       type: long
       description: >
         TThe number of messages in the queue that are delayed and not available for reading immediately.
-    - name: message.not_visible.count
+    - name: message.not_visible
       type: long
       description: >
         The number of messages that are in flight.
-    - name: message.visible.count
+    - name: message.visible
       type: long
       description: >
         The number of messages available for retrieval from the queue.
-    - name: message.deleted.count
+    - name: message.deleted
       type: long
       description: >
         The number of messages deleted from the queue.
-    - name: message.received.count
+    - name: message.received
       type: long
       description: >
         The number of messages returned by calls to the ReceiveMessage action.
-    - name: message.sent.count
+    - name: message.sent
       type: long
       description: >
         The number of messages added to a queue.
-    - name: empty_receives.count
+    - name: empty_receives
       type: long
       description: >
         The number of ReceiveMessage API calls that did not return a message.

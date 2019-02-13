@@ -15,28 +15,14 @@ var (
 			"sec": c.Float("ApproximateAgeOfOldestMessage"),
 		},
 		"messages": s.Object{
-			"delayed": s.Object{
-				"count": c.Int("ApproximateNumberOfMessagesDelayed"),
-			},
-			"not_visible": s.Object{
-				"count": c.Int("ApproximateNumberOfMessagesNotVisible"),
-			},
-			"visible": s.Object{
-				"count": c.Int("ApproximateNumberOfMessagesVisible"),
-			},
-			"deleted": s.Object{
-				"count": c.Int("NumberOfMessagesDeleted"),
-			},
-			"received": s.Object{
-				"count": c.Int("NumberOfMessagesReceived"),
-			},
-			"sent": s.Object{
-				"count": c.Int("NumberOfMessagesSent"),
-			},
+			"delayed":     c.Float("ApproximateNumberOfMessagesDelayed"),
+			"not_visible": c.Float("ApproximateNumberOfMessagesNotVisible"),
+			"visible":     c.Float("ApproximateNumberOfMessagesVisible"),
+			"deleted":     c.Float("NumberOfMessagesDeleted"),
+			"received":    c.Float("NumberOfMessagesReceived"),
+			"sent":        c.Float("NumberOfMessagesSent"),
 		},
-		"empty_receives": s.Object{
-			"count": c.Int("NumberOfEmptyReceives"),
-		},
+		"empty_receives": c.Float("NumberOfEmptyReceives"),
 		"sent_message_size": s.Object{
 			"bytes": c.Float("SentMessageSize"),
 		},
