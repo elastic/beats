@@ -1,0 +1,53 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-consul]]
+== consul module
+
+beta[]
+
+This is the https://www.consul.io[Hashicorp's Consul] Metricbeat module. It is still in beta and under active development to add new Metricsets and introduce enhancements.
+
+[float]
+== Compatibility
+
+The module is being tested with https://github.com/hashicorp/docker-consul/blob/9bd2aa7ecf2414b8712e055f2374699148e8941c/0.X/Dockerfile[1.4.2] version
+
+[float]
+== Metricsets
+
+The following Metricset is included:
+
+=== `agent`
+
+`agent` Metricset fetches information from a Consul Agent in 'Client' mode. It fetches information about the health of the autopilot, runtime metrics and raft data.
+
+
+[float]
+=== Example configuration
+
+The consul module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: consul
+  metricsets:
+  - agent
+  enabled: true
+  period: 10s
+  hosts: ["localhost:8500"]
+
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-consul-agent,agent>>
+
+include::consul/agent.asciidoc[]
+

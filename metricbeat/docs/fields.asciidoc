@@ -19,6 +19,7 @@ grouped in the following categories:
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
+* <<exported-fields-consul>>
 * <<exported-fields-couchbase>>
 * <<exported-fields-couchdb>>
 * <<exported-fields-docker-processor>>
@@ -2102,6 +2103,125 @@ required: True
 
 The document type. Always set to "doc".
 
+
+--
+
+[[exported-fields-consul]]
+== consul fields
+
+Consul module
+
+
+
+
+[float]
+== agent fields
+
+Agent Metricset fetches metrics information from a Consul instance running as Agent
+
+
+
+
+*`consul.agent.autopilot.healthy`*::
++
+--
+type: boolean
+
+Overall health of the local server cluster
+
+--
+
+[float]
+== runtime fields
+
+Runtime related metrics
+
+
+
+*`consul.agent.runtime.sys.bytes`*::
++
+--
+type: long
+
+Number of bytes of memory obtained from the OS.
+
+--
+
+*`consul.agent.runtime.malloc_count`*::
++
+--
+type: long
+
+Heap objects allocated
+
+--
+
+*`consul.agent.runtime.heap_objects`*::
++
+--
+type: long
+
+Objects allocated on the heap and is a general memory pressure indicator. This may burst from time to time but should return to a steady state value.
+
+--
+
+*`consul.agent.runtime.goroutines`*::
++
+--
+type: long
+
+Running goroutines and is a general load pressure indicator. This may burst from time to time but should return to a steady state value.
+
+--
+
+
+*`consul.agent.runtime.alloc.bytes`*::
++
+--
+type: long
+
+Bytes allocated by the Consul process.
+
+--
+
+[float]
+== garbage_collector fields
+
+Garbage collector metrics
+
+
+*`consul.agent.runtime.garbage_collector.runs`*::
++
+--
+type: long
+
+Garbage collector total executions
+
+--
+
+[float]
+== pause fields
+
+Time that the garbage collector has paused the app
+
+
+
+*`consul.agent.runtime.garbage_collector.pause.current.ns`*::
++
+--
+type: long
+
+Garbage collector pause time in nanoseconds
+
+--
+
+
+*`consul.agent.runtime.garbage_collector.pause.total.ns`*::
++
+--
+type: long
+
+Nanoseconds consumed by stop-the-world garbage collection pauses since Consul started.
 
 --
 
