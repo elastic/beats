@@ -29,7 +29,12 @@ do
   mkdir -p "$dest_dir"
   params="--chunk=1"
   if [ "$PREVIEW" = "1" ]; then
-    params="--chunk=1 -open chunk=1 -open"
+    params="--chunk=1 --open chunk=1 --open"
   fi
+
+  if [ -d "$resource_dir" ]; then
+    params="$params --resource=${resource_dir}"
+  fi
+
   $docs_dir/build_docs.pl $params --doc "$index" -out "$dest_dir"
 done
