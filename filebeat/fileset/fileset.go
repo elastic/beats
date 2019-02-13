@@ -472,7 +472,7 @@ func (fs *Fileset) GetMLConfigs() []mlimporter.MLConfig {
 	var mlConfigs []mlimporter.MLConfig
 	for _, ml := range fs.manifest.MachineLearning {
 		mlConfigs = append(mlConfigs, mlimporter.MLConfig{
-			ID:           fmt.Sprintf("filebeat-%s-%s-%s", fs.mcfg.Module, fs.name, ml.Name),
+			ID:           fmt.Sprintf("filebeat-%s-%s-%s_ecs", fs.mcfg.Module, fs.name, ml.Name),
 			JobPath:      filepath.Join(fs.modulePath, fs.name, ml.Job),
 			DatafeedPath: filepath.Join(fs.modulePath, fs.name, ml.Datafeed),
 			MinVersion:   ml.MinVersion,
