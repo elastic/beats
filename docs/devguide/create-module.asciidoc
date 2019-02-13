@@ -78,6 +78,66 @@ the metricsets. This file does not have `_test.go` in the name because otherwise
 To see an example of the `testing.go` file, look at the https://github.com/elastic/beats/tree/master/metricbeat/module/mysql[mysql module].
 
 [float]
+===== Test a Metricbeat module manually
+
+To test a Metricbeat module manually, follow the steps below.
+
+First we have to build the docker image which is available for the modules. As an example let's take MySQL module.
+
+This steps assume you have checked out the Beats repository from Github and are inside `beats` directory:
+
+```
+cd metricbeat/module/mysql/_meta/
+docker build .
+```
+
+This changes your directory to where the Dockerfile is for MySQL and builds the docker image. In the end you should see something like:
+
+```
+...
+Removing intermediate container 0e58cfb7b197
+ ---> 9492074840ea
+Step 5/5 : COPY test.cnf /etc/mysql/conf.d/test.cnf
+ ---> 002969e1d810
+Successfully built 002969e1d810
+```
+
+The last has after `Successfully built` is the important one. It's the one we run our container on. Before we run the container we also need to know which port to expose. The port is listed in the `env` file:
+
+```
+cat env
+```
+
+The output you will get is similar to:
+```
+MYSQL_DSN=root:test@tcp(mysql:3306)/
+MYSQL_HOST=mysql
+MYSQL_PORT=3306
+```
+
+As we see, the port is 3306. We now have all the information to start our MySQL service locally:
+
+```
+docker run -p 3306:3306 002969e1d810
+```
+
+This starts the container and you can now use it for testing the MySQL module.
+
+To run metricbeat with the module we need to build the binary and enable the module. The assumption is now that you are back in the `beats` path:
+
+```
+cd metricbeat
+mage build
+./metricbeat modules enable mysql
+./metricbeat -e
+```
+
+This will enable the module and start Metricbeat. It's now sending data to your local Elasticsearch instance. If you need to modify the mysql config, adjust `modules.d/mysql.yml` and restart Metricbeat. To update the Elasticsearch output, adjust `metricbeat.yml` file.
+
+
+
+
+[float]
 ===== Run Environment tests for one module
 
 All the environments are setup with docker. `make integration-tests-environment` and `make system-tests-environment` can be used to run tests for all modules. In case you are developing a module it is convenient to run the tests only for one module and directly run it on your machine.
