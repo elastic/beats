@@ -36,8 +36,8 @@ import (
 )
 
 var availableMLModules = map[string]string{
-	"apache2": "access",
-	"nginx":   "access",
+	"apache": "access",
+	"nginx":  "access",
 }
 
 type ModuleRegistry struct {
