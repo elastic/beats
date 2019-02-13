@@ -4,11 +4,15 @@
             "grok": {
                 "field": "message",
                 "patterns":[
+                    "\\[%{POSINT:process.pid}\\]( %{NATSTIME:nats.log.timestamp})? \\[%{NATSLOGLEVEL:log.level}\\] %{NATSGREEDYDATA}",
                     "\\[%{POSINT:process.pid}\\]( %{NATSTIME:nats.log.timestamp})? \\[%{NATSLOGLEVEL:log.level}\\] %{GREEDYDATA:message}"
                 ],
                 "pattern_definitions": {
                     "NATSTIME": "%{YEAR}/%{MONTHNUM}/%{MONTHDAY} %{TIME}",
-                    "NATSLOGLEVEL":"(INF|DBG|WRN|ERR|FTL|TRC)"
+                    "NATSLOGLEVEL":"(INF|DBG|WRN|ERR|FTL|TRC)",
+                    "NATSGREEDYDATA": "%{IPV4:ip}:%{POSINT:port} - cid:%{POSINT:client.id} - %{NATSDIRECTION:msg.direction} \\[%{NATSMESSAGETYPE:msg.type} %{DATA:msg.topic} %{GREEDYDATA} %{POSINT:msg.bytes}\\]",
+                    "NATSDIRECTION": "(<<-|->>)",
+                    "NATSMESSAGETYPE": "(MSG|PUB|SUB)"
                 },
                 "ignore_missing": true
             }
