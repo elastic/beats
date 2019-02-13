@@ -75,7 +75,7 @@ pipeline {
         /**
           Run unit tests and report junit results.
         */
-        stage('Filebeat') {
+        stage('Filebeat unit') {
           agent { label 'linux && immutable' }
           options { skipDefaultCheckout() }
           environment {
@@ -88,6 +88,60 @@ pipeline {
               unstash 'source'
               dir("${BASE_DIR}"){
                 sh './filebeat/scripts/jenkins/unit-test.sh'
+              }
+            }
+          }
+          post {
+            always {
+              junit(allowEmptyResults: true,
+                keepLongStdio: true,
+                testResults: "${BASE_DIR}/build/junit-*.xml")
+            }
+          }
+        }
+        /**
+          Run integration tests and report junit results.
+        */
+        stage('Filebeat integration') {
+          agent { label 'linux && immutable' }
+          options { skipDefaultCheckout() }
+          environment {
+            PATH = "${env.PATH}:${env.WORKSPACE}/bin"
+            HOME = "${env.WORKSPACE}"
+            GOPATH = "${env.WORKSPACE}"
+          }
+          steps {
+            withEnvWrapper() {
+              unstash 'source'
+              dir("${BASE_DIR}"){
+                sh './filebeat/scripts/jenkins/integration-test.sh'
+              }
+            }
+          }
+          post {
+            always {
+              junit(allowEmptyResults: true,
+                keepLongStdio: true,
+                testResults: "${BASE_DIR}/build/junit-*.xml")
+            }
+          }
+        }
+        /**
+          Run system tests and report junit results.
+        */
+        stage('Filebeat system') {
+          agent { label 'linux && immutable' }
+          options { skipDefaultCheckout() }
+          environment {
+            PATH = "${env.PATH}:${env.WORKSPACE}/bin"
+            HOME = "${env.WORKSPACE}"
+            GOPATH = "${env.WORKSPACE}"
+          }
+          steps {
+            withEnvWrapper() {
+              unstash 'source'
+              dir("${BASE_DIR}"){
+                sh './filebeat/scripts/jenkins/system-test.sh'
               }
             }
           }
