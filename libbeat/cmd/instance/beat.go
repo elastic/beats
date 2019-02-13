@@ -922,7 +922,7 @@ func initPaths(cfg *common.Config) error {
 	}
 
 	if err := paths.InitPaths(&partialConfig.Path); err != nil {
-		return fmt.Errorf("error setting default paths: %v", err)
+		return fmt.Errorf("error setting default paths: %+v", err)
 	}
 	return nil
 }
