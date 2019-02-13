@@ -19,8 +19,14 @@ package tlscommon
 
 import (
 	"crypto/tls"
+	"errors"
+	"fmt"
+	"io"
+	"os"
 
 	"github.com/joeshaw/multierror"
+
+	"github.com/elastic/beats/libbeat/logp"
 )
 
 // Config defines the user configurable options in the yaml file.
@@ -33,6 +39,12 @@ type Config struct {
 	Certificate      CertificateConfig       `config:",inline" yaml:",inline"`
 	CurveTypes       []tlsCurveType          `config:"curve_types" yaml:"curve_types,omitempty"`
 	Renegotiation    tlsRenegotiationSupport `config:"renegotiation" yaml:"renegotation"`
+	KeyLog           *keyLog                 `config:"key_log" yaml:"key_log"`
+}
+
+type keyLog struct {
+	Enabled bool   `config:"enabled" yaml:"enabled,omitempty"`
+	Path    string `config:"path" yaml:"path,omitempty"`
 }
 
 // LoadTLSConfig will load a certificate from config with all TLS based keys
@@ -79,6 +91,22 @@ func LoadTLSConfig(config *Config) (*TLSConfig, error) {
 		certs = []tls.Certificate{*cert}
 	}
 
+	var w io.Writer
+	if config.KeyLog != nil && config.KeyLog.Enabled {
+		logp.L().Warn("Using the key log writer is insecure and should only be used for debugging")
+
+		if len(config.KeyLog.Path) == 0 {
+			return nil, errors.New("missing path for the KeyLog writer")
+		}
+
+		logp.L().Warnf("Writing keys in NSS Key Log format to the file %s", config.KeyLog.Path)
+
+		w, err = os.OpenFile(config.KeyLog.Path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+		if err != nil {
+			return nil, fmt.Errorf("could not create the key Log writer, error: %+v", err)
+		}
+	}
+
 	// return config if no error occurred
 	return &TLSConfig{
 		Versions:         config.Versions,
@@ -88,6 +116,7 @@ func LoadTLSConfig(config *Config) (*TLSConfig, error) {
 		CipherSuites:     cipherSuites,
 		CurvePreferences: curves,
 		Renegotiation:    tls.RenegotiationSupport(config.Renegotiation),
+		KeyLogWriter:     w,
 	}, nil
 }
 

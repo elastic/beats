@@ -20,6 +20,7 @@ package tlscommon
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"io"
 
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -64,6 +65,10 @@ type TLSConfig struct {
 	// ClientAuth controls how we want to verify certificate from a client, `none`, `optional` and
 	// `required`, default to required. Do not affect TCP client.
 	ClientAuth tls.ClientAuthType
+
+	// KeyLogWriter allows to save key exchange information to a file allow the decryption of the
+	// communication with wireshark useful for debugging network issues.
+	KeyLogWriter io.Writer
 }
 
 // BuildModuleConfig takes the TLSConfig and transform it into a `tls.Config`.
@@ -90,5 +95,6 @@ func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
 		CipherSuites:       c.CipherSuites,
 		CurvePreferences:   c.CurvePreferences,
 		ClientAuth:         c.ClientAuth,
+		KeyLogWriter:       c.KeyLogWriter,
 	}
 }
