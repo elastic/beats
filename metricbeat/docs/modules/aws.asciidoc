@@ -84,6 +84,7 @@ metricbeat.modules:
   period: 300s
   metricsets:
     - "ec2"
+    - "sqs"
   access_key_id: '${AWS_ACCESS_KEY_ID:""}'
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
@@ -97,5 +98,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-aws-ec2,ec2>>
 
+* <<metricbeat-metricset-aws-sqs,sqs>>
+
 include::aws/ec2.asciidoc[]
+
+include::aws/sqs.asciidoc[]
 
