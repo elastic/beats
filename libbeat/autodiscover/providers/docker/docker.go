@@ -136,23 +136,24 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 	}
 
 	meta := common.MapStr{
-		"container": common.MapStr{
-			"id":     container.ID,
-			"name":   container.Name,
-			"image":  container.Image,
-			"labels": labelMap,
+		"id":   container.ID,
+		"name": container.Name,
+		"image": common.MapStr{
+			"name": container.Image,
 		},
+		// TODO: Do we need some dedotting here?
+		"labels": labelMap,
 	}
 	// Without this check there would be overlapping configurations with and without ports.
 	if len(container.Ports) == 0 {
 		event := bus.Event{
-			"provider": d.uuid,
-			"id":       container.ID,
-			flag:       true,
-			"host":     host,
-			"docker":   meta,
+			"provider":  d.uuid,
+			"id":        container.ID,
+			flag:        true,
+			"host":      host,
+			"container": meta,
 			"meta": common.MapStr{
-				"docker": meta,
+				"container": meta,
 			},
 		}
 
@@ -162,14 +163,14 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 	// Emit container container and port information
 	for _, port := range container.Ports {
 		event := bus.Event{
-			"provider": d.uuid,
-			"id":       container.ID,
-			flag:       true,
-			"host":     host,
-			"port":     port.PrivatePort,
-			"docker":   meta,
+			"provider":  d.uuid,
+			"id":        container.ID,
+			flag:        true,
+			"host":      host,
+			"port":      port.PrivatePort,
+			"container": meta,
 			"meta": common.MapStr{
-				"docker": meta,
+				"container": meta,
 			},
 		}
 
