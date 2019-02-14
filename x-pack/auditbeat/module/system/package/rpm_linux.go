@@ -236,7 +236,7 @@ func dlopenCFunctions() (*cFunctions, error) {
 			return nil, errs.Err()
 		}
 	} else {
-		C.my_rpmsqSetInterruptSafety(rpmsqSetInterruptSafety, 1)
+		C.my_rpmsqSetInterruptSafety(rpmsqSetInterruptSafety, 0)
 	}
 
 	return &cFun, nil
