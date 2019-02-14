@@ -7,43 +7,23 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD diff]
 
 ==== Breaking changes
 
 *Affecting all Beats*
 
-- Update add_cloud_metadata fields to adjust to ECS. {pull}9265[9265]
-- Automaticall cap signed integers to 63bits. {pull}8991[8991]
-- Rename beat.timezone to event.timezone. {pull}9458[9458]
-- Use _doc as document type. {pull}9056[9056]{pull}9573[9573]
-- Update to Golang 1.11.3. {pull}9560[9560]
-- Migrate add_docker_metadata fields to ECS.
-
 *Auditbeat*
 
 *Filebeat*
 
-- Modify apache/error dataset to follow ECS. {pull}8963[8963]
-- Rename many `traefik.access.*` fields to map to ECS. {pull}9005[9005]
-- Add module zeek. {issue}9931[9931] {pull}10034[10034]
-- Rename many `kibana.log.*` fields to map to ECS. {pull}9301[9301]
-
 *Heartbeat*
-
-- Remove monitor generator script that was rarely used. {pull}9648[9648]
 
 *Journalbeat*
 
 *Metricbeat*
 
-- Fix MongoDB dashboard that had some incorrect field names from `status` Metricset {pull}9795[9795] {issue}9715[9715]
-
 *Packetbeat*
-
-- Adjust Packetbeat `http` fields to ECS Beta 2 {pull}9645[9645]
-  - `http.request.body` moves to `http.request.body.content`
-  - `http.response.body` moves to `http.response.body.content`
 
 *Winlogbeat*
 
@@ -53,17 +33,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Enforce validation for the Central Management access token. {issue}9621[9621]
-- Allow to unenroll a Beat from the UI. {issue}9452[9452]
-- Fix exclude_labels when there are dotted keys {pull}10154[10154]
-
 *Auditbeat*
 
 *Filebeat*
 
 *Heartbeat*
-
-- Made monitors.d configuration part of the default config. {pull}9004[9004]
 
 *Journalbeat*
 
@@ -79,34 +53,17 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Update field definitions for `http` to ECS Beta 2 {pull}9645[9645]
-- Release Jolokia autodiscover as GA. {pull}9706[9706]
-
 *Auditbeat*
-
-- Add system module. {pull}9546[9546]
 
 *Filebeat*
 
-- Added module for parsing Google Santa logs. {pull}9540[9540]
-- Added netflow input type that supports NetFlow v1, v5, v6, v7, v8, v9 and IPFIX. {issue}9399[9399]
-- Add option to modules.yml file to indicate that a module has been moved {pull}9432[9432].
-
 *Heartbeat*
-
-- Fixed rare issue where TLS connections to endpoints with x509 certificates missing either notBefore or notAfter would cause the check to fail with a stacktrace.  {pull}9566[9566]
-
 
 *Journalbeat*
 
 *Metricbeat*
 
-- Add `key` metricset to the Redis module. {issue}9582[9582] {pull}9657[9657] {pull}9746[9746]
-- Add `socket_summary` metricset to system defaults, removing experimental tag and supporting Windows {pull}9709[9709]
-
 *Packetbeat*
-
-- Add support to decode mysql prepare statement command. {pull}8084[8084]
 
 *Functionbeat*
 
@@ -132,6 +89,340 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-7.0.0-beta1]]
+=== Beats version 7.0.0-beta1
+https://github.com/elastic/beats/compare/v7.0.0-alpha2...v7.0.0-beta1[Check the HEAD diff]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Embedded html is not escaped anymore by default. {pull}9914[9914]
+- Remove port settings from Logstash and Redis output. {pull}9934[9934]
+- Rename `process.exe` to `process.executable` in add_process_metadata to align with ECS. {pull}9949[9949]
+- Import ECS change https://github.com/elastic/ecs/pull/308[ecs#308]:
+  leaf field `user.group` is now the `group` field set. {pull}10275[10275]
+- Update the code of Central Management to align with the new returned format. {pull}10019[10019]
+- Docker and Kubernetes labels/annotations will be "dedoted" by default. {pull}10338[10338]
+- Remove --setup command line flag. {pull}10138[10138]
+- Remove --version command line flag. {pull}10138[10138]
+- Remove --configtest command line flag. {pull}10138[10138]
+- Move output.elasticsearch.ilm settings to setup.ilm. {pull}10347[10347]
+- ILM will be available by default if Elasticsearch > 7.0 is used. {pull}10347[10347]
+
+*Auditbeat*
+
+- Rename `process.exe` to `process.executable` in auditd module to align with ECS. {pull}9949[9949]
+- Rename `process.cwd` to `process.working_directory` in auditd module to align with ECS. {pull}10195[10195]
+- Change data type of `process.pid` and `process.ppid` to number in JSON output
+  of the auditd module. {pull}10195[10195]
+- Change data type of `file.uid` and `file.gid` to string in JSON output of the
+  FIM module. {pull}10195[10195]
+- Field `file.origin` changed type from `text` to `keyword`. {pull}10544[10544]
+- Rename user fields to ECS in auditd module. {pull}10456[10456]
+- Rename `event.type` to `auditd.message_type` in auditd module because event.type is reserved for future use by ECS. {pull}10536[10536]
+- Rename `auditd.messages` to `event.original` and `auditd.warnings` to `error.message`. {pull}10577[10577]
+
+*Filebeat*
+
+- Rename many `kibana.log.*` fields to map to ECS. {pull}9301[9301]
+- Modify apache/error dataset to follow ECS. {pull}8963[8963]
+- Rename many `traefik.access.*` fields to map to ECS. {pull}9005[9005]
+- Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
+- Rename `read_timestamp` to `event.created` for Redis input. {pull}9924[9924]
+- Rename a few `elasticsearch.audit.*` fields to map to ECS. {pull}9293[9293]
+- Rename `read_timestamp` to `event.created` for all Filebeat modules using it. {pull}10139[10139]
+- Rename many `iis.error.*` fields to map to ECS. {pull}9955[9955]
+- Adjust fileset `haproxy.log` to map to ECS. {pull}10143[10143]
+- Rename a few `logstash.*` fields to map to ECS, remove logstash.slowlog.message. {pull}9935[9935]
+- Rename a few `mongodb.*` fields to map to ECS. {pull}10009[10009]
+- Rename a few `mysql.*` fields to map to ECS. {pull}10008[10008]
+- Rename a few `nginx.error.*` fields to map to ECS. {pull}10007[10007]
+- Rename many `auditd.log.*` fields to map to ECS. {pull}10192[10192]
+- Filesets with multiple ingest pipelines added in {pull}8914[8914] only work with Elasticsearch >= 6.5.0 {pull}10001[10001]
+- Remove service.name from Elastcsearch module. Replace by service.type. {pull}10042[10042]
+- Remove numeric coercions for `user.id` and `group.id`. IDs should be `keyword`. {pull}10233[10233]
+- Add grok pattern to support redis 5.0.3 log timestamp. {issue}9819[9819] {pull}10033[10033]
+- Now save the 'first seen' timestamp in `event.created` (previously `read_timestamp`),
+  instead of saving the parsed date. Now aligned with `event.created` semantics elsewhere. {pull}10139[10139]
+- Rename `mysql.error.thread_id` and `mysql.slowlog.id` to `mysql.thread_id`. {pull}10161[10161]
+- Remove `mysql.error.timestamp`  and `mysql.slowlog.timestamp`. {pull}10161[10161]
+- Migrate multiple fields to `event.duration`, from modules "apache", "elasticsearch",
+  "haproxy", "iis", "kibana", "mysql", "nginx", "postgresql" and "traefik",
+  including `http.response.elapsed_time` (ECS). {pull}10188[10188], {pull}10274[10274]
+- Rename multiple fields to `http.response.body.bytes`, from modules "apache", "iis",
+  "kibana", "nginx" and "traefik", including `http.response.content_length` (ECS). {pull}10188[10188]
+- Change type from haproxy.log fileset fields from text to keyword: response.captured_headers, request.captured_headers, `raw_request_line`, `mode`. {pull}10397[10397]
+- Change type of field backend_url and frontend_name in traefik.access metricset to type keyword. {pull}10401[10401]
+- Ingesting Elasticsearch audit logs is only supported with Elasticsearch 6.5.0 and above {pull}10352[10352]
+- Migrate Elasticsearch audit logs fields to ECS {pull}10352[10352]
+- Several text fields in the Logstash module are now indexed as `keyword` fields with `text` multi-fields (ECS). {pull}10417[10417]
+- Several text fields in the Elasticsearch module are now indexed as `keyword` fields with `text` multi-fields (ECS). {pull}10414[10414]
+- Move dissect pattern for traefik.access fileset from Filbeat to Elasticsearch. {pull}10442[10442]
+- The `elasticsearch/deprecation` fileset now indexes the `component` field under `elasticsearch` instead of `elasticsearch.server`. {pull}10445[10445]
+- Remove field `kafka.log.trace.full` from kafka.log fielset. {pull}10398[10398]
+- Change field `kafka.log.class` for kafka.log fileset from text to keyword. {pull}10398[10398]
+- Address add_kubernetes_metadata processor issue where old source field is 
+  still used for matcher. {issue}10505[10505] {pull}10506[10506]
+- Change type of haproxy.source from text to keyword. {pull}10506[10506]
+- Rename `event.type` to `suricata.eve.event_type` in Suricata module because event.type is reserved for future use by ECS. {pull}10575[10575]
+- Populate more ECS fields in the Suricata module. {pull}10006[10006]
+- Rename setting `filebeat.registry_flush` to `filebeat.registry.flush`. {pull}10504[10504]
+- Rename setting `filebeat.registry_file_permission` to `filebeat.registry.file_permission`. {pull}10504[10504]
+- Remove setting `filebeat.registry_file` in favor of `filebeat.registry.path`. The registry file will be stored in a sub-directory by now. {pull}10504[10504]
+
+*Heartbeat*
+
+- Remove monitor generator script that was rarely used. {pull}9648[9648]
+- monitor IDs are now configurable. Auto generated monitor IDs now use a different formula based on a hash of their config values. If you wish to have continuity with the old format of monitor IDs you'll need to set the `id` property explicitly. {pull}9697[9697]
+- A number of fields have been aliased to their relevant counterparts in the `url.*` field. Existing visualizations should mostly work. The fields that have been moved are `monitor.scheme -> url.scheme`, `monitor.host -> url.domain`, `resolve.host -> url.domain`, `http.url -> url.full`,  `tcp.port -> url.port`. In addition to these moves the new fields `url.username`, `url.password`, `url.path`, and `url.query` are now present. It should be noted that the `url.password` field does not contain actual password values, but rather the text `<hidden>` {pull}9570[9570].
+- The included Kibana HTTP dashboard is now removed in favor of the Uptime app in Kibana. {pull}10294[10294]
+
+*Journalbeat*
+
+- Rename read_timestamp to event.created to align with ECS. {pull}10043[10043], {pull}10139[10139]
+- Rename host.name to host.hostname to align with ECS. {pull}10043[10043]
+- Fix typo in the field name `container.id_truncated`. {pull}10525[10525]
+- Rename `container.image.tag` to `container.log.tag`. {pull}10561[10561]
+- Change type of `text` fields to `keyword`. {pull}10542[10542]
+
+*Metricbeat*
+
+- Migrate system process metricset fields to ECS. {pull}10332[10332]
+- Refactor Prometheus metric mappings {pull}9948[9948]
+- Removed Prometheus stats metricset in favor of just using Prometheus collector {pull}9948[9948]
+- Migrate system socket metricset fields to ECS. {pull}10339[10339]
+- Renamed direction values in sockets to ECS recommendations, from incoming/outcoming to inbound/outbound. {pull}10339[10339]
+- Adjust Redis.info metricset fields to ECS. {pull}10319[10319]
+- Change type of field docker.container.ip_addresses to `ip` instead of `keyword`. {pull}10364[10364]
+- Rename http.request.body field to http.request.body.content. {pull}10315[10315]
+- Adjust php_fpm.process metricset fields to ECS. {pull}10366[10366]
+- Adjust mongodb.status metricset to to ECS. {pull}10368[10368]
+- Refactor munin module to collect an event per plugin and to have more strict field mappings. `namespace` option has been removed, and will be replaced by `service.name`. {pull}10322[10322]
+- Change the following fields from type text to keyword: {pull}10318[10318]
+  - ceph.osd_df.name
+  - ceph.osd_tree.name
+  - ceph.osd_tree.children
+  - kafka.consumergroup.meta
+  - kibana.stats.name
+  - mongodb.metrics.replication.executor.network_interface
+  - php_fpm.process.request_uri
+  - php_fpm.process.script
+- Add `service.name` option to all modules to explicitly set `service.name` if it is unset. {pull}10427[10427]
+- Update a few elasticsearch.* fields to map to ECS. {pull}10350[10350]
+- Update a few logstash.* fields to map to ECS. {pull}10350[10350]
+- Update a few kibana.* fields to map to ECS. {pull}10350[10350]
+- Update rabbitmq.* fields to map to ECS. {pull}10563[10563]
+- Update haproxy.* fields to map to ECS. {pull}10558[10558] {pull}10568[10568]
+- Collect all EC2 meta data from all instances in all states. {pull}10628[10628]
+- Fix MongoDB dashboard that had some incorrect field names from `status` Metricset {pull}9795[9795] {issue}9715[9715]
+
+*Packetbeat*
+
+- Adjust Packetbeat `http` fields to ECS Beta 2 {pull}9645[9645]
+  - `http.request.body` moves to `http.request.body.content`
+  - `http.response.body` moves to `http.response.body.content`
+- Changed Packetbeat fields to align with ECS. {issue}7968[7968]
+- Removed trailing dot from domain names reported by the DNS protocol. {pull}9941[9941]
+
+*Winlogbeat*
+
+- Adjust Winlogbeat fields to map to ECS. {pull}10333[10333]
+
+*Functionbeat*
+
+- Correctly normalize Cloudformation resource name. {issue}10087[10087]
+- Functionbeat can now deploy a function for Kinesis. {10116}10116[10116]
+- Allow functionbeat to use the keystore. {issue}9009[9009]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix config appender registration. {pull}9873[9873]
+- Gracefully handle TLS options when enrolling a Beat. {issue}9129[9129]
+- The backing off now implements jitter to better distribute the load. {issue}10172[10172]
+- Fix TLS certificate DoS vulnerability. {pull}10302[10302]
+- Fix panic and file unlock in spool on atomic operation (arm, x86-32). File lock was not released when panic occurs, leading to the beat deadlocking on startup. {pull}10289[10289]
+- Fix encoding of timestamps when using disk spool. {issue}10099[10099]
+- Fix stopping of modules started by kubernetes autodiscover. {pull}10476[10476]
+- Fix a issue when remote and local configuration didn't match when fetching configuration from Central Management. {issue}10587[10587]
+- Fix unauthorized error when loading dashboards by adding username and password into kibana config. {issue}10513[10513] {pull}10675[10675]
+- Fix exclude_labels when there are dotted keys {pull}10154[10154]
+- Fix registry handle leak on Windows (https://github.com/elastic/go-sysinfo/pull/33). {pull}9920[9920]
+
+*Auditbeat*
+
+- Enable System module config on Windows. {pull}10237[10237]
+
+*Filebeat*
+
+- Support IPv6 addresses with zone id in IIS ingest pipeline.
+  {issue}9836[9836] error log: {pull}9869[9869], access log: {pull}9955[9955].
+- Support haproxy log lines without captured headers. {issue}9463[9463] {pull}9958[9958]
+- Make elasticsearch/audit fileset be more lenient in parsing node name. {issue}10035[10035] {pull}10135[10135]
+- Fix bad bytes count in `docker` input when filtering by stream. {pull}10211[10211]
+- Fixed data types for roles and indices fields in `elasticsearch/audit` fileset {pull}10307[10307]
+- Ensure `source.address` is always populated by the nginx module (ECS). {pull}10418[10418]
+- Support mysql 5.7.22 slowlog starting with time information. {issue}7892[7892] {pull}9647[9647]
+
+*Heartbeat*
+
+- Made monitors.d configuration part of the default config. {pull}9004[9004]
+- Fixed rare issue where TLS connections to endpoints with x509 certificates missing either notBefore or notAfter would cause the check to fail with a stacktrace.  {pull}9566[9566]
+
+*Journalbeat*
+
+- Do not stop collecting events when journal entries change. {pull}9994[9994]
+
+*Metricbeat*
+
+- Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
+- Fix pod UID metadata enrichment in Kubernetes module. {pull}10081[10081]
+- Fix issue that would prevent collection of processes without command line on Windows. {pull}10196[10196]
+- Fixed data type for tags field in `docker/container` metricset {pull}10307[10307]
+- Fixed data type for tags field in `docker/image` metricset {pull}10307[10307]
+- Fixed data type for isr field in `kafka/partition` metricset {pull}10307[10307]
+- Fixed data types for various hosts fields in `mongodb/replstatus` metricset {pull}10307[10307]
+- Added function to close sql database connection. {pull}10355[10355]
+- Fix issue with `elasticsearch/node_stats` metricset (x-pack) not indexing `source_node` field. {pull}10639[10639]
+
+*Packetbeat*
+
+- Fix DHCPv4 dashboard that wouldn't load in Kibana. {issue}9850[9850]
+- Fixed a crash when using af_packet capture {pull}10477[10477]
+
+*Winlogbeat*
+
+- Close handle on signalEvent. {pull}9838[9838]
+
+*Functionbeat*
+
+- Ensure that functionbeat is logging at info level not debug. {issue}10262[10262]
+- Add the required permissions to the role when deployment SQS functions. {issue}9152[9152]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update field definitions for `http` to ECS Beta 2 {pull}9645[9645]
+- Add `agent.id` and `agent.ephemeral_id` fields to all beats. {pull}9404[9404]
+- Add `name` config option to `add_host_metadata` processor. {pull}9943[9943]
+- Add `add_labels` and `add_tags` processors. {pull}9973[9973]
+- Add missing file encoding to readers. {pull}10080[10080]
+- Introduce `migration.enabled` configuration. {pull}9805[9805]
+- Add alias field support in Kibana index pattern. {pull}10075[10075]
+- Add `add_fields` processor. {pull}10119[10119]
+- Add Kibana field formatter to bytes fields. {pull}10184[10184]
+- Document a few more `auditd.log.*` fields. {pull}10192[10192]
+- Support Kafka 2.1.0. {pull}10440[10440]
+- Add ILM mode `auto` to setup.ilm.enabled setting. This new default value detects if ILM is available {pull}10347[10347]
+- Add support to read ILM policy from external JSON file. {pull}10347[10347]
+- Add `overwrite` and `check_exists` settings to ILM support. {pull}10347[10347]
+- Generate Kibana index pattern on demand instead of using a local file. {pull}10478[10478]
+- Calls to Elasticsearch X-Pack APIs made by Beats won't cause deprecation logs in Elasticsearch logs. {9656}9656[9656]
+- Allow to unenroll a Beat from the UI. {issue}9452[9452]
+- Release Jolokia autodiscover as GA. {pull}9706[9706]
+- Allow Central Management to send events back to kibana. {issue}9382[9382]
+
+*Auditbeat*
+
+- Add system module. {pull}9546[9546]
+- Add `user.id` (UID) and `user.name` for ECS. {pull}10195[10195]
+- Add `group.id` (GID) and `group.name` for ECS. {pull}10195[10195]
+- System module `process` dataset: Add user information to processes. {pull}9963[9963]
+- Add system `package` dataset. {pull}10225[10225]
+- Add system module `login` dataset. {pull}9327[9327]
+- Add `entity_id` fields. {pull}10500[10500]
+- Add seven dashboards for the system module. {pull}10511[10511]
+
+*Filebeat*
+
+- Add `convert_timezone` option to Elasticsearch module to convert dates to UTC. {issue}9756[9756] {pull}9761[9761]
+- Added module for parsing Google Santa logs. {pull}9540[9540]
+- Added netflow input type that supports NetFlow v1, v5, v6, v7, v8, v9 and IPFIX. {issue}9399[9399]
+- Add option to modules.yml file to indicate that a module has been moved {pull}9432[9432].
+- Add support for ssl_request_log in apache2 module. {issue}8088[8088] {pull}9833[9833]
+- Add support for iis 7.5 log format. {issue}9753[9753] {pull}9967[9967]
+- Add service.type field to all Modules. By default the field is set with the module name. It can be overwritten with `service.type` config. {pull}10042[10042]
+- Add support for MariaDB in the `slowlog` fileset of `mysql` module. {pull}9731[9731]
+- Apache module's error fileset now performs GeoIP lookup, like the access fileset. {pull}10273[10273]
+- Elasticsearch module's slowlog now populates `event.duration` (ECS). {pull}9293[9293]
+- HAProxy module now populates `event.duration` and `http.response.bytes` (ECS). {pull}10143[10143]
+- Teach elasticsearch/audit fileset to parse out some more fields. {issue}10134[10134] {pull}10137[10137]
+- Add convert_timezone to nginx module. {issue}9839[9839] {pull}10148[10148]
+- Add support for Percona in the `slowlog` fileset of `mysql` module. {issue}6665[6665] {pull}10227[10227]
+- Added support for ingesting structured Elasticsearch audit logs {pull}10352[10352]
+- Added support for ingesting structured Elasticsearch slow logs {pull}10445[10445]
+- Added support for ingesting structured Elasticsearch deprecation logs {pull}10445[10445]
+- New iptables module that receives iptables/ip6tables logs over syslog or file. Supports Ubiquiti Firewall extensions. {issue}8781[8781] {pull}10176[10176]
+- Added support for ingesting structured Elasticsearch server logs {pull}10428[10428]
+- Populate more ECS fields in the Suricata module. {pull}10006[10006]
+- Add module zeek. {issue}9931[9931] {pull}10034[10034]
+
+*Heartbeat*
+
+- Autodiscover metadata is now included in events by default. So, if you are using the docker provider for instance, you'll see the correct fields under the `docker` key. {pull}10258[10258]
+
+*Journalbeat*
+
+- Migrate registry from previously incorrect path. {pull}10486[10486]
+
+*Metricbeat*
+
+- Add `key` metricset to the Redis module. {issue}9582[9582] {pull}9657[9657] {pull}9746[9746]
+- Add `socket_summary` metricset to system defaults, removing experimental tag and supporting Windows {pull}9709[9709]
+- Add docker `event` metricset. {pull}9856[9856]
+- Add 'performance' metricset to x-pack mssql module {pull}9826[9826]
+- Add DeDot for kubernetes labels and annotations. {issue}9860[9860] {pull}9939[9939]
+- Add more meaningful metrics to 'performance' Metricset on 'MSSQL' module {pull}10011[10011]
+- Rename some fields in `performance` Metricset on MSSQL module to match the updated documentation from Microsoft {pull}10074[10074]
+- Add AWS EC2 module. {pull}9257[9257] {issue}9300[9300]
+- Release windows Metricbeat module as GA. {pull}10163[10163]
+- Release traefik Metricbeat module as GA. {pull}10166[10166]
+- Release Elastic stack modules (Elasticsearch, Logstash, and Kibana) as GA. {pull}10094[10094]
+- List filesystems on Windows that have an access path but not an assigned letter {issue}8916[8916] {pull}10196[10196]
+- Add `nats` module. {issue}10071[10071]
+- Release uswgi Metricbeat module GA. {pull}10164[10164]
+- Release php_fpm module as GA. {pull}10198[10198]
+- Release Memcached module as GA. {pull}10199[10199]
+- Release etcd module as GA. {pull}10200[10200]
+- Release Ceph module as GA. {pull}10202[10202]
+- Release aerospike module as GA. {pull}10203[10203]
+- Release kubernetes apiserver and event metricsets as GA {pull}10212[10212]
+- Release Couchbase module as GA. {pull}10201[10201]
+- Release RabbitMQ module GA. {pull}10165[10165]
+- Release envoyproxy module GA. {pull}10223[10223]
+- Release mongodb.metrics and mongodb.replstatus as GA. {pull}10242[10242]
+- Release mysql.galera_status as GA. {pull}10242[10242]
+- Release postgresql.statement as GA. {pull}10242[10242]
+- Release RabbitMQ Metricbeat module GA. {pull}10165[10165]
+- Release Dropwizard module as GA. {pull}10240[10240]
+- Release Graphite module as GA. {pull}10240[10240]
+- Release kvm module as beta. {pull}10279[10279]
+- Release http.server metricset as GA. {pull}10240[10240]
+- Release Nats module as GA. {pull}10281[10281]
+- Release munin module as GA. {pull}10311[10311]
+- Release Golang module as GA. {pull}10312[10312]
+- Release use of xpack.enabled: true flag in Elasticsearch and Kibana modules as GA. {pull}10222[10222]
+- Add support for MySQL 8.0 and tests also for Percona and MariaDB. {pull}10261[10261]
+- Rename 'db' Metricset to 'transaction_log' in MSSQL Metricbeat module {pull}10109[10109]
+- Add process arguments and the path to its executable file in the system process metricset {pull}10332[10332]
+- Added 'server' Metricset to Zookeeper Metricbeat module {issue}8938[8938] {pull}10341[10341]
+- Release AWS module as GA. {pull}10345[10345]
+- Add overview dashboard to Zookeeper Metricbeat module {pull}10379[10379]
+
+*Packetbeat*
+
+- Add `network.community_id` to Packetbeat flow events. {pull}10061[10061]
+- Add aliases for flow fields that were renamed. {issue}7968[7968] {pull}10063[10063]
+- Add support to decode mysql prepare statement command. {pull}8084[8084]
+
+*Functionbeat*
+
+- Mark Functionbeat  as GA. {pull}10564[10564]
+
 
 [[release-notes-7.0.0-alpha2]]
 === Beats version 7.0.0-alpha2
@@ -369,6 +660,132 @@ https://github.com/elastic/beats/compare/v6.5.0...v7.0.0-alpha1[View commits]
 - Add support to decode HTTP bodies compressed with `gzip` and `deflate`. {pull}7915[7915]
 - Added support to calculate certificates' fingerprints (MD5, SHA-1, SHA-256). {issue}8180[8180]
 - Support new TLS version negotiation introduced in TLS 1.3. {issue}8647[8647].
+
+[[release-notes-6.6.0]]
+=== Beats version 6.6.0
+https://github.com/elastic/beats/compare/v6.5.4...6.6[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Dissect syntax change, use * instead of ? when working with field reference. {issue}8054[8054]
+
+*Filebeat*
+
+- Allow beats to blacklist certain part of the configuration while using Central Management. {pull}9099[9099]
+
+*Metricbeat*
+
+- Allow beats to blacklist certain part of the configuration while using Central Management. {pull}9099[9099]
+
+*Functionbeat*
+
+- The CLI will now log CloudFormation Stack events. {issue}8912[8912]
+- Correctly normalize Cloudformation resource name. {issue}10087[10087]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix autodiscover configurations stopping when metadata is missing. {pull}8851[8851]
+- Refresh host metadata in add_host_metadata. {pull}9359[9359]
+- When collecting swap metrics for beats telemetry or system metricbeat module handle cases of free swap being bigger than total swap by assuming no swap is being used. {issue}6271[6271] {pull}9383[9383]
+- Ignore non index fields in default_field for Elasticsearch. {pull}9549[9549]
+- Update Golang to 1.10.6. {pull}9563[9563]
+- Update Kibana index pattern attributes for objects that are disabled. {pull}9644[9644]
+- Enforce validation for the Central Management access token. {issue}9621[9621]
+- Fix registry handle leak on Windows (https://github.com/elastic/go-sysinfo/pull/33). {pull}9920[9920]
+- Gracefully handle TLS options when enrolling a Beat. {issue}9129[9129]
+- Allow to unenroll a Beat from the UI. {issue}9452[9452]
+- The backing off now implements jitter to better distribute the load. {issue}10172[10172]
+- Fix config appender registration. {pull}9873[9873]
+- Fix TLS certificate DoS vulnerability. {pull}10304[10304]
+
+*Filebeat*
+
+- Fix improperly set config for CRI Flag in Docker Input {pull}8899[8899]
+- Just enabling the `elasticsearch` fileset and starting Filebeat no longer causes an error. {pull}8891[8891]
+- Fix macOS default log path for elasticsearch module based on homebrew paths. {pul}8939[8939]
+- Support IPv6 addresses with zone id in IIS ingest pipeline. {issue}9836[9836] error log: {pull}9869[9869] access log: {pull}10030[10030]
+- Support haproxy log lines without captured headers. {issue}9463[9463] {pull}9958[9958]
+
+*Heartbeat*
+
+- Heartbeat now always downloads the entire body of HTTP endpoints, even if no checks against the body content are declared. This fixes an issue where timing metrics would be incorrect in scenarios where the body wasn't used since the connection would be closed soon after the headers were sent, but before the entire body was. {pull}8894[8894]
+
+*Metricbeat*
+
+- Add missing namespace field in http server metricset {pull}7890[7890]
+- Fix issue with not collecting Elasticsearch cross-cluster replication stats correctly. {pull}9179[9179]
+- The `node.name` field in the `elasticsearch/node` metricset now correctly reports the Elasticsarch node name. Previously this field was incorrectly reporting the node ID instead. {pull}9209[9209]
+- Fix panics in vsphere module when certain values where not returned by the API. {pull}9784[9784]
+- Fix pod UID metadata enrichment in Kubernetes module. {pull}10081[10081]
+
+
+*Packetbeat*
+
+- Fix issue with process monitor associating traffic to the wrong process. {issue}9151[9151] {pull}9443[9443]
+- Fix DHCPv4 dashboard that wouldn't load in Kibana. {issue}9850[9850]
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Unify dashboard exporter tools. {pull}9097[9097]
+- Dissect will now flag event on parsing error. {pull}8751[8751]
+- Added the `redirect_stderr` option that allows panics to be logged to log files. {pull}8430[8430]
+- Add cache.ttl to add_host_metadata. {pull}9359[9359]
+- Add support for index lifecycle management (beta). {pull}7963[7963]
+- Always include Pod UID as part of Pod metadata. {pull]9517[9517]
+- Release Jolokia autodiscover as GA. {pull}9706[9706]
+
+*Auditbeat*
+
+- Add system module. {pull}9546[9546]
+
+*Filebeat*
+- Added `detect_null_bytes` selector to detect null bytes from a io.reader. {pull}9210[9210]
+- Added `syslog_host` variable to HAProxy module to allow syslog listener to bind to configured host. {pull}9366[9366]
+- Allow to force CRI format parsing for better performance {pull}8424[8424]
+- Add event.dataset to module events. {pull}9457[9457]
+- Add field log.source.address and log.file.path to replace source. {pull}9435[9435]
+- Add support for multi-core thread_id in postgresql module {issue}9156[9156] {pull}9482[9482]
+- Added netflow input type that supports NetFlow v1, v5, v6, v7, v8, v9 and IPFIX. {issue}9399[9399]
+
+*Journalbeat*
+
+- Add the ability to check against JSON HTTP bodies with conditions. {pull}8667[8667]
+- Add cursor_seek_fallback option. {pull}9234[9234]
+
+*Metricbeat*
+
+- Collect custom cluster `display_name` in `elasticsearch/cluster_stats` metricset. {pull}8445[8445]
+- Test etcd module with etcd 3.3. {pull}9068[9068]
+- All `elasticsearch` metricsets now have module-level `cluster.id` and `cluster.name` fields. {pull}8770[8770] {pull}8771[8771] {pull}9164[9164] {pull}9165[9165] {pull}9166[9166] {pull}9168[9168]
+- All `elasticsearch` node-level metricsets now have `node.id` and `node.name` fields. {pull}9168[9168] {pull}9209[9209]
+- Add settings to disable docker and cgroup cpu metrics per core. {issue}9187[9187] {pull}9194[9194] {pull}9589[9589]
+- The `elasticsearch/node` metricset now reports the Elasticsearch cluster UUID. {pull}8771[8771]
+- Support GET requests in Jolokia module. {issue}8566[8566] {pull}9226[9226]
+- Add freebsd support for the uptime metricset. {pull}9413[9413]
+- Add `host.os.name` field to add_host_metadata processor. {issue}8948[8948] {pull}9405[9405]
+- Add field `event.dataset` which is `{module}.{metricset)`. {pull}9393[9393]
+
+==== Deprecated
+
+*Filebeat*
+- Deprecate field source. Will be replaced by log.source.address and log.file.path in 7.0. {pull}9435[9435]
+
+*Metricbeat*
+
+- Deprecate field `metricset.rtt`. Replaced by `event.duration` which is in nano instead of micro seconds. {pull}9393[9393]
+
+*Packetbeat*
+
+- Support new TLS version negotiation introduced in TLS 1.3. {issue}8647[8647].
+
+
 
 [[release-notes-6.5.4]]
 === Beats version 6.5.4
