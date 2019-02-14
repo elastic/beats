@@ -323,9 +323,11 @@ func (r *Registrar) onEvents(states []file.State) {
 		}
 	}
 
-	for _, st := range states {
-		logp.Debug("registrar", "state update: %#v", st)
-	}
+	go func() {
+		for _, st := range states {
+			logp.Debug("registrar", "state update: %#v", st)
+		}
+	}()
 
 	logp.Debug("registrar", "Registrar state updates processed. Count: %v", len(states))
 

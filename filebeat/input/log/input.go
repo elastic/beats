@@ -699,6 +699,8 @@ func (p *Input) updateState(state file.State) error {
 	// Update first internal state
 	p.states.Update(state)
 
+	logp.Debug("input", "send state update: %#v", state)
+
 	data := util.NewData()
 	data.SetState(state)
 	ok := p.outlet.OnEvent(data)
