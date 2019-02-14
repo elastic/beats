@@ -251,6 +251,10 @@ func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time
 	f["event"] = event
 	f["process"] = process
 
+	if ev.Sequence() != -1 {
+		f["event.sequence"] = ev.Sequence()
+	}
+
 	return &beat.Event{
 		Timestamp: ev.Timestamp(timezone),
 		Meta: common.MapStr{

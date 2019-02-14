@@ -6586,6 +6586,18 @@ The input type from which the event was generated. This field is set to the valu
 
 --
 
+*`event.sequence`*::
++
+--
+type: long
+
+required: False
+
+The sequence number of this event.
+
+
+--
+
 *`syslog.facility`*::
 +
 --
