@@ -233,7 +233,7 @@ func isLocalOrPrivate(ip net.IP) bool {
 }
 
 // NetworkContains returns true if the given IP is contained by any of the
-// networks. networks can a CIDR or any of these named networks:
+// networks. networks can be a CIDR or any of these named networks:
 //   - loopback
 //   - global_unicast
 //   - unicast
