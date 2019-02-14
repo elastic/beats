@@ -1,5 +1,8 @@
 ###################### Filebeat Config Template ###############################
 
+
+max_procs: 1
+
 filebeat.{{input_config | default("inputs")}}:
 {% if inputs is not defined %}
 {% set inputs = true %}

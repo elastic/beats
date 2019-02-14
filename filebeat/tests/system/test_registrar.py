@@ -3,9 +3,10 @@
 
 import os
 import platform
-import time
+import re
 import shutil
 import stat
+import time
 import unittest
 
 from filebeat import BaseTest
@@ -844,7 +845,6 @@ class Test(BaseTest):
         else:
             assert data[0]["offset"] == 2
 
-    @unittest.skip("Skipped as flaky: https://github.com/elastic/beats/issues/7690")
     def test_clean_removed(self):
         """
         Checks that files which were removed, the state is removed
@@ -857,15 +857,15 @@ class Test(BaseTest):
             close_removed=True
         )
 
-        os.mkdir(self.working_dir + "/log/")
-        testfile_path1 = self.working_dir + "/log/input1"
-        testfile_path2 = self.working_dir + "/log/input2"
+        file1 = "input1"
+        file2 = "input2"
 
-        with open(testfile_path1, 'w') as testfile1:
-            testfile1.write("file to be removed\n")
+        inputs = self.input_logs()
+        registry = self.registry()
+        logs = self.log_access()
 
-        with open(testfile_path2, 'w') as testfile2:
-            testfile2.write("2\n")
+        inputs.write(file1, "file to be removed\n")
+        inputs.write(file2, "2\n")
 
         filebeat = self.start_beat()
 
@@ -874,41 +874,34 @@ class Test(BaseTest):
             max_timeout=10)
 
         # Wait until registry file is created
-        self.wait_until(lambda: self.log_contains_count("Registry file updated") > 1)
+        self.wait_until(registry.exists)
 
         # Wait until registry is updated
-        self.wait_until(lambda: len(self.get_registry()) == 2)
-        assert len(self.get_registry()) == 2
+        self.wait_until(lambda: registry.count() == 2)
 
-        os.remove(testfile_path1)
+        inputs.remove(file1)
 
         # Wait until states are removed from inputs
-        self.wait_until(lambda: self.log_contains("Remove state for file as file removed"))
+        self.wait_until(logs.nextCheck("Remove state for file as file removed"))
 
         # Add one more line to make sure registry is written
-        with open(testfile_path2, 'a') as testfile2:
-            testfile2.write("make sure registry is written\n")
-
+        inputs.append(file2, "make sure registry is written\n")
         self.wait_until(
             lambda: self.output_has(lines=3),
             max_timeout=10)
 
         # Make sure all states are cleaned up
-        self.wait_until(lambda: self.log_contains("Before: 1, After: 1, Pending: 0"))
+        self.wait_until(logs.nextCheck(re.compile("Registrar.*After: 1, Pending: 0")))
 
         filebeat.check_kill_and_wait()
 
         # Check that the first to files were removed from the registry
-        data = self.get_registry()
+        data = registry.load()
         assert len(data) == 1
 
         # Make sure the last file in the registry is the correct one and has the correct offset
-        if os.name == "nt":
-            assert data[0]["offset"] == len("make sure registry is written\n" + "2\n") + 2
-        else:
-            assert data[0]["offset"] == len("make sure registry is written\n" + "2\n")
+        assert data[0]["offset"] == inputs.size(file2)
 
-    @unittest.skip('flaky test https://github.com/elastic/beats/issues/9215')
     def test_clean_removed_with_clean_inactive(self):
         """
         Checks that files which were removed, the state is removed
@@ -918,59 +911,62 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/log/input*",
             scan_frequency="0.1s",
             clean_removed=True,
-            clean_inactive="20s",
+            clean_inactive="60s",
             ignore_older="15s",
             close_removed=True
         )
 
-        os.mkdir(self.working_dir + "/log/")
-        testfile_path1 = self.working_dir + "/log/input1"
-        testfile_path2 = self.working_dir + "/log/input2"
+        file1 = "input1"
+        file2 = "input2"
+        contents2 = [
+            "2\n",
+            "make sure registry is written\n",
+        ]
 
-        with open(testfile_path1, 'w') as testfile1:
-            testfile1.write("file to be removed\n")
+        inputs = self.input_logs()
+        registry = self.registry()
+        logs = self.log_access()
 
-        with open(testfile_path2, 'w') as testfile2:
-            testfile2.write("2\n")
-
+        inputs.write(file1, "file to be removed\n")
+        inputs.write(file2, contents2[0])
         filebeat = self.start_beat()
 
-        self.wait_until(
-            lambda: self.output_has(lines=2),
-            max_timeout=10)
+        self.wait_until(lambda: self.output_has(lines=2), max_timeout=10)
 
         # Wait until registry file is created
         self.wait_until(
-            lambda: self.log_contains_count("Registry file updated. 2 states written.") > 0,
+            logs.nextCheck("Registry file updated. 2 states written."),
             max_timeout=15)
 
-        data = self.get_registry()
-        assert len(data) == 2
+        count = registry.count()
+        print("registry size: {}".format(count))
+        assert count == 2
 
-        os.remove(testfile_path1)
+        inputs.remove(file1)
 
         # Wait until states are removed from inputs
-        self.wait_until(lambda: self.log_contains("Remove state for file as file removed"))
+        self.wait_until(logs.nextCheck("Remove state for file as file removed"))
 
         # Add one more line to make sure registry is written
-        with open(testfile_path2, 'a') as testfile2:
-            testfile2.write("make sure registry is written\n")
+        inputs.append(file2, contents2[1])
 
         self.wait_until(lambda: self.output_has(lines=3))
-        # Check is > as the same log line might happen before but afterwards it is repeated
-        self.wait_until(lambda: self.log_contains_count("Before: 1, After: 1, Pending: 1") > 5)
+
+        # wait until next gc and until registry file has been updated
+        self.wait_until(logs.nextCheck("Before: 1, After: 1, Pending: 1"))
+        self.wait_until(logs.nextCheck("Registry file updated. 1 states written."))
+        count = registry.count()
+        print("registry size after remove: {}".format(count))
+        assert count == 1
 
         filebeat.check_kill_and_wait()
 
-        # Check that the first to files were removed from the registry
-        data = self.get_registry()
+        # Check that the first two files were removed from the registry
+        data = registry.load()
         assert len(data) == 1
 
         # Make sure the last file in the registry is the correct one and has the correct offset
-        if os.name == "nt":
-            assert data[0]["offset"] == len("make sure registry is written\n" + "2\n") + 2
-        else:
-            assert data[0]["offset"] == len("make sure registry is written\n" + "2\n")
+        assert data[0]["offset"] == inputs.size(file2)
 
     def test_symlink_failure(self):
         """

@@ -323,6 +323,10 @@ func (r *Registrar) onEvents(states []file.State) {
 		}
 	}
 
+	for _, st := range states {
+		logp.Debug("registrar", "state update: %#v", st)
+	}
+
 	logp.Debug("registrar", "Registrar state updates processed. Count: %v", len(states))
 
 	// new set of events received -> mark state registry ready for next
@@ -389,6 +393,9 @@ func (r *Registrar) writeRegistry() error {
 
 	registryWrites.Inc()
 
+	// tmp, err := json.MarshalIndent(states, "", "    ")
+	// logp.Debug("registry", "registry contents: %s", tmp)
+
 	tempfile, err := writeTmpFile(r.registryFile, r.fileMode, states)
 	if err != nil {
 		registryFails.Inc()
@@ -408,7 +415,7 @@ func (r *Registrar) writeRegistry() error {
 }
 
 func writeTmpFile(baseName string, perm os.FileMode, states []file.State) (string, error) {
-	logp.Debug("registrar", "Write registry file: %s", baseName)
+	logp.Debug("registrar", "Write registry file: %s (%v)", baseName, len(states))
 
 	tempfile := baseName + ".new"
 	f, err := os.OpenFile(tempfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC|os.O_SYNC, perm)
