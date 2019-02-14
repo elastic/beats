@@ -394,9 +394,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 }
 
 // TestConfig check all settings are ok and the beat can be run
-func (b *Beat) TestConfig(bt beat.Creator) error {
+func (b *Beat) TestConfig(settings Settings, bt beat.Creator) error {
 	return handleError(func() error {
-		err := b.Init()
+		err := b.InitWithSettings(settings)
 		if err != nil {
 			return err
 		}
@@ -422,9 +422,9 @@ type SetupSettings struct {
 }
 
 // Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
-func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
+func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) error {
 	return handleError(func() error {
-		err := b.Init()
+		err := b.InitWithSettings(settings)
 		if err != nil {
 			return err
 		}
@@ -438,7 +438,7 @@ func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
 			return err
 		}
 
-		if settings.Template || settings.ILMPolicy {
+		if setup.Template || setup.ILMPolicy {
 			outCfg := b.Config.Output
 
 			if outCfg.Name() != "elasticsearch" {
@@ -455,7 +455,7 @@ func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
 				// prepare index by loading templates, lifecycle policies and write aliases
 
 				m := b.index.Manager(esClient, idxmgmt.BeatsAssets(b.Fields))
-				err = m.Setup(settings.Template, settings.ILMPolicy)
+				err = m.Setup(setup.Template, setup.ILMPolicy)
 				if err != nil {
 					return err
 				}
@@ -463,7 +463,7 @@ func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
 			fmt.Println("Index setup complete.")
 		}
 
-		if settings.Dashboard {
+		if setup.Dashboard {
 			fmt.Println("Loading dashboards (Kibana must be running and reachable)")
 			err = b.loadDashboards(context.Background(), true)
 
@@ -479,7 +479,7 @@ func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
 			}
 		}
 
-		if settings.MachineLearning && b.SetupMLCallback != nil {
+		if setup.MachineLearning && b.SetupMLCallback != nil {
 			err = b.SetupMLCallback(&b.Beat, b.Config.Kibana)
 			if err != nil {
 				return err
@@ -487,7 +487,7 @@ func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
 			fmt.Println("Loaded machine learning job configurations")
 		}
 
-		if settings.Pipeline && b.OverwritePipelinesCallback != nil {
+		if setup.Pipeline && b.OverwritePipelinesCallback != nil {
 			esConfig := b.Config.Output.Config()
 			err = b.OverwritePipelinesCallback(esConfig)
 			if err != nil {
