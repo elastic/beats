@@ -231,10 +231,6 @@ func (r *Reader) checkForNewEvents() (bool, error) {
 	default:
 	}
 
-	if c < 0 {
-		return false, fmt.Errorf("error while waiting for event: %+v", syscall.Errno(-c))
-	}
-
 	r.logger.Errorf("Unknown return code from Wait: %d\n", c)
 	return false, nil
 }
