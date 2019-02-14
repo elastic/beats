@@ -87,9 +87,18 @@ jobs:
 
     # Metricbeat
     - os: linux
-      env: TARGETS="-C metricbeat testsuite"
+      env: TARGETS="-C metricbeat unit-tests coverage-report"
       go: $TRAVIS_GO_VERSION
       stage: test
+    - os: linux
+      env: TARGETS="-C metricbeat integration-tests-environment coverage-report"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+    - os: linux
+      env: TARGETS="-C metricbeat update system-tests-environment coverage-report"
+      go: $TRAVIS_GO_VERSION
+      stage: test
+
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C metricbeat testsuite"
       go: $TRAVIS_GO_VERSION
