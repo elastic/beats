@@ -1,0 +1,60 @@
+{
+  "description": "Pipeline for parsing nats log logs",
+    "processors": [{
+            "grok": {
+                "field": "message",
+                "patterns":[
+                    "\\[%{POSINT:process.pid}\\]( %{NATSTIME:nats.log.timestamp})? \\[%{NATSLOGLEVEL:log.level}\\] %{GREEDYDATA:message}"
+                ],
+                "pattern_definitions": {
+                    "NATSTIME": "%{YEAR}/%{MONTHNUM}/%{MONTHDAY} %{TIME}",
+                    "NATSLOGLEVEL":"(INF|DBG|WRN|ERR|FTL|TRC)"
+                },
+                "ignore_missing": true
+            }
+        },
+        {
+            "script": {
+                "lang": "painless",
+                "source": "if (ctx.log.level == params.inf) {\n          ctx.log.level = params.info;\n        } else if (ctx.log.level == params.dbg) {\n          ctx.log.level = params.debug;\n        } else if (ctx.log.level == params.wrn) {\n          ctx.log.level = params.warning;\n        } else if (ctx.log.level == params.err) {\n          ctx.log.level = params.error;\n        } else if (ctx.log.level == params.ftl) {\n          ctx.log.level = params.fatal;\n        } else if (ctx.log.level == params.trc) {\n          ctx.log.level = params.trace;\n        }",
+                "params": {
+                    "inf": "INF",
+                    "info": "info",
+                    "dbg": "DBG",
+                    "debug": "debug",
+                    "wrn": "WRN",
+                    "warning": "warning",
+                    "err": "ERR",
+                    "error": "error",
+                    "ftl": "FTL",
+                    "fatal": "fatal",
+                    "trc": "TRC",
+                    "trace": "trace"
+                }
+            }
+        },
+        {
+            "rename": {
+                "field": "@timestamp",
+                "target_field": "event.created"
+            }
+        },
+        {
+            "date": {
+                "field": "nats.log.timestamp",
+                "target_field": "@timestamp",
+                "formats": ["yyyy/MM/dd HH:mm:ss.SSSSSS"]
+            }
+        },
+        {
+            "remove": {
+                "field": "nats.log.timestamp"
+            }
+        }],
+    "on_failure" : [{
+        "set" : {
+            "field" : "error.message",
+            "value" : "{{ _ingest.on_failure_message }}"
+        }
+    }]
+}

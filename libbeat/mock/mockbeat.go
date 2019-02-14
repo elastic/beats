@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 )
@@ -29,6 +30,8 @@ import (
 
 var Version = "9.9.9"
 var Name = "mockbeat"
+
+var Settings = instance.Settings{Name: Name, Version: Version}
 
 type Mockbeat struct {
 	done chan struct{}

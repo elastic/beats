@@ -302,6 +302,16 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+#--------------------------------- Nats Module ---------------------------------
+- module: nats
+  # All logs
+  log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #-------------------------------- Nginx Module --------------------------------
 #- module: nginx
   # Access logs

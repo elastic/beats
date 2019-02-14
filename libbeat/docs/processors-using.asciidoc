@@ -31,6 +31,32 @@ condition is present, then the action is executed only if the condition is
 fulfilled. If no condition is passed, then the action is always executed.
 * `<parameters>` is the list of parameters to pass to the processor.
 
+More complex conditional processing can be accomplished by using the
+if-then-else processor configuration. This allows multiple processors to be
+executed based on a single condition.
+
+[source,yaml]
+----
+processors:
+- if:
+    <condition>
+  then: <1>
+    - <processor_name>:
+        <parameters>
+    - <processor_name>:
+        <parameters>
+    ...
+  else: <2>
+    - <processor_name>:
+        <parameters>
+    - <processor_name>:
+        <parameters>
+    ...
+----
+<1> `then` must contain a single processor or a list of one or more processors
+to execute when the condition evaluates to true.
+<2> `else` is optional. It can contain a single processor or a list of
+processors to execute when the conditional evaluate to false.
 
 [[where-valid]]
 ==== Where are processors valid?
