@@ -41,7 +41,6 @@ type config struct {
 }
 
 type containers struct {
-	// IDs + Path to be removed in 8.0 in favor of Paths.
 	IDs  []string `config:"ids"`
 	Path string   `config:"path"`
 

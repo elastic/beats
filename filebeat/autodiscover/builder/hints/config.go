@@ -31,7 +31,7 @@ func defaultConfig() config {
 			"paths": []string{
 				// To be able to use this builder with CRI-O replace paths with:
 				// /var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log
-				"/var/lib/docker/containers/${data.kubernetes.container.id}/*-json.log",
+				"/var/lib/docker/containers/${data.container.id}/*-json.log",
 			},
 		},
 	}

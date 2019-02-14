@@ -77,6 +77,7 @@ func NewInput(
 		return nil, errors.New("Docker input requires at least one entry under 'containers.ids' or 'containers.paths'")
 	}
 
+	// IDs + Path and Paths are mutually exclusive. Ensure that only one of them are set in a given configuration
 	if len(ids) != 0 && len(paths) != 0 {
 		return nil, errors.New("can not provide both 'containers.ids' and 'containers.paths' in the same input config")
 	}
@@ -111,9 +112,11 @@ func NewInput(
 		return nil, errors.Wrap(err, "update input config")
 	}
 
-	// Set symlinks to true as CRI-O paths could point to symlinks instead of the actual path.
-	if err := cfg.SetBool("symlinks", -1, true); err != nil {
-		return nil, errors.Wrap(err, "update input config")
+	if len(paths) != 0 {
+		// Set symlinks to true as CRI-O paths could point to symlinks instead of the actual path.
+		if err := cfg.SetBool("symlinks", -1, true); err != nil {
+			return nil, errors.Wrap(err, "update input config")
+		}
 	}
 
 	// Add stream to meta to ensure different state per stream
