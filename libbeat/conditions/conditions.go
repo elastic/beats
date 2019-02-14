@@ -86,7 +86,7 @@ func NewCondition(config *Config) (Condition, error) {
 			condition, err = NewNotCondition(inner)
 		}
 	default:
-		err = errors.New("missing condition")
+		err = errors.New("missing or invalid condition")
 	}
 	if err != nil {
 		return nil, err
