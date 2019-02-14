@@ -3,3 +3,4 @@
   description: >
     Nats log files
   release: beta
+  fields:
