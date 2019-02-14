@@ -63,8 +63,8 @@ type Network struct {
 }
 
 type networkMatcher interface {
+	fmt.Stringer
 	Contains(net.IP) bool
-	String() string
 }
 
 type netContainsFunc func(net.IP) bool
