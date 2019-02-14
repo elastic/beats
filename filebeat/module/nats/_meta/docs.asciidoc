@@ -1,0 +1,39 @@
+:modulename: nats
+:has-dashboards: false
+
+== nats module
+
+This is the nats module.
+
+include::../include/what-happens.asciidoc[]
+
+[float]
+=== Compatibility
+
+The +{modulename}+ module was tested with logs from version v1.4.0.
+
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboard
+
+
+include::../include/configuring-intro.asciidoc[]
+
+
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+
+[float]
+==== `log` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
