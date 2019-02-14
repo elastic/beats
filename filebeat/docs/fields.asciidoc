@@ -7443,6 +7443,70 @@ Fields from NATS logs.
 Nats log files
 
 
+
+[float]
+== client fields
+
+Fields from NATS logs client.
+
+
+
+*`nats.log.client.ip`*::
++
+--
+type: ip
+
+--
+
+*`nats.log.client.port`*::
++
+--
+type: integer
+
+--
+
+*`nats.log.client.id`*::
++
+--
+type: integer
+
+--
+
+[float]
+== msg fields
+
+Fields from NATS logs message.
+
+
+
+*`nats.log.msg.bytes`*::
++
+--
+type: long
+
+--
+
+*`nats.log.msg.direction`*::
++
+--
+type: string
+
+--
+
+*`nats.log.msg.type`*::
++
+--
+type: string
+
+--
+
+*`nats.log.msg.topic`*::
++
+--
+type: string
+
+--
+
 [[exported-fields-netflow]]
 == NetFlow fields
 

@@ -4,3 +4,27 @@
     Nats log files
   release: beta
   fields:
+    - name: client
+      type: group
+      description: >
+        Fields from NATS logs client.
+      fields:
+        - name: ip
+          type: ip
+        - name: port
+          type: integer
+        - name: id
+          type: integer
+    - name: msg
+      type: group
+      description: >
+        Fields from NATS logs message.
+      fields:
+        - name: bytes
+          type: long
+        - name: direction
+          type: string
+        - name: type
+          type: string
+        - name: topic
+          type: string

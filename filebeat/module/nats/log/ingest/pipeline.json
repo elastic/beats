@@ -10,7 +10,7 @@
                 "pattern_definitions": {
                     "NATSTIME": "%{YEAR}/%{MONTHNUM}/%{MONTHDAY} %{TIME}",
                     "NATSLOGLEVEL":"(INF|DBG|WRN|ERR|FTL|TRC)",
-                    "NATSGREEDYDATA": "%{IPV4:ip}:%{POSINT:port} - cid:%{POSINT:client.id} - %{NATSDIRECTION:msg.direction} \\[%{NATSMESSAGETYPE:msg.type} %{DATA:msg.topic} %{GREEDYDATA} %{POSINT:msg.bytes}\\]",
+                    "NATSGREEDYDATA": "%{IPV4:nats.log.client.ip}:%{POSINT:nats.log.client.port} - cid:%{POSINT:nats.log.client.id} - %{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSMESSAGETYPE:nats.log.msg.type} %{DATA:nats.log.msg.topic} %{GREEDYDATA:message} %{POSINT:nats.log.msg.bytes}\\]",
                     "NATSDIRECTION": "(<<-|->>)",
                     "NATSMESSAGETYPE": "(MSG|PUB|SUB|PING)"
                 },
@@ -35,6 +35,19 @@
                     "trc": "TRC",
                     "trace": "trace"
                 }
+            }
+        },
+        {
+            "script": {
+                "lang": "painless",
+                "source": "if (ctx.nats.log.msg.direction == params.in) {\n          ctx.nats.log.msg.direction = params.incoming;\n        } else if (ctx.nats.log.msg.direction == params.out) {\n          ctx.nats.log.msg.direction = params.outgoing;\n        }",
+                "params": {
+                    "in": "<<-",
+                    "ingoing": "incoming",
+                    "out": "->>",
+                    "outgoing": "outgoing"
+                },
+                "if": "ctx.nats.log.msg?.direction != null"
             }
         },
         {
