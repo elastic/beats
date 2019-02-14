@@ -11,6 +11,7 @@
             "syscall": "execve",
             "tty": "pts0"
         },
+        "message_type": "syscall",
         "paths": [
             {
                 "dev": "08:01",
@@ -53,8 +54,7 @@
     "event": {
         "action": "executed",
         "category": "audit-rule",
-        "module": "auditd",
-        "type": "syscall"
+        "module": "auditd"
     },
     "file": {
         "device": "00:00",
@@ -65,9 +65,6 @@
         "owner": "root",
         "path": "/bin/uname",
         "uid": "0"
-    },
-    "group": {
-        "id": "1002"
     },
     "process": {
         "args": [
@@ -88,15 +85,30 @@
         "user_commands"
     ],
     "user": {
-        "auid": "1001",
-        "egid": "1002",
-        "euid": "1001",
-        "fsgid": "1002",
-        "fsuid": "1001",
-        "gid": "1002",
+        "audit": {
+            "id": "1001"
+        },
+        "effective": {
+            "group": {
+                "id": "1002"
+            },
+            "id": "1001"
+        },
+        "filesystem": {
+            "group": {
+                "id": "1002"
+            },
+            "id": "1001"
+        },
+        "group": {
+            "id": "1002"
+        },
         "id": "1001",
-        "sgid": "1002",
-        "suid": "1001",
-        "uid": "1001"
+        "saved": {
+            "group": {
+                "id": "1002"
+            },
+            "id": "1001"
+        }
     }
 }

@@ -775,20 +775,20 @@ filebeat.inputs:
 
 #========================= Filebeat global options ============================
 
-# Name of the registry file. If a relative path is used, it is considered relative to the
+# Registry data path. If a relative path is used, it is considered relative to the
 # data path.
-#filebeat.registry_file: ${path.data}/registry
+#filebeat.registry.path: ${path.data}/registry
 
-# The permissions mask to apply on registry file. The default value is 0600.
-# Must be a valid Unix-style file permissions mask expressed in octal notation.
-# This option is not supported on Windows.
-#filebeat.registry_file_permissions: 0600
+# The permissions mask to apply on registry data, and meta files. The default
+# value is 0600.  Must be a valid Unix-style file permissions mask expressed in
+# octal notation.  This option is not supported on Windows.
+#filebeat.registry.file_permissions: 0600
 
 # The timeout value that controls when registry entries are written to disk
-# (flushed). When an unwritten update exceeds this value, it triggers a write to
-# disk. When registry_flush is set to 0s, the registry is written to disk after
-# each batch of events has been published successfully. The default value is 0s.
-#filebeat.registry_flush: 0s
+# (flushed). When an unwritten update exceeds this value, it triggers a write
+# to disk. When flush is set to 0s, the registry is written to disk after each
+# batch of events has been published successfully. The default value is 0s.
+#filebeat.registry.flush: 0s
 
 # By default Ingest pipelines are not updated if a pipeline with the same ID
 # already exists. If this option is enabled Filebeat overwrites pipelines
@@ -1058,11 +1058,6 @@ output.elasticsearch:
   # In case you specify and additional path, the scheme is required: http://localhost:9200/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
-
-  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
-  #ilm.enabled: false
-  #ilm.rollover_alias: "filebeat"
-  #ilm.pattern: "{now/d}-000001"
 
   # Set gzip compression level.
   #compression_level: 0
@@ -1709,6 +1704,25 @@ setup.template.settings:
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
   #_source:
     #enabled: false
+
+#============================== Setup ILM =====================================
+
+# Configure Index Lifecycle Management Index Lifecycle Management creates a
+# write alias and adds additional settings to the template.
+# The elasticsearch.output.index setting will be replaced with the write alias
+# if ILM is enabled.
+
+# Enabled ILM support. Valid values are true, false, and auto. The beat will
+# detect availabilty of Index Lifecycle Management in Elasticsearch and enable
+# or disable ILM support.
+#setup.ilm.enabled: auto
+
+# Configure the ILM write alias name.
+#setup.ilm.rollover_alias: "filebeat"
+
+# Configure rollover index pattern.
+#setup.ilm.pattern: "{now/d}-000001"
+
 
 #============================== Kibana =====================================
 

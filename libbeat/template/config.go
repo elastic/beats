@@ -39,10 +39,10 @@ type TemplateSettings struct {
 	Source map[string]interface{} `config:"_source"`
 }
 
-var (
-	// DefaultConfig for index template
-	DefaultConfig = TemplateConfig{
+// DefaultConfig for index template
+func DefaultConfig() TemplateConfig {
+	return TemplateConfig{
 		Enabled: true,
 		Fields:  "",
 	}
-)
+}

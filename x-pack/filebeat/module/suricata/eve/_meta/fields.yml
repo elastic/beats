@@ -46,7 +46,8 @@
         type: keyword
 
       - name: filename
-        type: keyword
+        type: alias
+        path: file.path
 
       - name: tx_id
         type: long
@@ -67,25 +68,30 @@
         type: keyword
 
       - name: size
-        type: long
+        type: alias
+        path: file.size
 
     - name: icmp_type
       type: long
 
     - name: dest_port
-      type: long
+      type: alias
+      path: destination.port
 
     - name: src_port
-      type: long
+      type: alias
+      path: source.port
 
     - name: proto
-      type: keyword
+      type: alias
+      path: network.transport
 
     - name: pcap_cnt
       type: long
 
     - name: src_ip
-      type: ip
+      type: alias
+      path: source.ip
 
     - name: dns
       type: group
@@ -124,7 +130,8 @@
         type: keyword
 
     - name: dest_ip
-      type: ip
+      type: alias
+      path: destination.ip
 
     - name: icmp_code
       type: long
@@ -133,37 +140,45 @@
       type: group
       fields:
       - name: status
-        type: long
+        type: alias
+        path: http.response.status_code
 
       - name: redirect
         type: keyword
 
       - name: http_user_agent
-        type: keyword
+        type: alias
+        path: user_agent.original
 
       - name: protocol
         type: keyword
 
       - name: http_refer
-        type: keyword
+        type: alias
+        path: http.request.referrer
 
       - name: url
-        type: keyword
+        type: alias
+        path: url.original
 
       - name: hostname
-        type: keyword
+        type: alias
+        path: url.domain
 
       - name: length
-        type: long
+        type: alias
+        path: http.response.body.bytes
 
       - name: http_method
-        type: keyword
+        type: alias
+        path: http.request.method
 
       - name: http_content_type
         type: keyword
 
     - name: timestamp
-      type: date
+      type: alias
+      path: '@timestamp'
 
     - name: in_iface
       type: keyword
@@ -175,7 +190,8 @@
         type: keyword
 
       - name: severity
-        type: long
+        type: alias
+        path: event.severity
 
       - name: rev
         type: long
@@ -187,7 +203,8 @@
         type: keyword
 
       - name: action
-        type: keyword
+        type: alias
+        path: event.outcome
 
       - name: signature_id
         type: long
@@ -655,13 +672,16 @@
       type: group
       fields:
       - name: bytes_toclient
-        type: long
+        type: alias
+        path: destination.bytes
 
       - name: start
-        type: date
+        type: alias
+        path: event.start
 
       - name: pkts_toclient
-        type: long
+        type: alias
+        path: destination.packets
 
       - name: age
         type: long
@@ -670,13 +690,15 @@
         type: keyword
 
       - name: bytes_toserver
-        type: long
+        type: alias
+        path: source.bytes
 
       - name: reason
         type: keyword
 
       - name: pkts_toserver
-        type: long
+        type: alias
+        path: source.packets
 
       - name: end
         type: date
@@ -685,7 +707,8 @@
         type: boolean
 
     - name: app_proto
-      type: keyword
+      type: alias
+      path: network.protocol
 
     - name: tx_id
       type: long

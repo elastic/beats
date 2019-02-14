@@ -288,6 +288,7 @@ func (icmp *icmpPlugin) publishTransaction(trans *icmpTransaction) {
 	pbf.Source = &ecs.Source{IP: trans.tuple.srcIP.String()}
 	pbf.Destination = &ecs.Destination{IP: trans.tuple.dstIP.String()}
 	pbf.Event.Dataset = "icmp"
+	pbf.Error.Message = trans.notes
 
 	// common fields - group "event"
 	fields := evt.Fields
@@ -339,12 +340,6 @@ func (icmp *icmpPlugin) publishTransaction(trans *icmpTransaction) {
 			pbf.ICMPType = trans.response.Type
 			pbf.ICMPCode = trans.response.code
 		}
-	}
-
-	if len(trans.notes) == 1 {
-		evt.PutValue("error.message", trans.notes[0])
-	} else if len(trans.notes) > 1 {
-		evt.PutValue("error.message", trans.notes)
 	}
 
 	icmp.results(evt)

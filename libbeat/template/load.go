@@ -45,14 +45,13 @@ type Loader struct {
 }
 
 // NewLoader creates a new template loader
-func NewLoader(cfg *common.Config, client ESClient, beatInfo beat.Info, fields []byte, migration bool) (*Loader, error) {
-	config := DefaultConfig
-
-	err := cfg.Unpack(&config)
-	if err != nil {
-		return nil, err
-	}
-
+func NewLoader(
+	config TemplateConfig,
+	client ESClient,
+	beatInfo beat.Info,
+	fields []byte,
+	migration bool,
+) (*Loader, error) {
 	return &Loader{
 		config:    config,
 		client:    client,
@@ -155,8 +154,7 @@ func (l *Loader) CheckTemplate(templateName string) bool {
 }
 
 func loadJSON(client ESClient, path string, json map[string]interface{}) ([]byte, error) {
-	params := esVersionParams(client.GetVersion())
-	status, body, err := client.Request("PUT", path, "", params, json)
+	status, body, err := client.Request("PUT", path, "", nil, json)
 	if err != nil {
 		return body, fmt.Errorf("couldn't load json. Error: %s", err)
 	}
@@ -165,14 +163,4 @@ func loadJSON(client ESClient, path string, json map[string]interface{}) ([]byte
 	}
 
 	return body, nil
-}
-
-func esVersionParams(ver common.Version) map[string]string {
-	if ver.Major == 6 && ver.Minor == 7 {
-		return map[string]string{
-			"include_type_name": "false",
-		}
-	}
-
-	return nil
 }

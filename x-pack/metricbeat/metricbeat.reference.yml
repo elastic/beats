@@ -163,12 +163,27 @@ metricbeat.modules:
   hosts: ["localhost:5000"]
   enabled: true
 
+#-------------------------------- Consul Module --------------------------------
+- module: consul
+  metricsets:
+  - agent
+  enabled: true
+  period: 10s
+  hosts: ["localhost:8500"]
+
+
 #------------------------------ Couchbase Module ------------------------------
 - module: couchbase
   metricsets: ["bucket", "cluster", "node"]
   period: 10s
   hosts: ["localhost:8091"]
   enabled: true
+
+#------------------------------- Couchdb Module -------------------------------
+- module: couchdb
+  metricsets: ["server"]
+  period: 10s
+  hosts: ["localhost:5984"]
 
 #-------------------------------- Docker Module --------------------------------
 - module: docker
@@ -519,7 +534,15 @@ metricbeat.modules:
   enabled: true
   period: 10s
   hosts: ["localhost:4949"]
-  node.namespace: node
+
+  # List of plugins to collect metrics from, by default it collects from
+  # all the available ones.
+  #munin.plugins: []
+
+  # If set to true, it sanitizes fields names in concordance with munin
+  # implementation (all characters that are not alphanumeric, or underscore
+  # are replaced by underscores).
+  #munin.sanitize: false
 
 #-------------------------------- MySQL Module --------------------------------
 - module: mysql
@@ -707,7 +730,7 @@ metricbeat.modules:
 #------------------------------ ZooKeeper Module ------------------------------
 - module: zookeeper
   enabled: true
-  metricsets: ["mntr"]
+  metricsets: ["mntr", "server"]
   period: 10s
   hosts: ["localhost:2181"]
 
@@ -959,11 +982,6 @@ output.elasticsearch:
   # In case you specify and additional path, the scheme is required: http://localhost:9200/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
-
-  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
-  #ilm.enabled: false
-  #ilm.rollover_alias: "metricbeat"
-  #ilm.pattern: "{now/d}-000001"
 
   # Set gzip compression level.
   #compression_level: 0
@@ -1610,6 +1628,25 @@ setup.template.settings:
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
   #_source:
     #enabled: false
+
+#============================== Setup ILM =====================================
+
+# Configure Index Lifecycle Management Index Lifecycle Management creates a
+# write alias and adds additional settings to the template.
+# The elasticsearch.output.index setting will be replaced with the write alias
+# if ILM is enabled.
+
+# Enabled ILM support. Valid values are true, false, and auto. The beat will
+# detect availabilty of Index Lifecycle Management in Elasticsearch and enable
+# or disable ILM support.
+#setup.ilm.enabled: auto
+
+# Configure the ILM write alias name.
+#setup.ilm.rollover_alias: "metricbeat"
+
+# Configure rollover index pattern.
+#setup.ilm.pattern: "{now/d}-000001"
+
 
 #============================== Kibana =====================================
 

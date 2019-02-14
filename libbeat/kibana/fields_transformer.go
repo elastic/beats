@@ -32,9 +32,10 @@ type fieldsTransformer struct {
 	transformedFieldFormatMap common.MapStr
 	version                   *common.Version
 	keys                      map[string]int
+	migration                 bool
 }
 
-func newFieldsTransformer(version *common.Version, fields common.Fields) (*fieldsTransformer, error) {
+func newFieldsTransformer(version *common.Version, fields common.Fields, migration bool) (*fieldsTransformer, error) {
 	if version == nil {
 		return nil, errors.New("Version must be given")
 	}
@@ -44,6 +45,7 @@ func newFieldsTransformer(version *common.Version, fields common.Fields) (*field
 		transformedFields:         []common.MapStr{},
 		transformedFieldFormatMap: common.MapStr{},
 		keys:                      map[string]int{},
+		migration:                 migration,
 	}, nil
 }
 
@@ -88,6 +90,10 @@ func (t *fieldsTransformer) transformFields(commonFields common.Fields, path str
 		} else {
 			if f.Type == "alias" {
 				if t.version.LessThan(v640) {
+					continue
+				}
+				// Only adds migration aliases if migration is enabled
+				if f.MigrationAlias && !t.migration {
 					continue
 				}
 				if ff := t.fields.GetField(f.AliasPath); ff != nil {

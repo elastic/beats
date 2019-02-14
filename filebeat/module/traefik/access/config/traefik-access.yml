@@ -4,12 +4,3 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
-
-processors:
-- dissect:
-    tokenizer: '%{source.address} %{traefik.access.user_identifier} %{user.name} [%{traefik.access.time}]
-    "%{http.request.method} %{url.original} HTTP/%{http.version}"
-    %{http.response.status_code} %{traefik.access.message}'
-
-    field: "message"
-    target_prefix: ""

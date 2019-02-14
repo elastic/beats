@@ -79,14 +79,14 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 				"available": common.MapStr{
 					"bytes": availMem,
 				},
-				"workingSet": common.MapStr{
+				"working_set": common.MapStr{
 					"bytes": workingSet,
 				},
 				"rss": common.MapStr{
 					"bytes": rss,
 				},
-				"pageFaults":      pageFaults,
-				"majorPageFaults": majorPageFaults,
+				"page_faults":       pageFaults,
+				"major_page_faults": majorPageFaults,
 			},
 
 			"network": common.MapStr{

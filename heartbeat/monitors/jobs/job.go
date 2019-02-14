@@ -17,7 +17,9 @@
 
 package jobs
 
-import "github.com/elastic/beats/libbeat/beat"
+import (
+	"github.com/elastic/beats/libbeat/beat"
+)
 
 // A Job represents a unit of execution, and may return multiple continuation jobs.
 type Job func(event *beat.Event) ([]Job, error)
@@ -39,6 +41,24 @@ func WrapAll(jobs []Job, wrappers ...JobWrapper) []Job {
 	var wrapped []Job
 	for _, j := range jobs {
 		for _, wrapper := range wrappers {
+			j = Wrap(j, wrapper)
+		}
+		wrapped = append(wrapped, j)
+	}
+	return wrapped
+}
+
+// JobWrapperFactory can be used to created new instances of JobWrappers.
+type JobWrapperFactory func() JobWrapper
+
+// WrapAllSeparately wraps the given jobs using the given JobWrapperFactory instances.
+// This enables us to use a different JobWrapper for the jobs passed in, but recursively apply
+// the same wrapper to their children.
+func WrapAllSeparately(jobs []Job, factories ...JobWrapperFactory) []Job {
+	var wrapped []Job
+	for _, j := range jobs {
+		for _, factory := range factories {
+			wrapper := factory()
 			j = Wrap(j, wrapper)
 		}
 		wrapped = append(wrapped, j)

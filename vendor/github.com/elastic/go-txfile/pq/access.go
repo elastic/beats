@@ -80,6 +80,10 @@ func (a *access) rootPage(tx *txfile.Tx) (*txfile.Page, error) {
 	return tx.Page(a.rootID)
 }
 
+func (a *access) RootFileOffset() uintptr {
+	return a.Offset(a.rootID, uintptr(a.rootOff))
+}
+
 // LoadRootPage accesses the queue root page from within the passed write
 // transaction.
 // The Root page it's content is loaded into the write buffer for manipulations.

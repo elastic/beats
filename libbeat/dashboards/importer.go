@@ -54,17 +54,12 @@ type Importer struct {
 	cfg     *Config
 	version common.Version
 
-	loader Loader
+	loader KibanaLoader
+	fields common.MapStr
 }
 
-type Loader interface {
-	ImportIndex(file string) error
-	ImportDashboard(file string) error
-	statusMsg(msg string, a ...interface{})
-	Close() error
-}
-
-func NewImporter(version common.Version, cfg *Config, loader Loader) (*Importer, error) {
+// NewImporter creates a new dashboard importer
+func NewImporter(version common.Version, cfg *Config, loader KibanaLoader, fields common.MapStr) (*Importer, error) {
 
 	// Current max version is 7
 	if version.Major > 6 {
@@ -75,6 +70,7 @@ func NewImporter(version common.Version, cfg *Config, loader Loader) (*Importer,
 		cfg:     cfg,
 		version: version,
 		loader:  loader,
+		fields:  fields,
 	}, nil
 }
 
@@ -106,7 +102,7 @@ func (imp Importer) ImportFile(fileType string, file string) error {
 	if fileType == "dashboard" {
 		return imp.loader.ImportDashboard(file)
 	} else if fileType == "index-pattern" {
-		return imp.loader.ImportIndex(file)
+		return imp.loader.ImportIndexFile(file)
 	}
 	return fmt.Errorf("Unexpected file type %s", fileType)
 }
@@ -310,6 +306,10 @@ func (imp Importer) ImportKibanaDir(dir string) error {
 		return newErrNotFound("No directory %s", dir)
 	}
 
+	// Loads the internal index pattern
+	if imp.fields != nil {
+		imp.loader.ImportIndex(imp.fields)
+	}
 	check := []string{}
 	if !imp.cfg.OnlyDashboards {
 		check = append(check, "index-pattern")

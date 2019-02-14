@@ -15,6 +15,7 @@
             "syscall": "accept",
             "tty": "(none)"
         },
+        "message_type": "syscall",
         "result": "success",
         "sequence": 8832,
         "session": "unset",
@@ -34,12 +35,7 @@
     "event": {
         "action": "accepted-connection-from",
         "category": "audit-rule",
-        "module": "auditd",
-        "type": "syscall"
-    },
-    "group": {
-        "id": "0",
-        "name": "root"
+        "module": "auditd"
     },
     "network": {
         "direction": "incoming"
@@ -62,26 +58,38 @@
         "net"
     ],
     "user": {
-        "auid": "unset",
-        "egid": "0",
-        "euid": "0",
-        "fsgid": "0",
-        "fsuid": "0",
-        "gid": "0",
+        "audit": {
+            "id": "unset"
+        },
+        "effective": {
+            "group": {
+                "id": "0",
+                "name": "root"
+            },
+            "id": "0",
+            "name": "root"
+        },
+        "filesystem": {
+            "group": {
+                "id": "0",
+                "name": "root"
+            },
+            "id": "0",
+            "name": "root"
+        },
+        "group": {
+            "id": "0",
+            "name": "root"
+        },
         "id": "0",
         "name": "root",
-        "name_map": {
-            "egid": "root",
-            "euid": "root",
-            "fsgid": "root",
-            "fsuid": "root",
-            "gid": "root",
-            "sgid": "root",
-            "suid": "root",
-            "uid": "root"
-        },
-        "sgid": "0",
-        "suid": "0",
-        "uid": "0"
+        "saved": {
+            "group": {
+                "id": "0",
+                "name": "root"
+            },
+            "id": "0",
+            "name": "root"
+        }
     }
 }

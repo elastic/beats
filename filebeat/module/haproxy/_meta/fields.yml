@@ -53,14 +53,14 @@
           type: text
 
         - name: source
-          type: text
+          type: keyword
           description: The HAProxy source of the log
 
         - name: termination_state
           description: Condition the session was in when the session ended.
 
         - name: mode
-          type: text
+          type: keyword
           description: mode that the frontend is operating (TCP or HTTP)
 
         - name: connections

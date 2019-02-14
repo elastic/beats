@@ -35,15 +35,13 @@
         "source.ip": "192.168.33.1",
         "url.original": "/hello",
         "user.name": "-",
-        "user_agent.device": "Other",
-        "user_agent.major": "50",
-        "user_agent.minor": "0",
+        "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:50.0) Gecko/20100101 Firefox/50.0",
-        "user_agent.os.full_name": "Mac OS X 10.12",
-        "user_agent.os.major": "10",
-        "user_agent.os.minor": "12",
-        "user_agent.os.name": "Mac OS X"
+        "user_agent.os.full": "Mac OS X 10.12",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.12",
+        "user_agent.version": "50.0"
     },
     {
         "@timestamp": "2016-12-26T14:16:48.000Z",
@@ -77,14 +75,11 @@
         "source.ip": "172.17.0.1",
         "url.original": "/stringpatch",
         "user.name": "-",
-        "user_agent.device": "Other",
-        "user_agent.major": "15",
-        "user_agent.minor": "0",
+        "user_agent.device.name": "Other",
         "user_agent.name": "Firefox Alpha",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2",
-        "user_agent.os.full_name": "Windows 7",
         "user_agent.os.name": "Windows 7",
-        "user_agent.patch": "a2"
+        "user_agent.version": "15.0.a2"
     },
     {
         "@timestamp": "2017-05-29T19:02:48.000Z",
@@ -104,13 +99,10 @@
         "source.domain": "monitoring-server",
         "url.original": "/status",
         "user.name": "-",
-        "user_agent.device": "Other",
-        "user_agent.major": "15",
-        "user_agent.minor": "0",
+        "user_agent.device.name": "Other",
         "user_agent.name": "Firefox Alpha",
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2",
-        "user_agent.os.full_name": "Windows 7",
         "user_agent.os.name": "Windows 7",
-        "user_agent.patch": "a2"
+        "user_agent.version": "15.0.a2"
     }
 ]

@@ -2246,37 +2246,3 @@
       type: keyword
       description: >
         Hostname of the agent.
-
-    # Several user_agent fields were removed from ECS.
-    # TODO: Update filebeat/iis/access accordingly.
-    - name: user_agent.patch
-      type: keyword
-      description: >
-        Patch version of the user agent.
-    - name: user_agent.minor
-      type: keyword
-      description: >
-        Minor version of the user agent.
-    - name: user_agent.major
-      type: keyword
-      description: >
-        Major version of the user agent.
-    - name: user_agent.device
-      type: keyword
-      description: >
-        Name of the physical device.
-    - name: user_agent.os.major
-      type: long
-      description: >
-        Major version of the operating system.
-    - name: user_agent.os.minor
-      type: long
-      description: >
-        Minor version of the operating system.
-
-    # url.hostname was removed from ECS.
-    # TODO: Update Suricata module to use url.domain.
-    - name: url.hostname
-      type: keyword
-      description: >
-        Hostname of the request, such as "elastic.co".

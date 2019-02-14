@@ -223,7 +223,7 @@ func (t *Transaction) InitWithMsg(
 func (t *Transaction) Event(event *beat.Event) error {
 	event.Timestamp = t.Ts.Ts
 
-	pbf := &pb.Fields{}
+	pbf := pb.NewFields()
 	pbf.SetSource(&t.Src)
 	pbf.SetDestination(&t.Dst)
 	pbf.Source.Bytes = int64(t.BytesIn)
@@ -233,16 +233,12 @@ func (t *Transaction) Event(event *beat.Event) error {
 	pbf.Event.End = t.EndTime
 	pbf.Network.Transport = t.Transport.String()
 	pbf.Network.Protocol = pbf.Event.Dataset
+	pbf.Error.Message = t.Notes
 
 	fields := event.Fields
 	fields[pb.FieldsKey] = pbf
 	fields["type"] = pbf.Event.Dataset
 	fields["status"] = t.Status
-	if len(t.Notes) == 1 {
-		event.PutValue("error.message", t.Notes[0])
-	} else if len(t.Notes) > 1 {
-		event.PutValue("error.message", t.Notes)
-	}
 	return nil
 }
 

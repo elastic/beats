@@ -241,8 +241,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/coreos/go-systemd
-Version: v17
-Revision: 39ca1b05acc7ad1220e09f133283b8859a8b71ab
+Version: v18
+Revision: 9002847aa1425fb6ac49077c0a630b3b67e0fbfd
 License type (autodetected): Apache-2.0
 ./vendor/github.com/coreos/go-systemd/LICENSE:
 --------------------------------------------------------------------
@@ -657,8 +657,8 @@ Elasticsearch, B.V. (https://www.elastic.co/).
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-txfile
-Version: v0.0.3
-Revision: 389b527ad365f6fc6cf5fa7e0ba5a2294ad2f3ed
+Version: v0.0.6
+Revision: fa3d87c14381c01aaa1c7901877fb5e483294964
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-txfile/LICENSE:
 --------------------------------------------------------------------
@@ -667,8 +667,8 @@ Apache License 2.0
 
 --------------------------------------------------------------------
 Dependency: github.com/elastic/go-ucfg
-Version: v0.6.5
-Revision: 92d43887f91851c9936621665af7f796f4d03412
+Version: v0.7.0
+Revision: 0539807037ce820e147797f051ff32b05f4f9288
 License type (autodetected): Apache-2.0
 ./vendor/github.com/elastic/go-ucfg/LICENSE:
 --------------------------------------------------------------------
@@ -2254,7 +2254,7 @@ SoundCloud Ltd. (http://soundcloud.com/).
 
 --------------------------------------------------------------------
 Dependency: github.com/rcrowley/go-metrics
-Revision: 1f30fe9094a513ce4c700b9a54458bbb0c96996c
+Revision: 3113b8401b8a98917cde58f8bbd42a1b1c03b1fd
 License type (autodetected): BSD-2-Clause
 ./vendor/github.com/rcrowley/go-metrics/LICENSE:
 --------------------------------------------------------------------
@@ -2749,7 +2749,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------
 Dependency: github.com/tsg/gopacket
-Revision: f289b3ea3e41a01b2822be9caf5f40c01fdda05c
+Revision: 7c5392a5f2b5c5fa393c71e1f9064e22b5408995
 License type (autodetected): BSD-3-Clause
 ./vendor/github.com/tsg/gopacket/LICENSE:
 --------------------------------------------------------------------

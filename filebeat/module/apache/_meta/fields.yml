@@ -62,19 +62,7 @@
               fields:
                 - name: device
                   type: alias
-                  path: user_agent.device
-                  migration: true
-                - name: major
-                  type: alias
-                  path: user_agent.major
-                  migration: true
-                - name: minor
-                  type: alias
-                  path: user_agent.minor
-                  migration: true
-                - name: patch
-                  type: alias
-                  path: user_agent.patch
+                  path: user_agent.device.name
                   migration: true
                 - name: name
                   type: alias
@@ -83,14 +71,6 @@
                 - name: os
                   type: alias
                   path: user_agent.os.full_name
-                  migration: true
-                - name: os_major
-                  type: alias
-                  path: user_agent.os.major
-                  migration: true
-                - name: os_minor
-                  type: alias
-                  path: user_agent.os.minor
                   migration: true
                 - name: os_name
                   type: alias

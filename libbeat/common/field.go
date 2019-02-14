@@ -119,7 +119,7 @@ func (f *Field) Validate() error {
 }
 
 func LoadFieldsYaml(path string) (Fields, error) {
-	keys := []Field{}
+	var keys []Field
 
 	cfg, err := yaml.NewConfigWithFile(path)
 	if err != nil {
@@ -129,6 +129,23 @@ func LoadFieldsYaml(path string) (Fields, error) {
 
 	fields := Fields{}
 
+	for _, key := range keys {
+		fields = append(fields, key.Fields...)
+	}
+	return fields, nil
+}
+
+// LoadFields loads fields from a byte array
+func LoadFields(f []byte) (Fields, error) {
+	var keys []Field
+
+	cfg, err := yaml.NewConfig(f)
+	if err != nil {
+		return nil, err
+	}
+	cfg.Unpack(&keys)
+
+	fields := Fields{}
 	for _, key := range keys {
 		fields = append(fields, key.Fields...)
 	}

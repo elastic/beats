@@ -1,10 +1,11 @@
-FROM golang:1.11.4
+FROM golang:1.11.5
 
 RUN \
     apt-get update \
       && apt-get install -y --no-install-recommends \
          python-pip \
          virtualenv \
+         librpm-dev \
       && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip
