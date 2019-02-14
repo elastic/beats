@@ -12,7 +12,7 @@
                     "NATSLOGLEVEL":"(INF|DBG|WRN|ERR|FTL|TRC)",
                     "NATSGREEDYDATA": "%{IPV4:ip}:%{POSINT:port} - cid:%{POSINT:client.id} - %{NATSDIRECTION:msg.direction} \\[%{NATSMESSAGETYPE:msg.type} %{DATA:msg.topic} %{GREEDYDATA} %{POSINT:msg.bytes}\\]",
                     "NATSDIRECTION": "(<<-|->>)",
-                    "NATSMESSAGETYPE": "(MSG|PUB|SUB)"
+                    "NATSMESSAGETYPE": "(MSG|PUB|SUB|PING)"
                 },
                 "ignore_missing": true
             }
