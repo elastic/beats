@@ -44,12 +44,7 @@ func testProcessors(t *testing.T, cases map[string]testCase) {
 					t.Fatalf("Failed to create config(%v): %+v", i, err)
 				}
 
-				var plugin map[string]*common.Config
-				if err := config.Unpack(&plugin); err != nil {
-					t.Fatalf("Failed to unpack config: %+v", err)
-				}
-
-				ps[i], err = processors.New(processors.PluginConfig{plugin})
+				ps[i], err = processors.New([]*common.Config{config})
 				if err != nil {
 					t.Fatalf("Failed to create add_tags processor(%v): %+v", i, err)
 				}
@@ -57,7 +52,11 @@ func testProcessors(t *testing.T, cases map[string]testCase) {
 
 			current := &beat.Event{Fields: test.event.Clone()}
 			for i, processor := range ps {
-				current = processor.Run(current)
+				var err error
+				current, err = processor.Run(current)
+				if err != nil {
+					t.Fatal(err)
+				}
 				if current == nil {
 					t.Fatalf("Event dropped(%v)", i)
 				}
