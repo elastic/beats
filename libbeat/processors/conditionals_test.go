@@ -183,6 +183,20 @@ func TestIfElseThenProcessor(t *testing.T) {
     add_fields: {target: "", fields: {uid_type: user}}
 `
 
+	const ifThenElseIf = `
+- if:
+    range.uid.lt: 500
+  then:
+    - add_fields: {target: "", fields: {uid_type: reserved}}
+  else:
+    if:
+      equals.uid: 500
+    then:
+      add_fields: {target: "", fields: {uid_type: "eq_500"}}
+    else:
+      add_fields: {target: "", fields: {uid_type: "gt_500"}}
+`
+
 	testProcessors(t, map[string]testCase{
 		"if-then-true": {
 			event: common.MapStr{"uid": 411},
@@ -208,6 +222,11 @@ func TestIfElseThenProcessor(t *testing.T) {
 			event: common.MapStr{"uid": 500},
 			want:  common.MapStr{"uid": 500, "uid_type": "user"},
 			cfg:   ifThenElseSingleProcessor,
+		},
+		"if-then-else-if": {
+			event: common.MapStr{"uid": 500},
+			want:  common.MapStr{"uid": 500, "uid_type": "eq_500"},
+			cfg:   ifThenElseIf,
 		},
 	})
 }
