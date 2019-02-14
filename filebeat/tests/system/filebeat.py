@@ -66,6 +66,7 @@ class BaseTest(TestCase):
         full_path = os.path.join(self.working_dir, path)
         return oct(stat.S_IMODE(os.lstat(full_path).st_mode))
 
+
 class InputLogs:
     def __init__(self, home):
         self.home = home
@@ -125,7 +126,7 @@ class LogState:
 
     def lines(self, filter=None):
         if not filter:
-            filter = lambda x: True
+            def filter(x): return True
         with open(self.path, "r") as f:
             f.seek(self.off)
             return [l for l in f if filter(l)]
@@ -135,13 +136,13 @@ class LogState:
             msg = msg.lower()
 
         if type(msg) == REGEXP_TYPE:
-            match = lambda x: msg.search(x) is not None
+            def match(x): return msg.search(x) is not None
         else:
-            match = lambda x: x.find(msg) >= 0
+            def match(x): return x.find(msg) >= 0
 
         pred = match
         if ignore_case:
-            pred = lambda x: match(x.lower())
+            def pred(x): return match(x.lower())
 
         return len(self.lines(filter=pred)) >= count
 
