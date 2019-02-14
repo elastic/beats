@@ -38,6 +38,7 @@ func TestProcessors(t *testing.T) {
 		events               []common.MapStr
 		expected             []common.MapStr
 		includeAgentMetadata bool
+		includeHostName      bool
 	}
 
 	tests := []struct {
@@ -145,6 +146,52 @@ func TestProcessors(t *testing.T) {
 						},
 					},
 					includeAgentMetadata: true,
+				},
+			},
+		},
+		{
+			name: "add host name",
+			global: pipelineProcessors{
+				fields: common.MapStr{"global": 1, "host": common.MapStr{"name": "host123"}},
+			},
+			info: &beat.Info{
+				Hostname: "test.host.hostname",
+				Name:     "test.host.name",
+			},
+			local: []local{
+				{
+					config: beat.ClientConfig{},
+					events: []common.MapStr{{"value": "abc"}},
+					expected: []common.MapStr{
+						{
+							"host":  common.MapStr{"name": "test.host.name"},
+							"value": "abc", "global": 1,
+						},
+					},
+					includeHostName: true,
+				},
+			},
+		},
+		{
+			name: "add host name to existing host",
+			global: pipelineProcessors{
+				fields: common.MapStr{"global": 1, "host": common.MapStr{"name": "host123"}},
+			},
+			info: &beat.Info{
+				Hostname: "test.host.hostname",
+				Name:     "test.host.name",
+			},
+			local: []local{
+				{
+					config: beat.ClientConfig{},
+					events: []common.MapStr{{"value": "abc", "host": common.MapStr{"hostname": "test.other.hostname"}}},
+					expected: []common.MapStr{
+						{
+							"host":  common.MapStr{"name": "test.host.name", "hostname": "test.other.hostname"},
+							"value": "abc", "global": 1,
+						},
+					},
+					includeHostName: true,
 				},
 			},
 		},
@@ -393,6 +440,7 @@ func TestProcessors(t *testing.T) {
 			}
 			for i, local := range test.local {
 				local.config.SkipAgentMetadata = !local.includeAgentMetadata
+				local.config.SkipHostName = !local.includeHostName
 				programs[i] = newProcessorPipeline(info, monitors, test.global, local.config)
 			}
 
