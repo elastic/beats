@@ -323,12 +323,6 @@ func (r *Registrar) onEvents(states []file.State) {
 		}
 	}
 
-	go func() {
-		for _, st := range states {
-			logp.Debug("registrar", "state update: %#v", st)
-		}
-	}()
-
 	logp.Debug("registrar", "Registrar state updates processed. Count: %v", len(states))
 
 	// new set of events received -> mark state registry ready for next
@@ -394,9 +388,6 @@ func (r *Registrar) writeRegistry() error {
 	statesCurrent.Set(int64(len(states)))
 
 	registryWrites.Inc()
-
-	// tmp, err := json.MarshalIndent(states, "", "    ")
-	// logp.Debug("registry", "registry contents: %s", tmp)
 
 	tempfile, err := writeTmpFile(r.registryFile, r.fileMode, states)
 	if err != nil {
