@@ -274,8 +274,8 @@ func makeByHostAnyIPJob(
 		resolveStart := time.Now()
 		ip, err := net.ResolveIPAddr(network, host)
 		if err != nil {
-			resolveErr(event, host, err)
-			return nil, nil
+			resolveErr(event, host)
+			return nil, err
 		}
 
 		resolveEnd := time.Now()
@@ -303,8 +303,8 @@ func makeByHostAllIPJob(
 		resolveStart := time.Now()
 		ips, err := net.LookupIP(host)
 		if err != nil {
-			resolveErr(event, host, err)
-			return nil, nil
+			resolveErr(event, host)
+			return nil, err
 		}
 
 		resolveEnd := time.Now()
@@ -316,8 +316,8 @@ func makeByHostAllIPJob(
 
 		if len(ips) == 0 {
 			err := fmt.Errorf("no %v address resolvable for host %v", network, host)
-			resolveErr(event, host, err)
-			return nil, nil
+			resolveErr(event, host)
+			return nil, err
 		}
 
 		// create ip ping tasks
@@ -345,7 +345,7 @@ func resolveIPEvent(host, ip string, rtt time.Duration) common.MapStr {
 	}
 }
 
-func resolveErr(event *beat.Event, host string, err error) {
+func resolveErr(event *beat.Event, host string) {
 	MergeEventFields(event, common.MapStr{
 		"monitor": common.MapStr{
 			"host": host,

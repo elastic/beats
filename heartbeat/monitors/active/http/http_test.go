@@ -377,3 +377,32 @@ func TestUnreachableJob(t *testing.T) {
 		event.Fields,
 	)
 }
+
+func TestNXDomainJob(t *testing.T) {
+	host := "notadomain.notatld"
+	// Port 80 is sometimes omitted in logs a non-standard one is easier to validate
+	port := 1234
+	url := fmt.Sprintf("http://%s:%d", host, port)
+
+	event := testRequest(t, url)
+
+	validator := mapval.Strict(
+		mapval.MustCompile(mapval.Map{
+			"error": mapval.Map{
+				"message": mapval.IsStringContaining("no such host"),
+				"type":    "io",
+			},
+			"http": mapval.Map{
+				"url": fmt.Sprintf("http://%s:%d", host, port),
+			},
+			"monitor": mapval.Map{
+				"duration": mapval.Map{"us": mapval.IsDuration},
+				"host":     host,
+				"id":       fmt.Sprintf("http@http://%s:%d", host, port),
+				"scheme":   "http",
+				"status":   "down",
+			}, "resolve": mapval.Map{"host": host}, "tcp": mapval.Map{"port": uint16(port)},
+		}))
+
+	mapvaltest.Test(t, validator, event.Fields)
+}
