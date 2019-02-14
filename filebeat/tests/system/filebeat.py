@@ -22,7 +22,11 @@ class BaseTest(TestCase):
 
         super(BaseTest, self).setUpClass()
 
-    def registry(self, name=None, data_path=None):
+    @property
+    def registry(self):
+        return self.access_registry()
+
+    def access_registry(self, name=None, data_path=None):
         data_path = data_path if data_path else self.working_dir
         return Registry(data_path, name)
 
@@ -34,10 +38,10 @@ class BaseTest(TestCase):
         return InputLogs(os.path.join(self.working_dir, "log"))
 
     def has_registry(self, name=None, data_path=None):
-        return self.registry(name, data_path).exists()
+        return self.access_registry(name, data_path).exists()
 
     def get_registry(self, name=None, data_path=None, filter=None):
-        reg = self.registry(name, data_path)
+        reg = self.access_registry(name, data_path)
         self.wait_until(reg.exists)
         return reg.load(filter=filter)
 
@@ -75,16 +79,17 @@ class InputLogs:
         self._write_to(name, 'a', contents)
 
     def size(self, name):
-        return os.path.getsize(os.path.join(self.home, name))
+        return os.path.getsize(self.path_of(name))
 
     def _write_to(self, name, mode, contents):
-        path = os.path.join(self.home, name)
-        with open(path, mode) as f:
+        with open(self.path_of(name), mode) as f:
             f.write(contents)
 
     def remove(self, name):
-        path = os.path.join(self.home, name)
-        os.remove(path)
+        os.remove(self.path_of(name))
+
+    def path_of(self, name):
+        return os.path.join(self.home, name)
 
 
 class Registry:
@@ -132,7 +137,7 @@ class LogState:
         if type(msg) == REGEXP_TYPE:
             match = lambda x: msg.search(x) is not None
         else:
-            match = lambda x: x.find(msg)
+            match = lambda x: x.find(msg) >= 0
 
         pred = match
         if ignore_case:
@@ -148,3 +153,6 @@ class LogState:
 
     def nextCheck(self, msg, ignore_case=False, count=1):
         return lambda: self.next(msg, ignore_case, count)
+
+    def check(self, msg, ignore_case=False, count=1):
+        return lambda: self.contains(msg, ignore_case, count)

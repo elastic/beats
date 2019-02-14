@@ -779,71 +779,48 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/input*",
-            clean_inactive="4s",
+            clean_inactive="3s",
             ignore_older="2s",
             close_inactive="0.2s",
             scan_frequency="0.1s"
         )
 
-        os.mkdir(self.working_dir + "/log/")
-        testfile_path1 = self.working_dir + "/log/input1"
-        testfile_path2 = self.working_dir + "/log/input2"
-        testfile_path3 = self.working_dir + "/log/input3"
+        file1 = "input1"
+        file2 = "input2"
+        file3 = "input3"
 
-        with open(testfile_path1, 'w') as testfile1:
-            testfile1.write("first file\n")
+        inputs = self.input_logs()
+        logs = self.log_access()
 
-        with open(testfile_path2, 'w') as testfile2:
-            testfile2.write("second file\n")
+        inputs.write(file1, "first file\n")
+        inputs.write(file2, "second file\n")
 
         filebeat = self.start_beat()
 
-        self.wait_until(
-            lambda: self.output_has(lines=2),
-            max_timeout=10)
+        self.wait_until(lambda: self.output_has(lines=2), max_timeout=10)
 
         # Wait until registry file is created
-        self.wait_until(
-            lambda: self.log_contains_count("Registry file updated") > 1,
-            max_timeout=15)
-
-        # Syncing file on disk is always susceptible to timing issues.
-        time.sleep(1)
-
-        data = self.get_registry()
-        assert len(data) == 2
+        self.wait_until(lambda: self.registry.exists(), max_timeout=15)
+        assert self.registry.count() == 2
 
         # Wait until states are removed from inputs
-        self.wait_until(
-            lambda: self.log_contains_count(
-                "State removed for") == 2,
-            max_timeout=15)
-
-        with open(testfile_path3, 'w') as testfile3:
-            testfile3.write("2\n")
+        self.wait_until(logs.nextCheck("State removed for", count=2), max_timeout=15)
 
         # Write new file to make sure registrar is flushed again
-        self.wait_until(
-            lambda: self.output_has(lines=3),
-            max_timeout=30)
+        inputs.write(file3, "third file\n")
+        self.wait_until(lambda: self.output_has(lines=3), max_timeout=30)
 
-        # Wait until states are removed from inputs
-        self.wait_until(
-            lambda: self.log_contains_count(
-                "State removed for") >= 3,
-            max_timeout=15)
+        # Wait until state of new file is removed
+        self.wait_until(logs.nextCheck("State removed for"), max_timeout=15)
 
         filebeat.check_kill_and_wait()
 
         # Check that the first two files were removed from the registry
-        data = self.get_registry()
+        data = self.registry.load()
         assert len(data) == 1, "Expected a single file but got: %s" % data
 
         # Make sure the last file in the registry is the correct one and has the correct offset
-        if os.name == "nt":
-            assert data[0]["offset"] == 3
-        else:
-            assert data[0]["offset"] == 2
+        assert data[0]["offset"] == inputs.size(file3)
 
     def test_clean_removed(self):
         """
@@ -861,7 +838,7 @@ class Test(BaseTest):
         file2 = "input2"
 
         inputs = self.input_logs()
-        registry = self.registry()
+        registry = self.registry
         logs = self.log_access()
 
         inputs.write(file1, "file to be removed\n")
@@ -869,9 +846,7 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
 
-        self.wait_until(
-            lambda: self.output_has(lines=2),
-            max_timeout=10)
+        self.wait_until(lambda: self.output_has(lines=2), max_timeout=10)
 
         # Wait until registry file is created
         self.wait_until(registry.exists)
@@ -882,16 +857,14 @@ class Test(BaseTest):
         inputs.remove(file1)
 
         # Wait until states are removed from inputs
-        self.wait_until(logs.nextCheck("Remove state for file as file removed"))
+        self.wait_until(logs.check("Remove state for file as file removed"))
 
         # Add one more line to make sure registry is written
         inputs.append(file2, "make sure registry is written\n")
-        self.wait_until(
-            lambda: self.output_has(lines=3),
-            max_timeout=10)
+        self.wait_until(lambda: self.output_has(lines=3), max_timeout=10)
 
         # Make sure all states are cleaned up
-        self.wait_until(logs.nextCheck(re.compile("Registrar.*After: 1, Pending: 0")))
+        self.wait_until(logs.nextCheck(re.compile("Registrar.*After: 1")))
 
         filebeat.check_kill_and_wait()
 
@@ -924,7 +897,7 @@ class Test(BaseTest):
         ]
 
         inputs = self.input_logs()
-        registry = self.registry()
+        registry = self.registry
         logs = self.log_access()
 
         inputs.write(file1, "file to be removed\n")
@@ -953,7 +926,7 @@ class Test(BaseTest):
         self.wait_until(lambda: self.output_has(lines=3))
 
         # wait until next gc and until registry file has been updated
-        self.wait_until(logs.nextCheck("Before: 1, After: 1, Pending: 1"))
+        self.wait_until(logs.check("Before: 1, After: 1, Pending: 1"))
         self.wait_until(logs.nextCheck("Registry file updated. 1 states written."))
         count = registry.count()
         print("registry size after remove: {}".format(count))
@@ -1040,56 +1013,47 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            close_inactive="1s",
-            ignore_older="3s",
+            close_inactive="200ms",
+            ignore_older="2000ms",
         )
-        os.mkdir(self.working_dir + "/log/")
 
-        testfile_path1 = self.working_dir + "/log/test1.log"
-        testfile_path2 = self.working_dir + "/log/test2.log"
-        testfile_path3 = self.working_dir + "/log/test3.log"
-        testfile_path4 = self.working_dir + "/log/test4.log"
+        init_files = ["test"+str(i)+".log" for i in range(3)]
+        restart_files = ["test"+str(i+3)+".log" for i in range(1)]
 
-        with open(testfile_path1, 'w') as testfile1:
-            testfile1.write("Hello World\n")
-        with open(testfile_path2, 'w') as testfile2:
-            testfile2.write("Hello World\n")
-        with open(testfile_path3, 'w') as testfile3:
-            testfile3.write("Hello World\n")
+        inputs = self.input_logs()
+        logs = self.log_access()
+
+        for name in init_files:
+            inputs.write(name, "Hello World\n")
 
         filebeat = self.start_beat()
 
         # Make sure states written appears one more time
         self.wait_until(
-            lambda: self.log_contains("Ignore file because ignore_older"),
+            lambda: logs.contains("Ignore file because ignore_older"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            close_inactive="1s",
-            ignore_older="3s",
-            clean_inactive="5s",
+            close_inactive="200ms",
+            ignore_older="2000ms",
+            clean_inactive="3s",
         )
 
         filebeat = self.start_beat(output="filebeat2.log")
+        logs = self.log_access("filebeat2.log")
 
         # Write additional file
-        with open(testfile_path4, 'w') as testfile4:
-            testfile4.write("Hello World\n")
+        for name in restart_files:
+            inputs.write(name, "Hello World\n")
 
         # Make sure all 4 states are persisted
-        self.wait_until(
-            lambda: self.log_contains(
-                "input states cleaned up. Before: 4, After: 4", logfile="filebeat2.log"),
-            max_timeout=10)
+        self.wait_until(logs.nextCheck("input states cleaned up. Before: 4, After: 4"))
 
         # Wait until registry file is cleaned
-        self.wait_until(
-            lambda: self.log_contains(
-                "input states cleaned up. Before: 0, After: 0", logfile="filebeat2.log"),
-            max_timeout=10)
+        self.wait_until(logs.nextCheck("input states cleaned up. Before: 0, After: 0"))
 
         filebeat.check_kill_and_wait()
 
