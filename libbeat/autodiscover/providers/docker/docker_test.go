@@ -38,6 +38,7 @@ func TestGenerateHints(t *testing.T) {
 		},
 		// Docker meta must be present in the hints
 		{
+			// TODO: why must docker be present in the hints? Did my changes now break something?
 			event: bus.Event{
 				"docker": common.MapStr{
 					"container": common.MapStr{
