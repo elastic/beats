@@ -27,7 +27,6 @@ import (
 	"syscall"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	tml "golang.org/x/crypto/ssh/terminal"
 
 	"github.com/elastic/beats/libbeat/cmd/instance"
@@ -56,7 +55,7 @@ func getKeystore(settings instance.Settings) (keystore.Keystore, error) {
 //  - add
 //  - remove
 //  - list
-func genKeystoreCmd(settings instance.Settings, runFlags *pflag.FlagSet) *cobra.Command {
+func genKeystoreCmd(settings instance.Settings) *cobra.Command {
 	keystoreCmd := cobra.Command{
 		Use:   "keystore",
 		Short: "Manage secrets keystore",

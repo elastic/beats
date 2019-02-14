@@ -60,28 +60,24 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 		settings.IndexPrefix = settings.Name
 	}
 
-	name := settings.Name
-	version := settings.Version
-	runFlags := settings.RunFlags
-
 	rootCmd := &BeatsRootCmd{}
-	rootCmd.Use = name
+	rootCmd.Use = settings.Name
 
 	// Due to a dependence upon the beat name, the default config file path
-	err := cfgfile.ChangeDefaultCfgfileFlag(name)
+	err := cfgfile.ChangeDefaultCfgfileFlag(settings.Name)
 	if err != nil {
 		panic(fmt.Errorf("failed to set default config file path: %v", err))
 	}
 
 	// must be updated prior to CLI flag handling.
 
-	rootCmd.RunCmd = genRunCmd(settings, beatCreator, runFlags)
+	rootCmd.RunCmd = genRunCmd(settings, beatCreator)
 	rootCmd.ExportCmd = genExportCmd(settings)
 	rootCmd.TestCmd = genTestCmd(settings, beatCreator)
 	rootCmd.SetupCmd = genSetupCmd(settings, beatCreator)
-	rootCmd.KeystoreCmd = genKeystoreCmd(settings, runFlags)
-	rootCmd.VersionCmd = genVersionCmd(name, version)
-	rootCmd.CompletionCmd = genCompletionCmd(name, version, rootCmd)
+	rootCmd.KeystoreCmd = genKeystoreCmd(settings)
+	rootCmd.VersionCmd = genVersionCmd(settings)
+	rootCmd.CompletionCmd = genCompletionCmd(settings, rootCmd)
 
 	// Root command is an alias for run
 	rootCmd.Run = rootCmd.RunCmd.Run
