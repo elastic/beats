@@ -189,10 +189,10 @@ func (i *Input) publishAll() {
 
 // Stop stops all readers of the input.
 func (i *Input) Stop() {
-	i.client.Close()
 	for _, r := range i.readers {
 		r.Close()
 	}
+	i.client.Close()
 }
 
 // Wait waits until all readers are done.
