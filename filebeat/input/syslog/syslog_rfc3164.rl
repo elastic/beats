@@ -44,7 +44,7 @@
   timestamp_rfc3339 = year "-" month_numeric "-" day_two_digits (time_separator | space) time timezone?;
   timestamp = (timestamp_rfc3339 | timestamp_rfc3164) ":"?;
 
-  hostname = ([a-zA-Z0-9\.\-_%:]*([a-zA-Z0-9%] | "::"))+>tok $lookahead_duplicates %hostname;
+  hostname = ([a-zA-Z0-9\.\-_:]*([a-zA-Z0-9] | "::"))+>tok $lookahead_duplicates %hostname;
   hostVars = (hostname ":") | hostname;
   header = timestamp space hostVars ":"? space;
 

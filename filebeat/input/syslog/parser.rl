@@ -64,8 +64,8 @@ func Parse(data []byte, event *event) {
       }
 
       # NOTES: This allow to bail out of obvious non valid
-      # hostname, this might no be ideal in all situation, but
-      # when this happen we just go to the catch call case and at least
+      # hostname, this might not be ideal in all situation, but
+      # when this happen we just go to the catch all case and at least
       # extract the message
       action lookahead_duplicates{
         if p-1 > 0 {

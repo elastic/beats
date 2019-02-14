@@ -36,8 +36,8 @@ func TestParseSyslog(t *testing.T) {
 			log:   []byte("<190>589265: Feb 8 18:55:31.306: %SEC-11-IPACCESSLOGP: list 177 denied udp 10.0.0.1(53640) -> 10.100.0.1(15600), 1 packet"),
 			syslog: event{
 				priority:   190,
-				message:    "list 177 denied udp 10.0.0.1(53640) -> 10.100.0.1(15600), 1 packet",
-				hostname:   "%SEC-11-IPACCESSLOGP",
+				message:    "%SEC-11-IPACCESSLOGP: list 177 denied udp 10.0.0.1(53640) -> 10.100.0.1(15600), 1 packet",
+				hostname:   "",
 				program:    "",
 				pid:        -1,
 				month:      2,
