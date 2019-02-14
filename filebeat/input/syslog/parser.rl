@@ -95,6 +95,7 @@ func Parse(data []byte, event *event) {
       }
 
       action sequence {
+        event.SetSequence(data[tok:p])
       }
 
       include syslog_rfc3164 "syslog_rfc3164.rl";

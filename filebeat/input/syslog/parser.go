@@ -312,6 +312,8 @@ func Parse(data []byte, event *event) {
 	tr75:
 //line parser.rl:97
 
+		event.SetSequence(data[tok:p])
+
 //line parser.rl:22
 
 		tok = p
@@ -322,7 +324,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof2
 		}
 	st_case_2:
-//line parser.go:331
+//line parser.go:332
 		goto st2
 	tr1:
 //line parser.rl:22
@@ -335,7 +337,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof3
 		}
 	st_case_3:
-//line parser.go:344
+//line parser.go:345
 		if data[(p)] == 58 {
 			goto st48
 		}
@@ -393,7 +395,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof7
 		}
 	st_case_7:
-//line parser.go:402
+//line parser.go:403
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto tr19
 		}
@@ -409,7 +411,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof8
 		}
 	st_case_8:
-//line parser.go:418
+//line parser.go:419
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st9
 		}
@@ -434,7 +436,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof10
 		}
 	st_case_10:
-//line parser.go:443
+//line parser.go:444
 		if 48 <= data[(p)] && data[(p)] <= 51 {
 			goto tr22
 		}
@@ -450,7 +452,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof11
 		}
 	st_case_11:
-//line parser.go:459
+//line parser.go:460
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st12
 		}
@@ -483,7 +485,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof13
 		}
 	st_case_13:
-//line parser.go:492
+//line parser.go:493
 		if data[(p)] == 50 {
 			goto tr26
 		}
@@ -502,7 +504,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof14
 		}
 	st_case_14:
-//line parser.go:511
+//line parser.go:512
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st15
 		}
@@ -527,7 +529,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof16
 		}
 	st_case_16:
-//line parser.go:536
+//line parser.go:537
 		if 48 <= data[(p)] && data[(p)] <= 53 {
 			goto tr29
 		}
@@ -543,7 +545,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof17
 		}
 	st_case_17:
-//line parser.go:552
+//line parser.go:553
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st18
 		}
@@ -568,7 +570,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof19
 		}
 	st_case_19:
-//line parser.go:577
+//line parser.go:578
 		if 48 <= data[(p)] && data[(p)] <= 53 {
 			goto tr32
 		}
@@ -584,7 +586,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof20
 		}
 	st_case_20:
-//line parser.go:593
+//line parser.go:594
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st21
 		}
@@ -637,7 +639,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof22
 		}
 	st_case_22:
-//line parser.go:646
+//line parser.go:647
 		switch data[(p)] {
 		case 37:
 			goto tr39
@@ -703,7 +705,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof23
 		}
 	st_case_23:
-//line parser.go:708
+//line parser.go:709
 		switch data[(p)] {
 		case 32:
 			goto tr42
@@ -748,7 +750,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof24
 		}
 	st_case_24:
-//line parser.go:753
+//line parser.go:754
 		switch data[(p)] {
 		case 32:
 			goto tr0
@@ -772,7 +774,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof25
 		}
 	st_case_25:
-//line parser.go:777
+//line parser.go:778
 		switch data[(p)] {
 		case 32:
 			goto st2
@@ -798,7 +800,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof26
 		}
 	st_case_26:
-//line parser.go:803
+//line parser.go:804
 		switch data[(p)] {
 		case 32:
 			goto st27
@@ -830,7 +832,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof28
 		}
 	st_case_28:
-//line parser.go:835
+//line parser.go:836
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto tr51
 		}
@@ -846,7 +848,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof29
 		}
 	st_case_29:
-//line parser.go:851
+//line parser.go:852
 		if data[(p)] == 93 {
 			goto tr53
 		}
@@ -865,7 +867,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof30
 		}
 	st_case_30:
-//line parser.go:870
+//line parser.go:871
 		if data[(p)] == 58 {
 			goto st31
 		}
@@ -921,7 +923,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof32
 		}
 	st_case_32:
-//line parser.go:922
+//line parser.go:923
 		switch data[(p)] {
 		case 37:
 			goto tr43
@@ -987,7 +989,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof33
 		}
 	st_case_33:
-//line parser.go:984
+//line parser.go:985
 		switch data[(p)] {
 		case 37:
 			goto tr43
@@ -1053,7 +1055,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof34
 		}
 	st_case_34:
-//line parser.go:1046
+//line parser.go:1047
 		switch data[(p)] {
 		case 32:
 			goto tr42
@@ -1111,7 +1113,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof35
 		}
 	st_case_35:
-//line parser.go:1102
+//line parser.go:1103
 		switch data[(p)] {
 		case 32:
 			goto st24
@@ -1170,7 +1172,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof36
 		}
 	st_case_36:
-//line parser.go:1161
+//line parser.go:1162
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st37
 		}
@@ -1251,7 +1253,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof41
 		}
 	st_case_41:
-//line parser.go:1242
+//line parser.go:1243
 		if data[(p)] == 32 {
 			goto st22
 		}
@@ -1270,7 +1272,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof42
 		}
 	st_case_42:
-//line parser.go:1261
+//line parser.go:1262
 		if data[(p)] == 32 {
 			goto st22
 		}
@@ -1294,7 +1296,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof43
 		}
 	st_case_43:
-//line parser.go:1285
+//line parser.go:1286
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto tr67
 		}
@@ -1310,7 +1312,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof44
 		}
 	st_case_44:
-//line parser.go:1301
+//line parser.go:1302
 		switch data[(p)] {
 		case 32:
 			goto tr68
@@ -1359,7 +1361,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof45
 		}
 	st_case_45:
-//line parser.go:1350
+//line parser.go:1351
 		switch data[(p)] {
 		case 32:
 			goto tr61
@@ -1385,7 +1387,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof46
 		}
 	st_case_46:
-//line parser.go:1376
+//line parser.go:1377
 		if 48 <= data[(p)] && data[(p)] <= 51 {
 			goto st15
 		}
@@ -1425,7 +1427,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof49
 		}
 	st_case_49:
-//line parser.go:1416
+//line parser.go:1417
 		switch data[(p)] {
 		case 65:
 			goto tr77
@@ -1451,6 +1453,8 @@ func Parse(data []byte, event *event) {
 	tr76:
 //line parser.rl:97
 
+		event.SetSequence(data[tok:p])
+
 //line parser.rl:22
 
 		tok = p
@@ -1461,7 +1465,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof50
 		}
 	st_case_50:
-//line parser.go:1453
+//line parser.go:1455
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st51
 		}
@@ -1502,6 +1506,8 @@ func Parse(data []byte, event *event) {
 	tr77:
 //line parser.rl:97
 
+		event.SetSequence(data[tok:p])
+
 //line parser.rl:22
 
 		tok = p
@@ -1512,7 +1518,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof54
 		}
 	st_case_54:
-//line parser.go:1505
+//line parser.go:1508
 		switch data[(p)] {
 		case 112:
 			goto st55
@@ -1555,7 +1561,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof57
 		}
 	st_case_57:
-//line parser.go:1548
+//line parser.go:1551
 		switch data[(p)] {
 		case 32:
 			goto st58
@@ -1595,7 +1601,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof59
 		}
 	st_case_59:
-//line parser.go:1588
+//line parser.go:1591
 		if data[(p)] == 32 {
 			goto tr97
 		}
@@ -1614,7 +1620,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof60
 		}
 	st_case_60:
-//line parser.go:1607
+//line parser.go:1610
 		if data[(p)] == 50 {
 			goto tr99
 		}
@@ -1633,7 +1639,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof61
 		}
 	st_case_61:
-//line parser.go:1626
+//line parser.go:1629
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st62
 		}
@@ -1658,7 +1664,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof63
 		}
 	st_case_63:
-//line parser.go:1651
+//line parser.go:1654
 		if 48 <= data[(p)] && data[(p)] <= 53 {
 			goto tr102
 		}
@@ -1674,7 +1680,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof64
 		}
 	st_case_64:
-//line parser.go:1667
+//line parser.go:1670
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st65
 		}
@@ -1699,7 +1705,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof66
 		}
 	st_case_66:
-//line parser.go:1692
+//line parser.go:1695
 		if 48 <= data[(p)] && data[(p)] <= 53 {
 			goto tr105
 		}
@@ -1715,7 +1721,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof67
 		}
 	st_case_67:
-//line parser.go:1708
+//line parser.go:1711
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st68
 		}
@@ -1748,7 +1754,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof69
 		}
 	st_case_69:
-//line parser.go:1741
+//line parser.go:1744
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto tr108
 		}
@@ -1764,7 +1770,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof70
 		}
 	st_case_70:
-//line parser.go:1757
+//line parser.go:1760
 		switch data[(p)] {
 		case 32:
 			goto tr68
@@ -1791,7 +1797,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof71
 		}
 	st_case_71:
-//line parser.go:1784
+//line parser.go:1787
 		if 48 <= data[(p)] && data[(p)] <= 51 {
 			goto st62
 		}
@@ -1807,7 +1813,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof72
 		}
 	st_case_72:
-//line parser.go:1800
+//line parser.go:1803
 		if data[(p)] == 32 {
 			goto tr97
 		}
@@ -1831,7 +1837,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof73
 		}
 	st_case_73:
-//line parser.go:1824
+//line parser.go:1827
 		if data[(p)] == 32 {
 			goto tr97
 		}
@@ -1916,6 +1922,8 @@ func Parse(data []byte, event *event) {
 	tr78:
 //line parser.rl:97
 
+		event.SetSequence(data[tok:p])
+
 //line parser.rl:22
 
 		tok = p
@@ -1926,7 +1934,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof80
 		}
 	st_case_80:
-//line parser.go:1920
+//line parser.go:1924
 		if data[(p)] == 101 {
 			goto st81
 		}
@@ -2000,6 +2008,8 @@ func Parse(data []byte, event *event) {
 	tr79:
 //line parser.rl:97
 
+		event.SetSequence(data[tok:p])
+
 //line parser.rl:22
 
 		tok = p
@@ -2010,7 +2020,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof87
 		}
 	st_case_87:
-//line parser.go:2005
+//line parser.go:2010
 		if data[(p)] == 101 {
 			goto st88
 		}
@@ -2084,6 +2094,8 @@ func Parse(data []byte, event *event) {
 	tr80:
 //line parser.rl:97
 
+		event.SetSequence(data[tok:p])
+
 //line parser.rl:22
 
 		tok = p
@@ -2094,7 +2106,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof94
 		}
 	st_case_94:
-//line parser.go:2090
+//line parser.go:2096
 		switch data[(p)] {
 		case 97:
 			goto st95
@@ -2177,6 +2189,8 @@ func Parse(data []byte, event *event) {
 	tr81:
 //line parser.rl:97
 
+		event.SetSequence(data[tok:p])
+
 //line parser.rl:22
 
 		tok = p
@@ -2187,7 +2201,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof100
 		}
 	st_case_100:
-//line parser.go:2184
+//line parser.go:2191
 		if data[(p)] == 97 {
 			goto st101
 		}
@@ -2242,6 +2256,8 @@ func Parse(data []byte, event *event) {
 	tr82:
 //line parser.rl:97
 
+		event.SetSequence(data[tok:p])
+
 //line parser.rl:22
 
 		tok = p
@@ -2252,7 +2268,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof104
 		}
 	st_case_104:
-//line parser.go:2250
+//line parser.go:2258
 		if data[(p)] == 111 {
 			goto st105
 		}
@@ -2275,6 +2291,8 @@ func Parse(data []byte, event *event) {
 	tr83:
 //line parser.rl:97
 
+		event.SetSequence(data[tok:p])
+
 //line parser.rl:22
 
 		tok = p
@@ -2285,7 +2303,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof106
 		}
 	st_case_106:
-//line parser.go:2284
+//line parser.go:2293
 		if data[(p)] == 99 {
 			goto st107
 		}
@@ -2323,6 +2341,8 @@ func Parse(data []byte, event *event) {
 	tr84:
 //line parser.rl:97
 
+		event.SetSequence(data[tok:p])
+
 //line parser.rl:22
 
 		tok = p
@@ -2333,7 +2353,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof109
 		}
 	st_case_109:
-//line parser.go:2333
+//line parser.go:2343
 		if data[(p)] == 101 {
 			goto st110
 		}
@@ -2382,7 +2402,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof113
 		}
 	st_case_113:
-//line parser.go:2382
+//line parser.go:2392
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto tr141
 		}
@@ -2398,7 +2418,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof114
 		}
 	st_case_114:
-//line parser.go:2398
+//line parser.go:2408
 		if data[(p)] == 62 {
 			goto tr143
 		}
@@ -2462,7 +2482,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof119
 		}
 	st_case_119:
-//line parser.go:2462
+//line parser.go:2472
 		switch data[(p)] {
 		case 65:
 			goto tr3
@@ -2502,7 +2522,7 @@ func Parse(data []byte, event *event) {
 			goto _test_eof120
 		}
 	st_case_120:
-//line parser.go:2502
+//line parser.go:2512
 		goto st120
 	st_out:
 	_test_eof2:
@@ -2876,12 +2896,12 @@ func Parse(data []byte, event *event) {
 
 				event.SetMessage(data[tok:p])
 
-//line parser.go:2634
+//line parser.go:2644
 			}
 		}
 
 	}
 
-//line parser.rl:104
+//line parser.rl:105
 
 }

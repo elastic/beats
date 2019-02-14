@@ -47,6 +47,7 @@ func TestParseSyslog(t *testing.T) {
 				minute:     55,
 				second:     31,
 				nanosecond: 306000000,
+				sequence:   589265,
 			},
 		},
 		{
