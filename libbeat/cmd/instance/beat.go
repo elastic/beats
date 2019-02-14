@@ -681,7 +681,6 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	}
 
 	if b.Config.Dashboards.Enabled() {
-
 		var withMigration bool
 		if b.RawConfig.HasField("migration") {
 			sub, err := b.RawConfig.Child("migration", -1)
