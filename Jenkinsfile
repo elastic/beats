@@ -153,6 +153,87 @@ pipeline {
             }
           }
         }
+        /**
+         Run system tests and report junit results.
+         */
+        stage('Metricbeat unit') {
+          agent { label 'linux && immutable' }
+          options { skipDefaultCheckout() }
+          environment {
+            PATH = "${env.PATH}:${env.WORKSPACE}/bin"
+            HOME = "${env.WORKSPACE}"
+            GOPATH = "${env.WORKSPACE}"
+          }
+          steps {
+            withEnvWrapper() {
+              unstash 'source'
+              dir("${BASE_DIR}"){
+                sh './metricbeat/scripts/jenkins/unit-test.sh'
+              }
+            }
+          }
+          post {
+            always {
+              junit(allowEmptyResults: true,
+                      keepLongStdio: true,
+                      testResults: "${BASE_DIR}/build/junit-*.xml")
+            }
+          }
+        }
+        /**
+         Run integration tests and report junit results.
+         */
+        stage('Metricbeat integration') {
+          agent { label 'linux && immutable' }
+          options { skipDefaultCheckout() }
+          environment {
+            PATH = "${env.PATH}:${env.WORKSPACE}/bin"
+            HOME = "${env.WORKSPACE}"
+            GOPATH = "${env.WORKSPACE}"
+          }
+          steps {
+            withEnvWrapper() {
+              unstash 'source'
+              dir("${BASE_DIR}"){
+                sh './metricbeat/scripts/jenkins/integration-test.sh'
+              }
+            }
+          }
+          post {
+            always {
+              junit(allowEmptyResults: true,
+                      keepLongStdio: true,
+                      testResults: "${BASE_DIR}/build/junit-*.xml")
+            }
+          }
+        }
+        /**
+         Run system tests and report junit results.
+         */
+        stage('Metricbeat system') {
+          agent { label 'linux && immutable' }
+          options { skipDefaultCheckout() }
+          environment {
+            PATH = "${env.PATH}:${env.WORKSPACE}/bin"
+            HOME = "${env.WORKSPACE}"
+            GOPATH = "${env.WORKSPACE}"
+          }
+          steps {
+            withEnvWrapper() {
+              unstash 'source'
+              dir("${BASE_DIR}"){
+                sh './metricbeat/scripts/jenkins/system-test.sh'
+              }
+            }
+          }
+          post {
+            always {
+              junit(allowEmptyResults: true,
+                      keepLongStdio: true,
+                      testResults: "${BASE_DIR}/build/junit-*.xml")
+            }
+          }
+        }
       }
     }
   }
