@@ -123,6 +123,9 @@ func (procs *Processors) All() []beat.Processor {
 	return ret
 }
 
+// Run executes the all processors serially and returns the event and possibly
+// an error. If the event has been dropped (canceled) by a processor in the
+// list then a nil event is returned.
 func (procs *Processors) Run(event *beat.Event) (*beat.Event, error) {
 	var err error
 	for _, p := range procs.List {
