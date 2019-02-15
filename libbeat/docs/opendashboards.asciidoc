@@ -21,10 +21,10 @@ pattern is selected to see {beatname_uc} data.
 [role="screenshot"]
 image:./images/kibana-created-indexes.png[Discover tab with index selected]
 
-Go to the *Dashboard* page and select the dashboard that you want to open.
-
 TIP: If you don’t see data in {kib}, try changing the date range to a larger
 range. By default, {kib} shows the last 15 minutes.
+
+Go to the *Dashboard* page and select the dashboard that you want to open.
 
 [role="screenshot"]
 image:./images/kibana-navigation-vis.png[Navigation widget in Kibana]
