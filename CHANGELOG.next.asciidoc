@@ -278,6 +278,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - New iptables module that receives iptables/ip6tables logs over syslog or file. Supports Ubiquiti Firewall extensions. {issue}8781[8781] {pull}10176[10176]
 - Added support for ingesting structured Elasticsearch server logs {pull}10428[10428]
 - Populate more ECS fields in the Suricata module. {pull}10006[10006]
+- Add ISO8601 timestamp support in syslog metricset. {issue}8716[8716] {pull}10736[10736]
 
 *Heartbeat*
 
