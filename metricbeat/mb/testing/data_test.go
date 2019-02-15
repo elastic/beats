@@ -189,7 +189,7 @@ func getModulesPath() string {
 }
 
 func getModulePath(module string) string {
-	return getModulePath() + "/" + module
+	return getModulesPath() + "/" + module
 }
 
 func getMetricsetPath(module, metricSet string) string {
