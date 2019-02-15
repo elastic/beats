@@ -20,7 +20,9 @@
 package agent
 
 import (
+	"github.com/elastic/beats/metricbeat/mb"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/tests/compose"
@@ -39,11 +41,25 @@ func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "consul")
 
 	f := mbtest.NewReportingMetricSetV2(t, consul.GetConfig([]string{"agent"}))
-	events, errs := mbtest.ReportingFetchV2(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	var events []mb.Event
+
+	attempts := 0
+	var errs []error
+	for i := 0; i < attempts; i++ {
+		events, errs = mbtest.ReportingFetchV2(f)
+		if len(errs) > 0 {
+			t.Fatalf("Expected 0 errors, had %d. %v\n", len(errs), errs)
+		}
+
+		if len(events) == 0 {
+			attempts++
+			if attempts == 10 {
+				t.Fatalf("Expected 1 event, had %d\n", len(events))
+			}
+
+			time.Sleep(5 * time.Second)
+		}
 	}
-	assert.NotEmpty(t, events)
 
 	t.Logf("Found '%d' events", len(events))
 
