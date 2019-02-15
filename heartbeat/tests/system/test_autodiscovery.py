@@ -62,3 +62,5 @@ class TestAutodiscover(BaseTest):
                         matched = True
 
         assert matched
+
+        self.assert_fields_are_documented(output[0])
