@@ -6,7 +6,8 @@
                 "field": "message",
                 "patterns": [
                     "%{SYSLOGTIMESTAMP:system.syslog.timestamp} %{SYSLOGHOST:host.hostname} %{DATA:process.name}(?:\\[%{POSINT:process.pid:long}\\])?: %{GREEDYMULTILINE:system.syslog.message}",
-                    "%{SYSLOGTIMESTAMP:system.syslog.timestamp} %{GREEDYMULTILINE:system.syslog.message}"
+                    "%{SYSLOGTIMESTAMP:system.syslog.timestamp} %{GREEDYMULTILINE:system.syslog.message}",
+                    "%{TIMESTAMP_ISO8601:system.syslog.timestamp} %{SYSLOGHOST:host.hostname} %{DATA:process.name}(?:\\[%{POSINT:process.pid:long}\\])?: %{GREEDYMULTILINE:system.syslog.message}"
                 ],
                 "pattern_definitions" : {
                     "GREEDYMULTILINE" : "(.|\n)*"
@@ -32,7 +33,8 @@
                 "target_field": "@timestamp",
                 "formats": [
                     "MMM  d HH:mm:ss",
-                    "MMM dd HH:mm:ss"
+                    "MMM dd HH:mm:ss",
+                    "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZ"
                 ],
                 {< if .convert_timezone >}"timezone": "{{ beat.timezone }}",{< end >}
                 "ignore_failure": true
