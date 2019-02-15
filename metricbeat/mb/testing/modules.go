@@ -168,7 +168,7 @@ func NewReportingMetricSetV2(t testing.TB, config interface{}) mb.ReportingMetri
 	return reportingMetricSetV2
 }
 
-// NewReportingMetricSetV2 returns a new ReportingMetricSetV2 instance. Then
+// NewReportingMetricSetV2Error returns a new ReportingMetricSetV2 instance. Then
 // you can use ReportingFetchV2 to perform a Fetch operation with the MetricSet.
 func NewReportingMetricSetV2Error(t testing.TB, config interface{}) mb.ReportingMetricSetV2Error {
 	metricSet := newMetricSet(t, config)
