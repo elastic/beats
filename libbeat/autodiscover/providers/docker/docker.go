@@ -18,6 +18,8 @@
 package docker
 
 import (
+	"errors"
+
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
@@ -119,22 +121,22 @@ func (d *Provider) Start() {
 	}()
 }
 
-func (d *Provider) emitContainer(event bus.Event, flag string) {
+func (d *Provider) generateMetaDocker(event bus.Event) (*docker.Container, common.MapStr) {
 	container, ok := event["container"].(*docker.Container)
 	if !ok {
-		logp.Err("Couldn't get a container from watcher event")
-		return
+		logp.Error(errors.New("Couldn't get a container from watcher event"))
+		return nil, nil
 	}
 
-	var host string
-	if len(container.IPAddresses) > 0 {
-		host = container.IPAddresses[0]
-	}
 	labelMap := common.MapStr{}
 	for k, v := range container.Labels {
-		safemapstr.Put(labelMap, k, v)
+		if d.config.Dedot {
+			label := common.DeDot(k)
+			labelMap.Put(label, v)
+		} else {
+			safemapstr.Put(labelMap, k, v)
+		}
 	}
-
 	meta := common.MapStr{
 		"container": common.MapStr{
 			"id":     container.ID,
@@ -143,6 +145,16 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			"labels": labelMap,
 		},
 	}
+	return container, meta
+}
+
+func (d *Provider) emitContainer(event bus.Event, flag string) {
+	container, meta := d.generateMetaDocker(event)
+	var host string
+	if len(container.IPAddresses) > 0 {
+		host = container.IPAddresses[0]
+	}
+
 	// Without this check there would be overlapping configurations with and without ports.
 	if len(container.Ports) == 0 {
 		event := bus.Event{

@@ -20,6 +20,8 @@ package docker
 import (
 	"testing"
 
+	"github.com/elastic/beats/libbeat/common/docker"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -104,4 +106,54 @@ func getNestedAnnotations(in common.MapStr) common.MapStr {
 		out.Put(k, v)
 	}
 	return out
+}
+
+func TestGenerateMetaDocker(t *testing.T) {
+	event := bus.Event{
+		"container": &docker.Container{
+			ID:   "abc",
+			Name: "foobar",
+			Labels: map[string]string{
+				"do.not.include":          "true",
+				"co.elastic.logs/disable": "true",
+			},
+		},
+	}
+
+	cfg := defaultConfig()
+	cfg.Dedot = true
+	p := Provider{
+		config: cfg,
+	}
+	_, meta := p.generateMetaDocker(event)
+	expectedMetaDedot := common.MapStr{
+		"container": common.MapStr{
+			"id":    "abc",
+			"name":  "foobar",
+			"image": "",
+			"labels": common.MapStr{
+				"do_not_include":          "true",
+				"co_elastic_logs/disable": "true",
+			},
+		},
+	}
+	assert.Equal(t, expectedMetaDedot, meta)
+
+	cfg.Dedot = false
+	p = Provider{
+		config: cfg,
+	}
+	_, meta = p.generateMetaDocker(event)
+	expectedMeta := common.MapStr{
+		"container": common.MapStr{
+			"id":    "abc",
+			"name":  "foobar",
+			"image": "",
+			"labels": common.MapStr{
+				"do": common.MapStr{"not": common.MapStr{"include": "true"}},
+				"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
+			},
+		},
+	}
+	assert.Equal(t, expectedMeta, meta)
 }

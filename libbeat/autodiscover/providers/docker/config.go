@@ -32,6 +32,7 @@ type Config struct {
 	Builders     []*common.Config        `config:"builders"`
 	Appenders    []*common.Config        `config:"appenders"`
 	Templates    template.MapperSettings `config:"templates"`
+	Dedot        bool                    `config:"dedot"`
 }
 
 func defaultConfig() *Config {
