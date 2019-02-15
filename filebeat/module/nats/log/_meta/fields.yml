@@ -1,0 +1,6 @@
+- name: log
+  type: group
+  description: >
+    Nats log files
+  release: beta
+  fields:
