@@ -34,6 +34,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
+	t.Skip("Skip flaky test on Consul Agent")
 	logp.TestingSetup()
 
 	compose.EnsureUp(t, "consul")
