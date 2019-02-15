@@ -20,9 +20,10 @@
 package agent
 
 import (
-	"github.com/elastic/beats/metricbeat/mb"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/metricbeat/mb"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/tests/compose"
