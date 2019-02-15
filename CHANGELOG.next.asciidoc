@@ -109,3 +109,6 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 *Winlogbeat*
 
 *Functionbeat*
+*Journalbeat*
+
+- Journalbeat requires at least systemd v233 in order to follow entries after journal changes (rotation, vacuum).
