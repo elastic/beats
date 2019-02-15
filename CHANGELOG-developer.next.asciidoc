@@ -34,3 +34,4 @@ The list below covers the major changes between 7.0.0-alpha2 and master only.
 - Introduce ILM and IndexManagement support to beat.Settings. {pull}10347[10347]
 - Generating index pattern on demand instead of shipping them in the packages. {pull}10478[10478]
 - Metricset generator generates beta modules by default now. {pull}10657[10657]
+- Move host name addition to a processor. {pull}10728[10728]
