@@ -97,7 +97,6 @@ class TestAutodiscover(metricbeat.BaseTest):
         assert 'name' in output[0]['container']
         self.assert_fields_are_documented(output[0])
 
-
     @unittest.skipIf(not INTEGRATION_TESTS or
                      os.getenv("TESTING_ENVIRONMENT") == "2x",
                      "integration test not available on 2.x")
