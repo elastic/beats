@@ -48,8 +48,11 @@ class TestAutodiscover(filebeat.BaseTest):
         output = self.read_output_json()
         proc.check_kill_and_wait()
 
+
         # Check metadata is added
         assert output[0]['message'] == 'Busybox output 1'
-        assert output[0]['docker']['container']['image'] == 'busybox'
-        assert output[0]['docker']['container']['labels'] == {}
-        assert 'name' in output[0]['docker']['container']
+        assert output[0]['container']['image'] == 'busybox'
+        assert output[0]['container']['labels'] == {}
+        assert 'name' in output[0]['container']
+
+        self.assert_fields_are_documented(output[0])

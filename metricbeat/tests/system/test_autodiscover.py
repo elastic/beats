@@ -25,7 +25,7 @@ class TestAutodiscover(metricbeat.BaseTest):
                 'docker': {
                     'templates': '''
                       - condition:
-                          equals.docker.container.image: memcached:latest
+                          equals.container.image: memcached:latest
                         config:
                           - module: memcached
                             metricsets: ["stats"]
@@ -51,9 +51,9 @@ class TestAutodiscover(metricbeat.BaseTest):
         proc.check_kill_and_wait()
 
         # Check metadata is added
-        assert output[0]['docker']['container']['image'] == 'memcached:latest'
-        assert output[0]['docker']['container']['labels'] == {}
-        assert 'name' in output[0]['docker']['container']
+        assert output[0]['container']['image'] == 'memcached:latest'
+        assert output[0]['container']['labels'] == {}
+        assert 'name' in output[0]['container']
 
     @unittest.skipIf(not INTEGRATION_TESTS or
                      os.getenv("TESTING_ENVIRONMENT") == "2x",
@@ -93,8 +93,10 @@ class TestAutodiscover(metricbeat.BaseTest):
         proc.check_kill_and_wait()
 
         # Check metadata is added
-        assert output[0]['docker']['container']['image'] == 'memcached:latest'
-        assert 'name' in output[0]['docker']['container']
+        assert output[0]['container']['image'] == 'memcached:latest'
+        assert 'name' in output[0]['container']
+        self.assert_fields_are_documented(output[0])
+
 
     @unittest.skipIf(not INTEGRATION_TESTS or
                      os.getenv("TESTING_ENVIRONMENT") == "2x",
@@ -143,3 +145,4 @@ class TestAutodiscover(metricbeat.BaseTest):
 
         # Check field is added
         assert output[0]['fields']['foo'] == 'bar'
+        self.assert_fields_are_documented(output[0])
