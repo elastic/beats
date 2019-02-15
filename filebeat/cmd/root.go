@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/filebeat/beater"
 
 	cmd "github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 )
 
 // Name of this beat
@@ -37,8 +38,7 @@ func init() {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("once"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("modules"))
-
-	RootCmd = cmd.GenRootCmdWithRunFlags(Name, "", beater.New, runFlags)
+	RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{RunFlags: runFlags, Name: Name})
 	RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("M"))
 	RootCmd.TestCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
 	RootCmd.SetupCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))

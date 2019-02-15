@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/beats/libbeat/template"
 )
 
-func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersion string) *cobra.Command {
+func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "template",
 		Short: "Export index template to stdout",
@@ -40,7 +40,7 @@ func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersi
 			index, _ := cmd.Flags().GetString("index")
 			noILM, _ := cmd.Flags().GetBool("noilm")
 
-			b, err := instance.NewBeat(name, idxPrefix, beatVersion)
+			b, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
 			if err != nil {
 				fatalf("Error initializing beat: %+v", err)
 			}
@@ -106,8 +106,8 @@ func GenTemplateConfigCmd(settings instance.Settings, name, idxPrefix, beatVersi
 		},
 	}
 
-	genTemplateConfigCmd.Flags().String("es.version", beatVersion, "Elasticsearch version")
-	genTemplateConfigCmd.Flags().String("index", idxPrefix, "Base index name")
+	genTemplateConfigCmd.Flags().String("es.version", settings.Version, "Elasticsearch version")
+	genTemplateConfigCmd.Flags().String("index", settings.IndexPrefix, "Base index name")
 	genTemplateConfigCmd.Flags().Bool("noilm", false, "Generate template with ILM disabled")
 
 	return genTemplateConfigCmd
