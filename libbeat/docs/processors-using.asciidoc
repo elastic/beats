@@ -227,6 +227,7 @@ The supported conditions are:
 * <<condition-contains,`contains`>>
 * <<condition-regexp,`regexp`>>
 * <<condition-range, `range`>>
+* <<condition-network, `network`>>
 * <<condition-has_fields, `has_fields`>>
 * <<condition-or, `or`>>
 * <<condition-and, `and`>>
@@ -318,6 +319,58 @@ range:
     system.cpu.user.pct.lt: 0.8
 ------
 
+[float]
+[[condition-network]]
+===== `network`
+
+The `network` condition checks if the field is in a certain IP network range.
+Both IPv4 and IPv6 addresses are supported. The network range may be specified
+using CIDR notation, like "192.0.2.0/24" or "2001:db8::/32", or by using one of
+these named ranges:
+
+- `loopback` - Matches loopback addresses in the range of `127.0.0.0/8` or
+  `::1/128`.
+- `unicast` - Matches global unicast addresses defined in RFC 1122, RFC 4632,
+  and RFC 4291 with the exception of the IPv4 broadcast address
+  (`255.255.255.255`). This includes private address ranges.
+- `multicast` - Matches multicast addresses.
+- `interface_local_multicast` - Matches IPv6 interface-local multicast addresses.
+- `link_local_unicast` - Matches link-local unicast addresses.
+- `link_local_multicast` - Matches link-local multicast addresses.
+- `private` - Matches private address ranges defined in RFC 1918 (IPv4) and
+  RFC 4193 (IPv6).
+- `public` - Matches addresses that are not loopback, unspecified, IPv4
+  broadcast, link local unicast, link local multicast, interface local
+  multicast, or private.
+- `unspecified` - Matches unspecified addresses (either the IPv4 address
+  "0.0.0.0" or the IPv6 address "::").
+
+The following condition returns true if the `source.ip` value is within the
+private address space.
+
+[source,yaml]
+----
+network:
+    source.ip: private
+----
+
+This condition returns true if the `destination.ip` value is within the
+IPv4 range of `192.168.1.0` - `192.168.1.255`.
+
+[source,yaml]
+----
+network:
+    destination.ip: '192.168.1.0/24'
+----
+
+And this condition returns true when `destination.ip` is within any of the given
+subnets.
+
+[source,yaml]
+----
+network:
+    destination.ip: ['192.168.1.0/24', '10.0.0.0/8', loopback]
+----
 
 [float]
 [[condition-has_fields]]
