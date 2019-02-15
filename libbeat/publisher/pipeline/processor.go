@@ -127,15 +127,10 @@ func newProcessorPipeline(
 		processors.add(actions.NewAddFields(meta, needsCopy))
 	}
 
-	// setup 7: add agent metadata and host name
+	// setup 7: add agent metadata
 	if !config.SkipAgentMetadata {
 		needsCopy := global.alwaysCopy || global.processors != nil
 		processors.add(actions.NewAddFields(createAgentFields(info), needsCopy))
-	}
-
-	if !config.SkipHostName {
-		needsCopy := global.alwaysCopy || global.processors != nil
-		processors.add(actions.NewAddFields(addHostName(info), needsCopy))
 	}
 
 	// setup 8: pipeline processors list
@@ -286,10 +281,6 @@ func createAgentFields(info beat.Info) common.MapStr {
 	}
 
 	return common.MapStr{"agent": metadata}
-}
-
-func addHostName(info beat.Info) common.MapStr {
-	return common.MapStr{"host": common.MapStr{"name": info.Name}}
 }
 
 func debugPrintProcessor(info beat.Info, monitors Monitors) *processorFn {
