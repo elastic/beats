@@ -58,6 +58,8 @@ func TestFetch(t *testing.T) {
 			}
 
 			time.Sleep(5 * time.Second)
+		} else {
+			break
 		}
 	}
 
