@@ -5,6 +5,7 @@
 package management
 
 import (
+	"fmt"
 	"io"
 	"text/template"
 	"time"
@@ -81,6 +82,44 @@ type Config struct {
 	Kibana *kibana.ClientConfig `config:"kibana" yaml:"kibana"`
 
 	Blacklist ConfigBlacklistSettings `config:"blacklist" yaml:"blacklist"`
+
+	Metadata metadata `config:"metadata" yaml:"metadata,omitempty"`
+}
+
+// metadata restricts the types accepted for the value.
+type metadata map[string]metadataValue
+type metadataValue interface{}
+
+func (mv *metadata) Unpack(from interface{}) error {
+	rawMap, ok := from.(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("expected to receive a map of key/value pairs and received: %T", from)
+	}
+
+	newMap := make(map[string]metadataValue, len(rawMap))
+
+	for k, v := range rawMap {
+		switch value := v.(type) {
+		case int, int64, uint64, string, float64:
+			newMap[k] = value
+		case []interface{}:
+			for _, i := range value {
+				switch i.(type) {
+				case int, int64, uint64, string, float64:
+					continue
+				default:
+					return fmt.Errorf("%T is an invalid for the list, allowed values are int, string,"+
+						" or float", i)
+				}
+			}
+			newMap[k] = value
+		default:
+			return fmt.Errorf("%T is an invalid type for key %s, allowed values are int, string,"+
+				" float or a list of mixed elements", v, k)
+		}
+	}
+	*mv = newMap
+	return nil
 }
 
 // EventReporterConfig configuration of the events reporter.

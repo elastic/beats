@@ -126,6 +126,8 @@ func (cm *ConfigManager) Start() {
 	cfgwarn.Beta("Central management is enabled")
 	cm.logger.Info("Starting central management service")
 
+	cm.checkIn()
+
 	cm.reporter.Start()
 	cm.wg.Add(1)
 	go cm.worker()
@@ -326,6 +328,13 @@ func (cm *ConfigManager) updateState(state State) {
 	cm.state = &state
 	cm.reporter.AddEvent(&state)
 	cm.logger.Infof("Updating state to '%s'", state)
+}
+
+func (cm *ConfigManager) checkIn() {
+	cm.logger.Info("Check in to the Central management")
+
+	// Takes beats version
+	// Takes Metadata
 }
 
 func validateConfig(config *Config) error {
