@@ -22,6 +22,8 @@ import (
 	"os"
 	"time"
 
+	file_helper "github.com/elastic/beats/libbeat/common/file"
+
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input/file"
 	"github.com/elastic/beats/libbeat/logp"
@@ -152,11 +154,10 @@ func (f *Log) errorChecks(err error) error {
 
 	if f.config.CloseRemoved {
 		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
-		_, statErr := os.Stat(f.fs.Name())
-
-		// Error means file does not exist.
-		if statErr != nil {
-			return ErrRemoved
+		if osf, ok := f.fs.(*File); ok {
+			if file_helper.FileRemoved(osf.File) {
+				return ErrRemoved
+			}
 		}
 	}
 

@@ -18,11 +18,15 @@
 package file
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"reflect"
 	"strconv"
 	"syscall"
+	"unsafe"
+
+	"golang.org/x/sys/windows"
 )
 
 type StateOS struct {
@@ -30,6 +34,16 @@ type StateOS struct {
 	IdxLo uint64 `json:"idxlo,"`
 	Vol   uint64 `json:"vol,"`
 }
+
+var (
+	modkernel32 = windows.NewLazyDLL("kernel32.dll")
+
+	procGetFileInformationByHandleEx = modkernel32.NewProc("GetFileInformationByHandleEx")
+)
+
+var (
+	ErrDeletePending = errors.New("delete pending")
+)
 
 // GetOSState returns the platform specific StateOS
 func GetOSState(info os.FileInfo) StateOS {
@@ -106,4 +120,29 @@ func ReadOpen(path string) (*os.File, error) {
 	}
 
 	return os.NewFile(uintptr(handle), path), nil
+}
+
+// FileRemoved checks wheter the file held by f is removed.
+func FileRemoved(f *os.File) bool {
+	hdl := f.Fd()
+	if hdl == uintptr(syscall.InvalidHandle) {
+		return false
+	}
+
+	info := struct {
+		AllocationSize int64
+		EndOfFile      int64
+		NumberOfLinks  int32
+		DeletePending  bool
+		Directory      bool
+	}{}
+	infoSz := unsafe.Sizeof(info)
+
+	const class = 1 // FileStandardInfo
+	r1, _, err := syscall.Syscall6(
+		procGetFileInformationByHandleEx.Addr(), 4, uintptr(hdl), class, uintptr(unsafe.Pointer(&info)), infoSz, 0, 0)
+	if r1 == 0 { // ignore error and return original stat
+		return false
+	}
+	return info.DeletePending
 }
