@@ -22,6 +22,7 @@ The list below covers the major changes between 7.0.0-alpha2 and master only.
 - Outputs receive Index Manager as additional parameter. The index manager can
   be used to create an index selector. {pull}10347[10347]
 - Remove support for loading dashboards to Elasticsearch 5. {pull}10451[10451]
+- Remove support for deprecated `GenRootCmd` methods. {pull}10721[10721]
 
 ==== Bugfixes
 
