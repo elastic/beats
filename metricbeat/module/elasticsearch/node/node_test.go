@@ -71,7 +71,7 @@ func TestFetch(t *testing.T) {
 			}
 			reporter := &mbtest.CapturingReporterV2{}
 
-			metricSet := mbtest.NewReportingMetricSetV2(t, config)
+			metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 			metricSet.Fetch(reporter)
 
 			e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])

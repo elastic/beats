@@ -168,6 +168,19 @@ func NewReportingMetricSetV2(t testing.TB, config interface{}) mb.ReportingMetri
 	return reportingMetricSetV2
 }
 
+// NewReportingMetricSetV2 returns a new ReportingMetricSetV2 instance. Then
+// you can use ReportingFetchV2 to perform a Fetch operation with the MetricSet.
+func NewReportingMetricSetV2Error(t testing.TB, config interface{}) mb.ReportingMetricSetV2Error {
+	metricSet := newMetricSet(t, config)
+
+	reportingMetricSetV2Error, ok := metricSet.(mb.ReportingMetricSetV2Error)
+	if !ok {
+		t.Fatal("MetricSet does not implement ReportingMetricSetV2")
+	}
+
+	return reportingMetricSetV2Error
+}
+
 // CapturingReporterV2 is a reporter used for testing which stores all events and errors
 type CapturingReporterV2 struct {
 	events []mb.Event
