@@ -139,10 +139,10 @@ func FileRemoved(f *os.File) bool {
 	infoSz := unsafe.Sizeof(info)
 
 	const class = 1 // FileStandardInfo
-	r1, _, err := syscall.Syscall6(
+	r1, _, _ := syscall.Syscall6(
 		procGetFileInformationByHandleEx.Addr(), 4, uintptr(hdl), class, uintptr(unsafe.Pointer(&info)), infoSz, 0, 0)
-	if r1 == 0 { // ignore error and return original stat
-		return false
+	if r1 == 0 {
+		return true // assume file is removed if syscall errors
 	}
 	return info.DeletePending
 }
