@@ -66,18 +66,22 @@ my_headerLink(void *f, Header h) {
   return headerLink(h);
 }
 
+// Note: Using int32_t instead of rpmTag/rpmTagVal in definitions
+// to make it work on CentOS 6.x, 7.x, and Fedora 29.
 const char *
-my_headerGetString(void *f, Header h, rpmTagVal tag) {
-  const char * (*headerGetString)(Header, rpmTagVal);
-  headerGetString = (const char * (*)(Header, rpmTagVal))f;
+my_headerGetString(void *f, Header h, int32_t tag) {
+  const char * (*headerGetString)(Header, int32_t);
+  headerGetString = (const char * (*)(Header, int32_t))f;
 
   return headerGetString(h, tag);
 }
 
+// Note: Using int32_t instead of rpmTag/rpmTagVal in definitions
+// to make it work on CentOS 6.x, 7.x, and Fedora 29.
 uint64_t
-my_headerGetNumber(void *f, Header h, rpmTagVal tag) {
-  uint64_t (*headerGetNumber)(Header, rpmTagVal);
-  headerGetNumber = (uint64_t (*)(Header, rpmTagVal))f;
+my_headerGetNumber(void *f, Header h, int32_t tag) {
+  uint64_t (*headerGetNumber)(Header, int32_t);
+  headerGetNumber = (uint64_t (*)(Header, int32_t))f;
 
   return headerGetNumber(h, tag);
 }
