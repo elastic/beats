@@ -8,6 +8,7 @@ package pkg
 
 import (
 	"fmt"
+	"runtime"
 	"time"
 	"unsafe"
 
@@ -154,16 +155,17 @@ const (
 )
 
 type cFunctions struct {
-	rpmtsCreate        unsafe.Pointer
-	rpmReadConfigFiles unsafe.Pointer
-	rpmtsInitIterator  unsafe.Pointer
-	rpmdbNextIterator  unsafe.Pointer
-	headerLink         unsafe.Pointer
-	headerGetEntry     unsafe.Pointer
-	headerFree         unsafe.Pointer
-	rpmdbFreeIterator  unsafe.Pointer
-	rpmtsFree          unsafe.Pointer
-	rpmsqEnable        unsafe.Pointer
+	rpmtsCreate             unsafe.Pointer
+	rpmReadConfigFiles      unsafe.Pointer
+	rpmtsInitIterator       unsafe.Pointer
+	rpmdbNextIterator       unsafe.Pointer
+	headerLink              unsafe.Pointer
+	headerGetEntry          unsafe.Pointer
+	headerFree              unsafe.Pointer
+	rpmdbFreeIterator       unsafe.Pointer
+	rpmtsFree               unsafe.Pointer
+	rpmsqEnable             unsafe.Pointer
+	rpmsqSetInterruptSafety unsafe.Pointer
 }
 
 var cFun *cFunctions
@@ -225,7 +227,7 @@ func dlopenCFunctions() (*cFunctions, error) {
 	}
 
 	// Only available in librpm>=4.13.0
-	rpmsqSetInterruptSafety, err := librpm.GetSymbolPointer("rpmsqSetInterruptSafety")
+	cFun.rpmsqSetInterruptSafety, err = librpm.GetSymbolPointer("rpmsqSetInterruptSafety")
 	if err != nil {
 		var err2 error
 		// Only available in librpm<4.14.0
@@ -235,20 +237,30 @@ func dlopenCFunctions() (*cFunctions, error) {
 			errs = append(errs, err, err2)
 			return nil, errs.Err()
 		}
-	} else {
-		C.my_rpmsqSetInterruptSafety(rpmsqSetInterruptSafety, 0)
 	}
 
 	return &cFun, nil
 }
 
 func listRPMPackages() ([]*Package, error) {
+	// In newer versions, librpm is using the thread-local variable
+	// `disableInterruptSafety` in rpmio/rpmsq.c to disable signal
+	// traps. To make sure our settings remain in effect throughout
+	// our function calls we have to lock the OS thread here, since
+	// Golang can otherwise use any thread it likes for each C.* call.
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
 	if cFun == nil {
 		var err error
 		cFun, err = dlopenCFunctions()
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	if cFun.rpmsqSetInterruptSafety != nil {
+		C.my_rpmsqSetInterruptSafety(cFun.rpmsqSetInterruptSafety, 0)
 	}
 
 	rpmts := C.my_rpmtsCreate(cFun.rpmtsCreate)
