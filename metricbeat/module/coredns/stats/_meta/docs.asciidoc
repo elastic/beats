@@ -1,1 +1,1 @@
-This is the metrics metricset of the module coredns.
+This is the stats metricset of the module coredns.

@@ -1,4 +1,4 @@
-- name: metrics
+- name: stats
   type: group
   description: >
     Contains statistics related to the coreDNS service
@@ -12,7 +12,7 @@
       type: long
       description: >
          Total query count
-    - name: dns.request.duration.seconds
+    - name: dns.request.duration.sec
       type: long
       format: duration
       description: >

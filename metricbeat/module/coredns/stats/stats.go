@@ -26,7 +26,7 @@ var mapping = &prometheus.MetricsMapping{
 	Metrics: map[string]prometheus.MetricMap{
 		"coredns_panic_count_total":              prometheus.Metric("panic.count.total"),
 		"coredns_dns_request_count_total":        prometheus.Metric("dns.request.count.total"),
-		"coredns_dns_request_duration_seconds":   prometheus.Metric("dns.request.duration.seconds"),
+		"coredns_dns_request_duration_seconds":   prometheus.Metric("dns.request.duration.sec"),
 		"coredns_dns_request_size_bytes":         prometheus.Metric("dns.request.size.bytes"),
 		"coredns_dns_request_do_count_total":     prometheus.Metric("dns.request.do.count.total"),
 		"coredns_dns_request_type_count_total":   prometheus.Metric("dns.request.type.count.total"),
