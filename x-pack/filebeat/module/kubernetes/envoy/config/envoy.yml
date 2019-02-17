@@ -1,35 +1,19 @@
-#type: docker
-#containers.ids:
-#  - "*"
-type: log
-paths:
-{{ range $i, $path := .paths }}
- - {{$path}}
-{{ end }}
+# type: log
+# paths:
+# {{ range $i, $path := .paths }}
+#   - {{$path}}
+# {{ end }}
+type: docker
+containers.ids:
+  - '*'
+include_lines: ['^ACCESS']
 tags: {{.tags}}
-json.keys_under_root: false
 processors:
-  - rename:
-      fields:
-        - from: "json.kubernetes"
-          to: "kubernetes"
-        - from: "json.log"
-          to: "envoy.message"
-        - from: "json.time"
-          to: "envoy.timestamp"
-      ignore_missing: true
-      fail_on_error: false
+  # - drop_event.when.not:
+  #     - equals:
+  #         kubernetes.labels.service: ambassador
   - dissect:
-      tokenizer: "%{log_type} [%{ts}] \"%{method} %{path} %{proto}\" %{response_code} %{response_flags} %{bytes_received} %{bytes_sent} %{duration} %{upstream_service_time} \"%{forwarded_for}\" \"%{http_user_agent}\" \"%{request_id}\" \"%{authority}\" \"%{upstream_host}:%{upstream_port}\""
-      field: "envoy.message"
+      tokenizer: "%{log_type} [%{timestamp}] \"%{method} %{path} %{proto}\" %{response_code} %{response_flags} %{bytes_received} %{bytes_sent} %{duration} %{upstream_service_time} \"%{forwarded_for}\" \"%{http_user_agent}\" \"%{request_id}\" \"%{authority}\" \"%{upstream_host}:%{upstream_port}\""
+      field: "message"
       target_prefix: "envoy"
-  - drop_event.when:
-      or:
-        - equals:
-            envoy.method: %{method}
-        - equals:
-            envoy.response_code: %{response_code}
-        - not:
-            has_fields: ['envoy.method', 'envoy.response_code']  
-  - drop_fields:
-      fields: ['json', 'envoy.ts']
+  

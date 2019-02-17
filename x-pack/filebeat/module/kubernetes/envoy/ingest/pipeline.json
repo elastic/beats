@@ -4,7 +4,8 @@
     {
       "script": {
         "lang": "painless",
-        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = ctx['envoy']['timestamp']; ctx.envoy.remove('timestamp');"
+        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = ctx['envoy']['timestamp']; ctx.envoy.remove('timestamp');",
+        "ignore_failure" : true
       }
     },
     {

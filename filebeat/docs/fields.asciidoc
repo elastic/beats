@@ -6672,6 +6672,138 @@ type: keyword
 
 --
 
+[float]
+== envoy fields
+
+Fields from envoy proxy logs after normalization
+
+
+
+*`envoy.log_type`*::
++
+--
+type: keyword
+
+Envoy log type, normally ACCESS
+
+
+--
+
+*`envoy.method`*::
++
+--
+type: keyword
+
+--
+
+*`envoy.path`*::
++
+--
+type: keyword
+
+--
+
+*`envoy.proto`*::
++
+--
+type: keyword
+
+--
+
+*`envoy.response_code`*::
++
+--
+type: integer
+
+--
+
+*`envoy.response_flags`*::
++
+--
+type: keyword
+
+--
+
+*`envoy.bytes_received`*::
++
+--
+type: long
+
+--
+
+*`envoy.bytes_sent`*::
++
+--
+type: long
+
+--
+
+*`envoy.duration`*::
++
+--
+type: double
+
+--
+
+*`envoy.upstream_service_time`*::
++
+--
+type: double
+
+--
+
+*`envoy.forwarded_for`*::
++
+--
+type: keyword
+
+--
+
+*`envoy.http_user_agent`*::
++
+--
+type: keyword
+
+--
+
+*`envoy.request_id`*::
++
+--
+type: keyword
+
+--
+
+*`envoy.authority`*::
++
+--
+type: keyword
+
+--
+
+*`envoy.upstream_host`*::
++
+--
+type: ip
+
+--
+
+*`envoy.upstream_port`*::
++
+--
+type: integer
+
+--
+
+*`envoy.message`*::
++
+--
+type: text
+
+envoy original log message
+
+
+--
+
 [[exported-fields-log]]
 == Log file content fields
 
