@@ -4243,7 +4243,7 @@ List of keywords used to tag each event.
 --
 type: object
 
-example: {'env': 'production', 'application': 'foo-bar'}
+example: {'application': 'foo-bar', 'env': 'production'}
 
 Key/value pairs.
 Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
