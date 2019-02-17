@@ -34,6 +34,10 @@
       type: keyword
       description: >
         Holds the query type of the request
+    - name: dns.response.rcode.count.total
+      type: long
+      description: >
+        Counter of responses per zone and rcode
     - name: dns.response.rcode
       type: keyword
       description: >
@@ -47,10 +51,6 @@
       format: bytes
       description: >
           Response size in bytes
-    - name: dns.response.rcode.count.total
-      type: long
-      description: >
-          Counter of responses per zone and rcode
     - name: server
       type: keyword
       description: >
