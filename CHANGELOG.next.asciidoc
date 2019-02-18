@@ -77,6 +77,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 *Auditbeat*
 
 - Enable System module config on Windows. {pull}10237[10237]
+- Package: Disable librpm signal handlers. {pull}10694[10694]
 
 *Filebeat*
 
