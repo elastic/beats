@@ -562,6 +562,10 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error loading config file: %v", err)
 	}
 
+	if err := initPaths(cfg); err != nil {
+		return err
+	}
+
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
 	store, err := LoadKeystore(cfg, b.Info.Beat)
@@ -597,11 +601,6 @@ func (b *Beat) configure(settings Settings) error {
 
 	if name := b.Config.Name; name != "" {
 		b.Info.Name = name
-	}
-
-	err = paths.InitPaths(&b.Config.Path)
-	if err != nil {
-		return fmt.Errorf("error setting default paths: %v", err)
 	}
 
 	if err := configure.Logging(b.Info.Beat, b.Config.Logging); err != nil {
@@ -1004,4 +1003,23 @@ func LoadKeystore(cfg *common.Config, name string) (keystore.Keystore, error) {
 	keystoreCfg, _ := cfg.Child("keystore", -1)
 	defaultPathConfig := paths.Resolve(paths.Data, fmt.Sprintf("%s.keystore", name))
 	return keystore.Factory(keystoreCfg, defaultPathConfig)
+}
+
+func initPaths(cfg *common.Config) error {
+	// To Fix the chicken-egg problem with the Keystore and the loading of the configuration
+	// files we are doing a partial unpack of the configuration file and only take into consideration
+	// the paths field. After we will unpack the complete configuration and keystore reference
+	// will be correctly replaced.
+	partialConfig := struct {
+		Path paths.Path `config:"path"`
+	}{}
+
+	if err := cfg.Unpack(&partialConfig); err != nil {
+		return fmt.Errorf("error extracting default paths: %+v", err)
+	}
+
+	if err := paths.InitPaths(&partialConfig.Path); err != nil {
+		return fmt.Errorf("error setting default paths: %+v", err)
+	}
+	return nil
 }
