@@ -60,6 +60,12 @@
       description: >
         The Filebeat dataset that generated this event.
 
+    - name: event.sequence
+      type: long
+      required: false
+      description: >
+        The sequence number of this event.
+
     - name: syslog.facility
       type: long
       required: false

@@ -3301,6 +3301,18 @@ The Filebeat dataset that generated this event.
 
 --
 
+*`event.sequence`*::
++
+--
+type: long
+
+required: False
+
+The sequence number of this event.
+
+
+--
+
 *`syslog.facility`*::
 +
 --
