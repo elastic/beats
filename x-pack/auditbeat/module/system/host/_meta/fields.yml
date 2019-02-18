@@ -2,7 +2,7 @@
   type: group
   description: >
     `host` contains general host information.
-  release: experimental
+  release: beta
   fields:
   - name: uptime
     type: long
