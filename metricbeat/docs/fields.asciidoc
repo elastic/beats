@@ -19753,37 +19753,37 @@ Total number of rows returned by query.
 
 --
 
-*`postgresql.statement.time.total`*::
+*`postgresql.statement.query.time.total.ms`*::
 +
 --
-type: long
+type: float
 
 Total number of milliseconds spent running query.
 
 
 --
 
-*`postgresql.statement.time.min`*::
+*`postgresql.statement.query.time.min.ms`*::
 +
 --
-type: long
+type: float
 
 Minimum number of milliseconds spent running query.
 
 
 --
 
-*`postgresql.statement.time.max`*::
+*`postgresql.statement.query.time.max.ms`*::
 +
 --
-type: long
+type: float
 
 Maximum number of milliseconds spent running query.
 
 
 --
 
-*`postgresql.statement.time.mean`*::
+*`postgresql.statement.query.time.mean.ms`*::
 +
 --
 type: long
@@ -19793,7 +19793,7 @@ Mean number of milliseconds spent running query.
 
 --
 
-*`postgresql.statement.time.stddev`*::
+*`postgresql.statement.query.time.stddev.ms`*::
 +
 --
 type: long
@@ -19803,7 +19803,7 @@ Population standard deviation of time spent running query, in milliseconds.
 
 --
 
-*`postgresql.statement.memory.shared.hit`*::
+*`postgresql.statement.query.memory.shared.hit`*::
 +
 --
 type: long
@@ -19813,7 +19813,7 @@ Total number of shared block cache hits by the query.
 
 --
 
-*`postgresql.statement.memory.shared.read`*::
+*`postgresql.statement.query.memory.shared.read`*::
 +
 --
 type: long
@@ -19823,7 +19823,7 @@ Total number of shared block cache read by the query.
 
 --
 
-*`postgresql.statement.memory.shared.dirtied`*::
+*`postgresql.statement.query.memory.shared.dirtied`*::
 +
 --
 type: long
@@ -19833,7 +19833,7 @@ Total number of shared block cache dirtied by the query.
 
 --
 
-*`postgresql.statement.memory.shared.written`*::
+*`postgresql.statement.query.memory.shared.written`*::
 +
 --
 type: long
@@ -19843,7 +19843,7 @@ Total number of shared block cache written by the query.
 
 --
 
-*`postgresql.statement.memory.local.hit`*::
+*`postgresql.statement.query.memory.local.hit`*::
 +
 --
 type: long
@@ -19853,7 +19853,7 @@ Total number of local block cache hits by the query.
 
 --
 
-*`postgresql.statement.memory.local.read`*::
+*`postgresql.statement.query.memory.local.read`*::
 +
 --
 type: long
@@ -19863,7 +19863,7 @@ Total number of local block cache read by the query.
 
 --
 
-*`postgresql.statement.memory.local.dirtied`*::
+*`postgresql.statement.query.memory.local.dirtied`*::
 +
 --
 type: long
@@ -19873,7 +19873,7 @@ Total number of local block cache dirtied by the query.
 
 --
 
-*`postgresql.statement.memory.local.written`*::
+*`postgresql.statement.query.memory.local.written`*::
 +
 --
 type: long
@@ -19883,7 +19883,7 @@ Total number of local block cache written by the query.
 
 --
 
-*`postgresql.statement.memory.temp.read`*::
+*`postgresql.statement.query.memory.temp.read`*::
 +
 --
 type: long
@@ -19893,7 +19893,7 @@ Total number of temp block cache read by the query.
 
 --
 
-*`postgresql.statement.memory.temp.written`*::
+*`postgresql.statement.query.memory.temp.written`*::
 +
 --
 type: long
