@@ -90,6 +90,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename setting `filebeat.registry_flush` to `filebeat.registry.flush`. {pull}10504[10504]
 - Rename setting `filebeat.registry_file_permission` to `filebeat.registry.file_permission`. {pull}10504[10504]
 - Remove setting `filebeat.registry_file` in favor of `filebeat.registry.path`. The registry file will be stored in a sub-directory by now. {pull}10504[10504]
+- Add Filebeat kubernetes module. Add configuration knob for auto-discover hints to control whether log harvesting is enabled for the pod/container. {issue}10811[10811] {issue}10812[10812]
 
 *Heartbeat*
 

@@ -1,0 +1,12 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/lib/docker/containers/*/*-json.log
+      #- /Users/ray/go/src/github.com/elastic/beats/x-pack/filebeat/module/kubernetes/envoy/test/envoy-json.log
+  - name: tags
+    default: [envoy]
+
+ingest_pipeline: ingest/pipeline.json
+input: config/envoy.yml

@@ -245,6 +245,18 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+#------------------------------ Kubernetes Module ------------------------------
+- module: kubernetes
+  # All logs
+  coredns: 
+    enabled: true
+  envoy:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #------------------------------- Logstash Module -------------------------------
 #- module: logstash
   # logs

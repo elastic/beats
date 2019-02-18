@@ -1,0 +1,43 @@
+[
+    {
+        "@timestamp": "2019-02-12T18:37:42.921Z",
+        "ecs.version": "1.0.0-beta2",
+        "envoy.authority": "httpbin.org",
+        "envoy.bytes_received": "0",
+        "envoy.bytes_sent": "43",
+        "envoy.duration": "217",
+        "envoy.forwarded_for": "172.17.0.5",
+        "envoy.http_user_agent": "curl/7.59.0",
+        "envoy.log_type": "ACCESS",
+        "envoy.method": "GET",
+        "envoy.path": "/httpbin/ip",
+        "envoy.proto": "HTTP/1.1",
+        "envoy.request_id": "c62ec130-6dee-4f3b-a52b-4f0d1312d89d",
+        "envoy.response_code": "200",
+        "envoy.response_flags": "-",
+        "envoy.upstream_host": "52.87.35.92",
+        "envoy.upstream_port": "80",
+        "envoy.upstream_service_time": "216",
+        "event.dataset": "kubernetes.envoy",
+        "event.module": "kubernetes",
+        "fileset.name": "envoy",
+        "input.type": "log",
+        "kubernetes.container.name": "ambassador",
+        "kubernetes.labels.service": "ambassador",
+        "kubernetes.namespace": "default",
+        "kubernetes.node.name": "minikube",
+        "kubernetes.pod.name": "ambassador-76c58d9df4-jwhsg",
+        "kubernetes.pod.uid": "e57d545e-2a9d-11e9-995f-08002730e0dc",
+        "log.offset": 0,
+        "message": "ACCESS [2019-02-12T18:37:42.921Z] \"GET /httpbin/ip HTTP/1.1\" 200 - 0 43 217 216 \"172.17.0.5\" \"curl/7.59.0\" \"c62ec130-6dee-4f3b-a52b-4f0d1312d89d\" \"httpbin.org\" \"52.87.35.92:80\"",
+        "service.type": "kubernetes",
+        "stream": "stdout",
+        "tags": [
+            "envoy"
+        ],
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.59.0",
+        "user_agent.version": "7.59.0"
+    }
+]
