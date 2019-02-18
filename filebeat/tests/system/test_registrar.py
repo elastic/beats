@@ -789,11 +789,8 @@ class Test(BaseTest):
         file2 = "input2"
         file3 = "input3"
 
-        inputs = self.input_logs()
-        logs = self.log_access()
-
-        inputs.write(file1, "first file\n")
-        inputs.write(file2, "second file\n")
+        self.input_logs.write(file1, "first file\n")
+        self.input_logs.write(file2, "second file\n")
 
         filebeat = self.start_beat()
 
@@ -804,14 +801,14 @@ class Test(BaseTest):
         assert self.registry.count() == 2
 
         # Wait until states are removed from inputs
-        self.wait_until(logs.nextCheck("State removed for", count=2), max_timeout=15)
+        self.wait_until(self.logs.nextCheck("State removed for", count=2), max_timeout=15)
 
         # Write new file to make sure registrar is flushed again
-        inputs.write(file3, "third file\n")
+        self.input_logs.write(file3, "third file\n")
         self.wait_until(lambda: self.output_has(lines=3), max_timeout=30)
 
         # Wait until state of new file is removed
-        self.wait_until(logs.nextCheck("State removed for"), max_timeout=15)
+        self.wait_until(self.logs.nextCheck("State removed for"), max_timeout=15)
 
         filebeat.check_kill_and_wait()
 
@@ -820,7 +817,7 @@ class Test(BaseTest):
         assert len(data) == 1, "Expected a single file but got: %s" % data
 
         # Make sure the last file in the registry is the correct one and has the correct offset
-        assert data[0]["offset"] == inputs.size(file3)
+        assert data[0]["offset"] == self.input_logs.size(file3)
 
     def test_clean_removed(self):
         """
@@ -837,43 +834,39 @@ class Test(BaseTest):
         file1 = "input1"
         file2 = "input2"
 
-        inputs = self.input_logs()
-        registry = self.registry
-        logs = self.log_access()
-
-        inputs.write(file1, "file to be removed\n")
-        inputs.write(file2, "2\n")
+        self.input_logs.write(file1, "file to be removed\n")
+        self.input_logs.write(file2, "2\n")
 
         filebeat = self.start_beat()
 
         self.wait_until(lambda: self.output_has(lines=2), max_timeout=10)
 
         # Wait until registry file is created
-        self.wait_until(registry.exists)
+        self.wait_until(self.registry.exists)
 
         # Wait until registry is updated
-        self.wait_until(lambda: registry.count() == 2)
+        self.wait_until(lambda: self.registry.count() == 2)
 
-        inputs.remove(file1)
+        self.input_logs.remove(file1)
 
         # Wait until states are removed from inputs
-        self.wait_until(logs.check("Remove state for file as file removed"))
+        self.wait_until(self.logs.check("Remove state for file as file removed"))
 
         # Add one more line to make sure registry is written
-        inputs.append(file2, "make sure registry is written\n")
+        self.input_logs.append(file2, "make sure registry is written\n")
         self.wait_until(lambda: self.output_has(lines=3), max_timeout=10)
 
         # Make sure all states are cleaned up
-        self.wait_until(logs.nextCheck(re.compile("Registrar.*After: 1")))
+        self.wait_until(self.logs.nextCheck(re.compile("Registrar.*After: 1")))
 
         filebeat.check_kill_and_wait()
 
         # Check that the first to files were removed from the registry
-        data = registry.load()
+        data = self.registry.load()
         assert len(data) == 1
 
         # Make sure the last file in the registry is the correct one and has the correct offset
-        assert data[0]["offset"] == inputs.size(file2)
+        assert data[0]["offset"] == self.input_logs.size(file2)
 
     def test_clean_removed_with_clean_inactive(self):
         """
@@ -896,50 +889,46 @@ class Test(BaseTest):
             "make sure registry is written\n",
         ]
 
-        inputs = self.input_logs()
-        registry = self.registry
-        logs = self.log_access()
-
-        inputs.write(file1, "file to be removed\n")
-        inputs.write(file2, contents2[0])
+        self.input_logs.write(file1, "file to be removed\n")
+        self.input_logs.write(file2, contents2[0])
         filebeat = self.start_beat()
 
         self.wait_until(lambda: self.output_has(lines=2), max_timeout=10)
 
         # Wait until registry file is created
         self.wait_until(
-            logs.nextCheck("Registry file updated. 2 states written."),
+            self.logs.nextCheck("Registry file updated. 2 states written."),
             max_timeout=15)
 
-        count = registry.count()
+        count = self.registry.count()
         print("registry size: {}".format(count))
         assert count == 2
 
-        inputs.remove(file1)
+        self.input_logs.remove(file1)
 
         # Wait until states are removed from inputs
-        self.wait_until(logs.nextCheck("Remove state for file as file removed"))
+        self.wait_until(self.logs.nextCheck("Remove state for file as file removed"))
 
         # Add one more line to make sure registry is written
-        inputs.append(file2, contents2[1])
+        self.input_logs.append(file2, contents2[1])
 
         self.wait_until(lambda: self.output_has(lines=3))
 
         # wait until next gc and until registry file has been updated
-        self.wait_until(logs.check("Before: 1, After: 1, Pending: 1"))
-        self.wait_until(logs.nextCheck("Registry file updated. 1 states written."))
-        count = registry.count()
+        self.wait_until(self.logs.check("Before: 1, After: 1, Pending: 1"))
+        self.wait_until(self.logs.nextCheck("Registry file updated. 1 states written."))
+        count = self.registry.count()
         print("registry size after remove: {}".format(count))
         assert count == 1
 
         filebeat.check_kill_and_wait()
 
         # Check that the first two files were removed from the registry
-        data = registry.load()
+        data = self.registry.load()
         assert len(data) == 1
 
         # Make sure the last file in the registry is the correct one and has the correct offset
-        assert data[0]["offset"] == inputs.size(file2)
+        assert data[0]["offset"] == self.input_logs.size(file2)
 
     def test_symlink_failure(self):
         """
@@ -1020,17 +1009,14 @@ class Test(BaseTest):
         init_files = ["test"+str(i)+".log" for i in range(3)]
         restart_files = ["test"+str(i+3)+".log" for i in range(1)]
 
-        inputs = self.input_logs()
-        logs = self.log_access()
-
         for name in init_files:
-            inputs.write(name, "Hello World\n")
+            self.input_logs.write(name, "Hello World\n")
 
         filebeat = self.start_beat()
 
         # Make sure states written appears one more time
         self.wait_until(
-            lambda: logs.contains("Ignore file because ignore_older"),
+            self.logs.check("Ignore file because ignore_older"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait()
@@ -1047,7 +1033,7 @@ class Test(BaseTest):
 
         # Write additional file
         for name in restart_files:
-            inputs.write(name, "Hello World\n")
+            self.input_logs.write(name, "Hello World\n")
 
         # Make sure all 4 states are persisted
         self.wait_until(logs.nextCheck("input states cleaned up. Before: 4, After: 4"))

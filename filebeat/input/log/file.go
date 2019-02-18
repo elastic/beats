@@ -29,4 +29,4 @@ type File struct {
 
 func (File) Continuable() bool { return true }
 func (File) HasState() bool    { return true }
-func (f File) Removed() bool   { return file.FileRemoved(f.File) }
+func (f File) Removed() bool   { return file.IsRemoved(f.File) }

@@ -18,7 +18,6 @@
 package file
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"reflect"
@@ -39,10 +38,6 @@ var (
 	modkernel32 = windows.NewLazyDLL("kernel32.dll")
 
 	procGetFileInformationByHandleEx = modkernel32.NewProc("GetFileInformationByHandleEx")
-)
-
-var (
-	ErrDeletePending = errors.New("delete pending")
 )
 
 // GetOSState returns the platform specific StateOS
@@ -122,8 +117,13 @@ func ReadOpen(path string) (*os.File, error) {
 	return os.NewFile(uintptr(handle), path), nil
 }
 
-// FileRemoved checks wheter the file held by f is removed.
-func FileRemoved(f *os.File) bool {
+// IsRemoved checks wheter the file held by f is removed.
+// On Windows IsRemoved reads the DeletePending flags using the GetFileInformationByHandleEx.
+// A file is not removed/unlinked as long as at least one process still own a
+// file handle. A delete file is only marked as deleted, and file attributes
+// can still be read. Only opening a file marked with 'DeletePending' will
+// fail.
+func IsRemoved(f *os.File) bool {
 	hdl := f.Fd()
 	if hdl == uintptr(syscall.InvalidHandle) {
 		return false

@@ -26,6 +26,14 @@ class BaseTest(TestCase):
     def registry(self):
         return self.access_registry()
 
+    @property
+    def input_logs(self):
+        return InputLogs(os.path.join(self.working_dir, "log"))
+
+    @property
+    def logs(self):
+        return self.log_access()
+
     def access_registry(self, name=None, data_path=None):
         data_path = data_path if data_path else self.working_dir
         return Registry(data_path, name)
@@ -33,9 +41,6 @@ class BaseTest(TestCase):
     def log_access(self, file=None):
         file = file if file else self.beat_name + ".log"
         return LogState(os.path.join(self.working_dir, file))
-
-    def input_logs(self):
-        return InputLogs(os.path.join(self.working_dir, "log"))
 
     def has_registry(self, name=None, data_path=None):
         return self.access_registry(name, data_path).exists()
@@ -68,6 +73,8 @@ class BaseTest(TestCase):
 
 
 class InputLogs:
+    """ InputLogs is used to write and append to files which are read by filebeat. """
+
     def __init__(self, home):
         self.home = home
         if not os.path.isdir(self.home):
@@ -94,6 +101,8 @@ class InputLogs:
 
 
 class Registry:
+    """ Registry provides access to the registry used by filebeat to store its progress """
+
     def __init__(self, home, name=None):
         if not name:
             name = default_registry_file

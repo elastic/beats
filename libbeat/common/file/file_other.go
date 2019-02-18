@@ -63,8 +63,8 @@ func ReadOpen(path string) (*os.File, error) {
 	return os.OpenFile(path, flag, perm)
 }
 
-// FileRemoved checks wheter the file held by f is removed.
-func FileRemoved(f *os.File) bool {
+// IsRemoved checks wheter the file held by f is removed.
+func IsRemoved(f *os.File) bool {
 	_, err := os.Stat(f.Name())
 	return err != nil
 }
