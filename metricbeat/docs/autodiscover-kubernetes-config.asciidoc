@@ -6,6 +6,7 @@ metricbeat.autodiscover:
   providers:
     - type: kubernetes
       include_annotations: ["prometheus.io.scrape"]
+      annotations.dedot: false
       templates:
         - condition:
             contains:
@@ -17,3 +18,4 @@ metricbeat.autodiscover:
 -------------------------------------------------------------------------------------
 
 This configuration launches a `prometheus` module for all containers of pods annotated `prometheus.io.scrape=true`.
+If annotations.dedot set to true, dots in annotations will be replaced with `_`.

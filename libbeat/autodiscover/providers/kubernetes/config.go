@@ -38,6 +38,7 @@ type Config struct {
 	Builders     []*common.Config        `config:"builders"`
 	Appenders    []*common.Config        `config:"appenders"`
 	Templates    template.MapperSettings `config:"templates"`
+	Dedot        bool                    `config:"annotations.dedot"`
 }
 
 func defaultConfig() *Config {
@@ -46,6 +47,7 @@ func defaultConfig() *Config {
 		SyncPeriod:     1 * time.Second,
 		CleanupTimeout: 60 * time.Second,
 		Prefix:         "co.elastic",
+		Dedot:          false,
 	}
 }
 

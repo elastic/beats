@@ -473,6 +473,229 @@ func TestEmitEvent(t *testing.T) {
 	}
 }
 
+func TestDedotAnnotations(t *testing.T) {
+	name := "filebeat"
+	namespace := "default"
+	podIP := "127.0.0.1"
+	containerID := "docker://foobar"
+	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
+	containerImage := "elastic/filebeat:6.3.0"
+	node := "node"
+	cid := "005f3b90-4b9d-12f8-acf0-31020a840133.filebeat"
+	UUID, err := uuid.NewV4()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		Message  string
+		Flag     string
+		Dedot    bool
+		Pod      *kubernetes.Pod
+		Expected bus.Event
+	}{
+		{
+			Message: "Test annotations dedot false",
+			Flag:    "start",
+			Dedot:   false,
+			Pod: &v1.Pod{
+				Metadata: &metav1.ObjectMeta{
+					Name:      &name,
+					Uid:       &uid,
+					Namespace: &namespace,
+					Labels:    map[string]string{},
+					Annotations: map[string]string{
+						"co.elastic.logs/multiline.pattern": "^test",
+						"co.elastic.metrics/module":         "prometheus",
+						"co.elastic.metrics/period":         "10s",
+						"co.elastic.metrics.foobar/period":  "15s",
+						"not.to.include":                    "true",
+					},
+				},
+				Status: &v1.PodStatus{
+					PodIP: &podIP,
+					ContainerStatuses: []*kubernetes.PodContainerStatus{
+						{
+							Name:        &name,
+							ContainerID: &containerID,
+						},
+					},
+				},
+				Spec: &v1.PodSpec{
+					NodeName: &node,
+					Containers: []*kubernetes.Container{
+						{
+							Image: &containerImage,
+							Name:  &name,
+						},
+					},
+				},
+			},
+			Expected: bus.Event{
+				"start":    true,
+				"host":     "127.0.0.1",
+				"id":       cid,
+				"provider": UUID,
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"id":      "foobar",
+						"name":    "filebeat",
+						"image":   "elastic/filebeat:6.3.0",
+						"runtime": "docker",
+					},
+					"pod": common.MapStr{
+						"name": "filebeat",
+						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+					},
+					"node": common.MapStr{
+						"name": "node",
+					},
+					"namespace": "default",
+					"annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.logs/multiline.pattern": "^test",
+						"co.elastic.metrics/module":         "prometheus",
+						"co.elastic.metrics/period":         "10s",
+						"co.elastic.metrics.foobar/period":  "15s",
+						"not.to.include":                    "true",
+					}),
+				},
+				"meta": common.MapStr{
+					"kubernetes": common.MapStr{
+						"namespace": "default",
+						"container": common.MapStr{
+							"name": "filebeat",
+						}, "pod": common.MapStr{
+							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						}, "node": common.MapStr{
+							"name": "node",
+						},
+					},
+				},
+				"config": []*common.Config{},
+			},
+		},
+		{
+			Message: "Test annotations dedot true",
+			Flag:    "start",
+			Dedot:   true,
+			Pod: &v1.Pod{
+				Metadata: &metav1.ObjectMeta{
+					Name:      &name,
+					Uid:       &uid,
+					Namespace: &namespace,
+					Labels:    map[string]string{},
+					Annotations: map[string]string{
+						"co.elastic.logs/multiline.pattern": "^test",
+						"co.elastic.metrics/module":         "prometheus",
+						"co.elastic.metrics/period":         "10s",
+						"co.elastic.metrics.foobar/period":  "15s",
+						"not.to.include":                    "true",
+					},
+				},
+				Status: &v1.PodStatus{
+					PodIP: &podIP,
+					ContainerStatuses: []*kubernetes.PodContainerStatus{
+						{
+							Name:        &name,
+							ContainerID: &containerID,
+						},
+					},
+				},
+				Spec: &v1.PodSpec{
+					NodeName: &node,
+					Containers: []*kubernetes.Container{
+						{
+							Image: &containerImage,
+							Name:  &name,
+						},
+					},
+				},
+			},
+			Expected: bus.Event{
+				"start":    true,
+				"host":     "127.0.0.1",
+				"id":       cid,
+				"provider": UUID,
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"id":      "foobar",
+						"name":    "filebeat",
+						"image":   "elastic/filebeat:6.3.0",
+						"runtime": "docker",
+					},
+					"pod": common.MapStr{
+						"name": "filebeat",
+						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+					},
+					"node": common.MapStr{
+						"name": "node",
+					},
+					"namespace": "default",
+					"annotations": common.MapStr{
+						"co_elastic_logs/multiline_pattern": "^test",
+						"co_elastic_metrics/module":         "prometheus",
+						"co_elastic_metrics/period":         "10s",
+						"co_elastic_metrics_foobar/period":  "15s",
+						"not_to_include":                    "true",
+					},
+				},
+				"meta": common.MapStr{
+					"kubernetes": common.MapStr{
+						"namespace": "default",
+						"container": common.MapStr{
+							"name": "filebeat",
+						}, "pod": common.MapStr{
+							"name": "filebeat",
+							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+						}, "node": common.MapStr{
+							"name": "node",
+						},
+					},
+				},
+				"config": []*common.Config{},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Message, func(t *testing.T) {
+			mapper, err := template.NewConfigMapper(nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			metaGen, err := kubernetes.NewMetaGenerator(common.NewConfig())
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			config := defaultConfig()
+			config.Dedot = test.Dedot
+			p := &Provider{
+				config:    config,
+				bus:       bus.New("test"),
+				metagen:   metaGen,
+				templates: mapper,
+				uuid:      UUID,
+			}
+
+			listener := p.bus.Subscribe()
+
+			p.emit(test.Pod, test.Flag)
+
+			select {
+			case event := <-listener.Events():
+				assert.Equal(t, test.Expected, event, test.Message)
+			case <-time.After(2 * time.Second):
+				if test.Expected != nil {
+					t.Fatal("Timeout while waiting for event")
+				}
+			}
+		})
+	}
+}
+
 func getNestedAnnotations(in common.MapStr) common.MapStr {
 	out := common.MapStr{}
 

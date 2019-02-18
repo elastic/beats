@@ -31,10 +31,13 @@ metricbeat.max_start_delay: 10s
 # Autodiscover allows you to detect changes in the system and spawn new modules
 # as they happen.
 
+# If labels.dedot set to true, dots in labels will be replaced with `_`.
+
 #metricbeat.autodiscover:
   # List of enabled autodiscover providers
 #  providers:
 #    - type: docker
+#      labels.dedot: false
 #      templates:
 #        - condition:
 #            equals.docker.container.image: etcd
