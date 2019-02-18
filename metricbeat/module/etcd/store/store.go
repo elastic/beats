@@ -18,7 +18,6 @@
 package store
 
 import (
-	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -64,10 +63,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	content, err := m.http.FetchContent()
 	if err != nil {
-		return nil, err
+		reporter.Error(err)
+		return
 	}
-	return eventMapping(content), nil
+
+	reporter.Event(mb.Event{
+		MetricSetFields: eventMapping(content),
+	})
 }
