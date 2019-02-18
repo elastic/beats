@@ -18,6 +18,7 @@
 package store
 
 import (
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -34,6 +35,8 @@ var (
 		DefaultPath:   defaultPath,
 	}.Build()
 )
+
+var logger = logp.NewLogger("etcd.store")
 
 func init() {
 	mb.Registry.MustAddMetricSet("etcd", "store", New,
@@ -66,6 +69,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	content, err := m.http.FetchContent()
 	if err != nil {
+		logger.Error(err)
 		reporter.Error(err)
 		return
 	}
