@@ -12,7 +12,24 @@ other Beats should be migrated.
 
 Note: This changelog was only started after the 6.3 release.
 
-=== Beats version HEAD
+=== Beats version 7.0.0-beta1
+https://github.com/elastic/beats/compare/v7.0.0-alpha2..v7.0.0-beta1[Check the HEAD diff]
+
+==== Breaking changes
+- Outputs receive Index Manager as additional parameter. The index manager can
+  be used to create an index selector. {pull}10347[10347]
+- Remove support for loading dashboards to Elasticsearch 5. {pull}10451[10451]
+
+==== Added
+
+- Allow multiple object type configurations per field. {pull}9772[9772]
+- Move agent metadata addition to a processor. {pull}9952[9952]
+- Add (*common.Config).Has and (*common.Config).Remove. {pull}10363[10363]
+- Introduce ILM and IndexManagment support to beat.Settings. {pull}10347[10347]
+- Introduce ILM and IndexManagement support to beat.Settings. {pull}10347[10347]
+- Generating index pattern on demand instead of shipping them in the packages. {pull}10478[10478]
+
+=== Beats version 7.0.0-alpha2
 https://github.com/elastic/beats/compare/v6.3.0..v7.0.0-alpha2[Check the HEAD diff]
 
 The list below covers the major changes between 6.3.0 and 7.0.0-alpha2 only.
