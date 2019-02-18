@@ -57,7 +57,7 @@ func Fix(d time.Duration) Waiter {
 	}
 }
 
-// Timer uses a two Waiter strategy, the first will decide how much time to wait before
+// PeriodicTimer uses a two Waiter strategy, the first will decide how much time to wait before
 // receive the initial tick and the other will be how much time to wait before doing the other calls,
 // this can be used to introduce more randomness in the frequency of the calls for outside system.
 // This can be useful if you want to better distribute calls that could affect the performance of
