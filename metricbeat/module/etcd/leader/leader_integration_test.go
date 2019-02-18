@@ -24,6 +24,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/libbeat/tests/compose"

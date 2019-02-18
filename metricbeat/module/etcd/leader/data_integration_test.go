@@ -20,9 +20,11 @@
 package leader
 
 import (
-	"github.com/elastic/beats/libbeat/tests/compose"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
