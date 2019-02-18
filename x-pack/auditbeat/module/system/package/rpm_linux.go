@@ -321,7 +321,7 @@ func packageFromHeader(header C.Header, cFun *cFunctions) (*Package, error) {
 	if name != nil {
 		pkg.Name = C.GoString(name)
 	} else {
-		pkg.Error = errors.New("Failed to get package name")
+		return nil, errors.New("Failed to get package name")
 	}
 
 	version := C.my_headerGetString(cFun.headerGetString, header, RPMTAG_VERSION)
