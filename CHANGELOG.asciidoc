@@ -7,7 +7,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/1035569addc4a3b29ffa14f8a08c27c1ace16ef9...6.6[Check the HEAD diff]
+https://github.com/elastic/beats/compare/6.6.1...6.6[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -55,16 +55,11 @@ https://github.com/elastic/beats/compare/1035569addc4a3b29ffa14f8a08c27c1ace16ef
 
 *Affecting all Beats*
 
-- Release Jolokia autodiscover as GA. {pull}9706[9706]
-
 *Auditbeat*
 
 *Filebeat*
 
 *Heartbeat*
-
-- Fixed rare issue where TLS connections to endpoints with x509 certificates missing either notBefore or notAfter would cause the check to fail with a stacktrace.  {pull}9566[9566]
-
 
 *Journalbeat*
 
@@ -99,6 +94,52 @@ https://github.com/elastic/beats/compare/1035569addc4a3b29ffa14f8a08c27c1ace16ef
 
 ////////////////////////////////////////////////////////////
 
+[[release-notes-6.6.1]]
+=== Beats version 6.6.1
+https://github.com/elastic/beats/compare/v6.6.0...6.6.1[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Fix stopping of modules started by kubernetes autodiscover. {pull}10476[10476]
+
+*Auditbeat*
+
+- Enable System module config on Windows. {pull}10237[10237]
+
+*Filebeat*
+
+- Fix bad bytes count in `docker` input when filtering by stream. {pull}10211[10211]
+- Add `convert_timezone` option to Logstash module to convert dates to UTC. {issue}9756[9756] {pull}9797[9797]
+- Add `convert_timezone` option to Elasticsearch module to convert dates to UTC. {issue}9756[9756] {pull}9761[9761]
+- Make elasticsearch/audit fileset be more lenient in parsing node name. {issue}10035[10035] {pull}10135[10135]
+
+*Journalbeat*
+
+- Fix fields.yml indentation of audit group which had the effect of creating an incomplete Elasticsearch index template. {pull}10556[10556]
+
+*Metricbeat*
+
+- Fix issue with `elasticsearch/node_stats` metricset (x-pack) not indexing `source_node` field. {pull}10639[10639]
+
+*Packetbeat*
+
+- Fixed a crash when using af_packet capture {pull}10477[10477]
+
+*Functionbeat*
+
+- Ensure that functionbeat is logging at info level not debug. {issue}10262[10262]
+
+==== Added
+
+*Filebeat*
+
+- Teach elasticsearch/audit fileset to parse out some more fields. {issue}10134[10134] {pull}10137[10137]
+
+*Journalbeat*
+
+- Migrate registry from previously incorrect path. {pull}10486[10486]
 
 [[release-notes-6.6.0]]
 === Beats version 6.6.0
