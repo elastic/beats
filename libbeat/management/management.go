@@ -20,9 +20,11 @@ package management
 import (
 	"github.com/gofrs/uuid"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/feature"
+	"github.com/elastic/beats/libbeat/keystore"
 )
 
 // Namespace is the feature namespace for queue definition.
@@ -30,6 +32,31 @@ var Namespace = "libbeat.management"
 
 // DebugK used as key for all things central management
 var DebugK = "centralmgmt"
+
+// SystemInfo is the information about the current beat.
+// NOTE: I am isolating management from any changes for beat.Info.
+type SystemInfo struct {
+	// Beat the actual kind of beat.
+	Beat string
+
+	// Version is the version of the beat.
+	Version common.Version
+
+	// Name is the configured name of the beat.
+	Name string
+
+	// Hostname is the hostname of the beat.
+	Hostname string
+
+	// ID is the persistent ID associated to this machine.
+	ID uuid.UUID
+
+	// EphemeralID is the ID associated to the process invocation. (PID)
+	EphemeralID uuid.UUID
+
+	// Keystore
+	Keystore keystore.Keystore
+}
 
 // ConfigManager interacts with the beat to update configurations
 // from an external source
@@ -48,7 +75,7 @@ type ConfigManager interface {
 }
 
 // FactoryFunc for creating a config manager
-type FactoryFunc func(*common.Config, *reload.Registry, uuid.UUID) (ConfigManager, error)
+type FactoryFunc func(*common.Config, *reload.Registry, SystemInfo) (ConfigManager, error)
 
 // Register a config manager
 func Register(name string, fn FactoryFunc, stability feature.Stability) {
@@ -76,7 +103,7 @@ func Factory() FactoryFunc {
 // nilManager, fallback when no manager is present
 type nilManager struct{}
 
-func nilFactory(*common.Config, *reload.Registry, uuid.UUID) (ConfigManager, error) {
+func nilFactory(*common.Config, *reload.Registry, SystemInfo) (ConfigManager, error) {
 	return nilManager{}, nil
 }
 
@@ -84,3 +111,16 @@ func (nilManager) Enabled() bool                           { return false }
 func (nilManager) Start()                                  {}
 func (nilManager) Stop()                                   {}
 func (nilManager) CheckRawConfig(cfg *common.Config) error { return nil }
+
+// NewSystemInfo takes a beat info struct and create a SystemInfo struct.
+func NewSystemInfo(b beat.Beat) *SystemInfo {
+	return &SystemInfo{
+		Beat:        b.info.Beat,
+		Version:     common.MustNewVersion(b.info.Version),
+		Name:        b.info.Name,
+		Hostnmame:   b.info.Hostname,
+		ID:          b.info.ID,
+		EphemeralID: b.info.EphemeralID,
+		Keystore:    b.Keystore(),
+	}
+}

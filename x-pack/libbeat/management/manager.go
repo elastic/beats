@@ -12,12 +12,11 @@ import (
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/feature"
 
-	"github.com/gofrs/uuid"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
+	m "github.com/elastic/beats/libbeat/management"
 	"github.com/elastic/beats/x-pack/libbeat/management/api"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -33,33 +32,41 @@ func init() {
 // ConfigManager handles internal config updates. By retrieving
 // new configs from Kibana and applying them to the Beat
 type ConfigManager struct {
-	config    *Config
-	cache     *Cache
-	logger    *logp.Logger
-	client    api.AuthClienter
-	beatUUID  uuid.UUID
-	done      chan struct{}
-	registry  *reload.Registry
-	wg        sync.WaitGroup
-	blacklist *ConfigBlacklist
-	reporter  *api.EventReporter
-	state     *State
-	mux       sync.RWMutex
+	config     *Config
+	cache      *Cache
+	logger     *logp.Logger
+	client     api.AuthClienter
+	systemInfo m.SystemInfo
+	done       chan struct{}
+	registry   *reload.Registry
+	wg         sync.WaitGroup
+	blacklist  *ConfigBlacklist
+	reporter   *api.EventReporter
+	state      *State
+	mux        sync.RWMutex
 }
 
 // NewConfigManager returns a X-Pack Beats Central Management manager
-func NewConfigManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
+func NewConfigManager(
+	config *common.Config,
+	registry *reload.Registry,
+	systemInfo m.SystemInfo,
+) (management.ConfigManager, error) {
 	c := defaultConfig()
 	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
 			return nil, errors.Wrap(err, "parsing central management settings")
 		}
 	}
-	return NewConfigManagerWithConfig(c, registry, beatUUID)
+	return NewConfigManagerWithConfig(c, registry, systemInfo)
 }
 
 // NewConfigManagerWithConfig returns a X-Pack Beats Central Management manager
-func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
+func NewConfigManagerWithConfig(
+	c *Config,
+	registry *reload.Registry,
+	systemInfo m.SystemInfo,
+) (management.ConfigManager, error) {
 	var client *api.Client
 	var cache *Cache
 	var blacklist *ConfigBlacklist
@@ -92,18 +99,18 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 		}
 	}
 
-	authClient := &api.AuthClient{Client: client, AccessToken: c.AccessToken, BeatUUID: beatUUID}
+	authClient := &api.AuthClient{Client: client, AccessToken: c.AccessToken, BeatUUID: systemInfo.ID}
 	log := logp.NewLogger(management.DebugK)
 
 	return &ConfigManager{
-		config:    c,
-		cache:     cache,
-		blacklist: blacklist,
-		logger:    log,
-		client:    authClient,
-		done:      make(chan struct{}),
-		beatUUID:  beatUUID,
-		registry:  registry,
+		config:     c,
+		cache:      cache,
+		blacklist:  blacklist,
+		logger:     log,
+		client:     authClient,
+		done:       make(chan struct{}),
+		systemInfo: systemInfo,
+		registry:   registry,
 		reporter: api.NewEventReporter(
 			log,
 			authClient,
