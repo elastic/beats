@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v6.7.2...6.x[Check the HEAD diff]
 
 - Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
 - Fix initialization of the TCP input logger. {pull}11605[11605]
+- Add support for Cisco syslog format used by their switch. {pull}10760[10760]
 
 *Heartbeat*
 
