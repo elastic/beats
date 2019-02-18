@@ -29,6 +29,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Move output.elasticsearch.ilm settings to setup.ilm. {pull}10347[10347]
 - ILM will be available by default if Elasticsearch > 7.0 is used. {pull}10347[10347]
 - Allow Central Management to send events back to kibana. {issue}9382[9382]
+- Initialize the Paths before the keystore and save the keystore into `data/{beatname}.keystore`. {pull}10706[10706]
 
 *Auditbeat*
 
