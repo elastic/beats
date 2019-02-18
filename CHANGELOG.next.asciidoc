@@ -64,6 +64,8 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 *Filebeat*
 
+- Add ISO8601 timestamp support in syslog metricset. {issue}8716[8716] {pull}10736[10736]
+
 *Heartbeat*
 
 *Journalbeat*
