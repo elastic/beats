@@ -186,6 +186,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed data types for roles and indices fields in `elasticsearch/audit` fileset {pull}10307[10307]
 - Ensure `source.address` is always populated by the nginx module (ECS). {pull}10418[10418]
 - Cover empty request data, url and version in Apache2 module{pull}10730[10730]
+- Fix registry entries not being cleaned due to race conditions. {pull}10747[10747]
+- Improve detection of file deletion on Windows. {pull}10747[10747]
 
 *Heartbeat*
 

@@ -62,3 +62,9 @@ func ReadOpen(path string) (*os.File, error) {
 	perm := os.FileMode(0)
 	return os.OpenFile(path, flag, perm)
 }
+
+// IsRemoved checks wheter the file held by f is removed.
+func IsRemoved(f *os.File) bool {
+	_, err := os.Stat(f.Name())
+	return err != nil
+}

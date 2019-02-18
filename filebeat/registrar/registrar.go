@@ -408,7 +408,7 @@ func (r *Registrar) writeRegistry() error {
 }
 
 func writeTmpFile(baseName string, perm os.FileMode, states []file.State) (string, error) {
-	logp.Debug("registrar", "Write registry file: %s", baseName)
+	logp.Debug("registrar", "Write registry file: %s (%v)", baseName, len(states))
 
 	tempfile := baseName + ".new"
 	f, err := os.OpenFile(tempfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC|os.O_SYNC, perm)
