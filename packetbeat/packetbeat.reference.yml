@@ -279,7 +279,7 @@ packetbeat.protocols:
 
   # Configure the ports where to listen for MySQL traffic. You can disable
   # the MySQL protocol by commenting out the list of ports.
-  ports: [3306]
+  ports: [3306,3307]
 
   # If this option is enabled, the raw message of the request (`request` field)
   # is sent to Elasticsearch. The default is false.
@@ -444,7 +444,14 @@ packetbeat.protocols:
 
   # Configure the ports where to listen for TLS traffic. You can disable
   # the TLS protocol by commenting out the list of ports.
-  ports: [443]
+  ports:
+    - 443   # HTTPS
+    - 993   # IMAPS
+    - 995   # POP3S
+    - 5223  # XMPP over SSL
+    - 8443
+    - 8883  # Secure MQTT
+    - 9243  # Elasticsearch
 
   # List of hash algorithms to use to calculate certificates' fingerprints.
   # Valid values are `sha1`, `sha256` and `md5`.
@@ -460,33 +467,17 @@ packetbeat.protocols:
 
 #=========================== Monitored processes ==============================
 
-# Configure the processes to be monitored and how to find them. If a process is
-# monitored then Packetbeat attempts to use it's name to fill in the `proc` and
-# `client_proc` fields.
-# The processes can be found by searching their command line by a given string.
-#
-# Process matching is optional and can be enabled by uncommenting the following
-# lines.
-#
-#packetbeat.procs:
-#  enabled: false
-#  monitored:
-#    - process: mysqld
-#      cmdline_grep: mysqld
-#
-#    - process: pgsql
-#      cmdline_grep: postgres
-#
-#    - process: nginx
-#      cmdline_grep: nginx
-#
-#    - process: app
-#      cmdline_grep: gunicorn
+# Packetbeat can enrich events with information about the process associated
+# the socket that sent or received the packet if Packetbeat is monitoring
+# traffic from the host machine. By default process enrichment is disabled.
+# This feature works on Linux and Windows.
+packetbeat.procs.enabled: false
 
-# Uncomment the following if you want to ignore transactions created
-# by the server on which the shipper is installed. This option is useful
-# to remove duplicates if shippers are installed on multiple servers.
-#packetbeat.ignore_outgoing: true
+# If you want to ignore transactions created by the server on which the shipper
+# is installed you can enable this option. This option is useful to remove
+# duplicates if shippers are installed on multiple servers. Default value is
+# false.
+packetbeat.ignore_outgoing: false
 
 #================================ General ======================================
 
@@ -735,16 +726,11 @@ output.elasticsearch:
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
 
-  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
-  #ilm.enabled: false
-  #ilm.rollover_alias: "packetbeat"
-  #ilm.pattern: "{now/d}-000001"
-
   # Set gzip compression level.
   #compression_level: 0
 
   # Configure escaping HTML symbols in strings.
-  #escape_html: true
+  #escape_html: false
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
@@ -762,7 +748,7 @@ output.elasticsearch:
   # Optional index name. The default is "packetbeat" plus date
   # and generates [packetbeat-]YYYY.MM.DD keys.
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "packetbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
+  #index: "packetbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -851,7 +837,7 @@ output.elasticsearch:
   #compression_level: 3
 
   # Configure escaping HTML symbols in strings.
-  #escape_html: true
+  #escape_html: false
 
   # Optional maximum time to live for a connection to Logstash, after which the
   # connection will be re-established.  A value of `0s` (the default) will
@@ -988,7 +974,7 @@ output.elasticsearch:
     #pretty: false
 
     # Configure escaping HTML symbols in strings.
-    #escape_html: true
+    #escape_html: false
 
   # Metadata update configuration. Metadata contains leader information
   # used to decide which broker to use when publishing.
@@ -1102,16 +1088,12 @@ output.elasticsearch:
     #pretty: false
 
     # Configure escaping HTML symbols in strings.
-    #escape_html: true
+    #escape_html: false
 
   # The list of Redis servers to connect to. If load-balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
   #hosts: ["localhost:6379"]
-
-  # The Redis port to use if hosts does not contain a port number. The default
-  # is 6379.
-  #port: 6379
 
   # The name of the Redis list or channel the events are published to. The
   # default is packetbeat.
@@ -1222,7 +1204,7 @@ output.elasticsearch:
     #pretty: false
 
     # Configure escaping HTML symbols in strings.
-    #escape_html: true
+    #escape_html: false
 
   # Path to the directory where to save the generated files. The option is
   # mandatory.
@@ -1257,7 +1239,7 @@ output.elasticsearch:
     #pretty: false
 
     # Configure escaping HTML symbols in strings.
-    #escape_html: true
+    #escape_html: false
 
 #================================= Paths ======================================
 
@@ -1343,14 +1325,14 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Template name. By default the template name is "packetbeat-%{[beat.version]}"
+# Template name. By default the template name is "packetbeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.name: "packetbeat-%{[beat.version]}"
+#setup.template.name: "packetbeat-%{[agent.version]}"
 
-# Template pattern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
+# Template pattern. By default the template pattern is "-%{[agent.version]}-*" to apply to the default index settings.
 # The first part is the version of the beat and then -* is used to match all daily indices.
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.pattern: "packetbeat-%{[beat.version]}-*"
+#setup.template.pattern: "packetbeat-%{[agent.version]}-*"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
@@ -1389,6 +1371,25 @@ setup.template.settings:
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
   #_source:
     #enabled: false
+
+#============================== Setup ILM =====================================
+
+# Configure Index Lifecycle Management Index Lifecycle Management creates a
+# write alias and adds additional settings to the template.
+# The elasticsearch.output.index setting will be replaced with the write alias
+# if ILM is enabled.
+
+# Enabled ILM support. Valid values are true, false, and auto. The beat will
+# detect availabilty of Index Lifecycle Management in Elasticsearch and enable
+# or disable ILM support.
+#setup.ilm.enabled: auto
+
+# Configure the ILM write alias name.
+#setup.ilm.rollover_alias: "packetbeat"
+
+# Configure rollover index pattern.
+#setup.ilm.pattern: "{now/d}-000001"
+
 
 #============================== Kibana =====================================
 
@@ -1627,3 +1628,8 @@ logging.files:
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
 #seccomp.enabled: true
+
+#================================= Migration ==================================
+
+# This allows to enable migration aliases
+#migration.enabled: false

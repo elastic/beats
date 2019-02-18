@@ -3,32 +3,27 @@
   description: >
     Contains fields for the Traefik access logs.
   fields:
-    - name: duration
-      type: long
-      description: >
-        Duration of the access entry.
     - name: user_identifier
       type: keyword
       description: >
         Is the RFC 1413 identity of the client
-    - name: body_sent.bytes
-      type: long
-      format: bytes
-      description: >
-        The number of bytes of the server response body.
     - name: request_count
       type: long
       description: >
         The number of requests
     - name: frontend_name
-      type: text
+      type: keyword
       description: >
         The name of the frontend used
     - name: backend_url
-      type: text
+      type: keyword
       description:
         The url of the backend where request is forwarded
 
+    - name: body_sent.bytes
+      type: alias
+      path: http.response.body.bytes
+      migration: true
     - name: remote_ip
       type: alias
       path: source.address
@@ -67,28 +62,13 @@
       fields:
         - name: device
           type: alias
-          path: user_agent.device
-        - name: major
-          type: alias
-          path: user_agent.major
-        - name: minor
-          type: alias
-          path: user_agent.minor
-        - name: patch
-          type: alias
-          path: user_agent.patch
+          path: user_agent.device.name
         - name: name
           type: alias
           path: user_agent.name
         - name: os
           type: alias
           path: user_agent.os.full_name
-        - name: os_major
-          type: alias
-          path: user_agent.os.major
-        - name: os_minor
-          type: alias
-          path: user_agent.os.minor
         - name: os_name
           type: alias
           path: user_agent.os.name

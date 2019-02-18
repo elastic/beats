@@ -71,6 +71,7 @@ type event struct {
 	nanosecond int
 	year       int
 	loc        *time.Location
+	sequence   int
 }
 
 // newEvent() return a new event.
@@ -84,6 +85,7 @@ func newEvent() *event {
 		minute:   -1,
 		second:   -1,
 		year:     time.Now().Year(),
+		sequence: -1,
 	}
 }
 
@@ -267,6 +269,17 @@ func (s *event) Pid() int {
 // HasPid returns true if a pid is set.
 func (s *event) HasPid() bool {
 	return s.pid > 0
+}
+
+// SetSequence set the sequence number for this event.
+func (s *event) SetSequence(b []byte) {
+	s.sequence = bytesToInt(b)
+}
+
+// Sequence returns the sequence number of the event when defined,
+// otherwise return -1.
+func (s *event) Sequence() int {
+	return s.sequence
 }
 
 // SetNanoSecond sets the nanosecond.

@@ -79,13 +79,13 @@ type mongodbConnectionData struct {
 // Represent a full mongodb transaction (request/reply)
 // These transactions are the end product of this parser
 type transaction struct {
-	cmdline      *common.ProcessTuple
-	src          common.Endpoint
-	dst          common.Endpoint
-	responseTime int32
-	ts           time.Time
-	bytesOut     int
-	bytesIn      int
+	cmdline  *common.ProcessTuple
+	src      common.Endpoint
+	dst      common.Endpoint
+	ts       time.Time
+	endTime  time.Time
+	bytesOut int
+	bytesIn  int
 
 	mongodb common.MapStr
 

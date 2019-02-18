@@ -39,6 +39,25 @@ type PipelineLoader interface {
 	GetVersion() common.Version
 }
 
+// MultiplePipelineUnsupportedError is an error returned when a fileset uses multiple pipelines but is
+// running against a version of Elasticsearch that doesn't support this feature.
+type MultiplePipelineUnsupportedError struct {
+	module               string
+	fileset              string
+	esVersion            common.Version
+	minESVersionRequired common.Version
+}
+
+func (m MultiplePipelineUnsupportedError) Error() string {
+	return fmt.Sprintf(
+		"the %s/%s fileset has multiple pipelines, which are only supported with Elasticsearch >= %s. Currently running with Elasticsearch version %s",
+		m.module,
+		m.fileset,
+		m.minESVersionRequired.String(),
+		m.esVersion.String(),
+	)
+}
+
 // LoadPipelines loads the pipelines for each configured fileset.
 func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool) error {
 	for module, filesets := range reg.registry {
@@ -56,6 +75,13 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 			pipelines, err := fileset.GetPipelines(esClient.GetVersion())
 			if err != nil {
 				return fmt.Errorf("Error getting pipeline for fileset %s/%s: %v", module, name, err)
+			}
+
+			// Filesets with multiple pipelines can only be supported by Elasticsearch >= 6.5.0
+			esVersion := esClient.GetVersion()
+			minESVersionRequired := common.MustNewVersion("6.5.0")
+			if len(pipelines) > 1 && esVersion.LessThan(minESVersionRequired) {
+				return MultiplePipelineUnsupportedError{module, name, esVersion, *minESVersionRequired}
 			}
 
 			var pipelineIDsLoaded []string
@@ -148,20 +174,10 @@ func interpretError(initialErr error, body []byte) error {
 		strings.HasPrefix(response.Error.RootCause[0].Reason, "No processor type exists with name") &&
 		response.Error.RootCause[0].Header.ProcessorType != "" {
 
-		plugins := map[string]string{
-			"geoip":      "ingest-geoip",
-			"user_agent": "ingest-user-agent",
-		}
-		plugin, ok := plugins[response.Error.RootCause[0].Header.ProcessorType]
-		if !ok {
-			return fmt.Errorf("This module requires an Elasticsearch plugin that provides the %s processor. "+
-				"Please visit the Elasticsearch documentation for instructions on how to install this plugin. "+
-				"Response body: %s", response.Error.RootCause[0].Header.ProcessorType, body)
-		}
+		return fmt.Errorf("This module requires an Elasticsearch plugin that provides the %s processor. "+
+			"Please visit the Elasticsearch documentation for instructions on how to install this plugin. "+
+			"Response body: %s", response.Error.RootCause[0].Header.ProcessorType, body)
 
-		return fmt.Errorf("This module requires the %s plugin to be installed in Elasticsearch. "+
-			"You can install it using the following command in the Elasticsearch home directory:\n"+
-			"    sudo bin/elasticsearch-plugin install %s", plugin, plugin)
 	}
 
 	// older ES version?

@@ -18,25 +18,36 @@
     "system": {
         "memory": {
             "actual": {
-                "free": 5384859648,
+                "free": 4974256128,
                 "used": {
-                    "bytes": 11795009536,
-                    "pct": 0.6866
+                    "bytes": 11597463552,
+                    "pct": 0.6998
                 }
             },
-            "free": 941989888,
+            "free": 1320112128,
+            "hugepages": {
+                "default_size": 2097152,
+                "free": 0,
+                "reserved": 0,
+                "surplus": 0,
+                "total": 0,
+                "used": {
+                    "bytes": 0,
+                    "pct": 0
+                }
+            },
             "swap": {
-                "free": 1152122880,
-                "total": 3221225472,
+                "free": 3482378240,
+                "total": 8589930496,
                 "used": {
-                    "bytes": 2069102592,
-                    "pct": 0.6423
+                    "bytes": 5107552256,
+                    "pct": 0.5946
                 }
             },
-            "total": 17179869184,
+            "total": 16571719680,
             "used": {
-                "bytes": 16237879296,
-                "pct": 0.9452
+                "bytes": 15251607552,
+                "pct": 0.9203
             }
         }
     }

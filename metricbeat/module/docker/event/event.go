@@ -122,15 +122,10 @@ func (m *MetricSet) reportEvent(reporter mb.PushReporterV2, event events.Message
 
 	reporter.Event(mb.Event{
 		Timestamp: time,
-		RootFields: common.MapStr{
-			"event": common.MapStr{
-				"kind":    event.Type,
-				"action":  event.Action,
-				"created": time,
-				"id":      event.ID,
-			},
-		},
 		MetricSetFields: common.MapStr{
+			"id":     event.ID,
+			"type":   event.Type,
+			"action": event.Action,
 			"status": event.Status,
 			"from":   event.From,
 			"actor": common.MapStr{

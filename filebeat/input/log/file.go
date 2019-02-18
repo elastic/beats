@@ -17,7 +17,11 @@
 
 package log
 
-import "os"
+import (
+	"os"
+
+	"github.com/elastic/beats/libbeat/common/file"
+)
 
 type File struct {
 	*os.File
@@ -25,3 +29,4 @@ type File struct {
 
 func (File) Continuable() bool { return true }
 func (File) HasState() bool    { return true }
+func (f File) Removed() bool   { return file.IsRemoved(f.File) }

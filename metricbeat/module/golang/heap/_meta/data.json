@@ -1,55 +1,59 @@
 {
-    "@timestamp": "2017-02-22T08:29:22.819Z",
-    "beat": {
-        "hostname": "MacBook-Pro.local",
-        "name": "MacBook-Pro.local",
-        "version": "6.0.0-alpha1"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "golang.heap",
+        "duration": 115000,
+        "module": "golang"
     },
     "golang": {
         "heap": {
             "allocations": {
-                "active": 20619264,
-                "allocated": 19317104,
-                "frees": 56786,
-                "idle": 2383872,
-                "mallocs": 77939,
-                "objects": 21153,
-                "total": 42590064
+                "active": 16670720,
+                "allocated": 14115776,
+                "frees": 2830899,
+                "idle": 6496256,
+                "mallocs": 2921961,
+                "objects": 91062,
+                "total": 458114744
             },
-            "cmdline": "./bin/gopa --pprof",
+            "cmdline": "metricbeat --httpprof :6060 -e",
             "gc": {
-                "cpu_fraction": 0.000006,
-                "next_gc_limit": 33694576,
+                "cpu_fraction": 0.0000798538053427137,
+                "next_gc_limit": 22896432,
                 "pause": {
                     "avg": {
-                        "ns": 0
+                        "ns": 755847
                     },
-                    "count": 0,
+                    "count": 77,
                     "max": {
-                        "ns": 0
+                        "ns": 7537934
                     },
                     "sum": {
-                        "ns": 0
+                        "ns": 58200246
                     }
                 },
-                "total_count": 7,
+                "total_count": 77,
                 "total_pause": {
-                    "ns": 527378
+                    "ns": 58200246
                 }
             },
             "system": {
-                "obtained": 23003136,
+                "obtained": 23166976,
                 "released": 0,
-                "stack": 1114112,
-                "total": 28956920
+                "stack": 950272,
+                "total": 27908344
             }
         }
     },
     "metricset": {
-        "host": "localhost:6060",
-        "module": "golang",
-        "name": "heap",
-        "rtt": 1159
+        "name": "heap"
     },
-    "type": "metricsets"
+    "service": {
+        "address": "127.0.0.1:6060",
+        "type": "golang"
+    }
 }

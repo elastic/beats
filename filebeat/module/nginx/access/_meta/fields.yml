@@ -3,15 +3,16 @@
   description: >
     Contains fields for the Nginx access logs.
   fields:
-    - name: body_sent.bytes
-      type: long
-      format: bytes
-      description: >
-        The number of bytes of the server response body.
-
     - name: remote_ip_list
+      type: array
+      description: >
+        An array of remote IP addresses. It is a list because it is common to include, besides the client
+        IP address, IP addresses from headers like `X-Forwarded-For`.
+        Real source IP is restored to `source.ip`.
+
+    - name: body_sent.bytes
       type: alias
-      path: network.forwarded_ip
+      path: http.response.body.bytes
       migration: true
     - name: remote_ip
       type: alias
@@ -51,19 +52,7 @@
       fields:
         - name: device
           type: alias
-          path: user_agent.device
-          migration: true
-        - name: major
-          type: alias
-          path: user_agent.major
-          migration: true
-        - name: minor
-          type: alias
-          path: user_agent.minor
-          migration: true
-        - name: patch
-          type: alias
-          path: user_agent.patch
+          path: user_agent.device.name
           migration: true
         - name: name
           type: alias
@@ -72,14 +61,6 @@
         - name: os
           type: alias
           path: user_agent.os.full_name
-          migration: true
-        - name: os_major
-          type: alias
-          path: user_agent.os.major
-          migration: true
-        - name: os_minor
-          type: alias
-          path: user_agent.os.minor
           migration: true
         - name: os_name
           type: alias

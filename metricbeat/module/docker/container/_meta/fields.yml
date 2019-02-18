@@ -17,7 +17,7 @@
       description: >
         Container status.
     - name: ip_addresses
-      type: keyword
+      type: ip
       description: >
         Container IP addresses.
     - name: size
@@ -34,6 +34,6 @@
           description: >
              Size of the files that have been created or changed since creation.
     - name: tags
-      type: array
+      type: keyword
       description: >
         Image tags.

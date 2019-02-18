@@ -33,6 +33,7 @@ import (
 
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/packetbeat/publish"
 )
 
 const serverPort = 3306
@@ -42,6 +43,7 @@ type eventStore struct {
 }
 
 func (e *eventStore) publish(event beat.Event) {
+	publish.MarshalPacketbeatFields(&event, nil)
 	e.events = append(e.events, event)
 }
 
@@ -552,8 +554,9 @@ func Test_gap_in_response(t *testing.T) {
 	assert.Equal(t, true, drop)
 
 	trans := expectTransaction(t, store)
-	assert.NotNil(t, trans)
-	assert.Equal(t, []string{"Packet loss while capturing the response"}, trans["notes"])
+	if m, err := trans.GetValue("error.message"); assert.NoError(t, err) {
+		assert.Equal(t, m, "Packet loss while capturing the response")
+	}
 }
 
 // Test that loss of data during the request doesn't result in a
@@ -649,4 +652,26 @@ func Test_parseMysqlResponse_invalid(t *testing.T) {
 		assert.Equal(t, []string{""}, fields)
 		assert.Equal(t, [][]string{}, rows)
 	}
+}
+
+func Test_PreparedStatement(t *testing.T) {
+	logp.TestingSetup(logp.WithSelectors("mysql", "mysqldetailed"))
+	tcpTuple := testTCPTuple()
+	results := &eventStore{}
+	mysql := mysqlModForTests(results)
+
+	send := func(dir uint8, data string) {
+		rawData, err := hex.DecodeString(data)
+		assert.Nil(t, err)
+		packet := protos.Packet{Payload: rawData}
+
+		var private protos.ProtocolData
+		private = mysql.Parse(&packet, tcpTuple, dir, private)
+	}
+
+	send(tcp.TCPDirectionOriginal, "c00000001673656c6563742064697374696e637420636f756e742864697374696e63742070757263686173656465305f2e69642920617320636f6c5f305f305f2066726f6d2070757263686173655f64656d616e642070757263686173656465305f2077686572652070757263686173656465305f2e636861696e5f6d61737465723d3f20616e642070757263686173656465305f2e6372656174655f74696d653e3d3f20616e642070757263686173656465305f2e6372656174655f74696d653c3d3f")
+	send(tcp.TCPDirectionReverse, "0c000001000b000000010003000000001700000203646566000000013f000c3f0000000000fd80000000001700000303646566000000013f000c3f0000000000fd80000000001700000403646566000000013f000c3f0000000000fd800000000005000005fe000001201e0000060364656600000008636f6c5f305f305f000c3f001500000008810000000005000007fe00000120")
+	send(tcp.TCPDirectionOriginal, "33000000170b00000000010000000001fd000c000c000841313232343633380be107071c000000000000000be1070a1c173b3b00000000")
+	send(tcp.TCPDirectionReverse, "01000001011e0000020364656600000008636f6c5f305f305f000c3f001500000008810000000005000003fe000001200a00000400000b0000000000000005000005fe00000120")
+	assert.Len(t, results.events, 2)
 }

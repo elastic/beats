@@ -5,7 +5,7 @@ from nose.plugins.attrib import attr
 
 ZK_FIELDS = metricbeat.COMMON_FIELDS + ["zookeeper"]
 
-MNTR_FIELDS = ["version", "latency.avg", "latency.max",
+MNTR_FIELDS = ["latency.avg", "latency.max",
                "latency.min", "packets.received", "packets.sent",
                "outstanding_requests", "server_state", "znode_count",
                "watch_count", "ephemerals_count",
@@ -47,6 +47,34 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         zk_mntr.pop("followers", None)
 
         self.assertItemsEqual(self.de_dot(MNTR_FIELDS), zk_mntr.keys())
+
+        self.assert_fields_are_documented(evt)
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    @attr('integration')
+    def test_output(self):
+        """
+        ZooKeeper server module outputs an event.
+        """
+        self.render_config_template(modules=[{
+            "name": "zookeeper",
+            "metricsets": ["server"],
+            "hosts": self.get_hosts(),
+            "period": "5s"
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        output = self.read_output_json()
+        self.assertEqual(len(output), 1)
+        evt = output[0]
+
+        self.assertItemsEqual(self.de_dot(ZK_FIELDS), evt.keys())
+        zk_srvr = evt["zookeeper"]["server"]
+
+        assert zk_srvr["connections"] >= 0
 
         self.assert_fields_are_documented(evt)
 

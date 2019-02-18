@@ -76,6 +76,14 @@ type ClientConfig struct {
 	// if the normalization step should be skipped set this to true.
 	SkipNormalization bool
 
+	// By default events are decorated with agent metadata.
+	// To skip adding that metadata set this to true.
+	SkipAgentMetadata bool
+
+	// By default events are decorated with a host name.
+	// To skip adding that host.name set this to true.
+	SkipHostName bool
+
 	// ACK handler strategies.
 	// Note: ack handlers are run in another go-routine owned by the publisher pipeline.
 	//       They should not block for to long, to not block the internal buffers for

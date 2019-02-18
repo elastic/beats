@@ -26,6 +26,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Modify apache/error dataset to follow ECS. {pull}8963[8963]
 - Rename many `traefik.access.*` fields to map to ECS. {pull}9005[9005]
+- Add module zeek. {issue}9931[9931] {pull}10034[10034]
+- Rename many `kibana.log.*` fields to map to ECS. {pull}9301[9301]
 
 *Heartbeat*
 
@@ -34,6 +36,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Journalbeat*
 
 *Metricbeat*
+
+- Fix MongoDB dashboard that had some incorrect field names from `status` Metricset {pull}9795[9795] {issue}9715[9715]
 
 *Packetbeat*
 
@@ -51,6 +55,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Enforce validation for the Central Management access token. {issue}9621[9621]
 - Allow to unenroll a Beat from the UI. {issue}9452[9452]
+- Fix exclude_labels when there are dotted keys {pull}10154[10154]
 
 *Auditbeat*
 
@@ -101,7 +106,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
-- Add support for mongodb opcode 2013 (OP_MSG). {issue}6191[6191] {pull}8594[8594]
+- Add support to decode mysql prepare statement command. {pull}8084[8084]
 
 *Functionbeat*
 
@@ -158,6 +163,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...v7.0.0-alpha2[Check the
 - Rename many `nginx.access.*` fields to map to ECS. {pull}9081[9081]
 - Rename many `system.auth.*` fields to map to ECS. {pull}9138[9138]
 - Rename many `apache2.access.*` fields to map to ECS. {pull}9245[9245]
+- Rename `apache2` module to `apache`. {pull}9402[9402]
 
 *Metricbeat*
 
@@ -202,7 +208,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...v7.0.0-alpha2[Check the
 - Use `log.source.address` instead of `log.source.ip` for network input sources. {pull}9487[9487]
 - Rename many `redis.log.*` fields to map to ECS. {pull}9315[9315]
 - Rename many `icinga.*` fields to map to ECS. {pull}9294[9294]
-- Rename many `postgresql.log.*` fields to map to ECS. {pull}9303[9303]
+- Rename many `postgresql.log.*` fields to map to ECS. {pull}9308[9308]
 - Rename many `kafka.log.*` fields to map to ECS. {pull}9297[9297]
 - Add `convert_timezone` option to Logstash module to convert dates to UTC. {issue}9756[9756] {pull}9797[9797]
 
@@ -828,6 +834,7 @@ The issue will be fixed in the 6.4.1 release.
 - Release prometheus collector metricset as GA. {pull}7660[7660]
 - Add Elasticsearch `cluster_stats` metricset. {pull}7638[7638]
 - Added `basepath` setting for HTTP-based metricsets {pull}7700[7700]
+- Add couchdb module. {pull}9406[9406]
 
 *Packetbeat*
 

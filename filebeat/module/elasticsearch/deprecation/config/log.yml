@@ -5,7 +5,7 @@ paths:
 {{ end }}
 exclude_files: [".gz$","_slowlog.log$","_access.log$"]
 multiline:
-  pattern: '^\[[0-9]{4}-[0-9]{2}-[0-9]{2}'
+  pattern: '^(\[[0-9]{4}-[0-9]{2}-[0-9]{2}|{)'
   negate: true
   match: after
 
@@ -14,7 +14,3 @@ processors:
 - add_locale: ~
 {{ end }}
 
-fields:
-  service.name: "elasticsearch"
-
-fields_under_root: true

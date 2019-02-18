@@ -26,13 +26,13 @@ func TestConfiguration(t *testing.T) {
 		// Check enrollment token is correct
 		assert.Equal(t, "thisismyenrollmenttoken", r.Header.Get("kbn-beats-access-token"))
 
-		assert.Equal(t, "false", r.URL.Query().Get("validSetting"))
-
-		fmt.Fprintf(w, `{"configuration_blocks":[{"type":"filebeat.modules","config":{"module":"apache2"}},{"type":"metricbeat.modules","config":{"module":"system","period":"10s"}}]}`)
+		fmt.Fprintf(w, `{"configuration_blocks":[{"type":"filebeat.modules","config":{"_sub_type":"apache2"}},{"type":"metricbeat.modules","config":{"_sub_type":"system","period":"10s"}}]}`)
 	}))
 	defer server.Close()
 
-	configs, err := client.Configuration("thisismyenrollmenttoken", beatUUID, false)
+	auth := AuthClient{Client: client, AccessToken: "thisismyenrollmenttoken", BeatUUID: beatUUID}
+
+	configs, err := auth.Configuration()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -99,6 +99,34 @@ func TestConfigBlocksEqual(t *testing.T) {
 			equal: true,
 		},
 		{
+			name: "single element with slices",
+			a: ConfigBlocks{
+				ConfigBlocksWithType{
+					Type: "metricbeat.modules",
+					Blocks: []*ConfigBlock{
+						&ConfigBlock{
+							Raw: map[string]interface{}{
+								"foo": []string{"foo", "bar"},
+							},
+						},
+					},
+				},
+			},
+			b: ConfigBlocks{
+				ConfigBlocksWithType{
+					Type: "metricbeat.modules",
+					Blocks: []*ConfigBlock{
+						&ConfigBlock{
+							Raw: map[string]interface{}{
+								"foo": []string{"foo", "bar"},
+							},
+						},
+					},
+				},
+			},
+			equal: true,
+		},
+		{
 			name: "different number of blocks",
 			a: ConfigBlocks{
 				ConfigBlocksWithType{
@@ -137,7 +165,6 @@ func TestConfigBlocksEqual(t *testing.T) {
 				ConfigBlocksWithType{
 					Type: "metricbeat.modules",
 					Blocks: []*ConfigBlock{
-
 						&ConfigBlock{
 							Raw: map[string]interface{}{
 								"baz": "buzz",
@@ -150,7 +177,6 @@ func TestConfigBlocksEqual(t *testing.T) {
 				ConfigBlocksWithType{
 					Type: "metricbeat.modules",
 					Blocks: []*ConfigBlock{
-
 						&ConfigBlock{
 							Raw: map[string]interface{}{
 								"foo": "bar",
@@ -165,7 +191,11 @@ func TestConfigBlocksEqual(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			assert.Equal(t, test.equal, ConfigBlocksEqual(test.a, test.b))
+			check, err := ConfigBlocksEqual(test.a, test.b)
+			if !assert.NoError(t, err) {
+				return
+			}
+			assert.Equal(t, test.equal, check)
 		})
 	}
 }
@@ -187,6 +217,7 @@ func TestUnEnroll(t *testing.T) {
 	}))
 	defer server.Close()
 
-	_, err = client.Configuration("thisismyenrollmenttoken", beatUUID, false)
+	auth := AuthClient{Client: client, AccessToken: "thisismyenrollmenttoken", BeatUUID: beatUUID}
+	_, err = auth.Configuration()
 	assert.True(t, IsConfigurationNotFound(err))
 }

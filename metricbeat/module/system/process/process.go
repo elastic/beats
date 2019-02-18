@@ -98,10 +98,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch fetches metrics for all processes. It iterates over each PID and
 // collects process metadata, CPU metrics, and memory metrics.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	procs, err := m.stats.Get()
 	if err != nil {
-		return nil, errors.Wrap(err, "process stats")
+		r.Error(errors.Wrap(err, "process stats"))
+		return
 	}
 
 	if m.cgroup != nil {
@@ -123,5 +124,43 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 		}
 	}
 
-	return procs, err
+	for _, proc := range procs {
+		rootFields := common.MapStr{
+			"process": common.MapStr{
+				"name": getAndRemove(proc, "name"),
+				"pid":  getAndRemove(proc, "pid"),
+				"ppid": getAndRemove(proc, "ppid"),
+				"pgid": getAndRemove(proc, "pgid"),
+			},
+			"user": common.MapStr{
+				"name": getAndRemove(proc, "username"),
+			},
+		}
+
+		if cwd := getAndRemove(proc, "cwd"); cwd != nil {
+			rootFields.Put("process.working_directory", cwd)
+		}
+
+		if exe := getAndRemove(proc, "exe"); exe != nil {
+			rootFields.Put("process.executable", exe)
+		}
+
+		if args := getAndRemove(proc, "args"); args != nil {
+			rootFields.Put("process.args", args)
+		}
+
+		e := mb.Event{
+			RootFields:      rootFields,
+			MetricSetFields: proc,
+		}
+		r.Event(e)
+	}
+}
+
+func getAndRemove(from common.MapStr, field string) interface{} {
+	if v, ok := from[field]; ok {
+		delete(from, field)
+		return v
+	}
+	return nil
 }

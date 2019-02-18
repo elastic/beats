@@ -59,7 +59,7 @@ functionbeat.provider.aws.functions:
     type: sqs
 
     # Description of the method to help identify them when you run multiples functions.
-    description: "lambda function for sqs events"
+    description: "lambda function for SQS events"
 
     # Concurrency, is the reserved number of instances for that function.
     # Default is 5.
@@ -80,8 +80,9 @@ functionbeat.provider.aws.functions:
     #fields:
     #  env: staging
 
-    # List of cloudwatch log group registered to that function.
+    # List of SQS queues.
     triggers:
+        # Arn for the SQS queue.
       - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
 
     # Define custom processors for this function.
@@ -92,6 +93,56 @@ functionbeat.provider.aws.functions:
     #      max_depth: 1
     #      target: ""
     #      overwrite_keys: false
+    #
+
+  # Create a function that accepts events from Kinesis streams.
+  - name: kinesis
+    enabled: false
+    type: kinesis
+
+    # Description of the method to help identify them when you run multiples functions.
+    description: "lambda function for Kinesis events"
+
+    # Concurrency, is the reserved number of instances for that function.
+    # Default is 5.
+    #
+    # Note: There is a hard limit of 1000 functions of any kind per account.
+    #concurrency: 5
+
+    # The maximum memory allocated for this function, the configured size must be a factor of 64.
+    # There is a hard limit of 3008MiB for each function. Default is 128MiB.
+    #memory_size: 128MiB
+
+    # Dead letter queue configuration, this must be set to an ARN pointing to a SQS queue.
+    #dead_letter_config.target_arn:
+
+    # Optional fields that you can specify to add additional information to the
+    # output. Fields can be scalar values, arrays, dictionaries, or any nested
+    # combination of these.
+    #fields:
+    #  env: staging
+
+    # Define custom processors for this function.
+    #processors:
+    #  - decode_json_fields:
+    #      fields: ["message"]
+    #      process_array: false
+    #      max_depth: 1
+    #      target: ""
+    #      overwrite_keys: false
+
+    # List of Kinesis streams.
+    triggers:
+        # Arn for the Kinesis stream.
+      - event_source_arn: arn:aws:sqs:us-east-1:xxxxx:myevents
+
+        # batch_size is the number of events read in a batch.
+        # Default is 10.
+        #batch_size: 100
+
+        # Starting position is where to start reading events from the Kinesis stream.
+        # Default is trim_horizon.
+        #starting_position: "trim_horizon"
 
 #================================ General ======================================
 
@@ -340,16 +391,11 @@ output.elasticsearch:
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
 
-  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
-  #ilm.enabled: false
-  #ilm.rollover_alias: "functionbeat"
-  #ilm.pattern: "{now/d}-000001"
-
   # Set gzip compression level.
   #compression_level: 0
 
   # Configure escaping HTML symbols in strings.
-  #escape_html: true
+  #escape_html: false
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
@@ -367,7 +413,7 @@ output.elasticsearch:
   # Optional index name. The default is "functionbeat" plus date
   # and generates [functionbeat-]YYYY.MM.DD keys.
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "functionbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
+  #index: "functionbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -456,7 +502,7 @@ output.elasticsearch:
   #compression_level: 3
 
   # Configure escaping HTML symbols in strings.
-  #escape_html: true
+  #escape_html: false
 
   # Optional maximum time to live for a connection to Logstash, after which the
   # connection will be re-established.  A value of `0s` (the default) will
@@ -593,7 +639,7 @@ output.elasticsearch:
     #pretty: false
 
     # Configure escaping HTML symbols in strings.
-    #escape_html: true
+    #escape_html: false
 
   # Metadata update configuration. Metadata contains leader information
   # used to decide which broker to use when publishing.
@@ -707,16 +753,12 @@ output.elasticsearch:
     #pretty: false
 
     # Configure escaping HTML symbols in strings.
-    #escape_html: true
+    #escape_html: false
 
   # The list of Redis servers to connect to. If load-balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
   #hosts: ["localhost:6379"]
-
-  # The Redis port to use if hosts does not contain a port number. The default
-  # is 6379.
-  #port: 6379
 
   # The name of the Redis list or channel the events are published to. The
   # default is functionbeat.
@@ -827,7 +869,7 @@ output.elasticsearch:
     #pretty: false
 
     # Configure escaping HTML symbols in strings.
-    #escape_html: true
+    #escape_html: false
 
   # Path to the directory where to save the generated files. The option is
   # mandatory.
@@ -862,7 +904,7 @@ output.elasticsearch:
     #pretty: false
 
     # Configure escaping HTML symbols in strings.
-    #escape_html: true
+    #escape_html: false
 
 #================================= Paths ======================================
 
@@ -948,14 +990,14 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Template name. By default the template name is "functionbeat-%{[beat.version]}"
+# Template name. By default the template name is "functionbeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.name: "functionbeat-%{[beat.version]}"
+#setup.template.name: "functionbeat-%{[agent.version]}"
 
-# Template pattern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
+# Template pattern. By default the template pattern is "-%{[agent.version]}-*" to apply to the default index settings.
 # The first part is the version of the beat and then -* is used to match all daily indices.
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.pattern: "functionbeat-%{[beat.version]}-*"
+#setup.template.pattern: "functionbeat-%{[agent.version]}-*"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
@@ -994,6 +1036,25 @@ setup.template.settings:
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
   #_source:
     #enabled: false
+
+#============================== Setup ILM =====================================
+
+# Configure Index Lifecycle Management Index Lifecycle Management creates a
+# write alias and adds additional settings to the template.
+# The elasticsearch.output.index setting will be replaced with the write alias
+# if ILM is enabled.
+
+# Enabled ILM support. Valid values are true, false, and auto. The beat will
+# detect availabilty of Index Lifecycle Management in Elasticsearch and enable
+# or disable ILM support.
+#setup.ilm.enabled: auto
+
+# Configure the ILM write alias name.
+#setup.ilm.rollover_alias: "functionbeat"
+
+# Configure rollover index pattern.
+#setup.ilm.pattern: "{now/d}-000001"
+
 
 #============================== Kibana =====================================
 
@@ -1232,3 +1293,8 @@ logging.files:
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
 #seccomp.enabled: true
+
+#================================= Migration ==================================
+
+# This allows to enable migration aliases
+#migration.enabled: false

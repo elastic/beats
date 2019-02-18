@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/packetbeat/protos"
+	"github.com/elastic/beats/packetbeat/publish"
 )
 
 type testParser struct {
@@ -49,6 +50,7 @@ type eventStore struct {
 }
 
 func (e *eventStore) publish(event beat.Event) {
+	publish.MarshalPacketbeatFields(&event, nil)
 	e.events = append(e.events, event)
 }
 
@@ -1205,7 +1207,7 @@ func TestHttpParser_includeBodyFor(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, "done.", contents)
+	assert.Equal(t, common.NetString("done."), contents)
 }
 
 func TestHttpParser_sendRequestResponse(t *testing.T) {
@@ -1307,8 +1309,10 @@ func Test_gap_in_body_http1dot0_fin(t *testing.T) {
 	http.ReceivedFin(tcptuple, 1, private)
 
 	trans := expectTransaction(t, &store)
-	assert.NotNil(t, trans)
-	assert.Equal(t, trans["notes"], []string{"Packet loss while capturing the response"})
+	if assert.NotNil(t, trans) {
+		notes, _ := trans.GetValue("error.message")
+		assert.Equal(t, notes, "Packet loss while capturing the response")
+	}
 }
 
 func TestHttp_configsSettingAll(t *testing.T) {
@@ -1598,14 +1602,14 @@ func TestHTTP_Encodings(t *testing.T) {
 		assert.NotNil(t, trans, msg)
 		body, err := trans.GetValue("http.response.body.content")
 		if err == nil {
-			assert.Equal(t, testData.expectedBody, body, msg)
+			assert.Equal(t, common.NetString(testData.expectedBody), body, msg)
 		} else {
 			if len(testData.expectedBody) == 0 && len(testData.note) > 0 {
-				note, err := trans.GetValue("notes")
+				note, err := trans.GetValue("error.message")
 				if !assert.Nil(t, err, msg) {
-					t.Fatal(err)
+					return
 				}
-				assert.Equal(t, []string{testData.note}, note)
+				assert.Equal(t, testData.note, note)
 			} else {
 				t.Fatal(err)
 			}
@@ -1618,7 +1622,7 @@ func TestHTTP_Decoding_disabled(t *testing.T) {
 		"Host: server\r\n" +
 		"\r\n"
 
-	deflateBody := string([]byte{0xcb, 0xc8, 0xcf, 0x49, 0xe4, 0x02, 0x00})
+	deflateBody := common.NetString{0xcb, 0xc8, 0xcf, 0x49, 0xe4, 0x02, 0x00}
 
 	var store eventStore
 	http := httpModForTests(&store)

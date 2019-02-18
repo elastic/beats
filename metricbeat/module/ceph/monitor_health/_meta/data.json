@@ -1,18 +1,18 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
     "ceph": {
         "monitor_health": {
             "available": {
-                "kb": 49653688,
-                "pct": 75
+                "kb": 46814916,
+                "pct": 76
             },
             "health": "HEALTH_OK",
-            "last_updated": "2017-12-07T07:26:33.344939Z",
-            "name": "93c038136d94",
+            "last_updated": "2019-01-25T12:37:24.921587Z",
+            "name": "f0e2841bb524",
             "store_stats": {
                 "last_updated": "0.000000",
                 "log": {
@@ -22,24 +22,30 @@
                     "bytes": 65552
                 },
                 "sst": {
-                    "bytes": 726
+                    "bytes": 1087
                 },
                 "total": {
-                    "bytes": 2097894
+                    "bytes": 2098255
                 }
             },
             "total": {
-                "kb": 65792556
+                "kb": 61255492
             },
             "used": {
-                "kb": 12767092
+                "kb": 11299252
             }
         }
     },
+    "event": {
+        "dataset": "ceph.monitor_health",
+        "duration": 115000,
+        "module": "ceph"
+    },
     "metricset": {
-        "host": "ceph:5000",
-        "module": "ceph",
-        "name": "monitor_health",
-        "rtt": 115
+        "name": "monitor_health"
+    },
+    "service": {
+        "address": "127.0.0.1:5000",
+        "type": "ceph"
     }
 }

@@ -1,32 +1,52 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "event": {
+        "dataset": "system.socket",
+        "duration": 115000,
+        "module": "system"
+    },
     "metricset": {
-        "module": "system",
-        "name": "socket",
-        "rtt": 115
+        "name": "socket"
+    },
+    "network": {
+        "direction": "listening",
+        "iana_number": "41",
+        "type": "ipv6"
+    },
+    "process": {
+        "args": [
+            "/tmp/go-build774092237/b001/socket.test",
+            "-data"
+        ],
+        "executable": "/tmp/go-build774092237/b001/socket.test",
+        "name": "socket.test",
+        "pid": 32127
+    },
+    "server": {
+        "ip": "::",
+        "port": 45109
+    },
+    "service": {
+        "type": "system"
     },
     "system": {
         "socket": {
-            "direction": "listening",
-            "family": "ipv4",
             "local": {
-                "ip": "127.0.0.11",
-                "port": 45723
+                "ip": "::",
+                "port": 45109
             },
             "process": {
-                "cmdline": "/tmp/go-build519327234/github.com/elastic/beats/metricbeat/module/system/socket/_test/socket.test -test.v=true -data",
-                "command": "socket.test",
-                "exe": "/tmp/go-build519327234/github.com/elastic/beats/metricbeat/module/system/socket/_test/socket.test",
-                "pid": 2025
-            },
-            "user": {
-                "id": 0,
-                "name": "root"
+                "cmdline": "/tmp/go-build774092237/b001/socket.test -data"
             }
         }
+    },
+    "user": {
+        "full_name": "Jaime Soriano Pastor",
+        "id": "1000",
+        "name": "jaime"
     }
 }

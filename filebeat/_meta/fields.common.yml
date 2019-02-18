@@ -35,11 +35,11 @@
         The input type from which the event was generated. This field is set to the value specified
         for the `type` option in the input section of the Filebeat config file.
 
-    - name: read_timestamp
+    - name: event.sequence
+      type: long
+      required: false
       description: >
-        In case the ingest pipeline parses the timestamp from the log contents, it stores
-        the original `@timestamp` (representing the time when the log line was read) in this
-        field.
+        The sequence number of this event.
 
     - name: syslog.facility
       type: long
@@ -75,15 +75,10 @@
       description: >
         This field contains the flags of the event.
 
-    - name: http.response.elapsed_time
-      type: long
-      description: >
-        Elapsed time between request and response in milli seconds.
-
     - name: http.response.content_length
-      type: long
-      description: >
-        Content length of the HTTP response body.
+      type: alias
+      path: http.response.body.bytes
+      migration: true
 
     - name: user_agent
       type: group
@@ -95,11 +90,16 @@
           type: keyword
 
     - name: fileset.name
-      type: alias
-      path: event.dataset
-      migration: true
+      type: keyword
+      description: >
+        The Filebeat fileset that generated this event.
 
     - name: fileset.module
       type: alias
       path: event.module
+      migration: true
+
+    - name: read_timestamp
+      type: alias
+      path: event.created
       migration: true

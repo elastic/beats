@@ -10,19 +10,21 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common/reload"
+	"github.com/elastic/beats/libbeat/feature"
 
 	"github.com/gofrs/uuid"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/libbeat/feature"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/x-pack/libbeat/management/api"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/management"
 )
+
+var errEmptyAccessToken = errors.New("access_token is empty, you must reenroll your Beat")
 
 func init() {
 	management.Register("x-pack", NewConfigManager, feature.Beta)
@@ -34,18 +36,21 @@ type ConfigManager struct {
 	config    *Config
 	cache     *Cache
 	logger    *logp.Logger
-	client    *api.Client
+	client    api.AuthClienter
 	beatUUID  uuid.UUID
 	done      chan struct{}
 	registry  *reload.Registry
 	wg        sync.WaitGroup
 	blacklist *ConfigBlacklist
+	reporter  *api.EventReporter
+	state     *State
+	mux       sync.RWMutex
 }
 
 // NewConfigManager returns a X-Pack Beats Central Management manager
 func NewConfigManager(config *common.Config, registry *reload.Registry, beatUUID uuid.UUID) (management.ConfigManager, error) {
 	c := defaultConfig()
-	if config != nil {
+	if config.Enabled() {
 		if err := config.Unpack(&c); err != nil {
 			return nil, errors.Wrap(err, "parsing central management settings")
 		}
@@ -62,6 +67,10 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 	if c.Enabled {
 		var err error
 
+		if err = validateConfig(c); err != nil {
+			return nil, errors.Wrap(err, "wrong settings for configurations")
+		}
+
 		// Initialize configs blacklist
 		blacklist, err = NewConfigBlacklist(c.Blacklist)
 		if err != nil {
@@ -69,9 +78,7 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 		}
 
 		// Initialize central management settings cache
-		cache = &Cache{
-			ConfigOK: true,
-		}
+		cache = &Cache{}
 		if err := cache.Load(); err != nil {
 			return nil, errors.Wrap(err, "reading central management internal cache")
 		}
@@ -83,18 +90,26 @@ func NewConfigManagerWithConfig(c *Config, registry *reload.Registry, beatUUID u
 		if err != nil {
 			return nil, errors.Wrap(err, "initializing kibana client")
 		}
-
 	}
+
+	authClient := &api.AuthClient{Client: client, AccessToken: c.AccessToken, BeatUUID: beatUUID}
+	log := logp.NewLogger(management.DebugK)
 
 	return &ConfigManager{
 		config:    c,
 		cache:     cache,
 		blacklist: blacklist,
-		logger:    logp.NewLogger(management.DebugK),
-		client:    client,
+		logger:    log,
+		client:    authClient,
 		done:      make(chan struct{}),
 		beatUUID:  beatUUID,
 		registry:  registry,
+		reporter: api.NewEventReporter(
+			log,
+			authClient,
+			c.EventsReporter.Period,
+			c.EventsReporter.MaxBatchSize,
+		),
 	}, nil
 }
 
@@ -111,6 +126,7 @@ func (cm *ConfigManager) Start() {
 	cfgwarn.Beta("Central management is enabled")
 	cm.logger.Info("Starting central management service")
 
+	cm.reporter.Start()
 	cm.wg.Add(1)
 	go cm.worker()
 }
@@ -120,9 +136,15 @@ func (cm *ConfigManager) Stop() {
 	if !cm.Enabled() {
 		return
 	}
+
+	// stop collecting configuration
 	cm.logger.Info("Stopping central management service")
 	close(cm.done)
 	cm.wg.Wait()
+
+	// report last state and stop reporting.
+	cm.updateState(Stopped)
+	cm.reporter.Stop()
 }
 
 // CheckRawConfig check settings are correct to start the beat. This method
@@ -140,6 +162,8 @@ func (cm *ConfigManager) worker() {
 	firstRun := true
 	period := 0 * time.Second
 
+	cm.updateState(Starting)
+
 	// Start worker loop: fetch + apply + cache new settings
 	for {
 		select {
@@ -150,9 +174,16 @@ func (cm *ConfigManager) worker() {
 
 		changed := cm.fetch()
 		if changed || firstRun {
+			cm.updateState(InProgress)
 			// configs changed, apply changes
 			// TODO only reload the blocks that changed
-			cm.apply()
+			if errs := cm.apply(); !errs.IsEmpty() {
+				cm.reportErrors(errs)
+				cm.updateState(Failed)
+				cm.logger.Errorf("Could not apply the configuration, error: %+v", errs)
+			} else {
+				cm.updateState(Running)
+			}
 		}
 
 		if changed {
@@ -170,10 +201,16 @@ func (cm *ConfigManager) worker() {
 	}
 }
 
+func (cm *ConfigManager) reportErrors(errs Errors) {
+	for _, err := range errs {
+		cm.reporter.AddEvent(err)
+	}
+}
+
 // fetch configurations from kibana, return true if they changed
 func (cm *ConfigManager) fetch() bool {
 	cm.logger.Debug("Retrieving new configurations from Kibana")
-	configs, err := cm.client.Configuration(cm.config.AccessToken, cm.beatUUID, cm.cache.ConfigOK)
+	configs, err := cm.client.Configuration()
 
 	if api.IsConfigurationNotFound(err) {
 		if cm.cache.HasConfig() {
@@ -188,7 +225,13 @@ func (cm *ConfigManager) fetch() bool {
 		return false
 	}
 
-	if api.ConfigBlocksEqual(configs, cm.cache.Configs) {
+	equal, err := api.ConfigBlocksEqual(configs, cm.cache.Configs)
+	if err != nil {
+		cm.logger.Errorf("error comparing the configurations, will use cached ones: %s", err)
+		return false
+	}
+
+	if equal {
 		cm.logger.Debug("configuration didn't change, sleeping")
 		return false
 	}
@@ -199,52 +242,47 @@ func (cm *ConfigManager) fetch() bool {
 	return true
 }
 
-func (cm *ConfigManager) apply() {
-	configOK := true
-
+func (cm *ConfigManager) apply() Errors {
+	var errors Errors
 	missing := map[string]bool{}
 	for _, name := range cm.registry.GetRegisteredNames() {
 		missing[name] = true
 	}
 
-	// Filter unwanted configs from the list
-	errors := cm.blacklist.Filter(cm.cache.Configs)
-	if errors != nil {
-		cm.logger.Error(errors)
-		return
+	// Detect unwanted configs from the list
+	if errs := cm.blacklist.Detect(cm.cache.Configs); !errs.IsEmpty() {
+		errors = append(errors, errs...)
+		return errors
 	}
 
 	// Reload configs
 	for _, b := range cm.cache.Configs {
-		err := cm.reload(b.Type, b.Blocks)
-		configOK = configOK && err == nil
+		if err := cm.reload(b.Type, b.Blocks); err != nil {
+			errors = append(errors, err)
+		}
 		missing[b.Type] = false
 	}
 
 	// Unset missing configs
 	for name := range missing {
 		if missing[name] {
-			cm.reload(name, []*api.ConfigBlock{})
+			if err := cm.reload(name, []*api.ConfigBlock{}); err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
 
-	if !configOK {
-		cm.logger.Info("Failed to apply settings, reporting error on next fetch")
-	}
-
-	// Update configOK flag with the result of this apply
-	cm.cache.ConfigOK = configOK
+	return errors
 }
 
-func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) error {
+func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) *Error {
 	cm.logger.Infof("Applying settings for %s", t)
-
 	if obj := cm.registry.GetReloadable(t); obj != nil {
 		// Single object
 		if len(blocks) > 1 {
 			err := fmt.Errorf("got an invalid number of configs for %s: %d, expected: 1", t, len(blocks))
 			cm.logger.Error(err)
-			return err
+			return newConfigError(err)
 		}
 
 		var config *reload.ConfigWithMeta
@@ -253,13 +291,13 @@ func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) error {
 			config, err = blocks[0].ConfigWithMeta()
 			if err != nil {
 				cm.logger.Error(err)
-				return err
+				return newConfigError(err)
 			}
 		}
 
 		if err := obj.Reload(config); err != nil {
 			cm.logger.Error(err)
-			return err
+			return newConfigError(err)
 		}
 	} else if obj := cm.registry.GetReloadableList(t); obj != nil {
 		// List
@@ -268,16 +306,31 @@ func (cm *ConfigManager) reload(t string, blocks []*api.ConfigBlock) error {
 			config, err := block.ConfigWithMeta()
 			if err != nil {
 				cm.logger.Error(err)
-				continue
+				return newConfigError(err)
 			}
 			configs = append(configs, config)
 		}
 
 		if err := obj.Reload(configs); err != nil {
 			cm.logger.Error(err)
-			return err
+			return newConfigError(err)
 		}
 	}
 
+	return nil
+}
+
+func (cm *ConfigManager) updateState(state State) {
+	cm.mux.Lock()
+	defer cm.mux.Unlock()
+	cm.state = &state
+	cm.reporter.AddEvent(&state)
+	cm.logger.Infof("Updating state to '%s'", state)
+}
+
+func validateConfig(config *Config) error {
+	if len(config.AccessToken) == 0 {
+		return errEmptyAccessToken
+	}
 	return nil
 }

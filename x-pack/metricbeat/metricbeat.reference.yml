@@ -147,6 +147,15 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: password
 
+#--------------------------------- Aws Module ---------------------------------
+- module: aws
+  period: 300s
+  metricsets: ["ec2"]
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
+
 #--------------------------------- Ceph Module ---------------------------------
 - module: ceph
   metricsets: ["cluster_disk", "cluster_health", "monitor_health", "pool_disk", "osd_tree"]
@@ -154,12 +163,27 @@ metricbeat.modules:
   hosts: ["localhost:5000"]
   enabled: true
 
+#-------------------------------- Consul Module --------------------------------
+- module: consul
+  metricsets:
+  - agent
+  enabled: true
+  period: 10s
+  hosts: ["localhost:8500"]
+
+
 #------------------------------ Couchbase Module ------------------------------
 - module: couchbase
   metricsets: ["bucket", "cluster", "node"]
   period: 10s
   hosts: ["localhost:8091"]
   enabled: true
+
+#------------------------------- Couchdb Module -------------------------------
+- module: couchdb
+  metricsets: ["server"]
+  period: 10s
+  hosts: ["localhost:5984"]
 
 #-------------------------------- Docker Module --------------------------------
 - module: docker
@@ -216,6 +240,10 @@ metricbeat.modules:
 
   # Set to false to fetch all entries
   #index_recovery.active_only: true
+
+  # Set to true to send data collected by module to X-Pack
+  # Monitoring instead of metricbeat-* indices.
+  #xpack.enabled: false
 
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
@@ -368,6 +396,10 @@ metricbeat.modules:
   basepath: ""
   enabled: true
 
+  # Set to true to send data collected by module to X-Pack
+  # Monitoring instead of metricbeat-* indices.
+  #xpack.enabled: false
+
 #------------------------------ Kubernetes Module ------------------------------
 # Node metrics, from kubelet:
 - module: kubernetes
@@ -490,7 +522,8 @@ metricbeat.modules:
 #-------------------------------- Mssql Module --------------------------------
 - module: mssql
   metricsets:
-    - "db"
+    - "transaction_log"
+    - "performance"
   hosts: ["sqlserver://sa@localhost"]
   period: 10s
 
@@ -501,7 +534,15 @@ metricbeat.modules:
   enabled: true
   period: 10s
   hosts: ["localhost:4949"]
-  node.namespace: node
+
+  # List of plugins to collect metrics from, by default it collects from
+  # all the available ones.
+  #munin.plugins: []
+
+  # If set to true, it sanitizes fields names in concordance with munin
+  # implementation (all characters that are not alphanumeric, or underscore
+  # are replaced by underscores).
+  #munin.sanitize: false
 
 #-------------------------------- MySQL Module --------------------------------
 - module: mysql
@@ -523,6 +564,16 @@ metricbeat.modules:
 
   # By setting raw to true, all raw fields from the status metricset will be added to the event.
   #raw: false
+
+#--------------------------------- Nats Module ---------------------------------
+- module: nats
+  metricsets: ["connections", "routes", "stats", "subscriptions"]
+  period: 10s
+  hosts: ["localhost:8222"]
+  #stats.metrics_path: "/varz"
+  #connections.metrics_path: "/connz"
+  #routes.metrics_path: "/routez"
+  #subscriptions.metrics_path: "/subsz"
 
 #-------------------------------- Nginx Module --------------------------------
 - module: nginx
@@ -575,20 +626,11 @@ metricbeat.modules:
 
 #------------------------------ Prometheus Module ------------------------------
 - module: prometheus
-  metricsets: ["stats"]
-  enabled: true
   period: 10s
   hosts: ["localhost:9090"]
-  #metrics_path: /metrics
-  #namespace: example
-
-- module: prometheus
-  metricsets: ["collector"]
-  enabled: true
-  period: 10s
-  hosts: ["localhost:9090"]
-  #metrics_path: /metrics
-  #namespace: example
+  metrics_path: /metrics
+  #username: "user"
+  #password: "secret"
 
   # This can be used for service account based authorization:
   #  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
@@ -688,7 +730,7 @@ metricbeat.modules:
 #------------------------------ ZooKeeper Module ------------------------------
 - module: zookeeper
   enabled: true
-  metricsets: ["mntr"]
+  metricsets: ["mntr", "server"]
   period: 10s
   hosts: ["localhost:2181"]
 
@@ -941,16 +983,11 @@ output.elasticsearch:
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
 
-  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
-  #ilm.enabled: false
-  #ilm.rollover_alias: "metricbeat"
-  #ilm.pattern: "{now/d}-000001"
-
   # Set gzip compression level.
   #compression_level: 0
 
   # Configure escaping HTML symbols in strings.
-  #escape_html: true
+  #escape_html: false
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
@@ -968,7 +1005,7 @@ output.elasticsearch:
   # Optional index name. The default is "metricbeat" plus date
   # and generates [metricbeat-]YYYY.MM.DD keys.
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "metricbeat-%{[beat.version]}-%{+yyyy.MM.dd}"
+  #index: "metricbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest node pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -1057,7 +1094,7 @@ output.elasticsearch:
   #compression_level: 3
 
   # Configure escaping HTML symbols in strings.
-  #escape_html: true
+  #escape_html: false
 
   # Optional maximum time to live for a connection to Logstash, after which the
   # connection will be re-established.  A value of `0s` (the default) will
@@ -1194,7 +1231,7 @@ output.elasticsearch:
     #pretty: false
 
     # Configure escaping HTML symbols in strings.
-    #escape_html: true
+    #escape_html: false
 
   # Metadata update configuration. Metadata contains leader information
   # used to decide which broker to use when publishing.
@@ -1308,16 +1345,12 @@ output.elasticsearch:
     #pretty: false
 
     # Configure escaping HTML symbols in strings.
-    #escape_html: true
+    #escape_html: false
 
   # The list of Redis servers to connect to. If load-balancing is enabled, the
   # events are distributed to the servers in the list. If one server becomes
   # unreachable, the events are distributed to the reachable servers only.
   #hosts: ["localhost:6379"]
-
-  # The Redis port to use if hosts does not contain a port number. The default
-  # is 6379.
-  #port: 6379
 
   # The name of the Redis list or channel the events are published to. The
   # default is metricbeat.
@@ -1428,7 +1461,7 @@ output.elasticsearch:
     #pretty: false
 
     # Configure escaping HTML symbols in strings.
-    #escape_html: true
+    #escape_html: false
 
   # Path to the directory where to save the generated files. The option is
   # mandatory.
@@ -1463,7 +1496,7 @@ output.elasticsearch:
     #pretty: false
 
     # Configure escaping HTML symbols in strings.
-    #escape_html: true
+    #escape_html: false
 
 #================================= Paths ======================================
 
@@ -1549,14 +1582,14 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Template name. By default the template name is "metricbeat-%{[beat.version]}"
+# Template name. By default the template name is "metricbeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.name: "metricbeat-%{[beat.version]}"
+#setup.template.name: "metricbeat-%{[agent.version]}"
 
-# Template pattern. By default the template pattern is "-%{[beat.version]}-*" to apply to the default index settings.
+# Template pattern. By default the template pattern is "-%{[agent.version]}-*" to apply to the default index settings.
 # The first part is the version of the beat and then -* is used to match all daily indices.
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.pattern: "metricbeat-%{[beat.version]}-*"
+#setup.template.pattern: "metricbeat-%{[agent.version]}-*"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
@@ -1595,6 +1628,25 @@ setup.template.settings:
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-source-field.html
   #_source:
     #enabled: false
+
+#============================== Setup ILM =====================================
+
+# Configure Index Lifecycle Management Index Lifecycle Management creates a
+# write alias and adds additional settings to the template.
+# The elasticsearch.output.index setting will be replaced with the write alias
+# if ILM is enabled.
+
+# Enabled ILM support. Valid values are true, false, and auto. The beat will
+# detect availabilty of Index Lifecycle Management in Elasticsearch and enable
+# or disable ILM support.
+#setup.ilm.enabled: auto
+
+# Configure the ILM write alias name.
+#setup.ilm.rollover_alias: "metricbeat"
+
+# Configure rollover index pattern.
+#setup.ilm.pattern: "{now/d}-000001"
+
 
 #============================== Kibana =====================================
 
@@ -1833,3 +1885,8 @@ logging.files:
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
 #seccomp.enabled: true
+
+#================================= Migration ==================================
+
+# This allows to enable migration aliases
+#migration.enabled: false

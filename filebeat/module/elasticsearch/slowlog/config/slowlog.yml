@@ -6,7 +6,7 @@ paths:
 exclude_files: [".gz$"]
 
 multiline:
-  pattern: '^\[?[0-9]{4}-[0-9]{2}-[0-9]{2}'
+  pattern: '^(\[?[0-9]{4}-[0-9]{2}-[0-9]{2}|{)'
   negate: true
   match: after
 
@@ -14,7 +14,3 @@ multiline:
 processors:
 - add_locale: ~
 {{ end }}
-
-fields:
-  service.name: "elasticsearch"
-fields_under_root: true
