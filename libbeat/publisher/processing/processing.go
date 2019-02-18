@@ -15,32 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package instance
+package processing
 
 import (
-	"github.com/spf13/pflag"
-
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/idxmgmt"
-	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
-	"github.com/elastic/beats/libbeat/monitoring/report"
-	"github.com/elastic/beats/libbeat/publisher/processing"
+	"github.com/elastic/beats/libbeat/logp"
 )
 
-// Settings contains basic settings for any beat to pass into GenRootCmd
-type Settings struct {
-	Name            string
-	IndexPrefix     string
-	Version         string
-	Monitoring      report.Settings
-	RunFlags        *pflag.FlagSet
-	ConfigOverrides *common.Config
+type SupporterFactory func(info beat.Info, log *logp.Logger, cfg *common.Config) (Supporter, error)
 
-	DisableConfigResolver bool
-
-	// load custom index manager. The config object will be the Beats root configuration.
-	IndexManagement idxmgmt.SupportFactory
-	ILM             ilm.SupportFactory
-
-	Processing processing.SupporterFactory
-}
+type Supporter func(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error)
