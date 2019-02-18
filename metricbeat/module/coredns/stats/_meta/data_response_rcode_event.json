@@ -1,0 +1,30 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "coredns": {
+        "stats": {
+            "dns": {
+                "response": {
+                    "rcode": "NOERROR"
+                }
+            },
+            "server": "dns://:53",
+            "zone": "."
+        }
+    },
+    "event": {
+        "dataset": "coredns.stats",
+        "duration": 115000,
+        "module": "coredns"
+    },
+    "metricset": {
+        "name": "stats"
+    },
+    "service": {
+        "address": "127.0.0.1:9153",
+        "type": "coredns"
+    }
+}

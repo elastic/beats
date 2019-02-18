@@ -1,0 +1,54 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "coredns": {
+        "stats": {
+            "dns": {
+                "request": {
+                    "duration": {
+                        "sec": {
+                            "bucket": {
+                                "+Inf": 2210,
+                                "0.00025": 0,
+                                "0.0005": 0,
+                                "0.001": 0,
+                                "0.002": 0,
+                                "0.004": 0,
+                                "0.008": 0,
+                                "0.016": 0,
+                                "0.032": 0,
+                                "0.064": 0,
+                                "0.128": 2200,
+                                "0.256": 2210,
+                                "0.512": 2210,
+                                "1.024": 2210,
+                                "2.048": 2210,
+                                "4.096": 2210,
+                                "8.192": 2210
+                            },
+                            "count": 2210,
+                            "sum": 173.6070170089998
+                        }
+                    }
+                }
+            },
+            "server": "dns://:53",
+            "zone": "."
+        }
+    },
+    "event": {
+        "dataset": "coredns.stats",
+        "duration": 115000,
+        "module": "coredns"
+    },
+    "metricset": {
+        "name": "stats"
+    },
+    "service": {
+        "address": "127.0.0.1:9153",
+        "type": "coredns"
+    }
+}

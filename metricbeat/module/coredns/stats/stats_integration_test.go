@@ -32,9 +32,9 @@ import (
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "coredns")
 	// TODO: Use this function to find if an event is the wanted one
-	eventIs := func(event string) func(e common.MapStr) bool {
+	eventIs := func(eventType string) func(e common.MapStr) bool {
 		return func(e common.MapStr) bool {
-			hasEvent, _ := e.HasKey("event")
+			hasEvent, _ := e.HasKey(eventType)
 			return hasEvent
 		}
 	}
@@ -42,15 +42,19 @@ func TestData(t *testing.T) {
 		eventType string
 		path      string
 	}{
-		{"rcode_event", "./_meta/data_rcode_event.json"},
-		{"panic_event", "./_meta/data_panic_event.json"},
+		{"coredns.stats.panic.count.total", "./_meta/data_panic_event.json"},
+		{"coredns.stats.dns.request.count.total", "./_meta/data_request_count_event.json"},
+		{"coredns.stats.dns.request.size.bytes", "./_meta/data_request_size_bytes_event.json"},
+		{"coredns.stats.dns.request.duration.sec", "./_meta/data_request_duration_sec_event.json"},
+		{"coredns.stats.dns.response.rcode", "./_meta/data_response_rcode_event.json"},
+		{"coredns.stats.dns.response.size.bytes", "./_meta/data_response_size_bytes_event.json"},
+		{"coredns.stats.dns.request.type", "./_meta/data_request_type_event.json"},
 	}
-
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
 
 	for _, df := range dataFiles {
 		t.Run(fmt.Sprintf("event type:%s", df.eventType), func(t *testing.T) {
-			err = mbtest.WriteEventsReporterV2Cond(f, t, df.path, eventIs(df.eventType))
+			err := mbtest.WriteEventsReporterV2Cond(f, t, df.path, eventIs(df.eventType))
 			if err != nil {
 				t.Fatal("write", err)
 			}
