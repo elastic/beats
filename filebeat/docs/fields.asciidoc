@@ -27,6 +27,7 @@ grouped in the following categories:
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
+* <<exported-fields-kubernetes>>
 * <<exported-fields-log>>
 * <<exported-fields-logstash>>
 * <<exported-fields-mongodb>>
@@ -6518,6 +6519,288 @@ Kubernetes container name
 type: keyword
 
 Kubernetes container image
+
+
+--
+
+[[exported-fields-kubernetes]]
+== Kubernetes fields
+
+Module for handling logs produced by Kubenetes pods
+
+
+
+[float]
+== coredns fields
+
+Fields from coredns logs after normalization
+
+
+
+*`coredns.duration`*::
++
+--
+type: double
+
+--
+
+*`coredns.client`*::
++
+--
+type: ip
+
+--
+
+*`coredns.size`*::
++
+--
+type: integer
+
+--
+
+*`coredns.dnssec_ok`*::
++
+--
+type: boolean
+
+--
+
+*`coredns.proto`*::
++
+--
+type: keyword
+
+--
+
+*`coredns.qclass`*::
++
+--
+type: keyword
+
+--
+
+*`coredns.rsize`*::
++
+--
+type: integer
+
+--
+
+*`coredns.log_level`*::
++
+--
+type: keyword
+
+--
+
+*`coredns.id`*::
++
+--
+type: keyword
+
+--
+
+*`coredns.rcode`*::
++
+--
+type: keyword
+
+--
+
+*`coredns.port`*::
++
+--
+type: integer
+
+--
+
+*`coredns.bufsize`*::
++
+--
+type: integer
+
+--
+
+*`coredns.qtype`*::
++
+--
+type: keyword
+
+--
+
+*`coredns.rflags`*::
++
+--
+type: keyword
+
+coredns response flags
+
+
+--
+
+*`coredns.qname`*::
++
+--
+type: keyword
+
+coredns query name
+
+
+--
+
+*`coredns.message`*::
++
+--
+type: text
+
+coredns original log message
+
+
+--
+
+[float]
+== kubernetes fields
+
+Kubernetes meta fields
+
+
+
+
+*`kubernetes.replicaset.name`*::
++
+--
+type: keyword
+
+--
+
+[float]
+== envoy fields
+
+Fields from envoy proxy logs after normalization
+
+
+
+*`envoy.log_type`*::
++
+--
+type: keyword
+
+Envoy log type, normally ACCESS
+
+
+--
+
+*`envoy.method`*::
++
+--
+type: keyword
+
+--
+
+*`envoy.path`*::
++
+--
+type: keyword
+
+--
+
+*`envoy.proto`*::
++
+--
+type: keyword
+
+--
+
+*`envoy.response_code`*::
++
+--
+type: integer
+
+--
+
+*`envoy.response_flags`*::
++
+--
+type: keyword
+
+--
+
+*`envoy.bytes_received`*::
++
+--
+type: long
+
+--
+
+*`envoy.bytes_sent`*::
++
+--
+type: long
+
+--
+
+*`envoy.duration`*::
++
+--
+type: double
+
+--
+
+*`envoy.upstream_service_time`*::
++
+--
+type: double
+
+--
+
+*`envoy.forwarded_for`*::
++
+--
+type: keyword
+
+--
+
+*`envoy.http_user_agent`*::
++
+--
+type: keyword
+
+--
+
+*`envoy.request_id`*::
++
+--
+type: keyword
+
+--
+
+*`envoy.authority`*::
++
+--
+type: keyword
+
+--
+
+*`envoy.upstream_host`*::
++
+--
+type: ip
+
+--
+
+*`envoy.upstream_port`*::
++
+--
+type: integer
+
+--
+
+*`envoy.message`*::
++
+--
+type: text
+
+envoy original log message
 
 
 --

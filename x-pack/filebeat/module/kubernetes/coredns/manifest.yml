@@ -4,7 +4,6 @@ var:
   - name: paths
     default:
       - /var/lib/docker/containers/*/*-json.log
-      #- /Users/ray/go/src/github.com/elastic/beats/x-pack/filebeat/module/kubernetes/coredns/test/coredns-json.log
   - name: tags
     default: [coredns]
 
