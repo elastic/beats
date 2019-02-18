@@ -1,19 +1,14 @@
-# type: log
-# paths:
-# {{ range $i, $path := .paths }}
-#   - {{$path}}
-# {{ end }}
-type: docker
-containers.ids:
-  - '*'
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
 tags: {{.tags}}
+json.keys_under_root: true
 processors:
-  - drop_event.when.not.and:
-      - equals:
-        kubernetes.labels.k8s-app: kube-dns
-      - equals:
-        kubernetes.namespace: kube-system
   - dissect:
       tokenizer: "%{timestamp} [%{log_level}] %{client}:%{port} - %{id} \"%{qtype} %{qclass} %{qname} %{proto} %{size} %{dnssec_ok} %{bufsize}\" %{rcode} %{rflags} %{rsize} %{duration}s"
       field: "message"
       target_prefix: "coredns"
+  - drop_fields: 
+      fields: [time]

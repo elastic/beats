@@ -1,62 +1,46 @@
-# Zeek (Bro) module
+# kubernetes module
+
+This module enables log ingestion for kubernetes, specifically envoy and coredns filesets. 
 
 ## Caveats
 
 * Module is to be considered _beta_.
 
-## Install and Configure Zeek/Bro
-
-### Install Zeek/Bro (for MacOS with Brew)
-
-```
-brew install bro
-```
-
-* Configure it to process network traffic and generate logs. 
-* Edit `/usr/local/etc/node.cfg` to use the proper network interfaces. 
-* Edit `/usr/local/etc/network.cfg` to specify local networks accordingly.
-* Set `redef LogAscii::use_json=T;` in `/usr/local/share/bro/site/local.bro` to use JSON output. 
-
-### Install Zeek/Bro (for Ubuntu Linux)
-
-```
-apt install bro
-apt install broctl
-```
-
-* Configure it to process network traffic and generate logs. 
-* Edit `/etc/bro/node.cfg` to use the proper network interfaces. 
-* Edit `/etc/bro/network.cfg` to specify local networks accordingly.
-* Set `redef LogAscii::use_json=T;` in `/usr/share/bro/site/local.bro` to use JSON output. 
-
-## Start Zeek/Bro
-
-```
-sudo broctl deploy
-```
-
 ## Download and install Filebeat
 
 Grab the filebeat binary from elastic.co, and install it by following the instructions.
 
-## Configure Filebeat module and run
-
-Update filebeat.yml to point to Elasticsearch and Kibana. Setup Filebeat.
+## Enable kubernetes module by deploying the daemon set yaml file 
+```
+kubectl apply -f k8s-ingest.yaml
+```
+### Note the following section in the yaml file
 
 ```
-./filebeat setup --modules zeek -e -E setup.dashboards.directory=build/kibana
+filebeat.autodiscover:
+      providers:
+        - type: kubernetes
+          hints.enabled: true
+          default.disable: true
 ```
 
-Enable the Filebeat zeek module
+This enables auto-discovery and hints for filebeat. When default.disable is set to true (default value false), it will disable log harvesting for the pod/container, unless it has specific annotations enabled. This gives users more granular control on kubernetes log ingestion.
 
+### Sample kubernetes deployment configuration with annotations, and disable set to false, which enables log harvesting for the pods
 ```
-./filebeat modules enable zeek
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ambassador
+spec:
+  replicas: 3
+  template:
+    metadata:
+      annotations:
+        "co.elastic.logs/module": "kubernetes"
+        "co.elastic.logs/fileset": "envoy"
+        "co.elastic.logs/disable": "false"
+      labels:
+        service: ambassador
 ```
 
-Start Filebeat
-
-```
-./filebeat -e
-```
-
-Now, you should see the Zeek logs and dashboards in Kibana.
