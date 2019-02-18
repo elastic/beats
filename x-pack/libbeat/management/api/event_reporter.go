@@ -65,10 +65,12 @@ func (e *EventReporter) Stop() {
 
 func (e *EventReporter) worker() {
 	defer e.wg.Done()
-	wait := wait.New(
+	wait := wait.NewPeriodicTimer(
 		wait.MinWaitAndJitter(e.period, reportJitter),
 		wait.MinWaitAndJitter(e.period, reportJitter),
 	)
+	wait.Start()
+	defer wait.Stop()
 
 	var done bool
 	for !done {

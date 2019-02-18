@@ -22,6 +22,15 @@ import (
 	"time"
 )
 
+// Timer represents a timer implementation.
+type Timer interface {
+	Start()
+	Stop()
+	Wait() <-chan time.Time
+}
+
+var resetTimer = struct{}{}
+
 // Waiter is the strategy to be used to find out the time to wait before making a call.
 type Waiter func() time.Duration
 
@@ -53,31 +62,60 @@ func Fix(d time.Duration) Waiter {
 // this can be used to introduce more randomness in the frequency of the calls for outside system.
 // This can be useful if you want to better distribute calls that could affect the performance of
 // other system.
-type Timer struct {
+type PeriodicTimer struct {
 	c        chan time.Time
+	sig      chan struct{}
 	initial  Waiter
 	periodic Waiter
 	period   time.Duration
 }
 
-// New returns a wait, allowing to wait for a minimum time and a random amount.
-func New(initial, periodic Waiter) *Timer {
-	jt := &Timer{
-		c:        make(chan time.Time, 1),
+// NewPeriodicTimer returns a wait, allowing to wait for a minimum time and a random amount.
+func NewPeriodicTimer(initial, periodic Waiter) *PeriodicTimer {
+	jt := &PeriodicTimer{
+		c:        make(chan time.Time),
+		sig:      make(chan struct{}),
 		period:   initial(),
 		periodic: periodic,
 	}
 	return jt
 }
 
-// Wait waits for a period.
-func (jt *Timer) Wait() <-chan time.Time {
-	select {
-	case <-time.After(jt.period):
-		jt.c <- time.Now()
-		jt.period = jt.periodic()
+// Start starts the timer.
+func (jt *PeriodicTimer) Start() {
+	go jt.startTimer()
+}
+
+func (jt *PeriodicTimer) startTimer() {
+	for {
+		select {
+		case _, ok := <-jt.sig:
+			if !ok {
+				return
+			}
+			// reset the period for next loop.
+			jt.period = jt.periodic()
+		case <-time.After(jt.period):
+			jt.c <- time.Now()
+			jt.period = jt.periodic()
+		}
 	}
+}
+
+// Wait returns a channel that will receives tick.
+func (jt *PeriodicTimer) Wait() <-chan time.Time {
 	return jt.c
+}
+
+// Reset resets the current timer.
+func (jt *PeriodicTimer) Reset() {
+	jt.sig <- resetTimer
+}
+
+// Stop stops the current timer but won't close the channel, this prevent a goroutine to received
+// a bad tick. This is the same strategy used by the time.Ticker.
+func (jt *PeriodicTimer) Stop() {
+	close(jt.sig)
 }
 
 // Jitter sleeps for the min time plus a random time, this allow to effectively delays requests.

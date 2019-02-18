@@ -25,17 +25,21 @@ import (
 )
 
 func TestWait(t *testing.T) {
-	d1 := 100 * time.Millisecond
-	d2 := 200 * time.Millisecond
+	t.Run("Allow to wait for a period and initial time", func(t *testing.T) {
+		d1 := 100 * time.Millisecond
+		d2 := 200 * time.Millisecond
 
-	waiter := New(Fix(d1), Fix(d2))
+		waiter := NewPeriodicTimer(Fix(d1), Fix(d2))
+		waiter.Start()
+		defer waiter.Stop()
 
-	start := time.Now()
-	end := <-waiter.Wait()
+		start := time.Now()
+		end := <-waiter.Wait()
 
-	assert.True(t, end.Sub(start) >= d1)
+		assert.True(t, end.Sub(start) >= d1)
 
-	start = time.Now()
-	end = <-waiter.Wait()
-	assert.True(t, end.Sub(start) >= d2)
+		start = time.Now()
+		end = <-waiter.Wait()
+		assert.True(t, end.Sub(start) >= d2)
+	})
 }

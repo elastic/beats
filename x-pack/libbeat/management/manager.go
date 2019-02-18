@@ -168,10 +168,13 @@ func (cm *ConfigManager) worker() {
 	// Initial fetch && apply (even if errors happen while fetching)
 	firstRun := true
 
-	waiter := wait.New(
+	waiter := wait.NewPeriodicTimer(
 		wait.RandomDelay(cm.config.Period),
 		wait.MinWaitAndJitter(cm.config.Period, managerJitter),
 	)
+
+	waiter.Start()
+	defer waiter.Stop()
 
 	cm.updateState(Starting)
 
