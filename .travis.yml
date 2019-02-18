@@ -13,72 +13,72 @@ env:
     # Cross-compile for amd64 only to speed up testing.
     - GOX_FLAGS="-arch amd64"
     - DOCKER_COMPOSE_VERSION=1.9.0
-    - GO_VERSION="$(cat .go-version)"
+    - TRAVIS_GO_VERSION="$(cat .go-version)"
 
 matrix:
   include:
     # General checks
     - os: linux
       env: TARGETS="check"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
 
     # Filebeat
     - os: linux
       env: TARGETS="-C filebeat testsuite"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C filebeat testsuite"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
 
     # Heartbeat
     - os: linux
       env: TARGETS="-C heartbeat testsuite"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C heartbeat testsuite"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
 
     # Libbeat
     - os: linux
       env: TARGETS="-C libbeat testsuite"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
     - os: linux
       env: TARGETS="-C libbeat crosscompile"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
 
     # Metricbeat
     - os: linux
       env: TARGETS="-C metricbeat testsuite"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
     - os: osx
       env: TARGETS="TEST_ENVIRONMENT=0 -C metricbeat testsuite"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
     - os: linux
       env: TARGETS="-C metricbeat crosscompile"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
 
     # Packetbeat
     - os: linux
       env: TARGETS="-C packetbeat testsuite"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
 
     # Winlogbeat
     - os: linux
       env: TARGETS="-C winlogbeat crosscompile"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
 
     # Dashboards
     - os: linux
       env: TARGETS="-C libbeat/dashboards"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
 
     # Generators
     - os: linux
       env: TARGETS="-C generator/metricbeat test"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
     - os: linux
       env: TARGETS="-C generator/beat test"
-      go: $GO_VERSION
+      go: $TRAVIS_GO_VERSION
 
 addons:
   apt:
