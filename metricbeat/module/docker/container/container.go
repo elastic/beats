@@ -19,13 +19,12 @@ package container
 
 import (
 	"context"
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/docker"
 )
