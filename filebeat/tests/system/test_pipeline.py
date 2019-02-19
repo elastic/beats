@@ -106,4 +106,5 @@ class Test(BaseTest):
             assert o["x-pipeline"] == "test-pipeline"
         finally:
             for pipeline_id, pipeline in list(self.existing_pipelines.items()):
+                print(pipeline_id, pipeline)
                 self.es.transport.perform_request("PUT", "/_ingest/pipeline/"+pipeline_id, body=pipeline)
