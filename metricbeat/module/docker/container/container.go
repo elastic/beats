@@ -19,6 +19,7 @@ package container
 
 import (
 	"context"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/logp"
 
@@ -45,7 +46,7 @@ type MetricSet struct {
 
 // New creates a new instance of the docker container MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logger := logp.NewLogger("docker")
+	logger := logp.NewLogger("docker.container")
 	config := docker.DefaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -70,6 +71,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	// Fetch a list of all containers.
 	containers, err := m.dockerClient.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
+		err = errors.Wrap(err, "DockerClient ContainerList failed")
 		m.logger.Error(err.Error())
 		report.Error(err)
 	}
