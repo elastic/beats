@@ -42,6 +42,21 @@ func TestFetch(t *testing.T) {
 	assert.NotEmpty(t, events)
 }
 
+func TestData(t *testing.T) {
+	compose.EnsureUp(t, "etcd")
+
+	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+
+	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
+		t.Fatal("write", err)
+	}
+}
+
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "etcd",
