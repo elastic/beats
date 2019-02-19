@@ -331,35 +331,13 @@ func packageFromHeader(header C.Header, cFun *cFunctions) (*Package, error) {
 		pkg.Error = errors.New("Failed to get package version")
 	}
 
-	release := C.my_headerGetString(cFun.headerGetString, header, RPMTAG_RELEASE)
-	if release != nil {
-		pkg.Release = C.GoString(release)
-	}
+	pkg.Release = C.GoString(C.my_headerGetString(cFun.headerGetString, header, RPMTAG_RELEASE))
+	pkg.License = C.GoString(C.my_headerGetString(cFun.headerGetString, header, RPMTAG_LICENSE))
+	pkg.Arch = C.GoString(C.my_headerGetString(cFun.headerGetString, header, RPMTAG_ARCH))
+	pkg.URL = C.GoString(C.my_headerGetString(cFun.headerGetString, header, RPMTAG_URL))
+	pkg.Summary = C.GoString(C.my_headerGetString(cFun.headerGetString, header, RPMTAG_SUMMARY))
 
-	license := C.my_headerGetString(cFun.headerGetString, header, RPMTAG_LICENSE)
-	if license != nil {
-		pkg.License = C.GoString(license)
-	}
-
-	arch := C.my_headerGetString(cFun.headerGetString, header, RPMTAG_ARCH)
-	if arch != nil {
-		pkg.Arch = C.GoString(arch)
-	}
-
-	url := C.my_headerGetString(cFun.headerGetString, header, RPMTAG_URL)
-	if url != nil {
-		pkg.URL = C.GoString(url)
-	}
-
-	summary := C.my_headerGetString(cFun.headerGetString, header, RPMTAG_SUMMARY)
-	if summary != nil {
-		pkg.Summary = C.GoString(summary)
-	}
-
-	size := C.my_headerGetNumber(cFun.headerGetNumber, header, RPMTAG_SIZE)
-	if size != 0 {
-		pkg.Size = uint64(size)
-	}
+	pkg.Size = uint64(C.my_headerGetNumber(cFun.headerGetNumber, header, RPMTAG_SIZE))
 
 	installTime := C.my_headerGetNumber(cFun.headerGetNumber, header, RPMTAG_INSTALLTIME)
 	if installTime != 0 {
