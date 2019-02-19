@@ -1,37 +1,35 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "container.id": "afb04f8e0c863da14ea842d62a542e290b6d5d8fa4898c5d9e7511f24bd47282",
+    "container.image.name": "docker-filebeat-build:version1",
+    "container.name": "elegant_goldwasser",
     "docker": {
         "container": {
-            "command": "go test -tags=integration github.com/elastic/beats/metricbeat/module/... -data",
-            "created": "2017-12-07T07:20:57.000Z",
-            "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
-            "image": "metricbeatsnapshotnoxpack700alpha1d71419298b58ed8b0a5b60a6d1e4a476ffaf80a8_beat",
+            "command": "/bin/bash",
+            "created": "2019-02-18T18:18:34.000Z",
             "ip_addresses": [
-                "172.18.0.27"
+                "172.20.0.3"
             ],
-            "labels": {
-                "com_docker_compose_container-number": "1",
-                "com_docker_compose_oneoff": "True",
-                "com_docker_compose_project": "metricbeatsnapshotnoxpack700alpha1d71419298b58ed8b0a5b60a6d1e4a476ffaf80a8",
-                "com_docker_compose_service": "beat",
-                "com_docker_compose_version": "1.16.1"
-            },
-            "name": "metricbeatsnapshotnoxpack700alpha1d71419298b58ed8b0a5b60a6d1e4a476ffaf80a8_beat_run_1",
-            "size": {
-                "root_fs": 0,
-                "rw": 0
-            },
-            "status": "Up 6 minutes (healthy)"
+            "size.root_fs": 0,
+            "size.rw": 0,
+            "status": "Up 21 hours"
         }
     },
+    "event": {
+        "dataset": "docker.container",
+        "duration": 115000,
+        "module": "docker"
+    },
     "metricset": {
-        "host": "/var/run/docker.sock",
-        "module": "docker",
-        "name": "container",
-        "rtt": 115
-    }
+        "name": "container"
+    },
+    "service": {
+        "address": "/var/run/docker.sock",
+        "type": "docker"
+    },
+    "service.name": "container"
 }
