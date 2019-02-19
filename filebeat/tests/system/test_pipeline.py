@@ -17,6 +17,12 @@ class Test(BaseTest):
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
+        self.existing_pipelines = {}
+        try:
+            self.existing_pipelines = self.es.transport.perform_request("GET", "/_ingest/pipeline/*")
+        except:
+            pass
+
         self.modules_path = os.path.abspath(self.working_dir +
                                             "/../../../../module")
 
@@ -27,6 +33,7 @@ class Test(BaseTest):
                                         "/../../../../filebeat.test")
 
         self.index_name = "test-filebeat-pipeline"
+
 
     @unittest.skipIf(not INTEGRATION_TESTS,
                      "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
@@ -45,14 +52,6 @@ class Test(BaseTest):
             pass
         self.wait_until(lambda: not self.es.indices.exists(index_name))
 
-        body = {
-            "transient": {
-                "script.max_compilations_rate": "100/1m"
-            }
-        }
-
-        self.es.transport.perform_request('PUT', "/_cluster/settings", body=body)
-
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             elasticsearch=dict(
@@ -70,34 +69,41 @@ class Test(BaseTest):
         with open(testfile, 'a') as file:
             file.write("Hello World1\n")
 
-        # put pipeline
-        self.es.transport.perform_request("PUT", "/_ingest/pipeline/test",
-                                          body={
-                                              "processors": [{
-                                                  "set": {
-                                                      "field": "x-pipeline",
-                                                      "value": "test-pipeline",
-                                                  }
-                                              }]})
+        # clean up all pipelines before installing our own
+        self.es.transport.perform_request("DELETE", "/_ingest/pipeline/*")
 
-        filebeat = self.start_beat()
+        try:
+            # put pipeline
+            self.es.transport.perform_request("PUT", "/_ingest/pipeline/test",
+                                              body={
+                                                  "processors": [{
+                                                      "set": {
+                                                          "field": "x-pipeline",
+                                                          "value": "test-pipeline",
+                                                      }
+                                                  }]})
 
-        # Wait until the event is in ES
-        self.wait_until(lambda: self.es.indices.exists(index_name))
+            filebeat = self.start_beat()
 
-        def search_objects():
-            try:
-                self.es.indices.refresh(index=index_name)
-                res = self.es.search(index=index_name,
-                                     body={"query": {"match_all": {}}})
-                return [o["_source"] for o in res["hits"]["hits"]]
-            except:
-                return []
+            # Wait until the event is in ES
+            self.wait_until(lambda: self.es.indices.exists(index_name))
 
-        self.wait_until(lambda: len(search_objects()) > 0, max_timeout=20)
-        filebeat.check_kill_and_wait()
+            def search_objects():
+                try:
+                    self.es.indices.refresh(index=index_name)
+                    res = self.es.search(index=index_name,
+                                         body={"query": {"match_all": {}}})
+                    return [o["_source"] for o in res["hits"]["hits"]]
+                except:
+                    return []
 
-        objects = search_objects()
-        assert len(objects) == 1
-        o = objects[0]
-        assert o["x-pipeline"] == "test-pipeline"
+            self.wait_until(lambda: len(search_objects()) > 0, max_timeout=20)
+            filebeat.check_kill_and_wait()
+
+            objects = search_objects()
+            assert len(objects) == 1
+            o = objects[0]
+            assert o["x-pipeline"] == "test-pipeline"
+        finally:
+            for pipeline_id, pipeline in list(self.existing_pipelines.items()):
+                self.es.transport.perform_request("PUT", "/_ingest/pipeline/"+pipeline_id, body=pipeline)
