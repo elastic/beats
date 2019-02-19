@@ -5,7 +5,6 @@
 package ec2
 
 import (
-	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
 )
@@ -14,85 +13,37 @@ var (
 	schemaMetricSetFields = s.Schema{
 		"cpu": s.Object{
 			"total": s.Object{
-				"pct": c.Float("cpu.total.pct", s.Optional),
+				"pct": c.Float("CPUUtilization"),
 			},
-			"credit_usage":            c.Float("cpu.credit_usage", s.Optional),
-			"credit_balance":          c.Float("cpu.credit_balance", s.Optional),
-			"surplus_credit_balance":  c.Float("cpu.surplus_credit_balance", s.Optional),
-			"surplus_credits_charged": c.Float("cpu.surplus_credits_charged", s.Optional),
+			"credit_usage":            c.Float("CPUCreditUsage"),
+			"credit_balance":          c.Float("CPUCreditBalance"),
+			"surplus_credit_balance":  c.Float("CPUSurplusCreditBalance"),
+			"surplus_credits_charged": c.Float("CPUSurplusCreditsCharged"),
 		},
 		"diskio": s.Object{
 			"read": s.Object{
-				"bytes": c.Float("diskio.read.bytes", s.Optional),
-				"count": c.Float("diskio.read.count", s.Optional),
+				"bytes": c.Float("DiskReadBytes"),
+				"count": c.Float("DiskReadOps"),
 			},
 			"write": s.Object{
-				"bytes": c.Float("diskio.write.bytes", s.Optional),
-				"count": c.Float("diskio.write.count", s.Optional),
+				"bytes": c.Float("DiskWriteBytes"),
+				"count": c.Float("DiskWriteOps"),
 			},
 		},
 		"network": s.Object{
 			"in": s.Object{
-				"bytes":   c.Float("network.in.bytes", s.Optional),
-				"packets": c.Float("network.in.packets", s.Optional),
+				"bytes":   c.Float("NetworkIn"),
+				"packets": c.Float("NetworkPacketsIn"),
 			},
 			"out": s.Object{
-				"bytes":   c.Float("network.out.bytes", s.Optional),
-				"packets": c.Float("network.out.packets", s.Optional),
+				"bytes":   c.Float("NetworkOut"),
+				"packets": c.Float("NetworkPacketsOut"),
 			},
 		},
 		"status": s.Object{
-			"check_failed":          c.Int("status.check_failed", s.Optional),
-			"check_failed_instance": c.Int("status.check_failed_instance", s.Optional),
-			"check_failed_system":   c.Int("status.check_failed_system", s.Optional),
-		},
-		"instance": s.Object{
-			"image": s.Object{
-				"id": c.Str("instance.image.id", s.Optional),
-			},
-			"state": s.Object{
-				"name": c.Str("instance.state.name", s.Optional),
-				"code": c.Int("instance.state.code", s.Optional),
-			},
-			"monitoring": s.Object{
-				"state": c.Str("instance.monitoring.state", s.Optional),
-			},
-			"core": s.Object{
-				"count": c.Int("instance.core.count", s.Optional),
-			},
-			"threads_per_core": c.Int("instance.threads_per_core", s.Optional),
-			"public": s.Object{
-				"ip":       c.Str("instance.public.ip", s.Optional),
-				"dns_name": c.Str("instance.public.dns_name", s.Optional),
-			},
-			"private": s.Object{
-				"ip":       c.Str("instance.private.ip", s.Optional),
-				"dns_name": c.Str("instance.private.dns_name", s.Optional),
-			},
+			"check_failed":          c.Int("StatusCheckFailed"),
+			"check_failed_instance": c.Int("StatusCheckFailed_Instance"),
+			"check_failed_system":   c.Int("StatusCheckFailed_System"),
 		},
 	}
 )
-
-var (
-	schemaRootFields = s.Schema{
-		"service": s.Object{
-			"name": c.Str("service.name", s.Optional),
-		},
-		"cloud": s.Object{
-			"provider":          c.Str("cloud.provider", s.Optional),
-			"availability_zone": c.Str("cloud.availability_zone", s.Optional),
-			"region":            c.Str("cloud.region", s.Optional),
-			"instance": s.Object{
-				"id":   c.Str("cloud.instance.id", s.Optional),
-				"name": c.Str("cloud.instance.name", s.Optional),
-			},
-			"machine": s.Object{
-				"type": c.Str("cloud.machine.type", s.Optional),
-			},
-		},
-	}
-)
-
-func eventMapping(input map[string]interface{}, schema s.Schema) (common.MapStr, error) {
-	return schema.Apply(input)
-}
