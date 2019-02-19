@@ -46,51 +46,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-- Modify apache/error dataset to follow ECS. {pull}8963[8963]
-- Rename many `traefik.access.*` fields to map to ECS. {pull}9005[9005]
-- Fix parsing of GC entries in elasticsearch server log. {issue}9513[9513] {pull}9810[9810]
-- Rename `read_timestamp` to `event.created` for Redis input. {pull}9924[9924]
-- Rename a few `elasticsearch.audit.*` fields to map to ECS. {pull}9293[9293]
-- Rename `read_timestamp` to `event.created` for all Filebeat modules using it. {pull}10139[10139]
-- Rename many `iis.error.*` fields to map to ECS. {pull}9955[9955]
-- Adjust fileset `haproxy.log` to map to ECS. {pull}10143[10143]
-- Rename a few `logstash.*` fields to map to ECS, remove logstash.slowlog.message. {pull}9935[9935]
-- Rename a few `mongodb.*` fields to map to ECS. {pull}10009[10009]
-- Rename a few `mysql.*` fields to map to ECS. {pull}10008[10008]
-- Rename a few `nginx.error.*` fields to map to ECS. {pull}10007[10007]
-- Rename many `auditd.log.*` fields to map to ECS. {pull}10192[10192]
-- Filesets with multiple ingest pipelines added in {pull}8914[8914] only work with Elasticsearch >= 6.5.0 {pull}10001[10001]
-- Remove service.name from Elastcsearch module. Replace by service.type. {pull}10042[10042]
-- Remove numeric coercions for `user.id` and `group.id`. IDs should be `keyword`. {pull}10233[10233]
-- Add grok pattern to support redis 5.0.3 log timestamp. {issue}9819[9819] {pull}10033[10033]
-- Now save the 'first seen' timestamp in `event.created` (previously `read_timestamp`),
-  instead of saving the parsed date. Now aligned with `event.created` semantics elsewhere. {pull}10139[10139]
-- Rename `mysql.error.thread_id` and `mysql.slowlog.id` to `mysql.thread_id`. {pull}10161[10161]
-- Remove `mysql.error.timestamp`  and `mysql.slowlog.timestamp`. {pull}10161[10161]
-- Migrate multiple fields to `event.duration`, from modules "apache", "elasticsearch",
-  "haproxy", "iis", "kibana", "mysql", "nginx", "postgresql" and "traefik",
-  including `http.response.elapsed_time` (ECS). {pull}10188[10188], {pull}10274[10274]
-- Rename multiple fields to `http.response.body.bytes`, from modules "apache", "iis",
-  "kibana", "nginx" and "traefik", including `http.response.content_length` (ECS). {pull}10188[10188]
-- Change type from haproxy.log fileset fields from text to keyword: response.captured_headers, request.captured_headers, `raw_request_line`, `mode`. {pull}10397[10397]
-- Change type of field backend_url and frontend_name in traefik.access metricset to type keyword. {pull}10401[10401]
-- Ingesting Elasticsearch audit logs is only supported with Elasticsearch 6.5.0 and above {pull}10352[10352]
-- Migrate Elasticsearch audit logs fields to ECS {pull}10352[10352]
-- Several text fields in the Logstash module are now indexed as `keyword` fields with `text` multi-fields (ECS). {pull}10417[10417]
-- Several text fields in the Elasticsearch module are now indexed as `keyword` fields with `text` multi-fields (ECS). {pull}10414[10414]
-- Move dissect pattern for traefik.access fileset from Filbeat to Elasticsearch. {pull}10442[10442]
-- The `elasticsearch/deprecation` fileset now indexes the `component` field under `elasticsearch` instead of `elasticsearch.server`. {pull}10445[10445]
-- Remove field `kafka.log.trace.full` from kafka.log fielset. {pull}10398[10398]
-- Change field `kafka.log.class` for kafka.log fileset from text to keyword. {pull}10398[10398]
-- Address add_kubernetes_metadata processor issue where old source field is
-  still used for matcher. {issue}10505[10505] {pull}10506[10506]
-- Change type of haproxy.source from text to keyword. {pull}10506[10506]
-- Rename `event.type` to `suricata.eve.event_type` in Suricata module because event.type is reserved for future use by ECS. {pull}10575[10575]
-- Populate more ECS fields in the Suricata module. {pull}10006[10006]
-- Rename setting `filebeat.registry_flush` to `filebeat.registry.flush`. {pull}10504[10504]
-- Rename setting `filebeat.registry_file_permission` to `filebeat.registry.file_permission`. {pull}10504[10504]
-- Remove setting `filebeat.registry_file` in favor of `filebeat.registry.path`. The registry file will be stored in a sub-directory by now. {pull}10504[10504]
-
 *Heartbeat*
 
 - Remove monitor generator script that was rarely used. {pull}9648[9648]
