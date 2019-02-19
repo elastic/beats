@@ -81,6 +81,11 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}
 
 	// Calculate duration based on period
+	if config.Period == "" {
+		err = errors.New("period is not set in AWS module config")
+		return nil, err
+	}
+
 	durationString, periodSec, err := convertPeriodToDuration(config.Period)
 	if err != nil {
 		return nil, err
