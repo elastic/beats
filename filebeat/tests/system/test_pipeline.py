@@ -34,7 +34,6 @@ class Test(BaseTest):
 
         self.index_name = "test-filebeat-pipeline"
 
-
     @unittest.skipIf(not INTEGRATION_TESTS,
                      "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
     @unittest.skipIf(os.getenv("TESTING_ENVIRONMENT") == "2x",
