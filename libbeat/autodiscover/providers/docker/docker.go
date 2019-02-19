@@ -141,7 +141,7 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 		"image": common.MapStr{
 			"name": container.Image,
 		},
-		// TODO: Do we need some dedotting here?
+		// No need for dedot here. Dedot is done in docker metricbeat.
 		"labels": labelMap,
 	}
 	// Without this check there would be overlapping configurations with and without ports.
@@ -201,7 +201,7 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 	e := bus.Event{}
 	var dockerMeta common.MapStr
 
-	if rawDocker, err := common.MapStr(event).GetValue("docker.container"); err == nil {
+	if rawDocker, err := common.MapStr(event).GetValue("container"); err == nil {
 		dockerMeta = rawDocker.(common.MapStr)
 		e["container"] = dockerMeta
 	}

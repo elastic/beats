@@ -8,23 +8,51 @@
 # https://www.elastic.co/guide/en/beats/metricbeat/index.html
 
 #==========================  Modules configuration ============================
+metricbeat.modules:
+  - module: docker
+    # metricsets: ["container", "cpu", "diskio", "healthcheck", "info", "memory", "network"]
+    metricsets: ["container"]
+    hosts: ["unix:///var/run/docker.sock"]
+    period: 60s
 
-metricbeat.config.modules:
+metricbeat.autodiscover:
+  providers:
+    - type: docker
+      host: unix:///var/run/docker.sock
+      templates:
+        - condition:
+            contains.docker.container.image: "nginx:"
+          config:
+            - module: nginx
+              metricsets: ["stubstatus"]
+              hosts: ["${data.host}:80"]
+        - condition:
+            contains.docker.container.image: "kibana:"
+          config:
+            - module: kibana
+              hosts: ["${data.host}:5601"]
+        - condition:
+            contains.docker.container.image: "docker.elastic.co/elasticsearch/elasticsearch:"
+          config:
+            - module: elasticsearch
+              hosts: ["${data.host}:9200"]
+
+#metricbeat.config.modules:
   # Glob pattern for configuration loading
-  path: ${path.config}/modules.d/*.yml
+  # path: ${path.config}/modules.d/*.yml
 
   # Set to true to enable config reloading
-  reload.enabled: false
+  # reload.enabled: false
 
   # Period on which files under path should be checked for changes
   #reload.period: 10s
 
 #==================== Elasticsearch template setting ==========================
 
-setup.template.settings:
-  index.number_of_shards: 1
-  index.codec: best_compression
-  #_source.enabled: false
+#setup.template.settings:
+#  index.number_of_shards: 1
+#  index.codec: best_compression
+#  #_source.enabled: false
 
 #================================ General =====================================
 
@@ -64,7 +92,7 @@ setup.kibana:
   # Scheme and port can be left out and will be set to the default (http and 5601)
   # In case you specify and additional path, the scheme is required: http://localhost:5601/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
-  #host: "localhost:5601"
+  host: "kibana:5601"
 
   # Kibana Space ID
   # ID of the Kibana Space into which the dashboards should be loaded. By default,
@@ -91,7 +119,7 @@ setup.kibana:
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
+  hosts: ["elasticsearch:9200"]
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"

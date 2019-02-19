@@ -1,37 +1,47 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "container.id": "191e533a404a9b36b82a75e2a72f1191bdd5ec33486fd5c132165be61dc3eddd",
+    "container.image.name": "nginx:1.13",
+    "container.labels": {
+        "co_elastic_logs/fileset_stderr": "error",
+        "co_elastic_logs/fileset_stdout": "access",
+        "co_elastic_logs/module": "nginx",
+        "com_docker_compose_config-hash": "f430525112c7ed343346d8ec6975602b03b7fcf9181510002d4ee37d71a7a4e4",
+        "com_docker_compose_container-number": "5",
+        "com_docker_compose_oneoff": "False",
+        "com_docker_compose_project": "docker-autodiscovery",
+        "com_docker_compose_service": "nginx",
+        "com_docker_compose_version": "1.23.2",
+        "maintainer": "NGINX Docker Maintainers \u003cdocker-maint@nginx.com\u003e"
+    },
+    "container.name": "docker-autodiscovery_nginx_5",
     "docker": {
         "container": {
-            "command": "go test -tags=integration github.com/elastic/beats/metricbeat/module/... -data",
-            "created": "2017-12-07T07:20:57.000Z",
-            "id": "d88e67bb6961a5bb70c1c1c48094c6030e43768eed91e827f437111888f9967e",
-            "image": "metricbeatsnapshotnoxpack700alpha1d71419298b58ed8b0a5b60a6d1e4a476ffaf80a8_beat",
+            "command": "nginx -g 'daemon off;'",
+            "created": "2019-02-18T22:10:37.000Z",
             "ip_addresses": [
-                "172.18.0.27"
+                "172.20.0.9"
             ],
-            "labels": {
-                "com_docker_compose_container-number": "1",
-                "com_docker_compose_oneoff": "True",
-                "com_docker_compose_project": "metricbeatsnapshotnoxpack700alpha1d71419298b58ed8b0a5b60a6d1e4a476ffaf80a8",
-                "com_docker_compose_service": "beat",
-                "com_docker_compose_version": "1.16.1"
-            },
-            "name": "metricbeatsnapshotnoxpack700alpha1d71419298b58ed8b0a5b60a6d1e4a476ffaf80a8_beat_run_1",
-            "size": {
-                "root_fs": 0,
-                "rw": 0
-            },
-            "status": "Up 6 minutes (healthy)"
+            "size.root_fs": 0,
+            "size.rw": 0,
+            "status": "Up 5 minutes"
         }
     },
+    "event": {
+        "dataset": "docker.container",
+        "duration": 115000,
+        "module": "docker"
+    },
     "metricset": {
-        "host": "/var/run/docker.sock",
-        "module": "docker",
-        "name": "container",
-        "rtt": 115
-    }
+        "name": "container"
+    },
+    "service": {
+        "address": "/var/run/docker.sock",
+        "type": "docker"
+    },
+    "service.name": "container"
 }

@@ -36,15 +36,12 @@ func TestGenerateHints(t *testing.T) {
 			event:  bus.Event{},
 			result: bus.Event{},
 		},
-		// Docker meta must be present in the hints
+		// Container meta must be present in the hints
 		{
-			// TODO: why must docker be present in the hints? Did my changes now break something?
 			event: bus.Event{
-				"docker": common.MapStr{
-					"container": common.MapStr{
-						"id":   "abc",
-						"name": "foobar",
-					},
+				"container": common.MapStr{
+					"id":   "abc",
+					"name": "foobar",
 				},
 			},
 			result: bus.Event{
@@ -54,20 +51,18 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 		},
-		// Docker labels are testing with the following scenarios
+		// Docker container labels are testing with the following scenarios
 		// do.not.include must not be part of the hints
 		// logs/disable should be present in hints.logs.disable=true
 		{
 			event: bus.Event{
-				"docker": common.MapStr{
-					"container": common.MapStr{
-						"id":   "abc",
-						"name": "foobar",
-						"labels": getNestedAnnotations(common.MapStr{
-							"do.not.include":          "true",
-							"co.elastic.logs/disable": "true",
-						}),
-					},
+				"container": common.MapStr{
+					"id":   "abc",
+					"name": "foobar",
+					"labels": getNestedAnnotations(common.MapStr{
+						"do.not.include":          "true",
+						"co.elastic.logs/disable": "true",
+					}),
 				},
 			},
 			result: bus.Event{
