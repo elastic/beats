@@ -2609,14 +2609,34 @@ Total query count
 
 --
 
-*`coredns.stats.dns.request.duration.sec`*::
+*`coredns.stats.dns.request.duration.sec.bucket`*::
++
+--
+type: object
+
+Request duration histogram buckets
+
+
+--
+
+*`coredns.stats.dns.request.duration.sec.sum`*::
 +
 --
 type: long
 
 format: duration
 
-Duration to process each query
+Requests duration, sum of durations
+
+
+--
+
+*`coredns.stats.dns.request.duration.sec.count`*::
++
+--
+type: long
+
+Requests duration, number of requests
 
 
 --
@@ -2624,11 +2644,9 @@ Duration to process each query
 *`coredns.stats.dns.request.size.bytes`*::
 +
 --
-type: long
+type: object
 
-format: bytes
-
-Size of requests in bytes
+Request Size histogram buckets
 
 
 --
@@ -2696,11 +2714,9 @@ The address family of the transport (1 = IP (IP version 4), 2 = IP6 (IP version 
 *`coredns.stats.dns.response.size.bytes`*::
 +
 --
-type: long
+type: object
 
-format: bytes
-
-Response size in bytes
+Response Size histogram buckets
 
 
 --
