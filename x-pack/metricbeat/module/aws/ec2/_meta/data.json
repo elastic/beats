@@ -7,12 +7,12 @@
     "aws": {
         "ec2": {
             "cpu": {
-                "credit_balance": 169.089216,
-                "credit_usage": 0.002926,
+                "credit_balance": 576,
+                "credit_usage": 0.144723,
                 "surplus_credit_balance": 0,
                 "surplus_credits_charged": 0,
                 "total": {
-                    "pct": 0.033333333333322
+                    "pct": 1.366194313233248
                 }
             },
             "diskio": {
@@ -27,21 +27,21 @@
             },
             "instance": {
                 "core": {
-                    "count": 1
+                    "count": 2
                 },
                 "image": {
-                    "id": "ami-01e24be29428c15b2"
+                    "id": "ami-f920cd94"
                 },
                 "monitoring": {
                     "state": "disabled"
                 },
                 "private": {
-                    "dns_name": "ip-172-31-26-12.us-west-2.compute.internal",
-                    "ip": "172.31.26.12"
+                    "dns_name": "ip-10-0-0-148.ec2.internal",
+                    "ip": "10.0.0.148"
                 },
                 "public": {
-                    "dns_name": "ec2-34-217-213-210.us-west-2.compute.amazonaws.com",
-                    "ip": "34.217.213.210"
+                    "dns_name": "ec2-54-226-109-162.compute-1.amazonaws.com",
+                    "ip": "54.226.109.162"
                 },
                 "state": {
                     "code": 16,
@@ -51,12 +51,12 @@
             },
             "network": {
                 "in": {
-                    "bytes": 296.6,
-                    "packets": 3
+                    "bytes": 737000.4,
+                    "packets": 1361.2
                 },
                 "out": {
-                    "bytes": 269,
-                    "packets": 3.6
+                    "bytes": 227871.2,
+                    "packets": 1411.2
                 }
             },
             "status": {
@@ -67,15 +67,15 @@
         }
     },
     "cloud": {
-        "availability_zone": "us-west-2a",
+        "availability_zone": "us-east-1b",
         "instance": {
-            "id": "i-077bdaf7e5d81bba3"
+            "id": "i-77f84332"
         },
         "machine": {
-            "type": "t2.micro"
+            "type": "t2.medium"
         },
         "provider": "ec2",
-        "region": "us-west-2"
+        "region": "us-east-1"
     },
     "event": {
         "dataset": "aws.ec2",
