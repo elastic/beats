@@ -10,25 +10,21 @@ This file is generated! See scripts/docs_collector.py
 
 == Kubernetes Module
 
-This is a filebeat module for Kubernetes. It ingests logs for Kubernetes pods and containers.
+This is a filebeat module for Kubernetes. It ingests logs for Kubernetes pods and containers, specifically coredns and envoy.
 
 [float]
 === Compatibility
-
-This module requires the {elasticsearch-plugins}/ingest-geoip.html[ingest-geoip]
-and {elasticsearch-plugins}/ingest-user-agent.html[ingest-user-agent]
-Elasticsearch plugins.
 
 This module has been developed against Kubernetes v1.13.x, but is expected to work
 with other versions of Kubernetes.
 
 [float]
-=== Example dashboard
+//=== Example dashboard
 
-This module comes with a sample dashboard. For example:
+//This module comes with a sample dashboard. For example:
 
-[role="screenshot"]
-image::./images/filename.png[]
+//[role="screenshot"]
+//image::./images/filename.png[]
 
 
 [float]
