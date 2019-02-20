@@ -13,10 +13,10 @@
                 "not_visible": 0,
                 "received": 0,
                 "sent": 0,
-                "visible": 57
+                "visible": 91
             },
             "oldest_message_age": {
-                "sec": 84295
+                "sec": 86404
             },
             "sent_message_size": {}
         }

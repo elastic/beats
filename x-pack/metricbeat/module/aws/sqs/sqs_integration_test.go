@@ -7,10 +7,9 @@
 package sqs
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/elastic/beats/x-pack/metricbeat/module/aws"
+	"github.com/elastic/beats/x-pack/metricbeat/module/aws/mtest"
 
 	"github.com/stretchr/testify/assert"
 
@@ -18,7 +17,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	config, info := aws.GetConfigForTest("sqs")
+	config, info := mtest.GetConfigForTest("sqs")
 	if info != "" {
 		t.Skip("Skipping TestFetch: " + info)
 	}
@@ -36,12 +35,24 @@ func TestFetch(t *testing.T) {
 	t.Logf("Module: %s Metricset: %s", sqsMetricSet.Module().Name(), sqsMetricSet.Name())
 
 	for _, event := range events {
-		fmt.Println("event = ", event)
+		// RootField
+		mtest.CheckEventField("service.name", "string", event, t)
+		mtest.CheckEventField("cloud.region", "string", event, t)
+		// MetricSetField
+		mtest.CheckEventField("empty_receives", "float", event, t)
+		mtest.CheckEventField("messages.delayed", "float", event, t)
+		mtest.CheckEventField("messages.deleted", "float", event, t)
+		mtest.CheckEventField("messages.not_visible", "float", event, t)
+		mtest.CheckEventField("messages.received", "float", event, t)
+		mtest.CheckEventField("messages.sent", "float", event, t)
+		mtest.CheckEventField("messages.visible", "float", event, t)
+		mtest.CheckEventField("oldest_message_age.sec", "float", event, t)
+		mtest.CheckEventField("sent_message_size", "float", event, t)
 	}
 }
 
 func TestData(t *testing.T) {
-	config, info := aws.GetConfigForTest("sqs")
+	config, info := mtest.GetConfigForTest("sqs")
 	if info != "" {
 		t.Skip("Skipping TestData: " + info)
 	}
