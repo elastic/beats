@@ -1,0 +1,11 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/lib/docker/containers/*/*-json.log
+  - name: tags
+    default: [envoy]
+
+ingest_pipeline: ingest/pipeline.json
+input: config/envoy.yml
