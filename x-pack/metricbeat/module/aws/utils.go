@@ -26,7 +26,27 @@ func GetStartTimeEndTime(durationString string) (startTime time.Time, endTime ti
 	return startTime, endTime, nil
 }
 
-// GetMetricDataPerRegion function uses MetricDataQueries to get metric data output.
+// GetListMetricsOutput function gets listMetrics results from cloudwatch per namespace for each region.
+// ListMetrics Cloudwatch API is used to list the specified metrics. The returned metrics can be used with GetMetricData
+// to obtain statistical data.
+func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch cloudwatchiface.CloudWatchAPI) ([]cloudwatch.Metric, error) {
+	listMetricsInput := &cloudwatch.ListMetricsInput{Namespace: &namespace}
+	reqListMetrics := svcCloudwatch.ListMetricsRequest(listMetricsInput)
+
+	// List metrics of a given namespace for each region
+	listMetricsOutput, err := reqListMetrics.Send()
+	if err != nil {
+		err = errors.Wrap(err, "ListMetricsRequest failed, skipping region "+regionName)
+		return nil, err
+	}
+
+	if listMetricsOutput.Metrics == nil || len(listMetricsOutput.Metrics) == 0 {
+		// No metrics in this region
+		return nil, nil
+	}
+	return listMetricsOutput.Metrics, nil
+}
+
 func getMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, nextToken *string, svc cloudwatchiface.CloudWatchAPI, startTime time.Time, endTime time.Time) (*cloudwatch.GetMetricDataOutput, error) {
 	getMetricDataInput := &cloudwatch.GetMetricDataInput{
 		NextToken:         nextToken,
@@ -58,27 +78,6 @@ func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cl
 		getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
 	}
 	return getMetricDataOutput.MetricDataResults, nil
-}
-
-// GetListMetricsOutput function gets listMetrics results from cloudwatch per namespace for each region.
-// ListMetrics Cloudwatch API is used to list the specified metrics. The returned metrics can be used with GetMetricData
-// to obtain statistical data.
-func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch *cloudwatch.CloudWatch) ([]cloudwatch.Metric, error) {
-	listMetricsInput := &cloudwatch.ListMetricsInput{Namespace: &namespace}
-	reqListMetrics := svcCloudwatch.ListMetricsRequest(listMetricsInput)
-
-	// List metrics of a given namespace for each region
-	listMetricsOutput, err := reqListMetrics.Send()
-	if err != nil {
-		err = errors.Wrap(err, "ListMetricsRequest failed, skipping region "+regionName)
-		return nil, err
-	}
-
-	if listMetricsOutput.Metrics == nil || len(listMetricsOutput.Metrics) == 0 {
-		// No metrics in this region
-		return nil, nil
-	}
-	return listMetricsOutput.Metrics, nil
 }
 
 // EventMapping maps data in input to a predefined schema.
