@@ -92,17 +92,21 @@ func checkEvent(t *testing.T, listener bus.Listener, start bool) {
 				assert.Equal(t, getValue(e, "stop"), true)
 				assert.Nil(t, getValue(e, "start"))
 			}
-			assert.Equal(t, getValue(e, "docker.container.image"), "busybox")
-			assert.Equal(t, getValue(e, "docker.container.labels"), common.MapStr{
+			assert.Equal(t, getValue(e, "container.image.name"), "busybox")
+			assert.Equal(t, getValue(e, "container.labels"), common.MapStr{
 				"label": common.MapStr{
 					"value": "foo",
 					"child": "bar",
 				},
 			})
-			assert.NotNil(t, getValue(e, "docker.container.id"))
-			assert.NotNil(t, getValue(e, "docker.container.name"))
+			assert.NotNil(t, getValue(e, "container.id"))
+			assert.NotNil(t, getValue(e, "container.name"))
 			assert.NotNil(t, getValue(e, "host"))
-			assert.Equal(t, getValue(e, "docker"), getValue(e, "meta.docker"))
+			assert.Equal(t, getValue(e, "container"), getValue(e, "meta.container"))
+			assert.Equal(t, getValue(e, "docker.container.id"), getValue(e, "meta.container.id"))
+			assert.Equal(t, getValue(e, "docker.container.name"), getValue(e, "meta.container.name"))
+			assert.Equal(t, getValue(e, "docker.container.labels"), getValue(e, "meta.container.labels"))
+			assert.Equal(t, getValue(e, "docker.container.image"), getValue(e, "meta.container.image.name"))
 			return
 
 		case <-time.After(10 * time.Second):
