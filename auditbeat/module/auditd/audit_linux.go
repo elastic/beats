@@ -218,7 +218,105 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 			}
 		}()
 	}
+
+	if ms.config.Reload.Enabled {
+		ruleReloader := NewRuleReloader(ms.config.RuleFiles, ms.config.Reload)
+
+		go ruleReloader.Run(ms, reporter)
+	}
+
 	wg.Wait()
+}
+
+type Reloader struct {
+	reload Reload
+	pathes []string
+	done   chan struct{}
+	wg     sync.WaitGroup
+}
+
+func NewRuleReloader(pathes []string, reload Reload) *Reloader {
+
+	newPathes := []string{}
+
+	for _, path := range pathes {
+		if !filepath.IsAbs(path) {
+			path = paths.Resolve(paths.Config, path)
+		}
+		newPathes = append(newPathes, path)
+	}
+
+	return &Reloader{
+		reload: reload,
+		pathes: newPathes,
+		done:   make(chan struct{}),
+	}
+}
+
+// Run runs the reloader
+func (rl *Reloader) Run(ms *MetricSet, reporter mb.PushReporterV2) {
+	ms.log.Info("Auditd Rule reloader started")
+
+	rl.wg.Add(1)
+	defer rl.wg.Done()
+
+	gws := []*cfgfile.GlobWatcher{}
+	for _, path := range rl.pathes {
+		gws = append(gws, cfgfile.NewGlobWatcher(path))
+	}
+
+	// If reloading is disable, config files should be loaded immediately
+	if !rl.reload.Enabled {
+		rl.reload.Period = 0
+	}
+
+	for {
+		select {
+		case <-rl.done:
+			return
+
+		case <-time.After(rl.reload.Period):
+			ms.log.Debugf("Scan for new Auditd Rule files")
+
+			for _, gw := range gws {
+				_, updated, err := gw.Scan()
+				ms.log.Info("rule files updated:", updated)
+
+				if err != nil {
+					// In most cases of error, updated == false, so will continue
+					// to next iteration below
+					ms.log.Errorw("Error fetching new Auditd Rule files: %v", err)
+				}
+
+				// no file changes
+				if !updated {
+					continue
+				}
+
+				// Reload all config objects
+				if err := ms.config.reloadRules(); err != nil {
+					reporter.Error(err)
+					ms.log.Errorw("Failure reload audit rules from rule file", "error", err)
+					return
+				}
+				ms.log.Info("Reload rule files, rule number:", len(ms.config.rules()))
+				if err := ms.addRules(reporter); err != nil {
+					reporter.Error(err)
+					ms.log.Errorw("Failure adding audit rules", "error", err)
+				}
+			}
+		}
+
+		// Path loading is enabled but not reloading. Loads files only once and then stops.
+		if !rl.reload.Enabled {
+			ms.log.Info("Loading of config files completed.")
+			select {
+			case <-rl.done:
+				ms.log.Info("Dynamic config reloader stopped")
+				return
+			}
+		}
+	}
 }
 
 func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
