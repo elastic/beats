@@ -132,7 +132,7 @@ func TestEventMetadata(t *testing.T) {
 		evt.Meta = newMeta()
 
 		err := evt.Delete("@metadataSpecial")
-		
+
 		assert.Error(t, err)
 		assert.Equal(t, newMeta(), evt.Meta)
 	})
