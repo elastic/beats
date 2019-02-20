@@ -135,7 +135,7 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 		safemapstr.Put(labelMap, k, v)
 	}
 
-	meta := common.MapStr{
+	metaOld := common.MapStr{
 		"container": common.MapStr{
 			"id":     container.ID,
 			"name":   container.Name,
@@ -143,16 +143,27 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			"labels": labelMap,
 		},
 	}
+
+	metaNew := common.MapStr{
+		"id":   container.ID,
+		"name": container.Name,
+		"image": common.MapStr{
+			"name": container.Image,
+		},
+		"labels": labelMap,
+	}
 	// Without this check there would be overlapping configurations with and without ports.
 	if len(container.Ports) == 0 {
 		event := bus.Event{
-			"provider": d.uuid,
-			"id":       container.ID,
-			flag:       true,
-			"host":     host,
-			"docker":   meta,
+			"provider":  d.uuid,
+			"id":        container.ID,
+			flag:        true,
+			"host":      host,
+			"docker":    metaOld,
+			"container": metaNew,
 			"meta": common.MapStr{
-				"docker": meta,
+				"docker":    metaOld,
+				"container": metaNew,
 			},
 		}
 
@@ -162,14 +173,16 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 	// Emit container container and port information
 	for _, port := range container.Ports {
 		event := bus.Event{
-			"provider": d.uuid,
-			"id":       container.ID,
-			flag:       true,
-			"host":     host,
-			"port":     port.PrivatePort,
-			"docker":   meta,
+			"provider":  d.uuid,
+			"id":        container.ID,
+			flag:        true,
+			"host":      host,
+			"port":      port.PrivatePort,
+			"docker":    metaOld,
+			"container": metaNew,
 			"meta": common.MapStr{
-				"docker": meta,
+				"docker":    metaOld,
+				"container": metaNew,
 			},
 		}
 
@@ -202,8 +215,10 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 
 	if rawDocker, err := common.MapStr(event).GetValue("docker.container"); err == nil {
 		dockerMeta = rawDocker.(common.MapStr)
-		e["container"] = dockerMeta
+	} else if rawDocker, err := common.MapStr(event).GetValue("container"); err == nil {
+		dockerMeta = rawDocker.(common.MapStr)
 	}
+	e["container"] = dockerMeta
 
 	if host, ok := event["host"]; ok {
 		e["host"] = host

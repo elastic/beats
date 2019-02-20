@@ -123,17 +123,17 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	var cid string
 	var err error
 
-	// Extract CID from the filepath contained in the "source" field.
+	// Extract CID
+	if v, err := event.GetValue(dockerContainerIDKey); err == nil {
+		cid, _ = v.(string)
+	}
+
 	if d.sourceProcessor != nil {
 		if event.Fields["source"] != nil {
 			event, err = d.sourceProcessor.Run(event)
 			if err != nil {
 				d.log.Debugf("Error while extracting container ID from source path: %v", err)
 				return event, nil
-			}
-
-			if v, err := event.GetValue(dockerContainerIDKey); err == nil {
-				cid, _ = v.(string)
 			}
 		}
 	}
