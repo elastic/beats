@@ -138,7 +138,7 @@ Make sure you include the path to the host's journal. The path might be
 
 ["source", "sh", subs="attributes"]
 --------------------------------------------
-docker run -d \
+sudo docker run -d \
   --name={beatname_lc} \
   --user=root \
   --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
