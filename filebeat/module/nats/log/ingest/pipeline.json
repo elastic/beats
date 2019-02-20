@@ -28,7 +28,7 @@
             "grok": {
                 "field": "nats.log.msg.info",
                 "patterns": [
-                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSMESSAGETYPE:nats.log.msg.type} %{GREEDYDATA:nats.log.msg.topicdata} %{POSINT:nats.log.msg.bytes}\\]",
+                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSMESSAGETYPE:nats.log.msg.type} %{GREEDYDATA:nats.log.msg.subject_data} %{POSINT:nats.log.msg.bytes}\\]",
                     "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSMESSAGETYPE:nats.log.msg.type} %{GREEDYDATA:nats.log.msg.data}\\]",
                     "%{NATSDIRECTION:nats.log.msg.direction} %{NATSMESSAGETYPE:nats.log.msg.type}: \\[%{GREEDYDATA:nats.log.msg.payload}\\]",
                     "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSMESSAGETYPE:nats.log.msg.type}\\]",
@@ -43,9 +43,9 @@
         },
         {
             "grok": {
-                "field": "nats.log.msg.topicdata",
+                "field": "nats.log.msg.subject_data",
                 "patterns": [
-                    "%{NOTSPACE:nats.log.msg.subject} %{POSINT:nats.log.msg.sid} %{NOTSPACE:nats.log.msg.replyto}",
+                    "%{NOTSPACE:nats.log.msg.subject} %{POSINT:nats.log.msg.sid} %{NOTSPACE:nats.log.msg.reply_to}",
                     "%{NOTSPACE:nats.log.msg.subject} %{POSINT:nats.log.msg.sid}",
                     "%{NOTSPACE:nats.log.msg.subject}"
                 ],
@@ -71,7 +71,7 @@
         },
         {
             "remove": {
-                "field": "nats.log.msg.topicdata",
+                "field": "nats.log.msg.subject_data",
                 "ignore_missing": true
             }
         },

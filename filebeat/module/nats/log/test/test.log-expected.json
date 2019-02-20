@@ -188,7 +188,7 @@
         "nats.log.client.port": "36262",
         "nats.log.msg.bytes": "20",
         "nats.log.msg.direction": "incoming",
-        "nats.log.msg.replyto": "_INBOX.e3hAUbP4r5wbjw3Hudw42r.udigGiHn",
+        "nats.log.msg.reply_to": "_INBOX.e3hAUbP4r5wbjw3Hudw42r.udigGiHn",
         "nats.log.msg.sid": "1",
         "nats.log.msg.subject": "aiuser.platinum1.pingpeer",
         "nats.log.msg.type": "MSG",

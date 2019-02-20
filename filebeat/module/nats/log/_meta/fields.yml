@@ -49,8 +49,8 @@
         - name: sid
           type: integer
           description: >
-            The unique alphanumeric subscription ID pf the subject
-        - name: replyto
+            The unique alphanumeric subscription ID of the subject
+        - name: reply_to
           type: keyword
           description: >
             The inbox subject on which the publisher is listening for responses

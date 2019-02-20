@@ -5,7 +5,7 @@ var:
     default:
       # This is an example location of where a user can
       # set the nats server to log. By default nats
-      # logs only in stdout. In order to set a nats server
+      # logs only in stderr. In order to set a nats server
       # to log in specific file use -l flag, for instance:
       # ./gnatsd -DV -l /var/log/nats/nats.log
       # See more on https://nats.io/documentation/server/gnatsd-logging/

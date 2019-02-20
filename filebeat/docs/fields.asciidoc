@@ -7543,12 +7543,12 @@ Subject name this message was received on
 --
 type: integer
 
-The unique alphanumeric subscription ID pf the subject
+The unique alphanumeric subscription ID of the subject
 
 
 --
 
-*`nats.log.msg.replyto`*::
+*`nats.log.msg.reply_to`*::
 +
 --
 type: keyword
