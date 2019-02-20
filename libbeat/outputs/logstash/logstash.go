@@ -46,7 +46,7 @@ func makeLogstash(
 	cfg *common.Config,
 ) (outputs.Group, error) {
 	if !cfg.HasField("index") {
-		cfg.SetString("index", -1, beat.Beat)
+		cfg.SetString("index", -1, beat.IndexPrefix)
 	}
 
 	err := cfgwarn.CheckRemoved6xSettings(cfg, "port")
