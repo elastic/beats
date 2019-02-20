@@ -162,7 +162,6 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			"docker":    metaOld,
 			"container": metaNew,
 			"meta": common.MapStr{
-				"docker":    metaOld,
 				"container": metaNew,
 			},
 		}
@@ -181,7 +180,6 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			"docker":    metaOld,
 			"container": metaNew,
 			"meta": common.MapStr{
-				"docker":    metaOld,
 				"container": metaNew,
 			},
 		}
@@ -215,10 +213,8 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 
 	if rawDocker, err := common.MapStr(event).GetValue("docker.container"); err == nil {
 		dockerMeta = rawDocker.(common.MapStr)
-	} else if rawDocker, err := common.MapStr(event).GetValue("container"); err == nil {
-		dockerMeta = rawDocker.(common.MapStr)
+		e["container"] = dockerMeta
 	}
-	e["container"] = dockerMeta
 
 	if host, ok := event["host"]; ok {
 		e["host"] = host
