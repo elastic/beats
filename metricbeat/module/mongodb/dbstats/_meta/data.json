@@ -1,25 +1,27 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "event": {
+        "dataset": "mongodb.dbstats",
+        "duration": 115000,
+        "module": "mongodb"
+    },
     "metricset": {
-        "host": "mongodb:27017",
-        "module": "mongodb",
-        "name": "dbstats",
-        "rtt": 115
+        "name": "dbstats"
     },
     "mongodb": {
         "dbstats": {
             "avg_obj_size": {
-                "bytes": 59
+                "bytes": 741
             },
-            "collections": 1,
+            "collections": 2,
             "data_size": {
-                "bytes": 59
+                "bytes": 1482
             },
-            "db": "admin",
+            "db": "local",
             "file_size": {},
             "index_size": {
                 "bytes": 32768
@@ -27,10 +29,14 @@
             "indexes": 2,
             "ns_size_mb": {},
             "num_extents": 0,
-            "objects": 1,
+            "objects": 2,
             "storage_size": {
-                "bytes": 16384
+                "bytes": 32768
             }
         }
+    },
+    "service": {
+        "address": "172.26.0.2:27017",
+        "type": "mongodb"
     }
 }
