@@ -126,4 +126,14 @@ func TestEventMetadata(t *testing.T) {
 
 		assert.Equal(t, common.MapStr{"@metadataSpecial": id}, evt.Fields)
 	})
+
+	t.Run("delete non-metadata", func(t *testing.T) {
+		evt := newEmptyEvent()
+		evt.Meta = newMeta()
+
+		err := evt.Delete("@metadataSpecial")
+		
+		assert.Error(t, err)
+		assert.Equal(t, newMeta(), evt.Meta)
+	})
 }
