@@ -77,5 +77,24 @@
         "input.type": "log",
         "offset": 285,
         "prospector.type": "log"
+    },
+    {
+        "@timestamp": "2019-02-02T04:38:45.000Z",
+        "apache2.access.body_sent.bytes": "152",
+        "apache2.access.referrer": "-",
+        "apache2.access.remote_ip": "127.0.0.1",
+        "apache2.access.response_code": "408",
+        "apache2.access.user_agent.device": "Other",
+        "apache2.access.user_agent.name": "Other",
+        "apache2.access.user_agent.original": "-",
+        "apache2.access.user_agent.os": "Other",
+        "apache2.access.user_agent.os_name": "Other",
+        "apache2.access.user_name": "-",
+        "event.dataset": "apache2.access",
+        "fileset.module": "apache2",
+        "fileset.name": "access",
+        "input.type": "log",
+        "offset": 443,
+        "prospector.type": "log"
     }
 ]
