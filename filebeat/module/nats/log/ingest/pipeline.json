@@ -1,20 +1,83 @@
 {
-  "description": "Pipeline for parsing nats log logs",
-    "processors": [{
+    "description": "Pipeline for parsing nats log logs",
+    "processors": [
+        {
             "grok": {
                 "field": "message",
                 "patterns":[
-                    "\\[%{POSINT:process.pid}\\]( %{NATSTIME:nats.log.timestamp})? \\[%{NATSLOGLEVEL:log.level}\\] %{NATSGREEDYDATA}",
-                    "\\[%{POSINT:process.pid}\\]( %{NATSTIME:nats.log.timestamp})? \\[%{NATSLOGLEVEL:log.level}\\] %{GREEDYDATA:message}"
+                    "\\[%{POSINT:process.pid}\\]( %{NATSTIME:nats.log.timestamp})? \\[%{NATSLOGLEVEL:log.level}\\] %{GREEDYDATA:nats.log.info}"
                 ],
                 "pattern_definitions": {
                     "NATSTIME": "%{YEAR}/%{MONTHNUM}/%{MONTHDAY} %{TIME}",
-                    "NATSLOGLEVEL":"(INF|DBG|WRN|ERR|FTL|TRC)",
-                    "NATSGREEDYDATA": "%{IPV4:nats.log.client.ip}:%{POSINT:nats.log.client.port} - cid:%{POSINT:nats.log.client.id} - %{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSMESSAGETYPE:nats.log.msg.type} %{DATA:nats.log.msg.topic} %{GREEDYDATA:message} %{POSINT:nats.log.msg.bytes}\\]",
-                    "NATSDIRECTION": "(<<-|->>)",
-                    "NATSMESSAGETYPE": "(MSG|PUB|SUB|PING)"
+                    "NATSLOGLEVEL":"(INF|DBG|WRN|ERR|FTL|TRC)"
                 },
                 "ignore_missing": true
+            }
+        },
+        {
+            "grok": {
+                "field": "nats.log.info",
+                "patterns": [
+                    "%{IPV4:nats.log.client.ip}:%{POSINT:nats.log.client.port} - cid:%{POSINT:nats.log.client.id} - %{GREEDYDATA:nats.log.msg.info}",
+                    "%{GREEDYDATA:nats.log.msg.data}"
+                ],
+                "ignore_missing": true
+            }
+        },
+        {
+            "grok": {
+                "field": "nats.log.msg.info",
+                "patterns": [
+                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSMESSAGETYPE:nats.log.msg.type} %{GREEDYDATA:nats.log.msg.topicdata} %{POSINT:nats.log.msg.bytes}\\]",
+                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSMESSAGETYPE:nats.log.msg.type} %{GREEDYDATA:nats.log.msg.data}\\]",
+                    "%{NATSDIRECTION:nats.log.msg.direction} %{NATSMESSAGETYPE:nats.log.msg.type}: \\[%{GREEDYDATA:nats.log.msg.payload}\\]",
+                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSMESSAGETYPE:nats.log.msg.type}\\]",
+                    "%{GREEDYDATA:nats.log.msg.data}"
+                ],
+                "pattern_definitions": {
+                    "NATSDIRECTION": "(<<-|->>)",
+                    "NATSMESSAGETYPE": "(MSG|PUB|SUB|PING|PONG|CONNECT|MSG_PAYLOAD)"
+                },
+                "ignore_missing": true
+            }
+        },
+        {
+            "grok": {
+                "field": "nats.log.msg.topicdata",
+                "patterns": [
+                    "%{NOTSPACE:nats.log.msg.subject} %{POSINT:nats.log.msg.sid} %{NOTSPACE:nats.log.msg.replyto}",
+                    "%{NOTSPACE:nats.log.msg.subject} %{POSINT:nats.log.msg.sid}",
+                    "%{NOTSPACE:nats.log.msg.subject}"
+                ],
+                "ignore_missing": true
+            }
+        },
+        {
+            "remove": {
+                "field": "nats.log.info"
+            }
+        },
+        {
+            "remove": {
+                "field": "nats.log.msg.info",
+                "ignore_missing": true
+            }
+        },
+        {
+            "remove": {
+                "field": "nats.log.msg.payload",
+                "ignore_missing": true
+            }
+        },
+        {
+            "remove": {
+                "field": "nats.log.msg.topicdata",
+                "ignore_missing": true
+            }
+        },
+        {
+            "remove": {
+                "field": "message"
             }
         },
         {
@@ -43,7 +106,7 @@
                 "source": "if (ctx.nats.log.msg.direction == params.in) {\n          ctx.nats.log.msg.direction = params.incoming;\n        } else if (ctx.nats.log.msg.direction == params.out) {\n          ctx.nats.log.msg.direction = params.outgoing;\n        }",
                 "params": {
                     "in": "<<-",
-                    "ingoing": "incoming",
+                    "incoming": "incoming",
                     "out": "->>",
                     "outgoing": "outgoing"
                 },

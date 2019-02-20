@@ -11,10 +11,16 @@
       fields:
         - name: ip
           type: ip
+          description: >
+            The IP of the client
         - name: port
           type: integer
+          description: >
+            The port of the client
         - name: id
           type: integer
+          description: >
+            The id of the client
     - name: msg
       type: group
       description: >
@@ -22,9 +28,29 @@
       fields:
         - name: bytes
           type: long
+          description: >
+            Size of the payload in bytes
         - name: direction
-          type: string
+          type: text
+          description: >
+            The direction of the message
         - name: type
-          type: string
-        - name: topic
-          type: string
+          type: keyword
+          description: >
+            The protocol message type
+        - name: data
+          type: text
+          description: >
+            Data of logs not containing protocol messages information
+        - name: subject
+          type: keyword
+          description: >
+            Subject name this message was received on
+        - name: sid
+          type: integer
+          description: >
+            The unique alphanumeric subscription ID pf the subject
+        - name: replyto
+          type: keyword
+          description: >
+            The inbox subject on which the publisher is listening for responses

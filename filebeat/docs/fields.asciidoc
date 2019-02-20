@@ -7456,6 +7456,9 @@ Fields from NATS logs client.
 --
 type: ip
 
+The IP of the client
+
+
 --
 
 *`nats.log.client.port`*::
@@ -7463,12 +7466,18 @@ type: ip
 --
 type: integer
 
+The port of the client
+
+
 --
 
 *`nats.log.client.id`*::
 +
 --
 type: integer
+
+The id of the client
+
 
 --
 
@@ -7484,26 +7493,68 @@ Fields from NATS logs message.
 --
 type: long
 
+Size of the payload in bytes
+
+
 --
 
 *`nats.log.msg.direction`*::
 +
 --
-type: string
+type: text
+
+The direction of the message
+
 
 --
 
 *`nats.log.msg.type`*::
 +
 --
-type: string
+type: keyword
+
+The protocol message type
+
 
 --
 
-*`nats.log.msg.topic`*::
+*`nats.log.msg.data`*::
 +
 --
-type: string
+type: text
+
+Data of logs not containing protocol messages information
+
+
+--
+
+*`nats.log.msg.subject`*::
++
+--
+type: keyword
+
+Subject name this message was received on
+
+
+--
+
+*`nats.log.msg.sid`*::
++
+--
+type: integer
+
+The unique alphanumeric subscription ID pf the subject
+
+
+--
+
+*`nats.log.msg.replyto`*::
++
+--
+type: keyword
+
+The inbox subject on which the publisher is listening for responses
+
 
 --
 
