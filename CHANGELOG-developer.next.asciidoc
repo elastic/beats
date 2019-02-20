@@ -27,3 +27,4 @@ The list below covers the major changes between 7.0.0-beta1 and master only.
 
 - Metricset generator generates beta modules by default now. {pull}10657[10657]
 - Move host name addition to a processor. {pull}10728[10728]
+- The `beat.Event` accessor methods now support `@metadata` keys. {pull}10761[10761]
