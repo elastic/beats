@@ -7,6 +7,8 @@ from nose.plugins.attrib import attr
 
 class Test(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES=['docker']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_container_fields(self):
         """
@@ -22,7 +24,7 @@ class Test(metricbeat.BaseTest):
         )
 
         proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=30)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings(["Container stopped when recovering stats",
                                         "An error occurred while getting docker stats"])
@@ -170,7 +172,7 @@ class Test(metricbeat.BaseTest):
         }])
 
         proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=30)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings(["Container stopped when recovering stats",
                                         "An error occurred while getting docker stats"])
@@ -194,7 +196,7 @@ class Test(metricbeat.BaseTest):
         }])
 
         proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=30)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings(["Container stopped when recovering stats",
                                         "An error occurred while getting docker stats"])
@@ -223,7 +225,7 @@ class Test(metricbeat.BaseTest):
         }])
 
         proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=30)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings(["Container stopped when recovering stats",
                                         "An error occurred while getting docker stats"])
