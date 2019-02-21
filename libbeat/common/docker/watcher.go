@@ -78,6 +78,7 @@ type watcher struct {
 	stopped            sync.WaitGroup
 	bus                bus.Bus
 	shortID            bool // whether to store short ID in "containers" too
+	clock              clock
 }
 
 // Container info retrieved by the watcher
@@ -159,7 +160,7 @@ func (w *watcher) Container(ID string) *Container {
 	// Update last access time if it's deleted
 	if ok {
 		w.Lock()
-		w.deleted[container.ID] = time.Now()
+		w.deleted[container.ID] = w.time().Now()
 		w.Unlock()
 	}
 
@@ -183,7 +184,7 @@ func (w *watcher) Containers() map[string]*Container {
 func (w *watcher) Start() error {
 	// Do initial scan of existing containers
 	logp.Debug("docker", "Start docker containers scanner")
-	w.lastValidTimestamp = time.Now().Unix()
+	w.lastValidTimestamp = w.time().Now().Unix()
 
 	w.Lock()
 	defer w.Unlock()
@@ -279,14 +280,14 @@ func (w *watcher) watch() {
 					}
 
 					w.Lock()
-					w.deleted[event.Actor.ID] = time.Now()
+					w.deleted[event.Actor.ID] = w.time().Now()
 					w.Unlock()
 				}
 
 			case err := <-errors:
 				// Restart watch call
 				logp.Err("Error watching for docker events: %v", err)
-				time.Sleep(1 * time.Second)
+				<-w.time().After(1 * time.Second)
 				break WATCH
 
 			case <-w.ctx.Done():
@@ -340,46 +341,45 @@ func (w *watcher) listContainers(options types.ContainerListOptions) ([]*Contain
 func (w *watcher) cleanupWorker() {
 	for {
 		// Wait a full period
-		time.Sleep(w.cleanupTimeout)
-
 		select {
+		case <-w.time().After(w.cleanupTimeout):
 		case <-w.ctx.Done():
 			w.stopped.Done()
 			return
-		default:
-			// Check entries for timeout
-			var toDelete []string
-			timeout := time.Now().Add(-w.cleanupTimeout)
-			w.RLock()
-			for key, lastSeen := range w.deleted {
-				if lastSeen.Before(timeout) {
-					logp.Debug("docker", "Removing container %s after cool down timeout", key)
-					toDelete = append(toDelete, key)
-				}
-			}
-			w.RUnlock()
-
-			// Delete timed out entries:
-			for _, key := range toDelete {
-				container := w.Container(key)
-				if container != nil {
-					w.bus.Publish(bus.Event{
-						"delete":    true,
-						"container": container,
-					})
-				}
-			}
-
-			w.Lock()
-			for _, key := range toDelete {
-				delete(w.deleted, key)
-				delete(w.containers, key)
-				if w.shortID {
-					delete(w.containers, key[:shortIDLen])
-				}
-			}
-			w.Unlock()
 		}
+
+		// Check entries for timeout
+		var toDelete []string
+		timeout := w.time().Now().Add(-w.cleanupTimeout)
+		w.RLock()
+		for key, lastSeen := range w.deleted {
+			if lastSeen.Before(timeout) {
+				logp.Debug("docker", "Removing container %s after cool down timeout", key)
+				toDelete = append(toDelete, key)
+			}
+		}
+		w.RUnlock()
+
+		// Delete timed out entries:
+		for _, key := range toDelete {
+			container := w.Container(key)
+			if container != nil {
+				w.bus.Publish(bus.Event{
+					"delete":    true,
+					"container": container,
+				})
+			}
+		}
+
+		w.Lock()
+		for _, key := range toDelete {
+			delete(w.deleted, key)
+			delete(w.containers, key)
+			if w.shortID {
+				delete(w.containers, key[:shortIDLen])
+			}
+		}
+		w.Unlock()
 	}
 }
 
@@ -391,4 +391,23 @@ func (w *watcher) ListenStart() bus.Listener {
 // ListenStop returns a bus listener to receive container stopped events, with a `container` key holding it
 func (w *watcher) ListenStop() bus.Listener {
 	return w.bus.Subscribe("stop")
+}
+
+type clock interface {
+	Now() time.Time
+	After(time.Duration) <-chan time.Time
+}
+
+type systemClock struct{}
+
+func (*systemClock) Now() time.Time                         { return time.Now() }
+func (*systemClock) After(d time.Duration) <-chan time.Time { return time.After(d) }
+
+var defaultClock = &systemClock{}
+
+func (w *watcher) time() clock {
+	if w.clock == nil {
+		return defaultClock
+	}
+	return w.clock
 }

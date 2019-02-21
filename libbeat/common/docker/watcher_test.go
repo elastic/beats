@@ -69,7 +69,7 @@ func (m *MockClient) ContainerInspect(ctx context.Context, container string) (ty
 }
 
 func TestWatcherInitialization(t *testing.T) {
-	watcher := runWatcher(t, true,
+	watcher := runWatcher(t, true, nil,
 		[][]types.Container{
 			[]types.Container{
 				types.Container{
@@ -107,7 +107,7 @@ func TestWatcherInitialization(t *testing.T) {
 }
 
 func TestWatcherInitializationShortID(t *testing.T) {
-	watcher := runWatcherShortID(t, true,
+	watcher := runWatcherShortID(t, true, nil,
 		[][]types.Container{
 			[]types.Container{
 				types.Container{
@@ -152,7 +152,7 @@ func TestWatcherInitializationShortID(t *testing.T) {
 }
 
 func TestWatcherAddEvents(t *testing.T) {
-	watcher := runWatcher(t, true,
+	watcher := runWatcher(t, true, nil,
 		[][]types.Container{
 			[]types.Container{
 				types.Container{
@@ -205,7 +205,7 @@ func TestWatcherAddEvents(t *testing.T) {
 }
 
 func TestWatcherAddEventsShortID(t *testing.T) {
-	watcher := runWatcherShortID(t, true,
+	watcher := runWatcherShortID(t, true, nil,
 		[][]types.Container{
 			[]types.Container{
 				types.Container{
@@ -259,7 +259,7 @@ func TestWatcherAddEventsShortID(t *testing.T) {
 }
 
 func TestWatcherUpdateEvent(t *testing.T) {
-	watcher := runWatcher(t, true,
+	watcher := runWatcher(t, true, nil,
 		[][]types.Container{
 			[]types.Container{
 				types.Container{
@@ -307,7 +307,7 @@ func TestWatcherUpdateEvent(t *testing.T) {
 }
 
 func TestWatcherUpdateEventShortID(t *testing.T) {
-	watcher := runWatcherShortID(t, true,
+	watcher := runWatcherShortID(t, true, nil,
 		[][]types.Container{
 			[]types.Container{
 				types.Container{
@@ -356,7 +356,8 @@ func TestWatcherUpdateEventShortID(t *testing.T) {
 }
 
 func TestWatcherDie(t *testing.T) {
-	watcher := runWatcher(t, false,
+	clock := newTestClock()
+	watcher := runWatcher(t, false, clock,
 		[][]types.Container{
 			[]types.Container{
 				types.Container{
@@ -383,24 +384,21 @@ func TestWatcherDie(t *testing.T) {
 	for i := 0; i < 18; i++ {
 		watcher.Container("0332dbd79e20")
 		assert.Equal(t, 1, len(watcher.Containers()))
-		time.Sleep(50 * time.Millisecond)
+		clock.adjust(1 * time.Second)
 	}
 
-	// Checks a max of 10s for the watcher containers to be updated
-	for i := 0; i < 100; i++ {
-		// Now it should get removed
-		time.Sleep(100 * time.Millisecond)
-
-		if len(watcher.Containers()) == 0 {
-			break
-		}
-	}
-
+	// Checks after 10s for the watcher containers to be updated
+	l := watcher.bus.Subscribe()
+	defer l.Stop()
+	clock.adjust(10 * time.Second)
+	e := <-l.Events()
+	assert.Equal(t, true, e["delete"])
 	assert.Equal(t, 0, len(watcher.Containers()))
 }
 
 func TestWatcherDieShortID(t *testing.T) {
-	watcher := runWatcherShortID(t, false,
+	clock := newTestClock()
+	watcher := runWatcherShortID(t, false, clock,
 		[][]types.Container{
 			[]types.Container{
 				types.Container{
@@ -428,27 +426,23 @@ func TestWatcherDieShortID(t *testing.T) {
 	for i := 0; i < 18; i++ {
 		watcher.Container("0332dbd79e20")
 		assert.Equal(t, 1, len(watcher.Containers()))
-		time.Sleep(50 * time.Millisecond)
+		clock.adjust(1 * time.Second)
 	}
 
-	// Checks a max of 10s for the watcher containers to be updated
-	for i := 0; i < 100; i++ {
-		// Now it should get removed
-		time.Sleep(100 * time.Millisecond)
-
-		if len(watcher.Containers()) == 0 {
-			break
-		}
-	}
-
+	// Checks after 10s for the watcher containers to be updated
+	l := watcher.bus.Subscribe()
+	defer l.Stop()
+	clock.adjust(10 * time.Second)
+	e := <-l.Events()
+	assert.Equal(t, true, e["delete"])
 	assert.Equal(t, 0, len(watcher.Containers()))
 }
 
-func runWatcher(t *testing.T, kill bool, containers [][]types.Container, events []interface{}) *watcher {
-	return runWatcherShortID(t, kill, containers, events, false)
+func runWatcher(t *testing.T, kill bool, clock clock, containers [][]types.Container, events []interface{}) *watcher {
+	return runWatcherShortID(t, kill, clock, containers, events, false)
 }
 
-func runWatcherShortID(t *testing.T, kill bool, containers [][]types.Container, events []interface{}, enable bool) *watcher {
+func runWatcherShortID(t *testing.T, kill bool, clock clock, containers [][]types.Container, events []interface{}, enable bool) *watcher {
 	logp.TestingSetup()
 
 	client := &MockClient{
@@ -457,7 +451,7 @@ func runWatcherShortID(t *testing.T, kill bool, containers [][]types.Container, 
 		done:       make(chan interface{}),
 	}
 
-	w, err := NewWatcherWithClient(client, 200*time.Millisecond, enable)
+	w, err := NewWatcherWithClient(client, 10*time.Second, enable)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -465,6 +459,8 @@ func runWatcherShortID(t *testing.T, kill bool, containers [][]types.Container, 
 	if !ok {
 		t.Fatal("'watcher' was supposed to be pointer to the watcher structure")
 	}
+
+	watcher.clock = clock
 
 	err = watcher.Start()
 	if err != nil {
@@ -478,4 +474,46 @@ func runWatcherShortID(t *testing.T, kill bool, containers [][]types.Container, 
 	}
 
 	return watcher
+}
+
+type testClock struct {
+	now    time.Time
+	sleeps []testClockAfter
+}
+
+type testClockAfter struct {
+	alarm time.Time
+	c     chan time.Time
+}
+
+func newTestClock() *testClock {
+	return &testClock{
+		now: time.Now(),
+	}
+}
+
+func (c *testClock) Now() time.Time {
+	return c.now
+}
+
+func (c *testClock) After(d time.Duration) <-chan time.Time {
+	s := testClockAfter{
+		alarm: c.now.Add(d),
+		c:     make(chan time.Time),
+	}
+	c.sleeps = append(c.sleeps, s)
+	return s.c
+}
+
+func (c *testClock) adjust(d time.Duration) {
+	c.now = c.now.Add(d)
+	var sleeps []testClockAfter
+	for _, s := range c.sleeps {
+		if c.now.After(s.alarm) {
+			s.c <- c.now
+		} else {
+			sleeps = append(sleeps, s)
+		}
+	}
+	c.sleeps = sleeps
 }
