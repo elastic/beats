@@ -381,19 +381,28 @@ func TestWatcherDie(t *testing.T) {
 	)
 	defer watcher.Stop()
 
+	dl := watcher.bus.Subscribe("delete")
+	defer dl.Stop()
+	sl := watcher.bus.Subscribe("stop")
+	defer sl.Stop()
+
 	// Check it doesn't get removed while we request meta for the container
 	for i := 0; i < 18; i++ {
+		clock.adjust(1 * time.Second)
 		watcher.Container("0332dbd79e20")
 		assert.Equal(t, 1, len(watcher.Containers()))
-		clock.adjust(1 * time.Second)
 	}
 
 	// Checks after 10s for the watcher containers to be updated
-	l := watcher.bus.Subscribe()
-	defer l.Stop()
 	clock.adjust(11 * time.Second)
-	e := <-l.Events()
-	assert.Equal(t, true, e["delete"])
+	select {
+	case <-dl.Events():
+		t.Log("received delete event")
+	case <-sl.Events():
+		t.Log("received stop event")
+	case <-time.After(1 * time.Second):
+		t.Fatal("timeout waiting for delete event")
+	}
 	assert.Equal(t, 0, len(watcher.Containers()))
 }
 
@@ -423,19 +432,28 @@ func TestWatcherDieShortID(t *testing.T) {
 	)
 	defer watcher.Stop()
 
+	dl := watcher.bus.Subscribe("delete")
+	defer dl.Stop()
+	sl := watcher.bus.Subscribe("stop")
+	defer sl.Stop()
+
 	// Check it doesn't get removed while we request meta for the container
 	for i := 0; i < 18; i++ {
+		clock.adjust(1 * time.Second)
 		watcher.Container("0332dbd79e20")
 		assert.Equal(t, 1, len(watcher.Containers()))
-		clock.adjust(1 * time.Second)
 	}
 
 	// Checks after 10s for the watcher containers to be updated
-	l := watcher.bus.Subscribe()
-	defer l.Stop()
 	clock.adjust(11 * time.Second)
-	e := <-l.Events()
-	assert.Equal(t, true, e["delete"])
+	select {
+	case <-dl.Events():
+		t.Log("received delete event")
+	case <-sl.Events():
+		t.Log("received stop event")
+	case <-time.After(1 * time.Second):
+		t.Fatal("timeout waiting for delete event")
+	}
 	assert.Equal(t, 0, len(watcher.Containers()))
 }
 
@@ -461,7 +479,10 @@ func runWatcherShortID(t *testing.T, kill bool, clock clock, containers [][]type
 		t.Fatal("'watcher' was supposed to be pointer to the watcher structure")
 	}
 
-	watcher.clock = clock
+	if clock != nil {
+		t.Log("using mocked clock")
+		watcher.clock = clock
+	}
 
 	err = watcher.Start()
 	if err != nil {
