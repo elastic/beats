@@ -95,7 +95,6 @@ class TestAutodiscover(metricbeat.BaseTest):
         # Check metadata is added
         assert output[0]['docker']['container']['image'] == 'memcached:latest'
         assert 'name' in output[0]['docker']['container']
-        self.assert_fields_are_documented(output[0])
 
     @unittest.skipIf(not INTEGRATION_TESTS or
                      os.getenv("TESTING_ENVIRONMENT") == "2x",
@@ -144,4 +143,3 @@ class TestAutodiscover(metricbeat.BaseTest):
 
         # Check field is added
         assert output[0]['fields']['foo'] == 'bar'
-        self.assert_fields_are_documented(output[0])

@@ -135,15 +135,24 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 		safemapstr.Put(labelMap, k, v)
 	}
 
-	meta := common.MapStr{
+	metaOld := common.MapStr{
+		"container": common.MapStr{
+			"id":     container.ID,
+			"name":   container.Name,
+			"image":  container.Image,
+			"labels": labelMap,
+		},
+	}
+
+	metaNew := common.MapStr{
 		"id":   container.ID,
 		"name": container.Name,
 		"image": common.MapStr{
 			"name": container.Image,
 		},
-		// TODO: Do we need some dedotting here?
 		"labels": labelMap,
 	}
+
 	// Without this check there would be overlapping configurations with and without ports.
 	if len(container.Ports) == 0 {
 		event := bus.Event{
@@ -151,9 +160,10 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			"id":        container.ID,
 			flag:        true,
 			"host":      host,
-			"container": meta,
+			"docker":    metaOld,
+			"container": metaNew,
 			"meta": common.MapStr{
-				"container": meta,
+				"container": metaOld,
 			},
 		}
 
@@ -168,9 +178,10 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			flag:        true,
 			"host":      host,
 			"port":      port.PrivatePort,
-			"container": meta,
+			"docker":    metaOld,
+			"container": metaNew,
 			"meta": common.MapStr{
-				"container": meta,
+				"container": metaOld,
 			},
 		}
 

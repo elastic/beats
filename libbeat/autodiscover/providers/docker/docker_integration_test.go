@@ -103,6 +103,10 @@ func checkEvent(t *testing.T, listener bus.Listener, start bool) {
 			assert.NotNil(t, getValue(e, "container.name"))
 			assert.NotNil(t, getValue(e, "host"))
 			assert.Equal(t, getValue(e, "container"), getValue(e, "meta.container"))
+			assert.Equal(t, getValue(e, "docker.container.id"), getValue(e, "meta.container.id"))
+			assert.Equal(t, getValue(e, "docker.container.name"), getValue(e, "meta.container.name"))
+			assert.Equal(t, getValue(e, "docker.container.labels"), getValue(e, "meta.container.labels"))
+			assert.Equal(t, getValue(e, "docker.container.image"), getValue(e, "meta.container.image.name"))
 			return
 
 		case <-time.After(10 * time.Second):
