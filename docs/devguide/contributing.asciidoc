@@ -51,9 +51,9 @@ After https://golang.org/doc/install[installing Go], set the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
 your workspace location, and make sure the Go `bin` directory is in your PATH.
 
-The location where you clone is important. Clone the beats repository under the
-source directory of your `GOPATH`. If you don't have `GOPATH` already set, you
-can set it to the `go` directory in your home (`export GOPATH=$HOME/go`).
+The location where you clone is important. Make a directory structure under
+`GOPATH` that matches the URL used for Elastic repositories, then clone the
+beats repository under the new directory: 
 
 [source,shell]
 ----------------------------------------------------------------------
