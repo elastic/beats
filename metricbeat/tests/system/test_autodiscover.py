@@ -51,7 +51,7 @@ class TestAutodiscover(metricbeat.BaseTest):
         proc.check_kill_and_wait()
 
         # Check metadata is added
-        assert output[0]['container']['image'] == 'memcached:latest'
+        assert output[0]['container']['image']['name'] == 'memcached:latest'
         assert output[0]['container']['labels'] == {}
         assert 'name' in output[0]['container']
 
@@ -93,7 +93,7 @@ class TestAutodiscover(metricbeat.BaseTest):
         proc.check_kill_and_wait()
 
         # Check metadata is added
-        assert output[0]['container']['image'] == 'memcached:latest'
+        assert output[0]['container']['image']['name'] == 'memcached:latest'
         assert 'name' in output[0]['container']
         self.assert_fields_are_documented(output[0])
 
