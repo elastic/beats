@@ -42,6 +42,8 @@ func TestProcessorsConfigs(t *testing.T) {
 		Version:     "0.1",
 	}
 
+	ecsFields := common.MapStr{"version": ecsVersion}
+
 	cases := map[string]struct {
 		factory  SupporterFactory
 		global   string
@@ -174,7 +176,7 @@ func TestProcessorsConfigs(t *testing.T) {
 			global:  `{fields: {global: a, agent.foo: bar}, fields_under_root: true, tags: [tag]}`,
 			event:   `{"value": "abc"}`,
 			want: common.MapStr{
-				"ecs": ecsVersion,
+				"ecs": ecsFields,
 				"host": common.MapStr{
 					"name": "test.host.name",
 				},
@@ -200,7 +202,7 @@ func TestProcessorsConfigs(t *testing.T) {
 				return info
 			},
 			want: common.MapStr{
-				"ecs": ecsVersion,
+				"ecs": ecsFields,
 				"host": common.MapStr{
 					"name": "other.test.host.name",
 				},
@@ -223,7 +225,7 @@ func TestProcessorsConfigs(t *testing.T) {
 			global:  `{fields: {global: a, observer.foo: bar}, fields_under_root: true, tags: [tag]}`,
 			event:   `{"value": "abc"}`,
 			want: common.MapStr{
-				"ecs": ecsVersion,
+				"ecs": ecsFields,
 				"observer": common.MapStr{
 					"ephemeral_id": "123e4567-e89b-12d3-a456-426655440000",
 					"hostname":     "test.host.name",
