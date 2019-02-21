@@ -94,7 +94,7 @@ func (r *UtmpFileReader) ReadNew() (<-chan LoginRecord, <-chan error) {
 	errorC := make(chan error)
 
 	go func() {
-		defer logp.Recover("recovering from a crash while collecting login information")
+		defer logp.Recover("A panic occurred while collecting login information")
 		defer close(loginRecordC)
 		defer close(errorC)
 
