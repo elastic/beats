@@ -82,7 +82,7 @@ func checkEvent(t *testing.T, listener bus.Listener, start bool) {
 		select {
 		case e := <-listener.Events():
 			// Ignore any other container
-			if getValue(e, "container.image") != "busybox" {
+			if getValue(e, "docker.container.image") != "busybox" {
 				continue
 			}
 			if start {

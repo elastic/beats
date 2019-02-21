@@ -25,7 +25,7 @@ class TestAutodiscover(BaseTest):
                 'docker': {
                     'templates': '''
                       - condition:
-                          contains.container.image: redis
+                          contains.docker.container.image: redis
                         config:
                           - type: tcp
                             id: myid
