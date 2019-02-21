@@ -16,38 +16,48 @@
                 "id": 10
             },
             "database": {
-                "oid": "12407"
+                "oid": 175251
             },
             "query": {
-                "id":  "3240664890",
-                "text": "SELECT pg_sleep(?);",
-                "calls": "2",
-                "rows": "2",
-                "time": {
-                    "total": 120066.497,
-                    "min": 60029.533,
-                    "max": 60036.964,
-                    "mean": 60033.2485,
-                    "stddev": 3.71549999999843
-                },
+                "text": "ROLLBACK",
                 "memory": {
-                    "shared": {
-                        "hit": 0,
-                        "read": 0,
-                        "dirtied": 0,
-                        "written": 0,
-                    },
-                    "local": {
-                        "hit": 0,
-                        "read": 0,
-                        "dirtied": 0,
-                        "written": 0,
-                    },
-                    "temp": {
-                        "read": 0,
-                        "written": 0,
-                    }
-                }
+                  "shared": {
+                    "hit": 0,
+                    "read": 0,
+                    "dirtied": 0,
+                    "written": 0
+                  },
+                  "temp": {
+                    "read": 0,
+                    "written": 0
+                  },
+                  "local": {
+                    "hit": 0,
+                    "read": 0,
+                    "dirtied": 0,
+                    "written": 0
+                  }
+                },
+                "id": "961354038",
+                "rows": 0,
+                "time": {
+                  "min": {
+                    "ms": 0
+                  },
+                  "total": {
+                    "ms": 0.02900000000000002
+                  },
+                  "stddev": {
+                    "ms": 0.0003768830273792263
+                  },
+                  "max": {
+                    "ms": 0.001
+                  },
+                  "mean": {
+                    "ms": 0.0008285714285714287
+                  }
+                },
+                "calls": 35
             }
         }
     }
