@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/common/docker"
 )
 
 func TestGenerateHints(t *testing.T) {
@@ -104,4 +105,92 @@ func getNestedAnnotations(in common.MapStr) common.MapStr {
 		out.Put(k, v)
 	}
 	return out
+}
+
+func TestGenerateMetaDockerNoDedot(t *testing.T) {
+	event := bus.Event{
+		"container": &docker.Container{
+			ID:   "abc",
+			Name: "foobar",
+			Labels: map[string]string{
+				"do.not.include":          "true",
+				"co.elastic.logs/disable": "true",
+			},
+		},
+	}
+
+	cfg := defaultConfig()
+	cfg.Dedot = false
+	p := Provider{
+		config: cfg,
+	}
+	_, metaOld, metaNew := p.generateMetaDocker(event)
+	expectedMetaOld := common.MapStr{
+		"container": common.MapStr{
+			"id":    "abc",
+			"name":  "foobar",
+			"image": "",
+			"labels": common.MapStr{
+				"do": common.MapStr{"not": common.MapStr{"include": "true"}},
+				"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
+			},
+		},
+	}
+	expectedMetaNew := common.MapStr{
+		"id":   "abc",
+		"name": "foobar",
+		"image": common.MapStr{
+			"name": "",
+		},
+		"labels": common.MapStr{
+			"do": common.MapStr{"not": common.MapStr{"include": "true"}},
+			"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
+		},
+	}
+	assert.Equal(t, expectedMetaOld, metaOld)
+	assert.Equal(t, expectedMetaNew, metaNew)
+}
+
+func TestGenerateMetaDockerWithDedot(t *testing.T) {
+	event := bus.Event{
+		"container": &docker.Container{
+			ID:   "abc",
+			Name: "foobar",
+			Labels: map[string]string{
+				"do.not.include":          "true",
+				"co.elastic.logs/disable": "true",
+			},
+		},
+	}
+
+	cfg := defaultConfig()
+	cfg.Dedot = true
+	p := Provider{
+		config: cfg,
+	}
+	_, metaOld, metaNew := p.generateMetaDocker(event)
+	expectedMetaDedotOld := common.MapStr{
+		"container": common.MapStr{
+			"id":    "abc",
+			"name":  "foobar",
+			"image": "",
+			"labels": common.MapStr{
+				"do_not_include":          "true",
+				"co_elastic_logs/disable": "true",
+			},
+		},
+	}
+	expectedMetaDedotNew := common.MapStr{
+		"id":   "abc",
+		"name": "foobar",
+		"image": common.MapStr{
+			"name": "",
+		},
+		"labels": common.MapStr{
+			"do_not_include":          "true",
+			"co_elastic_logs/disable": "true",
+		},
+	}
+	assert.Equal(t, expectedMetaDedotOld, metaOld)
+	assert.Equal(t, expectedMetaDedotNew, metaNew)
 }
