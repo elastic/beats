@@ -50,7 +50,7 @@ class TestAutodiscover(filebeat.BaseTest):
 
         # Check metadata is added
         assert output[0]['message'] == 'Busybox output 1'
-        assert output[0]['container']['image'] == 'busybox'
+        assert output[0]['container']['image']['name'] == 'busybox'
         assert output[0]['container']['labels'] == {}
         assert 'name' in output[0]['container']
 
