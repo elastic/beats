@@ -25,7 +25,7 @@ class TestAutodiscover(metricbeat.BaseTest):
                 'docker': {
                     'templates': '''
                       - condition:
-                          equals.container.image: memcached:latest
+                          equals.docker.container.image: memcached:latest
                         config:
                           - module: memcached
                             metricsets: ["stats"]
