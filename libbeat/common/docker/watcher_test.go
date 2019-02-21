@@ -19,6 +19,7 @@ package docker
 
 import (
 	"errors"
+	"sync"
 	"testing"
 	"time"
 
@@ -390,7 +391,7 @@ func TestWatcherDie(t *testing.T) {
 	// Checks after 10s for the watcher containers to be updated
 	l := watcher.bus.Subscribe()
 	defer l.Stop()
-	clock.adjust(10 * time.Second)
+	clock.adjust(11 * time.Second)
 	e := <-l.Events()
 	assert.Equal(t, true, e["delete"])
 	assert.Equal(t, 0, len(watcher.Containers()))
@@ -432,7 +433,7 @@ func TestWatcherDieShortID(t *testing.T) {
 	// Checks after 10s for the watcher containers to be updated
 	l := watcher.bus.Subscribe()
 	defer l.Stop()
-	clock.adjust(10 * time.Second)
+	clock.adjust(11 * time.Second)
 	e := <-l.Events()
 	assert.Equal(t, true, e["delete"])
 	assert.Equal(t, 0, len(watcher.Containers()))
@@ -477,6 +478,7 @@ func runWatcherShortID(t *testing.T, kill bool, clock clock, containers [][]type
 }
 
 type testClock struct {
+	sync.Mutex
 	now    time.Time
 	sleeps []testClockAfter
 }
@@ -493,10 +495,14 @@ func newTestClock() *testClock {
 }
 
 func (c *testClock) Now() time.Time {
+	c.Lock()
+	defer c.Unlock()
 	return c.now
 }
 
 func (c *testClock) After(d time.Duration) <-chan time.Time {
+	c.Lock()
+	defer c.Unlock()
 	s := testClockAfter{
 		alarm: c.now.Add(d),
 		c:     make(chan time.Time),
@@ -506,6 +512,9 @@ func (c *testClock) After(d time.Duration) <-chan time.Time {
 }
 
 func (c *testClock) adjust(d time.Duration) {
+	c.Lock()
+	defer c.Unlock()
+
 	c.now = c.now.Add(d)
 	var sleeps []testClockAfter
 	for _, s := range c.sleeps {
