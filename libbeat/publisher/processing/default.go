@@ -116,11 +116,11 @@ func WithFields(fields common.MapStr) func(beat.Info) common.MapStr {
 	}
 }
 
-func WithSchema(key, version string) func(beat.Info) common.MapStr {
-	return WithFields(common.MapStr{key: version})
-}
-
-var WithECS = WithSchema("ecs", ecsVersion)
+var WithECS = WithFields(common.MapStr{
+	"ecs": common.MapStr{
+		"version": ecsVersion,
+	},
+})
 
 func WithHost(info beat.Info) common.MapStr {
 	return common.MapStr{
