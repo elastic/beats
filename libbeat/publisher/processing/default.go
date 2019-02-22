@@ -234,7 +234,7 @@ func (pp *pipelineProcessors) build(
 	processors.add(pp.processors)
 
 	// setup 9: debug print final event (P)
-	if logp.IsDebug("publish") {
+	if pp.log.IsDebug() {
 		processors.add(debugPrintProcessor(pp.info, pp.log))
 	}
 
