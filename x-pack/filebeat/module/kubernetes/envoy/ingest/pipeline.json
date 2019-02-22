@@ -1,0 +1,25 @@
+{
+  "description": "Pipeline for normalizing Kubernetes envoy logs",
+  "processors": [
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = ctx['envoy']['timestamp']; ctx.envoy.remove('timestamp');",
+        "ignore_failure" : true
+      }
+    },
+    {
+      "set": {
+        "field": "user_agent.original",
+        "value": "{{envoy.http_user_agent}}",
+        "ignore_failure": true
+      }
+    },
+    {
+      "user_agent": {
+        "field": "envoy.http_user_agent",
+        "ignore_missing": true
+      }
+    }
+  ]
+}
