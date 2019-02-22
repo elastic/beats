@@ -135,18 +135,21 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 	return nil
 }
 
-// setECSProcessors sets required ECS options in processors when filebeat version is 7.0.X
-// and ES is 6.7.X to ease migration to ECS
+// setECSProcessors sets required ECS options in processors when filebeat version is >= 7.0.0
+// and ES is 6.7.X to ease migration to ECS.
 func setECSProcessors(esVersion common.Version, pipelineID string, content map[string]interface{}) error {
 	ecsVersion := common.MustNewVersion("7.0.0")
 	if !esVersion.LessThan(ecsVersion) {
 		return nil
 	}
 
-	processors, ok := content["processors"].([]interface{})
+	p, ok := content["processors"]
 	if !ok {
-		logp.Debug("modules", "Pipeline '%s' without processors: %+v", pipelineID, content)
 		return nil
+	}
+	processors, ok := p.([]interface{})
+	if !ok {
+		return fmt.Errorf("'processors' in pipeline '%s' expected to be a list, found %T", pipelineID, p)
 	}
 
 	minUserAgentVersion := common.MustNewVersion("6.7.0")
@@ -157,7 +160,7 @@ func setECSProcessors(esVersion common.Version, pipelineID string, content map[s
 		}
 		if options, ok := processor["user_agent"].(map[string]interface{}); ok {
 			if esVersion.LessThan(minUserAgentVersion) {
-				return fmt.Errorf("user_agent processor requires option `ecs: true`, available in Elasticsearch %v", minUserAgentVersion)
+				return fmt.Errorf("user_agent processor requires option 'ecs: true', but Elasticsearch %v does not support this option (Elasticsearch %v or newer is required)", esVersion, minUserAgentVersion)
 			}
 			logp.Debug("modules", "Setting 'ecs: true' option in user_agent processor for field '%v' in pipeline '%s'", options["field"], pipelineID)
 			options["ecs"] = true
