@@ -136,3 +136,6 @@ You can label Docker containers with useful info to spin up {beatname_uc} module
 
 The above labels would allow {beatname_uc} to configure a Prometheus collector to poll port `9090`
 of the Docker container every 1 minute.
+
+To ensure compliance with docker label key recommendations the separator between the prefix and 
+hints config key is configurable via the key `separator`.

@@ -18,6 +18,8 @@
 package docker
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/docker"
@@ -28,6 +30,7 @@ type Config struct {
 	Host         string                  `config:"host"`
 	TLS          *docker.TLSConfig       `config:"ssl"`
 	Prefix       string                  `config:"prefix"`
+	Separator    string                  `config:"separator"`
 	HintsEnabled bool                    `config:"hints.enabled"`
 	Builders     []*common.Config        `config:"builders"`
 	Appenders    []*common.Config        `config:"appenders"`
@@ -36,15 +39,22 @@ type Config struct {
 
 func defaultConfig() *Config {
 	return &Config{
-		Host:   "unix:///var/run/docker.sock",
-		Prefix: "co.elastic",
+		Host:      "unix:///var/run/docker.sock",
+		Prefix:    "co.elastic",
+		Separator: "/",
 	}
 }
 
 // Validate ensures correctness of config
-func (c *Config) Validate() {
+func (c *Config) Validate() error {
 	// Make sure that prefix doesn't ends with a '.'
 	if c.Prefix[len(c.Prefix)-1] == '.' && c.Prefix != "." {
 		c.Prefix = c.Prefix[:len(c.Prefix)-2]
 	}
+	switch c.Separator {
+	case "/", "-", ".", "_":
+	default:
+		return fmt.Errorf("invalid separator value '%v' as its neither docker label recommended nor the elastic default. Please use one of: '/', '-', '.', '_'", c.Separator)
+	}
+	return nil
 }
