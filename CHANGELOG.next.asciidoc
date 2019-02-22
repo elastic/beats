@@ -43,6 +43,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 *Auditbeat*
 
 - Package: Disable librpm signal handlers. {pull}10694[10694]
+- Login: Handle different bad login UTMP types. {pull}10865[10865]
 
 *Filebeat*
 
