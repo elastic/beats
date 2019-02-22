@@ -52,7 +52,7 @@ class TestAutodiscover(metricbeat.BaseTest):
 
         # Check metadata is added
         assert output[0]['container']['image']['name'] == 'memcached:latest'
-        assert output[0]['container']['labels'] == {}
+        assert output[0]['docker']['container']['labels'] == {}
         assert 'name' in output[0]['container']
 
     @unittest.skipIf(not INTEGRATION_TESTS or
