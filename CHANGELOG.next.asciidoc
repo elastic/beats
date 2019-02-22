@@ -208,6 +208,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fix DHCPv4 dashboard that wouldn't load in Kibana. {issue}9850[9850]
 - Fixed a crash when using af_packet capture {pull}10477[10477]
+- Avoid reporting unknown MongoDB opcodes more than once. {pull}10878[10878]
 
 *Winlogbeat*
 
