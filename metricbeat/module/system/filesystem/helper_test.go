@@ -43,6 +43,10 @@ func TestFileSystemList(t *testing.T) {
 	assert.True(t, (len(fss) > 0))
 
 	for _, fs := range fss {
+		if fs.TypeName == "removable" && runtime.GOOS == "windows" {
+			continue
+		}
+
 		if fs.TypeName == "cdrom" {
 			continue
 		}
