@@ -219,3 +219,15 @@ class Test(BaseTest):
         o = objs[0]
         assert o["type"] == "mongodb"
         assert o["responsetime"] >= 0
+
+    def test_unknown_opcode_flood(self):
+        """
+        Tests that a repeated unknown opcode is reported just once.
+        """
+        self.render_config_template(
+            mongodb_ports=[9991]
+        )
+        self.run_packetbeat(pcap="mongodb_op_msg_opcode.pcap",
+                            debug_selectors=["mongodb"])
+        num_msgs = self.log_contains_count('Unknown operation code: ')
+        assert num_msgs == 1, "Unknown opcode reported more than once: {0}".format(num_msgs)
