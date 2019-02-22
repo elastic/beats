@@ -101,7 +101,6 @@ func TestFailedLogins(t *testing.T) {
 	checkFieldValue(t, events[2].RootFields, "event.outcome", "failure")
 	checkFieldValue(t, events[2].RootFields, "process.pid", 3788)
 	checkFieldValue(t, events[2].RootFields, "source.ip", "0.0.0.0")
-	checkFieldValue(t, events[2].RootFields, "user.id", 1001)
 	checkFieldValue(t, events[2].RootFields, "user.name", "elastic")
 	checkFieldValue(t, events[2].RootFields, "user.terminal", "pts/0")
 	assert.True(t, events[2].Timestamp.Equal(time.Date(2019, 2, 20, 17, 45, 8, 447344000, time.UTC)),
