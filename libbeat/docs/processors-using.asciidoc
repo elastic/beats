@@ -744,6 +744,9 @@ processors:
 If the necessary fields are not present in the event then the processor will
 silently continue without adding the target field.
 
+The processor also accepts an optional `seed` parameter that must be a 16-bit
+unsigned integer. This value gets incorporated into all generated hashes.
+
 [[drop-event]]
 === Drop events
 

@@ -20,6 +20,7 @@ package communityid
 type config struct {
 	Fields fieldsConfig `config:"fields"`
 	Target string       `config:"target"`
+	Seed   uint16       `config:"seed"`
 }
 
 type fieldsConfig struct {

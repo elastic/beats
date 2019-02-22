@@ -18,6 +18,7 @@
 package communityid
 
 import (
+	"crypto"
 	"fmt"
 	"net"
 	"strconv"
@@ -65,10 +66,15 @@ func New(cfg *common.Config) (processors.Processor, error) {
 }
 
 func newFromConfig(c config) (*processor, error) {
+	hasher := flowhash.CommunityID
+	if c.Seed != 0 {
+		hasher = flowhash.NewCommunityID(c.Seed, flowhash.Base64Encoding, crypto.SHA1)
+	}
+
 	return &processor{
 		config: c,
 		log:    logp.NewLogger(logName),
-		hasher: flowhash.CommunityID,
+		hasher: hasher,
 	}, nil
 }
 
@@ -77,10 +83,11 @@ func (p *processor) String() string {
 		"source_ip=%v, source_port=%v, "+
 		"destination_ip=%v, destination_port=%v, "+
 		"transport_protocol=%v, "+
-		"icmp_type=%v, icmp_code=%v]",
+		"icmp_type=%v, icmp_code=%v], seed=%d]",
 		p.Target, p.Fields.SourceIP, p.Fields.SourcePort,
 		p.Fields.DestinationIP, p.Fields.DestinationPort,
-		p.Fields.TransportProtocol, p.Fields.ICMPType, p.Fields.ICMPCode)
+		p.Fields.TransportProtocol, p.Fields.ICMPType, p.Fields.ICMPCode,
+		p.Seed)
 }
 
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
@@ -156,26 +163,34 @@ func (p *processor) buildFlow(event *beat.Event) *flowhash.Flow {
 			return nil
 		}
 	case icmpProtocol, icmpIPv6Protocol:
-		v, err = event.GetValue(p.Fields.ICMPType)
-		if err != nil {
-			return nil
-		}
-		flow.ICMP.Type, ok = tryToUint8(v)
-		if !ok {
-			return nil
-		}
-
-		v, err = event.GetValue(p.Fields.ICMPCode)
-		if err != nil {
-			return nil
-		}
-		flow.ICMP.Code, ok = tryToUint8(v)
-		if !ok {
-			return nil
+		// Return a flow even if the ICMP type/code is unavailable.
+		if t, c, ok := getICMPTypeCode(event, p.Fields.ICMPType, p.Fields.ICMPCode); ok {
+			flow.ICMP.Type, flow.ICMP.Code = t, c
 		}
 	}
 
 	return &flow
+}
+
+func getICMPTypeCode(event *beat.Event, typeField, codeField string) (t, c uint8, ok bool) {
+	v, err := event.GetValue(typeField)
+	if err != nil {
+		return 0, 0, false
+	}
+	t, ok = tryToUint8(v)
+	if !ok {
+		return 0, 0, false
+	}
+
+	v, err = event.GetValue(codeField)
+	if err != nil {
+		return 0, 0, false
+	}
+	c, ok = tryToUint8(v)
+	if !ok {
+		return 0, 0, false
+	}
+	return t, c, true
 }
 
 func tryToIP(from interface{}) (net.IP, bool) {
@@ -244,7 +259,8 @@ var transports = map[string]uint8{
 	"igmp":      igmpProtocol,
 	"tcp":       tcpProtocol,
 	"udp":       udpProtocol,
-	"icmp-ipv6": icmpIPv6Protocol,
+	"ipv6-icmp": icmpIPv6Protocol,
+	"icmpv6":    icmpIPv6Protocol,
 	"sctp":      sctpProtocol,
 }
 

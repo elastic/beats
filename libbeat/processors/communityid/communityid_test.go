@@ -51,37 +51,41 @@ func TestRun(t *testing.T) {
 	}
 
 	t.Run("valid", func(t *testing.T) {
-		testProcessor(t, evt(), "1:LQU9qZlK+B5F3KDmev6m5PMibrg=")
+		testProcessor(t, 0, evt(), "1:LQU9qZlK+B5F3KDmev6m5PMibrg=")
+	})
+
+	t.Run("seed", func(t *testing.T) {
+		testProcessor(t, 123, evt(), "1:hTSGlFQnR58UCk+NfKRZzA32dPg=")
 	})
 
 	t.Run("invalid source IP", func(t *testing.T) {
 		e := evt()
 		e.Put("source.ip", 2162716280)
-		testProcessor(t, e, nil)
+		testProcessor(t, 0, e, nil)
 	})
 
 	t.Run("invalid source port", func(t *testing.T) {
 		e := evt()
 		e.Put("source.port", 0)
-		testProcessor(t, e, nil)
+		testProcessor(t, 0, e, nil)
 	})
 
 	t.Run("invalid destination IP", func(t *testing.T) {
 		e := evt()
 		e.Put("destination.ip", "308.111.1.2.3")
-		testProcessor(t, e, nil)
+		testProcessor(t, 0, e, nil)
 	})
 
 	t.Run("invalid destination port", func(t *testing.T) {
 		e := evt()
 		e.Put("source.port", nil)
-		testProcessor(t, e, nil)
+		testProcessor(t, 0, e, nil)
 	})
 
 	t.Run("unknown protocol", func(t *testing.T) {
 		e := evt()
 		e.Put("network.transport", "xyz")
-		testProcessor(t, e, nil)
+		testProcessor(t, 0, e, nil)
 	})
 
 	t.Run("icmp", func(t *testing.T) {
@@ -89,13 +93,14 @@ func TestRun(t *testing.T) {
 		e.Put("network.transport", "icmp")
 		e.Put("icmp.type", 3)
 		e.Put("icmp.code", 3)
-		testProcessor(t, e, "1:KF3iG9XD24nhlSy4r1TcYIr5mfE=")
+		testProcessor(t, 0, e, "1:KF3iG9XD24nhlSy4r1TcYIr5mfE=")
 	})
 
 	t.Run("icmp without typecode", func(t *testing.T) {
+		// Hashes src_ip + dst_ip + protocol with zero value typecode.
 		e := evt()
 		e.Put("network.transport", "icmp")
-		testProcessor(t, e, nil)
+		testProcessor(t, 0, e, "1:PAE85ZfR4SbNXl5URZwWYyDehwU=")
 	})
 
 	t.Run("igmp", func(t *testing.T) {
@@ -103,7 +108,7 @@ func TestRun(t *testing.T) {
 		e.Delete("source.port")
 		e.Delete("destination.port")
 		e.Put("network.transport", "igmp")
-		testProcessor(t, e, "1:D3t8Q1aFA6Ev0A/AO4i9PnU3AeI=")
+		testProcessor(t, 0, e, "1:D3t8Q1aFA6Ev0A/AO4i9PnU3AeI=")
 	})
 
 	t.Run("protocol number as string", func(t *testing.T) {
@@ -111,7 +116,7 @@ func TestRun(t *testing.T) {
 		e.Delete("source.port")
 		e.Delete("destination.port")
 		e.Put("network.transport", "2")
-		testProcessor(t, e, "1:D3t8Q1aFA6Ev0A/AO4i9PnU3AeI=")
+		testProcessor(t, 0, e, "1:D3t8Q1aFA6Ev0A/AO4i9PnU3AeI=")
 	})
 
 	t.Run("protocol number", func(t *testing.T) {
@@ -119,14 +124,15 @@ func TestRun(t *testing.T) {
 		e.Delete("source.port")
 		e.Delete("destination.port")
 		e.Put("network.transport", 2)
-		testProcessor(t, e, "1:D3t8Q1aFA6Ev0A/AO4i9PnU3AeI=")
+		testProcessor(t, 0, e, "1:D3t8Q1aFA6Ev0A/AO4i9PnU3AeI=")
 	})
 }
 
-func testProcessor(t testing.TB, fields common.MapStr, expectedHash interface{}) {
+func testProcessor(t testing.TB, seed uint16, fields common.MapStr, expectedHash interface{}) {
 	t.Helper()
 
 	c := defaultConfig()
+	c.Seed = seed
 	p, err := newFromConfig(c)
 	if err != nil {
 		t.Fatal(err)
