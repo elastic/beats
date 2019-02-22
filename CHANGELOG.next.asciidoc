@@ -239,6 +239,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added support for ingesting structured Elasticsearch server logs {pull}10428[10428]
 - Populate more ECS fields in the Suricata module. {pull}10006[10006]
 - Add ISO8601 timestamp support in syslog metricset. {issue}8716[8716] {pull}10736[10736]
+- Add more info to message logged when a duplicated symlink file is found {pull}10845[10845]
 
 *Heartbeat*
 
