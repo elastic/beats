@@ -18,6 +18,8 @@
 package docker
 
 import (
+	"time"
+
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
@@ -113,7 +115,9 @@ func (d *Provider) Start() {
 				d.emitContainer(event, "start")
 
 			case event := <-d.stopListener.Events():
-				d.emitContainer(event, "stop")
+				time.AfterFunc(d.config.CleanupTimeout, func() {
+					d.emitContainer(event, "stop")
+				})
 			}
 		}
 	}()

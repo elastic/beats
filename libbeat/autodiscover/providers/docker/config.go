@@ -18,6 +18,8 @@
 package docker
 
 import (
+	"time"
+
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/docker"
@@ -25,19 +27,21 @@ import (
 
 // Config for docker autodiscover provider
 type Config struct {
-	Host         string                  `config:"host"`
-	TLS          *docker.TLSConfig       `config:"ssl"`
-	Prefix       string                  `config:"prefix"`
-	HintsEnabled bool                    `config:"hints.enabled"`
-	Builders     []*common.Config        `config:"builders"`
-	Appenders    []*common.Config        `config:"appenders"`
-	Templates    template.MapperSettings `config:"templates"`
+	Host           string                  `config:"host"`
+	TLS            *docker.TLSConfig       `config:"ssl"`
+	Prefix         string                  `config:"prefix"`
+	HintsEnabled   bool                    `config:"hints.enabled"`
+	Builders       []*common.Config        `config:"builders"`
+	Appenders      []*common.Config        `config:"appenders"`
+	Templates      template.MapperSettings `config:"templates"`
+	CleanupTimeout time.Duration           `config:"cleanup_timeout"`
 }
 
 func defaultConfig() *Config {
 	return &Config{
-		Host:   "unix:///var/run/docker.sock",
-		Prefix: "co.elastic",
+		Host:           "unix:///var/run/docker.sock",
+		Prefix:         "co.elastic",
+		CleanupTimeout: 60 * time.Second,
 	}
 }
 
