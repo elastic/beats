@@ -303,7 +303,7 @@ func (r *UtmpFileReader) processBadLoginRecord(utmp *Utmp) (*LoginRecord, error)
 		record.Hostname = utmp.UtHost
 	default:
 		// This should not happen.
-		return nil, errors.Errorf("UTMP record with unexpected type %v in bad login file.", utmp.UtType)
+		return nil, errors.Errorf("UTMP record with unexpected type %v in bad login file", utmp.UtType)
 	}
 
 	return &record, nil
