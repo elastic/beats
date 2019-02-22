@@ -227,6 +227,7 @@
         },
         {
             "geoip": {
+                "if": "ctx.source?.geo == null",
                 "field": "source.ip",
                 "target_field": "source.geo",
                 "ignore_missing": true
@@ -234,6 +235,7 @@
         },
         {
             "geoip": {
+                "if": "ctx.destination?.geo == null",
                 "field": "destination.ip",
                 "target_field": "destination.geo",
                 "ignore_missing": true
@@ -255,8 +257,22 @@
         },
         {
             "set": {
+                "if": "ctx.suricata?.eve?.event_type == \"alert\"",
+                "field": "event.kind",
+                "value": "alert"
+            }
+        },
+        {
+            "set": {
+                "if": "ctx.suricata?.eve?.event_type != \"alert\"",
                 "field": "event.kind",
                 "value": "event"
+            }
+        },
+        {
+            "set": {
+                "field": "event.category",
+                "value": "network_traffic"
             }
         }
     ],
