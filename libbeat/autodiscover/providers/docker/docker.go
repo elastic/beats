@@ -199,7 +199,7 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			"docker":    meta.Docker,
 			"container": meta.Container,
 			"meta": common.MapStr{
-				"container": meta.Metadata,
+				"docker": meta.Metadata,
 			},
 		}
 
@@ -217,7 +217,7 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			"docker":    meta.Docker,
 			"container": meta.Container,
 			"meta": common.MapStr{
-				"container": meta.Metadata,
+				"docker": meta.Metadata,
 			},
 		}
 

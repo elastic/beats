@@ -143,20 +143,16 @@ func TestGenerateMetaDockerNoDedot(t *testing.T) {
 			"image": common.MapStr{
 				"name": "",
 			},
-			"labels": common.MapStr{
-				"do": common.MapStr{"not": common.MapStr{"include": "true"}},
-				"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
-			},
 		},
 		Metadata: common.MapStr{
-			"id":   "abc",
-			"name": "foobar",
-			"image": common.MapStr{
-				"name": "",
-			},
-			"labels": common.MapStr{
-				"do": common.MapStr{"not": common.MapStr{"include": "true"}},
-				"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
+			"container": common.MapStr{
+				"id":    "abc",
+				"name":  "foobar",
+				"image": "",
+				"labels": common.MapStr{
+					"do": common.MapStr{"not": common.MapStr{"include": "true"}},
+					"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
+				},
 			},
 		},
 	}
@@ -201,20 +197,16 @@ func TestGenerateMetaDockerWithDedot(t *testing.T) {
 			"image": common.MapStr{
 				"name": "",
 			},
-			"labels": common.MapStr{
-				"do": common.MapStr{"not": common.MapStr{"include": "true"}},
-				"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
-			},
 		},
 		Metadata: common.MapStr{
-			"id":   "abc",
-			"name": "foobar",
-			"image": common.MapStr{
-				"name": "",
-			},
-			"labels": common.MapStr{
-				"do_not_include":          "true",
-				"co_elastic_logs/disable": "true",
+			"container": common.MapStr{
+				"id":    "abc",
+				"name":  "foobar",
+				"image": "",
+				"labels": common.MapStr{
+					"do_not_include":          "true",
+					"co_elastic_logs/disable": "true",
+				},
 			},
 		},
 	}
