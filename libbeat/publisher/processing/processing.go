@@ -23,6 +23,14 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+// SupporterFactory creates a new processing Supporter that can be used with
+// the publisher pipeline.  The factory gets the global configuration passed,
+// in order to configure some shared global event processing.
 type SupporterFactory func(info beat.Info, log *logp.Logger, cfg *common.Config) (Supporter, error)
 
+// Supporter is used to create an event processing pipeline. It is used by the
+// publisher pipeline when a client connects to the pipeline. The supporter
+// will merge the global and local configurations into a common event
+// processor.
+// If `drop` is set, then the processor generated must always drop all events.
 type Supporter func(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error)
