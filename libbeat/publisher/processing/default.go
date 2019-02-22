@@ -60,8 +60,8 @@ type modifier interface {
 
 type builtinModifier func(beat.Info) common.MapStr
 
-// NewObserverSupport creates a new SupporterFactory based on NewDefaultSupport.
-// NewObserverSupport automatically adds the `ecs.version`, `host.name` and `agent.X` fields
+// NewBeatSupport creates a new SupporterFactory based on NewDefaultSupport.
+// NewBeatSupport automatically adds the `ecs.version`, `host.name` and `agent.X` fields
 // to each event.
 func NewBeatSupport() SupporterFactory {
 	return NewDefaultSupport(true, WithECS, WithHost, WithBeatMeta("agent"))
