@@ -21,11 +21,17 @@ import (
 	"encoding/json"
 	"errors"
 	"strings"
+	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
 	"gopkg.in/mgo.v2/bson"
+)
+
+var (
+	unknownOpcodes = map[opCode]struct{}{}
+	mutex          sync.Mutex
 )
 
 func mongodbMessageParser(s *stream) (bool, bool) {
@@ -56,7 +62,12 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	opCode := opCode(code)
 
 	if !validOpcode(opCode) {
-		logp.Err("Unknown operation code: %v", opCode)
+		mutex.Lock()
+		defer mutex.Unlock()
+		if _, reported := unknownOpcodes[opCode]; !reported {
+			logp.Err("Unknown operation code: %v", opCode)
+			unknownOpcodes[opCode] = struct{}{}
+		}
 		return false, false
 	}
 
