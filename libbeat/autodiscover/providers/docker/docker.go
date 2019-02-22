@@ -121,46 +121,69 @@ func (d *Provider) Start() {
 	}()
 }
 
-func (d *Provider) generateMetaDocker(event bus.Event) (*docker.Container, common.MapStr, common.MapStr) {
+type dockerMetadata struct {
+	// Old selectors [Deprecated]
+	Docker common.MapStr
+
+	// New ECS-based selectors
+	Container common.MapStr
+
+	// Metadata used to enrich events, like ECS-based selectors but can
+	// have modifications like dedotting
+	Metadata common.MapStr
+}
+
+func (d *Provider) generateMetaDocker(event bus.Event) (*docker.Container, *dockerMetadata) {
 	container, ok := event["container"].(*docker.Container)
 	if !ok {
 		logp.Error(errors.New("Couldn't get a container from watcher event"))
-		return nil, nil, nil
+		return nil, nil
 	}
 
+	// Don't dedot selectors, dedot only metadata used for events enrichment
 	labelMap := common.MapStr{}
+	metaLabelMap := common.MapStr{}
 	for k, v := range container.Labels {
+		safemapstr.Put(labelMap, k, v)
 		if d.config.Dedot {
 			label := common.DeDot(k)
-			labelMap.Put(label, v)
+			metaLabelMap.Put(label, v)
 		} else {
-			safemapstr.Put(labelMap, k, v)
+			safemapstr.Put(metaLabelMap, k, v)
 		}
 	}
 
-	metaOld := common.MapStr{
-		"container": common.MapStr{
-			"id":     container.ID,
-			"name":   container.Name,
-			"image":  container.Image,
-			"labels": labelMap,
+	meta := &dockerMetadata{
+		Docker: common.MapStr{
+			"container": common.MapStr{
+				"id":     container.ID,
+				"name":   container.Name,
+				"image":  container.Image,
+				"labels": labelMap,
+			},
+		},
+		Container: common.MapStr{
+			"id":   container.ID,
+			"name": container.Name,
+			"image": common.MapStr{
+				"name": container.Image,
+			},
+		},
+		Metadata: common.MapStr{
+			"container": common.MapStr{
+				"id":     container.ID,
+				"name":   container.Name,
+				"image":  container.Image,
+				"labels": metaLabelMap,
+			},
 		},
 	}
 
-	metaNew := common.MapStr{
-		"id":   container.ID,
-		"name": container.Name,
-		"image": common.MapStr{
-			"name": container.Image,
-		},
-		"labels": labelMap,
-	}
-
-	return container, metaOld, metaNew
+	return container, meta
 }
 
 func (d *Provider) emitContainer(event bus.Event, flag string) {
-	container, metaOld, metaNew := d.generateMetaDocker(event)
+	container, meta := d.generateMetaDocker(event)
 	var host string
 	if len(container.IPAddresses) > 0 {
 		host = container.IPAddresses[0]
@@ -173,10 +196,10 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			"id":        container.ID,
 			flag:        true,
 			"host":      host,
-			"docker":    metaOld,
-			"container": metaNew,
+			"docker":    meta.Docker,
+			"container": meta.Container,
 			"meta": common.MapStr{
-				"container": metaOld,
+				"container": meta.Metadata,
 			},
 		}
 
@@ -191,10 +214,10 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			flag:        true,
 			"host":      host,
 			"port":      port.PrivatePort,
-			"docker":    metaOld,
-			"container": metaNew,
+			"docker":    meta.Docker,
+			"container": meta.Container,
 			"meta": common.MapStr{
-				"container": metaOld,
+				"container": meta.Metadata,
 			},
 		}
 
