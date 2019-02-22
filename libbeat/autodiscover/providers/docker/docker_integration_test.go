@@ -93,12 +93,12 @@ func checkEvent(t *testing.T, listener bus.Listener, start bool) {
 				assert.Nil(t, getValue(e, "start"))
 			}
 			assert.Equal(t, getValue(e, "container.image.name"), "busybox")
-			assert.Equal(t, getValue(e, "container.labels"), common.MapStr{
-				"label": common.MapStr{
-					"value": "foo",
-					"child": "bar",
-				},
-			})
+			// labels.dedot=true by default
+			assert.Equal(t, common.MapStr{
+				"label":       "foo",
+				"label_child": "bar",
+			},
+				getValue(e, "container.labels"))
 			assert.NotNil(t, getValue(e, "container.id"))
 			assert.NotNil(t, getValue(e, "container.name"))
 			assert.NotNil(t, getValue(e, "host"))
