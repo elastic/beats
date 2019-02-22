@@ -168,13 +168,16 @@ func (d *Provider) generateMetaDocker(event bus.Event) (*docker.Container, *dock
 			"image": common.MapStr{
 				"name": container.Image,
 			},
+			"labels": labelMap,
 		},
 		Metadata: common.MapStr{
-			"container": common.MapStr{
-				"id":     container.ID,
-				"name":   container.Name,
-				"image":  container.Image,
-				"labels": metaLabelMap,
+			"docker": common.MapStr{
+				"container": common.MapStr{
+					"id":     container.ID,
+					"name":   container.Name,
+					"image":  container.Image,
+					"labels": metaLabelMap,
+				},
 			},
 		},
 	}
@@ -198,9 +201,7 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			"host":      host,
 			"docker":    meta.Docker,
 			"container": meta.Container,
-			"meta": common.MapStr{
-				"docker": meta.Metadata,
-			},
+			"meta":      meta.Metadata,
 		}
 
 		d.publish(event)
@@ -216,9 +217,7 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 			"port":      port.PrivatePort,
 			"docker":    meta.Docker,
 			"container": meta.Container,
-			"meta": common.MapStr{
-				"docker": meta.Metadata,
-			},
+			"meta":      meta.Metadata,
 		}
 
 		d.publish(event)
