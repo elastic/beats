@@ -5,8 +5,14 @@
 package s3_daily_storage
 
 import (
+	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/libbeat/common"
 
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
@@ -100,24 +106,18 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 			continue
 		}
 
-		dailyStorageMetricNames := []string{"NumberOfObjects", "BucketSizeBytes"}
-		metricDataQueries := constructMetricQueries(listMetricsOutput, int64(m.PeriodInSec), dailyStorageMetricNames, nil)
-
+		metricDataQueries := constructMetricQueries(listMetricsOutput, m.PeriodInSec)
 		// Use metricDataQueries to make GetMetricData API calls
 		metricDataOutput, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
 		if err != nil {
-			err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName+" for instance "+instanceID)
+			err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName)
 			m.logger.Error(err.Error())
 			report.Error(err)
 			continue
 		}
 
-		// Create Cloudwatch Events for S3
-		event, info, err := createS3Events(metricDataOutput, metricsetName, regionName, schemaRootFields, schemaMetricSetFields)
-		if info != "" {
-			m.logger.Info(info)
-		}
-
+		// Create Cloudwatch Events for s3_daily_storage
+		event, err := createCloudWatchEvents(metricDataOutput, regionName)
 		if err != nil {
 			m.logger.Error(err.Error())
 			event.Error = err
@@ -128,15 +128,83 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	}
 }
 
-func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, instanceID string, periodInSec int) []cloudwatch.MetricDataQuery {
+func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, periodInSec int) []cloudwatch.MetricDataQuery {
 	metricDataQueries := []cloudwatch.MetricDataQuery{}
 	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
+	metricNames := []string{"NumberOfObjects", "BucketSizeBytes"}
 	for i, listMetric := range listMetricsOutput {
-		metricDataQuery := createMetricDataQuery(listMetric, instanceID, i, periodInSec)
+		if !aws.StringInSlice(*listMetric.MetricName, metricNames) {
+			continue
+		}
+
+		metricDataQuery := createMetricDataQuery(listMetric, periodInSec, i)
 		if metricDataQuery == metricDataQueryEmpty {
 			continue
 		}
 		metricDataQueries = append(metricDataQueries, metricDataQuery)
 	}
 	return metricDataQueries
+}
+
+func createMetricDataQuery(metric cloudwatch.Metric, periodInSec int, index int) (metricDataQuery cloudwatch.MetricDataQuery) {
+	statistic := "Average"
+	period := int64(periodInSec)
+	id := "s3d" + strconv.Itoa(index)
+	metricDims := metric.Dimensions
+	bucketName := ""
+	storageType := ""
+	for _, dim := range metricDims {
+		if *dim.Name == "BucketName" {
+			bucketName = *dim.Value
+		} else if *dim.Name == "StorageType" {
+			storageType = *dim.Value
+		}
+	}
+	metricName := *metric.MetricName
+	label := bucketName + " " + storageType + " " + metricName
+
+	metricDataQuery = cloudwatch.MetricDataQuery{
+		Id: &id,
+		MetricStat: &cloudwatch.MetricStat{
+			Period: &period,
+			Stat:   &statistic,
+			Metric: &metric,
+		},
+		Label: &label,
+	}
+	return
+}
+
+func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, regionName string) (event mb.Event, err error) {
+	event.Service = metricsetName
+	event.RootFields = common.MapStr{}
+	mapOfRootFieldsResults := make(map[string]interface{})
+	mapOfRootFieldsResults["service.name"] = metricsetName
+	mapOfRootFieldsResults["cloud.region"] = regionName
+
+	resultRootFields, err := aws.EventMapping(mapOfRootFieldsResults, schemaRootFields)
+	if err != nil {
+		err = errors.Wrap(err, "Error trying to apply schema schemaRootFields in AWS s3_daily_storage metricbeat module.")
+		return
+	}
+	event.RootFields = resultRootFields
+
+	mapOfMetricSetFieldResults := make(map[string]interface{})
+	for _, output := range getMetricDataResults {
+		if len(output.Values) == 0 {
+			continue
+		}
+		labels := strings.Split(*output.Label, " ")
+		mapOfMetricSetFieldResults["bucket.name"] = labels[0]
+		mapOfMetricSetFieldResults["bucket.storage.type"] = labels[1]
+		mapOfMetricSetFieldResults[labels[2]] = fmt.Sprint(output.Values[0])
+	}
+
+	resultMetricSetFields, err := aws.EventMapping(mapOfMetricSetFieldResults, schemaMetricSetFields)
+	if err != nil {
+		err = errors.Wrap(err, "Error trying to apply schema schemaMetricSetFields in AWS s3_daily_storage metricbeat module.")
+		return
+	}
+	event.MetricSetFields = resultMetricSetFields
+	return
 }
