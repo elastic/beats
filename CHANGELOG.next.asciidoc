@@ -132,6 +132,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Fix issue with process monitor associating traffic to the wrong process. {issue}9151[9151] {pull}9443[9443]
 - Fix DHCPv4 dashboard that wouldn't load in Kibana. {issue}9850[9850]
 - Fixed a crash when using af_packet capture {pull}10477[10477]
+- Avoid reporting unknown MongoDB opcodes more than once. {pull}10878[10878]
 
 *Winlogbeat*
 
