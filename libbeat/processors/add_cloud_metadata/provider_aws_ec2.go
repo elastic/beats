@@ -32,6 +32,8 @@ func newEc2MetadataFetcher(config *common.Config) (*metadataFetcher, error) {
 			"machine_type":      c.Str("instanceType"),
 			"region":            c.Str("region"),
 			"availability_zone": c.Str("availabilityZone"),
+			"accountId":         c.Str("accountId"),
+			"ami":               c.Str("imageId"),
 		}.Apply(m)
 		return out
 	}
