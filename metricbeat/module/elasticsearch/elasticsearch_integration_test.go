@@ -29,6 +29,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/pkg/errors"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -205,6 +207,9 @@ func createMLJob(host string) error {
 	}
 
 	body, resp, err := httpPutJSON(host, jobURL, mlJob)
+	if err != nil {
+		return errors.Wrap(err, "error doing PUT request when creating ML job")
+	}
 
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("HTTP error loading ml job %d: %s, %s", resp.StatusCode, resp.Status, string(body))
@@ -216,17 +221,17 @@ func createMLJob(host string) error {
 func createCCRStats(host string) error {
 	err := setupCCRRemote(host)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error setup CCR remote settings")
 	}
 
 	err = createCCRLeaderIndex(host)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error creating CCR leader index")
 	}
 
 	err = createCCRFollowerIndex(host)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error creating CCR follower index")
 	}
 
 	return nil
