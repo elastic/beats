@@ -207,7 +207,7 @@ func ecsDirectionString(direction sock.Direction) string {
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The %v/%v dataset is experimental", moduleName, metricsetName)
+	cfgwarn.Beta("The %v/%v dataset is beta", moduleName, metricsetName)
 
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
