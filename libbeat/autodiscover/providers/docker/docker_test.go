@@ -124,31 +124,45 @@ func TestGenerateMetaDockerNoDedot(t *testing.T) {
 	p := Provider{
 		config: cfg,
 	}
-	_, metaOld, metaNew := p.generateMetaDocker(event)
-	expectedMetaOld := common.MapStr{
-		"container": common.MapStr{
-			"id":    "abc",
-			"name":  "foobar",
-			"image": "",
+	_, meta := p.generateMetaDocker(event)
+	expectedMeta := &dockerMetadata{
+		Docker: common.MapStr{
+			"container": common.MapStr{
+				"id":    "abc",
+				"name":  "foobar",
+				"image": "",
+				"labels": common.MapStr{
+					"do": common.MapStr{"not": common.MapStr{"include": "true"}},
+					"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
+				},
+			},
+		},
+		Container: common.MapStr{
+			"id":   "abc",
+			"name": "foobar",
+			"image": common.MapStr{
+				"name": "",
+			},
+			"labels": common.MapStr{
+				"do": common.MapStr{"not": common.MapStr{"include": "true"}},
+				"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
+			},
+		},
+		Metadata: common.MapStr{
+			"id":   "abc",
+			"name": "foobar",
+			"image": common.MapStr{
+				"name": "",
+			},
 			"labels": common.MapStr{
 				"do": common.MapStr{"not": common.MapStr{"include": "true"}},
 				"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
 			},
 		},
 	}
-	expectedMetaNew := common.MapStr{
-		"id":   "abc",
-		"name": "foobar",
-		"image": common.MapStr{
-			"name": "",
-		},
-		"labels": common.MapStr{
-			"do": common.MapStr{"not": common.MapStr{"include": "true"}},
-			"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
-		},
-	}
-	assert.Equal(t, expectedMetaOld, metaOld)
-	assert.Equal(t, expectedMetaNew, metaNew)
+	assert.Equal(t, expectedMeta.Docker, meta.Docker)
+	assert.Equal(t, expectedMeta.Container, meta.Container)
+	assert.Equal(t, expectedMeta.Metadata, meta.Metadata)
 }
 
 func TestGenerateMetaDockerWithDedot(t *testing.T) {
@@ -168,29 +182,43 @@ func TestGenerateMetaDockerWithDedot(t *testing.T) {
 	p := Provider{
 		config: cfg,
 	}
-	_, metaOld, metaNew := p.generateMetaDocker(event)
-	expectedMetaDedotOld := common.MapStr{
-		"container": common.MapStr{
-			"id":    "abc",
-			"name":  "foobar",
-			"image": "",
+	_, meta := p.generateMetaDocker(event)
+	expectedMeta := &dockerMetadata{
+		Docker: common.MapStr{
+			"container": common.MapStr{
+				"id":    "abc",
+				"name":  "foobar",
+				"image": "",
+				"labels": common.MapStr{
+					"do": common.MapStr{"not": common.MapStr{"include": "true"}},
+					"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
+				},
+			},
+		},
+		Container: common.MapStr{
+			"id":   "abc",
+			"name": "foobar",
+			"image": common.MapStr{
+				"name": "",
+			},
+			"labels": common.MapStr{
+				"do": common.MapStr{"not": common.MapStr{"include": "true"}},
+				"co": common.MapStr{"elastic": common.MapStr{"logs/disable": "true"}},
+			},
+		},
+		Metadata: common.MapStr{
+			"id":   "abc",
+			"name": "foobar",
+			"image": common.MapStr{
+				"name": "",
+			},
 			"labels": common.MapStr{
 				"do_not_include":          "true",
 				"co_elastic_logs/disable": "true",
 			},
 		},
 	}
-	expectedMetaDedotNew := common.MapStr{
-		"id":   "abc",
-		"name": "foobar",
-		"image": common.MapStr{
-			"name": "",
-		},
-		"labels": common.MapStr{
-			"do_not_include":          "true",
-			"co_elastic_logs/disable": "true",
-		},
-	}
-	assert.Equal(t, expectedMetaDedotOld, metaOld)
-	assert.Equal(t, expectedMetaDedotNew, metaNew)
+	assert.Equal(t, expectedMeta.Docker, meta.Docker)
+	assert.Equal(t, expectedMeta.Container, meta.Container)
+	assert.Equal(t, expectedMeta.Metadata, meta.Metadata)
 }
