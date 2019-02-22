@@ -19,6 +19,7 @@ package beat
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -40,6 +41,7 @@ type Event struct {
 
 var (
 	errNoTimestamp = errors.New("value is no timestamp")
+	errNoMapStr    = errors.New("value is no map[string]interface{} type")
 )
 
 // SetID overwrites the "id" field in the events metadata.
@@ -54,6 +56,11 @@ func (e *Event) SetID(id string) {
 func (e *Event) GetValue(key string) (interface{}, error) {
 	if key == "@timestamp" {
 		return e.Timestamp, nil
+	} else if subKey, ok := metadataKey(key); ok {
+		if subKey == "" || e.Meta == nil {
+			return e.Meta, nil
+		}
+		return e.Meta.GetValue(subKey)
 	}
 	return e.Fields.GetValue(key)
 }
@@ -68,12 +75,50 @@ func (e *Event) PutValue(key string, v interface{}) (interface{}, error) {
 		default:
 			return nil, errNoTimestamp
 		}
+	} else if subKey, ok := metadataKey(key); ok {
+		if subKey == "" {
+			switch meta := v.(type) {
+			case common.MapStr:
+				e.Meta = meta
+			case map[string]interface{}:
+				e.Meta = meta
+			default:
+				return nil, errNoMapStr
+			}
+		} else if e.Meta == nil {
+			e.Meta = common.MapStr{}
+		}
+		return e.Meta.Put(subKey, v)
 	}
 
-	// TODO: add support to write into '@metadata'?
 	return e.Fields.Put(key, v)
 }
 
 func (e *Event) Delete(key string) error {
+	if subKey, ok := metadataKey(key); ok {
+		if subKey == "" {
+			e.Meta = nil
+			return nil
+		}
+		if e.Meta == nil {
+			return nil
+		}
+		return e.Meta.Delete(subKey)
+	}
 	return e.Fields.Delete(key)
+}
+
+func metadataKey(key string) (string, bool) {
+	if !strings.HasPrefix(key, "@metadata") {
+		return "", false
+	}
+
+	subKey := key[len("@metadata"):]
+	if subKey == "" {
+		return "", true
+	}
+	if subKey[0] == '.' {
+		return subKey[1:], true
+	}
+	return "", false
 }
