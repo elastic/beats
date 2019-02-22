@@ -203,7 +203,7 @@ func TestSetEcsProcessors(t *testing.T) {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			err := setEcsProcessors(*test.esVersion, "foo-pipeline", test.content)
+			err := setECSProcessors(*test.esVersion, "foo-pipeline", test.content)
 			if test.isErrExpected {
 				assert.Error(t, err)
 			} else {

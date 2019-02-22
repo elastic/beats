@@ -122,7 +122,7 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 		}
 	}
 
-	err := setEcsProcessors(esClient.GetVersion(), pipelineID, content)
+	err := setECSProcessors(esClient.GetVersion(), pipelineID, content)
 	if err != nil {
 		return fmt.Errorf("failed to adapt pipeline for ECS compatibility: %v", err)
 	}
@@ -135,9 +135,9 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 	return nil
 }
 
-// setEcsProcessors sets required ECS options in processors when filebeat version is 7.0.X
+// setECSProcessors sets required ECS options in processors when filebeat version is 7.0.X
 // and ES is 6.7.X to ease migration to ECS
-func setEcsProcessors(esVersion common.Version, pipelineID string, content map[string]interface{}) error {
+func setECSProcessors(esVersion common.Version, pipelineID string, content map[string]interface{}) error {
 	ecsVersion := common.MustNewVersion("7.0.0")
 	if !esVersion.LessThan(ecsVersion) {
 		return nil
