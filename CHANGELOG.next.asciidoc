@@ -54,6 +54,8 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 *Packetbeat*
 
+- Avoid reporting unknown MongoDB opcodes more than once. {pull}10878[10878]
+
 *Winlogbeat*
 
 *Functionbeat*
