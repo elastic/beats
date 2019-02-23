@@ -26,7 +26,7 @@ apt install broctl
 
 * Configure it to process network traffic and generate logs. 
 * Edit `/etc/bro/node.cfg` to use the proper network interfaces. 
-* Edit `/etc/bro/network.cfg` to specify local networks accordingly.
+* Edit `/etc/bro/networks.cfg` to specify local networks accordingly.
 * Set `redef LogAscii::use_json=T;` in `/usr/share/bro/site/local.bro` to use JSON output. 
 
 ## Start Zeek/Bro
