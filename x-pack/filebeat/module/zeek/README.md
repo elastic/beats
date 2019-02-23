@@ -44,7 +44,7 @@ Grab the filebeat binary from elastic.co, and install it by following the instru
 Update filebeat.yml to point to Elasticsearch and Kibana. Setup Filebeat.
 
 ```
-./filebeat setup --modules zeek -e -E setup.dashboards.directory=build/kibana
+./filebeat setup --modules zeek -e -E 'setup.dashboards.enabled=true'
 ```
 
 Enable the Filebeat zeek module
