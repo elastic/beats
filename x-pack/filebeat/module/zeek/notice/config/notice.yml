@@ -1,0 +1,113 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags}}
+
+json.keys_under_root: false
+
+processors:
+  - drop_fields:
+      fields: ["json.actions"]
+  - rename:
+      fields:
+        - from: "json"
+          to: "zeek.notice"
+
+        - from: "zeek.notice.src"
+          to: "source.address"
+          when:
+            has_fields: ["zeek.notice.src"]
+
+        - from: "zeek.notice.dest"
+          to: "destination.address"
+          when:
+            has_fields: ["zeek.notice.dest"]
+
+        - from: "zeek.notice.uid"
+          to: "zeek.session_id"
+          when:
+            has_fields: ["zeek.notice.uid"]
+
+        - from: "zeek.notice.p"
+          to: "destination.port"
+          when:
+            has_fields: ["zeek.notice.p"]
+
+        - from: "zeek.notice.conn"
+          to: "zeek.notice.connnection_id"
+          when:
+            has_fields: ["zeek.notice.conn"]
+
+        - from: "zeek.notice.iconn"
+          to: "zeek.notice.icmp_id"
+          when:
+            has_fields: ["zeek.notice.iconn"]
+
+        - from: "zeek.notice.id.orig_h"
+          to: "source.address"
+          when:
+            has_fields: ["zeek.notice.id.orig_h"]
+
+        - from: "zeek.notice.id.orig_p"
+          to: "source.port"
+          when:
+            has_fields: ["zeek.notice.id.orig_p"]
+
+        - from: "zeek.notice.id.resp_h"
+          to: "destination.address"
+          when:
+            has_fields: ["zeek.notice.id.resp_h"]
+
+        - from: "zeek.notice.id.resp_p"
+          to: "destination.port"
+          when:
+            has_fields: ["zeek.notice.id.resp_p"]
+
+        - from: "zeek.notice.proto"
+          to: "network.transport"
+          when:
+            has_fields: ["zeek.notice.proto"]
+
+        - from: "zeek.notice.id.orig_p"
+          to: "source.port"
+          when:
+            has_fields: ["zeek.notice.id.orig_p"]
+
+        - from: "zeek.notice.f.id"
+          to: "zeek.notice.file.id"
+          when:
+            has_fields: ["zeek.notice.f.id"]
+
+        - from: "zeek.notice.f.parent_id"
+          to: "dzeek.notice.file.parent_id"
+          when:
+            has_fields: ["zeek.notice.f.parent_id"]
+
+        - from: "zeek.notice.f.source"
+          to: "zeek.notice.file.source"
+          when:
+            has_fields: ["zeek.notice.f.source"]
+
+        - from: "zeek.notice.f.is_orig"
+          to: "zeek.notice.file.is_orig"
+          when:
+            has_fields: ["zeek.notice.f.is_orig"]
+
+        - from: "zeek.notice.f.seen_bytes"
+          to: "zeek.notice.file.seen_bytes"
+          when:
+            has_fields: ["zeek.notice.f.seen_bytes"]
+
+        - from: "zeek.notice.f.total_bytes"
+          to: "zeek.notice.file.total_bytes"
+          when:
+            has_fields: ["zeek.notice.f.total_bytes"]
+
+      ignore_missing: true
+      fail_on_error: false
+
+  - drop_fields:
+      fields: ["zeek.notice.remote_location", "zeek.notice.f"]

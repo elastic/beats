@@ -25,7 +25,7 @@
         "source.ip": "10.178.98.102",
         "source.port": 62995,
         "tags": [
-            "zeek"
+            "zeek.http"
         ],
         "url.domain": "ocsp.apple.com",
         "url.original": "/ocsp04-aaica02/ME4wTKADAgEAMEUwQzBBMAkGBSsOAwIaBQAEFNqvF+Za6oA4ceFRLsAWwEInjUhJBBQx6napI3Sl39T97qDBpp7GEQ4R7AIIUP1IOZZ86ns=",

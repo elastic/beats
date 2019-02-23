@@ -17,7 +17,7 @@
         "source.ip": "192.168.86.167",
         "source.port": 38339,
         "tags": [
-            "zeek"
+            "zeek.dns"
         ],
         "zeek.dns.AA": false,
         "zeek.dns.RA": true,

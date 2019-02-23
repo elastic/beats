@@ -14112,3 +14112,157 @@ type: keyword
 
 --
 
+*`zeek.notice.connection_id`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.notice.icmp_id`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.notice.file.id`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.notice.file.parent_id`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.notice.file.source`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.notice.file.is_orig`*::
++
+--
+type: boolean
+
+--
+
+*`zeek.notice.file.seen_bytes`*::
++
+--
+type: long
+
+--
+
+*`zeek.notice.file.total_bytes`*::
++
+--
+type: long
+
+--
+
+*`zeek.notice.fuid`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.notice.file_mime_type`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.notice.note`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.notice.msg`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.notice.sub`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.notice.n`*::
++
+--
+type: long
+
+--
+
+*`zeek.notice.peer_name`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.notice.peer_descr`*::
++
+--
+type: text
+
+--
+
+*`zeek.notice.actions`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.notice.email_body_sections`*::
++
+--
+type: text
+
+--
+
+*`zeek.notice.email_delay_tokens`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.notice.identifier`*::
++
+--
+type: keyword
+
+--
+
+*`zeek.notice.suppress_for`*::
++
+--
+type: double
+
+--
+
+*`zeek.notice.dropped`*::
++
+--
+type: boolean
+
+--
+

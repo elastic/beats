@@ -10,7 +10,7 @@
         "log.offset": 0,
         "service.type": "zeek",
         "tags": [
-            "zeek"
+            "zeek.files"
         ],
         "zeek.files.analyzers": [
             "X509",
@@ -48,7 +48,7 @@
         "log.offset": 452,
         "service.type": "zeek",
         "tags": [
-            "zeek"
+            "zeek.files"
         ],
         "zeek.files.analyzers": [
             "X509",

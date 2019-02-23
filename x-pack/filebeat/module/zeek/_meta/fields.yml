@@ -284,4 +284,72 @@
     - name: ssl.last_alert
       type: keyword
 
+    - name: notice.connection_id
+      type: keyword
+
+    - name: notice.icmp_id
+      type: keyword
+
+    - name: notice.file.id
+      type: keyword
+
+    - name: notice.file.parent_id
+      type: keyword
+
+    - name: notice.file.source
+      type: keyword
+
+    - name: notice.file.is_orig
+      type: boolean
+
+    - name: notice.file.seen_bytes
+      type: long
+
+    - name: notice.file.total_bytes
+      type: long
+
+    - name: notice.fuid
+      type: keyword
+
+    - name: notice.file_mime_type
+      type: keyword
+
+    - name: notice.note
+      type: keyword
+
+    - name: notice.msg
+      type: keyword
+
+    - name: notice.sub
+      type: keyword
+
+    - name: notice.n
+      type: long
+
+    - name: notice.peer_name
+      type: keyword
+
+    - name: notice.peer_descr
+      type: text
+
+    - name: notice.actions
+      type: keyword
+
+    - name: notice.email_body_sections
+      type: text
+
+    - name: notice.email_delay_tokens
+      type: keyword
+
+    - name: notice.identifier
+      type: keyword
+
+    - name: notice.suppress_for
+      type: double
+
+    - name: notice.dropped
+      type: boolean
+
+    
+
 

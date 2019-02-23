@@ -1,0 +1,47 @@
+{
+  "description": "Pipeline for normalizing Zeek notice.log",
+  "processors": [
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['notice']['ts'] * params.multiplier; ctx.zeek.notice.remove('ts');",
+        "params": {
+          "multiplier": 1000
+        }
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "if (ctx['destination'] != null && ctx['destination']['address'] != null) { ctx.destination.ip = ctx['destination']['address']; }"
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "if (ctx['source'] != null && ctx['source']['address'] != null) { ctx.source.ip = ctx['source']['address']; }"
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.event.id = ctx.zeek.session_id + \"-notice\";",
+        "ignore_failure": true
+      }
+    },
+    {
+      "geoip": {
+        "field": "destination.ip",
+        "target_field": "destination.geo",
+        "ignore_missing": true
+      }
+    },
+    {
+      "geoip": {
+        "field": "source.ip",
+        "target_field": "source.geo",
+        "ignore_missing": true
+      }
+    }
+  ]
+}
