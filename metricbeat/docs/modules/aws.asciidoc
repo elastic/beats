@@ -82,7 +82,8 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 metricbeat.modules:
 - module: aws
   period: 300s
-  metricsets: ["ec2"]
+  metricsets:
+    - "ec2"
   access_key_id: '${AWS_ACCESS_KEY_ID:""}'
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'

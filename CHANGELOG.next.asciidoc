@@ -76,6 +76,8 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 *Metricbeat*
 
+- Add filters and pie chart for AWS EC2 dashboard. {pull}10596[10596]
+
 *Packetbeat*
 
 *Functionbeat*
