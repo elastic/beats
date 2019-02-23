@@ -16,6 +16,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-mongodb>>
   * <<filebeat-module-mysql>>
   * <<filebeat-module-nats>>
+  * <<filebeat-module-netflow>>
   * <<filebeat-module-nginx>>
   * <<filebeat-module-osquery>>
   * <<filebeat-module-postgresql>>
@@ -43,6 +44,7 @@ include::modules/logstash.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mysql.asciidoc[]
 include::modules/nats.asciidoc[]
+include::modules/netflow.asciidoc[]
 include::modules/nginx.asciidoc[]
 include::modules/osquery.asciidoc[]
 include::modules/postgresql.asciidoc[]

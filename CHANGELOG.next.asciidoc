@@ -131,6 +131,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Enable System module config on Windows. {pull}10237[10237]
 - Package: Disable librpm signal handlers. {pull}10694[10694]
+- Login: Handle different bad login UTMP types. {pull}10865[10865]
 
 *Filebeat*
 
@@ -173,6 +174,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix DHCPv4 dashboard that wouldn't load in Kibana. {issue}9850[9850]
 - Fixed a crash when using af_packet capture {pull}10477[10477]
 - Prevent duplicate packet loss error messages in HTTP events. {pull}10709[10709]
+- Avoid reporting unknown MongoDB opcodes more than once. {pull}10878[10878]
 
 *Winlogbeat*
 
@@ -214,6 +216,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add system module `login` dataset. {pull}9327[9327]
 - Add `entity_id` fields. {pull}10500[10500]
 - Add seven dashboards for the system module. {pull}10511[10511]
+- Move System module to beta. {pull}10800[10800]
 
 *Filebeat*
 
@@ -240,6 +243,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Populate more ECS fields in the Suricata module. {pull}10006[10006]
 - Add ISO8601 timestamp support in syslog metricset. {issue}8716[8716] {pull}10736[10736]
 - Add more info to message logged when a duplicated symlink file is found {pull}10845[10845]
+- Add Netflow module to enrich flow events with geoip data. {pull}10877[10877]
 
 *Heartbeat*
 

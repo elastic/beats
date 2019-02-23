@@ -7,6 +7,8 @@ from nose.plugins.attrib import attr
 
 class Test(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['docker']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_container_fields(self):
         """

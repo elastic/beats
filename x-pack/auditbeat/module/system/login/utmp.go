@@ -242,13 +242,19 @@ func (r *UtmpFileReader) readNewInFile(loginRecordC chan<- LoginRecord, errorC c
 				r.log.Debugf("utmp: (ut_type=%d, ut_pid=%d, ut_line=%v, ut_user=%v, ut_host=%v, ut_tv.tv_sec=%v, ut_addr_v6=%v)",
 					utmp.UtType, utmp.UtPid, utmp.UtLine, utmp.UtUser, utmp.UtHost, utmp.UtTv, utmp.UtAddrV6)
 
-				loginRecord := r.processLoginRecord(utmp)
+				var loginRecord *LoginRecord
+				switch utmpFile.Type {
+				case Wtmp:
+					loginRecord = r.processGoodLoginRecord(utmp)
+				case Btmp:
+					loginRecord, err = r.processBadLoginRecord(utmp)
+					if err != nil {
+						errorC <- err
+					}
+				}
+
 				if loginRecord != nil {
 					loginRecord.Origin = utmpFile.Path
-					if utmpFile.Type == Btmp && loginRecord.Type == userLoginRecord {
-						loginRecord.Type = userLoginFailedRecord
-					}
-
 					loginRecordC <- *loginRecord
 				}
 			} else {
@@ -275,10 +281,39 @@ func (r *UtmpFileReader) updateSavedUtmpFile(utmpFile UtmpFile, f *os.File) erro
 	return nil
 }
 
-// processLoginRecord receives UTMP login records in order and returns
+// processBadLoginRecord takes a UTMP login record from the "bad" login file (/var/log/btmp)
+// and returns a LoginRecord for it.
+func (r *UtmpFileReader) processBadLoginRecord(utmp *Utmp) (*LoginRecord, error) {
+	record := LoginRecord{
+		Utmp:      utmp,
+		Timestamp: utmp.UtTv,
+		TTY:       utmp.UtLine,
+		UID:       -1,
+		PID:       -1,
+	}
+
+	switch utmp.UtType {
+	// See utmp(5) for C constants.
+	case LOGIN_PROCESS, USER_PROCESS:
+		record.Type = userLoginFailedRecord
+
+		record.Username = utmp.UtUser
+		record.UID = lookupUsername(record.Username)
+		record.PID = utmp.UtPid
+		record.IP = newIP(utmp.UtAddrV6)
+		record.Hostname = utmp.UtHost
+	default:
+		// This should not happen.
+		return nil, errors.Errorf("UTMP record with unexpected type %v in bad login file", utmp.UtType)
+	}
+
+	return &record, nil
+}
+
+// processGoodLoginRecord receives UTMP login records in order and returns
 // a corresponding LoginRecord. Some UTMP records do not translate
 // into a LoginRecord, in this case the return value is nil.
-func (r *UtmpFileReader) processLoginRecord(utmp *Utmp) *LoginRecord {
+func (r *UtmpFileReader) processGoodLoginRecord(utmp *Utmp) *LoginRecord {
 	record := LoginRecord{
 		Utmp:      utmp,
 		Timestamp: utmp.UtTv,
@@ -358,6 +393,7 @@ func (r *UtmpFileReader) processLoginRecord(utmp *Utmp) *LoginRecord {
 			  interesting information
 			- ACCOUNTING - not implemented according to manpage
 		*/
+		r.log.Debugf("Ignoring UTMP record of type %v.", utmp.UtType)
 		return nil
 	}
 

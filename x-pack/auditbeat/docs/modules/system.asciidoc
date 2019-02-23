@@ -7,7 +7,7 @@ This file is generated! See scripts/docs_collector.py
 
 == System Module
 
-experimental[]
+beta[]
 
 The `system` module collects various security related information about
 a system. All datasets send both periodic state information (e.g. all currently
