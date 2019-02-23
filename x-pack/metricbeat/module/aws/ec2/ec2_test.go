@@ -111,7 +111,7 @@ func (m *MockEC2Client) DescribeInstancesRequest(input *ec2.DescribeInstancesInp
 	}
 }
 
-func TestGetinstanceIDs(t *testing.T) {
+func TestGetInstanceIDs(t *testing.T) {
 	mockSvc := &MockEC2Client{}
 	instanceIDs, instancesOutputs, err := getInstancesPerRegion(mockSvc)
 	if err != nil {
