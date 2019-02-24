@@ -39,11 +39,9 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		IdleTimeout time.Duration `config:"idle_timeout"`
 		Network     string        `config:"network"`
 		MaxConn     int           `config:"maxconn" validate:"min=1"`
-		Password    string        `config:"password"`
 	}{
 		Network:  "tcp",
 		MaxConn:  10,
-		Password: "",
 	}
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
@@ -52,7 +50,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		pool: CreatePool(base.Host(), config.Password, config.Network,
+		pool: CreatePool(base.Host(), base.HostData().Password, config.Network,
 			config.MaxConn, config.IdleTimeout, base.Module().Config().Timeout),
 	}, nil
 }
