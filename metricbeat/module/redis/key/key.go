@@ -27,12 +27,13 @@ import (
 )
 
 var (
-	debugf = logp.MakeDebug("redis-key")
+	debugf     = logp.MakeDebug("redis-key")
+	hostParser = parse.URLHostParserBuilder{DefaultScheme: "redis"}.Build()
 )
 
 func init() {
 	mb.Registry.MustAddMetricSet("redis", "key", New,
-		mb.WithHostParser(parse.PassThruHostParser),
+		mb.WithHostParser(hostParser),
 	)
 }
 
