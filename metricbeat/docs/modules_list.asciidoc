@@ -4,8 +4,8 @@ This file is generated! See scripts/docs_collector.py
 
 [options="header"]
 |===================================
-|Modules   |Dashboards   |Metricsets
-|<<metricbeat-module-aerospike,Aerospike>>     |image:./images/icon-no.png[No prebuilt dashboards]    |
+|Modules   |Dashboards   |Metricsets   
+|<<metricbeat-module-aerospike,Aerospike>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-aerospike-namespace,namespace>>   
 |<<metricbeat-module-apache,Apache>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-apache-status,status>>   
@@ -23,10 +23,10 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-ceph-osd_tree,osd_tree>>   
 |<<metricbeat-metricset-ceph-pool_disk,pool_disk>>   
 |<<metricbeat-module-consul,consul>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-consul-agent,agent>> beta[]
+.1+| .1+|  |<<metricbeat-metricset-consul-agent,agent>> beta[]  
 |<<metricbeat-module-coredns,coredns>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-coredns-stats,stats>> beta[]  
-|<<metricbeat-module-couchbase,Couchbase>>     |image:./images/icon-no.png[No prebuilt dashboards]    |
+|<<metricbeat-module-couchbase,Couchbase>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .3+| .3+|  |<<metricbeat-metricset-couchbase-bucket,bucket>>   
 |<<metricbeat-metricset-couchbase-cluster,cluster>>   
 |<<metricbeat-metricset-couchbase-node,node>>   
@@ -168,8 +168,9 @@ This file is generated! See scripts/docs_collector.py
 .2+| .2+|  |<<metricbeat-metricset-windows-perfmon,perfmon>> beta[]  
 |<<metricbeat-metricset-windows-service,service>>   
 |<<metricbeat-module-zookeeper,ZooKeeper>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-zookeeper-mntr,mntr>>
-|<<metricbeat-metricset-zookeeper-server,server>>
+.2+| .2+|  |<<metricbeat-metricset-zookeeper-mntr,mntr>>   
+|<<metricbeat-metricset-zookeeper-server,server>>   
+|================================
 
 --
 

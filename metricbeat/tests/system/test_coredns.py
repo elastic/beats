@@ -29,8 +29,6 @@ class Test(metricbeat.BaseTest):
         self.assertGreater(len(output), 0)
 
         for evt in output:
-            print("event is:")
-            print(evt)
             self.assert_fields_are_documented(evt)
             self.assertItemsEqual(self.de_dot(COREDNS_FIELDS), evt.keys(), evt)
 

@@ -2609,7 +2609,7 @@ Total query count
 
 --
 
-*`coredns.stats.dns.request.duration.sec.bucket`*::
+*`coredns.stats.dns.request.duration.sec.bucket.*`*::
 +
 --
 type: object
@@ -2641,12 +2641,32 @@ Requests duration, number of requests
 
 --
 
-*`coredns.stats.dns.request.size.bytes`*::
+*`coredns.stats.dns.request.size.bytes.bucket.*`*::
 +
 --
 type: object
 
 Request Size histogram buckets
+
+
+--
+
+*`coredns.stats.dns.request.size.bytes.sum`*::
++
+--
+type: double
+
+Request Size histogram sum
+
+
+--
+
+*`coredns.stats.dns.request.size.bytes.count`*::
++
+--
+type: double
+
+Request Size histogram count
 
 
 --
@@ -2671,7 +2691,7 @@ Counter of queries per zone and type
 
 --
 
-*`coredns.stats.dns.request.type`*::
+*`coredns.stats.type`*::
 +
 --
 type: keyword
@@ -2691,7 +2711,7 @@ Counter of responses per zone and rcode
 
 --
 
-*`coredns.stats.dns.response.rcode`*::
+*`coredns.stats.rcode`*::
 +
 --
 type: keyword
@@ -2701,7 +2721,7 @@ Holds the rcode of the response
 
 --
 
-*`coredns.stats.dns.request.family`*::
+*`coredns.stats.family`*::
 +
 --
 type: keyword
@@ -2711,12 +2731,32 @@ The address family of the transport (1 = IP (IP version 4), 2 = IP6 (IP version 
 
 --
 
-*`coredns.stats.dns.response.size.bytes`*::
+*`coredns.stats.dns.response.size.bytes.bucket.*`*::
 +
 --
 type: object
 
 Response Size histogram buckets
+
+
+--
+
+*`coredns.stats.dns.response.size.bytes.sum`*::
++
+--
+type: double
+
+Response Size histogram sum
+
+
+--
+
+*`coredns.stats.dns.response.size.bytes.count`*::
++
+--
+type: double
+
+Response Size histogram count
 
 
 --
