@@ -345,7 +345,7 @@ func getElasticsearchVersion(elasticsearchHostPort string) (*common.Version, err
 
 func httpPutJSON(host, path string, body []byte) ([]byte, *http.Response, error) {
 	req, err := http.NewRequest("PUT", "http://"+host+path, bytes.NewReader(body))
-	req.Close = True
+	req.Close = true
 	if err != nil {
 		return nil, nil, err
 	}
