@@ -94,7 +94,7 @@ filebeat.autodiscover:
       hints.enabled: true
 -------------------------------------------------------------------------------------
 
-Autodiscover provider a way to control whether log harvesting is by default disabled for the pods/containers when auto-discovery is in use. To enable it, just set `default.disable` to true:
+Autodiscover provides a way to control whether log harvesting is by default disabled for the pods/containers when auto-discovery is in use. To enable it, just set `default.disable` to true:
 
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ filebeat.autodiscover:
       hints.enabled: true
 -------------------------------------------------------------------------------------
 
-Autodiscover provider a way to control whether log harvesting is by default disabled for the 
+Autodiscover provides a way to control whether log harvesting is by default disabled for the 
 containers when auto-discovery is in use. To enable it, just set `default.disable` to true:
 
 ["source","yaml",subs="attributes"]
