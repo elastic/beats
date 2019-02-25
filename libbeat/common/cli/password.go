@@ -2,7 +2,7 @@
 // license agreements. See the NOTICE file distributed with
 // this work for additional information regarding copyright
 // ownership. Elasticsearch B.V. licenses this file to you under
-// the Apache License, Version 2.0 (the "License"); you may
+// Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -77,7 +77,7 @@ func env(p string) (string, error) {
 
 	v, ok := os.LookupEnv(p)
 	if !ok {
-		return "", fmt.Errorf("the environment variable %s does not exist", p)
+		return "", fmt.Errorf("environment variable %s does not exist", p)
 	}
 
 	return v, nil
