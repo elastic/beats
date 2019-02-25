@@ -50,6 +50,8 @@ class TestAutodiscover(filebeat.BaseTest):
 
         # Check metadata is added
         assert output[0]['message'] == 'Busybox output 1'
-        assert output[0]['docker']['container']['image'] == 'busybox'
+        assert output[0]['container']['image']['name'] == 'busybox'
         assert output[0]['docker']['container']['labels'] == {}
-        assert 'name' in output[0]['docker']['container']
+        assert 'name' in output[0]['container']
+
+        self.assert_fields_are_documented(output[0])

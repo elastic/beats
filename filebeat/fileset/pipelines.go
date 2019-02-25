@@ -121,11 +121,51 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 			return nil
 		}
 	}
+
+	err := setECSProcessors(esClient.GetVersion(), pipelineID, content)
+	if err != nil {
+		return fmt.Errorf("failed to adapt pipeline for ECS compatibility: %v", err)
+	}
+
 	body, err := esClient.LoadJSON(path, content)
 	if err != nil {
 		return interpretError(err, body)
 	}
 	logp.Info("Elasticsearch pipeline with ID '%s' loaded", pipelineID)
+	return nil
+}
+
+// setECSProcessors sets required ECS options in processors when filebeat version is >= 7.0.0
+// and ES is 6.7.X to ease migration to ECS.
+func setECSProcessors(esVersion common.Version, pipelineID string, content map[string]interface{}) error {
+	ecsVersion := common.MustNewVersion("7.0.0")
+	if !esVersion.LessThan(ecsVersion) {
+		return nil
+	}
+
+	p, ok := content["processors"]
+	if !ok {
+		return nil
+	}
+	processors, ok := p.([]interface{})
+	if !ok {
+		return fmt.Errorf("'processors' in pipeline '%s' expected to be a list, found %T", pipelineID, p)
+	}
+
+	minUserAgentVersion := common.MustNewVersion("6.7.0")
+	for _, p := range processors {
+		processor, ok := p.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		if options, ok := processor["user_agent"].(map[string]interface{}); ok {
+			if esVersion.LessThan(minUserAgentVersion) {
+				return fmt.Errorf("user_agent processor requires option 'ecs: true', but Elasticsearch %v does not support this option (Elasticsearch %v or newer is required)", esVersion, minUserAgentVersion)
+			}
+			logp.Debug("modules", "Setting 'ecs: true' option in user_agent processor for field '%v' in pipeline '%s'", options["field"], pipelineID)
+			options["ecs"] = true
+		}
+	}
 	return nil
 }
 
