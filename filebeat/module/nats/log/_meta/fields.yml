@@ -54,3 +54,15 @@
           type: keyword
           description: >
             The inbox subject on which the publisher is listening for responses
+        - name: max_messages
+          type: integer
+          description: >
+            An optional number of messages to wait for before automatically unsubscribing
+        - name: error
+          type: text
+          description: >
+            Details about the error occurred
+        - name: queue_group
+          type: text
+          description: >
+            The queue group which subscriber will join

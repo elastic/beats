@@ -7558,6 +7558,36 @@ The inbox subject on which the publisher is listening for responses
 
 --
 
+*`nats.log.msg.max_messages`*::
++
+--
+type: integer
+
+An optional number of messages to wait for before automatically unsubscribing
+
+
+--
+
+*`nats.log.msg.error`*::
++
+--
+type: text
+
+Details about the error occurred
+
+
+--
+
+*`nats.log.msg.queue_group`*::
++
+--
+type: text
+
+The queue group which subscriber will join
+
+
+--
+
 [[exported-fields-netflow]]
 == NetFlow fields
 

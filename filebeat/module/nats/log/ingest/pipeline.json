@@ -28,27 +28,32 @@
             "grok": {
                 "field": "nats.log.msg.info",
                 "patterns": [
-                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSMESSAGETYPE:nats.log.msg.type} %{GREEDYDATA:nats.log.msg.subject_data} %{POSINT:nats.log.msg.bytes}\\]",
-                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSMESSAGETYPE:nats.log.msg.type} %{GREEDYDATA:nats.log.msg.data}\\]",
-                    "%{NATSDIRECTION:nats.log.msg.direction} %{NATSMESSAGETYPE:nats.log.msg.type}: \\[%{GREEDYDATA:nats.log.msg.payload}\\]",
-                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSMESSAGETYPE:nats.log.msg.type}\\]",
+                    "%{NATSDIRECTION:nats.log.msg.direction} %{NATSPAYLOAD:nats.log.msg.type}: \\[%{GREEDYDATA:nats.log.msg.payload}\\]",
+                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSNOINFO:nats.log.msg.type}\\]",
+                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSUNSUB:nats.log.msg.type} %{POSINT:nats.log.msg.sid}( %{POSINT:nats.log.msg.max_messages})?\\]",
+                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSPUB:nats.log.msg.type} %{NOTSPACE:nats.log.msg.subject}( %{NOTSPACE:nats.log.msg.reply_to})? %{POSINT:nats.log.msg.bytes}\\]",
+                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSSUB:nats.log.msg.type} %{NOTSPACE:nats.log.msg.subject}( %{NOTSPACE:nats.log.msg.queue_group})? %{POSINT:nats.log.msg.sid}\\]",
+                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSMSG:nats.log.msg.type} %{NOTSPACE:nats.log.msg.subject} %{POSINT:nats.log.msg.sid}( %{NOTSPACE:nats.log.msg.reply_to})? %{POSINT:nats.log.msg.bytes}\\]",
+                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSCONNECTION:nats.log.msg.type} %{GREEDYDATA:nats.log.msg.data}\\]",
+                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSERROR:nats.log.msg.type} %{GREEDYDATA:nats.log.msg.error\\]",
                     "%{GREEDYDATA:nats.log.msg.data}"
                 ],
                 "pattern_definitions": {
                     "NATSDIRECTION": "(<<-|->>)",
-                    "NATSMESSAGETYPE": "(MSG|PUB|SUB|PING|PONG|CONNECT|MSG_PAYLOAD)"
+                    "NATSMSG": "MSG",
+                    "NATSPUB": "PUB",
+                    "NATSSUB": "SUB",
+                    "NATSUNSUB": "UNSUB",
+                    "NATSPAYLOAD": "MSG_PAYLOAD",
+                    "NATSERROR": "-ERROR",
+                    "NATSPING": "PING",
+                    "NATSPONG": "PONG",
+                    "NATSOK": "OK",
+                    "NATSCONNECT": "CONNECT",
+                    "NATSINFO": "INFO",
+                    "NATSCONNECTION": "(?:%{NATSCONNECT}|%{NATSINFO})",
+                    "NATSNOINFO": "(?:%{NATSPING}|%{NATSPONG}|%{NATSOK})"
                 },
-                "ignore_missing": true
-            }
-        },
-        {
-            "grok": {
-                "field": "nats.log.msg.subject_data",
-                "patterns": [
-                    "%{NOTSPACE:nats.log.msg.subject} %{POSINT:nats.log.msg.sid} %{NOTSPACE:nats.log.msg.reply_to}",
-                    "%{NOTSPACE:nats.log.msg.subject} %{POSINT:nats.log.msg.sid}",
-                    "%{NOTSPACE:nats.log.msg.subject}"
-                ],
                 "ignore_missing": true
             }
         },
@@ -66,12 +71,6 @@
         {
             "remove": {
                 "field": "nats.log.msg.payload",
-                "ignore_missing": true
-            }
-        },
-        {
-            "remove": {
-                "field": "nats.log.msg.subject_data",
                 "ignore_missing": true
             }
         },
