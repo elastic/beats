@@ -8,9 +8,14 @@
         "stats": {
             "dns": {
                 "response": {
-                    "rcode": "NOERROR"
+                    "rcode": {
+                        "count": {
+                            "total": 2207
+                        }
+                    }
                 }
             },
+            "rcode": "NOERROR",
             "server": "dns://:53",
             "zone": "."
         }

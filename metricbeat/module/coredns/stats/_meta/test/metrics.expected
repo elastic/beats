@@ -4,82 +4,17 @@
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"dns": {
-				"request": {
-					"type": "A"
-				}
-			},
-			"server": "dns://:53",
-			"zone": "mydomain.org."
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"dns": {
-				"request": {
-					"count": {
-						"total": 3940
-					},
-					"family": "1"
-				}
-			},
-			"proto": "udp",
-			"server": "dns://:53",
-			"zone": "mydomain.org."
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"dns": {
-				"request": {
-					"duration": {
-						"sec": {
-							"bucket": {
-								"+Inf": 3940,
-								"0.00025": 3894,
-								"0.0005": 3928,
-								"0.001": 3939,
-								"0.002": 3939,
-								"0.004": 3939,
-								"0.008": 3940,
-								"0.016": 3940,
-								"0.032": 3940,
-								"0.064": 3940,
-								"0.128": 3940,
-								"0.256": 3940,
-								"0.512": 3940,
-								"1.024": 3940,
-								"2.048": 3940,
-								"4.096": 3940,
-								"8.192": 3940
-							},
-							"count": 3940,
-							"sum": 0.5743562010000005
+				"response": {
+					"rcode": {
+						"count": {
+							"total": 440
 						}
 					}
 				}
 			},
+			"rcode": "NOERROR",
 			"server": "dns://:53",
-			"zone": "mydomain.org."
+			"zone": "."
 		},
 		"Index": "",
 		"ID": "",
@@ -114,12 +49,41 @@
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"dns": {
-				"response": {
-					"rcode": "NOERROR"
+				"request": {
+					"do": {
+						"count": {
+							"total": 113
+						}
+					},
+					"duration": {
+						"sec": {
+							"bucket": {
+								"+Inf": 440,
+								"0.00025": 0,
+								"0.0005": 0,
+								"0.001": 0,
+								"0.002": 0,
+								"0.004": 0,
+								"0.008": 0,
+								"0.016": 0,
+								"0.032": 0,
+								"0.064": 424,
+								"0.128": 437,
+								"0.256": 438,
+								"0.512": 440,
+								"1.024": 440,
+								"2.048": 440,
+								"4.096": 440,
+								"8.192": 440
+							},
+							"count": 440,
+							"sum": 21.712619368
+						}
+					}
 				}
 			},
 			"server": "dns://:53",
-			"zone": "mydomain.org."
+			"zone": "."
 		},
 		"Index": "",
 		"ID": "",
@@ -139,24 +103,24 @@
 					"size": {
 						"bytes": {
 							"bucket": {
-								"+Inf": 3940,
+								"+Inf": 440,
 								"0": 0,
-								"100": 3940,
-								"1023": 3940,
-								"16000": 3940,
-								"200": 3940,
-								"2047": 3940,
-								"300": 3940,
-								"32000": 3940,
-								"400": 3940,
-								"4095": 3940,
-								"48000": 3940,
-								"511": 3940,
-								"64000": 3940,
-								"8291": 3940
+								"100": 440,
+								"1023": 440,
+								"16000": 440,
+								"200": 440,
+								"2047": 440,
+								"300": 440,
+								"32000": 440,
+								"400": 440,
+								"4095": 440,
+								"48000": 440,
+								"511": 440,
+								"64000": 440,
+								"8291": 440
 							},
-							"count": 3940,
-							"sum": 236400
+							"count": 440,
+							"sum": 22880
 						}
 					}
 				},
@@ -164,31 +128,82 @@
 					"size": {
 						"bytes": {
 							"bucket": {
-								"+Inf": 3940,
+								"+Inf": 440,
 								"0": 0,
-								"100": 3940,
-								"1023": 3940,
-								"16000": 3940,
-								"200": 3940,
-								"2047": 3940,
-								"300": 3940,
-								"32000": 3940,
-								"400": 3940,
-								"4095": 3940,
-								"48000": 3940,
-								"511": 3940,
-								"64000": 3940,
-								"8291": 3940
+								"100": 440,
+								"1023": 440,
+								"16000": 440,
+								"200": 440,
+								"2047": 440,
+								"300": 440,
+								"32000": 440,
+								"400": 440,
+								"4095": 440,
+								"48000": 440,
+								"511": 440,
+								"64000": 440,
+								"8291": 440
 							},
-							"count": 3940,
-							"sum": 283680
+							"count": 440,
+							"sum": 29480
 						}
 					}
 				}
 			},
 			"proto": "udp",
 			"server": "dns://:53",
-			"zone": "mydomain.org."
+			"zone": "."
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"dns": {
+				"request": {
+					"count": {
+						"total": 440
+					}
+				}
+			},
+			"family": "1",
+			"proto": "udp",
+			"server": "dns://:53",
+			"zone": "."
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"dns": {
+				"request": {
+					"type": {
+						"count": {
+							"total": 440
+						}
+					}
+				}
+			},
+			"server": "dns://:53",
+			"type": "A",
+			"zone": "."
 		},
 		"Index": "",
 		"ID": "",

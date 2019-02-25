@@ -8,10 +8,15 @@
         "stats": {
             "dns": {
                 "request": {
-                    "type": "A"
+                    "type": {
+                        "count": {
+                            "total": 2207
+                        }
+                    }
                 }
             },
             "server": "dns://:53",
+            "type": "A",
             "zone": "."
         }
     },

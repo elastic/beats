@@ -9,11 +9,11 @@
             "dns": {
                 "request": {
                     "count": {
-                        "total": 2210
-                    },
-                    "family": "1"
+                        "total": 2207
+                    }
                 }
             },
+            "family": "1",
             "proto": "udp",
             "server": "dns://:53",
             "zone": "."

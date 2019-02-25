@@ -37,10 +37,10 @@ var mapping = &prometheus.MetricsMapping{
 	Labels: map[string]prometheus.LabelMap{
 		"server": prometheus.KeyLabel("server"),
 		"zone":   prometheus.KeyLabel("zone"),
-		"type":   prometheus.KeyLabel("dns.request.type"),
-		"rcode":  prometheus.KeyLabel("dns.response.rcode"),
+		"type":   prometheus.KeyLabel("type"),
+		"rcode":  prometheus.KeyLabel("rcode"),
 		"proto":  prometheus.KeyLabel("proto"),
-		"family": prometheus.KeyLabel("dns.request.family"),
+		"family": prometheus.KeyLabel("family"),
 	},
 }
 
