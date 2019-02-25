@@ -75,5 +75,10 @@ func env(p string) (string, error) {
 		return "", errors.New("env variable name is needed when using env: password method")
 	}
 
-	return os.Getenv(p), nil
+	v, ok := os.LookupEnv(p)
+	if !ok {
+		return "", fmt.Errorf("the environment variable %s does not exist", p)
+	}
+
+	return v, nil
 }
