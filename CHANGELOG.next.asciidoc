@@ -73,6 +73,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Do not panic when no tokenizer string is configured for a dissect processor. {issue}8895[8895]
 - Fix stopping of modules started by kubernetes autodiscover. {pull}10476[10476]
 - Fix a issue when remote and local configuration didn't match when fetching configuration from Central Management. {issue}10587[10587]
+- Add ECS-like selectors and dedotting to docker autodiscover. {issue}10757[10757] {pull}10862[10862]
 
 *Auditbeat*
 
@@ -126,7 +127,6 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Fixed data types for various hosts fields in `mongodb/replstatus` metricset {pull}10307[10307]
 - Added function to close sql database connection. {pull}10355[10355]
 - Fix issue with `elasticsearch/node_stats` metricset (x-pack) not indexing `source_node` field. {pull}10639[10639]
-- Migrate docker autodiscover to ECS. {issue}10757[10757] {pull}10862[10862]
 
 *Packetbeat*
 
