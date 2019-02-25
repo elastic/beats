@@ -106,6 +106,14 @@ func defaultConfig() kafkaConfig {
 	}
 }
 
+func readConfig(cfg *common.Config) (*kafkaConfig, error) {
+	c := defaultConfig()
+	if err := cfg.Unpack(&c); err != nil {
+		return nil, err
+	}
+	return &c, nil
+}
+
 func (c *kafkaConfig) Validate() error {
 	if len(c.Hosts) == 0 {
 		return errors.New("no hosts configured")
