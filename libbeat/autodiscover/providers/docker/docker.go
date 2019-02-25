@@ -191,6 +191,10 @@ func (d *Provider) generateMetaDocker(event bus.Event) (*docker.Container, *dock
 
 func (d *Provider) emitContainer(event bus.Event, flag string) {
 	container, meta := d.generateMetaDocker(event)
+	if container == nil || meta == nil {
+		return
+	}
+
 	var host string
 	if len(container.IPAddresses) > 0 {
 		host = container.IPAddresses[0]
