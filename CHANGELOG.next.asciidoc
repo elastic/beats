@@ -69,6 +69,8 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 *Auditbeat*
 
+- Move System module to beta. {pull}10800[10800]
+
 *Filebeat*
 
 - Add ISO8601 timestamp support in syslog metricset. {issue}8716[8716] {pull}10736[10736]
