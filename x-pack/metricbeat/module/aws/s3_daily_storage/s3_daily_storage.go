@@ -95,20 +95,20 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	for _, regionName := range m.MetricSet.RegionsList {
 		m.MetricSet.AwsConfig.Region = regionName
 		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
-		listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
+		listMetricsOutputs, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
 			m.logger.Error(err.Error())
 			report.Error(err)
 			continue
 		}
 
-		if listMetricsOutput == nil || len(listMetricsOutput) == 0 {
+		if listMetricsOutputs == nil || len(listMetricsOutputs) == 0 {
 			continue
 		}
 
-		metricDataQueries := constructMetricQueries(listMetricsOutput, m.PeriodInSec)
+		metricDataQueries := constructMetricQueries(listMetricsOutputs, m.PeriodInSec)
 		// Use metricDataQueries to make GetMetricData API calls
-		metricDataOutput, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
+		metricDataOutputs, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
 		if err != nil {
 			err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName)
 			m.logger.Error(err.Error())
@@ -117,22 +117,39 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		}
 
 		// Create Cloudwatch Events for s3_daily_storage
-		event, err := createCloudWatchEvents(metricDataOutput, regionName)
-		if err != nil {
-			m.logger.Error(err.Error())
-			event.Error = err
+		bucketNames := getBucketNames(listMetricsOutputs)
+		for _, bucketName := range bucketNames {
+			event, err := createCloudWatchEvents(metricDataOutputs, regionName, bucketName)
+			if err != nil {
+				m.logger.Error(err.Error())
+				event.Error = err
+				report.Event(event)
+				continue
+			}
 			report.Event(event)
-			continue
 		}
-		report.Event(event)
 	}
 }
 
-func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, periodInSec int) []cloudwatch.MetricDataQuery {
+func getBucketNames(listMetricsOutputs []cloudwatch.Metric) (bucketNames []string) {
+	for _, output := range listMetricsOutputs {
+		for _, dim := range output.Dimensions {
+			if *dim.Name == "BucketName" {
+				if aws.StringInSlice(*dim.Value, bucketNames) {
+					continue
+				}
+				bucketNames = append(bucketNames, *dim.Value)
+			}
+		}
+	}
+	return
+}
+
+func constructMetricQueries(listMetricsOutputs []cloudwatch.Metric, periodInSec int) []cloudwatch.MetricDataQuery {
 	metricDataQueries := []cloudwatch.MetricDataQuery{}
 	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
 	metricNames := []string{"NumberOfObjects", "BucketSizeBytes"}
-	for i, listMetric := range listMetricsOutput {
+	for i, listMetric := range listMetricsOutputs {
 		if !aws.StringInSlice(*listMetric.MetricName, metricNames) {
 			continue
 		}
@@ -175,29 +192,20 @@ func createMetricDataQuery(metric cloudwatch.Metric, periodInSec int, index int)
 	return
 }
 
-func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, regionName string) (event mb.Event, err error) {
+func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName string, bucketName string) (event mb.Event, err error) {
 	event.Service = metricsetName
 	event.RootFields = common.MapStr{}
-	mapOfRootFieldsResults := make(map[string]interface{})
-	mapOfRootFieldsResults["service.name"] = metricsetName
-	mapOfRootFieldsResults["cloud.region"] = regionName
+	// Cloud fields in ECS
+	event.RootFields.Put("service.name", metricsetName)
+	event.RootFields.Put("cloud.region", regionName)
 
-	resultRootFields, err := aws.EventMapping(mapOfRootFieldsResults, schemaRootFields)
-	if err != nil {
-		err = errors.Wrap(err, "Error trying to apply schema schemaRootFields in AWS s3_daily_storage metricbeat module.")
-		return
-	}
-	event.RootFields = resultRootFields
-
+	// AWS s3_daily_storage metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
-	for _, output := range getMetricDataResults {
-		if len(output.Values) == 0 {
-			continue
-		}
+	for _, output := range outputs {
 		labels := strings.Split(*output.Label, " ")
-		mapOfMetricSetFieldResults["bucket.name"] = labels[0]
-		mapOfMetricSetFieldResults["bucket.storage.type"] = labels[1]
-		mapOfMetricSetFieldResults[labels[2]] = fmt.Sprint(output.Values[0])
+		if labels[0] == bucketName {
+			mapOfMetricSetFieldResults[labels[2]] = fmt.Sprint(output.Values[0])
+		}
 	}
 
 	resultMetricSetFields, err := aws.EventMapping(mapOfMetricSetFieldResults, schemaMetricSetFields)
@@ -205,6 +213,8 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 		err = errors.Wrap(err, "Error trying to apply schema schemaMetricSetFields in AWS s3_daily_storage metricbeat module.")
 		return
 	}
+
+	resultMetricSetFields.Put("bucket.name", bucketName)
 	event.MetricSetFields = resultMetricSetFields
 	return
 }

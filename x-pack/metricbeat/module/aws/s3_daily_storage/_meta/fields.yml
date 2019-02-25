@@ -12,11 +12,7 @@ name: s3_daily_storage
       type: scaled_float
       description: >
         The amount of data in bytes stored in a bucket.
-    - name: bucket.storage.type
-      type: keyword
-      description: >
-        Storage type specified for each S3 bucket.
-    - name: object.count
+    - name: number_of_object
       type: long
       description: >
         The total number of objects stored in a bucket for all storage classes.
