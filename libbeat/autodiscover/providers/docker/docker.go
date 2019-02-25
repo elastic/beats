@@ -191,6 +191,10 @@ func (d *Provider) generateMetaDocker(event bus.Event) (*docker.Container, *dock
 
 func (d *Provider) emitContainer(event bus.Event, flag string) {
 	container, meta := d.generateMetaDocker(event)
+	if container == nil || meta == nil {
+		return
+	}
+
 	var host string
 	if len(container.IPAddresses) > 0 {
 		host = container.IPAddresses[0]
@@ -263,7 +267,7 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 		e["port"] = port
 	}
 	if labels, err := dockerMeta.GetValue("labels"); err == nil {
-		hints := builder.GenerateHints(labels.(common.MapStr), "", d.config.Prefix)
+		hints := builder.GenerateHints(labels.(common.MapStr), "", d.config.Prefix, d.config.DefaultDisable)
 		e["hints"] = hints
 	}
 	return e
