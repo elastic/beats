@@ -91,5 +91,4 @@ class Test(AuditbeatXPackTest):
 
         fields = ["user.entity_id", "system.audit.user.name"]
 
-        # Metricset is beta and that generates a warning, TODO: remove later
-        self.check_metricset("system", "user", COMMON_FIELDS + fields, warnings_allowed=True)
+        self.check_metricset("system", "user", COMMON_FIELDS + fields)
