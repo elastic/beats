@@ -1,6 +1,6 @@
 [role="xpack"]
 
-experimental[]
+beta[]
 
 This is the `socket` dataset of the system module.
 
