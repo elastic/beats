@@ -262,7 +262,7 @@ func TestProcessorsConfigs(t *testing.T) {
 			support, err := factory(info, logp.L(), cfg)
 			require.NoError(t, err)
 
-			prog, err := support(test.local, test.drop)
+			prog, err := support.Create(test.local, test.drop)
 			require.NoError(t, err)
 
 			actual, err := prog.Run(&beat.Event{
@@ -307,7 +307,7 @@ func TestNormalization(t *testing.T) {
 			s, err := NewDefaultSupport(test.normalize)(beat.Info{}, logp.L(), common.NewConfig())
 			require.NoError(t, err)
 
-			prog, err := s(beat.ProcessingConfig{}, false)
+			prog, err := s.Create(beat.ProcessingConfig{}, false)
 			require.NoError(t, err)
 
 			fields := test.in.Clone()
@@ -325,7 +325,7 @@ func TestAlwaysDrop(t *testing.T) {
 	s, err := NewDefaultSupport(true)(beat.Info{}, logp.L(), common.NewConfig())
 	require.NoError(t, err)
 
-	prog, err := s(beat.ProcessingConfig{}, true)
+	prog, err := s.Create(beat.ProcessingConfig{}, true)
 	require.NoError(t, err)
 
 	actual, err := prog.Run(&beat.Event{})
@@ -338,7 +338,7 @@ func TestDynamicFields(t *testing.T) {
 	require.NoError(t, err)
 
 	dynFields := common.NewMapStrPointer(common.MapStr{})
-	prog, err := factory(beat.ProcessingConfig{
+	prog, err := factory.Create(beat.ProcessingConfig{
 		DynamicFields: &dynFields,
 	}, false)
 	require.NoError(t, err)

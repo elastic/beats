@@ -99,7 +99,7 @@ func NewDefaultSupport(
 			return nil, fmt.Errorf("error initializing processors: %v", err)
 		}
 
-		p := pipelineProcessors{
+		p := &pipelineProcessors{
 			skipNormalize: !normalize,
 			log:           log,
 		}
@@ -134,7 +134,7 @@ func NewDefaultSupport(
 			p.tags = t
 		}
 
-		return p.build, nil
+		return p, nil
 	}
 }
 
@@ -196,7 +196,7 @@ func WithBeatMeta(key string) modifier {
 //  8. (P) pipeline processors list
 //  9. (P) (if publish/debug enabled) log event
 // 10. (P) (if output disabled) dropEvent
-func (pp *pipelineProcessors) build(
+func (pp *pipelineProcessors) Create(
 	cfg beat.ProcessingConfig,
 	drop bool,
 ) (beat.Processor, error) {

@@ -319,7 +319,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 
 	var processors beat.Processor
 	if p.processors != nil {
-		proc, err := p.processors(cfg.Processing, publishDisabled)
+		proc, err := p.processors.Create(cfg.Processing, publishDisabled)
 		if err != nil {
 			return nil, err
 		}
