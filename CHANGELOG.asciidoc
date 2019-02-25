@@ -465,7 +465,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha1...v7.0.0-alpha2[Check the
 - Add more TCP statuses to `socket_summary` metricset. {pull}9430[9430]
 - Remove experimental tag from ceph metricsets. {pull}9708[9708]
 - Add MS SQL module to X-Pack {pull}9414[9414
-- Add `coredns` metricbeat {pull}10585{10585]
 
 ==== Deprecated
 

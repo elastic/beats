@@ -17,8 +17,8 @@ ADD config /etc/coredns
 
 RUN apk add --update --no-cache bind-tools
 
-#HEALTHCHECK --retries=10 CMD dig @0.0.0.0 www.elastic.com >/dev/null
-HEALTHCHECK --interval=1s --retries=10 CMD dig @0.0.0.0 www.elastic.com >/dev/null
+# Check if the Coredns container is healthy
+HEALTHCHECK --interval=5s --retries=10 CMD dig @0.0.0.0 my.domain.org >/dev/null
 
 # Start coredns with custom configuration file
 ENTRYPOINT ["/coredns"]
