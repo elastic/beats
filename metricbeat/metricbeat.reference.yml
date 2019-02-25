@@ -35,6 +35,7 @@ metricbeat.max_start_delay: 10s
   # List of enabled autodiscover providers
 #  providers:
 #    - type: docker
+#      labels.dedot: true
 #      templates:
 #        - condition:
 #            equals.docker.container.image: etcd
