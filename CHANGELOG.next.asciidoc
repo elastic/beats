@@ -209,6 +209,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Calls to Elasticsearch X-Pack APIs made by Beats won't cause deprecation logs in Elasticsearch logs. {9656}9656[9656]
 - Add `network` condition to processors for matching IP addresses against CIDRs. {pull}10743[10743]
 - Add if/then/else support to processors. {pull}10744[10744]
+- Add `community_id` processor for computing network flow hashes. {pull}10745[10745]
+
 
 *Auditbeat*
 
