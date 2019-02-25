@@ -18,6 +18,8 @@
 package container
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -81,6 +83,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 	body, err := m.http.FetchContent()
 	if err != nil {
+		err = errors.Wrap(err, "error doing HTTP request to fetch 'container' Metricset data")
 		logger.Error(err)
 		reporter.Error(err)
 		return
