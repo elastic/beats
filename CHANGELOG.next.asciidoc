@@ -46,6 +46,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Set `ecs: true` in user_agent processors when loading pipelines with Filebeat 7.0.x into Elasticsearch 6.7.x. {issue}10655[10655] {pull}10875[10875]
+
 *Heartbeat*
 
 - Remove monitor generator script that was rarely used. {pull}9648[9648]
