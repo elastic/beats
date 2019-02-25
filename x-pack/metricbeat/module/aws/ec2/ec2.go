@@ -103,10 +103,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		}
 
 		for _, instanceID := range instanceIDs {
-			if instanceID != "i-77f84332" {
-				continue
-			}
-
 			metricDataQueries := constructMetricQueries(listMetricsOutput, instanceID, m.PeriodInSec)
 			if len(metricDataQueries) == 0 {
 				continue
