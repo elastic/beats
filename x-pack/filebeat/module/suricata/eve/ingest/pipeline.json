@@ -64,7 +64,8 @@
         },
         {
             "script": {
-                "source": "def domain = ctx.destination?.domain; if (domain instanceof Collection) { ctx.destination.domain = ctx.destination.domain.stream().distinct().collect(Collectors.toList()); if (domain.length == 1) { ctx.destination.domain = domain[0]; } }",
+                "type": "painless",
+                "source": "def domain = ctx.destination?.domain; if (domain instanceof Collection) { domain = domain.stream().distinct().collect(Collectors.toList()); if (domain.length == 1) { domain = domain[0]; }ctx.destination.domain = domain; }",
                 "ignore_failure": true
             }
         },
