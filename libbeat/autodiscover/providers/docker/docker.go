@@ -267,7 +267,7 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 		e["port"] = port
 	}
 	if labels, err := dockerMeta.GetValue("labels"); err == nil {
-		hints := builder.GenerateHints(labels.(common.MapStr), "", d.config.Prefix)
+		hints := builder.GenerateHints(labels.(common.MapStr), "", d.config.Prefix, d.config.DefaultDisable)
 		e["hints"] = hints
 	}
 	return e
