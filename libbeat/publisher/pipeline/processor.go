@@ -71,6 +71,7 @@ func newProcessorPipeline(
 	)
 
 	needsCopy := global.alwaysCopy || localProcessors != nil || global.processors != nil
+	builtin := global.builtinMeta
 
 	if !config.SkipNormalization {
 		// setup 1: generalize/normalize output (P)
@@ -102,13 +103,13 @@ func newProcessorPipeline(
 		// metadata will be merged into the fields.
 		// With dynamic fields potentially changing at any time, we need to copy,
 		// so we do not change shared structures be accident.
-		fieldsNeedsCopy := needsCopy || config.DynamicFields != nil || fields["beat"] != nil
+		fieldsNeedsCopy := needsCopy || config.DynamicFields != nil || hasKeyAnyOf(fields, builtin)
 		processors.add(makeAddFieldsProcessor("fields", fields, fieldsNeedsCopy))
 	}
 
 	if config.DynamicFields != nil {
 		checkCopy := func(m common.MapStr) bool {
-			return needsCopy || hasKey(m, "beat")
+			return needsCopy || hasKeyAnyOf(m, builtin)
 		}
 		processors.add(makeAddDynMetaProcessor("dynamicFields", config.DynamicFields, checkCopy))
 	}
@@ -117,8 +118,8 @@ func newProcessorPipeline(
 	processors.add(localProcessors)
 
 	// setup 6: add beats and host metadata
-	if meta := global.builtinMeta; len(meta) > 0 {
-		processors.add(makeAddFieldsProcessor("beatsMeta", meta, needsCopy))
+	if len(builtin) > 0 {
+		processors.add(makeAddFieldsProcessor("beatsMeta", builtin, needsCopy))
 	}
 
 	// setup 7: pipeline processors list
@@ -325,4 +326,13 @@ func makeClientProcessors(config beat.ClientConfig) processors.Processor {
 func hasKey(m common.MapStr, key string) bool {
 	_, exists := m[key]
 	return exists
+}
+
+func hasKeyAnyOf(m, builtin common.MapStr) bool {
+	for k := range builtin {
+		if hasKey(m, k) {
+			return true
+		}
+	}
+	return false
 }
