@@ -6,7 +6,7 @@ package fields
 
 import "fmt"
 
-var Fields = FieldDict{}
+var GlobalFields = FieldDict{}
 
 type Key struct {
 	EnterpriseID uint32
@@ -20,12 +20,20 @@ type Field struct {
 
 type FieldDict map[Key]*Field
 
-func RegisterFields(dict FieldDict) error {
+func RegisterGlobalFields(dict FieldDict) error {
 	for key, value := range dict {
-		if _, found := Fields[key]; found {
+		if _, found := GlobalFields[key]; found {
 			return fmt.Errorf("field %+v is duplicated", key)
 		}
-		Fields[key] = value
+		GlobalFields[key] = value
 	}
 	return nil
+}
+
+// Merge merges the passed fields into the dictionary, overwriting existing
+// fields if duplicated.
+func (f FieldDict) Merge(otherFields FieldDict) {
+	for key, value := range otherFields {
+		f[key] = value
+	}
 }
