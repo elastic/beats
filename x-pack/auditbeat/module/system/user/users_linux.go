@@ -21,6 +21,7 @@ import (
 	"os/user"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/joeshaw/multierror"
@@ -72,7 +73,9 @@ func readPasswdFile(readPasswords bool) ([]*User, error) {
 		passwd, err := C.getpwent()
 
 		if passwd == nil {
-			if err != nil {
+			// getpwent() can return ENOENT even when there is no error,
+			// see https://github.com/systemd/systemd/issues/9585.
+			if err != nil && err != syscall.ENOENT {
 				return users, errors.Wrap(err, "error getting user")
 			}
 
