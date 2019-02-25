@@ -22,19 +22,14 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-func eventsMapping(blkioStatsList []BlkioStats) []common.MapStr {
-	myEvents := []common.MapStr{}
+func eventsMapping(r mb.ReporterV2, blkioStatsList []BlkioStats) {
 	for _, blkioStats := range blkioStatsList {
-		myEvents = append(myEvents, eventMapping(&blkioStats))
+		eventMapping(r, &blkioStats)
 	}
-	return myEvents
 }
 
-func eventMapping(stats *BlkioStats) common.MapStr {
-	event := common.MapStr{
-		mb.ModuleDataKey: common.MapStr{
-			"container": stats.Container.ToMapStr(),
-		},
+func eventMapping(r mb.ReporterV2, stats *BlkioStats) {
+	fields := common.MapStr{
 		"reads":  stats.reads,
 		"writes": stats.writes,
 		"total":  stats.totals,
@@ -55,5 +50,8 @@ func eventMapping(stats *BlkioStats) common.MapStr {
 		},
 	}
 
-	return event
+	r.Event(mb.Event{
+		RootFields:      stats.Container.ToMapStr(),
+		MetricSetFields: fields,
+	})
 }
