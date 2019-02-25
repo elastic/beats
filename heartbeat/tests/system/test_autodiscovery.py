@@ -60,7 +60,9 @@ class TestAutodiscover(BaseTest):
                     # We don't check all the docker fields because this is really the responsibility
                     # of libbeat's autodiscovery code.
                     event = output[0]
-                    if event['monitor']['id'] == 'myid' and event['docker']['container']['id'] is not None:
+                    if event['monitor']['id'] == 'myid' and event['container']['id'] is not None:
                         matched = True
 
         assert matched
+
+        self.assert_fields_are_documented(output[0])

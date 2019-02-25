@@ -77,8 +77,8 @@ func makeKafka(
 ) (outputs.Group, error) {
 	debugf("initialize kafka output")
 
-	config := defaultConfig()
-	if err := cfg.Unpack(&config); err != nil {
+	config, err := readConfig(cfg)
+	if err != nil {
 		return outputs.Fail(err)
 	}
 
@@ -92,7 +92,7 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	libCfg, err := newSaramaConfig(&config)
+	libCfg, err := newSaramaConfig(config)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -107,7 +107,7 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	client, err := newKafkaClient(observer, hosts, beat.Beat, config.Key, topic, codec, libCfg)
+	client, err := newKafkaClient(observer, hosts, beat.IndexPrefix, config.Key, topic, codec, libCfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
