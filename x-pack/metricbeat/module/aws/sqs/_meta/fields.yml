@@ -1,0 +1,42 @@
+- name: sqs
+  type: group
+  description: >
+    `sqs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SQS.
+  release: beta
+  fields:
+    - name: oldest_message_age.sec
+      type: long
+      description: >
+        The approximate age of the oldest non-deleted message in the queue.
+    - name: message.delayed
+      type: long
+      description: >
+        TThe number of messages in the queue that are delayed and not available for reading immediately.
+    - name: message.not_visible
+      type: long
+      description: >
+        The number of messages that are in flight.
+    - name: message.visible
+      type: long
+      description: >
+        The number of messages available for retrieval from the queue.
+    - name: message.deleted
+      type: long
+      description: >
+        The number of messages deleted from the queue.
+    - name: message.received
+      type: long
+      description: >
+        The number of messages returned by calls to the ReceiveMessage action.
+    - name: message.sent
+      type: long
+      description: >
+        The number of messages added to a queue.
+    - name: empty_receives
+      type: long
+      description: >
+        The number of ReceiveMessage API calls that did not return a message.
+    - name: sent_message_size.bytes
+      type: scaled_float
+      description: >
+        The size of messages added to a queue.
