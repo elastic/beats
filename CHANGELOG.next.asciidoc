@@ -14,6 +14,8 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 *Filebeat*
 
+- Set `ecs: true` in user_agent processors when loading pipelines with Filebeat 7.0.x into Elasticsearch 6.7.x. {issue}10655[10655] {pull}10875[10875]
+
 *Heartbeat*
 
 *Journalbeat*
