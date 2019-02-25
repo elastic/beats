@@ -251,6 +251,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add more info to message logged when a duplicated symlink file is found {pull}10845[10845]
 - Add Netflow module to enrich flow events with geoip data. {pull}10877[10877]
 - Set `event.category: network_traffic` for Suricata. {pull}10882[10882]
+- Add configuration knob for auto-discover hints to control whether log harvesting is enabled for the pod/container. {issue}10811[10811] {pull}10911[10911]
 
 *Heartbeat*
 
