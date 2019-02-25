@@ -227,6 +227,7 @@
         },
         {
             "geoip": {
+                "if": "ctx.source?.geo == null",
                 "field": "source.ip",
                 "target_field": "source.geo",
                 "ignore_missing": true
@@ -234,6 +235,7 @@
         },
         {
             "geoip": {
+                "if": "ctx.destination?.geo == null",
                 "field": "destination.ip",
                 "target_field": "destination.geo",
                 "ignore_missing": true
@@ -254,9 +256,9 @@
             }
         },
         {
-            "set": {
-                "field": "event.kind",
-                "value": "event"
+            "script": {
+                "lang": "painless",
+                "source": "def t = ctx.suricata?.eve?.event_type; if (t == \"stats\") {\n  ctx['event']['kind'] = \"metric\";\n} else if (t == \"alert\") {\n  ctx['event']['kind'] = \"alert\";\n  ctx['event']['category'] = \"network_traffic\";\n} else {\n  ctx['event']['kind'] = \"event\";\n  ctx['event']['category'] = \"network_traffic\";\n}"
             }
         }
     ],
