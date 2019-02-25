@@ -6,9 +6,14 @@
 
 package user
 
+// #include <errno.h>
 // #include <sys/types.h>
 // #include <pwd.h>
 // #include <shadow.h>
+//
+// void setErrno(int err) {
+//      errno = err;
+// }
 import "C"
 
 import (
@@ -18,6 +23,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 )
 
@@ -28,24 +34,28 @@ var (
 // GetUsers retrieves a list of users using information from
 // /etc/passwd, /etc/group, and - if configured - /etc/shadow.
 func GetUsers(readPasswords bool) ([]*User, error) {
+	var errs multierror.Errors
+
 	users, err := readPasswdFile(readPasswords)
 	if err != nil {
-		return nil, err
+		errs = append(errs, err)
 	}
 
-	err = enrichWithGroups(users)
-	if err != nil {
-		return nil, err
-	}
-
-	if readPasswords {
-		err = enrichWithShadow(users)
+	if len(users) > 0 {
+		err = enrichWithGroups(users)
 		if err != nil {
-			return nil, err
+			errs = append(errs, err)
+		}
+
+		if readPasswords {
+			err = enrichWithShadow(users)
+			if err != nil {
+				errs = append(errs, err)
+			}
 		}
 	}
 
-	return users, nil
+	return users, errs.Err()
 }
 
 func readPasswdFile(readPasswords bool) ([]*User, error) {
@@ -54,9 +64,20 @@ func readPasswdFile(readPasswords bool) ([]*User, error) {
 	C.setpwent()
 	defer C.endpwent()
 
-	for passwd, err := C.getpwent(); passwd != nil; passwd, err = C.getpwent() {
-		if err != nil {
-			return nil, errors.Wrap(err, "error getting user")
+	for {
+		// Setting errno to 0 before calling getpwent().
+		// See return value section of getpwent(3).
+		C.setErrno(0)
+
+		passwd, err := C.getpwent()
+
+		if passwd == nil {
+			if err != nil {
+				return users, errors.Wrap(err, "error getting user")
+			}
+
+			// No more entries
+			break
 		}
 
 		// passwd is C.struct_passwd
@@ -161,9 +182,18 @@ func readShadowFile() (map[string]shadowFileEntry, error) {
 	defer C.endspent()
 
 	shadowEntries := make(map[string]shadowFileEntry)
-	for spwd, err := C.getspent(); spwd != nil; spwd, err = C.getspent() {
-		if err != nil {
-			return nil, errors.Wrap(err, "error while reading shadow file")
+
+	for {
+		C.setErrno(0)
+		spwd, err := C.getspent()
+
+		if spwd == nil {
+			if err != nil {
+				return shadowEntries, errors.Wrap(err, "error while reading shadow file")
+			}
+
+			// No more entries
+			break
 		}
 
 		shadow := shadowFileEntry{
