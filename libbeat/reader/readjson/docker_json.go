@@ -92,7 +92,7 @@ func (p *DockerJSONReader) parseCRILog(message *reader.Message, msg *logLine) er
 	if len(log) < split {
 		return errors.New("invalid CRI log format")
 	}
-	ts, err := time.Parse(time.RFC3339, string(log[i]))
+	ts, err := time.Parse(time.RFC3339Nano, string(log[i]))
 	if err != nil {
 		return errors.Wrap(err, "parsing CRI timestamp")
 	}
