@@ -8,9 +8,9 @@
       }
     },
     {
-      "script": {
-        "lang": "painless",
-        "source": "ctx.event.id = ctx['zeek']['session_id'];",
+      "set": {
+        "field": "ctx.event.id",
+        "value": "{{ctx.zeek.session_id}}",
         "if": "ctx.zeek.session_id != null"
       }
     },
