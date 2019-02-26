@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/fields"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/config"
+	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/fields"
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/record"
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/test"
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/v9"

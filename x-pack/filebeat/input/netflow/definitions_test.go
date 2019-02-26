@@ -7,9 +7,10 @@ package netflow
 import (
 	"testing"
 
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/fields"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
+
+	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/fields"
 )
 
 func TestLoadFieldDefinitions(t *testing.T) {
