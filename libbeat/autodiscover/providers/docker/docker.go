@@ -18,6 +18,8 @@
 package docker
 
 import (
+	"errors"
+
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/libbeat/autodiscover"
@@ -119,10 +121,73 @@ func (d *Provider) Start() {
 	}()
 }
 
-func (d *Provider) emitContainer(event bus.Event, flag string) {
+type dockerMetadata struct {
+	// Old selectors [Deprecated]
+	Docker common.MapStr
+
+	// New ECS-based selectors
+	Container common.MapStr
+
+	// Metadata used to enrich events, like ECS-based selectors but can
+	// have modifications like dedotting
+	Metadata common.MapStr
+}
+
+func (d *Provider) generateMetaDocker(event bus.Event) (*docker.Container, *dockerMetadata) {
 	container, ok := event["container"].(*docker.Container)
 	if !ok {
-		logp.Err("Couldn't get a container from watcher event")
+		logp.Error(errors.New("Couldn't get a container from watcher event"))
+		return nil, nil
+	}
+
+	// Don't dedot selectors, dedot only metadata used for events enrichment
+	labelMap := common.MapStr{}
+	metaLabelMap := common.MapStr{}
+	for k, v := range container.Labels {
+		safemapstr.Put(labelMap, k, v)
+		if d.config.Dedot {
+			label := common.DeDot(k)
+			metaLabelMap.Put(label, v)
+		} else {
+			safemapstr.Put(metaLabelMap, k, v)
+		}
+	}
+
+	meta := &dockerMetadata{
+		Docker: common.MapStr{
+			"container": common.MapStr{
+				"id":     container.ID,
+				"name":   container.Name,
+				"image":  container.Image,
+				"labels": labelMap,
+			},
+		},
+		Container: common.MapStr{
+			"id":   container.ID,
+			"name": container.Name,
+			"image": common.MapStr{
+				"name": container.Image,
+			},
+			"labels": labelMap,
+		},
+		Metadata: common.MapStr{
+			"docker": common.MapStr{
+				"container": common.MapStr{
+					"id":     container.ID,
+					"name":   container.Name,
+					"image":  container.Image,
+					"labels": metaLabelMap,
+				},
+			},
+		},
+	}
+
+	return container, meta
+}
+
+func (d *Provider) emitContainer(event bus.Event, flag string) {
+	container, meta := d.generateMetaDocker(event)
+	if container == nil || meta == nil {
 		return
 	}
 
@@ -130,30 +195,17 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 	if len(container.IPAddresses) > 0 {
 		host = container.IPAddresses[0]
 	}
-	labelMap := common.MapStr{}
-	for k, v := range container.Labels {
-		safemapstr.Put(labelMap, k, v)
-	}
 
-	meta := common.MapStr{
-		"container": common.MapStr{
-			"id":     container.ID,
-			"name":   container.Name,
-			"image":  container.Image,
-			"labels": labelMap,
-		},
-	}
 	// Without this check there would be overlapping configurations with and without ports.
 	if len(container.Ports) == 0 {
 		event := bus.Event{
-			"provider": d.uuid,
-			"id":       container.ID,
-			flag:       true,
-			"host":     host,
-			"docker":   meta,
-			"meta": common.MapStr{
-				"docker": meta,
-			},
+			"provider":  d.uuid,
+			"id":        container.ID,
+			flag:        true,
+			"host":      host,
+			"docker":    meta.Docker,
+			"container": meta.Container,
+			"meta":      meta.Metadata,
 		}
 
 		d.publish(event)
@@ -162,15 +214,14 @@ func (d *Provider) emitContainer(event bus.Event, flag string) {
 	// Emit container container and port information
 	for _, port := range container.Ports {
 		event := bus.Event{
-			"provider": d.uuid,
-			"id":       container.ID,
-			flag:       true,
-			"host":     host,
-			"port":     port.PrivatePort,
-			"docker":   meta,
-			"meta": common.MapStr{
-				"docker": meta,
-			},
+			"provider":  d.uuid,
+			"id":        container.ID,
+			flag:        true,
+			"host":      host,
+			"port":      port.PrivatePort,
+			"docker":    meta.Docker,
+			"container": meta.Container,
+			"meta":      meta.Metadata,
 		}
 
 		d.publish(event)

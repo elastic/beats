@@ -32,12 +32,14 @@ type Config struct {
 	Builders     []*common.Config        `config:"builders"`
 	Appenders    []*common.Config        `config:"appenders"`
 	Templates    template.MapperSettings `config:"templates"`
+	Dedot        bool                    `config:"labels.dedot"`
 }
 
 func defaultConfig() *Config {
 	return &Config{
 		Host:   "unix:///var/run/docker.sock",
 		Prefix: "co.elastic",
+		Dedot:  false,
 	}
 }
 
