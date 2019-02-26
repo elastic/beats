@@ -1259,7 +1259,7 @@ The per-request time from the complete request being received by an Amazon S3 bu
 
 --
 
-*`aws.s3_daily_storage.number_of_object`*::
+*`aws.s3_daily_storage.number_of_objects`*::
 +
 --
 type: long
