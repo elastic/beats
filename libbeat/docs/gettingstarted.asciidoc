@@ -26,3 +26,7 @@ After installing the {stack}, see the {beats} getting started guides:
 * {packetbeat-ref}/packetbeat-getting-started.html[Packetbeat]
 * {winlogbeat-ref}/winlogbeat-getting-started.html[Winlogbeat]
 
+If you're planning to use the
+{infra-guide}/infrastructure-ui-overview.html[Infrastructure] and
+{infra-guide}/logs-ui-overview.html[Logs] UIs in {kib}, also see the
+{infra-guide}/index.html[Infrastructure Monitoring Guide].
