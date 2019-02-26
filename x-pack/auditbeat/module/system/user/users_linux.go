@@ -19,6 +19,7 @@ import "C"
 import (
 	"crypto/sha512"
 	"os/user"
+	"runtime"
 	"strconv"
 	"strings"
 	"syscall"
@@ -36,6 +37,12 @@ var (
 // /etc/passwd, /etc/group, and - if configured - /etc/shadow.
 func GetUsers(readPasswords bool) ([]*User, error) {
 	var errs multierror.Errors
+
+	// We are using a number of thread sensitive C functions in
+	// this file, most importantly setpwent/getpwent/endpwent and
+	// setspent/getspent/endspent. And we set errno (which is thread-local).
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
 	users, err := readPasswdFile(readPasswords)
 	if err != nil {
@@ -187,7 +194,11 @@ func readShadowFile() (map[string]shadowFileEntry, error) {
 	shadowEntries := make(map[string]shadowFileEntry)
 
 	for {
+		// While getspnam(3) does not explicitly call out the need for setting errno to 0
+		// as getpwent(3) does, at least glibc uses the same code for both, and so it
+		// probably makes sense to do the same for both.
 		C.setErrno(0)
+
 		spwd, err := C.getspent()
 
 		if spwd == nil {
