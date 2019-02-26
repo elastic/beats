@@ -50,10 +50,23 @@
             }
         },
         {
-            "rename": {
+            "append": {
+                "if": "ctx.suricata?.eve?.http?.hostname != null",
+                "value": "{{suricata.eve.http.hostname}}",
+                "field": "destination.domain"
+            }
+        },
+        {
+            "remove": {
                 "field": "suricata.eve.http.hostname",
-                "target_field": "destination.domain",
-                "ignore_missing": true
+                "ignore_failure": true
+            }
+        },
+        {
+            "script": {
+                "type": "painless",
+                "source": "def domain = ctx.destination?.domain; if (domain instanceof Collection) { domain = domain.stream().distinct().collect(Collectors.toList()); if (domain.length == 1) { domain = domain[0]; }ctx.destination.domain = domain; }",
+                "ignore_failure": true
             }
         },
         {
