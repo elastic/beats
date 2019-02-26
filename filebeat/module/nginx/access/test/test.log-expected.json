@@ -219,5 +219,23 @@
         "user_agent.device.name": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "-"
+    },
+    {
+        "@timestamp": "2019-02-26T14:39:42.000Z",
+        "ecs.version": "1.0.0-beta2",
+        "event.dataset": "nginx.access",
+        "event.module": "nginx",
+        "fileset.name": "access",
+        "http.request.referrer": "-",
+        "http.response.body.bytes": 173,
+        "http.response.status_code": 400,
+        "input.type": "log",
+        "log.offset": 1184,
+        "nginx.access.origin": "unix:",
+        "service.type": "nginx",
+        "user.name": "-",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
+        "user_agent.original": "-"
     }
 ]
