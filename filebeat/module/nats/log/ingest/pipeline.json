@@ -102,6 +102,37 @@
         {
             "script": {
                 "lang": "painless",
+                "source": "if (ctx.nats.log.msg.type == params.msg) {\n          ctx.nats.log.msg.type = params.message;\n        } else if (ctx.nats.log.msg.type == params.pub) {\n          ctx.nats.log.msg.type = params.publish;\n        } else if (ctx.nats.log.msg.type == params.sub) {\n          ctx.nats.log.msg.type = params.subscribe;\n        } else if (ctx.nats.log.msg.type == params.unsub) {\n          ctx.nats.log.msg.type = params.unsubscribe;\n        } else if (ctx.nats.log.msg.type == params.msg_payload) {\n          ctx.nats.log.msg.type = params.payload;\n        } else if (ctx.nats.log.msg.type == params.err) {\n          ctx.nats.log.msg.type = params.error;\n        } else if (ctx.nats.log.msg.type == params.pi) {\n          ctx.nats.log.msg.type = params.ping;\n        } else if (ctx.nats.log.msg.type == params.po) {\n          ctx.nats.log.msg.type = params.pong;\n        } else if (ctx.nats.log.msg.type == params.ok) {\n          ctx.nats.log.msg.type = params.acknowledge;\n        } else if (ctx.nats.log.msg.type == params.connect) {\n          ctx.nats.log.msg.type = params.connection;\n        } else if (ctx.nats.log.msg.type == params.info) {\n          ctx.nats.log.msg.type = params.information;\n        }",
+                "params": {
+                    "msg": "MSG",
+                    "message": "message",
+                    "pub": "PUB",
+                    "publish": "publish",
+                    "sub": "SUB",
+                    "subscribe": "subscribe",
+                    "unsub": "UNSUB",
+                    "unsubscribe": "unsubscribe",
+                    "msg_payload": "MSG_PAYLOAD",
+                    "payload": "payload",
+                    "err": "-ERROR",
+                    "error": "error",
+                    "pi": "PING",
+                    "ping": "ping",
+                    "po": "PONG",
+                    "pong": "pong",
+                    "ok": "OK",
+                    "acknowledge": "acknowledge",
+                    "connect": "CONNECT",
+                    "connection": "connection",
+                    "info": "INFO",
+                    "information": "information"
+                },
+                "if": "ctx.nats.log.msg?.type != null"
+            }
+        },
+        {
+            "script": {
+                "lang": "painless",
                 "source": "if (ctx.nats.log.msg.direction == params.in) {\n          ctx.nats.log.msg.direction = params.incoming;\n        } else if (ctx.nats.log.msg.direction == params.out) {\n          ctx.nats.log.msg.direction = params.outgoing;\n        }",
                 "params": {
                     "in": "<<-",

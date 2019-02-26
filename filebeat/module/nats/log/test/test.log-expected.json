@@ -81,7 +81,7 @@
         "nats.log.client.port": "38630",
         "nats.log.msg.data": "{\"verbose\":false,\"pedantic\":false,\"tls_required\":false,\"name\":\"NATS Benchmark\",\"lang\":\"go\",\"version\":\"1.7.0\",\"protocol\":1,\"echo\":true}",
         "nats.log.msg.direction": "outgoing",
-        "nats.log.msg.type": "CONNECT",
+        "nats.log.msg.type": "connection",
         "process.pid": "1",
         "service.type": "nats"
     },
@@ -100,7 +100,7 @@
         "nats.log.msg.direction": "outgoing",
         "nats.log.msg.sid": "1",
         "nats.log.msg.subject": "foo",
-        "nats.log.msg.type": "SUB",
+        "nats.log.msg.type": "subscribe",
         "process.pid": "1",
         "service.type": "nats"
     },
@@ -117,7 +117,7 @@
         "nats.log.client.ip": "172.18.0.1",
         "nats.log.client.port": "38630",
         "nats.log.msg.direction": "outgoing",
-        "nats.log.msg.type": "PING",
+        "nats.log.msg.type": "ping",
         "process.pid": "1",
         "service.type": "nats"
     },
@@ -134,7 +134,7 @@
         "nats.log.client.ip": "172.18.0.1",
         "nats.log.client.port": "38630",
         "nats.log.msg.direction": "incoming",
-        "nats.log.msg.type": "PONG",
+        "nats.log.msg.type": "pong",
         "process.pid": "1",
         "service.type": "nats"
     },
@@ -154,7 +154,7 @@
         "nats.log.msg.direction": "outgoing",
         "nats.log.msg.reply_to": "_INBOX.e3hAUbP4r5wbjw3Hudw42r.udigGiHn",
         "nats.log.msg.subject": "aiuser.platinum1.pingpeer",
-        "nats.log.msg.type": "PUB",
+        "nats.log.msg.type": "publish",
         "process.pid": "1",
         "service.type": "nats"
     },
@@ -171,7 +171,7 @@
         "nats.log.client.ip": "50.39.246.116",
         "nats.log.client.port": "62388",
         "nats.log.msg.direction": "outgoing",
-        "nats.log.msg.type": "MSG_PAYLOAD",
+        "nats.log.msg.type": "payload",
         "process.pid": "1",
         "service.type": "nats"
     },
@@ -192,7 +192,7 @@
         "nats.log.msg.reply_to": "_INBOX.e3hAUbP4r5wbjw3Hudw42r.udigGiHn",
         "nats.log.msg.sid": "1",
         "nats.log.msg.subject": "aiuser.platinum1.pingpeer",
-        "nats.log.msg.type": "MSG",
+        "nats.log.msg.type": "message",
         "process.pid": "1",
         "service.type": "nats"
     },
@@ -211,7 +211,7 @@
         "nats.log.msg.bytes": "17",
         "nats.log.msg.direction": "outgoing",
         "nats.log.msg.subject": "_INBOX.e3hAUbP4r5wbjw3Hudw42r.udigGiHn",
-        "nats.log.msg.type": "PUB",
+        "nats.log.msg.type": "publish",
         "process.pid": "1",
         "service.type": "nats"
     },
@@ -228,7 +228,7 @@
         "nats.log.client.ip": "192.168.176.11",
         "nats.log.client.port": "36262",
         "nats.log.msg.direction": "outgoing",
-        "nats.log.msg.type": "MSG_PAYLOAD",
+        "nats.log.msg.type": "payload",
         "process.pid": "1",
         "service.type": "nats"
     },
@@ -248,7 +248,7 @@
         "nats.log.msg.direction": "incoming",
         "nats.log.msg.sid": "11",
         "nats.log.msg.subject": "_INBOX.e3hAUbP4r5wbjw3Hudw42r.udigGiHn",
-        "nats.log.msg.type": "MSG",
+        "nats.log.msg.type": "message",
         "process.pid": "1",
         "service.type": "nats"
     },
@@ -267,7 +267,7 @@
         "nats.log.msg.bytes": "1583",
         "nats.log.msg.direction": "outgoing",
         "nats.log.msg.subject": "aiuser.platinum1.appstats",
-        "nats.log.msg.type": "PUB",
+        "nats.log.msg.type": "publish",
         "process.pid": "1",
         "service.type": "nats"
     },
@@ -287,7 +287,7 @@
         "nats.log.msg.direction": "incoming",
         "nats.log.msg.sid": "6",
         "nats.log.msg.subject": "aiuser.platinum1.appstats",
-        "nats.log.msg.type": "MSG",
+        "nats.log.msg.type": "message",
         "process.pid": "1",
         "service.type": "nats"
     },
@@ -304,7 +304,7 @@
         "nats.log.client.ip": "172.18.0.1",
         "nats.log.client.port": "38630",
         "nats.log.msg.direction": "incoming",
-        "nats.log.msg.type": "OK",
+        "nats.log.msg.type": "acknowledge",
         "process.pid": "1",
         "service.type": "nats"
     }
