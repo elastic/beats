@@ -48,7 +48,7 @@ type DatTests struct {
 }
 
 type DatTest struct {
-	Files  []string `yaml:files`
+	Files  []string `yaml:"files"`
 	Fields []string `yaml:"custom_fields"`
 }
 
