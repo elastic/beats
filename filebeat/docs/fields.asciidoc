@@ -11807,7 +11807,7 @@ Query statement.
 *`postgresql.log.timezone`*::
 +
 --
-type: alias
+type: array
 
 alias to: event.timezone
 
