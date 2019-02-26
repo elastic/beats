@@ -25,8 +25,8 @@
     },
     {
       "set": {
-        "field": "ctx.event.id",
-        "value": "{{ctx.zeek.session_id}}",
+        "field": "event.id",
+        "value": "{{zeek.session_id}}",
         "if": "ctx.zeek.session_id != null"
       }
     },
