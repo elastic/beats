@@ -31,6 +31,20 @@
       }
     },
     {
+      "script": {
+        "lang": "painless",
+        "source": "if (ctx.zeek.connection.local_orig) ctx.tags.add(\"local_orig\");",
+        "if": "ctx.zeek.connection.local_orig != null"
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "if (ctx.zeek.connection.local_resp) ctx.tags.add(\"local_resp\");",
+        "if": "ctx.zeek.connection.local_resp != null"
+      }
+    },
+    {
       "set": {
         "field": "source.ip",
         "value": "{{source.address}}"

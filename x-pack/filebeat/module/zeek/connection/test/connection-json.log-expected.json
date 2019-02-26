@@ -24,7 +24,9 @@
         "source.packets": 1,
         "source.port": 38339,
         "tags": [
-            "zeek.connection"
+            "zeek.connection",
+            "local_orig",
+            "local_resp"
         ],
         "zeek.connection.history": "Dd",
         "zeek.connection.local_orig": true,
