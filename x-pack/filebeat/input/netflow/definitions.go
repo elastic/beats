@@ -187,11 +187,9 @@ func loadFields(def map[interface{}]interface{}, pem uint32, dest fields.FieldDi
 	return nil
 }
 
-var emptyDefinitionErr = errors.New("custom fields definition is empty")
-
 func fieldsAreIPFIX(tree map[interface{}]interface{}) (bool, error) {
 	if len(tree) == 0 {
-		return false, emptyDefinitionErr
+		return false, errors.New("custom fields definition is empty")
 	}
 	var seenList, seenMap bool
 	for key, value := range tree {
