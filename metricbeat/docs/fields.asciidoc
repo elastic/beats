@@ -1086,6 +1086,7 @@ The state of the instance (pending | running | shutting-down | terminated | stop
 --
 
 [float]
+<<<<<<< HEAD
 == s3_request fields
 
 `s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
@@ -1093,6 +1094,15 @@ The state of the instance (pending | running | shutting-down | terminated | stop
 
 
 *`aws.s3_request.bucket.name`*::
+=======
+== s3_daily_storage fields
+
+`s3_daily_storage` contains the daily storage metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
+
+
+
+*`aws.s3_daily_storage.bucket.name`*::
+>>>>>>> fix fields.yml formatting
 +
 --
 type: keyword
@@ -1102,6 +1112,7 @@ Name of a S3 bucket.
 
 --
 
+<<<<<<< HEAD
 *`aws.s3_request.requests.total`*::
 +
 --
@@ -1173,10 +1184,6 @@ The number of Amazon S3 SELECT Object Content requests made for objects in an Am
 --
 
 *`aws.s3_request.requests.select.scanned.bytes`*::
-+
---
-type: scaled_float
-
 The number of bytes of data scanned with Amazon S3 SELECT Object Content requests in an Amazon S3 bucket.
 
 
@@ -1252,12 +1259,11 @@ The per-request time from the complete request being received by an Amazon S3 bu
 
 --
 
-*`aws.s3_request.latency.total_request.ms`*::
+*`aws.s3_daily_storage.number_of_object`*::
 +
 --
 type: long
-
-The elapsed per-request time from the first byte received to the last byte sent to an Amazon S3 bucket.
+The total number of objects stored in a bucket for all storage classes.
 
 
 --
