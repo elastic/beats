@@ -4,29 +4,28 @@
     {
       "script": {
         "lang": "painless",
-        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['notice']['ts'] * params.multiplier; ctx.zeek.notice.remove('ts');",
-        "params": {
-          "multiplier": 1000
-        }
+        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['notice']['ts'] * 1000; ctx.zeek.notice.remove('ts');"
       }
     },
     {
       "script": {
         "lang": "painless",
-        "source": "if (ctx['destination'] != null && ctx['destination']['address'] != null) { ctx.destination.ip = ctx['destination']['address']; }"
+        "source": "ctx.destination.ip = ctx['destination']['address'];",
+        "if": "ctx.destination?.address != null"
       }
     },
     {
       "script": {
         "lang": "painless",
-        "source": "if (ctx['source'] != null && ctx['source']['address'] != null) { ctx.source.ip = ctx['source']['address']; }"
+        "source": "ctx.source.ip = ctx['source']['address'];",
+        "if": "ctx.source?.address != null"
       }
     },
     {
       "script": {
         "lang": "painless",
-        "source": "ctx.event.id = ctx.zeek.session_id + \"-notice\";",
-        "ignore_failure": true
+        "source": "ctx.event.id = ctx['zeek']['session_id'];",
+        "if": "ctx.zeek.session_id != null"
       }
     },
     {

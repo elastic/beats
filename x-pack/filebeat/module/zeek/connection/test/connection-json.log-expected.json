@@ -9,7 +9,7 @@
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "zeek.connection",
         "event.duration": 0.0,
-        "event.id": "CAcJw21BbVedgFnYH3-connection",
+        "event.id": "CAcJw21BbVedgFnYH3",
         "event.module": "zeek",
         "fileset.name": "connection",
         "input.type": "log",

@@ -10,7 +10,7 @@
         "destination.port": 80,
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "zeek.http",
-        "event.id": "CCNp8v1SNzY7v9d1Ih-http",
+        "event.id": "CCNp8v1SNzY7v9d1Ih",
         "event.module": "zeek",
         "fileset.name": "http",
         "http.request.body.bytes": 0,
