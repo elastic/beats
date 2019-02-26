@@ -36,6 +36,13 @@
             }
         },
         {
+            "split": {
+                "field": "nginx.access.origin",
+                "separator": "\"?,?\\s+",
+                "ignore_missing": true
+            }
+        },
+        {
             "set": {
                 "field": "source.ip",
                 "value": ""
