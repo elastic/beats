@@ -136,7 +136,7 @@ class Test(metricbeat.BaseTest):
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_network_fields(self):
         """
-        test info fields
+        test network fields
         """
         self.render_config_template(modules=[{
             "name": "docker",
