@@ -6,11 +6,15 @@ package netflow
 
 import (
 	"fmt"
+	"io/ioutil"
 	"math"
+	"os"
 	"strconv"
 
-	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/fields"
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
+
+	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/fields"
 )
 
 var logstashName2Decoder = map[string]fields.Decoder{
@@ -43,7 +47,8 @@ var logstashName2Decoder = map[string]fields.Decoder{
 	"forwarding_status":       fields.UnsupportedDecoder{},
 }
 
-// LoadFieldDefinitions ...
+// LoadFieldDefinitions takes a parsed YAML tree from a Logstash
+// Netflow or IPFIX custom fields format and converts it to a FieldDict.
 func LoadFieldDefinitions(yaml interface{}) (defs fields.FieldDict, err error) {
 	tree, ok := yaml.(map[interface{}]interface{})
 	if !ok {
@@ -80,6 +85,25 @@ func LoadFieldDefinitions(yaml interface{}) (defs fields.FieldDict, err error) {
 		}
 	}
 	return defs, nil
+}
+
+// LoadFieldDefinitionsFromFile takes the path to a YAML file in Logstash
+// Netflow or IPFIX custom fields format and converts it to a FieldDict.
+func LoadFieldDefinitionsFromFile(path string) (defs fields.FieldDict, err error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	contents, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+	var tree interface{}
+	if err := yaml.Unmarshal(contents, &tree); err != nil {
+		return nil, errors.Wrap(err, "unable to parse YAML")
+	}
+	return LoadFieldDefinitions(tree)
 }
 
 func fits(value, min, max int64) bool {

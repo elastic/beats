@@ -29,6 +29,8 @@ Example configuration:
   protocols: [ v5, v9, ipfix ]
   expiration_timeout: 30m
   queue_size: 8192
+  custom_definitions:
+  - path/to/fields.yml
 ----
 
 
@@ -63,5 +65,17 @@ of traffic.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
+[float]
+[[custom_definitions]]
+==== `custom_definitions`
+
+A list of paths of field definitions YAML files. The supported format is
+the same used by Logstash's NetFlow codec.
+
+See https://github.com/logstash-plugins/logstash-codec-netflow/blob/master/lib/logstash/codecs/netflow/ipfix.yaml[Sample IPFIX fields]
+and https://github.com/logstash-plugins/logstash-codec-netflow/blob/master/lib/logstash/codecs/netflow/netflow.yaml[Sample NetFlow fields.]
+
+
 
 :type!:

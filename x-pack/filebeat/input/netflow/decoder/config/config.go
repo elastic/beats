@@ -67,14 +67,16 @@ func (c *Config) WithSequenceResetEnabled(enabled bool) *Config {
 // WithCustomFields extends the NetFlow V9/IPFIX supported fields with
 // custom ones. This method can be chained multiple times adding fields
 // from different sources.
-func (c *Config) WithCustomFields(first fields.FieldDict, rest ...fields.FieldDict) *Config {
+func (c *Config) WithCustomFields(dicts ...fields.FieldDict) *Config {
+	if len(dicts) == 0 {
+		return c
+	}
 	if c.fields == nil {
 		c.fields = fields.FieldDict{}
 		c.fields.Merge(fields.GlobalFields)
 	}
-	c.fields.Merge(first)
-	for _, next := range rest {
-		c.fields.Merge(next)
+	for _, dict := range dicts {
+		c.fields.Merge(dict)
 	}
 	return c
 }
