@@ -174,8 +174,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-02-23T01:54:58.557Z",
-      "version": "WzE5MjksNF0="
+      "updated_at": "2019-02-23T05:05:18.205Z",
+      "version": "WzMxMTYsNF0="
     },
     {
       "attributes": {
@@ -190,7 +190,7 @@
             }
           }
         },
-        "title": "Destination Geo [SIEM Zeek]",
+        "title": "Destination Geo [Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -253,7 +253,7 @@
               }
             }
           },
-          "title": "Destination Geo [SIEM Zeek]",
+          "title": "Destination Geo [Zeek]",
           "type": "tile_map"
         }
       },
@@ -269,8 +269,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-02-23T01:47:19.123Z",
-      "version": "WzE5MjEsNF0="
+      "updated_at": "2019-02-26T00:06:27.634Z",
+      "version": "WzMyNzUsNV0="
     },
     {
       "attributes": {
@@ -285,7 +285,7 @@
             }
           }
         },
-        "title": "Network Transport [SIEM Zeek]",
+        "title": "Network Transport [Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -337,7 +337,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Network Transport [SIEM Zeek]",
+          "title": "Network Transport [Zeek]",
           "type": "pie"
         }
       },
@@ -353,8 +353,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-02-23T01:48:28.840Z",
-      "version": "WzE5MjIsNF0="
+      "updated_at": "2019-02-26T00:07:08.521Z",
+      "version": "WzMyNzgsNV0="
     },
     {
       "attributes": {
@@ -369,7 +369,7 @@
             }
           }
         },
-        "title": "Network Application [SIEM Zeek]",
+        "title": "Network Application [Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -421,7 +421,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Network Application [SIEM Zeek]",
+          "title": "Network Application [Zeek]",
           "type": "pie"
         }
       },
@@ -437,8 +437,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-02-23T01:49:36.725Z",
-      "version": "WzE5MjMsNF0="
+      "updated_at": "2019-02-26T00:06:41.868Z",
+      "version": "WzMyNzYsNV0="
     },
     {
       "attributes": {
@@ -453,7 +453,7 @@
             }
           }
         },
-        "title": "Network Traffic Direction [SIEM Zeek]",
+        "title": "Network Traffic Direction [Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -505,7 +505,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Network Traffic Direction [SIEM Zeek]",
+          "title": "Network Traffic Direction [Zeek]",
           "type": "pie"
         }
       },
@@ -521,8 +521,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-02-23T01:50:27.347Z",
-      "version": "WzE5MjQsNF0="
+      "updated_at": "2019-02-26T00:06:55.885Z",
+      "version": "WzMyNzcsNV0="
     },
     {
       "attributes": {
@@ -537,7 +537,7 @@
             }
           }
         },
-        "title": "Top DNS Domains [SIEM Zeek]",
+        "title": "Top DNS Domains [Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -589,7 +589,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Top DNS Domains [SIEM Zeek]",
+          "title": "Top DNS Domains [Zeek]",
           "type": "pie"
         }
       },
@@ -605,8 +605,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-02-23T01:51:47.223Z",
-      "version": "WzE5MjUsNF0="
+      "updated_at": "2019-02-26T00:07:23.763Z",
+      "version": "WzMyNzksNV0="
     },
     {
       "attributes": {
@@ -621,7 +621,7 @@
             }
           }
         },
-        "title": "Top URL Domains [SIEM Zeek]",
+        "title": "Top URL Domains [Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -688,7 +688,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Top URL Domains [SIEM Zeek]",
+          "title": "Top URL Domains [Zeek]",
           "type": "pie"
         }
       },
@@ -704,8 +704,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-02-23T01:52:58.606Z",
-      "version": "WzE5MjYsNF0="
+      "updated_at": "2019-02-26T00:07:49.910Z",
+      "version": "WzMyODEsNV0="
     },
     {
       "attributes": {
@@ -720,7 +720,7 @@
             }
           }
         },
-        "title": "Top SSL Servers [SIEM Zeek]",
+        "title": "Top SSL Servers [Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -772,7 +772,7 @@
             "legendPosition": "right",
             "type": "pie"
           },
-          "title": "Top SSL Servers [SIEM Zeek]",
+          "title": "Top SSL Servers [Zeek]",
           "type": "pie"
         }
       },
@@ -788,8 +788,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-02-23T01:53:54.810Z",
-      "version": "WzE5MjcsNF0="
+      "updated_at": "2019-02-26T00:07:36.653Z",
+      "version": "WzMyODAsNV0="
     },
     {
       "attributes": {
@@ -803,7 +803,7 @@
             }
           }
         },
-        "title": "Time Series Count [SIEM Zeek]",
+        "title": "Number of Sessions Overtime [Zeek]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -841,7 +841,7 @@
             "time_field": "@timestamp",
             "type": "timeseries"
           },
-          "title": "Time Series Count [SIEM Zeek]",
+          "title": "Number of Sessions Overtime [Zeek]",
           "type": "metrics"
         }
       },
@@ -851,8 +851,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-02-23T01:54:35.921Z",
-      "version": "WzE5MjgsNF0="
+      "updated_at": "2019-02-26T00:05:56.379Z",
+      "version": "WzMyNzQsNV0="
     }
   ],
   "version": "7.0.0-beta1"
