@@ -71,6 +71,10 @@ A list of paths of field definitions YAML files. The supported formats are
 the same used by Logstash's NetFlow codec {logstash-ref}/plugins-codecs-netflow.html#plugins-codecs-netflow-ipfix_definitions[ipfix_definitions]
 and {logstash-ref}/plugins-codecs-netflow.html#plugins-codecs-netflow-netflow_definitions[netflow_definitions].
 
+[WARNING]
+Overriding the names and/or types of standard fields can prevent
+mapping of ECS fields to function correctly.
+
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
