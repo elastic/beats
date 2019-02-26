@@ -100,7 +100,7 @@ load the ingest pipelines manually. To do this, run the `setup` command with
 the `--pipelines` option specified. If you used the
 <<modules-command,`modules`>> command to enable modules in the `modules.d`
 directory, also specify the `--modules` flag. For example, the following command
-loads the ingest pipelines used by all metricsets enabled in the system, nginx,
+loads the ingest pipelines used by all filesets enabled in the system, nginx,
 and mysql modules:
 
 // override modulename attribute so it works with the --modules option
@@ -133,6 +133,10 @@ and mysql modules:
 ----
 PS > .{backslash}{beatname_lc}.exe setup --pipelines --modules {modulename}
 ----
+
+TIP: If you're loading ingest pipelines manually because you want to send events
+to {ls}, also see
+{logstash-ref}/filebeat-modules.html[Working with {beatname_uc} modules].
 
 :has_module_steps!:
 :modulename!:
