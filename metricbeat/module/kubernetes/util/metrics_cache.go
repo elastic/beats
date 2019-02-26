@@ -18,6 +18,7 @@
 package util
 
 import (
+	"context"
 	"sync"
 	"time"
 )
@@ -28,22 +29,22 @@ var PerfMetrics = NewPerfMetricsCache()
 const defaultTimeout = 120 * time.Second
 
 var now = time.Now
-var sleep = time.Sleep
+var after = time.After
 
 // NewPerfMetricsCache initializes and returns a new PerfMetricsCache
 func NewPerfMetricsCache() *PerfMetricsCache {
+	ctx := context.TODO()
 	return &PerfMetricsCache{
-		NodeMemAllocatable:   newValueMap(defaultTimeout),
-		NodeCoresAllocatable: newValueMap(defaultTimeout),
+		NodeMemAllocatable:   newValueMap(ctx, defaultTimeout),
+		NodeCoresAllocatable: newValueMap(ctx, defaultTimeout),
 
-		ContainerMemLimit:   newValueMap(defaultTimeout),
-		ContainerCoresLimit: newValueMap(defaultTimeout),
+		ContainerMemLimit:   newValueMap(ctx, defaultTimeout),
+		ContainerCoresLimit: newValueMap(ctx, defaultTimeout),
 	}
 }
 
 // PerfMetricsCache stores known metrics from Kubernetes nodes and containers
 type PerfMetricsCache struct {
-	mutex                sync.RWMutex
 	NodeMemAllocatable   *valueMap
 	NodeCoresAllocatable *valueMap
 
@@ -51,23 +52,28 @@ type PerfMetricsCache struct {
 	ContainerCoresLimit *valueMap
 }
 
-func newValueMap(timeout time.Duration) *valueMap {
-	return &valueMap{
-		values:  map[string]value{},
+func newValueMap(ctx context.Context, timeout time.Duration) *valueMap {
+	m := &valueMap{
+		values:  map[string]*value{},
 		timeout: timeout,
 	}
+	m.startWorkers(ctx)
+	return m
 }
 
 type valueMap struct {
-	sync.RWMutex
-	running bool
+	sync.Mutex
 	timeout time.Duration
-	values  map[string]value
+	values  map[string]*value
 }
 
 type value struct {
 	value   float64
 	expires int64
+}
+
+func (v *value) renew(timeout time.Duration) {
+	v.expires = now().Add(timeout).Unix()
 }
 
 // ContainerUID creates an unique ID for from namespace, pod name and container name
@@ -77,17 +83,20 @@ func ContainerUID(namespace, pod, container string) string {
 
 // Get value
 func (m *valueMap) Get(name string) float64 {
-	m.RLock()
-	defer m.RUnlock()
-	return m.values[name].value
+	return m.getWithDefault(name, 0)
 }
 
 // Get value
 func (m *valueMap) GetWithDefault(name string, def float64) float64 {
-	m.RLock()
-	defer m.RUnlock()
+	return m.getWithDefault(name, def)
+}
+
+func (m *valueMap) getWithDefault(name string, def float64) float64 {
+	m.Lock()
+	defer m.Unlock()
 	val, ok := m.values[name]
 	if ok {
+		val.renew(m.timeout)
 		return val.value
 	}
 	return def
@@ -97,26 +106,27 @@ func (m *valueMap) GetWithDefault(name string, def float64) float64 {
 func (m *valueMap) Set(name string, val float64) {
 	m.Lock()
 	defer m.Unlock()
-	m.ensureCleanupWorker()
-	m.values[name] = value{val, now().Add(m.timeout).Unix()}
+	v := &value{value: val}
+	v.renew(m.timeout)
+	m.values[name] = v
 }
 
-func (m *valueMap) ensureCleanupWorker() {
-	if !m.running {
-		// Run worker to cleanup expired entries
-		m.running = true
-		go func() {
-			for {
-				sleep(m.timeout)
-				m.Lock()
-				now := now().Unix()
-				for name, val := range m.values {
-					if now > val.expires {
-						delete(m.values, name)
-					}
-				}
-				m.Unlock()
+func (m *valueMap) startWorkers(ctx context.Context) {
+	go func() {
+		for {
+			var now time.Time
+			select {
+			case now = <-after(m.timeout):
+			case <-ctx.Done():
+				return
 			}
-		}()
-	}
+			m.Lock()
+			for name, val := range m.values {
+				if now.Unix() > val.expires {
+					delete(m.values, name)
+				}
+			}
+			m.Unlock()
+		}
+	}()
 }

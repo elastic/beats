@@ -18,6 +18,7 @@
 package util
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -26,40 +27,52 @@ import (
 
 func TestTimeout(t *testing.T) {
 	// Mock monotonic time:
-	fakeTimeCh := make(chan int64)
+	fakeTimeCh := make(chan time.Time)
+	fakeTime := time.Now()
 	go func() {
-		fakeTime := time.Now().Unix()
 		for {
-			fakeTime++
+			fakeTime = fakeTime.Add(1 * time.Millisecond)
 			fakeTimeCh <- fakeTime
 		}
 	}()
 
 	now = func() time.Time {
-		return time.Unix(<-fakeTimeCh, 0)
+		return <-fakeTimeCh
 	}
 
-	// Blocking sleep:
-	sleepCh := make(chan struct{})
-	sleep = func(time.Duration) {
-		<-sleepCh
+	// Blocking after:
+	afterCh := make(chan time.Time)
+	after = func(time.Duration) <-chan time.Time {
+		return afterCh
 	}
 
-	test := newValueMap(1 * time.Second)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	test := newValueMap(ctx, defaultTimeout)
 
 	test.Set("foo", 3.14)
 
+	// Check it is not removed if it is being read
+	for i := 0; i < 20; i++ {
+		fakeTime = fakeTime.Add(10 * time.Second)
+		afterCh <- fakeTime
+		assert.Equal(t, 3.14, test.Get("foo"))
+	}
+
 	// Let cleanup do its job
-	sleepCh <- struct{}{}
-	sleepCh <- struct{}{}
-	sleepCh <- struct{}{}
+	for i := 0; i < 3; i++ {
+		fakeTime = fakeTime.Add(defaultTimeout)
+		afterCh <- fakeTime
+	}
 
 	// Check it expired
 	assert.Equal(t, 0.0, test.Get("foo"))
 }
 
 func TestValueMap(t *testing.T) {
-	test := newValueMap(defaultTimeout)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	test := newValueMap(ctx, defaultTimeout)
 
 	// no value
 	assert.Equal(t, 0.0, test.Get("foo"))
@@ -70,7 +83,9 @@ func TestValueMap(t *testing.T) {
 }
 
 func TestGetWithDefault(t *testing.T) {
-	test := newValueMap(defaultTimeout)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	test := newValueMap(ctx, defaultTimeout)
 
 	// Empty + default
 	assert.Equal(t, 0.0, test.Get("foo"))
