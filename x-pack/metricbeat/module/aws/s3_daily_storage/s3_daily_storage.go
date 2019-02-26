@@ -85,7 +85,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	// Get startTime and endTime
 	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
 	if err != nil {
-		logp.Error(errors.Wrap(err, "Error ParseDuration"))
+		err = errors.Wrap(err, "Error ParseDuration")
 		m.logger.Error(err.Error())
 		report.Error(err)
 		return
@@ -97,6 +97,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
 		listMetricsOutputs, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
 		if err != nil {
+			err = errors.Wrap(err, "GetListMetricsOutput failed, skipping region "+regionName)
 			m.logger.Error(err.Error())
 			report.Error(err)
 			continue
@@ -111,7 +112,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		metricDataOutputs, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
 		if err != nil {
 			err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName)
-			m.logger.Error(err.Error())
+			m.logger.Error(err)
 			report.Error(err)
 			continue
 		}
@@ -121,7 +122,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		for _, bucketName := range bucketNames {
 			event, err := createCloudWatchEvents(metricDataOutputs, regionName, bucketName)
 			if err != nil {
-				m.logger.Error(err.Error())
+				err = errors.Wrap(err, "createCloudWatchEvents failed")
+				m.logger.Error(err)
 				event.Error = err
 				report.Event(event)
 				continue
@@ -203,7 +205,7 @@ func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName st
 	mapOfMetricSetFieldResults := make(map[string]interface{})
 	for _, output := range outputs {
 		labels := strings.Split(*output.Label, " ")
-		if labels[0] == bucketName {
+		if len(labels) == 3 && labels[0] == bucketName && len(output.Values) >= 1 {
 			mapOfMetricSetFieldResults[labels[2]] = fmt.Sprint(output.Values[0])
 		}
 	}
