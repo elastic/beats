@@ -53,6 +53,20 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 *Filebeat*
 
+- Add `convert_timezone` option to Elasticsearch module to convert dates to UTC. {issue}9756[9756] {pull}9761[9761]
+- Support IPv6 addresses with zone id in IIS ingest pipeline.
+  {issue}9836[9836] error log: {pull}9869[9869], access log: {pull}9955[9955].
+- Support haproxy log lines without captured headers. {issue}9463[9463] {pull}9958[9958]
+- Make elasticsearch/audit fileset be more lenient in parsing node name. {issue}10035[10035] {pull}10135[10135]
+- Fix bad bytes count in `docker` input when filtering by stream. {pull}10211[10211]
+- Fixed data types for roles and indices fields in `elasticsearch/audit` fileset {pull}10307[10307]
+- Ensure `source.address` is always populated by the nginx module (ECS). {pull}10418[10418]
+- Add support for Cisco syslog format used by their switch. {pull}10760[10760]
+- Cover empty request data, url and version in Apache2 module{pull}10730[10730]
+- Fix registry entries not being cleaned due to race conditions. {pull}10747[10747]
+- Improve detection of file deletion on Windows. {pull}10747[10747]
+- Fix errors in filebeat Zeek dashboard and README files. Add notice.log support. {pull}10916[10916]
+
 *Heartbeat*
 
 *Journalbeat*
