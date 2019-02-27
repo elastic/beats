@@ -30,6 +30,7 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/add_kubernetes_metadata"
 	_ "github.com/elastic/beats/libbeat/processors/add_locale"
 	_ "github.com/elastic/beats/libbeat/processors/add_process_metadata"
+	_ "github.com/elastic/beats/libbeat/processors/communityid"
 	_ "github.com/elastic/beats/libbeat/processors/dissect"
 	_ "github.com/elastic/beats/libbeat/processors/dns"
 	_ "github.com/elastic/beats/libbeat/publisher/includes" // Register publisher pipeline modules

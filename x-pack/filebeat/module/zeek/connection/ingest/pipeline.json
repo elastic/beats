@@ -4,27 +4,44 @@
     {
       "script": {
         "lang": "painless",
-        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['connection']['ts'] * params.multiplier; ctx.zeek.connection.remove('ts');",
-        "params": {
-          "multiplier": 1000
-        }
+        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['connection']['ts'] * 1000; ctx.zeek.connection.remove('ts');"
       }
     },
     {
       "script": {
         "lang": "painless",
-        "source": "ctx.event.duration = (long)ctx.event.duration * params.multiplier",
+        "source": "ctx.event.duration = (long)ctx.temp.duration * params.scale",
         "params": {
-          "multiplier": 1000000000
+          "scale": 1000000000
         },
-        "ignore_failure": true
+        "if": "ctx.temp?.duration != null"
+      }
+    },
+    {
+      "remove": {
+        "field": "temp.duration",
+        "ignore_missing": true
+      }
+    },
+    {
+      "set": {
+        "field": "event.id",
+        "value": "{{zeek.session_id}}",
+        "if": "ctx.zeek.session_id != null"
       }
     },
     {
       "script": {
         "lang": "painless",
-        "source": "ctx.event.id = ctx.zeek.session_id + \"-connection\"",
-        "ignore_failure": true
+        "source": "if (ctx.zeek.connection.local_orig) ctx.tags.add(\"local_orig\");",
+        "if": "ctx.zeek.connection.local_orig != null"
+      }
+    },
+    {
+      "script": {
+        "lang": "painless",
+        "source": "if (ctx.zeek.connection.local_resp) ctx.tags.add(\"local_resp\");",
+        "if": "ctx.zeek.connection.local_resp != null"
       }
     },
     {

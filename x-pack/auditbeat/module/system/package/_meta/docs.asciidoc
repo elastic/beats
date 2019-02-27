@@ -1,6 +1,6 @@
 [role="xpack"]
 
-experimental[]
+beta[]
 
 This is the `package` dataset of the system module.
 

@@ -48,6 +48,11 @@ func TestReadPassword(t *testing.T) {
 			input: "",
 			error: true,
 		},
+		{
+			name:  "Test env variable that does not exist",
+			input: "env:DO_NOT_EXIST",
+			error: true,
+		},
 	}
 
 	for _, test := range tests {
