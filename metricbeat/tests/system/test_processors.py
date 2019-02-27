@@ -3,6 +3,8 @@ import sys
 import metricbeat
 import unittest
 
+from metricbeat import COMMON_FIELDS
+
 
 @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
 class Test(metricbeat.BaseTest):
@@ -33,10 +35,9 @@ class Test(metricbeat.BaseTest):
 
         print(evt)
         print(evt.keys())
-        self.assertItemsEqual(self.de_dot([
-            'agent', '@timestamp', 'system', 'metricset.module',
-            'metricset.rtt', 'metricset.name', 'host', 'service', 'ecs', 'event'
-        ]), evt.keys())
+        self.assertItemsEqual(self.de_dot(
+            COMMON_FIELDS + ["system"]
+        ), evt.keys())
         cpu = evt["system"]["cpu"]
         print(cpu.keys())
         self.assertItemsEqual(self.de_dot([
