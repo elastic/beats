@@ -17,5 +17,5 @@ metricbeat.autodiscover:
 -------------------------------------------------------------------------------------
 
 This configuration launches a `redis` module for all containers running an image with `redis` in the name.
-`labels.dedot` is default to be `true` for docker autodiscover, which means dots in docker labels are replaced with '_' by default.
+`labels.dedot` defaults to be `true` for docker autodiscover, which means dots in docker labels are replaced with '_' by default.
 
