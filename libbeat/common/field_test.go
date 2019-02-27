@@ -43,12 +43,12 @@ func TestFieldsHasNode(t *testing.T) {
 			fields:  Fields{Field{Name: "a"}},
 			hasNode: false,
 		},
-		"node not in fields": {
+		"key not in fields, but node in fields": {
 			node: "a.b.c",
 			fields: Fields{
 				Field{Name: "a", Fields: Fields{Field{Name: "b"}}},
 			},
-			hasNode: false,
+			hasNode: true,
 		},
 		"last node in fields": {
 			node: "a.b.c",
@@ -387,6 +387,22 @@ func TestFieldConcat(t *testing.T) {
 				{Name: "a", Fields: Fields{{Name: "c"}}},
 			},
 		},
+		"deep nested with common prefix": {
+			a: Fields{{
+				Name:   "a",
+				Fields: Fields{{Name: "b"}},
+			}},
+			b: Fields{{
+				Name: "a",
+				Fields: Fields{{Name: "c", Fields: Fields{
+					{Name: "d"},
+				}}},
+			}},
+			want: Fields{
+				{Name: "a", Fields: Fields{{Name: "b"}}},
+				{Name: "a", Fields: Fields{{Name: "c", Fields: Fields{{Name: "d"}}}}},
+			},
+		},
 		"nested duplicates fail": {
 			fail: true,
 			a: Fields{{
@@ -405,6 +421,17 @@ func TestFieldConcat(t *testing.T) {
 				Name:   "a",
 				Fields: Fields{{Name: "b"}},
 			}},
+		},
+		"a is object and prefix of b": {
+			a: Fields{{Name: "a", Type: "object"}},
+			b: Fields{{
+				Name:   "a",
+				Fields: Fields{{Name: "b"}},
+			}},
+			want: Fields{
+				{Name: "a", Type: "object"},
+				{Name: "a", Fields: Fields{{Name: "b"}}},
+			},
 		},
 		"b is prefix of a": {
 			fail: true,

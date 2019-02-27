@@ -197,7 +197,7 @@ func (f Fields) hasNode(keys []string) bool {
 
 			// It's the last field to compare
 			if len(field.Fields) == 0 {
-				return false
+				return true
 			}
 
 			return field.Fields.hasNode(keys)
@@ -292,6 +292,46 @@ func (f Fields) getKeys(namespace string) []string {
 	return keys
 }
 
+// canConcat checks if inside fields the given node can be concatenated.
+// If the node already exists, this is only allowed for nodes of type object.
+func (f Fields) CanConcat(key string) bool {
+	keys := strings.Split(key, ".")
+	return f.canConcat(keys)
+}
+
+func (f Fields) canConcat(keys []string) bool {
+
+	// Nothing to compare, so does not contain it
+	if len(keys) == 0 {
+		return true
+	}
+
+	key := keys[0]
+	keys = keys[1:]
+
+	for _, field := range f {
+
+		if field.Name == key {
+
+			//// It's the last key to compare
+			if len(keys) == 0 {
+				return false
+			}
+
+			// It's the last field to compare, check if it is of type object
+			if len(field.Fields) == 0 {
+				if field.Type == "object" {
+					return true
+				}
+				return false
+			}
+
+			return field.Fields.canConcat(keys)
+		}
+	}
+	return true
+}
+
 // ConcatFields concatenates two Fields lists into a new list.
 // The operation fails if the input definitions define the same keys.
 func ConcatFields(a, b Fields) (Fields, error) {
@@ -304,7 +344,7 @@ func ConcatFields(a, b Fields) (Fields, error) {
 
 	// check for duplicates
 	for _, k := range b.GetKeys() {
-		if a.HasNode(k) {
+		if !a.CanConcat(k) {
 			return nil, fmt.Errorf("concat fails because key '%s' exists is duplicated", k)
 		}
 	}
