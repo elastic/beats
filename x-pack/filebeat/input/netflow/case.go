@@ -62,17 +62,17 @@ func CamelCaseToSnakeCase(in string) string {
 
 	out := make([]rune, 0, len(in)+4)
 	runes := []rune(in)
-	upperStrike := 1
+	upperCount := 1
 	for _, r := range runes {
 		lr := unicode.ToLower(r)
 		isUpper := lr != r
 		if isUpper {
-			if upperStrike == 0 {
+			if upperCount == 0 {
 				out = append(out, '_')
 			}
-			upperStrike++
+			upperCount++
 		} else {
-			if upperStrike > 2 {
+			if upperCount > 2 {
 				// Some magic here:
 				// NetFlow usually lowercases all but the first letter of an
 				// acronym (Icmp) Except when it is 2 characters long: (IP).
@@ -85,7 +85,7 @@ func CamelCaseToSnakeCase(in string) string {
 				n := len(out) - 1
 				out[n], out[n-1] = out[n-1], out[n]
 			}
-			upperStrike = 0
+			upperCount = 0
 		}
 		out = append(out, lr)
 	}
