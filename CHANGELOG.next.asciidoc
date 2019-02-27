@@ -46,6 +46,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Set `ecs: true` in user_agent processors when loading pipelines with Filebeat 7.0.x into Elasticsearch 6.7.x. {issue}10655[10655] {pull}10875[10875]
+
 *Heartbeat*
 
 - Remove monitor generator script that was rarely used. {pull}9648[9648]
@@ -90,6 +92,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update rabbitmq.* fields to map to ECS. {pull}10563[10563]
 - Update haproxy.* fields to map to ECS. {pull}10558[10558] {pull}10568[10568]
 - Collect all EC2 meta data from all instances in all states. {pull}10628[10628]
+- Migrate docker module to ECS. {pull}10927[10927]
 
 *Packetbeat*
 
@@ -147,6 +150,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Cover empty request data, url and version in Apache2 module{pull}10730[10730]
 - Fix registry entries not being cleaned due to race conditions. {pull}10747[10747]
 - Improve detection of file deletion on Windows. {pull}10747[10747]
+- Fix errors in filebeat Zeek dashboard and README files. Add notice.log support. {pull}10916[10916]
 
 *Heartbeat*
 
@@ -168,6 +172,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed data types for various hosts fields in `mongodb/replstatus` metricset {pull}10307[10307]
 - Added function to close sql database connection. {pull}10355[10355]
 - Fix issue with `elasticsearch/node_stats` metricset (x-pack) not indexing `source_node` field. {pull}10639[10639]
+- Migrate docker autodiscover to ECS. {issue}10757[10757] {pull}10862[10862]
 
 *Packetbeat*
 
@@ -205,6 +210,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Calls to Elasticsearch X-Pack APIs made by Beats won't cause deprecation logs in Elasticsearch logs. {9656}9656[9656]
 - Add `network` condition to processors for matching IP addresses against CIDRs. {pull}10743[10743]
 - Add if/then/else support to processors. {pull}10744[10744]
+- Add `community_id` processor for computing network flow hashes. {pull}10745[10745]
+
 
 *Auditbeat*
 
@@ -243,6 +250,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Populate more ECS fields in the Suricata module. {pull}10006[10006]
 - Add ISO8601 timestamp support in syslog metricset. {issue}8716[8716] {pull}10736[10736]
 - Add more info to message logged when a duplicated symlink file is found {pull}10845[10845]
+- Add option to configure docker input with paths {pull}10687[10687]
+- Add Netflow module to enrich flow events with geoip data. {pull}10877[10877]
+- Set `event.category: network_traffic` for Suricata. {pull}10882[10882]
+- Add configuration knob for auto-discover hints to control whether log harvesting is enabled for the pod/container. {issue}10811[10811] {pull}10911[10911]
+- Change Suricata module pipeline to handle `destination.domain` being set if a reverse DNS processor is used. {issue}10510[10510]
 
 *Heartbeat*
 
@@ -297,6 +309,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add overview dashboard to Zookeeper Metricbeat module {pull}10379[10379]
 - Add Consul Metricbeat module with Agent Metricset {pull}8631[8631]
 - Add filters and pie chart for AWS EC2 dashboard. {pull}10596[10596]
+- Add AWS SQS metricset. {pull}10684[10684] {issue}10053[10053]
 
 *Packetbeat*
 

@@ -9,7 +9,7 @@ var:
     os.darwin:
       - /usr/local/var/logs/current/dns.log
   - name: tags
-    default: [zeek]
+    default: [zeek.dns]
 
 ingest_pipeline: ingest/pipeline.json
 input: config/dns.yml
