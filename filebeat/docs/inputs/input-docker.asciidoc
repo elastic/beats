@@ -42,6 +42,24 @@ The list of Docker container IDs to read logs from. Specify
 The base path where Docker logs are located. The default
 is `/var/lib/docker/containers`.
 
+===== `containers.paths`
+
+The list of paths to read logs from. This can be used as an alternative to
+`containers.ids` for other runtimes that use the same logging format as docker
+but place their logs in different paths. For example when using CRI-O runtime in
+Kubernetes the following configuration can be used:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: docker
+  containers.paths:
+    - /var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log
+----
+
+When `containers.paths` is used, `containers.path` is ignored.
+
+
 ===== `containers.stream`
 
 Reads from the specified streams only: `all`, `stdout` or `stderr`. The default
