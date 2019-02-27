@@ -51,6 +51,7 @@ metricbeat.modules:
   default_region: '${AWS_REGION:us-west-1}'
 ----
 
+=== ec2 metricset
 By default, Amazon EC2 sends metric data to CloudWatch every 5 minutes. With this basic monitoring, `period` in aws module
 configuration should be larger or equal than `300s`. If `period` is set to be less than `300s`, the same cloudwatch metrics
 will be collected more than once which will cause extra fees without getting more granular metrics. For example, in `US East (N. Virginia)` region, it costs
@@ -63,12 +64,20 @@ larger than `60s`. Since AWS sends metric data to CloudWatch in 1-minute periods
 than `60s` will cause extra API requests which means extra charges on AWS. To avoid unnecessary charges, `period` is
 preferred to be set to `60s` or multiples of `60s`, such as `120s` and `180s`.
 
-Since cloudWatch metrics for Amazon SQS queues are automatically collected and pushed to CloudWatch every 5 minutes,
-`period` for `sqs` is recommended to set to `300s` or multiples of `300s`.
-
-The AWS module comes with a predefined dashboard. For example:
+The ec2 metricset comes with a predefined dashboard. For example:
 
 image::./images/metricbeat-aws-ec2-overview.png[]
+
+=== sqs metricset
+Cloudwatch metrics for Amazon SQS queues are automatically collected and pushed to CloudWatch every 5 minutes,
+the `period` for `sqs` metricset is recommended to be `300s` or multiples of `300s`.
+
+=== s3_request metricset
+Request metrics are available at 1-minute intervals and due to this, the `period` for
+`s3_request` metricset is recommended to set to `60s` or multiples of `60s`. Please see
+https://docs.aws.amazon.com/AmazonS3/latest/user-guide/configure-metrics.html[How to
+Configure Request Metrics for S3] for instructions on how to enable request metrics for
+each S3 bucket.
 
 
 [float]
