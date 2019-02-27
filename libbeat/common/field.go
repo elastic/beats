@@ -197,7 +197,7 @@ func (f Fields) hasNode(keys []string) bool {
 
 			// It's the last field to compare
 			if len(field.Fields) == 0 {
-				return true
+				return false
 			}
 
 			return field.Fields.hasNode(keys)

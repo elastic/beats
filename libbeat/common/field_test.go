@@ -27,6 +27,58 @@ import (
 	"github.com/elastic/go-ucfg/yaml"
 )
 
+func TestFieldsHasNode(t *testing.T) {
+	tests := map[string]struct {
+		node    string
+		fields  Fields
+		hasNode bool
+	}{
+		"empty fields": {
+			node:    "a.b",
+			fields:  Fields{},
+			hasNode: false,
+		},
+		"no node": {
+			node:    "",
+			fields:  Fields{Field{Name: "a"}},
+			hasNode: false,
+		},
+		"node not in fields": {
+			node: "a.b.c",
+			fields: Fields{
+				Field{Name: "a", Fields: Fields{Field{Name: "b"}}},
+			},
+			hasNode: false,
+		},
+		"last node in fields": {
+			node: "a.b.c",
+			fields: Fields{
+				Field{Name: "a", Fields: Fields{
+					Field{Name: "b", Fields: Fields{
+						Field{Name: "c"},
+					}}}},
+			},
+			hasNode: true,
+		},
+		"node in fields": {
+			node: "a.b",
+			fields: Fields{
+				Field{Name: "a", Fields: Fields{
+					Field{Name: "b", Fields: Fields{
+						Field{Name: "c"},
+					}}}},
+			},
+			hasNode: true,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			assert.Equal(t, test.hasNode, test.fields.HasNode(test.node))
+		})
+	}
+}
+
 func TestFieldsHasKey(t *testing.T) {
 	tests := map[string]struct {
 		key    string
