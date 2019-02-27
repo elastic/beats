@@ -1,7 +1,7 @@
-:beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{doc-branch}
+:beatsdevguide: http://www.elastic.co/guide/en/beats/devguide/{branch}
 :dashboards: https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-{stack-version}.zip
 :dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
-:dockerconfig: https://raw.githubusercontent.com/elastic/beats/{doc-branch}/deploy/docker/{beatname_lc}.docker.yml
+:dockerconfig: https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/docker/{beatname_lc}.docker.yml
 :downloads: https://artifacts.elastic.co/downloads/beats
 
 :cm-ui: Central Management
