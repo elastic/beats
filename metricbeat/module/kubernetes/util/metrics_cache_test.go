@@ -26,7 +26,7 @@ import (
 )
 
 type fakeClock struct {
-	sync.RWMutex
+	sync.Mutex
 	time int64
 }
 
