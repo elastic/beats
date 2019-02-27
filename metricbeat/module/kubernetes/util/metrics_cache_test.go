@@ -72,7 +72,6 @@ func TestTimeout(t *testing.T) {
 	fakeTime.advance(int64(defaultTimeout.Seconds()))
 	afterCh <- fakeTime.get()
 	afterCh <- fakeTime.get()
-	afterCh <- fakeTime.get()
 
 	// Check it expired
 	assert.Equal(t, 0.0, test.Get("foo"))
