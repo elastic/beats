@@ -6,19 +6,26 @@
     },
     "aws": {
         "s3_request": {
-            "4xx_errors": 0,
-            "5xx_errors": 0,
-            "all_requests": 1,
             "bucket": {
                 "name": "test-s3-ks"
             },
-            "bytes_downloaded": 1303,
-            "first_byte_latency": 109.8,
-            "head_requests": 1,
-            "list_requests": 1,
-            "select_returned": {},
-            "select_scanned": {},
-            "total_request_latency": 110.13333333333334
+            "downloaded": {
+                "bytes": 5212
+            },
+            "errors": {
+                "4xx": 0,
+                "5xx": 0
+            },
+            "latency": {
+                "first_byte": 2191,
+                "total_request": 2197
+            },
+            "requests": {
+                "head": 13,
+                "list": 4,
+                "total": 17
+            },
+            "uploaded": {}
         }
     },
     "cloud": {

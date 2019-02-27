@@ -16,7 +16,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	config, info := mtest.GetConfigForTest("s3_request", "3600s")
+	config, info := mtest.GetConfigForTest("s3_request", "86400s")
 	if info != "" {
 		t.Skip("Skipping TestFetch: " + info)
 	}
@@ -41,27 +41,27 @@ func TestFetch(t *testing.T) {
 
 		// MetricSetField
 		mtest.CheckEventField("bucket.name", "string", event, t)
-		mtest.CheckEventField("all_requests", "int", event, t)
-		mtest.CheckEventField("get_requests", "int", event, t)
-		mtest.CheckEventField("put_requests", "int", event, t)
-		mtest.CheckEventField("delete_requests", "int", event, t)
-		mtest.CheckEventField("head_requests", "int", event, t)
-		mtest.CheckEventField("post_requests", "int", event, t)
-		mtest.CheckEventField("select_requests", "int", event, t)
-		mtest.CheckEventField("select_scanned.bytes", "float", event, t)
-		mtest.CheckEventField("select_returned.bytes", "float", event, t)
-		mtest.CheckEventField("list_requests", "int", event, t)
-		mtest.CheckEventField("bytes_downloaded", "float", event, t)
-		mtest.CheckEventField("bytes_uploaded", "float", event, t)
-		mtest.CheckEventField("4xx_errors", "int", event, t)
-		mtest.CheckEventField("5xx_errors", "int", event, t)
-		mtest.CheckEventField("first_byte_latency", "float", event, t)
-		mtest.CheckEventField("total_request_latency", "float", event, t)
+		mtest.CheckEventField("requests.total", "int", event, t)
+		mtest.CheckEventField("requests.get", "int", event, t)
+		mtest.CheckEventField("requests.put", "int", event, t)
+		mtest.CheckEventField("requests.delete", "int", event, t)
+		mtest.CheckEventField("requests.head", "int", event, t)
+		mtest.CheckEventField("requests.post", "int", event, t)
+		mtest.CheckEventField("select.requests", "int", event, t)
+		mtest.CheckEventField("select.scanned.bytes", "float", event, t)
+		mtest.CheckEventField("select.returned.bytes", "float", event, t)
+		mtest.CheckEventField("requests.list", "int", event, t)
+		mtest.CheckEventField("downloaded.bytes", "float", event, t)
+		mtest.CheckEventField("uploaded.bytes", "float", event, t)
+		mtest.CheckEventField("errors.4xx", "int", event, t)
+		mtest.CheckEventField("errors.5xx", "int", event, t)
+		mtest.CheckEventField("latency.first_byte", "float", event, t)
+		mtest.CheckEventField("latency.total_request", "float", event, t)
 	}
 }
 
 func TestData(t *testing.T) {
-	config, info := mtest.GetConfigForTest("s3_request", "300s")
+	config, info := mtest.GetConfigForTest("s3_request", "86400s")
 	if info != "" {
 		t.Skip("Skipping TestData: " + info)
 	}

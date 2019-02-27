@@ -158,7 +158,7 @@ metricbeat.modules:
   session_token: '${AWS_SESSION_TOKEN:""}'
   default_region: '${AWS_REGION:us-west-1}'
 - module: aws
-  period: 60s
+  period: 86400s
   metricsets:
     - "s3_request"
   access_key_id: '${AWS_ACCESS_KEY_ID:""}'
