@@ -59,6 +59,8 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 *Metricbeat*
 
+- Migrate docker autodiscover to ECS. {issue}10757[10757] {pull}10862[10862]
+
 *Packetbeat*
 
 - Avoid reporting unknown MongoDB opcodes more than once. {pull}10878[10878]
