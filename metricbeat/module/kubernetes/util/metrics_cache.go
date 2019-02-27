@@ -18,7 +18,6 @@
 package util
 
 import (
-	"context"
 	"sync"
 	"time"
 )
@@ -28,18 +27,14 @@ var PerfMetrics = NewPerfMetricsCache()
 
 const defaultTimeout = 120 * time.Second
 
-var now = time.Now
-var after = time.After
-
 // NewPerfMetricsCache initializes and returns a new PerfMetricsCache
 func NewPerfMetricsCache() *PerfMetricsCache {
-	ctx := context.TODO()
 	return &PerfMetricsCache{
-		NodeMemAllocatable:   newValueMap(ctx, defaultTimeout),
-		NodeCoresAllocatable: newValueMap(ctx, defaultTimeout),
+		NodeMemAllocatable:   newValueMap(defaultTimeout),
+		NodeCoresAllocatable: newValueMap(defaultTimeout),
 
-		ContainerMemLimit:   newValueMap(ctx, defaultTimeout),
-		ContainerCoresLimit: newValueMap(ctx, defaultTimeout),
+		ContainerMemLimit:   newValueMap(defaultTimeout),
+		ContainerCoresLimit: newValueMap(defaultTimeout),
 	}
 }
 
@@ -52,28 +47,49 @@ type PerfMetricsCache struct {
 	ContainerCoresLimit *valueMap
 }
 
-func newValueMap(ctx context.Context, timeout time.Duration) *valueMap {
-	m := &valueMap{
+func newValueMap(timeout time.Duration) *valueMap {
+	return newValueMapWithClock(timeout, clock{})
+}
+
+func newValueMapWithClock(timeout time.Duration, clock clock) *valueMap {
+	m := valueMap{
 		values:  map[string]*value{},
 		timeout: timeout,
+		time:    clock,
 	}
-	m.startWorkers(ctx)
-	return m
+	m.startWorkers()
+	return &m
+}
+
+type clock struct {
+	now   func() time.Time
+	after func(time.Duration) <-chan time.Time
+}
+
+func (c *clock) Now() time.Time {
+	if c.now != nil {
+		return c.now()
+	}
+	return time.Now()
+}
+
+func (c *clock) After(d time.Duration) <-chan time.Time {
+	if c.after != nil {
+		return c.after(d)
+	}
+	return time.After(d)
 }
 
 type valueMap struct {
 	sync.Mutex
 	timeout time.Duration
 	values  map[string]*value
+	time    clock
 }
 
 type value struct {
 	value   float64
 	expires int64
-}
-
-func (v *value) renew(timeout time.Duration) {
-	v.expires = now().Add(timeout).Unix()
 }
 
 // ContainerUID creates an unique ID for from namespace, pod name and container name
@@ -96,7 +112,7 @@ func (m *valueMap) getWithDefault(name string, def float64) float64 {
 	defer m.Unlock()
 	val, ok := m.values[name]
 	if ok {
-		val.renew(m.timeout)
+		m.renew(val)
 		return val.value
 	}
 	return def
@@ -106,20 +122,24 @@ func (m *valueMap) getWithDefault(name string, def float64) float64 {
 func (m *valueMap) Set(name string, val float64) {
 	m.Lock()
 	defer m.Unlock()
-	v := &value{value: val}
-	v.renew(m.timeout)
-	m.values[name] = v
+	v, ok := m.values[name]
+	if ok {
+		v.value = val
+	} else {
+		v = &value{value: val}
+		m.values[name] = v
+	}
+	m.renew(v)
 }
 
-func (m *valueMap) startWorkers(ctx context.Context) {
+func (m *valueMap) renew(v *value) {
+	v.expires = m.time.Now().Add(m.timeout).Unix()
+}
+
+func (m *valueMap) startWorkers() {
 	go func() {
 		for {
-			var now time.Time
-			select {
-			case now = <-after(m.timeout):
-			case <-ctx.Done():
-				return
-			}
+			now := <-m.time.After(m.timeout)
 			m.Lock()
 			for name, val := range m.values {
 				if now.Unix() > val.expires {
