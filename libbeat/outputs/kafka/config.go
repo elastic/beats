@@ -62,6 +62,7 @@ type kafkaConfig struct {
 type metaConfig struct {
 	Retry       metaRetryConfig `config:"retry"`
 	RefreshFreq time.Duration   `config:"refresh_frequency" validate:"min=0"`
+	Full        bool            `config:"full"`
 }
 
 type metaRetryConfig struct {
@@ -90,6 +91,7 @@ func defaultConfig() kafkaConfig {
 				Backoff: 250 * time.Millisecond,
 			},
 			RefreshFreq: 10 * time.Minute,
+			Full:        true,
 		},
 		KeepAlive:        0,
 		MaxMessageBytes:  nil, // use library default
@@ -177,6 +179,7 @@ func newSaramaConfig(config *kafkaConfig) (*sarama.Config, error) {
 	k.Metadata.Retry.Max = config.Metadata.Retry.Max
 	k.Metadata.Retry.Backoff = config.Metadata.Retry.Backoff
 	k.Metadata.RefreshFrequency = config.Metadata.RefreshFreq
+	k.Metadata.Full = config.Metadata.Full
 
 	// configure producer API properties
 	if config.MaxMessageBytes != nil {
