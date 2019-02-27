@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !integration
-
 package state_deployment
 
 import (
@@ -56,24 +54,27 @@ func TestEventMapping(t *testing.T) {
 		"hosts":      []string{server.URL},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-
-	events, err := f.Fetch()
-	assert.NoError(t, err)
+	f := mbtest.NewReportingMetricSetV2(t, config)
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
 
 	assert.Equal(t, 5, len(events), "Wrong number of returned events")
 
 	testCases := testCases()
 	for _, event := range events {
-		name, err := event.GetValue("name")
+		metricsetFields := event.MetricSetFields
+		name, err := metricsetFields.GetValue("name")
 		if err == nil {
-			namespace, err := event.GetValue("_module.namespace")
+			namespace, err := metricsetFields.GetValue("_module.namespace")
 			if err == nil {
 				eventKey := namespace.(string) + "@" + name.(string)
 				oneTestCase, oneTestCaseFound := testCases[eventKey]
 				if oneTestCaseFound {
 					for k, v := range oneTestCase {
-						testValue(eventKey, t, event, k, v)
+						testValue(eventKey, t, metricsetFields, k, v)
 					}
 					delete(testCases, eventKey)
 				}
