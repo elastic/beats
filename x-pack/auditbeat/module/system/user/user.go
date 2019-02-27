@@ -201,7 +201,7 @@ type MetricSet struct {
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The %v/%v dataset is experimental", moduleName, metricsetName)
+	cfgwarn.Beta("The %v/%v dataset is beta", moduleName, metricsetName)
 	if runtime.GOOS != "linux" {
 		return nil, fmt.Errorf("the %v/%v dataset is only supported on Linux", moduleName, metricsetName)
 	}

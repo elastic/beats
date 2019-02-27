@@ -1,6 +1,6 @@
 [role="xpack"]
 
-experimental[]
+beta[]
 
 This is the `login` dataset of the system module.
 

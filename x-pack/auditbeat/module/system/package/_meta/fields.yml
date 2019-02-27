@@ -2,7 +2,7 @@
   type: group
   description: >
     `package` contains information about an installed or removed package.
-  release: experimental
+  release: beta
   fields:
   - name: entity_id
     type: keyword

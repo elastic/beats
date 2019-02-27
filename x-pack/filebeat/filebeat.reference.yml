@@ -257,7 +257,7 @@ filebeat.modules:
 
   # Slow logs
   #slowlog:
-   #enabled: true
+    #enabled: true
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
@@ -311,6 +311,14 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+#------------------------------- NetFlow Module -------------------------------
+- module: netflow
+  log:
+    enabled: true
+    var:
+      netflow_host: localhost
+      netflow_port: 2055
 
 #-------------------------------- Nginx Module --------------------------------
 #- module: nginx
@@ -436,6 +444,8 @@ filebeat.modules:
   files:
     enabled: true
   ssl:
+    enabled: true
+  notice:
     enabled: true
 
     # Set custom paths for the log files. If left empty,
