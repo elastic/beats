@@ -1242,7 +1242,7 @@ The number of HTTP 5xx server error status code requests made to an Amazon S3 bu
 
 --
 
-*`aws.s3_request.latency.first_byte`*::
+*`aws.s3_request.latency.first_byte.ms`*::
 +
 --
 type: long
@@ -1252,7 +1252,7 @@ The per-request time from the complete request being received by an Amazon S3 bu
 
 --
 
-*`aws.s3_request.latency.total_request`*::
+*`aws.s3_request.latency.total_request.ms`*::
 +
 --
 type: long

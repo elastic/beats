@@ -64,11 +64,11 @@
       type: long
       description: >
         The number of HTTP 5xx server error status code requests made to an Amazon S3 bucket with a value of either 0 or 1.
-    - name: latency.first_byte
+    - name: latency.first_byte.ms
       type: long
       description: >
         The per-request time from the complete request being received by an Amazon S3 bucket to when the response starts to be returned.
-    - name: latency.total_request
+    - name: latency.total_request.ms
       type: long
       description: >
         The elapsed per-request time from the first byte received to the last byte sent to an Amazon S3 bucket.

@@ -34,8 +34,8 @@ var (
 			"5xx": c.Int("5xxErrors"),
 		},
 		"latency": s.Object{
-			"first_byte":    c.Float("FirstByteLatency"),
-			"total_request": c.Float("TotalRequestLatency"),
+			"first_byte.ms":    c.Float("FirstByteLatency"),
+			"total_request.ms": c.Float("TotalRequestLatency"),
 		},
 	}
 )

@@ -55,8 +55,8 @@ func TestFetch(t *testing.T) {
 		mtest.CheckEventField("uploaded.bytes", "float", event, t)
 		mtest.CheckEventField("errors.4xx", "int", event, t)
 		mtest.CheckEventField("errors.5xx", "int", event, t)
-		mtest.CheckEventField("latency.first_byte", "float", event, t)
-		mtest.CheckEventField("latency.total_request", "float", event, t)
+		mtest.CheckEventField("latency.first_byte.ms", "float", event, t)
+		mtest.CheckEventField("latency.total_request.ms", "float", event, t)
 	}
 }
 
