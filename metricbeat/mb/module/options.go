@@ -64,6 +64,9 @@ func WithMetricSetInfo() Option {
 // given to the `service.name` setting in the module configuration.
 func WithServiceName() Option {
 	return func(w *Wrapper) {
+		if w.Module == nil {
+			return
+		}
 		serviceName := w.Module.Config().ServiceName
 		if serviceName == "" {
 			return
