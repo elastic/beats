@@ -47,5 +47,5 @@ func TestGetWithDefault(t *testing.T) {
 }
 
 func TestContainerUID(t *testing.T) {
-	assert.Equal(t, "a-b-c", ContainerUID("a", "b", "c"))
+	assert.Equal(t, "a/b/c", ContainerUID("a", "b", "c"))
 }
