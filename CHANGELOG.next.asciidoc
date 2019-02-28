@@ -30,6 +30,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - ILM will be available by default if Elasticsearch > 7.0 is used. {pull}10347[10347]
 - Allow Central Management to send events back to kibana. {issue}9382[9382]
 - Initialize the Paths before the keystore and save the keystore into `data/{beatname}.keystore`. {pull}10706[10706]
+- Add `cleanup_timeout` option to docker autodiscover, to wait some time before removing configurations after a container is stopped. {issue]10374[10374] {pull}10905[10905]
 
 *Auditbeat*
 
@@ -129,6 +130,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix a issue when remote and local configuration didn't match when fetching configuration from Central Management. {issue}10587[10587]
 - Fix unauthorized error when loading dashboards by adding username and password into kibana config. {issue}10513[10513] {pull}10675[10675]
 - Ensure all beat commands respect configured settings. {pull}10721[10721]
+- Allow to configure Kafka fetching strategy for the topic metadata. {pull}10682[10682]
+- Using an environment variable for the password when enrolling a beat will now raise an error if the variable doesn't exist. {pull}10936[10936]
 
 *Auditbeat*
 
@@ -150,6 +153,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Cover empty request data, url and version in Apache2 module{pull}10730[10730]
 - Fix registry entries not being cleaned due to race conditions. {pull}10747[10747]
 - Improve detection of file deletion on Windows. {pull}10747[10747]
+- Fix errors in filebeat Zeek dashboard and README files. Add notice.log support. {pull}10916[10916]
 
 *Heartbeat*
 
@@ -210,6 +214,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `network` condition to processors for matching IP addresses against CIDRs. {pull}10743[10743]
 - Add if/then/else support to processors. {pull}10744[10744]
 - Add `community_id` processor for computing network flow hashes. {pull}10745[10745]
+- Add output test to kafka output {pull}10834[10834]
 
 
 *Auditbeat*
@@ -309,6 +314,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Consul Metricbeat module with Agent Metricset {pull}8631[8631]
 - Add filters and pie chart for AWS EC2 dashboard. {pull}10596[10596]
 - Add AWS SQS metricset. {pull}10684[10684] {issue}10053[10053]
+- Add AWS s3_request metricset. {pull}10949[10949] {issue}10055[10055]
 
 *Packetbeat*
 

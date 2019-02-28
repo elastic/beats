@@ -18,6 +18,8 @@
 package docker
 
 import (
+	"time"
+
 	"github.com/elastic/beats/libbeat/autodiscover/template"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/docker"
@@ -34,13 +36,15 @@ type Config struct {
 	Appenders      []*common.Config        `config:"appenders"`
 	Templates      template.MapperSettings `config:"templates"`
 	Dedot          bool                    `config:"labels.dedot"`
+	CleanupTimeout time.Duration           `config:"cleanup_timeout"`
 }
 
 func defaultConfig() *Config {
 	return &Config{
-		Host:   "unix:///var/run/docker.sock",
-		Prefix: "co.elastic",
-		Dedot:  true,
+		Host:           "unix:///var/run/docker.sock",
+		Prefix:         "co.elastic",
+		Dedot:          true,
+		CleanupTimeout: 60 * time.Second,
 	}
 }
 

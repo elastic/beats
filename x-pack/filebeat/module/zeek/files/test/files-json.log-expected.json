@@ -3,14 +3,14 @@
         "@timestamp": 1547688796000,
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "zeek.files",
-        "event.id": "C8I0zn3r9EPbfLgta6-files",
+        "event.id": "C8I0zn3r9EPbfLgta6",
         "event.module": "zeek",
         "fileset.name": "files",
         "input.type": "log",
         "log.offset": 0,
         "service.type": "zeek",
         "tags": [
-            "zeek"
+            "zeek.files"
         ],
         "zeek.files.analyzers": [
             "X509",
@@ -41,14 +41,14 @@
         "@timestamp": 1547688801000,
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "zeek.files",
-        "event.id": "C6sjVo23iNApLnlAt6-files",
+        "event.id": "C6sjVo23iNApLnlAt6",
         "event.module": "zeek",
         "fileset.name": "files",
         "input.type": "log",
         "log.offset": 452,
         "service.type": "zeek",
         "tags": [
-            "zeek"
+            "zeek.files"
         ],
         "zeek.files.analyzers": [
             "X509",

@@ -1,0 +1,1 @@
+{"ts":1320435875.879278,"note":"SSH::Password_Guessing","msg":"172.16.238.1 appears to be guessing SSH passwords (seen in 30 connections).","sub":"Sampled servers:  172.16.238.136, 172.16.238.136, 172.16.238.136, 172.16.238.136, 172.16.238.136","src":"172.16.238.1","peer_descr":"bro","actions":["Notice::ACTION_LOG"],"suppress_for":3600.0,"dropped":false}

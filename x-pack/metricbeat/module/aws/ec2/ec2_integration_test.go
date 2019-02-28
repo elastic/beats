@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// +build integration
+
 package ec2
 
 import (
@@ -14,7 +16,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	config, info := mtest.GetConfigForTest("ec2")
+	config, info := mtest.GetConfigForTest("ec2", "300s")
 	if info != "" {
 		t.Skip("Skipping TestFetch: " + info)
 	}
@@ -63,7 +65,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	config, info := mtest.GetConfigForTest("ec2")
+	config, info := mtest.GetConfigForTest("ec2", "300s")
 	if info != "" {
 		t.Skip("Skipping TestData: " + info)
 	}
