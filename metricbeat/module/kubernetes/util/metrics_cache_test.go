@@ -18,64 +18,10 @@
 package util
 
 import (
-	"sync"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
-
-type fakeClock struct {
-	sync.Mutex
-	time int64
-}
-
-func (c *fakeClock) get() time.Time {
-	c.Lock()
-	defer c.Unlock()
-	c.time++
-	return time.Unix(c.time, 0)
-}
-
-func (c *fakeClock) advance(n int64) {
-	c.Lock()
-	defer c.Unlock()
-	c.time += n
-}
-
-func TestTimeout(t *testing.T) {
-	// Mock monotonic time:
-	fakeTime := fakeClock{}
-
-	// Blocking after:
-	afterCh := make(chan time.Time)
-	after := func(time.Duration) <-chan time.Time {
-		return afterCh
-	}
-
-	c := clock{
-		now:   fakeTime.get,
-		after: after,
-	}
-	test := newValueMapWithClock(defaultTimeout, c)
-	test.Set("foo", 3.14)
-
-	// Check it is not removed if it is being read
-	for i := 0; i < 4; i++ {
-		assert.Equal(t, 3.14, test.Get("foo"))
-		fakeTime.advance(int64(defaultTimeout.Seconds()) / 2)
-		afterCh <- fakeTime.get()
-		afterCh <- fakeTime.get()
-	}
-
-	// Let cleanup do its job
-	fakeTime.advance(int64(defaultTimeout.Seconds()))
-	afterCh <- fakeTime.get()
-	afterCh <- fakeTime.get()
-
-	// Check it expired
-	assert.Equal(t, 0.0, test.Get("foo"))
-}
 
 func TestValueMap(t *testing.T) {
 	test := newValueMap(defaultTimeout)

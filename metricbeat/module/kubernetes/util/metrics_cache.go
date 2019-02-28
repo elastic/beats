@@ -18,12 +18,17 @@
 package util
 
 import (
-	"sync"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 // PerfMetrics stores known metrics from Kubernetes nodes and containers
 var PerfMetrics = NewPerfMetricsCache()
+
+func init() {
+	PerfMetrics.Start()
+}
 
 const defaultTimeout = 120 * time.Second
 
@@ -47,106 +52,64 @@ type PerfMetricsCache struct {
 	ContainerCoresLimit *valueMap
 }
 
-func newValueMap(timeout time.Duration) *valueMap {
-	return newValueMapWithClock(timeout, clock{})
+// Start cache workers
+func (c *PerfMetricsCache) Start() {
+	c.NodeMemAllocatable.Start()
+	c.NodeCoresAllocatable.Start()
+	c.ContainerMemLimit.Start()
+	c.ContainerCoresLimit.Start()
 }
 
-func newValueMapWithClock(timeout time.Duration, clock clock) *valueMap {
-	m := valueMap{
-		values:  map[string]*value{},
-		timeout: timeout,
-		time:    clock,
-	}
-	m.startWorkers()
-	return &m
-}
-
-type clock struct {
-	now   func() time.Time
-	after func(time.Duration) <-chan time.Time
-}
-
-func (c *clock) Now() time.Time {
-	if c.now != nil {
-		return c.now()
-	}
-	return time.Now()
-}
-
-func (c *clock) After(d time.Duration) <-chan time.Time {
-	if c.after != nil {
-		return c.after(d)
-	}
-	return time.After(d)
+// Stop cache workers
+func (c *PerfMetricsCache) Stop() {
+	c.NodeMemAllocatable.Stop()
+	c.NodeCoresAllocatable.Stop()
+	c.ContainerMemLimit.Stop()
+	c.ContainerCoresLimit.Stop()
 }
 
 type valueMap struct {
-	sync.Mutex
+	cache   *common.Cache
 	timeout time.Duration
-	values  map[string]*value
-	time    clock
 }
 
-type value struct {
-	value   float64
-	expires int64
-}
-
-// ContainerUID creates an unique ID for from namespace, pod name and container name
-func ContainerUID(namespace, pod, container string) string {
-	return namespace + "-" + pod + "-" + container
+func newValueMap(timeout time.Duration) *valueMap {
+	return &valueMap{
+		cache:   common.NewCache(timeout, 0),
+		timeout: timeout,
+	}
 }
 
 // Get value
 func (m *valueMap) Get(name string) float64 {
-	return m.getWithDefault(name, 0)
+	return m.GetWithDefault(name, 0.0)
 }
 
 // Get value
 func (m *valueMap) GetWithDefault(name string, def float64) float64 {
-	return m.getWithDefault(name, def)
-}
-
-func (m *valueMap) getWithDefault(name string, def float64) float64 {
-	m.Lock()
-	defer m.Unlock()
-	val, ok := m.values[name]
-	if ok {
-		m.renew(val)
-		return val.value
+	v := m.cache.Get(name)
+	if v, ok := v.(float64); ok {
+		return v
 	}
 	return def
 }
 
 // Set value
 func (m *valueMap) Set(name string, val float64) {
-	m.Lock()
-	defer m.Unlock()
-	v, ok := m.values[name]
-	if ok {
-		v.value = val
-	} else {
-		v = &value{value: val}
-		m.values[name] = v
-	}
-	m.renew(v)
+	m.cache.PutWithTimeout(name, val, m.timeout)
 }
 
-func (m *valueMap) renew(v *value) {
-	v.expires = m.time.Now().Add(m.timeout).Unix()
+// Start cache workers
+func (m *valueMap) Start() {
+	m.cache.StartJanitor(m.timeout)
 }
 
-func (m *valueMap) startWorkers() {
-	go func() {
-		for {
-			now := <-m.time.After(m.timeout)
-			m.Lock()
-			for name, val := range m.values {
-				if now.Unix() > val.expires {
-					delete(m.values, name)
-				}
-			}
-			m.Unlock()
-		}
-	}()
+// Stop cache workers
+func (m *valueMap) Stop() {
+	m.cache.StopJanitor()
+}
+
+// ContainerUID creates an unique ID for from namespace, pod name and container name
+func ContainerUID(namespace, pod, container string) string {
+	return namespace + "-" + pod + "-" + container
 }
