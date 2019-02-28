@@ -19,6 +19,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1..master[Check the HEAD dif
 The list below covers the major changes between 7.0.0-beta1 and master only.
 
 ==== Breaking changes
+
 - Remove support for deprecated `GenRootCmd` methods. {pull}10721[10721]
 
 ==== Bugfixes
@@ -29,3 +30,4 @@ The list below covers the major changes between 7.0.0-beta1 and master only.
 - Metricset generator generates beta modules by default now. {pull}10657[10657]
 - Move host name addition to a processor. {pull}10728[10728]
 - The `beat.Event` accessor methods now support `@metadata` keys. {pull}10761[10761]
+- Assertion for documented fields in tests fails if any of the fields in the tested event is documented as an alias. {pull}10921[10921]
