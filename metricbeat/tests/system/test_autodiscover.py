@@ -23,6 +23,7 @@ class TestAutodiscover(metricbeat.BaseTest):
         self.render_config_template(
             autodiscover={
                 'docker': {
+                    'cleanup_timeout': '0s',
                     'templates': '''
                       - condition:
                           equals.docker.container.image: memcached:latest
@@ -69,6 +70,7 @@ class TestAutodiscover(metricbeat.BaseTest):
         self.render_config_template(
             autodiscover={
                 'docker': {
+                    'cleanup_timeout': '0s',
                     'hints.enabled': 'true',
                 },
             },
@@ -111,6 +113,7 @@ class TestAutodiscover(metricbeat.BaseTest):
         self.render_config_template(
             autodiscover={
                 'docker': {
+                    'cleanup_timeout': '0s',
                     'hints.enabled': 'true',
                     'appenders': '''
                       - type: config
