@@ -347,9 +347,9 @@ func TestGroupByInstance(t *testing.T) {
 	config.CounterConfig[0].Query = `\Processor Information(_Total)\% Processor Time`
 	config.CounterConfig[0].Format = "float"
 
-	config.CounterConfig[1].InstanceLabel = "disk.bytes.name"
-	config.CounterConfig[1].MeasurementLabel = "disk.bytes.read.total"
-	config.CounterConfig[1].Query = `\FileSystem Disk Activity(_Total)\FileSystem Bytes Read`
+	config.CounterConfig[1].InstanceLabel = "processor.name"
+	config.CounterConfig[1].MeasurementLabel = "processor.time.user.pct"
+	config.CounterConfig[1].Query = `\Processor Information(_Total)\% User Time`
 	config.CounterConfig[1].Format = "float"
 
 	config.CounterConfig[2].InstanceLabel = "processor.name"
@@ -381,13 +381,13 @@ func TestGroupByInstance(t *testing.T) {
 	}
 	assert.True(t, pctKey)
 
-	pctKey, err := values[0].MetricSetFields.HasKey("disk.bytes.read.total")
+	pctKey, err = values[0].MetricSetFields.HasKey("processor.time.user.pct")
 	if err != nil {
 		t.Fatal(err)
 	}
 	assert.True(t, pctKey)
 
-	pctKey, err := values[0].MetricSetFields.HasKey("processor.time.idle.average.ns")
+	pctKey, err = values[0].MetricSetFields.HasKey("processor.time.idle.average.ns")
 	if err != nil {
 		t.Fatal(err)
 	}
