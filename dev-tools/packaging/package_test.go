@@ -181,6 +181,8 @@ func checkDocker(t *testing.T, file string) {
 	}
 
 	checkDockerEntryPoint(t, p, info)
+	checkDockerLabels(t, info, file)
+	checkDockerUser(t, info)
 	checkModulesPresent(t, "", p)
 	checkModulesDPresent(t, "", p)
 }
@@ -380,6 +382,31 @@ func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
 			t.Fatal("TODO: check if binary is in $PATH")
 		}
 	})
+}
+
+func checkDockerLabels(t *testing.T, info *dockerInfo, file string) {
+	if vendor := info.Config.Labels["org.label-schema.vendor"]; vendor != "Elastic" {
+		t.Errorf("unexpected vendor label: %s", vendor)
+	}
+
+	expectedLicense := "Elastic License"
+	ossPrefix := strings.Join([]string{
+		info.Config.Labels["org.label-schema.name"],
+		"oss",
+		info.Config.Labels["org.label-schema.version"],
+	}, "-")
+	if strings.HasPrefix(filepath.Base(file), ossPrefix) {
+		expectedLicense = "ASL 2.0"
+	}
+	if license, present := info.Config.Labels["license"]; !present || license != expectedLicense {
+		t.Errorf("unexpected license label: %s", license)
+	}
+}
+
+func checkDockerUser(t *testing.T, info *dockerInfo) {
+	if info.Config.User == "root" {
+		t.Errorf("unexpected docker user: %s", info.Config.User)
+	}
 }
 
 // Helpers
@@ -640,8 +667,10 @@ func readDockerManifest(r io.Reader) (*dockerManifest, error) {
 
 type dockerInfo struct {
 	Config struct {
-		WorkingDir string
 		Entrypoint []string
+		Labels     map[string]string
+		User       string
+		WorkingDir string
 	} `json:"config"`
 }
 
