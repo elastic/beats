@@ -493,9 +493,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
         def extract_fields(doc_list, name):
             fields = []
             dictfields = []
+            aliases = []
 
             if doc_list is None:
-                return fields, dictfields
+                return fields, dictfields, aliases
 
             for field in doc_list:
 
@@ -510,14 +511,19 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     newName = field["name"]
 
                 if field.get("type") == "group":
-                    subfields, subdictfields = extract_fields(field["fields"], newName)
+                    subfields, subdictfields, subaliases = extract_fields(field["fields"], newName)
                     fields.extend(subfields)
                     dictfields.extend(subdictfields)
+                    aliases.extend(subaliases)
                 else:
                     fields.append(newName)
                     if field.get("type") in ["object", "geo_point"]:
                         dictfields.append(newName)
-            return fields, dictfields
+
+                if field.get("type") == "alias":
+                    aliases.append(newName)
+
+            return fields, dictfields, aliases
 
         global yaml_cache
 
@@ -542,12 +548,14 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
             fields = []
             dictfields = []
+            aliases = []
 
             for item in doc:
-                subfields, subdictfields = extract_fields(item["fields"], "")
+                subfields, subdictfields, subaliases = extract_fields(item["fields"], "")
                 fields.extend(subfields)
                 dictfields.extend(subdictfields)
-            return fields, dictfields
+                aliases.extend(subaliases)
+            return fields, dictfields, aliases
 
     def flatten_object(self, obj, dict_fields, prefix=""):
         result = {}
@@ -610,7 +618,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         Assert that all keys present in evt are documented in fields.yml.
         This reads from the global fields.yml, means `make collect` has to be run before the check.
         """
-        expected_fields, dict_fields = self.load_fields()
+        expected_fields, dict_fields, aliases = self.load_fields()
         flat = self.flatten_object(evt, dict_fields)
 
         def field_pattern_match(pattern, key):
@@ -625,15 +633,17 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     return False
             return True
 
-        def is_documented(key):
-            if key in expected_fields:
+        def is_documented(key, docs):
+            if key in docs:
                 return True
-            for pattern in (f for f in expected_fields if "*" in f):
+            for pattern in (f for f in docs if "*" in f):
                 if field_pattern_match(pattern, key):
                     return True
             return False
 
         for key in flat.keys():
             metaKey = key.startswith('@metadata.')
-            if not(is_documented(key) or metaKey):
+            if not(is_documented(key, expected_fields) or metaKey):
                 raise Exception("Key '{}' found in event is not documented!".format(key))
+            if is_documented(key, aliases):
+                raise Exception("Key '{}' found in event is documented as an alias!".format(key))
