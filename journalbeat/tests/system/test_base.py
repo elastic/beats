@@ -114,8 +114,8 @@ class Test(BaseTest):
         Journalbeat is able to follow reading a from a journal with an existing registry file.
         """
 
-	registry_path = self.beat_path + "/tests/system/input/test.registry"
-	input_path = self.beat_path + "/tests/system/input/test.journal"
+        registry_path = self.beat_path + "/tests/system/input/test.registry"
+        input_path = self.beat_path + "/tests/system/input/test.journal"
         self._prepare_registry_file(registry_path, input_path)
 
         self.render_config_template(
@@ -176,15 +176,16 @@ class Test(BaseTest):
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
 
-        def _prepare_registry_file(self, registry_path, journal_path):
-            lines = []
-            with open(registry_path, "r") as registry_file:
-                lines = registry_file.readlines()
-                lines[2] = "- path: " + journal_path + "\n"
+    def _prepare_registry_file(self, registry_path, journal_path):
+        lines = []
+        with open(registry_path, "r") as registry_file:
+            lines = registry_file.readlines()
+            lines[2] = "- path: " + journal_path + "\n"
 
-            with open(registry_path, "w") as registry_file:
-                for line in lines:
-                    registry_file.write(line)
+        with open(registry_path, "w") as registry_file:
+            for line in lines:
+                registry_file.write(line)
+
 
 if __name__ == '__main__':
     unittest.main()
