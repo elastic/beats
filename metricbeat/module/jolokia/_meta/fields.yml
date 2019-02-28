@@ -11,3 +11,7 @@
       description: >
           jolokia contains metrics exposed via jolokia agent
       fields:
+        - name: agent.version
+          type: keyword
+          description: >
+            version number of jolokia agent.

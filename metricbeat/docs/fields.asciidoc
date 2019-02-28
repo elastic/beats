@@ -11118,6 +11118,16 @@ jolokia contains metrics exposed via jolokia agent
 
 
 
+*`jolokia.agent.version`*::
++
+--
+type: keyword
+
+version number of jolokia agent.
+
+
+--
+
 [[exported-fields-kafka]]
 == Kafka fields
 

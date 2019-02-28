@@ -4,7 +4,3 @@
     Jolokia jmx metricset
   release: ga
   fields:
-    - name: agent.version
-      type: keyword
-      description: >
-        version number of jolokia agent.
