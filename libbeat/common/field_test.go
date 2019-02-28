@@ -27,6 +27,65 @@ import (
 	"github.com/elastic/go-ucfg/yaml"
 )
 
+func TestFieldsCanConcat(t *testing.T) {
+	tests := map[string]struct {
+		key       string
+		fields    Fields
+		canConcat bool
+	}{
+		"empty fields": {
+			key:       "a.b",
+			fields:    Fields{},
+			canConcat: true,
+		},
+		"no key": {
+			key:       "",
+			fields:    Fields{Field{Name: "a"}},
+			canConcat: false,
+		},
+		"key not in fields, but parent node in fields": {
+			key: "a.b.c",
+			fields: Fields{
+				Field{Name: "a", Fields: Fields{Field{Name: "b"}}},
+			},
+			canConcat: false,
+		},
+		"key not in fields, but parent node in fields and of type object": {
+			key: "a.b.c",
+			fields: Fields{
+				Field{Name: "a", Fields: Fields{Field{Name: "b", Type: "object"}}},
+			},
+			canConcat: true,
+		},
+		"last node in fields": {
+			key: "a.b.c",
+			fields: Fields{
+				Field{Name: "a", Fields: Fields{
+					Field{Name: "b", Fields: Fields{
+						Field{Name: "c"},
+					}}}},
+			},
+			canConcat: false,
+		},
+		"node in fields": {
+			key: "a.b",
+			fields: Fields{
+				Field{Name: "a", Fields: Fields{
+					Field{Name: "b", Fields: Fields{
+						Field{Name: "c"},
+					}}}},
+			},
+			canConcat: false,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			assert.Equal(t, test.canConcat, test.fields.CanConcat(test.key))
+		})
+	}
+}
+
 func TestFieldsHasNode(t *testing.T) {
 	tests := map[string]struct {
 		node    string

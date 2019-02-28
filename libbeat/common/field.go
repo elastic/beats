@@ -303,10 +303,13 @@ func (f Fields) canConcat(keys []string) bool {
 
 	// Nothing to compare, so does not contain it
 	if len(keys) == 0 {
-		return true
+		return false
 	}
 
 	key := keys[0]
+	if key == "" {
+		return false
+	}
 	keys = keys[1:]
 
 	for _, field := range f {
@@ -320,10 +323,7 @@ func (f Fields) canConcat(keys []string) bool {
 
 			// It's the last field to compare, check if it is of type object
 			if len(field.Fields) == 0 {
-				if field.Type == "object" {
-					return true
-				}
-				return false
+				return field.Type == "object"
 			}
 
 			return field.Fields.canConcat(keys)
