@@ -2,8 +2,7 @@
   metricsets: ["perfmon"]
   enabled: true
   period: 10s
-  perfmon.ignore_non_existent_counters: false
-  perfmon.group_measurements_by_instance: false
+  perfmon.ignore_non_existent_counters: true
   perfmon.counters:
   #  - instance_label: processor.name
   #    instance_name: total
