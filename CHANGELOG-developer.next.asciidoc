@@ -25,6 +25,7 @@ The list below covers the major changes between 7.0.0-beta1 and master only.
 - Remove support for deprecated `GenRootCmd` methods. {pull}10721[10721]
 
 ==== Bugfixes
+- Align default index between elasticsearch and logstash and kafka output. {pull}10841[10841]
 
 ==== Added
 
