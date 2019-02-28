@@ -81,3 +81,7 @@ Beats](https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.
 
 See our [CONTRIBUTING](CONTRIBUTING.md) file for information about setting up
 your dev environment to build Beats from the source.
+
+## Snapshots
+
+For testing purposes, we generate snapshot builds that you can find [here](https://beats-ci.elastic.co/job/elastic+beats+master+multijob-package-linux/lastSuccessfulBuild/gcsObjects/). Please be aware that these are built on top of master and are not meant for production.

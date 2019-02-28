@@ -9,7 +9,7 @@ var:
     os.darwin:
       - /usr/local/var/logs/current/http.log
   - name: tags
-    default: [zeek]
+    default: [zeek.http]
 
 ingest_pipeline: ingest/pipeline.json
 input: config/http.yml

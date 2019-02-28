@@ -2,7 +2,7 @@
   type: group
   description: >
     `user` contains information about the users on a system.
-  release: experimental
+  release: beta
   fields:
     - name: name
       type: keyword

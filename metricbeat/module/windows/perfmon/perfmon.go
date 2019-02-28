@@ -40,8 +40,9 @@ type CounterConfig struct {
 
 // Config for the windows perfmon metricset.
 type Config struct {
-	IgnoreNECounters bool            `config:"perfmon.ignore_non_existent_counters"`
-	CounterConfig    []CounterConfig `config:"perfmon.counters" validate:"required"`
+	IgnoreNECounters  bool            `config:"perfmon.ignore_non_existent_counters"`
+	GroupMeasurements bool            `config:"perfmon.group_measurements_by_instance"`
+	CounterConfig     []CounterConfig `config:"perfmon.counters" validate:"required"`
 }
 
 func init() {
