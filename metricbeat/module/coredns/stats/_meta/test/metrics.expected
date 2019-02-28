@@ -50,56 +50,6 @@
 		"MetricSetFields": {
 			"dns": {
 				"request": {
-					"do": {
-						"count": {
-							"total": 113
-						}
-					},
-					"duration": {
-						"sec": {
-							"bucket": {
-								"+Inf": 440,
-								"0.00025": 0,
-								"0.0005": 0,
-								"0.001": 0,
-								"0.002": 0,
-								"0.004": 0,
-								"0.008": 0,
-								"0.016": 0,
-								"0.032": 0,
-								"0.064": 424,
-								"0.128": 437,
-								"0.256": 438,
-								"0.512": 440,
-								"1.024": 440,
-								"2.048": 440,
-								"4.096": 440,
-								"8.192": 440
-							},
-							"count": 440,
-							"sum": 21.712619368
-						}
-					}
-				}
-			},
-			"server": "dns://:53",
-			"zone": "."
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"dns": {
-				"request": {
 					"size": {
 						"bytes": {
 							"bucket": {
@@ -203,6 +153,56 @@
 			},
 			"server": "dns://:53",
 			"type": "A",
+			"zone": "."
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"dns": {
+				"request": {
+					"do": {
+						"count": {
+							"total": 113
+						}
+					},
+					"duration": {
+						"sec": {
+							"bucket": {
+								"+Inf": 440,
+								"100": 0,
+								"102400": 440,
+								"12800": 437,
+								"1600": 0,
+								"200": 0,
+								"204800": 440,
+								"25": 0,
+								"25600": 438,
+								"3200": 0,
+								"400": 0,
+								"409600": 440,
+								"50": 0,
+								"51200": 440,
+								"6400": 424,
+								"800": 0,
+								"819200": 440
+							},
+							"count": 440,
+							"sum": 21.712619368
+						}
+					}
+				}
+			},
+			"server": "dns://:53",
 			"zone": "."
 		},
 		"Index": "",
