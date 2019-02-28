@@ -23,6 +23,7 @@ class TestAutodiscover(filebeat.BaseTest):
             inputs=False,
             autodiscover={
                 'docker': {
+                    'cleanup_timeout': '0s',
                     'templates': '''
                       - condition:
                           equals.docker.container.image: busybox
