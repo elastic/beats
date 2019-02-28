@@ -4,7 +4,7 @@
     "grok": {
       "field": "message",
       "patterns":[
-          "%{IPORHOST:apache2.access.remote_ip} - %{DATA:apache2.access.user_name} \\[%{HTTPDATE:apache2.access.time}\\] \"%{WORD:apache2.access.method} %{DATA:apache2.access.url} HTTP/%{NUMBER:apache2.access.http_version}\" %{NUMBER:apache2.access.response_code} (?:%{NUMBER:apache2.access.body_sent.bytes}|-)( \"%{DATA:apache2.access.referrer}\")?( \"%{DATA:apache2.access.agent}\")?",
+          "%{IPORHOST:apache2.access.remote_ip} - %{DATA:apache2.access.user_name} \\[%{HTTPDATE:apache2.access.time}\\] \"(?:%{WORD:apache2.access.method} %{DATA:apache2.access.url} HTTP/%{NUMBER:apache2.access.http_version}|-)?\" %{NUMBER:apache2.access.response_code} (?:%{NUMBER:apache2.access.body_sent.bytes}|-)( \"%{DATA:apache2.access.referrer}\")?( \"%{DATA:apache2.access.agent}\")?",
           "%{IPORHOST:apache2.access.remote_ip} - %{DATA:apache2.access.user_name} \\[%{HTTPDATE:apache2.access.time}\\] \"-\" %{NUMBER:apache2.access.response_code} -",
         "\\[%{HTTPDATE:apache2.access.time}\\] %{IPORHOST:apache2.access.remote_ip} %{DATA:apache2.access.ssl.protocol} %{DATA:apache2.access.ssl.cipher} \"%{WORD:http.request.method} %{DATA:apache2.access.url} HTTP/%{NUMBER:apache2.access.http_version}\" %{NUMBER:apache2.access.body_sent.bytes}"
         ],
@@ -23,11 +23,13 @@
     "date": {
       "field": "apache2.access.time",
       "target_field": "@timestamp",
-      "formats": ["dd/MMM/yyyy:H:m:s Z"]
+      "formats": ["dd/MMM/yyyy:H:m:s Z"],
+      "ignore_failure": true
     }
   }, {
     "remove": {
-      "field": "apache2.access.time"
+      "field": "apache2.access.time",
+      "ignore_failure": true
     }
   }, {
     "user_agent": {
