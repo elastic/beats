@@ -326,12 +326,11 @@ func (q *Query) Close() error {
 }
 
 type PerfmonReader struct {
-	query             *Query            // PDH Query
-	instanceLabel     map[string]string // Mapping of counter path to key used for the label (e.g. processor.name)
-	measurement       map[string]string // Mapping of counter path to key used for the value (e.g. processor.cpu_time).
-	executed          bool              // Indicates if the query has been executed.
-	log               *logp.Logger      //
-	groupMeasurements bool              // Indicates if measurements with the same instance label should be sent in the same event
+	query         *Query            // PDH Query
+	instanceLabel map[string]string // Mapping of counter path to key used for the label (e.g. processor.name)
+	measurement   map[string]string // Mapping of counter path to key used for the value (e.g. processor.cpu_time).
+	executed      bool              // Indicates if the query has been executed.
+	log           *logp.Logger
 }
 
 // NewPerfmonReader creates a new instance of PerfmonReader.
@@ -342,11 +341,10 @@ func NewPerfmonReader(config Config) (*PerfmonReader, error) {
 	}
 
 	r := &PerfmonReader{
-		query:             query,
-		instanceLabel:     map[string]string{},
-		measurement:       map[string]string{},
-		log:               logp.NewLogger("perfmon"),
-		groupMeasurements: config.GroupMeasurements,
+		query:         query,
+		instanceLabel: map[string]string{},
+		measurement:   map[string]string{},
+		log:           logp.NewLogger("perfmon"),
 	}
 
 	for _, counter := range config.CounterConfig {
@@ -390,52 +388,34 @@ func (r *PerfmonReader) Read() ([]mb.Event, error) {
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
 
-	eventMap := make(map[string]*mb.Event)
+	// Write the values into the map.
+	events := make([]mb.Event, 0, len(values))
 
 	for counterPath, values := range values {
-		for ind, val := range values {
+		for _, val := range values {
 			if val.Err != nil && !r.executed {
 				r.log.Debugw("Ignoring the first measurement because the data isn't ready",
 					"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
 				continue
 			}
 
-			var eventKey string
-			if r.groupMeasurements && val.Err == nil {
-				// Send measurements with the same instance label as part of the same event
-				eventKey = val.Instance
-			} else {
-				// Send every measurement as an individual event
-				// If a counter contains an error, it will always be sent as an individual event
-				eventKey = counterPath + strconv.Itoa(ind)
+			event := mb.Event{
+				MetricSetFields: common.MapStr{},
+				Error:           errors.Wrapf(val.Err, "failed on query=%v", counterPath),
 			}
 
-			// Create a new event if the key doesn't exist in the map
-			if _, ok := eventMap[eventKey]; !ok {
-				eventMap[eventKey] = &mb.Event{
-					MetricSetFields: common.MapStr{},
-					Error:           errors.Wrapf(val.Err, "failed on query=%v", counterPath),
-				}
-
-				if val.Instance != "" {
-					eventMap[eventKey].MetricSetFields.Put(r.instanceLabel[counterPath], val.Instance)
-				}
+			if val.Instance != "" {
+				event.MetricSetFields.Put(r.instanceLabel[counterPath], val.Instance)
 			}
-
-			event := eventMap[eventKey]
 
 			if val.Measurement != nil {
 				event.MetricSetFields.Put(r.measurement[counterPath], val.Measurement)
 			} else {
 				event.MetricSetFields.Put(r.measurement[counterPath], 0)
 			}
-		}
-	}
 
-	// Write the values into the map.
-	events := make([]mb.Event, 0, len(eventMap))
-	for _, val := range eventMap {
-		events = append(events, *val)
+			events = append(events, event)
+		}
 	}
 
 	r.executed = true
