@@ -139,3 +139,13 @@ func convertPeriodToDuration(period string) (string, int, error) {
 		return duration, numberPeriod, err
 	}
 }
+
+// StringInSlice checks if a string is already exists in list
+func StringInSlice(str string, list []string) bool {
+	for _, v := range list {
+		if v == str {
+			return true
+		}
+	}
+	return false
+}
