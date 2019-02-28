@@ -32,5 +32,5 @@ func init() {
 // AssetJolokia returns asset data.
 // This is the base64 encoded gzipped contents of ../metricbeat/module/jolokia.
 func AssetJolokia() string {
-	return "eJyEkVFOwzAQRP9zipG/aQ/gDw7AFRBCJtmk29reyLstye1RmgS5AsR+jtczTzsHXGj2OEuUC4cGMLZIHu5lVVwDdKRt4dFYssdzAwDbK5J010gNoCcp9t5K7nnw6EPURS0UKSh5DIu1khnnQT1enWp0T3Ans9G9NUDPFDv1d/MDckhUQy1j87gYFbmOm/IL1zrbR7SSLXBWJLLCrYKmUZQ63Dh8L4WBsm2fa4qa5L5zvFFRllwFrUwXmj+ldJX+JxmwmSBf0wcVSP8Icqyy12bS9COwPsI/cXtR5zTtVyCrNh4b2me/w1cAAAD//5henSM="
+	return "eJysk0FOwzAQRfc5xVc2bGgPkAUH4AoIIRNP0mkdT+SZlPb2KE2CXEoFop3lj/3/08R/hR0dK2wlyI5dARhboArl86SUBeBJ68S9scQKTwUAzF/RiR8CFYBuJNlbLbHhtkLjgo5qokBOqUI7WiuZcWy1wkupGspHlBuzvnwtgIYpeK1O5itE11EONY4d+9EoydDPyg9c08wXUUs0x1HRkSWuFXToRcljz+7rkGsp2nw5p8hJTmfWe0rKErOgiWlHxw9JPtOvkgGzCeLQvVOCNOcg6yvZ7G+LZf+HKKW0p7Tuk/ihttsCJy/MXg96ioBtnJ1TgBUc1VwI5CHxKtVdtn9B9e133MQXvaS7442m/9ndVOvucAGUN+gXnKXl2+6wVIjyZ3Fe72WWEn0GAAD//8ZaRaE="
 }

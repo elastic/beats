@@ -15,3 +15,19 @@
           type: keyword
           description: >
             version number of jolokia agent.
+        - name: agent.id
+          type: keyword
+          description: >
+            id of jolokia agent.
+        - name: server.product
+          type: keyword
+          description: >
+            server product's name that jolokia agent is installed on.
+        - name: server.version
+          type: keyword
+          description: >
+            server product's version number that jolokia agent is installed on.
+        - name: server.vendor
+          type: keyword
+          description: >
+            server product's vendor name that jolokia agent is installed on.

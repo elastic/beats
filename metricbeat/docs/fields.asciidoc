@@ -11128,6 +11128,46 @@ version number of jolokia agent.
 
 --
 
+*`jolokia.agent.id`*::
++
+--
+type: keyword
+
+id of jolokia agent.
+
+
+--
+
+*`jolokia.server.product`*::
++
+--
+type: keyword
+
+server product's name that jolokia agent is installed on.
+
+
+--
+
+*`jolokia.server.version`*::
++
+--
+type: keyword
+
+server product's version number that jolokia agent is installed on.
+
+
+--
+
+*`jolokia.server.vendor`*::
++
+--
+type: keyword
+
+server product's vendor name that jolokia agent is installed on.
+
+
+--
+
 [[exported-fields-kafka]]
 == Kafka fields
 
