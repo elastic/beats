@@ -160,14 +160,79 @@ class Test(BaseTest):
         required_log_snippets = [
             # journalbeat can be started
             "journalbeat is running",
-            # journalbeat can seek to the position defined in the cursor
-            "Added matcher expression",
             # message can be read from test journal
-            "unhandled HKEY event 0x60b0",
-            "please report the conditions when this event happened to",
             "unhandled HKEY event 0x60b1",
+            "please report the conditions when this event happened to",
             # Four events with priority 5 is publised
-            "journalbeat successfully published 4 events",
+            "journalbeat successfully published 5 events",
+        ]
+        for snippet in required_log_snippets:
+            self.wait_until(lambda: self.log_contains(snippet),
+                            name="Line in '{}' Journalbeat log".format(snippet))
+
+        exit_code = journalbeat_proc.kill_and_wait()
+        assert exit_code == 0
+
+    @unittest.skipUnless(sys.platform.startswith("linux"), "Journald only on Linux")
+    def test_read_events_with_syslog_identifier_filtering(self):
+        """
+        Journalbeat is able to pass matchers to the journal reader to test identifiers filter.
+        """
+
+        self.render_config_template(
+            journal_path=self.beat_path + "/tests/system/input/bigger.journal",
+            seek_method="head",
+            identifiers="audit",
+            path=os.path.abspath(self.working_dir) + "/log/*",
+        )
+        journalbeat_proc = self.start_beat()
+
+        required_log_snippets = [
+            # journalbeat can be started
+            "journalbeat is running",
+            # message can be read from test journal
+	    "SECCOMP auid=1000 uid=1000 gid=1000 ses=1 pid=20166",
+	    "SECCOMP auid=1000 uid=1000 gid=1000 ses=1 pid=20166",
+	    "SECCOMP auid=1000 uid=1000 gid=1000 ses=1 pid=20285",
+	    "SECCOMP auid=1000 uid=1000 gid=1000 ses=1 pid=21882",
+	    "SECCOMP auid=1000 uid=1000 gid=1000 ses=1 pid=21882",
+	    "SECCOMP auid=1000 uid=1000 gid=1000 ses=1 pid=19234",
+	    "SECCOMP auid=1000 uid=1000 gid=1000 ses=1 pid=17757",
+
+            # 25 events with priority 5 is publised
+            "journalbeat successfully published 26 events",
+        ]
+        for snippet in required_log_snippets:
+            self.wait_until(lambda: self.log_contains(snippet),
+                            name="Line in '{}' Journalbeat log".format(snippet))
+
+        exit_code = journalbeat_proc.kill_and_wait()
+        assert exit_code == 0
+
+    @unittest.skipUnless(sys.platform.startswith("linux"), "Journald only on Linux")
+    def test_read_events_with_sytemd_unit_filtering(self):
+        """
+        Journalbeat is able to pass matchers to the journal reader to test units filters.
+        """
+
+        self.render_config_template(
+            journal_path=self.beat_path + "/tests/system/input/bigger.journal",
+            seek_method="head",
+            units="docker.service",
+            path=os.path.abspath(self.working_dir) + "/log/*",
+        )
+        journalbeat_proc = self.start_beat()
+
+        required_log_snippets = [
+            # journalbeat can be started
+            "journalbeat is running",
+            # message can be read from test journal
+	    "Ignoring Exit Event, no such exec command found",
+	    "Health check for container a6f209d75876b7d113ee88abb19966e2cd6aa74eeb0d4e1fffc6856133d6786a",
+	    "Health check for container 9fbde5825e1b45aa34a221a992611c323ac6bcc96eb7eeb30da1a62015b89683",
+
+            # 25 events with priority 5 is publised
+            "journalbeat successfully published 26 events",
         ]
         for snippet in required_log_snippets:
             self.wait_until(lambda: self.log_contains(snippet),
@@ -185,6 +250,7 @@ class Test(BaseTest):
         with open(registry_path, "w") as registry_file:
             for line in lines:
                 registry_file.write(line)
+
 
 
 if __name__ == '__main__':

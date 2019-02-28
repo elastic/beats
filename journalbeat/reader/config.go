@@ -37,8 +37,15 @@ type Config struct {
 	// Backoff is the current interval to wait before
 	// attemting to read again from the journal.
 	Backoff time.Duration
+
 	// Matches store the key value pairs to match entries.
-	Matches []string
+	Matches MatcherConfig
+	// Units stores the units to monitor
+	Units []string
+	// Kernel stores whether kernel messages should be monitored
+	Kernel bool
+	// Identifiers stores the syslog identifiers to watch
+	Identifiers []string
 }
 
 const (

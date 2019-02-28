@@ -30,7 +30,16 @@ journalbeat.inputs:
 
   # Exact matching for field values of events.
   # Matching for nginx entries: "systemd.unit=nginx"
-  #include_matches: []
+  #include_matches.equals: []
+
+  # List of syslog identifiers to filter for
+  #identifiers: ["audit"]
+
+  # List of units to filter for
+  #units: ["docker.service"]
+
+  # If kernel entries are need to be forwarded if units are configured
+  #kernel: false
 
   # Optional fields that you can specify to add additional information to the
   # output. Fields can be scalar values, arrays, dictionaries, or any nested

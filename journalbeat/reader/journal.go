@@ -90,7 +90,7 @@ func NewLocal(c Config, done chan struct{}, state checkpoint.JournalState, logge
 }
 
 func newReader(logger *logp.Logger, done chan struct{}, c Config, journal *sdjournal.Journal, state checkpoint.JournalState) (*Reader, error) {
-	err := setupMatches(journal, c.Matches)
+	err := setupMatchesOfJournal(journal, c)
 	if err != nil {
 		return nil, err
 	}
@@ -109,36 +109,23 @@ func newReader(logger *logp.Logger, done chan struct{}, c Config, journal *sdjou
 	return r, nil
 }
 
-func setupMatches(j *sdjournal.Journal, matches []string) error {
-	for _, m := range matches {
-		elems := strings.Split(m, "=")
-		if len(elems) != 2 {
-			return fmt.Errorf("invalid match format: %s", m)
-		}
-
-		var p string
-		for journalKey, eventField := range journaldEventFields {
-			if elems[0] == eventField.name {
-				p = journalKey + "=" + elems[1]
-			}
-		}
-
-		// pass custom fields as is
-		if p == "" {
-			p = m
-		}
-
-		logp.Debug("journal", "Added matcher expression: %s", p)
-
-		err := j.AddMatch(p)
+func setupMatchesOfJournal(j *sdjournal.Journal, c Config) error {
+	if len(c.Units) > 0 {
+		err := setupUnitMatchers(j, c.Units, c.Kernel)
 		if err != nil {
-			return fmt.Errorf("error adding match to journal %v", err)
+			return err
 		}
+	}
 
-		err = j.AddDisjunction()
+	if len(c.Identifiers) > 0 {
+		err := setupSyslogIdentifierMatchers(j, c.Identifiers)
 		if err != nil {
-			return fmt.Errorf("error adding disjunction to journal: %v", err)
+			return err
 		}
+	}
+
+	if len(c.Matches.Equals) > 0 || len(c.Matches.Or) > 0 || len(c.Matches.And) > 0 {
+		return setupMatcherConfig(j, c.Matches)
 	}
 	return nil
 }

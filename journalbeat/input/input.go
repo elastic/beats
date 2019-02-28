@@ -73,6 +73,9 @@ func New(
 			Seek:               config.Seek,
 			CursorSeekFallback: config.CursorSeekFallback,
 			Matches:            config.Matches,
+			Units:              config.Units,
+			Kernel:             config.Kernel,
+			Identifiers:        config.Identifiers,
 		}
 
 		state := states[reader.LocalSystemJournalID]
@@ -91,6 +94,9 @@ func New(
 			Seek:               config.Seek,
 			CursorSeekFallback: config.CursorSeekFallback,
 			Matches:            config.Matches,
+			Units:              config.Units,
+			Kernel:             config.Kernel,
+			Identifiers:        config.Identifiers,
 		}
 		state := states[p]
 		r, err := reader.New(cfg, done, state, logger)

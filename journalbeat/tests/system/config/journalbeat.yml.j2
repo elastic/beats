@@ -5,7 +5,9 @@ journalbeat.inputs:
   {% if cursor_seek_fallback %}
   cursor_seek_fallback: {{ cursor_seek_fallback }}
   {% endif %}
-  include_matches: [{{ matches }}]
+  include_matches.equals: [{{ matches }}]
+  identifiers: [{{ identifiers }}]
+  units: [{{ units }}]
 
 journalbeat.registry_file: {{ registry_file }}
 
