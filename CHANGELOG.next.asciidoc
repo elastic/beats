@@ -184,6 +184,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix bad bytes count in `docker` input when filtering by stream. {pull}10211[10211]
 - Fixed data types for roles and indices fields in `elasticsearch/audit` fileset {pull}10307[10307]
 - Ensure `source.address` is always populated by the nginx module (ECS). {pull}10418[10418]
+- Fix errors in filebeat Zeek dashboard and README files. Add notice.log support. {pull}10916[10916]
 
 *Heartbeat*
 

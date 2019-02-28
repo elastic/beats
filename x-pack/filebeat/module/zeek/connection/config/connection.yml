@@ -17,7 +17,7 @@ processors:
           to: "zeek.connection"
 
         - from: "zeek.connection.duration"
-          to: "event.duration"
+          to: "temp.duration"
 
         - from: "zeek.connection.id.orig_h"
           to: "source.address"
