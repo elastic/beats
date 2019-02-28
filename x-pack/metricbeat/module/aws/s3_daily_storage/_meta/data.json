@@ -9,13 +9,14 @@
             "bucket": {
                 "name": "test-s3-ks",
                 "size": {
-                    "bytes": 969165
+                    "bytes": 1679631
                 }
             },
-            "number_of_objects": 2
+            "number_of_objects": 3
         }
     },
     "cloud": {
+        "provider": "aws",
         "region": "ap-southeast-1"
     },
     "event": {

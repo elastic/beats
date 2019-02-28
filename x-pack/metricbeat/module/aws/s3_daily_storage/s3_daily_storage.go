@@ -200,13 +200,19 @@ func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName st
 	// Cloud fields in ECS
 	event.RootFields.Put("service.name", metricsetName)
 	event.RootFields.Put("cloud.region", regionName)
+	event.RootFields.Put("cloud.provider", "aws")
 
 	// AWS s3_daily_storage metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
-	for _, output := range outputs {
-		labels := strings.Split(*output.Label, " ")
-		if len(labels) == 3 && labels[0] == bucketName && len(output.Values) >= 1 {
-			mapOfMetricSetFieldResults[labels[2]] = fmt.Sprint(output.Values[0])
+	// Find a timestamp for all metrics in output
+	if len(outputs) > 0 && len(outputs[0].Timestamps) > 0 {
+		timestamp := outputs[0].Timestamps[0]
+		for _, output := range outputs {
+			labels := strings.Split(*output.Label, " ")
+			// check timestamp to make sure metrics come from the same timestamp
+			if len(labels) == 3 && labels[0] == bucketName && len(output.Values) > 0 && output.Timestamps[0] == timestamp {
+				mapOfMetricSetFieldResults[labels[2]] = fmt.Sprint(output.Values[0])
+			}
 		}
 	}
 
