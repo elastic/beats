@@ -43,8 +43,9 @@ func TestDockerStart(t *testing.T) {
 		t.Fatal(err)
 	}
 	bus := bus.New("test")
-	config := common.NewConfig()
-	provider, err := AutodiscoverBuilder(bus, UUID, config)
+	config := defaultConfig()
+	config.CleanupTimeout = 0
+	provider, err := AutodiscoverBuilder(bus, UUID, common.MustNewConfigFrom(config))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -12,6 +12,27 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 - On Google Cloud Engine (GCE) the add_cloud_metadata will now trim the project
   info from the cloud.machine.type and cloud.availability_zone. {issue}10968[10968]
+- Update add_cloud_metadata fields to adjust to ECS. {pull}9265[9265]
+- Automaticall cap signed integers to 63bits. {pull}8991[8991]
+- Rename beat.timezone to event.timezone. {pull}9458[9458]
+- Use _doc as document type. {pull}9056[9056]{pull}9573[9573]
+- Update to Golang 1.11.3. {pull}9560[9560]
+- Embedded html is not escaped anymore by default. {pull}9914[9914]
+- Remove port settings from Logstash and Redis output. {pull}9934[9934]
+- Fix registry handle leak on Windows (https://github.com/elastic/go-sysinfo/pull/33). {pull}9920[9920]
+- Rename `process.exe` to `process.executable` in add_process_metadata to align with ECS. {pull}9949[9949]
+- Import ECS change https://github.com/elastic/ecs/pull/308[ecs#308]:
+  leaf field `user.group` is now the `group` field set. {pull}10275[10275]
+- Update the code of Central Management to align with the new returned format. {pull}10019[10019]
+- Docker and Kubernetes labels/annotations will be "dedoted" by default. {pull}10338[10338]
+- Remove --setup command line flag. {pull}10138[10138]
+- Remove --version command line flag. {pull}10138[10138]
+- Remove --configtest command line flag. {pull}10138[10138]
+- Move output.elasticsearch.ilm settings to setup.ilm. {pull}10347[10347]
+- ILM will be available by default if Elasticsearch > 7.0 is used. {pull}10347[10347]
+- Allow Central Management to send events back to kibana. {issue}9382[9382]
+- Initialize the Paths before the keystore and save the keystore into `data/{beatname}.keystore`. {pull}10706[10706]
+- Add `cleanup_timeout` option to docker autodiscover, to wait some time before removing configurations after a container is stopped. {issue]10374[10374] {pull}10905[10905]
 
 *Auditbeat*
 
