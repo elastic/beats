@@ -2810,6 +2810,16 @@ OS platform (e.g. centos, ubuntu, windows).
 
 --
 
+*`host.os.name`*::
++
+--
+type: keyword
+
+Operating system name (e.g. "Mac OS X").
+
+
+--
+
 *`host.os.version`*::
 +
 --
