@@ -53,6 +53,8 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 *Filebeat*
 
+- Fix errors in filebeat Zeek dashboard and README files. Add notice.log support. {pull}10916[10916]
+
 *Heartbeat*
 
 *Journalbeat*
