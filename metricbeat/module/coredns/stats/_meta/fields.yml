@@ -16,12 +16,12 @@
       type: object
       object_type: double
       description: >
-         Request duration histogram buckets
+         Request duration histogram buckets in nanoseconds
     - name: dns.request.duration.sec.sum
       type: long
       format: duration
       description: >
-         Requests duration, sum of durations
+         Requests duration, sum of durations in nanoseconds
     - name: dns.request.duration.sec.count
       type: long
       description: >

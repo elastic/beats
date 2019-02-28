@@ -10,12 +10,12 @@
                 "response": {
                     "rcode": {
                         "count": {
-                            "total": 92
+                            "total": 430
                         }
                     }
                 }
             },
-            "rcode": "NOERROR",
+            "rcode": "SERVFAIL",
             "server": "dns://:53",
             "zone": "."
         }

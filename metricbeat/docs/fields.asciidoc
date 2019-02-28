@@ -2614,7 +2614,7 @@ Total query count
 --
 type: object
 
-Request duration histogram buckets
+Request duration histogram buckets in nanoseconds
 
 
 --
@@ -2626,7 +2626,7 @@ type: long
 
 format: duration
 
-Requests duration, sum of durations
+Requests duration, sum of durations in nanoseconds
 
 
 --

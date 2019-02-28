@@ -9,14 +9,14 @@
             "dns": {
                 "request": {
                     "count": {
-                        "total": 92
+                        "total": 430
                     }
                 }
             },
             "family": "1",
             "proto": "udp",
             "server": "dns://:53",
-            "zone": "."
+            "zone": "dropped"
         }
     },
     "event": {
