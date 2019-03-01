@@ -17,7 +17,8 @@ class Test(BaseTest):
         Test stdin input. Checks if reading is continued after the first read.
         """
         self.render_config_template(
-            type="stdin"
+            type="stdin",
+            line_terminator="line_feed",
         )
 
         proc = self.start_beat()
@@ -55,6 +56,7 @@ class Test(BaseTest):
         self.render_config_template(
             type="stdin",
             close_eof="true",
+            line_terminator="line_feed",
         )
 
         args = [self.test_binary, "-systemTest"]

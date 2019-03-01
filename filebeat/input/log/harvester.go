@@ -34,6 +34,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"sync"
 	"time"
 
@@ -119,8 +120,13 @@ func NewHarvester(
 		return nil, err
 	}
 
+	cfg := defaultConfig
+	if runtime.GOOS == "windows" {
+		cfg.LineTerminator = readfile.CarriageReturnLineFeed
+	}
+
 	h := &Harvester{
-		config:        defaultConfig,
+		config:        cfg,
 		state:         state,
 		states:        states,
 		publishState:  publishState,
@@ -182,6 +188,8 @@ func (h *Harvester) Setup() error {
 		}
 		return fmt.Errorf("Harvester setup failed. Unexpected encoding line reader error: %s", err)
 	}
+
+	logp.Debug("harvester", "Harvester setup successful. Line terminator: %d", h.config.LineTerminator)
 
 	return nil
 }
@@ -564,7 +572,11 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
-	r, err = readfile.NewEncodeReader(reader, readfile.Config{h.encoding, h.config.BufferSize, h.config.LineTerminator})
+	r, err = readfile.NewEncodeReader(reader, readfile.Config{
+		Codec:      h.encoding,
+		BufferSize: h.config.BufferSize,
+		Terminator: h.config.LineTerminator,
+	})
 	if err != nil {
 		return nil, err
 	}

@@ -31,6 +31,8 @@ type EncoderReader struct {
 	reader *LineReader
 }
 
+// Config stores the configuration for the readers required to read
+// a file line by line
 type Config struct {
 	Codec      encoding.Encoding
 	BufferSize int

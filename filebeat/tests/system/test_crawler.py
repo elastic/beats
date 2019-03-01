@@ -504,7 +504,8 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            encoding="utf-8"
+            encoding="utf-8",
+            line_terminator="line_feed",
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -578,11 +579,12 @@ class Test(BaseTest):
         for enc_go, enc_py, _ in encodings:
             inputs.append({
                 "path": self.working_dir + "/log/test-{}".format(enc_py),
-                "encoding": enc_go
+                "encoding": enc_go,
+                "line_terminator": "line_feed",
             })
         self.render_config_template(
             template_name="filebeat_inputs",
-            inputs=inputs
+            inputs=inputs,
         )
 
         # run filebeat

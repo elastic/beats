@@ -19,7 +19,8 @@ class Test(BaseTest):
             multiline=True,
             pattern="^\[",
             negate="true",
-            match="after"
+            match="after",
+            line_terminator="line_feed",
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -49,7 +50,8 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/log/*",
             multiline=True,
             pattern="\\\\$",
-            match="before"
+            match="before",
+            line_terminator="line_feed",
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -125,7 +127,8 @@ connection <0.23893.109>, channel 3 - soft error:
             pattern="^\[",
             negate="true",
             match="after",
-            max_lines=3
+            max_lines=3,
+            line_terminator="line_feed",
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -207,7 +210,8 @@ connection <0.23893.109>, channel 3 - soft error:
             pattern="^\[",
             negate="true",
             match="after",
-            max_bytes=60
+            max_bytes=60,
+            line_terminator="line_feed",
         )
 
         os.mkdir(self.working_dir + "/log/")

@@ -4,6 +4,7 @@ filebeat.inputs:
     - {{input.path}}
   scan_frequency: 0.5s
   encoding: {{input.encoding | default("plain") }}
+  line_terminator: {{ input.line_terminator }}
 {% endfor %}
 
 {% if not skip_registry_config %}

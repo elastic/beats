@@ -15,7 +15,8 @@ class Test(BaseTest):
         """
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            json=dict(message_key="log")
+            json=dict(message_key="log"),
+            line_terminator="line_feed",
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -42,7 +43,8 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             json=dict(message_key="log", keys_under_root=True),
-            exclude_lines=["windows"]
+            exclude_lines=["windows"],
+            line_terminator="line_feed",
         )
 
         os.mkdir(self.working_dir + "/log/")
@@ -72,6 +74,7 @@ class Test(BaseTest):
                 message_key="message",
                 keys_under_root=True,
                 overwrite_keys=True),
+            line_terminator="line_feed",
             exclude_lines=["windows"]
         )
 
@@ -96,6 +99,7 @@ class Test(BaseTest):
             json=dict(
                 keys_under_root=True,
             ),
+            line_terminator="line_feed",
             agent_tags=["tag3", "tag4"]
         )
         os.mkdir(self.working_dir + "/log/")
@@ -164,6 +168,7 @@ class Test(BaseTest):
                 keys_under_root=True,
                 overwrite_keys=True
             ),
+            line_terminator="line_feed",
         )
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/json_timestamp.log"],
@@ -205,6 +210,7 @@ class Test(BaseTest):
                 keys_under_root=True,
                 overwrite_keys=True
             ),
+            line_terminator="line_feed",
         )
         os.mkdir(self.working_dir + "/log/")
         self.copy_files(["logs/json_type.log"],
@@ -243,6 +249,7 @@ class Test(BaseTest):
                 overwrite_keys=True,
                 add_error_key=True
             ),
+            line_terminator="line_feed",
             processors=[{
                 "drop_fields": {
                     "fields": ["headers.request-id"],
@@ -276,6 +283,7 @@ class Test(BaseTest):
         """
         Test if json_decoding_error is set to true, that no errors are logged.
         """
+
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             json=dict(
@@ -309,6 +317,7 @@ class Test(BaseTest):
         """
         Test if json_decoding_error is set to false, that an errors is logged.
         """
+
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             json=dict(
@@ -352,6 +361,7 @@ class Test(BaseTest):
                 overwrite_keys=True,
                 add_error_key=True
             ),
+            line_terminator="line_feed",
             processors=[{
                 "drop_fields": {
                     "fields": ["headers", "res"],
@@ -391,6 +401,7 @@ class Test(BaseTest):
             json=dict(
                 keys_under_root=True,
             ),
+            line_terminator="line_feed",
             processors=[{
                 "drop_event": {
                     "when": "equals.status: 200",
