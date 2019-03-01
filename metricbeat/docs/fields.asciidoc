@@ -1172,7 +1172,7 @@ The number of Amazon S3 SELECT Object Content requests made for objects in an Am
 
 --
 
-*`aws.s3_request.requests.select.scanned.bytes`*::
+*`aws.s3_request.requests.select_scanned.bytes`*::
 +
 --
 type: scaled_float
@@ -1182,7 +1182,7 @@ The number of bytes of data scanned with Amazon S3 SELECT Object Content request
 
 --
 
-*`aws.s3_request.requests.select.returned.bytes`*::
+*`aws.s3_request.requests.select_returned.bytes`*::
 +
 --
 type: scaled_float
