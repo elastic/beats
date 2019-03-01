@@ -174,12 +174,6 @@ func (l *winEventLog) Read() ([]Record, error) {
 		}
 
 		r, err := l.buildRecordFromXML(l.outputBuf.Bytes(), err)
-		if err != nil {
-			logp.Err("%s Dropping event. %v", l.logPrefix, err)
-			incrementMetric(dropReasons, err)
-			continue
-		}
-
 		r.Offset = checkpoint.EventLogState{
 			Name:         l.channelName,
 			RecordNumber: r.RecordID,
@@ -231,8 +225,8 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 
 func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, error) {
 	e, err := sys.UnmarshalEventXML(x)
-	if err != nil {
-		return Record{}, fmt.Errorf("Failed to unmarshal XML='%s'. %v", x, err)
+	if err != nil && recoveredErr == nil {
+		recoveredErr = err
 	}
 
 	err = sys.PopulateAccount(&e.User)
