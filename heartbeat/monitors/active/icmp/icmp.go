@@ -49,15 +49,6 @@ func create(
 	// not supported on all OSes)
 	// TODO: replace icmp package base reader/sender using raw sockets with
 	//       OS specific solution
-
-	addJob := func(t monitors.Job, err error) error {
-		if err != nil {
-			return err
-		}
-		jobs = append(jobs, t)
-		return nil
-	}
-
 	ipVersion := config.Mode.Network()
 	if len(config.Hosts) > 0 && ipVersion == "" {
 		err := fmt.Errorf("pinging hosts requires ipv4 or ipv6 mode enabled")
@@ -88,10 +79,12 @@ func create(
 		}
 
 		settings := monitors.MakeHostJobSettings(jobName, host, config.Mode)
-		err := addJob(monitors.MakeByHostJob(settings, pingFactory))
+		job, err := monitors.MakeByHostJob(settings, pingFactory)
 		if err != nil {
 			return nil, 0, err
 		}
+
+		jobs = append(jobs, monitors.WithJobId(jobName, job))
 	}
 
 	errWrappedJobs := monitors.WrapAll(jobs, monitors.WithErrAsField)
