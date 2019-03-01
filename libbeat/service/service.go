@@ -42,7 +42,7 @@ import (
 func HandleSignals(stopFunction func(), cancel context.CancelFunc) {
 	var callback sync.Once
 
-	// On ^C or SIGTERM, gracefully stop the sniffer
+	// On termination signals, gracefully stop the Beat
 	sigc := make(chan os.Signal, 1)
 	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	go func() {
