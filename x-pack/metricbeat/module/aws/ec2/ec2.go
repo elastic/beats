@@ -158,7 +158,7 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 	}
 
 	event.RootFields.Put("service.name", metricsetName)
-	event.RootFields.Put("cloud.provider", metricsetName)
+	event.RootFields.Put("cloud.provider", "aws")
 	event.RootFields.Put("cloud.availability_zone", *instanceOutput.Placement.AvailabilityZone)
 	event.RootFields.Put("cloud.region", regionName)
 	event.RootFields.Put("cloud.instance.id", instanceID)
