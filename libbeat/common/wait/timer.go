@@ -106,7 +106,7 @@ func (jt *PeriodicTimer) Wait() <-chan time.Time {
 }
 
 // Reset resets the current timer with the provided duration
-// NOTE: it is possible to receive a  tick before the reset actually happen.
+// NOTE: it is possible to receive a tick before the reset actually happen.
 func (jt *PeriodicTimer) Reset(d time.Duration) {
 	jt.resetOrDone <- d
 }
