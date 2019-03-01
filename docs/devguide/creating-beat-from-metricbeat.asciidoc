@@ -26,12 +26,12 @@ go get github.com/elastic/beats/metricbeat
 ----
 
 This will clone the beats repository into `GOPATH`. By default `go get`  fetches the master branch. To build your beat
-on a specific version of libbeat, check out the specific branch ({doc-branch} in the example below):
+on a specific version of libbeat, check out the specific branch ({branch} in the example below):
 
 ["source","sh",subs="attributes"]
 ----
 cd ${GOPATH}/src/github.com/elastic/beats
-git checkout {doc-branch}
+git checkout {branch}
 ----
 
 Note: If you have multiple go paths use `${GOPATH%%:*}`instead of `${GOPATH}`.

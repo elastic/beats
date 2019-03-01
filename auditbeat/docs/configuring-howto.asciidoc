@@ -14,7 +14,7 @@ There's also a full example configuration file at
 options. For mac and win, look in the archive that you extracted.
 
 The {beatname_uc} configuration file uses http://yaml.org/[YAML] for its syntax.
-See the {libbeat}/config-file-format.html[Config File Format] section of the
+See the {beats-ref}/config-file-format.html[Config File Format] section of the
 _Beats Platform Reference_ for more about the structure of the config file.
 
 The following topics describe how to configure {beatname_uc}:

@@ -839,7 +839,7 @@ Sets the path for log files. See the <<directory-layout>> section for details.
 *`--strict.perms`*::
 Sets strict permission checking on configuration files. The default is
 `-strict.perms=true`. See
-{libbeat}/config-file-permissions.html[Config file ownership and permissions] in
+{beats-ref}/config-file-permissions.html[Config file ownership and permissions] in
 the _Beats Platform Reference_ for more information.
 
 *`-v, --v`*::
