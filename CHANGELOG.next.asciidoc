@@ -34,6 +34,8 @@ https://github.com/elastic/beats/compare/v6.6.1...6.6[Check the HEAD diff]
 
 *Auditbeat*
 
+- System module: Fix and unify bucket closing logic. {pull}10897[10897]
+
 *Filebeat*
 
 *Heartbeat*
