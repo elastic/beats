@@ -13,7 +13,7 @@
 To secure the communication between {beatname_uc} and Elasticsearch, you can use
 HTTPS and basic authentication. Basic authentication for Elasticsearch is
 available when you enable {security} (see
-{securitydoc}/xpack-security.html[Securing the {stack}] and <<securing-beats>>).
+{stack-ov}/elasticsearch-security.html[Securing the {stack}] and <<securing-beats>>).
 If you aren't using {security}, you can use a web proxy instead.
 
 Here is a sample configuration:
