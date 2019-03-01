@@ -336,3 +336,62 @@ func TestWildcardQuery(t *testing.T) {
 
 	t.Log(values)
 }
+
+func TestGroupByInstance(t *testing.T) {
+	config := Config{
+		CounterConfig:     make([]CounterConfig, 3),
+		GroupMeasurements: true,
+	}
+	config.CounterConfig[0].InstanceLabel = "processor.name"
+	config.CounterConfig[0].MeasurementLabel = "processor.time.pct"
+	config.CounterConfig[0].Query = `\Processor Information(_Total)\% Processor Time`
+	config.CounterConfig[0].Format = "float"
+
+	config.CounterConfig[1].InstanceLabel = "processor.name"
+	config.CounterConfig[1].MeasurementLabel = "processor.time.user.pct"
+	config.CounterConfig[1].Query = `\Processor Information(_Total)\% User Time`
+	config.CounterConfig[1].Format = "float"
+
+	config.CounterConfig[2].InstanceLabel = "processor.name"
+	config.CounterConfig[2].MeasurementLabel = "processor.time.idle.average.ns"
+	config.CounterConfig[2].Query = `\Processor Information(_Total)\Average Idle Time`
+	config.CounterConfig[2].Format = "float"
+
+	handle, err := NewPerfmonReader(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer handle.query.Close()
+
+	values, _ := handle.Read()
+
+	time.Sleep(time.Millisecond * 1000)
+
+	values, err = handle.Read()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.EqualValues(t, 1, len(values)) // Assert all metrics have been grouped into a single event
+
+	// Test all keys exist in the event
+	pctKey, err := values[0].MetricSetFields.HasKey("processor.time.pct")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.True(t, pctKey)
+
+	pctKey, err = values[0].MetricSetFields.HasKey("processor.time.user.pct")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.True(t, pctKey)
+
+	pctKey, err = values[0].MetricSetFields.HasKey("processor.time.idle.average.ns")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.True(t, pctKey)
+
+	t.Log(values)
+}
