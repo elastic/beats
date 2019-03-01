@@ -96,7 +96,7 @@ The index template might not be loaded correctly. See <<filebeat-template>>.
 
 If you have recently performed an operation that loads or parses custom, structured logs,
 you might need to refresh the index to make the fields available in Kibana. To refresh
-the index, use the {elasticsearch}/indices-refresh.html[refresh API]. For example:
+the index, use the {ref}/indices-refresh.html[refresh API]. For example:
 
 ["source","sh"]
 ----------------------------------------------------------------------

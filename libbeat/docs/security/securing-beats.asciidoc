@@ -7,7 +7,7 @@
 ++++
 
 If you want {beatname_uc} to connect to a cluster that has
-{securitydoc}/xpack-security.html[{security}] enabled, there are extra
+{stack-ov}/elasticsearch-security.html[{security}] enabled, there are extra
 configuration steps:
 
 . <<beats-basic-auth>>.
