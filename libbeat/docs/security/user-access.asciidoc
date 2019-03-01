@@ -6,17 +6,23 @@ To enable users to access the indices {beatname_uc} creates, grant them `read`
 and `view_index_metadata` privileges on the {beatname_uc} indices. If they're
 using {kib}, they also need the `kibana_user` role.
 
-. Create a reader role that has the `read` and `view_index_metadata` privileges
+ifdef::apm-server[]
+X-Pack security provides a built-in role called `apm_user` that you can explicitly assign to users.
+This role grants them the necessary `read` and `view_index_metadata` privileges on the {beatname_uc} indices.
+endif::apm-server[]
+
+ifndef::apm-server[]
+. Create a role that has the `read` and `view_index_metadata` privileges
 on the {beatname_uc} indices.
 +
 You can create roles from the **Management > Roles** UI in {kib} or through the
 `role` API. For example, the following request creates a role named
-++{beat_default_index_prefix}_reader++:
+++{access_role}++:
 +
 --
 ["source","sh",subs="attributes,callouts"]
 ---------------------------------------------------------------
-POST _security/role/{beat_default_index_prefix}_reader
+POST _security/role/{access_role}
 {
   "indices": [
     {
@@ -30,40 +36,43 @@ POST _security/role/{beat_default_index_prefix}_reader
 <1> If you use a custom {beatname_uc} index pattern, specify that pattern
 instead of the default ++{beat_default_index_prefix}-*++ pattern.
 --
+endif::apm-server[]
 
-. Assign your users the reader role so they can access the {beatname_uc}
-indices. For {kib} users who need to visualize the data, also assign the
-`kibana_user` role:
+. Assign your users the ++{access_role}++
+role so they can access the {beatname_uc} indices.
+For {kib} users who need to visualize the data,
+also assign the `kibana_user` role:
 
 .. If you're using the `native` realm, you can assign roles with the
 **Management > Users** UI in {kib} or through the `user` API. For example, the
-following request grants ++{beat_default_index_prefix}_user++ the
-++{beat_default_index_prefix}_reader++ and `kibana_user` roles:
+following request grants ++{beat_default_index_prefix}_account++ the
+++{access_role}++ and `kibana_user` roles:
 +
 --
 ["source", "sh", subs="attributes,callouts"]
 ---------------------------------------------------------------
-POST /_security/user/{beat_default_index_prefix}_user
+POST /_security/user/{beat_default_index_prefix}_account
 {
   "password" : "{pwd}",
-  "roles" : [ "{beat_default_index_prefix}_reader","kibana_user"],
-  "full_name" : "{beatname_uc} User"
+  "roles" : [ "{access_role}","kibana_user"],
+  "full_name" : "{beatname_uc} account"
 }
 ---------------------------------------------------------------
 // CONSOLE
 --
-.. If you're using the LDAP, Active Directory, or PKI realms, you assign the
-roles in the `role_mapping.yml` configuration file. For example, the following
-snippet grants ++{beatname_uc} User++ the ++{beat_default_index_prefix}_reader++
-and `kibana_user` roles:
+.. If you're using the LDAP, Active Directory, or PKI realms,
+you assign the roles in the `role_mapping.yml` configuration file.
+For example, the following snippet grants
+++{beat_default_index_prefix}_account++ the
+++{access_role}++ and `kibana_user` roles:
 +
 --
 ["source", "yaml", subs="attributes,callouts"]
 ---------------------------------------------------------------
-{beat_default_index_prefix}_reader:
-  - "cn={beatname_uc} User,dc=example,dc=com"
+{access_role}:
+  - "cn={beat_default_index_prefix}_account,dc=example,dc=com"
 kibana_user:
-  - "cn={beatname_uc} User,dc=example,dc=com"
+  - "cn={beat_default_index_prefix}_account,dc=example,dc=com"
 ---------------------------------------------------------------
 
 For more information, see

@@ -48,6 +48,18 @@ func TestGenerateHints(t *testing.T) {
 			result: common.MapStr{},
 		},
 		{
+			msg: "Hints with logs.disable should return nothing",
+			event: bus.Event{
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"disable": "true",
+					},
+				},
+			},
+			len:    0,
+			result: common.MapStr{},
+		},
+		{
 			msg: "Empty event hints should return default config",
 			event: bus.Event{
 				"host": "1.2.3.4",

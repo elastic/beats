@@ -14,6 +14,7 @@ to collect. The example below collects processor time and disk writes every
   metricsets: [perfmon]
   period: 10s
   perfmon.ignore_non_existent_counters: true
+  perfmon.group_measurements_by_instance: true
   perfmon.counters:
     - instance_label: processor.name
       instance_name: total
@@ -33,6 +34,12 @@ to collect. The example below collects processor time and disk writes every
 metricset to ignore errors caused by counters that do not exist when set to
 true. Instead of an error, a message will be logged at the info level stating
 that the counter does not exist.
+
+*`group_measurements_by_instance`*:: A boolean option that causes metricbeat
+to send all measurements with a matching perfmon instance as part of a single
+event. In the above example, this will cause the physical_disk.write.per_sec
+and physical_disk.write.time.pct measurements to be sent as a single event.
+The default behaviour is for all measurements to be sent as separate events.
 
 *`counters`*:: Counters specifies a list of queries to perform. Each individual
 counter requires three config options - `instance_label`, `measurement_label`,

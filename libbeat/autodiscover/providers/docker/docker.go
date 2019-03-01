@@ -19,6 +19,7 @@ package docker
 
 import (
 	"errors"
+	"time"
 
 	"github.com/gofrs/uuid"
 
@@ -115,7 +116,9 @@ func (d *Provider) Start() {
 				d.emitContainer(event, "start")
 
 			case event := <-d.stopListener.Events():
-				d.emitContainer(event, "stop")
+				time.AfterFunc(d.config.CleanupTimeout, func() {
+					d.emitContainer(event, "stop")
+				})
 			}
 		}
 	}()
@@ -267,7 +270,7 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 		e["port"] = port
 	}
 	if labels, err := dockerMeta.GetValue("labels"); err == nil {
-		hints := builder.GenerateHints(labels.(common.MapStr), "", d.config.Prefix)
+		hints := builder.GenerateHints(labels.(common.MapStr), "", d.config.Prefix, d.config.DefaultDisable)
 		e["hints"] = hints
 	}
 	return e

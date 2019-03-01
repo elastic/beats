@@ -4,17 +4,14 @@
     {
       "script": {
         "lang": "painless",
-        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['ssl']['ts'] * params.multiplier; ctx.zeek.ssl.remove('ts');",
-        "params": {
-          "multiplier": 1000
-        }
+        "source": "ctx.event.created = ctx['@timestamp']; ctx['@timestamp'] = (long)ctx['zeek']['ssl']['ts'] * 1000; ctx.zeek.ssl.remove('ts');"
       }
     },
     {
-      "script": {
-        "lang": "painless",
-        "source": "ctx.event.id = ctx.zeek.session_id + \"-ssl\"",
-        "ignore_failure": true
+      "set": {
+        "field": "event.id",
+        "value": "{{zeek.session_id}}",
+        "if": "ctx.zeek.session_id != null"
       }
     },
     {
