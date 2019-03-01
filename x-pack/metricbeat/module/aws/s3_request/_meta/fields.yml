@@ -36,11 +36,11 @@
       type: long
       description: >
         The number of Amazon S3 SELECT Object Content requests made for objects in an Amazon S3 bucket.
-    - name: requests.select.scanned.bytes
+    - name: requests.select_scanned.bytes
       type: scaled_float
       description: >
         The number of bytes of data scanned with Amazon S3 SELECT Object Content requests in an Amazon S3 bucket.
-    - name: requests.select.returned.bytes
+    - name: requests.select_returned.bytes
       type: scaled_float
       description: >
         The number of bytes of data returned with Amazon S3 SELECT Object Content requests in an Amazon S3 bucket.
