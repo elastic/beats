@@ -1086,6 +1086,43 @@ The state of the instance (pending | running | shutting-down | terminated | stop
 --
 
 [float]
+== s3_daily_storage fields
+
+`s3_daily_storage` contains the daily storage metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
+
+
+
+*`aws.s3_daily_storage.bucket.name`*::
++
+--
+type: keyword
+
+Name of a S3 bucket.
+
+
+--
+
+*`aws.s3_daily_storage.bucket.size.bytes`*::
++
+--
+type: scaled_float
+
+The amount of data in bytes stored in a bucket.
+
+
+--
+
+*`aws.s3_daily_storage.number_of_objects`*::
++
+--
+type: long
+
+The total number of objects stored in a bucket for all storage classes.
+
+
+--
+
+[float]
 == s3_request fields
 
 `s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
@@ -1172,7 +1209,7 @@ The number of Amazon S3 SELECT Object Content requests made for objects in an Am
 
 --
 
-*`aws.s3_request.requests.select.scanned.bytes`*::
+*`aws.s3_request.requests.select_scanned.bytes`*::
 +
 --
 type: scaled_float
@@ -1182,7 +1219,7 @@ The number of bytes of data scanned with Amazon S3 SELECT Object Content request
 
 --
 
-*`aws.s3_request.requests.select.returned.bytes`*::
+*`aws.s3_request.requests.select_returned.bytes`*::
 +
 --
 type: scaled_float
@@ -26201,7 +26238,7 @@ server contains the metrics reported by the four-letter `srvr` command.
 --
 type: long
 
-Connections established by the server
+Number of clients currently connected to the server
 
 --
 
@@ -26211,7 +26248,7 @@ Connections established by the server
 --
 type: long
 
-Average latency of the server
+Average amount of time taken for the server to respond to a client request
 
 --
 
@@ -26220,7 +26257,7 @@ Average latency of the server
 --
 type: long
 
-Max latency reached by the server
+Maximum amount of time taken for the server to respond to a client request
 
 --
 
@@ -26229,7 +26266,7 @@ Max latency reached by the server
 --
 type: long
 
-Minimum latency that has been reached by the server
+Minimum amount of time taken for the server to respond to a client request
 
 --
 
@@ -26238,7 +26275,7 @@ Minimum latency that has been reached by the server
 --
 type: keyword
 
-Server mode
+Mode of the server. In an ensemble, this may either be leader or follower. Otherwise, it is standalone
 
 --
 
@@ -26256,7 +26293,7 @@ Total number of nodes
 --
 type: long
 
-Outstanding
+Number of requests queued at the server. This exceeds zero when the server receives more requests than it is able to process
 
 --
 
@@ -26265,7 +26302,7 @@ Outstanding
 --
 type: long
 
-Received requests to the server
+Number of requests received by the server
 
 --
 
@@ -26274,7 +26311,7 @@ Received requests to the server
 --
 type: long
 
-Requests sent by the server
+Number of requests sent by the server
 
 --
 
@@ -26283,7 +26320,7 @@ Requests sent by the server
 --
 type: date
 
-Date of the Zookeeper release in use
+Date of the Zookeeper release currently in use
 
 --
 
@@ -26292,7 +26329,7 @@ Date of the Zookeeper release in use
 --
 type: keyword
 
-Original value of the Zookeeper transaction ID
+Unique value of the Zookeeper transaction ID. The zxid consists of an epoch and a counter. It is established by the leader and is used to determine the temporal ordering of changes
 
 --
 
@@ -26310,7 +26347,7 @@ Total transactions of the leader in epoch
 --
 type: long
 
-Epoch value of the Zookeeper transaction ID
+Epoch value of the Zookeeper transaction ID. An epoch signifies the period in which a server is a leader
 
 --
 

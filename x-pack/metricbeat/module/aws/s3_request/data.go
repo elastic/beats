@@ -19,8 +19,8 @@ var (
 			"head":                  c.Int("HeadRequests"),
 			"post":                  c.Int("PostRequests"),
 			"select":                c.Int("SelectRequests"),
-			"select.scanned.bytes":  c.Float("SelectScannedBytes"),
-			"select.returned.bytes": c.Float("SelectReturnedBytes"),
+			"select_scanned.bytes":  c.Float("SelectScannedBytes"),
+			"select_returned.bytes": c.Float("SelectReturnedBytes"),
 			"list":                  c.Int("ListRequests"),
 		},
 		"downloaded": s.Object{
