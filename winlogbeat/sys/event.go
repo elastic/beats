@@ -26,7 +26,8 @@ import (
 // UnmarshalEventXML unmarshals the given XML into a new Event.
 func UnmarshalEventXML(rawXML []byte) (Event, error) {
 	var event Event
-	err := xml.Unmarshal(rawXML, &event)
+	decoder := xml.NewDecoder(newXmlSafeReader(rawXML))
+	err := decoder.Decode(&event)
 	return event, err
 }
 
