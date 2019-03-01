@@ -151,6 +151,23 @@ func TestXML(t *testing.T) {
 	}
 }
 
+func TestInvalidXML(t *testing.T) {
+	eventXML := fmt.Sprintf(`
+<Event>
+  <UserData>
+    <Operation_ClientFailure xmlns='http://manifests.microsoft.com/win/2006/windows/WMI'>
+      <Id>{00000000-0000-0000-0000-000000000000}</Id>
+      <Message>じゃあ宇宙カウボーイ。。。%s</Message>
+    </Operation_ClientFailure>
+  </UserData>
+</Event>
+`, "\x1b")
+	_, err := UnmarshalEventXML([]byte(eventXML))
+	if !assert.NoError(t, err) {
+		assert.Equal(t, err.Error(), "XML syntax error on line 6: illegal character code U+001B")
+	}
+}
+
 func BenchmarkXMLUnmarshal(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_, err := UnmarshalEventXML([]byte(allXML))
