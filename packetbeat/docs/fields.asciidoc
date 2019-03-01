@@ -2800,12 +2800,42 @@ Host architecture (e.g. x86_64, arm, ppc, mips).
 
 --
 
+*`host.containerized`*::
++
+--
+type: boolean
+
+If the host is a container.
+
+
+--
+
 *`host.os.platform`*::
 +
 --
 type: keyword
 
 OS platform (e.g. centos, ubuntu, windows).
+
+
+--
+
+*`host.os.name`*::
++
+--
+type: keyword
+
+Operating system name (e.g. "Mac OS X").
+
+
+--
+
+*`host.os.build`*::
++
+--
+type: keyword
+
+OS build information (e.g. "18D109").
 
 
 --

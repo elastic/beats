@@ -19,10 +19,22 @@
           type: keyword
           description: >
             Host architecture (e.g. x86_64, arm, ppc, mips).
+        - name: containerized
+          type: boolean
+          description: >
+            If the host is a container.
         - name: os.platform
           type: keyword
           description: >
             OS platform (e.g. centos, ubuntu, windows).
+        - name: os.name
+          type: keyword
+          description: >
+            Operating system name (e.g. "Mac OS X").
+        - name: os.build
+          type: keyword
+          description: >
+            OS build information (e.g. "18D109").
         - name: os.version
           type: keyword
           description: >
@@ -39,4 +51,3 @@
           type: keyword
           description: >
             List of hardware-addresses, usually MAC-addresses.
-
