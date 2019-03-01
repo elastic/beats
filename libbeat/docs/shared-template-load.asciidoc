@@ -16,7 +16,7 @@ the output is not Elasticsearch, you must
 <<load-template-manually,load the template manually>>. 
 endif::only-elasticsearch[]
 
-In Elasticsearch, {elasticsearch}/indices-templates.html[index
+In Elasticsearch, {ref}/indices-templates.html[index
 templates] are used to define settings and mappings that determine how fields
 should be analyzed.
 
