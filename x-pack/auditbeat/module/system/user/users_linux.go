@@ -11,8 +11,8 @@ package user
 // #include <pwd.h>
 // #include <shadow.h>
 //
-// void setErrno(int err) {
-//      errno = err;
+// void clearErrno() {
+//      errno = 0;
 // }
 import "C"
 
@@ -75,7 +75,7 @@ func readPasswdFile(readPasswords bool) ([]*User, error) {
 	for {
 		// Setting errno to 0 before calling getpwent().
 		// See return value section of getpwent(3).
-		C.setErrno(0)
+		C.clearErrno()
 
 		passwd, err := C.getpwent()
 
@@ -197,7 +197,7 @@ func readShadowFile() (map[string]shadowFileEntry, error) {
 		// While getspnam(3) does not explicitly call out the need for setting errno to 0
 		// as getpwent(3) does, at least glibc uses the same code for both, and so it
 		// probably makes sense to do the same for both.
-		C.setErrno(0)
+		C.clearErrno()
 
 		spwd, err := C.getspent()
 
