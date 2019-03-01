@@ -31,14 +31,16 @@ type EncoderReader struct {
 	reader *LineReader
 }
 
+type Config struct {
+	Codec      encoding.Encoding
+	BufferSize int
+	Terminator LineTerminator
+}
+
 // New creates a new Encode reader from input reader by applying
 // the given codec.
-func NewEncodeReader(
-	r io.Reader,
-	codec encoding.Encoding,
-	bufferSize int,
-) (EncoderReader, error) {
-	eReader, err := NewLineReader(r, codec, bufferSize)
+func NewEncodeReader(r io.Reader, config Config) (EncoderReader, error) {
+	eReader, err := NewLineReader(r, config)
 	return EncoderReader{eReader}, err
 }
 

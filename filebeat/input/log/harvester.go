@@ -564,7 +564,7 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		return nil, err
 	}
 
-	r, err = readfile.NewEncodeReader(reader, h.encoding, h.config.BufferSize)
+	r, err = readfile.NewEncodeReader(reader, readfile.Config{h.encoding, h.config.BufferSize, h.config.LineTerminator})
 	if err != nil {
 		return nil, err
 	}
@@ -578,7 +578,7 @@ func (h *Harvester) newLogFileReader() (reader.Reader, error) {
 		r = readjson.NewJSONReader(r, h.config.JSON)
 	}
 
-	r = readfile.NewStripNewline(r)
+	r = readfile.NewStripNewline(r, h.config.LineTerminator)
 
 	if h.config.Multiline != nil {
 		r, err = multiline.New(r, "\n", h.config.MaxBytes, h.config.Multiline)
