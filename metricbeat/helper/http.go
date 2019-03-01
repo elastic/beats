@@ -47,10 +47,14 @@ type HTTP struct {
 func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 	config := struct {
 		TLS             *tlscommon.Config `config:"ssl"`
+		ConnectTimeout  time.Duration     `config:"connect_timeout"`
 		Timeout         time.Duration     `config:"timeout"`
 		Headers         map[string]string `config:"headers"`
 		BearerTokenFile string            `config:"bearer_token_file"`
-	}{}
+	}{
+		ConnectTimeout: 2 * time.Second,
+		Timeout:        10 * time.Second,
+	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -74,8 +78,8 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 
 	var dialer, tlsDialer transport.Dialer
 
-	dialer = transport.NetDialer(config.Timeout)
-	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, config.Timeout)
+	dialer = transport.NetDialer(config.ConnectTimeout)
+	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, config.ConnectTimeout)
 	if err != nil {
 		return nil, err
 	}

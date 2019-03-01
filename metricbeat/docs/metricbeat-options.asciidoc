@@ -225,6 +225,16 @@ The username to use for basic authentication.
 The password to use for basic authentication.
 
 [float]
+==== `connect_timeout`
+
+Total time limit for an HTTP connection to be completed (Default: 2 seconds).
+
+[float]
+==== `timeout`
+
+Total time limit for HTTP requests made by the module (Default: 10 seconds).
+
+[float]
 ==== `ssl`
 
 Configuration options for SSL parameters like the certificate authority to use
