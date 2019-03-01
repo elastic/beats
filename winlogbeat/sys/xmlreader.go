@@ -73,6 +73,6 @@ func (r *xmlSafeReader) Read(d []byte) (n int, err error) {
 	return output(n)
 }
 
-func newXmlSafeReader(rawXML []byte) io.Reader {
+func newXMLSafeReader(rawXML []byte) io.Reader {
 	return &xmlSafeReader{inner: bytes.NewReader(rawXML)}
 }
