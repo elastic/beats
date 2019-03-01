@@ -139,6 +139,8 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Prevent Winlogbeat from dropping events with invalid XML. {pull}11006{11006}
+
 *Functionbeat*
 
 - Ensure that functionbeat is logging at info level not debug. {issue}10262[10262]

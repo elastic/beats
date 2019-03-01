@@ -127,6 +127,13 @@ func (e Record) ToEvent() beat.Event {
 	userData := addPairs(m, "user_data", e.UserData.Pairs)
 	addOptional(userData, "xml_name", e.UserData.Name.Local)
 
+	// Errors
+	if len(e.RenderErr) == 1 {
+		addOptional(m, "message_error", e.RenderErr[0])
+	} else {
+		addOptional(m, "message_error", e.RenderErr)
+	}
+
 	return beat.Event{
 		Timestamp: e.TimeCreated.SystemTime,
 		Fields:    m,
