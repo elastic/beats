@@ -273,10 +273,7 @@ sudo service {beatname_lc} start
 
 *docker:*
 
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-docker run {dockerimage}
-----------------------------------------------------------------------
+See <<running-on-docker>>.
 
 *mac and linux:*
 
