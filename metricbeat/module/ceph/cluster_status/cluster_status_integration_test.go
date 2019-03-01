@@ -30,7 +30,7 @@ import (
 )
 
 func TestData(t *testing.T) {
-	compose.EnsureUpWithTimeout(t, 30, "ceph")
+	compose.EnsureUpWithTimeout(t, 120, "ceph")
 
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2(f)
@@ -45,7 +45,7 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	compose.EnsureUpWithTimeout(t, 30, "ceph")
+	compose.EnsureUpWithTimeout(t, 120, "ceph")
 
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2(f)
