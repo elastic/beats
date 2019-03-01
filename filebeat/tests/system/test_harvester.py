@@ -856,3 +856,25 @@ class Test(BaseTest):
             'Matching null byte found at offset (13|14)')), max_timeout=5)
 
         filebeat.check_kill_and_wait()
+
+    def test_line_terminator(self):
+        """
+        Test if line_terminator can be configured to vertical tab
+        """
+
+        self.render_config_template(
+            path=os.path.abspath(self.beat_path) + "/tests/system/input/test-newline.log",
+            line_terminator="vertical_tab",
+        )
+
+        filebeat = self.start_beat()
+
+        messages = [
+            "\"message\": \"hello world\"",
+            "\"message\": \"goodbye world\"",
+        ]
+
+        for message in messages:
+            self.wait_until(lambda: self.log_contains(message))
+
+        filebeat.check_kill_and_wait()
