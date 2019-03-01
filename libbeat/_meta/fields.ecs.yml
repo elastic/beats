@@ -912,6 +912,12 @@
           description: >
             Operating system architecture.
 
+        - name: containerized
+          level: core
+          type: boolean
+          description: >
+            If the host is a container.
+
         - name: os
           title: Operating System
           group: 2
@@ -960,6 +966,13 @@
             example: "10.14.1"
             description: >
               Operating system version as a raw string.
+
+          - name: build
+            level: extended
+            type: keyword
+            example: "18D109"
+            description: >
+              OS build information.
 
           - name: kernel
             level: extended

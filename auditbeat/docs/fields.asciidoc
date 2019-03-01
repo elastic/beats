@@ -4117,6 +4117,16 @@ Operating system architecture.
 
 --
 
+*`host.containerized`*::
++
+--
+type: boolean
+
+If the host is a container.
+
+
+--
+
 [float]
 == os fields
 
@@ -4180,6 +4190,18 @@ type: keyword
 example: 10.14.1
 
 Operating system version as a raw string.
+
+
+--
+
+*`host.os.build`*::
++
+--
+type: keyword
+
+example: 18D109
+
+OS build information.
 
 
 --
