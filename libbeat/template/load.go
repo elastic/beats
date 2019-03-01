@@ -169,7 +169,7 @@ func loadJSON(client ESClient, path string, json map[string]interface{}) ([]byte
 func esVersionParams(ver common.Version) map[string]string {
 	if ver.Major == 6 && ver.Minor == 7 {
 		return map[string]string{
-			"include_type_name": "false",
+			"include_type_name": "true",
 		}
 	}
 
