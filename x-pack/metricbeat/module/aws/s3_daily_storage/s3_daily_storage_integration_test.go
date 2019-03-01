@@ -4,7 +4,7 @@
 
 // +build integration
 
-package s3_request
+package s3_daily_storage
 
 import (
 	"testing"
@@ -16,7 +16,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	config, info := mtest.GetConfigForTest("s3_request", "86400s")
+	config, info := mtest.GetConfigForTest("s3_daily_storage", "86400s")
 	if info != "" {
 		t.Skip("Skipping TestFetch: " + info)
 	}
@@ -41,27 +41,13 @@ func TestFetch(t *testing.T) {
 
 		// MetricSetField
 		mtest.CheckEventField("bucket.name", "string", event, t)
-		mtest.CheckEventField("requests.total", "int", event, t)
-		mtest.CheckEventField("requests.get", "int", event, t)
-		mtest.CheckEventField("requests.put", "int", event, t)
-		mtest.CheckEventField("requests.delete", "int", event, t)
-		mtest.CheckEventField("requests.head", "int", event, t)
-		mtest.CheckEventField("requests.post", "int", event, t)
-		mtest.CheckEventField("select.requests", "int", event, t)
-		mtest.CheckEventField("select_scanned.bytes", "float", event, t)
-		mtest.CheckEventField("select_returned.bytes", "float", event, t)
-		mtest.CheckEventField("requests.list", "int", event, t)
-		mtest.CheckEventField("downloaded.bytes", "float", event, t)
-		mtest.CheckEventField("uploaded.bytes", "float", event, t)
-		mtest.CheckEventField("errors.4xx", "int", event, t)
-		mtest.CheckEventField("errors.5xx", "int", event, t)
-		mtest.CheckEventField("latency.first_byte.ms", "float", event, t)
-		mtest.CheckEventField("latency.total_request.ms", "float", event, t)
+		mtest.CheckEventField("bucket.size.bytes", "float", event, t)
+		mtest.CheckEventField("number_of_object", "int", event, t)
 	}
 }
 
 func TestData(t *testing.T) {
-	config, info := mtest.GetConfigForTest("s3_request", "86400s")
+	config, info := mtest.GetConfigForTest("s3_daily_storage", "86400s")
 	if info != "" {
 		t.Skip("Skipping TestData: " + info)
 	}
