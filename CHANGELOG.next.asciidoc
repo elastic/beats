@@ -69,6 +69,8 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 *Winlogbeat*
 
+- Prevent Winlogbeat from dropping events with invalid XML. {pull}11006{11006}
+
 *Functionbeat*
 
 ==== Added
