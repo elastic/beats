@@ -18,7 +18,7 @@
 package server
 
 import (
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -35,6 +35,8 @@ var (
 		DefaultPath:   defaultPath,
 	}.Build()
 )
+
+var logger = logp.NewLogger("envoyproxy.server")
 
 func init() {
 	mb.Registry.MustAddMetricSet("envoyproxy", "server", New,
@@ -64,14 +66,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	content, err := m.http.FetchContent()
 	if err != nil {
-		return nil, err
+		logger.Error(err)
+		reporter.Error(err)
+		return
 	}
-	event, err := eventMapping(content)
-	if err != nil {
-		return nil, err
-	}
-	return event, nil
+
+	event, _ := eventMapping(content)
+	reporter.Event(mb.Event{MetricSetFields: event})
+
+	return
 }
