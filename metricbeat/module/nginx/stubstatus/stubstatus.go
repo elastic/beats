@@ -19,7 +19,7 @@
 package stubstatus
 
 import (
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -41,6 +41,8 @@ var (
 		DefaultPath:   defaultPath,
 	}.Build()
 )
+
+var logger = logp.NewLogger("nginx.stubstatus")
 
 func init() {
 	mb.Registry.MustAddMetricSet("nginx", "stubstatus", New,
@@ -68,12 +70,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-// Fetch makes an HTTP request to fetch status metrics from the stubstatus endpoint.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	scanner, err := m.http.FetchScanner()
 	if err != nil {
-		return nil, err
+		logger.Error(err)
+		reporter.Error(err)
+		return
 	}
+	event, _ := eventMapping(scanner, m)
+	reporter.Event(mb.Event{MetricSetFields: event})
 
-	return eventMapping(scanner, m)
+	return
 }
