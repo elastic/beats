@@ -1,8 +1,0 @@
-type: syslog
-  {{ if .convert_timezone }}
-processors:
-  - add_locale: ~
-  {{ end }}
-
-protocol.udp:
-  host: "{{.syslog_host}}:{{.syslog_port}}"

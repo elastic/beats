@@ -89,7 +89,7 @@ You specify settings in the  +{beatname_lc}.yml+ configuration file. This file
 is located in the archive that you extracted earlier.
 
 TIP: See the
-{libbeat}/config-file-format.html[Config File Format] section of the
+{beats-ref}/config-file-format.html[Config File Format] section of the
 _Beats Platform Reference_ for more about the structure of the config file.
 
 The following example configures a function called `cloudwatch` that collects

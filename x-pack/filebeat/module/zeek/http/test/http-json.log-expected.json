@@ -20,6 +20,8 @@
         "http.version": "1.1",
         "input.type": "log",
         "log.offset": 0,
+        "network.community_id": "1:dtBPRfpKEZyg1iOHss95buwv+cw=",
+        "network.transport": "tcp",
         "service.type": "zeek",
         "source.address": "10.178.98.102",
         "source.ip": "10.178.98.102",

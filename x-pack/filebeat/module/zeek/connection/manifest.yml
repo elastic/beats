@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/conn.log
   - name: tags
     default: [zeek.connection]
+  - name: community_id
+    default: true
 
 ingest_pipeline: ingest/pipeline.json
 input: config/connection.yml

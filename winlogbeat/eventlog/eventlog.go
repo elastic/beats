@@ -138,7 +138,11 @@ func (e Record) ToEvent() beat.Event {
 	addOptional(m, "message", sys.RemoveWindowsLineEndings(e.Message))
 	// Errors
 	addOptional(m, "error.code", e.RenderErrorCode)
-	addOptional(m, "error.message", e.RenderErr)
+	if len(e.RenderErr) == 1 {
+		addOptional(m, "error.message", e.RenderErr[0])
+	} else {
+		addOptional(m, "error.message", e.RenderErr)
+	}
 
 	addOptional(m, "event.original", e.XML)
 
