@@ -1,5 +1,6 @@
 import sys
 import os
+import glob
 import json
 import requests
 import string
@@ -61,9 +62,9 @@ class TestManagement(BaseTest):
         assert config_content != new_content
 
         # Settings backup has been created
-        assert os.path.isfile(os.path.join(
-            self.working_dir, "mockbeat.yml.bak"))
-        backup_content = open(config_path + ".bak", 'r').read()
+        backup_file = glob.glob(os.path.join( self.working_dir, "mockbeat.yml.*.bak")[0]
+        assert os.path.isfile(backup_file)
+        backup_content = open(backup_file).read()
         assert config_content == backup_content
 
     @unittest.skipIf(not INTEGRATION_TESTS,
