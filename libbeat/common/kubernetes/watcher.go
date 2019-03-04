@@ -260,7 +260,7 @@ func (w *watcher) watch() {
 				case io.EOF:
 					logp.Debug("kubernetes", "EOF while watching API")
 				case io.ErrUnexpectedEOF:
-					logp.Warn("kubernetes: Unexpected EOF while watching API")
+					logp.Info("kubernetes: Unexpected EOF while watching API")
 				default:
 					// This is an error event which can be recovered by moving to the latest resource version
 					logp.Err("kubernetes: Watching API error %v, ignoring event and moving to most recent resource version", err)
