@@ -179,6 +179,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added function to close sql database connection. {pull}10355[10355]
 - Fix issue with `elasticsearch/node_stats` metricset (x-pack) not indexing `source_node` field. {pull}10639[10639]
 - Migrate docker autodiscover to ECS. {issue}10757[10757] {pull}10862[10862]
+- Fix issue in kubernetes module preventing usage percentages to be properly calculated. {pull}10946[10946]
 
 *Packetbeat*
 
