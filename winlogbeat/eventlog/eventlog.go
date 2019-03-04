@@ -79,7 +79,11 @@ func (e Record) ToMapStr() common.MapStr {
 	addOptional(m, "opcode", e.Opcode)
 	addOptional(m, "keywords", e.Keywords)
 	addOptional(m, "message", sys.RemoveWindowsLineEndings(e.Message))
-	addOptional(m, "message_error", e.RenderErr)
+	if len(e.RenderErr) == 1 {
+		addOptional(m, "message_error", e.RenderErr[0])
+	} else {
+		addOptional(m, "message_error", e.RenderErr)
+	}
 
 	// Correlation
 	addOptional(m, "activity_id", e.Correlation.ActivityID)
