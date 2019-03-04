@@ -45,6 +45,7 @@ var (
 					Type:       "object",
 					ObjectType: "keyword",
 				},
+				// todo: not supported
 				common.Field{
 					Name: "obj-type-params",
 					ObjectTypeParams: []common.ObjectTypeCfg{
@@ -55,6 +56,15 @@ var (
 				},
 				common.Field{Name: "not-a-dimension", Type: "long"},
 			},
+		},
+		common.Field{
+			Name:       "obj1",
+			Type:       "object",
+			ObjectType: "keyword",
+		},
+		common.Field{
+			Name:      "obj1-but-not-a-child-of-obj1",
+			Dimension: &falsy,
 		},
 	}
 )
@@ -76,7 +86,9 @@ func TestTimesSeriesIsDimension(t *testing.T) {
 		{false, "overwritten-field1"},
 		{false, "overwritten-field2"},
 		{true, "nested-obj.object-of-keywords.third-level"},
-		{true, "nested-obj.second-level"},
+		{false, "nested-obj.second-level"},
+		{true, "obj1.key1"},
+		{false, "obj1-but-not-a-child-of-obj1.key1"},
 	} {
 		assert.Equal(t, test.isDim, processor.isDimension(test.field), test.field)
 	}

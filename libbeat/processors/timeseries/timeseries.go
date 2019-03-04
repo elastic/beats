@@ -112,8 +112,9 @@ func populateDimensions(prefix string, dimensions map[string]bool, prefixes map[
 
 		if f.Type == "object" {
 			// everything with this prefix could be a dimension
-			if _, ok := prefixes[prefix]; !ok || f.Overwrite {
-				prefixes[prefix] = isDimension(f)
+			name += "."
+			if _, ok := prefixes[name]; !ok || f.Overwrite {
+				prefixes[name] = isDimension(f)
 			}
 		} else {
 			if _, ok := dimensions[name]; !ok || f.Overwrite {
