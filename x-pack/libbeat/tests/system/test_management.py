@@ -40,6 +40,8 @@ class TestManagement(BaseTest):
         Enroll the beat in Kibana Central Management
         """
 
+        assert len(glob.glob(os.path.join(self.working_dir, "mockbeat.yml.*.bak"))) == 0
+
         # We don't care about this as it will be replaced by enrollment
         # process:
         config_path = os.path.join(self.working_dir, "mockbeat.yml")
