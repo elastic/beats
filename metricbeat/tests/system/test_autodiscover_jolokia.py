@@ -53,4 +53,6 @@ class Test(metricbeat.BaseTest):
 
         assert evt["jolokia"]["test"]["gc"]["collection_count"] >= 0
 
+        # Remove "test" fields because namespace specific fields are not documented
+        del(evt["jolokia"]["test"])
         self.assert_fields_are_documented(output[0])
