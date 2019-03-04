@@ -618,7 +618,7 @@
     {
       "attributes": {
         "columns": [
-          "host.hostname",
+          "host.name",
           "event.action",
           "message"
         ],

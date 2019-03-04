@@ -1803,7 +1803,7 @@
     {
       "attributes": {
         "columns": [
-          "host.hostname",
+          "host.name",
           "event.dataset",
           "event.action",
           "message"
