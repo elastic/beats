@@ -18,10 +18,11 @@
 package heap
 
 import (
+	"runtime"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/golang"
-	"runtime"
 )
 
 //Stats contains the memory info that we get from the fetch request
