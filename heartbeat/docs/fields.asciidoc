@@ -3383,6 +3383,30 @@ Hostname of the agent.
 Info collected for the host machine.
 
 
+
+
+*`host.containerized`*::
++
+--
+type: boolean
+
+If the host is a container.
+
+
+--
+
+*`host.os.build`*::
++
+--
+type: keyword
+
+example: 18D109
+
+OS build information.
+
+
+--
+
 [[exported-fields-http]]
 == HTTP monitor fields
 
