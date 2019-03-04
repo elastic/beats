@@ -220,7 +220,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 	}
 
 	if ms.config.Reload.Enabled {
-		ruleReloader := NewRuleReloader(ms.config.RuleFiles, ms.config.Reload)
+		ruleReloader := newRuleReloader(ms.config.RuleFiles, ms.config.Reload)
 
 		go ruleReloader.Run(ms, reporter)
 	}
@@ -229,13 +229,13 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 }
 
 type reloader struct {
-	reload Reload
+	reload reload
 	pathes []string
 	done   chan struct{}
 	wg     sync.WaitGroup
 }
 
-func NewRuleReloader(pathes []string, reload Reload) *reloader {
+func newRuleReloader(pathes []string, reload Reload) *reloader {
 
 	newPathes := []string{}
 
