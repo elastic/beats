@@ -20,6 +20,7 @@ package timeseries
 import (
 	"strings"
 
+	"github.com/elastic/beats/libbeat/processors"
 	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/libbeat/beat"
@@ -35,7 +36,7 @@ type timeseriesProcessor struct {
 // Events are processed to extract all their dimensions (keyword fields that
 // hold a dimension of the metrics) and compute a hash of all their values into
 // `timeseries.instance` field.
-func NewTimeSeriesProcessor(fields common.Fields) (*timeseriesProcessor, error) {
+func NewTimeSeriesProcessor(fields common.Fields) (processors.Processor, error) {
 	dimensions := map[string]bool{}
 	prefixes := map[string]bool{}
 	populateDimensions("", dimensions, prefixes, fields)
@@ -51,7 +52,7 @@ func NewTimeSeriesProcessor(fields common.Fields) (*timeseriesProcessor, error) 
 
 	// convert the prefix map to a list
 	prefixList := []string{}
-	for k, _ := range prefixes {
+	for k := range prefixes {
 		prefixList = append(prefixList, k)
 	}
 

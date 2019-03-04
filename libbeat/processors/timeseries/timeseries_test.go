@@ -73,6 +73,7 @@ func TestTimesSeriesIsDimension(t *testing.T) {
 	processor, err := NewTimeSeriesProcessor(fields)
 	require.NoError(t, err)
 
+	tsProcessor := processor.(*timeseriesProcessor)
 	for _, test := range []struct {
 		isDim bool
 		field string
@@ -90,7 +91,7 @@ func TestTimesSeriesIsDimension(t *testing.T) {
 		{true, "obj1.key1"},
 		{false, "obj1-but-not-a-child-of-obj1.key1"},
 	} {
-		assert.Equal(t, test.isDim, processor.isDimension(test.field), test.field)
+		assert.Equal(t, test.isDim, tsProcessor.isDimension(test.field), test.field)
 	}
 
 }
