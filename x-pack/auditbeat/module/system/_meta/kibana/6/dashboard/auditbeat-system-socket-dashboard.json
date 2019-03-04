@@ -454,7 +454,7 @@
     {
       "attributes": {
         "columns": [
-          "host.hostname",
+          "host.name",
           "network.direction",
           "process.name",
           "message"

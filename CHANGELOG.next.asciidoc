@@ -81,6 +81,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Enable System module config on Windows. {pull}10237[10237]
 - Package: Disable librpm signal handlers. {pull}10694[10694]
 - Login: Handle different bad login UTMP types. {pull}10865[10865]
+- Fix hostname references in System module dashbords. {pull}11064[11064]
 
 *Filebeat*
 

@@ -332,7 +332,7 @@
     {
       "attributes": {
         "columns": [
-          "host.hostname",
+          "host.name",
           "user.name",
           "event.action",
           "process.pid",

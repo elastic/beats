@@ -568,7 +568,7 @@
     {
       "attributes": {
         "columns": [
-          "host.hostname",
+          "host.name",
           "system.audit.user.name",
           "system.audit.user.password.type",
           "message"
