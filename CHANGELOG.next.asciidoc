@@ -42,6 +42,8 @@ https://github.com/elastic/beats/compare/v6.6.1...6.6[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix issue in kubernetes module preventing usage percentages to be properly calculated. {pull}10946[10946]
+
 *Packetbeat*
 
 - Avoid reporting unknown MongoDB opcodes more than once. {pull}10878[10878]
