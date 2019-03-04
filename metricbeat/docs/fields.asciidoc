@@ -11133,7 +11133,7 @@ version number of jolokia agent.
 --
 type: keyword
 
-id of jolokia agent.
+Each agent has a unique id which can be either provided during startup of the agent in form of a configuration parameter or being autodetected. If autodected, the id has several parts: The IP, the process id, hashcode of the agent and its type.
 
 
 --
@@ -11143,7 +11143,7 @@ id of jolokia agent.
 --
 type: keyword
 
-server product's name that jolokia agent is installed on.
+The container product if detected.
 
 
 --
@@ -11153,7 +11153,7 @@ server product's name that jolokia agent is installed on.
 --
 type: keyword
 
-server product's version number that jolokia agent is installed on.
+The container's version (if detected).
 
 
 --
@@ -11163,7 +11163,27 @@ server product's version number that jolokia agent is installed on.
 --
 type: keyword
 
-server product's vendor name that jolokia agent is installed on.
+The vendor of the container the agent is running in.
+
+
+--
+
+*`jolokia.url`*::
++
+--
+type: ip
+
+The URL how this agent can be contacted.
+
+
+--
+
+*`jolokia.secured`*::
++
+--
+type: boolean
+
+Whether the agent was configured for authentication or not.
 
 
 --
