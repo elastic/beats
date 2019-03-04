@@ -11,6 +11,7 @@
         "fileset.name": "dns",
         "input.type": "log",
         "log.offset": 0,
+        "network.community_id": "1:Z26DBGVYoBKQ1FT6qfPaAqBnJik=",
         "network.transport": "udp",
         "service.type": "zeek",
         "source.address": "192.168.86.167",
