@@ -1,0 +1,32 @@
+[
+    {
+        "@timestamp": "2019-01-07T21:25:21.871Z",
+        "ecs.version": "1.0.0-beta2",
+        "event.dataset": "logstash.log",
+        "event.module": "logstash",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "INFO",
+        "log.offset": 0,
+        "logstash.log.log_event.count": 1,
+        "logstash.log.log_event.running_pipelines": [
+            {
+                "metaClass": {
+                    "metaClass": {
+                        "metaClass": {
+                            "non_running_pipelines": [],
+                            "running_pipelines": "[:main]"
+                        }
+                    }
+                }
+            }
+        ],
+        "logstash.log.module": "logstash.agent",
+        "logstash.log.thread": "Ruby-0-Thread-1: /Users/mat/work/elastic/releases/6.5.1/logstash/lib/bootstrap/environment.rb:6",
+        "message": "Pipelines running",
+        "service.type": "logstash"
+    }
+]

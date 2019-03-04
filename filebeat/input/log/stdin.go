@@ -44,3 +44,4 @@ func (p Pipe) Name() string               { return p.File.Name() }
 func (p Pipe) Stat() (os.FileInfo, error) { return p.File.Stat() }
 func (p Pipe) Continuable() bool          { return false }
 func (p Pipe) HasState() bool             { return false }
+func (p Pipe) Removed() bool              { return false }

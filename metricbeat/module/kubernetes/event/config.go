@@ -23,10 +23,12 @@ import (
 )
 
 type kubeEventsConfig struct {
-	InCluster  bool          `config:"in_cluster"`
-	KubeConfig string        `config:"kube_config"`
-	Namespace  string        `config:"namespace"`
-	SyncPeriod time.Duration `config:"sync_period"`
+	InCluster        bool          `config:"in_cluster"`
+	KubeConfig       string        `config:"kube_config"`
+	Namespace        string        `config:"namespace"`
+	SyncPeriod       time.Duration `config:"sync_period"`
+	LabelsDedot      bool          `config:"labels.dedot"`
+	AnnotationsDedot bool          `config:"annotations.dedot"`
 }
 
 type Enabled struct {
@@ -35,8 +37,10 @@ type Enabled struct {
 
 func defaultKubernetesEventsConfig() kubeEventsConfig {
 	return kubeEventsConfig{
-		InCluster:  true,
-		SyncPeriod: 1 * time.Second,
+		InCluster:        true,
+		SyncPeriod:       1 * time.Second,
+		LabelsDedot:      true,
+		AnnotationsDedot: true,
 	}
 }
 

@@ -1,7 +1,16 @@
 # GitHub CODEOWNERS definition
 # See: https://help.github.com/articles/about-codeowners/
 
-* @elastic/beats
+# * @elastic/beats
+
+# libbeat
+/libbeat/ @elastic/beats
+/auditbeat/ @elastic/beats
+/packetbeat/ @elastic/beats
+/filebeat/ @elastic/beats
+/metricbeat/ @elastic/beats
+/journalbeat/ @elastic/beats
+/winlogbeat/ @elastic/beats
 
 # Auditbeat
 /auditbeat/module/ @elastic/secops
@@ -28,5 +37,3 @@
 
 # Heartbeat
 /heartbeat/ @elastic/uptime
-
-

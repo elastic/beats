@@ -28,6 +28,7 @@ class TestAutodiscover(BaseTest):
                           contains.docker.container.image: redis
                         config:
                           - type: tcp
+                            id: myid
                             hosts: ["${data.host}:${data.port}"]
                             schedule: "@every 1s"
                             timeout: 1s
@@ -55,10 +56,13 @@ class TestAutodiscover(BaseTest):
                     host = network_settings['Networks'].values()[
                         0]['IPAddress']
                     port = network_settings['Ports'].keys()[0].split("/")[0]
-                    # Check metadata is added
-                    expected = 'tcp-tcp@%s:%s' % (host, port)
-                    actual = output[0]['monitor']['id']
-                    if expected == actual:
+                    # Check metadata and docker fields are added
+                    # We don't check all the docker fields because this is really the responsibility
+                    # of libbeat's autodiscovery code.
+                    event = output[0]
+                    if event['monitor']['id'] == 'myid' and event['container']['id'] is not None:
                         matched = True
 
         assert matched
+
+        self.assert_fields_are_documented(output[0])

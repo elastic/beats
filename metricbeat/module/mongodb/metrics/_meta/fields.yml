@@ -1,5 +1,6 @@
 - name: metrics
   type: group
+  release: ga
   description: >
     Statistics that reflect the current use and state of a running `mongod` instance
     for more information, take a look at https://docs.mongodb.com/manual/reference/command/serverStatus/#serverstatus.metrics
@@ -383,7 +384,7 @@
             - name: shutting_down
               type: boolean
             - name: network_interface
-              type: text
+              type: keyword
         - name: apply
           type: group
           description: >

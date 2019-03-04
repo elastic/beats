@@ -1,0 +1,19 @@
+- key: nats
+  title: "Nats"
+  description: >
+    nats Module
+  release: ga
+  fields:
+    - name: nats
+      type: group
+      description: >
+        `nats` contains statistics that were read from Nats
+      fields:
+        - name: server.id
+          type: keyword
+          description: >
+            The server ID
+        - name: server.time
+          type: date
+          description: >
+            Server time of metric creation

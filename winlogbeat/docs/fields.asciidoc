@@ -14,12 +14,13 @@ grouped in the following categories:
 
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
-* <<exported-fields-common>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-ecs>>
 * <<exported-fields-eventlog>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-kubernetes-processor>>
+* <<exported-fields-process>>
+* <<exported-fields-winlog>>
 
 --
 [[exported-fields-beat]]
@@ -35,30 +36,6 @@ Contains common beat fields available in all event types.
 type: alias
 
 alias to: event.timezone
-
---
-
-*`@timestamp`*::
-+
---
-type: date
-
-example: August 26th 2016, 12:35:53.332
-
-format: date
-
-required: True
-
-The timestamp when the event log record was generated.
-
-
---
-
-*`tags`*::
-+
---
-Arbitrary tags that can be set per Beat and per transaction type.
-
 
 --
 
@@ -86,6 +63,24 @@ type: keyword
 
 Error type.
 
+
+--
+
+*`beat.name`*::
++
+--
+type: alias
+
+alias to: host.name
+
+--
+
+*`beat.hostname`*::
++
+--
+type: alias
+
+alias to: agent.hostname
 
 --
 
@@ -169,24 +164,6 @@ alias to: cloud.region
 
 --
 
-[[exported-fields-common]]
-== Common Winlogbeat fields
-
-Contains common fields available in all event types.
-
-
-
-*`type`*::
-+
---
-required: True
-
-The event log API type used to read the record. The possible values are "wineventlog" for the Windows Event Log API or "eventlogging" for the Event Logging API.
-The Event Logging API was designed for Windows Server 2003 or Windows 2000 operating systems. In Windows Vista, the event logging infrastructure was redesigned. On Windows Vista or later operating systems, the Windows Event Log API is used. Winlogbeat automatically detects which API to use for reading event logs.
-
-
---
-
 [[exported-fields-docker-processor]]
 == Docker fields
 
@@ -198,30 +175,27 @@ Docker stats collected from Docker.
 *`docker.container.id`*::
 +
 --
-type: keyword
+type: alias
 
-Unique container id.
-
+alias to: container.id
 
 --
 
 *`docker.container.image`*::
 +
 --
-type: keyword
+type: alias
 
-Name of the image the container was built on.
-
+alias to: container.image.name
 
 --
 
 *`docker.container.name`*::
 +
 --
-type: keyword
+type: alias
 
-Container name.
-
+alias to: container.name
 
 --
 
@@ -241,6 +215,61 @@ Image labels.
 ECS fields.
 
 
+
+*`@timestamp`*::
++
+--
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+required: True
+
+Date/time when the event originated.
+For log events this is the date/time when the event was generated, and not when it was read.
+Required field for all events.
+
+
+--
+
+*`tags`*::
++
+--
+type: keyword
+
+example: ["production", "env2"]
+
+List of keywords used to tag each event.
+
+
+--
+
+*`labels`*::
++
+--
+type: object
+
+example: {'application': 'foo-bar', 'env': 'production'}
+
+Key/value pairs.
+Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
+Example: `docker` and `k8s` labels.
+
+
+--
+
+*`message`*::
++
+--
+type: text
+
+example: Hello World
+
+For log events the message field contains the log message.
+In other use cases the message field can be used to concatenate different values which are then freely searchable. If multiple messages exist, they can be combined into one message.
+
+
+--
 
 [float]
 == agent fields
@@ -315,73 +344,23 @@ This id normally changes across restarts, but `agent.id` does not.
 --
 
 [float]
-== base fields
+== client fields
 
-The base set contains all fields which are on the top level. These fields are common across all types of events.
-
-
-
-*`base.@timestamp`*::
-+
---
-type: date
-
-example: 2016-05-23T08:05:34.853Z
-
-required: True
-
-Date/time when the event originated.
-For log events this is the date/time when the event was generated, and not when it was read.
-Required field for all events.
+A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records. For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields.  Client fields are generally not populated for packet-level events.
+Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
 
---
 
-*`base.tags`*::
+*`client.address`*::
 +
 --
 type: keyword
 
-example: ["production", "env2"]
-
-List of keywords used to tag each event.
-
-
---
-
-*`base.labels`*::
-+
---
-type: object
-
-example: {'application': 'foo-bar', 'env': 'production'}
-
-Key/value pairs.
-Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
-Example: `docker` and `k8s` labels.
+Some event client addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
 
 
 --
-
-*`base.message`*::
-+
---
-type: text
-
-example: Hello World
-
-For log events the message field contains the log message.
-In other use cases the message field can be used to concatenate different values which are then freely searchable. If multiple messages exist, they can be combined into one message.
-
-
---
-
-[float]
-== client fields
-
-A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records. For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjuction with server fields.  Client fields are generally not populated for packet-level events. 
-
-
 
 *`client.ip`*::
 +
@@ -430,6 +409,8 @@ Client domain.
 type: long
 
 example: 184
+
+format: bytes
 
 Bytes sent from the client to the server.
 
@@ -719,6 +700,17 @@ Destination fields describe details about the destination of a packet/event. Des
 
 
 
+*`destination.address`*::
++
+--
+type: keyword
+
+Some event destination addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+
+--
+
 *`destination.ip`*::
 +
 --
@@ -766,6 +758,8 @@ Destination domain.
 type: long
 
 example: 184
+
+format: bytes
 
 Bytes sent from the destination to the source.
 
@@ -901,13 +895,13 @@ Meta-information specific to ECS.
 --
 type: keyword
 
-example: 1.0.0-beta1
+example: 1.0.0-beta2
 
 required: True
 
 ECS version this event conforms to. `ecs.version` is a required field and must exist in all events.
 When querying across multiple indices -- which may conform to slightly different ECS versions -- this field lets integrations adjust to the schema version of the events.
-The current version is 1.0.0-beta1 .
+The current version is 1.0.0-beta2 .
 
 
 --
@@ -1101,6 +1095,8 @@ Hash (perhaps logstash fingerprint) of raw field to be able to demonstrate log i
 --
 type: long
 
+format: duration
+
 Duration of the event in nanoseconds.
 If event.start and event.end are known this value should be the difference between the end and start time.
 
@@ -1289,6 +1285,8 @@ Mode of the file in octal representation.
 --
 type: long
 
+format: bytes
+
 File size in bytes (field is only added when `type` is `file`).
 
 --
@@ -1448,7 +1446,19 @@ type: keyword
 
 example: Mac OS X
 
-Operating system name.
+Operating system name, without the version.
+
+
+--
+
+*`host.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
 
 
 --
@@ -1470,7 +1480,7 @@ OS family (such as redhat, debian, freebsd, windows).
 --
 type: keyword
 
-example: 10.12.6-rc2
+example: 10.14.1
 
 Operating system version as a raw string.
 
@@ -1606,9 +1616,22 @@ Fields related to HTTP activity.
 --
 type: keyword
 
-example: GET, POST, PUT
+example: get, post, put
 
 Http request method.
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS"  section.
+
+
+--
+
+*`http.request.body.content`*::
++
+--
+type: keyword
+
+example: Hello world
+
+The full http request body.
 
 
 --
@@ -1637,7 +1660,7 @@ Http response status code.
 
 --
 
-*`http.response.body`*::
+*`http.response.body.content`*::
 +
 --
 type: keyword
@@ -1657,6 +1680,62 @@ type: keyword
 example: 1.1
 
 Http version.
+
+
+--
+
+*`http.request.bytes`*::
++
+--
+type: long
+
+example: 1437
+
+format: bytes
+
+Total size in bytes of the request (body and headers).
+
+
+--
+
+*`http.request.body.bytes`*::
++
+--
+type: long
+
+example: 887
+
+format: bytes
+
+Size in bytes of the request body.
+
+
+--
+
+*`http.response.bytes`*::
++
+--
+type: long
+
+example: 1437
+
+format: bytes
+
+Total size in bytes of the response (body and headers).
+
+
+--
+
+*`http.response.body.bytes`*::
++
+--
+type: long
+
+example: 887
+
+format: bytes
+
+Size in bytes of the response body.
 
 
 --
@@ -1722,9 +1801,10 @@ Name given by operators to sections of their network.
 --
 type: keyword
 
-example: IPv4
+example: ipv4
 
-In the OSI Model this would be the Network Layer. IPv4, IPv6, IPSec, PIM, etc
+In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS" section.
 
 
 --
@@ -1746,9 +1826,10 @@ IANA Protocol Number (https://www.iana.org/assignments/protocol-numbers/protocol
 --
 type: keyword
 
-example: TCP
+example: tcp
 
-Same as network.iana_number, but instead using the Keyword name of the transport layer (UDP, TCP, IPv6-ICMP, etc.)
+Same as network.iana_number, but instead using the Keyword name of the transport layer (udp, tcp, ipv6-icmp, etc.)
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS"  section.
 
 
 --
@@ -1758,9 +1839,10 @@ Same as network.iana_number, but instead using the Keyword name of the transport
 --
 type: keyword
 
-example: AIM
+example: aim
 
 A name given to an application. This can be arbitrarily assigned for things like microservices, but also apply to things like skype, icq, facebook, twitter. This would be used in situations where the vendor or service can be decoded such as from the source/dest IP owners, ports, or wire format.
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS" section.
 
 
 --
@@ -1772,7 +1854,8 @@ type: keyword
 
 example: http
 
-L7 Network protocol name. ex. http, lumberjack, transport protocol
+L7 Network protocol name. ex. http, lumberjack, transport protocol.
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS" section.
 
 
 --
@@ -1830,6 +1913,8 @@ type: long
 
 example: 368
 
+format: bytes
+
 Total bytes transferred in both directions.
 If `source.bytes` and `destination.bytes` are known, `network.bytes` is their sum.
 
@@ -1852,7 +1937,7 @@ If `source.packets` and `destination.packets` are known, `network.packets` is th
 [float]
 == observer fields
 
-An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics. This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.  
+An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics. This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
 
 
 
@@ -1955,7 +2040,19 @@ type: keyword
 
 example: Mac OS X
 
-Operating system name.
+Operating system name, without the version.
+
+
+--
+
+*`observer.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
 
 
 --
@@ -1977,7 +2074,7 @@ OS family (such as redhat, debian, freebsd, windows).
 --
 type: keyword
 
-example: 10.12.6-rc2
+example: 10.14.1
 
 Operating system version as a raw string.
 
@@ -2154,7 +2251,19 @@ type: keyword
 
 example: Mac OS X
 
-Operating system name.
+Operating system name, without the version.
+
+
+--
+
+*`os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
 
 
 --
@@ -2176,7 +2285,7 @@ OS family (such as redhat, debian, freebsd, windows).
 --
 type: keyword
 
-example: 10.12.6-rc2
+example: 10.14.1
 
 Operating system version as a raw string.
 
@@ -2328,8 +2437,20 @@ All of the IPs seen on your event.
 == server fields
 
 A Server is defined as the responder in a network connection for events regarding sessions, connections, or bidirectional flow records. For TCP events, the server is the receiver of the initial SYN packet(s) of the TCP connection. For other protocols, the server is generally the responder in the network transaction. Some systems actually use the term "responder" to refer the server in TCP connections. The server fields describe details about the system acting as the server in the network event. Server fields are usually populated in conjunction with client fields. Server fields are generally not populated for packet-level events.
+Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
 
 
+
+*`server.address`*::
++
+--
+type: keyword
+
+Some event server addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+
+--
 
 *`server.ip`*::
 +
@@ -2378,6 +2499,8 @@ Server domain.
 type: long
 
 example: 184
+
+format: bytes
 
 Bytes sent from the server to the client.
 
@@ -2652,6 +2775,8 @@ Source domain.
 type: long
 
 example: 184
+
+format: bytes
 
 Bytes sent from the source to the destination.
 
@@ -2961,12 +3086,29 @@ Useful if `user.id` or `user.name` contain confidential information and cannot b
 
 --
 
-*`user.group`*::
+[float]
+== group fields
+
+The group fields are meant to represent groups that are relevant to the event.
+
+
+
+*`user.group.id`*::
 +
 --
 type: keyword
 
-Group the user is a part of. This field can contain a list of groups, if necessary.
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
 
 
 --
@@ -2987,8 +3129,6 @@ example: Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.
 
 Unparsed version of the user_agent.
 
-
-Field is not indexed.
 
 --
 
@@ -3054,7 +3194,19 @@ type: keyword
 
 example: Mac OS X
 
-Operating system name.
+Operating system name, without the version.
+
+
+--
+
+*`user_agent.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
 
 
 --
@@ -3076,7 +3228,7 @@ OS family (such as redhat, debian, freebsd, windows).
 --
 type: keyword
 
-example: 10.12.6-rc2
+example: 10.14.1
 
 Operating system version as a raw string.
 
@@ -3095,100 +3247,12 @@ Operating system kernel version as a raw string.
 
 --
 
-*`beat.name`*::
-+
---
-type: alias
-
-alias to: agent.type
-
---
-
-*`beat.hostname`*::
-+
---
-type: alias
-
-alias to: agent.hostname
-
---
-
 *`agent.hostname`*::
 +
 --
 type: keyword
 
 Hostname of the agent.
-
-
---
-
-*`user_agent.patch`*::
-+
---
-type: keyword
-
-Patch version of the user agent.
-
-
---
-
-*`user_agent.minor`*::
-+
---
-type: keyword
-
-Minor version of the user agent.
-
-
---
-
-*`user_agent.major`*::
-+
---
-type: keyword
-
-Major version of the user agent.
-
-
---
-
-*`user_agent.device`*::
-+
---
-type: keyword
-
-Name of the physical device.
-
-
---
-
-*`user_agent.os.major`*::
-+
---
-type: long
-
-Major version of the operating system.
-
-
---
-
-*`user_agent.os.minor`*::
-+
---
-type: long
-
-Minor version of the operating system.
-
-
---
-
-*`url.hostname`*::
-+
---
-type: keyword
-
-Hostname of the request, such as "elastic.co".
 
 
 --
@@ -3200,284 +3264,183 @@ Contains data from a Windows event log record.
 
 
 
+*`type`*::
++
+--
+type: alias
+
+alias to: winlog.api
+
+--
+
 *`activity_id`*::
 +
 --
-type: keyword
+type: alias
 
-required: False
-
-A globally unique identifier that identifies the current activity. The events that are published with this identifier are part of the same activity.
-
+alias to: winlog.activity_id
 
 --
 
 *`computer_name`*::
 +
 --
-type: keyword
+type: alias
 
-required: True
-
-The name of the computer that generated the record. When using Windows event forwarding, this name can differ from the `beat.hostname`.
-
-
---
-
-*`event_data`*::
-+
---
-type: object
-
-required: False
-
-The event-specific data. This field is mutually exclusive with `user_data`. If you are capturing event data on versions prior to Windows Vista, the parameters in `event_data` are named `param1`, `param2`, and so on, because event log parameters are unnamed in earlier versions of Windows.
-
+alias to: winlog.computer_name
 
 --
 
 *`event_id`*::
 +
 --
-type: long
+type: alias
 
-required: True
-
-The event identifier. The value is specific to the source of the event.
-
+alias to: winlog.event_id
 
 --
 
 *`keywords`*::
 +
 --
-type: keyword
+type: alias
 
-required: False
-
-The keywords are used to classify an event.
-
+alias to: winlog.keywords
 
 --
 
 *`log_name`*::
 +
 --
-type: keyword
+type: alias
 
-required: True
-
-The name of the event log from which this record was read. This value is one of the names from the `event_logs` collection in the configuration.
-
-
---
-
-*`level`*::
-+
---
-type: keyword
-
-required: False
-
-The level of the event. There are five levels of events that can be logged: Success, Information, Warning, Error, Audit Success, and Audit Failure.
-
-
---
-
-*`message`*::
-+
---
-type: text
-
-required: False
-
-The message from the event log record.
-
+alias to: winlog.channel
 
 --
 
 *`message_error`*::
 +
 --
-type: keyword
+type: alias
 
-required: False
-
-The error that occurred while reading and formatting the message from the log.
-
+alias to: error.message
 
 --
 
 *`record_number`*::
 +
 --
-type: keyword
+type: alias
 
-required: True
-
-The record number of the event log record. The first record written to an event log is record number 1, and other records are numbered sequentially. If the record number reaches the maximum value (2^32^ for the Event Logging API and 2^64^ for the Windows Event Log API), the next record number will be 0.
-
+alias to: winlog.record_id
 
 --
 
 *`related_activity_id`*::
 +
 --
-type: keyword
+type: alias
 
-required: False
-
-A globally unique identifier that identifies the activity to which control was transferred to. The related events would then have this identifier as their `activity_id` identifier.
-
+alias to: winlog.related_activity_id
 
 --
 
 *`opcode`*::
 +
 --
-type: keyword
+type: alias
 
-required: False
-
-The opcode defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged.
-
+alias to: winlog.opcode
 
 --
 
 *`provider_guid`*::
 +
 --
-type: keyword
+type: alias
 
-required: False
-
-A globally unique identifier that identifies the provider that logged the event.
-
+alias to: winlog.provider_guid
 
 --
 
 *`process_id`*::
 +
 --
-type: long
+type: alias
 
-required: False
-
-The process_id identifies the process that generated the event.
-
+alias to: winlog.process.pid
 
 --
 
 *`source_name`*::
 +
 --
-type: keyword
+type: alias
 
-required: True
-
-The source of the event log record (the application or service that logged the record).
-
+alias to: winlog.provider_name
 
 --
 
 *`task`*::
 +
 --
-type: keyword
+type: alias
 
-required: False
-
-The task defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged. The category used by the Event Logging API (on pre Windows Vista operating systems) is written to this field.
-
+alias to: winlog.task
 
 --
 
 *`thread_id`*::
 +
 --
-type: long
+type: alias
 
-required: False
-
-The thread_id identifies the thread that generated the event.
-
-
---
-
-*`user_data`*::
-+
---
-type: object
-
-required: False
-
-The event specific data. This field is mutually exclusive with `event_data`.
-
+alias to: winlog.process.thread.id
 
 --
 
 *`user.identifier`*::
 +
 --
-type: keyword
+type: alias
 
-example: S-1-5-21-3541430928-2051711210-1391384369-1001
-
-required: False
-
-The Windows security identifier (SID) of the account associated with this event.
-
-If Winlogbeat cannot resolve the SID to a name, then the `user.name`, `user.domain`, and `user.type` fields will be omitted from the event. If you discover Winlogbeat not resolving SIDs, review the log for clues as to what the problem may be.
-
+alias to: winlog.user.identifier
 
 --
 
 *`user.domain`*::
 +
 --
-type: keyword
+type: alias
 
-required: False
-
-The domain that the account associated with this event is a member of.
-
+alias to: winlog.user.domain
 
 --
 
 *`user.type`*::
 +
 --
-type: keyword
+type: alias
 
-required: False
-
-The type of account associated with this event.
-
+alias to: winlog.user.type
 
 --
 
 *`version`*::
 +
 --
-type: long
+type: alias
 
-required: False
-
-The version number of the event's definition.
+alias to: winlog.version
 
 --
 
 *`xml`*::
 +
 --
-type: text
+type: alias
 
-required: False
-
-The raw XML representation of the event obtained from Windows. This field is only available on operating systems supporting the Windows Event Log API (Microsoft Windows Vista and newer). This field is not included by default and must be enabled by setting `include_xml: true` as a configuration option for an individual event log.
-
-The XML representation of the event is useful for troubleshooting purposes. The data in the fields reported by Winlogbeat can be compared to the data in the XML to diagnose problems.
-
+alias to: event.original
 
 --
 
@@ -3486,6 +3449,30 @@ The XML representation of the event is useful for troubleshooting purposes. The 
 
 Info collected for the host machine.
 
+
+
+
+*`host.containerized`*::
++
+--
+type: boolean
+
+If the host is a container.
+
+
+--
+
+*`host.os.build`*::
++
+--
+type: keyword
+
+example: 18D109
+
+OS build information.
+
+
+--
 
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
@@ -3572,6 +3559,297 @@ type: keyword
 
 Kubernetes container image
 
+
+--
+
+[[exported-fields-process]]
+== Process fields
+
+Process metadata fields
+
+
+
+
+*`process.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
+
+--
+
+[[exported-fields-winlog]]
+== Windows Event Log fields emitted by Winlogbeat fields
+
+Fields from the Windows Event Log.
+
+
+
+*`event.code`*::
++
+--
+type: keyword
+
+required: False
+
+The code for this log message (Windows event ID).
+
+
+--
+
+*`event.original`*::
++
+--
+The raw XML representation of the event obtained from Windows. This field is only available on operating systems supporting the Windows Event Log API (Microsoft Windows Vista and newer). This field is not included by default and must be enabled by setting `include_xml: true` as a configuration option for an individual event log.
+The XML representation of the event is useful for troubleshooting purposes. The data in the fields reported by Winlogbeat can be compared to the data in the XML to diagnose problems.
+
+
+--
+
+[float]
+== winlog fields
+
+All fields specific to the Windows Event Log are defined here.
+
+
+
+*`winlog.api`*::
++
+--
+required: True
+
+The event log API type used to read the record. The possible values are "wineventlog" for the Windows Event Log API or "eventlogging" for the Event Logging API.
+The Event Logging API was designed for Windows Server 2003 or Windows 2000 operating systems. In Windows Vista, the event logging infrastructure was redesigned. On Windows Vista or later operating systems, the Windows Event Log API is used. Winlogbeat automatically detects which API to use for reading event logs.
+
+
+--
+
+*`winlog.activity_id`*::
++
+--
+type: keyword
+
+required: False
+
+A globally unique identifier that identifies the current activity. The events that are published with this identifier are part of the same activity.
+
+
+--
+
+*`winlog.computer_name`*::
++
+--
+type: keyword
+
+required: True
+
+The name of the computer that generated the record. When using Windows event forwarding, this name can differ from `agent.hostname`.
+
+
+--
+
+*`winlog.event_data`*::
++
+--
+type: object
+
+required: False
+
+The event-specific data. This field is mutually exclusive with `user_data`. If you are capturing event data on versions prior to Windows Vista, the parameters in `event_data` are named `param1`, `param2`, and so on, because event log parameters are unnamed in earlier versions of Windows.
+
+
+--
+
+*`winlog.event_id`*::
++
+--
+type: keyword
+
+required: True
+
+The event identifier. The value is specific to the source of the event.
+
+
+--
+
+*`winlog.keywords`*::
++
+--
+type: keyword
+
+required: False
+
+The keywords are used to classify an event.
+
+
+--
+
+*`winlog.channel`*::
++
+--
+type: keyword
+
+required: True
+
+The name of the channel from which this record was read. This value is one of the names from the `event_logs` collection in the configuration.
+
+
+--
+
+*`winlog.record_id`*::
++
+--
+type: keyword
+
+required: True
+
+The record ID of the event log record. The first record written to an event log is record number 1, and other records are numbered sequentially. If the record number reaches the maximum value (2^32^ for the Event Logging API and 2^64^ for the Windows Event Log API), the next record number will be 0.
+
+
+--
+
+*`winlog.related_activity_id`*::
++
+--
+type: keyword
+
+required: False
+
+A globally unique identifier that identifies the activity to which control was transferred to. The related events would then have this identifier as their `activity_id` identifier.
+
+
+--
+
+*`winlog.opcode`*::
++
+--
+type: keyword
+
+required: False
+
+The opcode defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged.
+
+
+--
+
+*`winlog.provider_guid`*::
++
+--
+type: keyword
+
+required: False
+
+A globally unique identifier that identifies the provider that logged the event.
+
+
+--
+
+*`winlog.process.pid`*::
++
+--
+type: long
+
+required: False
+
+The process_id of the Client Server Runtime Process.
+
+
+--
+
+*`winlog.provider_name`*::
++
+--
+type: keyword
+
+required: True
+
+The source of the event log record (the application or service that logged the record).
+
+
+--
+
+*`winlog.task`*::
++
+--
+type: keyword
+
+required: False
+
+The task defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged. The category used by the Event Logging API (on pre Windows Vista operating systems) is written to this field.
+
+
+--
+
+*`winlog.process.thread.id`*::
++
+--
+type: long
+
+required: False
+
+--
+
+*`winlog.user_data`*::
++
+--
+type: object
+
+required: False
+
+The event specific data. This field is mutually exclusive with `event_data`.
+
+
+--
+
+*`winlog.user.identifier`*::
++
+--
+type: keyword
+
+example: S-1-5-21-3541430928-2051711210-1391384369-1001
+
+required: False
+
+The Windows security identifier (SID) of the account associated with this event.
+
+If Winlogbeat cannot resolve the SID to a name, then the `user.name`, `user.domain`, and `user.type` fields will be omitted from the event. If you discover Winlogbeat not resolving SIDs, review the log for clues as to what the problem may be.
+
+
+--
+
+*`winlog.user.domain`*::
++
+--
+type: keyword
+
+required: False
+
+The domain that the account associated with this event is a member of.
+
+
+--
+
+*`winlog.user.type`*::
++
+--
+type: keyword
+
+required: False
+
+The type of account associated with this event.
+
+
+--
+
+*`winlog.version`*::
++
+--
+type: long
+
+required: False
+
+The version number of the event's definition.
 
 --
 

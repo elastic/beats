@@ -198,9 +198,6 @@ packetbeat.protocols:
 - type: dns
   ports: [53]
 
-  include_authorities: true
-  include_additionals: true
-
 - type: http
   ports: [80, 8080, 8081, 5000, 8002]
 
@@ -208,7 +205,7 @@ packetbeat.protocols:
   ports: [11211]
 
 - type: mysql
-  ports: [3306]
+  ports: [3306,3307]
 
 - type: pgsql
   ports: [5432]
@@ -226,7 +223,7 @@ packetbeat.protocols:
   ports: [9042]
 
 - type: tls
-  ports: [443]
+  ports: [443, 993, 995, 5223, 8443, 8883, 9243]
 
 ----------------------------------------------------------------------
 +
@@ -273,10 +270,7 @@ sudo service {beatname_lc} start
 
 *docker:*
 
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-docker run {dockerimage}
-----------------------------------------------------------------------
+See <<running-on-docker>>.
 
 *mac and linux:*
 
@@ -287,7 +281,7 @@ sudo ./packetbeat -e
 ----------------------------------------------------------------------
 <1> You'll be running Packetbeat as root, so you need to change ownership of the
 configuration file, or run Packetbeat with `--strict.perms=false` specified. See
-{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]in
+{beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]in
 the _Beats Platform Reference_.
 
 *win:*

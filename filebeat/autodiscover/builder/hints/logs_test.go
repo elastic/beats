@@ -48,6 +48,18 @@ func TestGenerateHints(t *testing.T) {
 			result: common.MapStr{},
 		},
 		{
+			msg: "Hints with logs.disable should return nothing",
+			event: bus.Event{
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"disable": "true",
+					},
+				},
+			},
+			len:    0,
+			result: common.MapStr{},
+		},
+		{
 			msg: "Empty event hints should return default config",
 			event: bus.Event{
 				"host": "1.2.3.4",
@@ -370,6 +382,238 @@ func TestGenerateHints(t *testing.T) {
 				"containers": map[string]interface{}{
 					"ids": []string{
 						"${data.container.id}",
+					},
+				},
+				"close_timeout": "true",
+			},
+		})
+
+		// Configure path for modules access
+		abs, _ := filepath.Abs("../../..")
+		err := paths.InitPaths(&paths.Path{
+			Home: abs,
+		})
+
+		l, err := NewLogHints(cfg)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		cfgs := l.CreateConfig(test.event)
+		assert.Equal(t, len(cfgs), test.len, test.msg)
+		if test.len != 0 {
+			config := common.MapStr{}
+			err := cfgs[0].Unpack(&config)
+			assert.Nil(t, err, test.msg)
+
+			assert.Equal(t, test.result, config, test.msg)
+		}
+
+	}
+}
+
+func TestGenerateHintsWithPaths(t *testing.T) {
+	tests := []struct {
+		msg    string
+		event  bus.Event
+		path   string
+		len    int
+		result common.MapStr
+	}{
+		{
+			msg: "Empty event hints should return default config",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+					"pod": common.MapStr{
+						"name": "pod",
+						"uid":  "12345",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+			},
+			path: "/var/lib/docker/containers/${data.kubernetes.container.id}/*-json.log",
+			len:  1,
+			result: common.MapStr{
+				"type": "docker",
+				"containers": map[string]interface{}{
+					"paths": []interface{}{"/var/lib/docker/containers/abc/*-json.log"},
+				},
+				"close_timeout": "true",
+			},
+		},
+		{
+			msg: "Hint with processors config must have a processors in the input config",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+					"pod": common.MapStr{
+						"name": "pod",
+						"uid":  "12345",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"processors": common.MapStr{
+							"1": common.MapStr{
+								"dissect": common.MapStr{
+									"tokenizer": "%{key1} %{key2}",
+								},
+							},
+							"drop_event": common.MapStr{},
+						},
+					},
+				},
+			},
+			len:  1,
+			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
+			result: common.MapStr{
+				"type": "docker",
+				"containers": map[string]interface{}{
+					"paths": []interface{}{"/var/log/pods/12345/foobar/*.log"},
+				},
+				"close_timeout": "true",
+				"processors": []interface{}{
+					map[string]interface{}{
+						"dissect": map[string]interface{}{
+							"tokenizer": "%{key1} %{key2}",
+						},
+					},
+					map[string]interface{}{
+						"drop_event": nil,
+					},
+				},
+			},
+		},
+		{
+			msg: "Hint with module should attach input to its filesets",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+					"pod": common.MapStr{
+						"name": "pod",
+						"uid":  "12345",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"module": "apache2",
+					},
+				},
+			},
+			len:  1,
+			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
+			result: common.MapStr{
+				"module": "apache2",
+				"error": map[string]interface{}{
+					"enabled": true,
+					"input": map[string]interface{}{
+						"type": "docker",
+						"containers": map[string]interface{}{
+							"stream": "all",
+							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
+						},
+						"close_timeout": "true",
+					},
+				},
+				"access": map[string]interface{}{
+					"enabled": true,
+					"input": map[string]interface{}{
+						"type": "docker",
+						"containers": map[string]interface{}{
+							"stream": "all",
+							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
+						},
+						"close_timeout": "true",
+					},
+				},
+			},
+		},
+		{
+			msg: "Hint with module should honor defined filesets",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"kubernetes": common.MapStr{
+					"container": common.MapStr{
+						"name": "foobar",
+						"id":   "abc",
+					},
+					"pod": common.MapStr{
+						"name": "pod",
+						"uid":  "12345",
+					},
+				},
+				"container": common.MapStr{
+					"name": "foobar",
+					"id":   "abc",
+				},
+				"hints": common.MapStr{
+					"logs": common.MapStr{
+						"module":  "apache2",
+						"fileset": "access",
+					},
+				},
+			},
+			len:  1,
+			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
+			result: common.MapStr{
+				"module": "apache2",
+				"access": map[string]interface{}{
+					"enabled": true,
+					"input": map[string]interface{}{
+						"type": "docker",
+						"containers": map[string]interface{}{
+							"stream": "all",
+							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
+						},
+						"close_timeout": "true",
+					},
+				},
+				"error": map[string]interface{}{
+					"enabled": false,
+					"input": map[string]interface{}{
+						"type": "docker",
+						"containers": map[string]interface{}{
+							"stream": "all",
+							"paths":  []interface{}{"/var/log/pods/12345/foobar/*.log"},
+						},
+						"close_timeout": "true",
+					},
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		cfg, _ := common.NewConfigFrom(map[string]interface{}{
+			"config": map[string]interface{}{
+				"type": "docker",
+				"containers": map[string]interface{}{
+					"paths": []string{
+						test.path,
 					},
 				},
 				"close_timeout": "true",

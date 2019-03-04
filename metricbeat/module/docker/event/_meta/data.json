@@ -1,0 +1,29 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "docker": {
+        "event": {
+            "action": "pull",
+            "actor": {
+                "attributes": {
+                    "name": "busybox"
+                },
+                "id": "busybox:latest"
+            },
+            "from": "",
+            "id": "busybox:latest",
+            "status": "pull",
+            "type": "image"
+        }
+    },
+    "event": {
+        "dataset": "event",
+        "module": "docker"
+    },
+    "service": {
+        "type": "docker"
+    }
+}

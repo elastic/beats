@@ -23,6 +23,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/elastic/beats/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/plugin"
@@ -70,7 +71,7 @@ func init() {
 
 // PluginBuilder is the signature of functions used to build active
 // monitorStarts
-type PluginBuilder func(string, *common.Config) (jobs []Job, endpoints int, err error)
+type PluginBuilder func(string, *common.Config) (jobs []jobs.Job, endpoints int, err error)
 
 // Type represents whether a plugin is active or passive.
 type Type uint8
@@ -104,11 +105,11 @@ func RegisterActive(name string, builder PluginBuilder) {
 }
 
 // ErrPluginAlreadyExists is returned when there is an attempt to register two plugins
-// with the same name.
+// with the same pluginName.
 type ErrPluginAlreadyExists pluginBuilder
 
 func (m ErrPluginAlreadyExists) Error() string {
-	return fmt.Sprintf("monitor plugin '%s' already exists", m.name)
+	return fmt.Sprintf("monitor plugin '%s' already exists", m.typ)
 }
 
 func (r *pluginsReg) add(plugin pluginBuilder) error {
@@ -121,7 +122,7 @@ func (r *pluginsReg) add(plugin pluginBuilder) error {
 
 func (r *pluginsReg) register(plugin pluginBuilder) error {
 	if _, found := r.monitors[plugin.name]; found {
-		return fmt.Errorf("monitor type %v already exists", plugin.name)
+		return fmt.Errorf("monitor type %v already exists", plugin.typ)
 	}
 
 	r.monitors[plugin.name] = plugin
@@ -152,7 +153,7 @@ func (r *pluginsReg) monitorNames() []string {
 	return names
 }
 
-func (e *pluginBuilder) create(cfg *common.Config) (jobs []Job, endpoints int, err error) {
+func (e *pluginBuilder) create(cfg *common.Config) (jobs []jobs.Job, endpoints int, err error) {
 	return e.builder(e.name, cfg)
 }
 

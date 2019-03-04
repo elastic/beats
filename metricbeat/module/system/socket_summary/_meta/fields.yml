@@ -3,6 +3,7 @@
   type: group
   description: >
     Summary metrics of open sockets in the host system
+  release: ga
   fields:
     - name: all
       type: group

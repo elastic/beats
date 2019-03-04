@@ -20,6 +20,7 @@
 package publish
 
 import (
+	"net"
 	"testing"
 	"time"
 
@@ -27,6 +28,8 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/packetbeat/pb"
+	"github.com/elastic/ecs/code/go/ecs"
 )
 
 func testEvent() beat.Event {
@@ -88,125 +91,98 @@ func TestFilterEvent(t *testing.T) {
 	}
 }
 
-func TestDirectionOut(t *testing.T) {
-	processor := transProcessor{
-		localIPs:       []string{"192.145.2.4"},
-		ignoreOutgoing: false,
-		name:           "test",
-	}
+func TestPublish(t *testing.T) {
+	var srcIP, dstIP = "192.145.2.4", "192.145.2.5"
 
-	event := beat.Event{
-		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"type": "test",
-			"src": &common.Endpoint{
-				IP:     "192.145.2.4",
-				Port:   3267,
-				Domain: "server1",
-				Process: common.Process{
-					Args: []string{"proc1", "start"},
-					Name: "proc1",
+	event := func() *beat.Event {
+		return &beat.Event{
+			Timestamp: time.Now(),
+			Fields: common.MapStr{
+				"type": "test",
+				"_packetbeat": &pb.Fields{
+					Source: &ecs.Source{
+						IP:   srcIP,
+						Port: 3267,
+					},
+					Destination: &ecs.Destination{
+						IP:   dstIP,
+						Port: 32232,
+					},
 				},
 			},
-			"dst": &common.Endpoint{
-				IP:     "192.145.2.5",
-				Port:   32232,
-				Domain: "server2",
-				Process: common.Process{
-					Args: []string{"proc2", "start"},
-					Name: "proc2",
-				},
-			},
-		},
+		}
 	}
 
-	if res, _ := processor.Run(&event); res == nil {
-		t.Fatalf("event has been filtered out")
-	}
-	clientIP, _ := event.GetValue("client.ip")
-	assert.Equal(t, "192.145.2.4", clientIP)
-	dir, _ := event.GetValue("network.direction")
-	assert.Equal(t, "outgoing", dir)
-}
+	t.Run("direction/inbound", func(t *testing.T) {
+		processor := transProcessor{
+			localIPs: []net.IP{net.ParseIP(dstIP)},
+			name:     "test",
+		}
 
-func TestDirectionIn(t *testing.T) {
-	processor := transProcessor{
-		localIPs:       []string{"192.145.2.5"},
-		ignoreOutgoing: false,
-		name:           "test",
-	}
+		res, _ := processor.Run(event())
+		if res == nil {
+			t.Fatalf("event has been filtered out")
+		}
 
-	event := beat.Event{
-		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"type": "test",
-			"src": &common.Endpoint{
-				IP:     "192.145.2.4",
-				Port:   3267,
-				Domain: "server1",
-				Process: common.Process{
-					Args: []string{"proc1", "start"},
-					Name: "proc1",
-				},
-			},
-			"dst": &common.Endpoint{
-				IP:     "192.145.2.5",
-				Port:   32232,
-				Domain: "server2",
-				Process: common.Process{
-					Args: []string{"proc2", "start"},
-					Name: "proc2",
-				},
-			},
-		},
-	}
+		dir, _ := res.GetValue("network.direction")
+		assert.Equal(t, "inbound", dir)
+	})
 
-	if res, _ := processor.Run(&event); res == nil {
-		t.Fatalf("event has been filtered out")
-	}
-	clientIP, _ := event.GetValue("client.ip")
-	assert.Equal(t, "192.145.2.4", clientIP)
-	dir, _ := event.GetValue("network.direction")
-	assert.Equal(t, "incoming", dir)
-}
+	t.Run("direction/outbound", func(t *testing.T) {
+		processor := transProcessor{
+			localIPs: []net.IP{net.ParseIP(srcIP)},
+			name:     "test",
+		}
 
-func TestNoDirection(t *testing.T) {
-	processor := transProcessor{
-		localIPs:       []string{"192.145.2.6"},
-		ignoreOutgoing: false,
-		name:           "test",
-	}
+		res, _ := processor.Run(event())
+		if res == nil {
+			t.Fatalf("event has been filtered out")
+		}
 
-	event := beat.Event{
-		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"type": "test",
-			"src": &common.Endpoint{
-				IP:     "192.145.2.4",
-				Port:   3267,
-				Domain: "server1",
-				Process: common.Process{
-					Args: []string{"proc1", "start"},
-					Name: "proc1",
-				},
-			},
-			"dst": &common.Endpoint{
-				IP:     "192.145.2.5",
-				Port:   32232,
-				Domain: "server2",
-				Process: common.Process{
-					Args: []string{"proc2", "start"},
-					Name: "proc2",
-				},
-			},
-		},
-	}
+		dir, _ := res.GetValue("network.direction")
+		assert.Equal(t, "outbound", dir)
+	})
 
-	if res, _ := processor.Run(&event); res == nil {
-		t.Fatalf("event has been filtered out")
-	}
-	clientIP, _ := event.GetValue("client.ip")
-	assert.Equal(t, "192.145.2.4", clientIP)
-	dir, _ := event.GetValue("network.direction")
-	assert.Nil(t, dir)
+	t.Run("direction/internal", func(t *testing.T) {
+		processor := transProcessor{
+			localIPs: []net.IP{net.ParseIP(srcIP), net.ParseIP(dstIP)},
+			name:     "test",
+		}
+
+		res, _ := processor.Run(event())
+		if res == nil {
+			t.Fatalf("event has been filtered out")
+		}
+
+		dir, _ := res.GetValue("network.direction")
+		assert.Equal(t, "internal", dir)
+	})
+
+	t.Run("direction/none", func(t *testing.T) {
+		processor := transProcessor{
+			localIPs: []net.IP{net.ParseIP(dstIP + "1")},
+			name:     "test",
+		}
+
+		res, _ := processor.Run(event())
+		if res == nil {
+			t.Fatalf("event has been filtered out")
+		}
+
+		dir, _ := res.GetValue("network.direction")
+		assert.Nil(t, dir)
+	})
+
+	t.Run("ignore_outgoing", func(t *testing.T) {
+		processor := transProcessor{
+			localIPs:       []net.IP{net.ParseIP(srcIP)},
+			ignoreOutgoing: true,
+			name:           "test",
+		}
+
+		res, err := processor.Run(event())
+		if assert.NoError(t, err) {
+			assert.Nil(t, res)
+		}
+	})
 }

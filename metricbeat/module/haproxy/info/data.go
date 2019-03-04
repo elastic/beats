@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	s "github.com/elastic/beats/libbeat/common/schema"
 	c "github.com/elastic/beats/libbeat/common/schema/mapstrstr"
+	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/haproxy"
 
 	"reflect"
@@ -131,7 +132,7 @@ var (
 )
 
 // Map data to MapStr
-func eventMapping(info *haproxy.Info) (common.MapStr, error) {
+func eventMapping(info *haproxy.Info, r mb.ReporterV2) {
 	// Full mapping from info
 
 	st := reflect.ValueOf(info).Elem()
@@ -145,14 +146,16 @@ func eventMapping(info *haproxy.Info) (common.MapStr, error) {
 			// Convert this value to a float between 0.0 and 1.0
 			fval, err := strconv.ParseFloat(f.Interface().(string), 64)
 			if err != nil {
-				return nil, err
+				r.Error(err)
+				return
 			}
 			source[typeOfT.Field(i).Name] = strconv.FormatFloat(fval/float64(100), 'f', 2, 64)
 		} else if typeOfT.Field(i).Name == "Memmax_MB" {
 			// Convert this value to bytes
 			val, err := strconv.Atoi(strings.TrimSpace(f.Interface().(string)))
 			if err != nil {
-				return nil, err
+				r.Error(err)
+				return
 			}
 			source[typeOfT.Field(i).Name] = strconv.Itoa((val * 1024 * 1024))
 		} else {
@@ -161,6 +164,16 @@ func eventMapping(info *haproxy.Info) (common.MapStr, error) {
 
 	}
 
-	data, _ := schema.Apply(source)
-	return data, nil
+	event := mb.Event{
+		RootFields: common.MapStr{},
+	}
+
+	fields, _ := schema.Apply(source)
+	if processID, err := fields.GetValue("pid"); err == nil {
+		event.RootFields.Put("process.pid", processID)
+		fields.Delete("pid")
+	}
+
+	event.MetricSetFields = fields
+	r.Event(event)
 }

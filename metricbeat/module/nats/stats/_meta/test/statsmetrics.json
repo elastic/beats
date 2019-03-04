@@ -1,0 +1,22 @@
+{
+    "uptime": "2h41m42s",
+    "now": "2018-12-28T12:33:53.026864929Z",
+    "out_msgs": 0,
+    "out_bytes": 0,
+    "total_connections": 35,
+    "server_id": "bUAdpRFtMWddIBWw80Yd9D",
+    "in_bytes": 0,
+    "remotes": 0,
+    "slow_consumers": 0,
+    "in_msgs": 0,
+    "http_req_stats": {
+        "/": 10,
+        "/connz": 10,
+        "/routez": 10,
+        "/subsz": 10,
+        "/varz": 10
+    },
+    "cpu": 52,
+    "mem": 7806976,
+    "cores": 0
+}

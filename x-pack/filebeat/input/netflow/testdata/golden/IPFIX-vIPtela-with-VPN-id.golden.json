@@ -17,7 +17,7 @@
           "kind": "event"
         },
         "flow": {
-          "id": "5qh7ipMbBV0",
+          "id": "dO-Anbp9xpw",
           "locality": "private"
         },
         "netflow": {
@@ -52,11 +52,11 @@
           "source_transport_port": 41717,
           "tcp_control_bits": 16,
           "type": "netflow_flow",
-          "viptela_vpin_d": 100
+          "viptela_vpn_id": 100
         },
         "network": {
           "bytes": 775,
-          "community_id": "1:+fvsmN9SnAg8yt/KBn6yA19IrXE=",
+          "community_id": "1:uhU0lSQQ+LoAMve6GxHC0M3nIes=",
           "direction": "unknown",
           "iana_number": 6,
           "packets": 8,

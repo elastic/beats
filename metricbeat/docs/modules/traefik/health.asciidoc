@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-traefik-health]]
 === traefik health metricset
 
-experimental[]
-
 include::../../../module/traefik/health/_meta/docs.asciidoc[]
 
 

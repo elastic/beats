@@ -1,10 +1,11 @@
-version: '2.1'
+version: '2.3'
 services:
   beat:
     build: ../../filebeat
     depends_on:
       - proxy_dep
     environment:
+      - BEAT_STRICT_PERMS=false
       - ES_HOST=elasticsearch
       - ES_PORT=9200
     working_dir: /go/src/github.com/elastic/beats/x-pack/filebeat

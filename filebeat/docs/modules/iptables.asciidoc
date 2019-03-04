@@ -1,0 +1,85 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-iptables]]
+[role="xpack"]
+
+:modulename: iptables
+:has-dashboards: true
+
+== Iptables module
+
+This is a module for iptables and ip6tables logs. It parses logs received
+over the network via syslog or from a file. Also, it understands the prefix added
+by some Ubiquiti firewalls, which includes the rule set name, rule number and
+the action performed on the traffic (allow/deny).
+
+When you run the module, it performs a few tasks under the hood:
+
+* Sets the default input to `syslog` and binds to `localhost` port `9001`
+  (but don’t worry, you can override the defaults).
+
+* Uses ingest node to parse and process the log lines, shaping the data into
+  a structure suitable for visualizing in Kibana.
+
+* Deploys dashboards for visualizing the log data.
+
+[float]
+=== Compatibility
+
+This module requires the {plugins}/ingest-geoip.html[ingest-geoip]
+Elasticsearch plugins.
+
+include::../include/running-modules.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with sample dashboards showing geolocation and network
+protocols used. One for all iptables logs:
+
+[role="screenshot"]
+image::./images/kibana-iptables.png[]
+
+and one specific for Ubiquiti Firewall logs:
+
+[role="screenshot"]
+image::./images/kibana-iptables-ubiquiti.png[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The module is by default configured to run via syslog on port 9001. However
+it can also be configured to read from a file path. See the following example.
+
+["source","yaml",subs="attributes"]
+-----
+- module: iptables
+  log:
+    enabled: true
+    var.paths: ["/var/log/iptables.log"]
+    var.input: "file"
+-----
+
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `log` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-iptables,exported fields>> section.
+

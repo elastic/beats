@@ -18,8 +18,6 @@
 package queue
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/rabbitmq"
 )
@@ -38,8 +36,6 @@ type MetricSet struct {
 
 // New creates new instance of MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The rabbitmq queue metricset is beta")
-
 	ms, err := rabbitmq.NewMetricSet(base, rabbitmq.QueuesPath)
 	if err != nil {
 		return nil, err
@@ -47,13 +43,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{ms}, nil
 }
 
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+// Fetch fetches queue data
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	content, err := m.HTTP.FetchContent()
 
 	if err != nil {
-		return nil, err
+		r.Error(err)
+		return
 	}
 
-	events, _ := eventsMapping(content)
-	return events, nil
+	eventsMapping(content, r)
 }

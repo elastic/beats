@@ -1,4 +1,4 @@
-version: '2.1'
+version: '2.3'
 services:
   beat:
     build: ../../metricbeat
@@ -9,3 +9,9 @@ services:
       - ${PWD}/../..:/go/src/github.com/elastic/beats/
       - /var/run/docker.sock:/var/run/docker.sock
     command: make
+    env_file:
+      - ./module/mssql/_meta/env
+
+  # Modules
+  mssql:
+    build: ./module/mssql/_meta

@@ -98,6 +98,10 @@ func StopIntegTestEnv() error {
 		return nil
 	}
 
+	if _, skip := skipIntegTest(); skip {
+		return nil
+	}
+
 	composeEnv, err := integTestDockerComposeEnvVars()
 	if err != nil {
 		return err
@@ -241,6 +245,10 @@ func haveIntegTestEnvRequirements() error {
 
 // skipIntegTest returns true if integ tests should be skipped.
 func skipIntegTest() (reason string, skip bool) {
+	if IsInIntegTestEnv() {
+		return "", false
+	}
+
 	// Honor the TEST_ENVIRONMENT value if set.
 	if testEnvVar, isSet := os.LookupEnv("TEST_ENVIRONMENT"); isSet {
 		enabled, err := strconv.ParseBool(testEnvVar)

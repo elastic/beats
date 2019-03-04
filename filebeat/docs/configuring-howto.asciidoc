@@ -14,7 +14,7 @@ There's also a full example configuration file at
 options. For mac and win, look in the archive that you extracted.
 
 The {beatname_uc} configuration file uses http://yaml.org/[YAML] for its syntax.
-See the {libbeat}/config-file-format.html[Config File Format] section of the
+See the {beats-ref}/config-file-format.html[Config File Format] section of the
 _Beats Platform Reference_ for more about the structure of the config file.
 
 include::../../libbeat/docs/shared-cm-tip.asciidoc[]
@@ -28,6 +28,7 @@ The following topics describe how to configure Filebeat:
 * <<filebeat-configuration-reloading>>
 * <<configuring-internal-queue>>
 * <<configuring-output>>
+* <<ilm>>
 * <<load-balancing>>
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
@@ -60,6 +61,8 @@ include::./reload-configuration.asciidoc[]
 include::{libbeat-dir}/docs/queueconfig.asciidoc[]
 
 include::{libbeat-dir}/docs/outputconfig.asciidoc[]
+
+include::../../libbeat/docs/shared-ilm.asciidoc[]
 
 include::./load-balancing.asciidoc[]
 

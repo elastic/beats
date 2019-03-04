@@ -22,19 +22,14 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-func eventsMapping(cpuStatsList []CPUStats) []common.MapStr {
-	events := []common.MapStr{}
+func eventsMapping(r mb.ReporterV2, cpuStatsList []CPUStats) {
 	for _, cpuStats := range cpuStatsList {
-		events = append(events, eventMapping(&cpuStats))
+		eventMapping(r, &cpuStats)
 	}
-	return events
 }
 
-func eventMapping(stats *CPUStats) common.MapStr {
-	event := common.MapStr{
-		mb.ModuleDataKey: common.MapStr{
-			"container": stats.Container.ToMapStr(),
-		},
+func eventMapping(r mb.ReporterV2, stats *CPUStats) {
+	fields := common.MapStr{
 		"core": stats.PerCpuUsage,
 		"total": common.MapStr{
 			"pct": stats.TotalUsage,
@@ -53,5 +48,8 @@ func eventMapping(stats *CPUStats) common.MapStr {
 		},
 	}
 
-	return event
+	r.Event(mb.Event{
+		RootFields:      stats.Container.ToMapStr(),
+		MetricSetFields: fields,
+	})
 }

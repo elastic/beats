@@ -97,8 +97,9 @@ func (b packageBuilder) Build() error {
 }
 
 type testPackagesParams struct {
-	HasModules  bool
-	HasModulesD bool
+	HasModules   bool
+	HasMonitorsD bool
+	HasModulesD  bool
 }
 
 // TestPackagesOption defines a option to the TestPackages target.
@@ -108,6 +109,13 @@ type TestPackagesOption func(params *testPackagesParams)
 func WithModules() func(params *testPackagesParams) {
 	return func(params *testPackagesParams) {
 		params.HasModules = true
+	}
+}
+
+// WithMonitorsD enables monitors folder contents testing.
+func WithMonitorsD() func(params *testPackagesParams) {
+	return func(params *testPackagesParams) {
+		params.HasMonitorsD = true
 	}
 }
 
@@ -140,10 +148,17 @@ func TestPackages(options ...TestPackagesOption) error {
 		args = append(args, "--modules")
 	}
 
+	if params.HasMonitorsD {
+		args = append(args, "--monitors.d")
+	}
+
 	if params.HasModulesD {
 		args = append(args, "--modules.d")
 	}
 
+	if BeatUser == "root" {
+		args = append(args, "-root-owner")
+	}
 	args = append(args, "-files", MustExpand("{{.PWD}}/build/distributions/*"))
 
 	if out, err := goTest(args...); err != nil {

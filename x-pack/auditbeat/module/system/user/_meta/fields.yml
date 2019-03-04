@@ -2,18 +2,18 @@
   type: group
   description: >
     `user` contains information about the users on a system.
-  release: experimental
+  release: beta
   fields:
     - name: name
       type: keyword
       description: >
           User name.
     - name: uid
-      type: integer
+      type: keyword
       description: >
           User ID.
     - name: gid
-      type: integer
+      type: keyword
       description: >
           Group ID.
     - name: dir
@@ -25,7 +25,7 @@
       description: >
           Program to run at login.
     - name: user_information
-      type: text
+      type: keyword
       description: >
           General user information. On Linux, this is the gecos field.
     - name: group

@@ -10,6 +10,9 @@ import datetime
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 
+testPolicyName = "libbeat-test-default-policy"
+
+
 class Test(BaseTest):
 
     def setUp(self):
@@ -19,7 +22,7 @@ class Test(BaseTest):
         print("Using elasticsearch: {}".format(self.elasticsearch_url))
         self.es = Elasticsearch([self.elasticsearch_url])
         self.alias_name = "mockbeat-9.9.9"
-        self.policy_name = "beats-default-policy"
+        self.policy_name = testPolicyName
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
@@ -31,9 +34,11 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
+            ilm={
+                "enabled": True,
+            },
             elasticsearch={
                 "hosts": self.get_elasticsearch_url(),
-                "ilm.enabled": True,
             },
         )
 
@@ -48,7 +53,8 @@ class Test(BaseTest):
         # Check if template is loaded with settings
         template = self.es.transport.perform_request('GET', '/_template/' + self.alias_name)
 
-        assert template[self.alias_name]["settings"]["index"]["lifecycle"]["name"] == "beats-default-policy"
+        print(self.alias_name)
+        assert template[self.alias_name]["settings"]["index"]["lifecycle"]["name"] == testPolicyName
         assert template[self.alias_name]["settings"]["index"]["lifecycle"]["rollover_alias"] == self.alias_name
 
         # Make sure the correct index + alias was created
@@ -75,11 +81,13 @@ class Test(BaseTest):
 
         alias_name = "foo"
         self.render_config_template(
+            ilm={
+                "enabled": True,
+                "pattern": "1",
+                "rollover_alias": alias_name
+            },
             elasticsearch={
                 "hosts": self.get_elasticsearch_url(),
-                "ilm.enabled": True,
-                "ilm.pattern": "1",
-                "ilm.rollover_alias": alias_name
             },
         )
 
@@ -109,10 +117,12 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
+            ilm={
+                "enabled": True,
+                "pattern": "1"
+            },
             elasticsearch={
                 "hosts": self.get_elasticsearch_url(),
-                "ilm.enabled": True,
-                "ilm.pattern": "1"
             },
         )
 
@@ -142,10 +152,12 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
+            ilm={
+                "enabled": True,
+                "pattern": "'{now/d}'"
+            },
             elasticsearch={
                 "hosts": self.get_elasticsearch_url(),
-                "ilm.enabled": True,
-                "ilm.pattern": "'{now/d}'"
             },
         )
 

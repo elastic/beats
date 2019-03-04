@@ -2,6 +2,7 @@
   type: group
   description: >
     Metrics obtained from Traefik's health API endpoint
+  release: ga
   fields:
     - name: uptime.sec
       type: long
