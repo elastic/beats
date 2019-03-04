@@ -274,3 +274,6 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 
 ==== Known Issue
 
+*Journalbeat*
+
+- Journalbeat requires at least systemd v233 in order to follow entries after journal changes (rotation, vacuum).
