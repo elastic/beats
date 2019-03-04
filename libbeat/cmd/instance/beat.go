@@ -307,7 +307,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		pipeline.Monitors{
 			Metrics:   reg,
 			Telemetry: monitoring.GetNamespace("state").GetRegistry(),
-			Logger:    logp.L().Named("publisher"),
+			Logger:    logp.L().Named("publish"),
 		},
 		b.Config.Pipeline,
 		b.makeOutputFactory(b.Config.Output),
