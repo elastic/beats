@@ -62,7 +62,7 @@ class TestManagement(BaseTest):
         assert config_content != new_content
 
         # Settings backup has been created
-        backup_file = glob.glob(os.path.join( self.working_dir, "mockbeat.yml.*.bak")[0]
+        backup_file = glob.glob(os.path.join(self.working_dir, "mockbeat.yml.*.bak"))[0]
         assert os.path.isfile(backup_file)
         backup_content = open(backup_file).read()
         assert config_content == backup_content
