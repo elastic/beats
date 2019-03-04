@@ -134,12 +134,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Ensure all beat commands respect configured settings. {pull}10721[10721]
 - Allow to configure Kafka fetching strategy for the topic metadata. {pull}10682[10682]
 - Using an environment variable for the password when enrolling a beat will now raise an error if the variable doesn't exist. {pull}10936[10936]
+- Add missing `host.containerized` and `host.os.build` to fields.ecs.yml. {pull}11016[11016]
 
 *Auditbeat*
 
 - Enable System module config on Windows. {pull}10237[10237]
 - Package: Disable librpm signal handlers. {pull}10694[10694]
 - Login: Handle different bad login UTMP types. {pull}10865[10865]
+- System module: Fix and unify bucket closing logic. {pull}10897[10897]
 
 *Filebeat*
 
@@ -178,6 +180,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added function to close sql database connection. {pull}10355[10355]
 - Fix issue with `elasticsearch/node_stats` metricset (x-pack) not indexing `source_node` field. {pull}10639[10639]
 - Migrate docker autodiscover to ECS. {issue}10757[10757] {pull}10862[10862]
+- Fix issue in kubernetes module preventing usage percentages to be properly calculated. {pull}10946[10946]
 
 *Packetbeat*
 
@@ -187,6 +190,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Avoid reporting unknown MongoDB opcodes more than once. {pull}10878[10878]
 
 *Winlogbeat*
+
+- Prevent Winlogbeat from dropping events with invalid XML. {pull}11006{11006}
 
 *Functionbeat*
 
@@ -261,6 +266,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Set `event.category: network_traffic` for Suricata. {pull}10882[10882]
 - Add configuration knob for auto-discover hints to control whether log harvesting is enabled for the pod/container. {issue}10811[10811] {pull}10911[10911]
 - Change Suricata module pipeline to handle `destination.domain` being set if a reverse DNS processor is used. {issue}10510[10510]
+- Add the `network.community_id` flow identifier to field to the IPTables, Suricata, and Zeek modules. {pull}11005[11005]
 
 *Heartbeat*
 
