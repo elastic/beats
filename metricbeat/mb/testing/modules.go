@@ -175,7 +175,7 @@ func NewReportingMetricSetV2Error(t testing.TB, config interface{}) mb.Reporting
 
 	reportingMetricSetV2Error, ok := metricSet.(mb.ReportingMetricSetV2Error)
 	if !ok {
-		t.Fatal("MetricSet does not implement ReportingMetricSetV2")
+		t.Fatal("MetricSet does not implement ReportingMetricSetV2Error")
 	}
 
 	return reportingMetricSetV2Error
