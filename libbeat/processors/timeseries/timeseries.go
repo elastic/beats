@@ -22,37 +22,40 @@ import (
 
 	"github.com/mitchellh/hashstructure"
 
-	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/processors"
 )
 
 type timeseriesProcessor struct {
 	dimensions map[string]interface{}
-	prefixes   map[string]interface{}
+	prefixes   []string
 }
 
 // NewTimeSeriesProcessor returns a processor to add timeseries info to events
 // Events are processed to extract all their dimensions (keyword fields that
 // hold a dimension of the metrics) and compute a hash of all their values into
 // `timeseries.instance` field.
-func NewTimeSeriesProcessor(beatName string) (processors.Processor, error) {
-	fieldsYAML, err := asset.GetFields(beatName)
-	if err != nil {
-		return nil, err
-	}
-
-	fields, err := common.NewFieldsFromYAML(fieldsYAML)
-	if err != nil {
-		return nil, err
-	}
-
-	dimensions := map[string]interface{}{}
-	prefixes := map[string]interface{}{}
+func NewTimeSeriesProcessor(fields common.Fields) (*timeseriesProcessor, error) {
+	dimensions := map[string]bool{}
+	prefixes := map[string]bool{}
 	populateDimensions("", dimensions, prefixes, fields)
 
-	return &timeseriesProcessor{dimensions: dimensions, prefixes: prefixes}, nil
+	// remove false values and convert to map where a nil value means
+	// it's a dimension
+	dimensionsNilDict := map[string]interface{}{}
+	for k, v := range dimensions {
+		if v {
+			dimensionsNilDict[k] = nil
+		}
+	}
+
+	// convert the prefix map to a list
+	prefixList := []string{}
+	for k, _ := range prefixes {
+		prefixList = append(prefixList, k)
+	}
+
+	return &timeseriesProcessor{dimensions: dimensionsNilDict, prefixes: prefixList}, nil
 }
 
 func (t *timeseriesProcessor) Run(event *beat.Event) (*beat.Event, error) {
@@ -85,7 +88,7 @@ func (t *timeseriesProcessor) isDimension(field string) bool {
 	}
 
 	// field matches any of the prefixes
-	for prefix := range t.prefixes {
+	for _, prefix := range t.prefixes {
 		if strings.HasPrefix(field, prefix) {
 			return true
 		}
@@ -95,7 +98,7 @@ func (t *timeseriesProcessor) isDimension(field string) bool {
 }
 
 // put all dimension fields in the given map for quick access
-func populateDimensions(prefix string, dimensions map[string]interface{}, prefixes map[string]interface{}, fields common.Fields) {
+func populateDimensions(prefix string, dimensions map[string]bool, prefixes map[string]bool, fields common.Fields) {
 	for _, f := range fields {
 		name := f.Name
 		if prefix != "" {
@@ -107,12 +110,14 @@ func populateDimensions(prefix string, dimensions map[string]interface{}, prefix
 			continue
 		}
 
-		if isDimension(f) {
-			if f.Type == "object" {
-				// everything with this prefix is a dimension
-				prefixes[prefix] = nil
-			} else {
-				dimensions[name] = nil
+		if f.Type == "object" {
+			// everything with this prefix could be a dimension
+			if _, ok := prefixes[prefix]; !ok || f.Overwrite {
+				prefixes[prefix] = isDimension(f)
+			}
+		} else {
+			if _, ok := dimensions[name]; !ok || f.Overwrite {
+				dimensions[name] = isDimension(f)
 			}
 		}
 	}

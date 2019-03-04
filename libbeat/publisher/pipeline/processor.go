@@ -145,10 +145,12 @@ func newProcessorPipeline(
 
 	// setup 9: time series metadata
 	if config.TimeSeries {
-		timeseriesProcessor, err := timeseries.NewTimeSeriesProcessor(info.Beat)
+		fields, err := common.BeatFields(info.Beat)
 		if err != nil {
 			return nil, err
 		}
+
+		timeseriesProcessor := timeseries.NewTimeSeriesProcessor(fields)
 		processors.add(timeseriesProcessor)
 	}
 

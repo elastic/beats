@@ -23,6 +23,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/go-ucfg/yaml"
 )
 
@@ -331,4 +332,14 @@ func NewFieldsFromYAML(data []byte) (Fields, error) {
 		fields = append(fields, key.Fields...)
 	}
 	return fields, nil
+}
+
+// BeatFields loads fields for beat with name `beatName`
+func BeatFields(beatName string) (Fields, error) {
+	fieldsYAML, err := asset.GetFields(beatName)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewFieldsFromYAML(fieldsYAML)
 }
