@@ -10566,6 +10566,30 @@ The average queue time in ms over the last 1024 requests.
 Info collected for the host machine.
 
 
+
+
+*`host.containerized`*::
++
+--
+type: boolean
+
+If the host is a container.
+
+
+--
+
+*`host.os.build`*::
++
+--
+type: keyword
+
+example: 18D109
+
+OS build information.
+
+
+--
+
 [[exported-fields-http]]
 == HTTP fields
 
