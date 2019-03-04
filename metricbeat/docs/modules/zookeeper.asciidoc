@@ -43,9 +43,13 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-zookeeper-connections,connections>>
+
 * <<metricbeat-metricset-zookeeper-mntr,mntr>>
 
 * <<metricbeat-metricset-zookeeper-server,server>>
+
+include::zookeeper/connections.asciidoc[]
 
 include::zookeeper/mntr.asciidoc[]
 

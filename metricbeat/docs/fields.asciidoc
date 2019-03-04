@@ -26259,6 +26259,23 @@ ZooKeeper metrics collected by the four-letter monitoring commands.
 
 
 [float]
+== connections fields
+
+connections
+
+
+
+*`zookeeper.connections.example`*::
++
+--
+type: keyword
+
+Example field
+
+
+--
+
+[float]
 == mntr fields
 
 `mntr` contains the metrics reported by the four-letter `mntr` command.
