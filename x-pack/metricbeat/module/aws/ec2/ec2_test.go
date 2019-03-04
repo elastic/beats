@@ -11,7 +11,6 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/ec2iface"
 	"github.com/stretchr/testify/assert"
@@ -25,11 +24,6 @@ import (
 // MockEC2Client struct is used for unit tests.
 type MockEC2Client struct {
 	ec2iface.EC2API
-}
-
-// MockCloudWatchClient struct is used for unit tests.
-type MockCloudWatchClient struct {
-	cloudwatchiface.CloudWatchAPI
 }
 
 var (

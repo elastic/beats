@@ -270,10 +270,7 @@ sudo service {beatname_lc} start
 
 *docker:*
 
-["source","sh",subs="attributes"]
-----------------------------------------------------------------------
-docker run {dockerimage}
-----------------------------------------------------------------------
+See <<running-on-docker>>.
 
 *mac and linux:*
 
@@ -284,7 +281,7 @@ sudo ./packetbeat -e
 ----------------------------------------------------------------------
 <1> You'll be running Packetbeat as root, so you need to change ownership of the
 configuration file, or run Packetbeat with `--strict.perms=false` specified. See
-{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]in
+{beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]in
 the _Beats Platform Reference_.
 
 *win:*

@@ -201,6 +201,7 @@ func createS3RequestEvents(outputs []cloudwatch.MetricDataResult, regionName str
 	// Cloud fields in ECS
 	event.RootFields.Put("service.name", metricsetName)
 	event.RootFields.Put("cloud.region", regionName)
+	event.RootFields.Put("cloud.provider", "aws")
 
 	// AWS s3_request metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})

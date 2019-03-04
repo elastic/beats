@@ -31,6 +31,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow Central Management to send events back to kibana. {issue}9382[9382]
 - Initialize the Paths before the keystore and save the keystore into `data/{beatname}.keystore`. {pull}10706[10706]
 - Add `cleanup_timeout` option to docker autodiscover, to wait some time before removing configurations after a container is stopped. {issue]10374[10374] {pull}10905[10905]
+- On Google Cloud Engine (GCE) the add_cloud_metadata will now trim the project
+  info from the cloud.machine.type and cloud.availability_zone. {issue}10968[10968]
 
 *Auditbeat*
 
@@ -132,12 +134,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Ensure all beat commands respect configured settings. {pull}10721[10721]
 - Allow to configure Kafka fetching strategy for the topic metadata. {pull}10682[10682]
 - Using an environment variable for the password when enrolling a beat will now raise an error if the variable doesn't exist. {pull}10936[10936]
+- Add missing `host.containerized` and `host.os.build` to fields.ecs.yml. {pull}11016[11016]
 
 *Auditbeat*
 
 - Enable System module config on Windows. {pull}10237[10237]
 - Package: Disable librpm signal handlers. {pull}10694[10694]
 - Login: Handle different bad login UTMP types. {pull}10865[10865]
+- System module: Fix and unify bucket closing logic. {pull}10897[10897]
 
 *Filebeat*
 
@@ -176,6 +180,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added function to close sql database connection. {pull}10355[10355]
 - Fix issue with `elasticsearch/node_stats` metricset (x-pack) not indexing `source_node` field. {pull}10639[10639]
 - Migrate docker autodiscover to ECS. {issue}10757[10757] {pull}10862[10862]
+- Fix issue in kubernetes module preventing usage percentages to be properly calculated. {pull}10946[10946]
 
 *Packetbeat*
 
@@ -185,6 +190,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Avoid reporting unknown MongoDB opcodes more than once. {pull}10878[10878]
 
 *Winlogbeat*
+
+- Prevent Winlogbeat from dropping events with invalid XML. {pull}11006{11006}
 
 *Functionbeat*
 
@@ -214,6 +221,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `network` condition to processors for matching IP addresses against CIDRs. {pull}10743[10743]
 - Add if/then/else support to processors. {pull}10744[10744]
 - Add `community_id` processor for computing network flow hashes. {pull}10745[10745]
+- Add output test to kafka output {pull}10834[10834]
 
 
 *Auditbeat*
@@ -314,6 +322,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add filters and pie chart for AWS EC2 dashboard. {pull}10596[10596]
 - Add AWS SQS metricset. {pull}10684[10684] {issue}10053[10053]
 - Add AWS s3_request metricset. {pull}10949[10949] {issue}10055[10055]
+- Add s3_daily_storage metricset. {pull}10940[10940] {issue}10055[10055]
 
 *Packetbeat*
 
