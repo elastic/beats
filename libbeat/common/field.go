@@ -126,7 +126,10 @@ func LoadFieldsYaml(path string) (Fields, error) {
 	if err != nil {
 		return nil, err
 	}
-	cfg.Unpack(&keys)
+	err = cfg.Unpack(&keys)
+	if err != nil {
+		return nil, err
+	}
 
 	fields := Fields{}
 
@@ -144,7 +147,10 @@ func LoadFields(f []byte) (Fields, error) {
 	if err != nil {
 		return nil, err
 	}
-	cfg.Unpack(&keys)
+	err = cfg.Unpack(&keys)
+	if err != nil {
+		return nil, err
+	}
 
 	fields := Fields{}
 	for _, key := range keys {
@@ -324,7 +330,10 @@ func NewFieldsFromYAML(data []byte) (Fields, error) {
 	if err != nil {
 		return nil, err
 	}
-	cfg.Unpack(&keys)
+	err = cfg.Unpack(&keys)
+	if err != nil {
+		return nil, err
+	}
 
 	fields := Fields{}
 
