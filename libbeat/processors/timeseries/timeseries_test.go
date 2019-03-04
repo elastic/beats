@@ -171,10 +171,7 @@ func TestTimesSeriesHashes(t *testing.T) {
 			Fields:     test.in,
 		}
 		t.Run(test.name, func(t *testing.T) {
-			var out *beat.Event
-			var err error
-
-			out, err = timeseriesProcessor.Run(&event)
+			out, err := timeseriesProcessor.Run(&event)
 
 			assert.NoError(t, err)
 			assert.Equal(t, test.expected, out.Fields)
