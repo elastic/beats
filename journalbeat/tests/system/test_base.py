@@ -4,6 +4,7 @@ import os
 import sys
 import unittest
 import time
+import yaml
 
 
 class Test(BaseTest):
@@ -114,10 +115,14 @@ class Test(BaseTest):
         Journalbeat is able to follow reading a from a journal with an existing registry file.
         """
 
+        registry_path = self.beat_path + "/tests/system/input/test.registry"
+        input_path = self.beat_path + "/tests/system/input/test.journal"
+        self._prepare_registry_file(registry_path, input_path)
+
         self.render_config_template(
-            journal_path=self.beat_path + "/tests/system/input/test.journal",
+            journal_path=input_path,
             seek_method="cursor",
-            registry_file=self.beat_path + "/tests/system/input/test.registry",
+            registry_file=registry_path,
             path=os.path.abspath(self.working_dir) + "/log/*",
         )
         journalbeat_proc = self.start_beat()
@@ -140,7 +145,7 @@ class Test(BaseTest):
         assert exit_code == 0
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "Journald only on Linux")
-    def test_read_events_with_existing_registry(self):
+    def test_read_events_with_include_matches(self):
         """
         Journalbeat is able to pass matchers to the journal reader and read filtered messages.
         """
@@ -171,6 +176,16 @@ class Test(BaseTest):
 
         exit_code = journalbeat_proc.kill_and_wait()
         assert exit_code == 0
+
+    def _prepare_registry_file(self, registry_path, journal_path):
+        lines = []
+        with open(registry_path, "r") as registry_file:
+            lines = registry_file.readlines()
+            lines[2] = "- path: " + journal_path + "\n"
+
+        with open(registry_path, "w") as registry_file:
+            for line in lines:
+                registry_file.write(line)
 
 
 if __name__ == '__main__':
