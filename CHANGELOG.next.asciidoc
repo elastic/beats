@@ -135,6 +135,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow to configure Kafka fetching strategy for the topic metadata. {pull}10682[10682]
 - Using an environment variable for the password when enrolling a beat will now raise an error if the variable doesn't exist. {pull}10936[10936]
 - Add missing `host.containerized` and `host.os.build` to fields.ecs.yml. {pull}11016[11016]
+- Reconnections of Kubernetes watchers are now logged at debug level when they are harmless. {pull}10988[10988]
 
 *Auditbeat*
 
@@ -181,6 +182,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix issue with `elasticsearch/node_stats` metricset (x-pack) not indexing `source_node` field. {pull}10639[10639]
 - Migrate docker autodiscover to ECS. {issue}10757[10757] {pull}10862[10862]
 - Fix issue in kubernetes module preventing usage percentages to be properly calculated. {pull}10946[10946]
+- Fix for not reusable http client leading to connection leaks in Jolokia module {pull}11014[11014]
 
 *Packetbeat*
 
