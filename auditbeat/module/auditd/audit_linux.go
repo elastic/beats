@@ -235,7 +235,7 @@ type reloader struct {
 	wg     sync.WaitGroup
 }
 
-func newRuleReloader(pathes []string, reload Reload) *reloader {
+func newRuleReloader(pathes []string, reload reload) *reloader {
 
 	newPathes := []string{}
 

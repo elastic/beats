@@ -54,7 +54,7 @@ type Config struct {
 	SocketType   string   `config:"socket_type"`         // Socket type to use with the kernel (unicast or multicast).
 
 	// reload auditd rule files
-	reload reload `config:"reload"`
+	Reload reload `config:"reload"`
 
 	// Tuning options (advanced, use with care)
 	ReassemblerMaxInFlight uint32        `config:"reassembler.max_in_flight"`
@@ -98,7 +98,7 @@ var defaultConfig = Config{
 	ReassemblerTimeout:     2 * time.Second,
 	StreamBufferQueueSize:  8192,
 	StreamBufferConsumers:  0,
-	reload:                 reload{Enabled: false, Period: 30 * time.Second},
+	Reload:                 reload{Enabled: false, Period: 30 * time.Second},
 }
 
 // Validate validates the rules specified in the config.
