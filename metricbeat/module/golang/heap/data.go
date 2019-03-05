@@ -21,7 +21,6 @@ import (
 	"runtime"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/golang"
 )
 
@@ -31,7 +30,7 @@ type Stats struct {
 	Cmdline  []interface{}
 }
 
-func eventMapping(r mb.ReporterV2, stats Stats, m *MetricSet) {
+func eventMapping(stats Stats, m *MetricSet) common.MapStr {
 	var event = common.MapStr{
 		"cmdline": golang.GetCmdStr(stats.Cmdline),
 	}
@@ -106,7 +105,6 @@ func eventMapping(r mb.ReporterV2, stats Stats, m *MetricSet) {
 		},
 	}
 
-	r.Event(mb.Event{
-		MetricSetFields: event,
-	})
+	return event
+
 }

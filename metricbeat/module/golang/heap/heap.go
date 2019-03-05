@@ -93,5 +93,8 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-	eventMapping(reporter, stats, m)
+	reporter.Event(mb.Event{
+		MetricSetFields: eventMapping(stats, m),
+	})
+
 }
