@@ -20,9 +20,12 @@
 package instance
 
 import (
+	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
+	"github.com/elastic/beats/libbeat/paths"
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
@@ -91,4 +94,38 @@ func TestInitKibanaConfig(t *testing.T) {
 	assert.Equal(t, "elastic-test-password", password)
 	assert.Equal(t, "https", protocol)
 	assert.Equal(t, "127.0.0.1:5601", host)
+}
+
+func TestEmptyMetaJson(t *testing.T) {
+	b, err := NewBeat("filebeat", "testidx", "0.9")
+	if err != nil {
+		panic(err)
+	}
+
+	metaPath := paths.Resolve(paths.Data, "meta.json")
+	backupMetaPath := paths.Resolve(paths.Data, "meta.json.backup")
+
+	// backup existing meta file
+	_, err = os.Stat(metaPath)
+	backedUp := false
+	if !os.IsNotExist(err) {
+		err := os.Rename(metaPath, backupMetaPath)
+		assert.Equal(t, nil, err, "Cannot backup meta file")
+		backedUp = true
+	}
+
+	// prepare empty meta
+	ioutil.WriteFile(metaPath, nil, 0644)
+
+	metaErr := b.loadMeta()
+
+	// cleanup
+	os.Remove(metaPath)
+	if backedUp {
+		err = os.Rename(backupMetaPath, metaPath)
+		assert.Equal(t, nil, err, "Cleanup failed")
+	}
+
+	assert.Equal(t, nil, metaErr, "Unable to load meta file properly")
+	assert.NotEqual(t, uuid.Nil, b.Info.ID, "Beats UUID is not set")
 }
