@@ -65,17 +65,6 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, 60938, peer["port"])
 }
 
-func TestData(t *testing.T) {
-	server := mtest.Server(t, mtest.DefaultServerConfig)
-	defer server.Close()
-
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig(server.URL))
-	err := mbtest.WriteEventsReporterV2(ms, t, "")
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}
-
 func getConfig(url string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "rabbitmq",
