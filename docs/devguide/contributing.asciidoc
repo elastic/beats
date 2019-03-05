@@ -55,7 +55,7 @@ simply set it to the `go` directory in your home (`export GOPATH=$HOME/go`).
 --------------------------------------------------------------------------------
 mkdir -p ${GOPATH}/src/github.com/elastic
 cd ${GOPATH}/src/github.com/elastic
-git clone git@github.com:elastic/beats.git
+git clone https://github.com/elastic/beats.git
 --------------------------------------------------------------------------------
 
 NOTE: If you have multiple go paths, use `${GOPATH%%:*}` instead of `${GOPATH}`.
