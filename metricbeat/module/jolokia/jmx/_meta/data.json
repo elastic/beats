@@ -6,7 +6,8 @@
         "module": "jolokia"
     },
     "jolokia": {
-        "testnamespace": {
+        "jmx": {
+            "_namespace": "testnamespace",
             "memory": {
                 "heap_usage": {
                     "committed": 514850816,

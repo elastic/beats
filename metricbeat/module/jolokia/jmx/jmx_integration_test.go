@@ -33,13 +33,15 @@ func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "jolokia")
 
 	for _, config := range getConfigs() {
-		f := mbtest.NewEventsFetcher(t, config)
-		events, err := f.Fetch()
-		if !assert.NoError(t, err) {
-			t.FailNow()
+		f := mbtest.NewReportingMetricSetV2(t, config)
+		events, errs := mbtest.ReportingFetchV2(f)
+		if len(errs) > 0 {
+			t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 		}
+		assert.NotEmpty(t, events)
+
 		t.Logf("%s/%s events: %+v", f.Module().Name(), f.Name(), events)
-		if len(events) == 0 || len(events[0]) <= 1 {
+		if len(events) == 0 {
 			t.Fatal("Empty events")
 		}
 	}
@@ -49,9 +51,14 @@ func TestData(t *testing.T) {
 	compose.EnsureUp(t, "jolokia")
 
 	for _, config := range getConfigs() {
-		f := mbtest.NewEventsFetcher(t, config)
-		err := mbtest.WriteEvents(f, t)
-		if err != nil {
+		f := mbtest.NewReportingMetricSetV2(t, config)
+		events, errs := mbtest.ReportingFetchV2(f)
+		if len(errs) > 0 {
+			t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+		}
+		assert.NotEmpty(t, events)
+
+		if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
 			t.Fatal("write", err)
 		}
 	}
