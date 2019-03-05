@@ -209,11 +209,50 @@ func (r *CapturingReporterV2) GetErrors() []error {
 	return r.errs
 }
 
+// CapturingReporterV2 is a reporter used for testing which stores all events and errors
+type CapturingReporterV2Error struct {
+	events []mb.Event
+	errs   []error
+}
+
+// Event is used to report an event
+func (r *CapturingReporterV2Error) Event(event mb.Event) bool {
+	r.events = append(r.events, event)
+	return true
+}
+
+// Error is used to report an error
+func (r *CapturingReporterV2Error) Error(err error) bool {
+	r.errs = append(r.errs, err)
+	return true
+}
+
+// GetEvents returns all reported events
+func (r *CapturingReporterV2Error) GetEvents() []mb.Event {
+	return r.events
+}
+
+// GetErrors returns all reported errors
+func (r *CapturingReporterV2Error) GetErrors() []error {
+	return r.errs
+}
+
 // ReportingFetchV2 runs the given reporting metricset and returns all of the
 // events and errors that occur during that period.
 func ReportingFetchV2(metricSet mb.ReportingMetricSetV2) ([]mb.Event, []error) {
 	r := &CapturingReporterV2{}
 	metricSet.Fetch(r)
+	return r.events, r.errs
+}
+
+// ReportingFetchV2Error runs the given reporting metricset and returns all of the
+// events and errors that occur during that period.
+func ReportingFetchV2Error(metricSet mb.ReportingMetricSetV2Error) ([]mb.Event, []error) {
+	r := &CapturingReporterV2{}
+	err := metricSet.Fetch(r)
+	if err != nil {
+		r.errs = append(r.errs, err)
+	}
 	return r.events, r.errs
 }
 
