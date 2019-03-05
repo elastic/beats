@@ -28,6 +28,8 @@ import (
 )
 
 func TestData(t *testing.T) {
+	t.Skip("Skipping data generation test")
+
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
