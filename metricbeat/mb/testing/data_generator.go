@@ -149,11 +149,6 @@ func StandardizeEvent(ms mb.MetricSet, e mb.Event, modifiers ...mb.EventModifier
 
 	fullEvent := e.BeatEvent(ms.Module().Name(), ms.Name(), modifiers...)
 
-	fullEvent.Fields["agent"] = common.MapStr{
-		"name":     "host.example.com",
-		"hostname": "host.example.com",
-	}
-
 	return fullEvent
 }
 

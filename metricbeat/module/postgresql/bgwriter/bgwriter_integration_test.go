@@ -33,11 +33,13 @@ import (
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "postgresql")
 
-	f := mbtest.NewEventFetcher(t, getConfig())
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
+	assert.NotEmpty(t, events)
+	event := events[0].MetricSetFields
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
@@ -62,10 +64,14 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "postgresql")
 
-	f := mbtest.NewEventFetcher(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
 
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
+	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }

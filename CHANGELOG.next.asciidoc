@@ -135,6 +135,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow to configure Kafka fetching strategy for the topic metadata. {pull}10682[10682]
 - Using an environment variable for the password when enrolling a beat will now raise an error if the variable doesn't exist. {pull}10936[10936]
 - Add missing `host.containerized` and `host.os.build` to fields.ecs.yml. {pull}11016[11016]
+- Reconnections of Kubernetes watchers are now logged at debug level when they are harmless. {pull}10988[10988]
+- Include ip and boolean type when generating index pattern. {pull}10995[10995]
 
 *Auditbeat*
 
@@ -158,6 +160,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix registry entries not being cleaned due to race conditions. {pull}10747[10747]
 - Improve detection of file deletion on Windows. {pull}10747[10747]
 - Fix errors in filebeat Zeek dashboard and README files. Add notice.log support. {pull}10916[10916]
+- Fix a bug when converting NetFlow fields to snake_case. {pull}10950[10950]
 
 *Heartbeat*
 
@@ -181,6 +184,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix issue with `elasticsearch/node_stats` metricset (x-pack) not indexing `source_node` field. {pull}10639[10639]
 - Migrate docker autodiscover to ECS. {issue}10757[10757] {pull}10862[10862]
 - Fix issue in kubernetes module preventing usage percentages to be properly calculated. {pull}10946[10946]
+- Fix for not reusable http client leading to connection leaks in Jolokia module {pull}11014[11014]
 
 *Packetbeat*
 
@@ -266,6 +270,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Set `event.category: network_traffic` for Suricata. {pull}10882[10882]
 - Add configuration knob for auto-discover hints to control whether log harvesting is enabled for the pod/container. {issue}10811[10811] {pull}10911[10911]
 - Change Suricata module pipeline to handle `destination.domain` being set if a reverse DNS processor is used. {issue}10510[10510]
+- Add the `network.community_id` flow identifier to field to the IPTables, Suricata, and Zeek modules. {pull}11005[11005]
 
 *Heartbeat*
 
