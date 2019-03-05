@@ -45,6 +45,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Fix a issue when remote and local configuration didn't match when fetching configuration from Central Management. {issue}10587[10587]
 - Fix unauthorized error when loading dashboards by adding username and password into kibana config. {issue}10513[10513] {pull}10675[10675]
 - Ensure all beat commands respect configured settings. {pull}10721[10721]
+- Add missing host.* fields to fields.yml. {pull}11016[11016]
 
 *Auditbeat*
 
