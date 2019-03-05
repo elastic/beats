@@ -222,6 +222,42 @@ func TestEventGroupingMapperGetRequest(t *testing.T) {
 	assert.ElementsMatch(t, expected, events)
 }
 
+// TestEventGroupingMapperGetRequestUptime tests responses which are returned
+// from a Jolokia GET request and only has one uptime runtime value.
+func TestEventGroupingMapperGetRequestUptime(t *testing.T) {
+	absPath, err := filepath.Abs("./_meta/test")
+
+	assert.NotNil(t, absPath)
+	assert.Nil(t, err)
+
+	jolokiaResponse, err := ioutil.ReadFile(absPath + "/jolokia_get_response_uptime.json")
+
+	assert.Nil(t, err)
+
+	var mapping = AttributeMapping{
+		attributeMappingKey{"java.lang:type=Runtime", "Uptime"}: Attribute{
+			Field: "runtime.uptime", Event: "runtime"},
+	}
+
+	// Construct a new GET response event mapper
+	eventMapper := NewJolokiaHTTPRequestFetcher("GET")
+
+	// Map response to Metricbeat events
+	events, err := eventMapper.EventMapping(jolokiaResponse, mapping)
+
+	assert.Nil(t, err)
+
+	expected := []common.MapStr{
+		{
+			"runtime": common.MapStr{
+				"uptime": float64(88622),
+			},
+		},
+	}
+
+	assert.ElementsMatch(t, expected, events)
+}
+
 func TestEventMapperWithWildcard(t *testing.T) {
 	absPath, err := filepath.Abs("./_meta/test")
 

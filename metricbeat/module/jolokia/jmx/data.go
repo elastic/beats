@@ -33,9 +33,10 @@ const (
 
 type Entry struct {
 	Request struct {
-		Mbean string `json:"mbean"`
+		Mbean     string      `json:"mbean"`
+		Attribute interface{} `json:"attribute"`
 	}
-	Value map[string]interface{}
+	Value interface{}
 }
 
 // Map responseBody to common.MapStr
@@ -90,7 +91,22 @@ type Entry struct {
 //        "timestamp": 1519409583
 //        "status": 200,
 //     }
-//  }
+//  ]
+//
+// A response with single value
+//
+//  [
+//     {
+//      "request":{
+//          "mbean":"java.lang:type=Runtime",
+//         "attribute":"Uptime",
+//         "type":"read"
+//       },
+//        "value":88622,
+//         "timestamp":1551739190,
+//         "status":200
+//    }
+// ]
 type eventKey struct {
 	mbean, event string
 }
@@ -104,7 +120,19 @@ func eventMapping(entries []Entry, mapping AttributeMapping) ([]common.MapStr, e
 
 	for _, v := range entries {
 		hasWildcard := strings.Contains(v.Request.Mbean, "*")
-		for attribute, value := range v.Value {
+		// Check if value in entry is a map interface and if attribute in entry is a string type
+		entryValues, okValue := v.Value.(map[string]interface{})
+		attribute, okAttribute := v.Request.Attribute.(string)
+		if !okValue && okAttribute {
+			entryValue := v.Value.(float64)
+			err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, entryValue, mbeanEvents, mapping)
+			if err != nil {
+				errs = append(errs, err)
+			}
+			continue
+		}
+
+		for attribute, value := range entryValues {
 			if !hasWildcard {
 				err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, value, mbeanEvents, mapping)
 				if err != nil {
