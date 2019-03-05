@@ -99,6 +99,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	if totalEvents == 0 {
 		err = errors.New("Failed to retrieve dbStats from any databases")
 		logger.Error(err)
+		reporter.Error(err)
 	}
 
 	return
