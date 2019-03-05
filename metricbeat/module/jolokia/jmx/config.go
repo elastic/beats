@@ -29,7 +29,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/metricbeat/helper"
 )
 
 type JMXMapping struct {
@@ -355,20 +354,17 @@ func (pc *JolokiaHTTPGetFetcher) Fetch(m *MetricSet) ([]common.MapStr, error) {
 	}
 
 	for _, r := range httpReqs {
+		m.http.SetMethod(r.HTTPMethod)
+		m.http.SetURI(m.BaseMetricSet.HostData().SanitizedURI + r.URI)
 
-		http, err := helper.NewHTTP(m.BaseMetricSet)
-
-		http.SetMethod(r.HTTPMethod)
-		http.SetURI(m.BaseMetricSet.HostData().SanitizedURI + r.URI)
-
-		resBody, err := http.FetchContent()
+		resBody, err := m.http.FetchContent()
 		if err != nil {
 			return nil, err
 		}
 
 		if logp.IsDebug(metricsetName) {
 			m.log.Debugw("Jolokia response body",
-				"host", m.HostData().Host, "uri", http.GetURI(), "body", string(resBody), "type", "response")
+				"host", m.HostData().Host, "uri", m.http.GetURI(), "body", string(resBody), "type", "response")
 		}
 
 		// Map response to Metricbeat events
@@ -491,19 +487,17 @@ func (pc *JolokiaHTTPPostFetcher) Fetch(m *MetricSet) ([]common.MapStr, error) {
 		}
 	}
 
-	http, err := helper.NewHTTP(m.BaseMetricSet)
+	m.http.SetMethod(httpReqs[0].HTTPMethod)
+	m.http.SetBody(httpReqs[0].Body)
 
-	http.SetMethod(httpReqs[0].HTTPMethod)
-	http.SetBody(httpReqs[0].Body)
-
-	resBody, err := http.FetchContent()
+	resBody, err := m.http.FetchContent()
 	if err != nil {
 		return nil, err
 	}
 
 	if logp.IsDebug(metricsetName) {
 		m.log.Debugw("Jolokia response body",
-			"host", m.HostData().Host, "uri", http.GetURI(), "body", string(resBody), "type", "response")
+			"host", m.HostData().Host, "uri", m.http.GetURI(), "body", string(resBody), "type", "response")
 	}
 
 	// Map response to Metricbeat events
