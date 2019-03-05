@@ -102,6 +102,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Fix bad bytes count in `docker` input when filtering by stream. {pull}10211[10211]
 - Fixed data types for roles and indices fields in `elasticsearch/audit` fileset {pull}10307[10307]
 - Cover empty request data, url and version in Apache2 module{pull}10846[10846]
+- Fix a bug when converting NetFlow fields to snake_case. {pull}10950[10950]
 
 *Heartbeat*
 
