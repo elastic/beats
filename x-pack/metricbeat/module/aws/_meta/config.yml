@@ -11,6 +11,7 @@
   period: 86400s
   metricsets:
     - "s3_request"
+    - "s3_daily_storage"
   access_key_id: '${AWS_ACCESS_KEY_ID:""}'
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'

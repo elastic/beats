@@ -274,7 +274,7 @@ used to construct the `paths` list for the input `paths` option.
 Any template files that you add to the `config/` folder need to generate a valid
 Filebeat input configuration in YAML format. The options accepted by the
 input configuration are documented in the
-{filebeat}/configuration-filebeat-options.html[Filebeat Inputs] section of
+{filebeat-ref}/configuration-filebeat-options.html[Filebeat Inputs] section of
 the Filebeat documentation.
 
 The template files use the templating language defined by the
@@ -304,12 +304,12 @@ variables to dynamically switch between configurations.
 ==== ingest/*.json
 
 The `ingest/` folder contains Elasticsearch
-{elasticsearch}/ingest.html[Ingest Node] pipeline configurations. The Ingest
+{ref}/ingest.html[Ingest Node] pipeline configurations. The Ingest
 Node pipelines are responsible for parsing the log lines and doing other
 manipulations on the data.
 
 The files in this folder are JSON documents representing
-{elasticsearch}/pipeline.html[pipeline definitions]. Just like with the `config/`
+{ref}/pipeline.html[pipeline definitions]. Just like with the `config/`
 folder, you can define multiple pipelines, but a single one is loaded at runtime
 based on the information from `manifest.yml`.
 
@@ -332,9 +332,9 @@ The generator creates a JSON object similar to this one:
 
 From here, you would typically add processors to the `processors` array to do
 the actual parsing. For details on how to use ingest node processors, see the
-{elasticsearch}/ingest-processors.html[ingest node documentation]. In
+{ref}/ingest-processors.html[ingest node documentation]. In
 particular, you will likely find the
-{elasticsearch}/grok-processor.html[Grok processor] to be useful for parsing.
+{ref}/grok-processor.html[Grok processor] to be useful for parsing.
 Here is an example for parsing the Nginx access logs.
 
 [source,json]
@@ -412,7 +412,7 @@ ingest_pipeline:
 ----
 
 While developing the pipeline definition, we recommend making use of the
-{elasticsearch}/simulate-pipeline-api.html[Simulate Pipeline API] for testing
+{ref}/simulate-pipeline-api.html[Simulate Pipeline API] for testing
 and quick iteration.
 
 By default Filebeat does not update Ingest pipelines if already loaded. If you
