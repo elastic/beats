@@ -18,6 +18,7 @@
 package jmx
 
 import (
+	"reflect"
 	"strings"
 
 	"github.com/joeshaw/multierror"
@@ -120,43 +121,53 @@ func eventMapping(entries []Entry, mapping AttributeMapping) ([]common.MapStr, e
 
 	for _, v := range entries {
 		hasWildcard := strings.Contains(v.Request.Mbean, "*")
-		// Check if value in entry is a map interface and if attribute in entry is a string type
-		entryValues, okValue := v.Value.(map[string]interface{})
-		attribute, okAttribute := v.Request.Attribute.(string)
-		if !okValue && okAttribute {
+		if v.Value == nil || v.Request.Attribute == nil {
+			continue
+		}
+		attributeType := reflect.TypeOf(v.Request.Attribute).String()
+		valueType := reflect.TypeOf(v.Value).String()
+
+		// check if value is map[string]interface type
+		if valueType == "map[string]interface {}" {
+			entryValues := v.Value.(map[string]interface{})
+			for attribute, value := range entryValues {
+				if !hasWildcard {
+					err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, value, mbeanEvents, mapping)
+					if err != nil {
+						errs = append(errs, err)
+					}
+					continue
+				}
+
+				// If there was a wildcard, we are going to have an additional
+				// nesting level in response values, and attribute here is going
+				// to be actually the matching mbean name
+				values, ok := value.(map[string]interface{})
+				if !ok {
+					errs = append(errs, errors.Errorf("expected map of values for %s", v.Request.Mbean))
+					continue
+				}
+
+				responseMbean := attribute
+				for attribute, value := range values {
+					err := parseResponseEntry(v.Request.Mbean, responseMbean, attribute, value, mbeanEvents, mapping)
+					if err != nil {
+						errs = append(errs, err)
+					}
+				}
+			}
+			continue
+		}
+
+		// Check if attribute in entry is a string type and value is float64
+		if attributeType == "string" && valueType == "float64" {
+			attribute := v.Request.Attribute.(string)
 			entryValue := v.Value.(float64)
 			err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, entryValue, mbeanEvents, mapping)
 			if err != nil {
 				errs = append(errs, err)
 			}
 			continue
-		}
-
-		for attribute, value := range entryValues {
-			if !hasWildcard {
-				err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, value, mbeanEvents, mapping)
-				if err != nil {
-					errs = append(errs, err)
-				}
-				continue
-			}
-
-			// If there was a wildcard, we are going to have an additional
-			// nesting level in response values, and attribute here is going
-			// to be actually the matching mbean name
-			values, ok := value.(map[string]interface{})
-			if !ok {
-				errs = append(errs, errors.Errorf("expected map of values for %s", v.Request.Mbean))
-				continue
-			}
-
-			responseMbean := attribute
-			for attribute, value := range values {
-				err := parseResponseEntry(v.Request.Mbean, responseMbean, attribute, value, mbeanEvents, mapping)
-				if err != nil {
-					errs = append(errs, err)
-				}
-			}
 		}
 	}
 
