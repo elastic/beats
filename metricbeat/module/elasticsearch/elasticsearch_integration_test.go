@@ -50,7 +50,7 @@ import (
 )
 
 var metricSets = []string{
-	"ccr",
+	//"ccr",
 	"cluster_stats",
 	"index",
 	"index_recovery",
