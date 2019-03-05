@@ -254,5 +254,7 @@ var (
 		"":             "string",
 		"geo_point":    "geo_point",
 		"date":         "date",
+		"ip":           "ip",
+		"boolean":      "boolean",
 	}
 )
