@@ -46,6 +46,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Fix unauthorized error when loading dashboards by adding username and password into kibana config. {issue}10513[10513] {pull}10675[10675]
 - Ensure all beat commands respect configured settings. {pull}10721[10721]
 - Add missing host.* fields to fields.yml. {pull}11016[11016]
+- Include ip and boolean type when generating index pattern. {pull}10995[10995]
 
 *Auditbeat*
 
