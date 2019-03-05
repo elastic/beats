@@ -89,7 +89,7 @@ id:
 
 Where `id` is the numeric field ID.
 
-The IPFIX format similar, but grouped by Private Enterprise NUmber (PEN):
+The IPFIX format similar, but grouped by Private Enterprise Number (PEN):
 ["source","yaml",subs="attributes"]
 pen1:
   id:
