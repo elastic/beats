@@ -44,10 +44,10 @@ const (
 
 // DatTests specifies the .dat files associated with test cases.
 type DatTests struct {
-	Tests map[string]DatTest `yaml:"tests"`
+	Tests map[string]TestCase `yaml:"tests"`
 }
 
-type DatTest struct {
+type TestCase struct {
 	Files  []string `yaml:"files"`
 	Fields []string `yaml:"custom_fields"`
 }
@@ -154,7 +154,7 @@ func readDatTests(t testing.TB) *DatTests {
 	return &tests
 }
 
-func getFlowsFromDat(t testing.TB, name string, testData DatTest) TestResult {
+func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 	t.Helper()
 
 	config := decoder.NewConfig().
@@ -163,7 +163,7 @@ func getFlowsFromDat(t testing.TB, name string, testData DatTest) TestResult {
 		WithExpiration(0).
 		WithLogOutput(test.TestLogWriter{TB: t})
 
-	for _, fieldFile := range testData.Fields {
+	for _, fieldFile := range testCase.Fields {
 		fields, err := LoadFieldDefinitionsFromFile(filepath.Join(fieldsDir, fieldFile))
 		if err != nil {
 			t.Fatal(err, fieldFile)
@@ -178,7 +178,7 @@ func getFlowsFromDat(t testing.TB, name string, testData DatTest) TestResult {
 
 	source := test.MakeAddress(t, datSourceIP+":4444")
 	var events []beat.Event
-	for _, f := range testData.Files {
+	for _, f := range testCase.Files {
 		dat, err := ioutil.ReadFile(filepath.Join(datDir, f))
 		if err != nil {
 			t.Fatal(err)
