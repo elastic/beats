@@ -29,7 +29,8 @@ import (
 
 func TestNode(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"Data": testData,
+		"Data":  testData,
+		"Fetch": testFetch,
 	})
 }
 
@@ -39,6 +40,17 @@ func testData(t *testing.T, r compose.R) {
 	if err != nil {
 		t.Fatal("write", err)
 	}
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	t.Skip("Skipping test as it was not stable. Probably first event is empty.")
+	reporter := &mbtest.CapturingReporterV2{}
+
+	metricSet := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
+	metricSet.Fetch(reporter)
+
+	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
+	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
 }
 
 func getConfig(host string) map[string]interface{} {

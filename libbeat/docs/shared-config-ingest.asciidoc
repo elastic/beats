@@ -13,7 +13,7 @@
 == Parse data by using ingest node
 
 When you use Elasticsearch for output, you can configure {beatname_uc} to use
-{elasticsearch}/ingest.html[ingest node] to pre-process documents before the
+{ref}/ingest.html[ingest node] to pre-process documents before the
 actual indexing takes place in Elasticsearch. Ingest node is a convenient
 processing option when you want to do some extra processing on your data, but
 you do not require the full power of Logstash. For example, you can create an
@@ -42,7 +42,7 @@ named `pipeline.json`:
     "processors": [
         {
             "lowercase": {
-                "field": "beat.name"
+                "field": "agent.name"
             }
         }
     ]
@@ -65,7 +65,7 @@ output.elasticsearch:
   pipeline: "test-pipeline"
 ------------------------------------------------------------------------------
 
-When you run {beatname_uc}, the value of `beat.name` is converted to lowercase before indexing.
+When you run {beatname_uc}, the value of `agent.name` is converted to lowercase before indexing.
 
 For more information about defining a pre-processing pipeline, see the
-{elasticsearch}/ingest.html[Ingest Node] documentation.
+{ref}/ingest.html[Ingest Node] documentation.

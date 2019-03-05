@@ -23,6 +23,7 @@ grouped in the following categories:
 * <<exported-fields-host-processor>>
 * <<exported-fields-icinga>>
 * <<exported-fields-iis>>
+* <<exported-fields-iptables>>
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
@@ -30,7 +31,9 @@ grouped in the following categories:
 * <<exported-fields-logstash>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
+* <<exported-fields-nats>>
 * <<exported-fields-netflow>>
+* <<exported-fields-netflow-module>>
 * <<exported-fields-nginx>>
 * <<exported-fields-osquery>>
 * <<exported-fields-postgresql>>
@@ -40,6 +43,7 @@ grouped in the following categories:
 * <<exported-fields-suricata>>
 * <<exported-fields-system>>
 * <<exported-fields-traefik>>
+* <<exported-fields-zeek>>
 
 --
 [[exported-fields-apache]]
@@ -62,7 +66,7 @@ Aliases for backward compatibility with old apache2 fields
 --
 type: alias
 
-alias to: apache.access.remote_ip
+alias to: source.address
 
 --
 
@@ -89,7 +93,7 @@ alias to: apache.access.ssl.cipher
 --
 type: alias
 
-alias to: apache.access.body_sent.bytes
+alias to: http.response.body.bytes
 
 --
 
@@ -162,34 +166,7 @@ alias to: user_agent.original
 --
 type: alias
 
-alias to: user_agent.device
-
---
-
-*`apache2.access.user_agent.major`*::
-+
---
-type: alias
-
-alias to: user_agent.major
-
---
-
-*`apache2.access.user_agent.minor`*::
-+
---
-type: alias
-
-alias to: user_agent.minor
-
---
-
-*`apache2.access.user_agent.patch`*::
-+
---
-type: alias
-
-alias to: user_agent.patch
+alias to: user_agent.device.name
 
 --
 
@@ -208,24 +185,6 @@ alias to: user_agent.name
 type: alias
 
 alias to: user_agent.os.full_name
-
---
-
-*`apache2.access.user_agent.os_major`*::
-+
---
-type: alias
-
-alias to: user_agent.os.major
-
---
-
-*`apache2.access.user_agent.os_minor`*::
-+
---
-type: alias
-
-alias to: user_agent.os.minor
 
 --
 
@@ -362,16 +321,6 @@ Contains fields for the Apache HTTP Server access logs.
 
 
 
-*`apache.access.remote_ip`*::
-+
---
-type: keyword
-
-Client IP address or hostname.
-
-
---
-
 *`apache.access.ssl.protocol`*::
 +
 --
@@ -388,18 +337,6 @@ SSL protocol version.
 type: keyword
 
 SSL cipher name.
-
-
---
-
-*`apache.access.body_sent.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
 
 
 --
@@ -428,6 +365,232 @@ Module for parsing auditd logs.
 
 
 
+
+*`user.terminal`*::
++
+--
+type: keyword
+
+Terminal or tty device on which the user is performing the observed activity.
+
+
+--
+
+
+*`user.audit.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.audit.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
+
+
+--
+
+*`user.audit.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.audit.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
+
+
+*`user.effective.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.effective.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
+
+
+--
+
+*`user.effective.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.effective.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
+
+
+*`user.filesystem.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.filesystem.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
+
+
+--
+
+*`user.filesystem.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.filesystem.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
+
+
+*`user.owner.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.owner.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
+
+
+--
+
+*`user.owner.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.owner.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
+
+
+*`user.saved.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.saved.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
+
+
+--
+
+*`user.saved.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.saved.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
+
 [float]
 == auditd fields
 
@@ -441,14 +604,6 @@ Fields from the auditd logs.
 Fields from the Linux audit log. Not all fields are documented here because they are dynamic and vary by audit event type.
 
 
-
-*`auditd.log.record_type`*::
-+
---
-The audit event type.
-
-
---
 
 *`auditd.log.old_auid`*::
 +
@@ -492,30 +647,6 @@ The audit event sequence number.
 
 --
 
-*`auditd.log.acct`*::
-+
---
-The user account name associated with the event.
-
-
---
-
-*`auditd.log.pid`*::
-+
---
-The ID of the process.
-
-
---
-
-*`auditd.log.ppid`*::
-+
---
-The ID of the process.
-
-
---
-
 *`auditd.log.items`*::
 +
 --
@@ -532,6 +663,13 @@ The item field indicates which item out of the total number of items. This numbe
 
 --
 
+*`auditd.log.tty`*::
++
+--
+type: keyword
+
+--
+
 *`auditd.log.a0`*::
 +
 --
@@ -540,78 +678,302 @@ The first argument to the system call.
 
 --
 
+*`auditd.log.addr`*::
++
+--
+type: ip
+
+--
+
+*`auditd.log.rport`*::
++
+--
+type: long
+
+--
+
+*`auditd.log.laddr`*::
++
+--
+type: ip
+
+--
+
+*`auditd.log.lport`*::
++
+--
+type: long
+
+--
+
+*`auditd.log.acct`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`auditd.log.pid`*::
++
+--
+type: alias
+
+alias to: process.pid
+
+--
+
+*`auditd.log.ppid`*::
++
+--
+type: alias
+
+alias to: process.ppid
+
+--
+
 *`auditd.log.res`*::
 +
 --
-The result of the system call (success or failure).
+type: alias
 
+alias to: event.outcome
 
 --
 
-[float]
-== geoip fields
+*`auditd.log.record_type`*::
++
+--
+type: alias
 
-Contains GeoIP information gathered based on the `auditd.log.addr` field. Only present if the GeoIP Elasticsearch plugin is available and used.
+alias to: event.action
 
+--
 
 
 *`auditd.log.geoip.continent_name`*::
 +
 --
-type: keyword
+type: alias
 
-The name of the continent.
-
-
---
-
-*`auditd.log.geoip.city_name`*::
-+
---
-type: keyword
-
-The name of the city.
-
-
---
-
-*`auditd.log.geoip.region_name`*::
-+
---
-type: keyword
-
-The name of the region.
-
+alias to: source.geo.continent_name
 
 --
 
 *`auditd.log.geoip.country_iso_code`*::
 +
 --
-type: keyword
+type: alias
 
-Country ISO code.
-
+alias to: source.geo.country_iso_code
 
 --
 
 *`auditd.log.geoip.location`*::
 +
 --
-type: geo_point
+type: alias
 
-The longitude and latitude.
+alias to: source.geo.location
 
+--
+
+*`auditd.log.geoip.region_name`*::
++
+--
+type: alias
+
+alias to: source.geo.region_name
+
+--
+
+*`auditd.log.geoip.city_name`*::
++
+--
+type: alias
+
+alias to: source.geo.city_name
 
 --
 
 *`auditd.log.geoip.region_iso_code`*::
 +
 --
-type: keyword
+type: alias
 
-Region ISO code.
+alias to: source.geo.region_iso_code
 
+--
+
+*`auditd.log.arch`*::
++
+--
+type: alias
+
+alias to: host.architecture
+
+--
+
+*`auditd.log.gid`*::
++
+--
+type: alias
+
+alias to: user.group.id
+
+--
+
+*`auditd.log.uid`*::
++
+--
+type: alias
+
+alias to: user.id
+
+--
+
+*`auditd.log.agid`*::
++
+--
+type: alias
+
+alias to: user.audit.group.id
+
+--
+
+*`auditd.log.auid`*::
++
+--
+type: alias
+
+alias to: user.audit.id
+
+--
+
+*`auditd.log.fsgid`*::
++
+--
+type: alias
+
+alias to: user.filesystem.group.id
+
+--
+
+*`auditd.log.fsuid`*::
++
+--
+type: alias
+
+alias to: user.filesystem.id
+
+--
+
+*`auditd.log.egid`*::
++
+--
+type: alias
+
+alias to: user.effective.group.id
+
+--
+
+*`auditd.log.euid`*::
++
+--
+type: alias
+
+alias to: user.effective.id
+
+--
+
+*`auditd.log.sgid`*::
++
+--
+type: alias
+
+alias to: user.saved.group.id
+
+--
+
+*`auditd.log.suid`*::
++
+--
+type: alias
+
+alias to: user.saved.id
+
+--
+
+*`auditd.log.ogid`*::
++
+--
+type: alias
+
+alias to: user.owner.group.id
+
+--
+
+*`auditd.log.ouid`*::
++
+--
+type: alias
+
+alias to: user.owner.id
+
+--
+
+*`auditd.log.comm`*::
++
+--
+type: alias
+
+alias to: process.name
+
+--
+
+*`auditd.log.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
+
+--
+
+*`auditd.log.terminal`*::
++
+--
+type: alias
+
+alias to: user.terminal
+
+--
+
+*`auditd.log.msg`*::
++
+--
+type: alias
+
+alias to: message
+
+--
+
+*`auditd.log.src`*::
++
+--
+type: alias
+
+alias to: source.address
+
+--
+
+*`auditd.log.dst`*::
++
+--
+type: alias
+
+alias to: destination.address
 
 --
 
@@ -1002,6 +1364,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the client to the server.
 
 
@@ -1349,6 +1713,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the destination to the source.
 
 
@@ -1683,6 +2049,8 @@ Hash (perhaps logstash fingerprint) of raw field to be able to demonstrate log i
 --
 type: long
 
+format: duration
+
 Duration of the event in nanoseconds.
 If event.start and event.end are known this value should be the difference between the end and start time.
 
@@ -1870,6 +2238,8 @@ Mode of the file in octal representation.
 +
 --
 type: long
+
+format: bytes
 
 File size in bytes (field is only added when `type` is `file`).
 
@@ -2275,6 +2645,8 @@ type: long
 
 example: 1437
 
+format: bytes
+
 Total size in bytes of the request (body and headers).
 
 
@@ -2286,6 +2658,8 @@ Total size in bytes of the request (body and headers).
 type: long
 
 example: 887
+
+format: bytes
 
 Size in bytes of the request body.
 
@@ -2299,6 +2673,8 @@ type: long
 
 example: 1437
 
+format: bytes
+
 Total size in bytes of the response (body and headers).
 
 
@@ -2310,6 +2686,8 @@ Total size in bytes of the response (body and headers).
 type: long
 
 example: 887
+
+format: bytes
 
 Size in bytes of the response body.
 
@@ -2489,6 +2867,8 @@ type: long
 
 example: 368
 
+format: bytes
+
 Total bytes transferred in both directions.
 If `source.bytes` and `destination.bytes` are known, `network.bytes` is their sum.
 
@@ -2511,7 +2891,7 @@ If `source.packets` and `destination.packets` are known, `network.packets` is th
 [float]
 == observer fields
 
-An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics. This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.  
+An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics. This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
 
 
 
@@ -3074,6 +3454,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the server to the client.
 
 
@@ -3347,6 +3729,8 @@ Source domain.
 type: long
 
 example: 184
+
+format: bytes
 
 Bytes sent from the source to the destination.
 
@@ -3656,12 +4040,29 @@ Useful if `user.id` or `user.name` contain confidential information and cannot b
 
 --
 
-*`user.group`*::
+[float]
+== group fields
+
+The group fields are meant to represent groups that are relevant to the event.
+
+
+
+*`user.group.id`*::
 +
 --
 type: keyword
 
-Group the user is a part of. This field can contain a list of groups, if necessary.
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
 
 
 --
@@ -3810,76 +4211,6 @@ Hostname of the agent.
 
 --
 
-*`user_agent.patch`*::
-+
---
-type: keyword
-
-Patch version of the user agent.
-
-
---
-
-*`user_agent.minor`*::
-+
---
-type: keyword
-
-Minor version of the user agent.
-
-
---
-
-*`user_agent.major`*::
-+
---
-type: keyword
-
-Major version of the user agent.
-
-
---
-
-*`user_agent.device`*::
-+
---
-type: keyword
-
-Name of the physical device.
-
-
---
-
-*`user_agent.os.major`*::
-+
---
-type: long
-
-Major version of the operating system.
-
-
---
-
-*`user_agent.os.minor`*::
-+
---
-type: long
-
-Minor version of the operating system.
-
-
---
-
-*`url.hostname`*::
-+
---
-type: keyword
-
-Hostname of the request, such as "elastic.co".
-
-
---
-
 [[exported-fields-elasticsearch]]
 == elasticsearch fields
 
@@ -3892,6 +4223,50 @@ elasticsearch Module
 
 
 
+
+*`elasticsearch.component`*::
++
+--
+type: keyword
+
+example: o.e.c.m.MetaDataCreateIndexService
+
+Elasticsearch component from where the log event originated
+
+--
+
+*`elasticsearch.cluster.uuid`*::
++
+--
+type: keyword
+
+example: GmvrbHlNTiSVYiPf8kxg9g
+
+UUID of the cluster
+
+--
+
+*`elasticsearch.cluster.name`*::
++
+--
+type: keyword
+
+example: docker-cluster
+
+Name of the cluster
+
+--
+
+*`elasticsearch.node.id`*::
++
+--
+type: keyword
+
+example: DSiWcTyeThWtUXLB9J0BMw
+
+ID of the node
+
+--
 
 *`elasticsearch.node.name`*::
 +
@@ -3954,7 +4329,7 @@ The layer from which this event originated: rest, transport or ip_filter
 
 --
 
-*`elasticsearch.audit.origin_type`*::
+*`elasticsearch.audit.origin.type`*::
 +
 --
 type: keyword
@@ -3962,6 +4337,35 @@ type: keyword
 example: local_node
 
 Where the request originated: rest (request originated from a REST API request), transport (request was received on the transport channel), local_node (the local node issued the request)
+
+--
+
+*`elasticsearch.audit.realm`*::
++
+--
+type: keyword
+
+The authentication realm the authentication was validated against
+
+--
+
+*`elasticsearch.audit.user.realm`*::
++
+--
+type: keyword
+
+The user's authentication realm, if authenticated
+
+--
+
+*`elasticsearch.audit.user.roles`*::
++
+--
+type: keyword
+
+example: ['kibana_user', 'beats_admin']
+
+Roles to which the principal belongs
 
 --
 
@@ -3976,7 +4380,38 @@ The name of the action that was executed
 
 --
 
-*`elasticsearch.audit.request`*::
+*`elasticsearch.audit.url.params`*::
++
+--
+example: {username=jacknich2}
+
+REST URI parameters
+
+--
+
+*`elasticsearch.audit.indices`*::
++
+--
+type: keyword
+
+example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
+
+Indices accessed by action
+
+--
+
+*`elasticsearch.audit.request.id`*::
++
+--
+type: keyword
+
+example: WzL_kb6VSvOhAq0twPvHOQ
+
+Unique ID of request
+
+--
+
+*`elasticsearch.audit.request.name`*::
 +
 --
 type: keyword
@@ -3984,6 +4419,15 @@ type: keyword
 example: ClearScrollRequest
 
 The type of request that was executed
+
+--
+
+*`elasticsearch.audit.request_body`*::
++
+--
+type: alias
+
+alias to: http.request.body.content
 
 --
 
@@ -4011,15 +4455,6 @@ alias to: source.ip
 type: alias
 
 alias to: url.original
-
---
-
-*`elasticsearch.audit.request_body`*::
-+
---
-type: alias
-
-alias to: http.request.body.content
 
 --
 
@@ -4285,14 +4720,10 @@ Young generation occupancy in kilobytes.
 Server log file
 
 
-*`elasticsearch.server.component`*::
+*`elasticsearch.server.stacktrace`*::
 +
 --
-type: keyword
-
-example: o.e.c.m.MetaDataCreateIndexService
-
-Log component
+Field is not indexed.
 
 --
 
@@ -4383,7 +4814,7 @@ Logger name
 *`elasticsearch.slowlog.took`*::
 +
 --
-type: text
+type: keyword
 
 example: 300ms
 
@@ -4405,11 +4836,11 @@ Types
 *`elasticsearch.slowlog.stats`*::
 +
 --
-type: text
+type: keyword
 
-example: 
+example: group1
 
-Statistics
+Stats groups
 
 --
 
@@ -4427,7 +4858,7 @@ Search type
 *`elasticsearch.slowlog.source_query`*::
 +
 --
-type: text
+type: keyword
 
 example: {"query":{"match_all":{"boost":1.0}}}
 
@@ -4438,22 +4869,11 @@ Slow query
 *`elasticsearch.slowlog.extra_source`*::
 +
 --
-type: text
+type: keyword
 
 example: 
 
 Extra source information
-
---
-
-*`elasticsearch.slowlog.took_millis`*::
-+
---
-type: keyword
-
-example: 42
-
-Time took in milliseconds
 
 --
 
@@ -4628,7 +5048,7 @@ Error message logged by HAProxy in case of error.
 *`haproxy.source`*::
 +
 --
-type: text
+type: keyword
 
 The HAProxy source of the log
 
@@ -4644,7 +5064,7 @@ Condition the session was in when the session ended.
 *`haproxy.mode`*::
 +
 --
-type: text
+type: keyword
 
 mode that the frontend is operating (TCP or HTTP)
 
@@ -4710,9 +5130,9 @@ Information about the client doing the request
 *`haproxy.client.ip`*::
 +
 --
-IP address of the client which initiated the TCP connection to haproxy.
-If connection is via unix socket, socket path is in this field.
+type: alias
 
+alias to: source.address
 
 --
 
@@ -4851,7 +5271,7 @@ Optional "name=value" entry indicating that the client had this cookie in the re
 *`haproxy.http.response.captured_headers`*::
 +
 --
-type: text
+type: keyword
 
 List of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
 
@@ -4884,7 +5304,7 @@ Optional "name=value" entry indicating that the server has returned a cookie wit
 *`haproxy.http.request.captured_headers`*::
 +
 --
-type: text
+type: keyword
 
 List of headers captured in the request due to the presence of the "capture request header" statement in the frontend.
 
@@ -4894,18 +5314,9 @@ List of headers captured in the request due to the presence of the "capture requ
 *`haproxy.http.request.raw_request_line`*::
 +
 --
-type: text
+type: keyword
 
 Complete HTTP request line, including the method, request and HTTP version string.
-
---
-
-*`haproxy.http.request.time_active_ms`*::
-+
---
-type: long
-
-Time the request remained active in haproxy, which is the total time in milliseconds elapsed between the first byte of the request was received and the last byte of response was sent.
 
 --
 
@@ -4933,15 +5344,6 @@ Total time in milliseconds spent waiting for a full HTTP request from the client
 TCP log format
 
 
-*`haproxy.tcp.processing_time_ms`*::
-+
---
-type: long
-
-Total time in milliseconds elapsed between the accept and the last close
-
---
-
 *`haproxy.tcp.connection_waiting_time_ms`*::
 +
 --
@@ -4956,6 +5358,30 @@ Total time in milliseconds elapsed between the accept and the last close
 
 Info collected for the host machine.
 
+
+
+
+*`host.containerized`*::
++
+--
+type: boolean
+
+If the host is a container.
+
+
+--
+
+*`host.os.build`*::
++
+--
+type: keyword
+
+example: 18D109
+
+OS build information.
+
+
+--
 
 [[exported-fields-icinga]]
 == Icinga fields
@@ -5116,16 +5542,6 @@ The Windows status code.
 
 --
 
-*`iis.access.request_time_ms`*::
-+
---
-type: long
-
-The request time in milliseconds.
-
-
---
-
 *`iis.access.site_name`*::
 +
 --
@@ -5156,27 +5572,21 @@ The content of the cookie sent or received, if any.
 
 --
 
-*`iis.access.body_sent.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
-
-
---
-
 *`iis.access.body_received.bytes`*::
 +
 --
-type: long
+type: alias
 
-format: bytes
+alias to: http.request.body.bytes
 
-The number of bytes of the server request body.
+--
 
+*`iis.access.body_sent.bytes`*::
++
+--
+type: alias
+
+alias to: http.response.body.bytes
 
 --
 
@@ -5285,34 +5695,7 @@ alias to: host.hostname
 --
 type: alias
 
-alias to: user_agent.device
-
---
-
-*`iis.access.user_agent.major`*::
-+
---
-type: alias
-
-alias to: user_agent.major
-
---
-
-*`iis.access.user_agent.minor`*::
-+
---
-type: alias
-
-alias to: user_agent.minor
-
---
-
-*`iis.access.user_agent.patch`*::
-+
---
-type: alias
-
-alias to: user_agent.patch
+alias to: user_agent.device.name
 
 --
 
@@ -5331,24 +5714,6 @@ alias to: user_agent.name
 type: alias
 
 alias to: user_agent.os.full_name
-
---
-
-*`iis.access.user_agent.os_major`*::
-+
---
-type: alias
-
-alias to: user_agent.os.major
-
---
-
-*`iis.access.user_agent.os_minor`*::
-+
---
-type: alias
-
-alias to: user_agent.os.minor
 
 --
 
@@ -5579,6 +5944,326 @@ alias to: source.geo.region_iso_code
 
 --
 
+[[exported-fields-iptables]]
+== iptables fields
+
+Module for handling the iptables logs.
+
+
+
+[float]
+== iptables fields
+
+Fields from the iptables logs.
+
+
+
+*`iptables.ether_type`*::
++
+--
+type: long
+
+Value of the ethernet type field identifying the network layer protocol.
+
+
+--
+
+*`iptables.flow_label`*::
++
+--
+type: integer
+
+IPv6 flow label.
+
+
+--
+
+*`iptables.fragment_flags`*::
++
+--
+type: keyword
+
+IP fragment flags. A combination of CE, DF and MF.
+
+
+--
+
+*`iptables.fragment_offset`*::
++
+--
+type: long
+
+Offset of the current IP fragment.
+
+
+--
+
+[float]
+== icmp fields
+
+ICMP fields.
+
+
+
+*`iptables.icmp.code`*::
++
+--
+type: long
+
+ICMP code.
+
+
+--
+
+*`iptables.icmp.id`*::
++
+--
+type: long
+
+ICMP ID.
+
+
+--
+
+*`iptables.icmp.parameter`*::
++
+--
+type: long
+
+ICMP parameter.
+
+
+--
+
+*`iptables.icmp.redirect`*::
++
+--
+type: ip
+
+ICMP redirect address.
+
+
+--
+
+*`iptables.icmp.seq`*::
++
+--
+type: long
+
+ICMP sequence number.
+
+
+--
+
+*`iptables.icmp.type`*::
++
+--
+type: long
+
+ICMP type.
+
+
+--
+
+*`iptables.id`*::
++
+--
+type: long
+
+Packet identifier.
+
+
+--
+
+*`iptables.incomplete_bytes`*::
++
+--
+type: long
+
+Number of incomplete bytes.
+
+
+--
+
+*`iptables.input_device`*::
++
+--
+type: keyword
+
+Device that received the packet.
+
+
+--
+
+*`iptables.precedence_bits`*::
++
+--
+type: short
+
+IP precedence bits.
+
+
+--
+
+*`iptables.tos`*::
++
+--
+type: long
+
+IP Type of Service field.
+
+
+--
+
+*`iptables.length`*::
++
+--
+type: long
+
+Packet length.
+
+
+--
+
+*`iptables.output_device`*::
++
+--
+type: keyword
+
+Device that output the packet.
+
+
+--
+
+[float]
+== tcp fields
+
+TCP fields.
+
+
+
+*`iptables.tcp.flags`*::
++
+--
+type: keyword
+
+TCP flags.
+
+
+--
+
+*`iptables.tcp.reserved_bits`*::
++
+--
+type: short
+
+TCP reserved bits.
+
+
+--
+
+*`iptables.tcp.seq`*::
++
+--
+type: long
+
+TCP sequence number.
+
+
+--
+
+*`iptables.tcp.ack`*::
++
+--
+type: long
+
+TCP Acknowledgment number.
+
+
+--
+
+*`iptables.tcp.window`*::
++
+--
+type: long
+
+Advertised TCP window size.
+
+
+--
+
+*`iptables.ttl`*::
++
+--
+type: integer
+
+Time To Live field.
+
+
+--
+
+[float]
+== udp fields
+
+UDP fields.
+
+
+
+*`iptables.udp.length`*::
++
+--
+type: long
+
+Length of the UDP header and payload.
+
+
+--
+
+[float]
+== ubiquiti fields
+
+Fields for Ubiquiti network devices.
+
+
+
+*`iptables.ubiquiti.input_zone`*::
++
+--
+type: keyword
+
+Input zone.
+
+
+--
+
+*`iptables.ubiquiti.output_zone`*::
++
+--
+type: keyword
+
+Output zone.
+
+
+--
+
+*`iptables.ubiquiti.rule_number`*::
++
+--
+type: keyword
+
+The rule number within the rule set.
+
+--
+
+*`iptables.ubiquiti.rule_set`*::
++
+--
+type: keyword
+
+The rule set name.
+
+--
+
 [[exported-fields-kafka]]
 == Kafka fields
 
@@ -5630,7 +6315,7 @@ Component the log is coming from.
 *`kafka.log.class`*::
 +
 --
-type: text
+type: keyword
 
 Java class the log is coming from.
 
@@ -5660,16 +6345,6 @@ Java class the trace is coming from.
 type: text
 
 Message part of the trace.
-
-
---
-
-*`kafka.log.trace.full`*::
-+
---
-type: text
-
-The full trace in the log line.
 
 
 --
@@ -5937,6 +6612,18 @@ The input type from which the event was generated. This field is set to the valu
 
 --
 
+*`event.sequence`*::
++
+--
+type: long
+
+required: False
+
+The sequence number of this event.
+
+
+--
+
 *`syslog.facility`*::
 +
 --
@@ -6005,23 +6692,12 @@ This field contains the flags of the event.
 
 --
 
-*`http.response.elapsed_time`*::
-+
---
-type: long
-
-Elapsed time between request and response in milli seconds.
-
-
---
-
 *`http.response.content_length`*::
 +
 --
-type: long
+type: alias
 
-Content length of the HTTP response body.
-
+alias to: http.response.body.bytes
 
 --
 
@@ -6095,10 +6771,17 @@ The module or class where the event originate.
 *`logstash.log.thread`*::
 +
 --
-type: text
+type: keyword
 
 Information about the running thread where the log originate.
 
+
+*`logstash.log.thread.text`*::
++
+--
+type: text
+
+--
 
 --
 
@@ -6137,16 +6820,6 @@ slowlog
 
 
 
-*`logstash.slowlog.message`*::
-+
---
-type: text
-
-Contains the un-parsed log message
-
-
---
-
 *`logstash.slowlog.module`*::
 +
 --
@@ -6160,20 +6833,34 @@ The module or class where the event originate.
 *`logstash.slowlog.thread`*::
 +
 --
-type: text
+type: keyword
 
 Information about the running thread where the log originate.
 
+
+*`logstash.slowlog.thread.text`*::
++
+--
+type: text
+
+--
 
 --
 
 *`logstash.slowlog.event`*::
 +
 --
-type: text
+type: keyword
 
 Raw dump of the original event
 
+
+*`logstash.slowlog.event.text`*::
++
+--
+type: text
+
+--
 
 --
 
@@ -6210,10 +6897,17 @@ Execution time for the plugin in milliseconds.
 *`logstash.slowlog.plugin_params`*::
 +
 --
-type: text
+type: keyword
 
 String value of the plugin configuration
 
+
+*`logstash.slowlog.plugin_params.text`*::
++
+--
+type: text
+
+--
 
 --
 
@@ -6373,16 +7067,6 @@ Contains fields from the MySQL slow logs.
 
 
 
-*`mysql.slowlog.query_time.sec`*::
-+
---
-type: float
-
-The total time the query took, in seconds, as a floating point number.
-
-
---
-
 *`mysql.slowlog.lock_time.sec`*::
 +
 --
@@ -6419,6 +7103,18 @@ The number of rows scanned by the query.
 type: long
 
 The number of rows modified by the query.
+
+
+--
+
+*`mysql.slowlog.bytes_sent`*::
++
+--
+type: long
+
+format: bytes
+
+The size of the query result.
 
 
 --
@@ -6460,6 +7156,26 @@ Current authenticated user, used to determine access privileges. Can differ from
 
 --
 
+*`mysql.slowlog.last_errno`*::
++
+--
+type: keyword
+
+Last SQL error seen.
+
+
+--
+
+*`mysql.slowlog.killed`*::
++
+--
+type: keyword
+
+Code of the reason if the query was killed.
+
+
+--
+
 *`mysql.slowlog.query_cache_hit`*::
 +
 --
@@ -6487,6 +7203,37 @@ type: boolean
 
 Whether the query needed temporary tables on disk.
 
+
+--
+
+*`mysql.slowlog.tmp_tables`*::
++
+--
+type: long
+
+Number of temporary tables created for this query
+
+
+--
+
+*`mysql.slowlog.tmp_disk_tables`*::
++
+--
+type: long
+
+Number of temporary tables created on disk for this query.
+
+
+--
+
+*`mysql.slowlog.tmp_table_sizes`*::
++
+--
+type: long
+
+format: bytes
+
+Size of temporary tables created for this query.
 
 --
 
@@ -6550,6 +7297,105 @@ Number of merge passes executed for the query.
 
 --
 
+*`mysql.slowlog.log_slow_rate_type`*::
++
+--
+type: keyword
+
+Type of slow log rate limit, it can be `session` if the rate limit is applied per session, or `query` if it applies per query.
+
+
+--
+
+*`mysql.slowlog.log_slow_rate_limit`*::
++
+--
+type: keyword
+
+Slow log rate limit, a value of 100 means that one in a hundred queries or sessions are being logged.
+
+
+--
+
+[float]
+== innodb fields
+
+Contains fields relative to InnoDB engine
+
+
+
+*`mysql.slowlog.innodb.trx_id`*::
++
+--
+type: keyword
+
+Transaction ID
+
+
+--
+
+*`mysql.slowlog.innodb.io_r_ops`*::
++
+--
+type: long
+
+Number of page read operations.
+
+
+--
+
+*`mysql.slowlog.innodb.io_r_bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Bytes read during page read operations.
+
+
+--
+
+*`mysql.slowlog.innodb.io_r_wait.sec`*::
++
+--
+type: long
+
+How long it took to read all needed data from storage.
+
+
+--
+
+*`mysql.slowlog.innodb.rec_lock_wait.sec`*::
++
+--
+type: long
+
+How long the query waited for locks.
+
+
+--
+
+*`mysql.slowlog.innodb.queue_wait.sec`*::
++
+--
+type: long
+
+How long the query waited to enter the InnoDB queue and to be executed once in the queue.
+
+
+--
+
+*`mysql.slowlog.innodb.pages_distinct`*::
++
+--
+type: long
+
+Approximated count of pages accessed to execute the query.
+
+
+--
+
 *`mysql.slowlog.user`*::
 +
 --
@@ -6576,6 +7422,26 @@ type: alias
 alias to: source.ip
 
 --
+
+[[exported-fields-nats]]
+== nats fields
+
+Module for parsing NATS log files.
+
+
+
+[float]
+== nats fields
+
+Fields from NATS logs.
+
+
+
+[float]
+== log fields
+
+Nats log files
+
 
 [[exported-fields-netflow]]
 == NetFlow fields
@@ -9780,6 +10646,12 @@ type: short
 
 --
 
+[[exported-fields-netflow-module]]
+== NetFlow fields
+
+Module for receiving NetFlow and IPFIX flow records over UDP. The module does not add fields beyond what the netflow input provides.
+
+
 [[exported-fields-nginx]]
 == Nginx fields
 
@@ -9801,24 +10673,22 @@ Contains fields for the Nginx access logs.
 
 
 
-*`nginx.access.body_sent.bytes`*::
+*`nginx.access.remote_ip_list`*::
 +
 --
-type: long
+type: array
 
-format: bytes
-
-The number of bytes of the server response body.
+An array of remote IP addresses. It is a list because it is common to include, besides the client IP address, IP addresses from headers like `X-Forwarded-For`. Real source IP is restored to `source.ip`.
 
 
 --
 
-*`nginx.access.remote_ip_list`*::
+*`nginx.access.body_sent.bytes`*::
 +
 --
 type: alias
 
-alias to: network.forwarded_ip
+alias to: http.response.body.bytes
 
 --
 
@@ -9900,34 +10770,7 @@ alias to: user_agent.original
 --
 type: alias
 
-alias to: user_agent.device
-
---
-
-*`nginx.access.user_agent.major`*::
-+
---
-type: alias
-
-alias to: user_agent.major
-
---
-
-*`nginx.access.user_agent.minor`*::
-+
---
-type: alias
-
-alias to: user_agent.minor
-
---
-
-*`nginx.access.user_agent.patch`*::
-+
---
-type: alias
-
-alias to: user_agent.patch
+alias to: user_agent.device.name
 
 --
 
@@ -9946,24 +10789,6 @@ alias to: user_agent.name
 type: alias
 
 alias to: user_agent.os.full_name
-
---
-
-*`nginx.access.user_agent.os_major`*::
-+
---
-type: alias
-
-alias to: user_agent.os.major
-
---
-
-*`nginx.access.user_agent.os_minor`*::
-+
---
-type: alias
-
-alias to: user_agent.os.minor
 
 --
 
@@ -10206,17 +11031,6 @@ Core id
 example: mydb
 
 Name of database
-
---
-
-*`postgresql.log.duration`*::
-+
---
-type: float
-
-example: 30.0
-
-Duration of a query.
 
 --
 
@@ -10660,7 +11474,9 @@ type: keyword
 *`suricata.eve.fileinfo.filename`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: file.path
 
 --
 
@@ -10709,7 +11525,9 @@ type: keyword
 *`suricata.eve.fileinfo.size`*::
 +
 --
-type: long
+type: alias
+
+alias to: file.size
 
 --
 
@@ -10723,21 +11541,27 @@ type: long
 *`suricata.eve.dest_port`*::
 +
 --
-type: long
+type: alias
+
+alias to: destination.port
 
 --
 
 *`suricata.eve.src_port`*::
 +
 --
-type: long
+type: alias
+
+alias to: source.port
 
 --
 
 *`suricata.eve.proto`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: network.transport
 
 --
 
@@ -10751,7 +11575,9 @@ type: long
 *`suricata.eve.src_ip`*::
 +
 --
-type: ip
+type: alias
+
+alias to: source.ip
 
 --
 
@@ -10830,7 +11656,9 @@ type: keyword
 *`suricata.eve.dest_ip`*::
 +
 --
-type: ip
+type: alias
+
+alias to: destination.ip
 
 --
 
@@ -10845,7 +11673,9 @@ type: long
 *`suricata.eve.http.status`*::
 +
 --
-type: long
+type: alias
+
+alias to: http.response.status_code
 
 --
 
@@ -10859,7 +11689,9 @@ type: keyword
 *`suricata.eve.http.http_user_agent`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: user_agent.original
 
 --
 
@@ -10873,35 +11705,45 @@ type: keyword
 *`suricata.eve.http.http_refer`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: http.request.referrer
 
 --
 
 *`suricata.eve.http.url`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: url.original
 
 --
 
 *`suricata.eve.http.hostname`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: url.domain
 
 --
 
 *`suricata.eve.http.length`*::
 +
 --
-type: long
+type: alias
+
+alias to: http.response.body.bytes
 
 --
 
 *`suricata.eve.http.http_method`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: http.request.method
 
 --
 
@@ -10915,7 +11757,9 @@ type: keyword
 *`suricata.eve.timestamp`*::
 +
 --
-type: date
+type: alias
+
+alias to: @timestamp
 
 --
 
@@ -10937,7 +11781,9 @@ type: keyword
 *`suricata.eve.alert.severity`*::
 +
 --
-type: long
+type: alias
+
+alias to: event.severity
 
 --
 
@@ -10965,7 +11811,9 @@ type: keyword
 *`suricata.eve.alert.action`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: event.outcome
 
 --
 
@@ -11913,21 +12761,27 @@ type: keyword
 *`suricata.eve.flow.bytes_toclient`*::
 +
 --
-type: long
+type: alias
+
+alias to: destination.bytes
 
 --
 
 *`suricata.eve.flow.start`*::
 +
 --
-type: date
+type: alias
+
+alias to: event.start
 
 --
 
 *`suricata.eve.flow.pkts_toclient`*::
 +
 --
-type: long
+type: alias
+
+alias to: destination.packets
 
 --
 
@@ -11948,7 +12802,9 @@ type: keyword
 *`suricata.eve.flow.bytes_toserver`*::
 +
 --
-type: long
+type: alias
+
+alias to: source.bytes
 
 --
 
@@ -11962,7 +12818,9 @@ type: keyword
 *`suricata.eve.flow.pkts_toserver`*::
 +
 --
-type: long
+type: alias
+
+alias to: source.packets
 
 --
 
@@ -11983,7 +12841,9 @@ type: boolean
 *`suricata.eve.app_proto`*::
 +
 --
-type: keyword
+type: alias
+
+alias to: network.protocol
 
 --
 
@@ -12411,34 +13271,12 @@ Contains fields for the Traefik access logs.
 
 
 
-*`traefik.access.duration`*::
-+
---
-type: long
-
-Duration of the access entry.
-
-
---
-
 *`traefik.access.user_identifier`*::
 +
 --
 type: keyword
 
 Is the RFC 1413 identity of the client
-
-
---
-
-*`traefik.access.body_sent.bytes`*::
-+
---
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
 
 
 --
@@ -12456,7 +13294,7 @@ The number of requests
 *`traefik.access.frontend_name`*::
 +
 --
-type: text
+type: keyword
 
 The name of the frontend used
 
@@ -12466,9 +13304,18 @@ The name of the frontend used
 *`traefik.access.backend_url`*::
 +
 --
-type: text
+type: keyword
 
 The url of the backend where request is forwarded
+
+--
+
+*`traefik.access.body_sent.bytes`*::
++
+--
+type: alias
+
+alias to: http.response.body.bytes
 
 --
 
@@ -12550,34 +13397,7 @@ alias to: user_agent.original
 --
 type: alias
 
-alias to: user_agent.device
-
---
-
-*`traefik.access.user_agent.major`*::
-+
---
-type: alias
-
-alias to: user_agent.major
-
---
-
-*`traefik.access.user_agent.minor`*::
-+
---
-type: alias
-
-alias to: user_agent.minor
-
---
-
-*`traefik.access.user_agent.patch`*::
-+
---
-type: alias
-
-alias to: user_agent.patch
+alias to: user_agent.device.name
 
 --
 
@@ -12596,24 +13416,6 @@ alias to: user_agent.name
 type: alias
 
 alias to: user_agent.os.full_name
-
---
-
-*`traefik.access.user_agent.os_major`*::
-+
---
-type: alias
-
-alias to: user_agent.os.major
-
---
-
-*`traefik.access.user_agent.os_minor`*::
-+
---
-type: alias
-
-alias to: user_agent.os.minor
 
 --
 
@@ -12687,6 +13489,1205 @@ alias to: source.geo.city_name
 type: alias
 
 alias to: source.geo.region_iso_code
+
+--
+
+[[exported-fields-zeek]]
+== Zeek fields
+
+Module for handling logs produced by Zeek/Bro
+
+
+
+[float]
+== zeek fields
+
+Fields from Zeek/Bro logs after normalization
+
+
+
+*`zeek.session_id`*::
++
+--
+type: keyword
+
+A unique identifier of the session 
+
+
+--
+
+*`zeek.connection.local_orig`*::
++
+--
+type: boolean
+
+Indicates whether the session is originated locally
+
+
+--
+
+*`zeek.connection.local_resp`*::
++
+--
+type: boolean
+
+Indicates whether the session is responded locally
+
+
+--
+
+*`zeek.connection.missed_bytes`*::
++
+--
+type: long
+
+Missed bytes for the session
+
+
+--
+
+*`zeek.connection.state`*::
++
+--
+type: keyword
+
+Flags indicating the state of the session
+
+
+--
+
+*`zeek.connection.history`*::
++
+--
+type: keyword
+
+Flags indicating the history of the session
+
+
+--
+
+*`zeek.connection.orig_l2_addr`*::
++
+--
+type: keyword
+
+Link-layer address of the originator, if available
+
+
+--
+
+*`zeek.connection.resp_l2_addr`*::
++
+--
+type: keyword
+
+Link-layer address of the responder, if available
+
+
+--
+
+*`zeek.connection.vlan`*::
++
+--
+type: integer
+
+VLAN identifier
+
+
+--
+
+*`zeek.connection.inner_vlan`*::
++
+--
+type: integer
+
+VLAN identifier
+
+
+--
+
+*`zeek.dns.trans_id`*::
++
+--
+type: keyword
+
+DNS transaction identifier
+
+
+--
+
+*`zeek.dns.rtt`*::
++
+--
+type: double
+
+Round trip time for the query and response
+
+
+--
+
+*`zeek.dns.query`*::
++
+--
+type: keyword
+
+The domain name that is the subject of the DNS query
+
+
+--
+
+*`zeek.dns.qclass`*::
++
+--
+type: long
+
+The QCLASS value specifying the class of the query
+
+
+--
+
+*`zeek.dns.qclass_name`*::
++
+--
+type: keyword
+
+A descriptive name for the class of the query
+
+
+--
+
+*`zeek.dns.qtype`*::
++
+--
+type: long
+
+A QTYPE value specifying the type of the query
+
+
+--
+
+*`zeek.dns.qtype_name`*::
++
+--
+type: keyword
+
+A descriptive name for the type of the query
+
+
+--
+
+*`zeek.dns.rcode`*::
++
+--
+type: long
+
+The response code value in DNS response messages
+
+
+--
+
+*`zeek.dns.rcode_name`*::
++
+--
+type: keyword
+
+A descriptive name for the response code value
+
+
+--
+
+*`zeek.dns.AA`*::
++
+--
+type: boolean
+
+The Authoritative Answer bit for response messages specifies that the responding 
+name server is an authority for the domain name in the question section
+
+
+--
+
+*`zeek.dns.TC`*::
++
+--
+type: boolean
+
+The Truncation bit specifies that the message was truncated
+
+
+--
+
+*`zeek.dns.RD`*::
++
+--
+type: boolean
+
+The Recursion Desired bit in a request message indicates that the client 
+wants recursive service for this query
+
+
+--
+
+*`zeek.dns.RA`*::
++
+--
+type: boolean
+
+The Recursion Available bit in a response message indicates that the name 
+server supports recursive queries.
+
+
+--
+
+*`zeek.dns.answers`*::
++
+--
+type: keyword
+
+The set of resource descriptions in the query answer
+
+
+--
+
+*`zeek.dns.TTLs`*::
++
+--
+type: double
+
+The caching intervals of the associated RRs described by the answers field
+
+
+--
+
+*`zeek.dns.rejected`*::
++
+--
+type: boolean
+
+Indicates whether the DNS query was rejected by the server
+
+
+--
+
+*`zeek.dns.total_answers`*::
++
+--
+type: integer
+
+The total number of resource records in the reply 
+
+
+--
+
+*`zeek.dns.total_replies`*::
++
+--
+type: integer
+
+The total number of resource records in the reply message
+
+
+--
+
+*`zeek.dns.saw_query`*::
++
+--
+type: boolean
+
+Whether the full DNS query has been seen
+
+
+--
+
+*`zeek.dns.saw_reply`*::
++
+--
+type: boolean
+
+Whether the full DNS reply has been seen
+
+
+--
+
+*`zeek.http.trans_depth`*::
++
+--
+type: integer
+
+Represents the pipelined depth into the connection of this request/response transaction
+
+
+--
+
+*`zeek.http.status_msg`*::
++
+--
+type: keyword
+
+Status message returned by the server
+
+
+--
+
+*`zeek.http.info_code`*::
++
+--
+type: integer
+
+Last seen 1xx informational reply code returned by the server.
+
+
+--
+
+*`zeek.http.info_msg`*::
++
+--
+type: keyword
+
+Last seen 1xx informational reply message returned by the server.
+
+
+--
+
+*`zeek.http.tags`*::
++
+--
+type: keyword
+
+A set of indicators of various attributes discovered and related to a particular 
+request/response pair.
+
+
+--
+
+*`zeek.http.password`*::
++
+--
+type: keyword
+
+Password if basic-auth is performed for the request
+
+
+--
+
+*`zeek.http.captured_password`*::
++
+--
+type: boolean
+
+Determines if the password will be captured for this request
+
+
+--
+
+*`zeek.http.proxied`*::
++
+--
+type: keyword
+
+All of the headers that may indicate if the HTTP request was proxied
+
+
+--
+
+*`zeek.http.range_request`*::
++
+--
+type: boolean
+
+Indicates if this request can assume 206 partial content in response
+
+
+--
+
+*`zeek.http.client_header_names`*::
++
+--
+type: keyword
+
+The vector of HTTP header names sent by the client. No header values 
+are included here, just the header names.
+
+
+--
+
+*`zeek.http.server_header_names`*::
++
+--
+type: keyword
+
+The vector of HTTP header names sent by the server. No header values 
+are included here, just the header names
+
+
+--
+
+*`zeek.http.orig_fuids`*::
++
+--
+type: keyword
+
+An ordered vector of file unique IDs from the originator
+
+
+--
+
+*`zeek.http.orig_mime_types`*::
++
+--
+type: keyword
+
+An ordered vector of mime types from the originator
+
+
+--
+
+*`zeek.http.orig_filenames`*::
++
+--
+type: keyword
+
+An ordered vector of filenames from the originator
+
+
+--
+
+*`zeek.http.resp_fuids`*::
++
+--
+type: keyword
+
+An ordered vector of file unique IDs from the responder
+
+
+--
+
+*`zeek.http.resp_mime_types`*::
++
+--
+type: keyword
+
+An ordered vector of mime types from the responder
+
+
+--
+
+*`zeek.http.resp_filenames`*::
++
+--
+type: keyword
+
+An ordered vector of filenames from the responder
+
+
+--
+
+*`zeek.http.orig_mime_depth`*::
++
+--
+type: integer
+
+Current number of MIME entities in the HTTP request message body
+
+
+--
+
+*`zeek.http.resp_mime_depth`*::
++
+--
+type: integer
+
+Current number of MIME entities in the HTTP response message body
+
+
+--
+
+*`zeek.files.fuid`*::
++
+--
+type: keyword
+
+A file unique identifier
+
+
+--
+
+*`zeek.files.tx_host`*::
++
+--
+type: ip
+
+The host that transferred the file
+
+
+--
+
+*`zeek.files.rx_host`*::
++
+--
+type: ip
+
+The host that received the file
+
+
+--
+
+*`zeek.files.session_ids`*::
++
+--
+type: keyword
+
+The sessions that have this file
+
+
+--
+
+*`zeek.files.source`*::
++
+--
+type: keyword
+
+An identification of the source of the file data. E.g. it may be a network protocol 
+over which it was transferred, or a local file path which was read, or some other 
+input source
+
+
+--
+
+*`zeek.files.depth`*::
++
+--
+type: long
+
+A value to represent the depth of this file in relation to its source. In SMTP, it 
+is the depth of the MIME attachment on the message. In HTTP, it is the depth of the 
+request within the TCP connection
+
+
+--
+
+*`zeek.files.analyzers`*::
++
+--
+type: keyword
+
+A set of analysis types done during the file analysis
+
+
+--
+
+*`zeek.files.mime_type`*::
++
+--
+type: keyword
+
+Mime type of the file
+
+
+--
+
+*`zeek.files.filename`*::
++
+--
+type: keyword
+
+Name of the file if available
+
+
+--
+
+*`zeek.files.local_orig`*::
++
+--
+type: boolean
+
+If the source of this file is a network connection, this field indicates if the data 
+originated from the local network or not
+
+
+--
+
+*`zeek.files.is_orig`*::
++
+--
+type: boolean
+
+If the source of this file is a network connection, this field indicates if the file is 
+being sent by the originator of the connection or the responder
+
+
+--
+
+*`zeek.files.duration`*::
++
+--
+type: double
+
+The duration the file was analyzed for. Not the duration of the session.
+
+
+--
+
+*`zeek.files.seen_bytes`*::
++
+--
+type: long
+
+Number of bytes provided to the file analysis engine for the file
+
+
+--
+
+*`zeek.files.total_bytes`*::
++
+--
+type: long
+
+Total number of bytes that are supposed to comprise the full file
+
+
+--
+
+*`zeek.files.missing_bytes`*::
++
+--
+type: long
+
+The number of bytes in the file stream that were completely missed during the process 
+of analysis
+
+
+--
+
+*`zeek.files.overflow_bytes`*::
++
+--
+type: long
+
+The number of bytes in the file stream that were not delivered to stream file analyzers. 
+This could be overlapping bytes or bytes that couldn't be reassembled
+
+
+--
+
+*`zeek.files.timedout`*::
++
+--
+type: boolean
+
+Whether the file analysis timed out at least once for the file
+
+
+--
+
+*`zeek.files.parent_fuid`*::
++
+--
+type: keyword
+
+Identifier associated with a container file from which this one was extracted as part of 
+the file analysis
+
+
+--
+
+*`zeek.files.md5`*::
++
+--
+type: keyword
+
+An MD5 digest of the file contents
+
+
+--
+
+*`zeek.files.sha1`*::
++
+--
+type: keyword
+
+A SHA1 digest of the file contents
+
+
+--
+
+*`zeek.files.sha256`*::
++
+--
+type: keyword
+
+A SHA256 digest of the file contents.
+
+
+--
+
+*`zeek.files.extracted`*::
++
+--
+type: keyword
+
+Local filename of extracted file
+
+
+--
+
+*`zeek.files.extracted_cutoff`*::
++
+--
+type: boolean
+
+Indicate whether the file being extracted was cut off hence not extracted completely
+
+
+--
+
+*`zeek.files.extracted_size`*::
++
+--
+type: long
+
+The number of bytes extracted to disk
+
+
+--
+
+*`zeek.files.entropy`*::
++
+--
+type: double
+
+The information density of the contents of the file
+
+
+--
+
+*`zeek.ssl.version`*::
++
+--
+type: keyword
+
+SSL/TLS version that was logged
+
+
+--
+
+*`zeek.ssl.cipher`*::
++
+--
+type: keyword
+
+SSL/TLS cipher suite that was logged
+
+
+--
+
+*`zeek.ssl.curve`*::
++
+--
+type: keyword
+
+Elliptic curve that was logged when using ECDH/ECDHE
+
+
+--
+
+*`zeek.ssl.server_name`*::
++
+--
+type: keyword
+
+Value of the Server Name Indicator SSL/TLS extension. It indicates the server name 
+that the client was requesting
+
+
+--
+
+*`zeek.ssl.resumed`*::
++
+--
+type: boolean
+
+Flag to indicate if the session was resumed reusing the key material exchanged in an 
+earlier connection
+
+
+--
+
+*`zeek.ssl.next_protocol`*::
++
+--
+type: keyword
+
+Next protocol the server chose using the application layer next protocol extension
+
+
+--
+
+*`zeek.ssl.established`*::
++
+--
+type: boolean
+
+Flag to indicate if this ssl session has been established successfully
+
+
+--
+
+*`zeek.ssl.cert_chain`*::
++
+--
+type: keyword
+
+Chain of certificates offered by the server to validate its complete signing chain
+
+
+--
+
+*`zeek.ssl.cert_chain_fuids`*::
++
+--
+type: keyword
+
+An ordered vector of certificate file identifiers for the certificates offered by the server
+
+
+--
+
+*`zeek.ssl.client_cert_chain`*::
++
+--
+type: keyword
+
+Chain of certificates offered by the client to validate its complete signing chain
+
+
+--
+
+*`zeek.ssl.client_cert_chain_fuids`*::
++
+--
+type: keyword
+
+An ordered vector of certificate file identifiers for the certificates offered by the client
+
+
+--
+
+*`zeek.ssl.issuer`*::
++
+--
+type: keyword
+
+Subject of the signer of the X.509 certificate offered by the server
+
+
+--
+
+*`zeek.ssl.client_issuer`*::
++
+--
+type: keyword
+
+Subject of the X.509 certificate offered by the client
+
+
+--
+
+*`zeek.ssl.validation_status`*::
++
+--
+type: keyword
+
+Result of certificate validation for this connection
+
+
+--
+
+*`zeek.ssl.validation_code`*::
++
+--
+type: keyword
+
+Result of certificate validation for this connection, given as OpenSSL validation code
+
+
+--
+
+*`zeek.ssl.subject`*::
++
+--
+type: keyword
+
+Subject of the X.509 certificate offered by the server
+
+
+--
+
+*`zeek.ssl.client_subject`*::
++
+--
+type: keyword
+
+Subject of the X.509 certificate offered by the client
+
+
+--
+
+*`zeek.ssl.last_alert`*::
++
+--
+type: keyword
+
+Last alert that was seen during the connection
+
+
+--
+
+*`zeek.notice.connection_id`*::
++
+--
+type: keyword
+
+Identifier of the related connection session
+
+
+--
+
+*`zeek.notice.icmp_id`*::
++
+--
+type: keyword
+
+Identifier of the related ICMP session
+
+
+--
+
+*`zeek.notice.file.id`*::
++
+--
+type: keyword
+
+An identifier associated with a single file that is related to this notice
+
+
+--
+
+*`zeek.notice.file.parent_id`*::
++
+--
+type: keyword
+
+Identifier associated with a container file from which this one was extracted
+
+
+--
+
+*`zeek.notice.file.source`*::
++
+--
+type: keyword
+
+An identification of the source of the file data. E.g. it may be a network protocol 
+over which it was transferred, or a local file path which was read, or some other 
+input source
+
+
+--
+
+*`zeek.notice.file.mime_type`*::
++
+--
+type: keyword
+
+A mime type if the notice is related to a file
+
+
+--
+
+*`zeek.notice.file.is_orig`*::
++
+--
+type: boolean
+
+If the source of this file is a network connection, this field indicates if the file is 
+being sent by the originator of the connection or the responder
+
+
+--
+
+*`zeek.notice.file.seen_bytes`*::
++
+--
+type: long
+
+Number of bytes provided to the file analysis engine for the file
+
+
+--
+
+*`zeek.fnotice.file.total_bytes`*::
++
+--
+type: long
+
+Total number of bytes that are supposed to comprise the full file
+
+
+--
+
+*`zeek.notice.file.missing_bytes`*::
++
+--
+type: long
+
+The number of bytes in the file stream that were completely missed during the process 
+of analysis
+
+
+--
+
+*`zeek.notice.file.overflow_bytes`*::
++
+--
+type: long
+
+The number of bytes in the file stream that were not delivered to stream file analyzers. 
+This could be overlapping bytes or bytes that couldn't be reassembled
+
+
+--
+
+*`zeek.notice.fuid`*::
++
+--
+type: keyword
+
+A file unique ID if this notice is related to a file
+
+
+--
+
+*`zeek.notice.note`*::
++
+--
+type: keyword
+
+The type of the notice
+
+
+--
+
+*`zeek.notice.msg`*::
++
+--
+type: keyword
+
+The human readable message for the notice.
+
+
+--
+
+*`zeek.notice.sub`*::
++
+--
+type: keyword
+
+The human readable sub-message
+
+
+--
+
+*`zeek.notice.n`*::
++
+--
+type: long
+
+Associated count, or a status code
+
+
+--
+
+*`zeek.notice.peer_name`*::
++
+--
+type: keyword
+
+Name of remote peer that raised this notice
+
+
+--
+
+*`zeek.notice.peer_descr`*::
++
+--
+type: text
+
+Textual description for the peer that raised this notice
+
+
+--
+
+*`zeek.notice.actions`*::
++
+--
+type: keyword
+
+The actions which have been applied to this notice
+
+
+--
+
+*`zeek.notice.email_body_sections`*::
++
+--
+type: text
+
+By adding chunks of text into this element, other scripts can expand on notices 
+that are being emailed
+
+
+--
+
+*`zeek.notice.email_delay_tokens`*::
++
+--
+type: keyword
+
+Adding a string token to this set will cause the built-in emailing functionality 
+to delay sending the email either the token has been removed or the email 
+has been delayed for the specified time duration
+
+
+--
+
+*`zeek.notice.identifier`*::
++
+--
+type: keyword
+
+This field is provided when a notice is generated for the purpose of deduplicating notices
+
+
+--
+
+*`zeek.notice.suppress_for`*::
++
+--
+type: double
+
+This field indicates the length of time that this unique notice should be suppressed
+
+
+--
+
+*`zeek.notice.dropped`*::
++
+--
+type: boolean
+
+Indicate if the source IP address was dropped and denied network access
+
 
 --
 

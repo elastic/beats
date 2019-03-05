@@ -7,28 +7,56 @@
     "aws": {
         "ec2": {
             "cpu": {
+                "credit_balance": 576,
+                "credit_usage": 0.144723,
+                "surplus_credit_balance": 0,
+                "surplus_credits_charged": 0,
                 "total": {
-                    "pct": 3.34375
+                    "pct": 1.366194313233248
                 }
             },
             "diskio": {
                 "read": {
                     "bytes": 0,
-                    "ops": 0
+                    "count": 0
                 },
                 "write": {
-                    "bytes": 14036172.8,
-                    "ops": 1320.4
+                    "bytes": 0,
+                    "count": 0
                 }
+            },
+            "instance": {
+                "core": {
+                    "count": 2
+                },
+                "image": {
+                    "id": "ami-f920cd94"
+                },
+                "monitoring": {
+                    "state": "disabled"
+                },
+                "private": {
+                    "dns_name": "ip-10-0-0-148.ec2.internal",
+                    "ip": "10.0.0.148"
+                },
+                "public": {
+                    "dns_name": "ec2-54-226-109-162.compute-1.amazonaws.com",
+                    "ip": "54.226.109.162"
+                },
+                "state": {
+                    "code": 16,
+                    "name": "running"
+                },
+                "threads_per_core": 1
             },
             "network": {
                 "in": {
-                    "bytes": 112.8,
-                    "packets": 2
+                    "bytes": 737000.4,
+                    "packets": 1361.2
                 },
                 "out": {
-                    "bytes": 84.8,
-                    "packets": 2
+                    "bytes": 227871.2,
+                    "packets": 1411.2
                 }
             },
             "status": {
@@ -39,18 +67,15 @@
         }
     },
     "cloud": {
-        "availability_zone": "eu-central-1b",
-        "image": {
-            "id": "ami-556ef13a"
-        },
+        "availability_zone": "us-east-1b",
         "instance": {
-            "id": "i-08027f3dcddb9a976"
+            "id": "i-77f84332"
         },
         "machine": {
-            "type": "i3.4xlarge"
+            "type": "t2.medium"
         },
         "provider": "ec2",
-        "region": "eu-central-1"
+        "region": "us-east-1"
     },
     "event": {
         "dataset": "aws.ec2",

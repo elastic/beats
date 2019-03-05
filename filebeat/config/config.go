@@ -39,25 +39,33 @@ const (
 )
 
 type Config struct {
-	Inputs                  []*common.Config     `config:"inputs"`
-	RegistryFile            string               `config:"registry_file"`
-	RegistryFilePermissions os.FileMode          `config:"registry_file_permissions"`
-	RegistryFlush           time.Duration        `config:"registry_flush"`
-	ConfigDir               string               `config:"config_dir"`
-	ShutdownTimeout         time.Duration        `config:"shutdown_timeout"`
-	Modules                 []*common.Config     `config:"modules"`
-	ConfigInput             *common.Config       `config:"config.inputs"`
-	ConfigModules           *common.Config       `config:"config.modules"`
-	Autodiscover            *autodiscover.Config `config:"autodiscover"`
-	OverwritePipelines      bool                 `config:"overwrite_pipelines"`
+	Inputs             []*common.Config     `config:"inputs"`
+	Registry           Registry             `config:"registry"`
+	ConfigDir          string               `config:"config_dir"`
+	ShutdownTimeout    time.Duration        `config:"shutdown_timeout"`
+	Modules            []*common.Config     `config:"modules"`
+	ConfigInput        *common.Config       `config:"config.inputs"`
+	ConfigModules      *common.Config       `config:"config.modules"`
+	Autodiscover       *autodiscover.Config `config:"autodiscover"`
+	OverwritePipelines bool                 `config:"overwrite_pipelines"`
+}
+
+type Registry struct {
+	Path         string        `config:"path"`
+	Permissions  os.FileMode   `config:"file_permissions"`
+	FlushTimeout time.Duration `config:"flush"`
+	MigrateFile  string        `config:"migrate_file"`
 }
 
 var (
 	DefaultConfig = Config{
-		RegistryFile:            "registry",
-		RegistryFilePermissions: 0600,
-		ShutdownTimeout:         0,
-		OverwritePipelines:      false,
+		Registry: Registry{
+			Path:        "registry",
+			Permissions: 0600,
+			MigrateFile: "",
+		},
+		ShutdownTimeout:    0,
+		OverwritePipelines: false,
 	}
 )
 

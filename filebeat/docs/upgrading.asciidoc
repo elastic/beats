@@ -3,5 +3,5 @@
 
 For information about upgrading to a new version, see the following topics in the _Beats Platform Reference_:
 
-* {libbeat}/breaking-changes.html[Breaking Changes]
-* {libbeat}/upgrading.html[Upgrading]
+* {beats-ref}/breaking-changes.html[Breaking Changes]
+* {beats-ref}/upgrading.html[Upgrading]

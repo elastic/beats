@@ -37,11 +37,13 @@ func TestMetrics(t *testing.T) {
 }
 
 func testFetch(t *testing.T, r compose.R) {
-	f := mbtest.NewEventFetcher(t, mtest.GetConfig("metrics", r.Host()))
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("metrics", r.Host()))
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
+	assert.NotEmpty(t, events)
+	event := events[0].MetricSetFields
 
 	// Check a few event Fields
 	findCount, err := event.GetValue("commands.find.total")
@@ -54,9 +56,8 @@ func testFetch(t *testing.T, r compose.R) {
 }
 
 func testData(t *testing.T, r compose.R) {
-	f := mbtest.NewEventFetcher(t, mtest.GetConfig("metrics", r.Host()))
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("metrics", r.Host()))
+	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }

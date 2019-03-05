@@ -25,7 +25,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/mapval"
-	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
 func TestURLFields(t *testing.T) {
@@ -41,6 +40,7 @@ func TestURLFields(t *testing.T) {
 				"full":   "http://elastic.co",
 				"scheme": "http",
 				"domain": "elastic.co",
+				"port":   uint16(80),
 			},
 		},
 		{
@@ -50,24 +50,27 @@ func TestURLFields(t *testing.T) {
 				"full":   "https://elastic.co",
 				"scheme": "https",
 				"domain": "elastic.co",
+				"port":   uint16(443),
 			},
 		},
 		{
 			"fancy-proto",
-			"tcp+ssl://elastic.co",
+			"tcp+ssl://elastic.co:1234",
 			common.MapStr{
-				"full":   "tcp+ssl://elastic.co",
+				"full":   "tcp+ssl://elastic.co:1234",
 				"scheme": "tcp+ssl",
 				"domain": "elastic.co",
+				"port":   uint16(1234),
 			},
 		},
 		{
 			"complex",
-			"tcp+ssl://myuser:mypass@elastic.co/foo/bar?q=dosomething&x=y",
+			"tcp+ssl://myuser:mypass@elastic.co:65500/foo/bar?q=dosomething&x=y",
 			common.MapStr{
-				"full":     "tcp+ssl://myuser:%3Chidden%3E@elastic.co/foo/bar?q=dosomething&x=y",
+				"full":     "tcp+ssl://myuser:%3Chidden%3E@elastic.co:65500/foo/bar?q=dosomething&x=y",
 				"scheme":   "tcp+ssl",
 				"domain":   "elastic.co",
+				"port":     uint16(65500),
 				"path":     "/foo/bar",
 				"query":    "q=dosomething&x=y",
 				"username": "myuser",
@@ -81,7 +84,7 @@ func TestURLFields(t *testing.T) {
 			require.NoError(t, err)
 
 			got := URLFields(parsed)
-			mapvaltest.Test(t, mapval.MustCompile(mapval.Map(tt.want)), got)
+			mapval.Test(t, mapval.MustCompile(mapval.Map(tt.want)), got)
 		})
 	}
 }

@@ -38,14 +38,13 @@ func TestDatabase(t *testing.T) {
 }
 
 func testFetch(t *testing.T, r compose.R) {
-	f := mbtest.NewEventsFetcher(t, mtest.GetConfig("database", r.Host()))
-	events, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("database", r.Host()))
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
-
-	assert.True(t, len(events) > 0)
-	event := events[0]
+	assert.NotEmpty(t, events)
+	event := events[0].MetricSetFields
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
 
@@ -65,9 +64,14 @@ func testFetch(t *testing.T, r compose.R) {
 }
 
 func testData(t *testing.T, r compose.R) {
-	f := mbtest.NewEventsFetcher(t, mtest.GetConfig("database", r.Host()))
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("database", r.Host()))
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+
+	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }

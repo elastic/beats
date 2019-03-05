@@ -10,7 +10,8 @@
         "log.offset": 0,
         "message": "File does not exist: /var/www/favicon.ico",
         "service.type": "apache",
-        "source.address": "192.168.33.1"
+        "source.address": "192.168.33.1",
+        "source.ip": "192.168.33.1"
     },
     {
         "@timestamp": "2016-12-26T16:15:55.103Z",
@@ -40,6 +41,14 @@
         "process.pid": 35708,
         "process.thread.id": 4328636416,
         "service.type": "apache",
-        "source.address": "72.15.99.187"
+        "source.address": "72.15.99.187",
+        "source.geo.city_name": "Newnan",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.location.lat": 33.3734,
+        "source.geo.location.lon": -84.8541,
+        "source.geo.region_iso_code": "US-GA",
+        "source.geo.region_name": "Georgia",
+        "source.ip": "72.15.99.187"
     }
 ]

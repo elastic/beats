@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/mapval"
-	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
 func TestWrapAll(t *testing.T) {
@@ -117,7 +116,7 @@ func TestWrapAll(t *testing.T) {
 				fr := results[idx].Fields
 
 				validator := mapval.Strict(mapval.MustCompile(rf))
-				mapvaltest.Test(t, validator, fr)
+				mapval.Test(t, validator, fr)
 			}
 		})
 	}

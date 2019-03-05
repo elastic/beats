@@ -5,15 +5,16 @@ import requests
 import string
 import random
 import unittest
+import time
 from elasticsearch import Elasticsearch
+from os import path
 
 
 from base import BaseTest
 
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
-KIBANA_PASSWORD = 'changeme'
-TIMEOUT = 5 * 60
+TIMEOUT = 2 * 60
 
 
 class TestManagement(BaseTest):
@@ -23,9 +24,13 @@ class TestManagement(BaseTest):
         # NOTES: Theses options are linked to the specific of the docker compose environment for
         # CM.
         self.es_host = os.getenv('ES_HOST', 'localhost') + ":" + os.getenv('ES_POST', '9200')
-        self.es_user = "elastic"
+        self.es_user = "myelastic"
         self.es_pass = "changeme"
         self.es = Elasticsearch([self.get_elasticsearch_url()], verify_certs=True)
+        self.keystore_path = self.working_dir + "/data/keystore"
+
+        if path.exists(self.keystore_path):
+            os.Remove(self.keystore_path)
 
     @unittest.skipIf(not INTEGRATION_TESTS,
                      "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
@@ -37,11 +42,11 @@ class TestManagement(BaseTest):
         # We don't care about this as it will be replaced by enrollment
         # process:
         config_path = os.path.join(self.working_dir, "mockbeat.yml")
-        self.render_config_template("mockbeat", config_path)
+        self.render_config_template("mockbeat", config_path, keystore_path=self.keystore_path)
 
         config_content = open(config_path, 'r').read()
 
-        exit_code = self.enroll(KIBANA_PASSWORD)
+        exit_code = self.enroll(self.es_user, self.es_pass)
 
         assert exit_code == 0
 
@@ -49,7 +54,7 @@ class TestManagement(BaseTest):
 
         # Enroll creates a keystore (to store access token)
         assert os.path.isfile(os.path.join(
-            self.working_dir, "mockbeat.keystore"))
+            self.working_dir, "data/keystore"))
 
         # New settings file is in place now
         new_content = open(config_path, 'r').read()
@@ -70,17 +75,17 @@ class TestManagement(BaseTest):
         # We don't care about this as it will be replaced by enrollment
         # process:
         config_path = os.path.join(self.working_dir, "mockbeat.yml")
-        self.render_config_template("mockbeat", config_path)
+        self.render_config_template("mockbeat", config_path, keystore_path=self.keystore_path)
 
         config_content = open(config_path, 'r').read()
 
-        exit_code = self.enroll('wrong password')
+        exit_code = self.enroll("not", 'wrong password')
 
         assert exit_code == 1
 
         # Keystore wasn't created
         assert not os.path.isfile(os.path.join(
-            self.working_dir, "mockbeat.keystore"))
+            self.working_dir, "data/keystore"))
 
         # Settings hasn't changed
         new_content = open(config_path, 'r').read()
@@ -94,8 +99,8 @@ class TestManagement(BaseTest):
         """
         # Enroll the beat
         config_path = os.path.join(self.working_dir, "mockbeat.yml")
-        self.render_config_template("mockbeat", config_path)
-        exit_code = self.enroll(KIBANA_PASSWORD)
+        self.render_config_template("mockbeat", config_path, keystore_path=self.keystore_path)
+        exit_code = self.enroll(self.es_user, self.es_pass)
         assert exit_code == 0
 
         index = self.random_index()
@@ -103,29 +108,27 @@ class TestManagement(BaseTest):
         self.create_and_assing_tag([
             {
                 "type": "output",
-                "configs": [
-                    {
-                        "output": "elasticsearch",
-                        "elasticsearch": {
-                            "hosts": [self.es_host],
-                            "username": self.es_user,
-                            "password": self.es_pass,
-                            "index": index,
-                        }
-                    }
-                ]
+                "config": {
+                        "_sub_type": "elasticsearch",
+                        "hosts": [self.es_host],
+                        "username": self.es_user,
+                        "password": self.es_pass,
+                        "index": index,
+                },
+                "id": "myconfig",
             }
         ])
 
         # Start beat
         proc = self.start_beat(extra_args=[
             "-E", "management.period=1s",
+            "-E", "keystore.path=%s" % self.keystore_path,
         ])
 
         # Wait for beat to apply new conf
         self.wait_log_contains("Applying settings for output")
 
-        self.wait_until(lambda: self.log_contains("PublishEvents: "))
+        self.wait_until(lambda: self.log_contains("PublishEvents: "), max_timeout=TIMEOUT)
 
         self.wait_documents(index, 1)
 
@@ -135,20 +138,18 @@ class TestManagement(BaseTest):
         self.create_and_assing_tag([
             {
                 "type": "output",
-                "configs": [
-                    {
-                        "output": "elasticsearch",
-                        "elasticsearch": {
-                            "hosts": [self.es_host],
-                            "username": self.es_user,
-                            "password": self.es_pass,
-                            "index": index2,
-                        }
-                    }
-                ]
+                "config": {
+                        "_sub_type": "elasticsearch",
+                        "hosts": [self.es_host],
+                        "username": self.es_user,
+                        "password": self.es_pass,
+                        "index": index2,
+                },
+                "id": "myconfig",
             }
         ])
-        self.wait_until(lambda: self.log_contains("PublishEvents: "))
+        self.wait_log_contains("Applying settings for output")
+        self.wait_until(lambda: self.log_contains("PublishEvents: "), max_timeout=TIMEOUT)
         self.wait_documents(index2, 1)
 
         proc.check_kill_and_wait()
@@ -161,8 +162,8 @@ class TestManagement(BaseTest):
         """
         # Enroll the beat
         config_path = os.path.join(self.working_dir, "mockbeat.yml")
-        self.render_config_template("mockbeat", config_path)
-        exit_code = self.enroll(KIBANA_PASSWORD)
+        self.render_config_template("mockbeat", config_path, keystore_path=self.keystore_path)
+        exit_code = self.enroll(self.es_user, self.es_pass)
         assert exit_code == 0
 
         index = self.random_index()
@@ -171,27 +172,23 @@ class TestManagement(BaseTest):
         self.create_and_assing_tag([
             {
                 "type": "output",
-                "configs": [
-                    {
-
-                        "output": "elasticsearch",
-                        "elasticsearch": {
-                            "hosts": [self.es_host],
-                            "username": self.es_user,
-                            "password": self.es_pass,
-                            "index": index,
-                        }
-                    }
-                ]
+                "config": {
+                        "_sub_type": "elasticsearch",
+                        "hosts": [self.es_host],
+                        "username": self.es_user,
+                        "password": self.es_pass,
+                        "index": index,
+                }
             }
         ])
 
         # Start beat
         proc = self.start_beat(extra_args=[
             "-E", "management.period=1s",
+            "-E", "keystore.path=%s" % self.keystore_path,
         ])
 
-        self.wait_until(lambda: self.log_contains("PublishEvents: "), )
+        self.wait_until(lambda: self.log_contains("PublishEvents: "), max_timeout=TIMEOUT)
         self.wait_documents(index, 1)
         proc.check_kill_and_wait()
 
@@ -203,16 +200,17 @@ class TestManagement(BaseTest):
             "-E", "management.period=1s",
             "-E", "management.kibana.host=wronghost",
             "-E", "management.kibana.timeout=0.5s",
+            "-E", "keystore.path=%s" % self.keystore_path,
         ])
 
-        self.wait_until(lambda: self.log_contains("PublishEvents: "))
+        self.wait_until(lambda: self.log_contains("PublishEvents: "), max_timeout=TIMEOUT)
         self.wait_documents(index, 1)
         proc.check_kill_and_wait()
 
-    def enroll(self, password):
+    def enroll(self, user, password):
         return self.run_beat(
             extra_args=["enroll", self.get_kibana_url(),
-                        "--password", "env:PASS", "--force"],
+                        "--password", "env:PASS", "--username", user, "--force"],
             logging_args=["-v", "-d", "*"],
             env={
                 'PASS': password,
@@ -227,11 +225,10 @@ class TestManagement(BaseTest):
         url = self.get_kibana_url() + "/api/status"
 
         r = requests.get(url, headers=headers,
-                         auth=('elastic', KIBANA_PASSWORD))
-        print(r.text)
+                         auth=(self.es_user, self.es_pass))
 
     def create_and_assing_tag(self, blocks):
-        tag_name = "test"
+        tag_name = "test%d" % int(time.time() * 1000)
         headers = {
             "kbn-xsrf": "1"
         }
@@ -240,11 +237,20 @@ class TestManagement(BaseTest):
         url = self.get_kibana_url() + "/api/beats/tag/" + tag_name
         data = {
             "color": "#DD0A73",
-            "configuration_blocks": blocks,
+            "name": tag_name,
         }
 
         r = requests.put(url, json=data, headers=headers,
-                         auth=('elastic', KIBANA_PASSWORD))
+                         auth=(self.es_user, self.es_pass))
+        assert r.status_code in (200, 201)
+
+        # Create blocks
+        url = self.get_kibana_url() + "/api/beats/configurations"
+        for b in blocks:
+            b["tag"] = tag_name
+
+        r = requests.put(url, json=blocks, headers=headers,
+                         auth=(self.es_user, self.es_pass))
         assert r.status_code in (200, 201)
 
         # Retrieve beat ID
@@ -255,7 +261,8 @@ class TestManagement(BaseTest):
         data = {"assignments": [{"beatId": meta["uuid"], "tag": tag_name}]}
         url = self.get_kibana_url() + "/api/beats/agents_tags/assignments"
         r = requests.post(url, json=data, headers=headers,
-                          auth=('elastic', KIBANA_PASSWORD))
+                          auth=(self.es_user, self.es_pass))
+
         assert r.status_code == 200
 
     def get_elasticsearch_url(self):
@@ -269,9 +276,10 @@ class TestManagement(BaseTest):
 
     def check_document_count(self, index, count):
         try:
+            self.es.indices.refresh(index=index)
             return self.es.search(index=index, body={"query": {"match_all": {}}})['hits']['total'] >= count
         except:
             return False
 
     def wait_documents(self, index, count):
-        self.wait_until(lambda: self.check_document_count(index, count), max_timeout=TIMEOUT)
+        self.wait_until(lambda: self.check_document_count(index, count), max_timeout=TIMEOUT, poll_interval=1)

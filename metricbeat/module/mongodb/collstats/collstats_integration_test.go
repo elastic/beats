@@ -37,28 +37,29 @@ func TestCollstats(t *testing.T) {
 }
 
 func testFetch(t *testing.T, r compose.R) {
-	f := mbtest.NewEventsFetcher(t, mtest.GetConfig("collstats", r.Host()))
-	events, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("collstats", r.Host()))
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
+	assert.NotEmpty(t, events)
 
 	for _, event := range events {
 		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+		metricsetFields := event.MetricSetFields
 
 		// Check a few event Fields
-		db := event["db"].(string)
+		db := metricsetFields["db"].(string)
 		assert.NotEqual(t, db, "")
 
-		collection := event["collection"].(string)
+		collection := metricsetFields["collection"].(string)
 		assert.NotEqual(t, collection, "")
 	}
 }
 
 func testData(t *testing.T, r compose.R) {
-	f := mbtest.NewEventsFetcher(t, mtest.GetConfig("collstats", r.Host()))
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("collstats", r.Host()))
+	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }

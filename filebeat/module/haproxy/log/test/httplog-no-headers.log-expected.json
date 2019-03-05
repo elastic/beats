@@ -8,7 +8,6 @@
         "haproxy.backend_name": "http-webservices",
         "haproxy.backend_queue": 0,
         "haproxy.bytes_read": 213,
-        "haproxy.client.ip": "127.0.0.1",
         "haproxy.connection_wait_time_ms": -1,
         "haproxy.connections.active": 1,
         "haproxy.connections.backend": 0,
@@ -18,7 +17,6 @@
         "haproxy.frontend_name": "http-webservices",
         "haproxy.http.request.captured_cookie": "-",
         "haproxy.http.request.raw_request_line": "GET / HTTP/1.1",
-        "haproxy.http.request.time_active_ms": 0,
         "haproxy.http.request.time_wait_ms": 0,
         "haproxy.http.request.time_wait_without_data_ms": -1,
         "haproxy.http.response.captured_cookie": "-",
@@ -33,6 +31,7 @@
         "process.name": "haproxy",
         "process.pid": 19312,
         "service.type": "haproxy",
+        "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "source.port": 35982
     },
@@ -45,7 +44,6 @@
         "haproxy.backend_name": "http-webservices",
         "haproxy.backend_queue": 0,
         "haproxy.bytes_read": 213,
-        "haproxy.client.ip": "127.0.0.1",
         "haproxy.connection_wait_time_ms": -1,
         "haproxy.connections.active": 1,
         "haproxy.connections.backend": 0,
@@ -55,7 +53,6 @@
         "haproxy.frontend_name": "http-webservices",
         "haproxy.http.request.captured_cookie": "-",
         "haproxy.http.request.raw_request_line": "GET /foo HTTP/1.1",
-        "haproxy.http.request.time_active_ms": 0,
         "haproxy.http.request.time_wait_ms": 0,
         "haproxy.http.request.time_wait_without_data_ms": -1,
         "haproxy.http.response.captured_cookie": "-",
@@ -70,6 +67,7 @@
         "process.name": "haproxy",
         "process.pid": 29785,
         "service.type": "haproxy",
+        "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "source.port": 43738
     },
@@ -82,7 +80,6 @@
         "haproxy.backend_name": "http-webservices",
         "haproxy.backend_queue": 0,
         "haproxy.bytes_read": 213,
-        "haproxy.client.ip": "127.0.0.1",
         "haproxy.connection_wait_time_ms": -1,
         "haproxy.connections.active": 1,
         "haproxy.connections.backend": 0,
@@ -95,7 +92,6 @@
             "localhost:8888"
         ],
         "haproxy.http.request.raw_request_line": "GET /foo HTTP/1.1",
-        "haproxy.http.request.time_active_ms": 0,
         "haproxy.http.request.time_wait_ms": 0,
         "haproxy.http.request.time_wait_without_data_ms": -1,
         "haproxy.http.response.captured_cookie": "-",
@@ -111,6 +107,7 @@
         "process.name": "haproxy",
         "process.pid": 7873,
         "service.type": "haproxy",
+        "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
         "source.port": 44542
     }

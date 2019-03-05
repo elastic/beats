@@ -117,6 +117,8 @@ auditbeat.modules:
 - module: system
   datasets:
     - host    # General host information, e.g. uptime, IPs
+    - login   # User logins, logouts, and system boots.
+    - package # Installed, updated, and removed packages
     - process # Started and stopped processes
     - socket  # Opened and closed sockets
     - user    # User information
@@ -128,6 +130,7 @@ auditbeat.modules:
 
   # The state.period can be overridden for any dataset.
   # host.state.period: 12h
+  # package.state.period: 12h
   # process.state.period: 12h
   # socket.state.period: 12h
   # user.state.period: 12h
@@ -136,6 +139,12 @@ auditbeat.modules:
   # /etc/passwd and /etc/shadow and store a hash locally to
   # detect any changes.
   user.detect_password_changes: true
+
+  # File patterns of the login record files.
+  # wtmp: History of successful logins, logouts, and system shutdowns and boots.
+  # btmp: Failed login attempts.
+  login.wtmp_file_pattern: /var/log/wtmp*
+  login.btmp_file_pattern: /var/log/btmp*
 
 #================================ General ======================================
 
@@ -254,7 +263,7 @@ auditbeat.modules:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# The supported processors are drop_fields, drop_event, include_fields, 
+# The supported processors are drop_fields, drop_event, include_fields,
 # decode_json_fields, and add_cloud_metadata.
 #
 # For example, you can use the following processors to keep the fields that
@@ -345,7 +354,7 @@ auditbeat.modules:
 #    match_pids: ["system.process.ppid"]
 #    target: system.process.parent
 #
-# The following example decodes fields containing JSON strings 
+# The following example decodes fields containing JSON strings
 # and replaces the strings with valid JSON objects.
 #
 #processors:
@@ -383,11 +392,6 @@ output.elasticsearch:
   # In case you specify and additional path, the scheme is required: http://localhost:9200/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
-
-  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
-  #ilm.enabled: false
-  #ilm.rollover_alias: "auditbeat"
-  #ilm.pattern: "{now/d}-000001"
 
   # Set gzip compression level.
   #compression_level: 0
@@ -651,6 +655,9 @@ output.elasticsearch:
 
     # Refresh metadata interval. Defaults to every 10 minutes.
     #refresh_frequency: 10m
+
+    # Strategy for fetching the topics metadata from the broker. Default is true.
+    #full: true
 
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1
@@ -1035,6 +1042,25 @@ setup.template.settings:
   #_source:
     #enabled: false
 
+#============================== Setup ILM =====================================
+
+# Configure Index Lifecycle Management Index Lifecycle Management creates a
+# write alias and adds additional settings to the template.
+# The elasticsearch.output.index setting will be replaced with the write alias
+# if ILM is enabled.
+
+# Enabled ILM support. Valid values are true, false, and auto. The beat will
+# detect availabilty of Index Lifecycle Management in Elasticsearch and enable
+# or disable ILM support.
+#setup.ilm.enabled: auto
+
+# Configure the ILM write alias name.
+#setup.ilm.rollover_alias: "auditbeat"
+
+# Configure rollover index pattern.
+#setup.ilm.pattern: "{now/d}-000001"
+
+
 #============================== Kibana =====================================
 
 # Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
@@ -1272,3 +1298,8 @@ logging.files:
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
 #seccomp.enabled: true
+
+#================================= Migration ==================================
+
+# This allows to enable migration aliases
+#migration.enabled: false

@@ -18,18 +18,11 @@
 package actions
 
 import (
-	"encoding/json"
 	"fmt"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/processors"
 )
-
-type addLabels struct {
-	labels common.MapStr
-	shared bool
-}
 
 // LabelsKey is the default target key for the add_labels processor.
 const LabelsKey = "labels"
@@ -37,55 +30,30 @@ const LabelsKey = "labels"
 func init() {
 	processors.RegisterPlugin("add_labels",
 		configChecked(createAddLabels,
-			requireFields("labels"),
-			allowedFields("labels", "target", "when")))
+			requireFields(LabelsKey),
+			allowedFields(LabelsKey, "when")))
 }
 
 func createAddLabels(c *common.Config) (processors.Processor, error) {
 	config := struct {
 		Labels common.MapStr `config:"labels" validate:"required"`
-		Target *string       `config:"target"`
 	}{}
 	err := c.Unpack(&config)
 	if err != nil {
 		return nil, fmt.Errorf("fail to unpack the add_fields configuration: %s", err)
 	}
 
-	var target string
-	if config.Target == nil {
-		target = LabelsKey
-	} else {
-		target = *config.Target
-	}
-
-	labels := config.Labels
-	if target != "" {
-		labels = common.MapStr{
-			target: labels,
-		}
-	}
-
-	return NewAddLabels(labels, true), nil
+	return makeFieldsProcessor(LabelsKey, config.Labels.Flatten(), true), nil
 }
 
 // NewAddLabels creates a new processor adding the given object to events. Set
 // `shared` true if there is the chance of labels being changed/modified by
 // subsequent processors.
+// If labels contains nested objects, NewAddLabels will flatten keys into labels by
+// by joining names with a dot ('.') .
+// The labels will be inserted into the 'labels' field.
 func NewAddLabels(labels common.MapStr, shared bool) processors.Processor {
-	return &addLabels{labels: labels, shared: shared}
-}
-
-func (af *addLabels) Run(event *beat.Event) (*beat.Event, error) {
-	labels := af.labels
-	if af.shared {
-		labels = labels.Clone()
-	}
-
-	event.Fields.DeepUpdate(labels)
-	return event, nil
-}
-
-func (af *addLabels) String() string {
-	s, _ := json.Marshal(af.labels)
-	return fmt.Sprintf("add_labels=%s", s)
+	return NewAddFields(common.MapStr{
+		LabelsKey: labels.Flatten(),
+	}, shared)
 }

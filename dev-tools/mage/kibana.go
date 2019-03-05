@@ -69,27 +69,12 @@ func KibanaDashboards(moduleDirs ...string) error {
 	// Convert 6.x dashboards to strings.
 	err = sh.Run("python",
 		filepath.Join(esBeatsDir, "libbeat/scripts/unpack_dashboards.py"),
-		"--glob="+filepath.Join(kibanaBuildDir, "6/dashboard/*.json"))
+		"--glob="+filepath.Join(kibanaBuildDir, "7/dashboard/*.json"))
 	if err != nil {
 		return err
 	}
 
-	beatVersion, err := BeatQualifiedVersion()
-	if err != nil {
-		return err
-	}
-
-	// Generate Kibana index pattern files from fields.yml.
-	indexPatternCmd := sh.RunCmd("go", "run",
-		filepath.Join(esBeatsDir, "dev-tools/cmd/kibana_index_pattern/kibana_index_pattern.go"),
-		"-beat", BeatName,
-		"-version", beatVersion,
-		"-index", BeatIndexPrefix+"-*",
-		"-fields", "fields.yml",
-		"-out", kibanaBuildDir,
-	)
-
-	return indexPatternCmd()
+	return nil
 }
 
 // PackageKibanaDashboardsFromBuildDir reconfigures the packaging configuration

@@ -22,6 +22,8 @@ package process
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/php_fpm/mtest"
@@ -29,8 +31,23 @@ import (
 
 func TestProcess(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"Data": testData,
+		"Fetch": testFetch,
+		"Data":  testData,
 	})
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("process", r.Host()))
+	events, errs := mbtest.ReportingFetchV2(f)
+
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
+		t.FailNow()
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("php_fpm", "process").Fields.StringToPrint())
+
 }
 
 func testData(t *testing.T, r compose.R) {

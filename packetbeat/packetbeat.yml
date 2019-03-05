@@ -49,14 +49,6 @@ packetbeat.protocols:
   # the DNS protocol by commenting out the list of ports.
   ports: [53]
 
-  # include_authorities controls whether or not the dns.authorities field
-  # (authority resource records) is added to messages.
-  include_authorities: true
-
-  # include_additionals controls whether or not the dns.additionals field
-  # (additional resource records) is added to messages.
-  include_additionals: true
-
 - type: http
   # Configure the ports where to listen for HTTP traffic. You can disable
   # the HTTP protocol by commenting out the list of ports.
@@ -112,7 +104,7 @@ packetbeat.protocols:
 #==================== Elasticsearch template setting ==========================
 
 setup.template.settings:
-  index.number_of_shards: 3
+  index.number_of_shards: 1
   #index.codec: best_compression
   #_source.enabled: false
 
@@ -135,7 +127,7 @@ setup.template.settings:
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
 # the dashboards is disabled by default and can be enabled either by setting the
-# options here, or by using the `-setup` CLI flag or the `setup` command.
+# options here or by using the `setup` command.
 #setup.dashboards.enabled: false
 
 # The URL from where to download the dashboards archive. By default this URL
@@ -182,9 +174,6 @@ setup.kibana:
 output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
-
-  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
-  #ilm.enabled: false
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
@@ -239,3 +228,8 @@ processors:
 # have the Elasticsearch output configured, you can simply uncomment the
 # following line.
 #xpack.monitoring.elasticsearch:
+
+#================================= Migration ==================================
+
+# This allows to enable migration aliases
+#migration.enabled: false

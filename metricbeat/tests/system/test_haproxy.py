@@ -20,7 +20,7 @@ class HaproxyTest(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(HAPROXY_FIELDS), evt.keys(), evt)
+        self.assertItemsEqual(self.de_dot(HAPROXY_FIELDS + ["process"]), evt.keys(), evt)
 
         self.assert_fields_are_documented(evt)
 
@@ -48,7 +48,7 @@ class HaproxyTest(metricbeat.BaseTest):
 
         for evt in output:
             print(evt)
-            self.assertItemsEqual(self.de_dot(HAPROXY_FIELDS), evt.keys(), evt)
+            self.assertItemsEqual(self.de_dot(HAPROXY_FIELDS + ["process"]), evt.keys(), evt)
             self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")

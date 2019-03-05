@@ -20,7 +20,6 @@ package ml_job
 import (
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
@@ -34,7 +33,7 @@ func init() {
 }
 
 const (
-	jobPath = "/_xpack/ml/anomaly_detectors/_all/_stats"
+	jobPathSuffix = "/anomaly_detectors/_all/_stats"
 )
 
 // MetricSet for ml job
@@ -45,13 +44,12 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The " + base.FullyQualifiedName() + " metricset is beta.")
-
 	// Get the stats from the local node
-	ms, err := elasticsearch.NewMetricSet(base, jobPath)
+	ms, err := elasticsearch.NewMetricSet(base, "") // servicePath will be set in Fetch() based on ES version
 	if err != nil {
 		return nil, err
 	}
+
 	return &MetricSet{MetricSet: ms}, nil
 }
 
@@ -75,6 +73,12 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	if err != nil {
 		elastic.ReportAndLogError(err, r, m.Log)
 		return
+	}
+
+	if info.Version.Number.Major < 7 {
+		m.SetServiceURI("/_xpack/ml" + jobPathSuffix)
+	} else {
+		m.SetServiceURI("/_ml" + jobPathSuffix)
 	}
 
 	content, err := m.HTTP.FetchContent()

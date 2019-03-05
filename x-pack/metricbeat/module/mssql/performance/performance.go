@@ -42,9 +42,8 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	log     *logp.Logger
-	fetcher *mssql.Fetcher
-	db      *sql.DB
+	log *logp.Logger
+	db  *sql.DB
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking

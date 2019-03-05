@@ -24,13 +24,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestStore(t *testing.T) {
-	runner := compose.TestRunner{Service: "etcd"}
+	logp.TestingSetup()
 
+	runner := compose.TestRunner{Service: "etcd"}
 	runner.Run(t, compose.Suite{
 		"Fetch": testFetch,
 		"Data":  testData,
@@ -38,20 +40,17 @@ func TestStore(t *testing.T) {
 }
 
 func testFetch(t *testing.T, r compose.R) {
-	f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
-
-	assert.NotNil(t, event)
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	assert.NotEmpty(t, events)
 }
 
 func testData(t *testing.T, r compose.R) {
-	f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
+	f := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
+	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }

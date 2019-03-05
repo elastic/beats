@@ -24,15 +24,18 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+var v640 = common.MustNewVersion("6.4.0")
+
 type fieldsTransformer struct {
 	fields                    common.Fields
 	transformedFields         []common.MapStr
 	transformedFieldFormatMap common.MapStr
 	version                   *common.Version
 	keys                      map[string]int
+	migration                 bool
 }
 
-func newFieldsTransformer(version *common.Version, fields common.Fields) (*fieldsTransformer, error) {
+func newFieldsTransformer(version *common.Version, fields common.Fields, migration bool) (*fieldsTransformer, error) {
 	if version == nil {
 		return nil, errors.New("Version must be given")
 	}
@@ -42,6 +45,7 @@ func newFieldsTransformer(version *common.Version, fields common.Fields) (*field
 		transformedFields:         []common.MapStr{},
 		transformedFieldFormatMap: common.MapStr{},
 		keys:                      map[string]int{},
+		migration:                 migration,
 	}, nil
 }
 
@@ -84,6 +88,23 @@ func (t *fieldsTransformer) transformFields(commonFields common.Fields, path str
 				t.transformFields(f.Fields, f.Path)
 			}
 		} else {
+			if f.Type == "alias" {
+				if t.version.LessThan(v640) {
+					continue
+				}
+				// Only adds migration aliases if migration is enabled
+				if f.MigrationAlias && !t.migration {
+					continue
+				}
+				if ff := t.fields.GetField(f.AliasPath); ff != nil {
+					// copy the field, keep
+					path := f.Path
+					name := f.Name
+					f = *ff
+					f.Path = path
+					f.Name = name
+				}
+			}
 			t.add(f)
 
 			if f.MultiFields != nil {
@@ -104,7 +125,7 @@ func (t *fieldsTransformer) update(target *common.MapStr, override common.Field)
 		target.Update(field)
 		if !override.Overwrite {
 			// compatible duplication
-			return fmt.Errorf("field <%s> is duplicated, remove it or set 'overwrite: true'", override.Path)
+			return fmt.Errorf("field <%s> is duplicated, remove it or set 'overwrite: true', %+v, %+v", override.Path, override, field)
 		}
 		return nil
 	}

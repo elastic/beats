@@ -1,4 +1,4 @@
-version: "2.1"
+version: "2.3"
 
 services:
   beat:
@@ -37,10 +37,29 @@ services:
     ports:
       - 5000
 
+  consul:
+    build: ./module/consul/_meta
+    ports:
+      - 8500
+
   couchbase:
     build: ./module/couchbase/_meta
     ports:
       - 8091
+
+  couchdb:
+    build: ./module/couchdb/_meta
+    ports:
+      - 5984
+
+  # Dummy container for docker tests, so there is a container with
+  # healthcheck generating events
+  docker:
+    image: alpine
+    command: '/bin/sh -c "trap : TERM INT; sleep 15d"'
+    healthcheck:
+      interval: 1s
+      test: ["CMD", "true"]
 
   dropwizard:
     build: ./module/dropwizard/_meta
@@ -69,6 +88,11 @@ services:
         ETCD_VERSION: v3.2.25
     ports:
       - 2379
+
+  golang:
+    build: ./module/golang/_meta
+    ports:
+      - 6060
 
   haproxy:
     build: ./module/haproxy/_meta
@@ -184,7 +208,50 @@ services:
       - 4949
 
   mysql:
-    build: ./module/mysql/_meta
+    build:
+      context: ./module/mysql/_meta
+      args:
+        MYSQL_IMAGE: mysql:5.7.24
+    ports:
+      - 3306
+
+  mysql_8_0:
+    build:
+      context: ./module/mysql/_meta
+      args:
+        MYSQL_IMAGE: mysql:8.0.13
+    ports:
+      - 3306
+
+  percona_5_7:
+    build:
+      context: ./module/mysql/_meta
+      args:
+        MYSQL_IMAGE: percona:5.7.24
+    ports:
+      - 3306
+
+  percona_8_0:
+    build:
+      context: ./module/mysql/_meta
+      args:
+        MYSQL_IMAGE: percona:8.0.13-4
+    ports:
+      - 3306
+
+  mariadb_10_2:
+    build:
+      context: ./module/mysql/_meta
+      args:
+        MYSQL_IMAGE: mariadb:10.2.17
+    ports:
+      - 3306
+
+  mariadb_10_3:
+    build:
+      context: ./module/mysql/_meta
+      args:
+        MYSQL_IMAGE: mariadb:10.3.12
     ports:
       - 3306
 

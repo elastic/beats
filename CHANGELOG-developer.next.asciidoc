@@ -14,15 +14,20 @@ Note: This changelog documents the current changes which are not yet present in
 an actual release.
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v7.0.0-alpha2..master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v7.0.0-beta1..master[Check the HEAD diff]
 
-The list below covers the major changes between 7.0.0-alpha2 and master only.
+The list below covers the major changes between 7.0.0-beta1 and master only.
 
 ==== Breaking changes
 
+- Remove support for deprecated `GenRootCmd` methods. {pull}10721[10721]
+
 ==== Bugfixes
+- Align default index between elasticsearch and logstash and kafka output. {pull}10841[10841]
 
 ==== Added
 
-- Allow multiple object type configurations per field. {pull}9772[9772]
-- Move agent metadata addition to a processor. {pull}9952[9952]
+- Metricset generator generates beta modules by default now. {pull}10657[10657]
+- Move host name addition to a processor. {pull}10728[10728]
+- The `beat.Event` accessor methods now support `@metadata` keys. {pull}10761[10761]
+- Assertion for documented fields in tests fails if any of the fields in the tested event is documented as an alias. {pull}10921[10921]

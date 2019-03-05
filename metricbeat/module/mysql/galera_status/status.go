@@ -28,7 +28,6 @@ import (
 	"database/sql"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mysql"
@@ -56,8 +55,6 @@ type MetricSet struct {
 // New create a new instance of the MetricSet
 // Loads query_mode config setting from the config file
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The mysql galera_status metricset is experimental")
-
 	return &MetricSet{BaseMetricSet: base}, nil
 }
 
@@ -109,4 +106,12 @@ func (m *MetricSet) loadStatus(db *sql.DB) (map[string]string, error) {
 	}
 
 	return galeraStatus, nil
+}
+
+// Close closes the database connection and prevents future queries.
+func (m *MetricSet) Close() error {
+	if m.db == nil {
+		return nil
+	}
+	return errors.Wrap(m.db.Close(), "failed to close mysql database client")
 }

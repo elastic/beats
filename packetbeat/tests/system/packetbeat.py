@@ -9,11 +9,20 @@ from beat.beat import TestCase
 from beat.beat import Proc
 
 TRANS_REQUIRED_FIELDS = ["@timestamp", "type", "status",
-                         "agent.type", "agent.hostname", "agent.version"]
+                         "agent.type", "agent.hostname", "agent.version",
+                         "event.kind", "event.category", "event.dataset", "event.start",
+                         "source.ip", "destination.ip",
+                         "client.ip", "server.ip",
+                         "network.type", "network.transport", "network.community_id",
+                         ]
 
-FLOWS_REQUIRED_FIELDS = ["@timestamp", "type", "event.dataset", "event.start",
-                         "event.end", "event.duration", "flow.id",
-                         "agent.type", "agent.hostname", "agent.version"]
+FLOWS_REQUIRED_FIELDS = ["@timestamp", "type",
+                         "agent.type", "agent.hostname", "agent.version",
+                         "event.kind", "event.category", "event.dataset", "event.action", "event.start", "event.end", "event.duration",
+                         "source.ip", "destination.ip",
+                         "flow.id",
+                         "network.type", "network.transport", "network.community_id",
+                         ]
 
 
 class BaseTest(TestCase):
@@ -120,9 +129,7 @@ class BaseTest(TestCase):
         with open(os.path.join(self.working_dir, output_file), "r") as f:
             for line in f:
                 document = self.flatten_object(json.loads(line), self.dict_fields)
-                if not types or \
-                    ("type" in document and document["type"] in types) or \
-                        ("event.type" in document and document["event.type"] in types):
+                if not types or document["type"] in types:
                     jsons.append(document)
         self.all_have_fields(jsons, required_fields or TRANS_REQUIRED_FIELDS)
         self.all_fields_are_expected(jsons, self.expected_fields)
@@ -130,5 +137,5 @@ class BaseTest(TestCase):
 
     def setUp(self):
 
-        self.expected_fields, self.dict_fields = self.load_fields()
+        self.expected_fields, self.dict_fields, _ = self.load_fields()
         super(BaseTest, self).setUp()

@@ -467,30 +467,14 @@ packetbeat.protocols:
 
 #=========================== Monitored processes ==============================
 
-# Configure the processes to be monitored and how to find them. If a process is
-# monitored then Packetbeat attempts to use it's name to fill in the `proc` and
-# `client_proc` fields.
-# The processes can be found by searching their command line by a given string.
-#
-# Process matching is optional and can be enabled by uncommenting the following
-# lines.
-#
-#packetbeat.procs:
-#  enabled: false
-#  monitored:
-#    - process: mysqld
-#      cmdline_grep: mysqld
-#
-#    - process: pgsql
-#      cmdline_grep: postgres
-#
-#    - process: nginx
-#      cmdline_grep: nginx
-#
-#    - process: app
-#      cmdline_grep: gunicorn
+# Packetbeat can enrich events with information about the process associated
+# the socket that sent or received the packet if Packetbeat is monitoring
+# traffic from the host machine. By default process enrichment is disabled.
+# This feature works on Linux and Windows.
+packetbeat.procs.enabled: false
 
-# Uncomment the following if you want to ignore transactions created
-# by the server on which the shipper is installed. This option is useful
-# to remove duplicates if shippers are installed on multiple servers.
-#packetbeat.ignore_outgoing: true
+# If you want to ignore transactions created by the server on which the shipper
+# is installed you can enable this option. This option is useful to remove
+# duplicates if shippers are installed on multiple servers. Default value is
+# false.
+packetbeat.ignore_outgoing: false

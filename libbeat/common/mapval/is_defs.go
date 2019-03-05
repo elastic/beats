@@ -126,7 +126,7 @@ func IsDeepEqual(to interface{}) IsDef {
 		return SimpleResult(
 			path,
 			false,
-			fmt.Sprintf("objects not equal: actual(%v) != expected(%v)", v, to),
+			fmt.Sprintf("objects not equal: actual(%T(%v)) != expected(%T(%v))", v, v, to, to),
 		)
 	})
 }
@@ -175,6 +175,34 @@ func IsAny(of ...IsDef) IsDef {
 			fmt.Sprintf("Value was none of %#v, actual value was %#v", names, v),
 		)
 	})
+}
+
+// IsUnique instances are used in multiple spots, flagging a value as being in error if it's seen across invocations.
+// To use it, assign IsUnique to a variable, then use that variable multiple times in a Map.
+func IsUnique() IsDef {
+	return ScopedIsUnique().IsUniqueTo("")
+}
+
+// UniqScopeTracker is represents the tracking data for invoking IsUniqueTo.
+type UniqScopeTracker map[interface{}]string
+
+// IsUniqueTo validates that the given value is only ever seen within a single namespace.
+func (ust UniqScopeTracker) IsUniqueTo(namespace string) IsDef {
+	return Is("unique", func(path path, v interface{}) *Results {
+		for trackerK, trackerNs := range ust {
+			hasNamespace := len(namespace) > 0
+			if reflect.DeepEqual(trackerK, v) && (!hasNamespace || namespace != trackerNs) {
+				return SimpleResult(path, false, "Value '%v' is repeated", v)
+			}
+		}
+
+		ust[v] = namespace
+		return ValidResult(path)
+	})
+}
+
+func ScopedIsUnique() UniqScopeTracker {
+	return UniqScopeTracker{}
 }
 
 // isStrCheck is a helper for IsDefs that must assert that the value is a string first.

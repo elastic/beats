@@ -45,6 +45,12 @@ journalbeat.inputs:
   # data path.
   #registry_file: registry
 
+#==================== Elasticsearch template setting ==========================
+setup.template.settings:
+  index.number_of_shards: 1
+  #index.codec: best_compression
+  #_source.enabled: false
+
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group
@@ -64,7 +70,7 @@ journalbeat.inputs:
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
 # the dashboards is disabled by default and can be enabled either by setting the
-# options here, or by using the `-setup` CLI flag or the `setup` command.
+# options here or by using the `setup` command.
 #setup.dashboards.enabled: false
 
 # The URL from where to download the dashboards archive. By default this URL
@@ -111,9 +117,6 @@ setup.kibana:
 output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
-
-  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
-  #ilm.enabled: false
 
   # Optional protocol and basic auth credentials.
   #protocol: "https"
@@ -168,3 +171,8 @@ processors:
 # have the Elasticsearch output configured, you can simply uncomment the
 # following line.
 #xpack.monitoring.elasticsearch:
+
+#================================= Migration ==================================
+
+# This allows to enable migration aliases
+#migration.enabled: false

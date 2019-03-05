@@ -22,7 +22,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/kubernetes"
 	"github.com/elastic/beats/libbeat/common/safemapstr"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -47,7 +46,8 @@ type MetricSet struct {
 }
 
 // dedotConfig defines LabelsDedot and AnnotationsDedot.
-// Default to be false. If set to true, replace dots in labels with `_`.
+// If set to true, replace dots in labels with `_`.
+// Default to be true.
 type dedotConfig struct {
 	LabelsDedot      bool `config:"labels.dedot"`
 	AnnotationsDedot bool `config:"annotations.dedot"`
@@ -57,8 +57,6 @@ type dedotConfig struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The kubernetes event metricset is beta")
-
 	config := defaultKubernetesEventsConfig()
 
 	err := base.Module().UnpackConfig(&config)

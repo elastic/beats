@@ -26,6 +26,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 )
 
@@ -99,6 +100,115 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 				assert.IsType(t, MultiplePipelineUnsupportedError{}, err)
 			} else {
 				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestSetEcsProcessors(t *testing.T) {
+	cases := []struct {
+		name          string
+		esVersion     *common.Version
+		content       map[string]interface{}
+		expected      map[string]interface{}
+		isErrExpected bool
+	}{
+		{
+			name:      "ES < 6.7.0",
+			esVersion: common.MustNewVersion("6.6.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"user_agent": map[string]interface{}{
+							"field": "foo.http_user_agent",
+						},
+					},
+				}},
+			isErrExpected: true,
+		},
+		{
+			name:      "ES == 6.7.0",
+			esVersion: common.MustNewVersion("6.7.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"rename": map[string]interface{}{
+							"field":        "foo.src_ip",
+							"target_field": "source.ip",
+						},
+					},
+					map[string]interface{}{
+						"user_agent": map[string]interface{}{
+							"field": "foo.http_user_agent",
+						},
+					},
+				},
+			},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"rename": map[string]interface{}{
+							"field":        "foo.src_ip",
+							"target_field": "source.ip",
+						},
+					},
+					map[string]interface{}{
+						"user_agent": map[string]interface{}{
+							"field": "foo.http_user_agent",
+							"ecs":   true,
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES >= 7.0.0",
+			esVersion: common.MustNewVersion("7.0.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"rename": map[string]interface{}{
+							"field":        "foo.src_ip",
+							"target_field": "source.ip",
+						},
+					},
+					map[string]interface{}{
+						"user_agent": map[string]interface{}{
+							"field": "foo.http_user_agent",
+						},
+					},
+				},
+			},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"rename": map[string]interface{}{
+							"field":        "foo.src_ip",
+							"target_field": "source.ip",
+						},
+					},
+					map[string]interface{}{
+						"user_agent": map[string]interface{}{
+							"field": "foo.http_user_agent",
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+	}
+
+	for _, test := range cases {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			err := setECSProcessors(*test.esVersion, "foo-pipeline", test.content)
+			if test.isErrExpected {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, test.content)
 			}
 		})
 	}

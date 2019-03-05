@@ -467,33 +467,17 @@ packetbeat.protocols:
 
 #=========================== Monitored processes ==============================
 
-# Configure the processes to be monitored and how to find them. If a process is
-# monitored then Packetbeat attempts to use it's name to fill in the `proc` and
-# `client_proc` fields.
-# The processes can be found by searching their command line by a given string.
-#
-# Process matching is optional and can be enabled by uncommenting the following
-# lines.
-#
-#packetbeat.procs:
-#  enabled: false
-#  monitored:
-#    - process: mysqld
-#      cmdline_grep: mysqld
-#
-#    - process: pgsql
-#      cmdline_grep: postgres
-#
-#    - process: nginx
-#      cmdline_grep: nginx
-#
-#    - process: app
-#      cmdline_grep: gunicorn
+# Packetbeat can enrich events with information about the process associated
+# the socket that sent or received the packet if Packetbeat is monitoring
+# traffic from the host machine. By default process enrichment is disabled.
+# This feature works on Linux and Windows.
+packetbeat.procs.enabled: false
 
-# Uncomment the following if you want to ignore transactions created
-# by the server on which the shipper is installed. This option is useful
-# to remove duplicates if shippers are installed on multiple servers.
-#packetbeat.ignore_outgoing: true
+# If you want to ignore transactions created by the server on which the shipper
+# is installed you can enable this option. This option is useful to remove
+# duplicates if shippers are installed on multiple servers. Default value is
+# false.
+packetbeat.ignore_outgoing: false
 
 #================================ General ======================================
 
@@ -612,7 +596,7 @@ packetbeat.protocols:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# The supported processors are drop_fields, drop_event, include_fields, 
+# The supported processors are drop_fields, drop_event, include_fields,
 # decode_json_fields, and add_cloud_metadata.
 #
 # For example, you can use the following processors to keep the fields that
@@ -703,7 +687,7 @@ packetbeat.protocols:
 #    match_pids: ["system.process.ppid"]
 #    target: system.process.parent
 #
-# The following example decodes fields containing JSON strings 
+# The following example decodes fields containing JSON strings
 # and replaces the strings with valid JSON objects.
 #
 #processors:
@@ -741,11 +725,6 @@ output.elasticsearch:
   # In case you specify and additional path, the scheme is required: http://localhost:9200/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
-
-  # Enabled ilm (beta) to use index lifecycle management instead daily indices.
-  #ilm.enabled: false
-  #ilm.rollover_alias: "packetbeat"
-  #ilm.pattern: "{now/d}-000001"
 
   # Set gzip compression level.
   #compression_level: 0
@@ -1009,6 +988,9 @@ output.elasticsearch:
 
     # Refresh metadata interval. Defaults to every 10 minutes.
     #refresh_frequency: 10m
+
+    # Strategy for fetching the topics metadata from the broker. Default is true.
+    #full: true
 
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1
@@ -1393,6 +1375,25 @@ setup.template.settings:
   #_source:
     #enabled: false
 
+#============================== Setup ILM =====================================
+
+# Configure Index Lifecycle Management Index Lifecycle Management creates a
+# write alias and adds additional settings to the template.
+# The elasticsearch.output.index setting will be replaced with the write alias
+# if ILM is enabled.
+
+# Enabled ILM support. Valid values are true, false, and auto. The beat will
+# detect availabilty of Index Lifecycle Management in Elasticsearch and enable
+# or disable ILM support.
+#setup.ilm.enabled: auto
+
+# Configure the ILM write alias name.
+#setup.ilm.rollover_alias: "packetbeat"
+
+# Configure rollover index pattern.
+#setup.ilm.pattern: "{now/d}-000001"
+
+
 #============================== Kibana =====================================
 
 # Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
@@ -1630,3 +1631,8 @@ logging.files:
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
 #seccomp.enabled: true
+
+#================================= Migration ==================================
+
+# This allows to enable migration aliases
+#migration.enabled: false

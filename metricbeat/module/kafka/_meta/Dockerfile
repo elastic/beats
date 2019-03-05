@@ -1,6 +1,6 @@
 FROM openjdk:8-jre-alpine3.8
 
-ARG KAFKA_VERSION=2.0.0
+ARG KAFKA_VERSION=2.1.0
 
 ENV KAFKA_HOME /kafka
 ENV KAFKA_LOGS_DIR="/kafka-logs"

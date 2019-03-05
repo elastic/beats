@@ -210,3 +210,8 @@ func (c *CloudwatchLogs) Template() *cloudformation.Template {
 func (c *CloudwatchLogs) LambdaConfig() *lambdaConfig {
 	return c.config.LambdaConfig
 }
+
+// Policies returns a slice of policy to add to the lambda.
+func (c *CloudwatchLogs) Policies() []cloudformation.AWSIAMRole_Policy {
+	return []cloudformation.AWSIAMRole_Policy{}
+}

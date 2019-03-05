@@ -18,8 +18,6 @@
 package metrics
 
 import (
-	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mongodb"
@@ -27,7 +25,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-var debugf = logp.MakeDebug("mongodb.metrics")
+var logger = logp.NewLogger("mongodb.metrics")
 
 func init() {
 	mb.Registry.MustAddMetricSet("mongodb", "metrics", New,
@@ -48,7 +46,6 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The mongodb metrics metricset is experimental.")
 	ms, err := mongodb.NewMetricSet(base)
 	if err != nil {
 		return nil, err
@@ -56,26 +53,33 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{ms}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right format
-// It returns the event which is then forward to the output. In case of an error, a
-// descriptive error must be returned.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
-
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	// instantiate direct connections to each of the configured Mongo hosts
 	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
 	if err != nil {
-		return nil, err
+		logger.Error(err)
+		reporter.Error(err)
+		return
 	}
 	defer mongoSession.Close()
 
 	result := map[string]interface{}{}
 	if err := mongoSession.DB("admin").Run(bson.D{{Name: "serverStatus", Value: 1}}, &result); err != nil {
-		return nil, err
+		logger.Error(err)
+		reporter.Error(err)
+		return
 	}
 
 	data, err := schema.Apply(result)
 	if err != nil {
-		return nil, err
+		logger.Error(err)
+		reporter.Error(err)
+		return
 	}
-	return data, nil
+	reporter.Event(mb.Event{MetricSetFields: data})
+
+	return
 }

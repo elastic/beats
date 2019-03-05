@@ -27,6 +27,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/pkg/errors"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -88,10 +90,15 @@ func testFetch(t *testing.T, r compose.R) {
 	err := createIndex(host)
 	assert.NoError(t, err)
 
-	err = enableTrialLicense(host)
+	version, err := getElasticsearchVersion(host)
+	if err != nil {
+		t.Fatal("getting elasticsearch version", err)
+	}
+
+	err = enableTrialLicense(host, version)
 	assert.NoError(t, err)
 
-	err = createMLJob(host)
+	err = createMLJob(host, version)
 	assert.NoError(t, err)
 
 	err = createCCRStats(host)
@@ -99,7 +106,7 @@ func testFetch(t *testing.T, r compose.R) {
 
 	for _, metricSet := range metricSets {
 		t.Run(metricSet, func(t *testing.T) {
-			checkSkip(t, metricSet, host)
+			checkSkip(t, metricSet, version, host)
 			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet, host))
 			events, errs := mbtest.ReportingFetchV2(f)
 
@@ -114,9 +121,14 @@ func testFetch(t *testing.T, r compose.R) {
 }
 
 func testData(t *testing.T, r compose.R) {
+	version, err := getElasticsearchVersion(r.Host())
+	if err != nil {
+		t.Fatal("getting elasticsearch version", err)
+	}
+
 	for _, metricSet := range metricSets {
 		t.Run(metricSet, func(t *testing.T) {
-			checkSkip(t, metricSet, r.Host())
+			checkSkip(t, metricSet, version, r.Host())
 			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet, r.Host()))
 			err := mbtest.WriteEventsReporterV2(f, t, metricSet)
 			if err != nil {
@@ -163,10 +175,15 @@ func createIndex(host string) error {
 }
 
 // createIndex creates and elasticsearch index in case it does not exit yet
-func enableTrialLicense(host string) error {
+func enableTrialLicense(host string, version *common.Version) error {
 	client := &http.Client{}
 
-	enableXPackURL := "/_xpack/license/start_trial?acknowledge=true"
+	var enableXPackURL string
+	if version.Major < 7 {
+		enableXPackURL = "/_xpack/license/start_trial?acknowledge=true"
+	} else {
+		enableXPackURL = "/_license/start_trial?acknowledge=true"
+	}
 
 	req, err := http.NewRequest("POST", "http://"+host+enableXPackURL, nil)
 	if err != nil {
@@ -190,20 +207,28 @@ func enableTrialLicense(host string) error {
 	return nil
 }
 
-func createMLJob(host string) error {
+func createMLJob(host string, version *common.Version) error {
 
 	mlJob, err := ioutil.ReadFile("ml_job/_meta/test/test_job.json")
 	if err != nil {
 		return err
 	}
 
-	jobURL := "/_xpack/ml/anomaly_detectors/total-requests"
+	var jobURL string
+	if version.Major < 7 {
+		jobURL = "/_xpack/ml/anomaly_detectors/total-requests"
+	} else {
+		jobURL = "/_ml/anomaly_detectors/total-requests"
+	}
 
 	if checkExists("http://" + host + jobURL) {
 		return nil
 	}
 
 	body, resp, err := httpPutJSON(host, jobURL, mlJob)
+	if err != nil {
+		return errors.Wrap(err, "error doing PUT request when creating ML job")
+	}
 
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("HTTP error loading ml job %d: %s, %s", resp.StatusCode, resp.Status, string(body))
@@ -215,17 +240,17 @@ func createMLJob(host string) error {
 func createCCRStats(host string) error {
 	err := setupCCRRemote(host)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error setup CCR remote settings")
 	}
 
 	err = createCCRLeaderIndex(host)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error creating CCR leader index")
 	}
 
 	err = createCCRFollowerIndex(host)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "error creating CCR follower index")
 	}
 
 	return nil
@@ -278,14 +303,9 @@ func checkExists(url string) bool {
 	return false
 }
 
-func checkSkip(t *testing.T, metricset string, host string) {
+func checkSkip(t *testing.T, metricset string, version *common.Version, host string) {
 	if metricset != "ccr" {
 		return
-	}
-
-	version, err := getElasticsearchVersion(host)
-	if err != nil {
-		t.Fatal("getting elasticsearch version", err)
 	}
 
 	isCCRStatsAPIAvailable := elastic.IsFeatureAvailable(version, elasticsearch.CCRStatsAPIAvailableVersion)

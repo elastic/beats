@@ -52,6 +52,7 @@ type Field struct {
 	CopyTo         string      `config:"copy_to"`
 	IgnoreAbove    int         `config:"ignore_above"`
 	AliasPath      string      `config:"path"`
+	MigrationAlias bool        `config:"migration"`
 
 	ObjectType            string          `config:"object_type"`
 	ObjectTypeMappingType string          `config:"object_type_mapping_type"`
@@ -64,6 +65,7 @@ type Field struct {
 	Searchable   *bool  `config:"searchable"`
 	Aggregatable *bool  `config:"aggregatable"`
 	Script       string `config:"script"`
+
 	// Kibana params
 	Pattern              string              `config:"pattern"`
 	InputFormat          string              `config:"input_format"`
@@ -117,7 +119,7 @@ func (f *Field) Validate() error {
 }
 
 func LoadFieldsYaml(path string) (Fields, error) {
-	keys := []Field{}
+	var keys []Field
 
 	cfg, err := yaml.NewConfigWithFile(path)
 	if err != nil {
@@ -133,6 +135,23 @@ func LoadFieldsYaml(path string) (Fields, error) {
 	return fields, nil
 }
 
+// LoadFields loads fields from a byte array
+func LoadFields(f []byte) (Fields, error) {
+	var keys []Field
+
+	cfg, err := yaml.NewConfig(f)
+	if err != nil {
+		return nil, err
+	}
+	cfg.Unpack(&keys)
+
+	fields := Fields{}
+	for _, key := range keys {
+		fields = append(fields, key.Fields...)
+	}
+	return fields, nil
+}
+
 // HasKey checks if inside fields the given key exists
 // The key can be in the form of a.b.c and it will check if the nested field exist
 // In case the key is `a` and there is a value `a.b` false is return as it only
@@ -140,6 +159,13 @@ func LoadFieldsYaml(path string) (Fields, error) {
 func (f Fields) HasKey(key string) bool {
 	keys := strings.Split(key, ".")
 	return f.hasKey(keys)
+}
+
+// GetField returns the field in case it exists
+func (f Fields) GetField(key string) *Field {
+	keys := strings.Split(key, ".")
+	return f.getField(keys)
+
 }
 
 // HasNode checks if inside fields the given node exists
@@ -216,6 +242,32 @@ func (f Fields) hasKey(keys []string) bool {
 	return false
 }
 
+func (f Fields) getField(keys []string) *Field {
+	// Nothing to compare anymore
+	if len(keys) == 0 {
+		return nil
+	}
+
+	key := keys[0]
+	keys = keys[1:]
+
+	for _, field := range f {
+		if field.Name == key {
+
+			if len(field.Fields) > 0 {
+				return field.Fields.getField(keys)
+			}
+			// Last entry in the tree but still more keys
+			if len(keys) > 0 {
+				return nil
+			}
+
+			return &field
+		}
+	}
+	return nil
+}
+
 // GetKeys returns a flat list of keys this Fields contains
 func (f Fields) GetKeys() []string {
 	return f.getKeys("")
@@ -238,4 +290,26 @@ func (f Fields) getKeys(namespace string) []string {
 	}
 
 	return keys
+}
+
+// ConcatFields concatenates two Fields lists into a new list.
+// The operation fails if the input definitions define the same keys.
+func ConcatFields(a, b Fields) (Fields, error) {
+	if len(b) == 0 {
+		return a, nil
+	}
+	if len(a) == 0 {
+		return b, nil
+	}
+
+	// check for duplicates
+	for _, k := range b.GetKeys() {
+		if a.HasNode(k) {
+			return nil, fmt.Errorf("concat fails because key '%s' exists is duplicated", k)
+		}
+	}
+
+	// all fine, let's concat a+b into new array
+	fields := make(Fields, 0, len(a)+len(b))
+	return append(append(fields, a...), b...), nil
 }

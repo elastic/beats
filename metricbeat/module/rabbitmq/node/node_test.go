@@ -28,14 +28,14 @@ import (
 )
 
 func TestFetchNodeEventContents(t *testing.T) {
-	testFetch(t, configCollectNode)
+	testFetchContents(t, configCollectNode)
 }
 
 func TestFetchClusterEventContents(t *testing.T) {
-	testFetch(t, configCollectCluster)
+	testFetchContents(t, configCollectCluster)
 }
 
-func testFetch(t *testing.T, collect string) {
+func testFetchContents(t *testing.T, collect string) {
 	server := mtest.Server(t, mtest.DefaultServerConfig)
 	defer server.Close()
 

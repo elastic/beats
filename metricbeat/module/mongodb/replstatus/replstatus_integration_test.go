@@ -47,13 +47,15 @@ func testFetch(t *testing.T, r compose.R) {
 		t.FailNow()
 	}
 
-	f := mbtest.NewEventFetcher(t, mtest.GetConfig("replstatus", r.Host()))
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("replstatus", r.Host()))
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
+	assert.NotEmpty(t, events)
+	event := events[0].MetricSetFields
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 
 	// Check event fields
 	oplog := event["oplog"].(common.MapStr)
@@ -79,9 +81,8 @@ func testFetch(t *testing.T, r compose.R) {
 }
 
 func testData(t *testing.T, r compose.R) {
-	f := mbtest.NewEventFetcher(t, mtest.GetConfig("replstatus", r.Host()))
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
+	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("replstatus", r.Host()))
+	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }

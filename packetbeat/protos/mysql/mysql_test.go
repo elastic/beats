@@ -33,6 +33,7 @@ import (
 
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/packetbeat/publish"
 )
 
 const serverPort = 3306
@@ -42,6 +43,7 @@ type eventStore struct {
 }
 
 func (e *eventStore) publish(event beat.Event) {
+	publish.MarshalPacketbeatFields(&event, nil)
 	e.events = append(e.events, event)
 }
 
@@ -552,8 +554,9 @@ func Test_gap_in_response(t *testing.T) {
 	assert.Equal(t, true, drop)
 
 	trans := expectTransaction(t, store)
-	assert.NotNil(t, trans)
-	assert.Equal(t, []string{"Packet loss while capturing the response"}, trans["notes"])
+	if m, err := trans.GetValue("error.message"); assert.NoError(t, err) {
+		assert.Equal(t, m, "Packet loss while capturing the response")
+	}
 }
 
 // Test that loss of data during the request doesn't result in a

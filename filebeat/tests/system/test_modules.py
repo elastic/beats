@@ -27,6 +27,8 @@ def load_fileset_test_cases():
     else:
         modules = os.listdir(modules_dir)
 
+    filesets_env = os.getenv("TESTING_FILEBEAT_FILESETS")
+
     test_cases = []
 
     for module in modules:
@@ -35,7 +37,12 @@ def load_fileset_test_cases():
         if not os.path.isdir(path):
             continue
 
-        for fileset in os.listdir(path):
+        if filesets_env:
+            filesets = filesets_env.split(",")
+        else:
+            filesets = os.listdir(path)
+
+        for fileset in filesets:
             if not os.path.isdir(os.path.join(path, fileset)):
                 continue
 
@@ -89,7 +96,7 @@ class Test(BaseTest):
             template_name="filebeat_modules",
             output=cfgfile,
             index_name=self.index_name,
-            elasticsearch_url=self.elasticsearch_url
+            elasticsearch_url=self.elasticsearch_url,
         )
 
         self.run_on_file(
@@ -111,6 +118,7 @@ class Test(BaseTest):
             self.filebeat, "-systemTest",
             "-e", "-d", "*", "-once",
             "-c", cfgfile,
+            "-E", "setup.ilm.enabled=false",
             "-modules={}".format(module),
             "-M", "{module}.*.enabled=false".format(module=module),
             "-M", "{module}.{fileset}.enabled=true".format(

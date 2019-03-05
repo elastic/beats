@@ -15,7 +15,15 @@
 :global-flags: Also see <<global-flags,Global flags>>.
 
 :deploy-command-short-desc: Deploys the specified function to your serverless environment
+
+ifndef::no_dashboards[]
 :export-command-short-desc: Exports the configuration, index template, or a dashboard to stdout
+endif::no_dashboards[]
+
+ifdef::no_dashboards[]
+:export-command-short-desc: Exports the configuration or index template to stdout
+endif::no_dashboards[]
+
 :help-command-short-desc: Shows help for any command
 :keystore-command-short-desc: Manages the <<keystore,secrets keystore>>
 :modules-command-short-desc: Manages configured modules
@@ -23,22 +31,16 @@
 :remove-command-short-desc: Removes the specified function from your serverless environment
 :run-command-short-desc: Runs {beatname_uc}. This command is used by default if you start {beatname_uc} without specifying a command
 
-ifndef::deprecate_dashboard_loading[]
-
 ifdef::has_ml_jobs[]
 :setup-command-short-desc: Sets up the initial environment, including the index template, {kib} dashboards (when available), and machine learning jobs (when available)
 endif::[]
 
-ifndef::has_ml_jobs[]
+ifdef::no_dashboards[]
+:setup-command-short-desc: Sets up the initial environment, including the ES index template
+endif::no_dashboards[]
+
+ifndef::has_ml_jobs,no_dashboards[]
 :setup-command-short-desc: Sets up the initial environment, including the index template and {kib} dashboards (when available)
-endif::[]
-
-endif::[]
-
-ifdef::deprecate_dashboard_loading[]
-
-:setup-command-short-desc: Sets up the initial environment, including the ES index template and {kib} dashboards (deprecated).
-
 endif::[]
 
 :update-command-short-desc: Updates the specified function
@@ -53,15 +55,15 @@ endif::[]
 <titleabbrev>Command reference</titleabbrev>
 ++++
 
-ifndef::deprecate_dashboard_loading[]
+ifndef::no_dashboards[]
 {beatname_uc} provides a command-line interface for starting {beatname_uc} and
 performing common tasks, like testing configuration files and loading dashboards.
-endif::[]
+endif::no_dashboards[]
 
-ifdef::deprecate_dashboard_loading[]
+ifdef::no_dashboards[]
 {beatname_uc} provides a command-line interface for starting {beatname_uc} and
-performing common tasks, like testing configuration files and loading dashboards (deprecated).
-endif::[]
+performing common tasks, like testing configuration files.
+endif::no_dashboards[]
 
 The command-line also supports <<global-flags,global flags>>
 for controlling global behaviors.
@@ -140,9 +142,17 @@ endif::[]
 [[export-command]]
 ==== `export` command
 
+ifndef::no_dashboards[]
 {export-command-short-desc}. You can use this
 command to quickly view your configuration, see the contents of the index
 template, or export a dashboard from {kib}.
+endif::no_dashboards[]
+
+ifdef::no_dashboards[]
+{export-command-short-desc}. You can use this
+command to quickly view your configuration or see the contents of the index
+template.
+endif::no_dashboards[]
 
 *SYNOPSIS*
 
@@ -157,6 +167,7 @@ template, or export a dashboard from {kib}.
 Exports the current configuration to stdout. If you use the `-c` flag, this
 command exports the configuration that's defined in the specified file.
 
+ifndef::no_dashboards[]
 [[dashboard-subcommand]]*`dashboard`*::
 Exports a dashboard. You can use this option to store a dashboard on disk in a
 module and load it automatically. For example, to export the dashboard to a JSON
@@ -179,6 +190,7 @@ To load the dashboard, copy the generated `dashboard.json` file into the
 +
 If {kib} is not running on `localhost:5061`, you must also adjust the
 {beatname_uc} configuration under `setup.kibana`.
+endif::no_dashboards[]
 
 [[template-subcommand]]*`template`*::
 Exports the index template to stdout. You can specify the `--es.version` and
@@ -202,20 +214,31 @@ When used with <<template-subcommand,`template`>>, sets the base name to use for
 the index template. If this flag is not specified, the default base name is
 +{beatname_lc}+.
 
+ifndef::no_dashboards[]
 *`--id DASHBOARD_ID`*::
 When used with <<dashboard-subcommand,`dashboard`>>, specifies the dashboard ID.
+endif::no_dashboards[]
 
 {global-flags}
 
 *EXAMPLES*
 
+ifndef::no_dashboards[]
 ["source","sh",subs="attributes"]
 -----
 {beatname_lc} export config
 {beatname_lc} export template --es.version {stack-version} --index myindexname
 {beatname_lc} export dashboard --id="a7b35890-8baa-11e8-9676-ef67484126fb" > dashboard.json
 -----
+endif::no_dashboards[]
 
+ifdef::no_dashboards[]
+["source","sh",subs="attributes"]
+-----
+{beatname_lc} export config
+{beatname_lc} export template --es.version {stack-version} --index myindexname
+-----
+endif::no_dashboards[]
 
 [[help-command]]
 ==== `help` command
@@ -523,21 +546,6 @@ the end of the file is reached. By default harvesters are closed after
 `close_inactive` is reached.
 endif::[]
 
-*`--setup`*::
-ifdef::deprecate_dashboard_loading[]
-deprecated[{deprecate_dashboard_loading}]
-endif::[]
-+
-ifdef::has_ml_jobs[]
-Loads the initial setup, including Elasticsearch template, {kib} index pattern,
-{kib} dashboards (when available), and Machine learning jobs.
-endif::[]
-ifndef::has_ml_jobs[]
-Loads the initial setup, including Elasticsearch template, {kib} index pattern, and {kib} dashboards (when available).
-endif::[]
-If you want to use the command without running {beatname_uc}, use the <<setup-command,`setup`>> command instead.
-
-
 ifeval::["{beatname_lc}"=="metricbeat"]
 *`--system.hostfs MOUNT_POINT`*::
 
@@ -558,14 +566,14 @@ endif::[]
 
 ["source","sh",subs="attributes"]
 -----
-{beatname_lc} run -e --setup
+{beatname_lc} run -e
 -----
 
 Or:
 
 ["source","sh",subs="attributes"]
 -----
-{beatname_lc} -e --setup
+{beatname_lc} -e
 -----
 
 [[setup-command]]
@@ -575,16 +583,18 @@ Or:
 
 * The index template ensures that fields are mapped correctly in Elasticsearch.
 
+ifndef::no_dashboards[]
 * The {kib} dashboards make it easier for you to visualize {beatname_uc} data
 in {kib}.
+endif::no_dashboards[]
 
 ifdef::has_ml_jobs[]
 * The machine learning jobs contain the configuration information and metadata
 necessary to analyze data for anomalies.
 endif::[]
 
-Use this command instead of `run --setup` when you want to set up the
-environment without actually running {beatname_uc} and ingesting data.
+Use this command if you want to set up the environment without actually running
+{beatname_uc} and ingesting data.
 
 *SYNOPSIS*
 
@@ -596,21 +606,13 @@ environment without actually running {beatname_uc} and ingesting data.
 
 *FLAGS*
 
-ifndef::deprecate_dashboard_loading[]
+ifndef::no_dashboards[]
 *`--dashboards`*::
 Sets up the {kib} dashboards (when available). This option loads the dashboards
 from the {beatname_uc} package. For more options, such as loading customized
 dashboards, see {beatsdevguide}/import-dashboards.html[Importing Existing Beat
 Dashboards] in the _Beats Developer Guide_.
-endif::[]
-
-ifdef::deprecate_dashboard_loading[]
-*`--dashboards`*::
-
-deprecated[{deprecate_dashboard_loading}]
-+
-Sets up the {kib} dashboards only.
-endif::[]
+endif::no_dashboards[]
 
 *`-h, --help`*::
 Shows help for the `setup` command.
@@ -837,7 +839,7 @@ Sets the path for log files. See the <<directory-layout>> section for details.
 *`--strict.perms`*::
 Sets strict permission checking on configuration files. The default is
 `-strict.perms=true`. See
-{libbeat}/config-file-permissions.html[Config file ownership and permissions] in
+{beats-ref}/config-file-permissions.html[Config file ownership and permissions] in
 the _Beats Platform Reference_ for more information.
 
 *`-v, --v`*::

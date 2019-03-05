@@ -2,7 +2,7 @@
   type: group
   description: >
     expvar
-  release: beta
+  release: ga
   fields:
     - name: cmdline
       type: keyword

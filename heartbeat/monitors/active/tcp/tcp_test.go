@@ -35,7 +35,6 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/mapval"
 	btesting "github.com/elastic/beats/libbeat/testing"
-	"github.com/elastic/beats/libbeat/testing/mapvaltest"
 )
 
 func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
@@ -102,10 +101,11 @@ func TestUpEndpointJob(t *testing.T) {
 
 	event := testTCPCheck(t, "localhost", port)
 
-	mapvaltest.Test(
+	mapval.Test(
 		t,
 		mapval.Strict(mapval.Compose(
 			hbtest.BaseChecks("127.0.0.1", "up", "tcp"),
+			hbtest.SummaryChecks(1, 0),
 			hbtest.SimpleURLChecks(t, "tcp", "localhost", port),
 			hbtest.RespondingTCPChecks(),
 			mapval.MustCompile(mapval.Map{
@@ -144,12 +144,13 @@ func TestTLSConnection(t *testing.T) {
 	defer os.Remove(certFile.Name())
 
 	event := testTLSTCPCheck(t, ip, port, certFile.Name())
-	mapvaltest.Test(
+	mapval.Test(
 		t,
 		mapval.Strict(mapval.Compose(
 			hbtest.TLSChecks(0, 0, cert),
 			hbtest.RespondingTCPChecks(),
 			hbtest.BaseChecks(ip, "up", "tcp"),
+			hbtest.SummaryChecks(1, 0),
 			hbtest.SimpleURLChecks(t, "ssl", serverURL.Hostname(), port),
 		)),
 		event.Fields,
@@ -164,10 +165,11 @@ func TestConnectionRefusedEndpointJob(t *testing.T) {
 	event := testTCPCheck(t, ip, port)
 
 	dialErr := fmt.Sprintf("dial tcp %s:%d", ip, port)
-	mapvaltest.Test(
+	mapval.Test(
 		t,
 		mapval.Strict(mapval.Compose(
 			tcpMonitorChecks(ip, ip, port, "down"),
+			hbtest.SummaryChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "tcp", ip, port),
 			hbtest.ErrorChecks(dialErr, "io"),
 		)),
@@ -181,10 +183,11 @@ func TestUnreachableEndpointJob(t *testing.T) {
 	event := testTCPCheck(t, ip, port)
 
 	dialErr := fmt.Sprintf("dial tcp %s:%d", ip, port)
-	mapvaltest.Test(
+	mapval.Test(
 		t,
 		mapval.Strict(mapval.Compose(
 			tcpMonitorChecks(ip, ip, port, "down"),
+			hbtest.SummaryChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "tcp", ip, port),
 			hbtest.ErrorChecks(dialErr, "io"),
 		)),

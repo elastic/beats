@@ -44,7 +44,8 @@ class Test(metricbeat.BaseTest):
         self.assertEqual(len(output), 1)
         evt = output[0]
 
-        self.assertItemsEqual(self.de_dot(REDIS_FIELDS), evt.keys())
+        fields = REDIS_FIELDS + ["process", "os"]
+        self.assertItemsEqual(self.de_dot(fields), evt.keys())
         redis_info = evt["redis"]["info"]
         self.assertItemsEqual(self.de_dot(REDIS_INFO_FIELDS), redis_info.keys())
         self.assertItemsEqual(self.de_dot(CLIENTS_FIELDS), redis_info["clients"].keys())
@@ -161,6 +162,11 @@ class Test(metricbeat.BaseTest):
 
     def get_hosts(self):
         return [self.compose_host()]
+
+    def get_host(self):
+        if len(self.compose_hosts()) > 0:
+            return self.compose_hosts()[0]
+        return "localhost"
 
 
 class TestRedis4(Test):

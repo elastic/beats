@@ -25,41 +25,18 @@ import (
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/prometheus/mtest"
-
-	"github.com/stretchr/testify/assert"
 )
-
-// These tests are running with prometheus metrics as an example as this container is already available
-// Every prometheus exporter should work here.
 
 func TestCollector(t *testing.T) {
 	mtest.Runner.Run(t, compose.Suite{
-		"Fetch": testFetch,
-		"Data":  testData,
+		"Data": testData,
 	})
 }
 
-func testFetch(t *testing.T, r compose.R) {
-	f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
-
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
-}
-
 func testData(t *testing.T, r compose.R) {
-	f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
-
-	err := mbtest.WriteEvents(f, t)
+	ms := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("collector", r.Host()))
+	err := mbtest.WriteEventsReporterV2(ms, t, "")
 	if err != nil {
-		t.Fatal("write", err)
+		t.Fatal(err)
 	}
-}
-
-func getConfig(host string) map[string]interface{} {
-	config := mtest.GetConfig("collector", host)
-	config["namespace"] = "collector"
-	return config
 }

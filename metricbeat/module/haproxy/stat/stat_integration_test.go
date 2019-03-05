@@ -22,22 +22,48 @@ package stat
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/haproxy"
 )
 
-func TestData(t *testing.T) {
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	err := mbtest.WriteEvents(f, t)
+func TestStat(t *testing.T) {
+	runner := compose.TestRunner{Service: "haproxy"}
+	runner.Run(t, compose.Suite{
+		"Fetch": testFetch,
+		"Data":  testData,
+	})
+}
+
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
+	events, errs := mbtest.ReportingFetchV2(f)
+
+	assert.Empty(t, errs)
+	if !assert.NotEmpty(t, events) {
+		t.FailNow()
+	}
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("haproxy", "stat").Fields.StringToPrint())
+
+}
+
+func testData(t *testing.T, r compose.R) {
+	config := getConfig(r.Host())
+	f := mbtest.NewReportingMetricSetV2(t, config)
+	err := mbtest.WriteEventsReporterV2(f, t, ".")
 	if err != nil {
 		t.Fatal("write", err)
 	}
+
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "haproxy",
 		"metricsets": []string{"stat"},
-		"hosts":      []string{"tcp://" + haproxy.GetEnvHost() + ":" + haproxy.GetEnvPort()},
+		"hosts":      []string{"tcp://" + host},
 	}
 }
