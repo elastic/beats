@@ -20,10 +20,9 @@ package activity
 import (
 	"database/sql"
 
-	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/postgresql"
 
@@ -60,7 +59,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	db, err := sql.Open("postgres", m.HostData().URI)
 	if err != nil {
-		logger.Error(logger)
+		logger.Error(err)
 		reporter.Error(err)
 		return
 	}
