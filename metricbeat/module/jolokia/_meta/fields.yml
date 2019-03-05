@@ -14,7 +14,7 @@
         - name: agent.version
           type: keyword
           description: >
-            version number of jolokia agent.
+            Version number of jolokia agent.
         - name: agent.id
           type: keyword
           description: >
@@ -32,7 +32,7 @@
           description: >
             The vendor of the container the agent is running in.
         - name: url
-          type: ip
+          type: keyword
           description: >
             The URL how this agent can be contacted.
         - name: secured
