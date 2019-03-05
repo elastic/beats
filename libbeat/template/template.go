@@ -121,7 +121,7 @@ func (t *Template) load(fields common.Fields) (common.MapStr, error) {
 	var err error
 	if len(t.config.AppendFields) > 0 {
 		cfgwarn.Experimental("append_fields is used.")
-		fields, err = appendFields(fields, t.config.AppendFields)
+		fields, err = common.ConcatFields(fields, t.config.AppendFields)
 		if err != nil {
 			return nil, err
 		}
@@ -254,22 +254,6 @@ func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.
 	}
 
 	return basicStructure
-}
-
-func appendFields(fields, appendFields common.Fields) (common.Fields, error) {
-	if len(appendFields) > 0 {
-		appendFieldKeys := appendFields.GetKeys()
-
-		// Append is only allowed to add fields, not overwrite
-		for _, key := range appendFieldKeys {
-			if fields.HasNode(key) {
-				return nil, fmt.Errorf("append_fields contains an already existing key: %s", key)
-			}
-		}
-		// Appends fields to existing fields
-		fields = append(fields, appendFields...)
-	}
-	return fields, nil
 }
 
 func loadYamlByte(data []byte) (common.Fields, error) {
