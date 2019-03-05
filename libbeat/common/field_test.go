@@ -18,6 +18,7 @@
 package common
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -26,65 +27,6 @@ import (
 
 	"github.com/elastic/go-ucfg/yaml"
 )
-
-func TestFieldsCanConcat(t *testing.T) {
-	tests := map[string]struct {
-		key       string
-		fields    Fields
-		canConcat bool
-	}{
-		"empty fields": {
-			key:       "a.b",
-			fields:    Fields{},
-			canConcat: true,
-		},
-		"no key": {
-			key:       "",
-			fields:    Fields{Field{Name: "a"}},
-			canConcat: false,
-		},
-		"key not in fields, but parent node in fields": {
-			key: "a.b.c",
-			fields: Fields{
-				Field{Name: "a", Fields: Fields{Field{Name: "b"}}},
-			},
-			canConcat: false,
-		},
-		"key not in fields, but parent node in fields and of type object": {
-			key: "a.b.c",
-			fields: Fields{
-				Field{Name: "a", Fields: Fields{Field{Name: "b", Type: "object"}}},
-			},
-			canConcat: true,
-		},
-		"last node in fields": {
-			key: "a.b.c",
-			fields: Fields{
-				Field{Name: "a", Fields: Fields{
-					Field{Name: "b", Fields: Fields{
-						Field{Name: "c"},
-					}}}},
-			},
-			canConcat: false,
-		},
-		"node in fields": {
-			key: "a.b",
-			fields: Fields{
-				Field{Name: "a", Fields: Fields{
-					Field{Name: "b", Fields: Fields{
-						Field{Name: "c"},
-					}}}},
-			},
-			canConcat: false,
-		},
-	}
-
-	for name, test := range tests {
-		t.Run(name, func(t *testing.T) {
-			assert.Equal(t, test.canConcat, test.fields.CanConcat(test.key))
-		})
-	}
-}
 
 func TestFieldsHasNode(t *testing.T) {
 	tests := map[string]struct {
@@ -411,7 +353,7 @@ func TestFieldConcat(t *testing.T) {
 	tests := map[string]struct {
 		a, b Fields
 		want Fields
-		fail bool
+		err  string
 	}{
 		"empty lists": {},
 		"first list only": {
@@ -428,9 +370,9 @@ func TestFieldConcat(t *testing.T) {
 			want: Fields{{Name: "a"}, {Name: "b"}},
 		},
 		"duplicates fail": {
-			a:    Fields{{Name: "a"}},
-			b:    Fields{{Name: "a"}},
-			fail: true,
+			a:   Fields{{Name: "a"}},
+			b:   Fields{{Name: "a"}},
+			err: "1 error: fields contain key <a>",
 		},
 		"nested with common prefix": {
 			a: Fields{{
@@ -463,7 +405,6 @@ func TestFieldConcat(t *testing.T) {
 			},
 		},
 		"nested duplicates fail": {
-			fail: true,
 			a: Fields{{
 				Name:   "a",
 				Fields: Fields{{Name: "b"}, {Name: "c"}},
@@ -472,14 +413,15 @@ func TestFieldConcat(t *testing.T) {
 				Name:   "a",
 				Fields: Fields{{Name: "c"}},
 			}},
+			err: "1 error: fields contain key <a.c>",
 		},
 		"a is prefix of b": {
-			fail: true,
-			a:    Fields{{Name: "a"}},
+			a: Fields{{Name: "a"}},
 			b: Fields{{
 				Name:   "a",
 				Fields: Fields{{Name: "b"}},
 			}},
+			err: "1 error: fields contain non object node conflicting with key <a.b>",
 		},
 		"a is object and prefix of b": {
 			a: Fields{{Name: "a", Type: "object"}},
@@ -493,25 +435,103 @@ func TestFieldConcat(t *testing.T) {
 			},
 		},
 		"b is prefix of a": {
-			fail: true,
 			a: Fields{{
 				Name:   "a",
 				Fields: Fields{{Name: "b"}},
 			}},
-			b: Fields{{Name: "a"}},
+			b:   Fields{{Name: "a"}},
+			err: "1 error: fields contain key <a>",
+		},
+		"multiple errors": {
+			a: Fields{
+				{Name: "a", Fields: Fields{{Name: "b"}}},
+				{Name: "foo", Fields: Fields{{Name: "b"}}},
+				{Name: "bar", Type: "object"},
+			},
+			b: Fields{
+				{Name: "bar", Fields: Fields{{Name: "foo"}}},
+				{Name: "a"},
+				{Name: "foo", Fields: Fields{{Name: "b", Fields: Fields{{Name: "c"}}}}},
+			},
+
+			err: "2 errors: fields contain key <a>; fields contain non object node conflicting with key <foo.b.c>",
 		},
 	}
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			fs, err := ConcatFields(test.a, test.b)
-			if test.fail {
-				assert.Error(t, err)
+			if test.err == "" {
+				assert.NoError(t, err)
+				assert.Equal(t, test.want, fs)
 				return
 			}
+			if assert.Error(t, err) {
+				assert.Equal(t, test.err, err.Error())
+			}
+		})
+	}
+}
 
-			assert.NoError(t, err)
-			assert.Equal(t, test.want, fs)
+func TestFieldsCanConcat(t *testing.T) {
+	tests := map[string]struct {
+		key    string
+		fields Fields
+		err    string
+	}{
+		"empty fields": {
+			key:    "a.b",
+			fields: Fields{},
+		},
+		"no key": {
+			key:    "",
+			fields: Fields{Field{Name: "a"}},
+		},
+		"key not in fields, but parent node in fields": {
+			key: "a.b.c",
+			fields: Fields{
+				Field{Name: "a", Fields: Fields{Field{Name: "b"}}},
+			},
+			err: "fields contain non object node conflicting with key <a.b.c>",
+		},
+		"key not in fields, but parent node in fields and of type object": {
+			key: "a.b.c",
+			fields: Fields{
+				Field{Name: "a", Fields: Fields{Field{Name: "b", Type: "object"}}},
+			},
+		},
+		"last node in fields": {
+			key: "a.b.c",
+			fields: Fields{
+				Field{Name: "a", Fields: Fields{
+					Field{Name: "b", Fields: Fields{
+						Field{Name: "c"},
+					}}}},
+			},
+			err: "fields contain key <a.b.c>",
+		},
+		"node in fields": {
+			key: "a.b",
+			fields: Fields{
+				Field{Name: "a", Fields: Fields{
+					Field{Name: "b", Fields: Fields{
+						Field{Name: "c"},
+					}}}},
+			},
+			err: "fields contain key <a.b>",
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			err := test.fields.canConcat(test.key, strings.Split(test.key, "."))
+			if test.err == "" {
+				assert.Nil(t, err)
+				return
+			}
+			if assert.Error(t, err) {
+				assert.Equal(t, test.err, err.Error())
+			}
 		})
 	}
 }
