@@ -126,7 +126,7 @@ func WriteEventsReporterV2Cond(f mb.ReportingMetricSetV2, t testing.TB, path str
 	return nil
 }
 
-// WriteEventsReporterV2Cond fetches events and writes the first event that matches
+// WriteEventsReporterV2ErrorCond fetches events and writes the first event that matches
 // the condition to a file.
 func WriteEventsReporterV2ErrorCond(f mb.ReportingMetricSetV2Error, t testing.TB, path string, cond func(common.MapStr) bool) error {
 	if !*dataFlag {
