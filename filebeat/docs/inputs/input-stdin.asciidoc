@@ -1,0 +1,34 @@
+:type: stdin
+
+[id="{beatname_lc}-input-{type}"]
+=== Stdin input
+
+++++
+<titleabbrev>Stdin</titleabbrev>
+++++
+
+Use the `stdin` input to read events from standard in.
+
+Note: This input cannot be run at the same time with other input types.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: stdin
+----
+
+[[stdin-input-options]]
+==== Configuration options
+
+The `stdin` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+include::../inputs/input-common-harvester-options.asciidoc[]
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../inputs/input-common-options.asciidoc[]
+
+:type!:
+

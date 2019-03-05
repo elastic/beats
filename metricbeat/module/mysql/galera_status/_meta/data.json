@@ -1,0 +1,81 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"host.example.com",
+        "name":"host.example.com"
+    },
+    "metricset":{
+        "host":"localhost:3306",
+        "module":"mysql",
+        "name":"galera_status",
+        "rtt":44269
+    },
+    "mysql":{
+        "galera_status":{
+            "apply": {
+                "oooe": 0,
+                "oool": 0,
+                "window": 1
+            },
+            "connected": "ON",
+            "flow_ctl": {
+                "recv": 0,
+                "sent": 0,
+                "paused": 0,
+                "paused_ns": 0
+            },
+            "ready": "ON",
+            "received": {
+                "count": 173,
+                "bytes": 152425
+            },
+            "local": {
+                "state": "Synced",
+                "bf_aborts": 0,
+                "cert_failures": 0,
+                "commits": 1325,
+                "recv": {
+                    "queue_max": 2,
+                    "queue_min": 0,
+                    "queue": 0,
+                    "queue_avg": 0.011561
+                },
+                "replays": 0,
+                "send": {
+                    "queue_min": 0,
+                    "queue": 0,
+                    "queue_avg": 0,
+                    "queue_max": 1
+                }
+            },
+            "evs": {
+                "evict": "",
+                "state": "OPERATIONAL"
+            },
+            "repl": {
+                "bytes": 1689804,
+                "data_bytes": 1540647,
+                "keys": 4170,
+                "keys_bytes": 63973,
+                "other_bytes": 0,
+                "count": 1331
+            },
+            "commit": {
+                "oooe": 0,
+                "window": 1
+            },
+            "cluster": {
+                "conf_id": 930,
+                "size": 3,
+                "status": "Primary"
+            },
+            "last_committed": 23944,
+            "cert": {
+                "deps_distance": 43.524557,
+                "index_size": 22,
+                "interval": 0
+            }
+        }
+    },
+    "type":"metricsets"
+}

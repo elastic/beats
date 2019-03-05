@@ -1,8 +1,8 @@
-- name: node_stats
+- name: node.stats
   type: group
   description: >
     node_stats metrics.
-  release: experimental
+  release: ga
   fields:
     - name: events
       type: group

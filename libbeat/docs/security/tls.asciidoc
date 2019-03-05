@@ -1,6 +1,6 @@
 [role="xpack"]
 [[beats-tls]]
-=== Configuring {beatname_uc} to use Encrypted Connections
+=== Configure {beatname_uc} to use encrypted connections
 
 If encryption is enabled on the {es} cluster, you need to connect to {es} via
 HTTPS. If the certificate authority (CA) that signed your node certificates
@@ -14,9 +14,9 @@ protocol to all host URLs:
 ["source","js",subs="attributes,callouts"]
 --------------------------------------------------
 output.elasticsearch:
-    hosts: ["https://localhost:9200"] <1>
-    index: "{beatname_lc}"
-    ssl.certificate_authorities: ["/etc/pki/root/ca.pem"] <2>
+  hosts: ["https://localhost:9200"] <1>
+  index: "{beatname_lc}"
+  ssl.certificate_authorities: ["/etc/pki/root/ca.pem"] <2>
 --------------------------------------------------
 <1> Specify the `https` protocol to connect the {es} cluster.
 <2> Specify the path to the local `.pem` file that contains your Certificate

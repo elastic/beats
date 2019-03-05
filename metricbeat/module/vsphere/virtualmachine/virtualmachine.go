@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package virtualmachine
 
 import (
@@ -22,10 +39,12 @@ import (
 	"github.com/vmware/govmomi/vim25/types"
 )
 
+var logger = logp.NewLogger("vsphere")
+
 func init() {
-	if err := mb.Registry.AddMetricSet("vsphere", "virtualmachine", New); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("vsphere", "virtualmachine", New,
+		mb.DefaultMetricSet(),
+	)
 }
 
 type MetricSet struct {
@@ -121,49 +140,40 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 			freeMemory := (int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024) - (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024)
 
-			event := common.MapStr{
-				"host": vm.Summary.Runtime.Host.Value,
-				"name": vm.Summary.Config.Name,
-				"cpu": common.MapStr{
-					"used": common.MapStr{
-						"mhz": vm.Summary.QuickStats.OverallCpuUsage,
-					},
-				},
-				"memory": common.MapStr{
-					"used": common.MapStr{
-						"guest": common.MapStr{
-							"bytes": (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024),
-						},
-						"host": common.MapStr{
-							"bytes": (int64(vm.Summary.QuickStats.HostMemoryUsage) * 1024 * 1024),
-						},
-					},
-					"total": common.MapStr{
-						"guest": common.MapStr{
-							"bytes": (int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024),
-						},
-					},
-					"free": common.MapStr{
-						"guest": common.MapStr{
-							"bytes": freeMemory,
-						},
-					},
-				},
+			event := common.MapStr{}
+
+			event["name"] = vm.Summary.Config.Name
+			event.Put("cpu.used.mhz", vm.Summary.QuickStats.OverallCpuUsage)
+			event.Put("memory.used.guest.bytes", int64(vm.Summary.QuickStats.GuestMemoryUsage)*1024*1024)
+			event.Put("memory.used.host.bytes", int64(vm.Summary.QuickStats.HostMemoryUsage)*1024*1024)
+			event.Put("memory.total.guest.bytes", int64(vm.Summary.Config.MemorySizeMB)*1024*1024)
+			event.Put("memory.free.guest.bytes", freeMemory)
+
+			if vm.Summary.Runtime.Host != nil {
+				event["host"] = vm.Summary.Runtime.Host.Value
+			} else {
+				logger.Debug("'Host', 'Runtime' or 'Summary' data not found. This is either a parsing error " +
+					"from vsphere library, an error trying to reach host/guest or incomplete information returned " +
+					"from host/guest")
 			}
 
 			// Get custom fields (attributes) values if get_custom_fields is true.
-			if m.GetCustomFields {
+			if m.GetCustomFields && vm.Summary.CustomValue != nil {
 				customFields := getCustomFields(vm.Summary.CustomValue, customFieldsMap)
 
 				if len(customFields) > 0 {
 					event["custom_fields"] = customFields
 				}
+			} else {
+				logger.Debug("custom fields not activated or custom values not found/parse in Summary data. This " +
+					"is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete " +
+					"information returned from host/guest")
 			}
 
 			if vm.Summary.Vm != nil {
 				networkNames, err := getNetworkNames(c, vm.Summary.Vm.Reference())
 				if err != nil {
-					logp.Debug("vsphere", err.Error())
+					logger.Debug(err.Error())
 				} else {
 					if len(networkNames) > 0 {
 						event["network_names"] = networkNames

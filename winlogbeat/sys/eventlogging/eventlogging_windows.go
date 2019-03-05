@@ -1,10 +1,26 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package eventlogging
 
 import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"reflect"
 	"strings"
 	"syscall"
 	"time"
@@ -100,6 +116,7 @@ func RenderEvents(
 	eventsRaw []byte,
 	lang uint32,
 	buffer []byte,
+	insertStrings *StringInserts,
 	pubHandleProvider func(string) sys.MessageFiles,
 ) ([]sys.Event, int, error) {
 	var events []sys.Event
@@ -139,23 +156,27 @@ func RenderEvents(
 			event.User = *sid
 		}
 
+		if record.numStrings > MaxInsertStrings {
+			logp.Warn("Record contains %d strings, more than the limit %d. Excess will be ignored.",
+				record.numStrings, MaxInsertStrings)
+			record.numStrings = MaxInsertStrings
+		}
 		// Parse the UTF-16 message insert strings.
-		stringInserts, stringInsertPtrs, err := parseInsertStrings(record, recordBuf)
-		if err != nil {
-			event.RenderErr = err.Error()
+		if err = insertStrings.Parse(record, recordBuf); err != nil {
+			event.RenderErr = append(event.RenderErr, err.Error())
 			events = append(events, event)
 			continue
 		}
 
-		for _, s := range stringInserts {
+		for _, s := range insertStrings.Strings() {
 			event.EventData.Pairs = append(event.EventData.Pairs, sys.KeyValue{Value: s})
 		}
 
 		// Format the parametrized message using the insert strings.
 		event.Message, err = formatMessage(record.sourceName,
-			record.eventID, lang, stringInsertPtrs, buffer, pubHandleProvider)
+			record.eventID, lang, insertStrings.Pointer(), buffer, pubHandleProvider)
 		if err != nil {
-			event.RenderErr = err.Error()
+			event.RenderErr = append(event.RenderErr, err.Error())
 			if errno, ok := err.(syscall.Errno); ok {
 				event.RenderErrorCode = uint32(errno)
 			}
@@ -180,15 +201,10 @@ func formatMessage(
 	sourceName string,
 	eventID uint32,
 	lang uint32,
-	stringInserts []uintptr,
+	stringInserts uintptr,
 	buffer []byte,
 	pubHandleProvider func(string) sys.MessageFiles,
 ) (string, error) {
-	var addr uintptr
-	if len(stringInserts) > 0 {
-		addr = reflect.ValueOf(&stringInserts[0]).Pointer()
-	}
-
 	messageFiles := pubHandleProvider(sourceName)
 
 	var lastErr error
@@ -208,7 +224,7 @@ func formatMessage(
 			lang,
 			&buffer[0],            // Max size allowed is 64k bytes.
 			uint32(len(buffer)/2), // Size of buffer in TCHARS
-			addr)
+			stringInserts)
 		// bufferUsed = numChars * sizeof(TCHAR) + sizeof(null-terminator)
 		bufferUsed := int(numChars*2 + 2)
 		if err == syscall.ERROR_INSUFFICIENT_BUFFER {
@@ -389,38 +405,6 @@ func parseEventLogRecord(buffer []byte) (eventLogRecord, error) {
 	}
 
 	return record, nil
-}
-
-// parseInsertStrings parses the insert strings from buffer which should contain
-// an eventLogRecord. It returns an array of strings (data is copied and
-// converted to UTF-8) and an array of pointers to the null-terminated UTF-16
-// strings within buffer.
-func parseInsertStrings(record eventLogRecord, buffer []byte) ([]string, []uintptr, error) {
-	if record.numStrings < 1 {
-		return nil, nil, nil
-	}
-
-	inserts := make([]string, record.numStrings)
-	insertPtrs := make([]uintptr, record.numStrings)
-	offset := int(record.stringOffset)
-	bufferPtr := reflect.ValueOf(&buffer[0]).Pointer()
-
-	for i := 0; i < int(record.numStrings); i++ {
-		if offset > len(buffer) {
-			return nil, nil, fmt.Errorf("Failed reading string number %d, "+
-				"offset=%d, len(buffer)=%d, record=%+v", i+1, offset,
-				len(buffer), record)
-		}
-		insertStr, length, err := sys.UTF16BytesToString(buffer[offset:])
-		if err != nil {
-			return nil, nil, err
-		}
-		inserts[i] = insertStr
-		insertPtrs[i] = bufferPtr + uintptr(offset)
-		offset += length
-	}
-
-	return inserts, insertPtrs, nil
 }
 
 func parseSID(record eventLogRecord, buffer []byte) (*sys.SID, error) {

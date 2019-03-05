@@ -1,0 +1,20 @@
+{beatname_uc} supports templates for modules:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+heartbeat.autodiscover:
+  providers:
+    - type: kubernetes
+      include_annotations: ["prometheus.io.scrape"]
+      templates:
+        - condition:
+            contains:
+              kubernetes.annotations.prometheus.io.scrape: "true"
+          config:
+            - type: http
+              hosts: ["${data.host}:${data.port}"]
+              schedule: "@every 1s"
+              timeout: 1s
+-------------------------------------------------------------------------------------
+
+This configuration launches an `http` module for all containers of pods annotated with `prometheus.io.scrape=true`.

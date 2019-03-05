@@ -1,0 +1,89 @@
+{
+    "description": "Pipeline for parsing elasticsearch server logs",
+    "processors": [
+        {
+            "rename": {
+                "field": "@timestamp",
+                "target_field": "event.created"
+            }
+        },
+        {
+            "grok": {
+                "field": "message",
+                "patterns": [
+                    "^%{CHAR:first_char}"
+                ],
+                "pattern_definitions": {
+                    "CHAR": "."
+                }
+            }
+        },
+        {
+            "pipeline": {
+                "if": "ctx.first_char != '{'",
+                "name": "{< IngestPipeline "pipeline-plaintext" >}"
+            }
+        },
+        {
+            "pipeline": {
+                "if": "ctx.first_char == '{'",
+                "name": "{< IngestPipeline "pipeline-json" >}"
+            }
+        },
+        {
+            "script": {
+                "lang": "painless",
+                "source": "if (ctx.elasticsearch.server.gc != null && ctx.elasticsearch.server.gc.observation_duration != null) { if (ctx.elasticsearch.server.gc.observation_duration.unit == params.seconds_unit) { ctx.elasticsearch.server.gc.observation_duration.ms = ctx.elasticsearch.server.gc.observation_duration.time * params.ms_in_one_s;}if (ctx.elasticsearch.server.gc.observation_duration.unit == params.milliseconds_unit) { ctx.elasticsearch.server.gc.observation_duration.ms = ctx.elasticsearch.server.gc.observation_duration.time; } if (ctx.elasticsearch.server.gc.observation_duration.unit == params.minutes_unit) { ctx.elasticsearch.server.gc.observation_duration.ms = ctx.elasticsearch.server.gc.observation_duration.time * params.ms_in_one_m; }} if (ctx.elasticsearch.server.gc != null && ctx.elasticsearch.server.gc.collection_duration != null) { if (ctx.elasticsearch.server.gc.collection_duration.unit == params.seconds_unit) { ctx.elasticsearch.server.gc.collection_duration.ms = ctx.elasticsearch.server.gc.collection_duration.time * params.ms_in_one_s;} if (ctx.elasticsearch.server.gc.collection_duration.unit == params.milliseconds_unit) {ctx.elasticsearch.server.gc.collection_duration.ms = ctx.elasticsearch.server.gc.collection_duration.time; } if (ctx.elasticsearch.server.gc.collection_duration.unit == params.minutes_unit) { ctx.elasticsearch.server.gc.collection_duration.ms = ctx.elasticsearch.server.gc.collection_duration.time * params.ms_in_one_m; }}",
+                "params": {
+                    "minutes_unit": "m",
+                    "seconds_unit": "s",
+                    "milliseconds_unit": "ms",
+                    "ms_in_one_s": 1000,
+                    "ms_in_one_m": 60000
+                }
+            }
+        },
+        {
+            "remove": {
+                "field": [
+                    "elasticsearch.server.gc.collection_duration.time",
+                    "elasticsearch.server.gc.collection_duration.unit",
+                    "elasticsearch.server.gc.observation_duration.time",
+                    "elasticsearch.server.gc.observation_duration.unit"
+                ],
+                "ignore_missing": true
+            }
+        },
+        {
+            "date": {
+                "field": "elasticsearch.server.timestamp",
+                "target_field": "@timestamp",
+                "formats": [
+                    "ISO8601"
+                ],
+                {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
+                "ignore_failure": true
+            }
+        },
+        {
+            "remove": {
+                "field": "elasticsearch.server.timestamp"
+            }
+        },
+        {
+            "remove": {
+                "field": [
+                    "first_char"
+                ]
+            }
+        }
+    ],
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ]
+}

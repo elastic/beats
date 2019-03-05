@@ -1,0 +1,189 @@
+{beatname_uc} supports autodiscover based on hints from the provider. The hints system looks for
+hints in Kubernetes Pod annotations or Docker labels that have the prefix `co.elastic.logs`. As soon as
+the container starts, {beatname_uc} will check if it contains any hints and launch the proper config for
+it. Hints tell {beatname_uc} how to get logs for the given container. By default logs will be retrieved
+from the container using the `docker` input. You can use hints to modify this behavior. This is the full
+list of supported hints:
+
+[float]
+===== `co.elastic.logs/disable`
+
+Filebeat gets logs from all containers by default, you can set this hint to `true` to ignore
+the output of the container. Filebeat won't read or send logs from it.
+
+[float]
+===== `co.elastic.logs/multiline.*`
+
+Multiline settings. See <<multiline-examples>> for a full list of all supported options.
+
+[float]
+===== `co.elastic.logs/include_lines`
+
+A list of regular expressions to match the lines that you want {beatname_uc} to include.
+See <<configuration-filebeat-options>> for more info.
+
+[float]
+===== `co.elastic.logs/exclude_lines`
+
+A list of regular expressions to match the lines that you want {beatname_uc} to exclude.
+See <<configuration-filebeat-options>> for more info.
+
+[float]
+===== `co.elastic.logs/module`
+
+Instead of using raw `docker` input, specifies the module to use to parse logs from the container. See
+<<filebeat-modules>> for the list of supported modules.
+
+[float]
+===== `co.elastic.logs/fileset`
+
+When module is configured, map container logs to module filesets. You can either configure
+a single fileset like this:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+co.elastic.logs/fileset: access
+-------------------------------------------------------------------------------------
+
+Or configure a fileset per stream in the container (stdout and stderr):
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+co.elastic.logs/fileset.stdout: access
+co.elastic.logs/fileset.stderr: error
+-------------------------------------------------------------------------------------
+
+[float]
+===== `co.elastic.logs/raw`
+When an entire input/module configuration needs to be completely set the `raw` hint can be used. You can provide a
+stringified JSON of the input configuration. `raw` overrides every other hint and can be used to create bot a single or
+a list of configurations.
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+co.elastic.logs/raw: "[{\"containers\":{\"ids\":[\"${data.container.id}\"]},\"multiline\":{\"negate\":\"true\",\"pattern\":\"^test\"},\"type\":\"docker\"}]"
+-------------------------------------------------------------------------------------
+
+[float]
+===== `co.elastic.logs/processors`
+
+Define a processor to be added to the {beatname_uc} input/module configuration. See <<filtering-and-enhancing-data>> for the list
+of supported processors.
+
+In order to provide ordering of the processor definition, numbers can be provided. If not, the hints builder will do
+arbitrary ordering:
+
+["source","yaml"]
+-------------------------------------------------------------------------------------
+co.elastic.logs/processors.1.dissect.tokenizer: "%{key1} %{key2}"
+co.elastic.logs/processors.dissect.tokenizer: "%{key2} %{key1}"
+-------------------------------------------------------------------------------------
+
+In the above sample the processor definition tagged with `1` would be executed first.
+
+[float]
+==== Kubernetes
+
+Kubernetes autodiscover provider supports hints in Pod annotations. To enable it just set `hints.enabled`:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: true
+-------------------------------------------------------------------------------------
+
+Autodiscover provides a way to control whether log harvesting is by default disabled for the pods/containers when auto-discovery is in use. To enable it, just set `default.disable` to true:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      hints.enabled: true
+      default.disable: true
+-------------------------------------------------------------------------------------
+
+Then, for the pods/containers that log harvesting should be enabled, you can annotate with hint:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+annotations:
+  co.elastic.logs/disable: false
+-------------------------------------------------------------------------------------
+
+You can annotate Kubernetes Pods with useful info to spin up {beatname_uc} inputs or modules:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+annotations:
+  co.elastic.logs/multiline.pattern: '^\['
+  co.elastic.logs/multiline.negate: true
+  co.elastic.logs/multiline.match: after
+-------------------------------------------------------------------------------------
+
+
+[float]
+===== Multiple containers
+
+When a pod has multiple containers, the settings are shared unless you put the container name in the
+hint. For example, these hints configure multiline settings for all containers in the pod, but set a
+specific `exclude_lines` hint for the container called `sidecar`.
+
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+annotations:
+  co.elastic.logs/multiline.pattern: '^\['
+  co.elastic.logs/multiline.negate: true
+  co.elastic.logs/multiline.match: after
+  co.elastic.logs.sidecar/exclude_lines: '^DBG'
+-------------------------------------------------------------------------------------
+
+
+
+[float]
+==== Docker
+
+Docker autodiscover provider supports hints in labels. To enable it just set `hints.enabled`:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+-------------------------------------------------------------------------------------
+
+Autodiscover provides a way to control whether log harvesting is by default disabled for the 
+containers when auto-discovery is in use. To enable it, just set `default.disable` to true:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+      default.disable: true
+-------------------------------------------------------------------------------------
+
+Then, for the containers that log harvesting should be enabled, you can label Docker containers with:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+annotations:
+  co.elastic.logs/disable: false
+-------------------------------------------------------------------------------------
+
+You can label Docker containers with useful info to spin up {beatname_uc} inputs, for example:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+  co.elastic.logs/module: nginx
+  co.elastic.logs/fileset.stdout: access
+  co.elastic.logs/fileset.stderr: error
+-------------------------------------------------------------------------------------
+
+The above labels configure {beatname_uc} to use the Nginx module to harvest logs for this container.
+Access logs will be retrieved from stdout stream, and error logs from stderr.

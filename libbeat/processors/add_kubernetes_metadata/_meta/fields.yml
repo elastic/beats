@@ -1,8 +1,6 @@
 - key: kubernetes
   title: Kubernetes
   description: >
-    beta[]
-
     Kubernetes metadata added by the kubernetes processor
   short_config: false
   anchor: kubernetes-processor
@@ -15,10 +13,20 @@
           description: >
             Kubernetes pod name
 
+        - name: pod.uid
+          type: keyword
+          description: >
+            Kubernetes Pod UID
+
         - name: namespace
           type: keyword
           description: >
             Kubernetes namespace
+
+        - name: node.name
+          type: keyword
+          description: >
+            Kubernetes node name
 
         - name: labels
           type: object

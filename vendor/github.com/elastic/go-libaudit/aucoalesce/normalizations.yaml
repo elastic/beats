@@ -370,7 +370,19 @@ normalizations:
     primary: scontext
   object:
     primary: tcontext
+    secondary: tclass
   record_types: AVC
+  has_fields:
+  - seresult
+-
+  action: violated-apparmor-policy
+  object:
+    primary: operation
+    secondary: [requested_mask, denied_mask, capname]
+    what: policy
+  record_types: AVC
+  has_fields:
+  - apparmor
 -
   action: changed-group
   record_types: CHGRP_ID
@@ -403,6 +415,7 @@ normalizations:
     secondary: [addr, hostname]
     what: user-session
   record_types: CRYPTO_KEY_USER
+  source_ip: [addr]
 -
   action: crypto-officer-logged-in
   record_types: CRYPTO_LOGIN
@@ -416,6 +429,7 @@ normalizations:
     primary: addr
     secondary: [rport]
   record_types: CRYPTO_SESSION
+  source_ip: [addr]
 -
   action: access-result
   record_types: DAC_CHECK
@@ -652,10 +666,12 @@ normalizations:
   <<: *macro-user-session
   action: error
   record_types: USER_ERR
+  source_ip: [addr]
 -
   <<: *macro-user-session
   action: logged-in
   record_types: USER_LOGIN
+  source_ip: [addr]
 -
   <<: *macro-user-session
   action: logged-out
@@ -684,6 +700,7 @@ normalizations:
   <<: *macro-user-session
   action: started-session
   record_types: USER_START
+  source_ip: [addr]
 -
   action: changed-configuration
   object:

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package thrift
 
 import (
@@ -10,11 +27,11 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
@@ -47,7 +64,7 @@ type thriftMessage struct {
 	ts time.Time
 
 	tcpTuple     common.TCPTuple
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 	direction    uint8
 
 	start int
@@ -91,13 +108,12 @@ type thriftStream struct {
 }
 
 type thriftTransaction struct {
-	tuple        common.TCPTuple
-	src          common.Endpoint
-	dst          common.Endpoint
-	responseTime int32
-	ts           time.Time
-	bytesIn      uint64
-	bytesOut     uint64
+	tuple    common.TCPTuple
+	src      common.Endpoint
+	dst      common.Endpoint
+	ts       time.Time
+	bytesIn  uint64
+	bytesOut uint64
 
 	request *thriftMessage
 	reply   *thriftMessage
@@ -878,7 +894,7 @@ func (thrift *thriftPlugin) messageComplete(tcptuple *common.TCPTuple, dir uint8
 	// all ok, go to next level
 	stream.message.tcpTuple = *tcptuple
 	stream.message.direction = dir
-	stream.message.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
+	stream.message.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
 	if stream.message.frameSize == 0 {
 		stream.message.frameSize = uint32(stream.parseOffset - stream.message.start)
 	}
@@ -983,16 +999,7 @@ func (thrift *thriftPlugin) receivedRequest(msg *thriftMessage) {
 	thrift.transactions.Put(tuple.Hashable(), trans)
 
 	trans.ts = msg.ts
-	trans.src = common.Endpoint{
-		IP:   msg.tcpTuple.SrcIP.String(),
-		Port: msg.tcpTuple.SrcPort,
-		Proc: string(msg.cmdlineTuple.Src),
-	}
-	trans.dst = common.Endpoint{
-		IP:   msg.tcpTuple.DstIP.String(),
-		Port: msg.tcpTuple.DstPort,
-		Proc: string(msg.cmdlineTuple.Dst),
-	}
+	trans.src, trans.dst = common.MakeEndpointPair(msg.tcpTuple.BaseTuple, msg.cmdlineTuple)
 	if msg.direction == tcp.TCPDirectionReverse {
 		trans.src, trans.dst = trans.dst, trans.src
 	}
@@ -1021,8 +1028,6 @@ func (thrift *thriftPlugin) receivedReply(msg *thriftMessage) {
 
 	trans.reply = msg
 	trans.bytesOut = uint64(msg.frameSize)
-
-	trans.responseTime = int32(msg.ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
 
 	thrift.publishQueue <- trans
 	thrift.transactions.Delete(tuple.Hashable())
@@ -1077,42 +1082,52 @@ func (thrift *thriftPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 
 func (thrift *thriftPlugin) publishTransactions() {
 	for t := range thrift.publishQueue {
-		fields := common.MapStr{}
+		evt, pbf := pb.NewBeatEvent(t.ts)
+		pbf.SetSource(&t.src)
+		pbf.SetDestination(&t.dst)
+		pbf.Source.Bytes = int64(t.bytesIn)
+		pbf.Destination.Bytes = int64(t.bytesOut)
+		pbf.Event.Dataset = "thrift"
+		pbf.Network.Transport = "tcp"
+		pbf.Network.Protocol = pbf.Event.Dataset
 
-		fields["type"] = "thrift"
+		var status string
 		if t.reply != nil && t.reply.hasException {
-			fields["status"] = common.ERROR_STATUS
+			status = common.ERROR_STATUS
 		} else {
-			fields["status"] = common.OK_STATUS
+			status = common.OK_STATUS
 		}
-		fields["responsetime"] = t.responseTime
-		thriftmap := common.MapStr{}
+
+		fields := evt.Fields
+		fields["type"] = pbf.Event.Dataset
+		fields["status"] = status
+		thriftFields := common.MapStr{}
+		fields["thrift"] = thriftFields
 
 		if t.request != nil {
 			fields["method"] = t.request.method
 			fields["path"] = t.request.service
-			fields["query"] = fmt.Sprintf("%s%s", t.request.method, t.request.params)
-			fields["bytes_in"] = t.bytesIn
-			fields["bytes_out"] = t.bytesOut
-			thriftmap = common.MapStr{
-				"params": t.request.params,
-			}
+			query := t.request.method + t.request.params
+			fields["query"] = query
+			pbf.Event.Start = t.request.ts
+
+			thriftFields["params"] = t.request.params
 			if len(t.request.service) > 0 {
-				thriftmap["service"] = t.request.service
+				thriftFields["service"] = t.request.service
 			}
 
 			if thrift.sendRequest {
-				fields["request"] = fmt.Sprintf("%s%s", t.request.method,
-					t.request.params)
+				fields["request"] = query
 			}
 		}
 
 		if t.reply != nil {
-			thriftmap["return_value"] = t.reply.returnValue
+			pbf.Event.End = t.reply.ts
+
+			thriftFields["return_value"] = t.reply.returnValue
 			if len(t.reply.exceptions) > 0 {
-				thriftmap["exceptions"] = t.reply.exceptions
+				thriftFields["exceptions"] = t.reply.exceptions
 			}
-			fields["bytes_out"] = uint64(t.reply.frameSize)
 
 			if thrift.sendResponse {
 				if !t.reply.hasException {
@@ -1122,22 +1137,12 @@ func (thrift *thriftPlugin) publishTransactions() {
 						t.reply.exceptions)
 				}
 			}
-			if len(t.reply.notes) > 0 {
-				fields["notes"] = t.reply.notes
-			}
-		} else {
-			fields["bytes_out"] = 0
-		}
-		fields["thrift"] = thriftmap
 
-		fields["src"] = &t.src
-		fields["dst"] = &t.dst
+			pbf.Error.Message = t.reply.notes
+		}
 
 		if thrift.results != nil {
-			thrift.results(beat.Event{
-				Timestamp: t.ts,
-				Fields:    fields,
-			})
+			thrift.results(evt)
 		}
 
 		logp.Debug("thrift", "Published event")

@@ -9,6 +9,13 @@ var:
       - "{{.kafka_home}}/logs/server.log*"
       - "{{.kafka_home}}/logs/state-change.log*"
       - "{{.kafka_home}}/logs/kafka-*.log*"
+  - name: convert_timezone
+    default: false
+    # if ES < 6.1.0, this flag switches to false automatically when evaluating the
+    # pipeline
+    min_elasticsearch_version:
+      version: 6.1.0
+      value: false
 
 ingest_pipeline: ingest/pipeline.json
-prospector: config/log.yml
+input: config/log.yml

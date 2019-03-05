@@ -6,6 +6,12 @@
     - name: tls
       type: group
       fields:
+        - name: version
+          type: keyword
+          description: >
+            The version of the TLS protocol used.
+          example: "TLS 1.3"
+
         - name: handshake_completed
           type: boolean
           description: >
@@ -69,6 +75,34 @@
                     Length of the session ticket, if provided, or an empty string
                     to advertise support for tickets.
 
+                - name: supported_versions
+                  type: keyword
+                  description: >
+                    List of TLS versions that the client is willing to use.
+
+                - name: supported_groups
+                  type: keyword
+                  description: >
+                    List of Elliptic Curve Cryptography (ECC) curve groups
+                    supported by the client.
+
+                - name: signature_algorithms
+                  type: keyword
+                  description: >
+                    List of signature algorithms that may be use in digital
+                    signatures.
+
+                - name: ec_points_formats
+                  type: keyword
+                  description: >
+                    List of Elliptic Curve (EC) point formats. Indicates the
+                    set of point formats that the client can parse.
+
+                - name: _unparsed_
+                  type: keyword
+                  description: >
+                    List of extensions that were left unparsed by Packetbeat.
+
         - name: server_hello
           type: group
           fields:
@@ -91,6 +125,12 @@
                 The compression method selected by the server from the list
                 provided in the client hello.
 
+            - name: session_id
+              type: keyword
+              description: >
+                Unique number to identify the session for the corresponding
+                connection with the client.
+
             - name: extensions
               type: group
               description: The hello extensions provided by the server.
@@ -104,6 +144,22 @@
                   description: >
                     Used to announce that a session ticket will be provided
                     by the server. Always an empty string.
+
+                - name: supported_versions
+                  type: keyword
+                  description: >
+                    Negotiated TLS version to be used.
+
+                - name: ec_points_formats
+                  type: keyword
+                  description: >
+                    List of Elliptic Curve (EC) point formats. Indicates the
+                    set of point formats that the server can parse.
+
+                - name: _unparsed_
+                  type: keyword
+                  description: >
+                    List of extensions that were left unparsed by Packetbeat.
 
         - name: client_certificate
           type: group
@@ -197,6 +253,21 @@
                   type: keyword
                   description: Name or host name identified by the certificate.
 
+            - name: fingerprint
+              type: group
+              fields:
+              - name: md5
+                type: keyword
+                description: Certificate's MD5 fingerprint.
+
+              - name: sha1
+                type: keyword
+                description: Certificate's SHA-1 fingerprint.
+
+              - name: sha256
+                type: keyword
+                description: Certificate's SHA-256 fingerprint.
+
 
         - name: server_certificate
           type: group
@@ -289,6 +360,21 @@
                 - name: common_name
                   type: keyword
                   description: Name or host name identified by the certificate.
+
+            - name: fingerprint
+              type: group
+              fields:
+              - name: md5
+                type: keyword
+                description: Certificate's MD5 fingerprint.
+
+              - name: sha1
+                type: keyword
+                description: Certificate's SHA-1 fingerprint.
+
+              - name: sha256
+                type: keyword
+                description: Certificate's SHA-256 fingerprint.
 
         - name: server_certificate_chain
           type: array

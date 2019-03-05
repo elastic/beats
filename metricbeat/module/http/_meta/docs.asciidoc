@@ -6,4 +6,4 @@ This module is inspired by the Logstash https://www.elastic.co/guide/en/logstash
 
 This is often necessary in security restricted network setups, where Logstash is not able to reach all servers. Instead the server to be monitored itself has Metricbeat installed and can send the data or a collector server has Metricbeat installed which is deployed in the secured network environment and can reach all servers to be monitored.
 
-NOTE: As the HTTP mertricsets also fetch headers, this can lead to lots of fields in Elasticsearch in case there are many different headers. If this is the case for you and you don't need the headers, we recommend to use processors to filter out the header field.
+NOTE: As the HTTP metricsets also fetch headers, this can lead to lots of fields in Elasticsearch in case there are many different headers. If this is the case for you and you don't need the headers, we recommend to use processors to filter out the header field.

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package ucfg
 
 import (
@@ -14,7 +31,7 @@ import (
 // Merge traverses the value from recursively copying all values into a hierarchy
 // of Config objects plus primitives into c.
 //
-// Merge supports the options: PathSep, MetaData, StructTag, VarExp
+// Merge supports the options: PathSep, MetaData, StructTag, VarExp, ReplaceValues, AppendValues, PrependValues
 //
 // Merge uses the type-dependent default encodings:
 //  - Boolean values are encoded as booleans.
@@ -75,7 +92,23 @@ func mergeConfig(opts *options, to, from *Config) Error {
 }
 
 func mergeConfigDict(opts *options, to, from *Config) Error {
-	for k, v := range from.fields.dict() {
+	dict := from.fields.dict()
+	if len(dict) == 0 {
+		return nil
+	}
+
+	ok := false
+	if opts.configValueHandling == cfgReplaceValue {
+		old := to.fields.dict()
+		to.fields.d = nil
+		defer func() {
+			if !ok {
+				to.fields.d = old
+			}
+		}()
+	}
+
+	for k, v := range dict {
 		ctx := context{
 			parent: cfgSub{to},
 			field:  k,
@@ -89,46 +122,96 @@ func mergeConfigDict(opts *options, to, from *Config) Error {
 
 		to.fields.set(k, merged.cpy(ctx))
 	}
+
+	ok = true
 	return nil
 }
 
 func mergeConfigArr(opts *options, to, from *Config) Error {
-	l := len(to.fields.array())
-	if l > len(from.fields.array()) {
-		l = len(from.fields.array())
+	switch opts.configValueHandling {
+	case cfgReplaceValue:
+		return mergeConfigReplaceArr(opts, to, from)
+
+	case cfgArrPrepend:
+		return mergeConfigPrependArr(opts, to, from)
+
+	case cfgArrAppend:
+		return mergeConfigAppendArr(opts, to, from)
+
+	case cfgDefaultHandling, cfgMergeValues:
+		return mergeConfigMergeArr(opts, to, from)
+	default:
+		return mergeConfigMergeArr(opts, to, from)
 	}
+}
+
+func mergeConfigReplaceArr(opts *options, to, from *Config) Error {
+	a := from.fields.array()
+	if len(a) == 0 {
+		return nil
+	}
+
+	var parent value = cfgSub{to}
+	var fields = fields{
+		d: to.fields.d,
+		a: make([]value, 0, len(a)),
+	}
+	fields.append(parent, a)
+	*to.fields = fields
+	return nil
+}
+
+func mergeConfigMergeArr(opts *options, to, from *Config) Error {
+	l := len(to.fields.array())
+	arr := from.fields.array()
+	if l > len(arr) {
+		l = len(arr)
+	}
+
+	var parent value = cfgSub{to}
 
 	// merge array indexes available in to and from
 	for i := 0; i < l; i++ {
 		ctx := context{
-			parent: cfgSub{to},
+			parent: parent,
 			field:  fmt.Sprintf("%v", i),
 		}
 
 		old := to.fields.array()[i]
-		v := from.fields.array()[i]
-		merged, err := mergeValues(opts, old, v)
+		merged, err := mergeValues(opts, old, arr[i])
 		if err != nil {
 			return err
 		}
-		to.fields.setAt(i, cfgSub{to}, merged.cpy(ctx))
+		to.fields.setAt(i, parent, merged.cpy(ctx))
 	}
 
-	end := len(from.fields.array())
-	if end <= l {
+	if len(arr) > l {
+		// add additional array entries not yet in 'to'
+		to.fields.append(parent, arr[l:])
+	}
+	return nil
+}
+
+func mergeConfigPrependArr(opts *options, to, from *Config) Error {
+	a1 := to.fields.array()
+	a2 := from.fields.array()
+	if len(a2) == 0 {
 		return nil
 	}
 
-	// add additional array entries not yet in 'to'
-	for ; l < end; l++ {
-		ctx := context{
-			parent: cfgSub{to},
-			field:  fmt.Sprintf("%v", l),
-		}
-		v := from.fields.array()[l]
-		to.fields.setAt(l, cfgSub{to}, v.cpy(ctx))
+	var parent value = cfgSub{to}
+	var fields = fields{
+		d: to.fields.d,
+		a: make([]value, 0, len(a1)+len(a2)),
 	}
+	fields.append(parent, a2)
+	fields.append(parent, a1)
+	*to.fields = fields
+	return nil
+}
 
+func mergeConfigAppendArr(opts *options, to, from *Config) Error {
+	to.fields.append(cfgSub{to}, from.fields.array())
 	return nil
 }
 
@@ -425,7 +508,7 @@ func normalizeString(ctx context, opts *options, str string) (value, Error) {
 
 	switch p := varexp.(type) {
 	case constExp:
-		return newString(ctx, opts.meta, str), nil
+		return newString(ctx, opts.meta, string(p)), nil
 	case *reference:
 		return newRef(ctx, opts.meta, p), nil
 	}

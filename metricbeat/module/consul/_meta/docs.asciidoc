@@ -1,0 +1,15 @@
+This is the https://www.consul.io[Hashicorp's Consul] Metricbeat module. It is still in beta and under active development to add new Metricsets and introduce enhancements.
+
+[float]
+== Compatibility
+
+The module is being tested with https://github.com/hashicorp/docker-consul/blob/9bd2aa7ecf2414b8712e055f2374699148e8941c/0.X/Dockerfile[1.4.2] version
+
+[float]
+== Metricsets
+
+The following Metricset is included:
+
+=== `agent`
+
+`agent` Metricset fetches information from a Consul Agent in 'Client' mode. It fetches information about the health of the autopilot, runtime metrics and raft data.

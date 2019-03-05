@@ -1,0 +1,16 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/elasticsearch/gc.log.[0-9]*
+      - /var/log/elasticsearch/gc.log
+    os.darwin:
+      - /usr/local/var/lib/elasticsearch/gc.log.[0-9]*
+      - /usr/local/var/lib/elasticsearch/gc.log
+    os.windows:
+      - c:/ProgramData/Elastic/Elasticsearch/logs/gc.log.*
+      - c:/ProgramData/Elastic/Elasticsearch/logs/gc.log
+
+ingest_pipeline: ingest/pipeline.json
+input: config/gc.yml

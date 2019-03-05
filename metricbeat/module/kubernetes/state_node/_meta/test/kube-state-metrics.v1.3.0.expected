@@ -1,0 +1,34 @@
+[
+	{
+		"_namespace": "node",
+		"cpu": {
+			"allocatable": {
+				"cores": 2
+			},
+			"capacity": {
+				"cores": 2
+			}
+		},
+		"memory": {
+			"allocatable": {
+				"bytes": 1992347648
+			},
+			"capacity": {
+				"bytes": 2097205248
+			}
+		},
+		"name": "minikube",
+		"pod": {
+			"allocatable": {
+				"total": 110
+			},
+			"capacity": {
+				"total": 110
+			}
+		},
+		"status": {
+			"ready": "true",
+			"unschedulable": false
+		}
+	}
+]

@@ -11,15 +11,19 @@
 
 [IMPORTANT]
 .Prerequisite
-To use Logstash as an output, you must
-{libbeat}/logstash-installation.html#logstash-setup[install and configure] the Beats input
-plugin for Logstash.
+To send events to {ls}, you also need to create a {ls} configuration pipeline
+that listens for incoming Beats connections and indexes the received events into
+{es}. For more information, see the section about
+{stack-gs}/get-started-elastic-stack.html#logstash-setup[configuring {ls}] in
+the {stack} getting started tutorial. Also see the documentation for the
+{logstash-ref}/plugins-inputs-beats.html[{beats} input] and
+{logstash-ref}/plugins-outputs-elasticsearch.html[{es} output] plugins.
 
-If you want to use Logstash to perform additional processing on the data collected by
-{beatname_uc}, you need to configure {beatname_uc} to use Logstash.
+If you want to use {ls} to perform additional processing on the data collected by
+{beatname_uc}, you need to configure {beatname_uc} to use {ls}.
 
-To do this, you edit the {beatname_uc} configuration file to disable the Elasticsearch
-output by commenting it out and enable the Logstash output by uncommenting the
+To do this, you edit the {beatname_uc} configuration file to disable the {es}
+output by commenting it out and enable the {ls} output by uncommenting the
 logstash section:
 
 [source,yaml]
@@ -29,24 +33,35 @@ output.logstash:
   hosts: ["127.0.0.1:5044"]
 ------------------------------------------------------------------------------
 
-The `hosts` option specifies the Logstash server and the port (`5044`) where Logstash is configured to listen for incoming
+The `hosts` option specifies the {ls} server and the port (`5044`) where {ls} is configured to listen for incoming
 Beats connections.
 
-For this configuration, you must <<load-template-manually,load the index template into Elasticsearch manually>>
-because the options for auto loading the template are only available for the Elasticsearch output.
+For this configuration, you must <<load-template-manually,load the index template into {es} manually>>
+because the options for auto loading the template are only available for the {es} output.
 
-ifdef::allplatforms[]
+ifeval::["{beatname_lc}"=="filebeat"]
+Want to use <<filebeat-modules,{beatname_uc} modules>> with {ls}? You need to do
+some extra setup. For more information, see
+{logstash-ref}/filebeat-modules.html[Working with {beatname_uc} modules].
+endif::[]
+
+ifndef::win-only[]
+ifndef::apm-server[]
 
 include::../../libbeat/docs/step-test-config.asciidoc[]
 
-endif::allplatforms[]
+endif::apm-server[]
+ifdef::apm-server[]
 
-ifdef::win[]
+include::./step-test-config.asciidoc[]
+
+endif::apm-server[]
+endif::win-only[]
+
+ifdef::win-only[]
 
 TIP: To test your configuration file, change to the directory where the {beatname_uc}
 binary is installed, and run {beatname_uc} in the foreground with the following
 options specified: +.\winlogbeat.exe test config -c .\winlogbeat.yml -e+.
 
-endif::win[]
-
-
+endif::win-only[]

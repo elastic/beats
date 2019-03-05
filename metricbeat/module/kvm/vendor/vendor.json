@@ -1,0 +1,31 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "2u6FcCnyfRnJvUCWpEZZv6Yy+WE=",
+			"path": "github.com/davecgh/go-xdr/xdr2",
+			"revision": "e6a2ba005892b6a5b27cb5352f64c2e96942dd28",
+			"revisionTime": "2016-11-22T19:31:51Z"
+		},
+		{
+			"checksumSHA1": "r7EVnpz8g88YB0wTes+hs8VdBBo=",
+			"path": "github.com/digitalocean/go-libvirt",
+			"revision": "59d541f19311883ad82708651353009fb207d8a9",
+			"revisionTime": "2018-01-03T20:19:28Z"
+		},
+		{
+			"checksumSHA1": "NY8di5qB457jytcEX4DVcNw4u8k=",
+			"path": "github.com/digitalocean/go-libvirt/internal/constants",
+			"revision": "59d541f19311883ad82708651353009fb207d8a9",
+			"revisionTime": "2018-01-03T20:19:28Z"
+		},
+		{
+			"checksumSHA1": "wTAyp0Z2KqjokzJC3hHxMJTilIQ=",
+			"path": "github.com/digitalocean/go-libvirt/libvirttest",
+			"revision": "6075ea3c39a182efd22179110e92d4e8a8892d00",
+			"revisionTime": "2018-03-01T20:00:12Z"
+		}
+	],
+	"rootPath": "github.com/elastic/beats/metricbeat/module/kvm"
+}

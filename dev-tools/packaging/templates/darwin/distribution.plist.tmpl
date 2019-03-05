@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="2">
+    <pkg-ref id="{{.identifier}}"/>
+    <options customize="never" require-scripts="false" hostArchitectures="{{.Arch}}"/>
+    <volume-check>
+        <allowed-os-versions>
+            <os-version min="{{.min_supported_osx_version}}"/>
+        </allowed-os-versions>
+    </volume-check>
+    <choices-outline>
+        <line choice="default">
+            <line choice="{{.identifier}}"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="{{.identifier}}" visible="false">
+        <pkg-ref id="{{.identifier}}"/>
+        <pkg-ref id="co.elastic.beats.preference-pane"/>
+    </choice>
+    <pkg-ref id="{{.identifier}}" version="{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}" auth="Root" onConclusion="none">internal-{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}.pkg</pkg-ref>
+    <readme file="README.html" />
+    <license file="LICENSE.txt" />
+    <title>{{.BeatName | title}} {{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}</title>
+    <pkg-ref id="co.elastic.beats.preference-pane" version="{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}" auth="Root" onConclusion="none">BeatsPrefPane.pkg</pkg-ref>
+</installer-gui-script>

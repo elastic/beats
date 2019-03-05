@@ -1,0 +1,54 @@
+version: '2.3'
+services:
+  beat:
+    build: ${PWD}/.
+    depends_on:
+      - proxy_dep
+    env_file:
+      - ${PWD}/build/test.env
+    working_dir: /go/src/github.com/elastic/beats/x-pack/libbeat
+    volumes:
+      - ${PWD}/../..:/go/src/github.com/elastic/beats/
+      # We launch docker containers to test docker autodiscover:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: make
+
+  # This is a proxy used to block beats until all services are healthy.
+  # See: https://github.com/docker/compose/issues/4369
+  proxy_dep:
+    image: busybox
+    depends_on:
+      elasticsearch: { condition: service_healthy }
+      kibana: { condition: service_healthy }
+
+  elasticsearch:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: elasticsearch
+    healthcheck:
+      test: ["CMD-SHELL", 'python -c ''import urllib, json; response = urllib.urlopen("http://myelastic:changeme@localhost:9200/_cluster/health"); data = json.loads(response.read()); exit(1) if data["status"] != "green" else exit(0);''']
+      retries: 1200
+      interval: 5s
+      start_period: 60s
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "network.host="
+      - "transport.host=127.0.0.1"
+      - "http.host=0.0.0.0"
+      - "xpack.security.enabled=true"
+      - "xpack.license.self_generated.type=trial"
+      - "xpack.security.authc.realms.file.file1.order=0"
+    command: bash -c "bin/elasticsearch-users useradd myelastic -r superuser -p changeme | /usr/local/bin/docker-entrypoint.sh eswrapper"
+
+  kibana:
+    depends_on:
+      - elasticsearch
+    extends:
+      file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: kibana
+    healthcheck:
+      test: ["CMD-SHELL", 'python -c ''import urllib, json; response = urllib.urlopen("http://myelastic:changeme@localhost:5601/api/status"); data = json.loads(response.read()); exit(1) if data["status"]["overall"]["state"] != "green" else exit(0);''']
+      retries: 1200
+      interval: 5s
+      start_period: 60s
+    command: /usr/local/bin/kibana-docker --xpack.security.enabled=true --elasticsearch.username=myelastic --elasticsearch.password=changeme

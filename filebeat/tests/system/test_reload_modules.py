@@ -1,5 +1,4 @@
 import re
-import sys
 import unittest
 import os
 import shutil
@@ -16,7 +15,7 @@ moduleConfigTemplate = """
     enabled: true
     var.paths:
       - {}
-    prospector:
+    input:
       scan_frequency: 1s
   auth:
     enabled: false
@@ -31,7 +30,7 @@ class Test(BaseTest):
             self.es = Elasticsearch([self.get_elasticsearch_url()])
 
         # Copy system module
-        shutil.copytree(os.path.join("module", "test"),
+        shutil.copytree(os.path.join(self.beat_path, "tests", "system", "module", "test"),
                         os.path.join(self.working_dir, "module", "test"))
 
     def test_reload(self):
@@ -42,7 +41,7 @@ class Test(BaseTest):
             reload=True,
             reload_path=self.working_dir + "/configs/*.yml",
             reload_type="modules",
-            prospectors=False,
+            inputs=False,
         )
 
         proc = self.start_beat()
@@ -72,7 +71,7 @@ class Test(BaseTest):
             reload=True,
             reload_path=self.working_dir + "/configs/*.yml",
             reload_type="modules",
-            prospectors=False,
+            inputs=False,
             elasticsearch={"host": self.get_elasticsearch_url()}
         )
 
@@ -103,7 +102,7 @@ class Test(BaseTest):
             reload=True,
             reload_path=self.working_dir + "/configs/*.yml",
             reload_type="modules",
-            prospectors=False,
+            inputs=False,
             elasticsearch={"host": 'errorhost:9201'}
         )
 
@@ -126,7 +125,7 @@ class Test(BaseTest):
             reload=True,
             reload_path=self.working_dir + "/configs/*.yml",
             reload_type="modules",
-            prospectors=False,
+            inputs=False,
         )
 
         proc = self.start_beat()
@@ -146,13 +145,13 @@ class Test(BaseTest):
         self.wait_until(lambda: self.output_lines() == 1, max_timeout=10)
         print(self.output_lines())
 
-        # Remove prospector
+        # Remove input
         with open(self.working_dir + "/configs/system.yml", 'w') as f:
             f.write("")
 
-        # Wait until prospector is stopped
+        # Wait until input is stopped
         self.wait_until(
-            lambda: self.log_contains("Runner stopped:"),
+            lambda: self.log_contains("Stopping runner:"),
             max_timeout=15)
 
         with open(logfile, 'a') as f:
@@ -171,7 +170,7 @@ class Test(BaseTest):
         self.render_config_template(
             reload_path=self.working_dir + "/configs/*.yml",
             reload_type="modules",
-            prospectors=False,
+            inputs=False,
         )
 
         os.mkdir(self.working_dir + "/logs/")
@@ -219,7 +218,7 @@ class Test(BaseTest):
         self.render_config_template(
             reload=False,
             reload_path=self.working_dir + "/configs/*.yml",
-            prospectors=False,
+            inputs=False,
         )
         os.mkdir(self.working_dir + "/configs/")
 
@@ -229,7 +228,7 @@ class Test(BaseTest):
   test:
     enabled: true
     wrong_field: error
-    prospector:
+    input:
       scan_frequency: 1s
 """
         with open(config_path, 'w') as f:
@@ -239,7 +238,7 @@ class Test(BaseTest):
 
         # Wait until offset for new line is updated
         self.wait_until(
-            lambda: self.log_contains("No paths were defined for prospector accessing"),
+            lambda: self.log_contains("No paths were defined for input accessing"),
             max_timeout=10)
 
         assert exit_code == 1

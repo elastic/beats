@@ -40,6 +40,8 @@ over the username and password configuration options.
   password: test
 ----
 
+The default metricsets are `collstats`, `dbstats` and `status`.
+
 [float]
 === Compatibility
 

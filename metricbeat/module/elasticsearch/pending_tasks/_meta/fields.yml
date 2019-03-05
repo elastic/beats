@@ -1,0 +1,22 @@
+- name: cluster.pending_task
+  type: group
+  description: >
+    `cluster.pending_task` contains a pending task description.
+  release: ga
+  fields:
+    - name: insert_order
+      type: long
+      description: >
+        Insert order
+    - name: priority
+      type: long
+      description: >
+        Priority
+    - name: source
+      type: keyword
+      description: >
+        Source. For example: put-mapping
+    - name: time_in_queue.ms
+      type: long
+      description: >
+        Time in queue

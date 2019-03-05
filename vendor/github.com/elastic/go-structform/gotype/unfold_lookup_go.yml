@@ -1,0 +1,162 @@
+# Licensed to Elasticsearch B.V. under one or more contributor
+# license agreements. See the NOTICE file distributed with
+# this work for additional information regarding copyright
+# ownership. Elasticsearch B.V. licenses this file to you under
+# the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+import:
+  - unfold_templates.yml
+
+main: |
+  package gotype
+
+  func lookupGoTypeUnfolder(to interface{}) (unsafe.Pointer, ptrUnfolder) {
+    switch ptr := to.(type) {
+      case *interface{}:
+        return unsafe.Pointer(ptr), newUnfolderIfc()
+      case *[]interface{}:
+        return unsafe.Pointer(ptr), newUnfolderArrIfc()
+      case *map[string]interface{}:
+        return unsafe.Pointer(ptr), newUnfolderMapIfc()
+
+      {{ range data.primitiveTypes }}
+      case *{{ . }}:
+        return unsafe.Pointer(ptr), newUnfolder{{ . | capitalize }}()
+      case *[]{{ . }}:
+        return unsafe.Pointer(ptr), newUnfolderArr{{ . | capitalize }}()
+      case *map[string]{{ . }}:
+        return unsafe.Pointer(ptr), newUnfolderMap{{ . | capitalize }}()
+      {{ end }}
+    default:
+      return nil, nil
+    }
+  }
+
+  func lookupGoPtrUnfolder(t reflect.Type) (ptrUnfolder) {
+    switch t.Kind() {
+    case reflect.Interface:
+      return newUnfolderIfc()
+    {{ range data.primitiveTypes }}
+      case reflect.{{ . | capitalize }}:
+        return newUnfolder{{ . | capitalize }}()
+    {{ end }}
+
+    case reflect.Slice:
+      et := t.Elem()
+      switch et.Kind() {
+      case reflect.Interface:
+        return newUnfolderArrIfc()
+      {{ range data.primitiveTypes }}
+        case reflect.{{ . | capitalize }}:
+          return newUnfolderArr{{ . | capitalize }}()
+      {{ end }}
+      }
+
+    case reflect.Map:
+      if t.Key().Kind() != reflect.String {
+        return nil
+      }
+
+      et := t.Elem()
+      switch et.Kind() {
+      case reflect.Interface:
+        return newUnfolderMapIfc()
+      {{ range data.primitiveTypes }}
+        case reflect.{{ . | capitalize }}:
+          return newUnfolderMap{{ . | capitalize }}()
+      {{ end }}
+      }
+
+    }
+
+    return nil
+  }
+
+  func lookupReflUnfolder(ctx *unfoldCtx, t reflect.Type) (reflUnfolder, error) {
+    if f := unfoldRegistry.find(t); f != nil {
+      return f, nil
+    }
+
+    f, err := buildReflUnfolder(ctx, t)
+    if err != nil {
+      return nil, err
+    }
+
+    unfoldRegistry.set(t, f)
+    return f, nil
+  }
+
+  func buildReflUnfolder(ctx *unfoldCtx, t reflect.Type) (reflUnfolder, error) {
+    // we always expect a pointer
+    bt := t.Elem()
+
+    switch bt.Kind() {
+    case reflect.Interface:
+      return unfolderReflIfc, nil
+    {{ range data.primitiveTypes }}
+    case reflect.{{ . | capitalize }}:
+      return unfolderRefl{{ . | capitalize }}, nil
+    {{ end }}
+
+    case reflect.Array:
+      return nil, errTODO()
+
+    case reflect.Ptr:
+      unfolderElem, err := lookupReflUnfolder(ctx, bt)
+      if err != nil {
+        return nil, err
+      }
+      return newUnfolderReflPtr(unfolderElem), nil
+
+    case reflect.Slice:
+      et := bt.Elem()
+      switch et.Kind() {
+      case reflect.Interface:
+        return unfolderReflArrIfc, nil
+      {{ range data.primitiveTypes }}
+      case reflect.{{ . | capitalize }}:
+        return unfolderReflArr{{ . | capitalize }}, nil
+      {{ end }}
+      }
+
+      unfolderElem, err := lookupReflUnfolder(ctx, reflect.PtrTo(et))
+      if err != nil {
+        return nil, err
+      }
+      return newUnfolderReflSlice(unfolderElem), nil
+
+    case reflect.Map:
+      et := bt.Elem()
+      switch et.Kind() {
+      case reflect.Interface:
+        return unfolderReflMapIfc, nil
+      {{ range data.primitiveTypes }}
+      case reflect.{{ . | capitalize }}:
+        return unfolderReflMap{{ . | capitalize }}, nil
+      {{ end }}
+      }
+
+      unfolderElem, err := lookupReflUnfolder(ctx, reflect.PtrTo(et))
+      if err != nil {
+        return nil, err
+      }
+      return newUnfolderReflMap(unfolderElem), nil
+
+    case reflect.Struct:
+      return createUnfolderReflStruct(ctx, t)
+
+     default:
+       return nil, errTODO()
+    }
+  }

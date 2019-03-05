@@ -4,6 +4,7 @@ This file is generated! See scripts/docs_collector.py
 
 [[filebeat-module-auditd]]
 :modulename: auditd
+:has-dashboards: true
 
 == Auditd module
 
@@ -50,7 +51,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules {modulename} -M "auditd.log.var.paths=[/path/to/log/audit/audit.log*]"
+-M "auditd.log.var.paths=[/path/to/log/audit/audit.log*]"
 -----
 
 
@@ -65,6 +66,12 @@ include::../include/config-option-intro.asciidoc[]
 ==== `log` fileset settings
 
 include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
 
 
 [float]

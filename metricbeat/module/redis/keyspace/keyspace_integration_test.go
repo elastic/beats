@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build integration
 
 package keyspace
@@ -22,18 +39,18 @@ func TestFetch(t *testing.T) {
 	addEntry(t)
 
 	// Fetch data
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	events, err := f.Fetch()
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
+	events, err := mbtest.ReportingFetchV2(ms)
 	if err != nil {
 		t.Fatal("fetch", err)
 	}
 
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events)
+	t.Logf("%s/%s event: %+v", ms.Module().Name(), ms.Name(), events)
 
 	// Make sure at least 1 db keyspace exists
 	assert.True(t, len(events) > 0)
 
-	keyspace := events[0]
+	keyspace := events[0].MetricSetFields
 
 	assert.True(t, keyspace["avg_ttl"].(int64) >= 0)
 	assert.True(t, keyspace["expires"].(int64) >= 0)
@@ -46,9 +63,8 @@ func TestData(t *testing.T) {
 
 	addEntry(t)
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
-
-	err := mbtest.WriteEvents(f, t)
+	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
+	err := mbtest.WriteEventsReporterV2(ms, t, "")
 	if err != nil {
 		t.Fatal("write", err)
 	}

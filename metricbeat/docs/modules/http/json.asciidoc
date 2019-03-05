@@ -5,8 +5,6 @@ This file is generated! See scripts/docs_collector.py
 [[metricbeat-metricset-http-json]]
 === HTTP json metricset
 
-beta[]
-
 include::../../../module/http/json/_meta/docs.asciidoc[]
 
 

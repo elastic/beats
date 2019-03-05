@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // Package applayer provides common definitions with common fields
 // for use with application layer protocols among beats.
 package applayer
@@ -9,6 +26,8 @@ import (
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/streambuf"
+
+	"github.com/elastic/beats/packetbeat/pb"
 )
 
 // A Message its direction indicator
@@ -74,9 +93,8 @@ type Transaction struct {
 	// Ts sets the transaction its initial timestamp
 	Ts TransactionTimestamp
 
-	// ResponseTime is the transaction duration in milliseconds. Should be set
-	// to -1 if duration is unknown
-	ResponseTime int32
+	// EndTime is the time the transaction ended.
+	EndTime time.Time
 
 	// Status of final transaction
 	Status string // see libbeat/common/statuses.go
@@ -105,7 +123,7 @@ type Message struct {
 	Ts           time.Time
 	Tuple        common.IPPortTuple
 	Transport    Transport
-	CmdlineTuple *common.CmdlineTuple
+	CmdlineTuple *common.ProcessTuple
 	Direction    NetDirection
 	IsRequest    bool
 	Size         uint64
@@ -165,7 +183,7 @@ func (t *Transaction) Init(
 	transport Transport,
 	direction NetDirection,
 	time time.Time,
-	cmdline *common.CmdlineTuple,
+	cmdline *common.ProcessTuple,
 	notes []string,
 ) {
 	t.Type = typ
@@ -175,16 +193,7 @@ func (t *Transaction) Init(
 	// transactions have microseconds resolution
 	t.Ts.Ts = time
 	t.Ts.Millis = int64(time.UnixNano() / 1000)
-	t.Src = common.Endpoint{
-		IP:   tuple.SrcIP.String(),
-		Port: tuple.SrcPort,
-		Proc: string(cmdline.Src),
-	}
-	t.Dst = common.Endpoint{
-		IP:   tuple.DstIP.String(),
-		Port: tuple.DstPort,
-		Proc: string(cmdline.Dst),
-	}
+	t.Src, t.Dst = common.MakeEndpointPair(tuple.BaseTuple, cmdline)
 	t.Notes = notes
 
 	if direction == NetReverseDirection {
@@ -214,18 +223,22 @@ func (t *Transaction) InitWithMsg(
 func (t *Transaction) Event(event *beat.Event) error {
 	event.Timestamp = t.Ts.Ts
 
+	pbf := pb.NewFields()
+	pbf.SetSource(&t.Src)
+	pbf.SetDestination(&t.Dst)
+	pbf.Source.Bytes = int64(t.BytesIn)
+	pbf.Destination.Bytes = int64(t.BytesOut)
+	pbf.Event.Dataset = t.Type
+	pbf.Event.Start = t.Ts.Ts
+	pbf.Event.End = t.EndTime
+	pbf.Network.Transport = t.Transport.String()
+	pbf.Network.Protocol = pbf.Event.Dataset
+	pbf.Error.Message = t.Notes
+
 	fields := event.Fields
-	fields["type"] = t.Type
-	fields["responsetime"] = t.ResponseTime
-	fields["src"] = &t.Src
-	fields["dst"] = &t.Dst
-	fields["transport"] = t.Transport.String()
-	fields["bytes_out"] = t.BytesOut
-	fields["bytes_in"] = t.BytesIn
+	fields[pb.FieldsKey] = pbf
+	fields["type"] = pbf.Event.Dataset
 	fields["status"] = t.Status
-	if len(t.Notes) > 0 {
-		fields["notes"] = t.Notes
-	}
 	return nil
 }
 

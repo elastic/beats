@@ -44,6 +44,11 @@ winlogbeat.event_logs:
     {%- if log.invalid is defined %}
     invalid: {{ log.invalid }}
     {% endif %}
+    {% if log.extras -%}
+    {% for k, v in log.extras.items() -%}
+    {{ k }}: {{ v }}
+    {% endfor %}
+    {% endif -%}
   {% endfor -%}
 {% endif %}
 

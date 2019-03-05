@@ -1,0 +1,532 @@
+- name: metrics
+  type: group
+  release: ga
+  description: >
+    Statistics that reflect the current use and state of a running `mongod` instance
+    for more information, take a look at https://docs.mongodb.com/manual/reference/command/serverStatus/#serverstatus.metrics
+  fields:
+    - name: commands
+      type: group
+      description: >
+        Reports on the use of database commands.
+        The fields in metrics.commands are the names of database commands and each value is a document
+        that reports the total number of commands executed as well as the number of failed executions.
+
+        metrics.commands.<command>.failed shows the number of times <command> failed on this mongod.
+        metrics.commands.<command>.total shows the number of times <command> executed on this mongod.
+      fields:
+        - name: is_self
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: aggregate
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: build_info
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: coll_stats
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: connection_pool_stats
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: count
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: db_stats
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: distinct
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: find
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: get_cmd_line_opts
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: get_last_error
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: get_log
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: get_more
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: get_parameter
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: host_info
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: insert
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: is_master
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: last_collections
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: last_commands
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: list_databased
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: list_indexes
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: ping
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: profile
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: replset_get_rbid
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: replset_get_status
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: replset_heartbeat
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: replset_update_position
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: server_status
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: update
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+        - name: whatsmyuri
+          type: group
+          fields:
+            - name: failed
+              type: long
+            - name: total
+              type: long
+
+    - name: cursor
+      type: group
+      description: >
+        Contains data regarding cursor state and use.
+      fields:
+        - name: timed_out
+          type: long
+          description: >
+            The total number of cursors that have timed out since the server process started.
+        - name: open
+          type: group
+          description: >
+            Contains data regarding open cursors.
+          fields:
+            - name: no_timeout
+              type: long
+              description: >
+                The number of open cursors with the option DBQuery.Option.noTimeout set to prevent timeout.
+            - name: pinned
+              type: long
+              description: >
+                The number of `pinned` open cursors.
+            - name: total
+              type: long
+              description: >
+                The number of cursors that MongoDB is maintaining for clients.
+
+    - name: document
+      type: group
+      description: >
+        Reflects document access and modification patterns.
+      fields:
+        - name: deleted
+          type: long
+          description: >
+            The total number of documents deleted.
+        - name: inserted
+          type: long
+          description: >
+            The total number of documents inserted.
+        - name: returned
+          type: long
+          description: >
+            The total number of documents returned by queries.
+        - name: updated
+          type: long
+          description: >
+            The total number of documents updated.
+
+    - name: get_last_error
+      type: group
+      description: >
+          Returns the error status of the preceding write operation on the current connection.
+      fields:
+        - name: write_wait.ms
+          type: long
+          description: >
+            The total amount of time in milliseconds that the mongod has spent performing getLastError operations
+            with write concern (i.e. w) greater than 1.
+        - name: write_wait.count
+          type: long
+          description: >
+            The total number of getLastError operations with a specified write concern (i.e. w) greater than 1.
+        - name: write_timeouts
+          type: long
+          description: >
+            The number of times that write concern operations have timed out as a result of the wtimeout threshold to getLastError.
+
+    - name: operation
+      type: group
+      description: >
+        Holds counters for several types of update and query operations that MongoDB handles using special operation types.
+      fields:
+        - name: scan_and_order
+          type: long
+          description: >
+            The total number of queries that return sorted numbers that cannot perform the sort operation using an index.
+        - name: write_conflicts
+          type: long
+          description: >
+            The total number of queries that encountered write conflicts.
+
+    - name: query_executor
+      type: group
+      description: >
+        Reports data from the query execution system.
+      fields:
+        - name: scanned_indexes
+          type: long
+          description: >
+            The total number of index items scanned during queries and query-plan evaluation.
+        - name: scanned_documents
+          type: long
+          description: >
+            The total number of documents scanned during queries and query-plan evaluation.
+
+    - name: replication
+      type: group
+      description: >
+        Reports metrics related to the replication process.
+        metrics.replication appears on all mongod instances, even those that aren't members of replica sets.
+      fields:
+        - name: executor
+          type: group
+          description: >
+            Reports on various statistics for the replication executor.
+          fields:
+            - name: counters
+              type: group
+              fields:
+                - name: event_created
+                  type: long
+                - name: event_wait
+                  type: long
+                - name: cancels
+                  type: long
+                - name: waits
+                  type: long
+                - name: scheduled
+                  type: group
+                  fields:
+                    - name: netcmd
+                      type: long
+                    - name: dbwork
+                      type: long
+                    - name: exclusive
+                      type: long
+                    - name: work_at
+                      type: long
+                    - name: work
+                      type: long
+                    - name: failures
+                      type: long
+            - name: queues
+              type: group
+              fields:
+                - name: in_progress
+                  type: group
+                  fields:
+                    - name: network
+                      type: long
+                    - name: dbwork
+                      type: long
+                    - name: exclusive
+                      type: long
+                - name: sleepers
+                  type: long
+                - name: ready
+                  type: long
+                - name: free
+                  type: long
+            - name: unsignaled_events
+              type: long
+            - name: event_waiters
+              type: long
+            - name: shutting_down
+              type: boolean
+            - name: network_interface
+              type: keyword
+        - name: apply
+          type: group
+          description: >
+            Reports on the application of operations from the replication oplog.
+          fields:
+            - name: attempts_to_become_secondary
+              type: long
+            - name: batches
+              type: group
+              description: >
+                Reports on the oplog application process on secondaries members of replica sets.
+              fields:
+                - name: count
+                  type: long
+                  description: >
+                    The total number of batches applied across all databases.
+                - name: time.ms
+                  type: long
+                  description: >
+                    The total amount of time in milliseconds the mongod has spent applying operations from the oplog.
+            - name: ops
+              type: long
+              description: >
+                The total number of oplog operations applied.
+        - name: buffer
+          type: group
+          description: >
+            MongoDB buffers oplog operations from the replication sync source buffer before applying oplog entries in a batch.
+            metrics.replication.buffer provides a way to track the oplog buffer.
+          fields:
+            - name: count
+              type: long
+              description: >
+                The current number of operations in the oplog buffer.
+            - name: max_size.bytes
+              type: long
+              description: >
+                The maximum size of the buffer. This value is a constant setting in the mongod, and is not configurable.
+            - name: size.bytes
+              type: long
+              description: >
+                The current size of the contents of the oplog buffer.
+        - name: initial_sync
+          type: group
+          description: >
+            Report initial sync status
+          fields:
+            - name: completed
+              type: long
+            - name: failed_attempts
+              type: long
+            - name: failures
+              type: long
+        - name: network
+          type: group
+          description: >
+            Reports network use by the replication process.
+          fields:
+            - name: bytes
+              type: long
+              description: >
+                The total amount of data read from the replication sync source.
+            - name: getmores
+              type: group
+              description: >
+                Reports on the getmore operations, which are requests for additional results from the oplog cursor
+                as part of the oplog replication process.
+              fields:
+                - name: count
+                  type: long
+                  description: >
+                    The total number of getmore operations
+                - name: time.ms
+                  type: long
+                  description: >
+                    The total amount of time required to collect data from getmore operations.
+            - name: ops
+              type: long
+              description: >
+                The total number of operations read from the replication source.
+            - name: reders_created
+              type: long
+              description: >
+                The total number of oplog query processes created.
+        - name: preload
+          type: group
+          description: >
+            Reports on the `pre-fetch` stage, where MongoDB loads documents and indexes into RAM to improve replication throughput.
+          fields:
+            - name: docs
+              type: group
+              description: >
+                Reports on the documents loaded into memory during the pre-fetch stage.
+              fields:
+                - name: count
+                  type: long
+                  description: >
+                    The total number of documents loaded during the pre-fetch stage of replication.
+                - name: time.ms
+                  type: long
+                  decsription: >
+                    The total amount of time spent loading documents as part of the pre-fetch stage of replication.
+            - name: indexes
+              type: group
+              description: >
+                Reports on the index items loaded into memory during the pre-fetch stage of replication.
+              fields:
+                - name: count
+                  type: long
+                  description: >
+                    The total number of index entries loaded by members before updating documents as part of the pre-fetch stage of replication.
+                - name: time.ms
+                  type: long
+                  description: >
+                    The total amount of time, in milliseconds, spent loading index entries as part of the pre-fetch stage of replication.
+
+    - name: storage.free_list.search
+      type: group
+      fields:
+        - name: bucket_exhausted
+          type: long
+          description: >
+            The number of times that mongod has checked the free list without finding a suitably large record allocation.
+        - name: requests
+          type: long
+          description: >
+            The number of times mongod has searched for available record allocations.
+        - name: scanned
+          type: long
+          description: >
+            The number of available record allocations mongod has searched.
+
+    - name: ttl
+      type: group
+      description: >
+        Reports on the operation of the resource use of the ttl index process.
+      fields:
+        - name: deleted_documents
+          type: long
+          description: >
+            The total number of documents deleted from collections with a ttl index.
+        - name: passes
+          type: long
+          description: >
+            The number of times the background process removes documents from collections with a ttl index.

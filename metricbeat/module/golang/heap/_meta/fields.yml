@@ -1,13 +1,13 @@
 - name: heap
   type: group
   description: >
-    The golang program heap information exposed by expvar.
-  release: experimental
+    The Go program heap information exposed by expvar.
+  release: ga
   fields:
     - name: cmdline
       type: keyword
       description: >
-        The cmdline of this golang program start with.
+        The cmdline of this Go program start with.
 
     - name: gc
       type: group
@@ -33,7 +33,7 @@
           description: >
              Next collection will happen when HeapAlloc > this amount.
         - name: cpu_fraction
-          type: long
+          type: float
           description: >
              Fraction of CPU time used by GC.
         - name: pause

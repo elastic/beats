@@ -1,0 +1,14 @@
+- module: munin
+  metricsets: ["node"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:4949"]
+
+  # List of plugins to collect metrics from, by default it collects from
+  # all the available ones.
+  #munin.plugins: []
+
+  # If set to true, it sanitizes fields names in concordance with munin
+  # implementation (all characters that are not alphanumeric, or underscore
+  # are replaced by underscores).
+  #munin.sanitize: false

@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 import unittest
@@ -29,8 +30,35 @@ class Test(WriteReadTest):
         evts = self.read_events()
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg, extra={
-            "keywords": ["Classic"],
-            "opcode": "Info",
+            "winlog.keywords": ["Classic"],
+            "winlog.opcode": "Info",
+        })
+
+    def test_resume_reading_events(self):
+        """
+        wineventlog - Resume reading events
+        """
+        msg = "First event"
+        self.write_event_log(msg)
+        evts = self.read_events()
+        self.assertTrue(len(evts), 1)
+        self.assert_common_fields(evts[0], msg=msg, extra={
+            "winlog.keywords": ["Classic"],
+            "winlog.opcode": "Info",
+        })
+
+        # remove the output file, otherwise there is a race condition
+        # in read_events() below where it reads the results of the previous
+        # execution
+        os.unlink(os.path.join(self.working_dir, "output", self.beat_name))
+
+        msg = "Second event"
+        self.write_event_log(msg)
+        evts = self.read_events()
+        self.assertTrue(len(evts), 1)
+        self.assert_common_fields(evts[0], msg=msg, extra={
+            "winlog.keywords": ["Classic"],
+            "winlog.opcode": "Info",
         })
 
     def test_read_unknown_event_id(self):
@@ -43,11 +71,11 @@ class Test(WriteReadTest):
         evts = self.read_events()
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], eventID=event_id, extra={
-            "keywords": ["Classic"],
-            "opcode": "Info",
+            "winlog.keywords": ["Classic"],
+            "winlog.opcode": "Info",
         })
         # Oddly, no rendering error is being given.
-        self.assertTrue("message_error" not in evts[0])
+        self.assertTrue("error.message" not in evts[0])
 
     def test_read_unknown_sid(self):
         """
@@ -62,8 +90,8 @@ class Test(WriteReadTest):
         evts = self.read_events()
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg, sid=accountIdentifier, extra={
-            "keywords": ["Classic"],
-            "opcode": "Info",
+            "winlog.keywords": ["Classic"],
+            "winlog.opcode": "Info",
         })
 
     def test_fields_under_root(self):
@@ -74,7 +102,7 @@ class Test(WriteReadTest):
         self.write_event_log(msg)
         evts = self.read_events(config={
             "tags": ["global"],
-            "fields": {"global": "field", "env": "prod", "level": "overwrite"},
+            "fields": {"global": "field", "env": "prod", "log.level": "overwrite"},
             "fields_under_root": True,
             "event_logs": [
                 {
@@ -88,8 +116,8 @@ class Test(WriteReadTest):
         })
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg, level="overwrite", extra={
-            "keywords": ["Classic"],
-            "opcode": "Info",
+            "winlog.keywords": ["Classic"],
+            "winlog.opcode": "Info",
             "global": "field",
             "env": "dev",
             "local": "field",
@@ -114,8 +142,9 @@ class Test(WriteReadTest):
         })
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg, extra={
-            "keywords": ["Classic"],
-            "opcode": "Info",
+            "log.level": "information",
+            "winlog.keywords": ["Classic"],
+            "winlog.opcode": "Info",
             "fields.global": "field",
             "fields.env": "dev",
             "fields.level": "overwrite",
@@ -141,8 +170,10 @@ class Test(WriteReadTest):
         })
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg)
-        self.assertTrue("xml" in evts[0])
-        self.assertTrue(evts[0]["xml"].endswith('</Event>'), 'xml value: "{}"'.format(evts[0]["xml"]))
+        self.assertTrue("event.original" in evts[0])
+        original = evts[0]["event.original"]
+        self.assertTrue(original.endswith('</Event>'),
+                        'xml value should end with </Event>: "{}"'.format(original))
 
     def test_query_event_id(self):
         """
@@ -166,10 +197,10 @@ class Test(WriteReadTest):
             ]
         }, expected_events=4)
         self.assertTrue(len(evts), 4)
-        self.assertEqual(evts[0]["event_id"], 50)
-        self.assertEqual(evts[1]["event_id"], 100)
-        self.assertEqual(evts[2]["event_id"], 175)
-        self.assertEqual(evts[3]["event_id"], 200)
+        self.assertEqual(evts[0]["winlog.event_id"], 50)
+        self.assertEqual(evts[1]["winlog.event_id"], 100)
+        self.assertEqual(evts[2]["winlog.event_id"], 175)
+        self.assertEqual(evts[3]["winlog.event_id"], 200)
 
     def test_query_level_single(self):
         """
@@ -177,8 +208,10 @@ class Test(WriteReadTest):
         """
         self.write_event_log("success", level=win32evtlog.EVENTLOG_SUCCESS)
         self.write_event_log("error", level=win32evtlog.EVENTLOG_ERROR_TYPE)
-        self.write_event_log("warning", level=win32evtlog.EVENTLOG_WARNING_TYPE)
-        self.write_event_log("information", level=win32evtlog.EVENTLOG_INFORMATION_TYPE)
+        self.write_event_log(
+            "warning", level=win32evtlog.EVENTLOG_WARNING_TYPE)
+        self.write_event_log(
+            "information", level=win32evtlog.EVENTLOG_INFORMATION_TYPE)
         evts = self.read_events(config={
             "event_logs": [
                 {
@@ -189,16 +222,20 @@ class Test(WriteReadTest):
             ]
         })
         self.assertTrue(len(evts), 1)
-        self.assertEqual(evts[0]["level"], "Warning")
+        self.assertEqual(evts[0]["log.level"], "warning")
 
     def test_query_level_multiple(self):
         """
         wineventlog - Query by level (error, warning)
         """
-        self.write_event_log("success", level=win32evtlog.EVENTLOG_SUCCESS)  # Level 0, Info
-        self.write_event_log("error", level=win32evtlog.EVENTLOG_ERROR_TYPE)  # Level 2
-        self.write_event_log("warning", level=win32evtlog.EVENTLOG_WARNING_TYPE)  # Level 3
-        self.write_event_log("information", level=win32evtlog.EVENTLOG_INFORMATION_TYPE)  # Level 4
+        self.write_event_log(
+            "success", level=win32evtlog.EVENTLOG_SUCCESS)  # Level 0, Info
+        self.write_event_log(
+            "error", level=win32evtlog.EVENTLOG_ERROR_TYPE)  # Level 2
+        self.write_event_log(
+            "warning", level=win32evtlog.EVENTLOG_WARNING_TYPE)  # Level 3
+        self.write_event_log(
+            "information", level=win32evtlog.EVENTLOG_INFORMATION_TYPE)  # Level 4
         evts = self.read_events(config={
             "event_logs": [
                 {
@@ -209,8 +246,8 @@ class Test(WriteReadTest):
             ]
         }, expected_events=2)
         self.assertTrue(len(evts), 2)
-        self.assertEqual(evts[0]["level"], "Error")
-        self.assertEqual(evts[1]["level"], "Warning")
+        self.assertEqual(evts[0]["log.level"], "error")
+        self.assertEqual(evts[1]["log.level"], "warning")
 
     def test_query_ignore_older(self):
         """
@@ -229,11 +266,12 @@ class Test(WriteReadTest):
             ]
         })
         self.assertTrue(len(evts), 1)
-        self.assertEqual(evts[0]["event_id"], 10)
+        self.assertEqual(evts[0]["winlog.event_id"], 10)
+        self.assertEqual(evts[0]["event.code"], 10)
 
     def test_query_provider(self):
         """
-        wineventlog - Query by provider (event source)
+        wineventlog - Query by provider name (event source)
         """
         self.write_event_log("selected", source=self.otherAppName)
         self.write_event_log("filtered")
@@ -247,7 +285,7 @@ class Test(WriteReadTest):
             ]
         })
         self.assertTrue(len(evts), 1)
-        self.assertEqual(evts[0]["source_name"], self.otherAppName)
+        self.assertEqual(evts[0]["winlog.provider_name"], self.otherAppName)
 
     def test_query_multi_param(self):
         """
@@ -256,7 +294,8 @@ class Test(WriteReadTest):
         self.write_event_log("selected", source=self.otherAppName,
                              eventID=556, level=win32evtlog.EVENTLOG_ERROR_TYPE)
         self.write_event_log("filtered", source=self.otherAppName, eventID=556)
-        self.write_event_log("filtered", level=win32evtlog.EVENTLOG_WARNING_TYPE)
+        self.write_event_log(
+            "filtered", level=win32evtlog.EVENTLOG_WARNING_TYPE)
         evts = self.read_events(config={
             "event_logs": [
                 {
@@ -284,8 +323,9 @@ class Test(WriteReadTest):
                     "invalid": "garbage"}
             ]
         )
-        self.start_beat(extra_args=["-configtest"]).check_wait(exit_code=1)
-        assert self.log_contains("1 error: Invalid event log key 'invalid' found.")
+        self.start_beat().check_wait(exit_code=1)
+        assert self.log_contains(
+            "1 error: Invalid event log key 'invalid' found.")
 
     def test_utf16_characters(self):
         """
@@ -316,8 +356,35 @@ class Test(WriteReadTest):
         evts = self.read_events()
         self.assertTrue(len(evts), 1)
 
-        event_logs = self.read_registry()
+        event_logs = self.read_registry(requireBookmark=True)
         self.assertTrue(len(event_logs.keys()), 1)
         self.assertIn(self.providerName, event_logs)
         record_number = event_logs[self.providerName]["record_number"]
         self.assertGreater(record_number, 0)
+
+    def test_processors(self):
+        """
+        wineventlog - Processors are applied
+        """
+        self.write_event_log("Hello world!")
+
+        config = {
+            "event_logs": [
+                {
+                    "name": self.providerName,
+                    "api": self.api,
+                    "extras": {
+                        "processors": [
+                            {
+                                "drop_fields": {
+                                    "fields": ["message"],
+                                }
+                            }
+                        ],
+                    },
+                }
+            ]
+        }
+        evts = self.read_events(config)
+        self.assertTrue(len(evts), 1)
+        self.assertNotIn("message", evts[0])

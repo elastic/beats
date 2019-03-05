@@ -1,6 +1,8 @@
 = Winlogbeat Reference
 
-include::../../libbeat/docs/version.asciidoc[]
+:libbeat-dir: ../../libbeat
+
+include::{libbeat-dir}/docs/version.asciidoc[]
 
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
@@ -8,12 +10,16 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :beatname_lc: winlogbeat
 :beatname_uc: Winlogbeat
 :beatname_pkg: {beatname_lc}
+:github_repo_name: beats
+:discuss_forum: beats/{beatname_lc}
+:beat_default_index_prefix: {beatname_lc}
+:has_ml_jobs: yes
+:win_os:
+:win_only:
 
-include::../../libbeat/docs/shared-beats-attributes.asciidoc[]
+include::{libbeat-dir}/docs/shared-beats-attributes.asciidoc[]
 
 include::./overview.asciidoc[]
-
-include::../../libbeat/docs/contributing-to-beats.asciidoc[]
 
 include::./getting-started.asciidoc[]
 
@@ -25,10 +31,13 @@ include::./configuring-howto.asciidoc[]
 
 include::./fields.asciidoc[]
 
-include::./securing-winlogbeat.asciidoc[]
+include::{libbeat-dir}/docs/monitoring/monitoring-beats.asciidoc[]
 
-include::../../libbeat/docs/security/securing-beats.asciidoc[]
+include::{libbeat-dir}/docs/shared-securing-beat.asciidoc[]
 
 include::./troubleshooting.asciidoc[]
 
 include::./faq.asciidoc[]
+
+include::{libbeat-dir}/docs/contributing-to-beats.asciidoc[]
+

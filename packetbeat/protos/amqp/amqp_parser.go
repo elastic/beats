@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package amqp
 
 import (
@@ -72,7 +89,10 @@ func isProtocolHeader(data []byte) (isHeader bool, version string) {
 //func to read a frame header and check if it is valid and complete
 func readFrameHeader(data []byte) (ret *amqpFrame, err bool) {
 	var frame amqpFrame
-
+	if len(data) < 8 {
+		logp.Warn("Partial frame header, waiting for more data")
+		return nil, false
+	}
 	frame.size = binary.BigEndian.Uint32(data[3:7])
 	if len(data) < int(frame.size)+8 {
 		logp.Warn("Frame shorter than declared size, waiting for more data")
@@ -84,7 +104,7 @@ func readFrameHeader(data []byte) (ret *amqpFrame, err bool) {
 	}
 	frame.Type = frameType(data[0])
 	if frame.size == 0 {
-		//frame content is nil with hearbeat frames
+		//frame content is nil with heartbeat frames
 		frame.content = nil
 	} else {
 		frame.content = data[7 : frame.size+7]
@@ -316,7 +336,7 @@ func (amqp *amqpPlugin) handleAmqp(m *amqpMessage, tcptuple *common.TCPTuple, di
 	debugf("A message is ready to be handled")
 	m.tcpTuple = *tcptuple
 	m.direction = dir
-	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
+	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
 
 	if m.method == "basic.publish" {
 		amqp.handlePublishing(m)

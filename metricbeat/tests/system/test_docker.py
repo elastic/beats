@@ -7,6 +7,8 @@ from nose.plugins.attrib import attr
 
 class Test(metricbeat.BaseTest):
 
+    COMPOSE_SERVICES = ['docker']
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_container_fields(self):
         """
@@ -136,7 +138,7 @@ class Test(metricbeat.BaseTest):
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_network_fields(self):
         """
-        test info fields
+        test network fields
         """
         self.render_config_template(modules=[{
             "name": "docker",
@@ -207,6 +209,32 @@ class Test(metricbeat.BaseTest):
 
         if 'labels' in evt["docker"]["image"]:
             del evt["docker"]["image"]["labels"]
+
+        self.assert_fields_are_documented(evt)
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_event_fields(self):
+        """
+        test event fields
+        """
+        self.render_config_template(modules=[{
+            "name": "docker",
+            "metricsets": ["event"],
+            "hosts": ["unix:///var/run/docker.sock"],
+            "period": "10s",
+        }])
+
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings(["Container stopped when recovering stats",
+                                        "An error occurred while getting docker stats"])
+
+        output = self.read_output_json()
+        evt = output[0]
+
+        if 'attributes' in evt["docker"]["event"]["actor"]:
+            del evt["docker"]["event"]["actor"]["attributes"]
 
         self.assert_fields_are_documented(evt)
 

@@ -26,8 +26,10 @@ type Sigar interface {
 	GetLoadAverage() (LoadAverage, error)
 	GetMem() (Mem, error)
 	GetSwap() (Swap, error)
+	GetHugeTLBPages(HugeTLBPages, error)
 	GetFileSystemUsage(string) (FileSystemUsage, error)
 	GetFDUsage() (FDUsage, error)
+	GetRusage(who int) (Rusage, error)
 }
 
 type Cpu struct {
@@ -79,6 +81,15 @@ type Swap struct {
 	Total uint64
 	Used  uint64
 	Free  uint64
+}
+
+type HugeTLBPages struct {
+	Total              uint64
+	Free               uint64
+	Reserved           uint64
+	Surplus            uint64
+	DefaultSize        uint64
+	TotalAllocatedSize uint64
 }
 
 type CpuList struct {
@@ -174,4 +185,23 @@ type ProcFDUsage struct {
 	Open      uint64
 	SoftLimit uint64
 	HardLimit uint64
+}
+
+type Rusage struct {
+	Utime    time.Duration
+	Stime    time.Duration
+	Maxrss   int64
+	Ixrss    int64
+	Idrss    int64
+	Isrss    int64
+	Minflt   int64
+	Majflt   int64
+	Nswap    int64
+	Inblock  int64
+	Oublock  int64
+	Msgsnd   int64
+	Msgrcv   int64
+	Nsignals int64
+	Nvcsw    int64
+	Nivcsw   int64
 }

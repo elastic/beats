@@ -1,0 +1,63 @@
+{
+  "description": "Pipeline for parsing IIS error logs. Requires the geoip plugin.",
+  "processors": [{
+    "grok": {
+      "field": "message",
+      "patterns":[
+        "%{TIMESTAMP_ISO8601:iis.error.time} %{IPORHOST:source.address} %{NUMBER:source.port:long} %{IPORHOST:destination.address} %{IPORHOST:destination.port:long} (?:HTTP/%{NUMBER:http.version}|-) (?:%{WORD:http.request.method}|-) (?:%{URIPATHPARAM:url.original}|-)(?: -)? (?:%{NUMBER:http.response.status_code:long}|-) (?:%{NUMBER}|-) (?:%{NOTSPACE:iis.error.reason_phrase}|-) (?:%{NOTSPACE:iis.error.queue_name}|-)"
+      ],
+      "ignore_missing": true
+    }
+  }, {
+    "remove":{
+      "field": "message"
+    }
+  }, {
+    "rename": {
+      "field": "@timestamp",
+      "target_field": "event.created"
+    }
+  }, {
+    "date": {
+      "field": "iis.error.time",
+      "target_field": "@timestamp",
+      "formats": ["yyyy-MM-dd HH:mm:ss"]
+    }
+  }, {
+    "remove": {
+      "field": "iis.error.time"
+    }
+  }, {
+    "grok": {
+      "field": "destination.address",
+      "patterns": [
+        "%{NOZONEIP:destination.ip}"
+      ],
+      "pattern_definitions": {
+         "NOZONEIP": "[^%]*"
+      }
+    }
+  }, {
+    "grok": {
+      "field": "source.address",
+      "patterns": [
+        "%{NOZONEIP:source.ip}"
+      ],
+      "pattern_definitions": {
+         "NOZONEIP": "[^%]*"
+      }
+    }
+  }, {
+    "geoip": {
+      "field": "source.ip",
+      "target_field": "source.geo",
+      "ignore_failure": true
+    }
+  }],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

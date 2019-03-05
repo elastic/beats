@@ -1,18 +1,27 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "event": {
+        "dataset": "memcached.stats",
+        "duration": 115000,
+        "module": "memcached"
+    },
     "memcached": {
         "stats": {
+            "bytes": {
+                "current": 0,
+                "limit": 67108864
+            },
             "cmd": {
                 "get": 0,
                 "set": 0
             },
             "connections": {
                 "current": 10,
-                "total": 85
+                "total": 135
             },
             "evictions": 0,
             "get": {
@@ -25,21 +34,22 @@
             },
             "pid": 1,
             "read": {
-                "bytes": 6
+                "bytes": 18
             },
             "threads": 4,
             "uptime": {
-                "sec": 645
+                "sec": 139
             },
             "written": {
-                "bytes": 0
+                "bytes": 2616
             }
         }
     },
     "metricset": {
-        "host": "memcached:11211",
-        "module": "memcached",
-        "name": "stats",
-        "rtt": 115
+        "name": "stats"
+    },
+    "service": {
+        "address": "172.26.0.2:11211",
+        "type": "memcached"
     }
 }

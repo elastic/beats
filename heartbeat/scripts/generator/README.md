@@ -26,7 +26,7 @@ Monitor structure:
   monitoring jobs.
 - `_meta/fields.yml`: Document the monitors event field.
 - `_meta/config.yml`: Minimal sample configuration file 
-- `_meta/config.reference.yml`: Reference configuration file. All availalbe
+- `_meta/config.reference.yml`: Reference configuration file. All available
   settings are documented in the reference file.
 
 Code comments tagged with `IMPLEMENT_ME` in the go and meta files give details

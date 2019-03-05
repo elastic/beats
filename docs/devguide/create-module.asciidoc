@@ -82,7 +82,7 @@ To see an example of the `testing.go` file, look at the https://github.com/elast
 
 All the environments are setup with docker. `make integration-tests-environment` and `make system-tests-environment` can be used to run tests for all modules. In case you are developing a module it is convenient to run the tests only for one module and directly run it on your machine.
 
-First you need to start the environment for your module to test and expose the port to your local machien. For this you can run the following command inside the metricbeat directory:
+First you need to start the environment for your module to test and expose the port to your local machine. For this you can run the following command inside the metricbeat directory:
 
 [source,bash]
 ----

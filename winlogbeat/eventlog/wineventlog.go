@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build windows
 
 package eventlog
@@ -14,6 +31,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/elastic/beats/winlogbeat/sys"
 	win "github.com/elastic/beats/winlogbeat/sys/wineventlog"
 )
@@ -71,10 +89,10 @@ var _ EventLog = &winEventLog{}
 type winEventLog struct {
 	config       winEventLogConfig
 	query        string
-	channelName  string        // Name of the channel from which to read.
-	subscription win.EvtHandle // Handle to the subscription.
-	maxRead      int           // Maximum number returned in one Read.
-	lastRead     uint64        // Record number of the last read event.
+	channelName  string                   // Name of the channel from which to read.
+	subscription win.EvtHandle            // Handle to the subscription.
+	maxRead      int                      // Maximum number returned in one Read.
+	lastRead     checkpoint.EventLogState // Record number of the last read event.
 
 	render    func(event win.EvtHandle, out io.Writer) error // Function for rendering the event to XML.
 	renderBuf []byte                                         // Buffer used for rendering event.
@@ -89,8 +107,14 @@ func (l *winEventLog) Name() string {
 	return l.channelName
 }
 
-func (l *winEventLog) Open(recordNumber uint64) error {
-	bookmark, err := win.CreateBookmark(l.channelName, recordNumber)
+func (l *winEventLog) Open(state checkpoint.EventLogState) error {
+	var bookmark win.EvtHandle
+	var err error
+	if len(state.Bookmark) > 0 {
+		bookmark, err = win.CreateBookmarkFromXML(state.Bookmark)
+	} else {
+		bookmark, err = win.CreateBookmarkFromRecordID(l.channelName, state.RecordNumber)
+	}
 	if err != nil {
 		return err
 	}
@@ -102,6 +126,7 @@ func (l *winEventLog) Open(recordNumber uint64) error {
 	if err != nil {
 		return nil
 	}
+	defer windows.CloseHandle(signalEvent)
 
 	debugf("%s using subscription query=%s", l.logPrefix, l.query)
 	subscriptionHandle, err := win.Subscribe(
@@ -148,14 +173,17 @@ func (l *winEventLog) Read() ([]Record, error) {
 			continue
 		}
 
-		r, err := l.buildRecordFromXML(l.outputBuf.Bytes(), err)
-		if err != nil {
-			logp.Err("%s Dropping event. %v", l.logPrefix, err)
-			incrementMetric(dropReasons, err)
-			continue
+		r, _ := l.buildRecordFromXML(l.outputBuf.Bytes(), err)
+		r.Offset = checkpoint.EventLogState{
+			Name:         l.channelName,
+			RecordNumber: r.RecordID,
+			Timestamp:    r.TimeCreated.SystemTime,
+		}
+		if r.Offset.Bookmark, err = l.createBookmarkFromEvent(h); err != nil {
+			logp.Warn("%s failed creating bookmark: %v", l.logPrefix, err)
 		}
 		records = append(records, r)
-		l.lastRead = r.RecordID
+		l.lastRead = r.Offset
 	}
 
 	debugf("%s Read() is returning %d records", l.logPrefix, len(records))
@@ -196,9 +224,12 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 }
 
 func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, error) {
+	includeXML := l.config.IncludeXML
 	e, err := sys.UnmarshalEventXML(x)
 	if err != nil {
-		return Record{}, fmt.Errorf("Failed to unmarshal XML='%s'. %v", x, err)
+		e.RenderErr = append(e.RenderErr, err.Error())
+		// Add raw XML to event.original when decoding fails
+		includeXML = true
 	}
 
 	err = sys.PopulateAccount(&e.User)
@@ -209,10 +240,10 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 
 	if e.RenderErrorCode != 0 {
 		// Convert the render error code to an error message that can be
-		// included in the "message_error" field.
-		e.RenderErr = syscall.Errno(e.RenderErrorCode).Error()
+		// included in the "error.message" field.
+		e.RenderErr = append(e.RenderErr, syscall.Errno(e.RenderErrorCode).Error())
 	} else if recoveredErr != nil {
-		e.RenderErr = recoveredErr.Error()
+		e.RenderErr = append(e.RenderErr, recoveredErr.Error())
 	}
 
 	if e.Level == "" {
@@ -229,7 +260,7 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 		Event: e,
 	}
 
-	if l.config.IncludeXML {
+	if includeXML {
 		r.XML = string(x)
 	}
 
@@ -298,6 +329,17 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 	}
 
 	return l, nil
+}
+
+func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, error) {
+	bmHandle, err := win.CreateBookmarkFromEvent(evtHandle)
+	if err != nil {
+		return "", err
+	}
+	l.outputBuf.Reset()
+	err = win.RenderBookmarkXML(bmHandle, l.renderBuf, l.outputBuf)
+	win.Close(bmHandle)
+	return string(l.outputBuf.Bytes()), err
 }
 
 func init() {

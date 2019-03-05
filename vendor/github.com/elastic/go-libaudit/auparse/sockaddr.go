@@ -1,27 +1,24 @@
-// Copyright 2017 Elasticsearch Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 package auparse
 
 import (
-	"bytes"
-	"encoding/hex"
-	"fmt"
-	"net"
 	"strconv"
-
-	"github.com/pkg/errors"
 )
 
 func parseSockaddr(s string) (map[string]string, error) {
@@ -33,7 +30,7 @@ func parseSockaddr(s string) (map[string]string, error) {
 	out := map[string]string{}
 	switch addressFamily {
 	case 1: // AF_UNIX
-		socket, err := hexToASCII(s[4:])
+		socket, err := hexToString(s[4:])
 		if err != nil {
 			return nil, err
 		}
@@ -85,38 +82,4 @@ func parseSockaddr(s string) (map[string]string, error) {
 	}
 
 	return out, nil
-}
-
-func hexToASCII(h string) (string, error) {
-	output, err := hex.DecodeString(h)
-
-	nullTerm := bytes.Index(output, []byte{0})
-	if nullTerm != -1 {
-		output = output[:nullTerm]
-	}
-
-	return string(output), err
-}
-
-func hexToDec(h string) (int32, error) {
-	num, err := strconv.ParseInt(h, 16, 32)
-	return int32(num), err
-}
-
-func hexToIP(h string) (string, error) {
-	if len(h) == 8 {
-		a1, _ := hexToDec(h[0:2])
-		a2, _ := hexToDec(h[2:4])
-		a3, _ := hexToDec(h[4:6])
-		a4, _ := hexToDec(h[6:8])
-		return fmt.Sprintf("%d.%d.%d.%d", a1, a2, a3, a4), nil
-	} else if len(h) == 32 {
-		b, err := hex.DecodeString(h)
-		if err != nil {
-			return "", err
-		}
-		return net.IP(b).String(), nil
-	}
-
-	return "", errors.New("invalid size")
 }

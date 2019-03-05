@@ -10,7 +10,7 @@ var:
       - c:/programdata/traefik/logs/*access.log*
 
 ingest_pipeline: ingest/pipeline.json
-prospector: config/traefik-access.yml
+input: config/traefik-access.yml
 
 requires.processors:
 - name: user_agent

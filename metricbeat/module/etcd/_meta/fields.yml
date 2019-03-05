@@ -2,8 +2,8 @@
   title: "Etcd"
   description: >
     etcd Module
-  release: beta
-  settings: ["ssl"]
+  release: ga
+  settings: ["ssl", "http"]
   fields:
     - name: etcd
       type: group

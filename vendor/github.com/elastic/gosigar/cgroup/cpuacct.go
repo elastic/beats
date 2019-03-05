@@ -70,7 +70,7 @@ func cpuacctStat(path string, cpuacct *CPUAccountingSubsystem) error {
 		}
 	}
 
-	return nil
+	return sc.Err()
 }
 
 func cpuacctUsage(path string, cpuacct *CPUAccountingSubsystem) error {

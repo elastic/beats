@@ -1,0 +1,95 @@
+{
+    "auditd": {
+        "data": {
+            "a0": "3",
+            "a1": "7ffd0dc80040",
+            "a2": "7ffd0dc7ffd0",
+            "a3": "0",
+            "arch": "x86_64",
+            "exit": "5",
+            "socket": {
+                "addr": "72.83.230.100",
+                "family": "ipv4",
+                "port": "58140"
+            },
+            "syscall": "accept",
+            "tty": "(none)"
+        },
+        "message_type": "syscall",
+        "result": "success",
+        "sequence": 8832,
+        "session": "unset",
+        "summary": {
+            "actor": {
+                "primary": "unset",
+                "secondary": "root"
+            },
+            "how": "/usr/sbin/sshd",
+            "object": {
+                "primary": "72.83.230.100",
+                "secondary": "58140",
+                "type": "socket"
+            }
+        }
+    },
+    "event": {
+        "action": "accepted-connection-from",
+        "category": "audit-rule",
+        "module": "auditd"
+    },
+    "network": {
+        "direction": "incoming"
+    },
+    "process": {
+        "executable": "/usr/sbin/sshd",
+        "name": "sshd",
+        "pid": 1663,
+        "ppid": 1,
+        "title": "(sshd)"
+    },
+    "service": {
+        "type": "auditd"
+    },
+    "source": {
+        "ip": "72.83.230.100",
+        "port": "58140"
+    },
+    "tags": [
+        "net"
+    ],
+    "user": {
+        "audit": {
+            "id": "unset"
+        },
+        "effective": {
+            "group": {
+                "id": "0",
+                "name": "root"
+            },
+            "id": "0",
+            "name": "root"
+        },
+        "filesystem": {
+            "group": {
+                "id": "0",
+                "name": "root"
+            },
+            "id": "0",
+            "name": "root"
+        },
+        "group": {
+            "id": "0",
+            "name": "root"
+        },
+        "id": "0",
+        "name": "root",
+        "saved": {
+            "group": {
+                "id": "0",
+                "name": "root"
+            },
+            "id": "0",
+            "name": "root"
+        }
+    }
+}

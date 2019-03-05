@@ -11,23 +11,43 @@ class Test(BaseTest):
 
         assert len(objs) == 3
         assert all([o["type"] == "http" for o in objs])
-        assert all([o["client_ip"] == "192.168.1.104" for o in objs])
-        assert all([o["client_port"] == 54742 for o in objs])
-        assert all([o["ip"] == "192.168.1.110" for o in objs])
-        assert all([o["port"] == 80 for o in objs])
+        assert all([o["client.ip"] == "192.168.1.104" for o in objs])
+        assert all([o["client.port"] == 54742 for o in objs])
+        assert all([o["server.ip"] == "192.168.1.110" for o in objs])
+        assert all([o["server.port"] == 80 for o in objs])
+
+        assert all(["network.bytes" in o for o in objs])
+        assert all([o["network.type"] == "ipv4" for o in objs])
+        assert all([o["network.transport"] == "tcp" for o in objs])
+        assert all([o["network.protocol"] == "http" for o in objs])
+        assert all(["network.community_id" in o for o in objs])
+
+        assert all(["event.start" in o for o in objs])
+        assert all(["event.end" in o for o in objs])
+        assert all(["event.duration" in o for o in objs])
+
+        assert all(["http.request.method" in o for o in objs])
+        assert all(["http.request.bytes" in o for o in objs])
+        assert all(["http.response.bytes" in o for o in objs])
+        assert all(["http.response.status_code" in o for o in objs])
+        assert all(["http.response.status_phrase" in o for o in objs])
+
+        assert all(["url.full" in o for o in objs])
+
+        assert all(["user_agent.original" in o for o in objs])
 
         assert objs[0]["status"] == "OK"
         assert objs[1]["status"] == "OK"
         assert objs[2]["status"] == "Error"
 
-        assert all(["bytes_in" in o for o in objs])
-        assert all(["bytes_out" in o for o in objs])
+        assert all(["client.bytes" in o for o in objs])
+        assert all(["server.bytes" in o for o in objs])
 
-        assert objs[0]["bytes_in"] == 364
-        assert objs[0]["bytes_out"] == 1000
+        assert objs[0]["client.bytes"] == 364
+        assert objs[0]["server.bytes"] == 1000
 
-        assert objs[1]["bytes_in"] == 471
-        assert objs[1]["bytes_out"] == 234
+        assert objs[1]["client.bytes"] == 471
+        assert objs[1]["server.bytes"] == 234
 
-        assert objs[2]["bytes_in"] == 289
-        assert objs[2]["bytes_out"] == 396
+        assert objs[2]["client.bytes"] == 289
+        assert objs[2]["server.bytes"] == 396

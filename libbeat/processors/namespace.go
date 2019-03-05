@@ -1,9 +1,27 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package processors
 
 import (
-	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 )
@@ -41,7 +59,7 @@ func (ns *Namespace) add(names []string, p pluginer) error {
 	// register plugin if intermediate node in path being processed
 	if len(names) == 1 {
 		if _, found := ns.reg[name]; found {
-			return errors.New("exists already")
+			return errors.Errorf("%v exists already", name)
 		}
 
 		ns.reg[name] = p
@@ -77,20 +95,20 @@ func (ns *Namespace) Plugin() Constructor {
 			}
 
 			if section != "" {
-				return nil, fmt.Errorf("Too many lookup modules configured (%v, %v)",
-					section, name)
+				return nil, errors.Errorf("too many lookup modules "+
+					"configured (%v, %v)", section, name)
 			}
 
 			section = name
 		}
 
 		if section == "" {
-			return nil, errors.New("No lookup module configured")
+			return nil, errors.New("no lookup module configured")
 		}
 
 		backend, found := ns.reg[section]
 		if !found {
-			return nil, fmt.Errorf("Unknown lookup module: %v", section)
+			return nil, errors.Errorf("unknown lookup module: %v", section)
 		}
 
 		config, err := cfg.Child(section, -1)

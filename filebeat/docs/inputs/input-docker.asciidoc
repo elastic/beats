@@ -1,0 +1,106 @@
+:type: docker
+
+[id="{beatname_lc}-input-{type}"]
+=== Docker input
+
+++++
+<titleabbrev>Docker</titleabbrev>
+++++
+
+Use the `docker` input to read logs from Docker containers.
+
+This input searches for container logs under its path, and parse them into
+common message lines, extracting timestamps too. Everything happens before line
+filtering, multiline, and JSON decoding, so this input can be used in
+combination with those settings.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: docker
+  containers.ids: <1>
+    - '8b6fe7dc9e067b58476dc57d6986dd96d7100430c5de3b109a99cd56ac655347'
+----
+
+<1> `containers.ids` is required. All other settings are optional.
+
+==== Configuration options
+
+The `docker` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[[config-container-ids]]
+===== `containers.ids`
+
+The list of Docker container IDs to read logs from. Specify
+`containers.ids: '*'` to read from all containers.
+
+===== `containers.path`
+
+The base path where Docker logs are located. The default
+is `/var/lib/docker/containers`.
+
+===== `containers.paths`
+
+The list of paths to read logs from. This can be used as an alternative to
+`containers.ids` for other runtimes that use the same logging format as docker
+but place their logs in different paths. For example when using CRI-O runtime in
+Kubernetes the following configuration can be used:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: docker
+  containers.paths:
+    - /var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log
+----
+
+When `containers.paths` is used, `containers.path` is ignored.
+
+
+===== `containers.stream`
+
+Reads from the specified streams only: `all`, `stdout` or `stderr`. The default
+is `all`.
+
+===== `combine_partial`
+
+Enable partial messages joining. Docker `json-file` driver splits log lines larger than 16k bytes,
+end of line (`\n`) is present for common lines in the resulting file, while it's not the for the lines
+that have been split. `combine_partial` joins them back together when enabled. It is enabled by default.
+
+===== `cri.parse_flags`
+
+Enable CRI flags parsing from the log file. CRI uses flags to signal a partial line, enabling this will
+ensure partial lines are rejoined. It is disabled by default.
+
+
+The following input configures {beatname_uc} to read the `stdout` stream from
+all containers under the default Docker containers path:
+
+[source,yaml]
+----
+- type: docker
+  combine_partial: true
+  containers:
+    path: "/var/lib/docker/containers"
+    stream: "stdout"
+    ids:
+      - "*"
+----
+
+===== `cri.force`
+
+Force CRI format parsing. This disables automatic format detection, use it when you know format is CRI
+to gain some performance. This is false by default.
+
+include::../inputs/input-common-harvester-options.asciidoc[]
+
+include::../inputs/input-common-file-options.asciidoc[]
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../inputs/input-common-options.asciidoc[]
+
+:type!:

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package memcache
 
 // Memcache TCP Protocol Plugin implementation
@@ -174,7 +191,7 @@ func (mc *memcache) onTCPMessage(
 ) error {
 	msg.Tuple = *tuple
 	msg.Transport = applayer.TransportTCP
-	msg.CmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tuple)
+	msg.CmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tuple)
 
 	if msg.IsRequest {
 		return mc.onTCPRequest(conn, tuple, dir, msg)
@@ -377,7 +394,7 @@ func (mc *memcache) GapInStream(
 		}
 	}
 
-	// need to drop TCP stream. But try to publish all cached trancsactions first
+	// need to drop TCP stream. But try to publish all cached transactions first
 	mc.pushAllTCPTrans(conn.connection)
 	return private, true
 }

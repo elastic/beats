@@ -1,14 +1,37 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package mongodb
 
 import (
 	"encoding/json"
 	"errors"
 	"strings"
+	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 
 	"gopkg.in/mgo.v2/bson"
+)
+
+var (
+	unknownOpcodes = map[opCode]struct{}{}
+	mutex          sync.Mutex
 )
 
 func mongodbMessageParser(s *stream) (bool, bool) {
@@ -39,7 +62,12 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 	opCode := opCode(code)
 
 	if !validOpcode(opCode) {
-		logp.Err("Unknown operation code: %v", opCode)
+		mutex.Lock()
+		defer mutex.Unlock()
+		if _, reported := unknownOpcodes[opCode]; !reported {
+			logp.Err("Unknown operation code: %v", opCode)
+			unknownOpcodes[opCode] = struct{}{}
+		}
 		return false, false
 	}
 
@@ -341,6 +369,9 @@ func (d *decoder) readDocument() (bson.M, error) {
 	start := d.i
 	documentLength, err := d.readInt32()
 	d.i = start + documentLength
+	if len(d.in) < d.i {
+		return nil, errors.New("document out of bounds")
+	}
 
 	documentMap := bson.M{}
 

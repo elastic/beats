@@ -41,6 +41,10 @@ metricbeat.modules:
   metrics_path: {{ m.path }}
   {% endif -%}
 
+  {% if m.port -%}
+  port: {{ m.port }}
+  {% endif -%}
+
   {% if m.timeout -%}
   timeout: {{ m.timeout }}
   {% endif -%}
@@ -101,43 +105,6 @@ metricbeat.config.modules:
 # Disable random start delay for metricsets.
 metricbeat.max_start_delay: 0
 
-#================================ General =====================================
-
-# The name of the shipper that publishes the network data. It can be used to group
-# all the transactions sent by a single shipper in the web interface.
-# If this options is not defined, the hostname is used.
-name: {{shipper_name}}
-
-# The tags of the shipper are included in their own field with each
-# transaction published. Tags make it easy to group servers by different
-# logical properties.
-tags: [
-  {%- if agent_tags -%}
-      {%- for tag in agent_tags -%}
-          "{{ tag }}"
-          {%- if not loop.last %}, {% endif -%}
-      {%- endfor -%}
-  {%- endif -%}
-]
-
-
-#================================ Processors =====================================
-
-{%- if processors %}
-processors:
-{%- for processor in processors %}
-{%- for name, settings in processor.items() %}
-- {{name}}:
-  {%- if settings %}
-  {%- for k, v in settings.items() %}
-    {{k}}:
-      {{v | default([])}}
-  {%- endfor %}
-  {%- endif %}
-{%- endfor %}
-{%- endfor %}
-
-{%- endif %}
 
 #============================== Autodiscover ==================================
 
@@ -148,51 +115,10 @@ metricbeat.autodiscover:
   - type: {{provider}}
     {%- if settings %}
     {%- for k, v in settings.items() %}
-    {{k}}:
-      {{v | default([])}}
+    {{k}}: {{v | default([])}}
     {%- endfor %}
     {%- endif %}
   {%- endfor %}
 {% endif %}
 
-#================================ Queue =====================================
-
-queue.mem:
-  events: 4096
-  flush.min_events: {{ flush_min_events|default(8) }}
-  flush.timeout: 0.1s
-
-{% if kibana -%}
-setup.kibana.host: "{{ kibana.host }}"
-{%- endif %}
-
-#================================ Outputs =====================================
-
-# Configure what outputs to use when sending the data collected by the beat.
-# Multiple outputs may be used.
-
-output:
-  {% if elasticsearch -%}
-  elasticsearch:
-    hosts: ["{{ elasticsearch.host }}"]
-  {%- endif %}
-
-  # File as output
-  # Options
-  # path: where to save the files
-  # filename: name of the files
-  # rotate_every_kb: maximum size of the files in path
-  # number of files: maximum number of files in path
-  {% if not (console or elasticsearch) -%}
-  file:
-    path: {{ output_file_path|default(beat.working_dir + "/output") }}
-    filename: "{{ output_file_filename|default("metricbeat") }}"
-    rotate_every_kb: 1000
-    #number_of_files: 7
-  {%- endif %}
-
-{% if path_data %}
-#================================ Paths =====================================
-path:
-  data: {{path_data}}
-{%endif%}
+{% include './tests/system/config/libbeat.yml.j2' %}

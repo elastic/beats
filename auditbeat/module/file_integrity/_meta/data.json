@@ -1,6 +1,6 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
@@ -9,22 +9,26 @@
             "created",
             "updated"
         ],
+        "dataset": "file",
         "module": "file_integrity"
     },
     "file": {
-        "ctime": "2018-01-05T03:28:26Z",
-        "gid": 20,
+        "ctime": "2019-01-19T15:21:37.939882147Z",
+        "gid": "20",
         "group": "staff",
-        "inode": "20164115",
+        "inode": "8028777",
         "mode": "0600",
-        "mtime": "2018-01-05T03:28:26Z",
+        "mtime": "2019-01-19T15:21:37.939882147Z",
         "owner": "akroh",
-        "path": "/private/var/folders/8x/rnyk6yxn6w97lddn3bs02gf00000gn/T/audit-file864778064/file.data",
+        "path": "/private/var/folders/kx/7y5ztvx100z148jvds11c6rh0000gn/T/audit-file418060202/file.data",
         "size": 11,
         "type": "file",
-        "uid": 501
+        "uid": "501"
     },
     "hash": {
         "sha1": "2aae6c35c94fcfb415dbe95f408b9ce91ee846ed"
+    },
+    "service": {
+        "type": "file_integrity"
     }
 }

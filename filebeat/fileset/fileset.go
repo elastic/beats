@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 /*
 Package fileset contains the code that loads Filebeat modules (which are
 composed of filesets).
@@ -8,6 +25,7 @@ package fileset
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -16,20 +34,28 @@ import (
 	"strings"
 	"text/template"
 
+	errw "github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/logp"
 	mlimporter "github.com/elastic/beats/libbeat/ml-importer"
 )
 
 // Fileset struct is the representation of a fileset.
 type Fileset struct {
-	name       string
-	mcfg       *ModuleConfig
-	fcfg       *FilesetConfig
-	modulePath string
-	manifest   *manifest
-	vars       map[string]interface{}
-	pipelineID string
+	name        string
+	mcfg        *ModuleConfig
+	fcfg        *FilesetConfig
+	modulePath  string
+	manifest    *manifest
+	vars        map[string]interface{}
+	pipelineIDs []string
+}
+
+type pipeline struct {
+	id       string
+	contents map[string]interface{}
 }
 
 // New allocates a new Fileset object with the given configuration.
@@ -65,12 +91,12 @@ func (fs *Fileset) Read(beatVersion string) error {
 		return err
 	}
 
-	fs.vars, err = fs.evaluateVars()
+	fs.vars, err = fs.evaluateVars(beatVersion)
 	if err != nil {
 		return err
 	}
 
-	fs.pipelineID, err = fs.getPipelineID(beatVersion)
+	fs.pipelineIDs, err = fs.getPipelineIDs(beatVersion)
 	if err != nil {
 		return err
 	}
@@ -83,8 +109,8 @@ func (fs *Fileset) Read(beatVersion string) error {
 type manifest struct {
 	ModuleVersion   string                   `config:"module_version"`
 	Vars            []map[string]interface{} `config:"var"`
-	IngestPipeline  string                   `config:"ingest_pipeline"`
-	Prospector      string                   `config:"prospector"`
+	IngestPipeline  []string                 `config:"ingest_pipeline"`
+	Input           string                   `config:"input"`
 	MachineLearning []struct {
 		Name       string `config:"name"`
 		Job        string `config:"job"`
@@ -94,6 +120,20 @@ type manifest struct {
 	Requires struct {
 		Processors []ProcessorRequirement `config:"processors"`
 	} `config:"requires"`
+}
+
+func newManifest(cfg *common.Config) (*manifest, error) {
+	if err := cfgwarn.CheckRemoved6xSetting(cfg, "prospector"); err != nil {
+		return nil, err
+	}
+
+	var manifest manifest
+	err := cfg.Unpack(&manifest)
+	if err != nil {
+		return nil, err
+	}
+
+	return &manifest, nil
 }
 
 // ProcessorRequirement represents the declaration of a dependency to a particular
@@ -109,19 +149,18 @@ func (fs *Fileset) readManifest() (*manifest, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Error reading manifest file: %v", err)
 	}
-	var manifest manifest
-	err = cfg.Unpack(&manifest)
+	manifest, err := newManifest(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("Error unpacking manifest: %v", err)
 	}
-	return &manifest, nil
+	return manifest, nil
 }
 
 // evaluateVars resolves the fileset variables.
-func (fs *Fileset) evaluateVars() (map[string]interface{}, error) {
+func (fs *Fileset) evaluateVars(beatVersion string) (map[string]interface{}, error) {
 	var err error
 	vars := map[string]interface{}{}
-	vars["builtin"], err = fs.getBuiltinVars()
+	vars["builtin"], err = fs.getBuiltinVars(beatVersion)
 	if err != nil {
 		return nil, err
 	}
@@ -163,15 +202,14 @@ func (fs *Fileset) evaluateVars() (map[string]interface{}, error) {
 
 // turnOffElasticsearchVars re-evaluates the variables that have `min_elasticsearch_version`
 // set.
-func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersion string) (map[string]interface{}, error) {
+func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersion common.Version) (map[string]interface{}, error) {
 	retVars := map[string]interface{}{}
 	for key, val := range vars {
 		retVars[key] = val
 	}
 
-	haveVersion, err := common.NewVersion(esVersion)
-	if err != nil {
-		return vars, fmt.Errorf("Error parsing version %s: %v", esVersion, err)
+	if !esVersion.IsValid() {
+		return vars, errors.New("Unknown Elasticsearch version")
 	}
 
 	for _, vals := range fs.manifest.Vars {
@@ -188,11 +226,11 @@ func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersi
 				return vars, fmt.Errorf("Error parsing version %s: %v", minESVersion["version"].(string), err)
 			}
 
-			logp.Debug("fileset", "Comparing ES version %s with requirement of %s", haveVersion, minVersion)
+			logp.Debug("fileset", "Comparing ES version %s with requirement of %s", esVersion.String(), minVersion)
 
-			if haveVersion.LessThan(minVersion) {
+			if esVersion.LessThan(minVersion) {
 				retVars[name] = minESVersion["value"]
-				logp.Info("Setting var %s (%s) to %v because Elasticsearch version is %s", name, fs, minESVersion["value"], haveVersion)
+				logp.Info("Setting var %s (%s) to %v because Elasticsearch version is %s", name, fs, minESVersion["value"], esVersion.String())
 			}
 		}
 	}
@@ -233,7 +271,14 @@ func applyTemplate(vars map[string]interface{}, templateString string, specialDe
 	if specialDelims {
 		tpl = tpl.Delims("{<", ">}")
 	}
-	tpl, err := tpl.Parse(templateString)
+
+	tplFunctions, err := getTemplateFunctions(vars)
+	if err != nil {
+		return "", errw.Wrap(err, "error fetching template functions")
+	}
+	tpl = tpl.Funcs(tplFunctions)
+
+	tpl, err = tpl.Parse(templateString)
 	if err != nil {
 		return "", fmt.Errorf("Error parsing template %s: %v", templateString, err)
 	}
@@ -245,9 +290,27 @@ func applyTemplate(vars map[string]interface{}, templateString string, specialDe
 	return buf.String(), nil
 }
 
+func getTemplateFunctions(vars map[string]interface{}) (template.FuncMap, error) {
+	builtinVars, ok := vars["builtin"].(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("error fetching built-in vars as a dictionary")
+	}
+
+	return template.FuncMap{
+		"IngestPipeline": func(shortID string) string {
+			return formatPipelineID(
+				builtinVars["module"].(string),
+				builtinVars["fileset"].(string),
+				shortID,
+				builtinVars["beatVersion"].(string),
+			)
+		},
+	}, nil
+}
+
 // getBuiltinVars computes the supported built in variables and groups them
 // in a dictionary
-func (fs *Fileset) getBuiltinVars() (map[string]interface{}, error) {
+func (fs *Fileset) getBuiltinVars(beatVersion string) (map[string]interface{}, error) {
 	host, err := os.Hostname()
 	if err != nil || len(host) == 0 {
 		return nil, fmt.Errorf("Error getting the hostname: %v", err)
@@ -260,36 +323,39 @@ func (fs *Fileset) getBuiltinVars() (map[string]interface{}, error) {
 	}
 
 	return map[string]interface{}{
-		"hostname": hostname,
-		"domain":   domain,
+		"hostname":    hostname,
+		"domain":      domain,
+		"module":      fs.mcfg.Module,
+		"fileset":     fs.name,
+		"beatVersion": beatVersion,
 	}, nil
 }
 
-func (fs *Fileset) getProspectorConfig() (*common.Config, error) {
-	path, err := applyTemplate(fs.vars, fs.manifest.Prospector, false)
+func (fs *Fileset) getInputConfig() (*common.Config, error) {
+	path, err := applyTemplate(fs.vars, fs.manifest.Input, false)
 	if err != nil {
-		return nil, fmt.Errorf("Error expanding vars on the prospector path: %v", err)
+		return nil, fmt.Errorf("Error expanding vars on the input path: %v", err)
 	}
 	contents, err := ioutil.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
 	if err != nil {
-		return nil, fmt.Errorf("Error reading prospector file %s: %v", path, err)
+		return nil, fmt.Errorf("Error reading input file %s: %v", path, err)
 	}
 
 	yaml, err := applyTemplate(fs.vars, string(contents), false)
 	if err != nil {
-		return nil, fmt.Errorf("Error interpreting the template of the prospector: %v", err)
+		return nil, fmt.Errorf("Error interpreting the template of the input: %v", err)
 	}
 
 	cfg, err := common.NewConfigWithYAML([]byte(yaml), "")
 	if err != nil {
-		return nil, fmt.Errorf("Error reading prospector config: %v", err)
+		return nil, fmt.Errorf("Error reading input config: %v", err)
 	}
 
 	// overrides
-	if len(fs.fcfg.Prospector) > 0 {
-		overrides, err := common.NewConfigFrom(fs.fcfg.Prospector)
+	if len(fs.fcfg.Input) > 0 {
+		overrides, err := common.NewConfigFrom(fs.fcfg.Input)
 		if err != nil {
-			return nil, fmt.Errorf("Error creating config from prospector overrides: %v", err)
+			return nil, fmt.Errorf("Error creating config from input overrides: %v", err)
 		}
 		cfg, err = common.MergeConfigs(cfg, overrides)
 		if err != nil {
@@ -298,63 +364,84 @@ func (fs *Fileset) getProspectorConfig() (*common.Config, error) {
 	}
 
 	// force our pipeline ID
-	err = cfg.SetString("pipeline", -1, fs.pipelineID)
+	rootPipelineID := ""
+	if len(fs.pipelineIDs) > 0 {
+		rootPipelineID = fs.pipelineIDs[0]
+	}
+	err = cfg.SetString("pipeline", -1, rootPipelineID)
 	if err != nil {
-		return nil, fmt.Errorf("Error setting the pipeline ID in the prospector config: %v", err)
+		return nil, fmt.Errorf("Error setting the pipeline ID in the input config: %v", err)
 	}
 
 	// force our the module/fileset name
 	err = cfg.SetString("_module_name", -1, fs.mcfg.Module)
 	if err != nil {
-		return nil, fmt.Errorf("Error setting the _module_name cfg in the prospector config: %v", err)
+		return nil, fmt.Errorf("Error setting the _module_name cfg in the input config: %v", err)
 	}
 	err = cfg.SetString("_fileset_name", -1, fs.name)
 	if err != nil {
-		return nil, fmt.Errorf("Error setting the _fileset_name cfg in the prospector config: %v", err)
+		return nil, fmt.Errorf("Error setting the _fileset_name cfg in the input config: %v", err)
 	}
 
-	cfg.PrintDebugf("Merged prospector config for fileset %s/%s", fs.mcfg.Module, fs.name)
+	cfg.PrintDebugf("Merged input config for fileset %s/%s", fs.mcfg.Module, fs.name)
 
 	return cfg, nil
 }
 
-// getPipelineID returns the Ingest Node pipeline ID
-func (fs *Fileset) getPipelineID(beatVersion string) (string, error) {
-	path, err := applyTemplate(fs.vars, fs.manifest.IngestPipeline, false)
-	if err != nil {
-		return "", fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
+// getPipelineIDs returns the Ingest Node pipeline IDs
+func (fs *Fileset) getPipelineIDs(beatVersion string) ([]string, error) {
+	var pipelineIDs []string
+	for _, ingestPipeline := range fs.manifest.IngestPipeline {
+		path, err := applyTemplate(fs.vars, ingestPipeline, false)
+		if err != nil {
+			return nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
+		}
+
+		pipelineIDs = append(pipelineIDs, formatPipelineID(fs.mcfg.Module, fs.name, path, beatVersion))
 	}
 
-	return formatPipelineID(fs.mcfg.Module, fs.name, path, beatVersion), nil
+	return pipelineIDs, nil
 }
 
-// GetPipeline returns the JSON content of the Ingest Node pipeline that parses the logs.
-func (fs *Fileset) GetPipeline(esVersion string) (pipelineID string, content map[string]interface{}, err error) {
-	path, err := applyTemplate(fs.vars, fs.manifest.IngestPipeline, false)
-	if err != nil {
-		return "", nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
-	}
-
-	strContents, err := ioutil.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
-	if err != nil {
-		return "", nil, fmt.Errorf("Error reading pipeline file %s: %v", path, err)
-	}
-
+// GetPipelines returns the JSON content of the Ingest Node pipeline that parses the logs.
+func (fs *Fileset) GetPipelines(esVersion common.Version) (pipelines []pipeline, err error) {
 	vars, err := fs.turnOffElasticsearchVars(fs.vars, esVersion)
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
 
-	jsonString, err := applyTemplate(vars, string(strContents), true)
-	if err != nil {
-		return "", nil, fmt.Errorf("Error interpreting the template of the ingest pipeline: %v", err)
+	for idx, ingestPipeline := range fs.manifest.IngestPipeline {
+		path, err := applyTemplate(fs.vars, ingestPipeline, false)
+		if err != nil {
+			return nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
+		}
+
+		strContents, err := ioutil.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
+		if err != nil {
+			return nil, fmt.Errorf("Error reading pipeline file %s: %v", path, err)
+		}
+
+		jsonString, err := applyTemplate(vars, string(strContents), true)
+		if err != nil {
+			return nil, fmt.Errorf("Error interpreting the template of the ingest pipeline: %v", err)
+		}
+
+		var content map[string]interface{}
+		err = json.Unmarshal([]byte(jsonString), &content)
+		if err != nil {
+			return nil, fmt.Errorf("Error JSON decoding the pipeline file: %s: %v", path, err)
+		}
+
+		pipelineID := fs.pipelineIDs[idx]
+
+		p := pipeline{
+			pipelineID,
+			content,
+		}
+		pipelines = append(pipelines, p)
 	}
 
-	err = json.Unmarshal([]byte(jsonString), &content)
-	if err != nil {
-		return "", nil, fmt.Errorf("Error JSON decoding the pipeline file: %s: %v", path, err)
-	}
-	return fs.pipelineID, content, nil
+	return pipelines, nil
 }
 
 // formatPipelineID generates the ID to be used for the pipeline ID in Elasticsearch
@@ -385,7 +472,7 @@ func (fs *Fileset) GetMLConfigs() []mlimporter.MLConfig {
 	var mlConfigs []mlimporter.MLConfig
 	for _, ml := range fs.manifest.MachineLearning {
 		mlConfigs = append(mlConfigs, mlimporter.MLConfig{
-			ID:           fmt.Sprintf("filebeat-%s-%s-%s", fs.mcfg.Module, fs.name, ml.Name),
+			ID:           fmt.Sprintf("filebeat-%s-%s-%s_ecs", fs.mcfg.Module, fs.name, ml.Name),
 			JobPath:      filepath.Join(fs.modulePath, fs.name, ml.Job),
 			DatafeedPath: filepath.Join(fs.modulePath, fs.name, ml.Datafeed),
 			MinVersion:   ml.MinVersion,

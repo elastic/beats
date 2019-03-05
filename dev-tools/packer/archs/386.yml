@@ -1,5 +1,0 @@
-arch: '386'
-deb_arch: i386
-rpm_arch: i686
-bin_arch: x86
-win_arch: x86

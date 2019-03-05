@@ -14,15 +14,16 @@ class TestAutodiscover(filebeat.BaseTest):
                      "integration test not available on 2.x")
     def test_docker(self):
         """
-        Test docker autodiscover starts prospector
+        Test docker autodiscover starts input
         """
         import docker
         docker_client = docker.from_env()
 
         self.render_config_template(
-            prospectors=False,
+            inputs=False,
             autodiscover={
                 'docker': {
+                    'cleanup_timeout': '0s',
                     'templates': '''
                       - condition:
                           equals.docker.container.image: busybox
@@ -42,14 +43,16 @@ class TestAutodiscover(filebeat.BaseTest):
         docker_client.images.pull('busybox')
         docker_client.containers.run('busybox', 'sleep 1')
 
-        self.wait_until(lambda: self.log_contains('Autodiscover starting runner: prospector'))
-        self.wait_until(lambda: self.log_contains('Autodiscover stopping runner: prospector'))
+        self.wait_until(lambda: self.log_contains('Starting runner: input'))
+        self.wait_until(lambda: self.log_contains('Stopping runner: input'))
 
         output = self.read_output_json()
         proc.check_kill_and_wait()
 
         # Check metadata is added
         assert output[0]['message'] == 'Busybox output 1'
-        assert output[0]['docker']['container']['image'] == 'busybox'
+        assert output[0]['container']['image']['name'] == 'busybox'
         assert output[0]['docker']['container']['labels'] == {}
-        assert 'name' in output[0]['docker']['container']
+        assert 'name' in output[0]['container']
+
+        self.assert_fields_are_documented(output[0])

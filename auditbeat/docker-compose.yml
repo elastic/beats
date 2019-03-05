@@ -1,0 +1,40 @@
+version: '2.3'
+services:
+  beat:
+    build: ${PWD}/.
+    depends_on:
+      - proxy_dep
+    working_dir: /go/src/github.com/elastic/beats/auditbeat
+    environment:
+      - ES_HOST=elasticsearch
+      - ES_PORT=9200
+      - ES_USER=beats
+      - ES_PASS=testing
+      - KIBANA_HOST=kibana
+      - KIBANA_PORT=5601
+    volumes:
+      - ${PWD}/..:/go/src/github.com/elastic/beats/
+    command: make
+    privileged: true
+    pid: host
+    cap_add:
+      - AUDIT_CONTROL
+      - AUDIT_READ
+
+  # This is a proxy used to block beats until all services are healthy.
+  # See: https://github.com/docker/compose/issues/4369
+  proxy_dep:
+    image: busybox
+    depends_on:
+      elasticsearch: { condition: service_healthy }
+      kibana: { condition: service_healthy }
+
+  elasticsearch:
+    extends:
+      file: ../testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: elasticsearch
+
+  kibana:
+    extends:
+      file: ../testing/environments/${TESTING_ENVIRONMENT}.yml
+      service: kibana

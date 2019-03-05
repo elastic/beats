@@ -1,0 +1,36 @@
+- name: server
+  description: "Server log file"
+  type: group
+  fields:
+  - name: stacktrace
+    description": Stack trace in case of errors
+    index: false
+  - name: gc
+    description: "GC log"
+    type: group
+    fields:
+    - name: young
+      description: "Young GC"
+      example: ""
+      type: group
+      fields:
+      - name: one
+        description: ""
+        example: ""
+        type: long
+      - name: two
+        description: ""
+        example: ""
+        type: long
+    - name: overhead_seq
+      description: "Sequence number"
+      example: 3449992
+      type: long
+    - name: collection_duration.ms
+      description: "Time spent in GC, in milliseconds"
+      example: 1600
+      type: float
+    - name: observation_duration.ms
+      description: "Total time over which collection was observed, in milliseconds"
+      example: 1800
+      type: float

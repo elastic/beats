@@ -1,0 +1,42 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "beat": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "elasticsearch": {
+        "cluster": {
+            "id": "UziYVLPkTTmCzccc6102Bg",
+            "name": "elasticsearch"
+        },
+        "index": {
+            "name": "filebeat-7.0.0-alpha1-2018.05.09",
+            "total": {
+                "docs": {
+                    "count": 1,
+                    "deleted": 0
+                },
+                "segments": {
+                    "count": 1,
+                    "memory": {
+                        "bytes": 6983
+                    }
+                },
+                "store": {
+                    "size": {
+                        "bytes": 19326
+                    }
+                }
+            }
+        }
+    },
+    "metricset": {
+        "host": "127.0.0.1:9200",
+        "module": "elasticsearch",
+        "name": "index",
+        "rtt": 115
+    },
+    "service": {
+        "name": "elasticsearch"
+    }
+}

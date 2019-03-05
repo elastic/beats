@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package logp
 
 import (
@@ -83,8 +100,8 @@ func WTF(format string, v ...interface{}) {
 // Recover stops a panicking goroutine and logs an Error.
 func Recover(msg string) {
 	if r := recover(); r != nil {
-		msg := fmt.Sprintf("%s. Recovering, but please report this: %s.", msg, r)
+		msg := fmt.Sprintf("%s. Recovering, but please report this.", msg)
 		globalLogger().WithOptions(zap.AddCallerSkip(2)).
-			Error(msg, zap.Stack("stack"))
+			Error(msg, zap.Any("panic", r), zap.Stack("stack"))
 	}
 }

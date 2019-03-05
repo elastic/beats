@@ -1,0 +1,138 @@
+# Licensed to Elasticsearch B.V. under one or more contributor
+# license agreements. See the NOTICE file distributed with
+# this work for additional information regarding copyright
+# ownership. Elasticsearch B.V. licenses this file to you under
+# the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+import:
+  - unfold_templates.yml
+
+main: |
+  package gotype
+
+  func (u *unfolderReflSlice) OnNil(ctx *unfoldCtx) error {
+    u.prepare(ctx)
+    return nil
+  }
+
+  {{ invoke "makeReflPrimitives" "type" "unfolderReflSlice" }}
+  {{ invoke "makeReflChildArrays" "type" "unfolderReflSlice" }}
+  {{ invoke "makeReflChildObjects" "type" "unfolderReflSlice" }}
+
+  func (u *unfolderReflMapOnElem) OnNil(ctx *unfoldCtx) error {
+    ptr := ctx.value.current
+    m := ptr.Elem()
+    v := reflect.Zero(m.Type().Elem())
+    m.SetMapIndex(reflect.ValueOf(ctx.key.pop()), v)
+
+    ctx.unfolder.current = u.shared.waitKey
+    return nil
+  }
+
+  {{ invoke "makeReflPrimitives" "type" "unfolderReflMapOnElem" "process" "process" }}
+  {{ invoke "makeReflChildArrays" "type" "unfolderReflMapOnElem" "process" "process" }}
+  {{ invoke "makeReflChildObjects" "type" "unfolderReflMapOnElem" "process" "process" "error" "errExpectedObjectValue" }}
+
+  func (u *unfolderReflPtr) OnNil(ctx *unfoldCtx) error {
+    ptr := ctx.value.current
+    v := ptr.Elem()
+    v.Set(reflect.Zero(v.Type()))
+    u.cleanup(ctx)
+    return nil
+  }
+
+  {{ invoke "makeReflPrimitives" "type" "unfolderReflPtr" "process" "process" }}
+  {{ invoke "makeReflChildArrays" "type" "unfolderReflPtr" "process" "process" }}
+  {{ invoke "makeReflChildObjects" "type" "unfolderReflPtr" "process" "process" }}
+
+# makeReflPrimitiveCallbacks(type, [process])
+templates.makeReflPrimitives: |
+  {{ $type := .type}}
+  {{ $process := .process }}
+
+  func (u *{{ $type }}) OnByte(ctx *unfoldCtx, v byte) error {
+    elem := u.prepare(ctx)
+    u.elem.initState(ctx, elem)
+    err := ctx.unfolder.current.OnByte(ctx, v)
+    {{ if $process }}
+    if err == nil {
+      u.{{ $process }}(ctx)
+    }
+    {{ end }}
+    return err
+  }
+
+  func (u *{{ $type }}) OnStringRef(ctx *unfoldCtx, v []byte) error {
+    return u.OnString(ctx, string(v))
+  }
+
+  {{ range data.primitiveTypes }}
+    func (u *{{ $type }}) On{{ . | capitalize}}(ctx *unfoldCtx, v {{ . }}) error {
+      elem := u.prepare(ctx)
+      u.elem.initState(ctx, elem)
+      err := ctx.unfolder.current.On{{ . | capitalize }}(ctx, v)
+      {{ if $process }}
+      if err == nil {
+        u.{{ $process }}(ctx)
+      }
+      {{ end }}
+      return err
+    }
+  {{ end }}
+
+# makeReflChildArrays(type, [process])
+templates.makeReflChildArrays: |
+  {{ $type := .type}}
+  {{ $process := .process }}
+
+  func (u *{{ $type }}) OnArrayStart(ctx *unfoldCtx, l int, bt structform.BaseType) error {
+    elem := u.prepare(ctx)
+    u.elem.initState(ctx, elem)
+    return ctx.unfolder.current.OnArrayStart(ctx, l, bt)
+  }
+
+  func (u *{{ $type }}) OnChildArrayDone(ctx *unfoldCtx) error {
+    {{ if $process }}
+      u.{{ $process }}(ctx)
+    {{ end }}
+    return nil
+  }
+
+# makeReflChildObjects(type, [process], [error])
+templates.makeReflChildObjects: |
+  {{ $type := .type}}
+  {{ $process := .process }}
+  {{ $error := default "errUnsupported" .error }}
+
+  func (u *{{ $type }}) OnObjectStart(ctx *unfoldCtx, l int, bt structform.BaseType) error {
+    elem := u.prepare(ctx)
+    u.elem.initState(ctx, elem)
+    return ctx.unfolder.current.OnObjectStart(ctx, l, bt)
+  }
+
+  func (u *{{ $type }}) OnKey(_ *unfoldCtx, _ string) error {
+    return {{ $error }}
+  }
+
+  func (u *{{ $type }}) OnKeyRef(_ *unfoldCtx, _ []byte) error {
+    return {{ $error }}
+  }
+
+  func (u *{{ $type }}) OnChildObjectDone(ctx *unfoldCtx) error {
+    {{ if $process }}
+      u.{{ $process }}(ctx)
+    {{ end }}
+    return nil
+  }
+  

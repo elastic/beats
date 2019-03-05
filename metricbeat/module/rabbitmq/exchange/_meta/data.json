@@ -1,0 +1,47 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "rabbitmq.exchange",
+        "duration": 115000,
+        "module": "rabbitmq"
+    },
+    "metricset": {
+        "name": "exchange"
+    },
+    "rabbitmq": {
+        "exchange": {
+            "arguments": {},
+            "auto_delete": false,
+            "durable": true,
+            "internal": false,
+            "messages": {
+                "publish_in": {
+                    "count": 100,
+                    "details": {
+                        "rate": 0.5
+                    }
+                },
+                "publish_out": {
+                    "count": 99,
+                    "details": {
+                        "rate": 0.9
+                    }
+                }
+            },
+            "name": "exchange.name",
+            "type": "fanout"
+        },
+        "vhost": "/"
+    },
+    "service": {
+        "address": "127.0.0.1:53926",
+        "type": "rabbitmq"
+    },
+    "user": {
+        "name": "guest"
+    }
+}

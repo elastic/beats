@@ -34,7 +34,7 @@ class Test(BaseTest):
         total_lines = 1000
         lines_per_file = 10
         # Each line should have the same length + line ending
-        # Some spare capacity is added to make sure all events are presisted
+        # Some spare capacity is added to make sure all events are persisted
         line_length = len(str(total_lines)) + 1
 
         # Setup python log handler
@@ -56,7 +56,7 @@ class Test(BaseTest):
         # wait until filebeat is fully running
         self.wait_until(
             lambda: self.log_contains(
-                "Loading and starting Prospectors completed."),
+                "Loading and starting Inputs completed."),
             max_timeout=15)
 
         # Start logging and rotating
@@ -78,7 +78,7 @@ class Test(BaseTest):
                 v = int(content["message"])
                 entry_list.append(v)
 
-        ### This lines can be uncomemnted for debugging ###
+        ### This lines can be uncommented for debugging ###
         # Prints out the missing entries
         # for i in range(total_lines):
         #    if i not in entry_list:

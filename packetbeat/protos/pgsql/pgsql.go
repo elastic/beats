@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package pgsql
 
 import (
@@ -5,11 +22,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/procs"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
@@ -59,20 +76,21 @@ type pgsqlMessage struct {
 
 	direction    uint8
 	tcpTuple     common.TCPTuple
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 }
 
 type pgsqlTransaction struct {
-	tuple        common.TCPTuple
-	src          common.Endpoint
-	dst          common.Endpoint
-	responseTime int32
-	ts           time.Time
-	query        string
-	method       string
-	bytesOut     uint64
-	bytesIn      uint64
-	notes        []string
+	tuple    common.TCPTuple
+	src      common.Endpoint
+	dst      common.Endpoint
+	ts       time.Time
+	endTime  time.Time
+	query    string
+	method   string
+	bytesOut uint64
+	bytesIn  uint64
+	notes    []string
+	isError  bool
 
 	pgsql common.MapStr
 
@@ -344,7 +362,7 @@ var handlePgsql = func(pgsql *pgsqlPlugin, m *pgsqlMessage, tcptuple *common.TCP
 
 	m.tcpTuple = *tcptuple
 	m.direction = dir
-	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTuple(tcptuple.IPPort())
+	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
 
 	if m.isRequest {
 		pgsql.receivedPgsqlRequest(m)
@@ -372,16 +390,8 @@ func (pgsql *pgsqlPlugin) receivedPgsqlRequest(msg *pgsqlMessage) {
 		trans := &pgsqlTransaction{tuple: tuple}
 
 		trans.ts = msg.ts
-		trans.src = common.Endpoint{
-			IP:   msg.tcpTuple.SrcIP.String(),
-			Port: msg.tcpTuple.SrcPort,
-			Proc: string(msg.cmdlineTuple.Src),
-		}
-		trans.dst = common.Endpoint{
-			IP:   msg.tcpTuple.DstIP.String(),
-			Port: msg.tcpTuple.DstPort,
-			Proc: string(msg.cmdlineTuple.Dst),
-		}
+		trans.src, trans.dst = common.MakeEndpointPair(msg.tcpTuple.BaseTuple, msg.cmdlineTuple)
+
 		if msg.direction == tcp.TCPDirectionReverse {
 			trans.src, trans.dst = trans.dst, trans.src
 		}
@@ -420,16 +430,19 @@ func (pgsql *pgsqlPlugin) receivedPgsqlResponse(msg *pgsqlMessage) {
 	}
 
 	trans.pgsql.Update(common.MapStr{
-		"iserror":        msg.isError,
-		"num_rows":       msg.numberOfRows,
-		"num_fields":     msg.numberOfFields,
-		"error_code":     msg.errorCode,
-		"error_message":  msg.errorInfo,
-		"error_severity": msg.errorSeverity,
+		"num_rows":   msg.numberOfRows,
+		"num_fields": msg.numberOfFields,
 	})
+	if msg.isError {
+		trans.pgsql.Update(common.MapStr{
+			"error_code":     msg.errorCode,
+			"error_message":  msg.errorInfo,
+			"error_severity": msg.errorSeverity,
+		})
+	}
 	trans.bytesOut = msg.size
-
-	trans.responseTime = int32(msg.ts.Sub(trans.ts).Nanoseconds() / 1e6) // resp_time in milliseconds
+	trans.isError = msg.isError
+	trans.endTime = msg.ts
 	trans.responseRaw = common.DumpInCSVFormat(msg.fields, msg.rows)
 
 	trans.notes = append(trans.notes, msg.notes...)
@@ -444,38 +457,37 @@ func (pgsql *pgsqlPlugin) publishTransaction(t *pgsqlTransaction) {
 		return
 	}
 
-	fields := common.MapStr{}
+	evt, pbf := pb.NewBeatEvent(t.ts)
+	pbf.SetSource(&t.src)
+	pbf.SetDestination(&t.dst)
+	pbf.Source.Bytes = int64(t.bytesIn)
+	pbf.Destination.Bytes = int64(t.bytesOut)
+	pbf.Event.Start = t.ts
+	pbf.Event.End = t.endTime
+	pbf.Event.Dataset = "pgsql"
+	pbf.Network.Transport = "tcp"
+	pbf.Network.Protocol = pbf.Event.Dataset
+	pbf.Error.Message = t.notes
 
-	fields["type"] = "pgsql"
-	if t.pgsql["iserror"].(bool) {
+	fields := evt.Fields
+	fields["type"] = pbf.Event.Dataset
+	fields["query"] = t.query
+	fields["method"] = t.method
+	fields["pgsql"] = t.pgsql
+
+	if t.isError {
 		fields["status"] = common.ERROR_STATUS
 	} else {
 		fields["status"] = common.OK_STATUS
 	}
-	fields["responsetime"] = t.responseTime
 	if pgsql.sendRequest {
 		fields["request"] = t.requestRaw
 	}
 	if pgsql.sendResponse {
 		fields["response"] = t.responseRaw
 	}
-	fields["query"] = t.query
-	fields["method"] = t.method
-	fields["bytes_out"] = t.bytesOut
-	fields["bytes_in"] = t.bytesIn
-	fields["pgsql"] = t.pgsql
 
-	fields["src"] = &t.src
-	fields["dst"] = &t.dst
-
-	if len(t.notes) > 0 {
-		fields["notes"] = t.notes
-	}
-
-	pgsql.results(beat.Event{
-		Timestamp: t.ts,
-		Fields:    fields,
-	})
+	pgsql.results(evt)
 }
 
 func (pgsql *pgsqlPlugin) removeTransaction(transList []*pgsqlTransaction,

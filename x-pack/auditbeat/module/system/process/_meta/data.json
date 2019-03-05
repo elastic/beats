@@ -1,0 +1,49 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "action": "process_started",
+        "dataset": "process",
+        "kind": "event",
+        "module": "system"
+    },
+    "message": "Process zsh (PID: 12936) by user elastic STARTED",
+    "process": {
+        "args": [
+            "zsh"
+        ],
+        "entity_id": "e2e0c5f51b093b71afed6af23debc906090d2f2f2afa9b930bf7e0803a6b53d5",
+        "executable": "/bin/zsh",
+        "name": "zsh",
+        "pid": 12936,
+        "ppid": 3858,
+        "start": "2019-01-21T15:01:54.782288Z",
+        "working_directory": "/Users/elastic"
+    },
+    "service": {
+        "type": "system"
+    },
+    "user": {
+        "effective": {
+            "group": {
+                "id": "1000"
+            },
+            "id": "1000"
+        },
+        "group": {
+            "id": "1000",
+            "name": "elastic"
+        },
+        "id": "1000",
+        "name": "elastic",
+        "saved": {
+            "group": {
+                "id": "1000"
+            },
+            "id": "1000"
+        }
+    }
+}

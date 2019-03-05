@@ -1,0 +1,26 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/elasticsearch/*.log
+      - /var/log/elasticsearch/*_server.json
+    os.darwin:
+      - /usr/local/var/lib/elasticsearch/*.log
+      - /usr/local/var/lib/elasticsearch/*_server.json
+    os.windows:
+      - c:/ProgramData/Elastic/Elasticsearch/logs/*.log
+      - c:/ProgramData/Elastic/Elasticsearch/logs/*_server.json
+  - name: convert_timezone
+    default: false
+    # if ES < 6.1.0, this flag switches to false automatically when evaluating the
+    # pipeline
+    min_elasticsearch_version:
+      version: 6.1.0
+      value: false
+
+ingest_pipeline:
+  - ingest/pipeline.json
+  - ingest/pipeline-plaintext.json
+  - ingest/pipeline-json.json
+input: config/log.yml

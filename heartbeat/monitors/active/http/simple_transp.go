@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package http
 
 import (
@@ -68,7 +85,6 @@ func (t *SimpleTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
 
 	requestedGzip := false
 	if t.DisableCompression &&
@@ -111,6 +127,21 @@ func (t *SimpleTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	case ret = <-readerDone:
 		break
 	case <-done:
+		// We need to free resources from the main reader
+		// We start by closing the conn, which will most likely cause an error
+		// in the read goroutine (unless we are right on the boundary between timeout and success)
+		// and will free up both the connection and cause that go routine to terminate.
+		conn.Close()
+		// Now we block waiting for that goroutine to finish. We do this synchronously
+		// because with a closed connection it should return immediately.
+		// We can ignore the ret.err value because the error is most likely due to us
+		// prematurely closing the conn
+		ret := <-readerDone
+		// If the body has been allocated we need to close it
+		if ret.resp != nil {
+			ret.resp.Body.Close()
+		}
+		// finally, return the real error. No need to return a response here
 		return nil, errors.New("http: request timed out while waiting for response")
 	}
 	close(readerDone)
@@ -130,6 +161,22 @@ func (t *SimpleTransport) writeRequest(conn net.Conn, req *http.Request) error {
 	return err
 }
 
+// comboConnReadCloser wraps a ReadCloser that is backed by
+// on a net.Conn. It will close the net.Conn when the ReadCloser is closed.
+type comboConnReadCloser struct {
+	conn net.Conn
+	rc   io.ReadCloser
+}
+
+func (c comboConnReadCloser) Read(p []byte) (n int, err error) {
+	return c.rc.Read(p)
+}
+
+func (c comboConnReadCloser) Close() error {
+	defer c.conn.Close()
+	return c.rc.Close()
+}
+
 func (t *SimpleTransport) readResponse(
 	conn net.Conn,
 	req *http.Request,
@@ -140,6 +187,7 @@ func (t *SimpleTransport) readResponse(
 	if err != nil {
 		return nil, err
 	}
+	resp.Body = comboConnReadCloser{conn, resp.Body}
 
 	t.sigStartRead()
 

@@ -6,19 +6,24 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: filebeat
-    kubernetes.io/cluster-service: "true"
 data:
   filebeat.yml: |-
     filebeat.config:
-      prospectors:
-        # Mounted `filebeat-prospectors` configmap:
-        path: ${path.config}/prospectors.d/*.yml
-        # Reload prospectors configs as they change:
+      inputs:
+        # Mounted `filebeat-inputs` configmap:
+        path: ${path.config}/inputs.d/*.yml
+        # Reload inputs configs as they change:
         reload.enabled: false
       modules:
         path: ${path.config}/modules.d/*.yml
         # Reload module configs as they change:
         reload.enabled: false
+
+    # To enable hints based autodiscover, remove `filebeat.config.inputs` configuration and uncomment this:
+    #filebeat.autodiscover:
+    #  providers:
+    #    - type: kubernetes
+    #      hints.enabled: true
 
     processors:
       - add_cloud_metadata:
@@ -34,11 +39,10 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: filebeat-prospectors
+  name: filebeat-inputs
   namespace: kube-system
   labels:
     k8s-app: filebeat
-    kubernetes.io/cluster-service: "true"
 data:
   kubernetes.yml: |-
     - type: docker
@@ -55,19 +59,17 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: filebeat
-    kubernetes.io/cluster-service: "true"
 spec:
   template:
     metadata:
       labels:
         k8s-app: filebeat
-        kubernetes.io/cluster-service: "true"
     spec:
       serviceAccountName: filebeat
       terminationGracePeriodSeconds: 30
       containers:
       - name: filebeat
-        image: docker.elastic.co/beats/filebeat:7.0.0-alpha1
+        image: docker.elastic.co/beats/filebeat:8.0.0
         args: [
           "-c", "/etc/filebeat.yml",
           "-e",
@@ -87,6 +89,8 @@ spec:
           value:
         securityContext:
           runAsUser: 0
+          # If using Red Hat OpenShift uncomment this:
+          #privileged: true
         resources:
           limits:
             memory: 200Mi
@@ -98,8 +102,8 @@ spec:
           mountPath: /etc/filebeat.yml
           readOnly: true
           subPath: filebeat.yml
-        - name: prospectors
-          mountPath: /usr/share/filebeat/prospectors.d
+        - name: inputs
+          mountPath: /usr/share/filebeat/inputs.d
           readOnly: true
         - name: data
           mountPath: /usr/share/filebeat/data
@@ -114,12 +118,15 @@ spec:
       - name: varlibdockercontainers
         hostPath:
           path: /var/lib/docker/containers
-      - name: prospectors
+      - name: inputs
         configMap:
           defaultMode: 0600
-          name: filebeat-prospectors
+          name: filebeat-inputs
+      # data folder stores a registry of read status for all files, so we don't send everything again on a Filebeat pod restart
       - name: data
-        emptyDir: {}
+        hostPath:
+          path: /var/lib/filebeat-data
+          type: DirectoryOrCreate
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding

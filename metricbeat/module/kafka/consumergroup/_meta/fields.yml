@@ -2,10 +2,11 @@
   type: group
   description: >
     consumergroup
-  release: beta
+  release: ga
   fields:
     - name: broker
       type: group
+      deprecated: 6.5
       description: >
         Broker Consumer Group Information have been read from (Broker handling
         the consumer group).
@@ -26,10 +27,12 @@
 
     - name: topic
       type: keyword
+      deprecated: 6.5
       description: Topic name
 
     - name: partition
       type: long
+      deprecated: 6.5
       description: Partition ID
 
     - name: offset
@@ -37,7 +40,7 @@
       description: consumer offset into partition being read
 
     - name: meta
-      type: text
+      type: keyword
       description: custom consumer meta data string
 
     - name: error.code

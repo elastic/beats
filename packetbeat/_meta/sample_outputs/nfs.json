@@ -1,41 +1,56 @@
 {
-  "@timestamp": "2016-03-28T06:18:18.431Z",
-  "beat": {
-    "hostname": "localhost",
-    "name": "localhost"
-  },
-  "count": 1,
-  "dst": "127.0.0.1",
-  "dst_port": 2049,
-  "nfs": {
-    "minor_version": 1,
-    "opcode": "GETATTR",
-    "status": "NFSERR_NOENT",
-    "tag": "",
-    "version": 4
-  },
-  "rpc": {
-    "auth_flavor": "unix",
-    "call_size": 200,
-    "cred": {
-      "gid": 500,
-      "gids": [
-        491,
-        499,
-        500
-      ],
-      "machinename": "localhost",
-      "stamp": 4597002,
-      "uid": 500
+    "@timestamp": "1937-03-13T21:53:13.273Z",
+    "@metadata": {
+        "beat": "packetbeat",
+        "type": "doc",
+        "version": "7.0.0"
     },
-    "reply_size": 96,
-    "status": "success",
-    "time": 25631000,
-    "time_str": "25.631ms",
-    "xid": "2cf0c876"
-  },
-  "src": "127.0.0.1",
-  "src_port": 975,
-  "type": "nfs"
+    "type": "nfs",
+    "rpc": {
+        "call_size": 212,
+        "auth_flavor": "unix",
+        "cred": {
+            "stamp": 1459253713,
+            "machinename": "ani",
+            "uid": 500,
+            "gid": 500,
+            "gids": [
+                500,
+                500,
+                499,
+                491
+            ]
+        },
+        "reply_size": 152,
+        "time": 1092074000,
+        "time_str": "1.092074s",
+        "status": "success",
+        "xid": "00000008"
+    },
+    "agent": {
+        "hostname": "host.example.com",
+        "version": "7.0.0",
+        "type": "packetbeat"
+    },
+    "host": {
+        "name": "host.example.com"
+    },
+    "nfs": {
+        "version": 4,
+        "tag": "readdir",
+        "minor_version": 1,
+        "opcode": "READDIR",
+        "status": "NFS_OK"
+    },
+    "status": "OK",
+    "client": {
+        "ip": "127.0.0.1",
+        "port": 50676,
+        "domain": "host.example.com"
+    },
+    "server": {
+        "ip": "127.0.0.1",
+        "port": 2049,
+        "domain": "host.example.com"
+    }
 }
-

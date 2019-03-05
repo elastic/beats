@@ -11,26 +11,28 @@ import (
 	"{beat_path}/config"
 )
 
+// {Beat} configuration.
 type {Beat} struct {
 	done   chan struct{}
 	config config.Config
 	client beat.Client
 }
 
-// Creates beater
+// New creates an instance of {beat}.
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
-	config := config.DefaultConfig
-	if err := cfg.Unpack(&config); err != nil {
+	c := config.DefaultConfig
+	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
 	}
 
 	bt := &{Beat}{
 		done:   make(chan struct{}),
-		config: config,
+		config: c,
 	}
 	return bt, nil
 }
 
+// Run starts {beat}.
 func (bt *{Beat}) Run(b *beat.Beat) error {
 	logp.Info("{beat} is running! Hit CTRL-C to stop it.")
 
@@ -62,6 +64,7 @@ func (bt *{Beat}) Run(b *beat.Beat) error {
 	}
 }
 
+// Stop stops {beat}.
 func (bt *{Beat}) Stop() {
 	bt.client.Close()
 	close(bt.done)

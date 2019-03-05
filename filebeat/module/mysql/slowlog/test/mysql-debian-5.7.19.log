@@ -1,0 +1,5 @@
+# User@Host: root[root] @  [172.17.0.11]  Id:     5
+# Query_time: 0.000100  Lock_time: 0.000033 Rows_sent: 101  Rows_examined: 101
+SET timestamp=1524768632;
+SELECT intcol1,charcol1 FROM t1;
+# Time: 2018-04-26T18:50:32.437295Z

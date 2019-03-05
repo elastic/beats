@@ -1,6 +1,6 @@
 - name: osd_df
   type: group
-  release: experimental
+  release: ga
   description: >
     ceph osd disk usage information
   fields:
@@ -9,7 +9,7 @@
       description: >
         osd node id
     - name: name
-      type: text
+      type: keyword
       description: >
         osd node name
     - name: device_class

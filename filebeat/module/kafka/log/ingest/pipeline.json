@@ -6,15 +6,18 @@
         "field": "message",
         "trace_match": true,
         "patterns": [
-          "(?m)%{TIMESTAMP_ISO8601:kafka.log.timestamp}. %{LOGLEVEL:kafka.log.level} +%{JAVALOGMESSAGE:kafka.log.message} \\(%{JAVACLASS:kafka.log.class}\\)$[ \\n]*(?'kafka.log.trace.full'.*)"
+          "(?m)%{TIMESTAMP_ISO8601:kafka.log.timestamp}. %{LOGLEVEL:log.level} +%{JAVALOGMESSAGE:message} \\(%{JAVACLASS:kafka.log.class}\\)$[ \\n]*(?'kafka.log.trace.full'.*)"
         ]
       }
     },
     {
       "grok": {
-        "field": "kafka.log.message",
+        "field": "message",
+        "pattern_definitions": {
+          "KAFKA_COMPONENT": "[^\\]]*"
+        },
         "patterns": [
-          "\\[%{DATA:kafka.log.component}\\][,:. ] +%{JAVALOGMESSAGE:kafka.log.message}"
+          "\\[%{KAFKA_COMPONENT:kafka.log.component}\\][,:.]? +%{JAVALOGMESSAGE:message}"
         ],
         "on_failure": [
           {
@@ -43,16 +46,24 @@
       }
     },
     {
+      "remove": {
+        "field": "kafka.log.trace.full",
+        "ignore_missing": true
+      }
+    },
+    {
       "rename": {
         "field": "@timestamp",
-        "target_field": "beat.read_time"
+        "target_field": "event.created"
       }
     },
     {
       "date": {
         "field": "kafka.log.timestamp",
         "target_field": "@timestamp",
-        "formats": ["yyyy-MM-dd HH:mm:ss,SSS"]
+        "formats": ["yyyy-MM-dd HH:mm:ss,SSS"],
+        {< if .convert_timezone >}"timezone": "{{ beat.timezone }}",{< end >}
+        "ignore_failure": true
       }
     },
     {"remove": {"field": "kafka.log.timestamp" }}

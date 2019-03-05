@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build !integration
 
 package checkpoint
@@ -12,6 +29,31 @@ import (
 
 	"github.com/stretchr/testify/assert"
 )
+
+func eventually(t *testing.T, predicate func() (bool, error), timeout time.Duration) {
+	const minInterval = time.Millisecond * 5
+	const maxInterval = time.Millisecond * 500
+
+	checkInterval := timeout / 100
+	if checkInterval < minInterval {
+		checkInterval = minInterval
+	}
+	if checkInterval > maxInterval {
+		checkInterval = maxInterval
+	}
+	for deadline, first := time.Now().Add(timeout), true; first || time.Now().Before(deadline); first = false {
+		ok, err := predicate()
+		if err != nil {
+			t.Fatal("predicate failed with error:", err)
+			return
+		}
+		if ok {
+			return
+		}
+		time.Sleep(checkInterval)
+	}
+	t.Fatal("predicate is not true after", timeout)
+}
 
 // Test that a write is triggered when the maximum number of updates is reached.
 func TestWriteMaxUpdates(t *testing.T) {
@@ -38,9 +80,12 @@ func TestWriteMaxUpdates(t *testing.T) {
 	defer cp.Shutdown()
 
 	// Send update - it's not written to disk but it's in memory.
-	cp.Persist("App", 1, time.Now())
-	time.Sleep(500 * time.Millisecond)
-	_, found := cp.States()["App"]
+	cp.Persist("App", 1, time.Now(), "")
+	found := false
+	eventually(t, func() (bool, error) {
+		_, found = cp.States()["App"]
+		return found, nil
+	}, time.Second*15)
 	assert.True(t, found)
 
 	ps, err := cp.read()
@@ -50,12 +95,12 @@ func TestWriteMaxUpdates(t *testing.T) {
 	assert.Len(t, ps.States, 0)
 
 	// Send update - it is written to disk.
-	cp.Persist("App", 2, time.Now())
-	time.Sleep(750 * time.Millisecond)
-	ps, err = cp.read()
-	if err != nil {
-		t.Fatal("read failed", err)
-	}
+	cp.Persist("App", 2, time.Now(), "")
+	eventually(t, func() (bool, error) {
+		ps, err = cp.read()
+		return ps != nil && len(ps.States) > 0, err
+	}, time.Second*15)
+
 	if assert.Len(t, ps.States, 1, "state not written, could be a flush timing issue, retry") {
 		assert.Equal(t, "App", ps.States[0].Name)
 		assert.Equal(t, uint64(2), ps.States[0].RecordNumber)
@@ -89,8 +134,12 @@ func TestWriteTimedFlush(t *testing.T) {
 
 	// Send update then wait longer than the flush interval and it should be
 	// on disk.
-	cp.Persist("App", 1, time.Now())
-	time.Sleep(1500 * time.Millisecond)
+	cp.Persist("App", 1, time.Now(), "")
+	eventually(t, func() (bool, error) {
+		ps, err := cp.read()
+		return ps != nil && len(ps.States) > 0, err
+	}, time.Second*15)
+
 	ps, err := cp.read()
 	if err != nil {
 		t.Fatal("read failed", err)

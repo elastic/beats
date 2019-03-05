@@ -1,0 +1,9 @@
+- key: consul
+  title: "consul"
+  description: >
+    Consul module
+  release: beta
+  fields:
+    - name: consul
+      type: group
+      fields:

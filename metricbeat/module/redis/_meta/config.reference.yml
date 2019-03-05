@@ -1,0 +1,30 @@
+- module: redis
+  metricsets: ["info", "keyspace"]
+  enabled: true
+  period: 10s
+
+  # Redis hosts
+  hosts: ["127.0.0.1:6379"]
+
+  # Timeout after which time a metricset should return an error
+  # Timeout is by default defined as period, as a fetch of a metricset
+  # should never take longer then period, as otherwise calls can pile up.
+  #timeout: 1s
+
+  # Optional fields to be added to each event
+  #fields:
+  #  datacenter: west
+
+  # Network type to be used for redis connection. Default: tcp
+  #network: tcp
+
+  # Max number of concurrent connections. Default: 10
+  #maxconn: 10
+
+  # Filters can be used to reduce the number of fields sent.
+  #processors:
+  #  - include_fields:
+  #      fields: ["beat", "metricset", "redis.info.stats"]
+
+  # Redis AUTH password. Empty by default.
+  #password: foobared

@@ -1,0 +1,23 @@
+- key: host
+  title: Host
+  description: >
+    Info collected for the host machine.
+  anchor: host-processor
+  fields:
+
+    # ECS fields are in fields.ecs.yml.
+    # These are the non-ECS fields.
+    - name: host
+      type: group
+      fields:
+
+        - name: containerized
+          type: boolean
+          description: >
+            If the host is a container.
+
+        - name: os.build
+          type: keyword
+          example: "18D109"
+          description: >
+            OS build information.

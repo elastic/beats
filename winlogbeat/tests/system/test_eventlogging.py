@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 import unittest
@@ -29,6 +30,27 @@ class Test(WriteReadTest):
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg)
 
+    def test_resume_reading_events(self):
+        """
+        eventlogging - Resume reading events
+        """
+        msg = "First event"
+        self.write_event_log(msg)
+        evts = self.read_events()
+        self.assertTrue(len(evts), 1)
+        self.assert_common_fields(evts[0], msg=msg)
+
+        # remove the output file, otherwise there is a race condition
+        # in read_events() below where it reads the results of the previous
+        # execution
+        os.unlink(os.path.join(self.working_dir, "output", self.beat_name))
+
+        msg = "Second event"
+        self.write_event_log(msg)
+        evts = self.read_events()
+        self.assertTrue(len(evts), 1)
+        self.assert_common_fields(evts[0], msg=msg)
+
     def test_read_unknown_event_id(self):
         """
         eventlogging - Read unknown event ID
@@ -39,7 +61,7 @@ class Test(WriteReadTest):
         evts = self.read_events()
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], eventID=event_id)
-        self.assertEqual(evts[0]["message_error"].lower(),
+        self.assertEqual(evts[0]["error.message"].lower(),
                          ("The system cannot find message text for message "
                           "number 1111 in the message file for "
                           "C:\\Windows\\system32\\EventCreate.exe.").lower())
@@ -66,7 +88,7 @@ class Test(WriteReadTest):
         self.write_event_log(msg)
         evts = self.read_events(config={
             "tags": ["global"],
-            "fields": {"global": "field", "env": "prod", "level": "overwrite"},
+            "fields": {"global": "field", "env": "prod", "log.level": "overwrite"},
             "fields_under_root": True,
             "event_logs": [
                 {
@@ -104,6 +126,7 @@ class Test(WriteReadTest):
         })
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg, extra={
+            "log.level": "information",
             "fields.global": "field",
             "fields.env": "dev",
             "fields.level": "overwrite",
@@ -129,7 +152,8 @@ class Test(WriteReadTest):
             ]
         }, expected_events=1)
         self.assertTrue(len(evts), 1)
-        self.assertEqual(evts[0]["event_id"], 10)
+        self.assertEqual(evts[0]["winlog.event_id"], 10)
+        self.assertEqual(evts[0]["event.code"], 10)
 
     def test_unknown_eventlog_config(self):
         """
@@ -147,7 +171,7 @@ class Test(WriteReadTest):
                 }
             ]
         )
-        self.start_beat(extra_args=["-configtest"]).check_wait(exit_code=1)
+        self.start_beat().check_wait(exit_code=1)
         assert self.log_contains("4 errors: Invalid event log key")
 
     def test_utf16_characters(self):
@@ -178,8 +202,35 @@ class Test(WriteReadTest):
         evts = self.read_events()
         self.assertTrue(len(evts), 1)
 
-        event_logs = self.read_registry()
+        event_logs = self.read_registry(requireBookmark=False)
         self.assertTrue(len(event_logs.keys()), 1)
         self.assertIn(self.providerName, event_logs)
         record_number = event_logs[self.providerName]["record_number"]
         self.assertGreater(record_number, 0)
+
+    def test_processors(self):
+        """
+        eventlogging - Processors are applied
+        """
+        self.write_event_log("Hello world!")
+
+        config = {
+            "event_logs": [
+                {
+                    "name": self.providerName,
+                    "api": self.api,
+                    "extras": {
+                        "processors": [
+                            {
+                                "drop_fields": {
+                                    "fields": ["message"],
+                                }
+                            }
+                        ],
+                    },
+                }
+            ]
+        }
+        evts = self.read_events(config)
+        self.assertTrue(len(evts), 1)
+        self.assertNotIn("message", evts[0])

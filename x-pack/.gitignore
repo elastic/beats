@@ -1,0 +1,12 @@
+# Directories
+*beat/build
+*beat/logs
+*beat/data
+
+# Files
+*beat/*beat
+*beat/*beat.exe
+*beat/*beat.test
+*beat/*beat.test.exe
+*beat/fields.yml
+*beat/_meta/kibana.generated

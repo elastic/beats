@@ -1,7 +1,25 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package mongodb
 
 // Represent a mongodb message being parsed
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
@@ -11,7 +29,7 @@ type mongodbMessage struct {
 	ts time.Time
 
 	tcpTuple     common.TCPTuple
-	cmdlineTuple *common.CmdlineTuple
+	cmdlineTuple *common.ProcessTuple
 	direction    uint8
 
 	isResponse      bool
@@ -61,13 +79,13 @@ type mongodbConnectionData struct {
 // Represent a full mongodb transaction (request/reply)
 // These transactions are the end product of this parser
 type transaction struct {
-	cmdline      *common.CmdlineTuple
-	src          common.Endpoint
-	dst          common.Endpoint
-	responseTime int32
-	ts           time.Time
-	bytesOut     int
-	bytesIn      int
+	cmdline  *common.ProcessTuple
+	src      common.Endpoint
+	dst      common.Endpoint
+	ts       time.Time
+	endTime  time.Time
+	bytesOut int
+	bytesIn  int
 
 	mongodb common.MapStr
 
@@ -113,7 +131,10 @@ func validOpcode(o opCode) bool {
 }
 
 func (o opCode) String() string {
-	return opCodeNames[o]
+	if name, found := opCodeNames[o]; found {
+		return name
+	}
+	return fmt.Sprintf("(value=%d)", int32(o))
 }
 
 func awaitsReply(c opCode) bool {

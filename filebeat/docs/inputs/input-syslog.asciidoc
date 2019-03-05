@@ -1,0 +1,47 @@
+:type: syslog
+
+[id="{beatname_lc}-input-{type}"]
+=== Syslog input
+
+++++
+<titleabbrev>Syslog</titleabbrev>
+++++
+
+Use the `syslog` input to read events over TCP or UDP, this input will parse BSD (rfc3164)
+event and some variant.
+
+Example configurations:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: syslog
+  protocol.udp:
+    host: "localhost:9000"
+----
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: syslog
+  protocol.tcp:
+    host: "localhost:9000"
+----
+
+==== Configuration options
+
+The `syslog` input supports protocol specific configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+===== Protocol `udp`:
+
+include::../inputs/input-common-udp-options.asciidoc[]
+
+===== Protocol `tcp`:
+
+include::../inputs/input-common-tcp-options.asciidoc[]
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../inputs/input-common-options.asciidoc[]
+
+:type!:

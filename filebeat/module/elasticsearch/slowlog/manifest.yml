@@ -1,0 +1,32 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/elasticsearch/*_index_search_slowlog.log
+      - /var/log/elasticsearch/*_index_indexing_slowlog.log
+      - /var/log/elasticsearch/*_index_search_slowlog.json
+      - /var/log/elasticsearch/*_index_indexing_slowlog.json
+    os.darwin:
+      - /usr/local/var/lib/elasticsearch/*_index_search_slowlog.log
+      - /usr/local/var/lib/elasticsearch/*_index_indexing_slowlog.log
+      - /usr/local/var/lib/elasticsearch/*_index_search_slowlog.json
+      - /usr/local/var/lib/elasticsearch/*_index_indexing_slowlog.json
+    os.windows:
+      - c:/ProgramData/Elastic/Elasticsearch/logs/*_index_search_slowlog.log
+      - c:/ProgramData/Elastic/Elasticsearch/logs/*_index_indexing_slowlog.log
+      - c:/ProgramData/Elastic/Elasticsearch/logs/*_index_search_slowlog.json
+      - c:/ProgramData/Elastic/Elasticsearch/logs/*_index_indexing_slowlog.json
+  - name: convert_timezone
+    default: false
+    # if ES < 6.1.0, this flag switches to false automatically when evaluating the
+    # pipeline
+    min_elasticsearch_version:
+      version: 6.1.0
+      value: false
+
+ingest_pipeline:
+  - ingest/pipeline.json
+  - ingest/pipeline-plaintext.json
+  - ingest/pipeline-json.json
+input: config/slowlog.yml

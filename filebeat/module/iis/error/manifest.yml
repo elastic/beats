@@ -1,0 +1,17 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - c:/Windows/System32/LogFiles/HTTPERR/*.log
+    os.darwin: [""]
+    os.linux: [""]
+    os.windows:
+      - c:/Windows/System32/LogFiles/HTTPERR/*.log
+
+ingest_pipeline: ingest/default.json
+input: config/iis-error.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip

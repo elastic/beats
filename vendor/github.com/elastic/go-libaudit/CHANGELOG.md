@@ -2,6 +2,92 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Removed
+
+## [0.4.0]
+
+### Added
+
+- Added method to convert kernel rules to text format in order to display them.
+
+### Changed
+
+- aucoalesce - Made the user/group ID cache thread-safe. #42 #45
+
+### Deprecated
+
+### Removed
+
+
+## [0.3.0]
+
+### Added
+
+- Added support for setting the kernel's backlog wait time via the new
+  SetBacklogWaitTime function. #34
+- New method `GetStatusAsync` to perform asynchronous status checks. #37
+
+### Changed
+
+- AuditClient `Close()` is now safe to call more than once. #35
+
+### Deprecated
+
+### Removed
+
+## [0.2.1]
+
+### Added
+
+- Added better error messages for when `NewAuditClient` fails due to the
+  Linux kernel not supporting auditing (CONFIG_AUDIT=n). #32
+
+## [0.2.0]
+
+### Changed
+
+- auparse - Fixed parsing of apparmor AVC messages. #25
+- auparse - Update syscall and audit message type tables for Linux 4.16.
+- aucoalesce - Cache UID/GID values for one minute. #24
+
+## [0.1.1]
+
+- rules - Detect s390 or s390x as the runtime architecture (GOOS) and
+  automatically use the appropriate syscall name to number table without
+  requiring the rule to explicitly specify an arch (`-F arch=s390x`). #23
+
+## [0.1.0]
+
+### Changed
+
+- auparse - Fixed an issue where the name value was not being hex decoded from
+  PATH records. #20
+
+## [0.0.7]
+ 
+### Added
+
+- Added WaitForPendingACKs to receive pending ACK messages from the kernel. #14
+- The AuditClient will unregister with the kernel if `SetPID` has been called. #19
+ 
+### Changed
+
+- auparse - Fixed an issue where the proctitle value was being truncated. #15
+- auparse - Fixed an issue where values were incorrectly interpretted as hex
+  data. #13
+- auparse - Fixed parsing of the `key` value when multiple keys are present. #16
+- auparse - The `cmdline` key is no longer created for EXECVE records. #17
+- aucoalesce - Changed the event format to have objects for user, process, file,
+  and network data. #17
+- Fixed an issue when an audit notification is received while waiting for the
+  response to a control command.
+
 ## [0.0.6]
 
 ### Added

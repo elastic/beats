@@ -1,22 +1,38 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package raid
 
 import (
 	"path/filepath"
 
+	"github.com/pkg/errors"
+	"github.com/prometheus/procfs"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system"
-	"github.com/elastic/procfs"
-
-	"github.com/pkg/errors"
 )
 
 func init() {
-	if err := mb.Registry.AddMetricSet("system", "raid", New, parse.EmptyHostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("system", "raid", New,
+		mb.WithHostParser(parse.EmptyHostParser),
+	)
 }
 
 // MetricSet contains proc fs data.
@@ -27,8 +43,6 @@ type MetricSet struct {
 
 // New creates a new instance of the raid metricset.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Experimental("The system raid metricset is experimental")
-
 	systemModule, ok := base.Module().(*system.Module)
 	if !ok {
 		return nil, errors.New("unexpected module type")
@@ -53,23 +67,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	m := &MetricSet{
+	return &MetricSet{
 		BaseMetricSet: base,
 		fs:            fs,
-	}
-
-	return m, nil
+	}, nil
 }
 
 // Fetch fetches one event for each device
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-
+func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	stats, err := m.fs.ParseMDStat()
 	if err != nil {
-		return nil, err
+		r.Error(errors.Wrap(err, "failed to parse mdstat"))
+		return
 	}
 
-	events := make([]common.MapStr, 0, len(stats))
 	for _, stat := range stats {
 		event := common.MapStr{
 			"name":           stat.Name,
@@ -83,8 +94,9 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 				"total":  stat.BlocksTotal,
 			},
 		}
-		events = append(events, event)
-	}
 
-	return events, nil
+		r.Event(mb.Event{
+			MetricSetFields: event,
+		})
+	}
 }

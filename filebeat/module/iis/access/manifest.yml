@@ -1,0 +1,19 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - C:/inetpub/logs/LogFiles/*/*.log
+    os.darwin: [""]
+    os.linux: [""]
+    os.windows:
+      - C:/inetpub/logs/LogFiles/*/*.log
+
+ingest_pipeline: ingest/default.json
+input: config/iis-access.yml
+
+requires.processors:
+- name: user_agent
+  plugin: ingest-user-agent
+- name: geoip
+  plugin: ingest-geoip

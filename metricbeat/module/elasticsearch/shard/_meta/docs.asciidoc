@@ -1,0 +1,2 @@
+The `shard` metricset interrogates the
+https://www.elastic.co/guide/en/elasticsearch/reference/6.2/cluster-state.html[Cluster State API endpoint] to fetch information about all shards.

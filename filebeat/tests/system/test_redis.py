@@ -19,21 +19,21 @@ class Test(BaseTest):
         return r
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    def test_prospector(self):
+    def test_input(self):
         r = self.init()
         r.set("hello", "world")
 
-        prospector_raw = """
+        input_raw = """
 - type: redis
   hosts: ["{}:{}"]
   enabled: true
   scan_frequency: 1s
 """
-        prospector_raw = prospector_raw.format(self.get_host(), self.get_port())
+        input_raw = input_raw.format(self.get_host(), self.get_port())
 
         self.render_config_template(
-            prospector_raw=prospector_raw,
-            prospectors=False,
+            input_raw=input_raw,
+            inputs=False,
         )
 
         filebeat = self.start_beat()
@@ -45,8 +45,7 @@ class Test(BaseTest):
 
         output = self.read_output()[0]
 
-        print output
-        assert output["prospector.type"] == "redis"
+        assert output["input.type"] == "redis"
         assert "redis.slowlog.cmd" in output
 
     def get_host(self):

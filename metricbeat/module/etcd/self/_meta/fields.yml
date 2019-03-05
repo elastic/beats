@@ -2,7 +2,7 @@
   type: group
   description: >
     Contains etcd self statistics.
-  release: beta
+  release: ga
   fields:
     - name: id
       type: keyword
@@ -15,10 +15,12 @@
         id of the current leader member
     - name: leaderinfo.starttime
       type: keyword
+      description: >
+        the time when this node was started
     - name: leaderinfo.uptime
       type: keyword
       description: >
-        id of the current leader member
+        amount of time the leader has been leader
 
     - name: name
       type: keyword
@@ -29,7 +31,7 @@
       type: integer
       description: >
         number of append requests this node has processed
-    - name: recv.bandwithrate
+    - name: recv.bandwidthrate
       type: scaled_float
       description: >
         number of bytes per second this node is receiving (follower only)
@@ -42,7 +44,7 @@
       type: integer
       description: >
          number of requests that this node has sent
-    - name: send.bandwithrate
+    - name: send.bandwidthrate
       type: scaled_float
       description: >
         number of bytes per second this node is sending (leader only). This value is undefined on single member clusters.

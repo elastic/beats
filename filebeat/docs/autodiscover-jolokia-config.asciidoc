@@ -1,0 +1,23 @@
+Filebeat supports templates for inputs and modules:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------
+filebeat.autodiscover:
+  providers:
+    - type: jolokia
+      interfaces:
+      - name: lo
+      templates:
+      - condition:
+          contains:
+            jolokia.server.product: "kafka"
+        config:
+        - module: kafka
+          log:
+            enabled: true
+            var.paths:
+            - /var/log/kafka/*.log
+-------------------------------------------------------------------------------
+
+This configuration starts a jolokia module that collects logs of kafka if it is
+running. Discovery probes are sent using the local interface.

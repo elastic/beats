@@ -1,0 +1,75 @@
+[[running-on-kubernetes]]
+=== Running {beatname_uc} on Kubernetes
+
+{beatname_uc} <<running-on-docker,Docker images>> can be used on Kubernetes to
+check files integrity.
+
+ifeval::["{release-state}"=="unreleased"]
+
+However, version {stack-version} of {beatname_uc} has not yet been
+released, so no Docker image is currently available for this version.
+
+endif::[]
+
+
+[float]
+==== Kubernetes deploy manifests
+
+By deploying {beatname_uc} as a https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/[DaemonSet]
+we ensure we get a running instance on each node of the cluster.
+
+Everything is deployed under `kube-system` namespace, you can change that by
+updating the YAML file.
+
+To get the manifests just run:
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{branch}/deploy/kubernetes/{beatname_lc}-kubernetes.yaml
+------------------------------------------------
+
+[WARNING]
+=======================================
+If you are using Kubernetes 1.7 or earlier: {beatname_uc} uses a hostPath volume to persist internal data, it's located
+under /var/lib/{beatname_lc}-data. The manifest uses folder autocreation (`DirectoryOrCreate`), which was introduced in
+Kubernetes 1.8. You will need to remove `type: DirectoryOrCreate` from the manifest and create the host folder yourself.
+=======================================
+
+[float]
+==== Settings
+
+Some parameters are exposed in the manifest to configure logs destination, by
+default they will use an existing Elasticsearch deploy if it's present, but you
+may want to change that behavior, so just edit the YAML file and modify them:
+
+["source", "yaml", subs="attributes"]
+------------------------------------------------
+- name: ELASTICSEARCH_HOST
+  value: elasticsearch
+- name: ELASTICSEARCH_PORT
+  value: "9200"
+- name: ELASTICSEARCH_USERNAME
+  value: elastic
+- name: ELASTICSEARCH_PASSWORD
+  value: changeme
+------------------------------------------------
+
+[float]
+==== Deploy
+
+To deploy {beatname_uc} to Kubernetes just run:
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+kubectl create -f {beatname_lc}-kubernetes.yaml
+------------------------------------------------
+
+Then you should be able to check the status by running:
+
+["source", "sh", subs="attributes"]
+------------------------------------------------
+$ kubectl --namespace=kube-system get ds/{beatname_lc}
+
+NAME       DESIRED   CURRENT   READY     UP-TO-DATE   AVAILABLE   NODE-SELECTOR   AGE
+{beatname_lc}   32        32        0         32           0           <none>          1m
+------------------------------------------------

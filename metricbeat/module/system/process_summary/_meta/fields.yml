@@ -29,6 +29,10 @@
       type: long
       description: >
         Number of zombie processes on this host.
+    - name: dead
+      type: long
+      description: >
+        Number of dead processes on this host. It's very unlikely that it will appear but in some special situations it may happen.
     - name: unknown
       type: long
       description: >

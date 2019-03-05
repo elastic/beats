@@ -1,0 +1,41 @@
+- key: elasticsearch
+  title: "elasticsearch"
+  description: >
+    elasticsearch Module
+  fields:
+    - name: elasticsearch
+      type: group
+      description: >
+      fields:
+        - name: component
+          description: "Elasticsearch component from where the log event originated"
+          example: "o.e.c.m.MetaDataCreateIndexService"
+          type: keyword
+        - name: cluster.uuid
+          description: "UUID of the cluster"
+          example: "GmvrbHlNTiSVYiPf8kxg9g"
+          type: keyword
+        - name: cluster.name
+          description: "Name of the cluster"
+          example: "docker-cluster"
+          type: keyword
+        - name: node.id
+          description: "ID of the node"
+          example: "DSiWcTyeThWtUXLB9J0BMw"
+          type: keyword
+        - name: node.name
+          description: "Name of the node"
+          example: "vWNJsZ3"
+          type: keyword
+        - name: index.name
+          description: "Index name"
+          example: "filebeat-test-input"
+          type: keyword
+        - name: index.id
+          description: "Index id"
+          example: "aOGgDwbURfCV57AScqbCgw"
+          type: keyword
+        - name: shard.id
+          description: "Id of the shard"
+          example: "0"
+          type: keyword

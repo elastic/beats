@@ -1,0 +1,51 @@
+- name: exchange
+  type: group
+  description: >
+    exchange
+  release: ga
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        The name of the queue with non-ASCII characters escaped as in C.
+    - name: vhost
+      type: alias
+      path: rabbitmq.vhost
+      migration: true
+      description: >
+        Virtual host name with non-ASCII characters escaped as in C.
+    - name: durable
+      type: boolean
+      description: >
+        Whether or not the queue survives server restarts.
+    - name: auto_delete
+      type: boolean
+      description: >
+        Whether the queue will be deleted automatically when no longer used.
+    - name: internal
+      type: boolean
+      description: >
+        Whether the exchange is internal, i.e. cannot be directly published to by a client.
+    - name: user
+      type: alias
+      path: user.name
+      migration: true
+      description: >
+        User who created the exchange.
+
+    - name: messages.publish_in.count
+      type: long
+      description: >
+         Count of messages published "in" to an exchange, i.e. not taking account of routing.
+    - name: messages.publish_in.details.rate
+      type: float
+      description: >
+          How much the exchange publish-in count has changed per second in the most recent sampling interval.
+    - name: messages.publish_out.count
+      type: long
+      description: >
+         Count of messages published "out" of an exchange, i.e. taking account of routing.
+    - name: messages.publish_out.details.rate
+      type: float
+      description: >
+          How much the exchange publish-out count has changed per second in the most recent sampling interval.

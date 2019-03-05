@@ -1,0 +1,689 @@
+{
+    "cluster_name": "docker-cluster",
+    "compressed_size_in_bytes": 49692,
+    "routing_table": {
+        "indices": {
+            ".watcher-history-7-2018.04.17": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".watcher-history-7-2018.04.17",
+                            "allocation_id": {
+                                "id": "ySc29b2lREq85LpZZ6tQqQ"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".watcher-history-7-2018.04.20": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".watcher-history-7-2018.04.20",
+                            "allocation_id": {
+                                "id": "2Mb2YYsEQkKHSYx_BWmziQ"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-es-6-2018.04.17": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-es-6-2018.04.17",
+                            "allocation_id": {
+                                "id": "d9nN0jCSQK6o6eVd6asI2A"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-es-6-2018.04.21": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-es-6-2018.04.21",
+                            "allocation_id": {
+                                "id": "-NKgVp_iTQqrbsBGl4B5sQ"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".triggered_watches": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".triggered_watches",
+                            "allocation_id": {
+                                "id": "hpGM4kcnRw2XSO9kx0PzzA"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-es-6-2018.04.23": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-es-6-2018.04.23",
+                            "allocation_id": {
+                                "id": "5rCyAFEPT8u6Rt4CACrhUA"
+                            }
+                        }
+                    ]
+                }
+            },
+            "testindex": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": "testindex",
+                            "allocation_id": {
+                                "id": "pEwU3PKtTE2nWFOJ1UnzMA"
+                            }
+                        },
+                        {
+                            "state": "UNASSIGNED",
+                            "primary": false,
+                            "node": null,
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": "testindex",
+                            "recovery_source": {
+                                "type": "PEER"
+                            },
+                            "unassigned_info": {
+                                "reason": "INDEX_CREATED",
+                                "at": "2018-04-17T09:06:31.523Z",
+                                "delayed": false,
+                                "allocation_status": "no_attempt"
+                            }
+                        }
+                    ],
+                    "1": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 1,
+                            "index": "testindex",
+                            "allocation_id": {
+                                "id": "OQCrOwsTQb68kfI6wvfvfA"
+                            }
+                        },
+                        {
+                            "state": "UNASSIGNED",
+                            "primary": false,
+                            "node": null,
+                            "relocating_node": null,
+                            "shard": 1,
+                            "index": "testindex",
+                            "recovery_source": {
+                                "type": "PEER"
+                            },
+                            "unassigned_info": {
+                                "reason": "INDEX_CREATED",
+                                "at": "2018-04-17T09:06:31.523Z",
+                                "delayed": false,
+                                "allocation_status": "no_attempt"
+                            }
+                        }
+                    ],
+                    "2": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 2,
+                            "index": "testindex",
+                            "allocation_id": {
+                                "id": "KU2vy0mHT3yP5cTVFAxc9A"
+                            }
+                        },
+                        {
+                            "state": "UNASSIGNED",
+                            "primary": false,
+                            "node": null,
+                            "relocating_node": null,
+                            "shard": 2,
+                            "index": "testindex",
+                            "recovery_source": {
+                                "type": "PEER"
+                            },
+                            "unassigned_info": {
+                                "reason": "INDEX_CREATED",
+                                "at": "2018-04-17T09:06:31.523Z",
+                                "delayed": false,
+                                "allocation_status": "no_attempt"
+                            }
+                        }
+                    ],
+                    "3": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 3,
+                            "index": "testindex",
+                            "allocation_id": {
+                                "id": "f6jJdqh9SQe2SRybz0mN2A"
+                            }
+                        },
+                        {
+                            "state": "UNASSIGNED",
+                            "primary": false,
+                            "node": null,
+                            "relocating_node": null,
+                            "shard": 3,
+                            "index": "testindex",
+                            "recovery_source": {
+                                "type": "PEER"
+                            },
+                            "unassigned_info": {
+                                "reason": "INDEX_CREATED",
+                                "at": "2018-04-17T09:06:31.523Z",
+                                "delayed": false,
+                                "allocation_status": "no_attempt"
+                            }
+                        }
+                    ],
+                    "4": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 4,
+                            "index": "testindex",
+                            "allocation_id": {
+                                "id": "k36nAlsmTC2N1cJF4NAd7A"
+                            }
+                        },
+                        {
+                            "state": "UNASSIGNED",
+                            "primary": false,
+                            "node": null,
+                            "relocating_node": null,
+                            "shard": 4,
+                            "index": "testindex",
+                            "recovery_source": {
+                                "type": "PEER"
+                            },
+                            "unassigned_info": {
+                                "reason": "INDEX_CREATED",
+                                "at": "2018-04-17T09:06:31.523Z",
+                                "delayed": false,
+                                "allocation_status": "no_attempt"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-es-6-2018.04.20": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-es-6-2018.04.20",
+                            "allocation_id": {
+                                "id": "k4E-0Tb4Tu26OJVFapPqYA"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-es-6-2018.04.18": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-es-6-2018.04.18",
+                            "allocation_id": {
+                                "id": "zuzpxvQ6SXaJC6P_KdS5Hw"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".watcher-history-7-2018.04.19": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".watcher-history-7-2018.04.19",
+                            "allocation_id": {
+                                "id": "5LMJgFYESsSGqe8znMRvHw"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-logstash-6-2018.04.23": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-logstash-6-2018.04.23",
+                            "allocation_id": {
+                                "id": "ruhKHCXnSeCs3XF36V2Cfw"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".watcher-history-7-2018.04.21": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".watcher-history-7-2018.04.21",
+                            "allocation_id": {
+                                "id": "N4vZGytQRy2pz8u9V1CBwA"
+                            }
+                        }
+                    ]
+                }
+            },
+            "metricbeat-7.0.0-alpha1-2018.04.23": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": "metricbeat-7.0.0-alpha1-2018.04.23",
+                            "allocation_id": {
+                                "id": "Vi5fvZAvQe-W8zu0cv3g2A"
+                            }
+                        },
+                        {
+                            "state": "UNASSIGNED",
+                            "primary": false,
+                            "node": null,
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": "metricbeat-7.0.0-alpha1-2018.04.23",
+                            "recovery_source": {
+                                "type": "PEER"
+                            },
+                            "unassigned_info": {
+                                "reason": "INDEX_CREATED",
+                                "at": "2018-04-23T06:45:57.545Z",
+                                "delayed": false,
+                                "allocation_status": "no_attempt"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".watcher-history-7-2018.04.23": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".watcher-history-7-2018.04.23",
+                            "allocation_id": {
+                                "id": "4crt-Ub4SVSoxgok3H-bpw"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".watcher-history-7-2018.04.18": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".watcher-history-7-2018.04.18",
+                            "allocation_id": {
+                                "id": "UYLupaFoS2Gby94JdNYnsQ"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-kibana-6-2018.04.19": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-kibana-6-2018.04.19",
+                            "allocation_id": {
+                                "id": "euMN_YV_QcWuKCZS1iyz9Q"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-es-6-2018.04.19": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-es-6-2018.04.19",
+                            "allocation_id": {
+                                "id": "rgBeiNWXRwKiO1h0v1NLZQ"
+                            }
+                        }
+                    ]
+                }
+            },
+            "metricbeat-7.0.0-alpha1-2018.04.17": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": "metricbeat-7.0.0-alpha1-2018.04.17",
+                            "allocation_id": {
+                                "id": "rV1DH2rdRiyhNhEXgefwzg"
+                            }
+                        },
+                        {
+                            "state": "UNASSIGNED",
+                            "primary": false,
+                            "node": null,
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": "metricbeat-7.0.0-alpha1-2018.04.17",
+                            "recovery_source": {
+                                "type": "PEER"
+                            },
+                            "unassigned_info": {
+                                "reason": "INDEX_CREATED",
+                                "at": "2018-04-17T12:12:57.093Z",
+                                "delayed": false,
+                                "allocation_status": "no_attempt"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-kibana-6-2018.04.22": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-kibana-6-2018.04.22",
+                            "allocation_id": {
+                                "id": "KJbmsWimTVyWn-znN-gi0Q"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-alerts-6": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-alerts-6",
+                            "allocation_id": {
+                                "id": "FS2e938ERji7jRuFQ_QFVQ"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-es-6-2018.04.22": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-es-6-2018.04.22",
+                            "allocation_id": {
+                                "id": "YfSdMq9rRaGa4RTf1Bar3w"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-kibana-6-2018.04.20": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-kibana-6-2018.04.20",
+                            "allocation_id": {
+                                "id": "Wk3DGqB0TnqnXtbdu5qzfQ"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".watches": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".watches",
+                            "allocation_id": {
+                                "id": "L6v93p4qQa-qFENtJUuprQ"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-kibana-6-2018.04.21": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-kibana-6-2018.04.21",
+                            "allocation_id": {
+                                "id": "b9DbSr7tRB69YEbyDVVa0Q"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-kibana-6-2018.04.17": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-kibana-6-2018.04.17",
+                            "allocation_id": {
+                                "id": "98-Z-UcJR2uKs8P9Tf7t7w"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-kibana-6-2018.04.18": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-kibana-6-2018.04.18",
+                            "allocation_id": {
+                                "id": "fNDxGJ51QseQur63ikfw7w"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".monitoring-kibana-6-2018.04.23": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".monitoring-kibana-6-2018.04.23",
+                            "allocation_id": {
+                                "id": "lwqG9MdkQLykIL0oFTlh9w"
+                            }
+                        }
+                    ]
+                }
+            },
+            "metricbeat-7.0.0-alpha1-2018.04.20": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": "metricbeat-7.0.0-alpha1-2018.04.20",
+                            "allocation_id": {
+                                "id": "i7tSPiCyS62l8V0pl7KosQ"
+                            }
+                        },
+                        {
+                            "state": "UNASSIGNED",
+                            "primary": false,
+                            "node": null,
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": "metricbeat-7.0.0-alpha1-2018.04.20",
+                            "recovery_source": {
+                                "type": "PEER"
+                            },
+                            "unassigned_info": {
+                                "reason": "INDEX_CREATED",
+                                "at": "2018-04-20T10:54:33.134Z",
+                                "delayed": false,
+                                "allocation_status": "no_attempt"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".watcher-history-7-2018.04.22": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "VnS118cKS7-8mz8l2jZZKQ",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".watcher-history-7-2018.04.22",
+                            "allocation_id": {
+                                "id": "inTIuRJzQaGOELq5Wo-33g"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

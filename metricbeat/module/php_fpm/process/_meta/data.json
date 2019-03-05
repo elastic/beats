@@ -1,0 +1,53 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "event": {
+        "dataset": "php_fpm.process",
+        "duration": 115000,
+        "module": "php_fpm"
+    },
+    "http": {
+        "request": {
+            "method": "get"
+        },
+        "response": {
+            "body": {
+                "bytes": 0
+            }
+        }
+    },
+    "metricset": {
+        "name": "process"
+    },
+    "php_fpm": {
+        "pool": {
+            "name": "www"
+        },
+        "process": {
+            "last_request_cpu": 0,
+            "last_request_memory": 2097152,
+            "request_duration": 204,
+            "requests": 6,
+            "script": "-",
+            "start_since": 128,
+            "start_time": 1548769887,
+            "state": "Idle"
+        }
+    },
+    "process": {
+        "pid": 17
+    },
+    "service": {
+        "address": "127.0.0.1:81",
+        "type": "php_fpm"
+    },
+    "url": {
+        "original": "/status?full=\u0026json="
+    },
+    "user": {
+        "name": "-"
+    }
+}

@@ -1,0 +1,81 @@
+{
+    "description": "Pipeline for parsing elasticsearch slow logs.",
+    "processors": [
+        {
+            "rename": {
+                "field": "@timestamp",
+                "target_field": "event.created"
+            }
+        },
+        {
+            "grok": {
+                "field": "message",
+                "patterns": [
+                    "^%{CHAR:first_char}"
+                ],
+                "pattern_definitions": {
+                    "CHAR": "."
+                }
+            }
+        },
+        {
+            "pipeline": {
+                "if": "ctx.first_char != '{'",
+                "name": "{< IngestPipeline "pipeline-plaintext" >}"
+            }
+        },
+        {
+            "pipeline": {
+                "if": "ctx.first_char == '{'",
+                "name": "{< IngestPipeline "pipeline-json" >}"
+            }
+        },
+        {
+            "date": {
+                "field": "elasticsearch.slowlog.timestamp",
+                "target_field": "@timestamp",
+                "formats": [
+                    "ISO8601"
+                ],
+                {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
+                "ignore_failure": true
+            }
+        },
+        {
+            "remove": {
+                "field": "elasticsearch.slowlog.timestamp"
+            }
+        },
+        {
+            "script": {
+                "lang": "painless",
+                "source": "ctx.event.duration = Math.round(ctx.elasticsearch.slowlog.duration * params.scale)",
+                "params": {
+                    "scale": 1000000
+                },
+                "if": "ctx.elasticsearch.slowlog?.duration != null"
+            }
+        },
+        {
+            "remove": {
+                "field": "elasticsearch.slowlog.duration",
+                "ignore_missing": true
+            }
+        },
+        {
+            "remove": {
+                "field": [
+                    "first_char"
+                ]
+            }
+        }
+    ],
+    "on_failure": [
+        {
+            "set": {
+                "field": "error.message",
+                "value": "{{ _ingest.on_failure_message }}"
+            }
+        }
+    ]
+}

@@ -28,3 +28,4 @@ _testmain.go
 /libbeat.yml
 /libbeat.reference.yml
 /docs/fields.asciidoc
+_meta/kibana

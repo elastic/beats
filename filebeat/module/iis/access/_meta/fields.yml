@@ -1,0 +1,128 @@
+- name: access
+  type: group
+  description: >
+    Contains fields for IIS access logs.
+  fields:
+    - name: sub_status
+      type: long
+      description: >
+        The HTTP substatus code.
+    - name: win32_status
+      type: long
+      description: >
+        The Windows status code.
+    - name: site_name
+      type: keyword
+      description: >
+        The site name and instance number.
+    - name: server_name
+      type: keyword
+      description: >
+        The name of the server on which the log file entry was generated.
+    - name: cookie
+      type: keyword
+      description: >
+        The content of the cookie sent or received, if any.
+
+    - name: body_received.bytes
+      type: alias
+      path: http.request.body.bytes
+      migration: true
+    - name: body_sent.bytes
+      type: alias
+      path: http.response.body.bytes
+      migration: true
+    - name: server_ip
+      type: alias
+      path: destination.address
+      migration: true
+    - name: method
+      type: alias
+      path: http.request.method
+      migration: true
+    - name: url
+      type: alias
+      path: url.path
+      migration: true
+    - name: query_string
+      type: alias
+      path: url.query
+      migration: true
+    - name: port
+      type: alias
+      path: destination.port
+      migration: true
+    - name: user_name
+      type: alias
+      path: user.name
+      migration: true
+    - name: remote_ip
+      type: alias
+      path: source.address
+      migration: true
+    - name: referrer
+      type: alias
+      path: http.request.referrer
+      migration: true
+    - name: response_code
+      type: alias
+      path: http.response.status_code
+      migration: true
+    - name: http_version
+      type: alias
+      path: http.version
+      migration: true
+    - name: hostname
+      type: alias
+      path: host.hostname
+      migration: true
+    - name: user_agent
+      type: group
+      fields:
+        - name: device
+          type: alias
+          path: user_agent.device.name
+          migration: true
+        - name: name
+          type: alias
+          path: user_agent.name
+          migration: true
+        - name: os
+          type: alias
+          path: user_agent.os.full_name
+          migration: true
+        - name: os_name
+          type: alias
+          path: user_agent.os.name
+          migration: true
+        - name: original
+          type: alias
+          path: user_agent.original
+          migration: true
+    - name: geoip
+      type: group
+      fields:
+        - name: continent_name
+          type: alias
+          path: source.geo.continent_name
+          migration: true
+        - name: country_iso_code
+          type: alias
+          path: source.geo.country_iso_code
+          migration: true
+        - name: location
+          type: alias
+          path: source.geo.location
+          migration: true
+        - name: region_name
+          type: alias
+          path: source.geo.region_name
+          migration: true
+        - name: city_name
+          type: alias
+          path: source.geo.city_name
+          migration: true
+        - name: region_iso_code
+          type: alias
+          path: source.geo.region_iso_code
+          migration: true

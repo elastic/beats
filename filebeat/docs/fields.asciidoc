@@ -12,248 +12,334 @@ This file is generated! See _meta/fields.yml and scripts/generate_field_docs.py
 This document describes the fields that are exported by Filebeat. They are
 grouped in the following categories:
 
-* <<exported-fields-apache2>>
+* <<exported-fields-apache>>
 * <<exported-fields-auditd>>
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
 * <<exported-fields-docker-processor>>
+* <<exported-fields-ecs>>
+* <<exported-fields-elasticsearch>>
+* <<exported-fields-haproxy>>
+* <<exported-fields-host-processor>>
 * <<exported-fields-icinga>>
+* <<exported-fields-iis>>
+* <<exported-fields-iptables>>
 * <<exported-fields-kafka>>
+* <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-log>>
 * <<exported-fields-logstash>>
+* <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
+* <<exported-fields-nats>>
+* <<exported-fields-netflow>>
+* <<exported-fields-netflow-module>>
 * <<exported-fields-nginx>>
+* <<exported-fields-osquery>>
 * <<exported-fields-postgresql>>
+* <<exported-fields-process>>
 * <<exported-fields-redis>>
+* <<exported-fields-santa>>
+* <<exported-fields-suricata>>
 * <<exported-fields-system>>
 * <<exported-fields-traefik>>
+* <<exported-fields-zeek>>
 
 --
-[[exported-fields-apache2]]
-== Apache2 fields
+[[exported-fields-apache]]
+== Apache fields
 
-Apache2 Module
+Apache Module
 
 
 
 [float]
 == apache2 fields
 
-Apache2 fields.
+Aliases for backward compatibility with old apache2 fields
+
+
+
+
+*`apache2.access.remote_ip`*::
++
+--
+type: alias
+
+alias to: source.address
+
+--
+
+*`apache2.access.ssl.protocol`*::
++
+--
+type: alias
+
+alias to: apache.access.ssl.protocol
+
+--
+
+*`apache2.access.ssl.cipher`*::
++
+--
+type: alias
+
+alias to: apache.access.ssl.cipher
+
+--
+
+*`apache2.access.body_sent.bytes`*::
++
+--
+type: alias
+
+alias to: http.response.body.bytes
+
+--
+
+*`apache2.access.user_name`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`apache2.access.method`*::
++
+--
+type: alias
+
+alias to: http.request.method
+
+--
+
+*`apache2.access.url`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`apache2.access.http_version`*::
++
+--
+type: alias
+
+alias to: http.version
+
+--
+
+*`apache2.access.response_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
+*`apache2.access.referrer`*::
++
+--
+type: alias
+
+alias to: http.request.referrer
+
+--
+
+*`apache2.access.agent`*::
++
+--
+type: alias
+
+alias to: user_agent.original
+
+--
+
+
+*`apache2.access.user_agent.device`*::
++
+--
+type: alias
+
+alias to: user_agent.device.name
+
+--
+
+*`apache2.access.user_agent.name`*::
++
+--
+type: alias
+
+alias to: user_agent.name
+
+--
+
+*`apache2.access.user_agent.os`*::
++
+--
+type: alias
+
+alias to: user_agent.os.full_name
+
+--
+
+*`apache2.access.user_agent.os_name`*::
++
+--
+type: alias
+
+alias to: user_agent.os.name
+
+--
+
+*`apache2.access.user_agent.original`*::
++
+--
+type: alias
+
+alias to: user_agent.original
+
+--
+
+
+*`apache2.access.geoip.continent_name`*::
++
+--
+type: alias
+
+alias to: source.geo.continent_name
+
+--
+
+*`apache2.access.geoip.country_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.country_iso_code
+
+--
+
+*`apache2.access.geoip.location`*::
++
+--
+type: alias
+
+alias to: source.geo.location
+
+--
+
+*`apache2.access.geoip.region_name`*::
++
+--
+type: alias
+
+alias to: source.geo.region_name
+
+--
+
+*`apache2.access.geoip.city_name`*::
++
+--
+type: alias
+
+alias to: source.geo.city_name
+
+--
+
+*`apache2.access.geoip.region_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.region_iso_code
+
+--
+
+
+*`apache2.error.level`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
+*`apache2.error.message`*::
++
+--
+type: alias
+
+alias to: message
+
+--
+
+*`apache2.error.pid`*::
++
+--
+type: alias
+
+alias to: process.pid
+
+--
+
+*`apache2.error.tid`*::
++
+--
+type: alias
+
+alias to: process.thread.id
+
+--
+
+*`apache2.error.module`*::
++
+--
+type: alias
+
+alias to: apache.error.module
+
+--
+
+[float]
+== apache fields
+
+Apache fields.
 
 
 
 [float]
 == access fields
 
-Contains fields for the Apache2 HTTPD access logs.
+Contains fields for the Apache HTTP Server access logs.
 
 
 
-[float]
-=== `apache2.access.remote_ip`
-
+*`apache.access.ssl.protocol`*::
++
+--
 type: keyword
 
-Client IP address.
+SSL protocol version.
 
 
-[float]
-=== `apache2.access.user_name`
+--
 
+*`apache.access.ssl.cipher`*::
++
+--
 type: keyword
 
-The user name used when basic authentication is used.
+SSL cipher name.
 
 
-[float]
-=== `apache2.access.method`
-
-type: keyword
-
-example: GET
-
-The request HTTP method.
-
-
-[float]
-=== `apache2.access.url`
-
-type: keyword
-
-The request HTTP URL.
-
-
-[float]
-=== `apache2.access.http_version`
-
-type: keyword
-
-The HTTP version.
-
-
-[float]
-=== `apache2.access.response_code`
-
-type: long
-
-The HTTP response code.
-
-
-[float]
-=== `apache2.access.body_sent.bytes`
-
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
-
-
-[float]
-=== `apache2.access.referrer`
-
-type: keyword
-
-The HTTP referrer.
-
-
-[float]
-=== `apache2.access.agent`
-
-type: text
-
-Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
-
-
-[float]
-== user_agent fields
-
-Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
-
-
-
-[float]
-=== `apache2.access.user_agent.device`
-
-type: keyword
-
-The name of the physical device.
-
-
-[float]
-=== `apache2.access.user_agent.major`
-
-type: long
-
-The major version of the user agent.
-
-
-[float]
-=== `apache2.access.user_agent.minor`
-
-type: long
-
-The minor version of the user agent.
-
-
-[float]
-=== `apache2.access.user_agent.patch`
-
-type: keyword
-
-The patch version of the user agent.
-
-
-[float]
-=== `apache2.access.user_agent.name`
-
-type: keyword
-
-example: Chrome
-
-The name of the user agent.
-
-
-[float]
-=== `apache2.access.user_agent.os`
-
-type: keyword
-
-The name of the operating system.
-
-
-[float]
-=== `apache2.access.user_agent.os_major`
-
-type: long
-
-The major version of the operating system.
-
-
-[float]
-=== `apache2.access.user_agent.os_minor`
-
-type: long
-
-The minor version of the operating system.
-
-
-[float]
-=== `apache2.access.user_agent.os_name`
-
-type: keyword
-
-The name of the operating system.
-
-
-[float]
-== geoip fields
-
-Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
-
-
-[float]
-=== `apache2.access.geoip.continent_name`
-
-type: keyword
-
-The name of the continent.
-
-
-[float]
-=== `apache2.access.geoip.country_iso_code`
-
-type: keyword
-
-Country ISO code.
-
-
-[float]
-=== `apache2.access.geoip.location`
-
-type: geo_point
-
-The longitude and latitude.
-
-
-[float]
-=== `apache2.access.geoip.region_name`
-
-type: keyword
-
-The region name.
-
-
-[float]
-=== `apache2.access.geoip.city_name`
-
-type: keyword
-
-The city name.
-
+--
 
 [float]
 == error fields
@@ -262,53 +348,15 @@ Fields from the Apache error logs.
 
 
 
-[float]
-=== `apache2.error.level`
-
-type: keyword
-
-The severity level of the message.
-
-
-[float]
-=== `apache2.error.client`
-
-type: keyword
-
-The IP address of the client that generated the error.
-
-
-[float]
-=== `apache2.error.message`
-
-type: text
-
-The logged message.
-
-
-[float]
-=== `apache2.error.pid`
-
-type: long
-
-The process ID.
-
-
-[float]
-=== `apache2.error.tid`
-
-type: long
-
-The thread ID.
-
-
-[float]
-=== `apache2.error.module`
-
+*`apache.error.module`*::
++
+--
 type: keyword
 
 The module producing the logged message.
 
+
+--
 
 [[exported-fields-auditd]]
 == Auditd fields
@@ -316,6 +364,232 @@ The module producing the logged message.
 Module for parsing auditd logs.
 
 
+
+
+*`user.terminal`*::
++
+--
+type: keyword
+
+Terminal or tty device on which the user is performing the observed activity.
+
+
+--
+
+
+*`user.audit.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.audit.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
+
+
+--
+
+*`user.audit.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.audit.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
+
+
+*`user.effective.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.effective.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
+
+
+--
+
+*`user.effective.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.effective.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
+
+
+*`user.filesystem.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.filesystem.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
+
+
+--
+
+*`user.filesystem.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.filesystem.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
+
+
+*`user.owner.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.owner.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
+
+
+--
+
+*`user.owner.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.owner.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
+
+
+*`user.saved.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.saved.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
+
+
+--
+
+*`user.saved.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.saved.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
 
 [float]
 == auditd fields
@@ -331,132 +605,377 @@ Fields from the Linux audit log. Not all fields are documented here because they
 
 
 
-[float]
-=== `auditd.log.record_type`
-
-The audit event type.
-
-
-[float]
-=== `auditd.log.old_auid`
-
+*`auditd.log.old_auid`*::
++
+--
 For login events this is the old audit ID used for the user prior to this login.
 
 
-[float]
-=== `auditd.log.new_auid`
+--
 
+*`auditd.log.new_auid`*::
++
+--
 For login events this is the new audit ID. The audit ID can be used to trace future events to the user even if their identity changes (like becoming root).
 
 
-[float]
-=== `auditd.log.old_ses`
+--
 
+*`auditd.log.old_ses`*::
++
+--
 For login events this is the old session ID used for the user prior to this login.
 
 
-[float]
-=== `auditd.log.new_ses`
+--
 
+*`auditd.log.new_ses`*::
++
+--
 For login events this is the new session ID. It can be used to tie a user to future events by session ID.
 
 
-[float]
-=== `auditd.log.sequence`
+--
 
+*`auditd.log.sequence`*::
++
+--
 type: long
 
 The audit event sequence number.
 
 
-[float]
-=== `auditd.log.acct`
+--
 
-The user account name associated with the event.
-
-
-[float]
-=== `auditd.log.pid`
-
-The ID of the process.
-
-
-[float]
-=== `auditd.log.ppid`
-
-The ID of the process.
-
-
-[float]
-=== `auditd.log.items`
-
+*`auditd.log.items`*::
++
+--
 The number of items in an event.
 
 
-[float]
-=== `auditd.log.item`
+--
 
+*`auditd.log.item`*::
++
+--
 The item field indicates which item out of the total number of items. This number is zero-based; a value of 0 means it is the first item.
 
 
-[float]
-=== `auditd.log.a0`
+--
 
+*`auditd.log.tty`*::
++
+--
+type: keyword
+
+--
+
+*`auditd.log.a0`*::
++
+--
 The first argument to the system call.
 
 
-[float]
-=== `auditd.log.res`
+--
 
-The result of the system call (success or failure).
+*`auditd.log.addr`*::
++
+--
+type: ip
+
+--
+
+*`auditd.log.rport`*::
++
+--
+type: long
+
+--
+
+*`auditd.log.laddr`*::
++
+--
+type: ip
+
+--
+
+*`auditd.log.lport`*::
++
+--
+type: long
+
+--
+
+*`auditd.log.acct`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`auditd.log.pid`*::
++
+--
+type: alias
+
+alias to: process.pid
+
+--
+
+*`auditd.log.ppid`*::
++
+--
+type: alias
+
+alias to: process.ppid
+
+--
+
+*`auditd.log.res`*::
++
+--
+type: alias
+
+alias to: event.outcome
+
+--
+
+*`auditd.log.record_type`*::
++
+--
+type: alias
+
+alias to: event.action
+
+--
 
 
-[float]
-== geoip fields
+*`auditd.log.geoip.continent_name`*::
++
+--
+type: alias
 
-Contains GeoIP information gathered based on the `auditd.log.addr` field. Only present if the GeoIP Elasticsearch plugin is available and used.
+alias to: source.geo.continent_name
 
+--
 
+*`auditd.log.geoip.country_iso_code`*::
++
+--
+type: alias
 
-[float]
-=== `auditd.log.geoip.continent_name`
+alias to: source.geo.country_iso_code
 
-type: keyword
+--
 
-The name of the continent.
+*`auditd.log.geoip.location`*::
++
+--
+type: alias
 
+alias to: source.geo.location
 
-[float]
-=== `auditd.log.geoip.city_name`
+--
 
-type: keyword
+*`auditd.log.geoip.region_name`*::
++
+--
+type: alias
 
-The name of the city.
+alias to: source.geo.region_name
 
+--
 
-[float]
-=== `auditd.log.geoip.region_name`
+*`auditd.log.geoip.city_name`*::
++
+--
+type: alias
 
-type: keyword
+alias to: source.geo.city_name
 
-The name of the region.
+--
 
+*`auditd.log.geoip.region_iso_code`*::
++
+--
+type: alias
 
-[float]
-=== `auditd.log.geoip.country_iso_code`
+alias to: source.geo.region_iso_code
 
-type: keyword
+--
 
-Country ISO code.
+*`auditd.log.arch`*::
++
+--
+type: alias
 
+alias to: host.architecture
 
-[float]
-=== `auditd.log.geoip.location`
+--
 
-type: geo_point
+*`auditd.log.gid`*::
++
+--
+type: alias
 
-The longitude and latitude.
+alias to: user.group.id
 
+--
+
+*`auditd.log.uid`*::
++
+--
+type: alias
+
+alias to: user.id
+
+--
+
+*`auditd.log.agid`*::
++
+--
+type: alias
+
+alias to: user.audit.group.id
+
+--
+
+*`auditd.log.auid`*::
++
+--
+type: alias
+
+alias to: user.audit.id
+
+--
+
+*`auditd.log.fsgid`*::
++
+--
+type: alias
+
+alias to: user.filesystem.group.id
+
+--
+
+*`auditd.log.fsuid`*::
++
+--
+type: alias
+
+alias to: user.filesystem.id
+
+--
+
+*`auditd.log.egid`*::
++
+--
+type: alias
+
+alias to: user.effective.group.id
+
+--
+
+*`auditd.log.euid`*::
++
+--
+type: alias
+
+alias to: user.effective.id
+
+--
+
+*`auditd.log.sgid`*::
++
+--
+type: alias
+
+alias to: user.saved.group.id
+
+--
+
+*`auditd.log.suid`*::
++
+--
+type: alias
+
+alias to: user.saved.id
+
+--
+
+*`auditd.log.ogid`*::
++
+--
+type: alias
+
+alias to: user.owner.group.id
+
+--
+
+*`auditd.log.ouid`*::
++
+--
+type: alias
+
+alias to: user.owner.id
+
+--
+
+*`auditd.log.comm`*::
++
+--
+type: alias
+
+alias to: process.name
+
+--
+
+*`auditd.log.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
+
+--
+
+*`auditd.log.terminal`*::
++
+--
+type: alias
+
+alias to: user.terminal
+
+--
+
+*`auditd.log.msg`*::
++
+--
+type: alias
+
+alias to: message
+
+--
+
+*`auditd.log.src`*::
++
+--
+type: alias
+
+alias to: source.address
+
+--
+
+*`auditd.log.dst`*::
++
+--
+type: alias
+
+alias to: destination.address
+
+--
 
 [[exported-fields-beat]]
 == Beat fields
@@ -465,57 +984,24 @@ Contains common beat fields available in all event types.
 
 
 
-[float]
-=== `beat.name`
+*`beat.timezone`*::
++
+--
+type: alias
 
-The name of the Beat sending the log messages. If the Beat name is set in the configuration file, then that value is used. If it is not set, the hostname is used. To set the Beat name, use the `name` option in the configuration file.
+alias to: event.timezone
 
+--
 
-[float]
-=== `beat.hostname`
-
-The hostname as returned by the operating system on which the Beat is running.
-
-
-[float]
-=== `beat.timezone`
-
-The timezone as returned by the operating system on which the Beat is running.
-
-
-[float]
-=== `beat.version`
-
-The version of the beat that generated this event.
-
-
-[float]
-=== `@timestamp`
-
-type: date
-
-example: August 26th 2016, 12:35:53.332
-
-format: date
-
-required: True
-
-The timestamp when the event log record was generated.
-
-
-[float]
-=== `tags`
-
-Arbitrary tags that can be set per Beat and per transaction type.
-
-
-[float]
-=== `fields`
-
+*`fields`*::
++
+--
 type: object
 
 Contains user configurable fields.
 
+
+--
 
 [float]
 == error fields
@@ -524,29 +1010,33 @@ Error fields containing additional info in case of errors.
 
 
 
-[float]
-=== `error.message`
-
-type: text
-
-Error message.
-
-
-[float]
-=== `error.code`
-
-type: long
-
-Error code.
-
-
-[float]
-=== `error.type`
-
+*`error.type`*::
++
+--
 type: keyword
 
 Error type.
 
+
+--
+
+*`beat.name`*::
++
+--
+type: alias
+
+alias to: host.name
+
+--
+
+*`beat.hostname`*::
++
+--
+type: alias
+
+alias to: agent.hostname
+
+--
 
 [[exported-fields-cloud]]
 == Cloud provider metadata fields
@@ -555,96 +1045,4343 @@ Metadata from cloud providers added by the add_cloud_metadata processor.
 
 
 
+*`cloud.project.id`*::
++
+--
+example: project-x
+
+Name of the project in Google Cloud.
+
+
+--
+
+*`meta.cloud.provider`*::
++
+--
+type: alias
+
+alias to: cloud.provider
+
+--
+
+*`meta.cloud.instance_id`*::
++
+--
+type: alias
+
+alias to: cloud.instance.id
+
+--
+
+*`meta.cloud.instance_name`*::
++
+--
+type: alias
+
+alias to: cloud.instance.name
+
+--
+
+*`meta.cloud.machine_type`*::
++
+--
+type: alias
+
+alias to: cloud.machine.type
+
+--
+
+*`meta.cloud.availability_zone`*::
++
+--
+type: alias
+
+alias to: cloud.availability_zone
+
+--
+
+*`meta.cloud.project_id`*::
++
+--
+type: alias
+
+alias to: cloud.project.id
+
+--
+
+*`meta.cloud.region`*::
++
+--
+type: alias
+
+alias to: cloud.region
+
+--
+
+[[exported-fields-docker-processor]]
+== Docker fields
+
+Docker stats collected from Docker.
+
+
+
+
+*`docker.container.id`*::
++
+--
+type: alias
+
+alias to: container.id
+
+--
+
+*`docker.container.image`*::
++
+--
+type: alias
+
+alias to: container.image.name
+
+--
+
+*`docker.container.name`*::
++
+--
+type: alias
+
+alias to: container.name
+
+--
+
+*`docker.container.labels`*::
++
+--
+type: object
+
+Image labels.
+
+
+--
+
+[[exported-fields-ecs]]
+== ECS fields
+
+ECS fields.
+
+
+
+*`@timestamp`*::
++
+--
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+required: True
+
+Date/time when the event originated.
+For log events this is the date/time when the event was generated, and not when it was read.
+Required field for all events.
+
+
+--
+
+*`tags`*::
++
+--
+type: keyword
+
+example: ["production", "env2"]
+
+List of keywords used to tag each event.
+
+
+--
+
+*`labels`*::
++
+--
+type: object
+
+example: {'application': 'foo-bar', 'env': 'production'}
+
+Key/value pairs.
+Can be used to add meta information to events. Should not contain nested objects. All values are stored as keyword.
+Example: `docker` and `k8s` labels.
+
+
+--
+
+*`message`*::
++
+--
+type: text
+
+example: Hello World
+
+For log events the message field contains the log message.
+In other use cases the message field can be used to concatenate different values which are then freely searchable. If multiple messages exist, they can be combined into one message.
+
+
+--
+
 [float]
-=== `meta.cloud.provider`
+== agent fields
+
+The agent fields contain the data about the software entity, if any, that collects, detects, or observes events on a host, or takes measurements on a host. Examples include Beats. Agents may also run on observers. ECS agent.* fields shall be populated with details of the agent running on the host or observer where the event happened or the measurement was taken.
+
+
+
+*`agent.version`*::
++
+--
+type: keyword
+
+example: 6.0.0-rc2
+
+Version of the agent.
+
+
+--
+
+*`agent.name`*::
++
+--
+type: keyword
+
+example: foo
+
+Name of the agent.
+This is a name that can be given to an agent. This can be helpful if for example two Filebeat instances are running on the same host but a human readable separation is needed on which Filebeat instance data is coming from.
+If no name is given, the name is often left empty.
+
+
+--
+
+*`agent.type`*::
++
+--
+type: keyword
+
+example: filebeat
+
+Type of the agent.
+The agent type stays always the same and should be given by the agent used. In case of Filebeat the agent would always be Filebeat also if two Filebeat instances are run on the same machine.
+
+
+--
+
+*`agent.id`*::
++
+--
+type: keyword
+
+example: 8a4f500d
+
+Unique identifier of this agent (if one exists).
+Example: For Beats this would be beat.id.
+
+
+--
+
+*`agent.ephemeral_id`*::
++
+--
+type: keyword
+
+example: 8a4f500f
+
+Ephemeral identifier of this agent (if one exists).
+This id normally changes across restarts, but `agent.id` does not.
+
+
+--
+
+[float]
+== client fields
+
+A client is defined as the initiator of a network connection for events regarding sessions, connections, or bidirectional flow records. For TCP events, the client is the initiator of the TCP connection that sends the SYN packet(s). For other protocols, the client is generally the initiator or requestor in the network transaction. Some systems use the term "originator" to refer the client in TCP connections. The client fields describe details about the system acting as the client in the network event. Client fields are usually populated in conjunction with server fields.  Client fields are generally not populated for packet-level events.
+Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
+
+
+
+*`client.address`*::
++
+--
+type: keyword
+
+Some event client addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+
+--
+
+*`client.ip`*::
++
+--
+type: ip
+
+IP address of the client.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+
+--
+
+*`client.port`*::
++
+--
+type: long
+
+Port of the client.
+
+
+--
+
+*`client.mac`*::
++
+--
+type: keyword
+
+MAC address of the client.
+
+
+--
+
+*`client.domain`*::
++
+--
+type: keyword
+
+Client domain.
+
+
+--
+
+*`client.bytes`*::
++
+--
+type: long
+
+example: 184
+
+format: bytes
+
+Bytes sent from the client to the server.
+
+
+--
+
+*`client.packets`*::
++
+--
+type: long
+
+example: 12
+
+Packets sent from the client to the server.
+
+
+--
+
+[float]
+== geo fields
+
+Geo fields can carry data about a specific location related to an event or geo information derived from an IP field.
+
+
+
+*`client.geo.location`*::
++
+--
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+Longitude and latitude.
+
+
+--
+
+*`client.geo.continent_name`*::
++
+--
+type: keyword
+
+example: North America
+
+Name of the continent.
+
+
+--
+
+*`client.geo.country_name`*::
++
+--
+type: keyword
+
+example: Canada
+
+Country name.
+
+
+--
+
+*`client.geo.region_name`*::
++
+--
+type: keyword
+
+example: Quebec
+
+Region name.
+
+
+--
+
+*`client.geo.city_name`*::
++
+--
+type: keyword
+
+example: Montreal
+
+City name.
+
+
+--
+
+*`client.geo.country_iso_code`*::
++
+--
+type: keyword
+
+example: CA
+
+Country ISO code.
+
+
+--
+
+*`client.geo.region_iso_code`*::
++
+--
+type: keyword
+
+example: CA-QC
+
+Region ISO code.
+
+
+--
+
+*`client.geo.name`*::
++
+--
+type: keyword
+
+example: boston-dc
+
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+
+--
+
+[float]
+== cloud fields
+
+Fields related to the cloud or infrastructure the events are coming from.
+
+
+
+*`cloud.provider`*::
++
+--
+type: keyword
 
 example: ec2
 
-Name of the cloud provider. Possible values are ec2, gce, or digitalocean.
+Name of the cloud provider. Example values are ec2, gce, or digitalocean.
 
 
-[float]
-=== `meta.cloud.instance_id`
+--
 
-Instance ID of the host machine.
-
-
-[float]
-=== `meta.cloud.instance_name`
-
-Instance name of the host machine.
-
-
-[float]
-=== `meta.cloud.machine_type`
-
-example: t2.medium
-
-Machine type of the host machine.
-
-
-[float]
-=== `meta.cloud.availability_zone`
+*`cloud.availability_zone`*::
++
+--
+type: keyword
 
 example: us-east-1c
 
 Availability zone in which this host is running.
 
 
-[float]
-=== `meta.cloud.project_id`
+--
 
-example: project-x
+*`cloud.region`*::
++
+--
+type: keyword
 
-Name of the project in Google Cloud.
-
-
-[float]
-=== `meta.cloud.region`
+example: us-east-1
 
 Region in which this host is running.
 
 
-[[exported-fields-docker-processor]]
-== Docker fields
+--
 
-beta[]
-Docker stats collected from Docker.
+*`cloud.instance.id`*::
++
+--
+type: keyword
+
+example: i-1234567890abcdef0
+
+Instance ID of the host machine.
 
 
+--
 
+*`cloud.instance.name`*::
++
+--
+type: keyword
+
+Instance name of the host machine.
+
+
+--
+
+*`cloud.machine.type`*::
++
+--
+type: keyword
+
+example: t2.medium
+
+Machine type of the host machine.
+
+
+--
+
+*`cloud.account.id`*::
++
+--
+type: keyword
+
+example: 666777888999
+
+The cloud account or organization id used to identify different entities in a multi-tenant environment.
+Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
+
+
+--
 
 [float]
-=== `docker.container.id`
+== container fields
 
+Container fields are used for meta information about the specific container that is the source of information. These fields help correlate data based containers from any runtime.
+
+
+
+*`container.runtime`*::
++
+--
+type: keyword
+
+example: docker
+
+Runtime managing this container.
+
+
+--
+
+*`container.id`*::
++
+--
 type: keyword
 
 Unique container id.
 
 
-[float]
-=== `docker.container.image`
+--
 
+*`container.image.name`*::
++
+--
 type: keyword
 
 Name of the image the container was built on.
 
 
-[float]
-=== `docker.container.name`
+--
 
+*`container.image.tag`*::
++
+--
+type: keyword
+
+Container image tag.
+
+
+--
+
+*`container.name`*::
++
+--
 type: keyword
 
 Container name.
 
 
-[float]
-=== `docker.container.labels`
+--
 
+*`container.labels`*::
++
+--
 type: object
 
 Image labels.
 
+
+--
+
+[float]
+== destination fields
+
+Destination fields describe details about the destination of a packet/event. Destination fields are usually populated in conjunction with source fields.
+
+
+
+*`destination.address`*::
++
+--
+type: keyword
+
+Some event destination addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+
+--
+
+*`destination.ip`*::
++
+--
+type: ip
+
+IP address of the destination.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+
+--
+
+*`destination.port`*::
++
+--
+type: long
+
+Port of the destination.
+
+
+--
+
+*`destination.mac`*::
++
+--
+type: keyword
+
+MAC address of the destination.
+
+
+--
+
+*`destination.domain`*::
++
+--
+type: keyword
+
+Destination domain.
+
+
+--
+
+*`destination.bytes`*::
++
+--
+type: long
+
+example: 184
+
+format: bytes
+
+Bytes sent from the destination to the source.
+
+
+--
+
+*`destination.packets`*::
++
+--
+type: long
+
+example: 12
+
+Packets sent from the destination to the source.
+
+
+--
+
+[float]
+== geo fields
+
+Geo fields can carry data about a specific location related to an event or geo information derived from an IP field.
+
+
+
+*`destination.geo.location`*::
++
+--
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+Longitude and latitude.
+
+
+--
+
+*`destination.geo.continent_name`*::
++
+--
+type: keyword
+
+example: North America
+
+Name of the continent.
+
+
+--
+
+*`destination.geo.country_name`*::
++
+--
+type: keyword
+
+example: Canada
+
+Country name.
+
+
+--
+
+*`destination.geo.region_name`*::
++
+--
+type: keyword
+
+example: Quebec
+
+Region name.
+
+
+--
+
+*`destination.geo.city_name`*::
++
+--
+type: keyword
+
+example: Montreal
+
+City name.
+
+
+--
+
+*`destination.geo.country_iso_code`*::
++
+--
+type: keyword
+
+example: CA
+
+Country ISO code.
+
+
+--
+
+*`destination.geo.region_iso_code`*::
++
+--
+type: keyword
+
+example: CA-QC
+
+Region ISO code.
+
+
+--
+
+*`destination.geo.name`*::
++
+--
+type: keyword
+
+example: boston-dc
+
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+
+--
+
+[float]
+== ecs fields
+
+Meta-information specific to ECS.
+
+
+
+*`ecs.version`*::
++
+--
+type: keyword
+
+example: 1.0.0-beta2
+
+required: True
+
+ECS version this event conforms to. `ecs.version` is a required field and must exist in all events.
+When querying across multiple indices -- which may conform to slightly different ECS versions -- this field lets integrations adjust to the schema version of the events.
+The current version is 1.0.0-beta2 .
+
+
+--
+
+[float]
+== error fields
+
+These fields can represent errors of any kind. Use them for errors that happen while fetching events or in cases where the event itself contains an error.
+
+
+
+*`error.id`*::
++
+--
+type: keyword
+
+Unique identifier for the error.
+
+
+--
+
+*`error.message`*::
++
+--
+type: text
+
+Error message.
+
+
+--
+
+*`error.code`*::
++
+--
+type: keyword
+
+Error code describing the error.
+
+
+--
+
+[float]
+== event fields
+
+The event fields are used for context information about the log or metric event itself. A log is defined as an event containing details of something that happened. Log events must include the time at which the thing happened. Examples of log events include a process starting on a host, a network packet being sent from a source to a destination, or a network connection between a client and a server being initiated or closed. A metric is defined as an event containing one or more numerical or categorical measurements and the time at which the measurement was taken. Examples of metric events include memory pressure measured on a host, or vulnerabilities measured on a scanned host.
+
+
+
+*`event.id`*::
++
+--
+type: keyword
+
+example: 8a4f500d
+
+Unique ID to describe the event.
+
+
+--
+
+*`event.kind`*::
++
+--
+type: keyword
+
+example: state
+
+The kind of the event.
+This gives information about what type of information the event contains, without being specific to the contents of the event.  Examples are `event`, `state`, `alarm`. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+
+
+--
+
+*`event.category`*::
++
+--
+type: keyword
+
+example: user-management
+
+Event category.
+This contains high-level information about the contents of the event. It is more generic than `event.action`, in the sense that typically a category contains multiple actions. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+
+
+--
+
+*`event.action`*::
++
+--
+type: keyword
+
+example: user-password-change
+
+The action captured by the event.
+This describes the information in the event. It is more specific than `event.category`. Examples are `group-add`, `process-started`, `file-created`. The value is normally defined by the implementer.
+
+
+--
+
+*`event.outcome`*::
++
+--
+type: keyword
+
+example: success
+
+The outcome of the event.
+If the event describes an action, this fields contains the outcome of that action. Examples outcomes are `success` and `failure`. Warning: In future versions of ECS, we plan to provide a list of acceptable values for this field, please use with caution.
+
+
+--
+
+*`event.type`*::
++
+--
+type: keyword
+
+Reserved for future usage.
+Please avoid using this field for user data.
+
+
+--
+
+*`event.module`*::
++
+--
+type: keyword
+
+example: mysql
+
+Name of the module this data is coming from.
+This information is coming from the modules used in Beats or Logstash.
+
+
+--
+
+*`event.dataset`*::
++
+--
+type: keyword
+
+example: stats
+
+Name of the dataset.
+The concept of a `dataset` (fileset / metricset) is used in Beats as a subset of modules. It contains the information which is currently stored in metricset.name and metricset.module or fileset.name.
+
+
+--
+
+*`event.severity`*::
++
+--
+type: long
+
+example: 7
+
+Severity describes the severity of the event. What the different severity values mean can very different between use cases. It's up to the implementer to make sure severities are consistent across events.
+
+
+--
+
+*`event.original`*::
++
+--
+type: keyword
+
+example: Sep 19 08:26:10 host CEF:0&#124;Security&#124; threatmanager&#124;1.0&#124;100&#124; worm successfully stopped&#124;10&#124;src=10.0.0.1 dst=2.1.2.2spt=1232
+
+Raw text message of entire event. Used to demonstrate log integrity.
+This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`.
+
+
+Field is not indexed.
+
+--
+
+*`event.hash`*::
++
+--
+type: keyword
+
+example: 123456789012345678901234567890ABCD
+
+Hash (perhaps logstash fingerprint) of raw field to be able to demonstrate log integrity.
+
+
+--
+
+*`event.duration`*::
++
+--
+type: long
+
+format: duration
+
+Duration of the event in nanoseconds.
+If event.start and event.end are known this value should be the difference between the end and start time.
+
+
+--
+
+*`event.timezone`*::
++
+--
+type: keyword
+
+This field should be populated when the event's timestamp does not include timezone information already (e.g. default Syslog timestamps). It's optional otherwise.
+Acceptable timezone formats are: a canonical ID (e.g. "Europe/Amsterdam"), abbreviated (e.g. "EST") or an HH:mm differential (e.g. "-05:00").
+
+
+--
+
+*`event.created`*::
++
+--
+type: date
+
+event.created contains the date when the event was created.
+This timestamp is distinct from @timestamp in that @timestamp contains the processed timestamp. For logs these two timestamps can be different as the timestamp in the log line and when the event is read for example by Filebeat are not identical. `@timestamp` must contain the timestamp extracted from the log line, event.created when the log line is read. The same could apply to package capturing where @timestamp contains the timestamp extracted from the network package and event.created when the event was created.
+In case the two timestamps are identical, @timestamp should be used.
+
+
+--
+
+*`event.start`*::
++
+--
+type: date
+
+event.start contains the date when the event started or when the activity was first observed.
+
+
+--
+
+*`event.end`*::
++
+--
+type: date
+
+event.end contains the date when the event ended or when the activity was last observed.
+
+
+--
+
+*`event.risk_score`*::
++
+--
+type: float
+
+Risk score or priority of the event (e.g. security solutions). Use your system's original value here.
+
+
+--
+
+*`event.risk_score_norm`*::
++
+--
+type: float
+
+Normalized risk score or priority of the event, on a scale of 0 to 100.
+This is mainly useful if you use more than one system that assigns risk scores, and you want to see a normalized value across all systems.
+
+
+--
+
+[float]
+== file fields
+
+A file is defined as a set of information that has been created on, or has existed on a filesystem. File objects can be associated with host events, network events, and/or file events (e.g., those produced by File Integrity Monitoring [FIM] products or services). File fields provide details about the affected file associated with the event or metric.
+
+
+
+*`file.path`*::
++
+--
+type: keyword
+
+Path to the file.
+
+--
+
+*`file.target_path`*::
++
+--
+type: keyword
+
+Target path for symlinks.
+
+--
+
+*`file.extension`*::
++
+--
+type: keyword
+
+example: png
+
+File extension.
+This should allow easy filtering by file extensions.
+
+
+--
+
+*`file.type`*::
++
+--
+type: keyword
+
+File type (file, dir, or symlink).
+
+--
+
+*`file.device`*::
++
+--
+type: keyword
+
+Device that is the source of the file.
+
+--
+
+*`file.inode`*::
++
+--
+type: keyword
+
+Inode representing the file in the filesystem.
+
+--
+
+*`file.uid`*::
++
+--
+type: keyword
+
+The user ID (UID) or security identifier (SID) of the file owner.
+
+
+--
+
+*`file.owner`*::
++
+--
+type: keyword
+
+File owner's username.
+
+--
+
+*`file.gid`*::
++
+--
+type: keyword
+
+Primary group ID (GID) of the file.
+
+--
+
+*`file.group`*::
++
+--
+type: keyword
+
+Primary group name of the file.
+
+--
+
+*`file.mode`*::
++
+--
+type: keyword
+
+example: 416
+
+Mode of the file in octal representation.
+
+--
+
+*`file.size`*::
++
+--
+type: long
+
+format: bytes
+
+File size in bytes (field is only added when `type` is `file`).
+
+--
+
+*`file.mtime`*::
++
+--
+type: date
+
+Last time file content was modified.
+
+--
+
+*`file.ctime`*::
++
+--
+type: date
+
+Last time file metadata changed.
+
+--
+
+[float]
+== group fields
+
+The group fields are meant to represent groups that are relevant to the event.
+
+
+
+*`group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
+
+[float]
+== host fields
+
+A host is defined as a general computing instance. ECS host.* fields should be populated with details about the host on which the event happened, or on which the measurement was taken. Host types include hardware, virtual machines, Docker containers, and Kubernetes nodes.
+
+
+
+*`host.hostname`*::
++
+--
+type: keyword
+
+Hostname of the host.
+It normally contains what the `hostname` command returns on the host machine.
+
+
+--
+
+*`host.name`*::
++
+--
+type: keyword
+
+Name of the host.
+It can contain what `hostname` returns on Unix systems, the fully qualified domain name, or a name specified by the user. The sender decides which value to use.
+
+
+--
+
+*`host.id`*::
++
+--
+type: keyword
+
+Unique host id.
+As hostname is not always unique, use values that are meaningful in your environment.
+Example: The current usage of `beat.name`.
+
+
+--
+
+*`host.ip`*::
++
+--
+type: ip
+
+Host ip address.
+
+
+--
+
+*`host.mac`*::
++
+--
+type: keyword
+
+Host mac address.
+
+
+--
+
+*`host.type`*::
++
+--
+type: keyword
+
+Type of host.
+For Cloud providers this can be the machine type like `t2.medium`. If vm, this could be the container, for example, or other information meaningful in your environment.
+
+
+--
+
+*`host.architecture`*::
++
+--
+type: keyword
+
+example: x86_64
+
+Operating system architecture.
+
+
+--
+
+[float]
+== os fields
+
+The OS fields contain information about the operating system.
+
+
+
+*`host.os.platform`*::
++
+--
+type: keyword
+
+example: darwin
+
+Operating system platform (such centos, ubuntu, windows).
+
+
+--
+
+*`host.os.name`*::
++
+--
+type: keyword
+
+example: Mac OS X
+
+Operating system name, without the version.
+
+
+--
+
+*`host.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
+
+
+--
+
+*`host.os.family`*::
++
+--
+type: keyword
+
+example: debian
+
+OS family (such as redhat, debian, freebsd, windows).
+
+
+--
+
+*`host.os.version`*::
++
+--
+type: keyword
+
+example: 10.14.1
+
+Operating system version as a raw string.
+
+
+--
+
+*`host.os.kernel`*::
++
+--
+type: keyword
+
+example: 4.4.0-112-generic
+
+Operating system kernel version as a raw string.
+
+
+--
+
+[float]
+== geo fields
+
+Geo fields can carry data about a specific location related to an event or geo information derived from an IP field.
+
+
+
+*`host.geo.location`*::
++
+--
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+Longitude and latitude.
+
+
+--
+
+*`host.geo.continent_name`*::
++
+--
+type: keyword
+
+example: North America
+
+Name of the continent.
+
+
+--
+
+*`host.geo.country_name`*::
++
+--
+type: keyword
+
+example: Canada
+
+Country name.
+
+
+--
+
+*`host.geo.region_name`*::
++
+--
+type: keyword
+
+example: Quebec
+
+Region name.
+
+
+--
+
+*`host.geo.city_name`*::
++
+--
+type: keyword
+
+example: Montreal
+
+City name.
+
+
+--
+
+*`host.geo.country_iso_code`*::
++
+--
+type: keyword
+
+example: CA
+
+Country ISO code.
+
+
+--
+
+*`host.geo.region_iso_code`*::
++
+--
+type: keyword
+
+example: CA-QC
+
+Region ISO code.
+
+
+--
+
+*`host.geo.name`*::
++
+--
+type: keyword
+
+example: boston-dc
+
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+
+--
+
+[float]
+== http fields
+
+Fields related to HTTP activity.
+
+
+
+*`http.request.method`*::
++
+--
+type: keyword
+
+example: get, post, put
+
+Http request method.
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS"  section.
+
+
+--
+
+*`http.request.body.content`*::
++
+--
+type: keyword
+
+example: Hello world
+
+The full http request body.
+
+
+--
+
+*`http.request.referrer`*::
++
+--
+type: keyword
+
+example: https://blog.example.com/
+
+Referrer for this HTTP request.
+
+
+--
+
+*`http.response.status_code`*::
++
+--
+type: long
+
+example: 404
+
+Http response status code.
+
+
+--
+
+*`http.response.body.content`*::
++
+--
+type: keyword
+
+example: Hello world
+
+The full http response body.
+
+
+--
+
+*`http.version`*::
++
+--
+type: keyword
+
+example: 1.1
+
+Http version.
+
+
+--
+
+*`http.request.bytes`*::
++
+--
+type: long
+
+example: 1437
+
+format: bytes
+
+Total size in bytes of the request (body and headers).
+
+
+--
+
+*`http.request.body.bytes`*::
++
+--
+type: long
+
+example: 887
+
+format: bytes
+
+Size in bytes of the request body.
+
+
+--
+
+*`http.response.bytes`*::
++
+--
+type: long
+
+example: 1437
+
+format: bytes
+
+Total size in bytes of the response (body and headers).
+
+
+--
+
+*`http.response.body.bytes`*::
++
+--
+type: long
+
+example: 887
+
+format: bytes
+
+Size in bytes of the response body.
+
+
+--
+
+[float]
+== log fields
+
+Fields which are specific to log events.
+
+
+
+*`log.level`*::
++
+--
+type: keyword
+
+example: ERR
+
+Log level of the log event.
+Some examples are `WARN`, `ERR`, `INFO`.
+
+
+--
+
+*`log.original`*::
++
+--
+type: keyword
+
+example: Sep 19 08:26:10 localhost My log
+
+
+This is the original log message and contains the full log message before splitting it up in multiple parts.
+In contrast to the `message` field which can contain an extracted part of the log message, this field contains the original, full log message. It can have already some modifications applied like encoding or new lines removed to clean up the log message.
+This field is not indexed and doc_values are disabled so it can't be queried but the value can be retrieved from `_source`.
+
+
+Field is not indexed.
+
+--
+
+[float]
+== network fields
+
+The network is defined as the communication path over which a host or network event happens. The network.* fields should be populated with details about the network activity associated with an event.
+
+
+
+*`network.name`*::
++
+--
+type: keyword
+
+example: Guest Wifi
+
+Name given by operators to sections of their network.
+
+
+--
+
+*`network.type`*::
++
+--
+type: keyword
+
+example: ipv4
+
+In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS" section.
+
+
+--
+
+*`network.iana_number`*::
++
+--
+type: keyword
+
+example: 6
+
+IANA Protocol Number (https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml). Standardized list of protocols. This aligns well with NetFlow and sFlow related logs which use the IANA Protocol Number.
+
+
+--
+
+*`network.transport`*::
++
+--
+type: keyword
+
+example: tcp
+
+Same as network.iana_number, but instead using the Keyword name of the transport layer (udp, tcp, ipv6-icmp, etc.)
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS"  section.
+
+
+--
+
+*`network.application`*::
++
+--
+type: keyword
+
+example: aim
+
+A name given to an application. This can be arbitrarily assigned for things like microservices, but also apply to things like skype, icq, facebook, twitter. This would be used in situations where the vendor or service can be decoded such as from the source/dest IP owners, ports, or wire format.
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS" section.
+
+
+--
+
+*`network.protocol`*::
++
+--
+type: keyword
+
+example: http
+
+L7 Network protocol name. ex. http, lumberjack, transport protocol.
+The field value must be normalized to lowercase for querying. See "Lowercase Capitalization" in the "Implementing ECS" section.
+
+
+--
+
+*`network.direction`*::
++
+--
+type: keyword
+
+example: inbound
+
+Direction of the network traffic.
+Recommended values are:
+  * inbound
+  * outbound
+  * internal
+  * external
+  * unknown
+
+When mapping events from a host-based monitoring context, populate this field from the host's point of view.
+When mapping events from a network or perimeter-based monitoring context, populate this field from the point of view of your network perimeter.
+
+
+--
+
+*`network.forwarded_ip`*::
++
+--
+type: ip
+
+example: 192.1.1.2
+
+Host IP address when the source IP address is the proxy.
+
+
+--
+
+*`network.community_id`*::
++
+--
+type: keyword
+
+example: 1:hO+sN4H+MG5MY/8hIrXPqc4ZQz0=
+
+A hash of source and destination IPs and ports, as well as the protocol used in a communication. This is a tool-agnostic standard to identify flows.
+Learn more at https://github.com/corelight/community-id-spec.
+
+
+--
+
+*`network.bytes`*::
++
+--
+type: long
+
+example: 368
+
+format: bytes
+
+Total bytes transferred in both directions.
+If `source.bytes` and `destination.bytes` are known, `network.bytes` is their sum.
+
+
+--
+
+*`network.packets`*::
++
+--
+type: long
+
+example: 24
+
+Total packets transferred in both directions.
+If `source.packets` and `destination.packets` are known, `network.packets` is their sum.
+
+
+--
+
+[float]
+== observer fields
+
+An observer is defined as a special network, security, or application device used to detect, observe, or create network, security, or application-related events and metrics. This could be a custom hardware appliance or a server that has been configured to run special network, security, or application software. Examples include firewalls, intrusion detection/prevention systems, network monitoring sensors, web application firewalls, data loss prevention systems, and APM servers. The observer.* fields shall be populated with details of the system, if any, that detects, observes and/or creates a network, security, or application event or metric. Message queues and ETL components used in processing events or metrics are not considered observers in ECS.
+
+
+
+*`observer.mac`*::
++
+--
+type: keyword
+
+MAC address of the observer
+
+
+--
+
+*`observer.ip`*::
++
+--
+type: ip
+
+IP address of the observer.
+
+
+--
+
+*`observer.hostname`*::
++
+--
+type: keyword
+
+Hostname of the observer.
+
+
+--
+
+*`observer.vendor`*::
++
+--
+type: keyword
+
+observer vendor information.
+
+
+--
+
+*`observer.version`*::
++
+--
+type: keyword
+
+Observer version.
+
+
+--
+
+*`observer.serial_number`*::
++
+--
+type: keyword
+
+Observer serial number.
+
+
+--
+
+*`observer.type`*::
++
+--
+type: keyword
+
+example: firewall
+
+The type of the observer the data is coming from.
+There is no predefined list of observer types. Some examples are `forwarder`, `firewall`, `ids`, `ips`, `proxy`, `poller`, `sensor`, `APM server`.
+
+
+--
+
+[float]
+== os fields
+
+The OS fields contain information about the operating system.
+
+
+
+*`observer.os.platform`*::
++
+--
+type: keyword
+
+example: darwin
+
+Operating system platform (such centos, ubuntu, windows).
+
+
+--
+
+*`observer.os.name`*::
++
+--
+type: keyword
+
+example: Mac OS X
+
+Operating system name, without the version.
+
+
+--
+
+*`observer.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
+
+
+--
+
+*`observer.os.family`*::
++
+--
+type: keyword
+
+example: debian
+
+OS family (such as redhat, debian, freebsd, windows).
+
+
+--
+
+*`observer.os.version`*::
++
+--
+type: keyword
+
+example: 10.14.1
+
+Operating system version as a raw string.
+
+
+--
+
+*`observer.os.kernel`*::
++
+--
+type: keyword
+
+example: 4.4.0-112-generic
+
+Operating system kernel version as a raw string.
+
+
+--
+
+[float]
+== geo fields
+
+Geo fields can carry data about a specific location related to an event or geo information derived from an IP field.
+
+
+
+*`observer.geo.location`*::
++
+--
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+Longitude and latitude.
+
+
+--
+
+*`observer.geo.continent_name`*::
++
+--
+type: keyword
+
+example: North America
+
+Name of the continent.
+
+
+--
+
+*`observer.geo.country_name`*::
++
+--
+type: keyword
+
+example: Canada
+
+Country name.
+
+
+--
+
+*`observer.geo.region_name`*::
++
+--
+type: keyword
+
+example: Quebec
+
+Region name.
+
+
+--
+
+*`observer.geo.city_name`*::
++
+--
+type: keyword
+
+example: Montreal
+
+City name.
+
+
+--
+
+*`observer.geo.country_iso_code`*::
++
+--
+type: keyword
+
+example: CA
+
+Country ISO code.
+
+
+--
+
+*`observer.geo.region_iso_code`*::
++
+--
+type: keyword
+
+example: CA-QC
+
+Region ISO code.
+
+
+--
+
+*`observer.geo.name`*::
++
+--
+type: keyword
+
+example: boston-dc
+
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+
+--
+
+[float]
+== organization fields
+
+The organization fields enrich data with information about the company or entity the data is associated with. These fields help you arrange or filter data stored in an index by one or multiple organizations.
+
+
+
+*`organization.name`*::
++
+--
+type: keyword
+
+Organization name.
+
+
+--
+
+*`organization.id`*::
++
+--
+type: keyword
+
+Unique identifier for the organization.
+
+
+--
+
+[float]
+== os fields
+
+The OS fields contain information about the operating system.
+
+
+
+*`os.platform`*::
++
+--
+type: keyword
+
+example: darwin
+
+Operating system platform (such centos, ubuntu, windows).
+
+
+--
+
+*`os.name`*::
++
+--
+type: keyword
+
+example: Mac OS X
+
+Operating system name, without the version.
+
+
+--
+
+*`os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
+
+
+--
+
+*`os.family`*::
++
+--
+type: keyword
+
+example: debian
+
+OS family (such as redhat, debian, freebsd, windows).
+
+
+--
+
+*`os.version`*::
++
+--
+type: keyword
+
+example: 10.14.1
+
+Operating system version as a raw string.
+
+
+--
+
+*`os.kernel`*::
++
+--
+type: keyword
+
+example: 4.4.0-112-generic
+
+Operating system kernel version as a raw string.
+
+
+--
+
+[float]
+== process fields
+
+These fields contain information about a process. These fields can help you correlate metrics information with a process id/name from a log message.  The `process.pid` often stays in the metric itself and is copied to the global field for correlation.
+
+
+
+*`process.pid`*::
++
+--
+type: long
+
+Process id.
+
+
+--
+
+*`process.name`*::
++
+--
+type: keyword
+
+example: ssh
+
+Process name.
+Sometimes called program name or similar.
+
+
+--
+
+*`process.ppid`*::
++
+--
+type: long
+
+Process parent id.
+
+
+--
+
+*`process.args`*::
++
+--
+type: keyword
+
+example: ['ssh', '-l', 'user', '10.0.0.16']
+
+Process arguments.
+May be filtered to protect sensitive information.
+
+
+--
+
+*`process.executable`*::
++
+--
+type: keyword
+
+example: /usr/bin/ssh
+
+Absolute path to the process executable.
+
+
+--
+
+*`process.title`*::
++
+--
+type: keyword
+
+Process title.
+The proctitle, some times the same as process name. Can also be different: for example a browser setting its title to the web page currently opened.
+
+
+--
+
+*`process.thread.id`*::
++
+--
+type: long
+
+example: 4242
+
+Thread ID.
+
+
+--
+
+*`process.start`*::
++
+--
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+The time the process started.
+
+
+--
+
+*`process.working_directory`*::
++
+--
+type: keyword
+
+example: /home/alice
+
+The working directory of the process.
+
+
+--
+
+[float]
+== related fields
+
+This field set is meant to facilitate pivoting around a piece of data. Some pieces of information can be seen in many places in ECS. To facilitate searching for them, append values to their corresponding field in `related.`. A concrete example is IP addresses, which can be under host, observer, source, destination, client, server, and network.forwarded_ip. If you append all IPs to `related.ip`, you can then search for a given IP trivially, no matter where it appeared, by querying `related.ip:a.b.c.d`.
+
+
+
+*`related.ip`*::
++
+--
+type: ip
+
+All of the IPs seen on your event.
+
+
+--
+
+[float]
+== server fields
+
+A Server is defined as the responder in a network connection for events regarding sessions, connections, or bidirectional flow records. For TCP events, the server is the receiver of the initial SYN packet(s) of the TCP connection. For other protocols, the server is generally the responder in the network transaction. Some systems actually use the term "responder" to refer the server in TCP connections. The server fields describe details about the system acting as the server in the network event. Server fields are usually populated in conjunction with client fields. Server fields are generally not populated for packet-level events.
+Client / server representations can add semantic context to an exchange, which is helpful to visualize the data in certain situations. If your context falls in that category, you should still ensure that source and destination are filled appropriately.
+
+
+
+*`server.address`*::
++
+--
+type: keyword
+
+Some event server addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+
+--
+
+*`server.ip`*::
++
+--
+type: ip
+
+IP address of the server.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+
+--
+
+*`server.port`*::
++
+--
+type: long
+
+Port of the server.
+
+
+--
+
+*`server.mac`*::
++
+--
+type: keyword
+
+MAC address of the server.
+
+
+--
+
+*`server.domain`*::
++
+--
+type: keyword
+
+Server domain.
+
+
+--
+
+*`server.bytes`*::
++
+--
+type: long
+
+example: 184
+
+format: bytes
+
+Bytes sent from the server to the client.
+
+
+--
+
+*`server.packets`*::
++
+--
+type: long
+
+example: 12
+
+Packets sent from the server to the client.
+
+
+--
+
+[float]
+== geo fields
+
+Geo fields can carry data about a specific location related to an event or geo information derived from an IP field.
+
+
+
+*`server.geo.location`*::
++
+--
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+Longitude and latitude.
+
+
+--
+
+*`server.geo.continent_name`*::
++
+--
+type: keyword
+
+example: North America
+
+Name of the continent.
+
+
+--
+
+*`server.geo.country_name`*::
++
+--
+type: keyword
+
+example: Canada
+
+Country name.
+
+
+--
+
+*`server.geo.region_name`*::
++
+--
+type: keyword
+
+example: Quebec
+
+Region name.
+
+
+--
+
+*`server.geo.city_name`*::
++
+--
+type: keyword
+
+example: Montreal
+
+City name.
+
+
+--
+
+*`server.geo.country_iso_code`*::
++
+--
+type: keyword
+
+example: CA
+
+Country ISO code.
+
+
+--
+
+*`server.geo.region_iso_code`*::
++
+--
+type: keyword
+
+example: CA-QC
+
+Region ISO code.
+
+
+--
+
+*`server.geo.name`*::
++
+--
+type: keyword
+
+example: boston-dc
+
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+
+--
+
+[float]
+== service fields
+
+The service fields describe the service for or from which the data was collected. These fields help you find and correlate logs for a specific service and version.
+
+
+
+*`service.id`*::
++
+--
+type: keyword
+
+example: d37e5ebfe0ae6c4972dbe9f0174a1637bb8247f6
+
+Unique identifier of the running service.
+This id should uniquely identify this service. This makes it possible to correlate logs and metrics for one specific service.
+Example: If you are experiencing issues with one redis instance, you can filter on that id to see metrics and logs for that single instance.
+
+
+--
+
+*`service.name`*::
++
+--
+type: keyword
+
+example: elasticsearch-metrics
+
+Name of the service data is collected from.
+The name of the service is normally user given. This allows if two instances of the same service are running on the same machine they can be differentiated by the `service.name`.
+Also it allows for distributed services that run on multiple hosts to correlate the related instances based on the name.
+In the case of Elasticsearch the service.name could contain the cluster name. For Beats the service.name is by default a copy of the `service.type` field if no name is specified.
+
+
+--
+
+*`service.type`*::
++
+--
+type: keyword
+
+example: elasticsearch
+
+The type of the service data is collected from.
+The type can be used to group and correlate logs and metrics from one service type.
+Example: If logs or metrics are collected from Elasticsearch, `service.type` would be `elasticsearch`.
+
+
+--
+
+*`service.state`*::
++
+--
+type: keyword
+
+Current state of the service.
+
+
+--
+
+*`service.version`*::
++
+--
+type: keyword
+
+example: 3.2.4
+
+Version of the service the data was collected from.
+This allows to look at a data set only for a specific version of a service.
+
+
+--
+
+*`service.ephemeral_id`*::
++
+--
+type: keyword
+
+example: 8a4f500f
+
+Ephemeral identifier of this service (if one exists).
+This id normally changes across restarts, but `service.id` does not.
+
+
+--
+
+[float]
+== source fields
+
+Source fields describe details about the source of a packet/event. Source fields are usually populated in conjunction with destination fields.
+
+
+
+*`source.address`*::
++
+--
+type: keyword
+
+Some event source addresses are defined ambiguously. The event will sometimes list an IP, a domain or a unix socket.  You should always store the raw address in the `.address` field.
+Then it should be duplicated to `.ip` or `.domain`, depending on which one it is.
+
+
+--
+
+*`source.ip`*::
++
+--
+type: ip
+
+IP address of the source.
+Can be one or multiple IPv4 or IPv6 addresses.
+
+
+--
+
+*`source.port`*::
++
+--
+type: long
+
+Port of the source.
+
+
+--
+
+*`source.mac`*::
++
+--
+type: keyword
+
+MAC address of the source.
+
+
+--
+
+*`source.domain`*::
++
+--
+type: keyword
+
+Source domain.
+
+
+--
+
+*`source.bytes`*::
++
+--
+type: long
+
+example: 184
+
+format: bytes
+
+Bytes sent from the source to the destination.
+
+
+--
+
+*`source.packets`*::
++
+--
+type: long
+
+example: 12
+
+Packets sent from the source to the destination.
+
+
+--
+
+[float]
+== geo fields
+
+Geo fields can carry data about a specific location related to an event or geo information derived from an IP field.
+
+
+
+*`source.geo.location`*::
++
+--
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+Longitude and latitude.
+
+
+--
+
+*`source.geo.continent_name`*::
++
+--
+type: keyword
+
+example: North America
+
+Name of the continent.
+
+
+--
+
+*`source.geo.country_name`*::
++
+--
+type: keyword
+
+example: Canada
+
+Country name.
+
+
+--
+
+*`source.geo.region_name`*::
++
+--
+type: keyword
+
+example: Quebec
+
+Region name.
+
+
+--
+
+*`source.geo.city_name`*::
++
+--
+type: keyword
+
+example: Montreal
+
+City name.
+
+
+--
+
+*`source.geo.country_iso_code`*::
++
+--
+type: keyword
+
+example: CA
+
+Country ISO code.
+
+
+--
+
+*`source.geo.region_iso_code`*::
++
+--
+type: keyword
+
+example: CA-QC
+
+Region ISO code.
+
+
+--
+
+*`source.geo.name`*::
++
+--
+type: keyword
+
+example: boston-dc
+
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+
+--
+
+[float]
+== url fields
+
+URL fields provide a complete URL, with scheme, host, and path.
+
+
+
+*`url.original`*::
++
+--
+type: keyword
+
+example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
+
+
+Unmodified original url as seen in the event source.
+Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path.
+This field is meant to represent the URL as it was observed, complete or not.
+
+
+--
+
+*`url.full`*::
++
+--
+type: keyword
+
+example: https://www.elastic.co:443/search?q=elasticsearch#top
+
+If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
+
+
+--
+
+*`url.scheme`*::
++
+--
+type: keyword
+
+example: https
+
+Scheme of the request, such as "https".
+Note: The `:` is not part of the scheme.
+
+
+--
+
+*`url.domain`*::
++
+--
+type: keyword
+
+example: www.elastic.co
+
+Domain of the request, such as "www.elastic.co".
+In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `domain` field.
+
+
+--
+
+*`url.port`*::
++
+--
+type: integer
+
+example: 443
+
+Port of the request, such as 443.
+
+
+--
+
+*`url.path`*::
++
+--
+type: keyword
+
+Path of the request, such as "/search".
+
+
+--
+
+*`url.query`*::
++
+--
+type: keyword
+
+The query field describes the query string of the request, such as "q=elasticsearch".
+The `?` is excluded from the query string. If a URL contains no `?`, there is no query field. If there is a `?` but no query, the query field exists with an empty string. The `exists` query can be used to differentiate between the two cases.
+
+
+--
+
+*`url.fragment`*::
++
+--
+type: keyword
+
+Portion of the url after the `#`, such as "top".
+The `#` is not part of the fragment.
+
+
+--
+
+*`url.username`*::
++
+--
+type: keyword
+
+Username of the request.
+
+
+--
+
+*`url.password`*::
++
+--
+type: keyword
+
+Password of the request.
+
+
+--
+
+[float]
+== user fields
+
+The user fields describe information about the user that is relevant to  the event. Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
+
+
+
+*`user.id`*::
++
+--
+type: keyword
+
+One or multiple unique identifiers of the user.
+
+
+--
+
+*`user.name`*::
++
+--
+type: keyword
+
+example: albert
+
+Short name or login of the user.
+
+
+--
+
+*`user.full_name`*::
++
+--
+type: keyword
+
+example: Albert Einstein
+
+User's full name, if available.
+
+
+--
+
+*`user.email`*::
++
+--
+type: keyword
+
+User email address.
+
+
+--
+
+*`user.hash`*::
++
+--
+type: keyword
+
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+
+--
+
+[float]
+== group fields
+
+The group fields are meant to represent groups that are relevant to the event.
+
+
+
+*`user.group.id`*::
++
+--
+type: keyword
+
+Unique identifier for the group on the system/platform.
+
+
+--
+
+*`user.group.name`*::
++
+--
+type: keyword
+
+Name of the group.
+
+
+--
+
+[float]
+== user_agent fields
+
+The user_agent fields normally come from a browser request. They often show up in web service logs coming from the parsed user agent string.
+
+
+
+*`user_agent.original`*::
++
+--
+type: keyword
+
+example: Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1
+
+Unparsed version of the user_agent.
+
+
+--
+
+*`user_agent.name`*::
++
+--
+type: keyword
+
+example: Safari
+
+Name of the user agent.
+
+
+--
+
+*`user_agent.version`*::
++
+--
+type: keyword
+
+example: 12.0
+
+Version of the user agent.
+
+
+--
+
+*`user_agent.device.name`*::
++
+--
+type: keyword
+
+example: iPhone
+
+Name of the device.
+
+
+--
+
+[float]
+== os fields
+
+The OS fields contain information about the operating system.
+
+
+
+*`user_agent.os.platform`*::
++
+--
+type: keyword
+
+example: darwin
+
+Operating system platform (such centos, ubuntu, windows).
+
+
+--
+
+*`user_agent.os.name`*::
++
+--
+type: keyword
+
+example: Mac OS X
+
+Operating system name, without the version.
+
+
+--
+
+*`user_agent.os.full`*::
++
+--
+type: keyword
+
+example: Mac OS Mojave
+
+Operating system name, including the version or code name.
+
+
+--
+
+*`user_agent.os.family`*::
++
+--
+type: keyword
+
+example: debian
+
+OS family (such as redhat, debian, freebsd, windows).
+
+
+--
+
+*`user_agent.os.version`*::
++
+--
+type: keyword
+
+example: 10.14.1
+
+Operating system version as a raw string.
+
+
+--
+
+*`user_agent.os.kernel`*::
++
+--
+type: keyword
+
+example: 4.4.0-112-generic
+
+Operating system kernel version as a raw string.
+
+
+--
+
+*`agent.hostname`*::
++
+--
+type: keyword
+
+Hostname of the agent.
+
+
+--
+
+[[exported-fields-elasticsearch]]
+== elasticsearch fields
+
+elasticsearch Module
+
+
+
+[float]
+== elasticsearch fields
+
+
+
+
+*`elasticsearch.component`*::
++
+--
+type: keyword
+
+example: o.e.c.m.MetaDataCreateIndexService
+
+Elasticsearch component from where the log event originated
+
+--
+
+*`elasticsearch.cluster.uuid`*::
++
+--
+type: keyword
+
+example: GmvrbHlNTiSVYiPf8kxg9g
+
+UUID of the cluster
+
+--
+
+*`elasticsearch.cluster.name`*::
++
+--
+type: keyword
+
+example: docker-cluster
+
+Name of the cluster
+
+--
+
+*`elasticsearch.node.id`*::
++
+--
+type: keyword
+
+example: DSiWcTyeThWtUXLB9J0BMw
+
+ID of the node
+
+--
+
+*`elasticsearch.node.name`*::
++
+--
+type: keyword
+
+example: vWNJsZ3
+
+Name of the node
+
+--
+
+*`elasticsearch.index.name`*::
++
+--
+type: keyword
+
+example: filebeat-test-input
+
+Index name
+
+--
+
+*`elasticsearch.index.id`*::
++
+--
+type: keyword
+
+example: aOGgDwbURfCV57AScqbCgw
+
+Index id
+
+--
+
+*`elasticsearch.shard.id`*::
++
+--
+type: keyword
+
+example: 0
+
+Id of the shard
+
+--
+
+[float]
+== audit fields
+
+
+
+
+*`elasticsearch.audit.layer`*::
++
+--
+type: keyword
+
+example: rest
+
+The layer from which this event originated: rest, transport or ip_filter
+
+--
+
+*`elasticsearch.audit.origin.type`*::
++
+--
+type: keyword
+
+example: local_node
+
+Where the request originated: rest (request originated from a REST API request), transport (request was received on the transport channel), local_node (the local node issued the request)
+
+--
+
+*`elasticsearch.audit.realm`*::
++
+--
+type: keyword
+
+The authentication realm the authentication was validated against
+
+--
+
+*`elasticsearch.audit.user.realm`*::
++
+--
+type: keyword
+
+The user's authentication realm, if authenticated
+
+--
+
+*`elasticsearch.audit.user.roles`*::
++
+--
+type: keyword
+
+example: ['kibana_user', 'beats_admin']
+
+Roles to which the principal belongs
+
+--
+
+*`elasticsearch.audit.action`*::
++
+--
+type: keyword
+
+example: cluster:monitor/main
+
+The name of the action that was executed
+
+--
+
+*`elasticsearch.audit.url.params`*::
++
+--
+example: {username=jacknich2}
+
+REST URI parameters
+
+--
+
+*`elasticsearch.audit.indices`*::
++
+--
+type: keyword
+
+example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
+
+Indices accessed by action
+
+--
+
+*`elasticsearch.audit.request.id`*::
++
+--
+type: keyword
+
+example: WzL_kb6VSvOhAq0twPvHOQ
+
+Unique ID of request
+
+--
+
+*`elasticsearch.audit.request.name`*::
++
+--
+type: keyword
+
+example: ClearScrollRequest
+
+The type of request that was executed
+
+--
+
+*`elasticsearch.audit.request_body`*::
++
+--
+type: alias
+
+alias to: http.request.body.content
+
+--
+
+*`elasticsearch.audit.event_type`*::
++
+--
+type: alias
+
+alias to: event.type
+
+--
+
+*`elasticsearch.audit.origin_address`*::
++
+--
+type: alias
+
+alias to: source.ip
+
+--
+
+*`elasticsearch.audit.uri`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`elasticsearch.audit.principal`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+[float]
+== deprecation fields
+
+
+
+[float]
+== gc fields
+
+GC fileset fields.
+
+
+
+[float]
+== phase fields
+
+Fields specific to GC phase.
+
+
+
+*`elasticsearch.gc.phase.name`*::
++
+--
+type: keyword
+
+Name of the GC collection phase.
+
+
+--
+
+*`elasticsearch.gc.phase.duration_sec`*::
++
+--
+type: float
+
+Collection phase duration according to the Java virtual machine.
+
+
+--
+
+*`elasticsearch.gc.phase.scrub_symbol_table_time_sec`*::
++
+--
+type: float
+
+Pause time in seconds cleaning up symbol tables.
+
+
+--
+
+*`elasticsearch.gc.phase.scrub_string_table_time_sec`*::
++
+--
+type: float
+
+Pause time in seconds cleaning up string tables.
+
+
+--
+
+*`elasticsearch.gc.phase.weak_refs_processing_time_sec`*::
++
+--
+type: float
+
+Time spent processing weak references in seconds.
+
+
+--
+
+*`elasticsearch.gc.phase.parallel_rescan_time_sec`*::
++
+--
+type: float
+
+Time spent in seconds marking live objects while application is stopped.
+
+
+--
+
+*`elasticsearch.gc.phase.class_unload_time_sec`*::
++
+--
+type: float
+
+Time spent unloading unused classes in seconds.
+
+
+--
+
+[float]
+== cpu_time fields
+
+Process CPU time spent performing collections.
+
+
+
+*`elasticsearch.gc.phase.cpu_time.user_sec`*::
++
+--
+type: float
+
+CPU time spent outside the kernel.
+
+
+--
+
+*`elasticsearch.gc.phase.cpu_time.sys_sec`*::
++
+--
+type: float
+
+CPU time spent inside the kernel. 
+
+
+--
+
+*`elasticsearch.gc.phase.cpu_time.real_sec`*::
++
+--
+type: float
+
+Total elapsed CPU time spent to complete the collection from start to finish.
+
+
+--
+
+*`elasticsearch.gc.jvm_runtime_sec`*::
++
+--
+type: float
+
+The time from JVM start up in seconds, as a floating point number.
+
+
+--
+
+*`elasticsearch.gc.threads_total_stop_time_sec`*::
++
+--
+type: float
+
+Garbage collection threads total stop time seconds.
+
+
+--
+
+*`elasticsearch.gc.stopping_threads_time_sec`*::
++
+--
+type: float
+
+Time took to stop threads seconds.
+
+
+--
+
+*`elasticsearch.gc.tags`*::
++
+--
+type: keyword
+
+GC logging tags.
+
+
+--
+
+[float]
+== heap fields
+
+Heap allocation and total size.
+
+
+
+*`elasticsearch.gc.heap.size_kb`*::
++
+--
+type: integer
+
+Total heap size in kilobytes.
+
+
+--
+
+*`elasticsearch.gc.heap.used_kb`*::
++
+--
+type: integer
+
+Used heap in kilobytes.
+
+
+--
+
+[float]
+== old_gen fields
+
+Old generation occupancy and total size.
+
+
+
+*`elasticsearch.gc.old_gen.size_kb`*::
++
+--
+type: integer
+
+Total size of old generation in kilobytes.
+
+
+--
+
+*`elasticsearch.gc.old_gen.used_kb`*::
++
+--
+type: integer
+
+Old generation occupancy in kilobytes.
+
+
+--
+
+[float]
+== young_gen fields
+
+Young generation occupancy and total size.
+
+
+
+*`elasticsearch.gc.young_gen.size_kb`*::
++
+--
+type: integer
+
+Total size of young generation in kilobytes.
+
+
+--
+
+*`elasticsearch.gc.young_gen.used_kb`*::
++
+--
+type: integer
+
+Young generation occupancy in kilobytes.
+
+
+--
+
+[float]
+== server fields
+
+Server log file
+
+
+*`elasticsearch.server.stacktrace`*::
++
+--
+Field is not indexed.
+
+--
+
+[float]
+== gc fields
+
+GC log
+
+
+[float]
+== young fields
+
+Young GC
+
+
+*`elasticsearch.server.gc.young.one`*::
++
+--
+type: long
+
+example: 
+
+
+
+--
+
+*`elasticsearch.server.gc.young.two`*::
++
+--
+type: long
+
+example: 
+
+
+
+--
+
+*`elasticsearch.server.gc.overhead_seq`*::
++
+--
+type: long
+
+example: 3449992
+
+Sequence number
+
+--
+
+*`elasticsearch.server.gc.collection_duration.ms`*::
++
+--
+type: float
+
+example: 1600
+
+Time spent in GC, in milliseconds
+
+--
+
+*`elasticsearch.server.gc.observation_duration.ms`*::
++
+--
+type: float
+
+example: 1800
+
+Total time over which collection was observed, in milliseconds
+
+--
+
+[float]
+== slowlog fields
+
+Slowlog events from Elasticsearch
+
+
+*`elasticsearch.slowlog.logger`*::
++
+--
+type: keyword
+
+example: index.search.slowlog.fetch
+
+Logger name
+
+--
+
+*`elasticsearch.slowlog.took`*::
++
+--
+type: keyword
+
+example: 300ms
+
+Time it took to execute the query
+
+--
+
+*`elasticsearch.slowlog.types`*::
++
+--
+type: keyword
+
+example: 
+
+Types
+
+--
+
+*`elasticsearch.slowlog.stats`*::
++
+--
+type: keyword
+
+example: group1
+
+Stats groups
+
+--
+
+*`elasticsearch.slowlog.search_type`*::
++
+--
+type: keyword
+
+example: QUERY_THEN_FETCH
+
+Search type
+
+--
+
+*`elasticsearch.slowlog.source_query`*::
++
+--
+type: keyword
+
+example: {"query":{"match_all":{"boost":1.0}}}
+
+Slow query
+
+--
+
+*`elasticsearch.slowlog.extra_source`*::
++
+--
+type: keyword
+
+example: 
+
+Extra source information
+
+--
+
+*`elasticsearch.slowlog.total_hits`*::
++
+--
+type: keyword
+
+example: 42
+
+Total hits
+
+--
+
+*`elasticsearch.slowlog.total_shards`*::
++
+--
+type: keyword
+
+example: 22
+
+Total queried shards
+
+--
+
+*`elasticsearch.slowlog.routing`*::
++
+--
+type: keyword
+
+example: s01HZ2QBk9jw4gtgaFtn
+
+Routing
+
+--
+
+*`elasticsearch.slowlog.id`*::
++
+--
+type: keyword
+
+example: 
+
+Id
+
+--
+
+*`elasticsearch.slowlog.type`*::
++
+--
+type: keyword
+
+example: doc
+
+Type
+
+--
+
+[[exported-fields-haproxy]]
+== haproxy fields
+
+haproxy Module
+
+
+
+[float]
+== haproxy fields
+
+
+
+
+*`haproxy.frontend_name`*::
++
+--
+Name of the frontend (or listener) which received and processed the connection.
+
+--
+
+*`haproxy.backend_name`*::
++
+--
+Name of the backend (or listener) which was selected to manage the connection to the server.
+
+--
+
+*`haproxy.server_name`*::
++
+--
+Name of the last server to which the connection was sent.
+
+--
+
+*`haproxy.total_waiting_time_ms`*::
++
+--
+type: long
+
+Total time in milliseconds spent waiting in the various queues
+
+--
+
+*`haproxy.connection_wait_time_ms`*::
++
+--
+type: long
+
+Total time in milliseconds spent waiting for the connection to establish to the final server
+
+--
+
+*`haproxy.bytes_read`*::
++
+--
+type: long
+
+Total number of bytes transmitted to the client when the log is emitted.
+
+--
+
+*`haproxy.time_queue`*::
++
+--
+type: long
+
+Total time in milliseconds spent waiting in the various queues.
+
+--
+
+*`haproxy.time_backend_connect`*::
++
+--
+type: long
+
+Total time in milliseconds spent waiting for the connection to establish to the final server, including retries.
+
+--
+
+*`haproxy.server_queue`*::
++
+--
+type: long
+
+Total number of requests which were processed before this one in the server queue.
+
+--
+
+*`haproxy.backend_queue`*::
++
+--
+type: long
+
+Total number of requests which were processed before this one in the backend's global queue.
+
+--
+
+*`haproxy.bind_name`*::
++
+--
+Name of the listening address which received the connection.
+
+--
+
+*`haproxy.error_message`*::
++
+--
+type: text
+
+Error message logged by HAProxy in case of error.
+
+--
+
+*`haproxy.source`*::
++
+--
+type: keyword
+
+The HAProxy source of the log
+
+--
+
+*`haproxy.termination_state`*::
++
+--
+Condition the session was in when the session ended.
+
+--
+
+*`haproxy.mode`*::
++
+--
+type: keyword
+
+mode that the frontend is operating (TCP or HTTP)
+
+--
+
+[float]
+== connections fields
+
+Contains various counts of connections active in the process.
+
+
+*`haproxy.connections.active`*::
++
+--
+type: long
+
+Total number of concurrent connections on the process when the session was logged.
+
+--
+
+*`haproxy.connections.frontend`*::
++
+--
+type: long
+
+Total number of concurrent connections on the frontend when the session was logged.
+
+--
+
+*`haproxy.connections.backend`*::
++
+--
+type: long
+
+Total number of concurrent connections handled by the backend when the session was logged.
+
+--
+
+*`haproxy.connections.server`*::
++
+--
+type: long
+
+Total number of concurrent connections still active on the server when the session was logged.
+
+--
+
+*`haproxy.connections.retries`*::
++
+--
+type: long
+
+Number of connection retries experienced by this session when trying to connect to the server.
+
+--
+
+[float]
+== client fields
+
+Information about the client doing the request
+
+
+*`haproxy.client.ip`*::
++
+--
+type: alias
+
+alias to: source.address
+
+--
+
+*`haproxy.client.port`*::
++
+--
+type: alias
+
+alias to: source.port
+
+--
+
+*`haproxy.process_name`*::
++
+--
+type: alias
+
+alias to: process.name
+
+--
+
+*`haproxy.pid`*::
++
+--
+type: alias
+
+alias to: process.pid
+
+--
+
+[float]
+== destination fields
+
+Destination information
+
+
+*`haproxy.destination.port`*::
++
+--
+type: alias
+
+alias to: destination.port
+
+--
+
+*`haproxy.destination.ip`*::
++
+--
+type: alias
+
+alias to: destination.ip
+
+--
+
+[float]
+== geoip fields
+
+Contains GeoIP information gathered based on the client.ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
+
+
+
+*`haproxy.geoip.continent_name`*::
++
+--
+type: alias
+
+alias to: source.geo.continent_name
+
+--
+
+*`haproxy.geoip.country_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.country_iso_code
+
+--
+
+*`haproxy.geoip.location`*::
++
+--
+type: alias
+
+alias to: source.geo.location
+
+--
+
+*`haproxy.geoip.region_name`*::
++
+--
+type: alias
+
+alias to: source.geo.region_name
+
+--
+
+*`haproxy.geoip.city_name`*::
++
+--
+type: alias
+
+alias to: source.geo.city_name
+
+--
+
+*`haproxy.geoip.region_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.region_iso_code
+
+--
+
+[float]
+== http fields
+
+Please add description
+
+
+[float]
+== response fields
+
+Fields related to the HTTP response
+
+
+*`haproxy.http.response.captured_cookie`*::
++
+--
+Optional "name=value" entry indicating that the client had this cookie in the response.
+
+
+--
+
+*`haproxy.http.response.captured_headers`*::
++
+--
+type: keyword
+
+List of headers captured in the response due to the presence of the "capture response header" statement in the frontend.
+
+
+--
+
+*`haproxy.http.response.status_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
+[float]
+== request fields
+
+Fields related to the HTTP request
+
+
+*`haproxy.http.request.captured_cookie`*::
++
+--
+Optional "name=value" entry indicating that the server has returned a cookie with its request.
+
+
+--
+
+*`haproxy.http.request.captured_headers`*::
++
+--
+type: keyword
+
+List of headers captured in the request due to the presence of the "capture request header" statement in the frontend.
+
+
+--
+
+*`haproxy.http.request.raw_request_line`*::
++
+--
+type: keyword
+
+Complete HTTP request line, including the method, request and HTTP version string.
+
+--
+
+*`haproxy.http.request.time_wait_without_data_ms`*::
++
+--
+type: long
+
+Total time in milliseconds spent waiting for the server to send a full HTTP response, not counting data.
+
+--
+
+*`haproxy.http.request.time_wait_ms`*::
++
+--
+type: long
+
+Total time in milliseconds spent waiting for a full HTTP request from the client (not counting body) after the first byte was received.
+
+--
+
+[float]
+== tcp fields
+
+TCP log format
+
+
+*`haproxy.tcp.connection_waiting_time_ms`*::
++
+--
+type: long
+
+Total time in milliseconds elapsed between the accept and the last close
+
+--
+
+[[exported-fields-host-processor]]
+== Host fields
+
+Info collected for the host machine.
+
+
+
+
+*`host.containerized`*::
++
+--
+type: boolean
+
+If the host is a container.
+
+
+--
+
+*`host.os.build`*::
++
+--
+type: keyword
+
+example: 18D109
+
+OS build information.
+
+
+--
 
 [[exported-fields-icinga]]
 == Icinga fields
@@ -666,29 +5403,33 @@ Contains fields for the Icinga debug logs.
 
 
 
-[float]
-=== `icinga.debug.facility`
-
+*`icinga.debug.facility`*::
++
+--
 type: keyword
 
 Specifies what component of Icinga logged the message.
 
 
-[float]
-=== `icinga.debug.severity`
+--
 
-type: keyword
+*`icinga.debug.severity`*::
++
+--
+type: alias
 
-Possible values are "debug", "notice", "information", "warning" or "critical".
+alias to: log.level
 
+--
 
-[float]
-=== `icinga.debug.message`
+*`icinga.debug.message`*::
++
+--
+type: alias
 
-type: text
+alias to: message
 
-The logged message.
-
+--
 
 [float]
 == main fields
@@ -697,29 +5438,33 @@ Contains fields for the Icinga main logs.
 
 
 
-[float]
-=== `icinga.main.facility`
-
+*`icinga.main.facility`*::
++
+--
 type: keyword
 
 Specifies what component of Icinga logged the message.
 
 
-[float]
-=== `icinga.main.severity`
+--
 
-type: keyword
+*`icinga.main.severity`*::
++
+--
+type: alias
 
-Possible values are "debug", "notice", "information", "warning" or "critical".
+alias to: log.level
 
+--
 
-[float]
-=== `icinga.main.message`
+*`icinga.main.message`*::
++
+--
+type: alias
 
-type: text
+alias to: message
 
-The logged message.
-
+--
 
 [float]
 == startup fields
@@ -728,29 +5473,796 @@ Contains fields for the Icinga startup logs.
 
 
 
-[float]
-=== `icinga.startup.facility`
-
+*`icinga.startup.facility`*::
++
+--
 type: keyword
 
 Specifies what component of Icinga logged the message.
 
 
-[float]
-=== `icinga.startup.severity`
+--
 
+*`icinga.startup.severity`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
+*`icinga.startup.message`*::
++
+--
+type: alias
+
+alias to: message
+
+--
+
+[[exported-fields-iis]]
+== IIS fields
+
+Module for parsing IIS log files.
+
+
+
+[float]
+== iis fields
+
+Fields from IIS log files.
+
+
+
+[float]
+== access fields
+
+Contains fields for IIS access logs.
+
+
+
+*`iis.access.sub_status`*::
++
+--
+type: long
+
+The HTTP substatus code.
+
+
+--
+
+*`iis.access.win32_status`*::
++
+--
+type: long
+
+The Windows status code.
+
+
+--
+
+*`iis.access.site_name`*::
++
+--
 type: keyword
 
-Possible values are "debug", "notice", "information", "warning" or "critical".
+The site name and instance number.
+
+
+--
+
+*`iis.access.server_name`*::
++
+--
+type: keyword
+
+The name of the server on which the log file entry was generated.
+
+
+--
+
+*`iis.access.cookie`*::
++
+--
+type: keyword
+
+The content of the cookie sent or received, if any.
+
+
+--
+
+*`iis.access.body_received.bytes`*::
++
+--
+type: alias
+
+alias to: http.request.body.bytes
+
+--
+
+*`iis.access.body_sent.bytes`*::
++
+--
+type: alias
+
+alias to: http.response.body.bytes
+
+--
+
+*`iis.access.server_ip`*::
++
+--
+type: alias
+
+alias to: destination.address
+
+--
+
+*`iis.access.method`*::
++
+--
+type: alias
+
+alias to: http.request.method
+
+--
+
+*`iis.access.url`*::
++
+--
+type: alias
+
+alias to: url.path
+
+--
+
+*`iis.access.query_string`*::
++
+--
+type: alias
+
+alias to: url.query
+
+--
+
+*`iis.access.port`*::
++
+--
+type: alias
+
+alias to: destination.port
+
+--
+
+*`iis.access.user_name`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`iis.access.remote_ip`*::
++
+--
+type: alias
+
+alias to: source.address
+
+--
+
+*`iis.access.referrer`*::
++
+--
+type: alias
+
+alias to: http.request.referrer
+
+--
+
+*`iis.access.response_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
+*`iis.access.http_version`*::
++
+--
+type: alias
+
+alias to: http.version
+
+--
+
+*`iis.access.hostname`*::
++
+--
+type: alias
+
+alias to: host.hostname
+
+--
+
+
+*`iis.access.user_agent.device`*::
++
+--
+type: alias
+
+alias to: user_agent.device.name
+
+--
+
+*`iis.access.user_agent.name`*::
++
+--
+type: alias
+
+alias to: user_agent.name
+
+--
+
+*`iis.access.user_agent.os`*::
++
+--
+type: alias
+
+alias to: user_agent.os.full_name
+
+--
+
+*`iis.access.user_agent.os_name`*::
++
+--
+type: alias
+
+alias to: user_agent.os.name
+
+--
+
+*`iis.access.user_agent.original`*::
++
+--
+type: alias
+
+alias to: user_agent.original
+
+--
+
+
+*`iis.access.geoip.continent_name`*::
++
+--
+type: alias
+
+alias to: source.geo.continent_name
+
+--
+
+*`iis.access.geoip.country_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.country_iso_code
+
+--
+
+*`iis.access.geoip.location`*::
++
+--
+type: alias
+
+alias to: source.geo.location
+
+--
+
+*`iis.access.geoip.region_name`*::
++
+--
+type: alias
+
+alias to: source.geo.region_name
+
+--
+
+*`iis.access.geoip.city_name`*::
++
+--
+type: alias
+
+alias to: source.geo.city_name
+
+--
+
+*`iis.access.geoip.region_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.region_iso_code
+
+--
+
+[float]
+== error fields
+
+Contains fields for IIS error logs.
+
+
+
+*`iis.error.reason_phrase`*::
++
+--
+type: keyword
+
+The HTTP reason phrase.
+
+
+--
+
+*`iis.error.queue_name`*::
++
+--
+type: keyword
+
+The IIS application pool name.
+
+
+--
+
+*`iis.error.remote_ip`*::
++
+--
+type: alias
+
+alias to: source.address
+
+--
+
+*`iis.error.remote_port`*::
++
+--
+type: alias
+
+alias to: source.port
+
+--
+
+*`iis.error.server_ip`*::
++
+--
+type: alias
+
+alias to: destination.address
+
+--
+
+*`iis.error.server_port`*::
++
+--
+type: alias
+
+alias to: destination.port
+
+--
+
+*`iis.error.http_version`*::
++
+--
+type: alias
+
+alias to: http.version
+
+--
+
+*`iis.error.method`*::
++
+--
+type: alias
+
+alias to: http.request.method
+
+--
+
+*`iis.error.url`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`iis.error.response_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
+
+*`iis.error.geoip.continent_name`*::
++
+--
+type: alias
+
+alias to: source.geo.continent_name
+
+--
+
+*`iis.error.geoip.country_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.country_iso_code
+
+--
+
+*`iis.error.geoip.location`*::
++
+--
+type: alias
+
+alias to: source.geo.location
+
+--
+
+*`iis.error.geoip.region_name`*::
++
+--
+type: alias
+
+alias to: source.geo.region_name
+
+--
+
+*`iis.error.geoip.city_name`*::
++
+--
+type: alias
+
+alias to: source.geo.city_name
+
+--
+
+*`iis.error.geoip.region_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.region_iso_code
+
+--
+
+[[exported-fields-iptables]]
+== iptables fields
+
+Module for handling the iptables logs.
+
 
 
 [float]
-=== `icinga.startup.message`
+== iptables fields
 
-type: text
+Fields from the iptables logs.
 
-The logged message.
 
+
+*`iptables.ether_type`*::
++
+--
+type: long
+
+Value of the ethernet type field identifying the network layer protocol.
+
+
+--
+
+*`iptables.flow_label`*::
++
+--
+type: integer
+
+IPv6 flow label.
+
+
+--
+
+*`iptables.fragment_flags`*::
++
+--
+type: keyword
+
+IP fragment flags. A combination of CE, DF and MF.
+
+
+--
+
+*`iptables.fragment_offset`*::
++
+--
+type: long
+
+Offset of the current IP fragment.
+
+
+--
+
+[float]
+== icmp fields
+
+ICMP fields.
+
+
+
+*`iptables.icmp.code`*::
++
+--
+type: long
+
+ICMP code.
+
+
+--
+
+*`iptables.icmp.id`*::
++
+--
+type: long
+
+ICMP ID.
+
+
+--
+
+*`iptables.icmp.parameter`*::
++
+--
+type: long
+
+ICMP parameter.
+
+
+--
+
+*`iptables.icmp.redirect`*::
++
+--
+type: ip
+
+ICMP redirect address.
+
+
+--
+
+*`iptables.icmp.seq`*::
++
+--
+type: long
+
+ICMP sequence number.
+
+
+--
+
+*`iptables.icmp.type`*::
++
+--
+type: long
+
+ICMP type.
+
+
+--
+
+*`iptables.id`*::
++
+--
+type: long
+
+Packet identifier.
+
+
+--
+
+*`iptables.incomplete_bytes`*::
++
+--
+type: long
+
+Number of incomplete bytes.
+
+
+--
+
+*`iptables.input_device`*::
++
+--
+type: keyword
+
+Device that received the packet.
+
+
+--
+
+*`iptables.precedence_bits`*::
++
+--
+type: short
+
+IP precedence bits.
+
+
+--
+
+*`iptables.tos`*::
++
+--
+type: long
+
+IP Type of Service field.
+
+
+--
+
+*`iptables.length`*::
++
+--
+type: long
+
+Packet length.
+
+
+--
+
+*`iptables.output_device`*::
++
+--
+type: keyword
+
+Device that output the packet.
+
+
+--
+
+[float]
+== tcp fields
+
+TCP fields.
+
+
+
+*`iptables.tcp.flags`*::
++
+--
+type: keyword
+
+TCP flags.
+
+
+--
+
+*`iptables.tcp.reserved_bits`*::
++
+--
+type: short
+
+TCP reserved bits.
+
+
+--
+
+*`iptables.tcp.seq`*::
++
+--
+type: long
+
+TCP sequence number.
+
+
+--
+
+*`iptables.tcp.ack`*::
++
+--
+type: long
+
+TCP Acknowledgment number.
+
+
+--
+
+*`iptables.tcp.window`*::
++
+--
+type: long
+
+Advertised TCP window size.
+
+
+--
+
+*`iptables.ttl`*::
++
+--
+type: integer
+
+Time To Live field.
+
+
+--
+
+[float]
+== udp fields
+
+UDP fields.
+
+
+
+*`iptables.udp.length`*::
++
+--
+type: long
+
+Length of the UDP header and payload.
+
+
+--
+
+[float]
+== ubiquiti fields
+
+Fields for Ubiquiti network devices.
+
+
+
+*`iptables.ubiquiti.input_zone`*::
++
+--
+type: keyword
+
+Input zone.
+
+
+--
+
+*`iptables.ubiquiti.output_zone`*::
++
+--
+type: keyword
+
+Output zone.
+
+
+--
+
+*`iptables.ubiquiti.rule_number`*::
++
+--
+type: keyword
+
+The rule number within the rule set.
+
+--
+
+*`iptables.ubiquiti.rule_set`*::
++
+--
+type: keyword
+
+The rule set name.
+
+--
 
 [[exported-fields-kafka]]
 == Kafka fields
@@ -772,43 +6284,43 @@ Kafka log lines.
 
 
 
-[float]
-=== `kafka.log.timestamp`
+*`kafka.log.level`*::
++
+--
+type: alias
 
-The timestamp from the log line.
+alias to: log.level
 
+--
 
-[float]
-=== `kafka.log.level`
+*`kafka.log.message`*::
++
+--
+type: alias
 
-example: WARN
+alias to: message
 
-The log level.
+--
 
-
-[float]
-=== `kafka.log.message`
-
-type: text
-
-The logged message.
-
-
-[float]
-=== `kafka.log.component`
-
+*`kafka.log.component`*::
++
+--
 type: keyword
 
 Component the log is coming from.
 
 
-[float]
-=== `kafka.log.class`
+--
 
-type: text
+*`kafka.log.class`*::
++
+--
+type: keyword
 
 Java class the log is coming from.
 
+
+--
 
 [float]
 == trace fields
@@ -817,86 +6329,223 @@ Trace in the log line.
 
 
 
-[float]
-=== `kafka.log.trace.class`
-
+*`kafka.log.trace.class`*::
++
+--
 type: keyword
 
 Java class the trace is coming from.
 
 
-[float]
-=== `kafka.log.trace.message`
+--
 
+*`kafka.log.trace.message`*::
++
+--
 type: text
 
 Message part of the trace.
 
 
+--
+
+[[exported-fields-kibana]]
+== kibana fields
+
+kibana Module
+
+
+
 [float]
-=== `kafka.log.trace.full`
+== kibana fields
 
-type: text
 
-The full trace in the log line.
 
+
+[float]
+== log fields
+
+Kafka log lines.
+
+
+
+*`kibana.log.tags`*::
++
+--
+type: keyword
+
+Kibana logging tags.
+
+
+--
+
+*`kibana.log.state`*::
++
+--
+type: keyword
+
+Current state of Kibana.
+
+
+--
+
+*`kibana.log.meta`*::
++
+--
+type: object
+
+--
+
+*`kibana.log.kibana.log.meta.req.headers.referer`*::
++
+--
+type: alias
+
+alias to: http.request.referrer
+
+--
+
+*`kibana.log.kibana.log.meta.req.referer`*::
++
+--
+type: alias
+
+alias to: http.request.referrer
+
+--
+
+*`kibana.log.kibana.log.meta.req.headers.user-agent`*::
++
+--
+type: alias
+
+alias to: user_agent.original
+
+--
+
+*`kibana.log.kibana.log.meta.req.remoteAddress`*::
++
+--
+type: alias
+
+alias to: source.address
+
+--
+
+*`kibana.log.kibana.log.meta.req.url`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`kibana.log.kibana.log.meta.statusCode`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
+*`kibana.log.kibana.log.meta.method`*::
++
+--
+type: alias
+
+alias to: http.request.method
+
+--
 
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 
-beta[]
 Kubernetes metadata added by the kubernetes processor
 
 
 
 
-[float]
-=== `kubernetes.pod.name`
-
+*`kubernetes.pod.name`*::
++
+--
 type: keyword
 
 Kubernetes pod name
 
 
-[float]
-=== `kubernetes.namespace`
+--
 
+*`kubernetes.pod.uid`*::
++
+--
+type: keyword
+
+Kubernetes Pod UID
+
+
+--
+
+*`kubernetes.namespace`*::
++
+--
 type: keyword
 
 Kubernetes namespace
 
 
-[float]
-=== `kubernetes.labels`
+--
 
+*`kubernetes.node.name`*::
++
+--
+type: keyword
+
+Kubernetes node name
+
+
+--
+
+*`kubernetes.labels`*::
++
+--
 type: object
 
 Kubernetes labels map
 
 
-[float]
-=== `kubernetes.annotations`
+--
 
+*`kubernetes.annotations`*::
++
+--
 type: object
 
 Kubernetes annotations map
 
 
-[float]
-=== `kubernetes.container.name`
+--
 
+*`kubernetes.container.name`*::
++
+--
 type: keyword
 
 Kubernetes container name
 
 
-[float]
-=== `kubernetes.container.image`
+--
 
+*`kubernetes.container.image`*::
++
+--
 type: keyword
 
 Kubernetes container image
 
+
+--
 
 [[exported-fields-log]]
 == Log file content fields
@@ -905,19 +6554,33 @@ Contains log file lines.
 
 
 
-[float]
-=== `source`
-
+*`log.file.path`*::
++
+--
 type: keyword
 
-required: True
+required: False
 
 The file from which the line was read. This field contains the absolute path to the file. For example: `/var/log/system.log`.
 
 
-[float]
-=== `offset`
+--
 
+*`log.source.address`*::
++
+--
+type: keyword
+
+required: False
+
+Source address from which the log event was read / sent from.
+
+
+--
+
+*`log.offset`*::
++
+--
 type: long
 
 required: False
@@ -925,19 +6588,11 @@ required: False
 The file offset the reported line starts at.
 
 
-[float]
-=== `message`
+--
 
-type: text
-
-required: True
-
-The content of the line read from the log file.
-
-
-[float]
-=== `stream`
-
+*`stream`*::
++
+--
 type: keyword
 
 required: False
@@ -945,31 +6600,143 @@ required: False
 Log stream when reading container logs, can be 'stdout' or 'stderr'
 
 
-[float]
-=== `prospector.type`
+--
 
+*`input.type`*::
++
+--
 required: True
 
-The prospector type from which the event was generated. This field is set to the value specified for the `type` option in the prospector section of the Filebeat config file.
+The input type from which the event was generated. This field is set to the value specified for the `type` option in the input section of the Filebeat config file.
 
 
-[float]
-=== `read_timestamp`
+--
 
-In case the ingest pipeline parses the timestamp from the log contents, it stores the original `@timestamp` (representing the time when the log line was read) in this field.
+*`event.sequence`*::
++
+--
+type: long
+
+required: False
+
+The sequence number of this event.
 
 
-[float]
-=== `fileset.module`
+--
 
-The Filebeat module that generated this event.
+*`syslog.facility`*::
++
+--
+type: long
+
+required: False
+
+The facility extracted from the priority.
 
 
-[float]
-=== `fileset.name`
+--
+
+*`syslog.priority`*::
++
+--
+type: long
+
+required: False
+
+The priority of the syslog event.
+
+
+--
+
+*`syslog.severity_label`*::
++
+--
+type: keyword
+
+required: False
+
+The human readable severity.
+
+
+--
+
+*`syslog.facility_label`*::
++
+--
+type: keyword
+
+required: False
+
+The human readable facility.
+
+
+--
+
+*`process.program`*::
++
+--
+type: keyword
+
+required: False
+
+The name of the program.
+
+
+--
+
+*`log.flags`*::
++
+--
+This field contains the flags of the event.
+
+
+--
+
+*`http.response.content_length`*::
++
+--
+type: alias
+
+alias to: http.response.body.bytes
+
+--
+
+
+
+*`user_agent.os.full_name`*::
++
+--
+type: keyword
+
+--
+
+*`fileset.name`*::
++
+--
+type: keyword
 
 The Filebeat fileset that generated this event.
 
+
+--
+
+*`fileset.module`*::
++
+--
+type: alias
+
+alias to: event.module
+
+--
+
+*`read_timestamp`*::
++
+--
+type: alias
+
+alias to: event.created
+
+--
 
 [[exported-fields-logstash]]
 == logstash fields
@@ -991,45 +6758,60 @@ Fields from the Logstash logs.
 
 
 
-[float]
-=== `logstash.log.message`
-
-type: text
-
-Contains the un-parsed log message
-
-
-[float]
-=== `logstash.log.level`
-
-type: keyword
-
-The log level of the message, this correspond to Log4j levels.
-
-
-[float]
-=== `logstash.log.module`
-
+*`logstash.log.module`*::
++
+--
 type: keyword
 
 The module or class where the event originate.
 
 
-[float]
-=== `logstash.log.thread`
+--
 
-type: text
+*`logstash.log.thread`*::
++
+--
+type: keyword
 
 Information about the running thread where the log originate.
 
 
-[float]
-=== `logstash.log.log_event`
+*`logstash.log.thread.text`*::
++
+--
+type: text
 
+--
+
+--
+
+*`logstash.log.log_event`*::
++
+--
 type: object
 
 key and value debugging information.
 
+
+--
+
+*`logstash.log.message`*::
++
+--
+type: alias
+
+alias to: message
+
+--
+
+*`logstash.log.level`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
 
 [float]
 == slowlog fields
@@ -1038,93 +6820,187 @@ slowlog
 
 
 
-[float]
-=== `logstash.slowlog.message`
-
-type: text
-
-Contains the un-parsed log message
-
-
-[float]
-=== `logstash.slowlog.level`
-
-type: keyword
-
-The log level of the message, this correspond to Log4j levels.
-
-
-[float]
-=== `logstash.slowlog.module`
-
+*`logstash.slowlog.module`*::
++
+--
 type: keyword
 
 The module or class where the event originate.
 
 
-[float]
-=== `logstash.slowlog.thread`
+--
 
-type: text
+*`logstash.slowlog.thread`*::
++
+--
+type: keyword
 
 Information about the running thread where the log originate.
 
 
-[float]
-=== `logstash.slowlog.event`
-
+*`logstash.slowlog.thread.text`*::
++
+--
 type: text
+
+--
+
+--
+
+*`logstash.slowlog.event`*::
++
+--
+type: keyword
 
 Raw dump of the original event
 
 
-[float]
-=== `logstash.slowlog.plugin_name`
+*`logstash.slowlog.event.text`*::
++
+--
+type: text
 
+--
+
+--
+
+*`logstash.slowlog.plugin_name`*::
++
+--
 type: keyword
 
 Name of the plugin
 
 
-[float]
-=== `logstash.slowlog.plugin_type`
+--
 
+*`logstash.slowlog.plugin_type`*::
++
+--
 type: keyword
 
 Type of the plugin: Inputs, Filters, Outputs or Codecs.
 
 
-[float]
-=== `logstash.slowlog.took_in_millis`
+--
 
+*`logstash.slowlog.took_in_millis`*::
++
+--
 type: long
 
 Execution time for the plugin in milliseconds.
 
 
-[float]
-=== `logstash.slowlog.took_in_nanos`
+--
 
-type: long
-
-Execution time for the plugin in nanoseconds.
-
-
-[float]
-=== `logstash.slowlog.plugin_params`
-
-type: text
+*`logstash.slowlog.plugin_params`*::
++
+--
+type: keyword
 
 String value of the plugin configuration
 
 
-[float]
-=== `logstash.slowlog.plugin_params_object`
+*`logstash.slowlog.plugin_params.text`*::
++
+--
+type: text
 
+--
+
+--
+
+*`logstash.slowlog.plugin_params_object`*::
++
+--
 type: object
 
 key -> value of the configuration used by the plugin.
 
+
+--
+
+*`logstash.slowlog.level`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
+*`logstash.slowlog.took_in_nanos`*::
++
+--
+type: alias
+
+alias to: event.duration
+
+--
+
+[[exported-fields-mongodb]]
+== mongodb fields
+
+Module for parsing MongoDB log files.
+
+
+
+[float]
+== mongodb fields
+
+Fields from MongoDB logs.
+
+
+
+[float]
+== log fields
+
+Contains fields from MongoDB logs.
+
+
+
+*`mongodb.log.component`*::
++
+--
+type: keyword
+
+example: COMMAND
+
+Functional categorization of message
+
+
+--
+
+*`mongodb.log.context`*::
++
+--
+type: keyword
+
+example: initandlisten
+
+Context of message
+
+
+--
+
+*`mongodb.log.severity`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
+*`mongodb.log.message`*::
++
+--
+type: alias
+
+alias to: message
+
+--
 
 [[exported-fields-mysql]]
 == MySQL fields
@@ -1140,6 +7016,16 @@ Fields from the MySQL log files.
 
 
 
+*`mysql.thread_id`*::
++
+--
+type: long
+
+The connection or thread ID for the query.
+
+
+--
+
 [float]
 == error fields
 
@@ -1147,34 +7033,32 @@ Contains fields from the MySQL error logs.
 
 
 
-[float]
-=== `mysql.error.timestamp`
+*`mysql.error.thread_id`*::
++
+--
+type: alias
 
-The timestamp from the log line.
+alias to: mysql.thread_id
 
+--
 
-[float]
-=== `mysql.error.thread_id`
+*`mysql.error.level`*::
++
+--
+type: alias
 
-type: long
+alias to: log.level
 
-As of MySQL 5.7.2, this is the thread id. For MySQL versions prior to 5.7.2, this field contains the process id.
+--
 
+*`mysql.error.message`*::
++
+--
+type: alias
 
-[float]
-=== `mysql.error.level`
+alias to: message
 
-example: Warning
-
-The log level.
-
-[float]
-=== `mysql.error.message`
-
-type: text
-
-The logged message.
-
+--
 
 [float]
 == slowlog fields
@@ -1183,76 +7067,3589 @@ Contains fields from the MySQL slow logs.
 
 
 
-[float]
-=== `mysql.slowlog.user`
-
-The MySQL user that created the query.
-
-
-[float]
-=== `mysql.slowlog.host`
-
-The host from where the user that created the query logged in.
-
-
-[float]
-=== `mysql.slowlog.ip`
-
-The IP address from where the user that created the query logged in.
-
-
-[float]
-=== `mysql.slowlog.query_time.sec`
-
-type: float
-
-The total time the query took, in seconds, as a floating point number.
-
-
-[float]
-=== `mysql.slowlog.lock_time.sec`
-
+*`mysql.slowlog.lock_time.sec`*::
++
+--
 type: float
 
 The amount of time the query waited for the lock to be available. The value is in seconds, as a floating point number.
 
 
-[float]
-=== `mysql.slowlog.rows_sent`
+--
 
+*`mysql.slowlog.rows_sent`*::
++
+--
 type: long
 
 The number of rows returned by the query.
 
 
-[float]
-=== `mysql.slowlog.rows_examined`
+--
 
+*`mysql.slowlog.rows_examined`*::
++
+--
 type: long
 
 The number of rows scanned by the query.
 
 
-[float]
-=== `mysql.slowlog.timestamp`
+--
 
+*`mysql.slowlog.rows_affected`*::
++
+--
 type: long
 
-The unix timestamp taken from the `SET timestamp` query.
+The number of rows modified by the query.
 
 
-[float]
-=== `mysql.slowlog.query`
+--
 
+*`mysql.slowlog.bytes_sent`*::
++
+--
+type: long
+
+format: bytes
+
+The size of the query result.
+
+
+--
+
+*`mysql.slowlog.query`*::
++
+--
 The slow query.
 
 
-[float]
-=== `mysql.slowlog.id`
+--
 
+*`mysql.slowlog.id`*::
++
+--
+type: alias
+
+alias to: mysql.thread_id
+
+--
+
+*`mysql.slowlog.schema`*::
++
+--
+type: keyword
+
+The schema where the slow query was executed.
+
+
+--
+
+*`mysql.slowlog.current_user`*::
++
+--
+type: keyword
+
+Current authenticated user, used to determine access privileges. Can differ from the value for user.
+
+
+--
+
+*`mysql.slowlog.last_errno`*::
++
+--
+type: keyword
+
+Last SQL error seen.
+
+
+--
+
+*`mysql.slowlog.killed`*::
++
+--
+type: keyword
+
+Code of the reason if the query was killed.
+
+
+--
+
+*`mysql.slowlog.query_cache_hit`*::
++
+--
+type: boolean
+
+Whether the query cache was hit.
+
+
+--
+
+*`mysql.slowlog.tmp_table`*::
++
+--
+type: boolean
+
+Whether a temporary table was used to resolve the query.
+
+
+--
+
+*`mysql.slowlog.tmp_table_on_disk`*::
++
+--
+type: boolean
+
+Whether the query needed temporary tables on disk.
+
+
+--
+
+*`mysql.slowlog.tmp_tables`*::
++
+--
 type: long
 
-The connection ID for the query.
+Number of temporary tables created for this query
+
+
+--
+
+*`mysql.slowlog.tmp_disk_tables`*::
++
+--
+type: long
+
+Number of temporary tables created on disk for this query.
+
+
+--
+
+*`mysql.slowlog.tmp_table_sizes`*::
++
+--
+type: long
+
+format: bytes
+
+Size of temporary tables created for this query.
+
+--
+
+*`mysql.slowlog.filesort`*::
++
+--
+type: boolean
+
+Whether filesort optimization was used.
+
+
+--
+
+*`mysql.slowlog.filesort_on_disk`*::
++
+--
+type: boolean
+
+Whether filesort optimization was used and it needed temporary tables on disk.
+
+
+--
+
+*`mysql.slowlog.priority_queue`*::
++
+--
+type: boolean
+
+Whether a priority queue was used for filesort.
+
+
+--
+
+*`mysql.slowlog.full_scan`*::
++
+--
+type: boolean
+
+Whether a full table scan was needed for the slow query.
+
+
+--
+
+*`mysql.slowlog.full_join`*::
++
+--
+type: boolean
+
+Whether a full join was needed for the slow query (no indexes were used for joins).
+
+
+--
+
+*`mysql.slowlog.merge_passes`*::
++
+--
+type: long
+
+Number of merge passes executed for the query.
+
+
+--
+
+*`mysql.slowlog.log_slow_rate_type`*::
++
+--
+type: keyword
+
+Type of slow log rate limit, it can be `session` if the rate limit is applied per session, or `query` if it applies per query.
+
+
+--
+
+*`mysql.slowlog.log_slow_rate_limit`*::
++
+--
+type: keyword
+
+Slow log rate limit, a value of 100 means that one in a hundred queries or sessions are being logged.
+
+
+--
+
+[float]
+== innodb fields
+
+Contains fields relative to InnoDB engine
+
+
+
+*`mysql.slowlog.innodb.trx_id`*::
++
+--
+type: keyword
+
+Transaction ID
+
+
+--
+
+*`mysql.slowlog.innodb.io_r_ops`*::
++
+--
+type: long
+
+Number of page read operations.
+
+
+--
+
+*`mysql.slowlog.innodb.io_r_bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Bytes read during page read operations.
+
+
+--
+
+*`mysql.slowlog.innodb.io_r_wait.sec`*::
++
+--
+type: long
+
+How long it took to read all needed data from storage.
+
+
+--
+
+*`mysql.slowlog.innodb.rec_lock_wait.sec`*::
++
+--
+type: long
+
+How long the query waited for locks.
+
+
+--
+
+*`mysql.slowlog.innodb.queue_wait.sec`*::
++
+--
+type: long
+
+How long the query waited to enter the InnoDB queue and to be executed once in the queue.
+
+
+--
+
+*`mysql.slowlog.innodb.pages_distinct`*::
++
+--
+type: long
+
+Approximated count of pages accessed to execute the query.
+
+
+--
+
+*`mysql.slowlog.user`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`mysql.slowlog.host`*::
++
+--
+type: alias
+
+alias to: source.domain
+
+--
+
+*`mysql.slowlog.ip`*::
++
+--
+type: alias
+
+alias to: source.ip
+
+--
+
+[[exported-fields-nats]]
+== nats fields
+
+Module for parsing NATS log files.
+
+
+
+[float]
+== nats fields
+
+Fields from NATS logs.
+
+
+
+[float]
+== log fields
+
+Nats log files
+
+
+[[exported-fields-netflow]]
+== NetFlow fields
+
+Fields from NetFlow and IPFIX flows.
+
+
+
+[float]
+== netflow fields
+
+Fields from NetFlow and IPFIX.
+
+
+
+*`netflow.type`*::
++
+--
+type: keyword
+
+The type of NetFlow record described by this event.
+
+
+--
+
+[float]
+== exporter fields
+
+Metadata related to the exporter device that generated this record.
+
+
+
+*`netflow.exporter.address`*::
++
+--
+type: keyword
+
+Exporter's network address in IP:port format.
+
+
+--
+
+*`netflow.exporter.source_id`*::
++
+--
+type: long
+
+Observation domain ID to which this record belongs.
+
+
+--
+
+*`netflow.exporter.timestamp`*::
++
+--
+type: date
+
+Time and date of export.
+
+
+--
+
+*`netflow.exporter.uptime_millis`*::
++
+--
+type: long
+
+How long the exporter process has been running, in milliseconds.
+
+
+--
+
+*`netflow.exporter.version`*::
++
+--
+type: long
+
+NetFlow version used.
+
+
+--
+
+*`netflow.octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.packet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.delta_flow_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.protocol_identifier`*::
++
+--
+type: short
+
+--
+
+*`netflow.ip_class_of_service`*::
++
+--
+type: short
+
+--
+
+*`netflow.tcp_control_bits`*::
++
+--
+type: integer
+
+--
+
+*`netflow.source_transport_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.source_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.source_ipv4_prefix_length`*::
++
+--
+type: short
+
+--
+
+*`netflow.ingress_interface`*::
++
+--
+type: long
+
+--
+
+*`netflow.destination_transport_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.destination_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.destination_ipv4_prefix_length`*::
++
+--
+type: short
+
+--
+
+*`netflow.egress_interface`*::
++
+--
+type: long
+
+--
+
+*`netflow.ip_next_hop_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.bgp_source_as_number`*::
++
+--
+type: long
+
+--
+
+*`netflow.bgp_destination_as_number`*::
++
+--
+type: long
+
+--
+
+*`netflow.bgp_next_hop_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.post_mcast_packet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_mcast_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_end_sys_up_time`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_start_sys_up_time`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_packet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.minimum_ip_total_length`*::
++
+--
+type: long
+
+--
+
+*`netflow.maximum_ip_total_length`*::
++
+--
+type: long
+
+--
+
+*`netflow.source_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.destination_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.source_ipv6_prefix_length`*::
++
+--
+type: short
+
+--
+
+*`netflow.destination_ipv6_prefix_length`*::
++
+--
+type: short
+
+--
+
+*`netflow.flow_label_ipv6`*::
++
+--
+type: long
+
+--
+
+*`netflow.icmp_type_code_ipv4`*::
++
+--
+type: integer
+
+--
+
+*`netflow.igmp_type`*::
++
+--
+type: short
+
+--
+
+*`netflow.sampling_interval`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_algorithm`*::
++
+--
+type: short
+
+--
+
+*`netflow.flow_active_timeout`*::
++
+--
+type: integer
+
+--
+
+*`netflow.flow_idle_timeout`*::
++
+--
+type: integer
+
+--
+
+*`netflow.engine_type`*::
++
+--
+type: short
+
+--
+
+*`netflow.engine_id`*::
++
+--
+type: short
+
+--
+
+*`netflow.exported_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.exported_message_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.exported_flow_record_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.ipv4_router_sc`*::
++
+--
+type: ip
+
+--
+
+*`netflow.source_ipv4_prefix`*::
++
+--
+type: ip
+
+--
+
+*`netflow.destination_ipv4_prefix`*::
++
+--
+type: ip
+
+--
+
+*`netflow.mpls_top_label_type`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_top_label_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.sampler_id`*::
++
+--
+type: short
+
+--
+
+*`netflow.sampler_mode`*::
++
+--
+type: short
+
+--
+
+*`netflow.sampler_random_interval`*::
++
+--
+type: long
+
+--
+
+*`netflow.class_id`*::
++
+--
+type: short
+
+--
+
+*`netflow.minimum_ttl`*::
++
+--
+type: short
+
+--
+
+*`netflow.maximum_ttl`*::
++
+--
+type: short
+
+--
+
+*`netflow.fragment_identification`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_ip_class_of_service`*::
++
+--
+type: short
+
+--
+
+*`netflow.source_mac_address`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.post_destination_mac_address`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.vlan_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.post_vlan_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.ip_version`*::
++
+--
+type: short
+
+--
+
+*`netflow.flow_direction`*::
++
+--
+type: short
+
+--
+
+*`netflow.ip_next_hop_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.bgp_next_hop_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.ipv6_extension_headers`*::
++
+--
+type: long
+
+--
+
+*`netflow.mpls_top_label_stack_section`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section2`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section3`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section4`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section5`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section6`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section7`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section8`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section9`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section10`*::
++
+--
+type: short
+
+--
+
+*`netflow.destination_mac_address`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.post_source_mac_address`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.interface_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.interface_description`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.sampler_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.flags_and_sampler_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.fragment_offset`*::
++
+--
+type: integer
+
+--
+
+*`netflow.forwarding_status`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_vpn_route_distinguisher`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_top_label_prefix_length`*::
++
+--
+type: short
+
+--
+
+*`netflow.src_traffic_index`*::
++
+--
+type: long
+
+--
+
+*`netflow.dst_traffic_index`*::
++
+--
+type: long
+
+--
+
+*`netflow.application_description`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.application_id`*::
++
+--
+type: short
+
+--
+
+*`netflow.application_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.post_ip_diff_serv_code_point`*::
++
+--
+type: short
+
+--
+
+*`netflow.multicast_replication_factor`*::
++
+--
+type: long
+
+--
+
+*`netflow.class_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.classification_engine_id`*::
++
+--
+type: short
+
+--
+
+*`netflow.layer2packet_section_offset`*::
++
+--
+type: integer
+
+--
+
+*`netflow.layer2packet_section_size`*::
++
+--
+type: integer
+
+--
+
+*`netflow.layer2packet_section_data`*::
++
+--
+type: short
+
+--
+
+*`netflow.bgp_next_adjacent_as_number`*::
++
+--
+type: long
+
+--
+
+*`netflow.bgp_prev_adjacent_as_number`*::
++
+--
+type: long
+
+--
+
+*`netflow.exporter_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.exporter_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.dropped_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.dropped_packet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.dropped_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.dropped_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_end_reason`*::
++
+--
+type: short
+
+--
+
+*`netflow.common_properties_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.observation_point_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.icmp_type_code_ipv6`*::
++
+--
+type: integer
+
+--
+
+*`netflow.mpls_top_label_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.line_card_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.port_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.metering_process_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.exporting_process_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.template_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.wlan_channel_id`*::
++
+--
+type: short
+
+--
+
+*`netflow.wlan_ssid`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.flow_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.observation_domain_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_start_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_end_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_start_milliseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_end_milliseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_start_microseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_end_microseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_start_nanoseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_end_nanoseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_start_delta_microseconds`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_end_delta_microseconds`*::
++
+--
+type: long
+
+--
+
+*`netflow.system_init_time_milliseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.flow_duration_milliseconds`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_duration_microseconds`*::
++
+--
+type: long
+
+--
+
+*`netflow.observed_flow_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.ignored_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.ignored_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.not_sent_flow_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.not_sent_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.not_sent_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.destination_ipv6_prefix`*::
++
+--
+type: ip
+
+--
+
+*`netflow.source_ipv6_prefix`*::
++
+--
+type: ip
+
+--
+
+*`netflow.post_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_key_indicator`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_mcast_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_mcast_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.icmp_type_ipv4`*::
++
+--
+type: short
+
+--
+
+*`netflow.icmp_code_ipv4`*::
++
+--
+type: short
+
+--
+
+*`netflow.icmp_type_ipv6`*::
++
+--
+type: short
+
+--
+
+*`netflow.icmp_code_ipv6`*::
++
+--
+type: short
+
+--
+
+*`netflow.udp_source_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.udp_destination_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.tcp_source_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.tcp_destination_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.tcp_sequence_number`*::
++
+--
+type: long
+
+--
+
+*`netflow.tcp_acknowledgement_number`*::
++
+--
+type: long
+
+--
+
+*`netflow.tcp_window_size`*::
++
+--
+type: integer
+
+--
+
+*`netflow.tcp_urgent_pointer`*::
++
+--
+type: integer
+
+--
+
+*`netflow.tcp_header_length`*::
++
+--
+type: short
+
+--
+
+*`netflow.ip_header_length`*::
++
+--
+type: short
+
+--
+
+*`netflow.total_length_ipv4`*::
++
+--
+type: integer
+
+--
+
+*`netflow.payload_length_ipv6`*::
++
+--
+type: integer
+
+--
+
+*`netflow.ip_ttl`*::
++
+--
+type: short
+
+--
+
+*`netflow.next_header_ipv6`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_payload_length`*::
++
+--
+type: long
+
+--
+
+*`netflow.ip_diff_serv_code_point`*::
++
+--
+type: short
+
+--
+
+*`netflow.ip_precedence`*::
++
+--
+type: short
+
+--
+
+*`netflow.fragment_flags`*::
++
+--
+type: short
+
+--
+
+*`netflow.octet_delta_sum_of_squares`*::
++
+--
+type: long
+
+--
+
+*`netflow.octet_total_sum_of_squares`*::
++
+--
+type: long
+
+--
+
+*`netflow.mpls_top_label_ttl`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_length`*::
++
+--
+type: long
+
+--
+
+*`netflow.mpls_label_stack_depth`*::
++
+--
+type: long
+
+--
+
+*`netflow.mpls_top_label_exp`*::
++
+--
+type: short
+
+--
+
+*`netflow.ip_payload_length`*::
++
+--
+type: long
+
+--
+
+*`netflow.udp_message_length`*::
++
+--
+type: integer
+
+--
+
+*`netflow.is_multicast`*::
++
+--
+type: short
+
+--
+
+*`netflow.ipv4_ihl`*::
++
+--
+type: short
+
+--
+
+*`netflow.ipv4_options`*::
++
+--
+type: long
+
+--
+
+*`netflow.tcp_options`*::
++
+--
+type: long
+
+--
+
+*`netflow.padding_octets`*::
++
+--
+type: short
+
+--
+
+*`netflow.collector_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.collector_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.export_interface`*::
++
+--
+type: long
+
+--
+
+*`netflow.export_protocol_version`*::
++
+--
+type: short
+
+--
+
+*`netflow.export_transport_protocol`*::
++
+--
+type: short
+
+--
+
+*`netflow.collector_transport_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.exporter_transport_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.tcp_syn_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.tcp_fin_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.tcp_rst_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.tcp_psh_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.tcp_ack_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.tcp_urg_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.ip_total_length`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_nast_ource_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.post_nadt_estination_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.post_napst_ource_transport_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.post_napdt_estination_transport_port`*::
++
+--
+type: integer
+
+--
+
+*`netflow.nat_originating_address_realm`*::
++
+--
+type: short
+
+--
+
+*`netflow.nat_event`*::
++
+--
+type: short
+
+--
+
+*`netflow.initiator_octets`*::
++
+--
+type: long
+
+--
+
+*`netflow.responder_octets`*::
++
+--
+type: long
+
+--
+
+*`netflow.firewall_event`*::
++
+--
+type: short
+
+--
+
+*`netflow.ingress_vrfid`*::
++
+--
+type: long
+
+--
+
+*`netflow.egress_vrfid`*::
++
+--
+type: long
+
+--
+
+*`netflow.vr_fname`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.post_mpls_top_label_exp`*::
++
+--
+type: short
+
+--
+
+*`netflow.tcp_window_scale`*::
++
+--
+type: integer
+
+--
+
+*`netflow.biflow_direction`*::
++
+--
+type: short
+
+--
+
+*`netflow.ethernet_header_length`*::
++
+--
+type: short
+
+--
+
+*`netflow.ethernet_payload_length`*::
++
+--
+type: integer
+
+--
+
+*`netflow.ethernet_total_length`*::
++
+--
+type: integer
+
+--
+
+*`netflow.dot1q_vlan_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.dot1q_priority`*::
++
+--
+type: short
+
+--
+
+*`netflow.dot1q_customer_vlan_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.dot1q_customer_priority`*::
++
+--
+type: short
+
+--
+
+*`netflow.metro_evc_id`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.metro_evc_type`*::
++
+--
+type: short
+
+--
+
+*`netflow.pseudo_wire_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.pseudo_wire_type`*::
++
+--
+type: integer
+
+--
+
+*`netflow.pseudo_wire_control_word`*::
++
+--
+type: long
+
+--
+
+*`netflow.ingress_physical_interface`*::
++
+--
+type: long
+
+--
+
+*`netflow.egress_physical_interface`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_dot1q_vlan_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.post_dot1q_customer_vlan_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.ethernet_type`*::
++
+--
+type: integer
+
+--
+
+*`netflow.post_ip_precedence`*::
++
+--
+type: short
+
+--
+
+*`netflow.collection_time_milliseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.export_sctp_stream_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.max_export_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.max_flow_end_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.message_md5_checksum`*::
++
+--
+type: short
+
+--
+
+*`netflow.message_scope`*::
++
+--
+type: short
+
+--
+
+*`netflow.min_export_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.min_flow_start_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.opaque_octets`*::
++
+--
+type: short
+
+--
+
+*`netflow.session_scope`*::
++
+--
+type: short
+
+--
+
+*`netflow.max_flow_end_microseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.max_flow_end_milliseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.max_flow_end_nanoseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.min_flow_start_microseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.min_flow_start_milliseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.min_flow_start_nanoseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.collector_certificate`*::
++
+--
+type: short
+
+--
+
+*`netflow.exporter_certificate`*::
++
+--
+type: short
+
+--
+
+*`netflow.data_records_reliability`*::
++
+--
+type: boolean
+
+--
+
+*`netflow.observation_point_type`*::
++
+--
+type: short
+
+--
+
+*`netflow.new_connection_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.connection_sum_duration_seconds`*::
++
+--
+type: long
+
+--
+
+*`netflow.connection_transaction_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_nast_ource_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.post_nadt_estination_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.nat_pool_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.nat_pool_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.anonymization_flags`*::
++
+--
+type: integer
+
+--
+
+*`netflow.anonymization_technique`*::
++
+--
+type: integer
+
+--
+
+*`netflow.information_element_index`*::
++
+--
+type: integer
+
+--
+
+*`netflow.p2p_technology`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.tunnel_technology`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.encrypted_technology`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.bgp_validity_state`*::
++
+--
+type: short
+
+--
+
+*`netflow.ip_sec_spi`*::
++
+--
+type: long
+
+--
+
+*`netflow.gre_key`*::
++
+--
+type: long
+
+--
+
+*`netflow.nat_type`*::
++
+--
+type: short
+
+--
+
+*`netflow.initiator_packets`*::
++
+--
+type: long
+
+--
+
+*`netflow.responder_packets`*::
++
+--
+type: long
+
+--
+
+*`netflow.observation_domain_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.selection_sequence_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.selector_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.information_element_id`*::
++
+--
+type: integer
+
+--
+
+*`netflow.selector_algorithm`*::
++
+--
+type: integer
+
+--
+
+*`netflow.sampling_packet_interval`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_packet_space`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_time_interval`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_time_space`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_size`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_population`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_probability`*::
++
+--
+type: double
+
+--
+
+*`netflow.data_link_frame_size`*::
++
+--
+type: integer
+
+--
+
+*`netflow.ip_header_packet_section`*::
++
+--
+type: short
+
+--
+
+*`netflow.ip_payload_packet_section`*::
++
+--
+type: short
+
+--
+
+*`netflow.data_link_frame_section`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_label_stack_section`*::
++
+--
+type: short
+
+--
+
+*`netflow.mpls_payload_packet_section`*::
++
+--
+type: short
+
+--
+
+*`netflow.selector_id_total_pkts_observed`*::
++
+--
+type: long
+
+--
+
+*`netflow.selector_id_total_pkts_selected`*::
++
+--
+type: long
+
+--
+
+*`netflow.absolute_error`*::
++
+--
+type: double
+
+--
+
+*`netflow.relative_error`*::
++
+--
+type: double
+
+--
+
+*`netflow.observation_time_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.observation_time_milliseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.observation_time_microseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.observation_time_nanoseconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.digest_hash_value`*::
++
+--
+type: long
+
+--
+
+*`netflow.hash_ipp_ayload_offset`*::
++
+--
+type: long
+
+--
+
+*`netflow.hash_ipp_ayload_size`*::
++
+--
+type: long
+
+--
+
+*`netflow.hash_output_range_min`*::
++
+--
+type: long
+
+--
+
+*`netflow.hash_output_range_max`*::
++
+--
+type: long
+
+--
+
+*`netflow.hash_selected_range_min`*::
++
+--
+type: long
+
+--
+
+*`netflow.hash_selected_range_max`*::
++
+--
+type: long
+
+--
+
+*`netflow.hash_digest_output`*::
++
+--
+type: boolean
+
+--
+
+*`netflow.hash_initialiser_value`*::
++
+--
+type: long
+
+--
+
+*`netflow.selector_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.upper_cli_imit`*::
++
+--
+type: double
+
+--
+
+*`netflow.lower_cli_imit`*::
++
+--
+type: double
+
+--
+
+*`netflow.confidence_level`*::
++
+--
+type: double
+
+--
+
+*`netflow.information_element_data_type`*::
++
+--
+type: short
+
+--
+
+*`netflow.information_element_description`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.information_element_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.information_element_range_begin`*::
++
+--
+type: long
+
+--
+
+*`netflow.information_element_range_end`*::
++
+--
+type: long
+
+--
+
+*`netflow.information_element_semantics`*::
++
+--
+type: short
+
+--
+
+*`netflow.information_element_units`*::
++
+--
+type: integer
+
+--
+
+*`netflow.private_enterprise_number`*::
++
+--
+type: long
+
+--
+
+*`netflow.virtual_station_interface_id`*::
++
+--
+type: short
+
+--
+
+*`netflow.virtual_station_interface_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.virtual_station_uuid`*::
++
+--
+type: short
+
+--
+
+*`netflow.virtual_station_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.layer2_segment_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.layer2_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.layer2_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.ingress_unicast_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.ingress_multicast_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.ingress_broadcast_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.egress_unicast_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.egress_broadcast_packet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.monitoring_interval_start_milli_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.monitoring_interval_end_milli_seconds`*::
++
+--
+type: date
+
+--
+
+*`netflow.port_range_start`*::
++
+--
+type: integer
+
+--
+
+*`netflow.port_range_end`*::
++
+--
+type: integer
+
+--
+
+*`netflow.port_range_step_size`*::
++
+--
+type: integer
+
+--
+
+*`netflow.port_range_num_ports`*::
++
+--
+type: integer
+
+--
+
+*`netflow.sta_mac_address`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.sta_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.wtp_mac_address`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.ingress_interface_type`*::
++
+--
+type: long
+
+--
+
+*`netflow.egress_interface_type`*::
++
+--
+type: long
+
+--
+
+*`netflow.rtp_sequence_number`*::
++
+--
+type: integer
+
+--
+
+*`netflow.user_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.application_category_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.application_sub_category_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.application_group_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.original_flows_present`*::
++
+--
+type: long
+
+--
+
+*`netflow.original_flows_initiated`*::
++
+--
+type: long
+
+--
+
+*`netflow.original_flows_completed`*::
++
+--
+type: long
+
+--
+
+*`netflow.distinct_count_of_sourc_eipa_ddress`*::
++
+--
+type: long
+
+--
+
+*`netflow.distinct_count_of_destinatio_nipa_ddress`*::
++
+--
+type: long
+
+--
+
+*`netflow.distinct_count_of_source_ipv4_address`*::
++
+--
+type: long
+
+--
+
+*`netflow.distinct_count_of_destination_ipv4_address`*::
++
+--
+type: long
+
+--
+
+*`netflow.distinct_count_of_source_ipv6_address`*::
++
+--
+type: long
+
+--
+
+*`netflow.distinct_count_of_destination_ipv6_address`*::
++
+--
+type: long
+
+--
+
+*`netflow.value_distribution_method`*::
++
+--
+type: short
+
+--
+
+*`netflow.rfc3550_jitter_milliseconds`*::
++
+--
+type: long
+
+--
+
+*`netflow.rfc3550_jitter_microseconds`*::
++
+--
+type: long
+
+--
+
+*`netflow.rfc3550_jitter_nanoseconds`*::
++
+--
+type: long
+
+--
+
+*`netflow.dot1q_dei`*::
++
+--
+type: boolean
+
+--
+
+*`netflow.dot1q_customer_dei`*::
++
+--
+type: boolean
+
+--
+
+*`netflow.flow_selector_algorithm`*::
++
+--
+type: integer
+
+--
+
+*`netflow.flow_selected_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_selected_packet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_selected_flow_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.selector_itd_otal_flows_observed`*::
++
+--
+type: long
+
+--
+
+*`netflow.selector_itd_otal_flows_selected`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_flow_interval`*::
++
+--
+type: long
+
+--
+
+*`netflow.sampling_flow_spacing`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_sampling_time_interval`*::
++
+--
+type: long
+
+--
+
+*`netflow.flow_sampling_time_spacing`*::
++
+--
+type: long
+
+--
+
+*`netflow.hash_flow_domain`*::
++
+--
+type: integer
+
+--
+
+*`netflow.transport_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.transport_packet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.original_exporter_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.original_exporter_ipv6_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.original_observation_domain_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.intermediate_process_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.ignored_data_record_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.data_link_frame_type`*::
++
+--
+type: integer
+
+--
+
+*`netflow.section_offset`*::
++
+--
+type: integer
+
+--
+
+*`netflow.section_exported_octets`*::
++
+--
+type: integer
+
+--
+
+*`netflow.dot1q_service_instance_tag`*::
++
+--
+type: short
+
+--
+
+*`netflow.dot1q_service_instance_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.dot1q_service_instance_priority`*::
++
+--
+type: short
+
+--
+
+*`netflow.dot1q_customer_source_mac_address`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.dot1q_customer_destination_mac_address`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.post_layer2_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_mcast_layer2_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_layer2_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.post_mcast_layer2_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.minimum_layer2_total_length`*::
++
+--
+type: long
+
+--
+
+*`netflow.maximum_layer2_total_length`*::
++
+--
+type: long
+
+--
+
+*`netflow.dropped_layer2_octet_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.dropped_layer2_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.ignored_layer2_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.not_sent_layer2_octet_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.layer2_octet_delta_sum_of_squares`*::
++
+--
+type: long
+
+--
+
+*`netflow.layer2_octet_total_sum_of_squares`*::
++
+--
+type: long
+
+--
+
+*`netflow.layer2_frame_delta_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.layer2_frame_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.pseudo_wire_destination_ipv4_address`*::
++
+--
+type: ip
+
+--
+
+*`netflow.ignored_layer2_frame_total_count`*::
++
+--
+type: long
+
+--
+
+*`netflow.mib_object_value_integer`*::
++
+--
+type: integer
+
+--
+
+*`netflow.mib_object_value_octet_string`*::
++
+--
+type: short
+
+--
+
+*`netflow.mib_object_value_oid`*::
++
+--
+type: short
+
+--
+
+*`netflow.mib_object_value_bits`*::
++
+--
+type: short
+
+--
+
+*`netflow.mib_object_valuei_pa_ddress`*::
++
+--
+type: ip
+
+--
+
+*`netflow.mib_object_value_counter`*::
++
+--
+type: long
+
+--
+
+*`netflow.mib_object_value_gauge`*::
++
+--
+type: long
+
+--
+
+*`netflow.mib_object_value_time_ticks`*::
++
+--
+type: long
+
+--
+
+*`netflow.mib_object_value_unsigned`*::
++
+--
+type: long
+
+--
+
+*`netflow.mib_object_identifier`*::
++
+--
+type: short
+
+--
+
+*`netflow.mib_sub_identifier`*::
++
+--
+type: long
+
+--
+
+*`netflow.mib_index_indicator`*::
++
+--
+type: long
+
+--
+
+*`netflow.mib_capture_time_semantics`*::
++
+--
+type: short
+
+--
+
+*`netflow.mib_context_engine_id`*::
++
+--
+type: short
+
+--
+
+*`netflow.mib_context_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.mib_object_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.mib_object_description`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.mib_object_syntax`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.mib_module_name`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.mobile_imsi`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.mobile_msisdn`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.http_status_code`*::
++
+--
+type: integer
+
+--
+
+*`netflow.source_transport_ports_limit`*::
++
+--
+type: integer
+
+--
+
+*`netflow.http_request_method`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.http_request_host`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.http_request_target`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.http_message_version`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.nat_instance_id`*::
++
+--
+type: long
+
+--
+
+*`netflow.internal_address_realm`*::
++
+--
+type: short
+
+--
+
+*`netflow.external_address_realm`*::
++
+--
+type: short
+
+--
+
+*`netflow.nat_quota_exceeded_event`*::
++
+--
+type: long
+
+--
+
+*`netflow.nat_threshold_event`*::
++
+--
+type: long
+
+--
+
+*`netflow.http_user_agent`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.http_content_type`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.http_reason_phrase`*::
++
+--
+type: keyword
+
+--
+
+*`netflow.max_session_entries`*::
++
+--
+type: long
+
+--
+
+*`netflow.max_bieb_ntries`*::
++
+--
+type: long
+
+--
+
+*`netflow.max_entries_per_user`*::
++
+--
+type: long
+
+--
+
+*`netflow.max_subscribers`*::
++
+--
+type: long
+
+--
+
+*`netflow.max_fragments_pending_reassembly`*::
++
+--
+type: long
+
+--
+
+*`netflow.address_pool_high_threshold`*::
++
+--
+type: long
+
+--
+
+*`netflow.address_pool_low_threshold`*::
++
+--
+type: long
+
+--
+
+*`netflow.address_port_mapping_high_threshold`*::
++
+--
+type: long
+
+--
+
+*`netflow.address_port_mapping_low_threshold`*::
++
+--
+type: long
+
+--
+
+*`netflow.address_port_mapping_per_user_high_threshold`*::
++
+--
+type: long
+
+--
+
+*`netflow.global_address_mapping_high_threshold`*::
++
+--
+type: long
+
+--
+
+*`netflow.vpn_identifier`*::
++
+--
+type: short
+
+--
+
+[[exported-fields-netflow-module]]
+== NetFlow fields
+
+Module for receiving NetFlow and IPFIX flow records over UDP. The module does not add fields beyond what the netflow input provides.
 
 
 [[exported-fields-nginx]]
@@ -1276,217 +10673,197 @@ Contains fields for the Nginx access logs.
 
 
 
-[float]
-=== `nginx.access.remote_ip_list`
-
+*`nginx.access.remote_ip_list`*::
++
+--
 type: array
 
-An array of remote IP addresses. It is a list because it is common to include, besides the client IP address, IP addresses from headers like `X-Forwarded-For`. See also the `remote_ip` field.
+An array of remote IP addresses. It is a list because it is common to include, besides the client IP address, IP addresses from headers like `X-Forwarded-For`. Real source IP is restored to `source.ip`.
 
 
-[float]
-=== `nginx.access.remote_ip`
+--
 
-type: keyword
+*`nginx.access.body_sent.bytes`*::
++
+--
+type: alias
 
-Client IP address. The first public IP address from the `remote_ip_list` array. If no public IP addresses are present, this field contains the first private IP address from the `remote_ip_list` array.
+alias to: http.response.body.bytes
 
+--
 
-[float]
-=== `nginx.access.user_name`
+*`nginx.access.remote_ip`*::
++
+--
+type: alias
 
-type: keyword
+alias to: source.ip
 
-The user name used when basic authentication is used.
+--
 
+*`nginx.access.user_name`*::
++
+--
+type: alias
 
-[float]
-=== `nginx.access.method`
+alias to: user.name
 
-type: keyword
+--
 
-example: GET
+*`nginx.access.method`*::
++
+--
+type: alias
 
-The request HTTP method.
+alias to: http.request.method
 
+--
 
-[float]
-=== `nginx.access.url`
+*`nginx.access.url`*::
++
+--
+type: alias
 
-type: keyword
+alias to: url.original
 
-The request HTTP URL.
+--
 
+*`nginx.access.http_version`*::
++
+--
+type: alias
 
-[float]
-=== `nginx.access.http_version`
+alias to: http.version
 
-type: keyword
+--
 
-The HTTP version.
+*`nginx.access.response_code`*::
++
+--
+type: alias
 
+alias to: http.response.status_code
 
-[float]
-=== `nginx.access.response_code`
+--
 
-type: long
+*`nginx.access.referrer`*::
++
+--
+type: alias
 
-The HTTP response code.
+alias to: http.request.referrer
 
+--
 
-[float]
-=== `nginx.access.body_sent.bytes`
+*`nginx.access.agent`*::
++
+--
+type: alias
 
-type: long
+alias to: user_agent.original
 
-format: bytes
+--
 
-The number of bytes of the server response body.
 
+*`nginx.access.user_agent.device`*::
++
+--
+type: alias
 
-[float]
-=== `nginx.access.referrer`
+alias to: user_agent.device.name
 
-type: keyword
+--
 
-The HTTP referrer.
+*`nginx.access.user_agent.name`*::
++
+--
+type: alias
 
+alias to: user_agent.name
 
-[float]
-=== `nginx.access.agent`
+--
 
-type: text
+*`nginx.access.user_agent.os`*::
++
+--
+type: alias
 
-Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
+alias to: user_agent.os.full_name
 
+--
 
-[float]
-== user_agent fields
+*`nginx.access.user_agent.os_name`*::
++
+--
+type: alias
 
-Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
+alias to: user_agent.os.name
 
+--
 
+*`nginx.access.user_agent.original`*::
++
+--
+type: alias
 
-[float]
-=== `nginx.access.user_agent.device`
+alias to: user_agent.original
 
-type: keyword
+--
 
-The name of the physical device.
 
+*`nginx.access.geoip.continent_name`*::
++
+--
+type: alias
 
-[float]
-=== `nginx.access.user_agent.major`
+alias to: source.geo.continent_name
 
-type: long
+--
 
-The major version of the user agent.
+*`nginx.access.geoip.country_iso_code`*::
++
+--
+type: alias
 
+alias to: source.geo.country_iso_code
 
-[float]
-=== `nginx.access.user_agent.minor`
+--
 
-type: long
+*`nginx.access.geoip.location`*::
++
+--
+type: alias
 
-The minor version of the user agent.
+alias to: source.geo.location
 
+--
 
-[float]
-=== `nginx.access.user_agent.patch`
+*`nginx.access.geoip.region_name`*::
++
+--
+type: alias
 
-type: keyword
+alias to: source.geo.region_name
 
-The patch version of the user agent.
+--
 
+*`nginx.access.geoip.city_name`*::
++
+--
+type: alias
 
-[float]
-=== `nginx.access.user_agent.name`
+alias to: source.geo.city_name
 
-type: keyword
+--
 
-example: Chrome
+*`nginx.access.geoip.region_iso_code`*::
++
+--
+type: alias
 
-The name of the user agent.
+alias to: source.geo.region_iso_code
 
-
-[float]
-=== `nginx.access.user_agent.os`
-
-type: keyword
-
-The name of the operating system.
-
-
-[float]
-=== `nginx.access.user_agent.os_major`
-
-type: long
-
-The major version of the operating system.
-
-
-[float]
-=== `nginx.access.user_agent.os_minor`
-
-type: long
-
-The minor version of the operating system.
-
-
-[float]
-=== `nginx.access.user_agent.os_name`
-
-type: keyword
-
-The name of the operating system.
-
-
-[float]
-== geoip fields
-
-Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
-
-
-[float]
-=== `nginx.access.geoip.continent_name`
-
-type: keyword
-
-The name of the continent.
-
-
-[float]
-=== `nginx.access.geoip.country_iso_code`
-
-type: keyword
-
-Country ISO code.
-
-
-[float]
-=== `nginx.access.geoip.location`
-
-type: geo_point
-
-The longitude and latitude.
-
-
-[float]
-=== `nginx.access.geoip.region_name`
-
-type: keyword
-
-The region name.
-
-
-[float]
-=== `nginx.access.geoip.city_name`
-
-type: keyword
-
-The city name.
-
+--
 
 [float]
 == error fields
@@ -1495,45 +10872,119 @@ Contains fields for the Nginx error logs.
 
 
 
-[float]
-=== `nginx.error.level`
-
-type: keyword
-
-Error level (e.g. error, critical).
-
-
-[float]
-=== `nginx.error.pid`
-
-type: long
-
-Process identifier (PID).
-
-
-[float]
-=== `nginx.error.tid`
-
-type: long
-
-Thread identifier.
-
-
-[float]
-=== `nginx.error.connection_id`
-
+*`nginx.error.connection_id`*::
++
+--
 type: long
 
 Connection identifier.
 
 
+--
+
+*`nginx.error.level`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
+*`nginx.error.pid`*::
++
+--
+type: alias
+
+alias to: process.pid
+
+--
+
+*`nginx.error.tid`*::
++
+--
+type: alias
+
+alias to: process.thread.id
+
+--
+
+*`nginx.error.message`*::
++
+--
+type: alias
+
+alias to: message
+
+--
+
+[[exported-fields-osquery]]
+== Osquery fields
+
+Fields exported by the `osquery` module
+
+
+
 [float]
-=== `nginx.error.message`
+== osquery fields
 
-type: text
 
-The error message
 
+
+[float]
+== result fields
+
+Common fields exported by the result metricset.
+
+
+
+*`osquery.result.name`*::
++
+--
+type: keyword
+
+The name of the query that generated this event.
+
+
+--
+
+*`osquery.result.action`*::
++
+--
+type: keyword
+
+For incremental data, marks whether the entry was added or removed. It can be one of "added", "removed", or "snapshot".
+
+
+--
+
+*`osquery.result.host_identifier`*::
++
+--
+type: keyword
+
+The identifier for the host on which the osquery agent is running. Normally the hostname.
+
+
+--
+
+*`osquery.result.unix_time`*::
++
+--
+type: long
+
+Unix timestamp of the event, in seconds since the epoch. Used for computing the `@timestamp` column.
+
+
+--
+
+*`osquery.result.calendar_time`*::
++
+--
+String representation of the collection time, as formatted by osquery.
+
+
+--
 
 [[exported-fields-postgresql]]
 == PostgreSQL fields
@@ -1556,70 +11007,103 @@ Fields from the PostgreSQL log files.
 
 
 
-[float]
-=== `postgresql.log.timestamp`
-
+*`postgresql.log.timestamp`*::
++
+--
 The timestamp from the log line.
 
 
-[float]
-=== `postgresql.log.timezone`
+--
 
-The timezone of timestamp.
-
-
-[float]
-=== `postgresql.log.thread_id`
-
+*`postgresql.log.core_id`*::
++
+--
 type: long
 
-Process id
+Core id
 
 
-[float]
-=== `postgresql.log.user`
+--
 
-example: admin
-
-Name of user
-
-[float]
-=== `postgresql.log.database`
-
+*`postgresql.log.database`*::
++
+--
 example: mydb
 
 Name of database
 
-[float]
-=== `postgresql.log.level`
+--
 
-example: FATAL
-
-The log level.
-
-[float]
-=== `postgresql.log.duration`
-
-type: float
-
-example: 30.0
-
-Duration of a query.
-
-[float]
-=== `postgresql.log.query`
-
+*`postgresql.log.query`*::
++
+--
 example: SELECT * FROM users;
 
 Query statement.
 
-[float]
-=== `postgresql.log.message`
+--
 
-type: text
+*`postgresql.log.timezone`*::
++
+--
+type: alias
 
-The logged message.
+alias to: event.timezone
 
+--
+
+*`postgresql.log.thread_id`*::
++
+--
+type: alias
+
+alias to: process.pid
+
+--
+
+*`postgresql.log.user`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`postgresql.log.level`*::
++
+--
+type: alias
+
+alias to: log.level
+
+--
+
+*`postgresql.log.message`*::
++
+--
+type: alias
+
+alias to: message
+
+--
+
+[[exported-fields-process]]
+== Process fields
+
+Process metadata fields
+
+
+
+
+*`process.exe`*::
++
+--
+type: alias
+
+alias to: process.executable
+
+--
 
 [[exported-fields-redis]]
 == Redis fields
@@ -1641,37 +11125,42 @@ Redis log files
 
 
 
-[float]
-=== `redis.log.pid`
-
-type: long
-
-The process ID of the Redis server.
-
-
-[float]
-=== `redis.log.role`
-
+*`redis.log.role`*::
++
+--
 type: keyword
 
 The role of the Redis instance. Can be one of `master`, `slave`, `child` (for RDF/AOF writing child), or `sentinel`.
 
 
-[float]
-=== `redis.log.level`
+--
 
-type: keyword
+*`redis.log.pid`*::
++
+--
+type: alias
 
-The log level. Can be one of `debug`, `verbose`, `notice`, or `warning`.
+alias to: process.pid
 
+--
 
-[float]
-=== `redis.log.message`
+*`redis.log.level`*::
++
+--
+type: alias
 
-type: text
+alias to: log.level
 
-The log message
+--
 
+*`redis.log.message`*::
++
+--
+type: alias
+
+alias to: message
+
+--
 
 [float]
 == slowlog fields
@@ -1680,45 +11169,1726 @@ Slow logs are retrieved from Redis via a network connection.
 
 
 
-[float]
-=== `redis.slowlog.cmd`
-
+*`redis.slowlog.cmd`*::
++
+--
 type: keyword
 
 The command executed.
 
 
-[float]
-=== `redis.slowlog.duration.us`
+--
 
+*`redis.slowlog.duration.us`*::
++
+--
 type: long
 
 How long it took to execute the command in microseconds.
 
 
-[float]
-=== `redis.slowlog.id`
+--
 
+*`redis.slowlog.id`*::
++
+--
 type: long
 
 The ID of the query.
 
 
-[float]
-=== `redis.slowlog.key`
+--
 
+*`redis.slowlog.key`*::
++
+--
 type: keyword
 
 The key on which the command was executed.
 
 
-[float]
-=== `redis.slowlog.args`
+--
 
+*`redis.slowlog.args`*::
++
+--
 type: keyword
 
 The arguments with which the command was called.
 
+
+--
+
+[[exported-fields-santa]]
+== Google Santa fields
+
+Santa Module
+
+
+
+[float]
+== santa fields
+
+
+
+
+*`santa.action`*::
++
+--
+type: keyword
+
+example: EXEC
+
+Action
+
+--
+
+*`santa.decision`*::
++
+--
+type: keyword
+
+example: ALLOW
+
+Decision that santad took.
+
+--
+
+*`santa.reason`*::
++
+--
+type: keyword
+
+example: CERT
+
+Reason for the decsision.
+
+--
+
+*`santa.mode`*::
++
+--
+type: keyword
+
+example: M
+
+Operating mode of Santa.
+
+--
+
+[float]
+== disk fields
+
+Fields for DISKAPPEAR actions.
+
+
+*`santa.disk.volume`*::
++
+--
+The volume name.
+
+--
+
+*`santa.disk.bus`*::
++
+--
+The disk bus protocol.
+
+--
+
+*`santa.disk.serial`*::
++
+--
+The disk serial number.
+
+--
+
+*`santa.disk.bsdname`*::
++
+--
+example: disk1s3
+
+The disk BSD name.
+
+--
+
+*`santa.disk.model`*::
++
+--
+example: APPLE SSD SM0512L
+
+The disk model.
+
+--
+
+*`santa.disk.fs`*::
++
+--
+example: apfs
+
+The disk volume kind (filesystem type).
+
+--
+
+*`santa.disk.mount`*::
++
+--
+The disk volume path.
+
+--
+
+*`certificate.common_name`*::
++
+--
+type: keyword
+
+Common name from code signing certificate.
+
+--
+
+*`certificate.sha256`*::
++
+--
+type: keyword
+
+SHA256 hash of code signing certificate.
+
+--
+
+*`hash.sha256`*::
++
+--
+type: keyword
+
+Hash of process executable.
+
+--
+
+[[exported-fields-suricata]]
+== Suricata fields
+
+Module for handling the EVE JSON logs produced by Suricata.
+
+
+
+[float]
+== suricata fields
+
+Fields from the Suricata EVE log file.
+
+
+
+[float]
+== eve fields
+
+Fields exported by the EVE JSON logs
+
+
+
+*`suricata.eve.event_type`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.app_proto_orig`*::
++
+--
+type: keyword
+
+--
+
+
+*`suricata.eve.tcp.tcp_flags`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tcp.psh`*::
++
+--
+type: boolean
+
+--
+
+*`suricata.eve.tcp.tcp_flags_tc`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tcp.ack`*::
++
+--
+type: boolean
+
+--
+
+*`suricata.eve.tcp.syn`*::
++
+--
+type: boolean
+
+--
+
+*`suricata.eve.tcp.state`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tcp.tcp_flags_ts`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tcp.rst`*::
++
+--
+type: boolean
+
+--
+
+*`suricata.eve.tcp.fin`*::
++
+--
+type: boolean
+
+--
+
+
+*`suricata.eve.fileinfo.sha1`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.fileinfo.filename`*::
++
+--
+type: alias
+
+alias to: file.path
+
+--
+
+*`suricata.eve.fileinfo.tx_id`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.fileinfo.state`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.fileinfo.stored`*::
++
+--
+type: boolean
+
+--
+
+*`suricata.eve.fileinfo.gaps`*::
++
+--
+type: boolean
+
+--
+
+*`suricata.eve.fileinfo.sha256`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.fileinfo.md5`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.fileinfo.size`*::
++
+--
+type: alias
+
+alias to: file.size
+
+--
+
+*`suricata.eve.icmp_type`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.dest_port`*::
++
+--
+type: alias
+
+alias to: destination.port
+
+--
+
+*`suricata.eve.src_port`*::
++
+--
+type: alias
+
+alias to: source.port
+
+--
+
+*`suricata.eve.proto`*::
++
+--
+type: alias
+
+alias to: network.transport
+
+--
+
+*`suricata.eve.pcap_cnt`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.src_ip`*::
++
+--
+type: alias
+
+alias to: source.ip
+
+--
+
+
+*`suricata.eve.dns.type`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.dns.rrtype`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.dns.rrname`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.dns.rdata`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.dns.tx_id`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.dns.ttl`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.dns.rcode`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.dns.id`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.flow_id`*::
++
+--
+type: keyword
+
+--
+
+
+*`suricata.eve.email.status`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.dest_ip`*::
++
+--
+type: alias
+
+alias to: destination.ip
+
+--
+
+*`suricata.eve.icmp_code`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.http.status`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
+*`suricata.eve.http.redirect`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.http.http_user_agent`*::
++
+--
+type: alias
+
+alias to: user_agent.original
+
+--
+
+*`suricata.eve.http.protocol`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.http.http_refer`*::
++
+--
+type: alias
+
+alias to: http.request.referrer
+
+--
+
+*`suricata.eve.http.url`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`suricata.eve.http.hostname`*::
++
+--
+type: alias
+
+alias to: url.domain
+
+--
+
+*`suricata.eve.http.length`*::
++
+--
+type: alias
+
+alias to: http.response.body.bytes
+
+--
+
+*`suricata.eve.http.http_method`*::
++
+--
+type: alias
+
+alias to: http.request.method
+
+--
+
+*`suricata.eve.http.http_content_type`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.timestamp`*::
++
+--
+type: alias
+
+alias to: @timestamp
+
+--
+
+*`suricata.eve.in_iface`*::
++
+--
+type: keyword
+
+--
+
+
+*`suricata.eve.alert.category`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.severity`*::
++
+--
+type: alias
+
+alias to: event.severity
+
+--
+
+*`suricata.eve.alert.rev`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.alert.gid`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.alert.signature`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.action`*::
++
+--
+type: alias
+
+alias to: event.outcome
+
+--
+
+*`suricata.eve.alert.signature_id`*::
++
+--
+type: long
+
+--
+
+
+
+*`suricata.eve.ssh.client.proto_version`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.ssh.client.software_version`*::
++
+--
+type: keyword
+
+--
+
+
+*`suricata.eve.ssh.server.proto_version`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.ssh.server.software_version`*::
++
+--
+type: keyword
+
+--
+
+
+
+*`suricata.eve.stats.capture.kernel_packets`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.capture.kernel_drops`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.capture.kernel_ifdrops`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.uptime`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.detect.alert`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.http.memcap`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.http.memuse`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.file_store.open_files`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.defrag.max_frag_hits`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.defrag.ipv4.timeouts`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.defrag.ipv4.fragments`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.defrag.ipv4.reassembled`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.defrag.ipv6.timeouts`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.defrag.ipv6.fragments`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.defrag.ipv6.reassembled`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.flow.tcp_reuse`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.udp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.memcap`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.emerg_mode_entered`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.emerg_mode_over`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.tcp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.icmpv6`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.icmpv4`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.spare`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow.memuse`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.tcp.pseudo_failed`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.ssn_memcap_drop`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.insert_data_overlap_fail`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.sessions`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.pseudo`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.synack`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.insert_data_normal_fail`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.syn`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.memuse`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.invalid_checksum`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.segment_memcap_drop`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.overlap`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.insert_list_fail`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.rst`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.stream_depth_reached`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.reassembly_memuse`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.reassembly_gap`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.overlap_diff_data`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.tcp.no_flow`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.decoder.avg_pkt_size`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.bytes`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.tcp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.raw`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.ppp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.vlan_qinq`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.null`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.decoder.ltnull.unsupported_type`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.ltnull.pkt_too_small`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.invalid`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.gre`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.ipv4`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.ipv6`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.pkts`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.ipv6_in_ipv6`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.decoder.ipraw.invalid_ip_version`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.pppoe`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.udp`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.decoder.dce.pkt_too_small`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.vlan`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.sctp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.max_pkt_size`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.teredo`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.mpls`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.sll`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.icmpv6`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.icmpv4`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.erspan`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.ethernet`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.ipv4_in_ipv6`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.decoder.ieee8021ah`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.dns.memcap_global`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.dns.memcap_state`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.dns.memuse`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.flow_mgr.rows_busy`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.flows_timeout`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.flows_notimeout`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.rows_skipped`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.closed_pruned`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.new_pruned`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.flows_removed`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.bypassed_pruned`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.est_pruned`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.flows_timeout_inuse`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.flows_checked`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.rows_maxlen`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.rows_checked`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.flow_mgr.rows_empty`*::
++
+--
+type: long
+
+--
+
+
+
+*`suricata.eve.stats.app_layer.flow.tls`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.ftp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.http`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.failed_udp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.dns_udp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.dns_tcp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.smtp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.failed_tcp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.msn`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.ssh`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.imap`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.dcerpc_udp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.dcerpc_tcp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.flow.smb`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.stats.app_layer.tx.tls`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.ftp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.http`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.dns_udp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.dns_tcp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.smtp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.ssh`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.dcerpc_udp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.dcerpc_tcp`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.stats.app_layer.tx.smb`*::
++
+--
+type: long
+
+--
+
+
+*`suricata.eve.tls.notbefore`*::
++
+--
+type: date
+
+--
+
+*`suricata.eve.tls.issuerdn`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tls.sni`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tls.version`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tls.session_resumed`*::
++
+--
+type: boolean
+
+--
+
+*`suricata.eve.tls.fingerprint`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tls.serial`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.tls.notafter`*::
++
+--
+type: date
+
+--
+
+*`suricata.eve.tls.subject`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.app_proto_ts`*::
++
+--
+type: keyword
+
+--
+
+
+*`suricata.eve.flow.bytes_toclient`*::
++
+--
+type: alias
+
+alias to: destination.bytes
+
+--
+
+*`suricata.eve.flow.start`*::
++
+--
+type: alias
+
+alias to: event.start
+
+--
+
+*`suricata.eve.flow.pkts_toclient`*::
++
+--
+type: alias
+
+alias to: destination.packets
+
+--
+
+*`suricata.eve.flow.age`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.flow.state`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.flow.bytes_toserver`*::
++
+--
+type: alias
+
+alias to: source.bytes
+
+--
+
+*`suricata.eve.flow.reason`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.flow.pkts_toserver`*::
++
+--
+type: alias
+
+alias to: source.packets
+
+--
+
+*`suricata.eve.flow.end`*::
++
+--
+type: date
+
+--
+
+*`suricata.eve.flow.alerted`*::
++
+--
+type: boolean
+
+--
+
+*`suricata.eve.app_proto`*::
++
+--
+type: alias
+
+alias to: network.protocol
+
+--
+
+*`suricata.eve.tx_id`*::
++
+--
+type: long
+
+--
+
+*`suricata.eve.app_proto_tc`*::
++
+--
+type: keyword
+
+--
+
+
+*`suricata.eve.smtp.rcpt_to`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.smtp.mail_from`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.smtp.helo`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.app_proto_expected`*::
++
+--
+type: keyword
+
+--
 
 [[exported-fields-system]]
 == System fields
@@ -1741,139 +12911,168 @@ Fields from the Linux authorization logs.
 
 
 
-[float]
-=== `system.auth.timestamp`
+*`system.auth.timestamp`*::
++
+--
+type: alias
 
-The timestamp as read from the auth message.
+alias to: @timestamp
+
+--
+
+*`system.auth.hostname`*::
++
+--
+type: alias
+
+alias to: host.hostname
+
+--
+
+*`system.auth.program`*::
++
+--
+type: alias
+
+alias to: process.name
+
+--
+
+*`system.auth.pid`*::
++
+--
+type: alias
+
+alias to: process.pid
+
+--
+
+*`system.auth.message`*::
++
+--
+type: alias
+
+alias to: message
+
+--
+
+*`system.auth.user`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
 
 
-[float]
-=== `system.auth.hostname`
-
-The hostname as read from the auth message.
-
-
-[float]
-=== `system.auth.program`
-
-The process name as read from the auth message.
-
-
-[float]
-=== `system.auth.pid`
-
-type: long
-
-The PID of the process that sent the auth message.
-
-
-[float]
-=== `system.auth.message`
-
-The message in the log line.
-
-
-[float]
-=== `system.auth.user`
-
-The Unix user that this event refers to.
-
-
-[float]
-== ssh fields
-
-Fields specific to SSH login events.
-
-
-
-[float]
-=== `system.auth.ssh.event`
-
-The SSH login event. Can be one of "Accepted", "Failed", or "Invalid". "Accepted" means a successful login. "Invalid" means that the user is not configured on the system. "Failed" means that the SSH login attempt has failed.
-
-
-[float]
-=== `system.auth.ssh.method`
-
+*`system.auth.ssh.method`*::
++
+--
 The SSH authentication method. Can be one of "password" or "publickey".
 
 
-[float]
-=== `system.auth.ssh.ip`
+--
 
-type: ip
+*`system.auth.ssh.signature`*::
++
+--
+The signature of the client public key.
 
-The client IP from where the login attempt was made.
 
+--
 
-[float]
-=== `system.auth.ssh.dropped_ip`
-
+*`system.auth.ssh.dropped_ip`*::
++
+--
 type: ip
 
 The client IP from SSH connections that are open and immediately dropped.
 
 
-[float]
-=== `system.auth.ssh.port`
+--
 
-type: long
+*`system.auth.ssh.event`*::
++
+--
+type: alias
 
-The client port from where the login attempt was made.
+alias to: event.action
 
+--
 
-[float]
-=== `system.auth.ssh.signature`
+*`system.auth.ssh.ip`*::
++
+--
+type: alias
 
-The signature of the client public key.
+alias to: source.ip
 
+--
 
-[float]
-== geoip fields
+*`system.auth.ssh.port`*::
++
+--
+type: alias
 
-Contains GeoIP information gathered based on the `system.auth.ip` field. Only present if the GeoIP Elasticsearch plugin is available and used.
+alias to: source.port
 
-
-
-[float]
-=== `system.auth.ssh.geoip.continent_name`
-
-type: keyword
-
-The name of the continent.
-
-
-[float]
-=== `system.auth.ssh.geoip.city_name`
-
-type: keyword
-
-The name of the city.
+--
 
 
-[float]
-=== `system.auth.ssh.geoip.region_name`
+*`system.auth.ssh.geoip.continent_name`*::
++
+--
+type: alias
 
-type: keyword
+alias to: source.geo.continent_name
 
-The name of the region.
+--
 
+*`system.auth.ssh.geoip.country_iso_code`*::
++
+--
+type: alias
 
-[float]
-=== `system.auth.ssh.geoip.country_iso_code`
+alias to: source.geo.country_iso_code
 
-type: keyword
+--
 
-Country ISO code.
+*`system.auth.ssh.geoip.location`*::
++
+--
+type: alias
 
+alias to: source.geo.location
 
-[float]
-=== `system.auth.ssh.geoip.location`
+--
 
-type: geo_point
+*`system.auth.ssh.geoip.region_name`*::
++
+--
+type: alias
 
-The longitude and latitude.
+alias to: source.geo.region_name
 
+--
+
+*`system.auth.ssh.geoip.city_name`*::
++
+--
+type: alias
+
+alias to: source.geo.city_name
+
+--
+
+*`system.auth.ssh.geoip.region_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.region_iso_code
+
+--
 
 [float]
 == sudo fields
@@ -1882,39 +13081,49 @@ Fields specific to events created by the `sudo` command.
 
 
 
-[float]
-=== `system.auth.sudo.error`
-
+*`system.auth.sudo.error`*::
++
+--
 example: user NOT in sudoers
 
 The error message in case the sudo command failed.
 
 
-[float]
-=== `system.auth.sudo.tty`
+--
 
+*`system.auth.sudo.tty`*::
++
+--
 The TTY where the sudo command is executed.
 
 
-[float]
-=== `system.auth.sudo.pwd`
+--
 
+*`system.auth.sudo.pwd`*::
++
+--
 The current directory where the sudo command is executed.
 
 
-[float]
-=== `system.auth.sudo.user`
+--
 
+*`system.auth.sudo.user`*::
++
+--
 example: root
 
 The target user to which the sudo command is switching.
 
 
-[float]
-=== `system.auth.sudo.command`
+--
 
+*`system.auth.sudo.command`*::
++
+--
 The command executed via sudo.
 
+
+--
 
 [float]
 == useradd fields
@@ -1923,35 +13132,46 @@ Fields specific to events created by the `useradd` command.
 
 
 
-[float]
-=== `system.auth.useradd.name`
-
-The user name being added.
-
-
-[float]
-=== `system.auth.useradd.uid`
-
-type: long
-
-The user ID.
-
-[float]
-=== `system.auth.useradd.gid`
-
-type: long
-
-The group ID.
-
-[float]
-=== `system.auth.useradd.home`
-
+*`system.auth.useradd.home`*::
++
+--
 The home folder for the new user.
 
-[float]
-=== `system.auth.useradd.shell`
+--
 
+*`system.auth.useradd.shell`*::
++
+--
 The default shell for the new user.
+
+--
+
+*`system.auth.useradd.name`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`system.auth.useradd.uid`*::
++
+--
+type: alias
+
+alias to: user.id
+
+--
+
+*`system.auth.useradd.gid`*::
++
+--
+type: alias
+
+alias to: group.id
+
+--
 
 [float]
 == groupadd fields
@@ -1960,19 +13180,23 @@ Fields specific to events created by the `groupadd` command.
 
 
 
-[float]
-=== `system.auth.groupadd.name`
+*`system.auth.groupadd.name`*::
++
+--
+type: alias
 
-The name of the new group.
+alias to: group.name
 
+--
 
-[float]
-=== `system.auth.groupadd.gid`
+*`system.auth.groupadd.gid`*::
++
+--
+type: alias
 
-type: long
+alias to: group.id
 
-The ID of the new group.
-
+--
 
 [float]
 == syslog fields
@@ -1981,35 +13205,50 @@ Contains fields from the syslog system logs.
 
 
 
-[float]
-=== `system.syslog.timestamp`
+*`system.syslog.timestamp`*::
++
+--
+type: alias
 
-The timestamp as read from the syslog message.
+alias to: @timestamp
 
+--
 
-[float]
-=== `system.syslog.hostname`
+*`system.syslog.hostname`*::
++
+--
+type: alias
 
-The hostname as read from the syslog message.
+alias to: host.hostname
 
+--
 
-[float]
-=== `system.syslog.program`
+*`system.syslog.program`*::
++
+--
+type: alias
 
-The process name as read from the syslog message.
+alias to: process.name
 
+--
 
-[float]
-=== `system.syslog.pid`
+*`system.syslog.pid`*::
++
+--
+type: alias
 
-The PID of the process that sent the syslog message.
+alias to: process.pid
 
+--
 
-[float]
-=== `system.syslog.message`
+*`system.syslog.message`*::
++
+--
+type: alias
 
-The message in the log line.
+alias to: message
 
+--
 
 [[exported-fields-traefik]]
 == Traefik fields
@@ -2032,230 +13271,1423 @@ Contains fields for the Traefik access logs.
 
 
 
-[float]
-=== `traefik.access.remote_ip`
-
+*`traefik.access.user_identifier`*::
++
+--
 type: keyword
 
-Client IP address.
+Is the RFC 1413 identity of the client
 
 
-[float]
-=== `traefik.access.user_name`
+--
 
-type: keyword
-
-The user name used when basic authentication is used.
-
-
-[float]
-=== `traefik.access.method`
-
-type: keyword
-
-example: GET
-
-The request HTTP method.
-
-
-[float]
-=== `traefik.access.url`
-
-type: keyword
-
-The request HTTP URL.
-
-
-[float]
-=== `traefik.access.http_version`
-
-type: keyword
-
-The HTTP version.
-
-
-[float]
-=== `traefik.access.response_code`
-
-type: long
-
-The HTTP response code.
-
-
-[float]
-=== `traefik.access.body_sent.bytes`
-
-type: long
-
-format: bytes
-
-The number of bytes of the server response body.
-
-
-[float]
-=== `traefik.access.referrer`
-
-type: keyword
-
-The HTTP referrer.
-
-
-[float]
-=== `traefik.access.agent`
-
-type: text
-
-Contains the un-parsed user agent string. Only present if the user agent Elasticsearch plugin is not available or not used.
-
-
-[float]
-== user_agent fields
-
-Contains the parsed User agent field. Only present if the user agent Elasticsearch plugin is available and used.
-
-
-
-[float]
-=== `traefik.access.user_agent.device`
-
-type: keyword
-
-The name of the physical device.
-
-
-[float]
-=== `traefik.access.user_agent.major`
-
-type: long
-
-The major version of the user agent.
-
-
-[float]
-=== `traefik.access.user_agent.minor`
-
-type: long
-
-The minor version of the user agent.
-
-
-[float]
-=== `traefik.access.user_agent.patch`
-
-type: keyword
-
-The patch version of the user agent.
-
-
-[float]
-=== `traefik.access.user_agent.name`
-
-type: keyword
-
-example: Chrome
-
-The name of the user agent.
-
-
-[float]
-=== `traefik.access.user_agent.os`
-
-type: keyword
-
-The name of the operating system.
-
-
-[float]
-=== `traefik.access.user_agent.os_major`
-
-type: long
-
-The major version of the operating system.
-
-
-[float]
-=== `traefik.access.user_agent.os_minor`
-
-type: long
-
-The minor version of the operating system.
-
-
-[float]
-=== `traefik.access.user_agent.os_name`
-
-type: keyword
-
-The name of the operating system.
-
-
-[float]
-== geoip fields
-
-Contains GeoIP information gathered based on the remote_ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
-
-
-[float]
-=== `traefik.access.geoip.continent_name`
-
-type: keyword
-
-The name of the continent.
-
-
-[float]
-=== `traefik.access.geoip.country_iso_code`
-
-type: keyword
-
-Country ISO code.
-
-
-[float]
-=== `traefik.access.geoip.location`
-
-type: geo_point
-
-The longitude and latitude.
-
-
-[float]
-=== `traefik.access.geoip.region_name`
-
-type: keyword
-
-The region name.
-
-
-[float]
-=== `traefik.access.geoip.city_name`
-
-type: keyword
-
-The city name.
-
-
-[float]
-=== `traefik.access.request_count`
-
+*`traefik.access.request_count`*::
++
+--
 type: long
 
 The number of requests
 
 
-[float]
-=== `traefik.access.frontend_name`
+--
 
-type: text
+*`traefik.access.frontend_name`*::
++
+--
+type: keyword
 
 The name of the frontend used
 
 
-[float]
-=== `traefik.access.backend_url`
+--
 
-type: text
+*`traefik.access.backend_url`*::
++
+--
+type: keyword
 
 The url of the backend where request is forwarded
+
+--
+
+*`traefik.access.body_sent.bytes`*::
++
+--
+type: alias
+
+alias to: http.response.body.bytes
+
+--
+
+*`traefik.access.remote_ip`*::
++
+--
+type: alias
+
+alias to: source.address
+
+--
+
+*`traefik.access.user_name`*::
++
+--
+type: alias
+
+alias to: user.name
+
+--
+
+*`traefik.access.method`*::
++
+--
+type: alias
+
+alias to: http.request.method
+
+--
+
+*`traefik.access.url`*::
++
+--
+type: alias
+
+alias to: url.original
+
+--
+
+*`traefik.access.http_version`*::
++
+--
+type: alias
+
+alias to: http.version
+
+--
+
+*`traefik.access.response_code`*::
++
+--
+type: alias
+
+alias to: http.response.status_code
+
+--
+
+*`traefik.access.referrer`*::
++
+--
+type: alias
+
+alias to: http.request.referrer
+
+--
+
+*`traefik.access.agent`*::
++
+--
+type: alias
+
+alias to: user_agent.original
+
+--
+
+
+*`traefik.access.user_agent.device`*::
++
+--
+type: alias
+
+alias to: user_agent.device.name
+
+--
+
+*`traefik.access.user_agent.name`*::
++
+--
+type: alias
+
+alias to: user_agent.name
+
+--
+
+*`traefik.access.user_agent.os`*::
++
+--
+type: alias
+
+alias to: user_agent.os.full_name
+
+--
+
+*`traefik.access.user_agent.os_name`*::
++
+--
+type: alias
+
+alias to: user_agent.os.name
+
+--
+
+*`traefik.access.user_agent.original`*::
++
+--
+type: alias
+
+alias to: user_agent.original
+
+--
+
+
+*`traefik.access.geoip.continent_name`*::
++
+--
+type: alias
+
+alias to: source.geo.continent_name
+
+--
+
+*`traefik.access.geoip.country_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.country_iso_code
+
+--
+
+*`traefik.access.geoip.location`*::
++
+--
+type: alias
+
+alias to: source.geo.location
+
+--
+
+*`traefik.access.geoip.region_name`*::
++
+--
+type: alias
+
+alias to: source.geo.region_name
+
+--
+
+*`traefik.access.geoip.city_name`*::
++
+--
+type: alias
+
+alias to: source.geo.city_name
+
+--
+
+*`traefik.access.geoip.region_iso_code`*::
++
+--
+type: alias
+
+alias to: source.geo.region_iso_code
+
+--
+
+[[exported-fields-zeek]]
+== Zeek fields
+
+Module for handling logs produced by Zeek/Bro
+
+
+
+[float]
+== zeek fields
+
+Fields from Zeek/Bro logs after normalization
+
+
+
+*`zeek.session_id`*::
++
+--
+type: keyword
+
+A unique identifier of the session 
+
+
+--
+
+*`zeek.connection.local_orig`*::
++
+--
+type: boolean
+
+Indicates whether the session is originated locally
+
+
+--
+
+*`zeek.connection.local_resp`*::
++
+--
+type: boolean
+
+Indicates whether the session is responded locally
+
+
+--
+
+*`zeek.connection.missed_bytes`*::
++
+--
+type: long
+
+Missed bytes for the session
+
+
+--
+
+*`zeek.connection.state`*::
++
+--
+type: keyword
+
+Flags indicating the state of the session
+
+
+--
+
+*`zeek.connection.history`*::
++
+--
+type: keyword
+
+Flags indicating the history of the session
+
+
+--
+
+*`zeek.connection.orig_l2_addr`*::
++
+--
+type: keyword
+
+Link-layer address of the originator, if available
+
+
+--
+
+*`zeek.connection.resp_l2_addr`*::
++
+--
+type: keyword
+
+Link-layer address of the responder, if available
+
+
+--
+
+*`zeek.connection.vlan`*::
++
+--
+type: integer
+
+VLAN identifier
+
+
+--
+
+*`zeek.connection.inner_vlan`*::
++
+--
+type: integer
+
+VLAN identifier
+
+
+--
+
+*`zeek.dns.trans_id`*::
++
+--
+type: keyword
+
+DNS transaction identifier
+
+
+--
+
+*`zeek.dns.rtt`*::
++
+--
+type: double
+
+Round trip time for the query and response
+
+
+--
+
+*`zeek.dns.query`*::
++
+--
+type: keyword
+
+The domain name that is the subject of the DNS query
+
+
+--
+
+*`zeek.dns.qclass`*::
++
+--
+type: long
+
+The QCLASS value specifying the class of the query
+
+
+--
+
+*`zeek.dns.qclass_name`*::
++
+--
+type: keyword
+
+A descriptive name for the class of the query
+
+
+--
+
+*`zeek.dns.qtype`*::
++
+--
+type: long
+
+A QTYPE value specifying the type of the query
+
+
+--
+
+*`zeek.dns.qtype_name`*::
++
+--
+type: keyword
+
+A descriptive name for the type of the query
+
+
+--
+
+*`zeek.dns.rcode`*::
++
+--
+type: long
+
+The response code value in DNS response messages
+
+
+--
+
+*`zeek.dns.rcode_name`*::
++
+--
+type: keyword
+
+A descriptive name for the response code value
+
+
+--
+
+*`zeek.dns.AA`*::
++
+--
+type: boolean
+
+The Authoritative Answer bit for response messages specifies that the responding 
+name server is an authority for the domain name in the question section
+
+
+--
+
+*`zeek.dns.TC`*::
++
+--
+type: boolean
+
+The Truncation bit specifies that the message was truncated
+
+
+--
+
+*`zeek.dns.RD`*::
++
+--
+type: boolean
+
+The Recursion Desired bit in a request message indicates that the client 
+wants recursive service for this query
+
+
+--
+
+*`zeek.dns.RA`*::
++
+--
+type: boolean
+
+The Recursion Available bit in a response message indicates that the name 
+server supports recursive queries.
+
+
+--
+
+*`zeek.dns.answers`*::
++
+--
+type: keyword
+
+The set of resource descriptions in the query answer
+
+
+--
+
+*`zeek.dns.TTLs`*::
++
+--
+type: double
+
+The caching intervals of the associated RRs described by the answers field
+
+
+--
+
+*`zeek.dns.rejected`*::
++
+--
+type: boolean
+
+Indicates whether the DNS query was rejected by the server
+
+
+--
+
+*`zeek.dns.total_answers`*::
++
+--
+type: integer
+
+The total number of resource records in the reply 
+
+
+--
+
+*`zeek.dns.total_replies`*::
++
+--
+type: integer
+
+The total number of resource records in the reply message
+
+
+--
+
+*`zeek.dns.saw_query`*::
++
+--
+type: boolean
+
+Whether the full DNS query has been seen
+
+
+--
+
+*`zeek.dns.saw_reply`*::
++
+--
+type: boolean
+
+Whether the full DNS reply has been seen
+
+
+--
+
+*`zeek.http.trans_depth`*::
++
+--
+type: integer
+
+Represents the pipelined depth into the connection of this request/response transaction
+
+
+--
+
+*`zeek.http.status_msg`*::
++
+--
+type: keyword
+
+Status message returned by the server
+
+
+--
+
+*`zeek.http.info_code`*::
++
+--
+type: integer
+
+Last seen 1xx informational reply code returned by the server.
+
+
+--
+
+*`zeek.http.info_msg`*::
++
+--
+type: keyword
+
+Last seen 1xx informational reply message returned by the server.
+
+
+--
+
+*`zeek.http.tags`*::
++
+--
+type: keyword
+
+A set of indicators of various attributes discovered and related to a particular 
+request/response pair.
+
+
+--
+
+*`zeek.http.password`*::
++
+--
+type: keyword
+
+Password if basic-auth is performed for the request
+
+
+--
+
+*`zeek.http.captured_password`*::
++
+--
+type: boolean
+
+Determines if the password will be captured for this request
+
+
+--
+
+*`zeek.http.proxied`*::
++
+--
+type: keyword
+
+All of the headers that may indicate if the HTTP request was proxied
+
+
+--
+
+*`zeek.http.range_request`*::
++
+--
+type: boolean
+
+Indicates if this request can assume 206 partial content in response
+
+
+--
+
+*`zeek.http.client_header_names`*::
++
+--
+type: keyword
+
+The vector of HTTP header names sent by the client. No header values 
+are included here, just the header names.
+
+
+--
+
+*`zeek.http.server_header_names`*::
++
+--
+type: keyword
+
+The vector of HTTP header names sent by the server. No header values 
+are included here, just the header names
+
+
+--
+
+*`zeek.http.orig_fuids`*::
++
+--
+type: keyword
+
+An ordered vector of file unique IDs from the originator
+
+
+--
+
+*`zeek.http.orig_mime_types`*::
++
+--
+type: keyword
+
+An ordered vector of mime types from the originator
+
+
+--
+
+*`zeek.http.orig_filenames`*::
++
+--
+type: keyword
+
+An ordered vector of filenames from the originator
+
+
+--
+
+*`zeek.http.resp_fuids`*::
++
+--
+type: keyword
+
+An ordered vector of file unique IDs from the responder
+
+
+--
+
+*`zeek.http.resp_mime_types`*::
++
+--
+type: keyword
+
+An ordered vector of mime types from the responder
+
+
+--
+
+*`zeek.http.resp_filenames`*::
++
+--
+type: keyword
+
+An ordered vector of filenames from the responder
+
+
+--
+
+*`zeek.http.orig_mime_depth`*::
++
+--
+type: integer
+
+Current number of MIME entities in the HTTP request message body
+
+
+--
+
+*`zeek.http.resp_mime_depth`*::
++
+--
+type: integer
+
+Current number of MIME entities in the HTTP response message body
+
+
+--
+
+*`zeek.files.fuid`*::
++
+--
+type: keyword
+
+A file unique identifier
+
+
+--
+
+*`zeek.files.tx_host`*::
++
+--
+type: ip
+
+The host that transferred the file
+
+
+--
+
+*`zeek.files.rx_host`*::
++
+--
+type: ip
+
+The host that received the file
+
+
+--
+
+*`zeek.files.session_ids`*::
++
+--
+type: keyword
+
+The sessions that have this file
+
+
+--
+
+*`zeek.files.source`*::
++
+--
+type: keyword
+
+An identification of the source of the file data. E.g. it may be a network protocol 
+over which it was transferred, or a local file path which was read, or some other 
+input source
+
+
+--
+
+*`zeek.files.depth`*::
++
+--
+type: long
+
+A value to represent the depth of this file in relation to its source. In SMTP, it 
+is the depth of the MIME attachment on the message. In HTTP, it is the depth of the 
+request within the TCP connection
+
+
+--
+
+*`zeek.files.analyzers`*::
++
+--
+type: keyword
+
+A set of analysis types done during the file analysis
+
+
+--
+
+*`zeek.files.mime_type`*::
++
+--
+type: keyword
+
+Mime type of the file
+
+
+--
+
+*`zeek.files.filename`*::
++
+--
+type: keyword
+
+Name of the file if available
+
+
+--
+
+*`zeek.files.local_orig`*::
++
+--
+type: boolean
+
+If the source of this file is a network connection, this field indicates if the data 
+originated from the local network or not
+
+
+--
+
+*`zeek.files.is_orig`*::
++
+--
+type: boolean
+
+If the source of this file is a network connection, this field indicates if the file is 
+being sent by the originator of the connection or the responder
+
+
+--
+
+*`zeek.files.duration`*::
++
+--
+type: double
+
+The duration the file was analyzed for. Not the duration of the session.
+
+
+--
+
+*`zeek.files.seen_bytes`*::
++
+--
+type: long
+
+Number of bytes provided to the file analysis engine for the file
+
+
+--
+
+*`zeek.files.total_bytes`*::
++
+--
+type: long
+
+Total number of bytes that are supposed to comprise the full file
+
+
+--
+
+*`zeek.files.missing_bytes`*::
++
+--
+type: long
+
+The number of bytes in the file stream that were completely missed during the process 
+of analysis
+
+
+--
+
+*`zeek.files.overflow_bytes`*::
++
+--
+type: long
+
+The number of bytes in the file stream that were not delivered to stream file analyzers. 
+This could be overlapping bytes or bytes that couldn't be reassembled
+
+
+--
+
+*`zeek.files.timedout`*::
++
+--
+type: boolean
+
+Whether the file analysis timed out at least once for the file
+
+
+--
+
+*`zeek.files.parent_fuid`*::
++
+--
+type: keyword
+
+Identifier associated with a container file from which this one was extracted as part of 
+the file analysis
+
+
+--
+
+*`zeek.files.md5`*::
++
+--
+type: keyword
+
+An MD5 digest of the file contents
+
+
+--
+
+*`zeek.files.sha1`*::
++
+--
+type: keyword
+
+A SHA1 digest of the file contents
+
+
+--
+
+*`zeek.files.sha256`*::
++
+--
+type: keyword
+
+A SHA256 digest of the file contents.
+
+
+--
+
+*`zeek.files.extracted`*::
++
+--
+type: keyword
+
+Local filename of extracted file
+
+
+--
+
+*`zeek.files.extracted_cutoff`*::
++
+--
+type: boolean
+
+Indicate whether the file being extracted was cut off hence not extracted completely
+
+
+--
+
+*`zeek.files.extracted_size`*::
++
+--
+type: long
+
+The number of bytes extracted to disk
+
+
+--
+
+*`zeek.files.entropy`*::
++
+--
+type: double
+
+The information density of the contents of the file
+
+
+--
+
+*`zeek.ssl.version`*::
++
+--
+type: keyword
+
+SSL/TLS version that was logged
+
+
+--
+
+*`zeek.ssl.cipher`*::
++
+--
+type: keyword
+
+SSL/TLS cipher suite that was logged
+
+
+--
+
+*`zeek.ssl.curve`*::
++
+--
+type: keyword
+
+Elliptic curve that was logged when using ECDH/ECDHE
+
+
+--
+
+*`zeek.ssl.server_name`*::
++
+--
+type: keyword
+
+Value of the Server Name Indicator SSL/TLS extension. It indicates the server name 
+that the client was requesting
+
+
+--
+
+*`zeek.ssl.resumed`*::
++
+--
+type: boolean
+
+Flag to indicate if the session was resumed reusing the key material exchanged in an 
+earlier connection
+
+
+--
+
+*`zeek.ssl.next_protocol`*::
++
+--
+type: keyword
+
+Next protocol the server chose using the application layer next protocol extension
+
+
+--
+
+*`zeek.ssl.established`*::
++
+--
+type: boolean
+
+Flag to indicate if this ssl session has been established successfully
+
+
+--
+
+*`zeek.ssl.cert_chain`*::
++
+--
+type: keyword
+
+Chain of certificates offered by the server to validate its complete signing chain
+
+
+--
+
+*`zeek.ssl.cert_chain_fuids`*::
++
+--
+type: keyword
+
+An ordered vector of certificate file identifiers for the certificates offered by the server
+
+
+--
+
+*`zeek.ssl.client_cert_chain`*::
++
+--
+type: keyword
+
+Chain of certificates offered by the client to validate its complete signing chain
+
+
+--
+
+*`zeek.ssl.client_cert_chain_fuids`*::
++
+--
+type: keyword
+
+An ordered vector of certificate file identifiers for the certificates offered by the client
+
+
+--
+
+*`zeek.ssl.issuer`*::
++
+--
+type: keyword
+
+Subject of the signer of the X.509 certificate offered by the server
+
+
+--
+
+*`zeek.ssl.client_issuer`*::
++
+--
+type: keyword
+
+Subject of the X.509 certificate offered by the client
+
+
+--
+
+*`zeek.ssl.validation_status`*::
++
+--
+type: keyword
+
+Result of certificate validation for this connection
+
+
+--
+
+*`zeek.ssl.validation_code`*::
++
+--
+type: keyword
+
+Result of certificate validation for this connection, given as OpenSSL validation code
+
+
+--
+
+*`zeek.ssl.subject`*::
++
+--
+type: keyword
+
+Subject of the X.509 certificate offered by the server
+
+
+--
+
+*`zeek.ssl.client_subject`*::
++
+--
+type: keyword
+
+Subject of the X.509 certificate offered by the client
+
+
+--
+
+*`zeek.ssl.last_alert`*::
++
+--
+type: keyword
+
+Last alert that was seen during the connection
+
+
+--
+
+*`zeek.notice.connection_id`*::
++
+--
+type: keyword
+
+Identifier of the related connection session
+
+
+--
+
+*`zeek.notice.icmp_id`*::
++
+--
+type: keyword
+
+Identifier of the related ICMP session
+
+
+--
+
+*`zeek.notice.file.id`*::
++
+--
+type: keyword
+
+An identifier associated with a single file that is related to this notice
+
+
+--
+
+*`zeek.notice.file.parent_id`*::
++
+--
+type: keyword
+
+Identifier associated with a container file from which this one was extracted
+
+
+--
+
+*`zeek.notice.file.source`*::
++
+--
+type: keyword
+
+An identification of the source of the file data. E.g. it may be a network protocol 
+over which it was transferred, or a local file path which was read, or some other 
+input source
+
+
+--
+
+*`zeek.notice.file.mime_type`*::
++
+--
+type: keyword
+
+A mime type if the notice is related to a file
+
+
+--
+
+*`zeek.notice.file.is_orig`*::
++
+--
+type: boolean
+
+If the source of this file is a network connection, this field indicates if the file is 
+being sent by the originator of the connection or the responder
+
+
+--
+
+*`zeek.notice.file.seen_bytes`*::
++
+--
+type: long
+
+Number of bytes provided to the file analysis engine for the file
+
+
+--
+
+*`zeek.fnotice.file.total_bytes`*::
++
+--
+type: long
+
+Total number of bytes that are supposed to comprise the full file
+
+
+--
+
+*`zeek.notice.file.missing_bytes`*::
++
+--
+type: long
+
+The number of bytes in the file stream that were completely missed during the process 
+of analysis
+
+
+--
+
+*`zeek.notice.file.overflow_bytes`*::
++
+--
+type: long
+
+The number of bytes in the file stream that were not delivered to stream file analyzers. 
+This could be overlapping bytes or bytes that couldn't be reassembled
+
+
+--
+
+*`zeek.notice.fuid`*::
++
+--
+type: keyword
+
+A file unique ID if this notice is related to a file
+
+
+--
+
+*`zeek.notice.note`*::
++
+--
+type: keyword
+
+The type of the notice
+
+
+--
+
+*`zeek.notice.msg`*::
++
+--
+type: keyword
+
+The human readable message for the notice.
+
+
+--
+
+*`zeek.notice.sub`*::
++
+--
+type: keyword
+
+The human readable sub-message
+
+
+--
+
+*`zeek.notice.n`*::
++
+--
+type: long
+
+Associated count, or a status code
+
+
+--
+
+*`zeek.notice.peer_name`*::
++
+--
+type: keyword
+
+Name of remote peer that raised this notice
+
+
+--
+
+*`zeek.notice.peer_descr`*::
++
+--
+type: text
+
+Textual description for the peer that raised this notice
+
+
+--
+
+*`zeek.notice.actions`*::
++
+--
+type: keyword
+
+The actions which have been applied to this notice
+
+
+--
+
+*`zeek.notice.email_body_sections`*::
++
+--
+type: text
+
+By adding chunks of text into this element, other scripts can expand on notices 
+that are being emailed
+
+
+--
+
+*`zeek.notice.email_delay_tokens`*::
++
+--
+type: keyword
+
+Adding a string token to this set will cause the built-in emailing functionality 
+to delay sending the email either the token has been removed or the email 
+has been delayed for the specified time duration
+
+
+--
+
+*`zeek.notice.identifier`*::
++
+--
+type: keyword
+
+This field is provided when a notice is generated for the purpose of deduplicating notices
+
+
+--
+
+*`zeek.notice.suppress_for`*::
++
+--
+type: double
+
+This field indicates the length of time that this unique notice should be suppressed
+
+
+--
+
+*`zeek.notice.dropped`*::
++
+--
+type: boolean
+
+Indicate if the source IP address was dropped and denied network access
+
+
+--
 

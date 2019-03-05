@@ -4,7 +4,7 @@
     Nginx server status metrics collected from various modules.
   short_config: false
   release: ga
-  settings: ["ssl"]
+  settings: ["ssl", "http"]
   fields:
     - name: nginx
       type: group

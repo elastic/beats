@@ -84,3 +84,50 @@
           format: percent
           description: >
             The percentage of used swap memory.
+
+    - name: hugepages
+      type: group
+      prefix: "[float]"
+      description: This group contains statistics related to huge pages usage on the system.
+      fields:
+        - name: total
+          type: long
+          format: number
+          description: >
+            Number of huge pages in the pool.
+
+        - name: used.bytes
+          type: long
+          format: bytes
+          description: >
+            Memory used in allocated huge pages.
+
+        - name: used.pct
+          type: long
+          format: percent
+          description: >
+            Percentage of huge pages used.
+
+        - name: free
+          type: long
+          format: number
+          description: >
+            Number of available huge pages in the pool.
+
+        - name: reserved
+          type: long
+          format: number
+          description: >
+            Number of reserved but not allocated huge pages in the pool.
+
+        - name: surplus
+          type: long
+          format: number
+          description: >
+            Number of overcommited huge pages.
+
+        - name: default_size
+          type: long
+          format: bytes
+          description: >
+            Default size for huge pages.

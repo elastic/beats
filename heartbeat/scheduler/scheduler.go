@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package scheduler
 
 import (
@@ -6,20 +23,27 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 )
 
+const (
+	statePreRunning int = iota + 1
+	stateRunning
+	stateDone
+)
+
 type Scheduler struct {
-	limit   uint
-	running bool
+	limit uint
+	state atomic.Int
 
 	location *time.Location
 
 	jobs   []*job
 	active uint // number of active entries
 
-	add, rm  chan *job
-	finished chan taskOverSignal
+	addCh, rmCh chan *job
+	finished    chan taskOverSignal
 
 	// list of active tasks waiting to be executed
 	tasks []task
@@ -35,7 +59,7 @@ type Canceller func() error
 // all tasks of a job have been finished, the job is marked as done and subject
 // to be re-scheduled.
 type job struct {
-	name     string
+	id       string
 	next     time.Time
 	schedule Schedule
 	fn       TaskFunc
@@ -60,7 +84,7 @@ type taskOverSignal struct {
 }
 
 type Schedule interface {
-	Next(time.Time) time.Time
+	Next(now time.Time) (next time.Time)
 }
 
 var debugf = logp.MakeDebug("scheduler")
@@ -70,16 +94,17 @@ func New(limit uint) *Scheduler {
 }
 
 func NewWithLocation(limit uint, location *time.Location) *Scheduler {
+	stateInitial := statePreRunning
 	return &Scheduler{
 		limit:    limit,
 		location: location,
 
-		running: false,
-		jobs:    nil,
-		active:  0,
+		state:  atomic.MakeInt(stateInitial),
+		jobs:   nil,
+		active: 0,
 
-		add:      make(chan *job),
-		rm:       make(chan *job),
+		addCh:    make(chan *job),
+		rmCh:     make(chan *job),
 		finished: make(chan taskOverSignal),
 
 		done: make(chan struct{}),
@@ -88,53 +113,63 @@ func NewWithLocation(limit uint, location *time.Location) *Scheduler {
 }
 
 func (s *Scheduler) Start() error {
-	if s.running {
-		return errors.New("scheduler already running")
+	if !s.transitionRunning() {
+		return errors.New("scheduler can only be stopped from a running state")
 	}
 
-	s.running = true
 	go s.run()
 	return nil
 }
 
 func (s *Scheduler) Stop() error {
-	if !s.running {
-		return errors.New("scheduler already stopped")
+	if !s.isRunning() {
+		return errors.New("scheduler can only be started from an initialized state")
 	}
 
-	s.running = false
 	close(s.done)
 	s.wg.Wait()
+	s.transitionStopped()
 	return nil
 }
 
-func (s *Scheduler) Add(sched Schedule, name string, entrypoint TaskFunc) func() error {
-	debugf("Add scheduler job '%v'.", name)
+// ErrAlreadyStopped is returned when an Add operation is attempted after the scheduler
+// has already stopped.
+var ErrAlreadyStopped = errors.New("attempted to add job to already stopped scheduler")
+
+// Add adds the given TaskFunc to the current scheduler. Will return an error if the scheduler
+// is done.
+func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeFn func() error, err error) {
+	debugf("Add scheduler job '%v'.", id)
 
 	j := &job{
-		name:       name,
+		id:         id,
 		fn:         entrypoint,
 		schedule:   sched,
 		registered: false,
 		running:    0,
 	}
-	if !s.running {
-		s.doAdd(j)
+	if s.isPreRunning() {
+		s.addSync(j)
+	} else if s.isRunning() {
+		s.addCh <- j
 	} else {
-		s.add <- j
+		return nil, ErrAlreadyStopped
 	}
 
-	return func() error { return s.remove(j) }
+	return func() error { return s.remove(j) }, nil
 }
 
 func (s *Scheduler) remove(j *job) error {
-	debugf("Remove scheduler job '%v'", j.name)
+	debugf("Remove scheduler job '%v'", j.id)
 
-	if !s.running {
+	if s.isPreRunning() {
 		s.doRemove(j)
-	} else {
-		s.rm <- j
+	} else if s.isRunning() {
+		s.rmCh <- j
 	}
+	// There is no need to handle the isDone case
+	// because removing the job accomplishes nothing if
+	// the scheduler is stopped
 
 	return nil
 }
@@ -165,14 +200,19 @@ func (s *Scheduler) run() {
 		}
 		resched = true
 
-		if (s.limit == 0 || s.active < s.limit) && len(s.jobs) > 0 {
+		unlimited := s.limit == 0
+		if (unlimited || s.active < s.limit) && len(s.jobs) > 0 {
 			next := s.jobs[0].next
 			debugf("Next wakeup time: %v", next)
 
 			if timer != nil {
 				timer.Stop()
 			}
-			timer = time.NewTimer(next.Sub(time.Now().In(s.location)))
+
+			// Calculate the amount of time between now and the next execution
+			// since the timers operation on durations, not exact amounts of time
+			nextExecIn := next.Sub(time.Now().In(s.location))
+			timer = time.NewTimer(nextExecIn)
 		}
 
 		var timeSignal <-chan time.Time
@@ -188,13 +228,13 @@ func (s *Scheduler) run() {
 				}
 
 				if j.running > 0 {
-					debugf("Scheduled job '%v' still active.", j.name)
+					debugf("Scheduled job '%v' still active.", j.id)
 					reschedActive(j, now)
 					continue
 				}
 
 				if s.limit > 0 && s.active == s.limit {
-					logp.Info("Scheduled job '%v' waiting.", j.name)
+					logp.Info("Scheduled job '%v' waiting.", j.id)
 					timer = nil
 					continue
 				}
@@ -205,7 +245,7 @@ func (s *Scheduler) run() {
 		case sig := <-s.finished:
 			s.active--
 			j := sig.entry
-			debugf("Job '%v' returned at %v (cont=%v).", j.name, time.Now(), len(sig.cont))
+			debugf("Job '%v' returned at %v (cont=%v).", j.id, time.Now(), len(sig.cont))
 
 			// add number of job continuation tasks returned to current job task
 			// counter and remove count for task just being finished
@@ -225,7 +265,7 @@ func (s *Scheduler) run() {
 					continue
 				}
 
-				debugf("Start waiting job: %v", waiting.name)
+				debugf("Start waiting job: %v", waiting.id)
 				s.startJob(waiting)
 				break
 			}
@@ -275,11 +315,11 @@ func (s *Scheduler) run() {
 			// still active.
 			resched = count > 0
 
-		case j := <-s.add:
+		case j := <-s.addCh:
 			j.next = j.schedule.Next(time.Now().In(s.location))
-			s.doAdd(j)
+			s.addSync(j)
 
-		case j := <-s.rm:
+		case j := <-s.rmCh:
 			s.doRemove(j)
 
 		case <-s.done:
@@ -291,7 +331,7 @@ func (s *Scheduler) run() {
 }
 
 func reschedActive(j *job, now time.Time) {
-	logp.Info("Scheduled job '%v' already active.", j.name)
+	logp.Info("Scheduled job '%v' already active.", j.id)
 	if !now.Before(j.next) {
 		j.next = j.schedule.Next(j.next)
 	}
@@ -300,7 +340,7 @@ func reschedActive(j *job, now time.Time) {
 func (s *Scheduler) startJob(j *job) {
 	j.running++
 	j.next = j.schedule.Next(j.next)
-	debugf("Start job '%v' at %v.", j.name, time.Now())
+	debugf("Start job '%v' at %v.", j.id, time.Now())
 
 	s.runTask(task{j, j.fn})
 }
@@ -313,7 +353,7 @@ func (s *Scheduler) runTask(t task) {
 		defer func() {
 			if r := recover(); r != nil {
 				logp.Err("Panic in job '%v'. Recovering, but please report this: %s.",
-					j.name, r)
+					j.id, r)
 				logp.Err("Stacktrace: %s", debug.Stack())
 				s.signalFinished(j, nil)
 			}
@@ -324,7 +364,7 @@ func (s *Scheduler) runTask(t task) {
 	}()
 }
 
-func (s *Scheduler) doAdd(j *job) {
+func (s *Scheduler) addSync(j *job) {
 	j.registered = true
 	s.jobs = append(s.jobs, j)
 }
@@ -360,4 +400,20 @@ func (s *Scheduler) signalFinished(j *job, cont []TaskFunc) {
 	}
 
 	s.finished <- taskOverSignal{j, tasks}
+}
+
+func (s *Scheduler) transitionRunning() bool {
+	return s.state.CAS(statePreRunning, stateRunning)
+}
+
+func (s *Scheduler) transitionStopped() bool {
+	return s.state.CAS(stateRunning, stateDone)
+}
+
+func (s *Scheduler) isPreRunning() bool {
+	return s.state.Load() == statePreRunning
+}
+
+func (s *Scheduler) isRunning() bool {
+	return s.state.Load() == stateRunning
 }

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package fileout
 
 import (
@@ -18,6 +35,7 @@ func init() {
 }
 
 type fileOutput struct {
+	filePath string
 	beat     beat.Info
 	observer outputs.Observer
 	rotator  *file.Rotator
@@ -26,6 +44,7 @@ type fileOutput struct {
 
 // makeFileout instantiates a new file output instance.
 func makeFileout(
+	_ outputs.IndexManager,
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *common.Config,
@@ -57,12 +76,15 @@ func (out *fileOutput) init(beat beat.Info, c config) error {
 		path = filepath.Join(c.Path, out.beat.Beat)
 	}
 
+	out.filePath = path
+
 	var err error
 	out.rotator, err = file.NewFileRotator(
 		path,
 		file.MaxSizeBytes(c.RotateEveryKb*1024),
 		file.MaxBackups(c.NumberOfFiles),
 		file.Permissions(os.FileMode(c.Permissions)),
+		file.WithLogger(logp.NewLogger("rotator").With(logp.Namespace("rotator"))),
 	)
 	if err != nil {
 		return err
@@ -105,6 +127,7 @@ func (out *fileOutput) Publish(
 			} else {
 				logp.Warn("Failed to serialize the event: %v", err)
 			}
+			logp.Debug("file", "Failed event: %v", event)
 
 			dropped++
 			continue
@@ -130,4 +153,8 @@ func (out *fileOutput) Publish(
 	st.Acked(len(events) - dropped)
 
 	return nil
+}
+
+func (out *fileOutput) String() string {
+	return "file(" + out.filePath + ")"
 }

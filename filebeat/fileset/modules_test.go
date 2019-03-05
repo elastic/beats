@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build !integration
 
 package fileset
@@ -58,7 +75,7 @@ func TestNewModuleRegistry(t *testing.T) {
 
 	for module, filesets := range reg.registry {
 		for name, fileset := range filesets {
-			cfg, err := fileset.getProspectorConfig()
+			cfg, err := fileset.getInputConfig()
 			assert.NoError(t, err, fmt.Sprintf("module: %s, fileset: %s", module, name))
 
 			moduleName, err := cfg.String("_module_name", -1)
@@ -107,6 +124,24 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 	assert.Equal(t, []interface{}{"/hello/test"}, nginxAccess.vars["paths"])
 
 	assert.NotContains(t, reg.registry["nginx"], "error")
+}
+
+func TestMovedModule(t *testing.T) {
+	modulesPath, err := filepath.Abs("./test/moved_module")
+	assert.NoError(t, err)
+
+	configs := []*ModuleConfig{
+		&ModuleConfig{
+			Module: "old",
+			Filesets: map[string]*FilesetConfig{
+				"test": {},
+			},
+		},
+	}
+
+	reg, err := newModuleRegistry(modulesPath, configs, nil, "5.2.0")
+	assert.NoError(t, err)
+	assert.NotNil(t, reg)
 }
 
 func TestApplyOverrides(t *testing.T) {
@@ -169,19 +204,19 @@ func TestApplyOverrides(t *testing.T) {
 			},
 		},
 		{
-			name:    "prospector overrides",
+			name:    "input overrides",
 			fcfg:    FilesetConfig{},
 			module:  "nginx",
 			fileset: "access",
 			overrides: &ModuleOverrides{
 				"nginx": map[string]*common.Config{
 					"access": load(t, map[string]interface{}{
-						"prospector.close_eof": true,
+						"input.close_eof": true,
 					}),
 				},
 			},
 			expected: FilesetConfig{
-				Prospector: map[string]interface{}{
+				Input: map[string]interface{}{
 					"close_eof": true,
 				},
 			},
@@ -351,9 +386,9 @@ func TestMissingModuleFolder(t *testing.T) {
 	assert.NotNil(t, reg)
 
 	// this should return an empty list, but no error
-	prospectors, err := reg.GetProspectorConfigs()
+	inputs, err := reg.GetInputConfigs()
 	assert.NoError(t, err)
-	assert.Equal(t, 0, len(prospectors))
+	assert.Equal(t, 0, len(inputs))
 }
 
 func TestInterpretError(t *testing.T) {
@@ -362,16 +397,6 @@ func TestInterpretError(t *testing.T) {
 		Input  string
 		Output string
 	}{
-		{
-			Test:   "geoip not installed",
-			Input:  `{"error":{"root_cause":[{"type":"parse_exception","reason":"No processor type exists with name [geoip]","header":{"processor_type":"geoip"}}],"type":"parse_exception","reason":"No processor type exists with name [geoip]","header":{"processor_type":"geoip"}},"status":400}`,
-			Output: "This module requires the ingest-geoip plugin to be installed in Elasticsearch. You can install it using the following command in the Elasticsearch home directory:\n    sudo bin/elasticsearch-plugin install ingest-geoip",
-		},
-		{
-			Test:   "user-agent not installed",
-			Input:  `{"error":{"root_cause":[{"type":"parse_exception","reason":"No processor type exists with name [user_agent]","header":{"processor_type":"user_agent"}}],"type":"parse_exception","reason":"No processor type exists with name [user_agent]","header":{"processor_type":"user_agent"}},"status":400}`,
-			Output: "This module requires the ingest-user-agent plugin to be installed in Elasticsearch. You can install it using the following command in the Elasticsearch home directory:\n    sudo bin/elasticsearch-plugin install ingest-user-agent",
-		},
 		{
 			Test:  "other plugin not installed",
 			Input: `{"error":{"root_cause":[{"type":"parse_exception","reason":"No processor type exists with name [hello_test]","header":{"processor_type":"hello_test"}}],"type":"parse_exception","reason":"No processor type exists with name [hello_test]","header":{"processor_type":"hello_test"}},"status":400}`,

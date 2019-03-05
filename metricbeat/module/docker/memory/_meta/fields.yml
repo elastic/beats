@@ -2,7 +2,7 @@
   type: group
   description: >
     Memory metrics.
-  release: beta
+  release: ga
   fields:
 
     - name: fail.count

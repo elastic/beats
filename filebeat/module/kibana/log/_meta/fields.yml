@@ -1,0 +1,45 @@
+- name: log
+  type: group
+  description: >
+    Kafka log lines.
+  fields:
+    - name: tags
+      type: keyword
+      description: >
+        Kibana logging tags.
+    - name: state
+      type: keyword
+      description: >
+        Current state of Kibana.
+    - name: meta
+      type: object
+      object_type: keyword
+
+    - name: kibana.log.meta.req.headers.referer
+      type: alias
+      path: http.request.referrer
+      migration: true
+    - name: kibana.log.meta.req.referer
+      type: alias
+      path: http.request.referrer
+      migration: true
+    - name: kibana.log.meta.req.headers.user-agent
+      type: alias
+      path: user_agent.original
+      migration: true
+    - name: kibana.log.meta.req.remoteAddress
+      type: alias
+      path: source.address
+      migration: true
+    - name: kibana.log.meta.req.url
+      type: alias
+      path: url.original
+      migration: true
+    - name: kibana.log.meta.statusCode
+      type: alias
+      path: http.response.status_code
+      migration: true
+    - name: kibana.log.meta.method
+      type: alias
+      path: http.request.method
+      migration: true

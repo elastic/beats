@@ -22,21 +22,22 @@ class TestKeystore(KeystoreBase):
         Test that we correctly to string replacement with values from the keystore
         """
 
-        key = "elasticsearch_host"
-        secret = "myeleasticsearchsecrethost"
+        key = "mysecretpath"
+        secret = path.join(self.working_dir, "thisisultrasecretpath")
 
-        self.render_config_template(keystore_path=self.keystore_path, elasticsearch={
-            'hosts': "${%s}:9200" % key
-        })
+        self.render_config_template("mockbeat",
+                                    keystore_path=self.keystore_path,
+                                    output_file_path="${%s}" % key)
 
-        exit_code = self.run_beat(extra_args=["keystore", "create"])
+        exit_code = self.run_beat(extra_args=["keystore", "create"],
+                                  config="mockbeat.yml")
         assert exit_code == 0
 
         self.add_secret(key, secret)
-        proc = self.start_beat()
-        self.wait_until(lambda: self.log_contains("no such host"))
-        assert self.log_contains(secret)
+        proc = self.start_beat(config="mockbeat.yml")
+        self.wait_until(lambda: self.log_contains("ackloop:  done send ack"))
         proc.check_kill_and_wait()
+        assert path.exists(secret)
 
     def test_keystore_with_key_not_present(self):
         key = "elasticsearch_host"
@@ -49,3 +50,46 @@ class TestKeystore(KeystoreBase):
         assert self.log_contains(
             "missing field accessing 'output.elasticsearch.hosts'")
         assert exit_code == 1
+
+    def test_keystore_with_nested_key(self):
+        """
+        test that we support nested key
+        """
+
+        key = "output.elasticsearch.hosts.0"
+        secret = path.join(self.working_dir, "myeleasticsearchsecrethost")
+
+        self.render_config_template("mockbeat",
+                                    keystore_path=self.keystore_path,
+                                    output_file_path="${%s}" % key)
+
+        exit_code = self.run_beat(extra_args=["keystore", "create"],
+                                  config="mockbeat.yml")
+        assert exit_code == 0
+
+        self.add_secret(key, secret)
+        proc = self.start_beat(config="mockbeat.yml")
+        self.wait_until(lambda: self.log_contains("ackloop:  done send ack"))
+        proc.check_kill_and_wait()
+        assert path.exists(secret)
+
+    def test_export_config_with_keystore(self):
+        """
+        Test export config works and doesn't expose keystore value
+        """
+        key = "asecret"
+        secret = "asecretvalue"
+
+        self.render_config_template(keystore_path=self.keystore_path, elasticsearch={
+            'hosts': "${%s}" % key
+        })
+
+        exit_code = self.run_beat(extra_args=["keystore", "create"])
+        assert exit_code == 0
+
+        self.add_secret(key, value=secret)
+        exit_code = self.run_beat(extra_args=["export", "config"])
+
+        assert exit_code == 0
+        assert self.log_contains(secret) == False
+        assert self.log_contains("${%s}" % key)

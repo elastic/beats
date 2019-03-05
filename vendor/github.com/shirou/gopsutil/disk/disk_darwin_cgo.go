@@ -4,8 +4,7 @@
 package disk
 
 /*
-#cgo CFLAGS: -mmacosx-version-min=10.10 -DMACOSX_DEPLOYMENT_TARGET=10.10
-#cgo LDFLAGS: -mmacosx-version-min=10.10 -lobjc -framework Foundation -framework IOKit
+#cgo LDFLAGS: -lobjc -framework Foundation -framework IOKit
 #include <stdint.h>
 
 // ### enough?
@@ -27,6 +26,7 @@ typedef struct
 import "C"
 
 import (
+	"context"
 	"errors"
 	"strings"
 	"unsafe"
@@ -35,6 +35,10 @@ import (
 )
 
 func IOCounters(names ...string) (map[string]IOCountersStat, error) {
+	return IOCountersWithContext(context.Background(), names...)
+}
+
+func IOCountersWithContext(ctx context.Context, names ...string) (map[string]IOCountersStat, error) {
 	if C.StartIOCounterFetch() == 0 {
 		return nil, errors.New("Unable to fetch disk list")
 	}

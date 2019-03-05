@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package ucfg
 
 import (
@@ -44,6 +61,10 @@ type criticalError struct {
 var (
 	ErrMissing = errors.New("missing field")
 
+	ErrNoParse = errors.New("parsing dynamic configs is disabled")
+
+	ErrCyclicReference = errors.New("cyclic reference detected")
+
 	ErrDuplicateValidator = errors.New("validator already registered")
 
 	ErrTypeNoArray = errors.New("field is no array")
@@ -66,7 +87,7 @@ var (
 
 	ErrTODO = errors.New("TODO - implement me")
 
-	ErrDuplicateKeey = errors.New("duplicate key")
+	ErrDuplicateKey = errors.New("duplicate key")
 
 	ErrOverflow = errors.New("integer overflow")
 
@@ -161,7 +182,17 @@ func messagePath(reason error, meta *Meta, message, path string) string {
 }
 
 func raiseDuplicateKey(cfg *Config, name string) Error {
-	return raisePathErr(ErrDuplicateKeey, cfg.metadata, "", cfg.PathOf(name, "."))
+	return raisePathErr(ErrDuplicateKey, cfg.metadata, "", cfg.PathOf(name, "."))
+}
+
+func raiseCyclicErr(field string) Error {
+	message := fmt.Sprintf("cyclic reference detected for key: '%s'", field)
+
+	return baseError{
+		reason:  ErrCyclicReference,
+		class:   ErrConfig,
+		message: message,
+	}
 }
 
 func raiseMissing(c *Config, field string) Error {
@@ -228,6 +259,11 @@ func raiseUnsupportedInputType(ctx context, meta *Meta, v reflect.Value) Error {
 		v.Type(), v)
 
 	return raiseCritical(reason, messagePath(reason, meta, message, ctx.path(".")))
+}
+
+func raiseNoParse(ctx context, meta *Meta) Error {
+	reason := ErrNoParse
+	return raisePathErr(reason, meta, "", ctx.path("."))
 }
 
 func raiseNil(reason error) Error {

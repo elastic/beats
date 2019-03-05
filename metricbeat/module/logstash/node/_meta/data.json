@@ -1,23 +1,33 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "event": {
+        "dataset": "logstash.node",
+        "duration": 115000,
+        "module": "logstash"
+    },
     "logstash": {
         "node": {
-            "host": "4318d3c307b3",
             "jvm": {
-                "pid": 1,
-                "version": "1.8.0_151"
-            },
-            "version": "6.0.0-rc2"
+                "version": "1.8.0_191"
+            }
         }
     },
     "metricset": {
-        "host": "127.0.0.1:9600",
-        "module": "logstash",
-        "name": "node",
-        "rtt": 115
+        "name": "node"
+    },
+    "process": {
+        "pid": 93559
+    },
+    "service": {
+        "address": "127.0.0.1:9600",
+        "hostname": "Shaunaks-MBP-2.attlocal.net",
+        "id": "7565df20-c3aa-4261-81d5-3b0ab8d15c16",
+        "name": "logstash",
+        "type": "logstash",
+        "version": "7.0.0"
     }
 }

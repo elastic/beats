@@ -1,0 +1,24 @@
+[role="xpack"]
+[[beats-system-user]]
+=== Set the password for the built-in monitoring user
+
+{security} provides built-in user credentials in {es} that have a fixed set of
+privileges. In {beat_monitoring_user_version} and later releases, there is a
++{beat_monitoring_user}+ built-in user, which {beatname_uc} uses to store
+monitoring information in {es}.
+
+The initial passwords for all of the built-in users are set by using the
+`setup-passwords` tool in {es}. Thereafter, you can change the passwords by
+using the *Management > Users* page in Kibana or the
+{ref}/security-api-change-password.html[Change Password API].
+
+IMPORTANT: If you upgraded from {es} version {beat_monitoring_version} or earlier, you will not
+have set a password for the +{beat_monitoring_user}+ user. A user with the
+`manage_security` privilege must change the password for this built-in user.
+
+For more
+information, see:
+
+* {xpack-ref}/setting-up-authentication.html[Setting Up User Authentication]
+* {xpack-ref}/built-in-roles.html[Built-in Roles]
+* <<monitoring>>

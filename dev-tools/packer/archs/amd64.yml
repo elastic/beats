@@ -1,5 +1,0 @@
-arch: amd64
-deb_arch: amd64
-rpm_arch: x86_64
-bin_arch: x86_64
-win_arch: x86_64

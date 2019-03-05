@@ -1,42 +1,58 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "audit": {
-        "kernel": {
-            "action": "logged-in",
-            "actor": {
-                "attrs": {
-                    "auid": "unset",
-                    "uid": "root"
-                },
-                "primary": "unset",
-                "secondary": "(invalid user)"
-            },
-            "category": "user-login",
-            "data": {
-                "acct": "(invalid user)",
-                "addr": "179.38.151.221",
-                "exe": "/usr/sbin/sshd",
-                "op": "login",
-                "pid": "12635",
-                "terminal": "sshd"
-            },
-            "how": "/usr/sbin/sshd",
-            "record_type": "user_login",
-            "result": "fail",
-            "sequence": 19955,
-            "session": "unset",
-            "thing": {
-                "primary": "sshd",
-                "secondary": "179.38.151.221",
-                "what": "user-session"
-            }
-        }
-    },
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
+    "auditd": {
+        "data": {
+            "acct": "(invalid user)",
+            "op": "login",
+            "terminal": "sshd"
+        },
+        "message_type": "user_login",
+        "result": "fail",
+        "sequence": 19955,
+        "session": "unset",
+        "summary": {
+            "actor": {
+                "primary": "unset",
+                "secondary": "(invalid user)"
+            },
+            "how": "/usr/sbin/sshd",
+            "object": {
+                "primary": "sshd",
+                "secondary": "179.38.151.221",
+                "type": "user-session"
+            }
+        }
+    },
     "event": {
-        "module": "auditd"
+        "action": "logged-in",
+        "category": "user-login",
+        "module": "auditd",
+        "original": [
+            "type=USER_LOGIN msg=audit(1492896301.818:19955): pid=12635 uid=0 auid=4294967295 ses=4294967295 msg='op=login acct=28696E76616C6964207573657229 exe=\"/usr/sbin/sshd\" hostname=? addr=179.38.151.221 terminal=sshd res=failed'"
+        ]
+    },
+    "network": {
+        "direction": "incoming"
+    },
+    "process": {
+        "executable": "/usr/sbin/sshd",
+        "pid": 12635
+    },
+    "service": {
+        "type": "auditd"
+    },
+    "source": {
+        "ip": "179.38.151.221"
+    },
+    "user": {
+        "audit": {
+            "id": "unset"
+        },
+        "id": "0",
+        "name": "root"
     }
 }

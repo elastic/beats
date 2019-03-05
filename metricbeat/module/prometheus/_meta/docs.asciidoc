@@ -1,2 +1,2 @@
-This module periodically fetches metrics from
-https://prometheus.io/docs/[Prometheus].
+This module periodically scrapes metrics from
+https://prometheus.io/docs/instrumenting/exporters/[Prometheus exporters].

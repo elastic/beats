@@ -1,0 +1,53 @@
+import:
+  - 'types.yml'
+
+main: |
+  package bin
+ 
+  import "encoding/binary"
+ 
+  {{ range $enc, $long := data.endianess }}
+    {{ range $signdness, $long := data.signdness }}
+      {{ range $k, $bits := data.bits }}
+        {{ invoke "makeBinType" "bits" $bits "name" $signdness "enc" $enc }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+
+# makeBinType(bits, name, enc)
+templates.makeBinType: |
+  {{ $bits := .bits }}
+  {{ $len := div $bits 8 }}
+  {{ $name := .name }}
+  {{ $enc := .enc }}
+  {{ $endianess := index data.endianess $enc  }}
+  {{ $inst := capitalize $endianess | printf "%vEndian" }}
+  {{ $signdness := index data.signdness $name }}
+  {{ $gotype := printf "%v%v" (index data.baseType $name) $bits }}
+  {{ $accessor := printf "Uint%v" $bits }}
+
+  {{ $type := printf "%v%v%v" (capitalize $name) $bits $enc }}
+    
+  // {{ $type }} wraps a byte array into a {{ $endianess }} endian encoded {{ $bits }}bit {{ $signdness }} integer.
+  type {{ $type }} [{{ $len }}]byte
+
+  // Len returns the number of bytes required to store the value.
+  func (b *{{ $type }}) Len() int { return {{ $len }} }
+
+  // Get returns the decoded value.
+  func (b *{{ $type }}) Get() {{ $gotype }} {
+    {{- if (eq $bits 8) }}
+      return {{ $gotype }}(b[0])
+    {{ else }}
+      return {{ $gotype }}(binary.{{ $inst }}.{{ $accessor }}(b[:]))
+    {{ end -}}
+  }
+
+  // Set encodes a new value into the backing buffer:
+  func (b *{{ $type }}) Set(v {{ $gotype }}) {
+    {{- if (eq $bits 8) }}
+      b[0] = byte(v)
+    {{ else }}
+    binary.{{ $inst }}.Put{{ $accessor }}(b[:], uint{{ $bits }}(v))
+    {{ end -}}
+  }

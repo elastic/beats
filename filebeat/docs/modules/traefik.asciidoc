@@ -4,6 +4,7 @@ This file is generated! See scripts/docs_collector.py
 
 [[filebeat-module-traefik]]
 :modulename: traefik
+:has-dashboards: true
 
 == Traefik module
 
@@ -14,12 +15,6 @@ include::../include/what-happens.asciidoc[]
 
 [float]
 === Compatibility
-
-This module requires the
-{elasticsearch-plugins}/ingest-user-agent.html[ingest-user-agent] and
-{elasticsearch-plugins}/ingest-geoip.html[ingest-geoip] Elasticsearch plugins.
-
-//REVIEWERS: Do we need to say anything else about compatibility here?
 
 include::../include/running-modules.asciidoc[]
 
@@ -49,7 +44,7 @@ To specify the same settings at the command line, you use:
 
 ["source","sh",subs="attributes"]
 -----
-./{beatname_lc} --modules traefik -M "traefik.access.var.paths=[/path/to/traefik/access.log*]"
+-M "traefik.access.var.paths=[/path/to/traefik/access.log*]"
 -----
 
 
@@ -63,6 +58,11 @@ include::../include/config-option-intro.asciidoc[]
 
 include::../include/var-paths.asciidoc[]
 
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
 
 
 [float]

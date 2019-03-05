@@ -1,0 +1,5 @@
+- module: envoyproxy
+  #metricsets:
+  #  - server
+  period: 10s
+  hosts: ["localhost:9901"]

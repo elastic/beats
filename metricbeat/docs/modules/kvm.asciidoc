@@ -1,0 +1,43 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-kvm]]
+== kvm module
+
+beta[]
+
+This is the kvm module.
+
+
+[float]
+=== Example configuration
+
+The kvm module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: kvm
+  metricsets: ["dommemstat"]
+  enabled: true
+  period: 10s
+  hosts: ["unix:///var/run/libvirt/libvirt-sock"]
+  # For remote hosts, setup network access in libvirtd.conf
+  # and use the tcp scheme:
+  # hosts: [ "tcp://<host>:16509" ]
+
+  # Timeout to connect to Libvirt server
+  #timeout: 1s
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-kvm-dommemstat,dommemstat>>
+
+include::kvm/dommemstat.asciidoc[]
+

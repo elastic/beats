@@ -8,19 +8,11 @@
         HTTP related fields.
       fields:
         - name: url
-          type: text
+          type: alias
+          path: url.full
+          migration: true
           description: >
             Service url used by monitor.
-
-        - name: response
-          type: group
-          description: >
-            Service response parameters.
-          fields:
-            - name: status
-              type: integer
-              description: >
-                Response status code.
         - name: rtt
           type: group
           description: >
@@ -75,6 +67,11 @@
                 - name: us
                   type: long
                   description: Duration in microseconds
+
+            - name: content.us
+              type: long
+              description:
+                Time required to retrieved the content in micro seconds.
 
             - name: total
               type: group

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build !integration
 
 package mysql
@@ -6,6 +23,7 @@ import (
 	"encoding/hex"
 	"net"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -14,15 +32,18 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/elastic/beats/packetbeat/protos"
-
-	"time"
+	"github.com/elastic/beats/packetbeat/protos/tcp"
+	"github.com/elastic/beats/packetbeat/publish"
 )
+
+const serverPort = 3306
 
 type eventStore struct {
 	events []beat.Event
 }
 
 func (e *eventStore) publish(event beat.Event) {
+	publish.MarshalPacketbeatFields(&event, nil)
 	e.events = append(e.events, event)
 }
 
@@ -38,6 +59,7 @@ func mysqlModForTests(store *eventStore) *mysqlPlugin {
 
 	var mysql mysqlPlugin
 	config := defaultConfig
+	config.Ports = []int{serverPort}
 	mysql.init(callback, &config)
 	return &mysql
 }
@@ -65,7 +87,7 @@ func TestMySQLParser_simpleRequest(t *testing.T) {
 		t.Errorf("Failed to decode hex string")
 	}
 
-	stream := &mysqlStream{data: message, message: new(mysqlMessage)}
+	stream := &mysqlStream{data: message, message: new(mysqlMessage), isClient: true}
 
 	ok, complete := mysqlMessageParser(stream)
 
@@ -347,7 +369,7 @@ func TestParseMySQL_simpleUpdateResponse(t *testing.T) {
 		countHandleMysql++
 	}
 
-	mysql.Parse(&pkt, &tuple, 1, private)
+	mysql.Parse(&pkt, &tuple, tcp.TCPDirectionOriginal, private)
 
 	if countHandleMysql != 1 {
 		t.Errorf("handleMysql not called")
@@ -388,7 +410,7 @@ func TestParseMySQL_threeResponses(t *testing.T) {
 		countHandleMysql++
 	}
 
-	mysql.Parse(&pkt, &tuple, 1, private)
+	mysql.Parse(&pkt, &tuple, tcp.TCPDirectionOriginal, private)
 
 	if countHandleMysql != 3 {
 		t.Errorf("handleMysql not called three times")
@@ -430,7 +452,7 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 		countHandleMysql++
 	}
 
-	private = mysql.Parse(&pkt, &tuple, 1, private).(mysqlPrivateData)
+	private = mysql.Parse(&pkt, &tuple, tcp.TCPDirectionOriginal, private).(mysqlPrivateData)
 	if countHandleMysql != 0 {
 		t.Errorf("handleMysql called on first run")
 	}
@@ -463,10 +485,12 @@ func TestParseMySQL_splitResponse(t *testing.T) {
 func testTCPTuple() *common.TCPTuple {
 	t := &common.TCPTuple{
 		IPLength: 4,
-		SrcIP:    net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
-		SrcPort: 6512, DstPort: 3306,
+		BaseTuple: common.BaseTuple{
+			SrcIP: net.IPv4(192, 168, 0, 1), DstIP: net.IPv4(192, 168, 0, 2),
+			SrcPort: 6512, DstPort: serverPort,
+		},
 	}
-	t.ComputeHashebles()
+	t.ComputeHashables()
 	return t
 }
 
@@ -521,17 +545,18 @@ func Test_gap_in_response(t *testing.T) {
 
 	private := protos.ProtocolData(new(mysqlPrivateData))
 
-	private = mysql.Parse(&req, tcptuple, 0, private)
-	private = mysql.Parse(&resp, tcptuple, 1, private)
+	private = mysql.Parse(&req, tcptuple, tcp.TCPDirectionOriginal, private)
+	private = mysql.Parse(&resp, tcptuple, tcp.TCPDirectionReverse, private)
 
 	logp.Debug("mysql", "Now sending gap..")
 
-	_, drop := mysql.GapInStream(tcptuple, 1, 10, private)
+	_, drop := mysql.GapInStream(tcptuple, tcp.TCPDirectionReverse, 10, private)
 	assert.Equal(t, true, drop)
 
 	trans := expectTransaction(t, store)
-	assert.NotNil(t, trans)
-	assert.Equal(t, trans["notes"], []string{"Packet loss while capturing the response"})
+	if m, err := trans.GetValue("error.message"); assert.NoError(t, err) {
+		assert.Equal(t, m, "Packet loss while capturing the response")
+	}
 }
 
 // Test that loss of data during the request doesn't result in a
@@ -548,7 +573,7 @@ func Test_gap_in_eat_message(t *testing.T) {
 			"66726f6d20746573")
 	assert.Nil(t, err)
 
-	stream := &mysqlStream{data: reqData, message: new(mysqlMessage)}
+	stream := &mysqlStream{data: reqData, message: new(mysqlMessage), isClient: true}
 	ok, complete := mysqlMessageParser(stream)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, false, complete)
@@ -627,4 +652,26 @@ func Test_parseMysqlResponse_invalid(t *testing.T) {
 		assert.Equal(t, []string{""}, fields)
 		assert.Equal(t, [][]string{}, rows)
 	}
+}
+
+func Test_PreparedStatement(t *testing.T) {
+	logp.TestingSetup(logp.WithSelectors("mysql", "mysqldetailed"))
+	tcpTuple := testTCPTuple()
+	results := &eventStore{}
+	mysql := mysqlModForTests(results)
+
+	send := func(dir uint8, data string) {
+		rawData, err := hex.DecodeString(data)
+		assert.Nil(t, err)
+		packet := protos.Packet{Payload: rawData}
+
+		var private protos.ProtocolData
+		private = mysql.Parse(&packet, tcpTuple, dir, private)
+	}
+
+	send(tcp.TCPDirectionOriginal, "c00000001673656c6563742064697374696e637420636f756e742864697374696e63742070757263686173656465305f2e69642920617320636f6c5f305f305f2066726f6d2070757263686173655f64656d616e642070757263686173656465305f2077686572652070757263686173656465305f2e636861696e5f6d61737465723d3f20616e642070757263686173656465305f2e6372656174655f74696d653e3d3f20616e642070757263686173656465305f2e6372656174655f74696d653c3d3f")
+	send(tcp.TCPDirectionReverse, "0c000001000b000000010003000000001700000203646566000000013f000c3f0000000000fd80000000001700000303646566000000013f000c3f0000000000fd80000000001700000403646566000000013f000c3f0000000000fd800000000005000005fe000001201e0000060364656600000008636f6c5f305f305f000c3f001500000008810000000005000007fe00000120")
+	send(tcp.TCPDirectionOriginal, "33000000170b00000000010000000001fd000c000c000841313232343633380be107071c000000000000000be1070a1c173b3b00000000")
+	send(tcp.TCPDirectionReverse, "01000001011e0000020364656600000008636f6c5f305f305f000c3f001500000008810000000005000003fe000001200a00000400000b0000000000000005000005fe00000120")
+	assert.Len(t, results.events, 2)
 }

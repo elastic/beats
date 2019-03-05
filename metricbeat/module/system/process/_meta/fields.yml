@@ -5,42 +5,39 @@
   release: ga
   fields:
     - name: name
-      type: keyword
-      description: >
-        The process name.
+      type: alias
+      path: process.name
+      migration: true
     - name: state
       type: keyword
       description: >
         The process state. For example: "running".
     - name: pid
-      type: long
-      description: >
-        The process pid.
+      type: alias
+      path: process.pid
+      migration: true
     - name: ppid
-      type: long
-      description: >
-        The process parent pid.
+      type: alias
+      path: process.ppid
+      migration: true
     - name: pgid
-      type: long
-      description: >
-        The process group id.
+      type: alias
+      path: process.pgid
+      migration: true
     - name: cmdline
       type: keyword
       description: >
         The full command-line used to start the process, including the
         arguments separated by space.
+      ignore_above: 2048
     - name: username
-      type: keyword
-      description: >
-        The username of the user that created the process. If the username
-        cannot be determined, the field will contain the user's
-        numeric identifier (UID). On Windows, this field includes the user's
-        domain and is formatted as `domain\username`.
+      type: alias
+      path: user.name
+      migration: true
     - name: cwd
-      type: keyword
-      description: >
-        The current working directory of the process. This field is only
-        available on Linux.
+      type: alias
+      path: process.working_directory
+      migration: true
     - name: env
       type: object
       object_type: keyword
@@ -52,7 +49,7 @@
       prefix: "[float]"
       description: CPU-specific statistics per process.
       fields:
-        - name: user
+        - name: user.ticks
           type: long
           description: >
             The amount of CPU time the process spent in user space.
@@ -73,7 +70,7 @@
             The percentage of CPU time spent by the process since the last event.
             This value is normalized by the number of CPU cores and it ranges
             from 0 to 100%.
-        - name: system
+        - name: system.ticks
           type: long
           description: >
             The amount of CPU time the process spent in kernel space.

@@ -1,0 +1,140 @@
+//////////////////////////////////////////////////////////////////////////
+//// This content is shared by all Elastic Beats. Make sure you keep the
+//// descriptions here generic enough to work for all Beats that include
+//// this file. When using cross references, make sure that the cross
+//// references resolve correctly for any files that include this one.
+//// Use the appropriate variables defined in the index.asciidoc file to
+//// resolve Beat names: beatname_uc and beatname_lc.
+//// Use the following include to pull this content into a doc file:
+//// include::../../libbeat/docs/monitoring/configuring.asciidoc[]
+//// Make sure this content appears below a level 2 heading.
+//////////////////////////////////////////////////////////////////////////
+
+[[configuration-monitor]]
+== Monitoring configuration options
+++++
+<titleabbrev>Configuration options</titleabbrev>
+++++
+
+You can specify the following options in the `xpack.monitoring` section of the
++{beatname_lc}.yml+ config file:
+
+[float]
+=== `enabled`
+
+The `enabled` config is a boolean setting to enable or disable {monitoring}.
+If set to `true`, monitoring is enabled.
+
+The default value is `false`.
+
+[float]
+=== `elasticsearch`
+
+The {es} instances that you want to ship your {beatname_uc} metrics to. This
+configuration option contains the following fields:
+
+[float]
+==== `bulk_max_size`
+
+The maximum number of metrics to bulk in a single {es} bulk API index request.
+The default is `50`. For more information, see <<elasticsearch-output>>.
+
+[float]
+==== `backoff.init`
+
+The number of seconds to wait before trying to reconnect to Elasticsearch after
+a network error. After waiting `backoff.init` seconds, {beatname_uc} tries to
+reconnect. If the attempt fails, the backoff timer is increased exponentially up
+to `backoff.max`. After a successful connection, the backoff timer is reset. The
+default is 1s.
+
+[float]
+===== `backoff.max`
+
+The maximum number of seconds to wait before attempting to connect to
+Elasticsearch after a network error. The default is 60s.
+
+[float]
+==== `compression_level`
+
+The gzip compression level. Setting this value to `0` disables compression. The
+compression level must be in the range of `1` (best speed) to `9` (best
+compression). The default value is `0`. Increasing the compression level
+reduces the network usage but increases the CPU usage.
+
+[float]
+==== `headers`
+
+Custom HTTP headers to add to each request. For more information, see
+<<elasticsearch-output>>.
+
+[float]
+==== `hosts`
+
+The list of {es} nodes to connect to. Monitoring metrics are distributed to
+these nodes in round robin order. For more information, see
+<<elasticsearch-output>>.
+
+[float]
+==== `max_retries`
+
+The number of times to retry sending the monitoring metrics after a failure.
+After the specified number of retries, the metrics are typically dropped. The
+default value is `3`. For more information, see <<elasticsearch-output>>.
+
+[float]
+==== `parameters`
+
+Dictionary of HTTP parameters to pass within the url with index operations.
+
+[float]
+==== `password`
+
+The password that {beatname_uc} uses to authenticate with the {es} instances for
+shipping monitoring data.
+
+[float]
+==== `metrics.period`
+
+The time interval (in seconds) when metrics are sent to the {es} cluster. A new
+snapshot of {beatname_uc} metrics is generated and scheduled for publishing each
+period. The default value is 10 * time.Second.
+
+[float]
+==== `state.period`
+
+The time interval (in seconds) when state information are sent to the {es} cluster. A new
+snapshot of {beatname_uc} state is generated and scheduled for publishing each
+period. The default value is 60 * time.Second.
+
+[float]
+==== `protocol`
+
+The name of the protocol to use when connecting to the {es} cluster. The options
+are: `http` or `https`. The default is `http`. If you specify a URL for `hosts`,
+however, the value of protocol is overridden by the scheme you specify in the URL.
+
+[float]
+==== `proxy_url`
+
+The URL of the proxy to use when connecting to the {es} cluster. For more
+information, see <<elasticsearch-output>>.
+
+[float]
+==== `timeout`
+
+The HTTP request timeout in seconds for the {es} request. The default is `90`.
+
+[float]
+==== `ssl`
+
+Configuration options for Transport Layer Security (TLS) or Secure Sockets Layer
+(SSL) parameters like the certificate authority (CA) to use for HTTPS-based
+connections. If the `ssl` section is missing, the host CAs are used for
+HTTPS connections to {es}. For more information, see <<configuration-ssl>>.
+
+[float]
+==== `username`
+
+The user ID that {beatname_uc} uses to authenticate with the {es} instances for
+shipping monitoring data.

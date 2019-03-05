@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package keystore
 
 import (
@@ -45,6 +62,11 @@ type Keystore interface {
 
 	// Save persist the changes to the keystore.
 	Save() error
+}
+
+// Packager defines a keystore that we can read the raw bytes and be packaged in an artifact.
+type Packager interface {
+	Package() ([]byte, error)
 }
 
 // Factory Create the right keystore with the configured options.
@@ -101,16 +123,5 @@ func ResolverWrap(keystore Keystore) func(string) (string, error) {
 
 		logp.Debug("keystore", "accessing key '%s' from the keystore", keyName)
 		return string(v), nil
-	}
-}
-
-// ConfigOpts returns ucfg config options with a resolver linked to the current keystore.
-// TODO: Refactor to allow insert into the config option array without having to redefine everything
-func ConfigOpts(keystore Keystore) []ucfg.Option {
-	return []ucfg.Option{
-		ucfg.PathSep("."),
-		ucfg.Resolve(ResolverWrap(keystore)),
-		ucfg.ResolveEnv,
-		ucfg.VarExp,
 	}
 }

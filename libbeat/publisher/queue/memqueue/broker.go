@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package memqueue
 
 import (
@@ -5,7 +22,18 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/feature"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/publisher/queue"
+)
+
+// Feature exposes a memory queue.
+var Feature = queue.Feature("mem",
+	create,
+	feature.NewDetails(
+		"Memory queue",
+		"Buffer events in memory before sending to the output.",
+		feature.Stable),
 )
 
 type Broker struct {
@@ -59,13 +87,17 @@ func init() {
 	queue.RegisterType("mem", create)
 }
 
-func create(eventer queue.Eventer, cfg *common.Config) (queue.Queue, error) {
+func create(eventer queue.Eventer, logger *logp.Logger, cfg *common.Config) (queue.Queue, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
-	return NewBroker(Settings{
+	if logger == nil {
+		logger = logp.L()
+	}
+
+	return NewBroker(logger, Settings{
 		Eventer:        eventer,
 		Events:         config.Events,
 		FlushMinEvents: config.FlushMinEvents,
@@ -77,9 +109,10 @@ func create(eventer queue.Eventer, cfg *common.Config) (queue.Queue, error) {
 // If waitOnClose is set to true, the broker will block on Close, until all internal
 // workers handling incoming messages and ACKs have been shut down.
 func NewBroker(
+	logger logger,
 	settings Settings,
 ) *Broker {
-	// define internal channel size for procuder/client requests
+	// define internal channel size for producer/client requests
 	// to the broker
 	chanSize := 20
 
@@ -100,7 +133,10 @@ func NewBroker(
 		minEvents = sz
 	}
 
-	logger := defaultLogger
+	if logger == nil {
+		logger = logp.NewLogger("memqueue")
+	}
+
 	b := &Broker{
 		done:   make(chan struct{}),
 		logger: logger,

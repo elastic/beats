@@ -1,21 +1,38 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package template
 
 import (
 	"testing"
 
-	"github.com/elastic/beats/libbeat/common"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 func TestProcessor(t *testing.T) {
-	esVersion2, err := common.NewVersion("2.0.0")
-	assert.NoError(t, err)
-
 	falseVar := false
 	trueVar := true
-	p := &Processor{}
-	pEsVersion2 := &Processor{EsVersion: *esVersion2}
+	p := &Processor{EsVersion: *common.MustNewVersion("7.0.0")}
+	migrationP := &Processor{EsVersion: *common.MustNewVersion("7.0.0"), Migration: true}
+	pEsVersion2 := &Processor{EsVersion: *common.MustNewVersion("2.0.0")}
+	pEsVersion64 := &Processor{EsVersion: *common.MustNewVersion("6.4.0")}
+	pEsVersion63 := &Processor{EsVersion: *common.MustNewVersion("6.3.6")}
 
 	tests := []struct {
 		output   common.MapStr
@@ -37,6 +54,27 @@ func TestProcessor(t *testing.T) {
 			expected: common.MapStr{
 				"type":           "scaled_float",
 				"scaling_factor": 100,
+			},
+		},
+		{
+			output: p.scaledFloat(&common.Field{Type: "scaled_float"}, common.MapStr{scalingFactorKey: 0}),
+			expected: common.MapStr{
+				"type":           "scaled_float",
+				"scaling_factor": 1000,
+			},
+		},
+		{
+			output: p.scaledFloat(&common.Field{Type: "scaled_float"}, common.MapStr{"someKey": 10}),
+			expected: common.MapStr{
+				"type":           "scaled_float",
+				"scaling_factor": 1000,
+			},
+		},
+		{
+			output: p.scaledFloat(&common.Field{Type: "scaled_float"}, common.MapStr{scalingFactorKey: 10}),
+			expected: common.MapStr{
+				"type":           "scaled_float",
+				"scaling_factor": 10,
 			},
 		},
 		{
@@ -68,6 +106,15 @@ func TestProcessor(t *testing.T) {
 		{
 			output:   p.array(&common.Field{Type: "array", Index: &falseVar, ObjectType: "keyword"}),
 			expected: common.MapStr{"index": false, "type": "keyword"},
+		},
+		{
+			output:   pEsVersion64.alias(&common.Field{Type: "alias", AliasPath: "a.b"}),
+			expected: common.MapStr{"path": "a.b", "type": "alias"},
+		},
+		{
+			// alias unsupported in ES < 6.4
+			output:   pEsVersion63.alias(&common.Field{Type: "alias", AliasPath: "a.b"}),
+			expected: nil,
 		},
 		{
 			output: p.object(&common.Field{Type: "object", Enabled: &falseVar}),
@@ -114,6 +161,57 @@ func TestProcessor(t *testing.T) {
 					"raw": common.MapStr{
 						"type":         "keyword",
 						"ignore_above": 1024,
+					},
+				},
+			},
+		},
+		{
+			output: p.keyword(&common.Field{Type: "keyword", MultiFields: common.Fields{common.Field{Name: "analyzed", Type: "text", Norms: true}}}),
+			expected: common.MapStr{
+				"type":         "keyword",
+				"ignore_above": 1024,
+				"fields": common.MapStr{
+					"analyzed": common.MapStr{
+						"type": "text",
+					},
+				},
+			},
+		},
+		{
+			output: p.keyword(&common.Field{Type: "keyword", IgnoreAbove: 256}),
+			expected: common.MapStr{
+				"type":         "keyword",
+				"ignore_above": 256,
+			},
+		},
+		{
+			output: p.keyword(&common.Field{Type: "keyword", IgnoreAbove: -1}),
+			expected: common.MapStr{
+				"type": "keyword",
+			},
+		},
+		{
+			output: p.keyword(&common.Field{Type: "keyword"}),
+			expected: common.MapStr{
+				"type":         "keyword",
+				"ignore_above": 1024,
+			},
+		},
+		{
+			output: p.text(&common.Field{Type: "text", MultiFields: common.Fields{
+				common.Field{Name: "raw", Type: "keyword"},
+				common.Field{Name: "indexed", Type: "text"},
+			}, Norms: true}),
+			expected: common.MapStr{
+				"type": "text",
+				"fields": common.MapStr{
+					"raw": common.MapStr{
+						"type":         "keyword",
+						"ignore_above": 1024,
+					},
+					"indexed": common.MapStr{
+						"type":  "text",
+						"norms": false,
 					},
 				},
 			},
@@ -174,10 +272,32 @@ func TestProcessor(t *testing.T) {
 			},
 		},
 		{
+			output: p.other(&common.Field{Type: "double", DocValues: &falseVar}),
+			expected: common.MapStr{
+				"type": "double", "doc_values": false,
+			},
+		},
+		{
 			output: p.other(&common.Field{Type: "text", DocValues: &trueVar}),
 			expected: common.MapStr{
 				"type": "text", "doc_values": true,
 			},
+		},
+		{
+			output:   p.alias(&common.Field{Type: "alias", AliasPath: "a.c", MigrationAlias: false}),
+			expected: common.MapStr{"path": "a.c", "type": "alias"},
+		},
+		{
+			output:   p.alias(&common.Field{Type: "alias", AliasPath: "a.d", MigrationAlias: true}),
+			expected: nil,
+		},
+		{
+			output:   migrationP.alias(&common.Field{Type: "alias", AliasPath: "a.e", MigrationAlias: false}),
+			expected: common.MapStr{"path": "a.e", "type": "alias"},
+		},
+		{
+			output:   migrationP.alias(&common.Field{Type: "alias", AliasPath: "a.f", MigrationAlias: true}),
+			expected: common.MapStr{"path": "a.f", "type": "alias"},
 		},
 	}
 
@@ -186,22 +306,54 @@ func TestProcessor(t *testing.T) {
 	}
 }
 
-func TestDynamicTemplate(t *testing.T) {
+func TestDynamicTemplates(t *testing.T) {
 	p := &Processor{}
 	tests := []struct {
 		field    common.Field
-		expected common.MapStr
+		expected []common.MapStr
 	}{
 		{
 			field: common.Field{
 				Type: "object", ObjectType: "keyword",
 				Name: "context",
 			},
-			expected: common.MapStr{
-				"context": common.MapStr{
-					"mapping":            common.MapStr{"type": "keyword"},
-					"match_mapping_type": "string",
-					"path_match":         "context.*",
+			expected: []common.MapStr{
+				common.MapStr{
+					"context": common.MapStr{
+						"mapping":            common.MapStr{"type": "keyword"},
+						"match_mapping_type": "string",
+						"path_match":         "context.*",
+					},
+				},
+			},
+		},
+		{
+			field: common.Field{
+				Type: "object", ObjectType: "long", ObjectTypeMappingType: "futuretype",
+				Path: "language", Name: "english",
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"language.english": common.MapStr{
+						"mapping":            common.MapStr{"type": "long"},
+						"match_mapping_type": "futuretype",
+						"path_match":         "language.english.*",
+					},
+				},
+			},
+		},
+		{
+			field: common.Field{
+				Type: "object", ObjectType: "long", ObjectTypeMappingType: "*",
+				Path: "language", Name: "english",
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"language.english": common.MapStr{
+						"mapping":            common.MapStr{"type": "long"},
+						"match_mapping_type": "*",
+						"path_match":         "language.english.*",
+					},
 				},
 			},
 		},
@@ -210,11 +362,13 @@ func TestDynamicTemplate(t *testing.T) {
 				Type: "object", ObjectType: "long",
 				Path: "language", Name: "english",
 			},
-			expected: common.MapStr{
-				"language.english": common.MapStr{
-					"mapping":            common.MapStr{"type": "long"},
-					"match_mapping_type": "long",
-					"path_match":         "language.english.*",
+			expected: []common.MapStr{
+				common.MapStr{
+					"language.english": common.MapStr{
+						"mapping":            common.MapStr{"type": "long"},
+						"match_mapping_type": "long",
+						"path_match":         "language.english.*",
+					},
 				},
 			},
 		},
@@ -223,20 +377,115 @@ func TestDynamicTemplate(t *testing.T) {
 				Type: "object", ObjectType: "text",
 				Path: "language", Name: "english",
 			},
-			expected: common.MapStr{
-				"language.english": common.MapStr{
-					"mapping":            common.MapStr{"type": "text"},
-					"match_mapping_type": "string",
-					"path_match":         "language.english.*",
+			expected: []common.MapStr{
+				common.MapStr{
+					"language.english": common.MapStr{
+						"mapping":            common.MapStr{"type": "text"},
+						"match_mapping_type": "string",
+						"path_match":         "language.english.*",
+					},
+				},
+			},
+		},
+		{
+			field: common.Field{
+				Type: "object", ObjectType: "scaled_float",
+				Name: "core.*.pct",
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"core.*.pct": common.MapStr{
+						"mapping": common.MapStr{
+							"type":           "scaled_float",
+							"scaling_factor": defaultScalingFactor,
+						},
+						"match_mapping_type": "*",
+						"path_match":         "core.*.pct",
+					},
+				},
+			},
+		},
+		{
+			field: common.Field{
+				Type: "object", ObjectType: "scaled_float",
+				Name: "core.*.pct", ScalingFactor: 100, ObjectTypeMappingType: "float",
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"core.*.pct": common.MapStr{
+						"mapping": common.MapStr{
+							"type":           "scaled_float",
+							"scaling_factor": 100,
+						},
+						"match_mapping_type": "float",
+						"path_match":         "core.*.pct",
+					},
+				},
+			},
+		},
+		{
+			field: common.Field{
+				Type: "object", ObjectTypeParams: []common.ObjectTypeCfg{
+					{ObjectType: "float", ObjectTypeMappingType: "float"},
+					{ObjectType: "boolean"},
+					{ObjectType: "scaled_float", ScalingFactor: 10000},
+				},
+				Name: "context",
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"context": common.MapStr{
+						"mapping":            common.MapStr{"type": "float"},
+						"match_mapping_type": "float",
+						"path_match":         "context.*",
+					},
+				},
+				common.MapStr{
+					"context": common.MapStr{
+						"mapping":            common.MapStr{"type": "boolean"},
+						"match_mapping_type": "boolean",
+						"path_match":         "context.*",
+					},
+				},
+				common.MapStr{
+					"context": common.MapStr{
+						"mapping":            common.MapStr{"type": "scaled_float", "scaling_factor": 10000},
+						"match_mapping_type": "*",
+						"path_match":         "context.*",
+					},
 				},
 			},
 		},
 	}
 
+	for _, numericType := range []string{"byte", "double", "float", "long", "short", "boolean"} {
+		gen := struct {
+			field    common.Field
+			expected []common.MapStr
+		}{
+			field: common.Field{
+				Type: "object", ObjectType: numericType,
+				Name: "somefield", ObjectTypeMappingType: "long",
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"somefield": common.MapStr{
+						"mapping": common.MapStr{
+							"type": numericType,
+						},
+						"match_mapping_type": "long",
+						"path_match":         "somefield.*",
+					},
+				},
+			},
+		}
+		tests = append(tests, gen)
+	}
+
 	for _, test := range tests {
 		dynamicTemplates = nil
 		p.object(&test.field)
-		assert.Equal(t, test.expected, dynamicTemplates[0])
+		assert.Equal(t, test.expected, dynamicTemplates)
 	}
 }
 
@@ -272,7 +521,7 @@ func TestPropertiesCombine(t *testing.T) {
 	}
 
 	p := Processor{EsVersion: *version}
-	err = p.process(fields, "", output)
+	err = p.Process(fields, "", output)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -320,7 +569,7 @@ func TestProcessNoName(t *testing.T) {
 	}
 
 	p := Processor{EsVersion: *version}
-	err = p.process(fields, "", output)
+	err = p.Process(fields, "", output)
 	if err != nil {
 		t.Fatal(err)
 	}

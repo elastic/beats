@@ -1,0 +1,107 @@
+# Licensed to Elasticsearch B.V. under one or more contributor
+# license agreements. See the NOTICE file distributed with
+# this work for additional information regarding copyright
+# ownership. Elasticsearch B.V. licenses this file to you under
+# the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+main: |
+  package gotype
+
+  {{ invoke "makeIgnoreType" "type" "" }}
+
+  func (*unfolderIgnore) onValue(ctx *unfoldCtx) error {
+    ctx.unfolder.pop()
+    return nil
+  }
+
+  {{ invoke "makeIgnoreType" "type" "Arr" }}
+
+  func (*unfolderIgnoreArr) onValue(ctx *unfoldCtx) error {
+    return nil
+  }
+
+  func (*unfolderIgnoreArr) OnArrayFinished(ctx *unfoldCtx) error {
+    ctx.unfolder.pop()
+    return nil
+  }
+
+  {{ invoke "makeIgnoreType" "type" "Obj" }}
+
+  func (*unfolderIgnoreObj) onValue(ctx *unfoldCtx) error {
+    return nil
+  }
+
+  func (*unfolderIgnoreObj) OnObjectFinished(ctx *unfoldCtx) error {
+    ctx.unfolder.pop()
+    return nil
+  }
+
+templates.makeIgnoreType: |
+  {{ $type := .type }}
+  {{ $tUnfolder := printf "unfolderIgnore%v" $type }}
+
+  type unfoldIgnore{{ $type }}Value struct {}
+  type unfoldIgnore{{ $type }}Ptr struct {}
+  type {{ $tUnfolder }} struct {
+    unfolderErrUnknown
+  }
+
+  var (
+    _singletonUnfoldIgnore{{ $type }}Value = &unfoldIgnore{{ $type }}Value{}
+    _singletonUnfoldIgnore{{ $type }}Ptr = &unfoldIgnore{{ $type }}Ptr{}
+    _singleton{{ $tUnfolder }} = &{{ $tUnfolder }}{}
+  )
+
+  func (*unfoldIgnore{{ $type }}Value) initState(ctx *unfoldCtx, _ reflect.Value) {
+    ctx.unfolder.push(_singleton{{ $tUnfolder }})
+  }
+
+  func (*unfoldIgnore{{ $type }}Ptr) initState(ctx *unfoldCtx, _ unsafe.Pointer) {
+    ctx.unfolder.push(_singleton{{ $tUnfolder }})
+  }
+
+  func (u *{{ $tUnfolder }}) OnNil(ctx *unfoldCtx) error { return u.onValue(ctx) }
+  func (u *{{ $tUnfolder }}) OnBool(ctx *unfoldCtx, _ bool) error { return u.onValue(ctx) }
+  func (u *{{ $tUnfolder }}) OnString(ctx *unfoldCtx, _ string) error { return u.onValue(ctx) }
+  func (u *{{ $tUnfolder }}) OnInt8(ctx *unfoldCtx, _ int8) error { return u.onValue(ctx) }
+  func (u *{{ $tUnfolder }}) OnInt16(ctx *unfoldCtx, _ int16) error { return u.onValue(ctx) }
+  func (u *{{ $tUnfolder }}) OnInt32(ctx *unfoldCtx, _ int32) error { return u.onValue(ctx) }
+  func (u *{{ $tUnfolder }}) OnInt64(ctx *unfoldCtx, _ int64) error { return u.onValue(ctx) }
+  func (u *{{ $tUnfolder }}) OnInt(ctx *unfoldCtx, _ int) error { return u.onValue(ctx) }
+  func (u *{{ $tUnfolder }}) OnByte(ctx *unfoldCtx, _ byte) error { return u.onValue(ctx) }
+  func (u *{{ $tUnfolder }}) OnUint8(ctx *unfoldCtx, _ uint8) error { return u.onValue(ctx) }
+  func (u *{{ $tUnfolder }}) OnUint16(ctx *unfoldCtx, _ uint16) error { return u.onValue(ctx) }
+  func (u *{{ $tUnfolder }}) OnUint32(ctx *unfoldCtx, _ uint32) error { return u.onValue(ctx) }
+  func (u *{{ $tUnfolder }}) OnUint64(ctx *unfoldCtx, _ uint64) error { return u.onValue(ctx) }
+  func (u *{{ $tUnfolder }}) OnUint(ctx *unfoldCtx, _ uint) error { return u.onValue(ctx) }
+  func (u *{{ $tUnfolder }}) OnFloat32(ctx *unfoldCtx, _ float32) error { return u.onValue(ctx) }
+  func (u *{{ $tUnfolder }}) OnFloat64(ctx *unfoldCtx, _ float64) error { return u.onValue(ctx) }
+
+  func (u *{{ $tUnfolder }}) OnArrayStart(ctx *unfoldCtx, _ int, _ structform.BaseType) error {
+    _singletonUnfoldIgnoreArrPtr.initState(ctx, nil)
+    return nil
+  }
+
+  func (u *{{ $tUnfolder }}) OnChildArrayDone(ctx *unfoldCtx) error {
+    return u.onValue(ctx)
+  }
+
+  func (u *{{ $tUnfolder }}) OnObjectStart(ctx *unfoldCtx, _ int, _ structform.BaseType) error {
+    _singletonUnfoldIgnoreObjPtr.initState(ctx, nil)
+    return nil
+  }
+
+  func (u *{{ $tUnfolder }}) OnChildObjectDone(ctx *unfoldCtx) error {
+    return u.onValue(ctx)
+  }

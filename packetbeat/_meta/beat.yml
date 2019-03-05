@@ -11,7 +11,7 @@
 
 # Select the network interface to sniff the data. On Linux, you can use the
 # "any" keyword to sniff on all connected interfaces.
-packetbeat.interfaces.device: any
+packetbeat.interfaces.device: {{ call .device .GOOS }}
 
 #================================== Flows =====================================
 
@@ -40,18 +40,14 @@ packetbeat.protocols:
   #Cassandra port for traffic monitoring.
   ports: [9042]
 
+- type: dhcpv4
+  # Configure the DHCP for IPv4 ports.
+  ports: [67, 68]
+
 - type: dns
   # Configure the ports where to listen for DNS traffic. You can disable
   # the DNS protocol by commenting out the list of ports.
   ports: [53]
-
-  # include_authorities controls whether or not the dns.authorities field
-  # (authority resource records) is added to messages.
-  include_authorities: true
-
-  # include_additionals controls whether or not the dns.additionals field
-  # (additional resource records) is added to messages.
-  include_additionals: true
 
 - type: http
   # Configure the ports where to listen for HTTP traffic. You can disable
@@ -66,7 +62,7 @@ packetbeat.protocols:
 - type: mysql
   # Configure the ports where to listen for MySQL traffic. You can disable
   # the MySQL protocol by commenting out the list of ports.
-  ports: [3306]
+  ports: [3306,3307]
 
 - type: pgsql
   # Configure the ports where to listen for Pgsql traffic. You can disable
@@ -96,11 +92,18 @@ packetbeat.protocols:
 - type: tls
   # Configure the ports where to listen for TLS traffic. You can disable
   # the TLS protocol by commenting out the list of ports.
-  ports: [443]
+  ports:
+    - 443   # HTTPS
+    - 993   # IMAPS
+    - 995   # POP3S
+    - 5223  # XMPP over SSL
+    - 8443
+    - 8883  # Secure MQTT
+    - 9243  # Elasticsearch
 
 #==================== Elasticsearch template setting ==========================
 
 setup.template.settings:
-  index.number_of_shards: 3
+  index.number_of_shards: 1
   #index.codec: best_compression
   #_source.enabled: false

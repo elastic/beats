@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Script to run {{.BeatName | title}} in foreground with the same path settings that
+# the init script / systemd unit file would do.
+
+exec /usr/share/{{.BeatName}}/bin/{{.BeatName}} \
+  -path.home /usr/share/{{.BeatName}} \
+  -path.config /etc/{{.BeatName}} \
+  -path.data /var/lib/{{.BeatName}} \
+  -path.logs /var/log/{{.BeatName}} \
+  "$@"

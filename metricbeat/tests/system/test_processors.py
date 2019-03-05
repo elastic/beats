@@ -5,7 +5,7 @@ import unittest
 
 
 @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
-class TestProcessors(metricbeat.BaseTest):
+class Test(metricbeat.BaseTest):
 
     def test_drop_fields(self):
 
@@ -34,8 +34,8 @@ class TestProcessors(metricbeat.BaseTest):
         print(evt)
         print(evt.keys())
         self.assertItemsEqual(self.de_dot([
-            'beat', '@timestamp', 'system', 'metricset.module',
-            'metricset.rtt', 'metricset.name'
+            'agent', '@timestamp', 'system', 'metricset.module',
+            'metricset.rtt', 'metricset.name', 'host', 'service', 'ecs', 'event'
         ]), evt.keys())
         cpu = evt["system"]["cpu"]
         print(cpu.keys())
@@ -188,7 +188,7 @@ class TestProcessors(metricbeat.BaseTest):
                 "period": "1s"
             }],
             processors=[{
-                "include_fields": {"fields": ["system.process"]},
+                "include_fields": {"fields": ["system.process", "process"]},
             }, {
                 "drop_fields": {"fields": ["system.process.memory"]},
             }]
@@ -207,17 +207,17 @@ class TestProcessors(metricbeat.BaseTest):
         for key in [
             "system.process.cpu.start_time",
             "system.process.cpu.total.pct",
-            "system.process.name",
-            "system.process.pid",
+            "process.name",
+            "process.pid",
         ]:
-            assert key in output
+            assert key in output, "'%s' not found" % key
 
         for key in [
             "system.process.memory.size",
             "system.process.memory.rss.bytes",
             "system.process.memory.rss.pct"
         ]:
-            assert key not in output
+            assert key not in output, "'%s' not expected but found" % key
 
     def test_contradictory_multiple_actions(self):
         """
@@ -259,3 +259,31 @@ class TestProcessors(metricbeat.BaseTest):
             "system.process.memory.rss.pct"
         ]:
             assert key not in output
+
+    def test_rename_field(self):
+
+        self.render_config_template(
+            modules=[{
+                "name": "system",
+                "metricsets": ["cpu"],
+                "period": "1s"
+            }],
+            processors=[{
+                "rename": {
+                    "fields": [{"from": "event.dataset", "to": "hello.world"}],
+                },
+            }]
+        )
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+
+        output = self.read_output_json()
+        self.assertEqual(len(output), 1)
+        evt = output[0]
+
+        print(evt)
+        print(evt.keys())
+
+        assert "dataset" not in output[0]["event"]
+        assert "cpu" in output[0]["hello"]["world"]

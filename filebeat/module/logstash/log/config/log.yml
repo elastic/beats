@@ -4,3 +4,12 @@ paths:
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
+multiline:
+  pattern: ^\[[0-9]{4}-[0-9]{2}-[0-9]{2}
+  negate: true
+  match: after
+
+{{ if .convert_timezone }}
+processors:
+- add_locale: ~
+{{ end }}

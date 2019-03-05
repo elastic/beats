@@ -1,0 +1,39 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-traefik]]
+== traefik module
+
+This module periodically fetches metrics from a https://traefik.io/[Traefik]
+instance. The Traefik instance must be configured to expose it's HTTP API.
+
+=== Compatibility
+
+The Traefik metricsets were tested with Traefik 1.6.
+
+
+[float]
+=== Example configuration
+
+The traefik module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: traefik
+  metricsets: ["health"]
+  period: 10s
+  hosts: ["localhost:8080"]
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-traefik-health,health>>
+
+include::traefik/health.asciidoc[]
+

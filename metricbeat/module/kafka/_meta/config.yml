@@ -1,5 +1,7 @@
 - module: kafka
-  metricsets: ["partition"]
+  #metricsets:
+  #  - partition
+  #  - consumergroup
   period: 10s
   hosts: ["localhost:9092"]
 

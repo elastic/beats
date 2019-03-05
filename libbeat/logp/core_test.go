@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package logp
 
 import (
@@ -37,9 +54,11 @@ func TestLogger(t *testing.T) {
 }
 
 func TestLoggerSelectors(t *testing.T) {
-	if err := DevelopmentSetup(WithSelectors("good"), ToObserverOutput()); err != nil {
+	if err := DevelopmentSetup(WithSelectors("good", " padded "), ToObserverOutput()); err != nil {
 		t.Fatal(err)
 	}
+
+	assert.True(t, HasSelector("padded"))
 
 	good := NewLogger("good")
 	bad := NewLogger("bad")
@@ -81,12 +100,12 @@ func TestGlobalLoggerLevel(t *testing.T) {
 		assert.Equal(t, "info", logs[0].Message)
 	}
 
-	Warn("warn")
+	Warn("warning")
 	logs = ObserverLogs().TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, zap.WarnLevel, logs[0].Level)
 		assert.Equal(t, "", logs[0].LoggerName)
-		assert.Equal(t, "warn", logs[0].Message)
+		assert.Equal(t, "warning", logs[0].Message)
 	}
 
 	Err("error")
@@ -148,7 +167,7 @@ func TestLoggerLevel(t *testing.T) {
 }
 
 func TestRecover(t *testing.T) {
-	const recoveryExplanation = "Something went wrong."
+	const recoveryExplanation = "Something went wrong"
 	const cause = "unexpected condition"
 
 	DevelopmentSetup(ToObserverOutput())
@@ -160,8 +179,9 @@ func TestRecover(t *testing.T) {
 			assert.Equal(t, zap.ErrorLevel, log.Level)
 			assert.Equal(t, "logp/core_test.go",
 				strings.Split(log.Caller.TrimmedPath(), ":")[0])
-			assert.Contains(t, log.Message, recoveryExplanation)
-			assert.Contains(t, log.Message, cause)
+			assert.Contains(t, log.Message, recoveryExplanation+
+				". Recovering, but please report this.")
+			assert.Contains(t, log.ContextMap(), "panic")
 		}
 	}()
 
@@ -185,4 +205,30 @@ func TestIsDebug(t *testing.T) {
 	DevelopmentSetup(WithSelectors("only_this"))
 	assert.False(t, IsDebug("all"))
 	assert.True(t, IsDebug("only_this"))
+}
+
+func TestL(t *testing.T) {
+	if err := DevelopmentSetup(ToObserverOutput()); err != nil {
+		t.Fatal(err)
+	}
+
+	L().Infow("infow", "rate", 2)
+	logs := ObserverLogs().TakeAll()
+	if assert.Len(t, logs, 1) {
+		log := logs[0]
+		assert.Equal(t, zap.InfoLevel, log.Level)
+		assert.Equal(t, "", log.LoggerName)
+		assert.Equal(t, "infow", log.Message)
+		assert.Contains(t, log.ContextMap(), "rate")
+	}
+
+	const loggerName = "tester"
+	L().Named(loggerName).Warnf("warning %d", 1)
+	logs = ObserverLogs().TakeAll()
+	if assert.Len(t, logs, 1) {
+		log := logs[0]
+		assert.Equal(t, zap.WarnLevel, log.Level)
+		assert.Equal(t, loggerName, log.LoggerName)
+		assert.Equal(t, "warning 1", log.Message)
+	}
 }

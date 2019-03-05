@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package json
 
 import (
@@ -8,7 +25,6 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -50,6 +66,7 @@ type MetricSet struct {
 	body            string
 	requestEnabled  bool
 	responseEnabled bool
+	jsonIsArray     bool
 	deDotEnabled    bool
 }
 
@@ -57,7 +74,6 @@ type MetricSet struct {
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The http json metricset is in beta.")
 
 	config := struct {
 		Namespace       string `config:"namespace" validate:"required"`
@@ -65,12 +81,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		Body            string `config:"body"`
 		RequestEnabled  bool   `config:"request.enabled"`
 		ResponseEnabled bool   `config:"response.enabled"`
+		JSONIsArray     bool   `config:"json.is_array"`
 		DeDotEnabled    bool   `config:"dedot.enabled"`
 	}{
 		Method:          "GET",
 		Body:            "",
 		RequestEnabled:  false,
 		ResponseEnabled: false,
+		JSONIsArray:     false,
 		DeDotEnabled:    false,
 	}
 
@@ -78,7 +96,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	http := helper.NewHTTP(base)
+	http, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
 	http.SetMethod(config.Method)
 	http.SetBody([]byte(config.Body))
 
@@ -90,37 +111,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		http:            http,
 		requestEnabled:  config.RequestEnabled,
 		responseEnabled: config.ResponseEnabled,
+		jsonIsArray:     config.JSONIsArray,
 		deDotEnabled:    config.DeDotEnabled,
 	}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right format
-// It returns the event which is then forward to the output. In case of an error, a
-// descriptive error must be returned.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
-	response, err := m.http.FetchResponse()
-	if err != nil {
-		return nil, err
-	}
-	defer response.Body.Close()
-
-	var jsonBody map[string]interface{}
-	var event map[string]interface{}
-
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(body, &jsonBody)
-	if err != nil {
-		return nil, err
-	}
+func (m *MetricSet) processBody(response *http.Response, jsonBody interface{}) common.MapStr {
+	var event common.MapStr
 
 	if m.deDotEnabled {
-		event = replaceDots(jsonBody).(map[string]interface{})
+		event = common.DeDotJSON(jsonBody).(common.MapStr)
 	} else {
-		event = jsonBody
+		event = jsonBody.(common.MapStr)
 	}
 
 	if m.requestEnabled {
@@ -128,7 +130,9 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 			"request": common.MapStr{
 				"headers": m.getHeaders(response.Request.Header),
 				"method":  response.Request.Method,
-				"body":    m.body,
+				"body": common.MapStr{
+					"content": m.body,
+				},
 			},
 		}
 	}
@@ -147,7 +151,49 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	// Set dynamic namespace
 	event["_namespace"] = m.namespace
 
-	return event, nil
+	return event
+}
+
+// Fetch methods implements the data gathering and data conversion to the right format
+// It returns the event which is then forward to the output. In case of an error, a
+// descriptive error must be returned.
+func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+	response, err := m.http.FetchResponse()
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	var jsonBody common.MapStr
+	var jsonBodyArr []common.MapStr
+	var events []common.MapStr
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if m.jsonIsArray {
+		err = json.Unmarshal(body, &jsonBodyArr)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, obj := range jsonBodyArr {
+			event := m.processBody(response, obj)
+			events = append(events, event)
+		}
+	} else {
+		err = json.Unmarshal(body, &jsonBody)
+		if err != nil {
+			return nil, err
+		}
+
+		event := m.processBody(response, jsonBody)
+		events = append(events, event)
+	}
+
+	return events, nil
 }
 
 func (m *MetricSet) getHeaders(header http.Header) map[string]string {
@@ -161,17 +207,4 @@ func (m *MetricSet) getHeaders(header http.Header) map[string]string {
 		headers[k] = value
 	}
 	return headers
-}
-
-func replaceDots(data interface{}) interface{} {
-	switch data.(type) {
-	case map[string]interface{}:
-		result := map[string]interface{}{}
-		for key, value := range data.(map[string]interface{}) {
-			result[common.DeDot(key)] = replaceDots(value)
-		}
-		return result
-	default:
-		return data
-	}
 }

@@ -3,8 +3,8 @@
   description: >
     Kibana module
   short_config: false
-  release: beta
-  settings: ["ssl"]
+  release: ga
+  settings: ["ssl", "http"]
   fields:
     - name: kibana
       type: group

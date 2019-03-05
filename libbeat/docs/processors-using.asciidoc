@@ -1,25 +1,24 @@
 [[defining-processors]]
 === Define processors
 
-You define processors in the +{beatname_lc}.yml+ file to filter and enhance the
-data before sending events to the configured output.
-
-To define a processor, you specify the processor name, an optional condition,
-and a set of parameters:
+You can use processors to filter and enhance data before sending it to the
+configured output. To define a processor, you specify the processor name, an
+optional condition, and a set of parameters:
 
 [source,yaml]
 ------
 processors:
- - <processor_name>:
-     <parameters>
-     when:
-       <condition>
- - <processor_name>:
-     <parameters>
-     when:
-       <condition>
-...
+- <processor_name>:
+    when:
+      <condition>
+    <parameters>
 
+- <processor_name>:
+    when:
+      <condition>
+    <parameters>
+
+...
 ------
 
 Where:
@@ -27,10 +26,168 @@ Where:
 * `<processor_name>` specifies a <<processors,processor>> that performs some kind
 of action, such as selecting the fields that are exported or adding metadata to
 the event.
-* `<when: condition>` specifies an optional <<conditions,condition>>. If the
+* `<condition>` specifies an optional <<conditions,condition>>. If the
 condition is present, then the action is executed only if the condition is
 fulfilled. If no condition is passed, then the action is always executed.
 * `<parameters>` is the list of parameters to pass to the processor.
+
+More complex conditional processing can be accomplished by using the
+if-then-else processor configuration. This allows multiple processors to be
+executed based on a single condition.
+
+[source,yaml]
+----
+processors:
+- if:
+    <condition>
+  then: <1>
+    - <processor_name>:
+        <parameters>
+    - <processor_name>:
+        <parameters>
+    ...
+  else: <2>
+    - <processor_name>:
+        <parameters>
+    - <processor_name>:
+        <parameters>
+    ...
+----
+<1> `then` must contain a single processor or a list of one or more processors
+to execute when the condition evaluates to true.
+<2> `else` is optional. It can contain a single processor or a list of
+processors to execute when the conditional evaluate to false.
+
+[[where-valid]]
+==== Where are processors valid?
+
+// TODO: ANY NEW BEATS THAT RE-USE THIS TOPIC NEED TO DEFINE processor-scope.
+
+ifeval::["{beatname_lc}"=="filebeat"]
+:processor-scope: input
+endif::[]
+
+ifeval::["{beatname_lc}"=="auditbeat" or "{beatname_lc}"=="metricbeat"]
+:processor-scope: module
+endif::[]
+
+ifeval::["{beatname_lc}"=="packetbeat"]
+:processor-scope: protocol
+endif::[]
+
+ifeval::["{beatname_lc}"=="heartbeat"]
+:processor-scope: monitor
+endif::[]
+
+ifeval::["{beatname_lc}"=="winlogbeat"]
+:processor-scope: event log shipper
+endif::[]
+
+Processors are valid:
+
+* At the top-level in the configuration. The processor is applied to all data
+collected by {beatname_uc}.
+* Under a specific {processor-scope}. The processor is applied to the data
+collected for that {processor-scope}.
+ifeval::["{beatname_lc}"=="filebeat"]
+For example:
++
+[source,yaml]
+------
+- type: <input_type>
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+...
+------
++
+Similarly, for {beatname_uc} modules, you can define processors under the
+`input` section of the module definition. 
+endif::[]
+ifeval::["{beatname_lc}"=="metricbeat"]
+[source,yaml]
+----
+- module: <module_name>
+  metricsets: ["<metricset_name>"]
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters> 
+----
+endif::[]
+ifeval::["{beatname_lc}"=="auditbeat"]
+For example:
++
+[source,yaml]
+----
+auditbeat.modules:
+- module: <module_name>
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters> 
+----
+endif::[]
+ifeval::["{beatname_lc}"=="packetbeat"]
+For example:
++
+[source,yaml]
+----
+packetbeat.protocols:
+- type: <protocol_type>  
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+----
+
+* Under `packetbeat.flows`. The processor is applied to the data in
+<<configuration-flows,network flows>>:
++
+[source,yaml]
+----
+packetbeat.flows:
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+----
+endif::[]
+ifeval::["{beatname_lc}"=="heartbeat"]
+For example:
++
+[source,yaml]
+----
+heartbeat.monitors:
+- type: <monitor_type>
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+----
+endif::[]
+ifeval::["{beatname_lc}"=="winlogbeat"]
+For example:
++
+[source,yaml]
+----
+winlogbeat.event_logs:
+- name: <network_shipper_name>
+  processors:
+  - <processor_name>:
+      when:
+        <condition>
+      <parameters>
+----
+endif::[]
+
 
 [[processors]]
 ==== Processors
@@ -39,12 +196,18 @@ The supported processors are:
 
  * <<add-cloud-metadata,`add_cloud_metadata`>>
  * <<add-locale,`add_locale`>>
+ * <<community-id,`community_id`>>
  * <<decode-json-fields,`decode_json_fields`>>
  * <<drop-event,`drop_event`>>
  * <<drop-fields,`drop_fields`>>
  * <<include-fields,`include_fields`>>
+ * <<rename-fields,`rename`>>
  * <<add-kubernetes-metadata,`add_kubernetes_metadata`>>
  * <<add-docker-metadata,`add_docker_metadata`>>
+ * <<add-host-metadata,`add_host_metadata`>>
+ * <<dissect, `dissect`>>
+ * <<processor-dns, `dns`>>
+ * <<add-process-metadata,`add_process_metadata`>>
 
 [[conditions]]
 ==== Conditions
@@ -53,8 +216,8 @@ Each condition receives a field to compare. You can specify multiple fields
 under the same condition by using `AND` between the fields (for example,
 `field1 AND field2`).
 
-For each field, you can specify a simple field name or a nested map, for
-example `dns.question.name`.
+For each field, you can specify a simple field name or a nested map, for example
+`dns.question.name`.
 
 See <<exported-fields>> for a list of all the fields that are exported by
 {beatname_uc}.
@@ -65,6 +228,8 @@ The supported conditions are:
 * <<condition-contains,`contains`>>
 * <<condition-regexp,`regexp`>>
 * <<condition-range, `range`>>
+* <<condition-network, `network`>>
+* <<condition-has_fields, `has_fields`>>
 * <<condition-or, `or`>>
 * <<condition-and, `and`>>
 * <<condition-not, `not`>>
@@ -153,6 +318,75 @@ between 0.5 and 0.8.
 range:
     system.cpu.user.pct.gte: 0.5
     system.cpu.user.pct.lt: 0.8
+------
+
+[float]
+[[condition-network]]
+===== `network`
+
+The `network` condition checks if the field is in a certain IP network range.
+Both IPv4 and IPv6 addresses are supported. The network range may be specified
+using CIDR notation, like "192.0.2.0/24" or "2001:db8::/32", or by using one of
+these named ranges:
+
+- `loopback` - Matches loopback addresses in the range of `127.0.0.0/8` or
+  `::1/128`.
+- `unicast` - Matches global unicast addresses defined in RFC 1122, RFC 4632,
+  and RFC 4291 with the exception of the IPv4 broadcast address
+  (`255.255.255.255`). This includes private address ranges.
+- `multicast` - Matches multicast addresses.
+- `interface_local_multicast` - Matches IPv6 interface-local multicast addresses.
+- `link_local_unicast` - Matches link-local unicast addresses.
+- `link_local_multicast` - Matches link-local multicast addresses.
+- `private` - Matches private address ranges defined in RFC 1918 (IPv4) and
+  RFC 4193 (IPv6).
+- `public` - Matches addresses that are not loopback, unspecified, IPv4
+  broadcast, link local unicast, link local multicast, interface local
+  multicast, or private.
+- `unspecified` - Matches unspecified addresses (either the IPv4 address
+  "0.0.0.0" or the IPv6 address "::").
+
+The following condition returns true if the `source.ip` value is within the
+private address space.
+
+[source,yaml]
+----
+network:
+    source.ip: private
+----
+
+This condition returns true if the `destination.ip` value is within the
+IPv4 range of `192.168.1.0` - `192.168.1.255`.
+
+[source,yaml]
+----
+network:
+    destination.ip: '192.168.1.0/24'
+----
+
+And this condition returns true when `destination.ip` is within any of the given
+subnets.
+
+[source,yaml]
+----
+network:
+    destination.ip: ['192.168.1.0/24', '10.0.0.0/8', loopback]
+----
+
+[float]
+[[condition-has_fields]]
+===== `has_fields`
+
+The `has_fields` condition checks if all the given fields exist in the
+event. The condition accepts a list of string values denoting the field names.
+
+For example, the following condition checks if the `http.response.code` field
+is present in the event.
+
+
+[source,yaml]
+------
+has_fields: ['http.response.code']
 ------
 
 
@@ -261,6 +495,7 @@ The following cloud providers are supported:
 - https://www.qcloud.com/?lang=en[Tencent Cloud] (QCloud)
 - Alibaba Cloud (ECS)
 - Azure Virtual Machine
+- Openstack Nova
 
 The simple configuration below enables the processor.
 
@@ -287,14 +522,12 @@ _EC2_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "us-east-1c",
-      "instance_id": "i-4e123456",
-      "machine_type": "t2.medium",
-      "provider": "ec2",
-      "region": "us-east-1"
-    }
+  "cloud": {
+    "availability_zone": "us-east-1c",
+    "instance_id": "i-4e123456",
+    "machine_type": "t2.medium",
+    "provider": "ec2",
+    "region": "us-east-1"
   }
 }
 -------------------------------------------------------------------------------
@@ -304,12 +537,10 @@ _Digital Ocean_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "instance_id": "1234567",
-      "provider": "digitalocean",
-      "region": "nyc2"
-    }
+  "cloud": {
+    "instance_id": "1234567",
+    "provider": "digitalocean",
+    "region": "nyc2"
   }
 }
 -------------------------------------------------------------------------------
@@ -319,14 +550,12 @@ _GCE_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "projects/1234567890/zones/us-east1-b",
-      "instance_id": "1234556778987654321",
-      "machine_type": "projects/1234567890/machineTypes/f1-micro",
-      "project_id": "my-dev",
-      "provider": "gce"
-    }
+  "cloud": {
+    "availability_zone": "us-east1-b",
+    "instance_id": "1234556778987654321",
+    "machine_type": "f1-micro",
+    "project_id": "my-dev",
+    "provider": "gce"
   }
 }
 -------------------------------------------------------------------------------
@@ -336,13 +565,11 @@ _Tencent Cloud_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "gz-azone2",
-      "instance_id": "ins-qcloudv5",
-      "provider": "qcloud",
-      "region": "china-south-gz"
-    }
+  "cloud": {
+    "availability_zone": "gz-azone2",
+    "instance_id": "ins-qcloudv5",
+    "provider": "qcloud",
+    "region": "china-south-gz"
   }
 }
 -------------------------------------------------------------------------------
@@ -355,13 +582,11 @@ ECS instance.
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "cn-shenzhen",
-      "instance_id": "i-wz9g2hqiikg0aliyun2b",
-      "provider": "ecs",
-      "region": "cn-shenzhen-a"
-    }
+  "cloud": {
+    "availability_zone": "cn-shenzhen",
+    "instance_id": "i-wz9g2hqiikg0aliyun2b",
+    "provider": "ecs",
+    "region": "cn-shenzhen-a"
   }
 }
 -------------------------------------------------------------------------------
@@ -371,14 +596,27 @@ _Azure Virtual Machine_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "provider": "az",
-      "instance_id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
-      "instance_name": "test-az-vm",
-      "machine_type": "Standard_D3_v2",
-      "region": "eastus2"
-    }
+  "cloud": {
+    "provider": "az",
+    "instance_id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
+    "instance_name": "test-az-vm",
+    "machine_type": "Standard_D3_v2",
+    "region": "eastus2"
+  }
+}
+-------------------------------------------------------------------------------
+
+_Openstack Nova_
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "cloud": {
+    "provider": "openstack",
+    "instance_name": "test-998d932195.mycloud.tld",
+    "availability_zone": "xxxx-az-c",
+    "instance_id": "i-00011a84",
+    "machine_type": "m2.large"
   }
 }
 -------------------------------------------------------------------------------
@@ -448,6 +686,53 @@ is treated as if the field was not set at all.
 exist in the event are overwritten by keys from the decoded JSON object. The
 default value is false.
 
+[[community-id]]
+=== Community ID Network Flow Hash
+
+The `community_id` processor computes a network flow hash according to the
+https://github.com/corelight/community-id-spec[Community ID Flow Hash
+specification].
+
+The flow hash is useful for correlating all network events related to a
+single flow. For example you can filter on a community ID value and you might
+get back the Netflow records from multiple collectors and layer 7 protocol
+records from Packetbeat.
+
+By default the processor is configured to read the flow parameters from the
+appropriate Elastic Common Schema (ECS) fields. If you are processing ECS data
+then no parameters are required.
+
+[source,yaml]
+----
+processors:
+  - community_id:
+----
+
+If the data does not conform to ECS then you can customize the field names
+that the processor reads from. You can also change the `target` field which
+is where the computed hash is written to.
+
+[source,yaml]
+----
+processors:
+  - community_id:
+      fields:
+        source_ip: my_source_ip
+        source_port: my_source_port
+        destination_ip: my_dest_ip
+        destination_port: my_dest_port
+        transport: proto
+        icmp_type: my_icmp_type
+        icmp_code: my_icmp_code
+      target: network.community_id
+----
+
+If the necessary fields are not present in the event then the processor will
+silently continue without adding the target field.
+
+The processor also accepts an optional `seed` parameter that must be a 16-bit
+unsigned integer. This value gets incorporated into all generated hashes.
+
 [[drop-event]]
 === Drop events
 
@@ -512,16 +797,58 @@ section.
 NOTE: If you define an empty list of fields under `include_fields`, then only
 the required fields, `@timestamp` and `type`, are exported.
 
+[[rename-fields]]
+=== Rename fields from events
+
+The `rename` processor specifies a list of fields to rename. Under the `fields`
+key each entry contains a `from: old-key` and a `to: new-key` pair. `from` is
+the origin and `to` the target name of the field.
+
+Renaming fields can be useful in cases where field names cause conflicts. For
+example if an event has two fields, `c` and `c.b`, that are both assigned scalar
+values (e.g. `{"c": 1, "c.b": 2}`) this will result in an Elasticsearch error at
+ingest time. This is because the value of a cannot simultaneously be a scalar
+and an object. To prevent this rename_fields can be used to rename `c` to
+`c.value`.
+
+Rename fields cannot be used to overwrite fields. To overwrite fields either
+first rename the target field or use the `drop_fields` processor to drop the
+field and then rename the field.
+
+[source,yaml]
+-------
+processors:
+- rename:
+    fields:
+     - from: "a.g"
+       to: "e.d"
+    ignore_missing: false
+    fail_on_error: true
+-------
+
+The `rename` processor has the following configuration settings:
+
+`ignore_missing`:: (Optional) If set to true, no error is logged in case a key
+which should be renamed is missing. Default is `false`.
+
+`fail_on_error`:: (Optional) If set to true, in case of an error the renaming of
+fields is stopped and the original event is returned. If set to false, renaming
+continues also if an error happened during renaming. Default is `true`.
+
+See <<conditions>> for a list of supported conditions.
+
+You can specify multiple `ignore_missing` processors under the `processors`
+section.
+
 [[add-kubernetes-metadata]]
 === Add Kubernetes metadata
-
-beta[]
 
 The `add_kubernetes_metadata` processor annotates each event with relevant
 metadata based on which Kubernetes pod the event originated from. Each event is
 annotated with:
 
 * Pod Name
+* Pod UID
 * Namespace
 * Labels
 
@@ -534,16 +861,17 @@ Indexers take in a pod's metadata and builds indices based on the pod metadata.
 For example, the `ip_port` indexer can take a Kubernetes pod and index the pod
 metadata based on all `pod_ip:container_port` combinations.
 
-Matchers are used to contruct lookup keys for querying indices. For example,
+Matchers are used to construct lookup keys for querying indices. For example,
 when the `fields` matcher takes `["metricset.host"]` as a lookup field, it would
 construct a lookup key with the value of the field `metricset.host`.
 
 Each Beat can define its own default indexers and matchers which are enabled by
 default. For example, FileBeat enables the `container` indexer, which indexes
 pod metadata based on all container IDs, and a `logs_path` matcher, which takes
-the `source` field, extracts the container ID, and uses it to retrieve metadata.
+the `log.file.path` field, extracts the container ID, and uses it to retrieve 
+metadata.
 
-The configuration below enables the processor when the Beat is run as a pod in
+The configuration below enables the processor when {beatname_lc} is run as a pod in
 Kubernetes.
 
 [source,yaml]
@@ -588,8 +916,12 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 
 `in_cluster`:: (Optional) Use in cluster settings for Kubernetes client, `true`
 by default.
-`host`:: (Optional) In case `in_cluster` is false, use this host to connect to
-Kubernetes API.
+`host`:: (Optional) Identify the node where {beatname_lc} is running in case it
+cannot be accurately detected, as when running {beatname_lc} in host network
+mode.
+`namespace`:: (Optional) Select the namespace from which to collect the
+metadata. If it is not set, the processor collects metadata from all namespaces.
+It is unset by default.
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
 client.
 `default_indexers.enabled`:: (Optional) Enable/Disable default pod indexers, in
@@ -600,8 +932,6 @@ case you want to specify your own.
 [[add-docker-metadata]]
 === Add Docker metadata
 
-beta[]
-
 The `add_docker_metadata` processor annotates each event with relevant metadata
 from Docker containers:
 
@@ -610,15 +940,32 @@ from Docker containers:
 * Image
 * Labels
 
+[NOTE]
+=====
+When running {beatname_uc} in a container, you need to provide access to
+Docker’s unix socket in order for the `add_docker_metadata` processor to work.
+You can do this by mounting the socket inside the container. For example:
+
+`docker run -v /var/run/docker.sock:/var/run/docker.sock ...`
+
+To avoid privilege issues, you may also need to add `--user=root` to the
+`docker run` flags. Because the user must be part of the docker group in order
+to access `/var/run/docker.sock`, root access is required if {beatname_uc} is
+running as non-root inside the container. 
+=====
+
 [source,yaml]
 -------------------------------------------------------------------------------
 processors:
 - add_docker_metadata:
     host: "unix:///var/run/docker.sock"
     #match_fields: ["system.process.cgroup.id"]
+    #match_pids: ["process.pid", "process.ppid"]
     #match_source: true
     #match_source_index: 4
+    #match_short_id: true
     #cleanup_timeout: 60
+    #labels.dedot: false
     # To connect to Docker over TLS you must specify a client and CA certificate.
     #ssl:
     #  certificate_authority: "/etc/pki/root/ca.pem"
@@ -629,13 +976,307 @@ processors:
 It has the following settings:
 
 `host`:: (Optional) Docker socket (UNIX or TCP socket). It uses
-  `unix:///var/run/docker.sock` by default.
-`match_fields`:: (Optional) A list of fields to match a container id, at least
-  one of them should hold a container id to get the event enriched.
-`match_source`:: (Optional) Match container id from a log path present in
-  `source` field. Enabled by default.
-`match_source_index`:: (Optional) Index in the source path split by / to look
-  for container id. It defaults to 4 to match
-  `/var/lib/docker/containers/<container_id>/*.log`
+`unix:///var/run/docker.sock` by default.
+
+`ssl`:: (Optional) SSL configuration to use when connecting to the Docker
+socket.
+
+`match_fields`:: (Optional) A list of fields to match a container ID, at least
+one of them should hold a container ID to get the event enriched.
+
+`match_pids`:: (Optional) A list of fields that contain process IDs. If the
+process is running in Docker then the event will be enriched. The default value
+is `["process.pid", "process.ppid"]`.
+
+`match_source`:: (Optional) Match container ID from a log path present in the
+`source` field. Enabled by default.
+
+`match_short_id`:: (Optional) Match container short ID from a log path present
+in the `source` field. Disabled by default.
+This allows to match directories names that have the first 12 characters
+of the container ID. For example, `/var/log/containers/b7e3460e2b21/*.log`.
+
+`match_source_index`:: (Optional) Index in the source path split by `/` to look
+for container ID. It defaults to 4 to match
+`/var/lib/docker/containers/<container_id>/*.log`
+
 `cleanup_timeout`:: (Optional) Time of inactivity to consider we can clean and
 forget metadata for a container, 60s by default.
+
+`labels.dedot`:: (Optional) Default to be false. If set to true, replace dots in
+ labels with `_`.
+
+[[add-host-metadata]]
+=== Add Host metadata
+
+beta[]
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_host_metadata:
+    netinfo.enabled: false
+    cache.ttl: 5m
+    geo:
+      name: nyc-dc1-rack1
+      location: 40.7128, -74.0060
+      continent_name: North America
+      country_iso_code: US
+      region_name: New York
+      region_iso_code: NY
+      city_name: New York
+-------------------------------------------------------------------------------
+
+It has the following settings:
+
+`netinfo.enabled`:: (Optional) Default false. Include IP addresses and MAC addresses as fields host.ip and host.mac
+
+`cache.ttl`:: (Optional) The processor uses an internal cache for the host metadata. This sets the cache expiration time. The default is 5m, negative values disable caching altogether.
+
+`geo.name`:: User definable token to be used for identifying a discrete location. Frequently a datacenter, rack, or similar.
+
+`geo.location`:: Longitude and latitude in comma separated format.
+
+`geo.continent_name`:: Name of the continent.
+
+`geo.country_name`:: Name of the country.
+
+`geo.region_name`:: Name of the region.
+
+`geo.city_name`:: Name of the city.
+
+`geo.country_iso_code`:: ISO country code.
+
+`geo.region_iso_code`:: ISO region code.
+
+
+The `add_host_metadata` processor annotates each event with relevant metadata from the host machine.
+The fields added to the event are looking as following:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+   "host":{
+      "architecture":"x86_64",
+      "name":"example-host",
+      "id":"",
+      "os":{
+         "family":"darwin",
+         "build":"16G1212",
+         "platform":"darwin",
+         "version":"10.12.6",
+         "kernel":"16.7.0",
+         "name":"Mac OS X"
+      },
+      "ip": ["192.168.0.1", "10.0.0.1"],
+      "mac": ["00:25:96:12:34:56", "72:00:06:ff:79:f1"],
+      "geo": {
+          "continent_name": "North America",
+          "country_iso_code": "US",
+          "region_name": "New York",
+          "region_iso_code": "NY",
+          "city_name": "New York",
+          "name": "nyc-dc1-rack1",
+          "location": "40.7128, -74.0060"
+        }
+   }
+}
+-------------------------------------------------------------------------------
+
+[[dissect]]
+=== Dissect strings
+
+The dissect processor tokenizes incoming strings using defined patterns.
+
+[source,yaml]
+-------
+processors:
+- dissect:
+    tokenizer: "%{key1} %{key2}"
+    field: "message"
+    target_prefix: "dissect"
+-------
+
+The `dissect` processor has the following configuration settings:
+
+`field`:: (Optional) The event field to tokenize. Default is `message`.
+
+`target_prefix`:: (Optional) The name of the field where the values will be extracted. When an empty
+string is defined, the processor will create the keys at the root of the event. Default is
+`dissect`. When the target key already exists in the event, the processor won't replace it and log
+an error; you need to either drop or rename the key before using dissect.
+
+For tokenization to be successful, all keys must be found and extracted, if one of them cannot be
+found an error will be logged and no modification is done on the original event.
+
+NOTE: A key can contain any characters except reserved suffix or prefix modifiers:  `/`,`&`, `+`
+and `?`.
+
+See <<conditions>> for a list of supported conditions.
+
+[[processor-dns]]
+=== DNS Reverse Lookup
+
+The DNS processor performs reverse DNS lookups of IP addresses. It caches the
+responses that it receives in accordance to the time-to-live (TTL) value
+contained in the response. It also caches failures that occur during lookups.
+Each instance of this processor maintains its own independent cache.
+
+The processor uses its own DNS resolver to send requests to nameservers and does
+not use the operating system's resolver. It does not read any values contained
+in `/etc/hosts`.
+
+This processor can significantly slow down your pipeline's throughput if you
+have a high latency network or slow upstream nameserver. The cache will help
+with performance, but if the addresses being resolved have a high cardinality
+then the cache benefits will be diminished due to the high miss ratio.
+
+By way of example, if each DNS lookup takes 2 milliseconds, the maximum
+throughput you can achieve is 500 events per second (1000 milliseconds / 2
+milliseconds). If you have a high cache hit ratio then your throughput can be
+higher.
+
+This is a minimal configuration example that resolves the IP addresses contained
+in two fields.
+
+[source,yaml]
+----
+processors:
+- dns:
+    type: reverse
+    fields:
+      source.ip: source.hostname
+      destination.ip: destination.hostname
+----
+
+Next is a configuration example showing all options.
+
+[source,yaml]
+----
+processors:
+- dns:
+    type: reverse
+    action: append
+    fields:
+      server.ip: server.hostname
+      client.ip: client.hostname
+    success_cache:
+      capacity.initial: 1000
+      capacity.max: 10000
+    failure_cache:
+      capacity.initial: 1000
+      capacity.max: 10000
+      ttl: 1m
+    nameservers: ['192.0.2.1', '203.0.113.1']
+    timeout: 500ms
+    tag_on_failure: [_dns_reverse_lookup_failed]
+----
+
+The `dns` processor has the following configuration settings:
+
+`type`:: The type of DNS lookup to perform. The only supported type is
+`reverse` which queries for a PTR record.
+
+`action`:: This defines the behavior of the processor when the target field
+already exists in the event. The options are `append` (default) and `replace`.
+
+`fields`:: This is a mapping of source field names to target field names. The
+value of the source field will be used in the DNS query and result will be
+written to the target field.
+
+`success_cache.capacity.initial`:: The initial number of items that the success
+cache will be allocated to hold. When initialized the processor will allocate
+the memory for this number of items. Default value is `1000`.
+
+`success_cache.capacity.max`:: The maximum number of items that the success
+cache can hold. When the maximum capacity is reached a random item is evicted.
+Default value is `10000`.
+
+`failure_cache.capacity.initial`:: The initial number of items that the failure
+cache will be allocated to hold. When initialized the processor will allocate
+the memory for this number of items. Default value is `1000`.
+
+`failure_cache.capacity.max`:: The maximum number of items that the failure
+cache can hold. When the maximum capacity is reached a random item is evicted.
+Default value is `10000`.
+
+`failure_cache.ttl`:: The duration for which failures are cached. Valid time
+units are "ns", "us" (or "µs"), "ms", "s", "m", "h". Default value is `1m`.
+
+`nameservers`:: A list of nameservers to query. If there are multiple servers,
+the resolver queries them in the order listed. If none are specified then it
+will read the nameservers listed in `/etc/resolv.conf` once at initialization.
+On Windows you must always supply at least one nameserver.
+
+`timeout`:: The duration after which a DNS query will timeout. This is timeout
+for each DNS request so if you have 2 nameservers then the total timeout will be
+2 times this value. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m",
+"h". Default value is `500ms`.
+
+`tag_on_failure`:: A list of tags to add to the event when any lookup fails. The
+tags are only added once even if multiple lookups fail. By default no tags are
+added upon failure.
+
+[[add-process-metadata]]
+=== Add process metadata
+
+The Add process metadata processor enriches events with information from running
+processes, identified by their process ID (PID).
+
+[source,yaml]
+-------------------------------------------------------------------------------
+processors:
+- add_process_metadata:
+    match_pids: [system.process.ppid]
+    target: system.process.parent
+-------------------------------------------------------------------------------
+
+The fields added to the event look as follows:
+[source,json]
+-------------------------------------------------------------------------------
+"process": {
+  "name":  "systemd",
+  "title": "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
+  "exe":   "/usr/lib/systemd/systemd",
+  "args":  ["/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"],
+  "pid":   1,
+  "ppid":  0,
+  "start_time": "2018-08-22T08:44:50.684Z",
+}
+-------------------------------------------------------------------------------
+
+Optionally, the process environment can be included, too:
+[source,json]
+-------------------------------------------------------------------------------
+  ...
+  "env": {
+    "HOME":       "/",
+    "TERM":       "linux",
+    "BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
+    "LANG":       "en_US.UTF-8",
+  }
+  ...
+-------------------------------------------------------------------------------
+It has the following settings:
+
+`match_pids`:: List of fields to lookup for a PID. The processor will
+search the list sequentially until the field is found in the current event, and
+the PID lookup will be applied to the value of this field.
+
+`target`:: (Optional) Destination prefix where the `process` object will be
+created. The default is the event's root.
+
+`include_fields`:: (Optional) List of fields to add. By default, the processor
+will add all the available fields except `process.env`.
+
+`ignore_missing`:: (Optional) When set to `false`, events that don't contain any
+of the fields in match_pids will be discarded and an error will be generated. By
+default, this condition is ignored.
+
+`overwrite_keys`:: (Optional) By default, if a target field already exists, it
+will not be overwritten and an error will be logged. If `overwrite_keys` is
+set to `true`, this condition will be ignored.
+
+`restricted_fields`:: (Optional) By default, the `process.env` field is not
+output, to avoid leaking sensitive data. If `restricted_fields` is `true`, the
+field will be present in the output.

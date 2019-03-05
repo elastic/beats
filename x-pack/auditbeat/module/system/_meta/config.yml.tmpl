@@ -1,0 +1,53 @@
+{{ if .Reference -}}
+# The system module collects security related information about a host.
+# All datasets send both periodic state information (e.g. all currently
+# running processes) and real-time changes (e.g. when a new process starts
+# or stops).
+{{ end -}}
+- module: system
+  datasets:
+    - host    # General host information, e.g. uptime, IPs
+    {{ if eq .GOOS "linux" -}}
+    - login   # User logins, logouts, and system boots.
+    {{- end }}
+    {{ if ne .GOOS "windows" -}}
+    - package # Installed, updated, and removed packages
+    {{- end }}
+    - process # Started and stopped processes
+    {{ if eq .GOOS "linux" -}}
+    - socket  # Opened and closed sockets
+    - user    # User information
+    {{- end }}
+
+  # How often datasets send state updates with the
+  # current state of the system (e.g. all currently
+  # running processes, all open sockets).
+  state.period: 12h
+{{ if .Reference }}
+  # The state.period can be overridden for any dataset.
+  # host.state.period: 12h
+  {{ if ne .GOOS "windows" -}}
+  # package.state.period: 12h
+  {{- end }}
+  # process.state.period: 12h
+  {{ if eq .GOOS "linux" -}}
+  # socket.state.period: 12h
+  # user.state.period: 12h
+  {{- end }}
+{{ end }}
+  {{ if eq .GOOS "linux" -}}
+  # Enabled by default. Auditbeat will read password fields in
+  # /etc/passwd and /etc/shadow and store a hash locally to
+  # detect any changes.
+  user.detect_password_changes: true
+  {{- end }}
+
+  {{ if eq .GOOS "linux" -}}
+  # File patterns of the login record files.
+{{- if .Reference }}
+  # wtmp: History of successful logins, logouts, and system shutdowns and boots.
+  # btmp: Failed login attempts.
+{{- end }}
+  login.wtmp_file_pattern: /var/log/wtmp*
+  login.btmp_file_pattern: /var/log/btmp*
+  {{- end }}

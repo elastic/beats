@@ -1,0 +1,73 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "elasticsearch": {
+        "cluster": {
+            "id": "hyK0oDhoThywCtJd2DV8Bg"
+        }
+    },
+    "event": {
+        "dataset": "kibana.stats",
+        "duration": 115000,
+        "module": "kibana"
+    },
+    "kibana": {
+        "stats": {
+            "concurrent_connections": 1,
+            "host": {
+                "name": "localhost"
+            },
+            "index": "Shaunaks-MBP-2.attlocal.net",
+            "name": "Shaunaks-MBP-2.attlocal.net",
+            "process": {
+                "event_loop_delay": {
+                    "ms": 0.45250000059604645
+                },
+                "memory": {
+                    "heap": {
+                        "size_limit": {
+                            "bytes": 1526909922
+                        },
+                        "total": {
+                            "bytes": 307593216
+                        },
+                        "used": {
+                            "bytes": 226887112
+                        }
+                    }
+                },
+                "uptime": {
+                    "ms": 124098
+                }
+            },
+            "request": {
+                "disconnects": 0,
+                "total": 0
+            },
+            "response_time": {
+                "avg": {},
+                "max": {
+                    "ms": 0
+                }
+            },
+            "snapshot": false,
+            "status": "green"
+        }
+    },
+    "metricset": {
+        "name": "stats"
+    },
+    "process": {
+        "pid": 93807
+    },
+    "service": {
+        "address": "127.0.0.1:5601",
+        "id": "5b2de169-2785-441b-ae8c-186a1936b17d",
+        "name": "kibana",
+        "type": "kibana",
+        "version": "7.0.0"
+    }
+}

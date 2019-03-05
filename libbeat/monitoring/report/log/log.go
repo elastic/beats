@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package log
 
 import (
@@ -28,17 +45,27 @@ var gauges = map[string]bool{
 	"beat.memstats.memory_alloc":     true,
 	"beat.memstats.gc_next":          true,
 	"beat.info.uptime.ms":            true,
-	"beat.cpu.total.pct":             true,
-	"beat.cpu.total.norm.pct":        true,
+	"beat.cpu.user.ticks":            true,
+	"beat.cpu.user.time":             true,
+	"beat.cpu.system.ticks":          true,
+	"beat.cpu.system.time":           true,
 	"beat.cpu.total.value":           true,
-	"system.cpu.total.pct":           true,
-	"system.cpu.total.norm.pct":      true,
+	"beat.cpu.total.ticks":           true,
+	"beat.cpu.total.time":            true,
+	"beat.handles.open":              true,
+	"beat.handles.limit.hard":        true,
+	"beat.handles.limit.soft":        true,
 	"system.load.1":                  true,
 	"system.load.5":                  true,
 	"system.load.15":                 true,
 	"system.load.norm.1":             true,
 	"system.load.norm.5":             true,
 	"system.load.norm.15":            true,
+}
+
+// TODO: Change this when gauges are refactored, too.
+var strConsts = map[string]bool{
+	"beat.info.ephemeral_id": true,
 }
 
 var (
@@ -141,7 +168,9 @@ func makeDeltaSnapshot(prev, cur monitoring.FlatSnapshot) monitoring.FlatSnapsho
 	}
 
 	for k, s := range cur.Strings {
-		if p, ok := prev.Strings[k]; !ok || p != s {
+		if _, found := strConsts[k]; found {
+			delta.Strings[k] = s
+		} else if p, ok := prev.Strings[k]; !ok || p != s {
 			delta.Strings[k] = s
 		}
 	}

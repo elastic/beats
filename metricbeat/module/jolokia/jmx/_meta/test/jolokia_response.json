@@ -71,5 +71,24 @@
         },
         "timestamp": 1472298687,
         "status": 200
+    },
+    {
+        "request": {
+            "mbean": "Catalina:type=Server",
+            "attribute": "serverInfo",
+            "type": "read",
+            "target": {
+                "env": {
+                    "password": "QED",
+                    "user": "monitorRole"
+                },
+                "url": "service:jmx:rmi:///jndi/rmi://localhost:7091/jmxrmi"
+            }
+        },
+        "value": {
+            "serverInfo": "Apache Tomcat/9.0.7"
+        },
+        "timestamp": 1523785646,
+        "status": 200
     }
 ]

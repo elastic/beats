@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package amqp
 
 import (
@@ -5,11 +22,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 
+	"github.com/elastic/beats/packetbeat/pb"
 	"github.com/elastic/beats/packetbeat/protos"
 	"github.com/elastic/beats/packetbeat/protos/tcp"
 )
@@ -251,16 +268,7 @@ func (amqp *amqpPlugin) handleAmqpRequest(msg *amqpMessage) {
 	}
 
 	trans.ts = msg.ts
-	trans.src = common.Endpoint{
-		IP:   msg.tcpTuple.SrcIP.String(),
-		Port: msg.tcpTuple.SrcPort,
-		Proc: string(msg.cmdlineTuple.Src),
-	}
-	trans.dst = common.Endpoint{
-		IP:   msg.tcpTuple.DstIP.String(),
-		Port: msg.tcpTuple.DstPort,
-		Proc: string(msg.cmdlineTuple.Dst),
-	}
+	trans.src, trans.dst = common.MakeEndpointPair(msg.tcpTuple.BaseTuple, msg.cmdlineTuple)
 	if msg.direction == tcp.TCPDirectionReverse {
 		trans.src, trans.dst = trans.dst, trans.src
 	}
@@ -315,7 +323,7 @@ func (amqp *amqpPlugin) handleAmqpResponse(msg *amqpMessage) {
 		trans.method = "basic.get-empty"
 	}
 
-	trans.responseTime = int32(msg.ts.Sub(trans.ts).Nanoseconds() / 1e6)
+	trans.endTime = msg.ts
 	trans.notes = msg.notes
 
 	amqp.publishTransaction(trans)
@@ -354,16 +362,7 @@ func (amqp *amqpPlugin) handlePublishing(client *amqpMessage) {
 	}
 
 	trans.ts = client.ts
-	trans.src = common.Endpoint{
-		IP:   client.tcpTuple.SrcIP.String(),
-		Port: client.tcpTuple.SrcPort,
-		Proc: string(client.cmdlineTuple.Src),
-	}
-	trans.dst = common.Endpoint{
-		IP:   client.tcpTuple.DstIP.String(),
-		Port: client.tcpTuple.DstPort,
-		Proc: string(client.cmdlineTuple.Dst),
-	}
+	trans.src, trans.dst = common.MakeEndpointPair(client.tcpTuple.BaseTuple, client.cmdlineTuple)
 
 	trans.method = client.method
 	//for publishing and delivering, bytes in and out represent the length of the
@@ -398,16 +397,7 @@ func (amqp *amqpPlugin) handleDelivering(server *amqpMessage) {
 	}
 
 	trans.ts = server.ts
-	trans.src = common.Endpoint{
-		IP:   server.tcpTuple.SrcIP.String(),
-		Port: server.tcpTuple.SrcPort,
-		Proc: string(server.cmdlineTuple.Src),
-	}
-	trans.dst = common.Endpoint{
-		IP:   server.tcpTuple.DstIP.String(),
-		Port: server.tcpTuple.DstPort,
-		Proc: string(server.cmdlineTuple.Dst),
-	}
+	trans.src, trans.dst = common.MakeEndpointPair(server.tcpTuple.BaseTuple, server.cmdlineTuple)
 
 	//for publishing and delivering, bytes in and out represent the length of the
 	//message itself
@@ -437,21 +427,28 @@ func (amqp *amqpPlugin) publishTransaction(t *amqpTransaction) {
 		return
 	}
 
-	fields := common.MapStr{}
-	fields["type"] = "amqp"
+	evt, pbf := pb.NewBeatEvent(t.ts)
+	pbf.SetSource(&t.src)
+	pbf.SetDestination(&t.dst)
+	pbf.Source.Bytes = int64(t.bytesIn)
+	pbf.Destination.Bytes = int64(t.bytesOut)
+	pbf.Event.Start = t.ts
+	pbf.Event.End = t.endTime
+	pbf.Event.Dataset = "amqp"
+	pbf.Network.Protocol = pbf.Event.Dataset
+	pbf.Network.Transport = "tcp"
+	pbf.Error.Message = t.notes
 
+	fields := evt.Fields
+	fields["type"] = pbf.Event.Dataset
 	fields["method"] = t.method
+
 	if isError(t) {
 		fields["status"] = common.ERROR_STATUS
 	} else {
 		fields["status"] = common.OK_STATUS
 	}
-	fields["responsetime"] = t.responseTime
 	fields["amqp"] = t.amqp
-	fields["bytes_out"] = t.bytesOut
-	fields["bytes_in"] = t.bytesIn
-	fields["src"] = &t.src
-	fields["dst"] = &t.dst
 
 	//let's try to convert request/response to a readable format
 	if amqp.sendRequest {
@@ -493,14 +490,8 @@ func (amqp *amqpPlugin) publishTransaction(t *amqpTransaction) {
 			fields["response"] = t.response
 		}
 	}
-	if len(t.notes) > 0 {
-		fields["notes"] = t.notes
-	}
 
-	amqp.results(beat.Event{
-		Timestamp: t.ts,
-		Fields:    fields,
-	})
+	amqp.results(evt)
 }
 
 //function to check if method is async or not

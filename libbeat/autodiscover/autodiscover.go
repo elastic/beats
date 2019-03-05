@@ -1,74 +1,97 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package autodiscover
 
 import (
+	"fmt"
+	"time"
+
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/autodiscover/meta"
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
+	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/logp"
-
-	"github.com/mitchellh/hashstructure"
 )
 
-const debugK = "autodiscover"
+const (
+	debugK = "autodiscover"
+
+	// If a config reload fails after a new event, a new reload will be run after this period
+	retryPeriod = 10 * time.Second
+)
 
 // TODO autodiscover providers config reload
 
 // Adapter must be implemented by the beat in order to provide Autodiscover
 type Adapter interface {
-	// TODO Hints
 
 	// CreateConfig generates a valid list of configs from the given event, the received event will have all keys defined by `StartFilter`
 	CreateConfig(bus.Event) ([]*common.Config, error)
 
-	// CheckConfig tests given config to check if it will work or not, returns errors in case it won't work
-	CheckConfig(*common.Config) error
-
 	// RunnerFactory provides runner creation by feeding valid configs
 	cfgfile.RunnerFactory
 
-	// StartFilter returns the bus filter to retrieve runner start triggering events
-	StartFilter() []string
-
-	// StopFilter returns the bus filter to retrieve runner stop triggering events
-	StopFilter() []string
+	// EventFilter returns the bus filter to retrieve runner start/stop triggering events
+	EventFilter() []string
 }
 
 // Autodiscover process, it takes a beat adapter and user config and runs autodiscover process, spawning
 // new modules when any configured providers does a match
 type Autodiscover struct {
-	bus       bus.Bus
-	adapter   Adapter
-	providers []Provider
-	runners   *cfgfile.Registry
-	meta      *meta.Map
+	bus             bus.Bus
+	defaultPipeline beat.Pipeline
+	adapter         Adapter
+	providers       []Provider
+	configs         map[string]map[uint64]*reload.ConfigWithMeta
+	runners         *cfgfile.RunnerList
+	meta            *meta.Map
 
-	startListener bus.Listener
-	stopListener  bus.Listener
+	listener bus.Listener
 }
 
 // NewAutodiscover instantiates and returns a new Autodiscover manager
-func NewAutodiscover(name string, adapter Adapter, config *Config) (*Autodiscover, error) {
+func NewAutodiscover(name string, pipeline beat.Pipeline, adapter Adapter, config *Config) (*Autodiscover, error) {
 	// Init Event bus
 	bus := bus.New(name)
 
 	// Init providers
 	var providers []Provider
 	for _, providerCfg := range config.Providers {
-		provider, err := ProviderRegistry.BuildProvider(bus, providerCfg)
+		provider, err := Registry.BuildProvider(bus, providerCfg)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "error in autodiscover provider settings")
 		}
 		logp.Debug(debugK, "Configured autodiscover provider: %s", provider)
 		providers = append(providers, provider)
 	}
 
 	return &Autodiscover{
-		bus:       bus,
-		adapter:   adapter,
-		runners:   cfgfile.NewRegistry(),
-		providers: providers,
-		meta:      meta.NewMap(),
+		bus:             bus,
+		defaultPipeline: pipeline,
+		adapter:         adapter,
+		configs:         map[string]map[uint64]*reload.ConfigWithMeta{},
+		runners:         cfgfile.NewRunnerList("autodiscover", adapter, pipeline),
+		providers:       providers,
+		meta:            meta.NewMap(),
 	}, nil
 }
 
@@ -79,107 +102,136 @@ func (a *Autodiscover) Start() {
 	}
 
 	logp.Info("Starting autodiscover manager")
-	a.startListener = a.bus.Subscribe(a.adapter.StartFilter()...)
-	a.stopListener = a.bus.Subscribe(a.adapter.StopFilter()...)
+	a.listener = a.bus.Subscribe(a.adapter.EventFilter()...)
+
+	// It is important to start the worker first before starting the producer.
+	// In hosts that have large number of workloads, it is easy to have an initial
+	// sync of workloads to have a count that is greater than 100 (which is the size
+	// of the bounded Go channel. Starting the providers before the consumer would
+	// result in the channel filling up and never allowing the worker to start up.
+	go a.worker()
 
 	for _, provider := range a.providers {
 		provider.Start()
 	}
-
-	go a.startWorker()
-	go a.stopWorker()
 }
 
-func (a *Autodiscover) startWorker() {
-	for event := range a.startListener.Events() {
-		// This will happen on Stop:
-		if event == nil {
-			return
+func (a *Autodiscover) worker() {
+	var updated, retry bool
+
+	for {
+		select {
+		case event := <-a.listener.Events():
+			// This will happen on Stop:
+			if event == nil {
+				return
+			}
+
+			if _, ok := event["start"]; ok {
+				updated = a.handleStart(event)
+			}
+			if _, ok := event["stop"]; ok {
+				updated = a.handleStop(event)
+			}
+
+		case <-time.After(retryPeriod):
 		}
 
-		configs, err := a.adapter.CreateConfig(event)
-		if err != nil {
-			logp.Debug(debugK, "Could not generate config from event %v: %v", event, err)
-			continue
-		}
-		logp.Debug(debugK, "Got a start event: %v, generated configs: %+v", event, configs)
-
-		meta := getMeta(event)
-		for _, config := range configs {
-			rawCfg := map[string]interface{}{}
-			err := config.Unpack(rawCfg)
-
-			hash, err := hashstructure.Hash(rawCfg, nil)
-			if err != nil {
-				logp.Debug(debugK, "Could not hash config %v: %v", config, err)
-				continue
+		if updated || retry {
+			if retry {
+				logp.Debug(debugK, "Reloading existing autodiscover configs after error")
 			}
 
-			err = a.adapter.CheckConfig(config)
-			if err != nil {
-				logp.Debug(debugK, "Check failed for config %v: %v, won't start runner", config, err)
-				continue
+			configs := []*reload.ConfigWithMeta{}
+			for _, list := range a.configs {
+				for _, c := range list {
+					configs = append(configs, c)
+				}
 			}
 
-			// Update meta no matter what
-			dynFields := a.meta.Store(hash, meta)
+			err := a.runners.Reload(configs)
 
-			if a.runners.Has(hash) {
-				logp.Debug(debugK, "Config %v is already running", config)
-				continue
-			}
-
-			runner, err := a.adapter.Create(config, &dynFields)
-			if err != nil {
-				logp.Debug(debugK, "Failed to create runner with config %v: %v", config, err)
-				continue
-			}
-
-			logp.Info("Autodiscover starting runner: %s", runner)
-			a.runners.Add(hash, runner)
-			runner.Start()
+			// On error, make sure the next run also updates because some runners were not properly loaded
+			retry = err != nil
+			// reset updated status
+			updated = false
 		}
 	}
 }
 
-func (a *Autodiscover) stopWorker() {
-	for event := range a.stopListener.Events() {
-		// This will happen on Stop:
-		if event == nil {
-			return
-		}
+func (a *Autodiscover) handleStart(event bus.Event) bool {
+	var updated bool
 
-		configs, err := a.adapter.CreateConfig(event)
+	logp.Debug(debugK, "Got a start event: %v", event)
+
+	eventID := getID(event)
+	if eventID == "" {
+		logp.Err("Event didn't provide instance id: %+v, ignoring it", event)
+		return false
+	}
+
+	// Ensure configs list exists for this instance
+	if _, ok := a.configs[eventID]; !ok {
+		a.configs[eventID] = map[uint64]*reload.ConfigWithMeta{}
+	}
+
+	configs, err := a.adapter.CreateConfig(event)
+	if err != nil {
+		logp.Debug(debugK, "Could not generate config from event %v: %v", event, err)
+		return false
+	}
+	logp.Debug(debugK, "Generated configs: %+v", configs)
+
+	meta := getMeta(event)
+	for _, config := range configs {
+		hash, err := cfgfile.HashConfig(config)
 		if err != nil {
-			logp.Debug(debugK, "Could not generate config from event %v: %v", event, err)
+			logp.Debug(debugK, "Could not hash config %v: %v", config, err)
 			continue
 		}
-		logp.Debug(debugK, "Got a stop event: %v, generated configs: %+v", event, configs)
 
-		for _, config := range configs {
-			rawCfg := map[string]interface{}{}
-			err := config.Unpack(rawCfg)
-
-			hash, err := hashstructure.Hash(rawCfg, nil)
-			if err != nil {
-				logp.Debug(debugK, "Could not hash config %v: %v", config, err)
-				continue
-			}
-
-			if !a.runners.Has(hash) {
-				logp.Debug(debugK, "Config %v is not running", config)
-				continue
-			}
-
-			if runner := a.runners.Get(hash); runner != nil {
-				logp.Info("Autodiscover stopping runner: %s", runner)
-				runner.Stop()
-				a.runners.Remove(hash)
-			} else {
-				logp.Debug(debugK, "Runner not found for stopping: %s", hash)
-			}
+		err = a.adapter.CheckConfig(config)
+		if err != nil {
+			logp.Error(errors.Wrap(err, fmt.Sprintf("Auto discover config check failed for config %v, won't start runner", config)))
+			continue
 		}
+
+		// Update meta no matter what
+		dynFields := a.meta.Store(hash, meta)
+
+		if a.configs[eventID][hash] != nil {
+			logp.Debug(debugK, "Config %v is already running", config)
+			continue
+		}
+
+		a.configs[eventID][hash] = &reload.ConfigWithMeta{
+			Config: config,
+			Meta:   &dynFields,
+		}
+		updated = true
 	}
+
+	return updated
+}
+
+func (a *Autodiscover) handleStop(event bus.Event) bool {
+	var updated bool
+
+	logp.Debug(debugK, "Got a stop event: %v", event)
+	eventID := getID(event)
+	if eventID == "" {
+		logp.Err("Event didn't provide instance id: %+v, ignoring it", event)
+		return false
+	}
+
+	if len(a.configs[eventID]) > 0 {
+		logp.Debug(debugK, "Stopping %d configs", len(a.configs[eventID]))
+		updated = true
+	}
+
+	delete(a.configs, eventID)
+
+	return updated
 }
 
 func getMeta(event bus.Event) common.MapStr {
@@ -197,6 +249,21 @@ func getMeta(event bus.Event) common.MapStr {
 	return meta
 }
 
+// getID returns the event "id" field string if present
+func getID(e bus.Event) string {
+	provider, ok := e["provider"]
+	if !ok {
+		return ""
+	}
+
+	id, ok := e["id"]
+	if !ok {
+		return ""
+	}
+
+	return fmt.Sprintf("%s:%s", provider, id)
+}
+
 // Stop autodiscover process
 func (a *Autodiscover) Stop() {
 	if a == nil {
@@ -204,8 +271,7 @@ func (a *Autodiscover) Stop() {
 	}
 
 	// Stop listening for events
-	a.startListener.Stop()
-	a.stopListener.Stop()
+	a.listener.Stop()
 
 	// Stop providers
 	for _, provider := range a.providers {
@@ -213,9 +279,6 @@ func (a *Autodiscover) Stop() {
 	}
 
 	// Stop runners
-	for hash, runner := range a.runners.CopyList() {
-		runner.Stop()
-		a.meta.Remove(hash)
-	}
+	a.runners.Stop()
 	logp.Info("Stopped autodiscover manager")
 }

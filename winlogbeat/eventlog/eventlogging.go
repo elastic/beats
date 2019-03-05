@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 // +build windows
 
 package eventlog
@@ -11,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/winlogbeat/checkpoint"
 	"github.com/elastic/beats/winlogbeat/sys"
 	win "github.com/elastic/beats/winlogbeat/sys/eventlogging"
 )
@@ -63,6 +81,7 @@ type eventLogging struct {
 	handle    win.Handle         // Handle to the event log.
 	readBuf   []byte             // Buffer for reading in events.
 	formatBuf []byte             // Buffer for formatting messages.
+	insertBuf win.StringInserts  // Buffer for parsing insert strings.
 	handles   *messageFilesCache // Cached mapping of source name to event message file handles.
 	logPrefix string             // Prefix to add to all log entries.
 
@@ -76,9 +95,9 @@ func (l eventLogging) Name() string {
 	return l.name
 }
 
-func (l *eventLogging) Open(recordNumber uint64) error {
+func (l *eventLogging) Open(state checkpoint.EventLogState) error {
 	detailf("%s Open(recordNumber=%d) calling OpenEventLog(uncServerPath=, "+
-		"providerName=%s)", l.logPrefix, recordNumber, l.name)
+		"providerName=%s)", l.logPrefix, state.RecordNumber, l.name)
 	handle, err := win.OpenEventLog("", l.name)
 	if err != nil {
 		return err
@@ -91,7 +110,7 @@ func (l *eventLogging) Open(recordNumber uint64) error {
 
 	var oldestRecord, newestRecord uint32
 	if numRecords > 0 {
-		l.recordNumber = uint32(recordNumber)
+		l.recordNumber = uint32(state.RecordNumber)
 		l.seek = true
 		l.ignoreFirst = true
 
@@ -148,7 +167,7 @@ func (l *eventLogging) Read() ([]Record, error) {
 
 	l.readBuf = l.readBuf[0:numBytesRead]
 	events, _, err := win.RenderEvents(
-		l.readBuf[:numBytesRead], 0, l.formatBuf, l.handles.get)
+		l.readBuf[:numBytesRead], 0, l.formatBuf, &l.insertBuf, l.handles.get)
 	if err != nil {
 		return nil, err
 	}
@@ -169,6 +188,11 @@ func (l *eventLogging) Read() ([]Record, error) {
 		records = append(records, Record{
 			API:   eventLoggingAPIName,
 			Event: e,
+			Offset: checkpoint.EventLogState{
+				Name:         l.name,
+				RecordNumber: e.RecordID,
+				Timestamp:    e.TimeCreated.SystemTime,
+			},
 		})
 	}
 
@@ -208,7 +232,10 @@ func (l *eventLogging) readRetryErrorHandler(err error) error {
 
 		if reopen {
 			l.Close()
-			return l.Open(uint64(l.recordNumber))
+			return l.Open(checkpoint.EventLogState{
+				Name:         l.name,
+				RecordNumber: uint64(l.recordNumber),
+			})
 		}
 	}
 	return err

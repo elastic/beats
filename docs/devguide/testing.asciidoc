@@ -5,20 +5,20 @@ Beats has a various sets of tests. This guide should help to understand how the 
 
 In general there are two major test suites:
 
-* Tests written in Golang
+* Tests written in Go
 * Tests written in Python
 
-The tests written in Golang use the https://golang.org/pkg/testing/[Golang Testing package]. The tests written in Python depend on http://nose.readthedocs.io/en/latest/[nosetests] and require a compiled and executable binary from the Golang code. The python test run a beat with a specific config and params and either check if the output is as expected or if the correct things show up in the logs.
+The tests written in Go use the https://golang.org/pkg/testing/[Go Testing package]. The tests written in Python depend on http://nose.readthedocs.io/en/latest/[nosetests] and require a compiled and executable binary from the Go code. The python test run a beat with a specific config and params and either check if the output is as expected or if the correct things show up in the logs.
 
 For both of the above test suites so called integration tests exists. Integration tests in Beats are tests which require an external system like Elasticsearch to test if the integration with this service works as expected. Beats provides in its testsuite docker containers and docker-compose files to start these environments but a developer can run the required services also locally.
 
-==== Running Golang Tests
+==== Running Go Tests
 
-The golang tests can be executed in each Golang package by running `go test .`. This will execute all tests which don't don't require an external service to be running. To also run the Golang integration tests run `go test -tags=integration .`. It will require you to run the expected services on localhost.
+The Go tests can be executed in each Go package by running `go test .`. This will execute all tests which don't don't require an external service to be running. To also run the Go integration tests run `go test -tags=integration .`. It will require you to run the expected services on localhost.
 
 To run all non integration tests for a beat run `make unit`. This will execute all the tests which are not inside a `vendor` directory. If you want to have a coverage report for the tests which were run use `make unit-tests`. A coverage report will be generated under `build/coverage` directory.
 
-All Golang tests are in the same package as the tested code itself and have the postfix `_test` in the file name. Most of the tests are in the same package as the rest of the code. Some of the tests which should be sepearate from the rest of the code or should not use private variables go under `{packagename}_test`.
+All Go tests are in the same package as the tested code itself and have the postfix `_test` in the file name. Most of the tests are in the same package as the rest of the code. Some of the tests which should be separate from the rest of the code or should not use private variables go under `{packagename}_test`.
 
 
 ==== Running Python Tests
@@ -37,10 +37,10 @@ All Python tests are under `tests/system` directory.
 
 This is a quick summary of the available test commands:
 
-* `unit`: Golang tests
-* `unit-tests`: Golang tests with coverage reports
-* `integration-tests`: Golang tests with services in local docker
-* `integration-tests-environment`: Golang tests inside docker with service in docker
+* `unit`: Go tests
+* `unit-tests`: Go tests with coverage reports
+* `integration-tests`: Go tests with services in local docker
+* `integration-tests-environment`: Go tests inside docker with service in docker
 * `fast-system-tests`: Python tests
 * `system-tests`: Python tests with coverage report
 * `INTEGRATION_TESTS=1 system-tests`: Python tests with local services
@@ -50,7 +50,7 @@ This is a quick summary of the available test commands:
 
 There are two experimental test commands:
 
-* `benchmark-tests`: Running golang tests with `-bench` flag
+* `benchmark-tests`: Running Go tests with `-bench` flag
 * `load-tests`: Running system tests with `LOAD_TESTS=1` flag
 
 
@@ -60,7 +60,7 @@ If the tests were run to create a test coverage, the coverage report files can b
 
 ==== Race detection
 
-All tests can be run with the Golang race detector enabled by setting the environment variable `RACE_DETECTOR=1`. This applies to tests in Golang and Python. For Python the test binary has to be recompile when the flag is changed. Having the race detection enabled will slow down the tests.
+All tests can be run with the Go race detector enabled by setting the environment variable `RACE_DETECTOR=1`. This applies to tests in Go and Python. For Python the test binary has to be recompile when the flag is changed. Having the race detection enabled will slow down the tests.
 
 ==== Docker environment
 
