@@ -171,7 +171,7 @@ func TestAppendFields(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		_, err := appendFields(test.fields, test.appendFields)
+		_, err := common.ConcatFields(test.fields, test.appendFields)
 		if test.error {
 			assert.Error(t, err)
 		} else {
