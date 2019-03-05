@@ -20,6 +20,7 @@ package testing
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -60,6 +61,8 @@ func TestAll(t *testing.T) {
 
 	for _, f := range configFiles {
 		// get module and metricset name from path
+		fmt.Println("AAA")
+		fmt.Println(f)
 		s := strings.Split(f, filepath.ToSlash("/"))
 		moduleName := s[3]
 		metricSetName := s[4]
