@@ -111,19 +111,7 @@ func WriteEventsReporterV2Cond(f mb.ReportingMetricSetV2, t testing.TB, path str
 		return errs[0]
 	}
 
-	if len(events) == 0 {
-		return fmt.Errorf("no events were generated")
-	}
-
-	match, err := SelectEventV2(f, events, cond)
-	if err != nil {
-		return err
-	}
-
-	e := StandardizeEvent(f, match, mb.AddMetricSetInfo)
-
-	WriteEventToDataJSON(t, e, path)
-	return nil
+	return writeEvent(events, f, t, path, cond)
 }
 
 // WriteEventsReporterV2ErrorCond fetches events and writes the first event that matches
@@ -138,6 +126,10 @@ func WriteEventsReporterV2ErrorCond(f mb.ReportingMetricSetV2Error, t testing.TB
 		return errs[0]
 	}
 
+	return writeEvent(events, f, t, path, cond)
+}
+
+func writeEvent(events []mb.Event, f mb.MetricSet, t testing.TB, path string, cond func(common.MapStr) bool) error {
 	if len(events) == 0 {
 		return fmt.Errorf("no events were generated")
 	}
