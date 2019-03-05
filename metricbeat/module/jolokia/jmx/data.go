@@ -18,7 +18,6 @@
 package jmx
 
 import (
-	"reflect"
 	"strings"
 
 	"github.com/joeshaw/multierror"
@@ -120,54 +119,24 @@ func eventMapping(entries []Entry, mapping AttributeMapping) ([]common.MapStr, e
 	var errs multierror.Errors
 
 	for _, v := range entries {
-		hasWildcard := strings.Contains(v.Request.Mbean, "*")
 		if v.Value == nil || v.Request.Attribute == nil {
 			continue
 		}
-		attributeType := reflect.TypeOf(v.Request.Attribute).String()
-		valueType := reflect.TypeOf(v.Value).String()
 
-		// check if value is map[string]interface type
-		if valueType == "map[string]interface {}" {
+		switch attribute := v.Request.Attribute.(type) {
+		case string:
+			switch entryValues := v.Value.(type) {
+			case float64:
+				err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, entryValues, mbeanEvents, mapping)
+				if err != nil {
+					errs = append(errs, err)
+				}
+			case map[string]interface{}:
+				constructEvents(entryValues, v, mbeanEvents, mapping, errs)
+			}
+		case []interface{}:
 			entryValues := v.Value.(map[string]interface{})
-			for attribute, value := range entryValues {
-				if !hasWildcard {
-					err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, value, mbeanEvents, mapping)
-					if err != nil {
-						errs = append(errs, err)
-					}
-					continue
-				}
-
-				// If there was a wildcard, we are going to have an additional
-				// nesting level in response values, and attribute here is going
-				// to be actually the matching mbean name
-				values, ok := value.(map[string]interface{})
-				if !ok {
-					errs = append(errs, errors.Errorf("expected map of values for %s", v.Request.Mbean))
-					continue
-				}
-
-				responseMbean := attribute
-				for attribute, value := range values {
-					err := parseResponseEntry(v.Request.Mbean, responseMbean, attribute, value, mbeanEvents, mapping)
-					if err != nil {
-						errs = append(errs, err)
-					}
-				}
-			}
-			continue
-		}
-
-		// Check if attribute in entry is a string type and value is float64
-		if attributeType == "string" && valueType == "float64" {
-			attribute := v.Request.Attribute.(string)
-			entryValue := v.Value.(float64)
-			err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, entryValue, mbeanEvents, mapping)
-			if err != nil {
-				errs = append(errs, err)
-			}
-			continue
+			constructEvents(entryValues, v, mbeanEvents, mapping, errs)
 		}
 	}
 
@@ -177,6 +146,36 @@ func eventMapping(entries []Entry, mapping AttributeMapping) ([]common.MapStr, e
 	}
 
 	return events, errs.Err()
+}
+
+func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents map[eventKey]common.MapStr, mapping AttributeMapping, errs multierror.Errors) {
+	hasWildcard := strings.Contains(v.Request.Mbean, "*")
+	for attribute, value := range entryValues {
+		if !hasWildcard {
+			err := parseResponseEntry(v.Request.Mbean, v.Request.Mbean, attribute, value, mbeanEvents, mapping)
+			if err != nil {
+				errs = append(errs, err)
+			}
+			continue
+		}
+
+		// If there was a wildcard, we are going to have an additional
+		// nesting level in response values, and attribute here is going
+		// to be actually the matching mbean name
+		values, ok := value.(map[string]interface{})
+		if !ok {
+			errs = append(errs, errors.Errorf("expected map of values for %s", v.Request.Mbean))
+			continue
+		}
+
+		responseMbean := attribute
+		for attribute, value := range values {
+			err := parseResponseEntry(v.Request.Mbean, responseMbean, attribute, value, mbeanEvents, mapping)
+			if err != nil {
+				errs = append(errs, err)
+			}
+		}
+	}
 }
 
 func selectEvent(events map[eventKey]common.MapStr, key eventKey) common.MapStr {
@@ -216,13 +215,15 @@ func parseResponseEntry(
 
 	// In case the attributeValue is a map the keys are dedotted
 	data := attributeValue
-	c, ok := data.(map[string]interface{})
-	if ok {
+	switch aValue := attributeValue.(type) {
+	case map[string]interface{}:
 		newData := map[string]interface{}{}
-		for k, v := range c {
+		for k, v := range aValue {
 			newData[common.DeDot(k)] = v
 		}
 		data = newData
+	case float64:
+		data = aValue
 	}
 	_, err := event.Put(field.Field, data)
 	return err
