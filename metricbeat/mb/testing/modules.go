@@ -209,7 +209,7 @@ func (r *CapturingReporterV2) GetErrors() []error {
 	return r.errs
 }
 
-// CapturingReporterV2 is a reporter used for testing which stores all events and errors
+// CapturingReporterV2Error is a reporter used for testing which stores all events and errors
 type CapturingReporterV2Error struct {
 	events []mb.Event
 	errs   []error
