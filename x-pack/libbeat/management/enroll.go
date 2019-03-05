@@ -25,7 +25,6 @@ func Enroll(
 	beat *instance.Beat,
 	kibanaConfig *kibana.ClientConfig,
 	enrollmentToken string,
-	force bool,
 ) error {
 	// Ignore kibana version to avoid permission errors
 	kibanaConfig.IgnoreVersion = true

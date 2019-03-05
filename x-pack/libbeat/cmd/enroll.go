@@ -100,7 +100,7 @@ func genEnrollCmd(name, version string) *cobra.Command {
 					}
 				}
 
-				err = management.Enroll(beat, config, enrollmentToken, force)
+				err = management.Enroll(beat, config, enrollmentToken)
 				if err != nil {
 					return errors.Wrap(err, "Error while enrolling")
 				}
