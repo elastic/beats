@@ -14,7 +14,12 @@ import (
 )
 
 var fieldNameConverter = caseConverter{
-	conversion: make(map[string]string),
+	conversion: map[string]string{
+		// Special handled fields
+
+		// VRFname should be VRFName
+		"VRFname": "vrf_name",
+	},
 }
 
 type caseConverter struct {
@@ -50,24 +55,24 @@ func (c *caseConverter) ToSnakeCase(orig record.Map) common.MapStr {
 // format. This function is tailored to some specifics of NetFlow field names.
 // Don't reuse it.
 func CamelCaseToSnakeCase(in string) string {
-	// Lowercase those few fields that are already snake-cased
+	// skip those few fields that are already snake-cased
 	if strings.ContainsRune(in, '_') {
 		return strings.ToLower(in)
 	}
 
 	out := make([]rune, 0, len(in)+4)
 	runes := []rune(in)
-	upperStrike := 1
-	for pos, r := range runes {
+	upperCount := 1
+	for _, r := range runes {
 		lr := unicode.ToLower(r)
 		isUpper := lr != r
 		if isUpper {
-			if upperStrike == 0 {
+			if upperCount == 0 {
 				out = append(out, '_')
 			}
-			upperStrike++
+			upperCount++
 		} else {
-			if upperStrike > 2 {
+			if upperCount > 2 {
 				// Some magic here:
 				// NetFlow usually lowercases all but the first letter of an
 				// acronym (Icmp) Except when it is 2 characters long: (IP).
@@ -77,9 +82,10 @@ func CamelCaseToSnakeCase(in string) string {
 				// postNATSourceIPv4Address     : post_nat_source_ipv4_address
 				// selectorIDTotalFlowsObserved : selector_id_total_flows_...
 				out = append(out, '_')
-				out[pos], out[pos-1] = out[pos-1], out[pos]
+				n := len(out) - 1
+				out[n], out[n-1] = out[n-1], out[n]
 			}
-			upperStrike = 0
+			upperCount = 0
 		}
 		out = append(out, lr)
 	}
