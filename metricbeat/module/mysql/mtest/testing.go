@@ -36,6 +36,10 @@ func GetDSN(host string) string {
 		Addr:   host,
 		User:   "root",
 		Passwd: "test",
+
+		// Required if password is set and FormatDSN() is used
+		// since clients for MySQL 8.0
+		AllowNativePasswords: true,
 	}
 	return c.FormatDSN()
 }
