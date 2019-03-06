@@ -24,8 +24,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/common"
 
-	"fmt"
-
 	dto "github.com/prometheus/client_model/go"
 )
 
@@ -176,38 +174,11 @@ func (m *commonMetric) GetValue(metric *dto.Metric) interface{} {
 
 		buckets := histogram.GetBucket()
 		bucketMap := common.MapStr{}
-		needScale := false
 		for _, bucket := range buckets {
 			key := strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
 			bucketMap[key] = bucket.GetCumulativeCount()
-			// key should not be allowed to contain dots. If so, scale that key accordingly to avoid dots
-			if strings.Contains(key, ".") {
-				needScale = true
-			}
 		}
 		if len(bucketMap) != 0 {
-			if needScale {
-				// if needed scale keys that are in double precision format, use "nano" as scale factor
-				scaleFactor := 1000000000.0
-				for key, promValue := range bucketMap {
-					if strings.Contains(key, ".") {
-						s, err := strconv.ParseFloat(key, 64)
-						if err != nil {
-							return nil
-						}
-						scaledKey := int(s * scaleFactor)
-						stringKey := fmt.Sprintf("%d", scaledKey)
-						bucketMap.Put(stringKey, promValue)
-						bucketMap.Delete(key)
-					}
-				}
-				// scale sum metric too, since is the summary of the observed values that were scaled
-				sum, ok := value["sum"].(float64)
-				if !ok {
-					return nil
-				}
-				value.Put("sum", int(sum*scaleFactor))
-			}
 			value["bucket"] = bucketMap
 		}
 
