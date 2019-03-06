@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 )
 
@@ -106,6 +107,7 @@ type MetricSet interface {
 	HostData() HostData                  // HostData returns the parsed host data.
 	Registration() MetricSetRegistration // Params used in registration.
 	Metrics() *monitoring.Registry       // MetricSet specific metrics
+	Logger() *logp.Logger                // MetricSet specific logger
 }
 
 // Closer is an optional interface that a MetricSet can implement in order to
@@ -241,6 +243,7 @@ type BaseMetricSet struct {
 	hostData     HostData
 	registration MetricSetRegistration
 	metrics      *monitoring.Registry
+	logger       *logp.Logger
 }
 
 func (b *BaseMetricSet) String() string {
@@ -262,6 +265,11 @@ func (b *BaseMetricSet) ID() string {
 // Metrics returns the metrics registry.
 func (b *BaseMetricSet) Metrics() *monitoring.Registry {
 	return b.metrics
+}
+
+// Logger returns the logger.
+func (b *BaseMetricSet) Logger() *logp.Logger {
+	return b.logger
 }
 
 // Name returns the name of the MetricSet. It should not include the name of
