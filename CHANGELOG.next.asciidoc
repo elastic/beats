@@ -244,6 +244,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Gracefully shut down on SIGHUP {pull}10704[10704]
 
 - Add `script` processor that supports using Javascript to process events. {pull}NNNN[NNNN]
+- Add `script` processor that supports using Javascript to process events. {pull}10850[10850]
 
 *Auditbeat*
 
