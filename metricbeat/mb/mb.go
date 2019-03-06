@@ -201,6 +201,13 @@ type ReportingMetricSetV2 interface {
 	Fetch(r ReporterV2)
 }
 
+// ReportingMetricSetV2Error is a MetricSet that reports events or errors through the
+// ReporterV2 interface. Fetch is called periodically to collect events.
+type ReportingMetricSetV2Error interface {
+	MetricSet
+	Fetch(r ReporterV2) error
+}
+
 // PushMetricSetV2 is a MetricSet that pushes events (rather than pulling them
 // periodically via a Fetch callback). Run is invoked to start the event
 // subscription and it should block until the MetricSet is ready to stop or
