@@ -50,6 +50,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Ensure all beat commands respect configured settings. {pull}10721[10721]
 - Reconnections of Kubernetes watchers are now logged at debug level when they are harmless. {pull}10988[10988]
 - Add missing host.* fields to fields.yml. {pull}11016[11016]
+- Include ip and boolean type when generating index pattern. {pull}10995[10995]
 
 *Auditbeat*
 
