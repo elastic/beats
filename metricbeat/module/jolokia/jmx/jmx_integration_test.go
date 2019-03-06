@@ -184,6 +184,15 @@ func getConfigs() []map[string]interface{} {
 						},
 					},
 				},
+				{
+					"mbean": "java.lang:type=Runtime",
+					"attributes": []map[string]string{
+						{
+							"attr":  "Uptime",
+							"field": "uptime",
+						},
+					},
+				},
 			},
 		},
 	}
