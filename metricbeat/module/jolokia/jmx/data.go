@@ -95,16 +95,16 @@ type Entry struct {
 //
 // A response with single value
 //
-//  [
-//     {
-//      "request":{
+// [
+//    {
+//       "request": {
 //          "mbean":"java.lang:type=Runtime",
-//         "attribute":"Uptime",
-//         "type":"read"
+//          "attribute":"Uptime",
+//          "type":"read"
 //       },
-//        "value":88622,
-//         "timestamp":1551739190,
-//         "status":200
+//       "value":88622,
+//       "timestamp":1551739190,
+//       "status":200
 //    }
 // ]
 type eventKey struct {
