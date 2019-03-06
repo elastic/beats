@@ -12,16 +12,16 @@
                     "committed": 514850816,
                     "init": 536870912,
                     "max": 7635730432,
-                    "used": 125635728
+                    "used": 129678632
                 },
                 "non_heap_usage": {
-                    "committed": 30343168,
+                    "committed": 30408704,
                     "init": 2555904,
                     "max": -1,
-                    "used": 29467248
+                    "used": 28690656
                 }
             },
-            "uptime": 13716841
+            "uptime": 14364137
         }
     },
     "metricset": {
