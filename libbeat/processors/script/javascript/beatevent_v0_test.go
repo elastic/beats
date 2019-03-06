@@ -64,16 +64,25 @@ var eventV0Tests = []testCase{
 		code: `
 			var ip = evt.Get("source.ip");
 
-			if ("192.0.2.1" != ip) {
+			if ("192.0.2.1" !== ip) {
 				throw "failed to get IP";
 			}`,
+	},
+	{
+		name: "Get Object",
+		code: `
+			var source = evt.Get("source");
+
+  			if ("192.0.2.1" !== source.ip) {
+    			throw "failed to get IP";
+  			}`,
 	},
 	{
 		name: "Get Undefined Key",
 		code: `
 			var ip = evt.Get().source.ip;
 
-  			if ("192.0.2.1" != ip) {
+  			if ("192.0.2.1" !== ip) {
     			throw "failed to get IP";
   			}`,
 	},
@@ -82,7 +91,7 @@ var eventV0Tests = []testCase{
 		code: `
 			var ip = evt.fields.source.ip;
 
-  			if ("192.0.2.1" != ip) {
+  			if ("192.0.2.1" !== ip) {
     			throw "failed to get IP";
   			}`,
 	},
