@@ -57,6 +57,13 @@ func OpLowercaseValue() MetricOption {
 	return opLowercaseValue{}
 }
 
+// OpMultiplyBuckets multiplies bucket labels in histograms, useful to change units
+func OpMultiplyBuckets(multiplier float64) MetricOption {
+	return opMultiplyBuckets{
+		multiplier: multiplier,
+	}
+}
+
 // Metric directly maps a Prometheus metric to a Metricbeat field
 func Metric(field string, options ...MetricOption) MetricMap {
 	return &commonMetric{
@@ -266,4 +273,31 @@ func (o opLowercaseValue) Process(field string, value interface{}, labels common
 		value = strings.ToLower(val)
 	}
 	return field, value, labels
+}
+
+type opMultiplyBuckets struct {
+	multiplier float64
+}
+
+// Process will multiply the bucket labels if it is an histogram with numeric labels
+func (o opMultiplyBuckets) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
+	histogram, ok := value.(common.MapStr)
+	if !ok {
+		return field, value, labels
+	}
+	bucket, ok := histogram["bucket"].(common.MapStr)
+	if !ok {
+		return field, value, labels
+	}
+	multiplied := common.MapStr{}
+	for k, v := range bucket {
+		if f, err := strconv.ParseFloat(k, 64); err == nil {
+			key := strconv.FormatFloat(f*o.multiplier, 'f', -1, 64)
+			multiplied[key] = v
+		} else {
+			multiplied[k] = v
+		}
+	}
+	histogram["bucket"] = multiplied
+	return field, histogram, labels
 }
