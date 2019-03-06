@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/config"
+	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/fields"
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/test"
 )
 
@@ -179,4 +180,44 @@ func TestSessionReset(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Empty(t, flows)
 	})
+}
+
+func TestCustomFields(t *testing.T) {
+	addr := test.MakeAddress(t, "127.0.0.1:12345")
+
+	conf := config.Defaults()
+	conf.WithCustomFields(fields.FieldDict{
+		fields.Key{FieldID: 33333}: &fields.Field{Name: "customField", Decoder: fields.String},
+	})
+	assert.Contains(t, conf.Fields(), fields.Key{FieldID: 33333})
+	proto := New(conf)
+	flows, err := proto.OnPacket(test.MakePacket([]uint16{
+		// Header
+		// Version, Count, Uptime, Ts, SeqNo, Source
+		9, 1, 11, 11, 22, 22, 33, 33, 0, 1234,
+		// Set #1 (template)
+		0, 20, /*len of set*/
+		999, 3, /*len*/
+		1, 4, // Fields
+		2, 4,
+		33333, 8,
+	}), addr)
+	assert.NoError(t, err)
+	assert.Empty(t, flows)
+
+	flows, err = proto.OnPacket(test.MakePacket([]uint16{
+		// Header
+		// Version, Count, Uptime, Ts, SeqNo, Source
+		9, 1, 11, 11, 22, 22, 33, 34, 0, 1234,
+		// Set #1 (template)
+		999, 20, /*len of set*/
+		1, 1,
+		2, 2,
+		0x4865, 0x6c6c,
+		0x6f20, 0x3a29,
+	}), addr)
+	assert.NoError(t, err)
+	assert.Len(t, flows, 1)
+	assert.Contains(t, flows[0].Fields, "customField")
+	assert.Equal(t, flows[0].Fields["customField"], "Hello :)")
 }
