@@ -15,20 +15,20 @@
                     "committed": 514850816,
                     "init": 536870912,
                     "max": 7635730432,
-                    "used": 52889856
+                    "used": 42087240
                 },
                 "non_heap_usage": {
-                    "committed": 30015488,
+                    "committed": 29229056,
                     "init": 2555904,
                     "max": -1,
-                    "used": 29015664
+                    "used": 28395640
                 }
             },
-            "uptime": 1766843
+            "uptime": 239893
         }
     },
     "metricset": {
-        "host": "127.0.0.1:8080",
+        "host": "127.0.0.1:8778",
         "module": "jolokia",
         "name": "jmx",
         "namespace": "jolokia.testnamespace",
