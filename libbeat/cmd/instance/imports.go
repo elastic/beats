@@ -33,6 +33,5 @@ import (
 	_ "github.com/elastic/beats/libbeat/processors/communityid"
 	_ "github.com/elastic/beats/libbeat/processors/dissect"
 	_ "github.com/elastic/beats/libbeat/processors/dns"
-	_ "github.com/elastic/beats/libbeat/processors/script"
 	_ "github.com/elastic/beats/libbeat/publisher/includes" // Register publisher pipeline modules
 )

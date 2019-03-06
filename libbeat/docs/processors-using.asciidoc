@@ -208,7 +208,9 @@ The supported processors are:
  * <<drop-fields,`drop_fields`>>
  * <<include-fields,`include_fields`>>
  * <<rename-fields,`rename`>>
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat") or ("{beatname_lc}"=="journalbeat")]
  * <<processor-script,`script`>>
+endif::[]
 
 [[conditions]]
 ==== Conditions
@@ -1282,6 +1284,7 @@ set to `true`, this condition will be ignored.
 output, to avoid leaking sensitive data. If `restricted_fields` is `true`, the
 field will be present in the output.
 
+ifeval::[("{beatname_lc}"=="filebeat") or ("{beatname_lc}"=="winlogbeat") or ("{beatname_lc}"=="journalbeat")]
 [[processor-script]]
 === Script Processor
 
@@ -1450,4 +1453,4 @@ thrown.
 
 *Example*: `event.AppendTo("error.message", "invalid file hash");`
 |===
-
+endif::[]
