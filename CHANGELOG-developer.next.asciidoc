@@ -26,6 +26,7 @@ The list below covers the major changes between 7.0.0-beta1 and master only.
 
 ==== Bugfixes
 - Align default index between elasticsearch and logstash and kafka output. {pull}10841[10841]
+- Fix duplication check for `append_fields` option. {pull}10959[10959]
 
 ==== Added
 
