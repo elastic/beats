@@ -18,12 +18,15 @@
 package expvar
 
 import (
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/golang"
 )
+
+var logger = logp.NewLogger("golang.expvar")
 
 const (
 	defaultScheme = "http"
@@ -82,18 +85,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	json, err := m.http.FetchJSON()
 
 	if err != nil {
-		return nil, err
+		logger.Error(err)
+		reporter.Error(err)
+		return
 	}
 
 	//flatten cmdline
 	json["cmdline"] = golang.GetCmdStr(json["cmdline"])
 
-	//set namespace
-	json[mb.NamespaceKey] = m.namespace
-
-	return json, nil
+	reporter.Event(mb.Event{
+		MetricSetFields: json,
+		Namespace:       m.Module().Name() + "." + m.namespace,
+	})
 }
