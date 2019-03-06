@@ -102,7 +102,7 @@ type beatConfig struct {
 	Pipeline   pipeline.Config `config:",inline"`
 	Monitoring *common.Config  `config:"xpack.monitoring"`
 
-	// central managmenet settings
+	// central management settings
 	Management *common.Config `config:"management"`
 
 	// elastic stack 'setup' configurations
@@ -691,7 +691,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 		}
 
 		// Initialize kibana config. If username and password is set in elasticsearch output config but not in kibana,
-		// initKibanaConfig will attach the ussername and password into kibana config as a part of the initialization.
+		// initKibanaConfig will attach the username and password into kibana config as a part of the initialization.
 		kibanaConfig, err := initKibanaConfig(b.Config)
 		if err != nil {
 			return fmt.Errorf("error initKibanaConfig: %v", err)
