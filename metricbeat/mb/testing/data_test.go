@@ -37,6 +37,7 @@ import (
 
 	// TODO: generate include file for these tests automatically moving forward
 	_ "github.com/elastic/beats/metricbeat/module/kibana/status"
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes/apiserver"
 	_ "github.com/elastic/beats/metricbeat/module/php_fpm/pool"
 	_ "github.com/elastic/beats/metricbeat/module/php_fpm/process"
 	_ "github.com/elastic/beats/metricbeat/module/rabbitmq/connection"
@@ -53,8 +54,9 @@ var (
 )
 
 type Config struct {
-	Type string
-	URL  string
+	Type   string
+	URL    string
+	Suffix string
 }
 
 func TestAll(t *testing.T) {
@@ -77,13 +79,17 @@ func TestAll(t *testing.T) {
 			log.Fatalf("Unmarshal: %v", err)
 		}
 
-		getTestdataFiles(t, config.URL, moduleName, metricSetName)
+		if config.Suffix == "" {
+			config.Suffix = "json"
+		}
+
+		getTestdataFiles(t, config.URL, moduleName, metricSetName, config.Suffix)
 	}
 }
 
-func getTestdataFiles(t *testing.T, url, module, metricSet string) {
+func getTestdataFiles(t *testing.T, url, module, metricSet, suffix string) {
 
-	ff, _ := filepath.Glob(getMetricsetPath(module, metricSet) + "/_meta/testdata/*.json")
+	ff, _ := filepath.Glob(getMetricsetPath(module, metricSet) + "/_meta/testdata/*." + suffix)
 	var files []string
 	for _, f := range ff {
 		// Exclude all the expected files
@@ -95,12 +101,12 @@ func getTestdataFiles(t *testing.T, url, module, metricSet string) {
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			runTest(t, f, module, metricSet, url)
+			runTest(t, f, module, metricSet, url, suffix)
 		})
 	}
 }
 
-func runTest(t *testing.T, file string, module, metricSetName, url string) {
+func runTest(t *testing.T, file string, module, metricSetName, url, suffix string) {
 
 	// starts a server serving the given file under the given url
 	s := server(t, file, url)
@@ -157,7 +163,7 @@ func runTest(t *testing.T, file string, module, metricSetName, url string) {
 
 	assert.Equal(t, string(expected), string(output))
 
-	if strings.HasSuffix(file, "docs.json") {
+	if strings.HasSuffix(file, "docs."+suffix) {
 		writeDataJSON(t, data[0], module, metricSetName)
 	}
 }

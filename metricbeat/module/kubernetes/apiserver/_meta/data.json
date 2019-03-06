@@ -1,0 +1,26 @@
+{
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "kubernetes.apiserver",
+        "duration": 115000,
+        "module": "kubernetes"
+    },
+    "kubernetes": {
+        "apiserver": {
+            "request": {
+                "client": "kube-apiserver/v1.8.8 (linux/amd64) kubernetes/6e5b33a",
+                "count": 1,
+                "resource": "configmaps",
+                "scope": "namespace",
+                "verb": "GET"
+            }
+        }
+    },
+    "metricset": {
+        "name": "apiserver"
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "kubernetes"
+    }
+}
