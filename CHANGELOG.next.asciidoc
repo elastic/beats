@@ -71,6 +71,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 - Migrate docker autodiscover to ECS. {issue}10757[10757] {pull}10862[10862]
 - Fix issue in kubernetes module preventing usage percentages to be properly calculated. {pull}10946[10946]
+- Fix parsing error using GET in Jolokia module. {pull}11075[11075] {issue}11071[11071]
 
 *Packetbeat*
 
