@@ -25,7 +25,6 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
-	"github.com/elastic/beats/libbeat/paths"
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
@@ -102,30 +101,17 @@ func TestEmptyMetaJson(t *testing.T) {
 		panic(err)
 	}
 
-	metaPath := paths.Resolve(paths.Data, "meta.json")
-	backupMetaPath := paths.Resolve(paths.Data, "meta.json.backup")
+	// prepare empty meta file
+	metaFile, err := ioutil.TempFile("../test", "meta.json")
+	assert.Equal(t, nil, err, "Unable to create temporary meta file")
 
-	// backup existing meta file
-	_, err = os.Stat(metaPath)
-	backedUp := false
-	if !os.IsNotExist(err) {
-		err := os.Rename(metaPath, backupMetaPath)
-		assert.Equal(t, nil, err, "Cannot backup meta file")
-		backedUp = true
-	}
+	metaPath := metaFile.Name()
+	metaFile.Close()
+	defer os.Remove(metaPath)
 
-	// prepare empty meta
-	ioutil.WriteFile(metaPath, nil, 0644)
+	// load metadata
+	err = b.loadMeta(metaPath)
 
-	metaErr := b.loadMeta()
-
-	// cleanup
-	os.Remove(metaPath)
-	if backedUp {
-		err = os.Rename(backupMetaPath, metaPath)
-		assert.Equal(t, nil, err, "Cleanup failed")
-	}
-
-	assert.Equal(t, nil, metaErr, "Unable to load meta file properly")
+	assert.Equal(t, nil, err, "Unable to load meta file properly")
 	assert.NotEqual(t, uuid.Nil, b.Info.ID, "Beats UUID is not set")
 }

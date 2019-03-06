@@ -563,7 +563,8 @@ func (b *Beat) configure(settings Settings) error {
 	// log paths values to help with troubleshooting
 	logp.Info(paths.Paths.String())
 
-	err = b.loadMeta()
+	metaPath := paths.Resolve(paths.Data, "meta.json")
+	err = b.loadMeta(metaPath)
 	if err != nil {
 		return err
 	}
@@ -597,12 +598,11 @@ func (b *Beat) configure(settings Settings) error {
 	return err
 }
 
-func (b *Beat) loadMeta() error {
+func (b *Beat) loadMeta(metaPath string) error {
 	type meta struct {
 		UUID uuid.UUID `json:"uuid"`
 	}
 
-	metaPath := paths.Resolve(paths.Data, "meta.json")
 	logp.Debug("beat", "Beat metadata path: %v", metaPath)
 
 	f, err := openRegular(metaPath)
