@@ -45,15 +45,6 @@ func TestFetch(t *testing.T) {
 
 }
 
-func TestData(t *testing.T) {
-	compose.EnsureUp(t, "phpfpm")
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	err := mbtest.WriteEventsReporterV2(f, t, ".")
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}
-
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "php_fpm",
