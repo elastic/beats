@@ -92,7 +92,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 			continue
 		}
 		data, _ := schema.Apply(result)
-		reporter.Event(mb.Event{MetricSetFields: data})
+		if reported := reporter.Event(mb.Event{MetricSetFields: data}); !reported {
+			logger.Error("error reporting event")
+			return
+		}
 		totalEvents++
 	}
 
