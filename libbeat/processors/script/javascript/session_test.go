@@ -19,6 +19,11 @@ package javascript
 
 import (
 	"testing"
+	"time"
+
+	"github.com/elastic/beats/libbeat/beat"
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -136,4 +141,46 @@ func TestSessionTestFunction(t *testing.T) {
 		}, nil)
 		assert.Error(t, err)
 	})
+}
+
+func TestSessionTimeout(t *testing.T) {
+	logp.TestingSetup()
+
+	const runawayLoop = `
+		while (!evt.fields.stop) {
+			evt.Put("hello", "world");			
+		}
+    `
+
+	p, err := NewFromConfig(Config{
+		Code:           header + runawayLoop + footer,
+		Timeout:        500 * time.Millisecond,
+		TagOnException: "_js_exception",
+	}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	evt := &beat.Event{
+		Fields: common.MapStr{
+			"stop": false,
+		},
+	}
+
+	// Execute and expect a timeout.
+	evt, err = p.Run(evt)
+	if assert.Error(t, err) {
+		assert.Contains(t, err.Error(), timeoutError)
+
+		tags, _ := evt.GetValue("tags")
+		assert.Equal(t, []string{"_js_exception"}, tags)
+
+		errorMessage, _ := evt.GetValue("error.message")
+		assert.Contains(t, errorMessage, timeoutError)
+	}
+
+	// Verify that any internal runtime interrupt state has been cleared.
+	evt.PutValue("stop", true)
+	_, err = p.Run(evt)
+	assert.NoError(t, err)
 }

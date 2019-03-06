@@ -17,7 +17,11 @@
 
 package javascript
 
-import "github.com/pkg/errors"
+import (
+	"time"
+
+	"github.com/pkg/errors"
+)
 
 // Config defines the Javascript source files to use for the processor.
 type Config struct {
@@ -26,6 +30,7 @@ type Config struct {
 	File           string                 `config:"file"`
 	Files          []string               `config:"files"`
 	Params         map[string]interface{} `config:"script_params"`
+	Timeout        time.Duration          `config:"timeout" validate:"min=0"`
 	TagOnException string                 `config:"tag_on_exception"`
 }
 

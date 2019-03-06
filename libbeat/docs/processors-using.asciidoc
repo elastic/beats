@@ -1389,6 +1389,12 @@ of the script.
 `tag_on_exception`:: Tag to add to events in case the Javascript code causes an
 exception while processing an event. Defaults to `_js_exception`.
 
+`timeout`:: This sets an execution timeout for the `process` function. When
+the `process` function takes longer than the `timeout` period the function
+is interrupted. You can set this option to prevent a script from running for
+too long (like preventing an infinite `while` loop). By default there is no
+timeout.
+
 [float]
 ==== Event API
 

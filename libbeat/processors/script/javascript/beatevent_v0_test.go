@@ -19,8 +19,10 @@ package javascript
 
 import (
 	"fmt"
+	"runtime"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -191,20 +193,23 @@ func TestBeatEventV0(t *testing.T) {
 			assert.True(t, found, "metrics were not found in registry")
 		})
 	}
+
 }
 
 func BenchmarkBeatEventV0(b *testing.B) {
-	for _, tc := range eventV0Tests {
-		switch tc.name {
-		case "Delete", "Rename":
-			// Skip these tests for the benchmark because they affect the state
-			// of the event in way that prevents them from being run more than
-			// one time.
-			continue
+	goroutinesAtStart := runtime.NumGoroutine()
+	defer func() {
+		// Sanity check that timers are not leaking goroutines.
+		goroutinesAtEnd := runtime.NumGoroutine()
+		if goroutinesAtEnd != goroutinesAtStart {
+			b.Errorf("Suspected goroutine leak: atStart=%d, atEnd=%d",
+				goroutinesAtStart, goroutinesAtEnd)
 		}
+	}()
 
-		b.Run(tc.name, func(b *testing.B) {
-			p, err := NewFromConfig(Config{Code: header + tc.code + footer}, nil)
+	benchTest := func(tc testCase, timeout time.Duration) func(b *testing.B) {
+		return func(b *testing.B) {
+			p, err := NewFromConfig(Config{Code: header + tc.code + footer, Timeout: timeout}, nil)
 			if err != nil {
 				b.Fatal(err)
 			}
@@ -217,7 +222,18 @@ func BenchmarkBeatEventV0(b *testing.B) {
 					b.Fatal(err)
 				}
 			}
-		})
+		}
 	}
+	for _, tc := range eventV0Tests {
+		switch tc.name {
+		case "Delete", "Rename":
+			// Skip these tests for the benchmark because they affect the state
+			// of the event in way that prevents them from being run more than
+			// one time.
+			continue
+		}
 
+		b.Run(tc.name, benchTest(tc, 0))
+		b.Run("timeout_"+tc.name, benchTest(tc, 500*time.Millisecond))
+	}
 }

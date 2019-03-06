@@ -19,6 +19,7 @@ package javascript
 
 import (
 	"reflect"
+	"time"
 
 	"github.com/dop251/goja"
 	"github.com/pkg/errors"
@@ -34,6 +35,8 @@ const (
 	registerFunction   = "register"
 	entryPointFunction = "process"
 	testFunction       = "test"
+
+	timeoutError = "javascript processor execution timeout"
 )
 
 // Session is an instance of the processor.
@@ -73,6 +76,7 @@ type session struct {
 	makeEvent      func(Session) (Event, error)
 	evt            Event
 	processFunc    goja.Callable
+	timeout        time.Duration
 	tagOnException string
 }
 
@@ -92,6 +96,7 @@ func newSession(
 		vm:             goja.New(),
 		log:            logp.NewLogger(logName),
 		makeEvent:      newBeatEventV0,
+		timeout:        conf.Timeout,
 		tagOnException: conf.TagOnException,
 	}
 	if conf.ID != "" {
@@ -207,10 +212,19 @@ func (s *session) runProcessFunc(b *beat.Event) (*beat.Event, error) {
 		return b, err
 	}
 
+	// Interrupt the JS code if execution exceeds timeout.
+	if s.timeout > 0 {
+		t := time.AfterFunc(s.timeout, func() {
+			s.vm.Interrupt(timeoutError)
+		})
+		defer t.Stop()
+	}
+
 	if _, err = s.processFunc(goja.Undefined(), s.evt.JSObject()); err != nil {
 		if s.tagOnException != "" {
 			common.AddTags(b.Fields, []string{s.tagOnException})
 		}
+		appendString(b.Fields, "error.message", err.Error(), false)
 		return b, errors.Wrap(err, "failed in process function")
 	}
 
