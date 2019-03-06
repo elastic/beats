@@ -192,7 +192,7 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 	case mb.PushMetricSetV2:
 		ms.Run(reporter.V2())
 	case mb.EventFetcher, mb.EventsFetcher,
-		mb.ReportingMetricSet, mb.ReportingMetricSetV2:
+		mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error:
 		msw.startPeriodicFetching(reporter)
 	default:
 		// Earlier startup stages prevent this from happening.
@@ -236,6 +236,13 @@ func (msw *metricSetWrapper) fetch(reporter reporter) {
 	case mb.ReportingMetricSetV2:
 		reporter.StartFetchTimer()
 		fetcher.Fetch(reporter.V2())
+	case mb.ReportingMetricSetV2Error:
+		reporter.StartFetchTimer()
+		err := fetcher.Fetch(reporter.V2())
+		if err != nil {
+			reporter.V2().Error(err)
+			logp.Info("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+		}
 	default:
 		panic(fmt.Sprintf("unexpected fetcher type for %v", msw))
 	}
