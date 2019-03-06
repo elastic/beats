@@ -9,14 +9,6 @@
       description: >
         Fields from NATS logs client.
       fields:
-        - name: ip
-          type: ip
-          description: >
-            The IP of the client
-        - name: port
-          type: integer
-          description: >
-            The port of the client
         - name: id
           type: integer
           description: >
@@ -38,10 +30,6 @@
           type: keyword
           description: >
             The protocol message type
-        - name: data
-          type: text
-          description: >
-            Data of logs not containing protocol messages information
         - name: subject
           type: keyword
           description: >

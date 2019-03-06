@@ -18,7 +18,7 @@
             "grok": {
                 "field": "nats.log.info",
                 "patterns": [
-                    "%{IPV4:nats.log.client.ip}:%{POSINT:nats.log.client.port} - cid:%{POSINT:nats.log.client.id} - %{GREEDYDATA:nats.log.msg.info}",
+                    "%{IPV4:client.ip}:%{POSINT:client.port} - cid:%{POSINT:nats.log.client.id} - %{GREEDYDATA:nats.log.msg.info}",
                     "%{GREEDYDATA:nats.log.msg.data}"
                 ],
                 "ignore_missing": true
@@ -77,6 +77,13 @@
         {
             "remove": {
                 "field": "message"
+            }
+        },
+        {
+            "rename": {
+                "field": "nats.log.msg.data",
+                "target_field": "message",
+                "ignore_missing": true
             }
         },
         {

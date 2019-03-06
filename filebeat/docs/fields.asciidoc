@@ -7451,26 +7451,6 @@ Fields from NATS logs client.
 
 
 
-*`nats.log.client.ip`*::
-+
---
-type: ip
-
-The IP of the client
-
-
---
-
-*`nats.log.client.port`*::
-+
---
-type: integer
-
-The port of the client
-
-
---
-
 *`nats.log.client.id`*::
 +
 --
@@ -7514,16 +7494,6 @@ The direction of the message
 type: keyword
 
 The protocol message type
-
-
---
-
-*`nats.log.msg.data`*::
-+
---
-type: text
-
-Data of logs not containing protocol messages information
 
 
 --
