@@ -20,8 +20,9 @@ package cluster_health
 import (
 	"encoding/json"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 type Timecheck struct {
@@ -40,11 +41,11 @@ type HealthRequest struct {
 	Output Output `json:"output"`
 }
 
-func eventMapping(content []byte) common.MapStr {
+func eventMapping(content []byte) (common.MapStr, error) {
 	var d HealthRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		logp.Err("Error: %+v", err)
+		return nil, errors.Wrap(err, "error getting HealthRequest data")
 	}
 
 	return common.MapStr{
@@ -56,5 +57,5 @@ func eventMapping(content []byte) common.MapStr {
 				"status": d.Output.Timechecks.RoundStatus,
 			},
 		},
-	}
+	}, nil
 }
