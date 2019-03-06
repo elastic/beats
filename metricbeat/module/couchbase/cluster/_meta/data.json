@@ -1,6 +1,6 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
@@ -8,22 +8,22 @@
         "cluster": {
             "hdd": {
                 "free": {
-                    "bytes": 53223546102
+                    "bytes": 48341763359
                 },
                 "quota": {
                     "total": {
-                        "bytes": 67371577344
+                        "bytes": 185929859072
                     }
                 },
                 "total": {
-                    "bytes": 67371577344
+                    "bytes": 185929859072
                 },
                 "used": {
                     "by_data": {
-                        "bytes": 12962692
+                        "bytes": 23665027
                     },
                     "value": {
-                        "bytes": 14148031242
+                        "bytes": 137588095713
                     }
                 }
             },
@@ -56,23 +56,29 @@
                     }
                 },
                 "total": {
-                    "bytes": 4139122688
+                    "bytes": 16683503616
                 },
                 "used": {
                     "by_data": {
-                        "bytes": 53962032
+                        "bytes": 53961776
                     },
                     "value": {
-                        "bytes": 3484700672
+                        "bytes": 14443474944
                     }
                 }
             }
         }
     },
+    "event": {
+        "dataset": "couchbase.cluster",
+        "duration": 115000,
+        "module": "couchbase"
+    },
     "metricset": {
-        "host": "couchbase:8091",
-        "module": "couchbase",
-        "name": "cluster",
-        "rtt": 115
+        "name": "cluster"
+    },
+    "service": {
+        "address": "localhost:8091",
+        "type": "couchbase"
     }
 }

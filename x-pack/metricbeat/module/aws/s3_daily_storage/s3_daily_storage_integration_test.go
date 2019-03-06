@@ -42,7 +42,7 @@ func TestFetch(t *testing.T) {
 		// MetricSetField
 		mtest.CheckEventField("bucket.name", "string", event, t)
 		mtest.CheckEventField("bucket.size.bytes", "float", event, t)
-		mtest.CheckEventField("number_of_object", "int", event, t)
+		mtest.CheckEventField("number_of_objects", "float", event, t)
 	}
 }
 
