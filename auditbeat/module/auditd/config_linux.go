@@ -54,7 +54,7 @@ type Config struct {
 	SocketType   string   `config:"socket_type"`         // Socket type to use with the kernel (unicast or multicast).
 
 	// reload auditd rule files
-	Reload reload `config:"reload"`
+	Reload Reload `config:"reload"`
 
 	// Tuning options (advanced, use with care)
 	ReassemblerMaxInFlight uint32        `config:"reassembler.max_in_flight"`
@@ -70,8 +70,8 @@ type Config struct {
 	auditRules []auditRule
 }
 
-type reload struct {
-	Period  time.Duration `config:"period"`
+type Reload struct {
+	Period  time.Duration `config:"period" validate:"positive"`
 	Enabled bool          `config:"enabled"`
 }
 
@@ -98,7 +98,11 @@ var defaultConfig = Config{
 	ReassemblerTimeout:     2 * time.Second,
 	StreamBufferQueueSize:  8192,
 	StreamBufferConsumers:  0,
-	Reload:                 reload{Enabled: false, Period: 30 * time.Second},
+}
+
+// IsEnabled returns true if the enable field is set to true in the config.
+func (r *Reload) IsEnabled() bool {
+	return r != nil && (r.Enabled == true || r.Period != 0)
 }
 
 // Validate validates the rules specified in the config.
@@ -130,13 +134,9 @@ func (c Config) rules() []auditRule {
 }
 
 func (c *Config) reloadRules() error {
+	c.auditRules = nil
 
-	c.auditRules = []auditRule{}
-
-	if err := c.loadRules(); err != nil {
-		return err
-	}
-	return nil
+	return c.loadRules()
 }
 
 func (c *Config) loadRules() error {
