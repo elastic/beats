@@ -255,12 +255,17 @@ func (w *watcher) watch() {
 			r := w.k8sResourceFactory()
 			eventType, err := watcher.Next(r)
 			if err != nil {
-				logp.Err("kubernetes: Watching API error %v", err)
 				watcher.Close()
-				if !(err == io.EOF || err == io.ErrUnexpectedEOF) {
+				switch err {
+				case io.EOF:
+					logp.Debug("kubernetes", "EOF while watching API")
+				case io.ErrUnexpectedEOF:
+					logp.Info("kubernetes: Unexpected EOF while watching API")
+				default:
 					// This is an error event which can be recovered by moving to the latest resource version
-					logp.Info("kubernetes: Ignoring event, moving to most recent resource version")
+					logp.Err("kubernetes: Watching API error %v, ignoring event and moving to most recent resource version", err)
 					w.lastResourceVersion = ""
+
 				}
 				break
 			}
