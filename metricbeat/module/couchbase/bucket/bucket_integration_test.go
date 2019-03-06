@@ -22,23 +22,30 @@ package bucket
 import (
 	"testing"
 
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/couchbase"
 )
 
-func TestData(t *testing.T) {
-	f := mbtest.NewEventsFetcher(t, getConfig())
+func TestBucket(t *testing.T) {
+	runner := compose.TestRunner{Service: "couchbase"}
+	runner.Run(t, compose.Suite{
+		"Data": testData,
+	})
+}
 
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewEventsFetcher(t, getConfig(r.Host()))
 	err := mbtest.WriteEvents(f, t)
 	if err != nil {
 		t.Fatal("write", err)
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "couchbase",
 		"metricsets": []string{"bucket"},
-		"hosts":      []string{couchbase.GetEnvDSN()},
+		"hosts":      []string{couchbase.GetEnvDSN(host)},
 	}
 }

@@ -40,22 +40,24 @@ func TestExpvar(t *testing.T) {
 }
 
 func testData(t *testing.T, r compose.R) {
-	f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
-	err := mbtest.WriteEvent(f, t)
-	if err != nil {
-		t.Fatal("write", err)
+	f := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
+	err := mbtest.WriteEventsReporterV2(f, t, "")
+	if !assert.NoError(t, err) {
+		t.FailNow()
 	}
 }
 
 func testFetch(t *testing.T, r compose.R) {
-	f := mbtest.NewEventFetcher(t, getConfig(r.Host()))
-	event, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
+
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
 
-	assert.NotNil(t, event)
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+	assert.NotEmpty(t, events)
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
 
 func getConfig(host string) map[string]interface{} {

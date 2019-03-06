@@ -106,8 +106,21 @@ func runTest(t *testing.T, file string, module, metricSetName, url string) {
 	s := server(t, file, url)
 	defer s.Close()
 
-	metricSet := NewReportingMetricSetV2(t, getConfig(module, metricSetName, s.URL))
-	events, errs := ReportingFetchV2(metricSet)
+	metricSet := newMetricSet(t, getConfig(module, metricSetName, s.URL))
+
+	var events []mb.Event
+	var errs []error
+
+	switch v := metricSet.(type) {
+	case mb.ReportingMetricSetV2:
+		metricSet := NewReportingMetricSetV2(t, getConfig(module, metricSetName, s.URL))
+		events, errs = ReportingFetchV2(metricSet)
+	case mb.ReportingMetricSetV2Error:
+		metricSet := NewReportingMetricSetV2Error(t, getConfig(module, metricSetName, s.URL))
+		events, errs = ReportingFetchV2Error(metricSet)
+	default:
+		t.Fatalf("unknown type: %T", v)
+	}
 
 	// Gather errors to build also error events
 	for _, e := range errs {

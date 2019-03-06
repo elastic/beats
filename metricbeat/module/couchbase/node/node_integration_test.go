@@ -22,23 +22,43 @@ package node
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/couchbase"
 )
 
-func TestData(t *testing.T) {
-	f := mbtest.NewEventsFetcher(t, getConfig())
+func TestNode(t *testing.T) {
+	runner := compose.TestRunner{Service: "couchbase"}
+	runner.Run(t, compose.Suite{
+		"Fetch": testFetch,
+		"Data":  testData,
+	})
+}
 
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+
+	assert.NotEmpty(t, events)
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
+}
+
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
+	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "couchbase",
 		"metricsets": []string{"node"},
-		"hosts":      []string{couchbase.GetEnvDSN()},
+		"hosts":      []string{couchbase.GetEnvDSN(host)},
 	}
 }

@@ -56,11 +56,3 @@ func testData(t *testing.T, r compose.R) {
 		t.Fatal("write", err)
 	}
 }
-
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "php_fpm",
-		"metricsets": []string{"pool"},
-		"hosts":      []string{host},
-	}
-}

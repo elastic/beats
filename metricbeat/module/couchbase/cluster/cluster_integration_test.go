@@ -29,10 +29,16 @@ import (
 	"github.com/elastic/beats/metricbeat/module/couchbase"
 )
 
-func TestFetch(t *testing.T) {
-	compose.EnsureUp(t, "couchbase")
+func TestNode(t *testing.T) {
+	runner := compose.TestRunner{Service: "couchbase"}
+	runner.Run(t, compose.Suite{
+		"Fetch": testFetch,
+		"Data":  testData,
+	})
+}
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+func testFetch(t *testing.T, r compose.R) {
+	f := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
@@ -42,25 +48,17 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), events[0])
 }
 
-func TestData(t *testing.T) {
-	compose.EnsureUp(t, "couchbase")
-
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	events, errs := mbtest.ReportingFetchV2(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
-
-	assert.NotEmpty(t, events)
+func testData(t *testing.T, r compose.R) {
+	f := mbtest.NewReportingMetricSetV2(t, getConfig(r.Host()))
 	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }
 
-func getConfig() map[string]interface{} {
+func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "couchbase",
 		"metricsets": []string{"cluster"},
-		"hosts":      []string{couchbase.GetEnvDSN()},
+		"hosts":      []string{couchbase.GetEnvDSN(host)},
 	}
 }
