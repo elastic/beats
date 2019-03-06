@@ -10,6 +10,9 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 *Affecting all Beats*
 
+- On Google Cloud Engine (GCE) the add_cloud_metadata will now trim the project
+  info from the cloud.machine.type and cloud.availability_zone. {issue}10968[10968]
+
 *Auditbeat*
 
 *Filebeat*
