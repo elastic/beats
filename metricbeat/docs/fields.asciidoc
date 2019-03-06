@@ -9210,6 +9210,23 @@ ID of actual leader
 --
 
 [float]
+== metrics fields
+
+Etcd metrics from the /metrics endpoint
+
+
+
+*`etcd.metrics.has_leader`*::
++
+--
+type: byte
+
+A leader exists at the cluster
+
+
+--
+
+[float]
 == self fields
 
 Contains etcd self statistics.

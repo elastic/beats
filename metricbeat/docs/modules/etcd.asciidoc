@@ -40,11 +40,15 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-etcd-leader,leader>>
 
+* <<metricbeat-metricset-etcd-metrics,metrics>>
+
 * <<metricbeat-metricset-etcd-self,self>>
 
 * <<metricbeat-metricset-etcd-store,store>>
 
 include::etcd/leader.asciidoc[]
+
+include::etcd/metrics.asciidoc[]
 
 include::etcd/self.asciidoc[]
 

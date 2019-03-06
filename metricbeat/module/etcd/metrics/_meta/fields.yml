@@ -1,0 +1,9 @@
+- name: metrics
+  type: group
+  description: >
+    Etcd metrics from the /metrics endpoint
+  fields:
+    - name: has_leader
+      type: byte
+      description: >
+        A leader exists at the cluster
