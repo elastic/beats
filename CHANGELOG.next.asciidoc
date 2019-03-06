@@ -168,6 +168,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix stopping of modules started by kubernetes autodiscover. {pull}10476[10476]
 - Fix a issue when remote and local configuration didn't match when fetching configuration from Central Management. {issue}10587[10587]
 - Add missing host.* fields to fields.yml. {pull}11016[11016]
+- Include ip and boolean type when generating index pattern. {pull}10995[10995]
 
 *Auditbeat*
 
