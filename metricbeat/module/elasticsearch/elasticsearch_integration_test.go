@@ -30,12 +30,12 @@ import (
 	"testing"
 
 	"github.com/pkg/errors"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/tests/compose"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
-	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/beats/metricbeat/module/elasticsearch"
 	_ "github.com/elastic/beats/metricbeat/module/elasticsearch/ccr"
@@ -50,7 +50,7 @@ import (
 )
 
 var metricSets = []string{
-	//"ccr",
+	"ccr",
 	"cluster_stats",
 	"index",
 	"index_recovery",
@@ -85,27 +85,15 @@ func TestFetch(t *testing.T) {
 	for _, metricSet := range metricSets {
 		checkSkip(t, metricSet, version)
 		t.Run(metricSet, func(t *testing.T) {
-			var events []mb.Event
-			var errs []error
-			if metricSet == "node" {
-				f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet))
-				events, errs = mbtest.ReportingFetchV2Error(f)
-				assert.Empty(t, errs)
-				if !assert.NotEmpty(t, events) {
-					t.FailNow()
-				}
-				t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-					events[0].BeatEvent("elasticsearch", metricSet).Fields.StringToPrint())
-			} else {
-				f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
-				events, errs = mbtest.ReportingFetchV2(f)
-				assert.Empty(t, errs)
-				if !assert.NotEmpty(t, events) {
-					t.FailNow()
-				}
-				t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-					events[0].BeatEvent("elasticsearch", metricSet).Fields.StringToPrint())
+			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
+			events, errs := mbtest.ReportingFetchV2(f)
+
+			assert.Empty(t, errs)
+			if !assert.NotEmpty(t, events) {
+				t.FailNow()
 			}
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+				events[0].BeatEvent("elasticsearch", metricSet).Fields.StringToPrint())
 		})
 	}
 }
@@ -123,18 +111,10 @@ func TestData(t *testing.T) {
 	for _, metricSet := range metricSets {
 		checkSkip(t, metricSet, version)
 		t.Run(metricSet, func(t *testing.T) {
-			if metricSet == "node" {
-				f := mbtest.NewReportingMetricSetV2Error(t, getConfig(metricSet))
-				err := mbtest.WriteEventsReporterV2Error(f, t, metricSet)
-				if err != nil {
-					t.Fatal("write", err)
-				}
-			} else {
-				f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
-				err := mbtest.WriteEventsReporterV2(f, t, metricSet)
-				if err != nil {
-					t.Fatal("write", err)
-				}
+			f := mbtest.NewReportingMetricSetV2(t, getConfig(metricSet))
+			err := mbtest.WriteEventsReporterV2(f, t, metricSet)
+			if err != nil {
+				t.Fatal("write", err)
 			}
 		})
 	}
