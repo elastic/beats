@@ -32,44 +32,46 @@ import (
 func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "mongodb")
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	events, err := f.Fetch()
-	if !assert.NoError(t, err) {
-		t.FailNow()
+	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
+	assert.NotEmpty(t, events)
 
 	for _, event := range events {
 		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event)
+		metricsetFields := event.MetricSetFields
 
 		// Check a few event Fields
-		db := event["db"].(string)
+		db := metricsetFields["db"].(string)
 		assert.NotEqual(t, db, "")
 
-		collections := event["collections"].(int64)
+		collections := metricsetFields["collections"].(int64)
 		assert.True(t, collections > 0)
 
-		objects := event["objects"].(int64)
+		objects := metricsetFields["objects"].(int64)
 		assert.True(t, objects > 0)
 
-		avgObjSize, err := event.GetValue("avg_obj_size.bytes")
+		avgObjSize, err := metricsetFields.GetValue("avg_obj_size.bytes")
 		assert.NoError(t, err)
 		assert.True(t, avgObjSize.(int64) > 0)
 
-		dataSize, err := event.GetValue("data_size.bytes")
+		dataSize, err := metricsetFields.GetValue("data_size.bytes")
 		assert.NoError(t, err)
 		assert.True(t, dataSize.(int64) > 0)
 
-		storageSize, err := event.GetValue("storage_size.bytes")
+		storageSize, err := metricsetFields.GetValue("storage_size.bytes")
 		assert.NoError(t, err)
 		assert.True(t, storageSize.(int64) > 0)
 
-		numExtents := event["num_extents"].(int64)
+		numExtents := metricsetFields["num_extents"].(int64)
 		assert.True(t, numExtents >= 0)
 
-		indexes := event["indexes"].(int64)
+		indexes := metricsetFields["indexes"].(int64)
 		assert.True(t, indexes >= 0)
 
-		indexSize, err := event.GetValue("index_size.bytes")
+		indexSize, err := metricsetFields.GetValue("index_size.bytes")
 		assert.NoError(t, err)
 		assert.True(t, indexSize.(int64) > 0)
 	}
@@ -78,9 +80,14 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	compose.EnsureUp(t, "mongodb")
 
-	f := mbtest.NewEventsFetcher(t, getConfig())
-	err := mbtest.WriteEvents(f, t)
-	if err != nil {
+	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
+
+	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }

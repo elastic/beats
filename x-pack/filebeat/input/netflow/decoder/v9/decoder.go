@@ -30,10 +30,12 @@ type Decoder interface {
 	ReadTemplateSet(setID uint16, buf *bytes.Buffer) ([]*template.Template, error)
 	ReadFieldDefinition(*bytes.Buffer) (field fields.Key, length uint16, err error)
 	GetLogger() *log.Logger
+	GetFields() fields.FieldDict
 }
 
 type DecoderV9 struct {
 	Logger *log.Logger
+	Fields fields.FieldDict
 }
 
 var _ Decoder = (*DecoderV9)(nil)
@@ -92,7 +94,15 @@ func (d DecoderV9) ReadFieldDefinition(buf *bytes.Buffer) (field fields.Key, len
 	return field, length, nil
 }
 
+func (d DecoderV9) GetFields() fields.FieldDict {
+	if f := d.Fields; f != nil {
+		return f
+	}
+	return fields.GlobalFields
+}
+
 func ReadFields(d Decoder, buf *bytes.Buffer, count int) (record template.Template, err error) {
+	knownFields := d.GetFields()
 	logger := d.GetLogger()
 	record.Fields = make([]template.FieldTemplate, count)
 	for i := 0; i < count; i++ {
@@ -109,7 +119,7 @@ func ReadFields(d Decoder, buf *bytes.Buffer, count int) (record template.Templa
 		} else {
 			record.Length += int(field.Length)
 		}
-		if fieldInfo, found := fields.Fields[key]; found {
+		if fieldInfo, found := knownFields[key]; found {
 			min, max := fieldInfo.Decoder.MinLength(), fieldInfo.Decoder.MaxLength()
 			if length == template.VariableLength || min <= field.Length && field.Length <= max {
 				field.Info = fieldInfo

@@ -39,7 +39,7 @@ func init() {
 
 func New(config config.Config) protocol.Protocol {
 	logger := log.New(config.LogOutput(), LogPrefix, 0)
-	return NewProtocolWithDecoder(DecoderV9{logger}, config, logger)
+	return NewProtocolWithDecoder(DecoderV9{Logger: logger, Fields: config.Fields()}, config, logger)
 }
 
 func NewProtocolWithDecoder(decoder Decoder, config config.Config, logger *log.Logger) *NetflowV9Protocol {

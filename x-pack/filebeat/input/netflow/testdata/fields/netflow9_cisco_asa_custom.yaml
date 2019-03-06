@@ -1,0 +1,27 @@
+33000:
+- :acl_id_asa
+- :ingress_acl_id
+33001:
+- :acl_id_asa
+- egress_acl_id
+33002:
+- :uint16
+- :fw_ext_event
+40000:
+- :string
+- :username
+40001:
+- :ip4_addr
+- :xlate_src_addr_ipv4
+40002:
+- :ip4_addr
+- :xlate_dst_addr_ipv4
+40003:
+- :uint16
+- :xlate_src_port
+40004:
+- :uint16
+- :xlate_dst_port
+40005:
+- :uint8
+- :fw_event

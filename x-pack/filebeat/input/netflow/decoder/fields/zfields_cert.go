@@ -109,7 +109,7 @@ var CertFields = FieldDict{
 }
 
 func init() {
-	if err := RegisterFields(CertFields); err != nil {
+	if err := RegisterGlobalFields(CertFields); err != nil {
 		panic(err)
 	}
 }
