@@ -20,6 +20,8 @@ package jmx
 import (
 	"github.com/joeshaw/multierror"
 
+	"github.com/elastic/beats/metricbeat/helper"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -55,8 +57,9 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	mapping   []JMXMapping
 	namespace string
-	http      JolokiaHTTPRequestFetcher
+	jolokia   JolokiaHTTPRequestFetcher
 	log       *logp.Logger
+	http      *helper.HTTP
 }
 
 // New create a new instance of the MetricSet
@@ -71,16 +74,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	jolokiaHTTPBuild := NewJolokiaHTTPRequestFetcher(config.HTTPMethod)
+	jolokiaFetcher := NewJolokiaHTTPRequestFetcher(config.HTTPMethod)
 
 	log := logp.NewLogger(metricsetName).With("host", base.HostData().Host)
+
+	http, err := helper.NewHTTP(base)
+	if err != nil {
+		return nil, err
+	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
 		mapping:       config.Mappings,
 		namespace:     config.Namespace,
-		http:          jolokiaHTTPBuild,
+		jolokia:       jolokiaFetcher,
 		log:           log,
+		http:          http,
 	}, nil
 }
 
@@ -89,7 +98,7 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	var allEvents []common.MapStr
 
-	allEvents, err := m.http.Fetch(m)
+	allEvents, err := m.jolokia.Fetch(m)
 	if err != nil {
 		return nil, err
 	}

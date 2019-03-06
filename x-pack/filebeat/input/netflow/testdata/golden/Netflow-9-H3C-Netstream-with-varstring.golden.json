@@ -57,7 +57,7 @@
           "src_traffic_index": 0,
           "tcp_control_bits": 0,
           "type": "netflow_flow",
-          "vr_fname": ""
+          "vrf_name": ""
         },
         "network": {
           "bytes": 702,

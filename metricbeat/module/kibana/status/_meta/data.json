@@ -1,9 +1,5 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
+    "@timestamp": "2019-03-01T08:05:34.853Z",
     "event": {
         "dataset": "kibana.status",
         "duration": 115000,
@@ -12,13 +8,13 @@
     "kibana": {
         "status": {
             "metrics": {
-                "concurrent_connections": 0,
+                "concurrent_connections": 12,
                 "requests": {
-                    "disconnects": 0,
-                    "total": 0
+                    "disconnects": 3,
+                    "total": 241
                 }
             },
-            "name": "Shaunaks-MBP-2",
+            "name": "ruflin",
             "status": {
                 "overall": {
                     "state": "green"
@@ -30,10 +26,10 @@
         "name": "status"
     },
     "service": {
-        "address": "127.0.0.1:5601",
+        "address": "127.0.0.1:55555",
         "id": "5b2de169-2785-441b-ae8c-186a1936b17d",
         "name": "kibana",
         "type": "kibana",
-        "version": "7.0.0"
+        "version": "6.0.0-alpha1"
     }
 }
