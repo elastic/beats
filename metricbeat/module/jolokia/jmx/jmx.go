@@ -28,7 +28,6 @@ import (
 
 var (
 	metricsetName = "jolokia.jmx"
-	logger        = logp.NewLogger("jolokia.jmx")
 )
 
 // init registers the MetricSet with the central registry.
