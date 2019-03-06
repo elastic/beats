@@ -15,8 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package couchbase
+package mtest
 
-func GetEnvDSN(host string) string {
+// GetDSN gets the test DSN for a given host
+func GetDSN(host string) string {
 	return "http://Administrator:password@" + host
 }

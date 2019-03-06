@@ -24,7 +24,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
-	"github.com/elastic/beats/metricbeat/module/couchbase"
+	"github.com/elastic/beats/metricbeat/module/couchbase/mtest"
 )
 
 func TestBucket(t *testing.T) {
@@ -46,6 +46,6 @@ func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "couchbase",
 		"metricsets": []string{"bucket"},
-		"hosts":      []string{couchbase.GetEnvDSN(host)},
+		"hosts":      []string{mtest.GetDSN(host)},
 	}
 }
