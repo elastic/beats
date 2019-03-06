@@ -26,6 +26,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 )
 
@@ -194,6 +195,7 @@ func newBaseMetricSets(r *Register, m Module) ([]BaseMetricSet, error) {
 				module:  m,
 				host:    host,
 				metrics: metrics,
+				logger:  logp.NewLogger(m.Name() + "." + name),
 			})
 		}
 	}
