@@ -37,6 +37,8 @@ import (
 
 	// TODO: generate include file for these tests automatically moving forward
 	_ "github.com/elastic/beats/metricbeat/module/kibana/status"
+	_ "github.com/elastic/beats/metricbeat/module/php_fpm/pool"
+	_ "github.com/elastic/beats/metricbeat/module/php_fpm/process"
 	_ "github.com/elastic/beats/metricbeat/module/rabbitmq/connection"
 	_ "github.com/elastic/beats/metricbeat/module/traefik/health"
 )
@@ -174,7 +176,13 @@ func server(t *testing.T, path string, url string) *httptest.Server {
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == url {
+		query := ""
+		v := r.URL.Query()
+		if len(v) > 0 {
+			query += "?" + v.Encode()
+		}
+
+		if r.URL.Path+query == url {
 			w.Header().Set("Content-Type", "application/json;")
 			w.WriteHeader(200)
 			w.Write(body)
