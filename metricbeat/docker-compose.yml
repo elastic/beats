@@ -156,10 +156,10 @@ services:
     environment:
       # Needed for python tests
       KAFKA_ADVERTISED_HOST_AUTO: "yes"
-    image: metricbeat-kafka:0.10.2.1
+    image: metricbeat-kafka:0.10.2.3
     build:
       args:
-        KAFKA_VERSION: 0.10.2.1
+        KAFKA_VERSION: 0.10.2.3
 
   kibana:
     build: ./module/kibana/_meta
@@ -243,7 +243,7 @@ services:
     build:
       context: ./module/mysql/_meta
       args:
-        MYSQL_IMAGE: mariadb:10.2.17
+        MYSQL_IMAGE: mariadb:10.2.37
     ports:
       - 3306
 

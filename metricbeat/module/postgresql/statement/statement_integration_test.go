@@ -96,12 +96,6 @@ func testFetch(t *testing.T, r compose.R) {
 
 func testData(t *testing.T, r compose.R) {
 	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("statement", r.Host()))
-	events, errs := mbtest.ReportingFetchV2(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
-	assert.NotEmpty(t, events)
-
 	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}

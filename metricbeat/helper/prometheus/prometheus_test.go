@@ -52,6 +52,14 @@ histogram_metric_bucket{le="1e+09"} 1
 histogram_metric_bucket{le="+Inf"} 1
 histogram_metric_sum 117
 histogram_metric_count 1
+# TYPE histogram_decimal_metric histogram
+histogram_decimal_metric_bucket{le="0.001"} 1
+histogram_decimal_metric_bucket{le="0.01"} 1
+histogram_decimal_metric_bucket{le="0.1"} 2
+histogram_decimal_metric_bucket{le="1"} 3
+histogram_decimal_metric_bucket{le="+Inf"} 5
+histogram_decimal_metric_sum 4.31
+histogram_decimal_metric_count 5
 
 `
 
@@ -324,6 +332,31 @@ func TestPrometheus(t *testing.T) {
 								"100000000":  uint64(1),
 							},
 							"sum": 117.0,
+						},
+					},
+				},
+			},
+		},
+		{
+			msg: "Histogram decimal metric",
+			mapping: &MetricsMapping{
+				Metrics: map[string]MetricMap{
+					"histogram_decimal_metric": Metric("histogram.metric", OpMultiplyBuckets(1000)),
+				},
+			},
+			expected: []common.MapStr{
+				common.MapStr{
+					"histogram": common.MapStr{
+						"metric": common.MapStr{
+							"count": uint64(5),
+							"bucket": common.MapStr{
+								"1":    uint64(1),
+								"10":   uint64(1),
+								"100":  uint64(2),
+								"1000": uint64(3),
+								"+Inf": uint64(5),
+							},
+							"sum": 4.31,
 						},
 					},
 				},

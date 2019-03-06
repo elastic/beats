@@ -47,12 +47,20 @@ func testFetch(t *testing.T, r compose.R) {
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		events[0].BeatEvent("haproxy", "info").Fields.StringToPrint())
-
 }
+
 func testData(t *testing.T, r compose.R) {
 	f := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("pool", r.Host()))
 	err := mbtest.WriteEventsReporterV2(f, t, "")
 	if err != nil {
 		t.Fatal("write", err)
+	}
+}
+
+func getConfig(host string) map[string]interface{} {
+	return map[string]interface{}{
+		"module":     "php_fpm",
+		"metricsets": []string{"pool"},
+		"hosts":      []string{host},
 	}
 }
