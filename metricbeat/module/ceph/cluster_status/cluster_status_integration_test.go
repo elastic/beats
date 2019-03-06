@@ -22,20 +22,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	t.Skip("Skipping test. After migration to ReportV2 call to mbtest.ReportingFetchV2(f) fails (which replaced 'f := mbtest.NewEventsFetcher(t, getConfig())' call).")
-	
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	events, errs := mbtest.ReportingFetchV2(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
-	assert.NotEmpty(t, events)
 
 	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
 		t.Fatal("write", err)
