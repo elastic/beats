@@ -28,7 +28,7 @@ import (
 
 var (
 	metricsetName = "jolokia.jmx"
-    logger = logp.NewLogger("jolokia.jmx")
+	logger        = logp.NewLogger("jolokia.jmx")
 )
 
 // init registers the MetricSet with the central registry.
@@ -107,13 +107,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 	// Set dynamic namespace.
 	for _, event := range allEvents {
-		_, err := event.Put(mb.NamespaceKey, m.namespace)
-		if err != nil {
-			logger.Error(err)
-			reporter.Error(err)
-		}
 		reporter.Event(mb.Event{
 			MetricSetFields: event,
+			Namespace:       m.Module().Name() + "." + m.namespace,
 		})
 	}
 }

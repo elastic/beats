@@ -6,30 +6,29 @@
         "module": "jolokia"
     },
     "jolokia": {
-        "jmx": {
-            "_namespace": "testnamespace",
+        "testnamespace": {
             "memory": {
                 "heap_usage": {
                     "committed": 514850816,
                     "init": 536870912,
                     "max": 7635730432,
-                    "used": 133286280
+                    "used": 125635728
                 },
                 "non_heap_usage": {
-                    "committed": 32702464,
+                    "committed": 30343168,
                     "init": 2555904,
                     "max": -1,
-                    "used": 31349800
+                    "used": 29467248
                 }
             },
-            "uptime": 56281839
+            "uptime": 13716841
         }
     },
     "metricset": {
         "name": "jmx"
     },
     "service": {
-        "address": "127.0.0.1:8080",
+        "address": "127.0.0.1:8778",
         "type": "jolokia"
     }
 }
