@@ -289,6 +289,10 @@ func (o opMultiplyBuckets) Process(field string, value interface{}, labels commo
 	if !ok {
 		return field, value, labels
 	}
+	sum, ok := histogram["sum"].(float64)
+	if !ok {
+		return field, value, labels
+	}
 	multiplied := common.MapStr{}
 	for k, v := range bucket {
 		if f, err := strconv.ParseFloat(k, 64); err == nil {
@@ -299,5 +303,6 @@ func (o opMultiplyBuckets) Process(field string, value interface{}, labels commo
 		}
 	}
 	histogram["bucket"] = multiplied
+	histogram["sum"] = sum * o.multiplier
 	return field, histogram, labels
 }
