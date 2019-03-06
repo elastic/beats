@@ -117,8 +117,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	for _, event := range events {
 		reporter.Event(mb.Event{MetricSetFields: event})
 	}
-
-	return
 }
 
 // Close stops this metricset
