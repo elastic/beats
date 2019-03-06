@@ -33,17 +33,11 @@ func TestFetch(t *testing.T) {
 	compose.EnsureUp(t, "jolokia")
 
 	for _, config := range getConfigs() {
-		f := mbtest.NewReportingMetricSetV2(t, config)
-		events, errs := mbtest.ReportingFetchV2(f)
-		if len(errs) > 0 {
-			t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-		}
+		f := mbtest.NewReportingMetricSetV2Error(t, config)
+		events, errs := mbtest.ReportingFetchV2Error(f)
+		assert.Empty(t, errs)
 		assert.NotEmpty(t, events)
-
 		t.Logf("%s/%s events: %+v", f.Module().Name(), f.Name(), events)
-		if len(events) == 0 {
-			t.Fatal("Empty events")
-		}
 	}
 }
 
@@ -51,14 +45,12 @@ func TestData(t *testing.T) {
 	compose.EnsureUp(t, "jolokia")
 
 	for _, config := range getConfigs() {
-		f := mbtest.NewReportingMetricSetV2(t, config)
-		events, errs := mbtest.ReportingFetchV2(f)
-		if len(errs) > 0 {
-			t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-		}
+		f := mbtest.NewReportingMetricSetV2Error(t, config)
+		events, errs := mbtest.ReportingFetchV2Error(f)
+		assert.Empty(t, errs)
 		assert.NotEmpty(t, events)
 
-		if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
+		if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 			t.Fatal("write", err)
 		}
 	}

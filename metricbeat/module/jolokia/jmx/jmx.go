@@ -95,14 +95,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	var allEvents []common.MapStr
 
 	allEvents, err := m.jolokia.Fetch(m)
 	if err != nil {
-		logger.Error(err)
-		reporter.Error(err)
-		return
+		return err
 	}
 
 	// Set dynamic namespace.
@@ -112,4 +110,5 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 			Namespace:       m.Module().Name() + "." + m.namespace,
 		})
 	}
+	return nil
 }
