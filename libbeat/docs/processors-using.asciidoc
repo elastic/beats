@@ -1408,9 +1408,9 @@ The `Event` object passed to the `process` method has the following API.
 |Method |Description
 
 |`Get(string)`
-|Get a value from the event. If the key does not exist `null` is
-returned. If no key is provided then an object containing all fields is
-returned.
+|Get a value from the event (either a scalar or an object). If the key does not
+exist `null` is returned. If no key is provided then an object containing all
+fields is returned.
 
 *Example*: `var value = event.Get(key);`
 
