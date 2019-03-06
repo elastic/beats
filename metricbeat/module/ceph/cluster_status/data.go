@@ -19,6 +19,7 @@ package cluster_status
 
 import (
 	"encoding/json"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
