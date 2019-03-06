@@ -18,7 +18,6 @@
 package cluster_disk
 
 import (
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -34,8 +33,6 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
-
-	logger = logp.NewLogger("ceph.cluster_disk")
 )
 
 func init() {
@@ -70,7 +67,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	content, err := m.HTTP.FetchContent()
 
 	if err != nil {
-		logger.Error(err)
+		m.Logger().Error(err)
 		reporter.Error(err)
 		return
 	}
