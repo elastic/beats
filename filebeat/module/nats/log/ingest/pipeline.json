@@ -28,14 +28,14 @@
             "grok": {
                 "field": "nats.log.msg.info",
                 "patterns": [
-                    "%{NATSDIRECTION:nats.log.msg.direction} %{NATSPAYLOAD:nats.log.msg.type}: \\[%{GREEDYDATA:nats.log.msg.payload}\\]",
-                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSNOINFO:nats.log.msg.type}\\]",
-                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSUNSUB:nats.log.msg.type} %{POSINT:nats.log.msg.sid}( %{POSINT:nats.log.msg.max_messages})?\\]",
-                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSPUB:nats.log.msg.type} %{NOTSPACE:nats.log.msg.subject}( %{NOTSPACE:nats.log.msg.reply_to})? %{POSINT:nats.log.msg.bytes}\\]",
-                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSSUB:nats.log.msg.type} %{NOTSPACE:nats.log.msg.subject}( %{NOTSPACE:nats.log.msg.queue_group})? %{POSINT:nats.log.msg.sid}\\]",
-                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSMSG:nats.log.msg.type} %{NOTSPACE:nats.log.msg.subject} %{POSINT:nats.log.msg.sid}( %{NOTSPACE:nats.log.msg.reply_to})? %{POSINT:nats.log.msg.bytes}\\]",
-                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSCONNECTION:nats.log.msg.type} %{GREEDYDATA:nats.log.msg.data}\\]",
-                    "%{NATSDIRECTION:nats.log.msg.direction} \\[%{NATSERROR:nats.log.msg.type} %{GREEDYDATA:nats.log.msg.error\\]",
+                    "%{NATSDIRECTION:network.direction} %{NATSPAYLOAD:nats.log.msg.type}: \\[%{GREEDYDATA:nats.log.msg.payload}\\]",
+                    "%{NATSDIRECTION:network.direction} \\[%{NATSNOINFO:nats.log.msg.type}\\]",
+                    "%{NATSDIRECTION:network.direction} \\[%{NATSUNSUB:nats.log.msg.type}\\s+%{POSINT:nats.log.msg.sid}(\\s+%{POSINT:nats.log.msg.max_messages})?\\]",
+                    "%{NATSDIRECTION:network.direction} \\[%{NATSPUB:nats.log.msg.type}\\s+%{NOTSPACE:nats.log.msg.subject}(\\s+%{NOTSPACE:nats.log.msg.reply_to})?\\s+%{POSINT:nats.log.msg.bytes}\\]",
+                    "%{NATSDIRECTION:network.direction} \\[%{NATSSUB:nats.log.msg.type}\\s+%{NOTSPACE:nats.log.msg.subject}(\\s+%{NOTSPACE:nats.log.msg.queue_group})?\\s+%{POSINT:nats.log.msg.sid}\\]",
+                    "%{NATSDIRECTION:network.direction} \\[%{NATSMSG:nats.log.msg.type}\\s+%{NOTSPACE:nats.log.msg.subject}\\s+%{POSINT:nats.log.msg.sid}(\\s+%{NOTSPACE:nats.log.msg.reply_to})?\\s+%{POSINT:nats.log.msg.bytes}\\]",
+                    "%{NATSDIRECTION:network.direction} \\[%{NATSCONNECTION:nats.log.msg.type}\\s+%{GREEDYDATA:nats.log.msg.data}\\]",
+                    "%{NATSDIRECTION:network.direction} \\[%{NATSERROR:nats.log.msg.type}\\s+%{GREEDYDATA:nats.log.msg.error\\]",
                     "%{GREEDYDATA:nats.log.msg.data}"
                 ],
                 "pattern_definitions": {
@@ -140,14 +140,14 @@
         {
             "script": {
                 "lang": "painless",
-                "source": "if (ctx.nats.log.msg.direction == params.in) {\n          ctx.nats.log.msg.direction = params.incoming;\n        } else if (ctx.nats.log.msg.direction == params.out) {\n          ctx.nats.log.msg.direction = params.outgoing;\n        }",
+                "source": "if (ctx.network.direction == params.in) {\n          ctx.network.direction = params.inbound;\n        } else if (ctx.network.direction == params.out) {\n          ctx.network.direction = params.outbound;\n        }",
                 "params": {
                     "in": "<<-",
-                    "incoming": "incoming",
+                    "inbound": "inbound",
                     "out": "->>",
-                    "outgoing": "outgoing"
+                    "outbound": "outbound"
                 },
-                "if": "ctx.nats.log.msg?.direction != null"
+                "if": "ctx.network?.direction != null"
             }
         },
         {

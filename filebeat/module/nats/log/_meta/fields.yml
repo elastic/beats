@@ -20,12 +20,9 @@
       fields:
         - name: bytes
           type: long
+          format: bytes
           description: >
             Size of the payload in bytes
-        - name: direction
-          type: text
-          description: >
-            The direction of the message
         - name: type
           type: keyword
           description: >
@@ -46,7 +43,7 @@
           type: integer
           description: >
             An optional number of messages to wait for before automatically unsubscribing
-        - name: error
+        - name: error.message
           type: text
           description: >
             Details about the error occurred

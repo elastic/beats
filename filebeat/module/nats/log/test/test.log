@@ -4,7 +4,7 @@
 [1] 2019/02/06 07:19:40.624690 [INF] Server is ready
 [1] 2019/02/06 07:20:08.508891 [DBG] 172.18.0.1:38630 - cid:1 - Client connection created
 [1] 2019/02/06 07:20:08.510296 [TRC] 172.18.0.1:38630 - cid:1 - ->> [CONNECT {"verbose":false,"pedantic":false,"tls_required":false,"name":"NATS Benchmark","lang":"go","version":"1.7.0","protocol":1,"echo":true}]
-[1] 2019/02/06 07:20:08.512052 [TRC] 172.18.0.1:38630 - cid:1 - ->> [SUB foo 1]
+[1] 2019/02/06 07:20:08.512052 [TRC] 172.18.0.1:38630 - cid:1 - ->> [SUB foo  1]
 [1] 2019/02/06 07:20:08.512128 [TRC] 172.18.0.1:38630 - cid:1 - ->> [PING]
 [1] 2019/02/06 07:20:08.512153 [TRC] 172.18.0.1:38630 - cid:1 - <<- [PONG]
 [1] 2019/02/04 15:40:02.717819 [TRC] 50.39.246.116:62388 - cid:3 - ->> [PUB aiuser.platinum1.pingpeer _INBOX.e3hAUbP4r5wbjw3Hudw42r.udigGiHn 20]

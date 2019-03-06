@@ -7473,17 +7473,9 @@ Fields from NATS logs message.
 --
 type: long
 
+format: bytes
+
 Size of the payload in bytes
-
-
---
-
-*`nats.log.msg.direction`*::
-+
---
-type: text
-
-The direction of the message
 
 
 --
@@ -7538,7 +7530,7 @@ An optional number of messages to wait for before automatically unsubscribing
 
 --
 
-*`nats.log.msg.error`*::
+*`nats.log.msg.error.message`*::
 +
 --
 type: text
