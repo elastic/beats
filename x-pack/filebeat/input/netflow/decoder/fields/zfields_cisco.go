@@ -280,7 +280,7 @@ var CiscoFields = FieldDict{
 }
 
 func init() {
-	if err := RegisterFields(CiscoFields); err != nil {
+	if err := RegisterGlobalFields(CiscoFields); err != nil {
 		panic(err)
 	}
 }

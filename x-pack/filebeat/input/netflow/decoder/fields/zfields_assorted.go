@@ -512,7 +512,7 @@ var AssortedFields = FieldDict{
 }
 
 func init() {
-	if err := RegisterFields(AssortedFields); err != nil {
+	if err := RegisterGlobalFields(AssortedFields); err != nil {
 		panic(err)
 	}
 }

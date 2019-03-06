@@ -31,7 +31,7 @@ func init() {
 func New(config config.Config) protocol.Protocol {
 	logger := log.New(config.LogOutput(), LogPrefix, 0)
 	decoder := DecoderIPFIX{
-		DecoderV9: v9.DecoderV9{Logger: logger},
+		DecoderV9: v9.DecoderV9{Logger: logger, Fields: config.Fields()},
 	}
 	proto := &IPFixProtocol{
 		NetflowV9Protocol: *v9.NewProtocolWithDecoder(decoder, config, logger),

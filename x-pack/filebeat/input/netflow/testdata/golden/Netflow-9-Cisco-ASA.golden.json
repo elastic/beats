@@ -33,6 +33,8 @@
           },
           "flow_id": 8500,
           "flow_start_milliseconds": "2015-10-09T09:47:47.569Z",
+          "fw_event": 2,
+          "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
           "ingress_interface": 3,
@@ -41,7 +43,12 @@
           "protocol_identifier": 1,
           "source_ipv4_address": "192.168.14.1",
           "source_transport_port": 0,
-          "type": "netflow_flow"
+          "type": "netflow_flow",
+          "username": "",
+          "xlate_dst_addr_ipv4": "2.2.2.11",
+          "xlate_dst_port": 17549,
+          "xlate_src_addr_ipv4": "192.168.14.1",
+          "xlate_src_port": 0
         },
         "network": {
           "bytes": 56,
@@ -93,6 +100,8 @@
           },
           "flow_id": 8501,
           "flow_start_milliseconds": "2015-10-09T09:47:48.169Z",
+          "fw_event": 2,
+          "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 8,
           "ingress_interface": 2,
@@ -101,7 +110,12 @@
           "protocol_identifier": 1,
           "source_ipv4_address": "192.168.23.22",
           "source_transport_port": 17549,
-          "type": "netflow_flow"
+          "type": "netflow_flow",
+          "username": "",
+          "xlate_dst_addr_ipv4": "164.164.37.11",
+          "xlate_dst_port": 0,
+          "xlate_src_addr_ipv4": "192.168.23.22",
+          "xlate_src_port": 17549
         },
         "network": {
           "bytes": 56,
@@ -153,6 +167,8 @@
           },
           "flow_id": 8502,
           "flow_start_milliseconds": "2015-10-09T09:47:48.179Z",
+          "fw_event": 2,
+          "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
           "ingress_interface": 3,
@@ -161,7 +177,12 @@
           "protocol_identifier": 1,
           "source_ipv4_address": "164.164.37.11",
           "source_transport_port": 0,
-          "type": "netflow_flow"
+          "type": "netflow_flow",
+          "username": "",
+          "xlate_dst_addr_ipv4": "192.168.23.22",
+          "xlate_dst_port": 17549,
+          "xlate_src_addr_ipv4": "164.164.37.11",
+          "xlate_src_port": 0
         },
         "network": {
           "bytes": 56,
@@ -213,6 +234,8 @@
           },
           "flow_id": 8503,
           "flow_start_milliseconds": "2015-10-09T09:47:48.399Z",
+          "fw_event": 2,
+          "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 8,
           "ingress_interface": 2,
@@ -221,7 +244,12 @@
           "protocol_identifier": 1,
           "source_ipv4_address": "192.168.23.20",
           "source_transport_port": 17805,
-          "type": "netflow_flow"
+          "type": "netflow_flow",
+          "username": "",
+          "xlate_dst_addr_ipv4": "164.164.37.11",
+          "xlate_dst_port": 0,
+          "xlate_src_addr_ipv4": "192.168.23.20",
+          "xlate_src_port": 17805
         },
         "network": {
           "bytes": 56,
@@ -273,6 +301,8 @@
           },
           "flow_id": 8504,
           "flow_start_milliseconds": "2015-10-09T09:47:48.409Z",
+          "fw_event": 2,
+          "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
           "ingress_interface": 3,
@@ -281,7 +311,12 @@
           "protocol_identifier": 1,
           "source_ipv4_address": "164.164.37.11",
           "source_transport_port": 0,
-          "type": "netflow_flow"
+          "type": "netflow_flow",
+          "username": "",
+          "xlate_dst_addr_ipv4": "192.168.23.20",
+          "xlate_dst_port": 17805,
+          "xlate_src_addr_ipv4": "164.164.37.11",
+          "xlate_src_port": 0
         },
         "network": {
           "bytes": 56,
@@ -333,6 +368,8 @@
           },
           "flow_id": 8505,
           "flow_start_milliseconds": "2015-10-09T09:47:48.589Z",
+          "fw_event": 2,
+          "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 8,
           "ingress_interface": 3,
@@ -341,7 +378,12 @@
           "protocol_identifier": 1,
           "source_ipv4_address": "192.168.14.11",
           "source_transport_port": 17805,
-          "type": "netflow_flow"
+          "type": "netflow_flow",
+          "username": "",
+          "xlate_dst_addr_ipv4": "2.2.2.11",
+          "xlate_dst_port": 0,
+          "xlate_src_addr_ipv4": "192.168.14.11",
+          "xlate_src_port": 17805
         },
         "network": {
           "bytes": 56,
@@ -393,6 +435,8 @@
           },
           "flow_id": 8506,
           "flow_start_milliseconds": "2015-10-09T09:47:48.599Z",
+          "fw_event": 2,
+          "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
           "ingress_interface": 2,
@@ -401,7 +445,12 @@
           "protocol_identifier": 1,
           "source_ipv4_address": "2.2.2.11",
           "source_transport_port": 0,
-          "type": "netflow_flow"
+          "type": "netflow_flow",
+          "username": "",
+          "xlate_dst_addr_ipv4": "192.168.14.11",
+          "xlate_dst_port": 17805,
+          "xlate_src_addr_ipv4": "2.2.2.11",
+          "xlate_src_port": 0
         },
         "network": {
           "bytes": 56,
@@ -453,6 +502,8 @@
           },
           "flow_id": 8507,
           "flow_start_milliseconds": "2015-10-09T09:47:48.609Z",
+          "fw_event": 2,
+          "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 8,
           "ingress_interface": 2,
@@ -461,7 +512,12 @@
           "protocol_identifier": 1,
           "source_ipv4_address": "2.2.2.11",
           "source_transport_port": 17805,
-          "type": "netflow_flow"
+          "type": "netflow_flow",
+          "username": "",
+          "xlate_dst_addr_ipv4": "192.168.14.1",
+          "xlate_dst_port": 0,
+          "xlate_src_addr_ipv4": "2.2.2.11",
+          "xlate_src_port": 17805
         },
         "network": {
           "bytes": 56,
@@ -513,6 +569,8 @@
           },
           "flow_id": 8508,
           "flow_start_milliseconds": "2015-10-09T09:47:48.619Z",
+          "fw_event": 2,
+          "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
           "ingress_interface": 3,
@@ -521,7 +579,12 @@
           "protocol_identifier": 1,
           "source_ipv4_address": "192.168.14.1",
           "source_transport_port": 0,
-          "type": "netflow_flow"
+          "type": "netflow_flow",
+          "username": "",
+          "xlate_dst_addr_ipv4": "2.2.2.11",
+          "xlate_dst_port": 17805,
+          "xlate_src_addr_ipv4": "192.168.14.1",
+          "xlate_src_port": 0
         },
         "network": {
           "bytes": 56,
@@ -573,6 +636,8 @@
           },
           "flow_id": 8525,
           "flow_start_milliseconds": "2015-10-09T09:47:51.269Z",
+          "fw_event": 2,
+          "fw_ext_event": 2016,
           "icmp_code_ipv4": 3,
           "icmp_type_ipv4": 3,
           "ingress_interface": 3,
@@ -581,7 +646,12 @@
           "protocol_identifier": 1,
           "source_ipv4_address": "164.164.37.11",
           "source_transport_port": 0,
-          "type": "netflow_flow"
+          "type": "netflow_flow",
+          "username": "",
+          "xlate_dst_addr_ipv4": "192.168.23.1",
+          "xlate_dst_port": 0,
+          "xlate_src_addr_ipv4": "164.164.37.11",
+          "xlate_src_port": 0
         },
         "network": {
           "bytes": 160,
@@ -633,6 +703,8 @@
           },
           "flow_id": 8509,
           "flow_start_milliseconds": "2015-10-09T09:47:49.249Z",
+          "fw_event": 2,
+          "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 8,
           "ingress_interface": 2,
@@ -641,7 +713,12 @@
           "protocol_identifier": 1,
           "source_ipv4_address": "192.168.23.22",
           "source_transport_port": 18061,
-          "type": "netflow_flow"
+          "type": "netflow_flow",
+          "username": "",
+          "xlate_dst_addr_ipv4": "164.164.37.11",
+          "xlate_dst_port": 0,
+          "xlate_src_addr_ipv4": "192.168.23.22",
+          "xlate_src_port": 18061
         },
         "network": {
           "bytes": 56,
@@ -693,6 +770,8 @@
           },
           "flow_id": 8510,
           "flow_start_milliseconds": "2015-10-09T09:47:49.259Z",
+          "fw_event": 2,
+          "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
           "ingress_interface": 3,
@@ -701,7 +780,12 @@
           "protocol_identifier": 1,
           "source_ipv4_address": "164.164.37.11",
           "source_transport_port": 0,
-          "type": "netflow_flow"
+          "type": "netflow_flow",
+          "username": "",
+          "xlate_dst_addr_ipv4": "192.168.23.22",
+          "xlate_dst_port": 18061,
+          "xlate_src_addr_ipv4": "164.164.37.11",
+          "xlate_src_port": 0
         },
         "network": {
           "bytes": 56,
@@ -753,6 +837,8 @@
           },
           "flow_id": 8511,
           "flow_start_milliseconds": "2015-10-09T09:47:49.469Z",
+          "fw_event": 2,
+          "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 8,
           "ingress_interface": 2,
@@ -761,7 +847,12 @@
           "protocol_identifier": 1,
           "source_ipv4_address": "192.168.23.20",
           "source_transport_port": 18061,
-          "type": "netflow_flow"
+          "type": "netflow_flow",
+          "username": "",
+          "xlate_dst_addr_ipv4": "164.164.37.11",
+          "xlate_dst_port": 0,
+          "xlate_src_addr_ipv4": "192.168.23.20",
+          "xlate_src_port": 18061
         },
         "network": {
           "bytes": 56,
@@ -813,6 +904,8 @@
           },
           "flow_id": 8512,
           "flow_start_milliseconds": "2015-10-09T09:47:49.479Z",
+          "fw_event": 2,
+          "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
           "ingress_interface": 3,
@@ -821,7 +914,12 @@
           "protocol_identifier": 1,
           "source_ipv4_address": "164.164.37.11",
           "source_transport_port": 0,
-          "type": "netflow_flow"
+          "type": "netflow_flow",
+          "username": "",
+          "xlate_dst_addr_ipv4": "192.168.23.20",
+          "xlate_dst_port": 18061,
+          "xlate_src_addr_ipv4": "164.164.37.11",
+          "xlate_src_port": 0
         },
         "network": {
           "bytes": 56,
