@@ -11123,7 +11123,7 @@ jolokia contains metrics exposed via jolokia agent
 --
 type: keyword
 
-version number of jolokia agent.
+Version number of jolokia agent.
 
 
 --
@@ -11171,7 +11171,7 @@ The vendor of the container the agent is running in.
 *`jolokia.url`*::
 +
 --
-type: ip
+type: keyword
 
 The URL how this agent can be contacted.
 
