@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/go-ucfg/yaml"
@@ -250,13 +251,51 @@ func ConcatFields(a, b Fields) (Fields, error) {
 	}
 
 	// check for duplicates
-	for _, k := range b.GetKeys() {
-		if a.HasNode(k) {
-			return nil, fmt.Errorf("concat fails because key '%s' exists is duplicated", k)
-		}
+	if err := a.conflicts(b); err != nil {
+		return nil, err
 	}
 
-	// all fine, let's concat a+b into new array
+	// concat a+b into new array
 	fields := make(Fields, 0, len(a)+len(b))
 	return append(append(fields, a...), b...), nil
+}
+
+func (f Fields) conflicts(fields Fields) error {
+	var errs multierror.Errors
+	for _, key := range fields.GetKeys() {
+		keys := strings.Split(key, ".")
+		if err := f.canConcat(key, keys); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return errs.Err()
+}
+
+// canConcat checks if the given string can be concatenated to the existing fields f
+// a key cannot be concatenated if
+// - f has a node with name key
+// - f has a leaf with key's parent name and the leaf's type is not `object`
+func (f Fields) canConcat(k string, keys []string) error {
+	if len(keys) == 0 {
+		return nil
+	}
+	key := keys[0]
+	keys = keys[1:]
+	for _, field := range f {
+		if field.Name != key {
+			continue
+		}
+		// last key to compare
+		if len(keys) == 0 {
+			return errors.Errorf("fields contain key <%s>", k)
+		}
+		// last field to compare, only valid if it is of type object
+		if len(field.Fields) == 0 {
+			if field.Type != "object" {
+				return errors.Errorf("fields contain non object node conflicting with key <%s>", k)
+			}
+		}
+		return field.Fields.canConcat(k, keys)
+	}
+	return nil
 }
