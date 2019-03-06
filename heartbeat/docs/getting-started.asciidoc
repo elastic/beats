@@ -214,7 +214,7 @@ include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 [[load-kibana-dashboards]]
 === Step 4: Set up the Kibana dashboards
 
-include::{libbeat-dir}/docs/dashboards.asciidoc[]
+Dashboards for heartbeat can be found in the https://github.com/elastic/uptime-contrib[uptime-contrib] github repository.
 
 [[heartbeat-starting]]
 === Step 5: Start Heartbeat
