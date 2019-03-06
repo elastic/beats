@@ -634,10 +634,19 @@ func (b *Beat) loadMeta(metaPath string) error {
 		return fmt.Errorf("Failed to create Beat meta file: %s", err)
 	}
 
-	err = json.NewEncoder(f).Encode(meta{UUID: b.Info.ID})
-	f.Close()
+	encodeErr := json.NewEncoder(f).Encode(meta{UUID: b.Info.ID})
+	err = f.Sync()
 	if err != nil {
 		return fmt.Errorf("Beat meta file failed to write: %s", err)
+	}
+
+	err = f.Close()
+	if err != nil {
+		return fmt.Errorf("Beat meta file failed to write: %s", err)
+	}
+
+	if encodeErr != nil {
+		return fmt.Errorf("Beat meta file failed to write: %s", encodeErr)
 	}
 
 	// move temporary file into final location
