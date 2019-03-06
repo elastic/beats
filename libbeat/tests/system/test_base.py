@@ -23,7 +23,7 @@ class Test(BaseTest):
         proc.check_kill_and_wait()
         assert self.log_contains("mockbeat stopped.")
 
-    @unittest.skipIf(sys.platform.startswith("win"), "SIGHUP is not available on Windows"')
+    @unittest.skipIf(sys.platform.startswith("win"), "SIGHUP is not available on Windows")
     def test_sighup(self):
         """
         Basic test with exiting Mockbeat because of SIGHUP
