@@ -38,6 +38,8 @@ https://github.com/elastic/beats/compare/v6.6.1...6.6[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix a bug when converting NetFlow fields to snake_case. {pull}10950[10950]
+
 *Heartbeat*
 
 *Journalbeat*
