@@ -42,8 +42,6 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "jolokia")
-
 	for _, config := range getConfigs() {
 		f := mbtest.NewReportingMetricSetV2Error(t, config)
 		events, errs := mbtest.ReportingFetchV2Error(f)
