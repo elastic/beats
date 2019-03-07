@@ -170,6 +170,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Made monitors.d configuration part of the default config. {pull}9004[9004]
 - Fixed rare issue where TLS connections to endpoints with x509 certificates missing either notBefore or notAfter would cause the check to fail with a stacktrace.  {pull}9566[9566]
+- Fix checks for TCP send/receive data {pull}11118[11118]
 
 *Journalbeat*
 
