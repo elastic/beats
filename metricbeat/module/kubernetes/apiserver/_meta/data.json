@@ -8,23 +8,11 @@
     "kubernetes": {
         "apiserver": {
             "request": {
-                "latency": {
-                    "bucket": {
-                        "+Inf": 2947,
-                        "1000000": 0,
-                        "125000": 0,
-                        "2000000": 0,
-                        "250000": 0,
-                        "4000000": 0,
-                        "500000": 0,
-                        "8000000": 0
-                    },
-                    "count": 2947,
-                    "sum": 1319410001462
-                },
-                "resource": "networkpolicies",
-                "scope": "cluster",
-                "verb": "WATCH"
+                "client": "kubectl/v1.6.1 (linux/amd64) kubernetes/b0b7a32",
+                "count": 4,
+                "resource": "configmaps",
+                "scope": "namespace",
+                "verb": "DELETE"
             }
         }
     },

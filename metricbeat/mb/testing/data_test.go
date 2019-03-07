@@ -146,9 +146,10 @@ func runTest(t *testing.T, file string, module, metricSetName, url, suffix strin
 		data = append(data, beatEvent.Fields)
 	}
 
+	// Sorting the events is necessary as events are not necessarily sent in the same order
 	sort.SliceStable(data, func(i, j int) bool {
-		h1, _ := hashstructure.Hash(events[i], nil)
-		h2, _ := hashstructure.Hash(events[j], nil)
+		h1, _ := hashstructure.Hash(data[i], nil)
+		h2, _ := hashstructure.Hash(data[j], nil)
 		return h1 < h2
 	})
 
