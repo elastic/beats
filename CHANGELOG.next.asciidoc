@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v6.6.1...6.6[Check the HEAD diff]
 *Metricbeat*
 
 - Fix issue in kubernetes module preventing usage percentages to be properly calculated. {pull}10946[10946]
+- Fix parsing error using GET in Jolokia module. {pull}11075[11075] {issue}11071[11071]
 
 *Packetbeat*
 
