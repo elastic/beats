@@ -42,5 +42,5 @@ type Settings struct {
 	IndexManagement idxmgmt.SupportFactory
 	ILM             ilm.SupportFactory
 
-	Processing processing.SupporterFactory
+	Processing processing.SupportFactory
 }

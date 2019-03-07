@@ -20,6 +20,8 @@ package processing
 import (
 	"fmt"
 
+	"github.com/elastic/ecs/code/go/ecs"
+
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -27,64 +29,66 @@ import (
 	"github.com/elastic/beats/libbeat/processors/actions"
 )
 
-type pipelineProcessors struct {
+// builder is used to create the event processing pipeline in Beats.  The
+// builder orders and merges global and local (per client) event annotation
+// settings, with the configured event processors into one common event
+// processor for use with the publisher pipeline.
+// Also See: (*builder).Create
+type builder struct {
 	info beat.Info
 	log  *logp.Logger
 
 	skipNormalize bool
 
-	// The pipeline its processor settings for
-	// constructing the clients complete processor
-	// pipeline on connect.
+	// global pipeline fields and tags configurations
 	modifiers   []modifier
 	builtinMeta common.MapStr
 	fields      common.MapStr
 	tags        []string
 
-	processors beat.Processor
+	// global pipeline processors
+	processors *group
 
 	drop       bool // disabled is set if outputs have been disabled via CLI
 	alwaysCopy bool
 }
-
-const ecsVersion = "1.0.0-beta2"
 
 type modifier interface {
 	// BuiltinFields defines global fields to be added to every event.
 	BuiltinFields(beat.Info) common.MapStr
 
 	// ClientFields defines connection local fields to be added to each event
-	// of a pipieline client.
+	// of a pipeline client.
 	ClientFields(beat.Info, beat.ProcessingConfig) common.MapStr
 }
 
 type builtinModifier func(beat.Info) common.MapStr
 
-// NewBeatSupport creates a new SupporterFactory based on NewDefaultSupport.
-// NewBeatSupport automatically adds the `ecs.version`, `host.name` and `agent.X` fields
+// MakeDefaultBeatSupport creates a new SupporterFactory based on NewDefaultSupport.
+// MakeDefaultBeatSupport automatically adds the `ecs.version`, `host.name` and `agent.X` fields
 // to each event.
-func NewBeatSupport() SupporterFactory {
-	return NewDefaultSupport(true, WithECS, WithHost, WithBeatMeta("agent"))
+func MakeDefaultBeatSupport(normalize bool) SupportFactory {
+	return MakeDefaultSupport(normalize, WithECS, WithHost, WithBeatMeta("agent"))
 }
 
-// NewObserverSupport creates a new SupporterFactory based on NewDefaultSupport.
-// NewObserverSupport automatically adds the `ecs.version` and `observer.X` fields
+// MakeDefaultObserverSupport creates a new SupporterFactory based on NewDefaultSupport.
+// MakeDefaultObserverSupport automatically adds the `ecs.version` and `observer.X` fields
 // to each event.
-func NewObserverSupport(normalize bool) SupporterFactory {
-	return NewDefaultSupport(normalize, WithECS, WithBeatMeta("observer"))
+func MakeDefaultObserverSupport(normalize bool) SupportFactory {
+	return MakeDefaultSupport(normalize, WithECS, WithBeatMeta("observer"))
 }
 
-// NewDefaultSupport creates a new SupporterFactory for use with the publisher pipeline.
+// MakeDefaultSupport creates a new SupporterFactory for use with the publisher pipeline.
 // If normalize is set, events will be normalized first before being presented
 // to the actual processors.
 // The Supporter will apply the global `fields`, `fields_under_root`, `tags`
 // and `processor` settings to the event processing pipeline to be generated.
 // Use WithFields, WithBeatMeta, and other to declare the builtin fields to be added
 // to each event. Builtin fields can be modified using global `processors`, and `fields` only.
-func NewDefaultSupport(
+func MakeDefaultSupport(
 	normalize bool,
 	modifiers ...modifier,
-) SupporterFactory {
+) SupportFactory {
 	return func(info beat.Info, log *logp.Logger, beatCfg *common.Config) (Supporter, error) {
 		cfg := struct {
 			common.EventMetadata `config:",inline"`      // Fields and tags to add to each event.
@@ -99,42 +103,7 @@ func NewDefaultSupport(
 			return nil, fmt.Errorf("error initializing processors: %v", err)
 		}
 
-		p := &pipelineProcessors{
-			skipNormalize: !normalize,
-			log:           log,
-		}
-
-		hasProcessors := processors != nil && len(processors.List) > 0
-		if hasProcessors {
-			tmp := newProgram("global", log)
-			for _, p := range processors.List {
-				tmp.add(p)
-			}
-			p.processors = tmp
-		}
-
-		builtin := common.MapStr{}
-		for _, mod := range modifiers {
-			m := mod.BuiltinFields(info)
-			if len(m) > 0 {
-				builtin.DeepUpdate(m.Clone())
-			}
-		}
-		if len(builtin) > 0 {
-			p.builtinMeta = builtin
-		}
-
-		if em := cfg.EventMetadata; len(em.Fields) > 0 {
-			fields := common.MapStr{}
-			common.MergeFields(fields, em.Fields.Clone(), em.FieldsUnderRoot)
-			p.fields = fields
-		}
-
-		if t := cfg.EventMetadata.Tags; len(t) > 0 {
-			p.tags = t
-		}
-
-		return p, nil
+		return newBuilder(info, log, processors, cfg.EventMetadata, modifiers, !normalize), nil
 	}
 }
 
@@ -148,7 +117,7 @@ func WithFields(fields common.MapStr) modifier {
 // WithECS modifier adds `ecs.version` builtin fields to a processing pipeline.
 var WithECS modifier = WithFields(common.MapStr{
 	"ecs": common.MapStr{
-		"version": ecsVersion,
+		"version": ecs.Version,
 	},
 })
 
@@ -179,13 +148,56 @@ func WithBeatMeta(key string) modifier {
 	})
 }
 
-// build prepares the processor pipeline, merging
-// post processing, event annotations and actual configured processors.
-// The pipeline generated ensure the client and pipeline processors
-// will see the complete events with all meta data applied.
+func newBuilder(
+	info beat.Info,
+	log *logp.Logger,
+	processors *processors.Processors,
+	eventMeta common.EventMetadata,
+	modifiers []modifier,
+	skipNormalize bool,
+) *builder {
+	b := &builder{
+		skipNormalize: skipNormalize,
+		modifiers:     modifiers,
+		log:           log,
+	}
+
+	hasProcessors := processors != nil && len(processors.List) > 0
+	if hasProcessors {
+		tmp := newGroup("global", log)
+		for _, p := range processors.List {
+			tmp.add(p)
+		}
+		b.processors = tmp
+	}
+
+	builtin := common.MapStr{}
+	for _, mod := range modifiers {
+		m := mod.BuiltinFields(info)
+		if len(m) > 0 {
+			builtin.DeepUpdate(m.Clone())
+		}
+	}
+	if len(builtin) > 0 {
+		b.builtinMeta = builtin
+	}
+
+	if fields := eventMeta.Fields; len(fields) > 0 {
+		b.fields = common.MapStr{}
+		common.MergeFields(b.fields, fields.Clone(), eventMeta.FieldsUnderRoot)
+	}
+
+	if t := eventMeta.Tags; len(t) > 0 {
+		b.tags = t
+	}
+
+	return b
+}
+
+// Create combines the builder configuration with the client settings
+// in order to build the event processing pipeline.
 //
-// Pipeline (C=client, P=pipeline)
-//
+// Processing order (C=client, P=pipeline)
 //  1. (P) generalize/normalize event
 //  2. (C) add Meta from client Config to event.Meta
 //  3. (C) add Fields from client config to event.Fields
@@ -196,28 +208,22 @@ func WithBeatMeta(key string) modifier {
 //  8. (P) pipeline processors list
 //  9. (P) (if publish/debug enabled) log event
 // 10. (P) (if output disabled) dropEvent
-func (pp *pipelineProcessors) Create(
-	cfg beat.ProcessingConfig,
-	drop bool,
-) (beat.Processor, error) {
+func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error) {
 	var (
 		// pipeline processors
-		processors = &program{
-			title: "processPipeline",
-			log:   pp.log,
-		}
+		processors = newGroup("processPipeline", b.log)
 
 		// client fields and metadata
 		clientMeta      = cfg.Meta
-		localProcessors = makeClientProcessors(pp.log, cfg)
+		localProcessors = makeClientProcessors(b.log, cfg)
 	)
 
-	needsCopy := pp.alwaysCopy || localProcessors != nil || pp.processors != nil
+	needsCopy := b.alwaysCopy || localProcessors != nil || b.processors != nil
 
-	builtin := pp.builtinMeta
+	builtin := b.builtinMeta
 	var clientFields common.MapStr
-	for _, mod := range pp.modifiers {
-		m := mod.ClientFields(pp.info, cfg)
+	for _, mod := range b.modifiers {
+		m := mod.ClientFields(b.info, cfg)
 		if len(m) > 0 {
 			if clientFields == nil {
 				clientFields = common.MapStr{}
@@ -231,7 +237,7 @@ func (pp *pipelineProcessors) Create(
 		builtin = tmp
 	}
 
-	if !pp.skipNormalize {
+	if !b.skipNormalize {
 		// setup 1: generalize/normalize output (P)
 		processors.add(generalizeProcessor)
 	}
@@ -243,7 +249,7 @@ func (pp *pipelineProcessors) Create(
 
 	// setup 4, 5: pipeline tags + client tags
 	var tags []string
-	tags = append(tags, pp.tags...)
+	tags = append(tags, b.tags...)
 	tags = append(tags, cfg.EventMetadata.Tags...)
 	if len(tags) > 0 {
 		processors.add(actions.NewAddTags("tags", tags))
@@ -251,7 +257,7 @@ func (pp *pipelineProcessors) Create(
 
 	// setup 3, 4, 5: client config fields + pipeline fields + client fields + dyn metadata
 	fields := cfg.Fields.Clone()
-	fields.DeepUpdate(pp.fields.Clone())
+	fields.DeepUpdate(b.fields.Clone())
 	if em := cfg.EventMetadata; len(em.Fields) > 0 {
 		common.MergeFields(fields, em.Fields.Clone(), em.FieldsUnderRoot)
 	}
@@ -281,11 +287,11 @@ func (pp *pipelineProcessors) Create(
 	}
 
 	// setup 8: pipeline processors list
-	processors.add(pp.processors)
+	processors.add(b.processors)
 
 	// setup 9: debug print final event (P)
-	if pp.log.IsDebug() {
-		processors.add(debugPrintProcessor(pp.info, pp.log))
+	if b.log.IsDebug() {
+		processors.add(debugPrintProcessor(b.info, b.log))
 	}
 
 	// setup 10: drop all events if outputs are disabled (P)
@@ -305,7 +311,7 @@ func makeClientProcessors(
 		return nil
 	}
 
-	p := newProgram("client", log)
+	p := newGroup("client", log)
 	p.list = procs.All()
 	return p
 }

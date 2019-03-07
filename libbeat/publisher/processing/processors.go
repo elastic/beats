@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 )
 
-type program struct {
+type group struct {
 	log   *logp.Logger
 	title string
 	list  []beat.Processor
@@ -60,20 +60,20 @@ var dropDisabledProcessor = newProcessor("dropDisabled", func(event *beat.Event)
 	return nil, nil
 })
 
-func newProgram(title string, log *logp.Logger) *program {
-	return &program{
+func newGroup(title string, log *logp.Logger) *group {
+	return &group{
 		title: title,
 		log:   log,
 	}
 }
 
-func (p *program) add(processor processors.Processor) {
+func (p *group) add(processor processors.Processor) {
 	if processor != nil {
 		p.list = append(p.list, processor)
 	}
 }
 
-func (p *program) String() string {
+func (p *group) String() string {
 	var s []string
 	for _, p := range p.list {
 		s = append(s, p.String())
@@ -86,11 +86,11 @@ func (p *program) String() string {
 	return fmt.Sprintf("%v{%v}", p.title, str)
 }
 
-func (p *program) All() []beat.Processor {
+func (p *group) All() []beat.Processor {
 	return p.list
 }
 
-func (p *program) Run(event *beat.Event) (*beat.Event, error) {
+func (p *group) Run(event *beat.Event) (*beat.Event, error) {
 	if p == nil || len(p.list) == 0 {
 		return event, nil
 	}

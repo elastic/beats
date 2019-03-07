@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors/actions"
+	"github.com/elastic/ecs/code/go/ecs"
 )
 
 func TestProcessorsConfigs(t *testing.T) {
@@ -42,10 +43,10 @@ func TestProcessorsConfigs(t *testing.T) {
 		Version:     "0.1",
 	}
 
-	ecsFields := common.MapStr{"version": ecsVersion}
+	ecsFields := common.MapStr{"version": ecs.Version}
 
 	cases := map[string]struct {
-		factory  SupporterFactory
+		factory  SupportFactory
 		global   string
 		local    beat.ProcessingConfig
 		drop     bool
@@ -163,7 +164,7 @@ func TestProcessorsConfigs(t *testing.T) {
 		"with client processor": {
 			local: beat.ProcessingConfig{
 				Processor: func() beat.ProcessorList {
-					p := newProgram("test", logp.L())
+					p := newGroup("test", logp.L())
 					p.add(actions.NewAddFields(common.MapStr{"custom": "value"}, true))
 					return p
 				}(),
@@ -172,7 +173,7 @@ func TestProcessorsConfigs(t *testing.T) {
 			want:  common.MapStr{"value": "abc", "custom": "value"},
 		},
 		"with beat default fields": {
-			factory: NewBeatSupport(),
+			factory: MakeDefaultBeatSupport(true),
 			global:  `{fields: {global: a, agent.foo: bar}, fields_under_root: true, tags: [tag]}`,
 			event:   `{"value": "abc"}`,
 			want: common.MapStr{
@@ -194,7 +195,7 @@ func TestProcessorsConfigs(t *testing.T) {
 			},
 		},
 		"with beat default fields and custom name": {
-			factory: NewBeatSupport(),
+			factory: MakeDefaultBeatSupport(true),
 			global:  `{fields: {global: a, agent.foo: bar}, fields_under_root: true, tags: [tag]}`,
 			event:   `{"value": "abc"}`,
 			infoMod: func(info beat.Info) beat.Info {
@@ -221,7 +222,7 @@ func TestProcessorsConfigs(t *testing.T) {
 			},
 		},
 		"with observer default fields": {
-			factory: NewObserverSupport(false),
+			factory: MakeDefaultObserverSupport(false),
 			global:  `{fields: {global: a, observer.foo: bar}, fields_under_root: true, tags: [tag]}`,
 			event:   `{"value": "abc"}`,
 			want: common.MapStr{
@@ -256,7 +257,7 @@ func TestProcessorsConfigs(t *testing.T) {
 
 			factory := test.factory
 			if factory == nil {
-				factory = NewDefaultSupport(true)
+				factory = MakeDefaultSupport(true)
 			}
 
 			support, err := factory(info, logp.L(), cfg)
@@ -304,7 +305,7 @@ func TestNormalization(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			s, err := NewDefaultSupport(test.normalize)(beat.Info{}, logp.L(), common.NewConfig())
+			s, err := MakeDefaultSupport(test.normalize)(beat.Info{}, logp.L(), common.NewConfig())
 			require.NoError(t, err)
 
 			prog, err := s.Create(beat.ProcessingConfig{}, false)
@@ -322,7 +323,7 @@ func TestNormalization(t *testing.T) {
 }
 
 func TestAlwaysDrop(t *testing.T) {
-	s, err := NewDefaultSupport(true)(beat.Info{}, logp.L(), common.NewConfig())
+	s, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), common.NewConfig())
 	require.NoError(t, err)
 
 	prog, err := s.Create(beat.ProcessingConfig{}, true)
@@ -334,7 +335,7 @@ func TestAlwaysDrop(t *testing.T) {
 }
 
 func TestDynamicFields(t *testing.T) {
-	factory, err := NewDefaultSupport(true)(beat.Info{}, logp.L(), common.NewConfig())
+	factory, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), common.NewConfig())
 	require.NoError(t, err)
 
 	dynFields := common.NewMapStrPointer(common.MapStr{})

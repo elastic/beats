@@ -317,16 +317,10 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		}
 	}
 
-	var processors beat.Processor
-	if p.processors != nil {
-		proc, err := p.processors.Create(cfg.Processing, publishDisabled)
-		if err != nil {
-			return nil, err
-		}
-
-		processors = proc
+	processors, err := p.createEventProcessing(cfg.Processing, publishDisabled)
+	if err != nil {
+		return nil, err
 	}
-
 	acker := p.makeACKer(processors != nil, &cfg, waitClose)
 	producerCfg := queue.ProducerConfig{
 		// Cancel events from queue if acker is configured
@@ -366,6 +360,13 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 
 	p.observer.clientConnected()
 	return client, nil
+}
+
+func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bool) (beat.Processor, error) {
+	if p.processors == nil {
+		return nil, nil
+	}
+	return p.processors.Create(cfg, noPublish)
 }
 
 func (e *pipelineEventer) OnACK(n int) {

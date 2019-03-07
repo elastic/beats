@@ -603,7 +603,7 @@ func (b *Beat) configure(settings Settings) error {
 
 	processingFactory := settings.Processing
 	if processingFactory == nil {
-		processingFactory = processing.NewBeatSupport()
+		processingFactory = processing.MakeDefaultBeatSupport(true)
 	}
 	b.processing, err = processingFactory(b.Info, logp.L().Named("processors"), b.RawConfig)
 

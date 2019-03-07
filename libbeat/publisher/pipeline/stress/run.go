@@ -61,7 +61,7 @@ func RunTests(
 
 	log := logp.L()
 
-	processing, err := processing.NewDefaultSupport(false)(info, log, cfg)
+	processing, err := processing.MakeDefaultSupport(false)(info, log, cfg)
 	if err != nil {
 		return err
 	}
