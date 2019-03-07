@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -35,7 +36,7 @@ var (
 )
 
 func TestEmpty(t *testing.T) {
-	trans, err := newFieldsTransformer(version, common.Fields{}, true)
+	trans, err := newFieldsTransformer(version, asset.Fields{}, true)
 	assert.NoError(t, err)
 	out, err := trans.transform()
 	assert.NoError(t, err)
@@ -93,26 +94,26 @@ func TestEmpty(t *testing.T) {
 
 func TestMissingVersion(t *testing.T) {
 	var c *common.Version
-	_, err := newFieldsTransformer(c, common.Fields{}, true)
+	_, err := newFieldsTransformer(c, asset.Fields{}, true)
 	assert.Error(t, err)
 }
 
 func TestDuplicateField(t *testing.T) {
 	testCases := []struct {
-		commonFields []common.Field
+		commonFields []asset.Field
 	}{
 		// type change
-		{commonFields: []common.Field{
+		{commonFields: []asset.Field{
 			{Name: "context", Path: "something"},
 			{Name: "context", Path: "something", Type: "date"},
 		}},
 		// missing overwrite
-		{commonFields: []common.Field{
+		{commonFields: []asset.Field{
 			{Name: "context", Path: "something"},
 			{Name: "context", Path: "something"},
 		}},
 		// missing overwrite in source
-		{commonFields: []common.Field{
+		{commonFields: []asset.Field{
 			{Name: "context", Path: "something", Overwrite: true},
 			{Name: "context", Path: "something"},
 		}},
@@ -127,9 +128,9 @@ func TestDuplicateField(t *testing.T) {
 }
 
 func TestValidDuplicateField(t *testing.T) {
-	commonFields := common.Fields{
-		common.Field{Name: "context", Path: "something", Type: "keyword", Description: "original description"},
-		common.Field{Name: "context", Path: "something", Overwrite: true, Description: "updated description",
+	commonFields := asset.Fields{
+		asset.Field{Name: "context", Path: "something", Type: "keyword", Description: "original description"},
+		asset.Field{Name: "context", Path: "something", Overwrite: true, Description: "updated description",
 			Aggregatable: &falsy,
 			Analyzed:     &truthy,
 			Count:        2,
@@ -137,18 +138,18 @@ func TestValidDuplicateField(t *testing.T) {
 			Index:        &falsy,
 			Searchable:   &falsy,
 		},
-		common.Field{
+		asset.Field{
 			Name: "context",
 			Type: "group",
-			Fields: common.Fields{
-				common.Field{Name: "another", Type: "date"},
+			Fields: asset.Fields{
+				asset.Field{Name: "another", Type: "date"},
 			},
 		},
-		common.Field{
+		asset.Field{
 			Name: "context",
 			Type: "group",
-			Fields: common.Fields{
-				common.Field{Name: "another", Overwrite: true},
+			Fields: asset.Fields{
+				asset.Field{Name: "another", Overwrite: true},
 			},
 		},
 	}
@@ -171,11 +172,11 @@ func TestValidDuplicateField(t *testing.T) {
 }
 
 func TestInvalidVersion(t *testing.T) {
-	commonFields := common.Fields{
-		common.Field{
+	commonFields := asset.Fields{
+		asset.Field{
 			Name:   "versionTest",
 			Format: "url",
-			UrlTemplate: []common.VersionizedString{
+			UrlTemplate: []asset.VersionizedString{
 				{MinVersion: "3", Value: ""},
 			},
 		},
@@ -188,26 +189,26 @@ func TestInvalidVersion(t *testing.T) {
 
 func TestTransformTypes(t *testing.T) {
 	tests := []struct {
-		commonField common.Field
+		commonField asset.Field
 		expected    interface{}
 	}{
-		{commonField: common.Field{}, expected: "string"},
-		{commonField: common.Field{Type: "half_float"}, expected: "number"},
-		{commonField: common.Field{Type: "scaled_float"}, expected: "number"},
-		{commonField: common.Field{Type: "float"}, expected: "number"},
-		{commonField: common.Field{Type: "integer"}, expected: "number"},
-		{commonField: common.Field{Type: "long"}, expected: "number"},
-		{commonField: common.Field{Type: "short"}, expected: "number"},
-		{commonField: common.Field{Type: "byte"}, expected: "number"},
-		{commonField: common.Field{Type: "keyword"}, expected: "string"},
-		{commonField: common.Field{Type: "text"}, expected: "string"},
-		{commonField: common.Field{Type: "string"}, expected: nil},
-		{commonField: common.Field{Type: "date"}, expected: "date"},
-		{commonField: common.Field{Type: "geo_point"}, expected: "geo_point"},
-		{commonField: common.Field{Type: "invalid"}, expected: nil},
+		{commonField: asset.Field{}, expected: "string"},
+		{commonField: asset.Field{Type: "half_float"}, expected: "number"},
+		{commonField: asset.Field{Type: "scaled_float"}, expected: "number"},
+		{commonField: asset.Field{Type: "float"}, expected: "number"},
+		{commonField: asset.Field{Type: "integer"}, expected: "number"},
+		{commonField: asset.Field{Type: "long"}, expected: "number"},
+		{commonField: asset.Field{Type: "short"}, expected: "number"},
+		{commonField: asset.Field{Type: "byte"}, expected: "number"},
+		{commonField: asset.Field{Type: "keyword"}, expected: "string"},
+		{commonField: asset.Field{Type: "text"}, expected: "string"},
+		{commonField: asset.Field{Type: "string"}, expected: nil},
+		{commonField: asset.Field{Type: "date"}, expected: "date"},
+		{commonField: asset.Field{Type: "geo_point"}, expected: "geo_point"},
+		{commonField: asset.Field{Type: "invalid"}, expected: nil},
 	}
 	for idx, test := range tests {
-		trans, _ := newFieldsTransformer(version, common.Fields{test.commonField}, true)
+		trans, _ := newFieldsTransformer(version, asset.Fields{test.commonField}, true)
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
 		out := transformed["fields"].([]common.MapStr)[0]
@@ -217,32 +218,32 @@ func TestTransformTypes(t *testing.T) {
 
 func TestTransformGroup(t *testing.T) {
 	tests := []struct {
-		commonFields common.Fields
+		commonFields asset.Fields
 		expected     []string
 	}{
 		{
-			commonFields: common.Fields{common.Field{Name: "context", Path: "something"}},
+			commonFields: asset.Fields{asset.Field{Name: "context", Path: "something"}},
 			expected:     []string{"context"},
 		},
 		{
-			commonFields: common.Fields{
-				common.Field{
+			commonFields: asset.Fields{
+				asset.Field{
 					Name: "context",
 					Type: "group",
-					Fields: common.Fields{
-						common.Field{Name: "another", Type: ""},
+					Fields: asset.Fields{
+						asset.Field{Name: "another", Type: ""},
 					},
 				},
-				common.Field{
+				asset.Field{
 					Name: "context",
 					Type: "group",
-					Fields: common.Fields{
-						common.Field{Name: "type", Type: ""},
-						common.Field{
+					Fields: asset.Fields{
+						asset.Field{Name: "type", Type: ""},
+						asset.Field{
 							Name: "metric",
 							Type: "group",
-							Fields: common.Fields{
-								common.Field{Name: "object"},
+							Fields: asset.Fields{
+								asset.Field{Name: "object"},
 							},
 						},
 					},
@@ -265,70 +266,70 @@ func TestTransformGroup(t *testing.T) {
 
 func TestTransformMisc(t *testing.T) {
 	tests := []struct {
-		commonField common.Field
+		commonField asset.Field
 		expected    interface{}
 		attr        string
 	}{
-		{commonField: common.Field{}, expected: 0, attr: "count"},
-		{commonField: common.Field{Count: 4}, expected: 4, attr: "count"},
+		{commonField: asset.Field{}, expected: 0, attr: "count"},
+		{commonField: asset.Field{Count: 4}, expected: 4, attr: "count"},
 
 		// searchable
-		{commonField: common.Field{}, expected: true, attr: "searchable"},
-		{commonField: common.Field{Searchable: &truthy}, expected: true, attr: "searchable"},
-		{commonField: common.Field{Searchable: &falsy}, expected: false, attr: "searchable"},
-		{commonField: common.Field{Type: "binary"}, expected: false, attr: "searchable"},
-		{commonField: common.Field{Searchable: &truthy, Type: "binary"}, expected: false, attr: "searchable"},
+		{commonField: asset.Field{}, expected: true, attr: "searchable"},
+		{commonField: asset.Field{Searchable: &truthy}, expected: true, attr: "searchable"},
+		{commonField: asset.Field{Searchable: &falsy}, expected: false, attr: "searchable"},
+		{commonField: asset.Field{Type: "binary"}, expected: false, attr: "searchable"},
+		{commonField: asset.Field{Searchable: &truthy, Type: "binary"}, expected: false, attr: "searchable"},
 
 		// aggregatable
-		{commonField: common.Field{}, expected: true, attr: "aggregatable"},
-		{commonField: common.Field{Aggregatable: &truthy}, expected: true, attr: "aggregatable"},
-		{commonField: common.Field{Aggregatable: &falsy}, expected: false, attr: "aggregatable"},
-		{commonField: common.Field{Type: "binary"}, expected: false, attr: "aggregatable"},
-		{commonField: common.Field{Aggregatable: &truthy, Type: "binary"}, expected: false, attr: "aggregatable"},
-		{commonField: common.Field{Type: "keyword"}, expected: true, attr: "aggregatable"},
-		{commonField: common.Field{Aggregatable: &truthy, Type: "text"}, expected: false, attr: "aggregatable"},
-		{commonField: common.Field{Type: "text"}, expected: false, attr: "aggregatable"},
+		{commonField: asset.Field{}, expected: true, attr: "aggregatable"},
+		{commonField: asset.Field{Aggregatable: &truthy}, expected: true, attr: "aggregatable"},
+		{commonField: asset.Field{Aggregatable: &falsy}, expected: false, attr: "aggregatable"},
+		{commonField: asset.Field{Type: "binary"}, expected: false, attr: "aggregatable"},
+		{commonField: asset.Field{Aggregatable: &truthy, Type: "binary"}, expected: false, attr: "aggregatable"},
+		{commonField: asset.Field{Type: "keyword"}, expected: true, attr: "aggregatable"},
+		{commonField: asset.Field{Aggregatable: &truthy, Type: "text"}, expected: false, attr: "aggregatable"},
+		{commonField: asset.Field{Type: "text"}, expected: false, attr: "aggregatable"},
 
 		// analyzed
-		{commonField: common.Field{}, expected: false, attr: "analyzed"},
-		{commonField: common.Field{Analyzed: &truthy}, expected: true, attr: "analyzed"},
-		{commonField: common.Field{Analyzed: &falsy}, expected: false, attr: "analyzed"},
-		{commonField: common.Field{Type: "binary"}, expected: false, attr: "analyzed"},
-		{commonField: common.Field{Analyzed: &truthy, Type: "binary"}, expected: false, attr: "analyzed"},
+		{commonField: asset.Field{}, expected: false, attr: "analyzed"},
+		{commonField: asset.Field{Analyzed: &truthy}, expected: true, attr: "analyzed"},
+		{commonField: asset.Field{Analyzed: &falsy}, expected: false, attr: "analyzed"},
+		{commonField: asset.Field{Type: "binary"}, expected: false, attr: "analyzed"},
+		{commonField: asset.Field{Analyzed: &truthy, Type: "binary"}, expected: false, attr: "analyzed"},
 
 		// doc_values always set to true except for meta fields
-		{commonField: common.Field{}, expected: true, attr: "doc_values"},
-		{commonField: common.Field{DocValues: &truthy}, expected: true, attr: "doc_values"},
-		{commonField: common.Field{DocValues: &falsy}, expected: false, attr: "doc_values"},
-		{commonField: common.Field{Script: "doc[]"}, expected: false, attr: "doc_values"},
-		{commonField: common.Field{DocValues: &truthy, Script: "doc[]"}, expected: false, attr: "doc_values"},
-		{commonField: common.Field{Type: "binary"}, expected: false, attr: "doc_values"},
-		{commonField: common.Field{DocValues: &truthy, Type: "binary"}, expected: true, attr: "doc_values"},
+		{commonField: asset.Field{}, expected: true, attr: "doc_values"},
+		{commonField: asset.Field{DocValues: &truthy}, expected: true, attr: "doc_values"},
+		{commonField: asset.Field{DocValues: &falsy}, expected: false, attr: "doc_values"},
+		{commonField: asset.Field{Script: "doc[]"}, expected: false, attr: "doc_values"},
+		{commonField: asset.Field{DocValues: &truthy, Script: "doc[]"}, expected: false, attr: "doc_values"},
+		{commonField: asset.Field{Type: "binary"}, expected: false, attr: "doc_values"},
+		{commonField: asset.Field{DocValues: &truthy, Type: "binary"}, expected: true, attr: "doc_values"},
 
 		// enabled - only applies to objects (and only if set)
-		{commonField: common.Field{Type: "binary", Enabled: &falsy}, expected: nil, attr: "enabled"},
-		{commonField: common.Field{Type: "binary", Enabled: &truthy}, expected: nil, attr: "enabled"},
-		{commonField: common.Field{Type: "object", Enabled: &truthy}, expected: true, attr: "enabled"},
-		{commonField: common.Field{Type: "object", Enabled: &falsy}, expected: false, attr: "enabled"},
-		{commonField: common.Field{Type: "object", Enabled: &falsy}, expected: false, attr: "doc_values"},
+		{commonField: asset.Field{Type: "binary", Enabled: &falsy}, expected: nil, attr: "enabled"},
+		{commonField: asset.Field{Type: "binary", Enabled: &truthy}, expected: nil, attr: "enabled"},
+		{commonField: asset.Field{Type: "object", Enabled: &truthy}, expected: true, attr: "enabled"},
+		{commonField: asset.Field{Type: "object", Enabled: &falsy}, expected: false, attr: "enabled"},
+		{commonField: asset.Field{Type: "object", Enabled: &falsy}, expected: false, attr: "doc_values"},
 
 		// indexed
-		{commonField: common.Field{Type: "binary"}, expected: false, attr: "indexed"},
-		{commonField: common.Field{Index: &truthy, Type: "binary"}, expected: false, attr: "indexed"},
+		{commonField: asset.Field{Type: "binary"}, expected: false, attr: "indexed"},
+		{commonField: asset.Field{Index: &truthy, Type: "binary"}, expected: false, attr: "indexed"},
 
 		// script, scripted
-		{commonField: common.Field{}, expected: false, attr: "scripted"},
-		{commonField: common.Field{}, expected: nil, attr: "script"},
-		{commonField: common.Field{Script: "doc[]"}, expected: true, attr: "scripted"},
-		{commonField: common.Field{Script: "doc[]"}, expected: "doc[]", attr: "script"},
-		{commonField: common.Field{Type: "binary"}, expected: false, attr: "scripted"},
+		{commonField: asset.Field{}, expected: false, attr: "scripted"},
+		{commonField: asset.Field{}, expected: nil, attr: "script"},
+		{commonField: asset.Field{Script: "doc[]"}, expected: true, attr: "scripted"},
+		{commonField: asset.Field{Script: "doc[]"}, expected: "doc[]", attr: "script"},
+		{commonField: asset.Field{Type: "binary"}, expected: false, attr: "scripted"},
 
 		// language
-		{commonField: common.Field{}, expected: nil, attr: "lang"},
-		{commonField: common.Field{Script: "doc[]"}, expected: "painless", attr: "lang"},
+		{commonField: asset.Field{}, expected: nil, attr: "lang"},
+		{commonField: asset.Field{Script: "doc[]"}, expected: "painless", attr: "lang"},
 	}
 	for idx, test := range tests {
-		trans, _ := newFieldsTransformer(version, common.Fields{test.commonField}, true)
+		trans, _ := newFieldsTransformer(version, asset.Fields{test.commonField}, true)
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
 		out := transformed["fields"].([]common.MapStr)[0]
@@ -344,27 +345,27 @@ func TestTransformFieldFormatMap(t *testing.T) {
 	falsy := false
 
 	tests := []struct {
-		commonField common.Field
+		commonField asset.Field
 		version     *common.Version
 		expected    common.MapStr
 	}{
 		{
-			commonField: common.Field{Name: "c"},
+			commonField: asset.Field{Name: "c"},
 			expected:    common.MapStr{},
 			version:     version,
 		},
 		{
-			commonField: common.Field{Name: "c", Format: "url"},
+			commonField: asset.Field{Name: "c", Format: "url"},
 			expected:    common.MapStr{"c": common.MapStr{"id": "url"}},
 			version:     version,
 		},
 		{
-			commonField: common.Field{Name: "c", Pattern: "p"},
+			commonField: asset.Field{Name: "c", Pattern: "p"},
 			expected:    common.MapStr{"c": common.MapStr{"params": common.MapStr{"pattern": "p"}}},
 			version:     version,
 		},
 		{
-			commonField: common.Field{
+			commonField: asset.Field{
 				Name:    "c",
 				Format:  "url",
 				Pattern: "p",
@@ -378,7 +379,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 			version: version,
 		},
 		{
-			commonField: common.Field{
+			commonField: asset.Field{
 				Name:        "c",
 				Format:      "url",
 				InputFormat: "string",
@@ -394,7 +395,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 			version: version,
 		},
 		{
-			commonField: common.Field{
+			commonField: asset.Field{
 				Name:                 "c",
 				Format:               "url",
 				Pattern:              "[^-]",
@@ -414,7 +415,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 			version: version,
 		},
 		{
-			commonField: common.Field{
+			commonField: asset.Field{
 				Name:        "c",
 				InputFormat: "string",
 			},
@@ -423,7 +424,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 		},
 		{
 			version: version620,
-			commonField: common.Field{
+			commonField: asset.Field{
 				Name:                 "c",
 				Format:               "url",
 				Pattern:              "[^-]",
@@ -432,7 +433,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 				OutputFormat:         "float",
 				OutputPrecision:      &precision,
 				LabelTemplate:        "lblT",
-				UrlTemplate: []common.VersionizedString{
+				UrlTemplate: []asset.VersionizedString{
 					{MinVersion: "5.0.0", Value: "5x.urlTemplate"},
 					{MinVersion: "6.0.0", Value: "6x.urlTemplate"},
 				},
@@ -454,10 +455,10 @@ func TestTransformFieldFormatMap(t *testing.T) {
 		},
 		{
 			version: version620,
-			commonField: common.Field{
+			commonField: asset.Field{
 				Name:   "c",
 				Format: "url",
-				UrlTemplate: []common.VersionizedString{
+				UrlTemplate: []asset.VersionizedString{
 					{MinVersion: "6.4.0", Value: "6x.urlTemplate"},
 				},
 			},
@@ -467,10 +468,10 @@ func TestTransformFieldFormatMap(t *testing.T) {
 		},
 		{
 			version: version620,
-			commonField: common.Field{
+			commonField: asset.Field{
 				Name:   "c",
 				Format: "url",
-				UrlTemplate: []common.VersionizedString{
+				UrlTemplate: []asset.VersionizedString{
 					{MinVersion: "4.7.2", Value: "4x.urlTemplate"},
 					{MinVersion: "6.5.1", Value: "6x.urlTemplate"},
 				},
@@ -486,10 +487,10 @@ func TestTransformFieldFormatMap(t *testing.T) {
 		},
 		{
 			version: version620,
-			commonField: common.Field{
+			commonField: asset.Field{
 				Name:   "c",
 				Format: "url",
-				UrlTemplate: []common.VersionizedString{
+				UrlTemplate: []asset.VersionizedString{
 					{MinVersion: "6.2.0", Value: "6.2.0.urlTemplate"},
 					{MinVersion: "6.2.0-alpha", Value: "6.2.0-alpha.urlTemplate"},
 					{MinVersion: "6.2.7", Value: "6.2.7.urlTemplate"},
@@ -506,10 +507,10 @@ func TestTransformFieldFormatMap(t *testing.T) {
 		},
 		{
 			version: version620,
-			commonField: common.Field{
+			commonField: asset.Field{
 				Name:   "c",
 				Format: "url",
-				UrlTemplate: []common.VersionizedString{
+				UrlTemplate: []asset.VersionizedString{
 					{MinVersion: "4.1.0", Value: "4x.urlTemplate"},
 					{MinVersion: "5.2.0-rc2", Value: "5.2.0-rc2.urlTemplate"},
 					{MinVersion: "5.2.0-rc3", Value: "5.2.0-rc3.urlTemplate"},
@@ -527,7 +528,7 @@ func TestTransformFieldFormatMap(t *testing.T) {
 		},
 	}
 	for idx, test := range tests {
-		trans, _ := newFieldsTransformer(test.version, common.Fields{test.commonField}, true)
+		trans, _ := newFieldsTransformer(test.version, asset.Fields{test.commonField}, true)
 		transformed, err := trans.transform()
 		assert.NoError(t, err)
 		out := transformed["fieldFormatMap"]
@@ -537,25 +538,25 @@ func TestTransformFieldFormatMap(t *testing.T) {
 
 func TestTransformGroupAndEnabled(t *testing.T) {
 	tests := []struct {
-		commonFields common.Fields
+		commonFields asset.Fields
 		expected     []string
 	}{
 		{
-			commonFields: common.Fields{common.Field{Name: "context", Path: "something"}},
+			commonFields: asset.Fields{asset.Field{Name: "context", Path: "something"}},
 			expected:     []string{"context"},
 		},
 		{
-			commonFields: common.Fields{
-				common.Field{
+			commonFields: asset.Fields{
+				asset.Field{
 					Name: "context",
 					Type: "group",
-					Fields: common.Fields{
-						common.Field{Name: "type", Type: ""},
-						common.Field{
+					Fields: asset.Fields{
+						asset.Field{Name: "type", Type: ""},
+						asset.Field{
 							Name: "metric",
 							Type: "group",
-							Fields: common.Fields{
-								common.Field{Name: "object"},
+							Fields: asset.Fields{
+								asset.Field{Name: "object"},
 							},
 						},
 					},
@@ -564,28 +565,28 @@ func TestTransformGroupAndEnabled(t *testing.T) {
 			expected: []string{"context.type", "context.metric.object"},
 		},
 		{
-			commonFields: common.Fields{
-				common.Field{Name: "enabledField"},
-				common.Field{Name: "disabledField", Enabled: &falsy}, //enabled is ignored for Type!=group
-				common.Field{
+			commonFields: asset.Fields{
+				asset.Field{Name: "enabledField"},
+				asset.Field{Name: "disabledField", Enabled: &falsy}, //enabled is ignored for Type!=group
+				asset.Field{
 					Name:    "enabledGroup",
 					Type:    "group",
 					Enabled: &truthy,
-					Fields: common.Fields{
-						common.Field{Name: "type", Type: ""},
+					Fields: asset.Fields{
+						asset.Field{Name: "type", Type: ""},
 					},
 				},
-				common.Field{
+				asset.Field{
 					Name:    "context",
 					Type:    "group",
 					Enabled: &falsy,
-					Fields: common.Fields{
-						common.Field{Name: "type", Type: ""},
-						common.Field{
+					Fields: asset.Fields{
+						asset.Field{Name: "type", Type: ""},
+						asset.Field{
 							Name: "metric",
 							Type: "group",
-							Fields: common.Fields{
-								common.Field{Name: "object"},
+							Fields: asset.Fields{
+								asset.Field{Name: "object"},
 							},
 						},
 					},
@@ -607,15 +608,15 @@ func TestTransformGroupAndEnabled(t *testing.T) {
 }
 
 func TestTransformMultiField(t *testing.T) {
-	f := common.Field{
+	f := asset.Field{
 		Name: "context",
 		Type: "",
-		MultiFields: common.Fields{
-			common.Field{Name: "keyword", Type: "keyword"},
-			common.Field{Name: "text", Type: "text"},
+		MultiFields: asset.Fields{
+			asset.Field{Name: "keyword", Type: "keyword"},
+			asset.Field{Name: "text", Type: "text"},
 		},
 	}
-	trans, _ := newFieldsTransformer(version, common.Fields{f}, true)
+	trans, _ := newFieldsTransformer(version, asset.Fields{f}, true)
 	transformed, err := trans.transform()
 	assert.NoError(t, err)
 	out := transformed["fields"].([]common.MapStr)

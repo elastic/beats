@@ -21,6 +21,7 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/common"
 )
 
@@ -38,7 +39,7 @@ var (
 const scalingFactorKey = "scalingFactor"
 
 // Process recursively processes the given fields and writes the template in the given output
-func (p *Processor) Process(fields common.Fields, path string, output common.MapStr) error {
+func (p *Processor) Process(fields asset.Fields, path string, output common.MapStr) error {
 	for _, field := range fields {
 
 		if field.Name == "" {
@@ -81,7 +82,7 @@ func (p *Processor) Process(fields common.Fields, path string, output common.Map
 
 			// Combine properties with previous field definitions (if any)
 			properties := common.MapStr{}
-			key := common.GenerateKey(field.Name) + ".properties"
+			key := asset.GenerateKey(field.Name) + ".properties"
 			currentProperties, err := output.GetValue(key)
 			if err == nil {
 				var ok bool
@@ -106,7 +107,7 @@ func (p *Processor) Process(fields common.Fields, path string, output common.Map
 		}
 
 		if len(mapping) > 0 {
-			output.Put(common.GenerateKey(field.Name), mapping)
+			output.Put(asset.GenerateKey(field.Name), mapping)
 		}
 	}
 	return nil
@@ -132,13 +133,13 @@ func (p *Processor) other(f *common.Field) common.MapStr {
 	return property
 }
 
-func (p *Processor) integer(f *common.Field) common.MapStr {
+func (p *Processor) integer(f *asset.Field) common.MapStr {
 	property := getDefaultProperties(f)
 	property["type"] = "long"
 	return property
 }
 
-func (p *Processor) scaledFloat(f *common.Field, params ...common.MapStr) common.MapStr {
+func (p *Processor) scaledFloat(f *asset.Field, params ...common.MapStr) common.MapStr {
 	property := getDefaultProperties(f)
 	property["type"] = "scaled_float"
 
@@ -163,7 +164,7 @@ func (p *Processor) scaledFloat(f *common.Field, params ...common.MapStr) common
 	return property
 }
 
-func (p *Processor) halfFloat(f *common.Field) common.MapStr {
+func (p *Processor) halfFloat(f *asset.Field) common.MapStr {
 	property := getDefaultProperties(f)
 	property["type"] = "half_float"
 
@@ -173,7 +174,7 @@ func (p *Processor) halfFloat(f *common.Field) common.MapStr {
 	return property
 }
 
-func (p *Processor) ip(f *common.Field) common.MapStr {
+func (p *Processor) ip(f *asset.Field) common.MapStr {
 	property := getDefaultProperties(f)
 
 	property["type"] = "ip"
@@ -186,7 +187,7 @@ func (p *Processor) ip(f *common.Field) common.MapStr {
 	return property
 }
 
-func (p *Processor) keyword(f *common.Field) common.MapStr {
+func (p *Processor) keyword(f *asset.Field) common.MapStr {
 	property := getDefaultProperties(f)
 
 	property["type"] = "keyword"
@@ -213,7 +214,7 @@ func (p *Processor) keyword(f *common.Field) common.MapStr {
 	return property
 }
 
-func (p *Processor) text(f *common.Field) common.MapStr {
+func (p *Processor) text(f *asset.Field) common.MapStr {
 	properties := getDefaultProperties(f)
 
 	properties["type"] = "text"
@@ -249,7 +250,7 @@ func (p *Processor) text(f *common.Field) common.MapStr {
 	return properties
 }
 
-func (p *Processor) array(f *common.Field) common.MapStr {
+func (p *Processor) array(f *asset.Field) common.MapStr {
 	properties := getDefaultProperties(f)
 	if f.ObjectType != "" {
 		properties["type"] = f.ObjectType
@@ -257,7 +258,7 @@ func (p *Processor) array(f *common.Field) common.MapStr {
 	return properties
 }
 
-func (p *Processor) alias(f *common.Field) common.MapStr {
+func (p *Processor) alias(f *asset.Field) common.MapStr {
 	// Aliases were introduced in Elasticsearch 6.4, ignore if unsupported
 	if p.EsVersion.LessThan(common.MustNewVersion("6.4.0")) {
 		return nil
@@ -274,7 +275,7 @@ func (p *Processor) alias(f *common.Field) common.MapStr {
 	return properties
 }
 
-func (p *Processor) object(f *common.Field) common.MapStr {
+func (p *Processor) object(f *asset.Field) common.MapStr {
 	matchType := func(onlyType string, mt string) string {
 		if mt != "" {
 			return mt
@@ -282,11 +283,11 @@ func (p *Processor) object(f *common.Field) common.MapStr {
 		return onlyType
 	}
 
-	var otParams []common.ObjectTypeCfg
+	var otParams []asset.ObjectTypeCfg
 	if len(f.ObjectTypeParams) != 0 {
 		otParams = f.ObjectTypeParams
 	} else {
-		otParams = []common.ObjectTypeCfg{common.ObjectTypeCfg{
+		otParams = []asset.ObjectTypeCfg{asset.ObjectTypeCfg{
 			ObjectType: f.ObjectType, ObjectTypeMappingType: f.ObjectTypeMappingType, ScalingFactor: f.ScalingFactor}}
 	}
 
@@ -327,7 +328,7 @@ func (p *Processor) object(f *common.Field) common.MapStr {
 	return properties
 }
 
-func addDynamicTemplate(f *common.Field, properties common.MapStr, matchType string) {
+func addDynamicTemplate(f *asset.Field, properties common.MapStr, matchType string) {
 	path := ""
 	if len(f.Path) > 0 {
 		path = f.Path + "."
@@ -348,7 +349,7 @@ func addDynamicTemplate(f *common.Field, properties common.MapStr, matchType str
 	dynamicTemplates = append(dynamicTemplates, template)
 }
 
-func getDefaultProperties(f *common.Field) common.MapStr {
+func getDefaultProperties(f *asset.Field) common.MapStr {
 	// Currently no defaults exist
 	properties := common.MapStr{}
 
