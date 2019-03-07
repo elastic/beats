@@ -100,11 +100,27 @@ func (p *Processor) Process(fields common.Fields, path string, output common.Map
 			mapping = p.other(&field)
 		}
 
+		switch field.Type {
+		case "", "keyword", "text", "ip":
+			addToDefaultFields(&field)
+		}
+
 		if len(mapping) > 0 {
 			output.Put(common.GenerateKey(field.Name), mapping)
 		}
 	}
 	return nil
+}
+
+func addToDefaultFields(f *common.Field) {
+	fullName := f.Name
+	if f.Path != "" {
+		fullName = f.Path + "." + f.Name
+	}
+
+	if f.Index == nil || (f.Index != nil && *f.Index) {
+		defaultFields = append(defaultFields, fullName)
+	}
 }
 
 func (p *Processor) other(f *common.Field) common.MapStr {
@@ -173,15 +189,6 @@ func (p *Processor) ip(f *common.Field) common.MapStr {
 func (p *Processor) keyword(f *common.Field) common.MapStr {
 	property := getDefaultProperties(f)
 
-	fullName := f.Name
-	if f.Path != "" {
-		fullName = f.Path + "." + f.Name
-	}
-
-	if f.Index == nil || (f.Index != nil && *f.Index) {
-		defaultFields = append(defaultFields, fullName)
-	}
-
 	property["type"] = "keyword"
 
 	switch f.IgnoreAbove {
@@ -208,15 +215,6 @@ func (p *Processor) keyword(f *common.Field) common.MapStr {
 
 func (p *Processor) text(f *common.Field) common.MapStr {
 	properties := getDefaultProperties(f)
-
-	fullName := f.Name
-	if f.Path != "" {
-		fullName = f.Path + "." + f.Name
-	}
-
-	if f.Index == nil || (f.Index != nil && *f.Index) {
-		defaultFields = append(defaultFields, fullName)
-	}
 
 	properties["type"] = "text"
 
