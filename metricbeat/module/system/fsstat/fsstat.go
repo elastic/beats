@@ -53,7 +53,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		config.IgnoreTypes = filesystem.DefaultIgnoredTypes()
 	}
 	if len(config.IgnoreTypes) > 0 {
-		base.Logger().Info("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))
+		base.Log().Info("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))
 	}
 
 	return &MetricSet{
@@ -81,10 +81,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	for _, fs := range fss {
 		stat, err := filesystem.GetFileSystemStat(fs)
 		if err != nil {
-			m.Logger().Debug("error fetching filesystem stats for '%s': %v", fs.DirName, err)
+			m.Log().Debug("error fetching filesystem stats for '%s': %v", fs.DirName, err)
 			continue
 		}
-		m.Logger().Debug("filesystem: %s total=%d, used=%d, free=%d", stat.Mount, stat.Total, stat.Used, stat.Free)
+		m.Log().Debug("filesystem: %s total=%d, used=%d, free=%d", stat.Mount, stat.Total, stat.Used, stat.Free)
 
 		totalFiles += stat.Files
 		totalSize += stat.Total

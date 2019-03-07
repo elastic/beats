@@ -107,7 +107,7 @@ type MetricSet interface {
 	HostData() HostData                  // HostData returns the parsed host data.
 	Registration() MetricSetRegistration // Params used in registration.
 	Metrics() *monitoring.Registry       // MetricSet specific metrics
-	Logger() *logp.Logger                // MetricSet specific logger
+	Log() *logp.Logger                   // MetricSet specific logger
 }
 
 // Closer is an optional interface that a MetricSet can implement in order to
@@ -275,7 +275,7 @@ func (b *BaseMetricSet) Metrics() *monitoring.Registry {
 }
 
 // Logger returns the logger.
-func (b *BaseMetricSet) Logger() *logp.Logger {
+func (b *BaseMetricSet) Log() *logp.Logger {
 	return b.logger
 }
 

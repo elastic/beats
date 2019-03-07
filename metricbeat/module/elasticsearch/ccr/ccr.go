@@ -60,19 +60,19 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	isMaster, err := elasticsearch.IsMaster(m.HTTP, m.GetServiceURI())
 	if err != nil {
 		err = errors.Wrap(err, "error determining if connected Elasticsearch node is master")
-		elastic.ReportAndLogError(err, r, m.Log)
+		elastic.ReportAndLogError(err, r, m.Log())
 		return
 	}
 
 	// Not master, no event sent
 	if !isMaster {
-		m.Log.Debug("trying to fetch ccr stats from a non-master node")
+		m.Log().Debug("trying to fetch ccr stats from a non-master node")
 		return
 	}
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.GetServiceURI())
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Log)
+		elastic.ReportAndLogError(err, r, m.Log())
 		return
 	}
 
@@ -81,14 +81,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	ccrUnavailableMessage, err := m.checkCCRAvailability(info.Version.Number)
 	if err != nil {
 		err = errors.Wrap(err, "error determining if CCR is available")
-		elastic.ReportAndLogError(err, r, m.Log)
+		elastic.ReportAndLogError(err, r, m.Log())
 		return
 	}
 
 	if ccrUnavailableMessage != "" {
 		if time.Since(m.lastCCRLicenseMessageTimestamp) > 1*time.Minute {
 			err := fmt.Errorf(ccrUnavailableMessage)
-			elastic.ReportAndLogError(err, r, m.Log)
+			elastic.ReportAndLogError(err, r, m.Log())
 			m.lastCCRLicenseMessageTimestamp = time.Now()
 		}
 		return
@@ -96,7 +96,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Log)
+		elastic.ReportAndLogError(err, r, m.Log())
 		return
 	}
 
@@ -107,7 +107,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	}
 
 	if err != nil {
-		m.Log.Error(err)
+		m.Log().Error(err)
 		return
 	}
 }

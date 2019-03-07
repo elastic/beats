@@ -18,7 +18,6 @@
 package logstash
 
 import (
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
@@ -28,7 +27,6 @@ const ModuleName = "logstash"
 // MetricSet can be used to build other metricsets within the Logstash module.
 type MetricSet struct {
 	mb.BaseMetricSet
-	Log *logp.Logger
 }
 
 // NewMetricSet creates a metricset that can be used to build other metricsets
@@ -36,6 +34,5 @@ type MetricSet struct {
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	return &MetricSet{
 		base,
-		logp.NewLogger(ModuleName),
 	}, nil
 }

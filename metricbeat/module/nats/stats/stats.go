@@ -18,7 +18,6 @@
 package stats
 
 import (
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/helper/elastic"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -56,7 +55,6 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	http *helper.HTTP
-	Log  *logp.Logger
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -74,7 +72,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		base,
 		http,
-		logp.NewLogger("nats"),
 	}, nil
 }
 
@@ -84,12 +81,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	content, err := m.http.FetchContent()
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Log)
+		elastic.ReportAndLogError(err, r, m.Log())
 		return
 	}
 	err = eventMapping(r, content)
 	if err != nil {
-		elastic.ReportAndLogError(err, r, m.Log)
+		elastic.ReportAndLogError(err, r, m.Log())
 		return
 	}
 }
