@@ -1,0 +1,15 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+tags: {{.tags}}
+json.keys_under_root: true
+processors:
+  - dissect:
+      tokenizer: "%{timestamp} [%{coredns.logging_level}] %{source.address}:%{source.port} - %{coredns.id} \"%{coredns.query.type} %{coredns.query.class} %{coredns.query.name} %{network.transport} %{coredns.query.size} %{coredns.dnssec_ok} %{bufsize}\" %{coredns.response.code} %{coredns.response.flags} %{coredns.response.size} %{temp.duration}s"
+      field: "message"
+      target_prefix: ""
+
+  - drop_fields: 
+      fields: [bufsize, time]
