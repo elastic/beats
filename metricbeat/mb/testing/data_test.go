@@ -36,6 +36,8 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 
 	// TODO: generate include file for these tests automatically moving forward
+	_ "github.com/elastic/beats/metricbeat/module/couchbase/cluster"
+	_ "github.com/elastic/beats/metricbeat/module/couchbase/node"
 	_ "github.com/elastic/beats/metricbeat/module/kibana/status"
 	_ "github.com/elastic/beats/metricbeat/module/php_fpm/pool"
 	_ "github.com/elastic/beats/metricbeat/module/php_fpm/process"
