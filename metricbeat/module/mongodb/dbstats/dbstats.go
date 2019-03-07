@@ -18,7 +18,7 @@
 package dbstats
 
 import (
-	"errors"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/beats/metricbeat/module/mongodb"
 )
 
-var debugf = logp.MakeDebug("mongodb.dbstats")
+var logger = logp.NewLogger("mongodb.dbstats")
 
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
@@ -56,28 +56,30 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{ms}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right format
-// It returns the event which is then forward to the output. In case of an error, a
-// descriptive error must be returned.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
-	// events is the list of events collected from each of the databases.
-	var events []common.MapStr
-
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	// instantiate direct connections to each of the configured Mongo hosts
 	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
 	if err != nil {
-		return nil, err
+		logger.Error(err)
+		reporter.Error(err)
+		return
 	}
 	defer mongoSession.Close()
 
 	// Get the list of databases names, which we'll use to call db.stats() on each
 	dbNames, err := mongoSession.DatabaseNames()
 	if err != nil {
-		logp.Err("Error retrieving database names from Mongo instance")
-		return events, err
+		err = errors.Wrap(err, "Error retrieving database names from Mongo instance")
+		logger.Error(err)
+		reporter.Error(err)
+		return
 	}
 
 	// for each database, call db.stats() and append to events
+	totalEvents := 0
 	for _, dbName := range dbNames {
 		db := mongoSession.DB(dbName)
 
@@ -85,18 +87,23 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 		err := db.Run("dbStats", &result)
 		if err != nil {
-			logp.Err("Failed to retrieve stats for db %s", dbName)
+			err = errors.Wrapf(err, "Failed to retrieve stats for db %s", dbName)
+			logger.Error(err)
 			continue
 		}
 		data, _ := schema.Apply(result)
-		events = append(events, data)
+		if reported := reporter.Event(mb.Event{MetricSetFields: data}); !reported {
+			logger.Debug("error reporting event")
+			return
+		}
+		totalEvents++
 	}
 
-	if len(events) == 0 {
+	if totalEvents == 0 {
 		err = errors.New("Failed to retrieve dbStats from any databases")
-		logp.Err(err.Error())
-		return events, err
+		logger.Error(err)
+		reporter.Error(err)
 	}
 
-	return events, nil
+	return
 }

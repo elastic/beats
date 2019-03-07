@@ -1,0 +1,26 @@
+{
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "kubernetes.apiserver",
+        "duration": 115000,
+        "module": "kubernetes"
+    },
+    "kubernetes": {
+        "apiserver": {
+            "request": {
+                "client": "kubectl/v1.6.1 (linux/amd64) kubernetes/b0b7a32",
+                "count": 4,
+                "resource": "configmaps",
+                "scope": "namespace",
+                "verb": "DELETE"
+            }
+        }
+    },
+    "metricset": {
+        "name": "apiserver"
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "kubernetes"
+    }
+}
