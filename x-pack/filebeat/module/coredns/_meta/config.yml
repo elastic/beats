@@ -1,7 +1,10 @@
 - module: coredns
-  # All logs
+  # Fileset for native deployment
   log: 
     enabled: true
+  # Fileset for Kubernetes deployment
+  kubernetes:
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.

@@ -9,7 +9,11 @@
         "coredns.query.size": 43,
         "coredns.query.type": "A",
         "coredns.response.code": "NXDOMAIN",
-        "coredns.response.flags": "qr,rd,ra",
+        "coredns.response.flags": [
+            "qr",
+            "rd",
+            "ra"
+        ],
         "coredns.response.size": 136,
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "coredns.log",
