@@ -1,2 +1,10 @@
 type: http
 url: "/status?json="
+environment:
+  host:
+    env: PHPFPM_HOST
+    default: 127.0.0.1
+  port:
+    env: PHPFPM_PORT
+    default: 81
+  service: phpfpm
