@@ -26,8 +26,11 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
+
+	"github.com/mitchellh/hashstructure"
 
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
@@ -142,6 +145,12 @@ func runTest(t *testing.T, file string, module, metricSetName, url, suffix strin
 		beatEvent.Fields.Put("service.address", "127.0.0.1:55555")
 		data = append(data, beatEvent.Fields)
 	}
+
+	sort.SliceStable(data, func(i, j int) bool {
+		h1, _ := hashstructure.Hash(events[i], nil)
+		h2, _ := hashstructure.Hash(events[j], nil)
+		return h1 < h2
+	})
 
 	output, err := json.MarshalIndent(&data, "", "    ")
 	if err != nil {
