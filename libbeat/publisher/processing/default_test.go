@@ -164,9 +164,9 @@ func TestProcessorsConfigs(t *testing.T) {
 		"with client processor": {
 			local: beat.ProcessingConfig{
 				Processor: func() beat.ProcessorList {
-					p := newGroup("test", logp.L())
-					p.add(actions.NewAddFields(common.MapStr{"custom": "value"}, true))
-					return p
+					g := newGroup("test", logp.L())
+					g.add(actions.NewAddFields(common.MapStr{"custom": "value"}, true))
+					return g
 				}(),
 			},
 			event: `{"value": "abc"}`,

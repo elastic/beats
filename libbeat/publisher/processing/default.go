@@ -64,21 +64,21 @@ type modifier interface {
 
 type builtinModifier func(beat.Info) common.MapStr
 
-// MakeDefaultBeatSupport creates a new SupporterFactory based on NewDefaultSupport.
+// MakeDefaultBeatSupport creates a new SupportFactory based on NewDefaultSupport.
 // MakeDefaultBeatSupport automatically adds the `ecs.version`, `host.name` and `agent.X` fields
 // to each event.
 func MakeDefaultBeatSupport(normalize bool) SupportFactory {
 	return MakeDefaultSupport(normalize, WithECS, WithHost, WithBeatMeta("agent"))
 }
 
-// MakeDefaultObserverSupport creates a new SupporterFactory based on NewDefaultSupport.
+// MakeDefaultObserverSupport creates a new SupportFactory based on NewDefaultSupport.
 // MakeDefaultObserverSupport automatically adds the `ecs.version` and `observer.X` fields
 // to each event.
 func MakeDefaultObserverSupport(normalize bool) SupportFactory {
 	return MakeDefaultSupport(normalize, WithECS, WithBeatMeta("observer"))
 }
 
-// MakeDefaultSupport creates a new SupporterFactory for use with the publisher pipeline.
+// MakeDefaultSupport creates a new SupportFactory for use with the publisher pipeline.
 // If normalize is set, events will be normalized first before being presented
 // to the actual processors.
 // The Supporter will apply the global `fields`, `fields_under_root`, `tags`
