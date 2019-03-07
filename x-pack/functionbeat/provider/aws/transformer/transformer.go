@@ -64,13 +64,17 @@ func KinesisEvent(request events.KinesisEvent) []beat.Event {
 		events[idx] = beat.Event{
 			Timestamp: time.Now(),
 			Fields: common.MapStr{
-				"event_id":         record.EventID,
-				"event_name":       record.EventName,
-				"event_source":     record.EventSource,
-				"event_source_arn": record.EventSourceArn,
-				"event_version":    record.EventVersion,
-				"aws_region":       record.AwsRegion,
-				// TODO: more meta data at KinesisRecord, need to check doc
+				"event_id":                record.EventID,
+				"event_name":              record.EventName,
+				"event_source":            record.EventSource,
+				"event_source_arn":        record.EventSourceArn,
+				"event_version":           record.EventVersion,
+				"aws_region":              record.AwsRegion,
+				"message":                 string(record.Kinesis.Data),
+				"kinesis_partition_key":   record.Kinesis.PartitionKey,
+				"kinesis_schema_version":  record.Kinesis.KinesisSchemaVersion,
+				"kinesis_sequence_number": record.Kinesis.SequenceNumber,
+				"kinesis_encryption_type": record.Kinesis.EncryptionType,
 			},
 		}
 	}
