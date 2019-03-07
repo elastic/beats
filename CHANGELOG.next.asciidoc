@@ -137,6 +137,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Added function to close sql database connection. {pull}10355[10355]
 - Fix issue with `elasticsearch/node_stats` metricset (x-pack) not indexing `source_node` field. {pull}10639[10639]
 - Fix issue in kubernetes module preventing usage percentages to be properly calculated. {pull}10946[10946]
+- Fix parsing error using GET in Jolokia module. {pull}11075[11075] {issue}11071[11071]
 
 *Packetbeat*
 
