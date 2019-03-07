@@ -138,7 +138,7 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 			"service": common.MapStr{"name": "ec2"},
 			"cloud": common.MapStr{
 				"region":            regionName,
-				"provider":          "ec2",
+				"provider":          "aws",
 				"instance":          common.MapStr{"id": "i-123"},
 				"machine":           common.MapStr{"type": "t2.medium"},
 				"availability_zone": "us-west-1a",
