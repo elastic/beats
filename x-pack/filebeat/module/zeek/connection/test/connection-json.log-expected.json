@@ -39,6 +39,8 @@
     {
         "@timestamp": 1547188416000,
         "destination.address": "8.8.8.8",
+        "destination.autonomous_system.number": 15169,
+        "destination.autonomous_system.organization.name": "Google LLC",
         "destination.bytes": 206,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -79,6 +81,8 @@
     {
         "@timestamp": 1547188417000,
         "destination.address": "8.8.8.8",
+        "destination.autonomous_system.number": 15169,
+        "destination.autonomous_system.organization.name": "Google LLC",
         "destination.bytes": 206,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -101,6 +105,8 @@
         "network.transport": "udp",
         "service.type": "zeek",
         "source.address": "4.4.2.2",
+        "source.autonomous_system.number": 3356,
+        "source.autonomous_system.organization.name": "Level 3 Parent, LLC",
         "source.bytes": 103,
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",

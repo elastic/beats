@@ -3,17 +3,55 @@
     "processors": [
         {
             "geoip": {
-                "if": "ctx.source?.geo == null",
+                "if": "ctx.source?.autonomous_system == null",
+                "database_file": "GeoLite2-ASN.mmdb",
                 "field": "source.ip",
-                "target_field": "source.geo",
+                "target_field": "source.autonomous_system",
+                "properties": [
+                    "asn",
+                    "organization_name"
+                ],
                 "ignore_missing": true
             }
         },
         {
             "geoip": {
-                "if": "ctx.destination?.geo == null",
+                "if": "ctx.destination?.autonomous_system == null",
+                "database_file": "GeoLite2-ASN.mmdb",
                 "field": "destination.ip",
-                "target_field": "destination.geo",
+                "target_field": "destination.autonomous_system",
+                "properties": [
+                    "asn",
+                    "organization_name"
+                ],
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.autonomous_system.asn",
+                "target_field": "source.autonomous_system.number",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "destination.autonomous_system.asn",
+                "target_field": "destination.autonomous_system.number",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "source.autonomous_system.organization_name",
+                "target_field": "source.autonomous_system.organization.name",
+                "ignore_missing": true
+            }
+        },
+        {
+            "rename": {
+                "field": "destination.autonomous_system.organization_name",
+                "target_field": "destination.autonomous_system.organization.name",
                 "ignore_missing": true
             }
         }

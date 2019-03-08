@@ -422,6 +422,30 @@
           description: >
             Packets sent from the destination to the source.
 
+        - name: autonomous_system
+          title: Autonomous System
+          description: >
+            An autonomous system (AS) is a collection of connected Internet Protocol
+            (IP) routing prefixes under the control of one or more network operators on
+            behalf of a single administrative entity or domain that presents a common,
+            clearly defined routing policy to the internet.
+          type: group
+          fields:
+            - name: number
+              level: extended
+              type: long
+              description: >
+                Unique number allocated to the autonomous system. The autonomous
+                system number (ASN) uniquely identifies each network on the Internet.
+              example: 15169
+
+            - name: organization.name
+              level: extended
+              type: keyword
+              description: >
+                Organization name.
+              example: Google LLC
+
         - name: geo
           title: Geo
           group: 2
@@ -1907,6 +1931,30 @@
           example: 12
           description: >
             Packets sent from the source to the destination.
+
+        - name: autonomous_system
+          title: Autonomous System
+          description: >
+            An autonomous system (AS) is a collection of connected Internet Protocol
+            (IP) routing prefixes under the control of one or more network operators on
+            behalf of a single administrative entity or domain that presents a common,
+            clearly defined routing policy to the internet.
+          type: group
+          fields:
+            - name: number
+              level: extended
+              type: long
+              description: >
+                Unique number allocated to the autonomous system. The autonomous
+                system number (ASN) uniquely identifies each network on the Internet.
+              example: 15169
+
+            - name: organization.name
+              level: extended
+              type: keyword
+              description: >
+                Organization name.
+              example: Google LLC
 
         - name: geo
           title: Geo

@@ -23,6 +23,8 @@
     {
         "@timestamp": 1551393388000,
         "destination.address": "207.154.238.205",
+        "destination.autonomous_system.number": 14061,
+        "destination.autonomous_system.organization.name": "DigitalOcean, LLC",
         "destination.geo.city_name": "New York",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -39,6 +41,8 @@
         "log.offset": 357,
         "service.type": "zeek",
         "source.address": "8.42.77.171",
+        "source.autonomous_system.number": 393552,
+        "source.autonomous_system.organization.name": "Longmont Power & Communications",
         "source.geo.city_name": "Longmont",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",

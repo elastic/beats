@@ -1733,6 +1733,37 @@ Packets sent from the destination to the source.
 --
 
 [float]
+== autonomous_system fields
+
+An autonomous system (AS) is a collection of connected Internet Protocol (IP) routing prefixes under the control of one or more network operators on behalf of a single administrative entity or domain that presents a common, clearly defined routing policy to the internet.
+
+
+
+*`destination.autonomous_system.number`*::
++
+--
+type: long
+
+example: 15169
+
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+
+--
+
+*`destination.autonomous_system.organization.name`*::
++
+--
+type: keyword
+
+example: Google LLC
+
+Organization name.
+
+
+--
+
+[float]
 == geo fields
 
 Geo fields can carry data about a specific location related to an event or geo information derived from an IP field.
@@ -3745,6 +3776,37 @@ type: long
 example: 12
 
 Packets sent from the source to the destination.
+
+
+--
+
+[float]
+== autonomous_system fields
+
+An autonomous system (AS) is a collection of connected Internet Protocol (IP) routing prefixes under the control of one or more network operators on behalf of a single administrative entity or domain that presents a common, clearly defined routing policy to the internet.
+
+
+
+*`source.autonomous_system.number`*::
++
+--
+type: long
+
+example: 15169
+
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+
+--
+
+*`source.autonomous_system.organization.name`*::
++
+--
+type: keyword
+
+example: Google LLC
+
+Organization name.
 
 
 --
