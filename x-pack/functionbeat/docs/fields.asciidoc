@@ -29,6 +29,15 @@ Contains common beat fields available in all event types.
 
 
 
+*`agent.hostname`*::
++
+--
+type: keyword
+
+Hostname of the agent.
+
+--
+
 *`beat.timezone`*::
 +
 --
