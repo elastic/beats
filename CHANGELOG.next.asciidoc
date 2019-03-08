@@ -240,6 +240,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `community_id` processor for computing network flow hashes. {pull}10745[10745]
 - Add output test to kafka output {pull}10834[10834]
 - Add ip fields to default_field in Elasticsearch template. {pull}11035[11035]
+- Loading external fields.yml files. {pull}11199[11199]
 
 
 *Auditbeat*

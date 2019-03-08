@@ -93,7 +93,11 @@ func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
 				fieldsPath := paths.Resolve(paths.Config, tmplCfg.Fields)
 				templateString, err = tmpl.LoadFile(fieldsPath)
 			} else {
-				templateString, err = tmpl.LoadBytes(b.Fields)
+				fields, err := b.Mapping.GetBytes()
+				if err != nil {
+					fatalf("Error getting fields of Beat: %+v", err)
+				}
+				templateString, err = tmpl.LoadBytes(fields)
 			}
 			if err != nil {
 				fatalf("Error generating template: %+v", err)

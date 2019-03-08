@@ -64,8 +64,6 @@ type Beat struct {
 
 	BeatConfig *common.Config // The beat's own configuration section
 
-	Fields []byte // Data from fields.yml
-
 	ConfigManager management.ConfigManager // config manager
 }
 

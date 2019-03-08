@@ -1769,6 +1769,10 @@ output.elasticsearch:
 #- name: field_name
 #  type: field_type
 
+# List of external fields.yml files to load.
+#setup.template.external_fields:
+#- /path/to/external/fields.yml
+
 # Enable JSON template loading. If this is enabled, the fields.yml is ignored.
 #setup.template.json.enabled: false
 

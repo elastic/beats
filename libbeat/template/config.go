@@ -29,9 +29,10 @@ type TemplateConfig struct {
 		Path    string `config:"path"`
 		Name    string `config:"name"`
 	} `config:"json"`
-	AppendFields mapping.Fields   `config:"append_fields"`
-	Overwrite    bool             `config:"overwrite"`
-	Settings     TemplateSettings `config:"settings"`
+	AppendFields   mapping.Fields   `config:"append_fields"`
+	ExternalFields []string         `config:"external_fields"`
+	Overwrite      bool             `config:"overwrite"`
+	Settings       TemplateSettings `config:"settings"`
 }
 
 type TemplateSettings struct {

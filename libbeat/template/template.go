@@ -24,7 +24,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/fmtstr"
 	"github.com/elastic/beats/libbeat/mapping"
 	"github.com/elastic/go-ucfg/yaml"
@@ -138,15 +137,6 @@ func (t *Template) load(fields mapping.Fields) (common.MapStr, error) {
 
 	dynamicTemplates = nil
 	defaultFields = nil
-
-	var err error
-	if len(t.config.AppendFields) > 0 {
-		cfgwarn.Experimental("append_fields is used.")
-		fields, err = mapping.ConcatFields(fields, t.config.AppendFields)
-		if err != nil {
-			return nil, err
-		}
-	}
 
 	// Start processing at the root
 	properties := common.MapStr{}

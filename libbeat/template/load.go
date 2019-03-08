@@ -102,18 +102,8 @@ func (l *Loader) Load() error {
 			if err != nil {
 				return fmt.Errorf("could not unmarshal json template: %s", err)
 			}
-			// Load fields from path
-		} else if l.config.Fields != "" {
-			logp.Debug("template", "Load fields.yml from file: %s", l.config.Fields)
-
-			fieldsPath := paths.Resolve(paths.Config, l.config.Fields)
-
-			template, err = tmpl.LoadFile(fieldsPath)
-			if err != nil {
-				return fmt.Errorf("error creating template from file %s: %v", fieldsPath, err)
-			}
 		} else {
-			logp.Debug("template", "Load default fields.yml")
+			logp.Debug("template", "Load fields from configured fields.yml and additions")
 			template, err = tmpl.LoadBytes(l.fields)
 			if err != nil {
 				return fmt.Errorf("error creating template: %v", err)

@@ -71,6 +71,8 @@ setup.template:
   settings:
     index.number_of_shards: 1
     index.codec: best_compression
+  append_fields: {{ append_fields_list }}
+  external_fields: {{ external_fields_files }}
   name: {{ es_template_name }}
   pattern: {{ es_template_pattern }}
   overwrite: {{ template_overwrite|default("false") }}

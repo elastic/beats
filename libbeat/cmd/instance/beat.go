@@ -33,13 +33,13 @@ import (
 	"time"
 
 	"github.com/elastic/beats/libbeat/kibana"
+	"github.com/elastic/beats/libbeat/mapping"
 
 	"github.com/gofrs/uuid"
 	errw "github.com/pkg/errors"
 	"go.uber.org/zap"
 
 	"github.com/elastic/beats/libbeat/api"
-	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/cloudid"
@@ -76,6 +76,8 @@ type Beat struct {
 
 	Config    beatConfig
 	RawConfig *common.Config // Raw config that can be unpacked to get Beat specific config data.
+
+	Mapping mapping.Supporter // Get all fields of the Beat
 
 	keystore keystore.Keystore
 	index    idxmgmt.Supporter
@@ -193,11 +195,6 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 		return nil, err
 	}
 
-	fields, err := asset.GetFields(name)
-	if err != nil {
-		return nil, err
-	}
-
 	id, err := uuid.NewV4()
 	if err != nil {
 		return nil, err
@@ -213,7 +210,6 @@ func NewBeat(name, indexPrefix, v string) (*Beat, error) {
 			ID:          id,
 			EphemeralID: ephemeralID,
 		},
-		Fields: fields,
 	}
 
 	return &Beat{Beat: b}, nil
@@ -457,8 +453,11 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 				}
 
 				// prepare index by loading templates, lifecycle policies and write aliases
-
-				m := b.index.Manager(esClient, idxmgmt.BeatsAssets(b.Fields))
+				fields, err := b.Mapping.GetBytes()
+				if err != nil {
+					return err
+				}
+				m := b.index.Manager(esClient, idxmgmt.BeatsAssets(fields))
 				err = m.Setup(setup.Template, setup.ILMPolicy)
 				if err != nil {
 					return err
@@ -606,7 +605,11 @@ func (b *Beat) configure(settings Settings) error {
 		processingFactory = processing.MakeDefaultBeatSupport(true)
 	}
 	b.processing, err = processingFactory(b.Info, logp.L().Named("processors"), b.RawConfig)
+	if err != nil {
+		return err
+	}
 
+	b.Mapping, err = mapping.DefaultSupport(nil, b.Beat.Info.Beat, b.RawConfig)
 	return err
 }
 
@@ -718,7 +721,11 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 		// but it's assumed that KB and ES have the same minor version.
 		v := client.GetVersion()
 
-		indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, b.Info.Version, v, withMigration)
+		fieldBytes, err := b.Mapping.GetBytes()
+		if err != nil {
+			return err
+		}
+		indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, fieldBytes, b.Info.Version, v, withMigration)
 		if err != nil {
 			return fmt.Errorf("error creating index pattern generator: %v", err)
 		}
@@ -757,7 +764,12 @@ func (b *Beat) registerESIndexManagement() error {
 // Build and return a callback to load index template into ES
 func (b *Beat) indexSetupCallback() func(esClient *elasticsearch.Client) error {
 	return func(esClient *elasticsearch.Client) error {
-		m := b.index.Manager(esClient, idxmgmt.BeatsAssets(b.Fields))
+		fieldBytes, err := b.Mapping.GetBytes()
+		if err != nil {
+			return err
+		}
+
+		m := b.index.Manager(esClient, idxmgmt.BeatsAssets(fieldBytes))
 		return m.Setup(true, true)
 	}
 }
