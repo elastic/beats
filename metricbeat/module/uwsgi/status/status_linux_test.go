@@ -57,8 +57,8 @@ func TestFetchDataUnixSock(t *testing.T) {
 		"hosts":      []string{"unix://" + listener.Addr().String()},
 	}
 
-	f := mbtest.NewEventsFetcher(t, config)
-	events, err := f.Fetch()
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, err := mbtest.ReportingFetchV2Error(f)
 	assert.NoError(t, err)
 
 	assertTestData(t, events)
