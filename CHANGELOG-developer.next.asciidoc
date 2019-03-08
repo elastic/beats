@@ -23,10 +23,13 @@ The list below covers the major changes between 7.0.0-beta1 and master only.
   be used to create an index selector. {pull}10347[10347]
 - Remove support for loading dashboards to Elasticsearch 5. {pull}10451[10451]
 - Remove support for deprecated `GenRootCmd` methods. {pull}10721[10721]
+- Remove SkipNormalization, SkipAgentMetadata, SkipAddHostName. {pull}10801[10801] {pull}10769[10769]
 
 ==== Bugfixes
+
 - Align default index between elasticsearch and logstash and kafka output. {pull}10841[10841]
 - Fix duplication check for `append_fields` option. {pull}10959[10959]
 
 ==== Added
 
+- Introduce processing.Support to instance.Setting. This allows Beats to fully modify the event processing. {pull}10801[10801]

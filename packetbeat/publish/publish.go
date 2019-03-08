@@ -97,8 +97,10 @@ func (p *TransactionPublisher) CreateReporter(
 	}
 
 	clientConfig := beat.ClientConfig{
-		EventMetadata: meta.Event,
-		Processor:     processors,
+		Processing: beat.ProcessingConfig{
+			EventMetadata: meta.Event,
+			Processor:     processors,
+		},
 	}
 	if p.canDrop {
 		clientConfig.PublishMode = beat.DropIfFull

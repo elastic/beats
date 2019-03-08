@@ -139,9 +139,11 @@ func (t *configuredJob) Start() {
 	}
 
 	t.client, err = t.monitor.pipelineConnector.ConnectWith(beat.ClientConfig{
-		EventMetadata: t.config.EventMetadata,
-		Processor:     t.processors,
-		Fields:        fields,
+		Processing: beat.ProcessingConfig{
+			EventMetadata: t.config.EventMetadata,
+			Processor:     t.processors,
+			Fields:        fields,
+		},
 	})
 	if err != nil {
 		logp.Err("could not start monitor: %v", err)
