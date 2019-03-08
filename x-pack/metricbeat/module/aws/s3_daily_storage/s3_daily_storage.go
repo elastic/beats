@@ -84,8 +84,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	namespace := "AWS/S3"
 	// Get startTime and endTime
-	// Duration should always be "-172800s" for s3_daily_storage metrics. Otherwise the query will not return any results
-	startTime, endTime, err := aws.GetStartTimeEndTime("-172800s")
+	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
 	if err != nil {
 		err = errors.Wrap(err, "Error ParseDuration")
 		m.logger.Error(err.Error())
@@ -221,7 +220,7 @@ func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName st
 			labels := strings.Split(*output.Label, " ")
 			// check timestamp to make sure metrics come from the same timestamp
 			if len(labels) == 3 && labels[0] == bucketName && len(output.Values) > 0 && output.Timestamps[0] == timestamp {
-				mapOfMetricSetFieldResults[labels[2]] = fmt.Sprint(output.Values[0])
+				mapOfMetricSetFieldResults[labels[2]] = fmt.Sprint(output.Values[len(output.Values)-1])
 			}
 		}
 	}
