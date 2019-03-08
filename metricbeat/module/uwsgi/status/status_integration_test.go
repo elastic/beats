@@ -45,7 +45,6 @@ func TestFetchTCP(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "uwsgi_http")
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("http"))
 
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
