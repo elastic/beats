@@ -85,6 +85,9 @@ func Load(
 		Annotations: Annotations{
 			Event: config.EventMetadata,
 			Builtin: common.MapStr{
+				"host": common.MapStr{
+					"name": name,
+				},
 				"ecs": common.MapStr{
 					"version": "1.0.0-beta2",
 				},
