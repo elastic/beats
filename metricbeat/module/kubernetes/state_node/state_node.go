@@ -115,7 +115,17 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 	m.enricher.Enrich(events)
 	for _, event := range events {
-		reporter.Event(mb.Event{MetricSetFields: event})
+		var namespace string
+		for k, v := range event {
+			if k == "_namespace" {
+				namespace = v.(string)
+			}
+		}
+
+		reporter.Event(mb.Event{
+			MetricSetFields: event,
+			Namespace:       namespace,
+		})
 	}
 }
 
