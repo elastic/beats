@@ -121,10 +121,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 			continue
 		}
 
-		if regionName == "ap-southeast-1" {
-			fmt.Println("metricDataOutputs2 = ", metricDataOutputs)
-		}
-
 		// Create Cloudwatch Events for s3_request
 		bucketNames := getBucketNames(listMetricsOutputs)
 		for _, bucketName := range bucketNames {
