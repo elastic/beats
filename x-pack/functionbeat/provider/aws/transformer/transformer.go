@@ -58,6 +58,7 @@ func APIGatewayProxyRequest(request events.APIGatewayProxyRequest) beat.Event {
 }
 
 // KinesisEvent takes a kinesis event and create multiples beat events.
+// DOCS: https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html
 func KinesisEvent(request events.KinesisEvent) []beat.Event {
 	events := make([]beat.Event, len(request.Records))
 	for idx, record := range request.Records {
