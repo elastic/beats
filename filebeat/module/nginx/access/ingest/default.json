@@ -61,7 +61,7 @@
                 "formats": [
                     "dd/MMM/yyyy:H:m:s Z"
                 ],
-                {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
+                {< if .convert_timezone >}"timezone": "{{ beat.timezone }}",{< end >}
                 "ignore_failure": true
             }
         },
