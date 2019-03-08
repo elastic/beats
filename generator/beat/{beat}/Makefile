@@ -3,7 +3,7 @@ BEAT_PATH={beat_path}
 BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
-export ES_BEATS?=./vendor/github.com/elastic/beats
+ES_BEATS?=./vendor/github.com/elastic/beats
 LIBBEAT_MAKEFILE=$(ES_BEATS)/libbeat/scripts/Makefile
 GOPACKAGES=$(shell govendor list -no-status +local)
 GOBUILD_FLAGS=-i -ldflags "-X $(BEAT_PATH)/vendor/github.com/elastic/beats/libbeat/version.buildTime=$(NOW) -X $(BEAT_PATH)/vendor/github.com/elastic/beats/libbeat/version.commit=$(COMMIT_ID)"
@@ -18,7 +18,7 @@ NO_COLLECT=true
 setup: pre-setup git-add
 
 pre-setup: copy-vendor git-init
-	$(MAKE) -f $(LIBBEAT_MAKEFILE) mage
+	$(MAKE) -f $(LIBBEAT_MAKEFILE) mage ES_BEATS=$(ES_BEATS)
 	$(MAKE) -f $(LIBBEAT_MAKEFILE) update BEAT_NAME=$(BEAT_NAME) ES_BEATS=$(ES_BEATS) NO_COLLECT=$(NO_COLLECT)
 
 # Copy beats into vendor directory
