@@ -43,6 +43,7 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/couchbase/node"
 	_ "github.com/elastic/beats/metricbeat/module/kibana/status"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/apiserver"
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_node"
 	_ "github.com/elastic/beats/metricbeat/module/php_fpm/pool"
 	_ "github.com/elastic/beats/metricbeat/module/php_fpm/process"
 	_ "github.com/elastic/beats/metricbeat/module/rabbitmq/connection"
