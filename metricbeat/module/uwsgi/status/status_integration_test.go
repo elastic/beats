@@ -32,23 +32,37 @@ import (
 func TestFetchTCP(t *testing.T) {
 	compose.EnsureUp(t, "uwsgi_tcp")
 
-	f := mbtest.NewEventsFetcher(t, getConfig("tcp"))
-	events, err := f.Fetch()
-	assert.NoError(t, err)
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("tcp"))
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
 
-	assert.True(t, len(events) > 0)
+	t.Log(events)
 	totals := findItems(events, "total")
 	assert.Equal(t, 1, len(totals))
+}
+
+func TestData(t *testing.T) {
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("http"))
+
+	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
+		t.Fatal("write", err)
+	}
 }
 
 func TestFetchHTTP(t *testing.T) {
 	compose.EnsureUp(t, "uwsgi_http")
 
-	f := mbtest.NewEventsFetcher(t, getConfig("http"))
-	events, err := f.Fetch()
-	assert.NoError(t, err)
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("http"))
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
 
-	assert.True(t, len(events) > 0)
+	t.Log(events)
 	totals := findItems(events, "total")
 	assert.Equal(t, 1, len(totals))
 }
