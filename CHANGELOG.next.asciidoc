@@ -47,10 +47,10 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 
 - The CLI will now log CloudFormation Stack events. {issue}8912[8912]
 - Mark Functionbeat  as GA. {pull}10564[10564]
-
 - Correctly normalize Cloudformation resource name. {issue}10087[10087]
 - Functionbeat can now deploy a function for Kinesis. {10116}10116[10116]
 - Allow functionbeat to use the keystore. {issue}9009[9009]
+- Correctly extract Kinesis Data field from the Kinesis Record. {pull}11141[11141]
 
 ==== Bugfixes
 
