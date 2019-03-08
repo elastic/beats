@@ -33,6 +33,8 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 *Functionbeat*
 
+- Correctly extract Kinesis Data field from the Kinesis Record. {pull}11141[11141]
+
 ==== Bugfixes
 
 *Affecting all Beats*
