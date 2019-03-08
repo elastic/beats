@@ -1,0 +1,49 @@
+{{ if .internal_networks }}
+  # Add network.direction, source.locality, and destination.locality when
+  # source.ip and destination.ip are present. The internal_networks variable
+  # defines a comma-separated list of CIDRs or named networks that to be
+  # considered "internal".
+  - if:
+      has_fields: [source.ip, destination.ip]
+    then:
+      - if:
+          network.source.ip: [{{ .internal_networks }}]
+        then:
+          - add_fields:
+              target: ""
+              fields:
+                source.locality: internal
+          - if:
+              network.destination.ip: [{{ .internal_networks }}]
+            then:
+              add_fields:
+                target: ""
+                fields:
+                  destination.locality: internal
+                  network.direction: internal
+            else:
+              add_fields:
+                target: ""
+                fields:
+                  destination.locality: external
+                  network.direction: outbound
+        else:
+          - add_fields:
+              target: ""
+              fields:
+                source.locality: external
+          - if:
+              network.destination.ip: [{{ .internal_networks }}]
+            then:
+              add_fields:
+                target: ""
+                fields:
+                  destination.locality: internal
+                  network.direction: inbound
+            else:
+              add_fields:
+                target: ""
+                fields:
+                  destination.locality: external
+                  network.direction: external
+{{ end }}

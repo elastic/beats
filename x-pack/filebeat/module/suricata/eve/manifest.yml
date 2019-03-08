@@ -12,9 +12,9 @@ var:
     default: [suricata]
   - name: community_id
     default: true
+  - name: internal_networks
+    default: private
 
-  # - name: nested_ecs
-  #   default: false
 ingest_pipeline: ingest/pipeline.json
 input: config/eve.yml
 

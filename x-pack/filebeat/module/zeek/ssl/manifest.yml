@@ -12,6 +12,8 @@ var:
     default: [zeek.ssl]
   - name: community_id
     default: true
+  - name: internal_networks
+    default: false
 
 ingest_pipeline: ingest/pipeline.json
 input: config/ssl.yml

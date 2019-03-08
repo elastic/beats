@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": 1547688736000,
-        "destination.address": "35.199.178.4",
         "destination.geo.city_name": "Mountain View",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -21,7 +20,6 @@
         "network.community_id": "1:1PMhYqOKBIyRAQeMbg/pWiJ198g=",
         "network.transport": "tcp",
         "service.type": "zeek",
-        "source.address": "10.178.98.102",
         "source.ip": "10.178.98.102",
         "source.port": 63199,
         "tags": [
@@ -46,7 +44,6 @@
     },
     {
         "@timestamp": 1547688736000,
-        "destination.address": "35.199.178.4",
         "destination.geo.city_name": "Mountain View",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
@@ -66,7 +63,6 @@
         "network.community_id": "1:zYbLmqRN6PLPB067HNAiAQISqvI=",
         "network.transport": "tcp",
         "service.type": "zeek",
-        "source.address": "10.178.98.102",
         "source.ip": "10.178.98.102",
         "source.port": 63198,
         "tags": [

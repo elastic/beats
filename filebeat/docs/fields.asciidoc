@@ -1706,6 +1706,15 @@ Destination domain.
 
 --
 
+*`destination.locality`*::
++
+--
+type: keyword
+
+Indicates if the IP is internal or external.
+
+--
+
 *`destination.bytes`*::
 +
 --
@@ -3720,6 +3729,15 @@ type: keyword
 
 Source domain.
 
+
+--
+
+*`source.locality`*::
++
+--
+type: keyword
+
+Indicates if the IP is internal or external.
 
 --
 

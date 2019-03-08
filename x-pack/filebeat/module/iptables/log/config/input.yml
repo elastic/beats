@@ -52,4 +52,5 @@ processors:
       fields:
         icmp_type: iptables.icmp.type
         icmp_code: iptables.icmp.code
-{{ end}}
+{{ end }}
+{{ template "macros/processor-network-direction.tmpl" . }}

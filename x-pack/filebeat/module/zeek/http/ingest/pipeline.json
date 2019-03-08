@@ -16,18 +16,6 @@
     },
     {
       "set": {
-        "field": "source.ip",
-        "value": "{{source.address}}"
-      }
-    },
-    {
-      "set": {
-        "field": "destination.ip",
-        "value": "{{destination.address}}"
-      }
-    },
-    {
-      "set": {
         "field": "url.port",
         "value": "{{destination.port}}"
       }

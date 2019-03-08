@@ -25,7 +25,6 @@ package fileset
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -34,7 +33,7 @@ import (
 	"strings"
 	"text/template"
 
-	errw "github.com/pkg/errors"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -51,6 +50,8 @@ type Fileset struct {
 	manifest    *manifest
 	vars        map[string]interface{}
 	pipelineIDs []string
+	tmpl        *template.Template // Based template loaded with macros.
+	log         *logp.Logger
 }
 
 type pipeline struct {
@@ -60,14 +61,23 @@ type pipeline struct {
 
 // New allocates a new Fileset object with the given configuration.
 func New(
-	modulesPath string,
+	moduleDir string,
 	name string,
 	mcfg *ModuleConfig,
-	fcfg *FilesetConfig) (*Fileset, error) {
+	fcfg *FilesetConfig,
+) (*Fileset, error) {
+	modulePath := filepath.Join(moduleDir, mcfg.Module)
+	if _, err := os.Stat(modulePath); err != nil {
+		if os.IsNotExist(err) {
+			return nil, errors.Wrapf(err, "module %s (%s) does not exist", mcfg.Module, modulePath)
+		}
+		return nil, errors.Wrapf(err, "failed to load module %v from %v", mcfg.Module, modulePath)
+	}
 
-	modulePath := filepath.Join(modulesPath, mcfg.Module)
-	if _, err := os.Stat(modulePath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("Module %s (%s) doesn't exist.", mcfg.Module, modulePath)
+	// Load templates (.tmpl files) from module/_macro dir.
+	tmpl := template.New(mcfg.Module + "." + name)
+	if err := loadTemplateMacros(filepath.Join(moduleDir, "_macros"), tmpl); err != nil {
+		return nil, err
 	}
 
 	return &Fileset{
@@ -75,6 +85,8 @@ func New(
 		mcfg:       mcfg,
 		fcfg:       fcfg,
 		modulePath: modulePath,
+		tmpl:       tmpl,
+		log:        logp.NewLogger("fileset").With("name", mcfg.Module+"."+name),
 	}, nil
 }
 
@@ -186,7 +198,7 @@ func (fs *Fileset) evaluateVars(beatVersion string) (map[string]interface{}, err
 			}
 		}
 
-		vars[name], err = resolveVariable(vars, value)
+		vars[name], err = fs.resolveVariable(vars, value)
 		if err != nil {
 			return nil, fmt.Errorf("Error resolving variables on %s: %v", name, err)
 		}
@@ -226,11 +238,11 @@ func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersi
 				return vars, fmt.Errorf("Error parsing version %s: %v", minESVersion["version"].(string), err)
 			}
 
-			logp.Debug("fileset", "Comparing ES version %s with requirement of %s", esVersion.String(), minVersion)
+			fs.log.Debugf("Comparing ES version %s with requirement of %s", esVersion.String(), minVersion)
 
 			if esVersion.LessThan(minVersion) {
 				retVars[name] = minESVersion["value"]
-				logp.Info("Setting var %s (%s) to %v because Elasticsearch version is %s", name, fs, minESVersion["value"], esVersion.String())
+				fs.log.Infof("Setting var %s (%s) to %v because Elasticsearch version is %s", name, fs, minESVersion["value"], esVersion.String())
 			}
 		}
 	}
@@ -240,16 +252,16 @@ func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersi
 
 // resolveVariable considers the value as a template so it can refer to built-in variables
 // as well as other variables defined before them.
-func resolveVariable(vars map[string]interface{}, value interface{}) (interface{}, error) {
+func (fs *Fileset) resolveVariable(vars map[string]interface{}, value interface{}) (interface{}, error) {
 	switch v := value.(type) {
 	case string:
-		return applyTemplate(vars, v, false)
+		return fs.applyTemplate(vars, v, false)
 	case []interface{}:
 		transformed := []interface{}{}
 		for _, val := range v {
 			s, ok := val.(string)
 			if ok {
-				transf, err := applyTemplate(vars, s, false)
+				transf, err := fs.applyTemplate(vars, s, false)
 				if err != nil {
 					return nil, fmt.Errorf("array: %v", err)
 				}
@@ -263,18 +275,44 @@ func resolveVariable(vars map[string]interface{}, value interface{}) (interface{
 	return value, nil
 }
 
+// loadTemplateMacros loads the *.tmpl files contained in the given directory
+// to the template. The loaded templates can be referenced via
+// {{ template "macros/filename.tmpl" . }} in other templates.
+func loadTemplateMacros(macroDir string, tmpl *template.Template) error {
+	files, err := filepath.Glob(filepath.Join(macroDir, "*.tmpl"))
+	if err != nil {
+		return err
+	}
+
+	for _, f := range files {
+		t, err := template.ParseFiles(f)
+		if err != nil {
+			return errors.Wrapf(err, "failed parsing template at %v", f)
+		}
+
+		_, err = tmpl.AddParseTree("macros/"+filepath.Base(f), t.Tree)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // applyTemplate applies a Golang text/template. If specialDelims is set to true,
 // the delimiters are set to `{<` and `>}` instead of `{{` and `}}`. These are easier to use
 // in pipeline definitions.
-func applyTemplate(vars map[string]interface{}, templateString string, specialDelims bool) (string, error) {
-	tpl := template.New("text")
+func (fs *Fileset) applyTemplate(vars map[string]interface{}, templateString string, specialDelims bool) (string, error) {
+	tpl, err := fs.tmpl.Clone()
+	if err != nil {
+		return "", nil
+	}
 	if specialDelims {
 		tpl = tpl.Delims("{<", ">}")
 	}
 
 	tplFunctions, err := getTemplateFunctions(vars)
 	if err != nil {
-		return "", errw.Wrap(err, "error fetching template functions")
+		return "", errors.Wrap(err, "error fetching template functions")
 	}
 	tpl = tpl.Funcs(tplFunctions)
 
@@ -332,7 +370,7 @@ func (fs *Fileset) getBuiltinVars(beatVersion string) (map[string]interface{}, e
 }
 
 func (fs *Fileset) getInputConfig() (*common.Config, error) {
-	path, err := applyTemplate(fs.vars, fs.manifest.Input, false)
+	path, err := fs.applyTemplate(fs.vars, fs.manifest.Input, false)
 	if err != nil {
 		return nil, fmt.Errorf("Error expanding vars on the input path: %v", err)
 	}
@@ -341,10 +379,11 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 		return nil, fmt.Errorf("Error reading input file %s: %v", path, err)
 	}
 
-	yaml, err := applyTemplate(fs.vars, string(contents), false)
+	yaml, err := fs.applyTemplate(fs.vars, string(contents), false)
 	if err != nil {
 		return nil, fmt.Errorf("Error interpreting the template of the input: %v", err)
 	}
+	fs.log.Debugf("Input config:\n%v", string(yaml))
 
 	cfg, err := common.NewConfigWithYAML([]byte(yaml), "")
 	if err != nil {
@@ -392,7 +431,7 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 func (fs *Fileset) getPipelineIDs(beatVersion string) ([]string, error) {
 	var pipelineIDs []string
 	for _, ingestPipeline := range fs.manifest.IngestPipeline {
-		path, err := applyTemplate(fs.vars, ingestPipeline, false)
+		path, err := fs.applyTemplate(fs.vars, ingestPipeline, false)
 		if err != nil {
 			return nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
 		}
@@ -411,7 +450,7 @@ func (fs *Fileset) GetPipelines(esVersion common.Version) (pipelines []pipeline,
 	}
 
 	for idx, ingestPipeline := range fs.manifest.IngestPipeline {
-		path, err := applyTemplate(fs.vars, ingestPipeline, false)
+		path, err := fs.applyTemplate(fs.vars, ingestPipeline, false)
 		if err != nil {
 			return nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
 		}
@@ -421,7 +460,7 @@ func (fs *Fileset) GetPipelines(esVersion common.Version) (pipelines []pipeline,
 			return nil, fmt.Errorf("Error reading pipeline file %s: %v", path, err)
 		}
 
-		jsonString, err := applyTemplate(vars, string(strContents), true)
+		jsonString, err := fs.applyTemplate(vars, string(strContents), true)
 		if err != nil {
 			return nil, fmt.Errorf("Error interpreting the template of the ingest pipeline: %v", err)
 		}

@@ -8,8 +8,27 @@ tags: {{.tags}}
 
 json.keys_under_root: false
 
-{{ if .community_id }}
 processors:
+  - rename:
+      ignore_missing: true
+      fail_on_error: false
+      fields:
+        - from: json.src_ip
+          to:   source.ip
+
+        - from: json.src_port
+          to:   source.port
+
+        - from: json.dest_ip
+          to:   destination.ip
+
+        - from: json.dest_port
+          to:   destination.port
+
+        - from: json.proto
+          to:   network.transport
+
+{{ if .community_id }}
   - community_id:
       fields:
         source_ip: json.src_ip
@@ -18,3 +37,4 @@ processors:
         destination_port: json.dest_port
         transport: json.proto
 {{ end }}
+{{ template "macros/processor-network-direction.tmpl" . }}

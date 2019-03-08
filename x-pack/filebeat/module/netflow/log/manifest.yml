@@ -11,6 +11,8 @@ var:
     default: 30m
   - name: queue_size
     default: 8192
+  - name: internal_networks
+    default: private
 
 ingest_pipeline: ingest/pipeline.json
 input: config/netflow.yml

@@ -21,6 +21,8 @@ var:
       value: false
   - name: community_id
     default: true
+  - name: internal_networks
+    default: private
 
 ingest_pipeline: ingest/pipeline.json
 input: config/input.yml

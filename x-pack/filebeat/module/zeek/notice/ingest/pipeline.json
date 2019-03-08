@@ -9,20 +9,6 @@
     },
     {
       "set": {
-        "field": "destination.ip",
-        "value": "{{destination.address}}",
-        "if": "ctx.destination?.address != null"
-      }
-    },
-    {
-      "set": {
-        "field": "source.ip",
-        "value": "{{source.address}}",
-        "if": "ctx.source?.address != null"
-      }
-    },
-    {
-      "set": {
         "field": "event.id",
         "value": "{{zeek.session_id}}",
         "if": "ctx.zeek.session_id != null"

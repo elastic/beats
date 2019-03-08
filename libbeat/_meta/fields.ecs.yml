@@ -406,6 +406,11 @@
           description: >
             Destination domain.
 
+        - name: locality
+          level: extended
+          type: keyword
+          description: Indicates if the IP is internal or external.
+
         # Metrics
         - name: bytes
           level: core
@@ -1891,6 +1896,11 @@
           type: keyword
           description: >
             Source domain.
+
+        - name: locality
+          level: extended
+          type: keyword
+          description: Indicates if the IP is internal or external.
 
         # Metrics
         - name: bytes

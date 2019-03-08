@@ -1,7 +1,6 @@
 [
     {
         "@timestamp": 1547687130000,
-        "destination.address": "17.253.5.203",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
         "destination.geo.location.lat": 37.751,
@@ -23,7 +22,6 @@
         "network.community_id": "1:dtBPRfpKEZyg1iOHss95buwv+cw=",
         "network.transport": "tcp",
         "service.type": "zeek",
-        "source.address": "10.178.98.102",
         "source.ip": "10.178.98.102",
         "source.port": 62995,
         "tags": [

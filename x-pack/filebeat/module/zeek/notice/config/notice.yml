@@ -17,10 +17,10 @@ processors:
           to: "zeek.notice"
 
         - from: "zeek.notice.src"
-          to: "source.address"
+          to: "source.ip"
 
         - from: "zeek.notice.dst"
-          to: "destination.address"
+          to: "destination.ip"
 
         - from: "zeek.notice.uid"
           to: "zeek.session_id"
@@ -79,8 +79,6 @@ processors:
   - drop_fields:
       fields: ["zeek.notice.remote_location", "zeek.notice.f"]
 {{ if .community_id }}
-  - community_id:
-      fields:
-        source_ip: source.address
-        destination_ip: destination.address
+  - community_id: ~
 {{ end }}
+{{ template "macros/processor-network-direction.tmpl" . }}

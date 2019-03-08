@@ -8,34 +8,6 @@
             }
         },
         {
-            "rename": {
-                "field": "suricata.eve.src_ip",
-                "target_field": "source.ip",
-                "ignore_missing": true
-            }
-        },
-        {
-            "rename": {
-                "field": "suricata.eve.src_port",
-                "target_field": "source.port",
-                "ignore_missing": true
-            }
-        },
-        {
-            "rename": {
-                "field": "suricata.eve.dest_ip",
-                "target_field": "destination.ip",
-                "ignore_missing": true
-            }
-        },
-        {
-            "rename": {
-                "field": "suricata.eve.dest_port",
-                "target_field": "destination.port",
-                "ignore_missing": true
-            }
-        },
-        {
             "lowercase": {
                 "field": "suricata.eve.http.http_method",
                 "target_field": "http.request.method",
@@ -220,8 +192,7 @@
         },
         {
             "lowercase": {
-                "field": "suricata.eve.proto",
-                "target_field": "network.transport",
+                "field": "network.transport",
                 "ignore_missing": true
             }
         },

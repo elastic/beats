@@ -33,32 +33,21 @@
     {
       "script": {
         "lang": "painless",
-        "source": "if (ctx.zeek.connection.local_orig) ctx.tags.add(\"local_orig\");",
-        "if": "ctx.zeek.connection.local_orig != null"
+        "if": "ctx.source?.locality == null && ctx.zeek?.connection?.local_orig != null",
+        "source": "if (ctx.zeek.connection.local_orig) { ctx.source.locality = \"internal\"; } else { ctx.source.locality = \"external\"; }"
       }
     },
     {
       "script": {
         "lang": "painless",
-        "source": "if (ctx.zeek.connection.local_resp) ctx.tags.add(\"local_resp\");",
-        "if": "ctx.zeek.connection.local_resp != null"
-      }
-    },
-    {
-      "set": {
-        "field": "source.ip",
-        "value": "{{source.address}}"
-      }
-    },
-    {
-      "set": {
-        "field": "destination.ip",
-        "value": "{{destination.address}}"
+        "if": "ctx.destination?.locality == null && ctx.zeek?.connection?.local_resp != null",
+        "source": "if (ctx.zeek.connection.local_resp) { ctx.destination.locality = \"internal\"; } else { ctx.destination.locality = \"external\"; }"
       }
     },
     {
       "script": {
         "lang": "painless",
+        "if": "ctx.network?.direction == null && ctx.zeek?.connection?.local_orig != null && ctx.zeek?.connection?.local_resp != null",
         "source": "if (ctx.zeek.connection.local_orig == true && ctx.zeek.connection.local_resp == true) {ctx.network.direction = \"internal\"} else if (ctx.zeek.connection.local_orig == true && ctx.zeek.connection.local_resp == false) {ctx.network.direction = \"outbound\"} else if (ctx.zeek.connection.local_orig == false && ctx.zeek.connection.local_resp == true) {ctx.network.direction = \"inbound\"} else {ctx.network.direction = \"external\"}"
       }
     },

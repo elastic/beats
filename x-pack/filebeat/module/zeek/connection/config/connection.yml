@@ -20,13 +20,13 @@ processors:
           to: "temp.duration"
 
         - from: "zeek.connection.id.orig_h"
-          to: "source.address"
+          to: "source.ip"
 
         - from: "zeek.connection.id.orig_p"
           to: "source.port"
 
         - from: "zeek.connection.id.resp_h"
-          to: "destination.address"
+          to: "destination.ip"
 
         - from: "zeek.connection.id.resp_p"
           to: "destination.port"
@@ -63,13 +63,9 @@ processors:
     then:
       community_id:
         fields:
-          source_ip: source.address
-          destination_ip: destination.address
           icmp_type: source.port
           icmp_code: destination.port
     else:
-      community_id:
-        fields:
-          source_ip: source.address
-          destination_ip: destination.address
+      community_id: ~
 {{ end }}
+{{ template "macros/processor-network-direction.tmpl" . }}
