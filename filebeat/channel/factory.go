@@ -125,13 +125,15 @@ func (f *OutletFactory) Create(p beat.Pipeline, cfg *common.Config, dynFields *c
 	}
 
 	client, err := p.ConnectWith(beat.ClientConfig{
-		PublishMode:   beat.GuaranteedSend,
-		EventMetadata: config.EventMetadata,
-		DynamicFields: dynFields,
-		Meta:          meta,
-		Fields:        fields,
-		Processor:     processors,
-		Events:        f.eventer,
+		PublishMode: beat.GuaranteedSend,
+		Processing: beat.ProcessingConfig{
+			EventMetadata: config.EventMetadata,
+			DynamicFields: dynFields,
+			Meta:          meta,
+			Fields:        fields,
+			Processor:     processors,
+		},
+		Events: f.eventer,
 	})
 	if err != nil {
 		return nil, err

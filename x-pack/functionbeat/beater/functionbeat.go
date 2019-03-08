@@ -143,9 +143,11 @@ func makeClientFactory(log *logp.Logger, manager *licenser.Manager, pipeline bea
 		}
 
 		client, err := core.NewSyncClient(log, pipeline, beat.ClientConfig{
-			PublishMode:   beat.GuaranteedSend,
-			Processor:     processors,
-			EventMetadata: c.EventMetadata,
+			PublishMode: beat.GuaranteedSend,
+			Processing: beat.ProcessingConfig{
+				Processor:     processors,
+				EventMetadata: c.EventMetadata,
+			},
 		})
 
 		if err != nil {
