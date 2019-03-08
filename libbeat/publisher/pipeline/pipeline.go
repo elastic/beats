@@ -31,8 +31,8 @@ import (
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/processors"
 	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/publisher/processing"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
@@ -73,21 +73,7 @@ type Pipeline struct {
 	ackBuilder ackBuilder
 	eventSema  *sema
 
-	processors pipelineProcessors
-}
-
-type pipelineProcessors struct {
-	// The pipeline its processor settings for
-	// constructing the clients complete processor
-	// pipeline on connect.
-	builtinMeta common.MapStr
-	fields      common.MapStr
-	tags        []string
-
-	processors beat.Processor
-
-	disabled   bool // disabled is set if outputs have been disabled via CLI
-	alwaysCopy bool
+	processors processing.Supporter
 }
 
 // Settings is used to pass additional settings to a newly created pipeline instance.
@@ -98,19 +84,7 @@ type Settings struct {
 
 	WaitCloseMode WaitCloseMode
 
-	Annotations Annotations
-	Processors  *processors.Processors
-
-	Disabled bool
-}
-
-// Annotations configures additional metadata to be adde to every single event
-// being published. The meta data will be added before executing the configured
-// processors, so all processors configured with the pipeline or client will see
-// the same/complete event.
-type Annotations struct {
-	Event   common.EventMetadata
-	Builtin common.MapStr
+	Processors processing.Supporter
 }
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.
@@ -172,17 +146,13 @@ func New(
 		monitors.Logger = logp.NewLogger("publish")
 	}
 
-	annotations := settings.Annotations
-	processors := settings.Processors
-	log := monitors.Logger
-	disabledOutput := settings.Disabled
 	p := &Pipeline{
 		beatInfo:         beat,
 		monitors:         monitors,
 		observer:         nilObserver,
 		waitCloseMode:    settings.WaitCloseMode,
 		waitCloseTimeout: settings.WaitClose,
-		processors:       makePipelineProcessors(log, annotations, processors, disabledOutput),
+		processors:       settings.Processors,
 	}
 	p.ackBuilder = &pipelineEmptyACK{p}
 	p.ackActive = atomic.MakeBool(true)
@@ -347,7 +317,10 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		}
 	}
 
-	processors := newProcessorPipeline(p.beatInfo, p.monitors, p.processors, cfg)
+	processors, err := p.createEventProcessing(cfg.Processing, publishDisabled)
+	if err != nil {
+		return nil, err
+	}
 	acker := p.makeACKer(processors != nil, &cfg, waitClose)
 	producerCfg := queue.ProducerConfig{
 		// Cancel events from queue if acker is configured
@@ -389,6 +362,13 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	return client, nil
 }
 
+func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bool) (beat.Processor, error) {
+	if p.processors == nil {
+		return nil, nil
+	}
+	return p.processors.Create(cfg, noPublish)
+}
+
 func (e *pipelineEventer) OnACK(n int) {
 	e.observer.queueACKed(n)
 
@@ -412,42 +392,6 @@ func (e *waitCloser) dec(n int) {
 
 func (e *waitCloser) wait() {
 	e.events.Wait()
-}
-
-func makePipelineProcessors(
-	log *logp.Logger,
-	annotations Annotations,
-	processors *processors.Processors,
-	disabled bool,
-) pipelineProcessors {
-	p := pipelineProcessors{
-		disabled: disabled,
-	}
-
-	hasProcessors := processors != nil && len(processors.List) > 0
-	if hasProcessors {
-		tmp := newProgram("global", log)
-		for _, p := range processors.List {
-			tmp.add(p)
-		}
-		p.processors = tmp
-	}
-
-	if meta := annotations.Builtin; meta != nil {
-		p.builtinMeta = meta
-	}
-
-	if em := annotations.Event; len(em.Fields) > 0 {
-		fields := common.MapStr{}
-		common.MergeFields(fields, em.Fields.Clone(), em.FieldsUnderRoot)
-		p.fields = fields
-	}
-
-	if t := annotations.Event.Tags; len(t) > 0 {
-		p.tags = t
-	}
-
-	return p
 }
 
 // OutputReloader returns a reloadable object for the output section of this pipeline

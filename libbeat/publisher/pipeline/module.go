@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/libbeat/outputs"
-	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/publisher/processing"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 )
 
@@ -60,6 +60,7 @@ func Load(
 	beatInfo beat.Info,
 	monitors Monitors,
 	config Config,
+	processors processing.Supporter,
 	makeOutput func(outputs.Observer) (string, outputs.Group, error),
 ) (*Pipeline, error) {
 	log := monitors.Logger
@@ -71,28 +72,11 @@ func Load(
 		log.Info("Dry run mode. All output types except the file based one are disabled.")
 	}
 
-	processors, err := processors.New(config.Processors)
-	if err != nil {
-		return nil, fmt.Errorf("error initializing processors: %v", err)
-	}
-
 	name := beatInfo.Name
 	settings := Settings{
 		WaitClose:     0,
 		WaitCloseMode: NoWaitOnClose,
-		Disabled:      publishDisabled,
 		Processors:    processors,
-		Annotations: Annotations{
-			Event: config.EventMetadata,
-			Builtin: common.MapStr{
-				"host": common.MapStr{
-					"name": name,
-				},
-				"ecs": common.MapStr{
-					"version": "1.0.0-beta2",
-				},
-			},
-		},
 	}
 
 	queueBuilder, err := createQueueBuilder(config.Queue, monitors)
