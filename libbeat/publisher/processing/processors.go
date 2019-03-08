@@ -100,7 +100,7 @@ func (p *group) Run(event *beat.Event) (*beat.Event, error) {
 
 		event, err = sub.Run(event)
 		if err != nil {
-			// XXX: We don't drop the event, but continue filtering here iff the most
+			// XXX: We don't drop the event, but continue filtering here if the most
 			//      recent processor did return an event.
 			//      We want processors having this kind of implicit behavior
 			//      on errors?
