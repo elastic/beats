@@ -65,6 +65,8 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 *Heartbeat*
 
+- Fix checks for TCP send/receive data {pull}11118[11118]
+
 *Journalbeat*
 
 *Metricbeat*
