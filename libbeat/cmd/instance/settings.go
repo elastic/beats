@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/libbeat/idxmgmt"
 	"github.com/elastic/beats/libbeat/idxmgmt/ilm"
 	"github.com/elastic/beats/libbeat/monitoring/report"
+	"github.com/elastic/beats/libbeat/publisher/processing"
 )
 
 // Settings contains basic settings for any beat to pass into GenRootCmd
@@ -40,4 +41,6 @@ type Settings struct {
 	// load custom index manager. The config object will be the Beats root configuration.
 	IndexManagement idxmgmt.SupportFactory
 	ILM             ilm.SupportFactory
+
+	Processing processing.SupportFactory
 }

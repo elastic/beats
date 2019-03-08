@@ -469,7 +469,7 @@ var IpfixFields = FieldDict{
 }
 
 func init() {
-	if err := RegisterFields(IpfixFields); err != nil {
+	if err := RegisterGlobalFields(IpfixFields); err != nil {
 		panic(err)
 	}
 }

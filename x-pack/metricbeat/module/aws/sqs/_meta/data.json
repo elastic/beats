@@ -1,0 +1,39 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
+    },
+    "aws": {
+        "sqs": {
+            "empty_receives": 0,
+            "messages": {
+                "delayed": 0,
+                "deleted": 0,
+                "not_visible": 0,
+                "received": 0,
+                "sent": 0,
+                "visible": 91
+            },
+            "oldest_message_age": {
+                "sec": 86404
+            },
+            "sent_message_size": {}
+        }
+    },
+    "cloud": {
+        "region": "us-east-1"
+    },
+    "event": {
+        "dataset": "aws.sqs",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "sqs"
+    },
+    "service": {
+        "name": "sqs",
+        "type": "sqs"
+    }
+}

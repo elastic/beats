@@ -257,7 +257,7 @@ filebeat.modules:
 
   # Slow logs
   #slowlog:
-   #enabled: true
+    #enabled: true
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
@@ -301,6 +301,24 @@ filebeat.modules:
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
+
+#--------------------------------- Nats Module ---------------------------------
+- module: nats
+  # All logs
+  log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
+#------------------------------- NetFlow Module -------------------------------
+- module: netflow
+  log:
+    enabled: true
+    var:
+      netflow_host: localhost
+      netflow_port: 2055
 
 #-------------------------------- Nginx Module --------------------------------
 #- module: nginx
@@ -822,6 +840,11 @@ filebeat.inputs:
   # processing.
   #queue_size: 8192
 
+  # Custom field definitions for NetFlow V9 / IPFIX.
+  # List of files with YAML fields definition.
+  #custom_definitions:
+  #- path/to/ipfix.yaml
+  #- path/to/netflow.yaml
 #========================== Filebeat autodiscover ==============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules
@@ -995,7 +1018,7 @@ filebeat.inputs:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# The supported processors are drop_fields, drop_event, include_fields, 
+# The supported processors are drop_fields, drop_event, include_fields,
 # decode_json_fields, and add_cloud_metadata.
 #
 # For example, you can use the following processors to keep the fields that
@@ -1086,7 +1109,7 @@ filebeat.inputs:
 #    match_pids: ["system.process.ppid"]
 #    target: system.process.parent
 #
-# The following example decodes fields containing JSON strings 
+# The following example decodes fields containing JSON strings
 # and replaces the strings with valid JSON objects.
 #
 #processors:
@@ -1387,6 +1410,9 @@ output.elasticsearch:
 
     # Refresh metadata interval. Defaults to every 10 minutes.
     #refresh_frequency: 10m
+
+    # Strategy for fetching the topics metadata from the broker. Default is true.
+    #full: true
 
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1

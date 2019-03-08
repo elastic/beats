@@ -14,22 +14,24 @@ Note: This changelog documents the current changes which are not yet present in
 an actual release.
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v7.0.0-alpha2..master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v7.0.0-beta1..master[Check the HEAD diff]
 
-The list below covers the major changes between 7.0.0-alpha2 and master only.
+The list below covers the major changes between 7.0.0-beta1 and master only.
 
 ==== Breaking changes
-- Outputs receive Index Manager as additional parameter. The index manager can
-  be used to create an index selector. {pull}10347[10347]
-- Remove support for loading dashboards to Elasticsearch 5. {pull}10451[10451]
+
+- Remove support for deprecated `GenRootCmd` methods. {pull}10721[10721]
+- Remove SkipNormalization, SkipAgentMetadata, SkipAddHostName. {pull}10801[10801] {pull}10769[10769]
 
 ==== Bugfixes
 
+- Align default index between elasticsearch and logstash and kafka output. {pull}10841[10841]
+- Fix duplication check for `append_fields` option. {pull}10959[10959]
+
 ==== Added
 
-- Allow multiple object type configurations per field. {pull}9772[9772]
-- Move agent metadata addition to a processor. {pull}9952[9952]
-- Add (*common.Config).Has and (*common.Config).Remove. {pull}10363[10363]
-- Introduce ILM and IndexManagment support to beat.Settings. {pull}10347[10347]
-- Introduce ILM and IndexManagement support to beat.Settings. {pull}10347[10347]
-- Generating index pattern on demand instead of shipping them in the packages. {pull}10478[10478]
+- Metricset generator generates beta modules by default now. {pull}10657[10657]
+- The `beat.Event` accessor methods now support `@metadata` keys. {pull}10761[10761]
+- Assertion for documented fields in tests fails if any of the fields in the tested event is documented as an alias. {pull}10921[10921]
+- Support for Logger in the Metricset base instance. {pull}11106[11106]
+- Introduce processing.Support to instance.Setting. This allows Beats to fully modify the event processing. {pull}10801[10801]

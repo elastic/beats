@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/libbeat/outputs/outil"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/libbeat/publisher/processing"
 	"github.com/elastic/beats/libbeat/publisher/queue"
 	"github.com/elastic/beats/libbeat/publisher/queue/memqueue"
 )
@@ -169,11 +170,16 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 	outClient := outputs.NewFailoverClient(clients)
 	outClient = outputs.WithBackoff(outClient, config.Backoff.Init, config.Backoff.Max)
 
+	processing, err := processing.MakeDefaultSupport(true)(beat, log, common.NewConfig())
+	if err != nil {
+		return nil, err
+	}
+
 	pipeline, err := pipeline.New(
 		beat,
 		pipeline.Monitors{
 			Metrics: monitoring,
-			Logger:  logp.NewLogger(selector),
+			Logger:  log,
 		},
 		queueFactory,
 		outputs.Group{
@@ -184,6 +190,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 		pipeline.Settings{
 			WaitClose:     0,
 			WaitCloseMode: pipeline.NoWaitOnClose,
+			Processors:    processing,
 		})
 	if err != nil {
 		return nil, err

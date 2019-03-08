@@ -10,7 +10,10 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-module-apache,Apache>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-apache-status,status>>   
 |<<metricbeat-module-aws,aws>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.1+| .1+|  |<<metricbeat-metricset-aws-ec2,ec2>>   
+.4+| .4+|  |<<metricbeat-metricset-aws-ec2,ec2>>   
+|<<metricbeat-metricset-aws-s3_daily_storage,s3_daily_storage>> beta[]  
+|<<metricbeat-metricset-aws-s3_request,s3_request>> beta[]  
+|<<metricbeat-metricset-aws-sqs,sqs>> beta[]  
 |<<metricbeat-module-ceph,Ceph>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .7+| .7+|  |<<metricbeat-metricset-ceph-cluster_disk,cluster_disk>>   
 |<<metricbeat-metricset-ceph-cluster_health,cluster_health>>   
@@ -19,6 +22,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-ceph-osd_df,osd_df>>   
 |<<metricbeat-metricset-ceph-osd_tree,osd_tree>>   
 |<<metricbeat-metricset-ceph-pool_disk,pool_disk>>   
+|<<metricbeat-module-consul,consul>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-consul-agent,agent>> beta[]  
 |<<metricbeat-module-couchbase,Couchbase>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .3+| .3+|  |<<metricbeat-metricset-couchbase-bucket,bucket>>   
 |<<metricbeat-metricset-couchbase-cluster,cluster>>   
@@ -171,6 +176,7 @@ include::modules/aerospike.asciidoc[]
 include::modules/apache.asciidoc[]
 include::modules/aws.asciidoc[]
 include::modules/ceph.asciidoc[]
+include::modules/consul.asciidoc[]
 include::modules/couchbase.asciidoc[]
 include::modules/couchdb.asciidoc[]
 include::modules/docker.asciidoc[]

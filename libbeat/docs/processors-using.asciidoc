@@ -31,6 +31,32 @@ condition is present, then the action is executed only if the condition is
 fulfilled. If no condition is passed, then the action is always executed.
 * `<parameters>` is the list of parameters to pass to the processor.
 
+More complex conditional processing can be accomplished by using the
+if-then-else processor configuration. This allows multiple processors to be
+executed based on a single condition.
+
+[source,yaml]
+----
+processors:
+- if:
+    <condition>
+  then: <1>
+    - <processor_name>:
+        <parameters>
+    - <processor_name>:
+        <parameters>
+    ...
+  else: <2>
+    - <processor_name>:
+        <parameters>
+    - <processor_name>:
+        <parameters>
+    ...
+----
+<1> `then` must contain a single processor or a list of one or more processors
+to execute when the condition evaluates to true.
+<2> `else` is optional. It can contain a single processor or a list of
+processors to execute when the conditional evaluate to false.
 
 [[where-valid]]
 ==== Where are processors valid?
@@ -170,6 +196,7 @@ The supported processors are:
 
  * <<add-cloud-metadata,`add_cloud_metadata`>>
  * <<add-locale,`add_locale`>>
+ * <<community-id,`community_id`>>
  * <<decode-json-fields,`decode_json_fields`>>
  * <<drop-event,`drop_event`>>
  * <<drop-fields,`drop_fields`>>
@@ -201,6 +228,7 @@ The supported conditions are:
 * <<condition-contains,`contains`>>
 * <<condition-regexp,`regexp`>>
 * <<condition-range, `range`>>
+* <<condition-network, `network`>>
 * <<condition-has_fields, `has_fields`>>
 * <<condition-or, `or`>>
 * <<condition-and, `and`>>
@@ -292,6 +320,58 @@ range:
     system.cpu.user.pct.lt: 0.8
 ------
 
+[float]
+[[condition-network]]
+===== `network`
+
+The `network` condition checks if the field is in a certain IP network range.
+Both IPv4 and IPv6 addresses are supported. The network range may be specified
+using CIDR notation, like "192.0.2.0/24" or "2001:db8::/32", or by using one of
+these named ranges:
+
+- `loopback` - Matches loopback addresses in the range of `127.0.0.0/8` or
+  `::1/128`.
+- `unicast` - Matches global unicast addresses defined in RFC 1122, RFC 4632,
+  and RFC 4291 with the exception of the IPv4 broadcast address
+  (`255.255.255.255`). This includes private address ranges.
+- `multicast` - Matches multicast addresses.
+- `interface_local_multicast` - Matches IPv6 interface-local multicast addresses.
+- `link_local_unicast` - Matches link-local unicast addresses.
+- `link_local_multicast` - Matches link-local multicast addresses.
+- `private` - Matches private address ranges defined in RFC 1918 (IPv4) and
+  RFC 4193 (IPv6).
+- `public` - Matches addresses that are not loopback, unspecified, IPv4
+  broadcast, link local unicast, link local multicast, interface local
+  multicast, or private.
+- `unspecified` - Matches unspecified addresses (either the IPv4 address
+  "0.0.0.0" or the IPv6 address "::").
+
+The following condition returns true if the `source.ip` value is within the
+private address space.
+
+[source,yaml]
+----
+network:
+    source.ip: private
+----
+
+This condition returns true if the `destination.ip` value is within the
+IPv4 range of `192.168.1.0` - `192.168.1.255`.
+
+[source,yaml]
+----
+network:
+    destination.ip: '192.168.1.0/24'
+----
+
+And this condition returns true when `destination.ip` is within any of the given
+subnets.
+
+[source,yaml]
+----
+network:
+    destination.ip: ['192.168.1.0/24', '10.0.0.0/8', loopback]
+----
 
 [float]
 [[condition-has_fields]]
@@ -442,14 +522,12 @@ _EC2_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "us-east-1c",
-      "instance_id": "i-4e123456",
-      "machine_type": "t2.medium",
-      "provider": "ec2",
-      "region": "us-east-1"
-    }
+  "cloud": {
+    "availability_zone": "us-east-1c",
+    "instance_id": "i-4e123456",
+    "machine_type": "t2.medium",
+    "provider": "ec2",
+    "region": "us-east-1"
   }
 }
 -------------------------------------------------------------------------------
@@ -459,12 +537,10 @@ _Digital Ocean_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "instance_id": "1234567",
-      "provider": "digitalocean",
-      "region": "nyc2"
-    }
+  "cloud": {
+    "instance_id": "1234567",
+    "provider": "digitalocean",
+    "region": "nyc2"
   }
 }
 -------------------------------------------------------------------------------
@@ -474,14 +550,12 @@ _GCE_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "projects/1234567890/zones/us-east1-b",
-      "instance_id": "1234556778987654321",
-      "machine_type": "projects/1234567890/machineTypes/f1-micro",
-      "project_id": "my-dev",
-      "provider": "gce"
-    }
+  "cloud": {
+    "availability_zone": "us-east1-b",
+    "instance_id": "1234556778987654321",
+    "machine_type": "f1-micro",
+    "project_id": "my-dev",
+    "provider": "gce"
   }
 }
 -------------------------------------------------------------------------------
@@ -491,13 +565,11 @@ _Tencent Cloud_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "gz-azone2",
-      "instance_id": "ins-qcloudv5",
-      "provider": "qcloud",
-      "region": "china-south-gz"
-    }
+  "cloud": {
+    "availability_zone": "gz-azone2",
+    "instance_id": "ins-qcloudv5",
+    "provider": "qcloud",
+    "region": "china-south-gz"
   }
 }
 -------------------------------------------------------------------------------
@@ -510,13 +582,11 @@ ECS instance.
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "cn-shenzhen",
-      "instance_id": "i-wz9g2hqiikg0aliyun2b",
-      "provider": "ecs",
-      "region": "cn-shenzhen-a"
-    }
+  "cloud": {
+    "availability_zone": "cn-shenzhen",
+    "instance_id": "i-wz9g2hqiikg0aliyun2b",
+    "provider": "ecs",
+    "region": "cn-shenzhen-a"
   }
 }
 -------------------------------------------------------------------------------
@@ -526,14 +596,12 @@ _Azure Virtual Machine_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "provider": "az",
-      "instance_id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
-      "instance_name": "test-az-vm",
-      "machine_type": "Standard_D3_v2",
-      "region": "eastus2"
-    }
+  "cloud": {
+    "provider": "az",
+    "instance_id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
+    "instance_name": "test-az-vm",
+    "machine_type": "Standard_D3_v2",
+    "region": "eastus2"
   }
 }
 -------------------------------------------------------------------------------
@@ -543,14 +611,12 @@ _Openstack Nova_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "provider": "openstack",
-      "instance_name": "test-998d932195.mycloud.tld",
-      "availability_zone": "xxxx-az-c",
-      "instance_id": "i-00011a84",
-      "machine_type": "m2.large"
-    }
+  "cloud": {
+    "provider": "openstack",
+    "instance_name": "test-998d932195.mycloud.tld",
+    "availability_zone": "xxxx-az-c",
+    "instance_id": "i-00011a84",
+    "machine_type": "m2.large"
   }
 }
 -------------------------------------------------------------------------------
@@ -619,6 +685,53 @@ is treated as if the field was not set at all.
 `overwrite_keys`:: (Optional) A boolean that specifies whether keys that already
 exist in the event are overwritten by keys from the decoded JSON object. The
 default value is false.
+
+[[community-id]]
+=== Community ID Network Flow Hash
+
+The `community_id` processor computes a network flow hash according to the
+https://github.com/corelight/community-id-spec[Community ID Flow Hash
+specification].
+
+The flow hash is useful for correlating all network events related to a
+single flow. For example you can filter on a community ID value and you might
+get back the Netflow records from multiple collectors and layer 7 protocol
+records from Packetbeat.
+
+By default the processor is configured to read the flow parameters from the
+appropriate Elastic Common Schema (ECS) fields. If you are processing ECS data
+then no parameters are required.
+
+[source,yaml]
+----
+processors:
+  - community_id:
+----
+
+If the data does not conform to ECS then you can customize the field names
+that the processor reads from. You can also change the `target` field which
+is where the computed hash is written to.
+
+[source,yaml]
+----
+processors:
+  - community_id:
+      fields:
+        source_ip: my_source_ip
+        source_port: my_source_port
+        destination_ip: my_dest_ip
+        destination_port: my_dest_port
+        transport: proto
+        icmp_type: my_icmp_type
+        icmp_code: my_icmp_code
+      target: network.community_id
+----
+
+If the necessary fields are not present in the event then the processor will
+silently continue without adding the target field.
+
+The processor also accepts an optional `seed` parameter that must be a 16-bit
+unsigned integer. This value gets incorporated into all generated hashes.
 
 [[drop-event]]
 === Drop events

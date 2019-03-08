@@ -150,7 +150,18 @@ metricbeat.modules:
 #--------------------------------- Aws Module ---------------------------------
 - module: aws
   period: 300s
-  metricsets: ["ec2"]
+  metricsets:
+    - "ec2"
+    - "sqs"
+  access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  session_token: '${AWS_SESSION_TOKEN:""}'
+  default_region: '${AWS_REGION:us-west-1}'
+- module: aws
+  period: 86400s
+  metricsets:
+    - "s3_request"
+    - "s3_daily_storage"
   access_key_id: '${AWS_ACCESS_KEY_ID:""}'
   secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
   session_token: '${AWS_SESSION_TOKEN:""}'
@@ -162,6 +173,15 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:5000"]
   enabled: true
+
+#-------------------------------- Consul Module --------------------------------
+- module: consul
+  metricsets:
+  - agent
+  enabled: true
+  period: 10s
+  hosts: ["localhost:8500"]
+
 
 #------------------------------ Couchbase Module ------------------------------
 - module: couchbase
@@ -706,7 +726,8 @@ metricbeat.modules:
   metricsets: ["perfmon"]
   enabled: true
   period: 10s
-  perfmon.ignore_non_existent_counters: true
+  perfmon.ignore_non_existent_counters: false
+  perfmon.group_measurements_by_instance: false
   perfmon.counters:
   #  - instance_label: processor.name
   #    instance_name: total
@@ -844,7 +865,7 @@ metricbeat.modules:
 #
 #   event -> filter1 -> event1 -> filter2 ->event2 ...
 #
-# The supported processors are drop_fields, drop_event, include_fields, 
+# The supported processors are drop_fields, drop_event, include_fields,
 # decode_json_fields, and add_cloud_metadata.
 #
 # For example, you can use the following processors to keep the fields that
@@ -935,7 +956,7 @@ metricbeat.modules:
 #    match_pids: ["system.process.ppid"]
 #    target: system.process.parent
 #
-# The following example decodes fields containing JSON strings 
+# The following example decodes fields containing JSON strings
 # and replaces the strings with valid JSON objects.
 #
 #processors:
@@ -1236,6 +1257,9 @@ output.elasticsearch:
 
     # Refresh metadata interval. Defaults to every 10 minutes.
     #refresh_frequency: 10m
+
+    # Strategy for fetching the topics metadata from the broker. Default is true.
+    #full: true
 
   # The number of concurrent load-balanced Kafka output workers.
   #worker: 1

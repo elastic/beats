@@ -249,7 +249,7 @@ endif::no_dashboards[]
 
 You can set the index dynamically by using a format string to access any event
 field. For example, this configuration uses a custom field, `fields.log_type`,
-to set the index: 
+to set the index:
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
@@ -261,13 +261,13 @@ output.elasticsearch:
 <1> We recommend including +{beat_version_key}+ in the name to avoid mapping issues
 when you upgrade.
 
-With this configuration, all events with `log_type: normal` are sent to an 
+With this configuration, all events with `log_type: normal` are sent to an
 index named +normal-{version}-{localdate}+, and all events with
 `log_type: critical` are sent to an index named
 +critical-{version}-{localdate}+.
 
 TIP: To learn how to add custom fields to events, see the
-<<libbeat-configuration-fields,`fields`>> option.  
+<<libbeat-configuration-fields,`fields`>> option.
 
 See the <<indices-option-es,`indices`>> setting for other ways to set the index
 dynamically.
@@ -285,7 +285,7 @@ matches, the <<index-option-es,`index`>> setting is used.
 Rule settings:
 
 *`index`*:: The index format string to use. If this string contains field
-references, such as `%{[fields.name]}`, the fields must exist, or the rule fails. 
+references, such as `%{[fields.name]}`, the fields must exist, or the rule fails.
 
 *`mappings`*:: A dictionary that takes the value returned by `index` and maps it
 to a new name.
@@ -347,7 +347,7 @@ ifndef::no_ilm[]
 [[ilm-es]]
 ===== `ilm`
 
-Configuration options for index lifecycle management. 
+Configuration options for index lifecycle management.
 
 See <<ilm>> for more information.
 endif::no_ilm[]
@@ -369,7 +369,7 @@ For more information, see <<configuring-ingest-node>>.
 
 You can set the ingest node pipeline dynamically by using a format string to
 access any event field. For example, this configuration uses a custom field,
-`fields.log_type`, to set the pipeline for each event: 
+`fields.log_type`, to set the pipeline for each event:
 
 ["source","yaml",subs="attributes"]
 ------------------------------------------------------------------------------
@@ -384,7 +384,7 @@ named `normal_pipeline`, and all events with `log_type: critical` are sent to a
 pipeline named `critical_pipeline`.
 
 TIP: To learn how to add custom fields to events, see the
-<<libbeat-configuration-fields,`fields`>> option.   
+<<libbeat-configuration-fields,`fields`>> option.
 
 See the <<pipelines-option-es,`pipelines`>> setting for other ways to set the
 ingest node pipeline dynamically.
@@ -403,7 +403,7 @@ Rule settings:
 
 *`pipeline`*:: The pipeline format string to use. If this string contains field
 references, such as `%{[fields.name]}`, the fields must exist, or the rule
-fails.  
+fails.
 
 *`mappings`*:: A dictionary that takes the value returned by `pipeline` and maps
 it to a new name.
@@ -555,7 +555,7 @@ use in Logstash for indexing and filtering:
 }
 ------------------------------------------------------------------------------
 <1> {beatname_uc} uses the `@metadata` field to send metadata to Logstash. See the
-{logstashdoc}/event-dependent-configuration.html#metadata[Logstash documentation]
+{logstash-ref}/event-dependent-configuration.html#metadata[Logstash documentation]
 for more about the `@metadata` field.
 <2> The default is {beatname_lc}. To change this value, set the
 <<logstash-index,`index`>> option in the {beatname_uc} config file.
@@ -870,7 +870,7 @@ topic: '%{[fields.log_topic]}'
 -----
 
 TIP: To learn how to add custom fields to events, see the
-<<libbeat-configuration-fields,`fields`>> option.  
+<<libbeat-configuration-fields,`fields`>> option.
 
 See the <<topics-option-kafka,`topics`>> setting for other ways to set the
 topic dynamically.
@@ -889,7 +889,7 @@ Rule settings:
 
 *`topic`*:: The topic format string to use.  If this string contains field
 references, such as `%{[fields.name]}`, the fields must exist, or the rule
-fails. 
+fails.
 
 *`mappings`*:: A dictionary that takes the value returned by `topic` and maps it
 to a new name.
@@ -901,7 +901,7 @@ match.
 ifndef::no-processors[]
 All the <<conditions,conditions>> supported by processors are also supported
 here.
-endif::no-processors[] 
+endif::no-processors[]
 
 
 ===== `key`
@@ -954,6 +954,10 @@ Kafka metadata update settings. The metadata do contain information about
 brokers, topics, partition, and active leaders to use for publishing.
 
 *`refresh_frequency`*:: Metadata refresh interval. Defaults to 10 minutes.
+
+*`full`*:: Strategy to use when fetching metadata, when this option is `true`, the client will maintain
+a full set of metadata for all the available topics, if the this option is set to `false` it will only refresh the
+metadata for the configured topics. The default is true.
 
 *`retry.max`*:: Total number of metadata update retries when cluster is in middle of leader election. The default is 3.
 
@@ -1099,7 +1103,7 @@ output.redis:
 
 
 TIP: To learn how to add custom fields to events, see the
-<<libbeat-configuration-fields,`fields`>> option.  
+<<libbeat-configuration-fields,`fields`>> option.
 
 See the <<keys-option-redis,`keys`>> setting for other ways to set the key
 dynamically.

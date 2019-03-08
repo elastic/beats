@@ -6,7 +6,9 @@ include::{libbeat-dir}/docs/shared-getting-started-intro.asciidoc[]
 * <<{beatname_lc}-installation>>
 * <<{beatname_lc}-configuration>>
 * <<{beatname_lc}-template>>
+* <<load-kibana-dashboards>>
 * <<{beatname_lc}-starting>>
+* <<view-kibana-dashboards>>
 * <<setup-repositories>>
 
 [id="{beatname_lc}-installation"]
@@ -159,8 +161,15 @@ include::{libbeat-dir}/docs/step-look-at-config.asciidoc[]
 
 include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 
+[[load-kibana-dashboards]]
+=== Step 4: Set up the Kibana dashboards
+
+:requires-sudo: yes
+include::../../libbeat/docs/dashboards.asciidoc[]
+:requires-sudo!:
+
 [id="{beatname_lc}-starting"]
-=== Step 4: Start {beatname_uc}
+=== Step 5: Start {beatname_uc}
 
 Start {beatname_uc} by issuing the appropriate command for your platform. If you
 are accessing a secured Elasticsearch cluster, make sure you've configured
@@ -187,24 +196,33 @@ sudo ./{beatname_lc} -e
 <1> You'll be running {beatname_uc} as root, so you need to change ownership
 of the configuration file, or run {beatname_uc} with `--strict.perms=false`
 specified. See
-{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
+{beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_.
 
 {beatname_uc} is now ready to send journal events to the defined output.
 
 [[view-kibana-dashboards]]
-=== Step 5: View your data in Kibana
+=== Step 6: View the sample Kibana dashboards
 
-There are currently no example dashboards available for {beatname_uc}.
+To make it easier for you to visualize your log data, we have created example
+{beatname_uc} dashboards. You loaded the dashboards earlier when you ran the
+`setup` command.
 
-To learn how to view and explore your data, see the
-_{kibana-ref}/index.html[{kib} User Guide]_.
+include::../../libbeat/docs/opendashboards.asciidoc[]
+
+The dashboards are provided as examples. We recommend that you
+{kibana-ref}/dashboard.html[customize] them to meet your needs.
+
+[role="screenshot"]
+image:./images/journald-log-data.png[Journald data]
+
 
 [NOTE]
 =====
-By default, the Logs UI in {kib} only shows logs from `filebeat-*`
-indexes. To show {beatname_uc} indexes, add the following settings to the {kib}
-configuration: 
+You can also use the {infra-guide}/logs-ui-overview.html[Logs UI] in {kib} to
+tail logs in real time. By default, however, the Logs UI only shows logs from
+`filebeat-*` indexes. To show {beatname_uc} indexes, add the following settings
+to the {kib} configuration: 
 
 [source,yaml]
 ----

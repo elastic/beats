@@ -47,12 +47,11 @@ type phpFpmProcess struct {
 	LastRequestMemory int     `json:"last request memory"`
 }
 
-func eventsMapping(r mb.ReporterV2, content []byte) {
+func eventsMapping(r mb.ReporterV2, content []byte) error {
 	var status phpFpmStatus
 	err := json.Unmarshal(content, &status)
 	if err != nil {
-		r.Error(err)
-		return
+		return err
 	}
 	//remapping process details to match the naming format
 	for _, process := range status.Processes {
@@ -94,4 +93,5 @@ func eventsMapping(r mb.ReporterV2, content []byte) {
 		event.ModuleFields.Put("pool.name", status.Name)
 		r.Event(event)
 	}
+	return nil
 }

@@ -264,7 +264,6 @@ class Test(BaseTest):
 
         assert len(output) == 5 + 6
 
-    @unittest.skipIf(os.name == 'nt', 'flaky test https://github.com/elastic/beats/issues/9213')
     def test_file_disappear_appear(self):
         """
         Checks that filebeat keeps running in case a log files is deleted
@@ -392,7 +391,7 @@ class Test(BaseTest):
 
             self.wait_until(
                 lambda: self.output_has(1),
-                max_timeout=15)
+                max_timeout=60, poll_interval=1)
 
         lines_written = 0
 
@@ -407,7 +406,7 @@ class Test(BaseTest):
 
                 self.wait_until(
                     lambda: self.output_has(lines_written + 1),
-                    max_timeout=15)
+                    max_timeout=60, poll_interval=1)
 
         filebeat.check_kill_and_wait()
 

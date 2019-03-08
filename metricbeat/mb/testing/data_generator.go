@@ -93,6 +93,12 @@ func WriteEventsReporterV2(f mb.ReportingMetricSetV2, t testing.TB, path string)
 	return WriteEventsReporterV2Cond(f, t, path, nil)
 }
 
+// WriteEventsReporterV2Error fetches events and writes the first event to a ./_meta/data.json
+// file.
+func WriteEventsReporterV2Error(f mb.ReportingMetricSetV2Error, t testing.TB, path string) error {
+	return WriteEventsReporterV2ErrorCond(f, t, path, nil)
+}
+
 // WriteEventsReporterV2Cond fetches events and writes the first event that matches
 // the condition to a file.
 func WriteEventsReporterV2Cond(f mb.ReportingMetricSetV2, t testing.TB, path string, cond func(common.MapStr) bool) error {
@@ -105,6 +111,25 @@ func WriteEventsReporterV2Cond(f mb.ReportingMetricSetV2, t testing.TB, path str
 		return errs[0]
 	}
 
+	return writeEvent(events, f, t, path, cond)
+}
+
+// WriteEventsReporterV2ErrorCond fetches events and writes the first event that matches
+// the condition to a file.
+func WriteEventsReporterV2ErrorCond(f mb.ReportingMetricSetV2Error, t testing.TB, path string, cond func(common.MapStr) bool) error {
+	if !*dataFlag {
+		t.Skip("skip data generation tests")
+	}
+
+	events, errs := ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		return errs[0]
+	}
+
+	return writeEvent(events, f, t, path, cond)
+}
+
+func writeEvent(events []mb.Event, f mb.MetricSet, t testing.TB, path string, cond func(common.MapStr) bool) error {
 	if len(events) == 0 {
 		return fmt.Errorf("no events were generated")
 	}
@@ -148,11 +173,6 @@ func StandardizeEvent(ms mb.MetricSet, e mb.Event, modifiers ...mb.EventModifier
 	}
 
 	fullEvent := e.BeatEvent(ms.Module().Name(), ms.Name(), modifiers...)
-
-	fullEvent.Fields["agent"] = common.MapStr{
-		"name":     "host.example.com",
-		"hostname": "host.example.com",
-	}
 
 	return fullEvent
 }
@@ -203,7 +223,7 @@ func SelectEvent(events []common.MapStr, cond func(e common.MapStr) bool) (commo
 }
 
 // SelectEventV2 selects the first event that matches an specific condition
-func SelectEventV2(f mb.ReportingMetricSetV2, events []mb.Event, cond func(e common.MapStr) bool) (mb.Event, error) {
+func SelectEventV2(f mb.MetricSet, events []mb.Event, cond func(e common.MapStr) bool) (mb.Event, error) {
 	if cond == nil && len(events) > 0 {
 		return events[0], nil
 	}

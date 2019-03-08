@@ -125,10 +125,12 @@ func New(
 func (i *Input) Run() {
 	var err error
 	i.client, err = i.pipeline.ConnectWith(beat.ClientConfig{
-		PublishMode:   beat.GuaranteedSend,
-		EventMetadata: i.eventMeta,
-		Meta:          nil,
-		Processor:     i.processors,
+		PublishMode: beat.GuaranteedSend,
+		Processing: beat.ProcessingConfig{
+			EventMetadata: i.eventMeta,
+			Meta:          nil,
+			Processor:     i.processors,
+		},
 		ACKCount: func(n int) {
 			i.logger.Infof("journalbeat successfully published %d events", n)
 		},
@@ -189,10 +191,10 @@ func (i *Input) publishAll() {
 
 // Stop stops all readers of the input.
 func (i *Input) Stop() {
-	i.client.Close()
 	for _, r := range i.readers {
 		r.Close()
 	}
+	i.client.Close()
 }
 
 // Wait waits until all readers are done.

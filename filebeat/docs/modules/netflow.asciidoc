@@ -1,0 +1,80 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-netflow]]
+[role="xpack"]
+
+:modulename: netflow
+:has-dashboards: false
+
+== NetFlow module
+
+This is a module for receiving NetFlow and IPFIX flow records over UDP. This
+input supports NetFlow versions 1, 5, 6, 7, 8 and 9, as well as IPFIX. For
+NetFlow versions older than 9, fields are mapped automatically to NetFlow v9.
+
+This module wraps the <<filebeat-input-netflow,netflow input>> to enrich the
+flow records with geolocation information about the IP endpoints by using
+Elasticsearch Ingest Node.
+
+[float]
+=== Compatibility
+
+This module requires the {plugins}/ingest-geoip.html[ingest-geoip]
+Elasticsearch plugins.
+
+include::../include/running-modules.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `log` fileset settings
+
+The fileset is by default configured to listen for UDP traffic on
+`localhost:2055`. For most uses cases you will want to set the `netflow_host`
+variable to allow the input bind to all interfaces so that it can receive
+traffic from network devices.
+
+["source","yaml",subs="attributes"]
+-----
+- module: netflow
+  log:
+    enabled: true
+    var:
+      netflow_host: 0.0.0.0
+      netflow_port: 2055
+-----
+
+`var.netflow_host`:: Address to find to. Defaults to `localhost`.
+
+`var.netflow_port`:: Port to listen on. Defaults to `2055`.
+
+`var.max_message_size`:: The maximum size of the message received over UDP.
+The default is `10KiB`.
+
+`var.expiration_timeout`:: The time before an idle session or unused template is
+expired. Only applicable to v9 and IPFIX protocols. A value of zero disables
+expiration.
+
+`var.queue_size`:: The maximum number of packets that can be queued for
+processing. Use this setting to avoid packet-loss when dealing with occasional
+bursts of traffic.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-netflow,exported fields>> section.
+

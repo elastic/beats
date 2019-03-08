@@ -1,0 +1,11 @@
+The sqs metricset of aws module allows you to monitor your AWS SQS queues. `sqs` metricset fetches a set of values from
+https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-available-cloudwatch-metrics.html[Amazon SQS Metrics].
+CloudWatch metrics for Amazon SQS queues are automatically collected and pushed to CloudWatch every five minutes.
+
+[float]
+=== AWS Permissions
+Some specific AWS permissions are required for IAM user to collect AWS SQS metrics.
+----
+cloudwatch:GetMetricData
+ec2:DescribeRegions
+----
