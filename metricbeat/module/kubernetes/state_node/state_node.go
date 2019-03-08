@@ -19,7 +19,6 @@ package state_node
 
 import (
 	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/logp"
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -57,13 +56,7 @@ var (
 		Labels: map[string]p.LabelMap{
 			"node": p.KeyLabel("name"),
 		},
-
-		ExtraFields: map[string]string{
-			mb.NamespaceKey: "node",
-		},
 	}
-
-	logger = logp.NewLogger("kubernetes.state_node")
 )
 
 // init registers the MetricSet with the central registry.
@@ -108,23 +101,16 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 	events, err := m.prometheus.GetProcessedMetrics(mapping)
 	if err != nil {
-		logger.Error(err)
+		m.Logger().Error(err)
 		reporter.Error(err)
 		return
 	}
 
 	m.enricher.Enrich(events)
 	for _, event := range events {
-		var namespace string
-		for k, v := range event {
-			if k == "_namespace" {
-				namespace = v.(string)
-			}
-		}
-
 		reporter.Event(mb.Event{
 			MetricSetFields: event,
-			Namespace:       namespace,
+			Namespace:       "kubernetes.node",
 		})
 	}
 }
