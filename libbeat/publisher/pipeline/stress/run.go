@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/libbeat/publisher/processing"
 )
 
 type config struct {
@@ -58,13 +59,21 @@ func RunTests(
 		return fmt.Errorf("unpacking config failed: %v", err)
 	}
 
+	log := logp.L()
+
+	processing, err := processing.MakeDefaultSupport(false)(info, log, cfg)
+	if err != nil {
+		return err
+	}
+
 	pipeline, err := pipeline.Load(info,
 		pipeline.Monitors{
 			Metrics:   nil,
 			Telemetry: nil,
-			Logger:    logp.L(),
+			Logger:    log,
 		},
 		config.Pipeline,
+		processing,
 		func(stat outputs.Observer) (string, outputs.Group, error) {
 			cfg := config.Output
 			out, err := outputs.Load(nil, info, stat, cfg.Name(), cfg.Config())
