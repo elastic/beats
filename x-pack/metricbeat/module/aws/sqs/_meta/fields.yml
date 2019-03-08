@@ -41,3 +41,7 @@
       format: bytes
       description: >
         The size of messages added to a queue.
+    - name: queue.name
+      type: keyword
+      description: >
+        SQS queue name

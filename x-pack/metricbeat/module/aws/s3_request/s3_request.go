@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/pkg/errors"
@@ -82,7 +83,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	namespace := "AWS/S3"
 	// Get startTime and endTime
-	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
+	// Duration should always be "-172800s" for s3_request metrics. Otherwise the query might not return any results
+	startTime, endTime, err := aws.GetStartTimeEndTime("-172800s")
 	if err != nil {
 		logp.Error(errors.Wrap(err, "Error ParseDuration"))
 		m.logger.Error(err.Error())
@@ -117,6 +119,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 			m.logger.Error(err.Error())
 			report.Error(err)
 			continue
+		}
+
+		if regionName == "ap-southeast-1" {
+			fmt.Println("metricDataOutputs2 = ", metricDataOutputs)
 		}
 
 		// Create Cloudwatch Events for s3_request
@@ -205,9 +211,17 @@ func createS3RequestEvents(outputs []cloudwatch.MetricDataResult, regionName str
 
 	// AWS s3_request metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
+
 	// Find a timestamp for all metrics in output
-	if len(outputs) > 0 && len(outputs[0].Timestamps) > 0 {
-		timestamp := outputs[0].Timestamps[0]
+	timestamp := time.Time{}
+	for _, output := range outputs {
+		if output.Timestamps != nil {
+			timestamp = output.Timestamps[0]
+			break
+		}
+	}
+
+	if !timestamp.IsZero() {
 		for _, output := range outputs {
 			labels := strings.Split(*output.Label, " ")
 			// check timestamp to make sure metrics come from the same timestamp

@@ -1,9 +1,5 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "aws": {
         "sqs": {
             "empty_receives": 0,
@@ -13,11 +9,12 @@
                 "not_visible": 0,
                 "received": 0,
                 "sent": 0,
-                "visible": 91
+                "visible": 45
             },
             "oldest_message_age": {
-                "sec": 86404
+                "sec": 82247
             },
+            "queue.name": "elb-log-queue-20171218185917658900000001",
             "sent_message_size": {}
         }
     },

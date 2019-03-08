@@ -165,7 +165,7 @@ func createSQSEvents(getMetricDataResults []cloudwatch.MetricDataResult, metrics
 			continue
 		}
 		labels := strings.Split(*output.Label, " ")
-		mapOfMetricSetFieldResults["queue.name"] = labels[0]
+		mapOfMetricSetFieldResults["QueueName"] = labels[0]
 		mapOfMetricSetFieldResults[labels[1]] = fmt.Sprint(output.Values[0])
 	}
 

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/pkg/errors"
@@ -83,7 +84,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	namespace := "AWS/S3"
 	// Get startTime and endTime
-	startTime, endTime, err := aws.GetStartTimeEndTime(m.DurationString)
+	// Duration should always be "-172800s" for s3_daily_storage metrics. Otherwise the query will not return any results
+	startTime, endTime, err := aws.GetStartTimeEndTime("-172800s")
 	if err != nil {
 		err = errors.Wrap(err, "Error ParseDuration")
 		m.logger.Error(err.Error())
@@ -205,7 +207,15 @@ func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName st
 	// AWS s3_daily_storage metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
 	// Find a timestamp for all metrics in output
-	if len(outputs) > 0 && len(outputs[0].Timestamps) > 0 {
+	timestamp := time.Time{}
+	for _, output := range outputs {
+		if output.Timestamps != nil {
+			timestamp = output.Timestamps[0]
+			break
+		}
+	}
+
+	if !timestamp.IsZero() {
 		timestamp := outputs[0].Timestamps[0]
 		for _, output := range outputs {
 			labels := strings.Split(*output.Label, " ")
