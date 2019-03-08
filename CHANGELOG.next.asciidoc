@@ -77,6 +77,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Add ECS-like selectors and dedotting to docker autodiscover. {issue}10757[10757] {pull}10862[10862]
 - Fix encoding of timestamps when using disk spool. {issue}10099[10099]
 - Include ip and boolean type when generating index pattern. {pull}10995[10995]
+- Using an environment variable for the password when enrolling a beat will now raise an error if the variable doesn't exist. {pull}10936[10936]
 
 *Auditbeat*
 
