@@ -58,8 +58,10 @@ func TestFetchDataUnixSock(t *testing.T) {
 	}
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
-	events, err := mbtest.ReportingFetchV2Error(f)
-	assert.NoError(t, err)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
 
 	assertTestData(t, events)
 	wg.Wait()
