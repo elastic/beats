@@ -34,6 +34,13 @@
       }
     },
     {
+      "script": {
+        "lang": "painless",
+        "source": "ctx.coredns.response.flags = ctx.coredns.response.flags.toUpperCase()",
+        "ignore_failure" : true
+      }
+    },
+    {
       "split": {
         "field": "coredns.response.flags",
         "separator": "," 

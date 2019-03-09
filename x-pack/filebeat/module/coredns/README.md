@@ -39,9 +39,10 @@ Now, the Coredns logs and dashboard should appear in Kibana.
 ## Deployment Scenario #2: coredns for kubernetes 
 
 For Kubernetes deployment, the filebeat daemon-set yaml file needs to be deployed to the 
-Kubernetes cluster.
+Kubernetes cluster. A sample configuration file is provided under the `beats/deploy` directory - 
+filebeat-autodiscover-k8s.yaml.
 ```
-kubectl apply -f filebeat-k8s.yaml
+kubectl apply -f filebeat-autodiscover-k8s.yaml
 ```
 
 #### Note the following section in the yaml file
