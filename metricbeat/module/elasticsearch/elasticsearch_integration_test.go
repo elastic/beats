@@ -28,6 +28,7 @@ import (
 	"net/http"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -254,6 +255,9 @@ func createCCRStats(host string) error {
 	if err != nil {
 		return errors.Wrap(err, "error creating CCR follower index")
 	}
+
+	// Give ES sufficient time to do the replication and produce stats
+	time.Sleep(300 * time.Millisecond)
 
 	return nil
 }
