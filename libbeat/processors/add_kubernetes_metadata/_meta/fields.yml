@@ -37,6 +37,11 @@
           type: object
           description: >
             Kubernetes annotations map
+        
+        - name: replicaset
+          type: object
+          description: >
+            Kubernetes replica-set map
 
         - name: container.name
           type: keyword

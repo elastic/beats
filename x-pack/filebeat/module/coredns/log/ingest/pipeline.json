@@ -17,7 +17,7 @@
     },
     {
       "convert" : {
-        "field" : "temp.duration",
+        "field" : "coredns.duration",
         "type": "double"
       }
     },
@@ -42,16 +42,16 @@
     {
       "script": {
         "lang": "painless",
-        "source": "ctx.event.duration = Math.round(ctx.temp.duration * params.scale)",
+        "source": "ctx.event.duration = Math.round(ctx.coredns.duration * params.scale)",
         "params": {
           "scale": 1000000000
         },
-        "if": "ctx.temp?.duration != null"
+        "if": "ctx.coredns?.duration != null"
       }
     },
     {
       "remove": {
-        "field": "temp.duration",
+        "field": "coredns.duration",
         "ignore_missing": true
       }
     }

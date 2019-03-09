@@ -57,8 +57,4 @@
       type: boolean
       description: >
         dnssec flag
-
-  - name: kubernetes.replicaset
-    type: object
-    description: >
-      Kubernetes replica set
+        
