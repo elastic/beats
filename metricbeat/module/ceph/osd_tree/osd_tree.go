@@ -18,7 +18,6 @@
 package osd_tree
 
 import (
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -35,8 +34,6 @@ var (
 		DefaultPath:   defaultPath,
 	}.Build()
 )
-
-var logger = logp.NewLogger("ceph.osd_tree")
 
 func init() {
 	mb.Registry.MustAddMetricSet("ceph", "osd_tree", New,
@@ -69,14 +66,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	content, err := m.HTTP.FetchContent()
 	if err != nil {
-		logger.Error(err)
+		m.Logger().Error(err)
 		reporter.Error(err)
 		return
 	}
 
 	events, err := eventsMapping(content)
 	if err != nil {
-		logger.Error(err)
+		m.Logger().Error(err)
 		reporter.Error(err)
 		return
 	}
