@@ -1073,9 +1073,9 @@ Fields for Cisco ASA Firewall.
 *`cisco.asa.message_id`*::
 +
 --
-type: long
+type: keyword
 
-The Cisco ASA message identifier.
+The Cisco ASA message identifier. TODO: Maybe a long?
 
 
 --
@@ -1086,6 +1086,141 @@ The Cisco ASA message identifier.
 type: keyword
 
 Suffix after %ASA identifier. Usually `session`.
+
+
+--
+
+*`cisco.asa.source_interface`*::
++
+--
+type: keyword
+
+TODO migrate to ECS?
+
+--
+
+*`cisco.asa.destination_interface`*::
++
+--
+type: keyword
+
+TODO migrate to ECS?
+
+--
+
+*`cisco.asa.list_id`*::
++
+--
+type: keyword
+
+TODO
+
+--
+
+*`cisco.asa.source_username`*::
++
+--
+type: keyword
+
+TODO
+
+--
+
+*`cisco.asa.destination_username`*::
++
+--
+type: keyword
+
+TODO
+
+--
+
+*`cisco.asa.mapped_source_ip`*::
++
+--
+type: ip
+
+TODO
+
+--
+
+*`cisco.asa.mapped_source_port`*::
++
+--
+type: long
+
+TODO
+
+--
+
+*`cisco.asa.mapped_destination_ip`*::
++
+--
+type: ip
+
+TODO
+
+--
+
+*`cisco.asa.mapped_destination_port`*::
++
+--
+type: long
+
+TODO
+
+--
+
+*`cisco.asa.threat_level`*::
++
+--
+type: keyword
+
+TODO
+
+--
+
+*`cisco.asa.threat_category`*::
++
+--
+type: keyword
+
+TODO
+
+--
+
+*`cisco.asa.connection_id`*::
++
+--
+type: keyword
+
+TODO
+
+--
+
+*`cisco.asa.threat_domain`*::
++
+--
+TODO
+
+--
+
+*`cisco.asa.icmp_type`*::
++
+--
+type: short
+
+ICMP type.
+
+
+--
+
+*`cisco.asa.icmp_code`*::
++
+--
+type: short
+
+ICMP code.
 
 
 --
