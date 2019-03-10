@@ -85,13 +85,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		svcSQS := sqs.New(*m.MetricSet.AwsConfig)
 
 		// Get queueUrls for each region
-		queueUrls, err := getQueueUrls(svcSQS)
+		queueURLs, err := getQueueUrls(svcSQS)
 		if err != nil {
 			m.logger.Error(err.Error())
 			report.Error(err)
 			continue
 		}
-		if len(queueUrls) == 0 {
+		if len(queueURLs) == 0 {
 			continue
 		}
 
@@ -122,9 +122,9 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		}
 
 		// Create Cloudwatch Events for SQS
-		for _, queueUrl := range queueUrls {
-			queueUrlParsed := strings.Split(queueUrl, "/")
-			queueName := queueUrlParsed[len(queueUrlParsed)-1]
+		for _, queueURL := range queueURLs {
+			queueURLParsed := strings.Split(queueURL, "/")
+			queueName := queueURLParsed[len(queueURLParsed)-1]
 			event, err := createSQSEvents(metricDataResults, queueName, metricsetName, regionName, schemaRequestFields)
 			if err != nil {
 				m.logger.Error(err.Error())
