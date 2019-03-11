@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/pkg/errors"
@@ -208,20 +207,16 @@ func createS3RequestEvents(outputs []cloudwatch.MetricDataResult, regionName str
 	mapOfMetricSetFieldResults := make(map[string]interface{})
 
 	// Find a timestamp for all metrics in output
-	timestamp := time.Time{}
-	for _, output := range outputs {
-		if output.Timestamps != nil {
-			timestamp = output.Timestamps[0]
-			break
-		}
-	}
-
+	timestamp := aws.FindTimestamp(outputs)
 	if !timestamp.IsZero() {
 		for _, output := range outputs {
-			labels := strings.Split(*output.Label, " ")
-			// check timestamp to make sure metrics come from the same timestamp
-			if len(labels) == 3 && labels[0] == bucketName && len(output.Values) > 0 && output.Timestamps[0] == timestamp {
-				mapOfMetricSetFieldResults[labels[2]] = fmt.Sprint(output.Values[len(output.Values)-1])
+			exists, timestampIdx := aws.InArray(timestamp, output.Timestamps)
+			if exists {
+				labels := strings.Split(*output.Label, " ")
+				// check timestamp to make sure metrics come from the same timestamp
+				if len(labels) == 3 && labels[0] == bucketName && len(output.Values) > timestampIdx {
+					mapOfMetricSetFieldResults[labels[2]] = fmt.Sprint(output.Values[timestampIdx])
+				}
 			}
 		}
 	}
