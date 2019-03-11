@@ -166,12 +166,23 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 
 	// AWS EC2 Metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
-	for _, output := range getMetricDataResults {
-		if len(output.Values) == 0 {
-			continue
+
+	// Find a timestamp for all metrics in output
+	timestamp := aws.FindTimestamp(getMetricDataResults)
+	if !timestamp.IsZero() {
+		for _, output := range getMetricDataResults {
+			if len(output.Values) == 0 {
+				continue
+			}
+			exists, timestampIdx := aws.InArray(timestamp, output.Timestamps)
+			if exists {
+				labels := strings.Split(*output.Label, " ")
+				// check timestamp to make sure metrics come from the same timestamp
+				if len(labels) == 2 && len(output.Values) > timestampIdx {
+					mapOfMetricSetFieldResults[labels[1]] = fmt.Sprint(output.Values[timestampIdx])
+				}
+			}
 		}
-		labels := strings.Split(*output.Label, " ")
-		mapOfMetricSetFieldResults[labels[1]] = fmt.Sprint(output.Values[len(output.Values)-1])
 	}
 
 	resultMetricSetFields, err := aws.EventMapping(mapOfMetricSetFieldResults, schemaMetricSetFields)

@@ -5,6 +5,7 @@
 package aws
 
 import (
+	"reflect"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
@@ -83,4 +84,66 @@ func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cl
 // EventMapping maps data in input to a predefined schema.
 func EventMapping(input map[string]interface{}, schema s.Schema) (common.MapStr, error) {
 	return schema.Apply(input, s.FailOnRequired)
+}
+
+// InArray checks if input val exists in array and if it exists, return the position.
+func InArray(val interface{}, array interface{}) (exists bool, index int) {
+	exists = false
+	index = -1
+
+	switch reflect.TypeOf(array).Kind() {
+	case reflect.Slice:
+		s := reflect.ValueOf(array)
+
+		for i := 0; i < s.Len(); i++ {
+			if reflect.DeepEqual(val, s.Index(i).Interface()) == true {
+				index = i
+				exists = true
+				return
+			}
+		}
+	}
+	return
+}
+
+// FindTimestamp function checks MetricDataResults and find the timestamp to collect metrics from.
+// For example, MetricDataResults might look like:
+// metricDataResults =  [{
+//	 Id: "sqs0",
+//   Label: "testName SentMessageSize",
+//   StatusCode: Complete,
+//   Timestamps: [2019-03-11 17:45:00 +0000 UTC],
+//   Values: [981]
+// } {
+//	 Id: "sqs1",
+//	 Label: "testName NumberOfMessagesSent",
+//	 StatusCode: Complete,
+//	 Timestamps: [2019-03-11 17:45:00 +0000 UTC,2019-03-11 17:40:00 +0000 UTC],
+//	 Values: [0.5,0]
+// }]
+// This case, we are collecting values for both metrics from timestamp 2019-03-11 17:45:00 +0000 UTC.
+func FindTimestamp(getMetricDataResults []cloudwatch.MetricDataResult) time.Time {
+	timestamp := time.Time{}
+	for _, output := range getMetricDataResults {
+		// When there are outputs with one timestamp, use this timestamp.
+		if output.Timestamps != nil && len(output.Timestamps) == 1 {
+			// Use the first timestamp from Timestamps field to collect the latest data.
+			timestamp = output.Timestamps[0]
+			break
+		}
+	}
+
+	// When there is no output with one timestamp, use the latest timestamp from timestamp list.
+	if timestamp.IsZero() {
+		for _, output := range getMetricDataResults {
+			// When there are outputs with one timestamp, use this timestamp
+			if output.Timestamps != nil && len(output.Timestamps) > 1 {
+				// Example Timestamps: [2019-03-11 17:36:00 +0000 UTC,2019-03-11 17:31:00 +0000 UTC]
+				timestamp = output.Timestamps[0]
+				break
+			}
+		}
+	}
+
+	return timestamp
 }
