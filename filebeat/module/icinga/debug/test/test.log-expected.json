@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2017-04-04T13:43:09.000Z",
+        "@timestamp": "2017-04-04T11:43:09.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "icinga.debug",
         "event.module": "icinga",
@@ -13,7 +13,7 @@
         "service.type": "icinga"
     },
     {
-        "@timestamp": "2017-04-04T13:43:09.000Z",
+        "@timestamp": "2017-04-04T11:43:09.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "icinga.debug",
         "event.module": "icinga",
@@ -26,7 +26,7 @@
         "service.type": "icinga"
     },
     {
-        "@timestamp": "2017-04-04T13:43:11.000Z",
+        "@timestamp": "2017-04-04T11:43:11.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "icinga.debug",
         "event.module": "icinga",

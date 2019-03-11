@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2018-06-19T05:16:15.549Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.layer": "rest",
         "event.dataset": "elasticsearch.audit",
@@ -15,6 +16,7 @@
         "user.name": "i030648"
     },
     {
+        "@timestamp": "2018-06-19T05:07:52.304Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.node.name": "v_VJhjV",
@@ -31,6 +33,7 @@
         "user.name": "rado"
     },
     {
+        "@timestamp": "2018-06-19T05:00:15.778Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.action": "indices:data/read/scroll/clear",
         "elasticsearch.audit.layer": "transport",
@@ -48,6 +51,7 @@
         "user.name": "_xpack_security"
     },
     {
+        "@timestamp": "2018-06-19T05:07:45.544Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.node.name": "v_VJhjV",
@@ -63,6 +67,7 @@
         "url.original": "/_xpack/security/_authenticate"
     },
     {
+        "@timestamp": "2018-06-19T05:26:27.268Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.layer": "rest",
         "event.dataset": "elasticsearch.audit",
@@ -78,6 +83,7 @@
         "user.name": "N078801"
     },
     {
+        "@timestamp": "2018-06-19T05:55:26.898Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.action": "cluster:monitor/main",
         "elasticsearch.audit.layer": "transport",
@@ -95,6 +101,7 @@
         "user.name": "_anonymous"
     },
     {
+        "@timestamp": "2018-06-19T05:24:15.190Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.node.name": "v_VJhjV",
@@ -112,6 +119,7 @@
         "user.name": "elastic"
     },
     {
+        "@timestamp": "2019-01-08T14:15:02.011Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.action": "indices:data/read/search[free_context]",
         "elasticsearch.audit.indices": [
@@ -144,6 +152,7 @@
         "user.name": "username"
     },
     {
+        "@timestamp": "2019-01-27T20:04:27.244Z",
         "ecs.version": "1.0.0-beta2",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.realm": "default_file",

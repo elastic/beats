@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2016-12-26T16:16:29.000Z",
+        "@timestamp": "2016-12-26T14:16:29.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "apache.access",
         "event.module": "apache",
@@ -44,7 +44,7 @@
         "user_agent.version": "50.0"
     },
     {
-        "@timestamp": "2016-12-26T16:16:48.000Z",
+        "@timestamp": "2016-12-26T14:16:48.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "apache.access",
         "event.module": "apache",
