@@ -33,7 +33,7 @@
                 "formats": [
                     "ISO8601"
                 ],
-                {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
+                {< if .convert_timezone >}"timezone": "{{ beat.timezone }}",{< end >}
                 "ignore_failure": true
             }
         },
