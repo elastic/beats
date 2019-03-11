@@ -114,10 +114,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 - Mark Functionbeat  as GA. {pull}10564[10564]
-
 - Correctly normalize Cloudformation resource name. {issue}10087[10087]
 - Functionbeat can now deploy a function for Kinesis. {10116}10116[10116]
 - Allow functionbeat to use the keystore. {issue}9009[9009]
+- Correctly extract Kinesis Data field from the Kinesis Record. {pull}11141[11141]
 
 ==== Bugfixes
 
@@ -139,6 +139,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add missing `host.containerized` and `host.os.build` to fields.ecs.yml. {pull}11016[11016]
 - Reconnections of Kubernetes watchers are now logged at debug level when they are harmless. {pull}10988[10988]
 - Include ip and boolean type when generating index pattern. {pull}10995[10995]
+- Cancelling enrollment of a beat will not enroll the beat. {issue}10150[10150]
 
 *Auditbeat*
 
@@ -146,6 +147,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Package: Disable librpm signal handlers. {pull}10694[10694]
 - Login: Handle different bad login UTMP types. {pull}10865[10865]
 - System module: Fix and unify bucket closing logic. {pull}10897[10897]
+- User dataset: Numerous fixes to error handling. {pull}10942[10942]
 
 *Filebeat*
 
@@ -170,6 +172,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Made monitors.d configuration part of the default config. {pull}9004[9004]
 - Fixed rare issue where TLS connections to endpoints with x509 certificates missing either notBefore or notAfter would cause the check to fail with a stacktrace.  {pull}9566[9566]
+- Fix checks for TCP send/receive data {pull}11118[11118]
 
 *Journalbeat*
 
@@ -192,6 +195,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix parsing error using GET in Jolokia module. {pull}11075[11075] {issue}11071[11071]
 - Collect metrics when EC2 instances are not in running state. {issue}11008[11008] {pull}11023[11023]
 - Change ECS field cloud.provider to aws. {pull}11023[11023]
+- Add documentation about jolokia autodiscover fields. {issue}10925[10925] {pull}10979[10979]
 
 *Packetbeat*
 
