@@ -204,7 +204,6 @@ func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName st
 
 	// AWS s3_daily_storage metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
-
 	// Find a timestamp for all metrics in output
 	if len(outputs) > 0 && len(outputs[0].Timestamps) > 0 {
 		timestamp := outputs[0].Timestamps[0]
