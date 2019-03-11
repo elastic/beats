@@ -104,17 +104,18 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 
 		for _, instanceID := range instanceIDs {
 			metricDataQueries := constructMetricQueries(listMetricsOutput, instanceID, m.PeriodInSec)
-			if len(metricDataQueries) == 0 {
-				continue
-			}
 
-			// Use metricDataQueries to make GetMetricData API calls
-			metricDataOutput, err := aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
-			if err != nil {
-				err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName+" for instance "+instanceID)
-				m.logger.Error(err.Error())
-				report.Error(err)
-				continue
+			// If metricDataQueries, still needs to createCloudWatchEvents.
+			metricDataOutput := []cloudwatch.MetricDataResult{}
+			if len(metricDataQueries) != 0 {
+				// Use metricDataQueries to make GetMetricData API calls
+				metricDataOutput, err = aws.GetMetricDataResults(metricDataQueries, svcCloudwatch, startTime, endTime)
+				if err != nil {
+					err = errors.Wrap(err, "GetMetricDataResults failed, skipping region "+regionName+" for instance "+instanceID)
+					m.logger.Error(err.Error())
+					report.Error(err)
+					continue
+				}
 			}
 
 			// Create Cloudwatch Events for EC2
@@ -157,7 +158,7 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 	}
 
 	event.RootFields.Put("service.name", metricsetName)
-	event.RootFields.Put("cloud.provider", metricsetName)
+	event.RootFields.Put("cloud.provider", "aws")
 	event.RootFields.Put("cloud.availability_zone", *instanceOutput.Placement.AvailabilityZone)
 	event.RootFields.Put("cloud.region", regionName)
 	event.RootFields.Put("cloud.instance.id", instanceID)
@@ -244,7 +245,7 @@ func getInstancesPerRegion(svc ec2iface.EC2API) (instanceIDs []string, instances
 func createMetricDataQuery(metric cloudwatch.Metric, instanceID string, index int, periodInSec int) (metricDataQuery cloudwatch.MetricDataQuery) {
 	statistic := "Average"
 	period := int64(periodInSec)
-	id := "e" + strconv.Itoa(index)
+	id := "ec2" + strconv.Itoa(index)
 	metricDims := metric.Dimensions
 
 	for _, dim := range metricDims {
