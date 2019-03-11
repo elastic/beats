@@ -107,6 +107,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Fixed data types for roles and indices fields in `elasticsearch/audit` fileset {pull}10307[10307]
 - Cover empty request data, url and version in Apache2 module{pull}10846[10846]
 - Fix a bug when converting NetFlow fields to snake_case. {pull}10950[10950]
+- Fix a bug with the convert_timezone option using the incorrect timezone field. {issue}11055[11055] {pull}11164[11164]
 
 *Heartbeat*
 

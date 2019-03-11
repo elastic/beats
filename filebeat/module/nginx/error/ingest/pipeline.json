@@ -22,7 +22,7 @@
       "field": "nginx.error.time",
       "target_field": "@timestamp",
       "formats": ["yyyy/MM/dd H:m:s"],
-      {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
+      {< if .convert_timezone >}"timezone": "{{ beat.timezone }}",{< end >}
       "ignore_failure": true
     }
   }, {
