@@ -94,6 +94,8 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 *Affecting all Beats*
 
+- Add ip fields to default_field in Elasticsearch template. {pull}11035[11035]
+
 *Auditbeat*
 
 - Move System module to beta. {pull}10800[10800]
