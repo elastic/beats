@@ -97,10 +97,17 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) mapval.
 
 // BaseChecks creates a skima.Validator that represents the "monitor" field present
 // in all heartbeat events.
+// If IP is set to "" this will check that the field is not present
 func BaseChecks(ip string, status string, typ string) mapval.Validator {
+	var ipCheck mapval.IsDef
+	if len(ip) > 0 {
+		ipCheck = mapval.IsEqual(ip)
+	} else {
+		ipCheck = mapval.Optional(mapval.IsEqual(ip))
+	}
 	return mapval.MustCompile(mapval.Map{
 		"monitor": mapval.Map{
-			"ip":          ip,
+			"ip":          ipCheck,
 			"duration.us": mapval.IsDuration,
 			"status":      status,
 			"id":          mapval.IsNonEmptyString,
