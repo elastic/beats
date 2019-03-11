@@ -12,7 +12,7 @@
       type: long
       description: >
         TThe number of messages in the queue that are delayed and not available for reading immediately.
-    - name: messages.not_visible
+    - name: message.not_visible
       type: long
       description: >
         The number of messages that are in flight.
