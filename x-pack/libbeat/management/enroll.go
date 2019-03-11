@@ -12,7 +12,6 @@ import (
 
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/cmd/instance"
-	"github.com/elastic/beats/libbeat/common/cli"
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/kibana"
 	"github.com/elastic/beats/x-pack/libbeat/management/api"
@@ -22,23 +21,27 @@ const accessTokenKey = "management.accesstoken"
 
 // Enroll this beat to the given kibana
 // This will use Central Management API to enroll and retrieve an access key for config retrieval
-func Enroll(beat *instance.Beat, kibanaConfig *kibana.ClientConfig, enrollmentToken string, force bool) (bool, error) {
+func Enroll(
+	beat *instance.Beat,
+	kibanaConfig *kibana.ClientConfig,
+	enrollmentToken string,
+) error {
 	// Ignore kibana version to avoid permission errors
 	kibanaConfig.IgnoreVersion = true
 
 	client, err := api.NewClient(kibanaConfig)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	accessToken, err := client.Enroll(beat.Info.Beat, beat.Info.Name, beat.Info.Version, beat.Info.Hostname, beat.Info.ID, enrollmentToken)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	// Store access token in keystore
 	if err := storeAccessToken(beat, accessToken); err != nil {
-		return false, err
+		return err
 	}
 
 	// Enrolled, persist state
@@ -47,35 +50,28 @@ func Enroll(beat *instance.Beat, kibanaConfig *kibana.ClientConfig, enrollmentTo
 	config.AccessToken = "${" + accessTokenKey + "}"
 	config.Kibana = kibanaConfig
 
-	confirm, err := confirmConfigOverwrite(force)
+	configFile := cfgfile.GetDefaultCfgfile()
+
+	// backup current settings:
+	backConfigFile := configFile + ".bak"
+	fmt.Println("Saving a copy of current settings to " + backConfigFile)
+	err = file.SafeFileRotate(backConfigFile, configFile)
 	if err != nil {
-		return false, err
+		return errors.Wrap(err, "creating a backup copy of current settings")
 	}
 
-	if confirm {
-		configFile := cfgfile.GetDefaultCfgfile()
+	// create the new ones:
+	f, err := os.OpenFile(configFile, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0600)
+	if err != nil {
+		return errors.Wrap(err, "opening settings file")
+	}
+	defer f.Close()
 
-		// backup current settings:
-		backConfigFile := configFile + ".bak"
-		fmt.Println("Saving a copy of current settings to " + backConfigFile)
-		err := file.SafeFileRotate(backConfigFile, configFile)
-		if err != nil {
-			return false, errors.Wrap(err, "creating a backup copy of current settings")
-		}
-
-		// create the new ones:
-		f, err := os.OpenFile(configFile, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0600)
-		if err != nil {
-			return false, errors.Wrap(err, "opening settings file")
-		}
-		defer f.Close()
-
-		if err := config.OverwriteConfigFile(f, beat.Beat.Info.Beat); err != nil {
-			return false, errors.Wrap(err, "overriding settings file")
-		}
+	if err := config.OverwriteConfigFile(f, beat.Beat.Info.Beat); err != nil {
+		return errors.Wrap(err, "overriding settings file")
 	}
 
-	return true, nil
+	return nil
 }
 
 func storeAccessToken(beat *instance.Beat, accessToken string) error {
@@ -91,12 +87,4 @@ func storeAccessToken(beat *instance.Beat, accessToken string) error {
 	}
 
 	return keystore.Save()
-}
-
-func confirmConfigOverwrite(force bool) (bool, error) {
-	if force {
-		return true, nil
-	}
-
-	return cli.Confirm("This will replace your current settings. Do you want to continue?", true)
 }
