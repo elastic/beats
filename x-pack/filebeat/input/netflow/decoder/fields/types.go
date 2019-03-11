@@ -376,5 +376,7 @@ var (
 	BasicList            = UnsupportedDecoder{}
 	SubTemplateList      = UnsupportedDecoder{}
 	SubTemplateMultiList = UnsupportedDecoder{}
-	ACLID                = ACLIDDecoder{}
 )
+
+// ACLID field added for Cisco ASA devices
+var ACLID = ACLIDDecoder{}
