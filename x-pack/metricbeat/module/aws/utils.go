@@ -5,7 +5,6 @@
 package aws
 
 import (
-	"reflect"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
@@ -86,21 +85,15 @@ func EventMapping(input map[string]interface{}, schema s.Schema) (common.MapStr,
 	return schema.Apply(input, s.FailOnRequired)
 }
 
-// InArray checks if input val exists in array and if it exists, return the position.
-func InArray(val interface{}, array interface{}) (exists bool, index int) {
+// CheckTimestampInArray checks if input val exists in array and if it exists, return the position.
+func CheckTimestampInArray(timestamp time.Time, timestampArray []time.Time) (exists bool, index int) {
 	exists = false
 	index = -1
-
-	switch reflect.TypeOf(array).Kind() {
-	case reflect.Slice:
-		s := reflect.ValueOf(array)
-
-		for i := 0; i < s.Len(); i++ {
-			if reflect.DeepEqual(val, s.Index(i).Interface()) == true {
-				index = i
-				exists = true
-				return
-			}
+	for i := 0; i < len(timestampArray); i++ {
+		if timestamp.Equal(timestampArray[i]) {
+			index = i
+			exists = true
+			return
 		}
 	}
 	return

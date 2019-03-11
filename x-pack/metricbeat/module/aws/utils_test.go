@@ -7,6 +7,7 @@ package aws
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
@@ -168,4 +169,83 @@ func TestGetMetricDataResults(t *testing.T) {
 	assert.Equal(t, id4, *getMetricDataResults[3].Id)
 	assert.Equal(t, label4, *getMetricDataResults[3].Label)
 	assert.Equal(t, 0.0, getMetricDataResults[3].Values[0])
+}
+
+func TestCheckTimestampInArray(t *testing.T) {
+	timestamp1 := time.Now()
+	timestamp2 := timestamp1.Add(5 * time.Minute)
+	timestamp3 := timestamp1.Add(10 * time.Minute)
+
+	timestampArray := []time.Time{timestamp1, timestamp2}
+	exists1, index1 := CheckTimestampInArray(timestamp1, timestampArray)
+	assert.True(t, exists1)
+	assert.Equal(t, 0, index1)
+
+	exists2, index2 := CheckTimestampInArray(timestamp3, timestampArray)
+	assert.False(t, exists2)
+	assert.Equal(t, -1, index2)
+}
+
+func TestFindTimestamp(t *testing.T) {
+	timestamp1 := time.Now()
+	timestamp2 := timestamp1.Add(5 * time.Minute)
+	getMetricDataResults1 := []cloudwatch.MetricDataResult{
+		{
+			Id:         &id1,
+			Label:      &label1,
+			StatusCode: cloudwatch.StatusCodeComplete,
+			Timestamps: []time.Time{timestamp1, timestamp2},
+			Values:     []float64{0, 1},
+		},
+		{
+			Id:         &id2,
+			Label:      &label2,
+			StatusCode: cloudwatch.StatusCodeComplete,
+			Timestamps: []time.Time{timestamp1},
+			Values:     []float64{2, 3},
+		},
+	}
+	target1 := FindTimestamp(getMetricDataResults1)
+	assert.Equal(t, timestamp1, target1)
+
+	getMetricDataResults2 := []cloudwatch.MetricDataResult{
+		{
+			Id:         &id1,
+			Label:      &label1,
+			StatusCode: cloudwatch.StatusCodeComplete,
+			Timestamps: []time.Time{timestamp1, timestamp2},
+			Values:     []float64{0, 1},
+		},
+		{
+			Id:         &id2,
+			Label:      &label2,
+			StatusCode: cloudwatch.StatusCodeComplete,
+		},
+	}
+	target2 := FindTimestamp(getMetricDataResults2)
+	assert.Equal(t, timestamp1, target2)
+
+	getMetricDataResults3 := []cloudwatch.MetricDataResult{
+		{
+			Id:         &id1,
+			Label:      &label1,
+			StatusCode: cloudwatch.StatusCodeComplete,
+			Timestamps: []time.Time{timestamp1, timestamp2},
+			Values:     []float64{0, 1},
+		},
+		{
+			Id:         &id2,
+			Label:      &label2,
+			StatusCode: cloudwatch.StatusCodeComplete,
+		},
+		{
+			Id:         &id3,
+			Label:      &label2,
+			StatusCode: cloudwatch.StatusCodeComplete,
+			Timestamps: []time.Time{timestamp2},
+			Values:     []float64{2, 3},
+		},
+	}
+	target3 := FindTimestamp(getMetricDataResults3)
+	assert.Equal(t, timestamp2, target3)
 }
