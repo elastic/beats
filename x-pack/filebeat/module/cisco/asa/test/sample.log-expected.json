@@ -54,7 +54,7 @@
         ]
     },
     {
-        "@timestamp": "2014-04-15T09:34:34.000-04:00",
+        "@timestamp": "2014-04-15T13:34:34.000Z",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.list_id": "acl_in",
         "cisco.asa.message_id": "106100",
@@ -956,7 +956,7 @@
         ]
     },
     {
-        "@timestamp": "2018-04-15T09:34:34.000-04:00",
+        "@timestamp": "2018-04-15T13:34:34.000Z",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.list_id": "acl_in",
         "cisco.asa.message_id": "106100",
