@@ -206,16 +206,13 @@ func createCloudWatchEvents(outputs []cloudwatch.MetricDataResult, regionName st
 	mapOfMetricSetFieldResults := make(map[string]interface{})
 
 	// Find a timestamp for all metrics in output
-	timestamp := aws.FindTimestamp(outputs)
-	if !timestamp.IsZero() {
+	if len(outputs) > 0 && len(outputs[0].Timestamps) > 0 {
+		timestamp := outputs[0].Timestamps[0]
 		for _, output := range outputs {
-			exists, timestampIdx := aws.InArray(timestamp, output.Timestamps)
-			if exists {
-				labels := strings.Split(*output.Label, " ")
-				// check timestamp to make sure metrics come from the same timestamp
-				if len(labels) == 3 && labels[0] == bucketName && len(output.Values) > timestampIdx {
-					mapOfMetricSetFieldResults[labels[2]] = fmt.Sprint(output.Values[timestampIdx])
-				}
+			labels := strings.Split(*output.Label, " ")
+			// check timestamp to make sure metrics come from the same timestamp
+			if len(labels) == 3 && labels[0] == bucketName && len(output.Values) > 0 && output.Timestamps[0] == timestamp {
+				mapOfMetricSetFieldResults[labels[2]] = fmt.Sprint(output.Values[0])
 			}
 		}
 	}
