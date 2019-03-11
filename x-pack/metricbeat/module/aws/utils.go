@@ -85,7 +85,7 @@ func EventMapping(input map[string]interface{}, schema s.Schema) (common.MapStr,
 	return schema.Apply(input, s.FailOnRequired)
 }
 
-// CheckTimestampInArray checks if input val exists in array and if it exists, return the position.
+// CheckTimestampInArray checks if input timestamp exists in timestampArray and if it exists, return the position.
 func CheckTimestampInArray(timestamp time.Time, timestampArray []time.Time) (exists bool, index int) {
 	exists = false
 	index = -1
