@@ -13,6 +13,6 @@
       description: >
         The amount of data in bytes stored in a bucket.
     - name: number_of_objects
-      type: long
+      type: scaled_float
       description: >
         The total number of objects stored in a bucket for all storage classes.

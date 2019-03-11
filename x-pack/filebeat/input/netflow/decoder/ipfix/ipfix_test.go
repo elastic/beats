@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/config"
+	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/fields"
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/record"
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/test"
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/v9"
@@ -187,4 +188,48 @@ func TestOptionTemplates(t *testing.T) {
 		assert.Len(t, v9proto.Session.Sessions, 1)
 		assert.Len(t, s.Templates, 1)
 	})
+}
+
+func TestCustomFields(t *testing.T) {
+	addr := test.MakeAddress(t, "127.0.0.1:12345")
+
+	conf := config.Defaults()
+	conf.WithCustomFields(fields.FieldDict{
+		fields.Key{EnterpriseID: 0x12345678, FieldID: 33}: &fields.Field{Name: "customField", Decoder: fields.String},
+	})
+	assert.Contains(t, conf.Fields(), fields.Key{EnterpriseID: 0x12345678, FieldID: 33})
+	proto := New(conf)
+	flows, err := proto.OnPacket(test.MakePacket([]uint16{
+		// Header
+		// Version, Length, Ts, SeqNo, Source
+		10, 42, 11, 11, 22, 22, 0, 1234,
+		// Set #1 (record template)
+		2, 26, /*len of set*/
+		999, 3,
+		1, 4, // Field 1
+		2, 4, // Field 2
+		// Field 3
+		0x8000 | 33, 6,
+		0x1234, 0x5678, // enterprise ID
+		0, // Padding
+	}), addr)
+	assert.NoError(t, err)
+	assert.Empty(t, flows)
+
+	flows, err = proto.OnPacket(test.MakePacket([]uint16{
+		// Header
+		// Version, Length, Ts, SeqNo, Source
+		10, 34, 11, 11, 22, 22, 0, 1234,
+		// Set  (data record)
+		999, 18, /*len of 999 record */
+		0x0102, 0x0304, // field 1
+		0x0506, 0x0708, // field 2
+		// Field 3
+		0x5465, 0x7374,
+		0x4d65,
+	}), addr)
+	assert.NoError(t, err)
+	assert.Len(t, flows, 1)
+	assert.Contains(t, flows[0].Fields, "customField")
+	assert.Equal(t, flows[0].Fields["customField"], "TestMe")
 }

@@ -64,10 +64,12 @@ func newEventLogger(
 func (e *eventLogger) connect(pipeline beat.Pipeline) (beat.Client, error) {
 	api := e.source.Name()
 	return pipeline.ConnectWith(beat.ClientConfig{
-		PublishMode:   beat.GuaranteedSend,
-		EventMetadata: e.eventMeta,
-		Meta:          nil, // TODO: configure modules/ES ingest pipeline?
-		Processor:     e.processors,
+		PublishMode: beat.GuaranteedSend,
+		Processing: beat.ProcessingConfig{
+			EventMetadata: e.eventMeta,
+			Meta:          nil, // TODO: configure modules/ES ingest pipeline?
+			Processor:     e.processors,
+		},
 		ACKCount: func(n int) {
 			addPublished(api, n)
 			logp.Info("EventLog[%s] successfully published %d events", api, n)

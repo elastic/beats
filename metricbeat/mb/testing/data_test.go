@@ -26,8 +26,11 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
+
+	"github.com/mitchellh/hashstructure"
 
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
@@ -36,7 +39,13 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 
 	// TODO: generate include file for these tests automatically moving forward
+	_ "github.com/elastic/beats/metricbeat/module/couchbase/cluster"
+	_ "github.com/elastic/beats/metricbeat/module/couchbase/node"
 	_ "github.com/elastic/beats/metricbeat/module/kibana/status"
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes/apiserver"
+	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_node"
+	_ "github.com/elastic/beats/metricbeat/module/php_fpm/pool"
+	_ "github.com/elastic/beats/metricbeat/module/php_fpm/process"
 	_ "github.com/elastic/beats/metricbeat/module/rabbitmq/connection"
 	_ "github.com/elastic/beats/metricbeat/module/traefik/health"
 )
@@ -51,8 +60,9 @@ var (
 )
 
 type Config struct {
-	Type string
-	URL  string
+	Type   string
+	URL    string
+	Suffix string
 }
 
 func TestAll(t *testing.T) {
@@ -75,13 +85,17 @@ func TestAll(t *testing.T) {
 			log.Fatalf("Unmarshal: %v", err)
 		}
 
-		getTestdataFiles(t, config.URL, moduleName, metricSetName)
+		if config.Suffix == "" {
+			config.Suffix = "json"
+		}
+
+		getTestdataFiles(t, config.URL, moduleName, metricSetName, config.Suffix)
 	}
 }
 
-func getTestdataFiles(t *testing.T, url, module, metricSet string) {
+func getTestdataFiles(t *testing.T, url, module, metricSet, suffix string) {
 
-	ff, _ := filepath.Glob(getMetricsetPath(module, metricSet) + "/_meta/testdata/*.json")
+	ff, _ := filepath.Glob(getMetricsetPath(module, metricSet) + "/_meta/testdata/*." + suffix)
 	var files []string
 	for _, f := range ff {
 		// Exclude all the expected files
@@ -93,19 +107,32 @@ func getTestdataFiles(t *testing.T, url, module, metricSet string) {
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			runTest(t, f, module, metricSet, url)
+			runTest(t, f, module, metricSet, url, suffix)
 		})
 	}
 }
 
-func runTest(t *testing.T, file string, module, metricSetName, url string) {
+func runTest(t *testing.T, file string, module, metricSetName, url, suffix string) {
 
 	// starts a server serving the given file under the given url
 	s := server(t, file, url)
 	defer s.Close()
 
-	metricSet := NewReportingMetricSetV2(t, getConfig(module, metricSetName, s.URL))
-	events, errs := ReportingFetchV2(metricSet)
+	metricSet := newMetricSet(t, getConfig(module, metricSetName, s.URL))
+
+	var events []mb.Event
+	var errs []error
+
+	switch v := metricSet.(type) {
+	case mb.ReportingMetricSetV2:
+		metricSet := NewReportingMetricSetV2(t, getConfig(module, metricSetName, s.URL))
+		events, errs = ReportingFetchV2(metricSet)
+	case mb.ReportingMetricSetV2Error:
+		metricSet := NewReportingMetricSetV2Error(t, getConfig(module, metricSetName, s.URL))
+		events, errs = ReportingFetchV2Error(metricSet)
+	default:
+		t.Fatalf("unknown type: %T", v)
+	}
 
 	// Gather errors to build also error events
 	for _, e := range errs {
@@ -121,6 +148,13 @@ func runTest(t *testing.T, file string, module, metricSetName, url string) {
 		beatEvent.Fields.Put("service.address", "127.0.0.1:55555")
 		data = append(data, beatEvent.Fields)
 	}
+
+	// Sorting the events is necessary as events are not necessarily sent in the same order
+	sort.SliceStable(data, func(i, j int) bool {
+		h1, _ := hashstructure.Hash(data[i], nil)
+		h2, _ := hashstructure.Hash(data[j], nil)
+		return h1 < h2
+	})
 
 	output, err := json.MarshalIndent(&data, "", "    ")
 	if err != nil {
@@ -142,7 +176,7 @@ func runTest(t *testing.T, file string, module, metricSetName, url string) {
 
 	assert.Equal(t, string(expected), string(output))
 
-	if strings.HasSuffix(file, "docs.json") {
+	if strings.HasSuffix(file, "docs."+suffix) {
 		writeDataJSON(t, data[0], module, metricSetName)
 	}
 }
@@ -174,7 +208,13 @@ func server(t *testing.T, path string, url string) *httptest.Server {
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == url {
+		query := ""
+		v := r.URL.Query()
+		if len(v) > 0 {
+			query += "?" + v.Encode()
+		}
+
+		if r.URL.Path+query == url {
 			w.Header().Set("Content-Type", "application/json;")
 			w.WriteHeader(200)
 			w.Write(body)
