@@ -1336,7 +1336,7 @@ TThe number of messages in the queue that are delayed and not available for read
 
 --
 
-*`aws.sqs.messages.not_visible`*::
+*`aws.sqs.message.not_visible`*::
 +
 --
 type: long
