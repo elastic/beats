@@ -114,10 +114,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 - Mark Functionbeat  as GA. {pull}10564[10564]
-
 - Correctly normalize Cloudformation resource name. {issue}10087[10087]
 - Functionbeat can now deploy a function for Kinesis. {10116}10116[10116]
 - Allow functionbeat to use the keystore. {issue}9009[9009]
+- Correctly extract Kinesis Data field from the Kinesis Record. {pull}11141[11141]
 
 ==== Bugfixes
 
@@ -139,6 +139,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add missing `host.containerized` and `host.os.build` to fields.ecs.yml. {pull}11016[11016]
 - Reconnections of Kubernetes watchers are now logged at debug level when they are harmless. {pull}10988[10988]
 - Include ip and boolean type when generating index pattern. {pull}10995[10995]
+- Cancelling enrollment of a beat will not enroll the beat. {issue}10150[10150]
 
 *Auditbeat*
 
