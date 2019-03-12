@@ -18,6 +18,7 @@
 package connections
 
 import (
+	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -34,7 +35,10 @@ var logger = logp.NewLogger("zookeeper.connections")
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("zookeeper", "connections", New)
+	mb.Registry.MustAddMetricSet("zookeeper", "connections", New,
+		mb.WithHostParser(parse.PassThruHostParser),
+		mb.DefaultMetricSet(),
+	)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -67,17 +71,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	outputReader, err := zookeeper.RunCommand("cons", m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		reporter.Error(errors.Wrap(err, "srvr command failed"))
+		reporter.Error(errors.Wrap(err, "'cons' command failed"))
 		return
 	}
 
-	metricsetFields, err := parseCons(outputReader)
+	events, err := parseCons(outputReader)
 	if err != nil {
 		reporter.Error(err)
 		return
 	}
 
-	reporter.Event(mb.Event{
-		MetricSetFields: metricsetFields,
-	})
+	for _, event := range events {
+		reporter.Event(mb.Event{
+			MetricSetFields: event,
+		})
+	}
 }
