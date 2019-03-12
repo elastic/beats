@@ -24,21 +24,11 @@ import (
 
 	"github.com/elastic/beats/metricbeat/module/zookeeper"
 
-	"github.com/stretchr/testify/assert"
-
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
 func TestData(t *testing.T) {
-	t.Skip("Skipping `data.json` generation test")
-
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	events, errs := mbtest.ReportingFetchV2(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
-	assert.NotEmpty(t, events)
-
 	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
