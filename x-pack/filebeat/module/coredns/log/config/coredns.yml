@@ -6,7 +6,7 @@ paths:
 tags: {{.tags}}
 processors:
   - dissect:
-      tokenizer: "%{timestamp} [%{coredns.logging_level}] %{source.address}:%{source.port} - %{coredns.id} \"%{coredns.query.type} %{coredns.query.class} %{coredns.query.name} %{network.transport} %{coredns.query.size} %{coredns.dnssec_ok} %{bufsize}\" %{coredns.response.code} %{coredns.response.flags} %{coredns.response.size} %{coredns.duration}s"
+      tokenizer: "%{timestamp} [%{log.level}] %{source.address}:%{source.port} - %{coredns.id} \"%{coredns.query.type} %{coredns.query.class} %{coredns.query.name} %{network.transport} %{coredns.query.size} %{coredns.dnssec_ok} %{bufsize}\" %{coredns.response.code} %{coredns.response.flags} %{coredns.response.size} %{coredns.duration}s"
       field: "message"
       target_prefix: ""
 

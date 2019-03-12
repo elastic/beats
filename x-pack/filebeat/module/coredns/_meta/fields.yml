@@ -15,6 +15,7 @@
 
     - name: query.size
       type: integer
+      format: bytes
       description: >
         size of the DNS query
 
@@ -33,11 +34,6 @@
       description: >
         DNS query type
 
-    - name: logging_level
-      type: keyword
-      description: >
-        coredns logging level
-
     - name: response.code
       type: keyword
       description: >
@@ -50,6 +46,7 @@
 
     - name: response.size
       type: integer
+      format: bytes
       description: >
         size of the DNS response
     

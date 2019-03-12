@@ -1157,6 +1157,8 @@ id of the DNS transaction
 --
 type: integer
 
+format: bytes
+
 size of the DNS query
 
 
@@ -1192,16 +1194,6 @@ DNS query type
 
 --
 
-*`coredns.logging_level`*::
-+
---
-type: keyword
-
-coredns logging level
-
-
---
-
 *`coredns.response.code`*::
 +
 --
@@ -1226,6 +1218,8 @@ DNS response flags
 +
 --
 type: integer
+
+format: bytes
 
 size of the DNS response
 
