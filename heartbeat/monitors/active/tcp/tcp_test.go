@@ -97,10 +97,6 @@ func setupServer(t *testing.T, serverCreator func(http.Handler) *httptest.Server
 	return server, port
 }
 
-func tcpMonitorChecks(host string, ip string, port uint16, status string) mapval.Validator {
-	return hbtest.BaseChecks(ip, status, "tcp")
-}
-
 func TestUpEndpointJob(t *testing.T) {
 	server, port := setupServer(t, httptest.NewServer)
 	defer server.Close()
@@ -174,7 +170,7 @@ func TestConnectionRefusedEndpointJob(t *testing.T) {
 	mapval.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			tcpMonitorChecks(ip, ip, port, "down"),
+			hbtest.BaseChecks(ip, "down", "tcp"),
 			hbtest.SummaryChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "tcp", ip, port),
 			hbtest.ErrorChecks(dialErr, "io"),
@@ -192,7 +188,7 @@ func TestUnreachableEndpointJob(t *testing.T) {
 	mapval.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			tcpMonitorChecks(ip, ip, port, "down"),
+			hbtest.BaseChecks(ip, "down", "tcp"),
 			hbtest.SummaryChecks(0, 1),
 			hbtest.SimpleURLChecks(t, "tcp", ip, port),
 			hbtest.ErrorChecks(dialErr, "io"),
@@ -219,7 +215,7 @@ func TestCheckUp(t *testing.T) {
 	mapval.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			tcpMonitorChecks(host, ip, port, "up"),
+			hbtest.BaseChecks(ip, "up", "tcp"),
 			hbtest.RespondingTCPChecks(),
 			hbtest.SimpleURLChecks(t, "tcp", host, port),
 			hbtest.SummaryChecks(1, 0),
@@ -255,7 +251,7 @@ func TestCheckDown(t *testing.T) {
 	mapval.Test(
 		t,
 		mapval.Strict(mapval.Compose(
-			tcpMonitorChecks(host, ip, port, "down"),
+			hbtest.BaseChecks(ip, "down", "tcp"),
 			hbtest.RespondingTCPChecks(),
 			hbtest.SimpleURLChecks(t, "tcp", host, port),
 			hbtest.SummaryChecks(0, 1),
@@ -272,6 +268,22 @@ func TestCheckDown(t *testing.T) {
 					"message": "received string mismatch",
 				},
 			}),
+		)), event.Fields)
+}
+
+func TestNXDomainJob(t *testing.T) {
+	host := "notadomainatallforsure.notadomain.notatldreally"
+	port := uint16(1234)
+	event := testTCPCheck(t, host, port)
+
+	dialErr := fmt.Sprintf("lookup %s", host)
+	mapval.Test(
+		t,
+		mapval.Strict(mapval.Compose(
+			hbtest.BaseChecks("", "down", "tcp"),
+			hbtest.SummaryChecks(0, 1),
+			hbtest.SimpleURLChecks(t, "tcp", host, port),
+			hbtest.ErrorChecks(dialErr, "io"),
 		)),
 		event.Fields,
 	)

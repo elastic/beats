@@ -20,16 +20,17 @@
 package ecs
 
 // The network is defined as the communication path over which a host or
-// network event happens. The network.* fields should be populated with details
-// about the network activity associated with an event.
+// network event happens.
+// The network.* fields should be populated with details about the network
+// activity associated with an event.
 type Network struct {
 	// Name given by operators to sections of their network.
 	Name string `ecs:"name"`
 
 	// In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec,
 	// pim, etc
-	// The field value must be normalized to lowercase for querying. See
-	// "Lowercase Capitalization" in the "Implementing ECS" section.
+	// The field value must be normalized to lowercase for querying. See the
+	// documentation section "Implementing ECS".
 	Type string `ecs:"type"`
 
 	// IANA Protocol Number
@@ -40,22 +41,22 @@ type Network struct {
 
 	// Same as network.iana_number, but instead using the Keyword name of the
 	// transport layer (udp, tcp, ipv6-icmp, etc.)
-	// The field value must be normalized to lowercase for querying. See
-	// "Lowercase Capitalization" in the "Implementing ECS"  section.
+	// The field value must be normalized to lowercase for querying. See the
+	// documentation section "Implementing ECS".
 	Transport string `ecs:"transport"`
 
-	// A name given to an application. This can be arbitrarily assigned for
-	// things like microservices, but also apply to things like skype, icq,
-	// facebook, twitter. This would be used in situations where the vendor or
-	// service can be decoded such as from the source/dest IP owners, ports, or
-	// wire format.
-	// The field value must be normalized to lowercase for querying. See
-	// "Lowercase Capitalization" in the "Implementing ECS" section.
+	// A name given to an application level protocol. This can be arbitrarily
+	// assigned for things like microservices, but also apply to things like
+	// skype, icq, facebook, twitter. This would be used in situations where
+	// the vendor or service can be decoded such as from the source/dest IP
+	// owners, ports, or wire format.
+	// The field value must be normalized to lowercase for querying. See the
+	// documentation section "Implementing ECS".
 	Application string `ecs:"application"`
 
 	// L7 Network protocol name. ex. http, lumberjack, transport protocol.
-	// The field value must be normalized to lowercase for querying. See
-	// "Lowercase Capitalization" in the "Implementing ECS" section.
+	// The field value must be normalized to lowercase for querying. See the
+	// documentation section "Implementing ECS".
 	Protocol string `ecs:"protocol"`
 
 	// Direction of the network traffic.

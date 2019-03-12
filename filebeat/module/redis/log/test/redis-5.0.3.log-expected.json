@@ -1,6 +1,6 @@
 [
     {
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "redis.log",
         "event.module": "redis",
         "fileset.name": "log",
