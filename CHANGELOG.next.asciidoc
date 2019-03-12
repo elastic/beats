@@ -17,6 +17,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Update the code of Central Management to align with the new returned format. {pull}10019[10019]
 - Allow Central Management to send events back to kibana. {issue}9382[9382]
 - Fix panic if fields settting is used to configure `hosts.x` fields. {issue}10824[10824] {pull}10935[10935]
+- Introduce query.default_field as part of the template. {pull}11205[11205]
 
 *Auditbeat*
 
