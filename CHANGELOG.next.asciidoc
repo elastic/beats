@@ -60,6 +60,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Package: Disable librpm signal handlers. {pull}10694[10694]
 - Login: Handle different bad login UTMP types. {pull}10865[10865]
 - System module: Fix and unify bucket closing logic. {pull}10897[10897]
+- User dataset: Numerous fixes to error handling. {pull}10942[10942]
 
 *Filebeat*
 
