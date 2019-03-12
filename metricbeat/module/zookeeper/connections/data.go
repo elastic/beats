@@ -26,8 +26,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
 )
 
 var ipCapturer = regexp.MustCompile(`\d+\.\d+\.\d+\.\d+`)
@@ -37,52 +35,55 @@ var queueCapture = regexp.MustCompile(`queued=(\d*),`)
 var receivedCapture = regexp.MustCompile(`recved=(\d*),`)
 var sentCapture = regexp.MustCompile(`sent=(\d*)`)
 
-func init() {
-	mb.Registry.MustAddMetricSet("zookeeper", "server", New,
-		mb.WithHostParser(parse.PassThruHostParser),
-		mb.DefaultMetricSet(),
-	)
-}
-
-func parseCons(i io.Reader) (common.MapStr, error) {
+func parseCons(i io.Reader) ([]common.MapStr, error) {
 	scanner := bufio.NewScanner(i)
 
-	output := common.MapStr{}
+	result := make([]common.MapStr, 0)
 
 	for scanner.Scan() {
+		outputLine := common.MapStr{}
 		line := scanner.Text()
 
-		err := checkRegexSliceAndSetString(output, ipCapturer.FindStringSubmatch(line), "ip", 0)
+		// Track parsing information to not send an completely empty line at the end of the for-loop
+		oneParsingIsCorrect := false
+		err := checkRegexSliceAndSetString(outputLine, ipCapturer.FindStringSubmatch(line), "ip", 0, &oneParsingIsCorrect)
 		if err != nil {
 			logger.Error(errors.Wrap(err, "error trying to parse ip"))
 		}
-		if err = checkRegexSliceAndSetInt(output, portCapture.FindStringSubmatch(line), "port", 1); err != nil {
+		if err = checkRegexSliceAndSetInt(outputLine, portCapture.FindStringSubmatch(line), "port", 1, &oneParsingIsCorrect); err != nil {
 			logger.Error(errors.Wrap(err, "error trying to parse port"))
 		}
-		if err = checkRegexSliceAndSetInt(output, thatNumberCapture.FindStringSubmatch(line), "number", 1); err != nil {
+		if err = checkRegexSliceAndSetInt(outputLine, thatNumberCapture.FindStringSubmatch(line), "number", 1, &oneParsingIsCorrect); err != nil {
 			logger.Error(errors.Wrap(err, "error trying to parse 'number' field"))
 		}
-		if err = checkRegexSliceAndSetInt(output, queueCapture.FindStringSubmatch(line), "queued", 1); err != nil {
+		if err = checkRegexSliceAndSetInt(outputLine, queueCapture.FindStringSubmatch(line), "queued", 1, &oneParsingIsCorrect); err != nil {
 			logger.Error(errors.Wrap(err, "error trying to parse 'queued' field"))
 		}
-		if err = checkRegexSliceAndSetInt(output, receivedCapture.FindStringSubmatch(line), "received", 1); err != nil {
+		if err = checkRegexSliceAndSetInt(outputLine, receivedCapture.FindStringSubmatch(line), "received", 1, &oneParsingIsCorrect); err != nil {
 			logger.Error(errors.Wrap(err, "error trying to parse 'received' field"))
 		}
-		if err = checkRegexSliceAndSetInt(output, sentCapture.FindStringSubmatch(line), "sent", 1); err != nil {
+		if err = checkRegexSliceAndSetInt(outputLine, sentCapture.FindStringSubmatch(line), "sent", 1, &oneParsingIsCorrect); err != nil {
 			logger.Error(errors.Wrap(err, "error trying to parse 'send' field"))
+		}
+
+		if oneParsingIsCorrect {
+			result = append(result, outputLine)
 		}
 	}
 
-	return output, nil
+	return result, nil
 }
 
-func checkRegexSliceAndSetInt(output common.MapStr, slice []string, key string, index int) error {
+func checkRegexSliceAndSetInt(output common.MapStr, slice []string, key string, index int, correct *bool) error {
 	if len(slice) != 0 {
 		n, err := strconv.ParseInt(slice[index], 10, 64)
 		if err != nil {
 			return err
 		}
-		output.Put(key, n)
+		*correct = true
+		if _, err = output.Put(key, n); err != nil {
+			return errors.Wrapf(err, "error placing key '%s' on event", key)
+		}
 	} else {
 		return errors.Errorf("%s not found in '%#v'", key, slice)
 	}
@@ -90,9 +91,12 @@ func checkRegexSliceAndSetInt(output common.MapStr, slice []string, key string, 
 	return nil
 }
 
-func checkRegexSliceAndSetString(output common.MapStr, slice []string, key string, index int) error {
+func checkRegexSliceAndSetString(output common.MapStr, slice []string, key string, index int, correct *bool) error {
 	if len(slice) != 0 {
-		output.Put(key, slice[index])
+		*correct = true
+		if _, err := output.Put(key, slice[index]); err != nil {
+			return errors.Wrapf(err, "error placing key '%s' on event", key)
+		}
 	} else {
 		return errors.Errorf("%s not found in '%#v'", key, slice)
 	}
