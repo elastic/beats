@@ -31,8 +31,11 @@ func TestData(t *testing.T) {
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":                       "system",
-		"metricsets":                   []string{"user"},
-		"user.detect_password_changes": true,
+		"module":     "system",
+		"metricsets": []string{"user"},
+
+		// Would require root access to /etc/shadow
+		// which we usually don't have when testing.
+		"user.detect_password_changes": false,
 	}
 }
