@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2016-12-26T16:16:29.000Z",
+        "@timestamp": "2016-12-26T14:16:29.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "apache.access",
         "event.module": "apache",
@@ -44,7 +44,7 @@
         "user_agent.version": "50.0"
     },
     {
-        "@timestamp": "2016-12-26T16:16:48.000Z",
+        "@timestamp": "2016-12-26T14:16:48.000Z",
         "ecs.version": "1.0.0-beta2",
         "event.dataset": "apache.access",
         "event.module": "apache",
@@ -104,5 +104,24 @@
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2",
         "user_agent.os.name": "Windows 7",
         "user_agent.version": "15.0.a2"
+    },
+    {
+        "@timestamp": "2019-02-02T04:38:45.000Z",
+        "ecs.version": "1.0.0-beta2",
+        "event.dataset": "apache.access",
+        "event.module": "apache",
+        "fileset.name": "access",
+        "http.request.referrer": "-",
+        "http.response.body.bytes": 152,
+        "http.response.status_code": 408,
+        "input.type": "log",
+        "log.offset": 603,
+        "service.type": "apache",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "user.name": "-",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
+        "user_agent.original": "-"
     }
 ]

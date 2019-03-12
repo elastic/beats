@@ -38,6 +38,8 @@ import (
 	_ "github.com/elastic/beats/metricbeat/module/ceph/osd_df"
 	_ "github.com/elastic/beats/metricbeat/module/ceph/osd_tree"
 	_ "github.com/elastic/beats/metricbeat/module/ceph/pool_disk"
+	_ "github.com/elastic/beats/metricbeat/module/consul"
+	_ "github.com/elastic/beats/metricbeat/module/consul/agent"
 	_ "github.com/elastic/beats/metricbeat/module/couchbase"
 	_ "github.com/elastic/beats/metricbeat/module/couchbase/bucket"
 	_ "github.com/elastic/beats/metricbeat/module/couchbase/cluster"

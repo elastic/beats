@@ -199,7 +199,7 @@ func TestKafkaPublish(t *testing.T) {
 		}
 
 		t.Run(name, func(t *testing.T) {
-			grp, err := makeKafka(nil, beat.Info{Beat: "libbeat"}, outputs.NewNilObserver(), cfg)
+			grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat"}, outputs.NewNilObserver(), cfg)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -208,6 +208,7 @@ func TestKafkaPublish(t *testing.T) {
 			if err := output.Connect(); err != nil {
 				t.Fatal(err)
 			}
+			assert.Equal(t, output.index, "testbeat")
 			defer output.Close()
 
 			// publish test events

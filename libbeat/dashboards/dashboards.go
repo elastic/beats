@@ -33,7 +33,7 @@ import (
 func ImportDashboards(
 	ctx context.Context,
 	beatInfo beat.Info, homePath string,
-	kibanaConfig, esConfig, dashboardsConfig *common.Config,
+	kibanaConfig, dashboardsConfig *common.Config,
 	msgOutputter MessageOutputter,
 	pattern common.MapStr,
 ) error {
@@ -48,18 +48,6 @@ func ImportDashboards(
 	err := dashboardsConfig.Unpack(&dashConfig)
 	if err != nil {
 		return err
-	}
-
-	if esConfig.Enabled() {
-		username, _ := esConfig.String("username", -1)
-		password, _ := esConfig.String("password", -1)
-
-		if !kibanaConfig.HasField("username") && username != "" {
-			kibanaConfig.SetString("username", -1, username)
-		}
-		if !kibanaConfig.HasField("password") && password != "" {
-			kibanaConfig.SetString("password", -1, password)
-		}
 	}
 
 	if !kibanaConfig.Enabled() {

@@ -124,7 +124,6 @@ class Test(BaseTest):
             lambda: self.log_contains("Total non-zero metrics"),
             max_timeout=2)
 
-    @unittest.skipIf(sys.platform == 'darwin', 'flaky test https://github.com/elastic/beats/issues/9216')
     def test_persistent_uuid(self):
         self.render_config_template()
 
@@ -133,7 +132,7 @@ class Test(BaseTest):
         def run():
             proc = self.start_beat(extra_args=["-path.home", self.working_dir])
             self.wait_until(lambda: self.log_contains("Mockbeat is alive"),
-                            max_timeout=2)
+                            max_timeout=60)
 
             # open meta file before killing the beat, checking the file being
             # available right after startup

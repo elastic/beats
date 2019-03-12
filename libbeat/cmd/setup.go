@@ -40,7 +40,7 @@ const (
 	ILMPolicyKey = "ilm-policy"
 )
 
-func genSetupCmd(name, idxPrefix, version string, beatCreator beat.Creator) *cobra.Command {
+func genSetupCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Command {
 	setup := cobra.Command{
 		Use:   "setup",
 		Short: "Setup index template, dashboards and ML jobs",
@@ -53,7 +53,7 @@ func genSetupCmd(name, idxPrefix, version string, beatCreator beat.Creator) *cob
  * ILM policy (for Elasticsearch 6.5 and newer).
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			beat, err := instance.NewBeat(name, idxPrefix, version)
+			beat, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)
@@ -103,7 +103,7 @@ func genSetupCmd(name, idxPrefix, version string, beatCreator beat.Creator) *cob
 				}
 			}
 
-			if err = beat.Setup(beatCreator, s); err != nil {
+			if err = beat.Setup(settings, beatCreator, s); err != nil {
 				os.Exit(1)
 			}
 		},

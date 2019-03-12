@@ -29,14 +29,14 @@ import (
 )
 
 // GenIndexPatternConfigCmd generates an index pattern for Kibana
-func GenIndexPatternConfigCmd(settings instance.Settings, name, idxPrefix, beatVersion string) *cobra.Command {
+func GenIndexPatternConfigCmd(settings instance.Settings) *cobra.Command {
 	genTemplateConfigCmd := &cobra.Command{
 		Use:   "index-pattern",
 		Short: "Export kibana index pattern to stdout",
 		Run: func(cmd *cobra.Command, args []string) {
 			version, _ := cmd.Flags().GetString("es.version")
 
-			b, err := instance.NewBeat(name, idxPrefix, beatVersion)
+			b, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
 			if err != nil {
 				fatalf("Error initializing beat: %+v", err)
 			}
@@ -63,7 +63,7 @@ func GenIndexPatternConfigCmd(settings instance.Settings, name, idxPrefix, beatV
 			if err != nil {
 				fatalf("Error creating version: %+v", err)
 			}
-			indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, beatVersion, *v, withMigration)
+			indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, settings.Version, *v, withMigration)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -80,8 +80,7 @@ func GenIndexPatternConfigCmd(settings instance.Settings, name, idxPrefix, beatV
 		},
 	}
 
-	genTemplateConfigCmd.Flags().String("es.version", beatVersion, "Elasticsearch version")
-	genTemplateConfigCmd.Flags().String("index", idxPrefix, "Base index name")
+	genTemplateConfigCmd.Flags().String("es.version", settings.Version, "Elasticsearch version")
 
 	return genTemplateConfigCmd
 }

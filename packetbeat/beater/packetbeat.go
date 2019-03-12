@@ -178,8 +178,10 @@ func (pb *packetbeat) setupFlows() error {
 	}
 
 	client, err := pb.pipeline.ConnectWith(beat.ClientConfig{
-		EventMetadata: config.Flows.EventMetadata,
-		Processor:     processors,
+		Processing: beat.ProcessingConfig{
+			EventMetadata: config.Flows.EventMetadata,
+			Processor:     processors,
+		},
 	})
 	if err != nil {
 		return err

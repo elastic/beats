@@ -11,8 +11,8 @@ https://www.zeek.org/manual/release/logs/index.html[Zeek JSON format].
 [float]
 === Compatibility
 
-This module requires the {elasticsearch-plugins}/ingest-geoip.html[ingest-geoip]
-and {elasticsearch-plugins}/ingest-user-agent.html[ingest-user-agent]
+This module requires the {plugins}/ingest-geoip.html[ingest-geoip]
+and {plugins}/ingest-user-agent.html[ingest-user-agent]
 Elasticsearch plugins.
 
 This module has been developed against Zeek 2.6.1, but is expected to work

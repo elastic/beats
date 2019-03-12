@@ -35,6 +35,8 @@ import (
 
 var (
 	schemaXpack = s.Schema{
+		"name":              c.Str("name"),
+		"transport_address": c.Str("transport_address"),
 		"indices": c.Dict("indices", s.Schema{
 			"docs": c.Dict("docs", s.Schema{
 				"count": c.Int("count"),
@@ -197,12 +199,22 @@ func eventsMappingXPack(r mb.ReporterV2, m *MetricSet, info elasticsearch.Info, 
 		nodeData["node_master"] = isMaster
 		nodeData["node_id"] = nodeID
 
+		// Build source_node object
+		sourceNode := common.MapStr{
+			"uuid":              nodeID,
+			"name":              nodeData["name"],
+			"transport_address": nodeData["transport_address"],
+		}
+		nodeData.Delete("name")
+		nodeData.Delete("transport_address")
+
 		event.RootFields = common.MapStr{
 			"timestamp":    time.Now(),
 			"cluster_uuid": info.ClusterID,
 			"interval_ms":  m.Module().Config().Period.Nanoseconds() / 1000 / 1000,
 			"type":         "node_stats",
 			"node_stats":   nodeData,
+			"source_node":  sourceNode,
 		}
 
 		event.Index = elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)

@@ -29,18 +29,18 @@ import (
 	"github.com/elastic/beats/libbeat/testing"
 )
 
-func GenTestOutputCmd(name, beatVersion string) *cobra.Command {
+func GenTestOutputCmd(settings instance.Settings) *cobra.Command {
 	return &cobra.Command{
 		Use:   "output",
-		Short: "Test " + name + " can connect to the output by using the current settings",
+		Short: "Test " + settings.Name + " can connect to the output by using the current settings",
 		Run: func(cmd *cobra.Command, args []string) {
-			b, err := instance.NewBeat(name, "", beatVersion)
+			b, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)
 			}
 
-			err = b.Init()
+			err = b.InitWithSettings(settings)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
 				os.Exit(1)

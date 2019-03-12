@@ -241,8 +241,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------
 Dependency: github.com/coreos/go-systemd
-Version: v17
-Revision: 39ca1b05acc7ad1220e09f133283b8859a8b71ab
+Version: v18
+Revision: 9002847aa1425fb6ac49077c0a630b3b67e0fbfd
 License type (autodetected): Apache-2.0
 ./vendor/github.com/coreos/go-systemd/LICENSE:
 --------------------------------------------------------------------

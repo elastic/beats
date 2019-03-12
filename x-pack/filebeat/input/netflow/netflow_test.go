@@ -38,12 +38,18 @@ const (
 	pcapDir     = "testdata/pcap"
 	datDir      = "testdata/dat"
 	goldenDir   = "testdata/golden"
+	fieldsDir   = "testdata/fields"
 	datSourceIP = "192.0.2.1"
 )
 
 // DatTests specifies the .dat files associated with test cases.
 type DatTests struct {
-	Tests map[string][]string `yaml:"tests"`
+	Tests map[string]TestCase `yaml:"tests"`
+}
+
+type TestCase struct {
+	Files  []string `yaml:"files"`
+	Fields []string `yaml:"custom_fields"`
 }
 
 // TestResult specifies the format of the result data that is written in a
@@ -94,10 +100,10 @@ func TestPCAPFiles(t *testing.T) {
 func TestDatFiles(t *testing.T) {
 	tests := readDatTests(t)
 
-	for name, files := range tests.Tests {
+	for name, testData := range tests.Tests {
 		t.Run(name, func(t *testing.T) {
 			goldenName := filepath.Join(goldenDir, sanitizer.Replace(name)+".golden.json")
-			result := getFlowsFromDat(t, name, files...)
+			result := getFlowsFromDat(t, name, testData)
 
 			if *update {
 				data, err := json.MarshalIndent(result, "", "  ")
@@ -148,7 +154,7 @@ func readDatTests(t testing.TB) *DatTests {
 	return &tests
 }
 
-func getFlowsFromDat(t testing.TB, name string, datFiles ...string) TestResult {
+func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 	t.Helper()
 
 	config := decoder.NewConfig().
@@ -157,6 +163,14 @@ func getFlowsFromDat(t testing.TB, name string, datFiles ...string) TestResult {
 		WithExpiration(0).
 		WithLogOutput(test.TestLogWriter{TB: t})
 
+	for _, fieldFile := range testCase.Fields {
+		fields, err := LoadFieldDefinitionsFromFile(filepath.Join(fieldsDir, fieldFile))
+		if err != nil {
+			t.Fatal(err, fieldFile)
+		}
+		config = config.WithCustomFields(fields)
+	}
+
 	decoder, err := decoder.NewDecoder(config)
 	if !assert.NoError(t, err) {
 		t.Fatal(err)
@@ -164,7 +178,7 @@ func getFlowsFromDat(t testing.TB, name string, datFiles ...string) TestResult {
 
 	source := test.MakeAddress(t, datSourceIP+":4444")
 	var events []beat.Event
-	for _, f := range datFiles {
+	for _, f := range testCase.Files {
 		dat, err := ioutil.ReadFile(filepath.Join(datDir, f))
 		if err != nil {
 			t.Fatal(err)

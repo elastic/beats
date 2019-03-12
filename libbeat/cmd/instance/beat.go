@@ -62,6 +62,7 @@ import (
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/plugin"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/libbeat/publisher/processing"
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/version"
 	sysinfo "github.com/elastic/go-sysinfo"
@@ -78,6 +79,8 @@ type Beat struct {
 
 	keystore keystore.Keystore
 	index    idxmgmt.Supporter
+
+	processing processing.Supporter
 }
 
 type beatConfig struct {
@@ -310,6 +313,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 			Logger:    logp.L().Named("publisher"),
 		},
 		b.Config.Pipeline,
+		b.processing,
 		b.makeOutputFactory(b.Config.Output),
 	)
 
@@ -394,9 +398,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 }
 
 // TestConfig check all settings are ok and the beat can be run
-func (b *Beat) TestConfig(bt beat.Creator) error {
+func (b *Beat) TestConfig(settings Settings, bt beat.Creator) error {
 	return handleError(func() error {
-		err := b.Init()
+		err := b.InitWithSettings(settings)
 		if err != nil {
 			return err
 		}
@@ -422,9 +426,9 @@ type SetupSettings struct {
 }
 
 // Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
-func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
+func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) error {
 	return handleError(func() error {
-		err := b.Init()
+		err := b.InitWithSettings(settings)
 		if err != nil {
 			return err
 		}
@@ -438,7 +442,7 @@ func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
 			return err
 		}
 
-		if settings.Template || settings.ILMPolicy {
+		if setup.Template || setup.ILMPolicy {
 			outCfg := b.Config.Output
 
 			if outCfg.Name() != "elasticsearch" {
@@ -455,7 +459,7 @@ func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
 				// prepare index by loading templates, lifecycle policies and write aliases
 
 				m := b.index.Manager(esClient, idxmgmt.BeatsAssets(b.Fields))
-				err = m.Setup(settings.Template, settings.ILMPolicy)
+				err = m.Setup(setup.Template, setup.ILMPolicy)
 				if err != nil {
 					return err
 				}
@@ -463,7 +467,7 @@ func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
 			fmt.Println("Index setup complete.")
 		}
 
-		if settings.Dashboard {
+		if setup.Dashboard {
 			fmt.Println("Loading dashboards (Kibana must be running and reachable)")
 			err = b.loadDashboards(context.Background(), true)
 
@@ -479,7 +483,7 @@ func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
 			}
 		}
 
-		if settings.MachineLearning && b.SetupMLCallback != nil {
+		if setup.MachineLearning && b.SetupMLCallback != nil {
 			err = b.SetupMLCallback(&b.Beat, b.Config.Kibana)
 			if err != nil {
 				return err
@@ -487,7 +491,7 @@ func (b *Beat) Setup(bt beat.Creator, settings SetupSettings) error {
 			fmt.Println("Loaded machine learning job configurations")
 		}
 
-		if settings.Pipeline && b.OverwritePipelinesCallback != nil {
+		if setup.Pipeline && b.OverwritePipelinesCallback != nil {
 			esConfig := b.Config.Output.Config()
 			err = b.OverwritePipelinesCallback(esConfig)
 			if err != nil {
@@ -517,6 +521,10 @@ func (b *Beat) configure(settings Settings) error {
 	cfg, err := cfgfile.Load("", settings.ConfigOverrides)
 	if err != nil {
 		return fmt.Errorf("error loading config file: %v", err)
+	}
+
+	if err := initPaths(cfg); err != nil {
+		return err
 	}
 
 	// We have to initialize the keystore before any unpack or merging the cloud
@@ -549,11 +557,6 @@ func (b *Beat) configure(settings Settings) error {
 
 	if name := b.Config.Name; name != "" {
 		b.Info.Name = name
-	}
-
-	err = paths.InitPaths(&b.Config.Path)
-	if err != nil {
-		return fmt.Errorf("error setting default paths: %v", err)
 	}
 
 	if err := configure.Logging(b.Info.Beat, b.Config.Logging); err != nil {
@@ -594,6 +597,16 @@ func (b *Beat) configure(settings Settings) error {
 		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM)
 	}
 	b.index, err = imFactory(nil, b.Beat.Info, b.RawConfig)
+	if err != nil {
+		return err
+	}
+
+	processingFactory := settings.Processing
+	if processingFactory == nil {
+		processingFactory = processing.MakeDefaultBeatSupport(true)
+	}
+	b.processing, err = processingFactory(b.Info, logp.L().Named("processors"), b.RawConfig)
+
 	return err
 }
 
@@ -681,11 +694,6 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	}
 
 	if b.Config.Dashboards.Enabled() {
-		var esConfig *common.Config
-		if b.Config.Output.Name() == "elasticsearch" {
-			esConfig = b.Config.Output.Config()
-		}
-
 		var withMigration bool
 		if b.RawConfig.HasField("migration") {
 			sub, err := b.RawConfig.Child("migration", -1)
@@ -695,10 +703,11 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 			withMigration = sub.Enabled()
 		}
 
-		// init kibana config object
-		kibanaConfig := b.Config.Kibana
-		if kibanaConfig == nil {
-			kibanaConfig = common.NewConfig()
+		// Initialize kibana config. If username and password is set in elasticsearch output config but not in kibana,
+		// initKibanaConfig will attach the ussername and password into kibana config as a part of the initialization.
+		kibanaConfig, err := initKibanaConfig(b.Config)
+		if err != nil {
+			return fmt.Errorf("error initKibanaConfig: %v", err)
 		}
 
 		client, err := kibana.NewKibanaClient(kibanaConfig)
@@ -720,7 +729,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 		}
 
 		err = dashboards.ImportDashboards(ctx, b.Info, paths.Resolve(paths.Home, ""),
-			kibanaConfig, esConfig, b.Config.Dashboards, nil, pattern)
+			kibanaConfig, b.Config.Dashboards, nil, pattern)
 		if err != nil {
 			return errw.Wrap(err, "Error importing Kibana dashboards")
 		}
@@ -885,4 +894,49 @@ func LoadKeystore(cfg *common.Config, name string) (keystore.Keystore, error) {
 	keystoreCfg, _ := cfg.Child("keystore", -1)
 	defaultPathConfig := paths.Resolve(paths.Data, fmt.Sprintf("%s.keystore", name))
 	return keystore.Factory(keystoreCfg, defaultPathConfig)
+}
+
+func initKibanaConfig(beatConfig beatConfig) (*common.Config, error) {
+	var esConfig *common.Config
+	if beatConfig.Output.Name() == "elasticsearch" {
+		esConfig = beatConfig.Output.Config()
+	}
+
+	// init kibana config object
+	kibanaConfig := beatConfig.Kibana
+	if kibanaConfig == nil {
+		kibanaConfig = common.NewConfig()
+	}
+
+	if esConfig.Enabled() {
+		username, _ := esConfig.String("username", -1)
+		password, _ := esConfig.String("password", -1)
+
+		if !kibanaConfig.HasField("username") && username != "" {
+			kibanaConfig.SetString("username", -1, username)
+		}
+		if !kibanaConfig.HasField("password") && password != "" {
+			kibanaConfig.SetString("password", -1, password)
+		}
+	}
+	return kibanaConfig, nil
+}
+
+func initPaths(cfg *common.Config) error {
+	// To Fix the chicken-egg problem with the Keystore and the loading of the configuration
+	// files we are doing a partial unpack of the configuration file and only take into consideration
+	// the paths field. After we will unpack the complete configuration and keystore reference
+	// will be correctly replaced.
+	partialConfig := struct {
+		Path paths.Path `config:"path"`
+	}{}
+
+	if err := cfg.Unpack(&partialConfig); err != nil {
+		return fmt.Errorf("error extracting default paths: %+v", err)
+	}
+
+	if err := paths.InitPaths(&partialConfig.Path); err != nil {
+		return fmt.Errorf("error setting default paths: %+v", err)
+	}
+	return nil
 }

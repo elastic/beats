@@ -31,7 +31,9 @@ grouped in the following categories:
 * <<exported-fields-logstash>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mysql>>
+* <<exported-fields-nats>>
 * <<exported-fields-netflow>>
+* <<exported-fields-netflow-module>>
 * <<exported-fields-nginx>>
 * <<exported-fields-osquery>>
 * <<exported-fields-postgresql>>
@@ -6610,6 +6612,18 @@ The input type from which the event was generated. This field is set to the valu
 
 --
 
+*`event.sequence`*::
++
+--
+type: long
+
+required: False
+
+The sequence number of this event.
+
+
+--
+
 *`syslog.facility`*::
 +
 --
@@ -7406,6 +7420,133 @@ alias to: source.domain
 type: alias
 
 alias to: source.ip
+
+--
+
+[[exported-fields-nats]]
+== nats fields
+
+Module for parsing NATS log files.
+
+
+
+[float]
+== nats fields
+
+Fields from NATS logs.
+
+
+
+[float]
+== log fields
+
+Nats log files
+
+
+
+[float]
+== client fields
+
+Fields from NATS logs client.
+
+
+
+*`nats.log.client.id`*::
++
+--
+type: integer
+
+The id of the client
+
+
+--
+
+[float]
+== msg fields
+
+Fields from NATS logs message.
+
+
+
+*`nats.log.msg.bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Size of the payload in bytes
+
+
+--
+
+*`nats.log.msg.type`*::
++
+--
+type: keyword
+
+The protocol message type
+
+
+--
+
+*`nats.log.msg.subject`*::
++
+--
+type: keyword
+
+Subject name this message was received on
+
+
+--
+
+*`nats.log.msg.sid`*::
++
+--
+type: integer
+
+The unique alphanumeric subscription ID of the subject
+
+
+--
+
+*`nats.log.msg.reply_to`*::
++
+--
+type: keyword
+
+The inbox subject on which the publisher is listening for responses
+
+
+--
+
+*`nats.log.msg.max_messages`*::
++
+--
+type: integer
+
+An optional number of messages to wait for before automatically unsubscribing
+
+
+--
+
+*`nats.log.msg.error.message`*::
++
+--
+type: text
+
+Details about the error occurred
+
+
+--
+
+*`nats.log.msg.queue_group`*::
++
+--
+type: text
+
+The queue group which subscriber will join
+
 
 --
 
@@ -10611,6 +10752,12 @@ type: long
 type: short
 
 --
+
+[[exported-fields-netflow-module]]
+== NetFlow fields
+
+Module for receiving NetFlow and IPFIX flow records over UDP. The module does not add fields beyond what the netflow input provides.
+
 
 [[exported-fields-nginx]]
 == Nginx fields

@@ -391,12 +391,12 @@ func (h *Harvester) SendStateUpdate() {
 		return
 	}
 
-	logp.Debug("harvester", "Update state: %s, offset: %v", h.state.Source, h.state.Offset)
-	h.states.Update(h.state)
-
 	d := util.NewData()
 	d.SetState(h.state)
 	h.publishState(d)
+
+	logp.Debug("harvester", "Update state: %s, offset: %v", h.state.Source, h.state.Offset)
+	h.states.Update(h.state)
 }
 
 // shouldExportLine decides if the line is exported or not based on

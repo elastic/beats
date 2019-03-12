@@ -1,4 +1,5 @@
-version: '2'
+version: '2.3'
+
 services:
   beat:
     build: ${PWD}/.
@@ -14,6 +15,7 @@ services:
       - ./module/aerospike/_meta/env
       - ./module/apache/_meta/env
       - ./module/ceph/_meta/env
+      - ./module/consul/_meta/env
       - ./module/couchbase/_meta/env
       - ./module/couchdb/_meta/env
       - ./module/dropwizard/_meta/env
@@ -58,11 +60,23 @@ services:
   ceph:
     build: ./module/ceph/_meta
 
+  consul:
+    build: ./module/consul/_meta
+
   couchbase:
     build: ./module/couchbase/_meta
 
   couchdb:
     build: ./module/couchdb/_meta
+
+  # Dummy container for docker tests, so there is a container with
+  # healthcheck generating events
+  docker:
+    image: alpine
+    command: '/bin/sh -c "trap : TERM INT; sleep 15d"'
+    healthcheck:
+      interval: 1s
+      test: ["CMD", "true"]
 
   dropwizard:
     build: ./module/dropwizard/_meta

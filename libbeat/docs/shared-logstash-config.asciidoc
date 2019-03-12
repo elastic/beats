@@ -22,7 +22,7 @@ the {stack} getting started tutorial. Also see the documentation for the
 If you want to use {ls} to perform additional processing on the data collected by
 {beatname_uc}, you need to configure {beatname_uc} to use {ls}.
 
-To do this, you edit the {beatname_uc} configuration file to disable the Elasticsearch
+To do this, you edit the {beatname_uc} configuration file to disable the {es}
 output by commenting it out and enable the {ls} output by uncommenting the
 logstash section:
 
@@ -36,8 +36,14 @@ output.logstash:
 The `hosts` option specifies the {ls} server and the port (`5044`) where {ls} is configured to listen for incoming
 Beats connections.
 
-For this configuration, you must <<load-template-manually,load the index template into Elasticsearch manually>>
-because the options for auto loading the template are only available for the Elasticsearch output.
+For this configuration, you must <<load-template-manually,load the index template into {es} manually>>
+because the options for auto loading the template are only available for the {es} output.
+
+ifeval::["{beatname_lc}"=="filebeat"]
+Want to use <<filebeat-modules,{beatname_uc} modules>> with {ls}? You need to do
+some extra setup. For more information, see
+{logstash-ref}/filebeat-modules.html[Working with {beatname_uc} modules].
+endif::[]
 
 ifndef::win-only[]
 ifndef::apm-server[]

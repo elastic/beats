@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/http.log
   - name: tags
     default: [zeek.http]
+  - name: community_id
+    default: true
 
 ingest_pipeline: ingest/pipeline.json
 input: config/http.yml

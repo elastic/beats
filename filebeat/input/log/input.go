@@ -286,7 +286,7 @@ func (p *Input) getFiles() map[string]os.FileInfo {
 			if p.config.Symlinks {
 				for _, finfo := range paths {
 					if os.SameFile(finfo, fileInfo) {
-						logp.Info("Same file found as symlink and originap. Skipping file: %s", file)
+						logp.Info("Same file found as symlink and original. Skipping file: %s (as it same as %s)", file, finfo.Name())
 						continue OUTER
 					}
 				}

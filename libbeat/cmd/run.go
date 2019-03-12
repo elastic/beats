@@ -22,13 +22,12 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cmd/instance"
 )
 
-func genRunCmd(settings instance.Settings, beatCreator beat.Creator, runFlags *pflag.FlagSet) *cobra.Command {
+func genRunCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Command {
 	name := settings.Name
 	runCmd := cobra.Command{
 		Use:   "run",
@@ -47,8 +46,8 @@ func genRunCmd(settings instance.Settings, beatCreator beat.Creator, runFlags *p
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("cpuprofile"))
 	runCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("memprofile"))
 
-	if runFlags != nil {
-		runCmd.Flags().AddFlagSet(runFlags)
+	if settings.RunFlags != nil {
+		runCmd.Flags().AddFlagSet(settings.RunFlags)
 	}
 
 	return &runCmd

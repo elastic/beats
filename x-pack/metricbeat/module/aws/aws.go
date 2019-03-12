@@ -81,6 +81,11 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}
 
 	// Calculate duration based on period
+	if config.Period == "" {
+		err = errors.New("period is not set in AWS module config")
+		return nil, err
+	}
+
 	durationString, periodSec, err := convertPeriodToDuration(config.Period)
 	if err != nil {
 		return nil, err
@@ -133,4 +138,14 @@ func convertPeriodToDuration(period string) (string, int, error) {
 		duration := "-" + strconv.Itoa(numberPeriod*2) + "s"
 		return duration, numberPeriod, err
 	}
+}
+
+// StringInSlice checks if a string is already exists in list
+func StringInSlice(str string, list []string) bool {
+	for _, v := range list {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }

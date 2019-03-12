@@ -50,12 +50,12 @@ git clone https://github.com/elastic/beats ${GOPATH}/src/github.com/elastic/beat
 ----------------------------------------------------------------------
 
 To build your beat
-on a specific version of libbeat, check out the specific branch ({doc-branch} in the example below):
+on a specific version of libbeat, check out the specific branch ({branch} in the example below):
 
 ["source","sh",subs="attributes"]
 ----
 cd ${GOPATH}/src/github.com/elastic/beats
-git checkout {doc-branch}
+git checkout {branch}
 ----
 
 NOTE: If you have multiple go paths, use `${GOPATH%%:*}` instead of `${GOPATH}`.
@@ -477,11 +477,12 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/cmd/instance"
 
 	"github.com/kimjmin/countbeat/beater"
 )
 
-var RootCmd = cmd.GenRootCmd("countbeat", "", beater.New)
+var RootCmd = cmd.GenRootCmdWithSettings(beater.New, instance.Settings{Name: "countbeat"})
 
 func main() {
 	if err := RootCmd.Execute(); err != nil {
@@ -494,4 +495,4 @@ func main() {
 === Sharing Your Beat with the Community
 
 When you're done with your new Beat, how about letting everyone know? Open
-a pull request to add your link to the {libbeat}/community-beats.html[Community Beats] list.
+a pull request to add your link to the {beats-ref}/community-beats.html[Community Beats] list.

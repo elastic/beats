@@ -73,7 +73,9 @@ type message struct {
 	saveBody bool
 	body     []byte
 
-	notes []string
+	notes          []string
+	packetLossReq  bool
+	packetLossResp bool
 
 	next *message
 }

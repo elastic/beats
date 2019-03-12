@@ -19,6 +19,7 @@ grouped in the following categories:
 * <<exported-fields-ceph>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
+* <<exported-fields-consul>>
 * <<exported-fields-couchbase>>
 * <<exported-fields-couchdb>>
 * <<exported-fields-docker-processor>>
@@ -1084,6 +1085,317 @@ The state of the instance (pending | running | shutting-down | terminated | stop
 
 --
 
+[float]
+== s3_daily_storage fields
+
+`s3_daily_storage` contains the daily storage metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
+
+
+
+*`aws.s3_daily_storage.bucket.name`*::
++
+--
+type: keyword
+
+Name of a S3 bucket.
+
+
+--
+
+*`aws.s3_daily_storage.bucket.size.bytes`*::
++
+--
+type: scaled_float
+
+The amount of data in bytes stored in a bucket.
+
+
+--
+
+*`aws.s3_daily_storage.number_of_objects`*::
++
+--
+type: scaled_float
+
+The total number of objects stored in a bucket for all storage classes.
+
+
+--
+
+[float]
+== s3_request fields
+
+`s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
+
+
+
+*`aws.s3_request.bucket.name`*::
++
+--
+type: keyword
+
+Name of a S3 bucket.
+
+
+--
+
+*`aws.s3_request.requests.total`*::
++
+--
+type: long
+
+The total number of HTTP requests made to an Amazon S3 bucket, regardless of type.
+
+
+--
+
+*`aws.s3_request.requests.get`*::
++
+--
+type: long
+
+The number of HTTP GET requests made for objects in an Amazon S3 bucket.
+
+
+--
+
+*`aws.s3_request.requests.put`*::
++
+--
+type: long
+
+The number of HTTP PUT requests made for objects in an Amazon S3 bucket.
+
+
+--
+
+*`aws.s3_request.requests.delete`*::
++
+--
+type: long
+
+The number of HTTP DELETE requests made for objects in an Amazon S3 bucket.
+
+
+--
+
+*`aws.s3_request.requests.head`*::
++
+--
+type: long
+
+The number of HTTP HEAD requests made to an Amazon S3 bucket.
+
+
+--
+
+*`aws.s3_request.requests.post`*::
++
+--
+type: long
+
+The number of HTTP POST requests made to an Amazon S3 bucket.
+
+
+--
+
+*`aws.s3_request.requests.select`*::
++
+--
+type: long
+
+The number of Amazon S3 SELECT Object Content requests made for objects in an Amazon S3 bucket.
+
+
+--
+
+*`aws.s3_request.requests.select_scanned.bytes`*::
++
+--
+type: scaled_float
+
+The number of bytes of data scanned with Amazon S3 SELECT Object Content requests in an Amazon S3 bucket.
+
+
+--
+
+*`aws.s3_request.requests.select_returned.bytes`*::
++
+--
+type: scaled_float
+
+The number of bytes of data returned with Amazon S3 SELECT Object Content requests in an Amazon S3 bucket.
+
+
+--
+
+*`aws.s3_request.requests.list`*::
++
+--
+type: long
+
+The number of HTTP requests that list the contents of a bucket.
+
+
+--
+
+*`aws.s3_request.downloaded.bytes`*::
++
+--
+type: scaled_float
+
+The number bytes downloaded for requests made to an Amazon S3 bucket, where the response includes a body.
+
+
+--
+
+*`aws.s3_request.uploaded.bytes`*::
++
+--
+type: scaled_float
+
+The number bytes uploaded that contain a request body, made to an Amazon S3 bucket.
+
+
+--
+
+*`aws.s3_request.errors.4xx`*::
++
+--
+type: long
+
+The number of HTTP 4xx client error status code requests made to an Amazon S3 bucket with a value of either 0 or 1.
+
+
+--
+
+*`aws.s3_request.errors.5xx`*::
++
+--
+type: long
+
+The number of HTTP 5xx server error status code requests made to an Amazon S3 bucket with a value of either 0 or 1.
+
+
+--
+
+*`aws.s3_request.latency.first_byte.ms`*::
++
+--
+type: long
+
+The per-request time from the complete request being received by an Amazon S3 bucket to when the response starts to be returned.
+
+
+--
+
+*`aws.s3_request.latency.total_request.ms`*::
++
+--
+type: long
+
+The elapsed per-request time from the first byte received to the last byte sent to an Amazon S3 bucket.
+
+
+--
+
+[float]
+== sqs fields
+
+`sqs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SQS.
+
+
+
+*`aws.sqs.oldest_message_age.sec`*::
++
+--
+type: long
+
+The approximate age of the oldest non-deleted message in the queue.
+
+
+--
+
+*`aws.sqs.message.delayed`*::
++
+--
+type: long
+
+TThe number of messages in the queue that are delayed and not available for reading immediately.
+
+
+--
+
+*`aws.sqs.message.not_visible`*::
++
+--
+type: long
+
+The number of messages that are in flight.
+
+
+--
+
+*`aws.sqs.message.visible`*::
++
+--
+type: long
+
+The number of messages available for retrieval from the queue.
+
+
+--
+
+*`aws.sqs.message.deleted`*::
++
+--
+type: long
+
+The number of messages deleted from the queue.
+
+
+--
+
+*`aws.sqs.message.received`*::
++
+--
+type: long
+
+The number of messages returned by calls to the ReceiveMessage action.
+
+
+--
+
+*`aws.sqs.message.sent`*::
++
+--
+type: long
+
+The number of messages added to a queue.
+
+
+--
+
+*`aws.sqs.empty_receives`*::
++
+--
+type: long
+
+The number of ReceiveMessage API calls that did not return a message.
+
+
+--
+
+*`aws.sqs.sent_message_size.bytes`*::
++
+--
+type: scaled_float
+
+The size of messages added to a queue.
+
+
+--
+
 [[exported-fields-beat]]
 == Beat fields
 
@@ -2102,6 +2414,125 @@ required: True
 
 The document type. Always set to "doc".
 
+
+--
+
+[[exported-fields-consul]]
+== consul fields
+
+Consul module
+
+
+
+
+[float]
+== agent fields
+
+Agent Metricset fetches metrics information from a Consul instance running as Agent
+
+
+
+
+*`consul.agent.autopilot.healthy`*::
++
+--
+type: boolean
+
+Overall health of the local server cluster
+
+--
+
+[float]
+== runtime fields
+
+Runtime related metrics
+
+
+
+*`consul.agent.runtime.sys.bytes`*::
++
+--
+type: long
+
+Number of bytes of memory obtained from the OS.
+
+--
+
+*`consul.agent.runtime.malloc_count`*::
++
+--
+type: long
+
+Heap objects allocated
+
+--
+
+*`consul.agent.runtime.heap_objects`*::
++
+--
+type: long
+
+Objects allocated on the heap and is a general memory pressure indicator. This may burst from time to time but should return to a steady state value.
+
+--
+
+*`consul.agent.runtime.goroutines`*::
++
+--
+type: long
+
+Running goroutines and is a general load pressure indicator. This may burst from time to time but should return to a steady state value.
+
+--
+
+
+*`consul.agent.runtime.alloc.bytes`*::
++
+--
+type: long
+
+Bytes allocated by the Consul process.
+
+--
+
+[float]
+== garbage_collector fields
+
+Garbage collector metrics
+
+
+*`consul.agent.runtime.garbage_collector.runs`*::
++
+--
+type: long
+
+Garbage collector total executions
+
+--
+
+[float]
+== pause fields
+
+Time that the garbage collector has paused the app
+
+
+
+*`consul.agent.runtime.garbage_collector.pause.current.ns`*::
++
+--
+type: long
+
+Garbage collector pause time in nanoseconds
+
+--
+
+
+*`consul.agent.runtime.garbage_collector.pause.total.ns`*::
++
+--
+type: long
+
+Nanoseconds consumed by stop-the-world garbage collection pauses since Consul started.
 
 --
 
@@ -10686,6 +11117,76 @@ Jolokia module
 jolokia contains metrics exposed via jolokia agent
 
 
+
+*`jolokia.agent.version`*::
++
+--
+type: keyword
+
+Version number of jolokia agent.
+
+
+--
+
+*`jolokia.agent.id`*::
++
+--
+type: keyword
+
+Each agent has a unique id which can be either provided during startup of the agent in form of a configuration parameter or being autodetected. If autodected, the id has several parts: The IP, the process id, hashcode of the agent and its type.
+
+
+--
+
+*`jolokia.server.product`*::
++
+--
+type: keyword
+
+The container product if detected.
+
+
+--
+
+*`jolokia.server.version`*::
++
+--
+type: keyword
+
+The container's version (if detected).
+
+
+--
+
+*`jolokia.server.vendor`*::
++
+--
+type: keyword
+
+The vendor of the container the agent is running in.
+
+
+--
+
+*`jolokia.url`*::
++
+--
+type: keyword
+
+The URL how this agent can be contacted.
+
+
+--
+
+*`jolokia.secured`*::
++
+--
+type: boolean
+
+Whether the agent was configured for authentication or not.
+
+
+--
 
 [[exported-fields-kafka]]
 == Kafka fields
@@ -19657,37 +20158,37 @@ Total number of rows returned by query.
 
 --
 
-*`postgresql.statement.time.total`*::
+*`postgresql.statement.query.time.total.ms`*::
 +
 --
-type: long
+type: float
 
 Total number of milliseconds spent running query.
 
 
 --
 
-*`postgresql.statement.time.min`*::
+*`postgresql.statement.query.time.min.ms`*::
 +
 --
-type: long
+type: float
 
 Minimum number of milliseconds spent running query.
 
 
 --
 
-*`postgresql.statement.time.max`*::
+*`postgresql.statement.query.time.max.ms`*::
 +
 --
-type: long
+type: float
 
 Maximum number of milliseconds spent running query.
 
 
 --
 
-*`postgresql.statement.time.mean`*::
+*`postgresql.statement.query.time.mean.ms`*::
 +
 --
 type: long
@@ -19697,7 +20198,7 @@ Mean number of milliseconds spent running query.
 
 --
 
-*`postgresql.statement.time.stddev`*::
+*`postgresql.statement.query.time.stddev.ms`*::
 +
 --
 type: long
@@ -19707,7 +20208,7 @@ Population standard deviation of time spent running query, in milliseconds.
 
 --
 
-*`postgresql.statement.memory.shared.hit`*::
+*`postgresql.statement.query.memory.shared.hit`*::
 +
 --
 type: long
@@ -19717,7 +20218,7 @@ Total number of shared block cache hits by the query.
 
 --
 
-*`postgresql.statement.memory.shared.read`*::
+*`postgresql.statement.query.memory.shared.read`*::
 +
 --
 type: long
@@ -19727,7 +20228,7 @@ Total number of shared block cache read by the query.
 
 --
 
-*`postgresql.statement.memory.shared.dirtied`*::
+*`postgresql.statement.query.memory.shared.dirtied`*::
 +
 --
 type: long
@@ -19737,7 +20238,7 @@ Total number of shared block cache dirtied by the query.
 
 --
 
-*`postgresql.statement.memory.shared.written`*::
+*`postgresql.statement.query.memory.shared.written`*::
 +
 --
 type: long
@@ -19747,7 +20248,7 @@ Total number of shared block cache written by the query.
 
 --
 
-*`postgresql.statement.memory.local.hit`*::
+*`postgresql.statement.query.memory.local.hit`*::
 +
 --
 type: long
@@ -19757,7 +20258,7 @@ Total number of local block cache hits by the query.
 
 --
 
-*`postgresql.statement.memory.local.read`*::
+*`postgresql.statement.query.memory.local.read`*::
 +
 --
 type: long
@@ -19767,7 +20268,7 @@ Total number of local block cache read by the query.
 
 --
 
-*`postgresql.statement.memory.local.dirtied`*::
+*`postgresql.statement.query.memory.local.dirtied`*::
 +
 --
 type: long
@@ -19777,7 +20278,7 @@ Total number of local block cache dirtied by the query.
 
 --
 
-*`postgresql.statement.memory.local.written`*::
+*`postgresql.statement.query.memory.local.written`*::
 +
 --
 type: long
@@ -19787,7 +20288,7 @@ Total number of local block cache written by the query.
 
 --
 
-*`postgresql.statement.memory.temp.read`*::
+*`postgresql.statement.query.memory.temp.read`*::
 +
 --
 type: long
@@ -19797,7 +20298,7 @@ Total number of temp block cache read by the query.
 
 --
 
-*`postgresql.statement.memory.temp.written`*::
+*`postgresql.statement.query.memory.temp.written`*::
 +
 --
 type: long
@@ -25831,7 +26332,7 @@ server contains the metrics reported by the four-letter `srvr` command.
 --
 type: long
 
-Connections established by the server
+Number of clients currently connected to the server
 
 --
 
@@ -25841,7 +26342,7 @@ Connections established by the server
 --
 type: long
 
-Average latency of the server
+Average amount of time taken for the server to respond to a client request
 
 --
 
@@ -25850,7 +26351,7 @@ Average latency of the server
 --
 type: long
 
-Max latency reached by the server
+Maximum amount of time taken for the server to respond to a client request
 
 --
 
@@ -25859,7 +26360,7 @@ Max latency reached by the server
 --
 type: long
 
-Minimum latency that has been reached by the server
+Minimum amount of time taken for the server to respond to a client request
 
 --
 
@@ -25868,7 +26369,7 @@ Minimum latency that has been reached by the server
 --
 type: keyword
 
-Server mode
+Mode of the server. In an ensemble, this may either be leader or follower. Otherwise, it is standalone
 
 --
 
@@ -25886,7 +26387,7 @@ Total number of nodes
 --
 type: long
 
-Outstanding
+Number of requests queued at the server. This exceeds zero when the server receives more requests than it is able to process
 
 --
 
@@ -25895,7 +26396,7 @@ Outstanding
 --
 type: long
 
-Received requests to the server
+Number of requests received by the server
 
 --
 
@@ -25904,7 +26405,7 @@ Received requests to the server
 --
 type: long
 
-Requests sent by the server
+Number of requests sent by the server
 
 --
 
@@ -25913,7 +26414,7 @@ Requests sent by the server
 --
 type: date
 
-Date of the Zookeeper release in use
+Date of the Zookeeper release currently in use
 
 --
 
@@ -25922,7 +26423,7 @@ Date of the Zookeeper release in use
 --
 type: keyword
 
-Original value of the Zookeeper transaction ID
+Unique value of the Zookeeper transaction ID. The zxid consists of an epoch and a counter. It is established by the leader and is used to determine the temporal ordering of changes
 
 --
 
@@ -25940,7 +26441,7 @@ Total transactions of the leader in epoch
 --
 type: long
 
-Epoch value of the Zookeeper transaction ID
+Epoch value of the Zookeeper transaction ID. An epoch signifies the period in which a server is a leader
 
 --
 

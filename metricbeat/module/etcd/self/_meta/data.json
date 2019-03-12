@@ -1,6 +1,6 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
+    "agent": {
         "hostname": "host.example.com",
         "name": "host.example.com"
     },
@@ -9,8 +9,8 @@
             "id": "8e9e05c52164694d",
             "leaderinfo": {
                 "leader": "8e9e05c52164694d",
-                "starttime": "2017-12-07T07:20:33.241031712Z",
-                "uptime": "9m4.919923089s"
+                "starttime": "2019-02-18T21:42:23.191073075Z",
+                "uptime": "23m12.747903053s"
             },
             "name": "default",
             "recv": {
@@ -27,14 +27,20 @@
                 "bandwidthrate": 0,
                 "pkgrate": 0
             },
-            "starttime": "2017-12-07T07:20:32.340598119Z",
+            "starttime": "2019-02-18T21:42:21.490011868Z",
             "state": "StateLeader"
         }
     },
+    "event": {
+        "dataset": "etcd.self",
+        "duration": 115000,
+        "module": "etcd"
+    },
     "metricset": {
-        "host": "etcd:2379",
-        "module": "etcd",
-        "name": "self",
-        "rtt": 115
+        "name": "self"
+    },
+    "service": {
+        "address": "127.0.0.1:2379",
+        "type": "etcd"
     }
 }
