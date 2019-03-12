@@ -86,17 +86,13 @@ func EventMapping(input map[string]interface{}, schema s.Schema) (common.MapStr,
 }
 
 // CheckTimestampInArray checks if input timestamp exists in timestampArray and if it exists, return the position.
-func CheckTimestampInArray(timestamp time.Time, timestampArray []time.Time) (exists bool, index int) {
-	exists = false
-	index = -1
+func CheckTimestampInArray(timestamp time.Time, timestampArray []time.Time) (bool, int) {
 	for i := 0; i < len(timestampArray); i++ {
 		if timestamp.Equal(timestampArray[i]) {
-			index = i
-			exists = true
-			return
+			return true, i
 		}
 	}
-	return
+	return false, -1
 }
 
 // FindTimestamp function checks MetricDataResults and find the timestamp to collect metrics from.
@@ -122,7 +118,7 @@ func FindTimestamp(getMetricDataResults []cloudwatch.MetricDataResult) time.Time
 		if output.Timestamps != nil && len(output.Timestamps) == 1 {
 			// Use the first timestamp from Timestamps field to collect the latest data.
 			timestamp = output.Timestamps[0]
-			break
+			return timestamp
 		}
 	}
 
@@ -133,7 +129,7 @@ func FindTimestamp(getMetricDataResults []cloudwatch.MetricDataResult) time.Time
 			if output.Timestamps != nil && len(output.Timestamps) > 1 {
 				// Example Timestamps: [2019-03-11 17:36:00 +0000 UTC,2019-03-11 17:31:00 +0000 UTC]
 				timestamp = output.Timestamps[0]
-				break
+				return timestamp
 			}
 		}
 	}

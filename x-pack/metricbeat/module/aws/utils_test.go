@@ -189,63 +189,74 @@ func TestCheckTimestampInArray(t *testing.T) {
 func TestFindTimestamp(t *testing.T) {
 	timestamp1 := time.Now()
 	timestamp2 := timestamp1.Add(5 * time.Minute)
-	getMetricDataResults1 := []cloudwatch.MetricDataResult{
+	cases := []struct {
+		getMetricDataResults []cloudwatch.MetricDataResult
+		expectedTimestamp    time.Time
+	}{
 		{
-			Id:         &id1,
-			Label:      &label1,
-			StatusCode: cloudwatch.StatusCodeComplete,
-			Timestamps: []time.Time{timestamp1, timestamp2},
-			Values:     []float64{0, 1},
+			getMetricDataResults: []cloudwatch.MetricDataResult{
+				{
+					Id:         &id1,
+					Label:      &label1,
+					StatusCode: cloudwatch.StatusCodeComplete,
+					Timestamps: []time.Time{timestamp1, timestamp2},
+					Values:     []float64{0, 1},
+				},
+				{
+					Id:         &id2,
+					Label:      &label2,
+					StatusCode: cloudwatch.StatusCodeComplete,
+					Timestamps: []time.Time{timestamp1},
+					Values:     []float64{2, 3},
+				},
+			},
+			expectedTimestamp: timestamp1,
 		},
 		{
-			Id:         &id2,
-			Label:      &label2,
-			StatusCode: cloudwatch.StatusCodeComplete,
-			Timestamps: []time.Time{timestamp1},
-			Values:     []float64{2, 3},
+			getMetricDataResults: []cloudwatch.MetricDataResult{
+				{
+					Id:         &id1,
+					Label:      &label1,
+					StatusCode: cloudwatch.StatusCodeComplete,
+					Timestamps: []time.Time{timestamp1, timestamp2},
+					Values:     []float64{0, 1},
+				},
+				{
+					Id:         &id2,
+					Label:      &label2,
+					StatusCode: cloudwatch.StatusCodeComplete,
+				},
+			},
+			expectedTimestamp: timestamp1,
+		},
+		{
+			getMetricDataResults: []cloudwatch.MetricDataResult{
+				{
+					Id:         &id1,
+					Label:      &label1,
+					StatusCode: cloudwatch.StatusCodeComplete,
+					Timestamps: []time.Time{timestamp1, timestamp2},
+					Values:     []float64{0, 1},
+				},
+				{
+					Id:         &id2,
+					Label:      &label2,
+					StatusCode: cloudwatch.StatusCodeComplete,
+				},
+				{
+					Id:         &id3,
+					Label:      &label2,
+					StatusCode: cloudwatch.StatusCodeComplete,
+					Timestamps: []time.Time{timestamp2},
+					Values:     []float64{2, 3},
+				},
+			},
+			expectedTimestamp: timestamp2,
 		},
 	}
-	target1 := FindTimestamp(getMetricDataResults1)
-	assert.Equal(t, timestamp1, target1)
 
-	getMetricDataResults2 := []cloudwatch.MetricDataResult{
-		{
-			Id:         &id1,
-			Label:      &label1,
-			StatusCode: cloudwatch.StatusCodeComplete,
-			Timestamps: []time.Time{timestamp1, timestamp2},
-			Values:     []float64{0, 1},
-		},
-		{
-			Id:         &id2,
-			Label:      &label2,
-			StatusCode: cloudwatch.StatusCodeComplete,
-		},
+	for _, c := range cases {
+		outputTimestamp := FindTimestamp(c.getMetricDataResults)
+		assert.Equal(t, c.expectedTimestamp, outputTimestamp)
 	}
-	target2 := FindTimestamp(getMetricDataResults2)
-	assert.Equal(t, timestamp1, target2)
-
-	getMetricDataResults3 := []cloudwatch.MetricDataResult{
-		{
-			Id:         &id1,
-			Label:      &label1,
-			StatusCode: cloudwatch.StatusCodeComplete,
-			Timestamps: []time.Time{timestamp1, timestamp2},
-			Values:     []float64{0, 1},
-		},
-		{
-			Id:         &id2,
-			Label:      &label2,
-			StatusCode: cloudwatch.StatusCodeComplete,
-		},
-		{
-			Id:         &id3,
-			Label:      &label2,
-			StatusCode: cloudwatch.StatusCodeComplete,
-			Timestamps: []time.Time{timestamp2},
-			Values:     []float64{2, 3},
-		},
-	}
-	target3 := FindTimestamp(getMetricDataResults3)
-	assert.Equal(t, timestamp2, target3)
 }
