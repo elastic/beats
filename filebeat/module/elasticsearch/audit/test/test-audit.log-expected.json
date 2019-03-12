@@ -1,7 +1,7 @@
 [
     {
         "@timestamp": "2018-10-31T09:34:25.109Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.origin.type": "rest",
         "elasticsearch.node.id": "DSiWcTyeThWtUXLB9J0BMw",
@@ -21,7 +21,7 @@
     },
     {
         "@timestamp": "2018-10-31T09:34:25.207Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.origin.type": "rest",
         "elasticsearch.node.id": "DSiWcTyeThWtUXLB9J0BMw",
@@ -41,7 +41,7 @@
     },
     {
         "@timestamp": "2018-10-31T09:35:11.428Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "elasticsearch.audit.action": "cluster:admin/xpack/security/realm/cache/clear",
         "elasticsearch.audit.layer": "transport",
         "elasticsearch.audit.origin.type": "local_node",
@@ -66,7 +66,7 @@
     },
     {
         "@timestamp": "2018-10-31T09:35:11.430Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "elasticsearch.audit.action": "cluster:admin/xpack/security/realm/cache/clear[n]",
         "elasticsearch.audit.layer": "transport",
         "elasticsearch.audit.origin.type": "local_node",
@@ -91,7 +91,7 @@
     },
     {
         "@timestamp": "2018-10-31T09:35:12.303Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "elasticsearch.audit.action": "cluster:admin/xpack/security/user/change_password",
         "elasticsearch.audit.layer": "transport",
         "elasticsearch.audit.origin.type": "rest",
@@ -116,7 +116,7 @@
     },
     {
         "@timestamp": "2018-10-31T09:35:12.314Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "elasticsearch.audit.action": "indices:admin/create",
         "elasticsearch.audit.indices": [
             ".security-6"
@@ -144,7 +144,7 @@
     },
     {
         "@timestamp": "2019-01-27T20:15:10.380Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "elasticsearch.audit.layer": "rest",
         "elasticsearch.audit.origin.type": "rest",
         "elasticsearch.audit.realm": "default_file",
