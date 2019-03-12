@@ -267,7 +267,7 @@
             }
           }
         },
-        "title": "Total Unique Domains [Coredns]",
+        "title": "Unique Domains [Coredns]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
@@ -276,6 +276,7 @@
               "enabled": true,
               "id": "1",
               "params": {
+                "customLabel": "Unique Domains",
                 "field": "coredns.query.name"
               },
               "schema": "metric",
@@ -313,7 +314,7 @@
               "metricColorMode": "None",
               "metrics": [
                 {
-                  "accessor": 1,
+                  "accessor": 0,
                   "aggType": "cardinality",
                   "format": {
                     "id": "number"
@@ -333,7 +334,7 @@
             },
             "type": "metric"
           },
-          "title": "Total Unique Domains [Coredns]",
+          "title": "Unique Domains [Coredns]",
           "type": "metric"
         }
       },
@@ -349,8 +350,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2019-03-11T20:30:07.079Z",
-      "version": "WzE0ODUsM10="
+      "updated_at": "2019-03-12T01:26:19.218Z",
+      "version": "WzE0OTMsM10="
     },
     {
       "attributes": {
