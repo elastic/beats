@@ -1,7 +1,7 @@
 [
     {
         "@timestamp": "2017-08-04T10:48:20.377Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -15,7 +15,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:20.379Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -29,7 +29,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:20.400Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -43,7 +43,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:20.400Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -57,7 +57,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:20.401Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -71,7 +71,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:20.413Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -85,7 +85,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:20.415Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -99,7 +99,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:20.420Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -113,7 +113,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:20.457Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -127,7 +127,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:20.458Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -141,7 +141,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:20.748Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -155,7 +155,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:20.800Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -169,7 +169,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:20.866Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -183,7 +183,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:20.873Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -197,7 +197,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:21.062Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -211,7 +211,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:21.063Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -225,7 +225,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:21.095Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -239,7 +239,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:21.127Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -253,7 +253,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:21.162Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
@@ -267,7 +267,7 @@
     },
     {
         "@timestamp": "2017-08-04T10:48:21.167Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
