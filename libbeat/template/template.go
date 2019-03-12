@@ -277,7 +277,7 @@ func buildIdxSettings(ver common.Version, userSettings common.MapStr) common.Map
 		indexSettings.Put("number_of_routing_shards", defaultNumberOfRoutingShards)
 	}
 
-	if ver.Major >= 7 {
+	if ver.Major >= 6 {
 		// copy defaultFields, as defaultFields is shared global slice.
 		fields := make([]string, len(defaultFields))
 		copy(fields, defaultFields)
