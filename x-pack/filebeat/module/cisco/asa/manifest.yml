@@ -22,7 +22,7 @@ var:
       version: 6.1.0
       value: false
 
-ingest_pipeline: ingest/pipeline.json
+ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml
 
 requires.processors:
