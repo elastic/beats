@@ -277,7 +277,8 @@ func buildIdxSettings(ver common.Version, userSettings common.MapStr) common.Map
 		indexSettings.Put("number_of_routing_shards", defaultNumberOfRoutingShards)
 	}
 
-	if ver.Major >= 7 {
+	// 6.0 is excluded because it did not support an array for query.default_field
+	if ver.Major >= 6 && !(ver.Major == 6 && ver.Minor == 0) {
 		// copy defaultFields, as defaultFields is shared global slice.
 		fields := make([]string, len(defaultFields))
 		copy(fields, defaultFields)
