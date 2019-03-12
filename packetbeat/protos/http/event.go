@@ -73,7 +73,7 @@ type ProtocolFields struct {
 }
 
 // netURL returns a new ecs.Url object with data from the HTTP request.
-func newURL(host string, port int32, path, query string) *ecs.Url {
+func newURL(host string, port int64, path, query string) *ecs.Url {
 	u := &ecs.Url{
 		Scheme: "http",
 		Domain: host,
@@ -87,7 +87,7 @@ func newURL(host string, port int32, path, query string) *ecs.Url {
 	return u
 }
 
-func synthesizeFullURL(u *ecs.Url, port int32) string {
+func synthesizeFullURL(u *ecs.Url, port int64) string {
 	if u.Domain == "" || port <= 0 {
 		return ""
 	}

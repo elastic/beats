@@ -2,7 +2,7 @@
     {
         "@timestamp": "2019-01-22T09:05:05.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
         "fileset.name": "log",
@@ -29,7 +29,7 @@
     {
         "@timestamp": "2019-01-22T09:05:05.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
         "fileset.name": "log",
@@ -56,7 +56,7 @@
     {
         "@timestamp": "2019-01-22T09:05:06.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
         "fileset.name": "log",
@@ -83,7 +83,7 @@
     {
         "@timestamp": "2019-01-22T09:05:06.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
         "fileset.name": "log",
@@ -110,7 +110,7 @@
     {
         "@timestamp": "2019-01-22T09:05:07.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
         "fileset.name": "log",
@@ -137,7 +137,7 @@
     {
         "@timestamp": "2019-01-22T09:05:07.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
         "fileset.name": "log",
@@ -164,7 +164,7 @@
     {
         "@timestamp": "2019-01-22T09:05:08.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
         "fileset.name": "log",
@@ -191,7 +191,7 @@
     {
         "@timestamp": "2019-01-22T09:05:08.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
         "fileset.name": "log",
@@ -218,7 +218,7 @@
     {
         "@timestamp": "2019-01-22T09:05:09.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
         "fileset.name": "log",
@@ -245,7 +245,7 @@
     {
         "@timestamp": "2019-01-22T09:05:09.000Z",
         "destination.ip": "2001:0db8:0000:0000:0000:0000:0000:0002",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
         "fileset.name": "log",
@@ -273,7 +273,7 @@
         "@timestamp": "2019-01-22T10:52:34.000Z",
         "destination.ip": "ff02:0000:0000:0000:0000:0000:0000:0016",
         "destination.mac": "90:10:12:34:56:78",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "iptables.log",
         "event.module": "iptables",
         "fileset.name": "log",

@@ -548,7 +548,7 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 		httpFields.RequestHeaders = http.collectHeaders(requ)
 
 		// url
-		u := newURL(host, int32(pbf.Destination.Port), path, params)
+		u := newURL(host, int64(pbf.Destination.Port), path, params)
 		pb.MarshalStruct(evt.Fields, "url", u)
 
 		// user-agent
