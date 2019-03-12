@@ -10796,6 +10796,76 @@ jolokia contains metrics exposed via jolokia agent
 
 
 
+*`jolokia.agent.version`*::
++
+--
+type: keyword
+
+Version number of jolokia agent.
+
+
+--
+
+*`jolokia.agent.id`*::
++
+--
+type: keyword
+
+Each agent has a unique id which can be either provided during startup of the agent in form of a configuration parameter or being autodetected. If autodected, the id has several parts: The IP, the process id, hashcode of the agent and its type.
+
+
+--
+
+*`jolokia.server.product`*::
++
+--
+type: keyword
+
+The container product if detected.
+
+
+--
+
+*`jolokia.server.version`*::
++
+--
+type: keyword
+
+The container's version (if detected).
+
+
+--
+
+*`jolokia.server.vendor`*::
++
+--
+type: keyword
+
+The vendor of the container the agent is running in.
+
+
+--
+
+*`jolokia.url`*::
++
+--
+type: keyword
+
+The URL how this agent can be contacted.
+
+
+--
+
+*`jolokia.secured`*::
++
+--
+type: boolean
+
+Whether the agent was configured for authentication or not.
+
+
+--
+
 [[exported-fields-kafka]]
 == Kafka fields
 

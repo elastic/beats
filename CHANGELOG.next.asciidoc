@@ -80,8 +80,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Migrate docker autodiscover to ECS. {issue}10757[10757] {pull}10862[10862]
 - Fix issue in kubernetes module preventing usage percentages to be properly calculated. {pull}10946[10946]
 - Fix parsing error using GET in Jolokia module. {pull}11075[11075] {issue}11071[11071]
-- Collect metrics when EC2 instances are not in running state. {issue}11008[11008] {pull}11023[11023]
-- Change ECS field cloud.provider to aws. {pull}11023[11023]
+- Add documentation about jolokia autodiscover fields. {issue}10925[10925] {pull}10979[10979]
 
 *Packetbeat*
 
