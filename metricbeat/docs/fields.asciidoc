@@ -26265,12 +26265,62 @@ connections
 
 
 
-*`zookeeper.connections.example`*::
+*`zookeeper.connections.ip`*::
 +
 --
 type: keyword
 
-Example field
+Connection IP
+
+
+--
+
+*`zookeeper.connections.port`*::
++
+--
+type: long
+
+Connection Port
+
+
+--
+
+*`zookeeper.connections.number`*::
++
+--
+type: long
+
+Connection Number
+
+
+--
+
+*`zookeeper.connections.queued`*::
++
+--
+type: long
+
+Queued connections
+
+
+--
+
+*`zookeeper.connections.received`*::
++
+--
+type: long
+
+Received connections
+
+
+--
+
+*`zookeeper.connections.sent`*::
++
+--
+type: long
+
+Connections sent
 
 
 --
