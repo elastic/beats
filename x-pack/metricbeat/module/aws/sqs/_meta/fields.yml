@@ -38,5 +38,6 @@
         The number of ReceiveMessage API calls that did not return a message.
     - name: sent_message_size.bytes
       type: long
+      format: bytes
       description: >
         The size of messages added to a queue.

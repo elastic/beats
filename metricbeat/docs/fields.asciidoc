@@ -1391,6 +1391,8 @@ The number of ReceiveMessage API calls that did not return a message.
 --
 type: long
 
+format: bytes
+
 The size of messages added to a queue.
 
 
