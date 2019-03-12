@@ -3,7 +3,27 @@
   description: >
     connections
   fields:
-    - name: example
+    - name: ip
       type: keyword
       description: >
-        Example field
+        Connection IP
+    - name: port
+      type: long
+      description: >
+        Connection Port
+    - name: number
+      type: long
+      description: >
+        Connection Number
+    - name: queued
+      type: long
+      description: >
+        Queued connections
+    - name: received
+      type: long
+      description: >
+        Received connections
+    - name: sent
+      type: long
+      description: >
+        Connections sent
