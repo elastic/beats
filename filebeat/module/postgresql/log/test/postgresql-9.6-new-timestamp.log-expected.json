@@ -1,7 +1,7 @@
 [
     {
         "@timestamp": "2017-07-31T13:36:43.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "EST",
@@ -17,7 +17,7 @@
     },
     {
         "@timestamp": "2017-07-31T13:36:44.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "EST",
@@ -33,7 +33,7 @@
     },
     {
         "@timestamp": "2017-07-31T13:46:02.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "EST",
@@ -49,7 +49,7 @@
     },
     {
         "@timestamp": "2017-07-31T13:46:23.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "EST",
@@ -67,7 +67,7 @@
     },
     {
         "@timestamp": "2017-07-31T13:46:55.000Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "EST",
