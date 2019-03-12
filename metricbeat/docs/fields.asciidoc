@@ -1309,7 +1309,7 @@ The elapsed per-request time from the first byte received to the last byte sent 
 *`aws.sqs.oldest_message_age.sec`*::
 +
 --
-type: scaled_float
+type: long
 
 The approximate age of the oldest non-deleted message in the queue.
 
@@ -1319,7 +1319,7 @@ The approximate age of the oldest non-deleted message in the queue.
 *`aws.sqs.messages.delayed`*::
 +
 --
-type: scaled_float
+type: long
 
 TThe number of messages in the queue that are delayed and not available for reading immediately.
 
@@ -1329,7 +1329,7 @@ TThe number of messages in the queue that are delayed and not available for read
 *`aws.sqs.messages.not_visible`*::
 +
 --
-type: scaled_float
+type: long
 
 The number of messages that are in flight.
 
@@ -1339,7 +1339,7 @@ The number of messages that are in flight.
 *`aws.sqs.messages.visible`*::
 +
 --
-type: scaled_float
+type: long
 
 The number of messages available for retrieval from the queue.
 
@@ -1349,7 +1349,7 @@ The number of messages available for retrieval from the queue.
 *`aws.sqs.messages.deleted`*::
 +
 --
-type: scaled_float
+type: long
 
 The number of messages deleted from the queue.
 
@@ -1359,7 +1359,7 @@ The number of messages deleted from the queue.
 *`aws.sqs.messages.received`*::
 +
 --
-type: scaled_float
+type: long
 
 The number of messages returned by calls to the ReceiveMessage action.
 
@@ -1369,7 +1369,7 @@ The number of messages returned by calls to the ReceiveMessage action.
 *`aws.sqs.messages.sent`*::
 +
 --
-type: scaled_float
+type: long
 
 The number of messages added to a queue.
 
@@ -1379,7 +1379,7 @@ The number of messages added to a queue.
 *`aws.sqs.empty_receives`*::
 +
 --
-type: scaled_float
+type: long
 
 The number of ReceiveMessage API calls that did not return a message.
 
@@ -1389,7 +1389,7 @@ The number of ReceiveMessage API calls that did not return a message.
 *`aws.sqs.sent_message_size.bytes`*::
 +
 --
-type: scaled_float
+type: long
 
 The size of messages added to a queue.
 
