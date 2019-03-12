@@ -65,6 +65,8 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 - Fix errors in filebeat Zeek dashboard and README files. Add notice.log support. {pull}10916[10916]
 - Fix a bug when converting NetFlow fields to snake_case. {pull}10950[10950]
+- Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test 
+  case. {issue}11004[11004] {pull}11105[11105]
 
 *Heartbeat*
 
