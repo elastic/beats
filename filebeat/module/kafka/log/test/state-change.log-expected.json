@@ -1,7 +1,7 @@
 [
     {
         "@timestamp": "2017-08-04T10:48:21.428Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "kafka.log",
         "event.module": "kafka",
         "fileset.name": "log",
