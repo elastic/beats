@@ -18,8 +18,9 @@
 package connections
 
 import (
-	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/metricbeat/mb/parse"
 
 	"github.com/elastic/beats/libbeat/logp"
 
