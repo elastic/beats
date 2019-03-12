@@ -20,14 +20,14 @@
 package ecs
 
 // A client is defined as the initiator of a network connection for events
-// regarding sessions, connections, or bidirectional flow records. For TCP
-// events, the client is the initiator of the TCP connection that sends the SYN
-// packet(s). For other protocols, the client is generally the initiator or
-// requestor in the network transaction. Some systems use the term "originator"
-// to refer the client in TCP connections. The client fields describe details
-// about the system acting as the client in the network event. Client fields
-// are usually populated in conjunction with server fields.  Client fields are
-// generally not populated for packet-level events.
+// regarding sessions, connections, or bidirectional flow records.
+// For TCP events, the client is the initiator of the TCP connection that sends
+// the SYN packet(s). For other protocols, the client is generally the
+// initiator or requestor in the network transaction. Some systems use the term
+// "originator" to refer the client in TCP connections. The client fields
+// describe details about the system acting as the client in the network event.
+// Client fields are usually populated in conjunction with server fields.
+// Client fields are generally not populated for packet-level events.
 // Client / server representations can add semantic context to an exchange,
 // which is helpful to visualize the data in certain situations. If your
 // context falls in that category, you should still ensure that source and
