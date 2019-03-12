@@ -122,18 +122,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		}
 
 		// Create Cloudwatch Events for SQS
-		for _, queueURL := range queueURLs {
-			queueURLParsed := strings.Split(queueURL, "/")
-			queueName := queueURLParsed[len(queueURLParsed)-1]
-			event, err := createSQSEvents(metricDataResults, queueName, metricsetName, regionName, schemaRequestFields)
-			if err != nil {
-				m.logger.Error(err.Error())
-				event.Error = err
-				report.Event(event)
-				continue
-			}
-			report.Event(event)
-		}
+		createSQSEvents(queueURLs, metricDataResults, regionName, report)
 	}
 }
 
@@ -144,7 +133,7 @@ func getQueueUrls(svc sqsiface.SQSAPI) ([]string, error) {
 	output, err := req.Send()
 	if err != nil {
 		err = errors.Wrap(err, "Error DescribeInstances")
-		return []string{}, err
+		return nil, err
 	}
 	return output.QueueUrls, nil
 }
@@ -183,7 +172,7 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, period int64) (m
 	return
 }
 
-func createSQSEvents(getMetricDataResults []cloudwatch.MetricDataResult, queueName string, metricsetName string, regionName string, schemaMetricFields s.Schema) (event mb.Event, err error) {
+func createEventPerQueue(getMetricDataResults []cloudwatch.MetricDataResult, queueName string, metricsetName string, regionName string, schemaMetricFields s.Schema) (event mb.Event, err error) {
 	event.Service = metricsetName
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("service.name", metricsetName)
@@ -211,4 +200,18 @@ func createSQSEvents(getMetricDataResults []cloudwatch.MetricDataResult, queueNa
 	event.MetricSetFields = resultMetricSetFields
 	event.MetricSetFields.Put("queue.name", queueName)
 	return
+}
+
+func createSQSEvents(queueURLs []string, metricDataResults []cloudwatch.MetricDataResult, regionName string, report mb.ReporterV2) {
+	for _, queueURL := range queueURLs {
+		queueURLParsed := strings.Split(queueURL, "/")
+		queueName := queueURLParsed[len(queueURLParsed)-1]
+		event, err := createEventPerQueue(metricDataResults, queueName, metricsetName, regionName, schemaRequestFields)
+		if err != nil {
+			event.Error = err
+			report.Event(event)
+			continue
+		}
+		report.Event(event)
+	}
 }
