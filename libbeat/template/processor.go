@@ -113,7 +113,7 @@ func (p *Processor) Process(fields asset.Fields, path string, output common.MapS
 	return nil
 }
 
-func addToDefaultFields(f *common.Field) {
+func addToDefaultFields(f *asset.Field) {
 	fullName := f.Name
 	if f.Path != "" {
 		fullName = f.Path + "." + f.Name
@@ -124,7 +124,7 @@ func addToDefaultFields(f *common.Field) {
 	}
 }
 
-func (p *Processor) other(f *common.Field) common.MapStr {
+func (p *Processor) other(f *asset.Field) common.MapStr {
 	property := getDefaultProperties(f)
 	if f.Type != "" {
 		property["type"] = f.Type
