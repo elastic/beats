@@ -23,6 +23,7 @@
         "netflow": {
           "destination_ipv4_address": "2.2.2.11",
           "destination_transport_port": 17549,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -37,6 +38,7 @@
           "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
+          "ingress_acl_id": "0f8e7ff3-fc1a030f-00000000",
           "ingress_interface": 3,
           "observation_time_milliseconds": "2015-10-09T09:47:49.599Z",
           "octet_total_count": 56,
@@ -90,6 +92,7 @@
         "netflow": {
           "destination_ipv4_address": "164.164.37.11",
           "destination_transport_port": 0,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 3,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -104,6 +107,7 @@
           "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 8,
+          "ingress_acl_id": "0f8e7ff3-fc1a030f-00000000",
           "ingress_interface": 2,
           "observation_time_milliseconds": "2015-10-09T09:47:50.179Z",
           "octet_total_count": 56,
@@ -157,6 +161,7 @@
         "netflow": {
           "destination_ipv4_address": "192.168.23.22",
           "destination_transport_port": 17549,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -171,6 +176,7 @@
           "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
+          "ingress_acl_id": "0f8e7ff3-fc1a030f-00000000",
           "ingress_interface": 3,
           "observation_time_milliseconds": "2015-10-09T09:47:50.219Z",
           "octet_total_count": 56,
@@ -224,6 +230,7 @@
         "netflow": {
           "destination_ipv4_address": "164.164.37.11",
           "destination_transport_port": 0,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 3,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -238,6 +245,7 @@
           "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 8,
+          "ingress_acl_id": "0f8e7ff3-fc1a030f-00000000",
           "ingress_interface": 2,
           "observation_time_milliseconds": "2015-10-09T09:47:50.419Z",
           "octet_total_count": 56,
@@ -291,6 +299,7 @@
         "netflow": {
           "destination_ipv4_address": "192.168.23.20",
           "destination_transport_port": 17805,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -305,6 +314,7 @@
           "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
+          "ingress_acl_id": "0f8e7ff3-fc1a030f-00000000",
           "ingress_interface": 3,
           "observation_time_milliseconds": "2015-10-09T09:47:50.429Z",
           "octet_total_count": 56,
@@ -358,6 +368,7 @@
         "netflow": {
           "destination_ipv4_address": "2.2.2.11",
           "destination_transport_port": 0,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -372,6 +383,7 @@
           "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 8,
+          "ingress_acl_id": "0f8e7ff3-fc1a030f-00000000",
           "ingress_interface": 3,
           "observation_time_milliseconds": "2015-10-09T09:47:50.619Z",
           "octet_total_count": 56,
@@ -425,6 +437,7 @@
         "netflow": {
           "destination_ipv4_address": "192.168.14.11",
           "destination_transport_port": 17805,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 3,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -439,6 +452,7 @@
           "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
+          "ingress_acl_id": "0f8e7ff3-fc1a030f-00000000",
           "ingress_interface": 2,
           "observation_time_milliseconds": "2015-10-09T09:47:50.639Z",
           "octet_total_count": 56,
@@ -492,6 +506,7 @@
         "netflow": {
           "destination_ipv4_address": "192.168.14.1",
           "destination_transport_port": 0,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 3,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -506,6 +521,7 @@
           "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 8,
+          "ingress_acl_id": "0f8e7ff3-fc1a030f-00000000",
           "ingress_interface": 2,
           "observation_time_milliseconds": "2015-10-09T09:47:50.639Z",
           "octet_total_count": 56,
@@ -559,6 +575,7 @@
         "netflow": {
           "destination_ipv4_address": "2.2.2.11",
           "destination_transport_port": 17805,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -573,6 +590,7 @@
           "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
+          "ingress_acl_id": "0f8e7ff3-fc1a030f-00000000",
           "ingress_interface": 3,
           "observation_time_milliseconds": "2015-10-09T09:47:50.639Z",
           "octet_total_count": 56,
@@ -626,6 +644,7 @@
         "netflow": {
           "destination_ipv4_address": "192.168.23.1",
           "destination_transport_port": 0,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -640,6 +659,7 @@
           "fw_ext_event": 2016,
           "icmp_code_ipv4": 3,
           "icmp_type_ipv4": 3,
+          "ingress_acl_id": "0f8e7ff3-fc1a030f-00000000",
           "ingress_interface": 3,
           "observation_time_milliseconds": "2015-10-09T09:47:51.269Z",
           "octet_total_count": 160,
@@ -693,6 +713,7 @@
         "netflow": {
           "destination_ipv4_address": "164.164.37.11",
           "destination_transport_port": 0,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 3,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -707,6 +728,7 @@
           "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 8,
+          "ingress_acl_id": "0f8e7ff3-fc1a030f-00000000",
           "ingress_interface": 2,
           "observation_time_milliseconds": "2015-10-09T09:47:51.269Z",
           "octet_total_count": 56,
@@ -760,6 +782,7 @@
         "netflow": {
           "destination_ipv4_address": "192.168.23.22",
           "destination_transport_port": 18061,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -774,6 +797,7 @@
           "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
+          "ingress_acl_id": "0f8e7ff3-fc1a030f-00000000",
           "ingress_interface": 3,
           "observation_time_milliseconds": "2015-10-09T09:47:51.289Z",
           "octet_total_count": 56,
@@ -827,6 +851,7 @@
         "netflow": {
           "destination_ipv4_address": "164.164.37.11",
           "destination_transport_port": 0,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 3,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -841,6 +866,7 @@
           "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 8,
+          "ingress_acl_id": "0f8e7ff3-fc1a030f-00000000",
           "ingress_interface": 2,
           "observation_time_milliseconds": "2015-10-09T09:47:51.489Z",
           "octet_total_count": 56,
@@ -894,6 +920,7 @@
         "netflow": {
           "destination_ipv4_address": "192.168.23.20",
           "destination_transport_port": 18061,
+          "egress_acl_id": "00000000-00000000-00000000",
           "egress_interface": 2,
           "exporter": {
             "address": "192.0.2.1:4444",
@@ -908,6 +935,7 @@
           "fw_ext_event": 2025,
           "icmp_code_ipv4": 0,
           "icmp_type_ipv4": 0,
+          "ingress_acl_id": "0f8e7ff3-fc1a030f-00000000",
           "ingress_interface": 3,
           "observation_time_milliseconds": "2015-10-09T09:47:51.509Z",
           "octet_total_count": 56,
