@@ -178,7 +178,7 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 			if exists {
 				labels := strings.Split(*output.Label, " ")
 				// check timestamp to make sure metrics come from the same timestamp
-				if len(labels) == 2 && len(output.Values) > timestampIdx {
+				if len(output.Values) > timestampIdx {
 					mapOfMetricSetFieldResults[labels[1]] = fmt.Sprint(output.Values[timestampIdx])
 				}
 			}
