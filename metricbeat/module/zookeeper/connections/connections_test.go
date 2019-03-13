@@ -43,9 +43,6 @@ func TestParser(t *testing.T) {
 	assert.Equal(t, int64(55218), firstLine["port"])
 	assert.Equal(t, int64(55218), secondLine["port"])
 
-	assert.Equal(t, int64(0), firstLine["number"])
-	assert.Equal(t, int64(0), secondLine["number"])
-
 	assert.Equal(t, int64(0), firstLine["queued"])
 	assert.Equal(t, int64(11), secondLine["queued"])
 

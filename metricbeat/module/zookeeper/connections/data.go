@@ -29,7 +29,6 @@ import (
 )
 
 var ipCapturer = regexp.MustCompile(`\d+\.\d+\.\d+\.\d+`)
-var thatNumberCapture = regexp.MustCompile(`\[(\d+)\]`)
 var portCapture = regexp.MustCompile(`:(\d+)\[`)
 var queueCapture = regexp.MustCompile(`queued=(\d*),`)
 var receivedCapture = regexp.MustCompile(`recved=(\d*),`)
@@ -52,9 +51,6 @@ func parseCons(i io.Reader) ([]common.MapStr, error) {
 		}
 		if err = checkRegexSliceAndSetInt(outputLine, portCapture.FindStringSubmatch(line), "port", 1, &oneParsingIsCorrect); err != nil {
 			logger.Error(errors.Wrap(err, "error trying to parse port"))
-		}
-		if err = checkRegexSliceAndSetInt(outputLine, thatNumberCapture.FindStringSubmatch(line), "number", 1, &oneParsingIsCorrect); err != nil {
-			logger.Error(errors.Wrap(err, "error trying to parse 'number' field"))
 		}
 		if err = checkRegexSliceAndSetInt(outputLine, queueCapture.FindStringSubmatch(line), "queued", 1, &oneParsingIsCorrect); err != nil {
 			logger.Error(errors.Wrap(err, "error trying to parse 'queued' field"))

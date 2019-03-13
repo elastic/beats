@@ -26285,16 +26285,6 @@ Connection Port
 
 --
 
-*`zookeeper.connections.number`*::
-+
---
-type: long
-
-Connection Number
-
-
---
-
 *`zookeeper.connections.queued`*::
 +
 --

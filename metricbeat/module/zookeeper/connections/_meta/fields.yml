@@ -11,10 +11,6 @@
       type: long
       description: >
         Connection Port
-    - name: number
-      type: long
-      description: >
-        Connection Number
     - name: queued
       type: long
       description: >
