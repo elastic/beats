@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -48,8 +49,6 @@ var (
 		DefaultPath:   defaultPath,
 		QueryParams:   autoQueryParam,
 	}.Build()
-
-	logger = logp.NewLogger("apache.status")
 )
 
 func init() {
@@ -80,17 +79,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	scanner, err := m.http.FetchScanner()
 	if err != nil {
-		logger.Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error fetching data")
 	}
 
 	data, _ := eventMapping(scanner, m.Host())
 
-	reporter.Event(mb.Event{MetricSetFields: data})
+	if reported := reporter.Event(mb.Event{MetricSetFields: data}); !reported {
+		m.Logger().Error("error reporting event")
+	}
 
-	return
+	return nil
 }
