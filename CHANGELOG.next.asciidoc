@@ -54,6 +54,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Add missing host.* fields to fields.yml. {pull}11016[11016]
 - Include ip and boolean type when generating index pattern. {pull}10995[10995]
 - Using an environment variable for the password when enrolling a beat will now raise an error if the variable doesn't exist. {pull}10936[10936]
+- Allow to configure Kafka fetching strategy for the topic metadata. {pull}10682[10682]
 
 *Auditbeat*
 
@@ -66,7 +67,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 - Fix errors in filebeat Zeek dashboard and README files. Add notice.log support. {pull}10916[10916]
 - Fix a bug when converting NetFlow fields to snake_case. {pull}10950[10950]
-- Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test 
+- Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test
   case. {issue}11004[11004] {pull}11105[11105]
 
 *Heartbeat*
