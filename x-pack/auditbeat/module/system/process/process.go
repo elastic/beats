@@ -403,26 +403,30 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 			}
 		}
 
-		userInfo, err := sysinfoProc.User()
-		if err != nil {
-			if process.Error == nil {
-				process.Error = errors.Wrapf(err, "failed to load user for PID %d", sysinfoProc.PID())
-			}
-		} else {
-			process.UserInfo = &userInfo
+		// Only report processes with an executable. Processes without
+		// are usually kernel processes that are not very interesting.
+		if process.Info.Exe != "" {
+			userInfo, err := sysinfoProc.User()
+			if err != nil {
+				if process.Error == nil {
+					process.Error = errors.Wrapf(err, "failed to load user for PID %d", sysinfoProc.PID())
+				}
+			} else {
+				process.UserInfo = &userInfo
 
-			goUser, err := user.LookupId(userInfo.UID)
-			if err == nil {
-				process.User = goUser
+				goUser, err := user.LookupId(userInfo.UID)
+				if err == nil {
+					process.User = goUser
+				}
+
+				group, err := user.LookupGroupId(userInfo.GID)
+				if err == nil {
+					process.Group = group
+				}
 			}
 
-			group, err := user.LookupGroupId(userInfo.GID)
-			if err == nil {
-				process.Group = group
-			}
+			processes = append(processes, process)
 		}
-
-		processes = append(processes, process)
 	}
 
 	return processes, nil
