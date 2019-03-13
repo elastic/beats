@@ -1,19 +1,28 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "agent": {
+        "hostname": "host.example.com",
+        "name": "host.example.com"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"zookeeper",
-        "name":"connections",
-        "rtt":44269
+    "event": {
+        "dataset": "zookeeper.connections",
+        "duration": 115000,
+        "module": "zookeeper"
     },
-    "zookeeper":{
-        "connections":{
-            "example": "connections"
+    "metricset": {
+        "name": "connections"
+    },
+    "service": {
+        "address": "172.17.0.2:2181",
+        "type": "zookeeper"
+    },
+    "zookeeper": {
+        "connections": {
+            "ip": "172.17.0.1",
+            "port": 44048,
+            "queued": 0,
+            "received": 1,
+            "sent": 0
         }
-    },
-    "type":"metricsets"
+    }
 }
