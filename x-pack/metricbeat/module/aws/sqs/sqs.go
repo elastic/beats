@@ -180,15 +180,22 @@ func createEventPerQueue(getMetricDataResults []cloudwatch.MetricDataResult, que
 
 	// AWS sqs metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
-	for _, output := range getMetricDataResults {
-		if len(output.Values) == 0 {
-			continue
+
+	// Find a timestamp for all metrics in output
+	timestamp := aws.FindTimestamp(getMetricDataResults)
+	if !timestamp.IsZero() {
+		for _, output := range getMetricDataResults {
+			if len(output.Values) == 0 {
+				continue
+			}
+			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
+			if exists {
+				labels := strings.Split(*output.Label, " ")
+				if labels[0] == queueName && len(output.Values) > timestampIdx {
+					mapOfMetricSetFieldResults[labels[1]] = fmt.Sprint(output.Values[timestampIdx])
+				}
+			}
 		}
-		labels := strings.Split(*output.Label, " ")
-		if labels[0] != queueName {
-			continue
-		}
-		mapOfMetricSetFieldResults[labels[1]] = fmt.Sprint(output.Values[0])
 	}
 
 	resultMetricSetFields, err := aws.EventMapping(mapOfMetricSetFieldResults, schemaMetricFields)

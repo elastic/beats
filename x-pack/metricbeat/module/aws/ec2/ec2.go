@@ -166,12 +166,22 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 
 	// AWS EC2 Metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
-	for _, output := range getMetricDataResults {
-		if len(output.Values) == 0 {
-			continue
+
+	// Find a timestamp for all metrics in output
+	timestamp := aws.FindTimestamp(getMetricDataResults)
+	if !timestamp.IsZero() {
+		for _, output := range getMetricDataResults {
+			if len(output.Values) == 0 {
+				continue
+			}
+			exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
+			if exists {
+				labels := strings.Split(*output.Label, " ")
+				if len(output.Values) > timestampIdx {
+					mapOfMetricSetFieldResults[labels[1]] = fmt.Sprint(output.Values[timestampIdx])
+				}
+			}
 		}
-		labels := strings.Split(*output.Label, " ")
-		mapOfMetricSetFieldResults[labels[1]] = fmt.Sprint(output.Values[0])
 	}
 
 	resultMetricSetFields, err := aws.EventMapping(mapOfMetricSetFieldResults, schemaMetricSetFields)
@@ -181,8 +191,9 @@ func createCloudWatchEvents(getMetricDataResults []cloudwatch.MetricDataResult, 
 	}
 
 	if len(mapOfMetricSetFieldResults) <= 11 {
-		info = "Missing Cloudwatch data for instance " + instanceID + ". This is expected for a new instance during the " +
-			"first data collection. If this shows up multiple times, please recheck the period setting in config."
+		info = "Missing Cloudwatch data for instance " + instanceID + ". This is expected for non-running instances or " +
+			"a new instance during the first data collection. If this shows up multiple times, please recheck the period " +
+			"setting in config."
 	}
 
 	instanceStateName, err := instanceOutput.State.Name.MarshalValue()
