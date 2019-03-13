@@ -36,6 +36,8 @@ https://github.com/elastic/beats/compare/v6.6.2...6.6[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix a bug with the convert_timezone option using the incorrect timezone field. {issue}11055[11055] {pull}11164[11164]
+
 *Heartbeat*
 
 *Journalbeat*
