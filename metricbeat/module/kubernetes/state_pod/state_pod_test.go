@@ -100,7 +100,6 @@ func testValue(eventKey string, t *testing.T, event common.MapStr, field string,
 func testCases() map[string]map[string]interface{} {
 	return map[string]map[string]interface{}{
 		"default@jumpy-owl-redis-3481028193-s78x9": {
-			"_namespace":        "pod",
 			"_module.namespace": "default",
 			"_module.node.name": "minikube",
 			"name":              "jumpy-owl-redis-3481028193-s78x9",
@@ -113,7 +112,6 @@ func testCases() map[string]map[string]interface{} {
 			"status.scheduled": "true",
 		},
 		"test@jumpy-owl-redis-3481028193-s78x9": {
-			"_namespace":        "pod",
 			"_module.namespace": "test",
 			"_module.node.name": "minikube-test",
 			"name":              "jumpy-owl-redis-3481028193-s78x9",
@@ -126,7 +124,6 @@ func testCases() map[string]map[string]interface{} {
 			"status.scheduled": "false",
 		},
 		"jenkins@wise-lynx-jenkins-1616735317-svn6k": {
-			"_namespace":        "pod",
 			"_module.namespace": "jenkins",
 			"_module.node.name": "minikube",
 			"name":              "wise-lynx-jenkins-1616735317-svn6k",
