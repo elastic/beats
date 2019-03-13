@@ -1408,6 +1408,16 @@ The size of messages added to a queue.
 
 --
 
+*`aws.sqs.queue.name`*::
++
+--
+type: keyword
+
+SQS queue name
+
+
+--
+
 [[exported-fields-beat]]
 == Beat fields
 
