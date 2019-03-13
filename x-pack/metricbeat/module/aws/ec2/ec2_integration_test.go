@@ -37,11 +37,17 @@ func TestFetch(t *testing.T) {
 		mtest.CheckEventField("service.name", "string", event, t)
 		mtest.CheckEventField("cloud.availability_zone", "string", event, t)
 		mtest.CheckEventField("cloud.provider", "string", event, t)
-		mtest.CheckEventField("cloud.image.id", "string", event, t)
 		mtest.CheckEventField("cloud.instance.id", "string", event, t)
 		mtest.CheckEventField("cloud.machine.type", "string", event, t)
 		mtest.CheckEventField("cloud.provider", "string", event, t)
 		mtest.CheckEventField("cloud.region", "string", event, t)
+		mtest.CheckEventField("instance.image.id", "string", event, t)
+		mtest.CheckEventField("instance.state.name", "string", event, t)
+		mtest.CheckEventField("instance.state.code", "int", event, t)
+		mtest.CheckEventField("instance.monitoring.state", "string", event, t)
+		mtest.CheckEventField("instance.core.count", "int", event, t)
+		mtest.CheckEventField("instance.threads_per_core", "int", event, t)
+
 		// MetricSetField
 		mtest.CheckEventField("cpu.total.pct", "float", event, t)
 		mtest.CheckEventField("cpu.credit_usage", "float", event, t)
