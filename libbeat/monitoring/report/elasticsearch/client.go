@@ -116,9 +116,7 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 		meta := common.MapStr{
 			"_index":   "",
 			"_routing": nil,
-		}
-		if c.es.GetVersion().Major < 7 {
-			meta["_type"] = t
+			"_type":    t,
 		}
 		bulk := [2]interface{}{
 			common.MapStr{"index": meta},
