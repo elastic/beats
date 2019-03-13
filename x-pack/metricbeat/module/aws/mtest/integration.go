@@ -76,15 +76,15 @@ func compareType(metricValue interface{}, expectedType string, metricName string
 	switch metricValue.(type) {
 	case float64:
 		if expectedType != "float" {
-			err = errors.New("Failed: Field " + metricName + "is not in type " + expectedType)
+			err = errors.New("Failed: Field " + metricName + " is not in type " + expectedType)
 		}
 	case string:
 		if expectedType != "string" {
-			err = errors.New("Failed: Field " + metricName + "is not in type " + expectedType)
+			err = errors.New("Failed: Field " + metricName + " is not in type " + expectedType)
 		}
 	case int64:
 		if expectedType != "int" {
-			err = errors.New("Failed: Field " + metricName + "is not in type " + expectedType)
+			err = errors.New("Failed: Field " + metricName + " is not in type " + expectedType)
 		}
 	}
 	return
