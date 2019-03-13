@@ -55,6 +55,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Include ip and boolean type when generating index pattern. {pull}10995[10995]
 - Using an environment variable for the password when enrolling a beat will now raise an error if the variable doesn't exist. {pull}10936[10936]
 - Cancelling enrollment of a beat will not enroll the beat. {issue}10150[10150]
+- Allow to configure Kafka fetching strategy for the topic metadata. {pull}10682[10682]
 
 *Auditbeat*
 
@@ -67,7 +68,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 - Fix errors in filebeat Zeek dashboard and README files. Add notice.log support. {pull}10916[10916]
 - Fix a bug when converting NetFlow fields to snake_case. {pull}10950[10950]
-- Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test 
+- Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test
   case. {issue}11004[11004] {pull}11105[11105]
 
 *Heartbeat*
@@ -82,6 +83,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Fix issue in kubernetes module preventing usage percentages to be properly calculated. {pull}10946[10946]
 - Fix parsing error using GET in Jolokia module. {pull}11075[11075] {issue}11071[11071]
 - Add documentation about jolokia autodiscover fields. {issue}10925[10925] {pull}10979[10979]
+- Add missing aws.ec2.instance.state.name into fields.yml. {issue}11219[11219] {pull}11221[11221]
 
 *Packetbeat*
 
@@ -106,6 +108,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 *Filebeat*
 
 - Add ISO8601 timestamp support in syslog metricset. {issue}8716[8716] {pull}10736[10736]
+- Add support for loading custom NetFlow and IPFIX field definitions to netflow input. {pull}10945[10945] {pull}11223[11223]
 
 *Heartbeat*
 

@@ -12,8 +12,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/atomic"
-
 	"github.com/elastic/beats/filebeat/channel"
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/input"
@@ -22,9 +20,11 @@ import (
 	"github.com/elastic/beats/filebeat/util"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring"
 	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder"
+	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/fields"
 )
 
 const (
@@ -84,9 +84,18 @@ func NewInput(
 		return nil, err
 	}
 
+	var customFields []fields.FieldDict
+	for _, yamlPath := range config.CustomDefinitions {
+		f, err := LoadFieldDefinitionsFromFile(yamlPath)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed parsing custom field definitions from file '%s'", yamlPath)
+		}
+		customFields = append(customFields, f)
+	}
 	decoder, err := decoder.NewDecoder(decoder.NewConfig().
 		WithProtocols(config.Protocols...).
-		WithExpiration(config.ExpirationTimeout))
+		WithExpiration(config.ExpirationTimeout).
+		WithCustomFields(customFields...))
 	if err != nil {
 		return nil, errors.Wrapf(err, "error initializing netflow decoder")
 	}
