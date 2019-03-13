@@ -1326,7 +1326,7 @@ The approximate age of the oldest non-deleted message in the queue.
 
 --
 
-*`aws.sqs.message.delayed`*::
+*`aws.sqs.messages.delayed`*::
 +
 --
 type: long
@@ -1346,7 +1346,7 @@ The number of messages that are in flight.
 
 --
 
-*`aws.sqs.message.visible`*::
+*`aws.sqs.messages.visible`*::
 +
 --
 type: long
@@ -1356,7 +1356,7 @@ The number of messages available for retrieval from the queue.
 
 --
 
-*`aws.sqs.message.deleted`*::
+*`aws.sqs.messages.deleted`*::
 +
 --
 type: long
@@ -1366,7 +1366,7 @@ The number of messages deleted from the queue.
 
 --
 
-*`aws.sqs.message.received`*::
+*`aws.sqs.messages.received`*::
 +
 --
 type: long
@@ -1376,7 +1376,7 @@ The number of messages returned by calls to the ReceiveMessage action.
 
 --
 
-*`aws.sqs.message.sent`*::
+*`aws.sqs.messages.sent`*::
 +
 --
 type: long
