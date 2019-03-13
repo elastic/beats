@@ -9,6 +9,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
+
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/pkg/errors"
 
@@ -79,6 +82,18 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 	for _, regionName := range m.MetricSet.RegionsList {
 		m.MetricSet.AwsConfig.Region = regionName
 		svcCloudwatch := cloudwatch.New(*m.MetricSet.AwsConfig)
+		svcSQS := sqs.New(*m.MetricSet.AwsConfig)
+
+		// Get queueUrls for each region
+		queueURLs, err := getQueueUrls(svcSQS)
+		if err != nil {
+			m.logger.Error(err.Error())
+			report.Error(err)
+			continue
+		}
+		if len(queueURLs) == 0 {
+			continue
+		}
 
 		// Get listMetrics output
 		listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
@@ -107,16 +122,20 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) {
 		}
 
 		// Create Cloudwatch Events for SQS
-		event, err := createSQSEvents(metricDataResults, metricsetName, regionName, schemaRequestFields)
-		if err != nil {
-			m.logger.Error(err.Error())
-			event.Error = err
-			report.Event(event)
-			continue
-		}
-
-		report.Event(event)
+		createSQSEvents(queueURLs, metricDataResults, regionName, report)
 	}
+}
+
+func getQueueUrls(svc sqsiface.SQSAPI) ([]string, error) {
+	// ListQueues
+	listQueuesInput := &sqs.ListQueuesInput{}
+	req := svc.ListQueuesRequest(listQueuesInput)
+	output, err := req.Send()
+	if err != nil {
+		err = errors.Wrap(err, "Error DescribeInstances")
+		return nil, err
+	}
+	return output.QueueUrls, nil
 }
 
 func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period int64) []cloudwatch.MetricDataQuery {
@@ -153,19 +172,22 @@ func createMetricDataQuery(metric cloudwatch.Metric, index int, period int64) (m
 	return
 }
 
-func createSQSEvents(getMetricDataResults []cloudwatch.MetricDataResult, metricsetName string, regionName string, schemaMetricFields s.Schema) (event mb.Event, err error) {
+func createEventPerQueue(getMetricDataResults []cloudwatch.MetricDataResult, queueName string, metricsetName string, regionName string, schemaMetricFields s.Schema) (event mb.Event, err error) {
 	event.Service = metricsetName
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("service.name", metricsetName)
 	event.RootFields.Put("cloud.region", regionName)
 
+	// AWS sqs metrics
 	mapOfMetricSetFieldResults := make(map[string]interface{})
 	for _, output := range getMetricDataResults {
 		if len(output.Values) == 0 {
 			continue
 		}
 		labels := strings.Split(*output.Label, " ")
-		mapOfMetricSetFieldResults["queue.name"] = labels[0]
+		if labels[0] != queueName {
+			continue
+		}
 		mapOfMetricSetFieldResults[labels[1]] = fmt.Sprint(output.Values[0])
 	}
 
@@ -174,6 +196,22 @@ func createSQSEvents(getMetricDataResults []cloudwatch.MetricDataResult, metrics
 		err = errors.Wrap(err, "Error trying to apply schemaMetricSetFields in AWS SQS metricbeat module.")
 		return
 	}
+
 	event.MetricSetFields = resultMetricSetFields
+	event.MetricSetFields.Put("queue.name", queueName)
 	return
+}
+
+func createSQSEvents(queueURLs []string, metricDataResults []cloudwatch.MetricDataResult, regionName string, report mb.ReporterV2) {
+	for _, queueURL := range queueURLs {
+		queueURLParsed := strings.Split(queueURL, "/")
+		queueName := queueURLParsed[len(queueURLParsed)-1]
+		event, err := createEventPerQueue(metricDataResults, queueName, metricsetName, regionName, schemaRequestFields)
+		if err != nil {
+			event.Error = err
+			report.Event(event)
+			continue
+		}
+		report.Event(event)
+	}
 }
