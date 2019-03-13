@@ -35,3 +35,4 @@ The list below covers the major changes between 7.0.0-beta1 and master only.
 - Assertion for documented fields in tests fails if any of the fields in the tested event is documented as an alias. {pull}10921[10921]
 - Support for Logger in the Metricset base instance. {pull}11106[11106]
 - Introduce processing.Support to instance.Setting. This allows Beats to fully modify the event processing. {pull}10801[10801]
+- Filebeat modules can now use ingest pipelines in YAML format. {pull}11209[11209]
