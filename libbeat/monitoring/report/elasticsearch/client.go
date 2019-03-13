@@ -21,6 +21,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring/report"
@@ -47,6 +49,11 @@ func newPublishClient(
 
 func (c *publishClient) Connect() error {
 	debugf("Monitoring client: connect.")
+
+	err := c.es.Connect()
+	if err != nil {
+		return errors.Wrap(err, "cannot connect underlying Elasticsearch client")
+	}
 
 	params := map[string]string{
 		"filter_path": "features.monitoring.enabled",
