@@ -33,8 +33,8 @@ import (
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/beats/auditbeat/core"
-	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/libbeat/mapping"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 	"github.com/elastic/go-libaudit"
@@ -102,7 +102,7 @@ func TestData(t *testing.T) {
 
 // assertFieldsAreDocumented mimics assert_fields_are_documented in Python system tests.
 func assertFieldsAreDocumented(t *testing.T, events []mb.Event) {
-	fieldsYml, err := asset.LoadFieldsYaml("../../fields.yml")
+	fieldsYml, err := mapping.LoadFieldsYaml("../../fields.yml")
 	if err != nil {
 		t.Fatal(err)
 	}

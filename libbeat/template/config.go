@@ -17,7 +17,7 @@
 
 package template
 
-import "github.com/elastic/beats/libbeat/asset"
+import "github.com/elastic/beats/libbeat/mapping"
 
 type TemplateConfig struct {
 	Enabled bool   `config:"enabled"`
@@ -29,7 +29,7 @@ type TemplateConfig struct {
 		Path    string `config:"path"`
 		Name    string `config:"name"`
 	} `config:"json"`
-	AppendFields asset.Fields     `config:"append_fields"`
+	AppendFields mapping.Fields   `config:"append_fields"`
 	Overwrite    bool             `config:"overwrite"`
 	Settings     TemplateSettings `config:"settings"`
 }
