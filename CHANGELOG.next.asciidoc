@@ -81,6 +81,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Fix issue in kubernetes module preventing usage percentages to be properly calculated. {pull}10946[10946]
 - Fix parsing error using GET in Jolokia module. {pull}11075[11075] {issue}11071[11071]
 - Add documentation about jolokia autodiscover fields. {issue}10925[10925] {pull}10979[10979]
+- Add missing aws.ec2.instance.state.name into fields.yml. {issue}11219[11219] {pull}11221[11221]
 
 *Packetbeat*
 
