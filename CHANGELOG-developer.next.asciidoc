@@ -22,6 +22,7 @@ The list below covers the major changes between 7.0.0-beta1 and master only.
 
 - Remove support for deprecated `GenRootCmd` methods. {pull}10721[10721]
 - Remove SkipNormalization, SkipAgentMetadata, SkipAddHostName. {pull}10801[10801] {pull}10769[10769]
+- Move Fields from package libbeat/common to libbeat/mapping. {pull}11198[11198]
 
 ==== Bugfixes
 
