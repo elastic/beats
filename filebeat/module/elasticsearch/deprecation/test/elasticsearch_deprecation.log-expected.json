@@ -1,7 +1,7 @@
 [
     {
         "@timestamp": "2018-04-23T16:40:13.737Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.d.a.a.i.t.p.PutIndexTemplateRequest",
         "event.dataset": "elasticsearch.deprecation",
         "event.module": "elasticsearch",
@@ -14,7 +14,7 @@
     },
     {
         "@timestamp": "2018-04-23T16:40:13.862Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.d.a.a.i.t.p.PutIndexTemplateRequest",
         "event.dataset": "elasticsearch.deprecation",
         "event.module": "elasticsearch",
@@ -27,7 +27,7 @@
     },
     {
         "@timestamp": "2018-04-23T16:40:14.792Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.d.a.a.i.t.p.PutIndexTemplateRequest",
         "event.dataset": "elasticsearch.deprecation",
         "event.module": "elasticsearch",
@@ -40,7 +40,7 @@
     },
     {
         "@timestamp": "2018-04-23T16:40:15.127Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "elasticsearch.component": "o.e.d.a.a.i.t.p.PutIndexTemplateRequest",
         "event.dataset": "elasticsearch.deprecation",
         "event.module": "elasticsearch",

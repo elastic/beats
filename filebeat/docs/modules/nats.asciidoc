@@ -21,7 +21,11 @@ The +{modulename}+ module was tested with logs from version v1.4.0.
 include::../include/running-modules.asciidoc[]
 
 [float]
-=== Example dashboard
+=== Dashboard
+
+The Nats module comes with a predefined dashboard. For example:
+
+image::./images/filebeat_nats_dashboard.png[]
 
 
 include::../include/configuring-intro.asciidoc[]
