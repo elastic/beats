@@ -29,6 +29,8 @@ Example configuration:
   protocols: [ v5, v9, ipfix ]
   expiration_timeout: 30m
   queue_size: 8192
+  custom_definitions:
+  - path/to/fields.yml
 ----
 
 
@@ -60,6 +62,52 @@ Only applicable to v9 and IPFIX protocols. A value of zero disables expiration.
 The maximum number of packets that can be queued for processing.
 Use this setting to avoid packet-loss when dealing with occasional bursts
 of traffic.
+
+[float]
+[[custom_definitions]]
+==== `custom_definitions`
+
+A list of paths to field definitions YAML files. These allow to update the
+NetFlow/IPFIX fields with vendor extensions and to override existing fields.
+
+The expected format is the same as used by Logstash's NetFlow codec
+{logstash-ref}/plugins-codecs-netflow.html#plugins-codecs-netflow-ipfix_definitions[ipfix_definitions]
+and {logstash-ref}/plugins-codecs-netflow.html#plugins-codecs-netflow-netflow_definitions[netflow_definitions].
+{beatname} will detect which of the two formats is used.
+
+NetFlow format example:
+["source","yaml",subs="attributes"]
+id:
+- default length in bytes
+- :name
+id:
+- :uintN or :intN: or :ip4_addr or :ip6_addr or :mac_addr or :string
+- :name
+id:
+- :skip
+
+
+Where `id` is the numeric field ID.
+
+The IPFIX format similar, but grouped by Private Enterprise Number (PEN):
+["source","yaml",subs="attributes"]
+pen1:
+  id:
+  - :uintN or :ip4_addr or :ip6_addr or :mac_addr or :string
+  - :name
+  id:
+  - :skip
+pen2:
+  id:
+  - :octetarray
+  - :name
+
+Note that fields are shared between NetFlow V9 and IPFIX. Changes to
+IPFIX PEN zero are equivalent to changes to NetFlow fields.
+
+[WARNING]
+Overriding the names and/or types of standard fields can prevent
+mapping of ECS fields to function properly.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]

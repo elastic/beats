@@ -20,7 +20,7 @@ var (
 )
 
 func buildDecoderByNameMap() {
-	for _, value := range fields.Fields {
+	for _, value := range fields.GlobalFields {
 		decoderByName[value.Name] = value.Decoder
 	}
 }
