@@ -330,7 +330,7 @@ The generator creates a JSON object similar to this one:
 }
 ----
 
-Alternatively, you can use YAML formatted pipelines, which uses a simpler sintax:
+Alternatively, you can use YAML formatted pipelines, which uses a simpler syntax:
 
 [source,yaml]
 ----
