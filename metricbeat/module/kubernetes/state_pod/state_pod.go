@@ -19,7 +19,6 @@ package state_pod
 
 import (
 	"github.com/elastic/beats/libbeat/common/kubernetes"
-	"github.com/elastic/beats/libbeat/logp"
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -53,13 +52,7 @@ var (
 			"pod_ip":  p.Label("ip"),
 			"host_ip": p.Label("host_ip"),
 		},
-
-		ExtraFields: map[string]string{
-			mb.NamespaceKey: "pod",
-		},
 	}
-
-	logger = logp.NewLogger("kubernetes.state_pod")
 )
 
 // init registers the MetricSet with the central registry.
@@ -104,14 +97,17 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 	events, err := m.prometheus.GetProcessedMetrics(mapping)
 	if err != nil {
-		logger.Error(err)
+		m.Logger().Error(err)
 		reporter.Error(err)
 		return
 	}
 
 	m.enricher.Enrich(events)
 	for _, event := range events {
-		reporter.Event(mb.Event{MetricSetFields: event})
+		reporter.Event(mb.Event{
+			MetricSetFields: event,
+			Namespace:       "kubernetes.pod",
+		})
 	}
 
 	return
