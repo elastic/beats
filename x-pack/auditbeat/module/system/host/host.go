@@ -190,7 +190,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Close cleans up the MetricSet when it finishes.
 func (ms *MetricSet) Close() error {
-	return ms.saveStateToDisk()
+	if ms.bucket != nil {
+		return ms.bucket.Close()
+	}
+	return nil
 }
 
 // Fetch collects data about the host. It is invoked periodically.
@@ -224,7 +227,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 
 	report.Event(hostEvent(host, eventTypeState, eventActionHost))
 
-	return nil
+	return ms.saveStateToDisk()
 }
 
 // reportChanges detects and reports any changes to this host since the last call.
@@ -375,17 +378,19 @@ func inflect(noun string, count int) string {
 func (ms *MetricSet) saveStateToDisk() error {
 	var buf bytes.Buffer
 	encoder := gob.NewEncoder(&buf)
-	err := encoder.Encode(*ms.lastHost)
-	if err != nil {
-		return errors.Wrap(err, "error encoding host information")
-	}
+	if ms.lastHost != nil {
+		err := encoder.Encode(*ms.lastHost)
+		if err != nil {
+			return errors.Wrap(err, "error encoding host information")
+		}
 
-	err = ms.bucket.Store(bucketKeyLastHost, buf.Bytes())
-	if err != nil {
-		return errors.Wrap(err, "error writing host information to disk")
-	}
+		err = ms.bucket.Store(bucketKeyLastHost, buf.Bytes())
+		if err != nil {
+			return errors.Wrap(err, "error writing host information to disk")
+		}
 
-	ms.log.Debug("Wrote host information to disk.")
+		ms.log.Debug("Wrote host information to disk.")
+	}
 	return nil
 }
 

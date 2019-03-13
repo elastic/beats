@@ -158,9 +158,9 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 				"name": "test-gce-dev",
 			},
 			"machine": common.MapStr{
-				"type": "projects/111111111111/machineTypes/f1-micro",
+				"type": "f1-micro",
 			},
-			"availability_zone": "projects/111111111111/zones/us-east1-b",
+			"availability_zone": "us-east1-b",
 			"project": common.MapStr{
 				"id": "test-dev",
 			},

@@ -46,22 +46,7 @@ type Client interface {
 type ClientConfig struct {
 	PublishMode PublishMode
 
-	// EventMetadata configures additional fields/tags to be added to published events.
-	EventMetadata common.EventMetadata
-
-	// Meta provides additional meta data to be added to the Meta field in the beat.Event
-	// structure.
-	Meta common.MapStr
-
-	// Fields provides additional 'global' fields to be added to every event
-	Fields common.MapStr
-
-	// DynamicFields provides additional fields to be added to every event, supporting live updates
-	DynamicFields *common.MapStrPointer
-
-	// Processors passes additional processor to the client, to be executed before
-	// the pipeline processors.
-	Processor ProcessorList
+	Processing ProcessingConfig
 
 	// WaitClose sets the maximum duration to wait on ACK, if client still has events
 	// active non-acknowledged events in the publisher pipeline.
@@ -71,14 +56,6 @@ type ClientConfig struct {
 
 	// Events configures callbacks for common client callbacks
 	Events ClientEventer
-
-	// By default events are normalized within processor pipeline,
-	// if the normalization step should be skipped set this to true.
-	SkipNormalization bool
-
-	// By default events are decorated with agent metadata.
-	// To skip adding that metadata set this to true.
-	SkipAgentMetadata bool
 
 	// ACK handler strategies.
 	// Note: ack handlers are run in another go-routine owned by the publisher pipeline.
@@ -99,6 +76,31 @@ type ClientConfig struct {
 	// ACKLastEvent reports the last ACKed event out of a batch of ACKed events only.
 	// Only the events 'Private' field will be reported.
 	ACKLastEvent func(interface{})
+}
+
+// ProcessingConfig provides additional event processing settings a client can
+// pass to the publisher pipeline on Connect.
+type ProcessingConfig struct {
+	// EventMetadata configures additional fields/tags to be added to published events.
+	EventMetadata common.EventMetadata
+
+	// Meta provides additional meta data to be added to the Meta field in the beat.Event
+	// structure.
+	Meta common.MapStr
+
+	// Fields provides additional 'global' fields to be added to every event
+	Fields common.MapStr
+
+	// DynamicFields provides additional fields to be added to every event, supporting live updates
+	DynamicFields *common.MapStrPointer
+
+	// Processors passes additional processor to the client, to be executed before
+	// the pipeline processors.
+	Processor ProcessorList
+
+	// Private contains additional information to be passed to the processing
+	// pipeline builder.
+	Private interface{}
 }
 
 // ClientEventer provides access to internal client events.

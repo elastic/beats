@@ -19,7 +19,7 @@ processors:
         - from: "zeek.notice.src"
           to: "source.address"
 
-        - from: "zeek.notice.dest"
+        - from: "zeek.notice.dst"
           to: "destination.address"
 
         - from: "zeek.notice.uid"

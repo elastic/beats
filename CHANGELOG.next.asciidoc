@@ -10,6 +10,9 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 *Affecting all Beats*
 
+- On Google Cloud Engine (GCE) the add_cloud_metadata will now trim the project
+  info from the cloud.machine.type and cloud.availability_zone. {issue}10968[10968]
+
 *Auditbeat*
 
 *Filebeat*
@@ -30,6 +33,8 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 *Functionbeat*
 
+- Correctly extract Kinesis Data field from the Kinesis Record. {pull}11141[11141]
+
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -45,18 +50,28 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Fix a issue when remote and local configuration didn't match when fetching configuration from Central Management. {issue}10587[10587]
 - Fix unauthorized error when loading dashboards by adding username and password into kibana config. {issue}10513[10513] {pull}10675[10675]
 - Ensure all beat commands respect configured settings. {pull}10721[10721]
+- Reconnections of Kubernetes watchers are now logged at debug level when they are harmless. {pull}10988[10988]
 - Add missing host.* fields to fields.yml. {pull}11016[11016]
+- Include ip and boolean type when generating index pattern. {pull}10995[10995]
+- Using an environment variable for the password when enrolling a beat will now raise an error if the variable doesn't exist. {pull}10936[10936]
 
 *Auditbeat*
 
 - Package: Disable librpm signal handlers. {pull}10694[10694]
 - Login: Handle different bad login UTMP types. {pull}10865[10865]
+- System module: Fix and unify bucket closing logic. {pull}10897[10897]
+- User dataset: Numerous fixes to error handling. {pull}10942[10942]
 
 *Filebeat*
 
 - Fix errors in filebeat Zeek dashboard and README files. Add notice.log support. {pull}10916[10916]
+- Fix a bug when converting NetFlow fields to snake_case. {pull}10950[10950]
+- Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test 
+  case. {issue}11004[11004] {pull}11105[11105]
 
 *Heartbeat*
+
+- Fix checks for TCP send/receive data {pull}11118[11118]
 
 *Journalbeat*
 
@@ -65,6 +80,8 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Migrate docker autodiscover to ECS. {issue}10757[10757] {pull}10862[10862]
 - Fix issue in kubernetes module preventing usage percentages to be properly calculated. {pull}10946[10946]
 - Fix for not reusable http client leading to connection leaks in Jolokia module {pull}11014[11014]
+- Fix parsing error using GET in Jolokia module. {pull}11075[11075] {issue}11071[11071]
+- Add documentation about jolokia autodiscover fields. {issue}10925[10925] {pull}10979[10979]
 
 *Packetbeat*
 
@@ -79,6 +96,8 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 ==== Added
 
 *Affecting all Beats*
+
+- Add ip fields to default_field in Elasticsearch template. {pull}11035[11035]
 
 *Auditbeat*
 

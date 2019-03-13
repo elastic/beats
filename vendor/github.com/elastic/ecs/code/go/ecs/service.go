@@ -20,8 +20,9 @@
 package ecs
 
 // The service fields describe the service for or from which the data was
-// collected. These fields help you find and correlate logs for a specific
-// service and version.
+// collected.
+// These fields help you find and correlate logs for a specific service and
+// version.
 type Service struct {
 	// Unique identifier of the running service.
 	// This id should uniquely identify this service. This makes it possible to

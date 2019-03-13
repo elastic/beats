@@ -84,8 +84,10 @@ func NewUtmpFileReader(log *logp.Logger, bucket datastore.Bucket, config config)
 
 // Close performs any cleanup tasks when the UTMP reader is done.
 func (r *UtmpFileReader) Close() error {
-	err := r.bucket.Close()
-	return errors.Wrap(err, "error closing bucket")
+	if r.bucket != nil {
+		return r.bucket.Close()
+	}
+	return nil
 }
 
 // ReadNew returns any new UTMP entries in any files matching the configured pattern.

@@ -442,14 +442,12 @@ _EC2_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "us-east-1c",
-      "instance_id": "i-4e123456",
-      "machine_type": "t2.medium",
-      "provider": "ec2",
-      "region": "us-east-1"
-    }
+  "cloud": {
+    "availability_zone": "us-east-1c",
+    "instance_id": "i-4e123456",
+    "machine_type": "t2.medium",
+    "provider": "ec2",
+    "region": "us-east-1"
   }
 }
 -------------------------------------------------------------------------------
@@ -459,12 +457,10 @@ _Digital Ocean_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "instance_id": "1234567",
-      "provider": "digitalocean",
-      "region": "nyc2"
-    }
+  "cloud": {
+    "instance_id": "1234567",
+    "provider": "digitalocean",
+    "region": "nyc2"
   }
 }
 -------------------------------------------------------------------------------
@@ -474,14 +470,12 @@ _GCE_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "projects/1234567890/zones/us-east1-b",
-      "instance_id": "1234556778987654321",
-      "machine_type": "projects/1234567890/machineTypes/f1-micro",
-      "project_id": "my-dev",
-      "provider": "gce"
-    }
+  "cloud": {
+    "availability_zone": "us-east1-b",
+    "instance_id": "1234556778987654321",
+    "machine_type": "f1-micro",
+    "project_id": "my-dev",
+    "provider": "gce"
   }
 }
 -------------------------------------------------------------------------------
@@ -491,13 +485,11 @@ _Tencent Cloud_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "gz-azone2",
-      "instance_id": "ins-qcloudv5",
-      "provider": "qcloud",
-      "region": "china-south-gz"
-    }
+  "cloud": {
+    "availability_zone": "gz-azone2",
+    "instance_id": "ins-qcloudv5",
+    "provider": "qcloud",
+    "region": "china-south-gz"
   }
 }
 -------------------------------------------------------------------------------
@@ -510,13 +502,11 @@ ECS instance.
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "availability_zone": "cn-shenzhen",
-      "instance_id": "i-wz9g2hqiikg0aliyun2b",
-      "provider": "ecs",
-      "region": "cn-shenzhen-a"
-    }
+  "cloud": {
+    "availability_zone": "cn-shenzhen",
+    "instance_id": "i-wz9g2hqiikg0aliyun2b",
+    "provider": "ecs",
+    "region": "cn-shenzhen-a"
   }
 }
 -------------------------------------------------------------------------------
@@ -526,14 +516,12 @@ _Azure Virtual Machine_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "provider": "az",
-      "instance_id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
-      "instance_name": "test-az-vm",
-      "machine_type": "Standard_D3_v2",
-      "region": "eastus2"
-    }
+  "cloud": {
+    "provider": "az",
+    "instance_id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
+    "instance_name": "test-az-vm",
+    "machine_type": "Standard_D3_v2",
+    "region": "eastus2"
   }
 }
 -------------------------------------------------------------------------------
@@ -543,14 +531,12 @@ _Openstack Nova_
 [source,json]
 -------------------------------------------------------------------------------
 {
-  "meta": {
-    "cloud": {
-      "provider": "openstack",
-      "instance_name": "test-998d932195.mycloud.tld",
-      "availability_zone": "xxxx-az-c",
-      "instance_id": "i-00011a84",
-      "machine_type": "m2.large"
-    }
+  "cloud": {
+    "provider": "openstack",
+    "instance_name": "test-998d932195.mycloud.tld",
+    "availability_zone": "xxxx-az-c",
+    "instance_id": "i-00011a84",
+    "machine_type": "m2.large"
   }
 }
 -------------------------------------------------------------------------------

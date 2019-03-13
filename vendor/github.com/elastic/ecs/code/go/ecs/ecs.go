@@ -26,6 +26,5 @@ type ECS struct {
 	// When querying across multiple indices -- which may conform to slightly
 	// different ECS versions -- this field lets integrations adjust to the
 	// schema version of the events.
-	// The current version is 1.0.0-beta2 .
 	Version string `ecs:"version"`
 }

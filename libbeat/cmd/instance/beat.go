@@ -62,6 +62,7 @@ import (
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/plugin"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/libbeat/publisher/processing"
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/version"
 	sysinfo "github.com/elastic/go-sysinfo"
@@ -78,6 +79,8 @@ type Beat struct {
 
 	keystore keystore.Keystore
 	index    idxmgmt.Supporter
+
+	processing processing.Supporter
 }
 
 type beatConfig struct {
@@ -310,6 +313,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 			Logger:    logp.L().Named("publisher"),
 		},
 		b.Config.Pipeline,
+		b.processing,
 		b.makeOutputFactory(b.Config.Output),
 	)
 
@@ -594,6 +598,16 @@ func (b *Beat) configure(settings Settings) error {
 		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM)
 	}
 	b.index, err = imFactory(nil, b.Beat.Info, b.RawConfig)
+	if err != nil {
+		return err
+	}
+
+	processingFactory := settings.Processing
+	if processingFactory == nil {
+		processingFactory = processing.MakeDefaultBeatSupport(true)
+	}
+	b.processing, err = processingFactory(b.Info, logp.L().Named("processors"), b.RawConfig)
+
 	return err
 }
 
