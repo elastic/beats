@@ -67,10 +67,6 @@
             "stop_writes": false
         }
     },
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "aerospike.namespace",
         "duration": 115000,

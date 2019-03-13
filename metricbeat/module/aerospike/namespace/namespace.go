@@ -24,7 +24,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/aerospike"
 )
@@ -36,8 +35,6 @@ func init() {
 		mb.DefaultMetricSet(),
 	)
 }
-
-var logger = logp.NewLogger("aerospike.namespace")
 
 // MetricSet type defines all fields of the MetricSet
 // As a minimum it must inherit the mb.BaseMetricSet fields, but can be extended with
@@ -72,24 +69,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	if err := m.connect(); err != nil {
-		logger.Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error connecting to Aerospike")
 	}
 
 	for _, node := range m.client.GetNodes() {
 		info, err := as.RequestNodeInfo(node, "namespaces")
 		if err != nil {
-			logger.Error("Failed to retrieve namespaces from node %s", node.GetName())
+			m.Logger().Error("Failed to retrieve namespaces from node %s", node.GetName())
 			continue
 		}
 
 		for _, namespace := range strings.Split(info["namespaces"], ";") {
 			info, err := as.RequestNodeInfo(node, "namespace/"+namespace)
 			if err != nil {
-				logger.Error("Failed to retrieve metrics for namespace %s from node %s", namespace, node.GetName())
+				m.Logger().Error("Failed to retrieve metrics for namespace %s from node %s", namespace, node.GetName())
 				continue
 			}
 
@@ -104,7 +99,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		}
 	}
 
-	return
+	return nil
 }
 
 // create an aerospike client if it doesn't exist yet
