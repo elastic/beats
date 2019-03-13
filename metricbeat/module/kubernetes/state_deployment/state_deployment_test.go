@@ -100,7 +100,6 @@ func testValue(eventKey string, t *testing.T, event common.MapStr, field string,
 func testCases() map[string]map[string]interface{} {
 	return map[string]map[string]interface{}{
 		"default@jumpy-owl-redis": {
-			"_namespace":        "deployment",
 			"_module.namespace": "default",
 
 			"name":   "jumpy-owl-redis",
@@ -112,7 +111,6 @@ func testCases() map[string]map[string]interface{} {
 			"replicas.updated":     1,
 		},
 		"test@jumpy-owl-redis": {
-			"_namespace":        "deployment",
 			"_module.namespace": "test",
 
 			"name":   "jumpy-owl-redis",
@@ -124,7 +122,6 @@ func testCases() map[string]map[string]interface{} {
 			"replicas.updated":     8,
 		},
 		"kube-system@tiller-deploy": {
-			"_namespace":        "deployment",
 			"_module.namespace": "kube-system",
 
 			"name":   "tiller-deploy",
