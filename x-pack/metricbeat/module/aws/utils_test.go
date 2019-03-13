@@ -176,14 +176,29 @@ func TestCheckTimestampInArray(t *testing.T) {
 	timestamp2 := timestamp1.Add(5 * time.Minute)
 	timestamp3 := timestamp1.Add(10 * time.Minute)
 
-	timestampArray := []time.Time{timestamp1, timestamp2}
-	exists1, index1 := CheckTimestampInArray(timestamp1, timestampArray)
-	assert.True(t, exists1)
-	assert.Equal(t, 0, index1)
+	cases := []struct {
+		targetTimestamp time.Time
+		expectedExists  bool
+		expectedIndex   int
+	}{
+		{
+			targetTimestamp: timestamp1,
+			expectedExists:  true,
+			expectedIndex:   0,
+		},
+		{
+			targetTimestamp: timestamp3,
+			expectedExists:  false,
+			expectedIndex:   -1,
+		},
+	}
 
-	exists2, index2 := CheckTimestampInArray(timestamp3, timestampArray)
-	assert.False(t, exists2)
-	assert.Equal(t, -1, index2)
+	timestampArray := []time.Time{timestamp1, timestamp2}
+	for _, c := range cases {
+		exists, index := CheckTimestampInArray(c.targetTimestamp, timestampArray)
+		assert.Equal(t, c.expectedExists, exists)
+		assert.Equal(t, c.expectedIndex, index)
+	}
 }
 
 func TestFindTimestamp(t *testing.T) {
