@@ -100,7 +100,11 @@
       type: integer
       description: >
         The state of the instance, as a 16-bit unsigned integer.
+    - name: instance.state.name
+      type: keyword
+      description: >
+        The state of the instance (pending | running | shutting-down | terminated | stopping | stopped).
     - name: instance.threads_per_core
       type: integer
       description: >
-        The state of the instance (pending | running | shutting-down | terminated | stopping | stopped).
+        The number of threads per CPU core.
