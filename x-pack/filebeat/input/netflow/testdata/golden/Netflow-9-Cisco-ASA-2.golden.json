@@ -483,6 +483,7 @@
           "locality": "private"
         },
         "netflow": {
+          "asa_username": "",
           "destination_ipv4_address": "192.168.0.18",
           "destination_transport_port": 80,
           "egress_acl_id": "00000000-00000000-00000000",
@@ -510,8 +511,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.0.1",
           "source_transport_port": 56649,
-          "type": "netflow_flow",
-          "username": ""
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:IZ8RrSqt8oeb2F2Rp9296zm54bc=",
@@ -682,6 +682,7 @@
           "locality": "private"
         },
         "netflow": {
+          "asa_username": "",
           "destination_ipv4_address": "192.168.0.17",
           "destination_transport_port": 80,
           "egress_acl_id": "00000000-00000000-00000000",
@@ -709,8 +710,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.0.2",
           "source_transport_port": 61777,
-          "type": "netflow_flow",
-          "username": ""
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:E1vNamQGw5X+X+vT1g7ui6Nc3O0=",
@@ -881,6 +881,7 @@
           "locality": "private"
         },
         "netflow": {
+          "asa_username": "",
           "destination_ipv4_address": "192.168.0.17",
           "destination_transport_port": 80,
           "egress_acl_id": "00000000-00000000-00000000",
@@ -908,8 +909,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.0.1",
           "source_transport_port": 56650,
-          "type": "netflow_flow",
-          "username": ""
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:pkwcoe/zjCLerUgj+HGAwwt4wV8=",
@@ -1080,6 +1080,7 @@
           "locality": "private"
         },
         "netflow": {
+          "asa_username": "",
           "destination_ipv4_address": "192.168.0.18",
           "destination_transport_port": 80,
           "egress_acl_id": "00000000-00000000-00000000",
@@ -1107,8 +1108,7 @@
           "protocol_identifier": 6,
           "source_ipv4_address": "192.168.0.1",
           "source_transport_port": 56651,
-          "type": "netflow_flow",
-          "username": ""
+          "type": "netflow_flow"
         },
         "network": {
           "community_id": "1:35/w0D/WO1QvBp8O+Vd95Nb+tt4=",
