@@ -104,7 +104,7 @@ func newSession(
 	}
 
 	// Register modules.
-	for name, registerModule := range moduleRegistry {
+	for name, registerModule := range sessionHooks {
 		s.log.Debugf("Registering module %v with the Javascript runtime.", name)
 		registerModule(s)
 	}
@@ -246,7 +246,7 @@ func (s *session) Event() Event {
 func init() {
 	// Register common.MapStr as being a simple map[string]interface{} for
 	// treatment within the JS VM.
-	AddModule("_type_mapstr", func(s Session) {
+	AddSessionHook("_type_mapstr", func(s Session) {
 		s.Runtime().RegisterSimpleMapType(reflect.TypeOf(common.MapStr(nil)),
 			func(i interface{}) map[string]interface{} {
 				return map[string]interface{}(i.(common.MapStr))
