@@ -29,7 +29,7 @@ func TestWait(t *testing.T) {
 		d1 := 100 * time.Millisecond
 		d2 := 200 * time.Millisecond
 
-		waiter := NewPeriodicTimer(Fix(d1), Fix(d2))
+		waiter := NewPeriodicTimer(Const(d1), Const(d2))
 		waiter.Start()
 		defer waiter.Stop()
 

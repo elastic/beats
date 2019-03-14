@@ -49,8 +49,8 @@ func RandomDelay(max time.Duration) Strategy {
 	}
 }
 
-// Fix waits for a fixed duration.
-func Fix(d time.Duration) Strategy {
+// Const waits for a fixed duration.
+func Const(d time.Duration) Strategy {
 	return func() time.Duration {
 		return d
 	}
