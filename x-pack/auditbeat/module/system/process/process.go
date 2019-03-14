@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"os/user"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -403,30 +404,31 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 			}
 		}
 
-		// Only report processes with an executable. Processes without
-		// are usually kernel processes that are not very interesting.
-		if process.Info.Exe != "" {
-			userInfo, err := sysinfoProc.User()
-			if err != nil {
-				if process.Error == nil {
-					process.Error = errors.Wrapf(err, "failed to load user for PID %d", sysinfoProc.PID())
-				}
-			} else {
-				process.UserInfo = &userInfo
+		userInfo, err := sysinfoProc.User()
+		if err != nil {
+			if process.Error == nil {
+				process.Error = errors.Wrapf(err, "failed to load user for PID %d", sysinfoProc.PID())
+			}
+		} else {
+			process.UserInfo = &userInfo
 
-				goUser, err := user.LookupId(userInfo.UID)
-				if err == nil {
-					process.User = goUser
-				}
-
-				group, err := user.LookupGroupId(userInfo.GID)
-				if err == nil {
-					process.Group = group
-				}
+			goUser, err := user.LookupId(userInfo.UID)
+			if err == nil {
+				process.User = goUser
 			}
 
-			processes = append(processes, process)
+			group, err := user.LookupGroupId(userInfo.GID)
+			if err == nil {
+				process.Group = group
+			}
 		}
+
+		// Exclude Linux kernel processes, they are not very interesting.
+		if runtime.GOOS == "linux" && userInfo.UID == "0" && process.Info.Exe == "" {
+			continue
+		}
+
+		processes = append(processes, process)
 	}
 
 	return processes, nil
