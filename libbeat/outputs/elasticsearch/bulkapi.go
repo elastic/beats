@@ -23,6 +23,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"github.com/elastic/beats/libbeat/common"
 )
 
 // MetaBuilder creates meta data for bulk requests
@@ -81,6 +83,7 @@ func (conn *Connection) BulkWith(
 // operations and sends them to Elasticsearch. The request is retransmitted up to max_retries
 // before returning an error.
 func (conn *Connection) MonitoringBulkWith(
+	esVersion common.Version,
 	params map[string]string,
 	body []interface{},
 ) (*QueryResult, error) {
@@ -94,7 +97,7 @@ func (conn *Connection) MonitoringBulkWith(
 		return nil, err
 	}
 
-	requ, err := newMonitoringBulkRequest(conn.URL, params, enc)
+	requ, err := newMonitoringBulkRequest(esVersion, conn.URL, params, enc)
 	if err != nil {
 		return nil, err
 	}
@@ -121,11 +124,19 @@ func newBulkRequest(
 }
 
 func newMonitoringBulkRequest(
+	esVersion common.Version,
 	urlStr string,
 	params map[string]string,
 	body bodyEncoder,
 ) (*bulkRequest, error) {
-	path, err := makePath("_monitoring", "bulk", "")
+	var path string
+	var err error
+	if esVersion.Major < 7 {
+		path, err = makePath("_xpack", "monitoring", "_bulk")
+	} else {
+		path, err = makePath("_monitoring", "bulk", "")
+	}
+
 	if err != nil {
 		return nil, err
 	}

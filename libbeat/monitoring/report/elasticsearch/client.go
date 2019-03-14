@@ -135,11 +135,8 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 
 		// Currently one request per event is sent. Reason is that each event can contain different
 		// interval params and X-Pack requires to send the interval param.
-		if c.es.GetVersion().Major < 7 {
-			_, err = c.es.BulkWith("_xpack", "monitoring", params, nil, bulk[:])
-		} else {
-			_, err = c.es.MonitoringBulkWith(params, bulk[:])
-		}
+		esVersion := c.es.GetVersion()
+		_, err = c.es.MonitoringBulkWith(esVersion, params, bulk[:])
 
 		if err != nil {
 			failed = append(failed, event)
