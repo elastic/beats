@@ -308,7 +308,7 @@ The `ingest/` folder contains Elasticsearch
 Node pipelines are responsible for parsing the log lines and doing other
 manipulations on the data.
 
-The files in this folder are JSON documents representing
+The files in this folder are JSON or YAML documents representing
 {ref}/pipeline.html[pipeline definitions]. Just like with the `config/`
 folder, you can define multiple pipelines, but a single one is loaded at runtime
 based on the information from `manifest.yml`.
@@ -328,6 +328,18 @@ The generator creates a JSON object similar to this one:
     }
   }]
 }
+----
+
+Alternatively, you can use YAML formatted pipelines, which uses a simpler syntax:
+
+[source,yaml]
+----
+description: "Pipeline for parsing {module} {fileset} logs"
+processors:
+on_failure:
+ - set:
+     field: error.message
+     value: "{{ _ingest.on_failure_message }}"
 ----
 
 From here, you would typically add processors to the `processors` array to do
@@ -407,7 +419,7 @@ file. The first pipeline in the list is considered to be the entry point pipelin
 ----
 ingest_pipeline:
   - ingest/main.json
-  - ingest/plain_logs.json
+  - ingest/plain_logs.yml
   - ingest/json_logs.json
 ----
 
