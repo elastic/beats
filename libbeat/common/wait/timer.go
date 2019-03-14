@@ -26,10 +26,9 @@ import (
 
 // Timer represents a timer implementation.
 type Timer interface {
-	Reset(time.Duration)
+	Reset(time.Duration) bool
 	Start()
 	Stop() bool
-	Reset() bool
 	Wait() <-chan time.Time
 }
 
