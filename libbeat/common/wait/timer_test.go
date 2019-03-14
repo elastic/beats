@@ -18,6 +18,7 @@
 package wait
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -64,7 +65,7 @@ func TestWait(t *testing.T) {
 	})
 
 	t.Run("Allow to reset a timer", func(t *testing.T) {
-		waiter := NewPeriodicTimer(Const(d1), Const(d2))
+		waiter := NewPeriodicTimer(Const(d1), Const(1*time.Second))
 		waiter.Start()
 		defer waiter.Stop()
 
@@ -72,11 +73,15 @@ func TestWait(t *testing.T) {
 		end := <-waiter.Wait()
 
 		assert.True(t, end.Sub(start) >= d1)
+
 		d3 := 400 * time.Millisecond
+		start = time.Now()
+
 		waiter.Reset(d3)
 
-		start = time.Now()
 		end = <-waiter.Wait()
+		fmt.Println(end.Sub(start))
 		assert.True(t, end.Sub(start) >= d3)
+		assert.True(t, end.Sub(start) < 1*time.Second)
 	})
 }
