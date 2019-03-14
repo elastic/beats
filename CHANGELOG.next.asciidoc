@@ -16,6 +16,8 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 *Auditbeat*
 
+- Process dataset: Only report processes with executable. {pull}11232[11232]
+
 *Filebeat*
 
 - Set `ecs: true` in user_agent processors when loading pipelines with Filebeat 7.0.x into Elasticsearch 6.7.x. {issue}10655[10655] {pull}10875[10875]
