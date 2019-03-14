@@ -143,6 +143,7 @@
     - name: bytes
       level: core
       type: long
+      format: bytes
       description: Bytes sent from the client to the server.
       example: 184
     - name: domain
@@ -382,6 +383,7 @@
     - name: bytes
       level: core
       type: long
+      format: bytes
       description: Bytes sent from the destination to the source.
       example: 184
     - name: domain
@@ -609,6 +611,8 @@
     - name: duration
       level: core
       type: long
+      format: duration
+      input_format: nanoseconds
       description: 'Duration of the event in nanoseconds.
 
         If event.start and event.end are known this value should be the difference
@@ -1185,6 +1189,7 @@
     - name: bytes
       level: core
       type: long
+      format: bytes
       description: 'Total bytes transferred in both directions.
 
         If `source.bytes` and `destination.bytes` are known, `network.bytes` is their
@@ -1594,6 +1599,7 @@
     - name: bytes
       level: core
       type: long
+      format: bytes
       description: Bytes sent from the server to the client.
       example: 184
     - name: domain
@@ -1807,6 +1813,7 @@
     - name: bytes
       level: core
       type: long
+      format: bytes
       description: Bytes sent from the source to the destination.
       example: 184
     - name: domain

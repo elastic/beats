@@ -2391,6 +2391,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the client to the server.
 
 --
@@ -2770,6 +2772,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the destination to the source.
 
 --
@@ -3093,6 +3097,8 @@ The concept of a `dataset` (fileset / metricset) is used in Beats as a subset of
 +
 --
 type: long
+
+format: duration
 
 Duration of the event in nanoseconds.
 If event.start and event.end are known this value should be the difference between the end and start time.
@@ -3971,6 +3977,8 @@ type: long
 
 example: 368
 
+format: bytes
+
 Total bytes transferred in both directions.
 If `source.bytes` and `destination.bytes` are known, `network.bytes` is their sum.
 
@@ -4560,6 +4568,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the server to the client.
 
 --
@@ -4873,6 +4883,8 @@ Then it should be duplicated to `.ip` or `.domain`, depending on which one it is
 type: long
 
 example: 184
+
+format: bytes
 
 Bytes sent from the source to the destination.
 
