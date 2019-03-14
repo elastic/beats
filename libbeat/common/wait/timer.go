@@ -30,12 +30,12 @@ type Timer interface {
 	Wait() <-chan time.Time
 }
 
-// Waiter is the strategy to be used to find out the time to wait before making a call.
-type Waiter func() time.Duration
+// Strategy is the strategy to be used to find out the time to wait before making a call.
+type Strategy func() time.Duration
 
 // MinWaitAndJitter takes a minimal wait time and jitter and will return a duration that will be at
 // least equal of bigger than the initial wait time.
-func MinWaitAndJitter(d, jitter time.Duration) Waiter {
+func MinWaitAndJitter(d, jitter time.Duration) Strategy {
 	return func() time.Duration {
 		return d + time.Duration(rand.Int63n(int64(jitter)))
 	}
@@ -43,14 +43,14 @@ func MinWaitAndJitter(d, jitter time.Duration) Waiter {
 
 // RandomDelay takes a maximum duration and will return a random values which will be
 // max <= values > 0.
-func RandomDelay(max time.Duration) Waiter {
+func RandomDelay(max time.Duration) Strategy {
 	return func() time.Duration {
 		return time.Duration(int64(max))
 	}
 }
 
 // Fix waits for a fixed duration.
-func Fix(d time.Duration) Waiter {
+func Fix(d time.Duration) Strategy {
 	return func() time.Duration {
 		return d
 	}
@@ -64,13 +64,13 @@ func Fix(d time.Duration) Waiter {
 type PeriodicTimer struct {
 	c           chan time.Time
 	resetOrDone chan time.Duration
-	initial     Waiter
-	periodic    Waiter
+	initial     Strategy
+	periodic    Strategy
 	period      time.Duration
 }
 
 // NewPeriodicTimer returns a wait, allowing to wait for a minimum time and a random amount.
-func NewPeriodicTimer(initial, periodic Waiter) *PeriodicTimer {
+func NewPeriodicTimer(initial, periodic Strategy) *PeriodicTimer {
 	jt := &PeriodicTimer{
 		c:           make(chan time.Time),
 		resetOrDone: make(chan time.Duration, 1),
