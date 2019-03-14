@@ -3777,12 +3777,12 @@ Kubernetes annotations map
 
 --
 
-*`kubernetes.replicaset`*::
+*`kubernetes.replicaset.name`*::
 +
 --
-type: object
+type: keyword
 
-Kubernetes replica-set map
+Kubernetes replica-set name
 
 
 --
