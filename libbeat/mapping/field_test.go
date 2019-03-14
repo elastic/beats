@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package common
+package mapping
 
 import (
 	"strings"
@@ -25,6 +25,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/go-ucfg/yaml"
 )
 
@@ -298,44 +299,44 @@ func TestGetField(t *testing.T) {
 
 func TestFieldValidate(t *testing.T) {
 	tests := map[string]struct {
-		cfg   MapStr
+		cfg   common.MapStr
 		field Field
 		err   bool
 	}{
 		"top level object type config": {
-			cfg:   MapStr{"object_type": "scaled_float", "object_type_mapping_type": "float", "scaling_factor": 10},
+			cfg:   common.MapStr{"object_type": "scaled_float", "object_type_mapping_type": "float", "scaling_factor": 10},
 			field: Field{ObjectType: "scaled_float", ObjectTypeMappingType: "float", ScalingFactor: 10},
 			err:   false,
 		},
 		"multiple object type configs": {
-			cfg: MapStr{"object_type_params": []MapStr{
+			cfg: common.MapStr{"object_type_params": []common.MapStr{
 				{"object_type": "scaled_float", "object_type_mapping_type": "float", "scaling_factor": 100}}},
 			field: Field{ObjectTypeParams: []ObjectTypeCfg{{ObjectType: "scaled_float", ObjectTypeMappingType: "float", ScalingFactor: 100}}},
 			err:   false,
 		},
 		"invalid config mixing object_type and object_type_params": {
-			cfg: MapStr{
+			cfg: common.MapStr{
 				"object_type":        "scaled_float",
-				"object_type_params": []MapStr{{"object_type": "scaled_float", "object_type_mapping_type": "float"}}},
+				"object_type_params": []common.MapStr{{"object_type": "scaled_float", "object_type_mapping_type": "float"}}},
 			err: true,
 		},
 		"invalid config mixing object_type_mapping_type and object_type_params": {
-			cfg: MapStr{
+			cfg: common.MapStr{
 				"object_type_mapping_type": "float",
-				"object_type_params":       []MapStr{{"object_type": "scaled_float", "object_type_mapping_type": "float"}}},
+				"object_type_params":       []common.MapStr{{"object_type": "scaled_float", "object_type_mapping_type": "float"}}},
 			err: true,
 		},
 		"invalid config mixing scaling_factor and object_type_params": {
-			cfg: MapStr{
+			cfg: common.MapStr{
 				"scaling_factor":     100,
-				"object_type_params": []MapStr{{"object_type": "scaled_float", "object_type_mapping_type": "float"}}},
+				"object_type_params": []common.MapStr{{"object_type": "scaled_float", "object_type_mapping_type": "float"}}},
 			err: true,
 		},
 	}
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			cfg, err := NewConfigFrom(test.cfg)
+			cfg, err := common.NewConfigFrom(test.cfg)
 			require.NoError(t, err)
 			var f Field
 			err = cfg.Unpack(&f)
