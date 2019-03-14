@@ -2,7 +2,7 @@
     {
         "@timestamp": "2019-01-01T01:00:27.000Z",
         "cisco.asa.message_id": "999999",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.action": "firewall-rule",
         "event.dataset": "cisco.asa",
         "event.module": "cisco",
