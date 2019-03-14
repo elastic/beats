@@ -20,6 +20,8 @@ package wait
 import (
 	"math/rand"
 	"time"
+
+	"github.com/elastic/beats/libbeat/common/atomic"
 )
 
 // Timer represents a timer implementation.
@@ -67,6 +69,7 @@ type PeriodicTimer struct {
 	initial     Strategy
 	periodic    Strategy
 	period      time.Duration
+	running     atomic.Bool
 }
 
 // NewPeriodicTimer returns a wait, allowing to wait for a minimum time and a random amount.
@@ -76,13 +79,17 @@ func NewPeriodicTimer(initial, periodic Strategy) *PeriodicTimer {
 		resetOrDone: make(chan time.Duration, 1),
 		period:      initial(),
 		periodic:    periodic,
+		running:     atomic.MakeBool(false),
 	}
 	return jt
 }
 
 // Start starts the timer.
 func (jt *PeriodicTimer) Start() {
-	go jt.startTimer()
+	if !jt.running.Load() {
+		jt.running.Store(true)
+		go jt.startTimer()
+	}
 }
 
 func (jt *PeriodicTimer) startTimer() {
@@ -113,8 +120,12 @@ func (jt *PeriodicTimer) Reset(d time.Duration) {
 
 // Stop stops the current timer but won't close the channel, this prevent a goroutine to received
 // a bad tick. This is the same strategy used by the time.Ticker.
-func (jt *PeriodicTimer) Stop() {
-	close(jt.resetOrDone)
+func (jt *PeriodicTimer) Stop() bool {
+	if jt.running.Load() {
+		close(jt.resetOrDone)
+		return true
+	}
+	return false
 }
 
 // Jitter sleeps for the min time plus a random time, this allow to effectively delays requests.
