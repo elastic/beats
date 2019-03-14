@@ -1794,6 +1794,8 @@ type: long
 
 example: 887
 
+format: bytes
+
 Size in bytes of the request body.
 
 --
@@ -1815,6 +1817,8 @@ The full HTTP request body.
 type: long
 
 example: 1437
+
+format: bytes
 
 Total size in bytes of the request (body and headers).
 
@@ -1850,6 +1854,8 @@ type: long
 
 example: 887
 
+format: bytes
+
 Size in bytes of the response body.
 
 --
@@ -1871,6 +1877,8 @@ The full HTTP response body.
 type: long
 
 example: 1437
+
+format: bytes
 
 Total size in bytes of the response (body and headers).
 
