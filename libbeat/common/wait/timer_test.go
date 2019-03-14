@@ -25,10 +25,10 @@ import (
 )
 
 func TestWait(t *testing.T) {
-	t.Run("Allow to wait for a period and initial time", func(t *testing.T) {
-		d1 := 100 * time.Millisecond
-		d2 := 200 * time.Millisecond
+	d1 := 100 * time.Millisecond
+	d2 := 200 * time.Millisecond
 
+	t.Run("Allow to wait for a period and initial time", func(t *testing.T) {
 		waiter := NewPeriodicTimer(Const(d1), Const(d2))
 		waiter.Start()
 		defer waiter.Stop()
@@ -41,5 +41,42 @@ func TestWait(t *testing.T) {
 		start = time.Now()
 		end = <-waiter.Wait()
 		assert.True(t, end.Sub(start) >= d2)
+	})
+
+	t.Run("Allow to stop and start a timer", func(t *testing.T) {
+		waiter := NewPeriodicTimer(Const(d1), Const(d2))
+		waiter.Start()
+		if waiter.Stop() {
+			<-waiter.Wait()
+		}
+
+		waiter.Start()
+		defer waiter.Stop()
+
+		start := time.Now()
+		end := <-waiter.Wait()
+
+		assert.True(t, end.Sub(start) >= d1)
+
+		start = time.Now()
+		end = <-waiter.Wait()
+		assert.True(t, end.Sub(start) >= d2)
+	})
+
+	t.Run("Allow to reset a timer", func(t *testing.T) {
+		waiter := NewPeriodicTimer(Const(d1), Const(d2))
+		waiter.Start()
+		defer waiter.Stop()
+
+		start := time.Now()
+		end := <-waiter.Wait()
+
+		assert.True(t, end.Sub(start) >= d1)
+		d3 := 400 * time.Millisecond
+		waiter.Reset(d3)
+
+		start = time.Now()
+		end = <-waiter.Wait()
+		assert.True(t, end.Sub(start) >= d3)
 	})
 }

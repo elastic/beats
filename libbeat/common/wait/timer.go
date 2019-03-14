@@ -28,7 +28,8 @@ import (
 type Timer interface {
 	Reset(time.Duration)
 	Start()
-	Stop()
+	Stop() bool
+	Reset() bool
 	Wait() <-chan time.Time
 }
 
@@ -64,45 +65,49 @@ func Const(d time.Duration) Strategy {
 // This can be useful if you want to better distribute calls that could affect the performance of
 // other system.
 type PeriodicTimer struct {
-	c           chan time.Time
-	resetOrDone chan time.Duration
-	initial     Strategy
-	periodic    Strategy
-	period      time.Duration
-	running     atomic.Bool
+	c        chan time.Time
+	done     chan struct{}
+	initial  Strategy
+	periodic Strategy
+	period   time.Duration
+	running  atomic.Bool
 }
 
 // NewPeriodicTimer returns a wait, allowing to wait for a minimum time and a random amount.
 func NewPeriodicTimer(initial, periodic Strategy) *PeriodicTimer {
 	jt := &PeriodicTimer{
-		c:           make(chan time.Time),
-		resetOrDone: make(chan time.Duration, 1),
-		period:      initial(),
-		periodic:    periodic,
-		running:     atomic.MakeBool(false),
+		c:        make(chan time.Time),
+		period:   initial(),
+		periodic: periodic,
+		running:  atomic.MakeBool(false),
 	}
 	return jt
 }
 
 // Start starts the timer.
+// NOTE: Starts should not be called at high frequency.
 func (jt *PeriodicTimer) Start() {
 	if !jt.running.Load() {
 		jt.running.Store(true)
-		go jt.startTimer()
+		jt.done = make(chan struct{})
+		jt.c = make(chan time.Time)
+
+		go func() {
+			jt.running.Store(false)
+			jt.startTimer(jt.period)
+		}()
 	}
 }
 
-func (jt *PeriodicTimer) startTimer() {
+func (jt *PeriodicTimer) startTimer(period time.Duration) {
 	for {
 		select {
-		case reset, ok := <-jt.resetOrDone:
-			if !ok {
-				return
-			}
-			jt.period = reset
-		case <-time.After(jt.period):
+		case <-jt.done:
+			close(jt.c)
+			return
+		case <-time.After(period):
 			jt.c <- time.Now()
-			jt.period = jt.periodic()
+			period = jt.periodic()
 		}
 	}
 }
@@ -112,17 +117,21 @@ func (jt *PeriodicTimer) Wait() <-chan time.Time {
 	return jt.c
 }
 
-// Reset resets the current timer with the provided duration
-// NOTE: it is possible to receive a tick before the reset actually happen.
-func (jt *PeriodicTimer) Reset(d time.Duration) {
-	jt.resetOrDone <- d
+// Reset resets the current timer with the provided duration.
+// NOTE: There function should not be called at high frequency, it is possible to receive a tick
+// before the reset actually happen.
+func (jt *PeriodicTimer) Reset(d time.Duration) bool {
+	active := jt.Stop()
+	jt.period = d
+	jt.Start()
+	return active
 }
 
 // Stop stops the current timer but won't close the channel, this prevent a goroutine to received
 // a bad tick. This is the same strategy used by the time.Ticker.
 func (jt *PeriodicTimer) Stop() bool {
 	if jt.running.Load() {
-		close(jt.resetOrDone)
+		close(jt.done)
 		return true
 	}
 	return false
