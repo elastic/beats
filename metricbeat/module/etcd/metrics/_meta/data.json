@@ -7,8 +7,8 @@
                     "bucket": {
                         "+Inf": 6,
                         "0.001": 4,
-                        "0.002": 5,
-                        "0.004": 5,
+                        "0.002": 4,
+                        "0.004": 6,
                         "0.008": 6,
                         "0.016": 6,
                         "0.032": 6,
@@ -22,33 +22,33 @@
                         "8.192": 6
                     },
                     "count": 6,
-                    "sum": 0.008863741999999999
+                    "sum": 0.005161901
                 },
                 "mvcc_db_total_size_in_bytes": 24576,
                 "wal_fsync_duration_seconds": {
                     "bucket": {
-                        "+Inf": 2,
+                        "+Inf": 3,
                         "0.001": 0,
                         "0.002": 0,
                         "0.004": 0,
-                        "0.008": 1,
-                        "0.016": 1,
-                        "0.032": 1,
-                        "0.064": 2,
-                        "0.128": 2,
-                        "0.256": 2,
-                        "0.512": 2,
-                        "1.024": 2,
-                        "2.048": 2,
-                        "4.096": 2,
-                        "8.192": 2
+                        "0.008": 2,
+                        "0.016": 2,
+                        "0.032": 2,
+                        "0.064": 3,
+                        "0.128": 3,
+                        "0.256": 3,
+                        "0.512": 3,
+                        "1.024": 3,
+                        "2.048": 3,
+                        "4.096": 3,
+                        "8.192": 3
                     },
-                    "count": 2,
-                    "sum": 0.06988536
+                    "count": 3,
+                    "sum": 0.071772434
                 }
             },
             "memory": {
-                "go_memstats_alloc_bytes": 4447520
+                "go_memstats_alloc_bytes": 4574760
             },
             "network": {
                 "client_grpc_received_bytes_total": 0,
@@ -59,7 +59,7 @@
                 "grpc_started_total": 0,
                 "has_leader": 1,
                 "leader_changes_seen_total": 1,
-                "proposals_committed_total": 6,
+                "proposals_committed_total": 8,
                 "proposals_failed_total": 0,
                 "proposals_pending": 0
             }

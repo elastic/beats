@@ -22,11 +22,6 @@ import (
 	"github.com/elastic/beats/metricbeat/mb"
 )
 
-const (
-	defaultScheme = "http"
-	defaultPath   = "/metrics"
-)
-
 func init() {
 	mapping := &prometheus.MetricsMapping{
 		Metrics: map[string]prometheus.MetricMap{
