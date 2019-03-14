@@ -38,22 +38,22 @@ const (
 
 type testCase struct {
 	name   string
-	code   string
+	source string
 	assert func(t testing.TB, evt *beat.Event, err error)
 }
 
 var eventV0Tests = []testCase{
 	{
-		name: "Put",
-		code: `evt.Put("hello", "world");`,
+		name:   "Put",
+		source: `evt.Put("hello", "world");`,
 		assert: func(t testing.TB, evt *beat.Event, err error) {
 			v, _ := evt.GetValue("hello")
 			assert.Equal(t, "world", v)
 		},
 	},
 	{
-		name: "Object Put Key",
-		code: `evt.fields["hello"] = "world";`,
+		name:   "Object Put Key",
+		source: `evt.fields["hello"] = "world";`,
 		assert: func(t testing.TB, evt *beat.Event, err error) {
 			v, _ := evt.GetValue("hello")
 			assert.Equal(t, "world", v)
@@ -61,7 +61,7 @@ var eventV0Tests = []testCase{
 	},
 	{
 		name: "Get",
-		code: `
+		source: `
 			var ip = evt.Get("source.ip");
 
 			if ("192.0.2.1" !== ip) {
@@ -70,7 +70,7 @@ var eventV0Tests = []testCase{
 	},
 	{
 		name: "Get Object",
-		code: `
+		source: `
 			var source = evt.Get("source");
 
   			if ("192.0.2.1" !== source.ip) {
@@ -79,7 +79,7 @@ var eventV0Tests = []testCase{
 	},
 	{
 		name: "Get Undefined Key",
-		code: `
+		source: `
 			var ip = evt.Get().source.ip;
 
   			if ("192.0.2.1" !== ip) {
@@ -88,7 +88,7 @@ var eventV0Tests = []testCase{
 	},
 	{
 		name: "fields get key",
-		code: `
+		source: `
 			var ip = evt.fields.source.ip;
 
   			if ("192.0.2.1" !== ip) {
@@ -96,16 +96,16 @@ var eventV0Tests = []testCase{
   			}`,
 	},
 	{
-		name: "Delete",
-		code: `if (!evt.Delete("source.ip")) { throw "delete failed"; }`,
+		name:   "Delete",
+		source: `if (!evt.Delete("source.ip")) { throw "delete failed"; }`,
 		assert: func(t testing.TB, evt *beat.Event, err error) {
 			ip, _ := evt.GetValue("source.ip")
 			assert.Nil(t, ip)
 		},
 	},
 	{
-		name: "Rename",
-		code: `if (!evt.Rename("source", "destination")) { throw "rename failed"; }`,
+		name:   "Rename",
+		source: `if (!evt.Rename("source", "destination")) { throw "rename failed"; }`,
 		assert: func(t testing.TB, evt *beat.Event, err error) {
 			ip, _ := evt.GetValue("destination.ip")
 			assert.Equal(t, "192.0.2.1", ip)
@@ -113,35 +113,35 @@ var eventV0Tests = []testCase{
 	},
 	{
 		name: "Get @metadata",
-		code: `if (evt.Get("@metadata.pipeline") !== "beat-1.2.3-module") {
+		source: `if (evt.Get("@metadata.pipeline") !== "beat-1.2.3-module") {
 					throw "failed to get @metadata";
                }`,
 	},
 	{
-		name: "Put @metadata",
-		code: `evt.Put("@metadata.foo", "bar");`,
+		name:   "Put @metadata",
+		source: `evt.Put("@metadata.foo", "bar");`,
 		assert: func(t testing.TB, evt *beat.Event, err error) {
 			assert.Equal(t, "bar", evt.Meta["foo"])
 		},
 	},
 	{
-		name: "Delete @metadata",
-		code: `evt.Delete("@metadata.pipeline");`,
+		name:   "Delete @metadata",
+		source: `evt.Delete("@metadata.pipeline");`,
 		assert: func(t testing.TB, evt *beat.Event, err error) {
 			assert.Nil(t, evt.Meta["pipeline"])
 		},
 	},
 	{
-		name: "Cancel",
-		code: `evt.Cancel();`,
+		name:   "Cancel",
+		source: `evt.Cancel();`,
 		assert: func(t testing.TB, evt *beat.Event, err error) {
 			assert.NoError(t, err)
 			assert.Nil(t, evt)
 		},
 	},
 	{
-		name: "Tag",
-		code: `evt.Tag("foo"); evt.Tag("bar"); evt.Tag("foo");`,
+		name:   "Tag",
+		source: `evt.Tag("foo"); evt.Tag("bar"); evt.Tag("foo");`,
 		assert: func(t testing.TB, evt *beat.Event, err error) {
 			if assert.NoError(t, err) {
 				assert.Equal(t, []string{"foo", "bar"}, evt.Fields["tags"])
@@ -149,8 +149,8 @@ var eventV0Tests = []testCase{
 		},
 	},
 	{
-		name: "AppendTo",
-		code: `evt.AppendTo("source.ip", "10.0.0.1");`,
+		name:   "AppendTo",
+		source: `evt.AppendTo("source.ip", "10.0.0.1");`,
 		assert: func(t testing.TB, evt *beat.Event, err error) {
 			if assert.NoError(t, err) {
 				srcIP, _ := evt.GetValue("source.ip")
@@ -178,7 +178,7 @@ func TestBeatEventV0(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			reg := monitoring.NewRegistry()
 
-			p, err := NewFromConfig(Config{ID: tc.name, Code: header + tc.code + footer}, reg)
+			p, err := NewFromConfig(Config{Tag: tc.name, Source: header + tc.source + footer}, reg)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -218,7 +218,7 @@ func BenchmarkBeatEventV0(b *testing.B) {
 
 	benchTest := func(tc testCase, timeout time.Duration) func(b *testing.B) {
 		return func(b *testing.B) {
-			p, err := NewFromConfig(Config{Code: header + tc.code + footer, Timeout: timeout}, nil)
+			p, err := NewFromConfig(Config{Source: header + tc.source + footer, Timeout: timeout}, nil)
 			if err != nil {
 				b.Fatal(err)
 			}

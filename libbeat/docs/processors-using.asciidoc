@@ -1302,9 +1302,9 @@ file or by pointing the processor at external file(s).
 ----
 processors:
 - script:
-    type: javascript
+    lang: javascript
     id: my_filter
-    code: >
+    source: >
       function process(event) {
           event.Tag("js");
       }
@@ -1316,24 +1316,24 @@ This loads `filter.js` from disk.
 ----
 processors:
 - script:
-    type: javascript
+    lang: javascript
     id: my_filter
     file: ${path.config}/filter.js
 ----
 
-Parameters can be passed to the script by adding `script_params` to the config.
-This allows for a script to be made reusable. When using `script_params` the
+Parameters can be passed to the script by adding `params` to the config.
+This allows for a script to be made reusable. When using `params` the
 code must define a `register(params)` function to receive the parameters.
 
 [source,yaml]
 ----
 processors:
 - script:
-    type: javascript
+    lang: javascript
     id: my_filter
-    script_params:
+    params:
       threshold: 15
-    code: >
+    source: >
       var params = {threshold: 42};
       function register(scriptParams) {
           params = scriptParams;
@@ -1370,14 +1370,14 @@ function test() {
 
 The `script` processor has the following configuration settings:
 
-`type`:: This field is required and its value must be `javascript`.
+`lang`:: This field is required and its value must be `javascript`.
 
-`id`:: This is an optional identifier that is added to log messages. If defined
+`tag`:: This is an optional identifier that is added to log messages. If defined
 it enables metrics logging for this instance of the processor. The metrics
 include the number of exceptions and a histogram of the execution times for
 the `process` function.
 
-`code`:: Inline Javascript code.
+`source`:: Inline Javascript source code.
 
 `file`:: Path to a script file to load. Relative paths are interpreted as
 relative to the `path.config` directory. Globs are expanded.
@@ -1386,8 +1386,8 @@ relative to the `path.config` directory. Globs are expanded.
 Relative paths are interpreted as relative to the `path.config` directory.
 And globs are expanded.
 
-`script_params`:: A dictionary of parameters that are passed to the `register`
-of the script.
+`params`:: A dictionary of parameters that are passed to the `register` of the
+script.
 
 `tag_on_exception`:: Tag to add to events in case the Javascript code causes an
 exception while processing an event. Defaults to `_js_exception`.

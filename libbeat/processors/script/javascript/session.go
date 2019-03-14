@@ -99,8 +99,8 @@ func newSession(
 		timeout:        conf.Timeout,
 		tagOnException: conf.TagOnException,
 	}
-	if conf.ID != "" {
-		s.log = s.log.With("instance_id", conf.ID)
+	if conf.Tag != "" {
+		s.log = s.log.With("instance_id", conf.Tag)
 	}
 
 	// Register modules.
@@ -150,12 +150,11 @@ func (s *session) setProcessFunction() error {
 	return nil
 }
 
-// registerScriptParams calls the register() function and passes the
-// script_params.
+// registerScriptParams calls the register() function and passes the params.
 func (s *session) registerScriptParams(params map[string]interface{}) error {
 	registerFunc := s.vm.Get(registerFunction)
 	if registerFunc == nil {
-		return errors.New("script_params were provided but no register function was found")
+		return errors.New("params were provided but no register function was found")
 	}
 	if registerFunc.ExportType().Kind() != reflect.Func {
 		return errors.New("register is not a function")
@@ -167,7 +166,7 @@ func (s *session) registerScriptParams(params map[string]interface{}) error {
 	if _, err := register(goja.Undefined(), s.Runtime().ToValue(params)); err != nil {
 		return errors.Wrap(err, "failed to register script_params")
 	}
-	s.log.Debug("Registered script_params with processor")
+	s.log.Debug("Registered params with processor")
 	return nil
 }
 

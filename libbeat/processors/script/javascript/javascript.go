@@ -66,28 +66,28 @@ func NewFromConfig(c Config, reg *monitoring.Registry) (processors.Processor, er
 	var sourceCode []byte
 
 	switch {
-	case c.Code != "":
+	case c.Source != "":
 		sourceFile = "inline.js"
-		sourceCode = []byte(c.Code)
+		sourceCode = []byte(c.Source)
 	case c.File != "":
 		sourceFile, sourceCode, err = loadSources(c.File)
 	case len(c.Files) > 0:
 		sourceFile, sourceCode, err = loadSources(c.Files...)
 	}
 	if err != nil {
-		return nil, annotateError(c.ID, err)
+		return nil, annotateError(c.Tag, err)
 	}
 
 	s, err := newSession(sourceFile, sourceCode, c)
 	if err != nil {
-		return nil, annotateError(c.ID, err)
+		return nil, annotateError(c.Tag, err)
 	}
 
 	return &jsProcessor{
 		Config:     c,
 		s:          s,
 		sourceFile: sourceFile,
-		stats:      getStats(c.ID, reg),
+		stats:      getStats(c.Tag, reg),
 	}, nil
 }
 
@@ -161,7 +161,7 @@ func (p *jsProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		run = p.runWithStats
 	}
 	rtn, err := run(event)
-	return rtn, annotateError(p.ID, err)
+	return rtn, annotateError(p.Tag, err)
 }
 
 func (p *jsProcessor) runWithStats(event *beat.Event) (*beat.Event, error) {
@@ -177,7 +177,7 @@ func (p *jsProcessor) runWithStats(event *beat.Event) (*beat.Event, error) {
 }
 
 func (p *jsProcessor) String() string {
-	return "script=[type=javascript, id=" + p.ID + ", sources=" + p.sourceFile + "]"
+	return "script=[type=javascript, id=" + p.Tag + ", sources=" + p.sourceFile + "]"
 }
 
 // hasMeta reports whether path contains any of the magic characters

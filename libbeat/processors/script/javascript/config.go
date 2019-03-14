@@ -25,19 +25,19 @@ import (
 
 // Config defines the Javascript source files to use for the processor.
 type Config struct {
-	ID             string                 `config:"id"`
-	Code           string                 `config:"code"`
-	File           string                 `config:"file"`
-	Files          []string               `config:"files"`
-	Params         map[string]interface{} `config:"script_params"`
-	Timeout        time.Duration          `config:"timeout" validate:"min=0"`
-	TagOnException string                 `config:"tag_on_exception"`
+	Tag            string                 `config:"tag"`                      // Processor ID for debug and metrics.
+	Source         string                 `config:"source"`                   // Inline script to execute.
+	File           string                 `config:"file"`                     // Source file.
+	Files          []string               `config:"files"`                    // Multiple source files.
+	Params         map[string]interface{} `config:"params"`                   // Parameters to pass to script.
+	Timeout        time.Duration          `config:"timeout" validate:"min=0"` // Execution timeout.
+	TagOnException string                 `config:"tag_on_exception"`         // Tag to add to events when an exception happens.
 }
 
 // Validate returns an error if one (and only one) option is not set.
 func (c Config) Validate() error {
 	numConfigured := 0
-	for _, set := range []bool{c.Code != "", c.File != "", len(c.Files) > 0} {
+	for _, set := range []bool{c.Source != "", c.File != "", len(c.Files) > 0} {
 		if set {
 			numConfigured++
 		}
@@ -46,10 +46,10 @@ func (c Config) Validate() error {
 	switch {
 	case numConfigured == 0:
 		return errors.Errorf("javascript must be defined via 'file', " +
-			"'files', or inline as 'code'")
+			"'files', or inline as 'source'")
 	case numConfigured > 1:
 		return errors.Errorf("javascript can be defined in only one of " +
-			"'file', 'files', or inline as 'code'")
+			"'file', 'files', or inline as 'source'")
 	}
 
 	return nil

@@ -32,7 +32,7 @@ func TestSessionTagOnException(t *testing.T) {
 	const script = `throw "this tags the event";`
 
 	p, err := NewFromConfig(Config{
-		Code:           header + script + footer,
+		Source:         header + script + footer,
 		TagOnException: defaultConfig().TagOnException,
 	}, nil)
 	if err != nil {
@@ -49,29 +49,29 @@ func TestSessionTagOnException(t *testing.T) {
 func TestSessionScriptParams(t *testing.T) {
 	t.Run("register method is optional", func(t *testing.T) {
 		_, err := NewFromConfig(Config{
-			Code: header + footer,
+			Source: header + footer,
 		}, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 	})
 
-	t.Run("register required for script_params", func(t *testing.T) {
+	t.Run("register required for params", func(t *testing.T) {
 		_, err := NewFromConfig(Config{
-			Code: header + footer,
+			Source: header + footer,
 			Params: map[string]interface{}{
 				"threshold": 42,
 			},
 		}, nil)
 		if assert.Error(t, err) {
-			assert.Contains(t, err.Error(), "script_params were provided")
+			assert.Contains(t, err.Error(), "params were provided")
 		}
 	})
 
-	t.Run("register script_params", func(t *testing.T) {
+	t.Run("register params", func(t *testing.T) {
 		const script = `
-			function register(script_params) {
-				if (script_params["threshold"] !== 42) {
+			function register(params) {
+				if (params["threshold"] !== 42) {
 					throw "invalid threshold";
 				}
 			}
@@ -79,7 +79,7 @@ func TestSessionScriptParams(t *testing.T) {
 			function process(event) {}
 		`
 		_, err := NewFromConfig(Config{
-			Code: script,
+			Source: script,
 			Params: map[string]interface{}{
 				"threshold": 42,
 			},
@@ -115,7 +115,7 @@ func TestSessionTestFunction(t *testing.T) {
 
 	t.Run("test method is optional", func(t *testing.T) {
 		_, err := NewFromConfig(Config{
-			Code: header + footer,
+			Source: header + footer,
 		}, nil)
 		if err != nil {
 			t.Fatal(err)
@@ -124,7 +124,7 @@ func TestSessionTestFunction(t *testing.T) {
 
 	t.Run("test success", func(t *testing.T) {
 		_, err := NewFromConfig(Config{
-			Code: script,
+			Source: script,
 			Params: map[string]interface{}{
 				"fail": false,
 			},
@@ -134,7 +134,7 @@ func TestSessionTestFunction(t *testing.T) {
 
 	t.Run("test failure", func(t *testing.T) {
 		_, err := NewFromConfig(Config{
-			Code: script,
+			Source: script,
 			Params: map[string]interface{}{
 				"fail": true,
 			},
@@ -153,7 +153,7 @@ func TestSessionTimeout(t *testing.T) {
     `
 
 	p, err := NewFromConfig(Config{
-		Code:           header + runawayLoop + footer,
+		Source:         header + runawayLoop + footer,
 		Timeout:        500 * time.Millisecond,
 		TagOnException: "_js_exception",
 	}, nil)

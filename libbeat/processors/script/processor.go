@@ -34,13 +34,13 @@ func init() {
 // New constructs a new script processor.
 func New(c *common.Config) (processors.Processor, error) {
 	var config = struct {
-		Type string `config:"type" validate:"required"`
+		Lang string `config:"lang" validate:"required"`
 	}{}
 	if err := c.Unpack(&config); err != nil {
 		return nil, err
 	}
 
-	switch strings.ToLower(config.Type) {
+	switch strings.ToLower(config.Lang) {
 	case "javascript", "js":
 		return javascript.New(c)
 	default:
