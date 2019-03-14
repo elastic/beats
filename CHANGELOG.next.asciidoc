@@ -172,6 +172,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Always include Pod UID as part of Pod metadata. {pull]9517[9517]
 - Release Jolokia autodiscover as GA. {pull}9706[9706]
 - Add ip fields to default_field in Elasticsearch template. {pull}11035[11035]
+- Add `cleanup_timeout` option to docker autodiscover, to wait some time before removing configurations after a container is stopped. {issue]10374[10374] {pull}10905[10905]
 
 *Auditbeat*
 
