@@ -41,7 +41,17 @@
         - name: replicaset.name
           type: keyword
           description: >
-            Kubernetes replica-set name
+            Kubernetes replicaset name
+
+        - name: deployment.name
+          type: keyword
+          description: >
+            Kubernetes deployment name
+
+        - name: statefulset.name
+          type: keyword
+          description: >
+            Kubernetes statefulset name
 
         - name: container.name
           type: keyword

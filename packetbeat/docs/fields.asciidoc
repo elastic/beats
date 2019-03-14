@@ -5758,7 +5758,27 @@ Kubernetes annotations map
 --
 type: keyword
 
-Kubernetes replica-set name
+Kubernetes replicaset name
+
+
+--
+
+*`kubernetes.deployment.name`*::
++
+--
+type: keyword
+
+Kubernetes deployment name
+
+
+--
+
+*`kubernetes.statefulset.name`*::
++
+--
+type: keyword
+
+Kubernetes statefulset name
 
 
 --
