@@ -10,7 +10,7 @@
         "%{TIMESTAMP_ISO8601:iis.access.time} \\[%{IPORHOST:destination.address}\\]\\(http://%{IPORHOST:destination.address}\\) %{WORD:http.request.method} %{URIPATH:url.path} %{NOTSPACE:url.query} %{NUMBER:destination.port:long} %{NOTSPACE:user.name} \\[%{IPORHOST:source.address}\\]\\(http://%{IPORHOST:source.address}\\) %{NOTSPACE:user_agent.original} %{NUMBER:http.response.status_code:long} %{NUMBER:iis.access.sub_status:long} %{NUMBER:iis.access.win32_status:long} %{NUMBER:temp.duration:long}"
       ],
       "pattern_definitions": {
-          "URIPATHWITHBRACKET": "(?:/[A-Za-z0-9$.+!*'(){},~:;=@#%_\\-\\[\\]]*)+"
+          "URIPATHWITHBRACKET": "(?:/[A-Za-z0-9$.+!*'(){},~:;=@#%&_\\-\\[\\]]*)+"
       },
       "ignore_missing": true
     }
