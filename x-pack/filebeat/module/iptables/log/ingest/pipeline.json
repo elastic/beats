@@ -64,7 +64,7 @@
                 "date": {
                     "field": "iptables.raw_date",
                     "ignore_failure": true,
-                    {< if .convert_timezone >}"timezone": "{{ beat.timezone }}",{< end >}
+                    {< if .convert_timezone >}"timezone": "{{ event.timezone }}",{< end >}
                     "formats": [
                         "MMM  d HH:mm:ss",
                         "MMM dd HH:mm:ss"

@@ -46,6 +46,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename user fields to ECS in auditd module. {pull}10456[10456]
 - Rename `event.type` to `auditd.message_type` in auditd module because event.type is reserved for future use by ECS. {pull}10536[10536]
 - Rename `auditd.messages` to `event.original` and `auditd.warnings` to `error.message`. {pull}10577[10577]
+- Process dataset: Only report processes with executable. {pull}11232[11232]
 
 *Filebeat*
 
@@ -241,6 +242,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add output test to kafka output {pull}10834[10834]
 - Add ip fields to default_field in Elasticsearch template. {pull}11035[11035]
 - Gracefully shut down on SIGHUP {pull}10704[10704]
+- Add `script` processor that supports using Javascript to process events. {pull}10850[10850]
 
 *Auditbeat*
 

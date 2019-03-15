@@ -269,9 +269,9 @@ func TestGetPipelineConvertTS(t *testing.T) {
 			marshaled, err := json.Marshal(pipeline.contents)
 			require.NoError(t, err)
 			if cfg.Timezone {
-				assert.Contains(t, string(marshaled), "beat.timezone")
+				assert.Contains(t, string(marshaled), "event.timezone")
 			} else {
-				assert.NotContains(t, string(marshaled), "beat.timezone")
+				assert.NotContains(t, string(marshaled), "event.timezone")
 			}
 		})
 	}
