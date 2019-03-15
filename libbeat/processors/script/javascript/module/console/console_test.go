@@ -21,12 +21,14 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors/script/javascript"
 
+	// Register require module.
 	_ "github.com/elastic/beats/libbeat/processors/script/javascript/module/require"
 )
 
@@ -35,9 +37,9 @@ func TestConsole(t *testing.T) {
 var console = require('console');
 
 function process(evt) {
-	console.log("Info %j", evt.fields);
-	console.warn("Warning [%s]", evt.fields.message);
-	console.error("Error processing event: %j", evt.fields);
+	console.log("TestConsole Info %j", evt.fields);
+	console.warn("TestConsole Warning [%s]", evt.fields.message);
+	console.error("TestConsole Error processing event: %j", evt.fields);
 }
 `
 
@@ -52,7 +54,15 @@ function process(evt) {
 		t.Fatal(err)
 	}
 
-	assert.Len(t, logp.ObserverLogs().FilterMessageSnippet("Info").All(), 1)
-	assert.Len(t, logp.ObserverLogs().FilterMessageSnippet("Warning").All(), 1)
-	assert.Len(t, logp.ObserverLogs().FilterMessageSnippet("Error").All(), 1)
+	logs := logp.ObserverLogs().FilterMessageSnippet("TestConsole").TakeAll()
+	if assert.Len(t, logs, 3) {
+		assert.Contains(t, logs[0].Message, "Info")
+		assert.Equal(t, logs[0].Level, zap.DebugLevel)
+
+		assert.Contains(t, logs[1].Message, "Warning")
+		assert.Equal(t, logs[1].Level, zap.WarnLevel)
+
+		assert.Contains(t, logs[2].Message, "Error")
+		assert.Equal(t, logs[2].Level, zap.ErrorLevel)
+	}
 }
