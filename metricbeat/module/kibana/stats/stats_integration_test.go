@@ -40,7 +40,7 @@ func TestFetch(t *testing.T) {
 
 	config := mtest.GetConfig("stats")
 	host := config["hosts"].([]string)[0]
-	version, err := getKibanaVersion(host)
+	version, err := getKibanaVersion(t, host)
 	if err != nil {
 		t.Fatal("getting kibana version", err)
 	}
@@ -92,7 +92,7 @@ func TestData(t *testing.T) {
 	}
 }
 
-func getKibanaVersion(kibanaHostPort string) (*common.Version, error) {
+func getKibanaVersion(t *testing.T, kibanaHostPort string) (*common.Version, error) {
 	resp, err := http.Get("http://" + kibanaHostPort + "/api/status")
 	if err != nil {
 		return nil, err
@@ -112,6 +112,7 @@ func getKibanaVersion(kibanaHostPort string) (*common.Version, error) {
 
 	version, err := data.GetValue("version.number")
 	if err != nil {
+		t.Log("Kibana GET /api/status response:", string(data))
 		return nil, err
 	}
 
