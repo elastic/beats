@@ -8,6 +8,7 @@ package ec2
 
 import (
 	"testing"
+	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
@@ -171,27 +172,32 @@ func TestCreateCloudWatchEvents(t *testing.T) {
 	assert.Equal(t, 1, len(instanceIDs))
 	instanceID := instanceIDs[0]
 	assert.Equal(t, instanceID, instanceID)
+	timestamp := time.Now()
 
 	getMetricDataOutput := []cloudwatch.MetricDataResult{
 		{
-			Id:     &id1,
-			Label:  &label1,
-			Values: []float64{0.25},
+			Id:         &id1,
+			Label:      &label1,
+			Values:     []float64{0.25},
+			Timestamps: []time.Time{timestamp},
 		},
 		{
-			Id:     &id2,
-			Label:  &label2,
-			Values: []float64{0.0},
+			Id:         &id2,
+			Label:      &label2,
+			Values:     []float64{0.0},
+			Timestamps: []time.Time{timestamp},
 		},
 		{
-			Id:     &id3,
-			Label:  &label3,
-			Values: []float64{0.0},
+			Id:         &id3,
+			Label:      &label3,
+			Values:     []float64{0.0},
+			Timestamps: []time.Time{timestamp},
 		},
 		{
-			Id:     &id4,
-			Label:  &label4,
-			Values: []float64{0.0},
+			Id:         &id4,
+			Label:      &label4,
+			Values:     []float64{0.0},
+			Timestamps: []time.Time{timestamp},
 		},
 	}
 
