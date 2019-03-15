@@ -1075,12 +1075,22 @@ The state of the instance, as a 16-bit unsigned integer.
 
 --
 
+*`aws.ec2.instance.state.name`*::
++
+--
+type: keyword
+
+The state of the instance (pending | running | shutting-down | terminated | stopping | stopped).
+
+
+--
+
 *`aws.ec2.instance.threads_per_core`*::
 +
 --
 type: integer
 
-The state of the instance (pending | running | shutting-down | terminated | stopping | stopped).
+The number of threads per CPU core.
 
 
 --
@@ -1316,7 +1326,7 @@ The approximate age of the oldest non-deleted message in the queue.
 
 --
 
-*`aws.sqs.message.delayed`*::
+*`aws.sqs.messages.delayed`*::
 +
 --
 type: long
@@ -1326,7 +1336,7 @@ TThe number of messages in the queue that are delayed and not available for read
 
 --
 
-*`aws.sqs.message.not_visible`*::
+*`aws.sqs.messages.not_visible`*::
 +
 --
 type: long
@@ -1336,7 +1346,7 @@ The number of messages that are in flight.
 
 --
 
-*`aws.sqs.message.visible`*::
+*`aws.sqs.messages.visible`*::
 +
 --
 type: long
@@ -1346,7 +1356,7 @@ The number of messages available for retrieval from the queue.
 
 --
 
-*`aws.sqs.message.deleted`*::
+*`aws.sqs.messages.deleted`*::
 +
 --
 type: long
@@ -1356,7 +1366,7 @@ The number of messages deleted from the queue.
 
 --
 
-*`aws.sqs.message.received`*::
+*`aws.sqs.messages.received`*::
 +
 --
 type: long
@@ -1366,7 +1376,7 @@ The number of messages returned by calls to the ReceiveMessage action.
 
 --
 
-*`aws.sqs.message.sent`*::
+*`aws.sqs.messages.sent`*::
 +
 --
 type: long
@@ -1389,9 +1399,21 @@ The number of ReceiveMessage API calls that did not return a message.
 *`aws.sqs.sent_message_size.bytes`*::
 +
 --
-type: scaled_float
+type: long
+
+format: bytes
 
 The size of messages added to a queue.
+
+
+--
+
+*`aws.sqs.queue.name`*::
++
+--
+type: keyword
+
+SQS queue name
 
 
 --
@@ -4674,6 +4696,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the client to the server.
 
 --
@@ -5053,6 +5077,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the destination to the source.
 
 --
@@ -5376,6 +5402,8 @@ The concept of a `dataset` (fileset / metricset) is used in Beats as a subset of
 +
 --
 type: long
+
+format: duration
 
 Duration of the event in nanoseconds.
 If event.start and event.end are known this value should be the difference between the end and start time.
@@ -6093,6 +6121,8 @@ type: long
 
 example: 887
 
+format: bytes
+
 Size in bytes of the request body.
 
 --
@@ -6114,6 +6144,8 @@ The full HTTP request body.
 type: long
 
 example: 1437
+
+format: bytes
 
 Total size in bytes of the request (body and headers).
 
@@ -6149,6 +6181,8 @@ type: long
 
 example: 887
 
+format: bytes
+
 Size in bytes of the response body.
 
 --
@@ -6170,6 +6204,8 @@ The full HTTP response body.
 type: long
 
 example: 1437
+
+format: bytes
 
 Total size in bytes of the response (body and headers).
 
@@ -6253,6 +6289,8 @@ The field value must be normalized to lowercase for querying. See the documentat
 type: long
 
 example: 368
+
+format: bytes
 
 Total bytes transferred in both directions.
 If `source.bytes` and `destination.bytes` are known, `network.bytes` is their sum.
@@ -6843,6 +6881,8 @@ type: long
 
 example: 184
 
+format: bytes
+
 Bytes sent from the server to the client.
 
 --
@@ -7156,6 +7196,8 @@ Then it should be duplicated to `.ip` or `.domain`, depending on which one it is
 type: long
 
 example: 184
+
+format: bytes
 
 Bytes sent from the source to the destination.
 
@@ -12093,6 +12135,36 @@ Kubernetes replica-set map
 
 --
 
+*`kubernetes.replicaset.name`*::
++
+--
+type: keyword
+
+Kubernetes replicaset name
+
+
+--
+
+*`kubernetes.deployment.name`*::
++
+--
+type: keyword
+
+Kubernetes deployment name
+
+
+--
+
+*`kubernetes.statefulset.name`*::
++
+--
+type: keyword
+
+Kubernetes statefulset name
+
+
+--
+
 *`kubernetes.container.name`*::
 +
 --
@@ -13329,16 +13401,6 @@ kubernetes deployment metrics
 
 
 
-*`kubernetes.deployment.name`*::
-+
---
-type: keyword
-
-Kubernetes deployment name
-
-
---
-
 *`kubernetes.deployment.paused`*::
 +
 --
@@ -13562,16 +13624,6 @@ kubernetes replica set metrics
 
 
 
-*`kubernetes.replicaset.name`*::
-+
---
-type: keyword
-
-Kubernetes replica set name
-
-
---
-
 [float]
 == replicas fields
 
@@ -13635,16 +13687,6 @@ The number of fully labeled replicas per ReplicaSet
 kubernetes stateful set metrics
 
 
-
-*`kubernetes.statefulset.name`*::
-+
---
-type: keyword
-
-Kubernetes stateful set name
-
-
---
 
 *`kubernetes.statefulset.created`*::
 +

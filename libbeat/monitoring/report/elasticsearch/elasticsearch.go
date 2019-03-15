@@ -68,7 +68,7 @@ var errNoMonitoring = errors.New("xpack monitoring not available")
 // default monitoring api parameters
 var defaultParams = map[string]string{
 	"system_id":          "beats",
-	"system_api_version": "6",
+	"system_api_version": "7",
 }
 
 func init() {
