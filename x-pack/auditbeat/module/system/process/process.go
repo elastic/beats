@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"os/user"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -420,6 +421,11 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 			if err == nil {
 				process.Group = group
 			}
+		}
+
+		// Exclude Linux kernel processes, they are not very interesting.
+		if runtime.GOOS == "linux" && userInfo.UID == "0" && process.Info.Exe == "" {
+			continue
 		}
 
 		processes = append(processes, process)
