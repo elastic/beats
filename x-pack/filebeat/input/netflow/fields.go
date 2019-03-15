@@ -11,11 +11,7 @@ import (
 )
 
 func init() {
-<<<<<<< HEAD
 	if err := asset.SetFields("filebeat", "netflow", asset.ModuleFieldsPri, AssetNetflow); err != nil {
-=======
-	if err := asset.SetFields("filebeat", "Netflow", asset.ModuleFieldsPri, AssetNetflow); err != nil {
->>>>>>> Introduce local fields generation
 		panic(err)
 	}
 }

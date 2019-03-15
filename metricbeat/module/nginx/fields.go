@@ -24,11 +24,7 @@ import (
 )
 
 func init() {
-<<<<<<< HEAD
 	if err := asset.SetFields("metricbeat", "nginx", asset.ModuleFieldsPri, AssetNginx); err != nil {
-=======
-	if err := asset.SetFields("metricbeat", "Nginx", asset.ModuleFieldsPri, AssetNginx); err != nil {
->>>>>>> Introduce local fields generation
 		panic(err)
 	}
 }

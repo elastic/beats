@@ -18,15 +18,12 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
-	"go/format"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/generator/fields"
@@ -93,19 +90,6 @@ func main() {
 		}
 
 		bs, err := asset.CreateAsset(license, beatName, module, module, data, "asset.ModuleFieldsPri", dir+"/"+module)
-
-		var buf bytes.Buffer
-		asset.Template.Execute(&buf, asset.Data{
-			License:  license,
-			Beat:     beatName,
-			Name:     goTypeName(module),
-			Data:     encData,
-			Priority: "asset.ModuleFieldsPri",
-			Package:  module,
-			Path:     dir + "/" + module,
-		})
-
-		bs, err := format.Source(buf.Bytes())
 		if err != nil {
 			log.Fatalf("Error creating golang file from template: %v", err)
 		}
@@ -120,28 +104,4 @@ func main() {
 func usageFlag() {
 	fmt.Fprintf(os.Stderr, usageText)
 	flag.PrintDefaults()
-}
-
-// goTypeName removes special characters ('_', '.', '@') and returns a
-// camel-cased name.
-func goTypeName(name string) string {
-	var b strings.Builder
-	for _, w := range strings.FieldsFunc(name, isSeparator) {
-		b.WriteString(strings.Title(w))
-	}
-	return b.String()
-}
-
-// isSeparate returns true if the character is a field name separator. This is
-// used to detect the separators in fields like ephemeral_id or instance.name.
-func isSeparator(c rune) bool {
-	switch c {
-	case '.', '_':
-		return true
-	case '@':
-		// This effectively filters @ from field names.
-		return true
-	default:
-		return false
-	}
 }

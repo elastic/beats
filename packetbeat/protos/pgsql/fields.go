@@ -24,11 +24,7 @@ import (
 )
 
 func init() {
-<<<<<<< HEAD
 	if err := asset.SetFields("packetbeat", "pgsql", asset.ModuleFieldsPri, AssetPgsql); err != nil {
-=======
-	if err := asset.SetFields("packetbeat", "Pgsql", asset.ModuleFieldsPri, AssetPgsql); err != nil {
->>>>>>> Introduce local fields generation
 		panic(err)
 	}
 }
@@ -36,9 +32,5 @@ func init() {
 // AssetPgsql returns asset data.
 // This is the base64 encoded gzipped contents of protos/pgsql.
 func AssetPgsql() string {
-<<<<<<< HEAD
 	return "eJzEkcFu6jAURPf5ihHrBx+QBRJCPAkJtRTYI0gmwapjB1+bKn9fhaTF0GbBqllF1z4zR9djvLNJUZdy1gnglddMMVpb8aXj9m01SoCckjlVe2VNimkCALcLY6mZqUJl4IXGo1DUuUwS9H/p9f4Y5lDxVtR+vqmZonQ21P0kJmKKzlm3z2zO76MHq92JkVMHoAUmEdEVamvKZKCiosihfK6lZyZDmcILnfLNU6FfUKxfWxF11NxfDjowWlPXudhsXjcPs/+z3Wz1MFvPXpbzn7ImVPtu/0Oi07ugZQF/IraL1WK+wznQNVAFJGQZRYqg/8GflHRvCiUQenh7hUyojnR3cbboXx+OPjjD/JeFto7OfvyZYdsd+30GAAD//yg57bo="
-=======
-	return "eJzEk8GO2jAQhu95il976aXwADlUQisqrRS1LHBHJpkkVh07zNgg3r5yEkoKiVRO9QkN/v199kwW+EXXFG0lJ5MAXntDKd42TnzFtPvM3hKgIMlZt147m+JbAgD3DQtpKdelzkFnsh6lJlPIMsHwK+32L2BVQ3dQXP7aUoqKXWiHyjgxTp0C8fVPdVLotvY1gd2lB/VBKAGTKlCya+BrgmdlReUx/yX+dwokfpk8cbUQs+MRoHc+OmdI2X8z+ig75qbafWaDEJMPbAXKogN8ha+19NeHFgh5eAfPgSasusghdwXNCcRHuHeoDyAGlk9XMc5Wc4iGRFT1GmXIzGoLnYm1n+3m5KG30Fi/dSL6aOhwVibQaGh65nq7/bl9qH1f7VfZQ22z+vHx/ixrQ3Pop/GlJu/W2fp9P3RZl5CQ5yRSBjPX4poi60j813GuHL6FYVSomHjQ6Mju8t8MI3vs9zsAAP//6hY8Lw=="
->>>>>>> Introduce local fields generation
 }

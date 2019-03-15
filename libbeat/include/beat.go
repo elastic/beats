@@ -32,5 +32,5 @@ func init() {
 // AssetBeat returns asset data.
 // This is the base64 encoded gzipped contents of ./build/fields/beat.yml.
 func AssetBeat() string {
-	return "eJyMUl1OwzAMfu8pvgtsB8gDDyDOgbzU7czSuErSoXF6lKSDpUKFPS22vz+73QEXvhmcmFIHJEmODZ7rq+dog8xJ1Bs8dQDwoj6R+Air06S+4DAIuz6CriSOTo4hHuQc+Mo+Id1mjscO65gpPAd4mrjqHpNM/KmeSwcFYEBOKK6VmdLZVLrt8CRjoOowhYW7hr0qNrR6emeb1lJ9vNXOhW8fGvq19Uv2Jv8SOcCqH2RcQgldxY6tAw5BQ2NgDLrM+yKvGXTfqq2K4kdQ30ueJQfxg+Y1W4oMHapO2XL+PW760U128F28G2pz79j6sZaBm6DlkPnvH0c8a2zmdu9XSDPiH8Q05q9jM7xl/woAAP//8G7fyA=="
+	return "eJyEUltSwzAM/M8p9gLtAfzRDxhmuAWjJkoqcOyMrZQpp2f8AJI2E/JnZbW70qo54INvBmcmbQAVtWzwVF4dxzbIpOKdwakBgGfvlMRFtH4cvct96IVtF0FXEktnyxAHshZ8ZafQ28Tx2KDCTOY5wNHIBjSw0+PFR03v/Au5wyRfnz50tbby8lrx8D30wpWlWTEnZ0eVkb+8WxOTFYq1MpFeTDF6Dx5lCFT0NMy8Zi+zrGj9+Z1braXyePt3klMtLjY7Rw5ovetlmENeZxG7m49D8GFlYAh+nvZFXlLTT15tURQ3gLpOEpYsxPU+BdhSzPvNOjm/9C0zXLpJDn6L2wnu2Pqzlhq3gny4jscQ0xEtcbv5ZdLNs3sk3rzRe/bvAAAA///mH/vl"
 }

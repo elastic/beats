@@ -24,11 +24,7 @@ import (
 )
 
 func init() {
-<<<<<<< HEAD
 	if err := asset.SetFields("auditbeat", "file_integrity", asset.ModuleFieldsPri, AssetFileIntegrity); err != nil {
-=======
-	if err := asset.SetFields("auditbeat", "FileIntegrity", asset.ModuleFieldsPri, AssetFileIntegrity); err != nil {
->>>>>>> Introduce local fields generation
 		panic(err)
 	}
 }

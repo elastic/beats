@@ -24,11 +24,7 @@ import (
 )
 
 func init() {
-<<<<<<< HEAD
 	if err := asset.SetFields("filebeat", "apache", asset.ModuleFieldsPri, AssetApache); err != nil {
-=======
-	if err := asset.SetFields("filebeat", "Apache", asset.ModuleFieldsPri, AssetApache); err != nil {
->>>>>>> update fields.go files
 		panic(err)
 	}
 }
@@ -36,9 +32,5 @@ func init() {
 // AssetApache returns asset data.
 // This is the base64 encoded gzipped contents of module/apache.
 func AssetApache() string {
-<<<<<<< HEAD
 	return "eJysl7+O4zgMxvs8BTH9qLgyxQGHAw5X3AELzPSGIjO2MIropegM/PYL/5tNMrIjOXEVyOH3/SjSgvgKH9jtQTfa1LgDECsO9/Dy17DwsgMoMRi2jVjye/hzBwAwvoT/qWxdHxRqYikM+aOt9iDc9otHi64M+yHgFbw+4Wzzx7AGIF2De6iY2mZaiXgNfs7qgAGOxHDQ5uNTcwmGTo0We7DOSgefVmogV84Wk/0kcclyxWMMhvC1HEOKhV9KMJ5IsLDN1dtZSffkN28aLfUeArVsUOmy5GuE/jnZivW4C9NufjcOwamGSciQy/Qe90iN2asVoVQOY5sa+WGKqEwKw4HKrgjoRR06wVu7eyC1SKMYQ0M+oOq1ojIpIG1ALvqfmQh9nIrEpXieUGoqt+X8s8UgKqqQlC7ntl7LThHbynq9pdl67OKMHCz5LRnHQ1Oc5/4oDJW51b1usCBa2hDTSeM4InP2x3ZV7wWNFHtdoZcNzV0MgamlX/62lv1vD21YOLgvJUs8W3NbhfWUommNOrEPOJbdEs1CeCbLgxAUM8lEoKCOrXOxgzAPZUkhn+dRlHjfbmFZVkr5/iqkhavGlv435MV69PLIRk83mQpJ3dVL3W9DrRfuChsodlBuQrurmArnyAx/exxqRSkVhrGy5J9Uv3Wx5OJZ6Z7VUCtSmTv0vFa6L7iENiMhM/FDY4fDM+bevRxVKhaXdskMQVe5F594VIpfY3NvtA3TMEh8j0zxk81+UjPqUm1yPc0TdI7xNDcNPaSiCt+uU5EhPHsGH2f+sSfVc+bqBav++Zu8aOvDZDGM/lLjjPHv+/sPeEM+I09mfXd/ccXYIGd2/sDuk/i2pCu8/fP29h/MqjBNGr+JtgzPmzFGzcFEbTx9Vlz+mWrCdLosyqCbVYeV/t+U+nuNk2ZfiLI11lcDoaOqwnI+j9TuVwAAAP//QYrRgg=="
-=======
-	return "eJysmM+O4zYMxu95CmLvq0OPORQoChQt0AILzNwNRWZsdWTRpegZ5O0L/5vNJLIj2ZlToAy/7yeSkS1+hze8HEG32tR4ABArDo/w7bdh4dsBoMRg2LZiyR/h1wMAwPgl/ENl5/qgUBNLYcifbXUE4a5fPFt0ZTgOAd/B6wZnm1+GNQC5tHiEiqlrp5WI1+DnrA4Y4EwMJ23ePjSXYKhptdiTdVYu8GGlBnLlbDHZTxLXLF94jMEQPpdjSLHwawnGhgQL2375dlbSPfnNN62Wek6FGgnUkkpjK9ZjOqa03hOE4FTLJGTI7YJYEUrlMLatkXdTRGVSGE5UXoqAXtTpInhrlweyrpVC0wXkov+YydHHqUhcimeDUlOZaViLtIrxvw6DqKhC0nY5t/86dorYVtbrLR3XYxfvyMGS37LjeGiKM2NoyQcsDJW51Z2SPQqoIFq6ENNJ4zgjc/Yv7ku9FzRS7HWFXjY0dzEEppZ++be17H97hMPCMX4tWeK7NbdVWN9SdFuLOmspvQZp9L90W44NHEsyyRjWPwVjQSYVo9Vi6v0YSzKpGJHzeAPFgkoqBMVMMhEoqHPnXOzBlIdSPKlPKexu1R7mOd3aw+xsWApLuc1n2Vuk+Am7hWVZKeVJUSEtvCJvOakNebEevexJdKCODaoKST3US823oc4LXwobKPZI34T2UDEVzpEZ/m0/1IpSKgxjZck/qX7rYsnFs3J5VkOtSGVm6Hmt9FhwCW1GQuYvJ2P+ddnhO+beEhxVKhaXdh0KQVe5r+jxqBS/1ubevVqm4bp5H5niJ5v9pGbUpdrk2syTnxzj6XY99JCKKty9+B/gbnh0uDZLmR2Ns6qxJ9W0vHMetGDV//1OXrT1YbIYRlZS44zx5+vrD3hBfkeezPru/uSKsUHysOkNLx/Et/VcgR2AnUUv8NcP0GXJPRAx1BSkd/zJFcV5OHnaRPTy8jfMqjBd0RNAVkZPmzFGTVhIRRQlZQLlyFe3bzzEjZYjxIIegL7WCL5rTshA51Gg/9B3XRg7bR42DHCRjeQd7ys4f0xNz9Rcd/2gm9XoKwfMpmL2ORo1+9YqO2N9NRA6qios5wNfHf4PAAD//0mO0CA="
->>>>>>> update fields.go files
 }

@@ -90,18 +90,6 @@ func main() {
 		name = file
 	}
 
-	// Capitalise first letter
-	name = goTypeName(name)
-	asset.Template.Execute(&buf, asset.Data{
-		Beat:     beatName,
-		Name:     name,
-		Priority: priority,
-		Data:     encData,
-		License:  licenseHeader,
-		Package:  pkg,
-		Path:     input,
-	})
-
 	bs, err := asset.CreateAsset(licenseHeader, beatName, name, pkg, data, priority, file)
 	if err != nil {
 		panic(err)
@@ -111,29 +99,5 @@ func main() {
 		os.Stdout.Write(bs)
 	} else {
 		ioutil.WriteFile(output, bs, 0640)
-	}
-}
-
-// goTypeName removes special characters ('_', '.', '@') and returns a
-// camel-cased name.
-func goTypeName(name string) string {
-	var b strings.Builder
-	for _, w := range strings.FieldsFunc(name, isSeparator) {
-		b.WriteString(strings.Title(w))
-	}
-	return b.String()
-}
-
-// isSeparate returns true if the character is a field name separator. This is
-// used to detect the separators in fields like ephemeral_id or instance.name.
-func isSeparator(c rune) bool {
-	switch c {
-	case '.', '_':
-		return true
-	case '@':
-		// This effectively filters @ from field names.
-		return true
-	default:
-		return false
 	}
 }

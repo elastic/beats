@@ -24,11 +24,7 @@ import (
 )
 
 func init() {
-<<<<<<< HEAD
 	if err := asset.SetFields("filebeat", "icinga", asset.ModuleFieldsPri, AssetIcinga); err != nil {
-=======
-	if err := asset.SetFields("filebeat", "Icinga", asset.ModuleFieldsPri, AssetIcinga); err != nil {
->>>>>>> Introduce local fields generation
 		panic(err)
 	}
 }
@@ -36,9 +32,5 @@ func init() {
 // AssetIcinga returns asset data.
 // This is the base64 encoded gzipped contents of module/icinga.
 func AssetIcinga() string {
-<<<<<<< HEAD
 	return "eJzsksFqwzAQRO/+iiH35AN06KWnHnrqF2yttbJEloS0TvDfFztO6hinUGihhexxBs08wWxx4N5AagmOKkBFPRtsXkZhUwGWS50lqcRg8FQBwNnEa7Sd5wpohL0tZvS2CNTyLHE47RMbuBy7NCkrqbc58yzL7527qmtxdyPP9xyDkoQyNaCJGbrny0fGfPjoym72bEkzJ2qoFi/a35gXsAP3p5jtwvsCb7i3xLU0wgWnPSnq2KYYOChic8H00Tm2I3jLpZDjT9xVysJHzvcoyQuVhZNI92bo2Xk+sl+4rbhMZ37NHa9WTmDfbFx/da/v2kUSfnEVQ/xjFP9tFEUp680CfnoXU8NjGn99Gh8BAAD//xYdyXI="
-=======
-	return "eJzsksFq8zAQhO9+iiH35AF0+C//qYee+gRba60skSUhrRP89sWOkzrGKQTaQiF7nEEzn2C2OHBvILUERxWgop4NNi+jsKkAy6XOklRiMPhXAcDZxGu0necKaIS9LWb0tgjU8ixxOO0TG7gcuzQpK6m3OfMsy++du6prcXcjz/c/BiUJZWpAEzN0z5ePjPnw0ZXd7NmSZk7UUC1etL8xL2AH7k8x24X3Bd5wb4lraYQLTntS1LFNMXBQxOaC6aNzbEfwlkshx5+4q5SFj5zvUZIXKgsnke7N0LPzfGS/cFtxmc78mjterZzAHmxcf3Wv79pFEn5wFUP8cxR/bRRFKevNAr57F1PDcxoPTmP369v4CAAA///Y9smg"
->>>>>>> Introduce local fields generation
 }

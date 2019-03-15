@@ -24,11 +24,7 @@ import (
 )
 
 func init() {
-<<<<<<< HEAD
 	if err := asset.SetFields("packetbeat", "mysql", asset.ModuleFieldsPri, AssetMysql); err != nil {
-=======
-	if err := asset.SetFields("packetbeat", "Mysql", asset.ModuleFieldsPri, AssetMysql); err != nil {
->>>>>>> Introduce local fields generation
 		panic(err)
 	}
 }
@@ -36,9 +32,5 @@ func init() {
 // AssetMysql returns asset data.
 // This is the base64 encoded gzipped contents of protos/mysql.
 func AssetMysql() string {
-<<<<<<< HEAD
 	return "eJy8k8GO0zAQhu95il974UL3AXLggnpYaUGC7j1y7XFrEdupZ0yVt0d20tJCCq2Q8CWRx/8/nz0zK3yjsYUf+dA3gDjpqcXTp3Hz5fWpAQyxTm4QF0OLDw0A1NiKB9LOOg36TkFgHfWGnxvMf209ukJQnn7alyXjQC12KeZh3rlUXKqUtaSFTJfikc/Rk0Mfw+5icwH0tF4sZE8TN3T0XgUDx+CsNTHb3L+H7B1PINAxiHKBq+jEcGUYst9SQrQoZOVbjvaKBSxKyFOQ5+a3+7jAlKRz5iHsl8+b9dc3HDKl8V5qZ2aoa2w69uNMQaawL0CG7LupIA9Rbtav649/pywREkisoukdr+yindsBiSSnQOYG4y898V8Ja9X/wFdz3Af3tqdiN03IDKeKuTKwKfpKIUkFVrro35XYIRMvNRilFFOno6F/mJZCVI1QjM7XxHacJuhmXk/MakePZnHBRszaxWw/AgAA//+Mhliv"
-=======
-	return "eJy8k0FvGyEQhe/7K55y6aXOD9hDL5UPkdJKrXO3MAw26gI2MzTaf1/BktTbrFtblcJlV8B78wFvVvhBYw8/8mnoAHEyUI+7L+Pm2+NdBxhindxRXAw9PnUAUNdWfCTtrNOgnxQE1tFg+L5D++vr1hWC8vTbvgwZj9Rjn2I+tplzxbnKMaUU0+v8i3YX40AqnM0vULbxYCEHmphxypRGJJKcAkMFVP+PkIPjiQKOwSSQCEmZ7rs3UMpa0kJmm+Izv0EbYthfxTUH09F7FabqWWtitnmYcekYRLnAVfTCMDMM2e8oIVoUsvItWwfFAhYl5CnIwnlcYEqydeYm7Ievm/X3p3ahV1I706Dm2PQ8jI2CTGFfgAzZb6eU3ES5WT+uP/+b8uzND9TucWYXbctoyw6ZC4x/ZOJdCeur/4Wv1rgO7ulAxW5q2wanirkysCn6SiFJBVa66D+UtVMmXgpY7bGtjob+o1sKUTVCMXo9Jnbj1EEX63piVnu6tYoLNqJpF6v9CgAA///kpYOQ"
->>>>>>> Introduce local fields generation
 }

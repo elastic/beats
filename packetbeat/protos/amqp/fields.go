@@ -24,11 +24,7 @@ import (
 )
 
 func init() {
-<<<<<<< HEAD
 	if err := asset.SetFields("packetbeat", "amqp", asset.ModuleFieldsPri, AssetAmqp); err != nil {
-=======
-	if err := asset.SetFields("packetbeat", "Amqp", asset.ModuleFieldsPri, AssetAmqp); err != nil {
->>>>>>> Introduce local fields generation
 		panic(err)
 	}
 }

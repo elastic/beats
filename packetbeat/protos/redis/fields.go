@@ -24,11 +24,7 @@ import (
 )
 
 func init() {
-<<<<<<< HEAD
 	if err := asset.SetFields("packetbeat", "redis", asset.ModuleFieldsPri, AssetRedis); err != nil {
-=======
-	if err := asset.SetFields("packetbeat", "Redis", asset.ModuleFieldsPri, AssetRedis); err != nil {
->>>>>>> Introduce local fields generation
 		panic(err)
 	}
 }

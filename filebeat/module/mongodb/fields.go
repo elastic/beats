@@ -24,29 +24,11 @@ import (
 )
 
 func init() {
-<<<<<<< HEAD
 	if err := asset.SetFields("filebeat", "mongodb", asset.ModuleFieldsPri, AssetMongodb); err != nil {
-=======
-	if err := asset.SetFields("filebeat", "Mongodb", asset.ModuleFieldsPri, AssetMongodb); err != nil {
->>>>>>> Introduce local fields generation
 		panic(err)
 	}
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-// AssetMongodb returns asset data.
-// This is the base64 encoded gzipped contents of module/mongodb.
-func AssetMongodb() string {
-=======
-<<<<<<< HEAD
-// Asset returns asset data
-func Asset() string {
->>>>>>> Introduce local fields generation
-	return "eJyUkdFO6zAMhu/7FL92vz1AL4502LS7wjOE1g3WkjhK0rHy9CjtJFoIBXxp6/f3Wd7jQmMNK05L91wBiZOhGrt7Z1cBHcU2sE8srsa/CgAa6QZD6CXAqxDZaTQ5cHqAEY2eDcVDBfRMpov1lNnDKUtLVq40eqqhgwz+3ing5jpPy9AHsUvaBMq1hC2BRvRiy1fgJjTXUVxS7OKd8L1ByeLDoxXrxZFLq/WbZOA8uDbPlEGrEmkJ/KZyA9LDUoxK0ypEN2V9fuHxqWn+P55Ww/n4C42vErqiokt0+5PgcY78qMOOk3Kd4ZjI/UKqYBfpSoHTWEgrwyqu+l6ll+n3B0NXMquZZR3UfFAKAxVQpVO2SaXEZ857AAAA//9KC+uk"
-=======
-=======
->>>>>>> update fields.go files
 // AssetMongodb returns asset data.
 // This is the base64 encoded gzipped contents of module/mongodb.
 func AssetMongodb() string {
