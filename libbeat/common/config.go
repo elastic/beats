@@ -146,7 +146,7 @@ func OverwriteConfigOpts(options []ucfg.Option) {
 
 func LoadFile(path string) (*Config, error) {
 	if IsStrictPerms() {
-		if err := ownerHasExclusiveWritePerms(path); err != nil {
+		if err := OwnerHasExclusiveWritePerms(path); err != nil {
 			return nil, err
 		}
 	}
@@ -414,10 +414,10 @@ func filterDebugObject(c interface{}) {
 	}
 }
 
-// ownerHasExclusiveWritePerms asserts that the current user or root is the
+// OwnerHasExclusiveWritePerms asserts that the current user or root is the
 // owner of the config file and that the config file is (at most) writable by
 // the owner or root (e.g. group and other cannot have write access).
-func ownerHasExclusiveWritePerms(name string) error {
+func OwnerHasExclusiveWritePerms(name string) error {
 	if runtime.GOOS == "windows" {
 		return nil
 	}
