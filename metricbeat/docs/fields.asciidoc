@@ -12125,6 +12125,36 @@ Kubernetes annotations map
 
 --
 
+*`kubernetes.replicaset.name`*::
++
+--
+type: keyword
+
+Kubernetes replicaset name
+
+
+--
+
+*`kubernetes.deployment.name`*::
++
+--
+type: keyword
+
+Kubernetes deployment name
+
+
+--
+
+*`kubernetes.statefulset.name`*::
++
+--
+type: keyword
+
+Kubernetes statefulset name
+
+
+--
+
 *`kubernetes.container.name`*::
 +
 --
@@ -13361,16 +13391,6 @@ kubernetes deployment metrics
 
 
 
-*`kubernetes.deployment.name`*::
-+
---
-type: keyword
-
-Kubernetes deployment name
-
-
---
-
 *`kubernetes.deployment.paused`*::
 +
 --
@@ -13594,16 +13614,6 @@ kubernetes replica set metrics
 
 
 
-*`kubernetes.replicaset.name`*::
-+
---
-type: keyword
-
-Kubernetes replica set name
-
-
---
-
 [float]
 == replicas fields
 
@@ -13667,16 +13677,6 @@ The number of fully labeled replicas per ReplicaSet
 kubernetes stateful set metrics
 
 
-
-*`kubernetes.statefulset.name`*::
-+
---
-type: keyword
-
-Kubernetes stateful set name
-
-
---
 
 *`kubernetes.statefulset.created`*::
 +
