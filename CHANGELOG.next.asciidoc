@@ -73,6 +73,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Fix a bug when converting NetFlow fields to snake_case. {pull}10950[10950]
 - Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test
   case. {issue}11004[11004] {pull}11105[11105]
+- Change URLPATH grok pattern to support brackets. {issue}11135[11135] {pull}11252[11252]
 
 *Heartbeat*
 
