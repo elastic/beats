@@ -43,9 +43,9 @@ func newOutlet(client beat.Client, wg eventCounter) *outlet {
 func (o *outlet) Close() error {
 	isOpen := o.isOpen.Swap(false)
 	if isOpen {
+		close(o.done)
 		return o.client.Close()
 	}
-	close(o.done)
 	return nil
 }
 
