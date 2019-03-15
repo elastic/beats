@@ -20,9 +20,8 @@ package console
 import (
 	"github.com/dop251/goja"
 	"github.com/dop251/goja_nodejs/require"
-	"go.uber.org/zap"
-
 	"github.com/elastic/beats/libbeat/logp"
+	"github.com/pkg/errors"
 
 	// Require the util module for handling the log format arguments.
 	_ "github.com/dop251/goja_nodejs/util"
@@ -32,10 +31,9 @@ import (
 type Console struct {
 	runtime *goja.Runtime
 	util    *goja.Object
-	logger  *logp.Logger
 }
 
-func (c *Console) makeLogFunc(log func(...interface{})) func(call goja.FunctionCall) goja.Value {
+func (c *Console) makeLogFunc(level logp.Level) func(call goja.FunctionCall) goja.Value {
 	return func(call goja.FunctionCall) goja.Value {
 		if format, ok := goja.AssertFunction(c.util.Get("format")); ok {
 			ret, err := format(c.util, call.Arguments...)
@@ -43,7 +41,17 @@ func (c *Console) makeLogFunc(log func(...interface{})) func(call goja.FunctionC
 				panic(err)
 			}
 
-			log(ret.String())
+			log := logp.L().Named("processor.javascript")
+			switch level {
+			case logp.DebugLevel:
+				log.Debug(ret.String())
+			case logp.WarnLevel:
+				log.Warn(ret.String())
+			case logp.ErrorLevel:
+				log.Error(ret.String())
+			default:
+				panic(errors.Errorf("unhandled logp.Level: %v", level))
+			}
 		} else {
 			panic(c.runtime.NewTypeError("util.format is not a function"))
 		}
@@ -56,15 +64,14 @@ func (c *Console) makeLogFunc(log func(...interface{})) func(call goja.FunctionC
 func Require(runtime *goja.Runtime, module *goja.Object) {
 	c := &Console{
 		runtime: runtime,
-		logger:  logp.NewLogger("processor.javascript", zap.AddCallerSkip(1)),
 	}
 
 	c.util = require.Require(runtime, "util").(*goja.Object)
 
 	o := module.Get("exports").(*goja.Object)
-	o.Set("log", c.makeLogFunc(c.logger.Debug))
-	o.Set("error", c.makeLogFunc(c.logger.Error))
-	o.Set("warn", c.makeLogFunc(c.logger.Warn))
+	o.Set("log", c.makeLogFunc(logp.DebugLevel))
+	o.Set("warn", c.makeLogFunc(logp.WarnLevel))
+	o.Set("error", c.makeLogFunc(logp.ErrorLevel))
 }
 
 // Enable adds console to the given runtime.
