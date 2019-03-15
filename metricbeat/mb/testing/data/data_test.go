@@ -30,14 +30,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/libbeat/mapping"
-
 	"github.com/mitchellh/hashstructure"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/mapping"
 	"github.com/elastic/beats/metricbeat/mb"
 	mbtesting "github.com/elastic/beats/metricbeat/mb/testing"
 
