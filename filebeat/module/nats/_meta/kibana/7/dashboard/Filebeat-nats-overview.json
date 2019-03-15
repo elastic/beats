@@ -8,7 +8,7 @@
             "filter": [],
             "index": "filebeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -130,7 +130,7 @@
             "filter": [],
             "index": "filebeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": "service.type: nats"
             }
           }
@@ -249,7 +249,7 @@
             "filter": [],
             "index": "filebeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -368,7 +368,7 @@
             "filter": [],
             "index": "filebeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -480,7 +480,7 @@
             "filter": [],
             "index": "filebeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": "service.type: nats"
             }
           }
@@ -538,7 +538,7 @@
             "filter": [],
             "index": "filebeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": "service.type: nats"
             }
           }
@@ -596,7 +596,7 @@
             "filter": [],
             "index": "filebeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }
@@ -654,7 +654,7 @@
             "filter": [],
             "index": "filebeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": "service.type: nats"
             }
           }
@@ -774,7 +774,7 @@
             "filter": [],
             "index": "filebeat-*",
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": "service.type: nats"
             }
           }
@@ -913,7 +913,7 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "language": "lucene",
+              "language": "kuery",
               "query": ""
             }
           }

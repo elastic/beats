@@ -147,14 +147,14 @@ type: mysql AND method: INSERT AND status: Error
 -------------------------------------------------
 
 
-Lucene also supports parentheses to group sub-queries.
+Kibana Query Language (KQL) also supports parentheses to group sub-queries.
 
 To search for either INSERT or UPDATE queries with a response time greater
 than or equal to 30ms:
 
 [source,yaml]
 ---------------------------------------------------------------------------
-(method: INSERT OR method: UPDATE) AND event.duration: [30000000 TO *]
+(method: INSERT OR method: UPDATE) AND event.duration >= 30000000
 ---------------------------------------------------------------------------
 
 
