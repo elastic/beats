@@ -6338,16 +6338,6 @@ Kubernetes annotations map
 
 --
 
-*`kubernetes.replicaset`*::
-+
---
-type: object
-
-Kubernetes replica-set map
-
-
---
-
 *`kubernetes.replicaset.name`*::
 +
 --
