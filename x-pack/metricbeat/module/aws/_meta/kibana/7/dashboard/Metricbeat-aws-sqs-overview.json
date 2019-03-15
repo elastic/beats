@@ -21,7 +21,7 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 9,
+              "h": 8,
               "i": "1",
               "w": 20,
               "x": 10,
@@ -34,7 +34,7 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 9,
+              "h": 8,
               "i": "2",
               "w": 18,
               "x": 30,
@@ -47,11 +47,11 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 10,
+              "h": 8,
               "i": "3",
               "w": 24,
               "x": 0,
-              "y": 9
+              "y": 8
             },
             "panelIndex": "3",
             "panelRefName": "panel_2",
@@ -60,11 +60,11 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 10,
+              "h": 8,
               "i": "4",
               "w": 24,
               "x": 24,
-              "y": 9
+              "y": 8
             },
             "panelIndex": "4",
             "panelRefName": "panel_3",
@@ -73,11 +73,11 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 11,
+              "h": 8,
               "i": "7",
               "w": 24,
               "x": 0,
-              "y": 19
+              "y": 16
             },
             "panelIndex": "7",
             "panelRefName": "panel_4",
@@ -86,11 +86,11 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 11,
+              "h": 8,
               "i": "8",
               "w": 24,
               "x": 24,
-              "y": 19
+              "y": 16
             },
             "panelIndex": "8",
             "panelRefName": "panel_5",
@@ -99,7 +99,7 @@
           {
             "embeddableConfig": {},
             "gridData": {
-              "h": 9,
+              "h": 8,
               "i": "9",
               "w": 10,
               "x": 0,
@@ -156,8 +156,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2019-03-11T04:40:48.653Z",
-      "version": "WzUyMiw3XQ=="
+      "updated_at": "2019-03-15T05:03:32.298Z",
+      "version": "WzQ1OCw1XQ=="
     },
     {
       "attributes": {
@@ -242,8 +242,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-11T04:27:28.332Z",
-      "version": "WzUxMSw3XQ=="
+      "updated_at": "2019-03-14T21:45:13.172Z",
+      "version": "WzI0Myw1XQ=="
     },
     {
       "attributes": {
@@ -315,8 +315,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-10T21:53:49.525Z",
-      "version": "WzUwMiw3XQ=="
+      "updated_at": "2019-03-14T21:45:13.172Z",
+      "version": "WzI0NCw1XQ=="
     },
     {
       "attributes": {
@@ -394,8 +394,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-11T04:30:26.153Z",
-      "version": "WzUxNSw3XQ=="
+      "updated_at": "2019-03-15T04:47:42.929Z",
+      "version": "WzQ1Miw1XQ=="
     },
     {
       "attributes": {
@@ -462,8 +462,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-11T04:30:57.099Z",
-      "version": "WzUxNiw3XQ=="
+      "updated_at": "2019-03-15T04:58:33.318Z",
+      "version": "WzQ1Niw1XQ=="
     },
     {
       "attributes": {
@@ -530,8 +530,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-11T04:36:11.427Z",
-      "version": "WzUxOCw3XQ=="
+      "updated_at": "2019-03-14T21:45:13.172Z",
+      "version": "WzI0Nyw1XQ=="
     },
     {
       "attributes": {
@@ -598,8 +598,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-11T04:37:16.534Z",
-      "version": "WzUyMCw3XQ=="
+      "updated_at": "2019-03-14T21:45:13.172Z",
+      "version": "WzI0OCw1XQ=="
     },
     {
       "attributes": {
@@ -665,8 +665,8 @@
       },
       "references": [],
       "type": "visualization",
-      "updated_at": "2019-03-11T04:39:43.389Z",
-      "version": "WzUyMSw3XQ=="
+      "updated_at": "2019-03-14T21:45:13.172Z",
+      "version": "WzI0OSw1XQ=="
     }
   ],
   "version": "7.0.0-beta1"
