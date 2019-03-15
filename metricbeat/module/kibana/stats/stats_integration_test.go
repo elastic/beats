@@ -71,7 +71,7 @@ func TestData(t *testing.T) {
 
 	config := mtest.GetConfig("stats")
 	host := config["hosts"].([]string)[0]
-	version, err := getKibanaVersion(host)
+	version, err := getKibanaVersion(t, host)
 	if err != nil {
 		t.Fatal("getting kibana version", err)
 	}
