@@ -22,6 +22,7 @@ The list below covers the major changes between 7.0.0-beta1 and master only.
 
 - Remove support for deprecated `GenRootCmd` methods. {pull}10721[10721]
 - Remove SkipNormalization, SkipAgentMetadata, SkipAddHostName. {pull}10801[10801] {pull}10769[10769]
+- Move Fields from package libbeat/common to libbeat/mapping. {pull}11198[11198]
 
 ==== Bugfixes
 
@@ -35,3 +36,6 @@ The list below covers the major changes between 7.0.0-beta1 and master only.
 - Assertion for documented fields in tests fails if any of the fields in the tested event is documented as an alias. {pull}10921[10921]
 - Support for Logger in the Metricset base instance. {pull}11106[11106]
 - Introduce processing.Support to instance.Setting. This allows Beats to fully modify the event processing. {pull}10801[10801]
+- Filebeat modules can now use ingest pipelines in YAML format. {pull}11209[11209]
+- Added support for using PYTHON_EXE to control what Python interpreter is used
+  by `make` and `mage`. Example: `export PYTHON_EXE=python2.7`. {pull}11212[11212]

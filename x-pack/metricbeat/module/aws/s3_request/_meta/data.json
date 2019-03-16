@@ -1,28 +1,23 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "aws": {
         "s3_request": {
             "bucket": {
                 "name": "test-s3-ks"
             },
             "downloaded": {
-                "bytes": 1303
+                "bytes": 2606
             },
             "errors": {
                 "4xx": 0,
                 "5xx": 0
             },
             "latency": {
-                "first_byte.ms": 544,
-                "total_request.ms": 545
+                "first_byte.ms": 1032,
+                "total_request.ms": 1032
             },
             "requests": {
-                "head": 1,
-                "list": 1,
+                "list": 2,
                 "total": 2
             },
             "uploaded": {}
