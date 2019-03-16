@@ -118,7 +118,7 @@ func runTest(t *testing.T, file string, module, metricSetName, url, suffix strin
 	s := server(t, file, url)
 	defer s.Close()
 
-	metricSet := newMetricSet(t, getConfig(module, metricSetName, s.URL))
+	metricSet := NewMetricSet(t, getConfig(module, metricSetName, s.URL))
 
 	var events []mb.Event
 	var errs []error
