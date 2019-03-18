@@ -32,6 +32,7 @@ func TestPodMetadata(t *testing.T) {
 	Deployment := "Deployment"
 	test := "test"
 	ReplicaSet := "ReplicaSet"
+	StatefulSet := "StatefulSet"
 	True := true
 	False := false
 	tests := []struct {
@@ -91,6 +92,44 @@ func TestPodMetadata(t *testing.T) {
 				"deployment": common.MapStr{"name": "test"},
 			},
 		},
+		{
+			pod: &Pod{
+				Metadata: &metav1.ObjectMeta{
+					Labels: map[string]string{"a.key": "foo", "a": "bar"},
+					Uid:    &UID,
+					OwnerReferences: []*metav1.OwnerReference{
+						{
+							Kind:       &Deployment,
+							Name:       &test,
+							Controller: &False,
+						},
+						{
+							Kind:       &ReplicaSet,
+							Name:       &ReplicaSet,
+							Controller: &True,
+						},
+						{
+							Kind:       &StatefulSet,
+							Name:       &StatefulSet,
+							Controller: &True,
+						},
+					},
+				},
+				Spec: &v1.PodSpec{
+					NodeName: &test,
+				},
+			},
+			meta: common.MapStr{
+				"pod": common.MapStr{
+					"name": "",
+					"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+				},
+				"node":        common.MapStr{"name": "test"},
+				"labels":      common.MapStr{"a": common.MapStr{"value": "bar", "key": "foo"}},
+				"replicaset":  common.MapStr{"name": "ReplicaSet"},
+				"statefulset": common.MapStr{"name": "StatefulSet"},
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -113,6 +152,7 @@ func TestPodMetadataDeDot(t *testing.T) {
 	Deployment := "Deployment"
 	test := "test"
 	ReplicaSet := "ReplicaSet"
+	StatefulSet := "StatefulSet"
 	True := true
 	False := false
 	tests := []struct {
@@ -172,6 +212,44 @@ func TestPodMetadataDeDot(t *testing.T) {
 				"node":       common.MapStr{"name": "test"},
 				"labels":     common.MapStr{"a": "bar", "a_key": "foo"},
 				"deployment": common.MapStr{"name": "test"},
+			},
+		},
+		{
+			pod: &Pod{
+				Metadata: &metav1.ObjectMeta{
+					Labels: map[string]string{"a.key": "foo", "a": "bar"},
+					Uid:    &UID,
+					OwnerReferences: []*metav1.OwnerReference{
+						{
+							Kind:       &Deployment,
+							Name:       &test,
+							Controller: &False,
+						},
+						{
+							Kind:       &ReplicaSet,
+							Name:       &ReplicaSet,
+							Controller: &True,
+						},
+						{
+							Kind:       &StatefulSet,
+							Name:       &StatefulSet,
+							Controller: &True,
+						},
+					},
+				},
+				Spec: &v1.PodSpec{
+					NodeName: &test,
+				},
+			},
+			meta: common.MapStr{
+				"pod": common.MapStr{
+					"name": "",
+					"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
+				},
+				"node":        common.MapStr{"name": "test"},
+				"labels":      common.MapStr{"a": "bar", "a_key": "foo"},
+				"replicaset":  common.MapStr{"name": "ReplicaSet"},
+				"statefulset": common.MapStr{"name": "StatefulSet"},
 			},
 		},
 	}

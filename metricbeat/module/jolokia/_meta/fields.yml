@@ -11,3 +11,31 @@
       description: >
           jolokia contains metrics exposed via jolokia agent
       fields:
+        - name: agent.version
+          type: keyword
+          description: >
+            Version number of jolokia agent.
+        - name: agent.id
+          type: keyword
+          description: >
+            Each agent has a unique id which can be either provided during startup of the agent in form of a configuration parameter or being autodetected. If autodected, the id has several parts: The IP, the process id, hashcode of the agent and its type.
+        - name: server.product
+          type: keyword
+          description: >
+            The container product if detected.
+        - name: server.version
+          type: keyword
+          description: >
+            The container's version (if detected).
+        - name: server.vendor
+          type: keyword
+          description: >
+            The vendor of the container the agent is running in.
+        - name: url
+          type: keyword
+          description: >
+            The URL how this agent can be contacted.
+        - name: secured
+          type: boolean
+          description: >
+            Whether the agent was configured for authentication or not.

@@ -20,8 +20,9 @@ package osd_df
 import (
 	"encoding/json"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/logp"
 )
 
 type Node struct {
@@ -47,8 +48,7 @@ func eventsMapping(content []byte) ([]common.MapStr, error) {
 	var d OsdDfRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		logp.Err("Error: %+v", err)
-		return nil, err
+		return nil, errors.Wrap(err, "error getting data for OSD_DF")
 	}
 
 	nodeList := d.Output.Nodes

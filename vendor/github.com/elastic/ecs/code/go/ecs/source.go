@@ -19,8 +19,8 @@
 
 package ecs
 
-// Source fields describe details about the source of a packet/event. Source
-// fields are usually populated in conjunction with destination fields.
+// Source fields describe details about the source of a packet/event.
+// Source fields are usually populated in conjunction with destination fields.
 type Source struct {
 	// Some event source addresses are defined ambiguously. The event will
 	// sometimes list an IP, a domain or a unix socket.  You should always

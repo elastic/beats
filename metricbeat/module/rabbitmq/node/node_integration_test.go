@@ -28,8 +28,6 @@ import (
 )
 
 func TestData(t *testing.T) {
-	compose.EnsureUp(t, "rabbitmq")
-
 	ms := mbtest.NewReportingMetricSetV2(t, getConfig())
 	err := mbtest.WriteEventsReporterV2(ms, t, "")
 	if err != nil {

@@ -22,6 +22,9 @@ import (
 
 	cmd "github.com/elastic/beats/libbeat/cmd"
 	"github.com/elastic/beats/libbeat/cmd/instance"
+
+	// Import the script processor.
+	_ "github.com/elastic/beats/libbeat/processors/script"
 )
 
 // Name of this beat

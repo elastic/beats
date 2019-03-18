@@ -1,0 +1,10 @@
+{
+    "request":{
+        "mbean":"java.lang:type=Runtime",
+        "attribute":"Uptime",
+        "type":"read"
+    },
+    "value":88622,
+    "timestamp":1551739190,
+    "status":200
+}

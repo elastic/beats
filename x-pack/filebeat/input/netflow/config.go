@@ -13,6 +13,15 @@ import (
 	"github.com/elastic/beats/filebeat/inputsource/udp"
 )
 
+type config struct {
+	udp.Config                `config:",inline"`
+	harvester.ForwarderConfig `config:",inline"`
+	Protocols                 []string      `config:"protocols"`
+	ExpirationTimeout         time.Duration `config:"expiration_timeout"`
+	PacketQueueSize           int           `config:"queue_size"`
+	CustomDefinitions         []string      `config:"custom_definitions"`
+}
+
 var defaultConfig = config{
 	Config: udp.Config{
 		MaxMessageSize: 10 * humanize.KiByte,
@@ -25,12 +34,4 @@ var defaultConfig = config{
 	Protocols:         []string{"v5", "v9", "ipfix"},
 	ExpirationTimeout: time.Minute * 30,
 	PacketQueueSize:   8192,
-}
-
-type config struct {
-	udp.Config                `config:",inline"`
-	harvester.ForwarderConfig `config:",inline"`
-	Protocols                 []string      `config:"protocols"`
-	ExpirationTimeout         time.Duration `config:"expiration_timeout"`
-	PacketQueueSize           int           `config:"queue_size"`
 }

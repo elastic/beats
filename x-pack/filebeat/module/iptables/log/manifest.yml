@@ -19,9 +19,11 @@ var:
     min_elasticsearch_version:
       version: 6.1.0
       value: false
+  - name: community_id
+    default: true
 
 ingest_pipeline: ingest/pipeline.json
-input: config/{{.input}}.yml
+input: config/input.yml
 
 requires.processors:
 - name: geoip

@@ -1,7 +1,7 @@
 [
     {
         "@timestamp": "2017-04-03T22:32:14.322Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -19,7 +19,7 @@
     },
     {
         "@timestamp": "2017-04-03T22:32:14.322Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "CEST",
@@ -37,7 +37,7 @@
     },
     {
         "@timestamp": "2017-04-03T22:35:22.389Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.duration": 37598000,
         "event.module": "postgresql",
@@ -60,7 +60,7 @@
     },
     {
         "@timestamp": "2017-07-31T13:36:43.557Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "EST",
@@ -76,7 +76,7 @@
     },
     {
         "@timestamp": "2017-07-31T13:36:44.227Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "EST",
@@ -92,7 +92,7 @@
     },
     {
         "@timestamp": "2017-07-31T13:46:02.670Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "EST",
@@ -108,7 +108,7 @@
     },
     {
         "@timestamp": "2017-07-31T13:46:23.016Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "EST",
@@ -126,7 +126,7 @@
     },
     {
         "@timestamp": "2017-07-31T13:46:55.637Z",
-        "ecs.version": "1.0.0-beta2",
+        "ecs.version": "1.0.0",
         "event.dataset": "postgresql.log",
         "event.module": "postgresql",
         "event.timezone": "EST",

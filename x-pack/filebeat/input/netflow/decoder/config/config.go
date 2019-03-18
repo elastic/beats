@@ -8,6 +8,8 @@ import (
 	"io"
 	"io/ioutil"
 	"time"
+
+	"github.com/elastic/beats/x-pack/filebeat/input/netflow/decoder/fields"
 )
 
 // Config stores the configuration used by the NetFlow Collector.
@@ -16,6 +18,7 @@ type Config struct {
 	logOutput   io.Writer
 	expiration  time.Duration
 	detectReset bool
+	fields      fields.FieldDict
 }
 
 var defaultCfg = Config{
@@ -61,6 +64,23 @@ func (c *Config) WithSequenceResetEnabled(enabled bool) *Config {
 	return c
 }
 
+// WithCustomFields extends the NetFlow V9/IPFIX supported fields with
+// custom ones. This method can be chained multiple times adding fields
+// from different sources.
+func (c *Config) WithCustomFields(dicts ...fields.FieldDict) *Config {
+	if len(dicts) == 0 {
+		return c
+	}
+	if c.fields == nil {
+		c.fields = fields.FieldDict{}
+		c.fields.Merge(fields.GlobalFields)
+	}
+	for _, dict := range dicts {
+		c.fields.Merge(dict)
+	}
+	return c
+}
+
 // Protocols returns a list of the protocols enabled.
 func (c *Config) Protocols() []string {
 	return c.protocols
@@ -80,4 +100,12 @@ func (c *Config) ExpirationTimeout() time.Duration {
 // SequenceResetEnabled returns if sequence reset detection is enabled.
 func (c *Config) SequenceResetEnabled() bool {
 	return c.detectReset
+}
+
+// Fields returns the configured fields.
+func (c *Config) Fields() fields.FieldDict {
+	if c.fields == nil {
+		return fields.GlobalFields
+	}
+	return c.fields
 }

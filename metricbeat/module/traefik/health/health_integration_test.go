@@ -64,13 +64,3 @@ func TestFetch(t *testing.T) {
 	badResponseCount, _ := event.MetricSetFields.GetValue("response.status_codes.404")
 	assert.True(t, badResponseCount.(float64) >= 1)
 }
-
-func TestData(t *testing.T) {
-	compose.EnsureUp(t, "traefik")
-
-	ms := mbtest.NewReportingMetricSetV2(t, mtest.GetConfig("health"))
-	err := mbtest.WriteEventsReporterV2(ms, t, "")
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}
