@@ -190,7 +190,7 @@ func writeDataJSON(t *testing.T, data common.MapStr, module, metricSet string) {
 	}
 }
 
-// checkDocument checks that all fields which show up in the events are documented
+// checkDocumented checks that all fields which show up in the events are documented
 func checkDocumented(t *testing.T, data []common.MapStr) {
 	fieldsData, err := asset.GetFields("metricbeat")
 	if err != nil {
