@@ -14,12 +14,6 @@ The file encoding to use for reading data that contains international
 characters. See the encoding names http://www.w3.org/TR/encoding/[recommended by
 the W3C for use in HTML5].
 
-Here are some sample encodings from W3C recommendation:
-
-    * plain, latin1, utf-8, utf-16be-bom, utf-16be, utf-16le, big5, gb18030,
-    gbk, hz-gb-2312,
-    * euc-kr, euc-jp, iso-2022-jp, shift-jis, and so on
-
 Valid encodings:
 
 	* `plain`: plain ASCII encoding
