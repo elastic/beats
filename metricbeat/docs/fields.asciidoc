@@ -20073,16 +20073,6 @@ RabbitMQ module
 
 
 
-*`rabbitmq.node.name`*::
-+
---
-type: keyword
-
-Node name
-
-
---
-
 *`rabbitmq.vhost`*::
 +
 --
@@ -20103,9 +20093,7 @@ connection
 *`rabbitmq.connection.name`*::
 +
 --
-type: alias
-
-alias to: rabbitmq.name
+type: keyword
 
 The name of the connection with non-ASCII characters escaped as in C.
 
@@ -20663,12 +20651,9 @@ Number of messages which have been written to the message store.
 *`rabbitmq.node.name`*::
 +
 --
-type: alias
-
-alias to: rabbitmq.node.name
+type: keyword
 
 Node name
-
 
 --
 
