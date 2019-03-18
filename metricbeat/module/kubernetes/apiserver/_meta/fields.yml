@@ -36,7 +36,7 @@
       type: long
       description: >
         Request latency, number of requests
-    - name: request.latency.bucket
+    - name: request.latency.bucket.*
       type: object
       object_type: long
       description: >

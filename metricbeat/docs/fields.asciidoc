@@ -12125,6 +12125,36 @@ Kubernetes annotations map
 
 --
 
+*`kubernetes.replicaset.name`*::
++
+--
+type: keyword
+
+Kubernetes replicaset name
+
+
+--
+
+*`kubernetes.deployment.name`*::
++
+--
+type: keyword
+
+Kubernetes deployment name
+
+
+--
+
+*`kubernetes.statefulset.name`*::
++
+--
+type: keyword
+
+Kubernetes statefulset name
+
+
+--
+
 *`kubernetes.container.name`*::
 +
 --
@@ -12246,7 +12276,7 @@ Request latency, number of requests
 
 --
 
-*`kubernetes.apiserver.request.latency.bucket`*::
+*`kubernetes.apiserver.request.latency.bucket.*`*::
 +
 --
 type: object
@@ -13361,16 +13391,6 @@ kubernetes deployment metrics
 
 
 
-*`kubernetes.deployment.name`*::
-+
---
-type: keyword
-
-Kubernetes deployment name
-
-
---
-
 *`kubernetes.deployment.paused`*::
 +
 --
@@ -13594,16 +13614,6 @@ kubernetes replica set metrics
 
 
 
-*`kubernetes.replicaset.name`*::
-+
---
-type: keyword
-
-Kubernetes replica set name
-
-
---
-
 [float]
 == replicas fields
 
@@ -13667,16 +13677,6 @@ The number of fully labeled replicas per ReplicaSet
 kubernetes stateful set metrics
 
 
-
-*`kubernetes.statefulset.name`*::
-+
---
-type: keyword
-
-Kubernetes stateful set name
-
-
---
 
 *`kubernetes.statefulset.created`*::
 +
@@ -20516,16 +20516,6 @@ RabbitMQ module
 
 
 
-*`rabbitmq.node.name`*::
-+
---
-type: keyword
-
-Node name
-
-
---
-
 *`rabbitmq.vhost`*::
 +
 --
@@ -20546,9 +20536,7 @@ connection
 *`rabbitmq.connection.name`*::
 +
 --
-type: alias
-
-alias to: rabbitmq.name
+type: keyword
 
 The name of the connection with non-ASCII characters escaped as in C.
 
@@ -21106,12 +21094,9 @@ Number of messages which have been written to the message store.
 *`rabbitmq.node.name`*::
 +
 --
-type: alias
-
-alias to: rabbitmq.node.name
+type: keyword
 
 Node name
-
 
 --
 
