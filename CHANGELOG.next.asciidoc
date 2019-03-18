@@ -111,6 +111,8 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Cover empty request data, url and version in Apache2 module{pull}10846[10846]
 - Fix a bug when converting NetFlow fields to snake_case. {pull}10950[10950]
 - Fix a bug with the convert_timezone option using the incorrect timezone field. {issue}11055[11055] {pull}11164[11164]
+- Change URLPATH grok pattern to support brackets. {issue}11135[11135] {pull}11252[11252]
+- Add support for iis log with different address format. {issue}11255[11255] {pull}11256[11256]
 
 *Heartbeat*
 
