@@ -79,11 +79,10 @@ func (conn *Connection) BulkWith(
 	return readQueryResult(result.raw)
 }
 
-// MonitoringBulkWith creates a HTTP request to the X-Pack Monitoring API containing a bunch of
+// SendMonitoringBulk creates a HTTP request to the X-Pack Monitoring API containing a bunch of
 // operations and sends them to Elasticsearch. The request is retransmitted up to max_retries
 // before returning an error.
-func (conn *Connection) MonitoringBulkWith(
-	esVersion common.Version,
+func (conn *Connection) SendMonitoringBulk(
 	params map[string]string,
 	body []interface{},
 ) (*QueryResult, error) {
@@ -97,7 +96,13 @@ func (conn *Connection) MonitoringBulkWith(
 		return nil, err
 	}
 
-	requ, err := newMonitoringBulkRequest(esVersion, conn.URL, params, enc)
+	if !conn.version.IsValid() {
+		if err := conn.Connect(); err != nil {
+			return nil, err
+		}
+	}
+
+	requ, err := newMonitoringBulkRequest(conn.version, conn.URL, params, enc)
 	if err != nil {
 		return nil, err
 	}
