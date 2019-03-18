@@ -171,6 +171,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   case. {issue}11004[11004] {pull}11105[11105]
 - Change URLPATH grok pattern to support brackets. {issue}11135[11135] {pull}11252[11252]
 - Add support for iis log with different address format. {issue}11255[11255] {pull}11256[11256]
+- Add fix to parse syslog message with priority value 0. {issue}11010[11010]
 
 *Heartbeat*
 
