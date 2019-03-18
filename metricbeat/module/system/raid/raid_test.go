@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//+build darwin freebsd linux openbsd
+
 package raid
 
 import (
