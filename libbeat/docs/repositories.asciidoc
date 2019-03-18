@@ -50,19 +50,19 @@ sudo apt-get install apt-transport-https
 --------------------------------------------------
 
 ifeval::["{release-state}"=="prerelease"]
-. Save the repository definition to  +/etc/apt/sources.list.d/elastic-6.x-prerelease.list+:
+. Save the repository definition to  +/etc/apt/sources.list.d/elastic-{major-version}-prerelease.list+:
 +
 ["source","sh",subs="attributes"]
 --------------------------------------------------
-echo "deb https://artifacts.elastic.co/packages/6.x-prerelease/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x-prerelease.list
+echo "deb https://artifacts.elastic.co/packages/{major-version}-prerelease/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{major-version}-prerelease.list
 --------------------------------------------------
 endif::[]
 ifeval::["{release-state}"=="released"]
-. Save the repository definition to  +/etc/apt/sources.list.d/elastic-6.x.list+:
+. Save the repository definition to  +/etc/apt/sources.list.d/elastic-{major-version}.list+:
 +
 ["source","sh",subs="attributes"]
 --------------------------------------------------
-echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
+echo "deb https://artifacts.elastic.co/packages/{major-version}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{major-version}.list
 --------------------------------------------------
 endif::[]
 +
@@ -123,9 +123,9 @@ your `/etc/yum.repos.d/` directory and add the following lines:
 ifeval::["{release-state}"=="prerelease"]
 ["source","sh",subs="attributes"]
 --------------------------------------------------
-[elastic-6.x-prerelease]
-name=Elastic repository for 6.x prerelease packages
-baseurl=https://artifacts.elastic.co/packages/6.x-prerelease/yum
+[elastic-{major-version}-prerelease]
+name=Elastic repository for {major-version} prerelease packages
+baseurl=https://artifacts.elastic.co/packages/{major-version}-prerelease/yum
 gpgcheck=1
 gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
 enabled=1
@@ -136,9 +136,9 @@ endif::[]
 ifeval::["{release-state}"=="released"]
 ["source","sh",subs="attributes"]
 --------------------------------------------------
-[elastic-6.x]
-name=Elastic repository for 6.x packages
-baseurl=https://artifacts.elastic.co/packages/6.x/yum
+[elastic-{major-version}]
+name=Elastic repository for {major-version} packages
+baseurl=https://artifacts.elastic.co/packages/{major-version}/yum
 gpgcheck=1
 gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
 enabled=1
