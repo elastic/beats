@@ -9,7 +9,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 
 	// register central management
-	"github.com/elastic/beats/x-pack/functionbeat/licenser"
+	"github.com/elastic/beats/x-pack/libbeat/licenser"
 	_ "github.com/elastic/beats/x-pack/libbeat/management"
 )
 

@@ -20,7 +20,7 @@ import (
 	"github.com/elastic/beats/x-pack/functionbeat/config"
 	"github.com/elastic/beats/x-pack/functionbeat/core"
 	_ "github.com/elastic/beats/x-pack/functionbeat/include" // imports features
-	"github.com/elastic/beats/x-pack/functionbeat/licenser"
+	"github.com/elastic/beats/x-pack/libbeat/licenser"
 	"github.com/elastic/beats/x-pack/functionbeat/provider"
 )
 
