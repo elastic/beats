@@ -6,12 +6,17 @@ package cmd
 
 import (
 	"github.com/elastic/beats/libbeat/cmd"
+	"github.com/elastic/beats/libbeat/logp"
 
 	// register central management
+	"github.com/elastic/beats/x-pack/functionbeat/licenser"
 	_ "github.com/elastic/beats/x-pack/libbeat/management"
 )
 
+var licenseDebugK = "license"
+
 // AddXPack extends the given root folder with XPack features
 func AddXPack(root *cmd.BeatsRootCmd, name string) {
+	licenser.Enforce(logp.NewLogger(licenseDebugK), licenser.BasicOrTrial)
 	root.AddCommand(genEnrollCmd(name, ""))
 }

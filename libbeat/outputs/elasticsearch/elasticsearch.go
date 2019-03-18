@@ -61,6 +61,10 @@ type callbacksRegistry struct {
 // XXX: it would be fantastic to do this without a package global
 var connectCallbackRegistry = newCallbacksRegistry()
 
+// LicenseCallback is called on every client connected.
+// NOTE: for performance reason the result should be cached, this values should be set on init.
+var LicenseCallback func(*Client) error
+
 func newCallbacksRegistry() callbacksRegistry {
 	return callbacksRegistry{
 		callbacks: make(map[uuid.UUID]connectCallback),

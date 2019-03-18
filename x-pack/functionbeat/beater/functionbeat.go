@@ -82,7 +82,7 @@ func (bt *Functionbeat) Run(b *beat.Beat) error {
 	defer manager.Stop()
 
 	// Wait until we receive the initial license.
-	if err := licenser.WaitForLicense(bt.ctx, bt.log, manager, checkLicense); err != nil {
+	if err := licenser.WaitForLicense(bt.ctx, bt.log, manager, licenser.BasicOrTrial); err != nil {
 		return err
 	}
 
@@ -156,7 +156,7 @@ func makeClientFactory(log *logp.Logger, manager *licenser.Manager, pipeline bea
 
 		// Make the client aware of the current license, the client will accept sending events to the
 		// pipeline until the client is closed or if the license change and is not valid.
-		licenseAware := core.NewLicenseAwareClient(client, checkLicense)
+		licenseAware := core.NewLicenseAwareClient(client, licenser.BasicOrTrial)
 		if err := manager.AddWatcher(licenseAware); err != nil {
 			return nil, err
 		}

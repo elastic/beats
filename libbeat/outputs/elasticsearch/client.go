@@ -225,6 +225,12 @@ func NewClient(
 	}
 
 	client.Connection.onConnectCallback = func() error {
+		if LicenseCallback != nil {
+			if err := LicenseCallback(client); err != nil {
+				return err
+			}
+		}
+
 		if onConnect != nil {
 			onConnect.mutex.Lock()
 			defer onConnect.mutex.Unlock()

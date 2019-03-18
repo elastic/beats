@@ -120,7 +120,7 @@ func (f *ElasticFetcher) Fetch() (*License, error) {
 	}
 
 	if status == http.StatusUnauthorized {
-		return nil, errors.New("Unauthorized access, could not connect to the xpack endpoint, verify your credentials")
+		return nil, errors.New("unauthorized access, could not connect to the xpack endpoint, verify your credentials")
 	}
 
 	if status != http.StatusOK {
