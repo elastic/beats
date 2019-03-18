@@ -12,31 +12,31 @@
       type: long
       description: >
          Total query count
-    - name: dns.request.duration.sec.bucket.*
+    - name: dns.request.duration.ns.bucket.*
       type: object
-      object_type: double
+      object_type: long
       description: >
          Request duration histogram buckets in nanoseconds
-    - name: dns.request.duration.sec.sum
+    - name: dns.request.duration.ns.sum
       type: long
       format: duration
       description: >
          Requests duration, sum of durations in nanoseconds
-    - name: dns.request.duration.sec.count
+    - name: dns.request.duration.ns.count
       type: long
       description: >
          Requests duration, number of requests
     - name: dns.request.size.bytes.bucket.*
       type: object
-      object_type: double
+      object_type: long
       description: >
          Request Size histogram buckets
     - name: dns.request.size.bytes.sum
-      type: double
+      type: long
       description: >
         Request Size histogram sum
     - name: dns.request.size.bytes.count
-      type: double
+      type: long
       description: >
         Request Size histogram count
     - name: dns.request.do.count.total
@@ -65,15 +65,15 @@
         The address family of the transport (1 = IP (IP version 4), 2 = IP6 (IP version 6))
     - name: dns.response.size.bytes.bucket.*
       type: object
-      object_type: double
+      object_type: long
       description: >
           Response Size histogram buckets
     - name: dns.response.size.bytes.sum
-      type: double
+      type: long
       description: >
         Response Size histogram sum
     - name: dns.response.size.bytes.count
-      type: double
+      type: long
       description: >
         Response Size histogram count
     - name: server

@@ -45,7 +45,7 @@ func TestData(t *testing.T) {
 		{"coredns.stats.panic.count.total", "./_meta/data_panic_event.json"},
 		{"coredns.stats.dns.request.count.total", "./_meta/data_request_count_event.json"},
 		{"coredns.stats.dns.request.size.bytes", "./_meta/data_size_bytes_event.json"},
-		{"coredns.stats.dns.request.duration.sec", "./_meta/data_request_duration_sec_event.json"},
+		{"coredns.stats.dns.request.duration.ns", "./_meta/data_request_duration_ns_event.json"},
 		{"coredns.stats.dns.response.rcode", "./_meta/data_response_rcode_event.json"},
 		{"coredns.stats.dns.request.type", "./_meta/data_request_type_event.json"},
 	}

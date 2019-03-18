@@ -178,6 +178,7 @@ func (m *commonMetric) GetValue(metric *dto.Metric) interface{} {
 			key := strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
 			bucketMap[key] = bucket.GetCumulativeCount()
 		}
+
 		if len(bucketMap) != 0 {
 			value["bucket"] = bucketMap
 		}

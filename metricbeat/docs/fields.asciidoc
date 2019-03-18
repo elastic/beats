@@ -2609,7 +2609,7 @@ Total query count
 
 --
 
-*`coredns.stats.dns.request.duration.sec.bucket.*`*::
+*`coredns.stats.dns.request.duration.ns.bucket.*`*::
 +
 --
 type: object
@@ -2619,7 +2619,7 @@ Request duration histogram buckets in nanoseconds
 
 --
 
-*`coredns.stats.dns.request.duration.sec.sum`*::
+*`coredns.stats.dns.request.duration.ns.sum`*::
 +
 --
 type: long
@@ -2631,7 +2631,7 @@ Requests duration, sum of durations in nanoseconds
 
 --
 
-*`coredns.stats.dns.request.duration.sec.count`*::
+*`coredns.stats.dns.request.duration.ns.count`*::
 +
 --
 type: long
@@ -2654,7 +2654,7 @@ Request Size histogram buckets
 *`coredns.stats.dns.request.size.bytes.sum`*::
 +
 --
-type: double
+type: long
 
 Request Size histogram sum
 
@@ -2664,7 +2664,7 @@ Request Size histogram sum
 *`coredns.stats.dns.request.size.bytes.count`*::
 +
 --
-type: double
+type: long
 
 Request Size histogram count
 
@@ -2744,7 +2744,7 @@ Response Size histogram buckets
 *`coredns.stats.dns.response.size.bytes.sum`*::
 +
 --
-type: double
+type: long
 
 Response Size histogram sum
 
@@ -2754,7 +2754,7 @@ Response Size histogram sum
 *`coredns.stats.dns.response.size.bytes.count`*::
 +
 --
-type: double
+type: long
 
 Response Size histogram count
 

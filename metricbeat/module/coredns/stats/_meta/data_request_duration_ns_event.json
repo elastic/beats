@@ -9,7 +9,7 @@
             "dns": {
                 "request": {
                     "duration": {
-                        "sec": {
+                        "ns": {
                             "bucket": {
                                 "+Inf": 430,
                                 "1000000": 0,
