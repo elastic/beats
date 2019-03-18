@@ -50,8 +50,8 @@ func GenIndexPatternConfigCmd(settings instance.Settings) *cobra.Command {
 			}
 
 			var withMigration bool
-			if b.RawConfig.HasField("migration") {
-				sub, err := b.RawConfig.Child("migration", -1)
+			if b.RawConfig.HasField("migration_67") {
+				sub, err := b.RawConfig.Child("migration_67", -1)
 				if err != nil {
 					fatalf("Failed to read migration setting: %+v", err)
 				}
