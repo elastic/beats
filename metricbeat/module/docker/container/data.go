@@ -71,7 +71,9 @@ func eventMapping(r mb.ReporterV2, cont *types.Container, dedot bool) {
 func extractIPAddresses(networks *types.SummaryNetworkSettings) []string {
 	ipAddresses := make([]string, 0, len(networks.Networks))
 	for _, network := range networks.Networks {
-		ipAddresses = append(ipAddresses, network.IPAddress)
+		if len(network.IPAddress) > 0 {
+			ipAddresses = append(ipAddresses, network.IPAddress)
+		}
 	}
 	return ipAddresses
 }
