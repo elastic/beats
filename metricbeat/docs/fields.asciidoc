@@ -20533,7 +20533,7 @@ connection
 
 
 
-*`rabbitmq.connection.connection.name`*::
+*`rabbitmq.connection.name`*::
 +
 --
 type: keyword
