@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//+build darwin freebsd linux openbsd
+
 package mdinfo
 
 //MockData is a fake type for testing
