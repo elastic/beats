@@ -121,11 +121,7 @@ processors:
      if: "ctx.cisco.asa.message_id == '106015'"
      field: "log.original"
      pattern: "%{event.outcome} %{network.transport} (no connection) from %{source.ip}/%{source.port} to %{destination.ip}/%{destination.port} flags %{} on interface %{cisco.asa.source_interface}"
- - set: 
-     if: "ctx.cisco.asa.message_id == '106015'"
-     field: "network.direction"
-     value: inbound
- - dissect: 
+ - dissect:
      if: "ctx.cisco.asa.message_id == '106016'"
      field: "log.original"
      pattern: "%{event.outcome} IP spoof from (%{source.ip}) to %{destination.ip} on interface %{cisco.asa.source_interface}"
@@ -407,6 +403,11 @@ processors:
      field: "event.outcome"
      if: "ctx.event?.outcome == \"denied\""
      value: deny
+ - set:
+     field: "event.outcome"
+     if: "ctx.event?.outcome == \"dropped\""
+     value: deny
+
  - set: 
      field: "network.transport"
      if: "ctx.network?.transport == \"icmpv6\""
