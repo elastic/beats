@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package testing
+package data
 
 import (
 	"encoding/json"
@@ -31,23 +31,17 @@ import (
 	"testing"
 
 	"github.com/mitchellh/hashstructure"
-
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/libbeat/asset"
 	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/mapping"
 	"github.com/elastic/beats/metricbeat/mb"
+	mbtesting "github.com/elastic/beats/metricbeat/mb/testing"
 
-	// TODO: generate include file for these tests automatically moving forward
-	_ "github.com/elastic/beats/metricbeat/module/couchbase/cluster"
-	_ "github.com/elastic/beats/metricbeat/module/couchbase/node"
-	_ "github.com/elastic/beats/metricbeat/module/kibana/status"
-	_ "github.com/elastic/beats/metricbeat/module/kubernetes/apiserver"
-	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_node"
-	_ "github.com/elastic/beats/metricbeat/module/php_fpm/pool"
-	_ "github.com/elastic/beats/metricbeat/module/php_fpm/process"
-	_ "github.com/elastic/beats/metricbeat/module/rabbitmq/connection"
-	_ "github.com/elastic/beats/metricbeat/module/traefik/health"
+	_ "github.com/elastic/beats/metricbeat/include"
+	_ "github.com/elastic/beats/metricbeat/include/fields"
 )
 
 const (
@@ -72,8 +66,8 @@ func TestAll(t *testing.T) {
 	for _, f := range configFiles {
 		// get module and metricset name from path
 		s := strings.Split(f, string(os.PathSeparator))
-		moduleName := s[3]
-		metricSetName := s[4]
+		moduleName := s[4]
+		metricSetName := s[5]
 
 		configFile, err := ioutil.ReadFile(f)
 		if err != nil {
@@ -95,7 +89,11 @@ func TestAll(t *testing.T) {
 
 func getTestdataFiles(t *testing.T, url, module, metricSet, suffix string) {
 
-	ff, _ := filepath.Glob(getMetricsetPath(module, metricSet) + "/_meta/testdata/*." + suffix)
+	ff, err := filepath.Glob(getMetricsetPath(module, metricSet) + "/_meta/testdata/*." + suffix)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	var files []string
 	for _, f := range ff {
 		// Exclude all the expected files
@@ -118,18 +116,18 @@ func runTest(t *testing.T, file string, module, metricSetName, url, suffix strin
 	s := server(t, file, url)
 	defer s.Close()
 
-	metricSet := newMetricSet(t, getConfig(module, metricSetName, s.URL))
+	metricSet := mbtesting.NewMetricSet(t, getConfig(module, metricSetName, s.URL))
 
 	var events []mb.Event
 	var errs []error
 
 	switch v := metricSet.(type) {
 	case mb.ReportingMetricSetV2:
-		metricSet := NewReportingMetricSetV2(t, getConfig(module, metricSetName, s.URL))
-		events, errs = ReportingFetchV2(metricSet)
+		metricSet := mbtesting.NewReportingMetricSetV2(t, getConfig(module, metricSetName, s.URL))
+		events, errs = mbtesting.ReportingFetchV2(metricSet)
 	case mb.ReportingMetricSetV2Error:
-		metricSet := NewReportingMetricSetV2Error(t, getConfig(module, metricSetName, s.URL))
-		events, errs = ReportingFetchV2Error(metricSet)
+		metricSet := mbtesting.NewReportingMetricSetV2Error(t, getConfig(module, metricSetName, s.URL))
+		events, errs = mbtesting.ReportingFetchV2Error(metricSet)
 	default:
 		t.Fatalf("unknown type: %T", v)
 	}
@@ -143,7 +141,7 @@ func runTest(t *testing.T, file string, module, metricSetName, url, suffix strin
 	var data []common.MapStr
 
 	for _, e := range events {
-		beatEvent := StandardizeEvent(metricSet, e, mb.AddMetricSetInfo)
+		beatEvent := mbtesting.StandardizeEvent(metricSet, e, mb.AddMetricSetInfo)
 		// Overwrite service.address as the port changes every time
 		beatEvent.Fields.Put("service.address", "127.0.0.1:55555")
 		data = append(data, beatEvent.Fields)
@@ -155,6 +153,8 @@ func runTest(t *testing.T, file string, module, metricSetName, url, suffix strin
 		h2, _ := hashstructure.Hash(data[j], nil)
 		return h1 < h2
 	})
+
+	checkDocumented(t, data)
 
 	output, err := json.MarshalIndent(&data, "", "    ")
 	if err != nil {
@@ -187,6 +187,41 @@ func writeDataJSON(t *testing.T, data common.MapStr, module, metricSet string) {
 	output, err := json.MarshalIndent(&data, "", "    ")
 	if err = ioutil.WriteFile(getMetricsetPath(module, metricSet)+"/_meta/data.json", output, 0644); err != nil {
 		t.Fatal(err)
+	}
+}
+
+// checkDocumented checks that all fields which show up in the events are documented
+func checkDocumented(t *testing.T, data []common.MapStr) {
+	fieldsData, err := asset.GetFields("metricbeat")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fields, err := mapping.LoadFields(fieldsData)
+	if err != nil {
+		t.Fatal(err)
+	}
+	documentedFields := fields.GetKeys()
+	keys := map[string]interface{}{}
+
+	for _, k := range documentedFields {
+		keys[k] = struct{}{}
+	}
+
+	for _, d := range data {
+		flat := d.Flatten()
+		for k := range flat {
+			if _, ok := keys[k]; !ok {
+				// If a field is defined as object it can also be defined as `status_codes.*`
+				// So this checks if such a key with the * exists by removing the last part.
+				splits := strings.Split(k, ".")
+				prefix := strings.Join(splits[0:len(splits)-1], ".")
+				if _, ok := keys[prefix+".*"]; ok {
+					continue
+				}
+				t.Fatalf("key missing: %s", k)
+			}
+		}
 	}
 }
 
@@ -226,7 +261,7 @@ func server(t *testing.T, path string, url string) *httptest.Server {
 }
 
 func getModulesPath() string {
-	return "../../module"
+	return "../../../module"
 }
 
 func getModulePath(module string) string {

@@ -12276,7 +12276,7 @@ Request latency, number of requests
 
 --
 
-*`kubernetes.apiserver.request.latency.bucket`*::
+*`kubernetes.apiserver.request.latency.bucket.*`*::
 +
 --
 type: object
