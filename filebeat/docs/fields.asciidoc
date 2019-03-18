@@ -1075,7 +1075,7 @@ Fields for Cisco ASA Firewall.
 --
 type: keyword
 
-The Cisco ASA message identifier. TODO: Maybe a long?
+The Cisco ASA message identifier.
 
 
 --
@@ -1085,7 +1085,9 @@ The Cisco ASA message identifier. TODO: Maybe a long?
 --
 type: keyword
 
-Suffix after %ASA identifier. Usually `session`.
+example: session
+
+Optional suffix after %ASA identifier.
 
 
 --
@@ -1095,7 +1097,8 @@ Suffix after %ASA identifier. Usually `session`.
 --
 type: keyword
 
-TODO migrate to ECS?
+Source interface for the flow or event.
+
 
 --
 
@@ -1104,7 +1107,8 @@ TODO migrate to ECS?
 --
 type: keyword
 
-TODO migrate to ECS?
+Destination interface for the flow or event.
+
 
 --
 
@@ -1113,7 +1117,8 @@ TODO migrate to ECS?
 --
 type: keyword
 
-TODO
+Name of the Access Control List that matched this event.
+
 
 --
 
@@ -1122,7 +1127,8 @@ TODO
 --
 type: keyword
 
-TODO
+Name of the user that is the source for this event.
+
 
 --
 
@@ -1131,7 +1137,8 @@ TODO
 --
 type: keyword
 
-TODO
+Name of the user that is the destination for this event.
+
 
 --
 
@@ -1140,7 +1147,8 @@ TODO
 --
 type: ip
 
-TODO
+The translated source IP address.
+
 
 --
 
@@ -1149,7 +1157,8 @@ TODO
 --
 type: long
 
-TODO
+The translated source port.
+
 
 --
 
@@ -1158,7 +1167,8 @@ TODO
 --
 type: ip
 
-TODO
+The translated destination IP address.
+
 
 --
 
@@ -1167,7 +1177,8 @@ TODO
 --
 type: long
 
-TODO
+The translated destination port.
+
 
 --
 
@@ -1176,7 +1187,8 @@ TODO
 --
 type: keyword
 
-TODO
+Threat level for malware / botnet traffic. One of very-low, low, moderate, high or very-high.
+
 
 --
 
@@ -1185,7 +1197,8 @@ TODO
 --
 type: keyword
 
-TODO
+Category for the malware / botnet traffic. For example: virus, botnet, trojan, etc.
+
 
 --
 
@@ -1194,14 +1207,8 @@ TODO
 --
 type: keyword
 
-TODO
+Unique identifier for a flow.
 
---
-
-*`cisco.asa.threat_domain`*::
-+
---
-TODO
 
 --
 
