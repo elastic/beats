@@ -16,6 +16,18 @@
       type: long
       description: >
          Number of active disks.
+    - name: disks.working
+      type: long
+      description: >
+         Number of working disks.
+    - name: disks.failed
+      type: long
+      description: >
+         Number of failed disks.
+    - name: disks.spare
+      type: long
+      description: >
+         Number of spare disks.
     - name: disks.total
       type: long
       description: >

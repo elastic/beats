@@ -25137,6 +25137,36 @@ Number of active disks.
 
 --
 
+*`system.raid.disks.working`*::
++
+--
+type: long
+
+Number of working disks.
+
+
+--
+
+*`system.raid.disks.failed`*::
++
+--
+type: long
+
+Number of failed disks.
+
+
+--
+
+*`system.raid.disks.spare`*::
++
+--
+type: long
+
+Number of spare disks.
+
+
+--
+
 *`system.raid.disks.total`*::
 +
 --

@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//+build darwin freebsd linux openbsd
+
 package raid
 
 import (
@@ -22,6 +24,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/prometheus/procfs"
+
+	"github.com/elastic/beats/metricbeat/module/system/raid/mdinfo"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -82,12 +86,26 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	}
 
 	for _, stat := range stats {
+		dev, err := mdinfo.NewDevice(stat.Name, string(m.fs))
+		if err != nil {
+			r.Error(errors.Wrap(err, "failed to to open raid device for ioctl"))
+			return
+		}
+		defer dev.Close()
+		arrayInfo, err := dev.GetArrayInfo()
+		if err != nil {
+			r.Error(errors.Wrap(err, "failed to get data from md device"))
+			return
+		}
 		event := common.MapStr{
 			"name":           stat.Name,
 			"activity_state": stat.ActivityState,
 			"disks": common.MapStr{
-				"active": stat.DisksActive,
-				"total":  stat.DisksTotal,
+				"active":  stat.DisksActive,
+				"working": arrayInfo.WorkingDisks,
+				"failed":  arrayInfo.FailedDisks,
+				"spare":   arrayInfo.SpareDisks,
+				"total":   stat.DisksTotal,
 			},
 			"blocks": common.MapStr{
 				"synced": stat.BlocksSynced,
