@@ -30,6 +30,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 *Metricbeat*
 
 - Migrate docker module to ECS. {pull}10927[10927]
+- Add connection and request timeouts for HTTP helper. {pull}11032[11032]
 
 *Packetbeat*
 
