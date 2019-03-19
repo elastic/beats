@@ -25,77 +25,84 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/metricbeat/mb"
+
 	"github.com/elastic/beats/libbeat/common"
 )
 
-var ipCapturer = regexp.MustCompile(`\d+\.\d+\.\d+\.\d+`)
-var portCapture = regexp.MustCompile(`:(\d+)\[`)
-var queueCapture = regexp.MustCompile(`queued=(\d*),`)
-var receivedCapture = regexp.MustCompile(`recved=(\d*),`)
-var sentCapture = regexp.MustCompile(`sent=(\d*)`)
+var capturer = regexp.MustCompile(`/(?P<ip>.*):(?P<port>\d+)\[(?P<interest_ops>\d*)]\(queued=(?P<queued>\d*),recved=(?P<received>\d*),sent=(?P<sent>\d*)\)`)
 
-func parseCons(i io.Reader) ([]common.MapStr, error) {
+func (m *MetricSet) parseCons(i io.Reader) ([]mb.Event, error) {
 	scanner := bufio.NewScanner(i)
 
-	result := make([]common.MapStr, 0)
+	result := make([]mb.Event, 0)
 
 	for scanner.Scan() {
-		outputLine := common.MapStr{}
+		metricsetFields := common.MapStr{}
+		rootFields := common.MapStr{}
 		line := scanner.Text()
 
-		// Track parsing information to not send an completely empty line at the end of the for-loop
 		oneParsingIsCorrect := false
-		err := checkRegexSliceAndSetString(outputLine, ipCapturer.FindStringSubmatch(line), "ip", 0, &oneParsingIsCorrect)
+		keyMap, err := lineToMap(line)
 		if err != nil {
-			logger.Error(errors.Wrap(err, "error trying to parse ip"))
+			m.Logger().Debugf(err.Error())
+			continue
 		}
-		if err = checkRegexSliceAndSetInt(outputLine, portCapture.FindStringSubmatch(line), "port", 1, &oneParsingIsCorrect); err != nil {
-			logger.Error(errors.Wrap(err, "error trying to parse port"))
-		}
-		if err = checkRegexSliceAndSetInt(outputLine, queueCapture.FindStringSubmatch(line), "queued", 1, &oneParsingIsCorrect); err != nil {
-			logger.Error(errors.Wrap(err, "error trying to parse 'queued' field"))
-		}
-		if err = checkRegexSliceAndSetInt(outputLine, receivedCapture.FindStringSubmatch(line), "received", 1, &oneParsingIsCorrect); err != nil {
-			logger.Error(errors.Wrap(err, "error trying to parse 'received' field"))
-		}
-		if err = checkRegexSliceAndSetInt(outputLine, sentCapture.FindStringSubmatch(line), "sent", 1, &oneParsingIsCorrect); err != nil {
-			logger.Error(errors.Wrap(err, "error trying to parse 'send' field"))
+
+		for k, v := range keyMap {
+			if k == "ip" {
+				if _, err := rootFields.Put("client.ip", v); err != nil {
+					m.Logger().Debugf("%v. Error placing key 'ip' on event", err)
+				} else {
+					oneParsingIsCorrect = true
+				}
+			} else if k == "port" {
+				m.checkRegexAndSetInt(rootFields, v, "client.port", &oneParsingIsCorrect)
+			} else {
+				m.checkRegexAndSetInt(metricsetFields, v, k, &oneParsingIsCorrect)
+			}
 		}
 
 		if oneParsingIsCorrect {
-			result = append(result, outputLine)
+			result = append(result, mb.Event{MetricSetFields: metricsetFields, RootFields: rootFields})
 		}
 	}
 
 	return result, nil
 }
 
-func checkRegexSliceAndSetInt(output common.MapStr, slice []string, key string, index int, correct *bool) error {
-	if len(slice) != 0 {
-		n, err := strconv.ParseInt(slice[index], 10, 64)
-		if err != nil {
-			return err
-		}
-		*correct = true
-		if _, err = output.Put(key, n); err != nil {
-			return errors.Wrapf(err, "error placing key '%s' on event", key)
-		}
-	} else {
-		return errors.Errorf("%s not found in '%#v'", key, slice)
+func lineToMap(line string) (map[string]string, error) {
+	capturedPatterns := capturer.FindStringSubmatch(line)
+	if len(capturedPatterns) < 1 {
+		//Nothing captured
+		return nil, errors.Errorf("no data captured in '%s'", line)
 	}
 
-	return nil
+	keyMap := make(map[string]string)
+	for i, name := range capturer.SubexpNames() {
+		if i != 0 && name != "" {
+			keyMap[name] = capturedPatterns[i]
+		}
+	}
+
+	return keyMap, nil
 }
 
-func checkRegexSliceAndSetString(output common.MapStr, slice []string, key string, index int, correct *bool) error {
-	if len(slice) != 0 {
-		*correct = true
-		if _, err := output.Put(key, slice[index]); err != nil {
-			return errors.Wrapf(err, "error placing key '%s' on event", key)
+func (m *MetricSet) checkRegexAndSetInt(output common.MapStr, capturedData string, key string, correct *bool) {
+	if capturedData != "" {
+		n, err := strconv.ParseInt(capturedData, 10, 64)
+		if err != nil {
+			m.Logger().Errorf("parse error: %v. Cannot convert string to it", err)
+			return
 		}
+		if _, err = output.Put(key, n); err != nil {
+			m.Logger().Errorf("parse error: %v. Error putting key '%s' on event", err, key)
+			return
+		}
+		*correct = true
 	} else {
-		return errors.Errorf("%s not found in '%#v'", key, slice)
+		m.Logger().Errorf("parse error: empty data for key '%s'", key)
 	}
 
-	return nil
+	return
 }

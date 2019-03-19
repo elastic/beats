@@ -1,16 +1,13 @@
 - name: connections
   type: group
+  release: beta
   description: >
     connections
   fields:
-    - name: ip
-      type: keyword
-      description: >
-        Connection IP
-    - name: port
+    - name: interest_ops
       type: long
       description: >
-        Connection Port
+        Interest ops
     - name: queued
       type: long
       description: >

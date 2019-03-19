@@ -1,8 +1,8 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "client": {
+        "ip": "172.17.0.1",
+        "port": 34812
     },
     "event": {
         "dataset": "zookeeper.connections",
@@ -13,13 +13,12 @@
         "name": "connections"
     },
     "service": {
-        "address": "172.17.0.2:2181",
+        "address": "localhost:2181",
         "type": "zookeeper"
     },
     "zookeeper": {
         "connections": {
-            "ip": "172.17.0.1",
-            "port": 44048,
+            "interest_ops": 0,
             "queued": 0,
             "received": 1,
             "sent": 0

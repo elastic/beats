@@ -22,14 +22,10 @@ import (
 
 	"github.com/elastic/beats/metricbeat/mb/parse"
 
-	"github.com/elastic/beats/libbeat/logp"
-
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/zookeeper"
 )
-
-var logger = logp.NewLogger("zookeeper.connections")
 
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
@@ -38,7 +34,6 @@ var logger = logp.NewLogger("zookeeper.connections")
 func init() {
 	mb.Registry.MustAddMetricSet("zookeeper", "connections", New,
 		mb.WithHostParser(parse.PassThruHostParser),
-		mb.DefaultMetricSet(),
 	)
 }
 
@@ -76,15 +71,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-	events, err := parseCons(outputReader)
+	events, err := m.parseCons(outputReader)
 	if err != nil {
 		reporter.Error(err)
 		return
 	}
 
 	for _, event := range events {
-		reporter.Event(mb.Event{
-			MetricSetFields: event,
-		})
+		reporter.Event(event)
 	}
 }
