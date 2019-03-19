@@ -51,7 +51,7 @@ class Test(BaseTest):
             elasticsearch={"host": self.get_elasticsearch_url()},
         )
         exit_code = self.run_beat(extra_args=["setup", "--template",
-                                              "-E", "setup.template.overwrite=true", "-E", "migration.enabled=true"])
+                                              "-E", "setup.template.overwrite=true", "-E", "migration.6_to_7.enabled=true"])
 
         assert exit_code == 0
         assert self.log_contains('Loaded index template')
