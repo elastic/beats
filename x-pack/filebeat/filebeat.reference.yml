@@ -2057,4 +2057,4 @@ logging.files:
 #================================= Migration ==================================
 
 # This allows to enable 6.7 migration aliases
-#migration_67.enabled: false
+#migration.6_to_7.enabled: false
