@@ -199,6 +199,72 @@ func TestTargetRootOption(t *testing.T) {
 	assert.Equal(t, expected.String(), actual.String())
 }
 
+func TestNotJsonObjectOrArrayDepthOne(t *testing.T) {
+	input := common.MapStr{
+		"msg": `{
+			"someDate": "2016-09-28T01:40:26.760+0000",
+			"someNumberAsString": "1475026826760",
+			"someNumber": 1475026826760,
+			"someString": "foobar",
+			"someString2": "2017 is awesome",
+			"someMap": "{\"a\":\"b\"}"
+		  }`,
+	}
+
+	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+		"fields":    fields,
+		"max_depth": 1,
+	})
+
+	actual := getActualValue(t, testConfig, input)
+
+	expected := common.MapStr{
+		"msg": common.MapStr{
+			"someDate":           "2016-09-28T01:40:26.760+0000",
+			"someNumber":         1475026826760,
+			"someNumberAsString": "1475026826760",
+			"someString":         "foobar",
+			"someString2":        "2017 is awesome",
+			"someMap":            "{\"a\":\"b\"}",
+		},
+	}
+
+	assert.Equal(t, expected.String(), actual.String())
+}
+
+func TestNotJsonObjectOrArrayDepthTen(t *testing.T) {
+	input := common.MapStr{
+		"msg": `{
+			"someDate": "2016-09-28T01:40:26.760+0000",
+			"someNumberAsString": "1475026826760",
+			"someNumber": 1475026826760,
+			"someString": "foobar",
+			"someString2": "2017 is awesome",
+			"someMap": "{\"a\":\"b\"}"
+		  }`,
+	}
+
+	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+		"fields":    fields,
+		"max_depth": 10,
+	})
+
+	actual := getActualValue(t, testConfig, input)
+
+	expected := common.MapStr{
+		"msg": common.MapStr{
+			"someDate":           "2016-09-28T01:40:26.760+0000",
+			"someNumber":         1475026826760,
+			"someNumberAsString": "1475026826760",
+			"someString":         "foobar",
+			"someString2":        "2017 is awesome",
+			"someMap":            common.MapStr{"a": "b"},
+		},
+	}
+
+	assert.Equal(t, expected.String(), actual.String())
+}
+
 func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
 	logp.TestingSetup()
 

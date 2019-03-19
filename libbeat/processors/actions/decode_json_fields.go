@@ -146,6 +146,10 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 			return v, false
 		}
 
+		if !strings.HasPrefix(str, "[") && !strings.HasPrefix(str, "{") {
+			return str, false
+		}
+
 		var tmp interface{}
 		err := unmarshal(maxDepth, str, &tmp, processArray)
 		if err != nil {
