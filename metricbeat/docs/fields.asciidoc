@@ -20,6 +20,7 @@ grouped in the following categories:
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-consul>>
+* <<exported-fields-coredns>>
 * <<exported-fields-couchbase>>
 * <<exported-fields-couchdb>>
 * <<exported-fields-docker-processor>>
@@ -2564,6 +2565,229 @@ Garbage collector pause time in nanoseconds
 type: long
 
 Nanoseconds consumed by stop-the-world garbage collection pauses since Consul started.
+
+--
+
+[[exported-fields-coredns]]
+== coredns fields
+
+coredns Module
+
+
+
+[float]
+== coredns fields
+
+`coredns` contains statistics that were read from coreDNS
+
+
+
+[float]
+== stats fields
+
+Contains statistics related to the coreDNS service
+
+
+
+*`coredns.stats.panic.count.total`*::
++
+--
+type: long
+
+Total number of panics
+
+
+--
+
+*`coredns.stats.dns.request.count.total`*::
++
+--
+type: long
+
+Total query count
+
+
+--
+
+*`coredns.stats.dns.request.duration.ns.bucket.*`*::
++
+--
+type: object
+
+Request duration histogram buckets in nanoseconds
+
+
+--
+
+*`coredns.stats.dns.request.duration.ns.sum`*::
++
+--
+type: long
+
+format: duration
+
+Requests duration, sum of durations in nanoseconds
+
+
+--
+
+*`coredns.stats.dns.request.duration.ns.count`*::
++
+--
+type: long
+
+Requests duration, number of requests
+
+
+--
+
+*`coredns.stats.dns.request.size.bytes.bucket.*`*::
++
+--
+type: object
+
+Request Size histogram buckets
+
+
+--
+
+*`coredns.stats.dns.request.size.bytes.sum`*::
++
+--
+type: long
+
+Request Size histogram sum
+
+
+--
+
+*`coredns.stats.dns.request.size.bytes.count`*::
++
+--
+type: long
+
+Request Size histogram count
+
+
+--
+
+*`coredns.stats.dns.request.do.count.total`*::
++
+--
+type: long
+
+Number of queries that have the DO bit set
+
+
+--
+
+*`coredns.stats.dns.request.type.count.total`*::
++
+--
+type: long
+
+Counter of queries per zone and type
+
+
+--
+
+*`coredns.stats.type`*::
++
+--
+type: keyword
+
+Holds the query type of the request
+
+
+--
+
+*`coredns.stats.dns.response.rcode.count.total`*::
++
+--
+type: long
+
+Counter of responses per zone and rcode
+
+
+--
+
+*`coredns.stats.rcode`*::
++
+--
+type: keyword
+
+Holds the rcode of the response
+
+
+--
+
+*`coredns.stats.family`*::
++
+--
+type: keyword
+
+The address family of the transport (1 = IP (IP version 4), 2 = IP6 (IP version 6))
+
+
+--
+
+*`coredns.stats.dns.response.size.bytes.bucket.*`*::
++
+--
+type: object
+
+Response Size histogram buckets
+
+
+--
+
+*`coredns.stats.dns.response.size.bytes.sum`*::
++
+--
+type: long
+
+Response Size histogram sum
+
+
+--
+
+*`coredns.stats.dns.response.size.bytes.count`*::
++
+--
+type: long
+
+Response Size histogram count
+
+
+--
+
+*`coredns.stats.server`*::
++
+--
+type: keyword
+
+The server responsible for the request
+
+
+--
+
+*`coredns.stats.zone`*::
++
+--
+type: keyword
+
+The zonename used for the request/response
+
+
+--
+
+*`coredns.stats.proto`*::
++
+--
+type: keyword
+
+The transport of the response ("udp" or "tcp")
+
 
 --
 
