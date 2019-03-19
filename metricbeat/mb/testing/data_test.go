@@ -41,6 +41,7 @@ import (
 	// TODO: generate include file for these tests automatically moving forward
 	_ "github.com/elastic/beats/metricbeat/module/couchbase/cluster"
 	_ "github.com/elastic/beats/metricbeat/module/couchbase/node"
+	_ "github.com/elastic/beats/metricbeat/module/etcd/metrics"
 	_ "github.com/elastic/beats/metricbeat/module/kibana/status"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/apiserver"
 	_ "github.com/elastic/beats/metricbeat/module/kubernetes/state_node"

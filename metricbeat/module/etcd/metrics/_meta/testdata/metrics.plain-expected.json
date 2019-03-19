@@ -1,0 +1,81 @@
+[
+    {
+        "etcd": {
+            "metrics": {
+                "disk": {
+                    "backend_commit_duration_seconds": {
+                        "bucket": {
+                            "+Inf": 6,
+                            "0.001": 4,
+                            "0.002": 4,
+                            "0.004": 6,
+                            "0.008": 6,
+                            "0.016": 6,
+                            "0.032": 6,
+                            "0.064": 6,
+                            "0.128": 6,
+                            "0.256": 6,
+                            "0.512": 6,
+                            "1.024": 6,
+                            "2.048": 6,
+                            "4.096": 6,
+                            "8.192": 6
+                        },
+                        "count": 6,
+                        "sum": 0.005161901
+                    },
+                    "mvcc_db_total_size_in_bytes": 24576,
+                    "wal_fsync_duration_seconds": {
+                        "bucket": {
+                            "+Inf": 3,
+                            "0.001": 0,
+                            "0.002": 0,
+                            "0.004": 0,
+                            "0.008": 2,
+                            "0.016": 2,
+                            "0.032": 2,
+                            "0.064": 3,
+                            "0.128": 3,
+                            "0.256": 3,
+                            "0.512": 3,
+                            "1.024": 3,
+                            "2.048": 3,
+                            "4.096": 3,
+                            "8.192": 3
+                        },
+                        "count": 3,
+                        "sum": 0.071772434
+                    }
+                },
+                "memory": {
+                    "go_memstats_alloc_bytes": 3130240
+                },
+                "network": {
+                    "client_grpc_received_bytes_total": 0,
+                    "client_grpc_sent_bytes_total": 0
+                },
+                "server": {
+                    "grpc_handled_total": 0,
+                    "grpc_started_total": 0,
+                    "has_leader": 1,
+                    "leader_changes_seen_total": 1,
+                    "proposals_committed_total": 8,
+                    "proposals_failed_total": 0,
+                    "proposals_pending": 0
+                }
+            }
+        },
+        "event": {
+            "dataset": "etcd.metrics",
+            "duration": 115000,
+            "module": "etcd"
+        },
+        "metricset": {
+            "name": "metrics"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "etcd"
+        }
+    }
+]
