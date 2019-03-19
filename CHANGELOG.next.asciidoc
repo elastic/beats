@@ -14,6 +14,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
   info from the cloud.machine.type and cloud.availability_zone. {issue}10968[10968]
 - Add `cleanup_timeout` option to docker autodiscover, to wait some time before removing configurations after a container is stopped. {issue]10374[10374] {pull}10905[10905]
 - Rename `migration.enabled` config to `migration.6_to_7.enabled`. {pull}11284[11284]
+- Initialize the Paths before the keystore and save the keystore into `data/{beatname}.keystore`. {pull}10706[10706]
 
 *Auditbeat*
 
