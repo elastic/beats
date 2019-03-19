@@ -13,7 +13,7 @@ import (
 	_ "github.com/elastic/beats/x-pack/libbeat/management"
 )
 
-var licenseDebugK = "license"
+const licenseDebugK = "license"
 
 // AddXPack extends the given root folder with XPack features
 func AddXPack(root *cmd.BeatsRootCmd, name string) {

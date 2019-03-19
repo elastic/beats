@@ -225,11 +225,12 @@ func NewClient(
 	}
 
 	client.Connection.onConnectCallback = func() error {
-		licenseCheck.mutex.RLock()
-		defer licenseCheck.mutex.RUnlock()
+		globalCallbackRegistry.mutex.Lock()
+		defer globalCallbackRegistry.mutex.Unlock()
 
-		if licenseCheck.callback != nil {
-			if err := licenseCheck.callback(client); err != nil {
+		for _, callback := range globalCallbackRegistry.callbacks {
+			err := callback(client)
+			if err != nil {
 				return err
 			}
 		}

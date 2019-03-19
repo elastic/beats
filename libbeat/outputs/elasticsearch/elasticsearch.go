@@ -61,19 +61,29 @@ type callbacksRegistry struct {
 // XXX: it would be fantastic to do this without a package global
 var connectCallbackRegistry = newCallbacksRegistry()
 
-type licenseCallbackHolder struct {
-	callback connectCallback
-	mutex    sync.RWMutex
-}
+// NOTE(ph): We need to refactor this, right now this is the only way to ensure that every calls
+// to an ES cluster executes a callback.
+var globalCallbackRegistry = newCallbacksRegistry()
 
-var licenseCheck = licenseCallbackHolder{}
+// RegisterGlobalCallback register a global callbacks.
+func RegisterGlobalCallback(callback connectCallback) (uuid.UUID, error) {
+	globalCallbackRegistry.mutex.Lock()
+	defer globalCallbackRegistry.mutex.Unlock()
 
-// RegisterLicenseCallback register a global license callback, this enforce that all Elasticsearch
-// clients do the check.
-func RegisterLicenseCallback(cb connectCallback) {
-	licenseCheck.mutex.Lock()
-	defer licenseCheck.mutex.Unlock()
-	licenseCheck.callback = cb
+	// find the next unique key
+	var key uuid.UUID
+	var err error
+	exists := true
+	for exists {
+		key, err = uuid.NewV4()
+		if err != nil {
+			return uuid.Nil, err
+		}
+		_, exists = globalCallbackRegistry.callbacks[key]
+	}
+
+	globalCallbackRegistry.callbacks[key] = callback
+	return key, nil
 }
 
 func newCallbacksRegistry() callbacksRegistry {

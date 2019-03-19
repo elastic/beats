@@ -5,9 +5,10 @@
 package licenser
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/libbeat/common/atomic"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/outputs/elasticsearch"
 )
@@ -15,26 +16,31 @@ import (
 // Enforce setups the corresponding callbacks in libbeat to verify the license on the
 // remote elasticsearch cluster.
 func Enforce(log *logp.Logger, checks ...CheckFunc) {
-	validLicense := atomic.MakeBool(false)
 	cb := func(client *elasticsearch.Client) error {
-		if validLicense.Load() {
-			return nil
-		}
-
 		fetcher := NewElasticFetcher(client)
 		license, err := fetcher.Fetch()
+
 		if err != nil {
 			return errors.Wrapf(err, "cannot retrieve the elasticsearch license or no license endpoint")
 		}
 
-		if !Validate(log, *license, checks...) {
-			return errors.New("could not find a valid license")
+		if license == OSSLicense {
+			return errors.New(
+				"The default distribution of Beats requires the default Elasticsearch distribution " +
+					"(with Xpack included). Please either download the default Elasticsearch distribution " +
+					"from elastic.co or the pure Apache 2.0 Beats distribution",
+			)
 		}
 
-		validLicense.Store(true)
+		if !Validate(log, *license, checks...) {
+			return fmt.Errorf(
+				"invalid license found, requires a basic or a valid trial license and received %s",
+				license.Get(),
+			)
+		}
 
 		return nil
 	}
 
-	elasticsearch.RegisterLicenseCallback(cb)
+	elasticsearch.RegisterGlobalCallback(cb)
 }
