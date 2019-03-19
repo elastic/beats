@@ -138,6 +138,11 @@ func (h *esClientHandler) CreateAlias(alias Alias) error {
 	firstIndex := fmt.Sprintf("<%s-%s>", alias.Name, alias.Pattern)
 	firstIndex = url.PathEscape(firstIndex)
 
+	// url.PathEscape does not encode / to %2F, which is correct per RFC3986. However,
+	// Elasticsearch requires this encoding to be done when using date math in Index
+	// APIs: https://www.elastic.co/guide/en/elasticsearch/reference/master/date-math-index-names.html
+	firstIndex = strings.ReplaceAll(firstIndex, "/", "%2F")
+
 	body := common.MapStr{
 		"aliases": common.MapStr{
 			alias.Name: common.MapStr{
