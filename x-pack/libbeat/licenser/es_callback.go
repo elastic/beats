@@ -9,7 +9,7 @@ import (
 )
 
 // Enforce setups the corresponding callbacks in libbeat to verify the license on the
-// remote elasticsearch clustrer.
+// remote elasticsearch cluster.
 func Enforce(log *logp.Logger, checks ...CheckFunc) {
 	validLicense := atomic.MakeBool(false)
 	cb := func(client *elasticsearch.Client) error {
