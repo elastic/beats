@@ -32,5 +32,6 @@ type Connector func(*common.Config, *common.MapStrPointer) (Outleter, error)
 // Outleter is the outlet for an input
 type Outleter interface {
 	Close() error
+	Done() <-chan struct{}
 	OnEvent(data *util.Data) bool
 }
