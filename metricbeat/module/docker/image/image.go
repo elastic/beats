@@ -78,3 +78,9 @@ func (m *MetricSet) Fetch() ([]common.MapStr, error) {
 
 	return eventsMapping(images, m.dedot), nil
 }
+
+//Close stops the metricset
+func (m *MetricSet) Close() error {
+
+	return m.dockerClient.Close()
+}
