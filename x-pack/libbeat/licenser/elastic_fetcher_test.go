@@ -35,9 +35,26 @@ func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Serv
 }
 
 func TestParseJSON(t *testing.T) {
-	t.Run("OSS release of Elasticsearch", func(t *testing.T) {
+	t.Run("OSS release of Elasticsearch (Code: 405)", func(t *testing.T) {
 		h := func(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Method Not Allowed", 405)
+		}
+		s, c := newServerClientPair(t, h)
+		defer s.Close()
+		defer c.Close()
+
+		fetcher := NewElasticFetcher(c)
+		oss, err := fetcher.Fetch()
+		if assert.NoError(t, err) {
+			return
+		}
+
+		assert.Equal(t, OSSLicense, oss)
+	})
+
+	t.Run("OSS release of Elasticsearch (Code: 400)", func(t *testing.T) {
+		h := func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, "Bad Request", 400)
 		}
 		s, c := newServerClientPair(t, h)
 		defer s.Close()
