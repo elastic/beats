@@ -150,10 +150,7 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 		var tmp interface{}
 		err := unmarshal(maxDepth, str, &tmp, processArray)
 		if err != nil {
-			if err == errProcessingSkipped {
-				return v, true
-			}
-			return v, false
+			return v, err == errProcessingSkipped
 		}
 
 		return tmp, true
