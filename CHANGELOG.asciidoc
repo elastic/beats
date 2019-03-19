@@ -90,7 +90,7 @@ https://github.com/elastic/beats/compare/v5.6.15...v5.6.16[View commits]
 
 *Winlogbeat*
 
-- Prevent Winlogbeat from dropping events with invalid XML. {pull}11006{11006}
+- Prevent Winlogbeat from dropping events with invalid XML. {pull}11006[11006]
 
 [[release-notes-5.6.15]]
 === Beats version 5.6.15
