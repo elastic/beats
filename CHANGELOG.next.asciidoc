@@ -72,8 +72,8 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 
 - Fix errors in filebeat Zeek dashboard and README files. Add notice.log support. {pull}10916[10916]
 - Fix a bug when converting NetFlow fields to snake_case. {pull}10950[10950]
-- Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test
-  case. {issue}11004[11004] {pull}11105[11105]
+- Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test case. {issue}11004[11004] {pull}11105[11105]
+- Fix issue preventing docker container events to be stored if the container has a network interface without ip address. {issue}11225[11225] {pull}11247[11247]
 - Change URLPATH grok pattern to support brackets. {issue}11135[11135] {pull}11252[11252]
 - Add support for iis log with different address format. {issue}11255[11255] {pull}11256[11256]
 
