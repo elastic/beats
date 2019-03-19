@@ -216,7 +216,7 @@ func (s *event) Priority() int {
 
 // HasPriority returns if the priority was in original event.
 func (s *event) HasPriority() bool {
-	return s.priority > 0
+	return s.priority >= 0
 }
 
 // Severity returns the severity, will return -1 if priority is not set.
