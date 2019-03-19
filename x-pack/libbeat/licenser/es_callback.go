@@ -21,7 +21,7 @@ func Enforce(log *logp.Logger, checks ...CheckFunc) {
 		license, err := fetcher.Fetch()
 
 		if err != nil {
-			return errors.Wrapf(err, "cannot retrieve the elasticsearch license or no license endpoint")
+			return errors.Wrapf(err, "cannot retrieve the elasticsearch license")
 		}
 
 		if license == OSSLicense {
