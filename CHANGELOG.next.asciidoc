@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `cleanup_timeout` option to docker autodiscover, to wait some time before removing configurations after a container is stopped. {issue]10374[10374] {pull}10905[10905]
 - On Google Cloud Engine (GCE) the add_cloud_metadata will now trim the project
   info from the cloud.machine.type and cloud.availability_zone. {issue}10968[10968]
+- Rename `migration.enabled` config to `migration.6_to_7.enabled`. {pull}11284[11284]
 
 *Auditbeat*
 
@@ -98,6 +99,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update haproxy.* fields to map to ECS. {pull}10558[10558] {pull}10568[10568]
 - Collect all EC2 meta data from all instances in all states. {pull}10628[10628]
 - Migrate docker module to ECS. {pull}10927[10927]
+- Add connection and request timeouts for HTTP helper. {pull}11032[11032]
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 
 *Packetbeat*
@@ -167,10 +169,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve detection of file deletion on Windows. {pull}10747[10747]
 - Fix errors in filebeat Zeek dashboard and README files. Add notice.log support. {pull}10916[10916]
 - Fix a bug when converting NetFlow fields to snake_case. {pull}10950[10950]
+- Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test case. {issue}11004[11004] {pull}11105[11105]
+- Fix issue preventing docker container events to be stored if the container has a network interface without ip address. {issue}11225[11225] {pull}11247[11247]
 - Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test 
   case. {issue}11004[11004] {pull}11105[11105]
 - Change URLPATH grok pattern to support brackets. {issue}11135[11135] {pull}11252[11252]
 - Add support for iis log with different address format. {issue}11255[11255] {pull}11256[11256]
+- Add fix to parse syslog message with priority value 0. {issue}11010[11010]
 
 *Heartbeat*
 
@@ -348,6 +353,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add AWS SQS metricset. {pull}10684[10684] {issue}10053[10053]
 - Add AWS s3_request metricset. {pull}10949[10949] {issue}10055[10055]
 - Add s3_daily_storage metricset. {pull}10940[10940] {issue}10055[10055]
+- Add `coredns` metricbeat module. {pull}10585{10585]
 
 *Packetbeat*
 
