@@ -29,10 +29,15 @@ import (
 func TestCopyFields(t *testing.T) {
 
 	var tests = []struct {
+		FromTo   fromTo
 		Input    common.MapStr
 		Expected common.MapStr
 	}{
 		{
+			FromTo: fromTo{
+				From: "message",
+				To:   "message_copied",
+			},
 			Input: common.MapStr{
 				"message": "please copy this line",
 			},
@@ -42,12 +47,48 @@ func TestCopyFields(t *testing.T) {
 			},
 		},
 		{
+			FromTo: fromTo{
+				From: "nested.message",
+				To:   "message_copied",
+			},
 			Input: common.MapStr{
-				"message": 42,
+				"nested": common.MapStr{
+					"message": "please copy this line",
+				},
 			},
 			Expected: common.MapStr{
-				"message":        42,
-				"message_copied": 42,
+				"nested": common.MapStr{
+					"message": "please copy this line",
+				},
+				"message_copied": "please copy this line",
+			},
+		},
+		{
+			FromTo: fromTo{
+				From: "dotted.message",
+				To:   "message_copied",
+			},
+			Input: common.MapStr{
+				"dotted.message": "please copy this line",
+			},
+			Expected: common.MapStr{
+				"dotted.message": "please copy this line",
+				"message_copied": "please copy this line",
+			},
+		},
+		{
+			FromTo: fromTo{
+				From: "message.original",
+				To:   "message.copied",
+			},
+			Input: common.MapStr{
+				"message.original": 42,
+			},
+			Expected: common.MapStr{
+				"message.original": 42,
+				"message": common.MapStr{
+					"copied": 42,
+				},
 			},
 		},
 	}
@@ -56,10 +97,7 @@ func TestCopyFields(t *testing.T) {
 		p := copyFields{
 			copyFieldsConfig{
 				Fields: []fromTo{
-					fromTo{
-						From: "message",
-						To:   "message_copied",
-					},
+					test.FromTo,
 				},
 			},
 		}

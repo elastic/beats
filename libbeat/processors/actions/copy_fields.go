@@ -102,5 +102,5 @@ func (f *copyFields) copyField(from string, to string, fields common.MapStr) err
 }
 
 func (f *copyFields) String() string {
-	return "copy=" + fmt.Sprintf("%+v", f.config.Fields)
+	return "copy_fields=" + fmt.Sprintf("%+v", f.config.Fields)
 }
