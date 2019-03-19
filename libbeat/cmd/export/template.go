@@ -74,16 +74,7 @@ func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
 				tmplCfg = template.DefaultConfig()
 			}
 
-			var withMigration bool
-			if b.RawConfig.HasField("migration") {
-				sub, err := b.RawConfig.Child("migration", -1)
-				if err != nil {
-					fatalf("Failed to read migration setting: %+v", err)
-				}
-				withMigration = sub.Enabled()
-			}
-
-			tmpl, err := template.New(b.Info.Version, index, *esVersion, tmplCfg, withMigration)
+			tmpl, err := template.New(b.Info.Version, index, *esVersion, tmplCfg, b.Config.Migration.Enabled())
 			if err != nil {
 				fatalf("Error generating template: %+v", err)
 			}
