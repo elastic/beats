@@ -5,9 +5,7 @@
   release: ga
   fields:
     - name: name
-      type: alias
-      path: rabbitmq.name
-      migration: true
+      type: keyword
       description: >
         The name of the connection with non-ASCII characters escaped as in C.
     - name: vhost

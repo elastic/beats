@@ -19,10 +19,16 @@ package helper
 
 import (
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/metricbeat/mb"
 )
 
 func TestGetAuthHeaderFromToken(t *testing.T) {
@@ -68,4 +74,58 @@ func TestGetAuthHeaderFromTokenNoFile(t *testing.T) {
 	header, err := getAuthHeaderFromToken("nonexistingfile")
 	assert.Equal(t, "", header)
 	assert.Error(t, err)
+}
+
+func TestTimeout(t *testing.T) {
+	c := make(chan struct{})
+	defer close(c)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		<-c
+	}))
+	defer ts.Close()
+
+	cfg := defaultConfig()
+	cfg.Timeout = 1 * time.Nanosecond
+	hostData := mb.HostData{
+		URI:          ts.URL,
+		SanitizedURI: ts.URL,
+	}
+
+	h, err := newHTTPFromConfig(cfg, "test", hostData)
+	require.NoError(t, err)
+
+	checkTimeout(t, h)
+}
+
+func TestConnectTimeout(t *testing.T) {
+	// This IP shouldn't exist, 192.0.2.0/24 is reserved for testing
+	uri := "http://192.0.2.42"
+	cfg := defaultConfig()
+	cfg.ConnectTimeout = 1 * time.Nanosecond
+	hostData := mb.HostData{
+		URI:          uri,
+		SanitizedURI: uri,
+	}
+
+	h, err := newHTTPFromConfig(cfg, "test", hostData)
+	require.NoError(t, err)
+
+	checkTimeout(t, h)
+}
+
+func checkTimeout(t *testing.T, h *HTTP) {
+	t.Helper()
+
+	done := make(chan struct{})
+	go func() {
+		_, err := h.FetchResponse()
+		assert.Error(t, err)
+		done <- struct{}{}
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(1 * time.Second):
+		t.Fatal("timeout should have happened time ago")
+	}
 }
