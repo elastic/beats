@@ -99,6 +99,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update haproxy.* fields to map to ECS. {pull}10558[10558] {pull}10568[10568]
 - Collect all EC2 meta data from all instances in all states. {pull}10628[10628]
 - Migrate docker module to ECS. {pull}10927[10927]
+- Add connection and request timeouts for HTTP helper. {pull}11032[11032]
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 
 *Packetbeat*
