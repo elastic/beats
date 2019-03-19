@@ -3,7 +3,94 @@
   description: >
     Etcd metrics from the /metrics endpoint
   fields:
-    - name: has_leader
+    # SERVER
+
+    - name: server.has_leader
       type: byte
       description: >
-        A leader exists at the cluster
+        Whether a leader exists in the cluster
+
+    - name: server.leader_changes_seen_total
+      type: integer
+      description: >
+        Number of leader changes seen at the cluster
+
+    - name: server.proposals_committed_total
+      type: long
+      description: >
+        Total number of consensus proposals commited
+
+    - name: server.proposals_failed_total
+      type: long
+      description: >
+        Total number of consensus proposals failed
+
+    - name: server.proposals_pending
+      type: long
+      description: >
+        Total number of consensus proposals pending
+
+    - name: server.grpc_handled_total
+      type: long
+      description: >
+        Total number of received gRPC requests
+
+    - name: server.grpc_started_total
+      type: long
+      description: >
+        Total number of sent gRPC requests
+
+    # DISK
+
+    - name: disk.mvcc_db_total_size_in_bytes
+      type: long
+      description: >
+        Size of stored data at MVCC
+
+    - name: disk.wal_fsync_duration_seconds.bucket
+      type: object
+      object_type: long
+      description: >
+        Latency for writing ahead logs to disk
+    - name: disk.wal_fsync_duration_seconds.count
+      type: long
+      description: >
+        Write ahead logs count
+    - name: disk.wal_fsync_duration_seconds.sum
+      type: scaled_float
+      description: >
+        Write ahead logs latency sum
+
+    - name: disk.backend_commit_duration_seconds.bucket
+      type: object
+      object_type: long
+      description: >
+        Latency for writing backend changes to disk
+    - name: disk.backend_commit_duration_seconds.count
+      type: long
+      description: >
+        Backend commits count
+    - name: disk.backend_commit_duration_seconds.sum
+      type: scaled_float
+      description: >
+        Backend commits latency sum
+
+    # MEMORY
+
+    - name: memory.go_memstats_alloc_bytes
+      type: long
+      description: >
+        Memory allocated bytes as of MemStats Go
+
+    # NETWORK
+
+    - name: netowrk.client_grpc_received_bytes_total
+      type: long
+      description: >
+        gRPC received bytes total
+
+    - name: netowrk.client_grpc_sent_bytes_total
+      type: long
+      description: >
+        gRPC received sent total
+        

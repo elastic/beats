@@ -9367,12 +9367,172 @@ Etcd metrics from the /metrics endpoint
 
 
 
-*`etcd.metrics.has_leader`*::
+*`etcd.metrics.server.has_leader`*::
 +
 --
 type: byte
 
-A leader exists at the cluster
+Whether a leader exists in the cluster
+
+
+--
+
+*`etcd.metrics.server.leader_changes_seen_total`*::
++
+--
+type: integer
+
+Number of leader changes seen at the cluster
+
+
+--
+
+*`etcd.metrics.server.proposals_committed_total`*::
++
+--
+type: long
+
+Total number of consensus proposals commited
+
+
+--
+
+*`etcd.metrics.server.proposals_failed_total`*::
++
+--
+type: long
+
+Total number of consensus proposals failed
+
+
+--
+
+*`etcd.metrics.server.proposals_pending`*::
++
+--
+type: long
+
+Total number of consensus proposals pending
+
+
+--
+
+*`etcd.metrics.server.grpc_handled_total`*::
++
+--
+type: long
+
+Total number of received gRPC requests
+
+
+--
+
+*`etcd.metrics.server.grpc_started_total`*::
++
+--
+type: long
+
+Total number of sent gRPC requests
+
+
+--
+
+*`etcd.metrics.disk.mvcc_db_total_size_in_bytes`*::
++
+--
+type: long
+
+Size of stored data at MVCC
+
+
+--
+
+*`etcd.metrics.disk.wal_fsync_duration_seconds.bucket`*::
++
+--
+type: object
+
+Latency for writing ahead logs to disk
+
+
+--
+
+*`etcd.metrics.disk.wal_fsync_duration_seconds.count`*::
++
+--
+type: long
+
+Write ahead logs count
+
+
+--
+
+*`etcd.metrics.disk.wal_fsync_duration_seconds.sum`*::
++
+--
+type: scaled_float
+
+Write ahead logs latency sum
+
+
+--
+
+*`etcd.metrics.disk.backend_commit_duration_seconds.bucket`*::
++
+--
+type: object
+
+Latency for writing backend changes to disk
+
+
+--
+
+*`etcd.metrics.disk.backend_commit_duration_seconds.count`*::
++
+--
+type: long
+
+Backend commits count
+
+
+--
+
+*`etcd.metrics.disk.backend_commit_duration_seconds.sum`*::
++
+--
+type: scaled_float
+
+Backend commits latency sum
+
+
+--
+
+*`etcd.metrics.memory.go_memstats_alloc_bytes`*::
++
+--
+type: long
+
+Memory allocated bytes as of MemStats Go
+
+
+--
+
+*`etcd.metrics.netowrk.client_grpc_received_bytes_total`*::
++
+--
+type: long
+
+gRPC received bytes total
+
+
+--
+
+*`etcd.metrics.netowrk.client_grpc_sent_bytes_total`*::
++
+--
+type: long
+
+gRPC received sent total
 
 
 --
