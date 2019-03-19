@@ -2,6 +2,7 @@
   type: group
   description: >
     Etcd metrics from the /metrics endpoint
+  release: ga
   fields:
     # SERVER
 
