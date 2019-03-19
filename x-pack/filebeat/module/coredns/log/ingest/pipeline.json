@@ -9,10 +9,23 @@
       }
     },
     {
+      "script": {
+        "lang": "painless",
+        "source": "ctx['source'] = new HashMap(); if (ctx.temp.source.charAt(0) == (char)(\"[\")) { def p = ctx.temp.source.indexOf (']'); def l = ctx.temp.source.length(); ctx.source.address = ctx.temp.source.substring(1, p); ctx.source.port = ctx.temp.source.substring(p+2, l);} else { def p = ctx.temp.source.indexOf (':'); def l = ctx.temp.source.length(); ctx.source.address = ctx.temp.source.substring(0, p); ctx.source.port = ctx.temp.source.substring(p+1, l);} ctx.remove('temp');", 
+        "if": "ctx.temp?.source != null"
+      }
+    },
+    {
       "set": {
         "field": "source.ip",
         "value": "{{source.address}}",
         "if": "ctx.source?.address != null"
+      }
+    },
+    {
+      "convert" : {
+        "field" : "source.port",
+        "type": "integer"
       }
     },
     {
@@ -34,10 +47,14 @@
       }
     },
     {
-      "script": {
-        "lang": "painless",
-        "source": "ctx.coredns.response.flags = ctx.coredns.response.flags.toUpperCase()",
-        "ignore_failure" : true
+      "convert" : {
+        "field" : "coredns.dnssec_ok",
+        "type": "boolean"
+      }
+    },
+    {
+      "uppercase": {
+        "field": "coredns.response.flags"
       }
     },
     {
