@@ -39,6 +39,8 @@ https://github.com/elastic/beats/compare/v6.7.0...6.x[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
+
 *Heartbeat*
 
 *Journalbeat*
