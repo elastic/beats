@@ -206,7 +206,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add documentation about jolokia autodiscover fields. {issue}10925[10925] {pull}10979[10979]
 - Add missing aws.ec2.instance.state.name into fields.yml. {issue}11219[11219] {pull}11221[11221]
 - Fix ec2 metricset to collect metrics from Cloudwatch with the same timestamp. {pull}11142[11142]
-- Fix potential memory leak in docker/container metricset {pull}11294[11294]
+- Fix potential memory leak in stopped docker metricsets {pull}11294[11294]
 
 *Packetbeat*
 
