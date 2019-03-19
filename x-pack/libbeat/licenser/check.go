@@ -28,11 +28,11 @@ func CheckTrial(log *logp.Logger, license License) bool {
 // CheckLicenseCover check that the current license cover the requested license.
 func CheckLicenseCover(licenseType LicenseType) func(*logp.Logger, License) bool {
 	return func(log *logp.Logger, license License) bool {
-		log.Debug("Checking that license cover %s", licenseType)
+		log.Debug("Checking that license covers %s", licenseType)
 		if license.Cover(licenseType) && license.IsActive() {
 			return true
 		}
-		log.Info("License is active for %s", licenseType)
+		log.Infof("License is active for %s", licenseType)
 		return false
 	}
 }
