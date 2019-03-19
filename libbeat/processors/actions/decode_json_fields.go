@@ -52,6 +52,7 @@ var (
 		MaxDepth:     1,
 		ProcessArray: false,
 	}
+	errProcessingSkipped = errors.New("processing skipped")
 )
 
 var debug = logp.MakeDebug("filters")
@@ -149,6 +150,9 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 		var tmp interface{}
 		err := unmarshal(maxDepth, str, &tmp, processArray)
 		if err != nil {
+			if err == errProcessingSkipped {
+				return v, true
+			}
 			return v, false
 		}
 
@@ -166,7 +170,7 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 	// We want to process arrays here
 	case []interface{}:
 		if !processArray {
-			break
+			return errProcessingSkipped
 		}
 
 		for i, v := range O {
