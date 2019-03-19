@@ -124,6 +124,15 @@ func DeregisterConnectCallback(key uuid.UUID) {
 	delete(connectCallbackRegistry.callbacks, key)
 }
 
+// DeregisterGlobalCallback deregisters a callback for the elasticsearch output
+// specified by its key. If a callback does not exist, nothing happens.
+func DeregisterGlobalCallback(key uuid.UUID) {
+	globalCallbackRegistry.mutex.Lock()
+	defer globalCallbackRegistry.mutex.Unlock()
+
+	delete(globalCallbackRegistry.callbacks, key)
+}
+
 func makeES(
 	im outputs.IndexManager,
 	beat beat.Info,
