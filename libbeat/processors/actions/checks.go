@@ -79,3 +79,26 @@ func allowedFields(fields ...string) func(*common.Config) error {
 		return nil
 	}
 }
+
+func mutuallyExclusiveRequiredFields(fields ...string) func(*common.Config) error {
+	return func(cfg *common.Config) error {
+		var foundField string
+		for _, field := range cfg.GetFields() {
+			for _, f := range fields {
+				if field == f {
+					if len(foundField) == 0 {
+						foundField = field
+					} else {
+						return fmt.Errorf("field %s and %s are mutually exclusive", foundField, field)
+					}
+				}
+			}
+		}
+
+		if len(foundField) == 0 {
+			return fmt.Errorf("missing option, select one from %v", fields)
+		}
+		return nil
+	}
+
+}
