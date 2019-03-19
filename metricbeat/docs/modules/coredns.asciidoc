@@ -1,0 +1,37 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-coredns]]
+== coredns module
+
+beta[]
+
+This is the coredns module.
+
+
+
+[float]
+=== Example configuration
+
+The coredns module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: coredns
+  metricsets: ["stats"]
+  period: 10s
+  hosts: ["localhost:9153"]
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-coredns-stats,stats>>
+
+include::coredns/stats.asciidoc[]
+
