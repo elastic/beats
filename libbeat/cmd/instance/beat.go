@@ -110,6 +110,9 @@ type beatConfig struct {
 	// elastic stack 'setup' configurations
 	Dashboards *common.Config `config:"setup.dashboards"`
 	Kibana     *common.Config `config:"setup.kibana"`
+
+	// Migration config to migration from 6 to 7
+	Migration *common.Config `config:"migration.6_to_7"`
 }
 
 var debugf = logp.MakeDebug("beat")
@@ -695,14 +698,6 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	}
 
 	if b.Config.Dashboards.Enabled() {
-		var withMigration bool
-		if b.RawConfig.HasField("migration") {
-			sub, err := b.RawConfig.Child("migration", -1)
-			if err != nil {
-				return fmt.Errorf("Failed to read migration setting: %+v", err)
-			}
-			withMigration = sub.Enabled()
-		}
 
 		// Initialize kibana config. If username and password is set in elasticsearch output config but not in kibana,
 		// initKibanaConfig will attach the ussername and password into kibana config as a part of the initialization.
@@ -719,7 +714,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 		// but it's assumed that KB and ES have the same minor version.
 		v := client.GetVersion()
 
-		indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, b.Info.Version, v, withMigration)
+		indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, b.Info.Version, v, b.Config.Migration.Enabled())
 		if err != nil {
 			return fmt.Errorf("error creating index pattern generator: %v", err)
 		}
