@@ -22,15 +22,12 @@ package raid
 import (
 	"path/filepath"
 
-	"github.com/pkg/errors"
-	"github.com/prometheus/procfs"
-
-	"github.com/elastic/beats/metricbeat/module/system/raid/mdinfo"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
 	"github.com/elastic/beats/metricbeat/module/system"
+	"github.com/pkg/errors"
+	"github.com/prometheus/procfs"
 )
 
 func init() {
@@ -42,7 +39,8 @@ func init() {
 // MetricSet contains proc fs data.
 type MetricSet struct {
 	mb.BaseMetricSet
-	fs procfs.FS
+	fs    procfs.FS
+	devFS string
 }
 
 // New creates a new instance of the raid metricset.
@@ -74,6 +72,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		fs:            fs,
+		devFS:         systemModule.HostFS + "/dev/",
 	}, nil
 }
 
@@ -86,7 +85,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	}
 
 	for _, stat := range stats {
-		dev, err := mdinfo.NewDevice(stat.Name, string(m.fs))
+		//stat.Name is the raid device name, which should be visible as /dev/md*
+		dev, err := NewDevice(m.devFS + stat.Name)
 		if err != nil {
 			r.Error(errors.Wrap(err, "failed to to open raid device for ioctl"))
 			return

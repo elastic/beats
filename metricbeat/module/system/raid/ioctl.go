@@ -17,14 +17,27 @@
 
 //+build darwin freebsd linux openbsd
 
-package mdinfo
+package raid
 
 import (
-	"fmt"
 	"os"
 	"syscall"
 	"unsafe"
+
+	"github.com/pkg/errors"
 )
+
+//this is a function var that we can override for the sake of testing
+var makeNewDevice = func(dev string) (MDData, error) {
+
+	//we're expecting the name as it comes from /proc/mdstat
+	f, err := os.Open(dev)
+	if err != nil {
+		return MDDevice{}, err
+	}
+
+	return MDDevice{dev: f}, nil
+}
 
 //IoctlGetArrayInfo is the ioctl device code for GET_ARRAY_INFO
 //On linux, this is generated via the _IOR() macro.
@@ -32,6 +45,41 @@ import (
 //9 is the block device major number, 17 is our magic number,
 //and the last value is the struct we pass via pointer to ioctl.
 var IoctlGetArrayInfo uint64 = 0x80480911
+
+//MDArrayInfo contains the MD data from iotctl()
+type MDArrayInfo struct {
+	MajorVersion int32
+	MinorVersion int32
+	PatchVersion int32
+	//RAID array creation time
+	Ctime uint32
+	Level int32
+	Size  int32
+	//Total devices
+	NrDisks int32
+	//Raid Devices
+	RAIDDisks     int32
+	MDMinor       int32
+	NotPersistent int32
+	//superblock update time
+	Utime uint32
+	//state bitmask
+	State        int32
+	ActiveDisks  int32
+	WorkingDisks int32
+	FailedDisks  int32
+	SpareDisks   int32
+	Layout       int32
+	//This value is normally divided by 1024, presumably to get block size.
+	//If you want the raid size in bytes, you need the BLKGETSIZE64 ioctl call.
+	ChunkSize int32
+}
+
+//MDData is an interface that provides a human-friendly way to access raid data via ioctl
+type MDData interface {
+	Close() error
+	GetArrayInfo() (MDArrayInfo, error)
+}
 
 //MDDevice is a multi-disk device to make status queries on
 type MDDevice struct {
@@ -52,7 +100,13 @@ func (dev MDDevice) GetArrayInfo() (MDArrayInfo, error) {
 	//r2 doesn't seem to be used.
 	_, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(dev.dev.Fd()), uintptr(IoctlGetArrayInfo), uintptr(unsafe.Pointer(&dat)))
 	if errno != 0 {
-		return dat, fmt.Errorf("Got error from syscall: %d", errno)
+		return dat, errors.Wrap(errno, "ioctl failed")
 	}
 	return dat, nil
+}
+
+//NewDevice opens a file to a /dev/md* device
+func NewDevice(dev string) (MDData, error) {
+
+	return makeNewDevice(dev)
 }

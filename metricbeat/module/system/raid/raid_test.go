@@ -27,7 +27,43 @@ import (
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
+//MockData is a fake type for testing
+type MockData string
+
+//Close closes the connection to the /dev/md device
+func (dev MockData) Close() error {
+	return nil
+}
+
+//GetArrayInfo returns a struct describing the state of the RAID array.
+func (dev MockData) GetArrayInfo() (MDArrayInfo, error) {
+
+	dat := MDArrayInfo{
+		MajorVersion:  1,
+		MinorVersion:  2,
+		Ctime:         0,
+		Level:         0,
+		RAIDDisks:     1,
+		NrDisks:       1,
+		NotPersistent: 0,
+		Utime:         0,
+		State:         1,
+		ActiveDisks:   1,
+		WorkingDisks:  1,
+		FailedDisks:   0,
+		SpareDisks:    5,
+		ChunkSize:     0,
+	}
+	return dat, nil
+}
+
 func TestData(t *testing.T) {
+
+	//override the var in ioctl.go for testing
+	makeNewDevice = func(dev string) (MDData, error) {
+		return MockData(" "), nil
+	}
+
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
 	err := mbtest.WriteEventsReporterV2(f, t, ".")
 	if err != nil {
@@ -36,6 +72,12 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
+
+	//override the var in ioctl.go for testing
+	makeNewDevice = func(dev string) (MDData, error) {
+		return MockData(" "), nil
+	}
+
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2(f)
 
