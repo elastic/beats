@@ -17,6 +17,6 @@ var licenseDebugK = "license"
 
 // AddXPack extends the given root folder with XPack features
 func AddXPack(root *cmd.BeatsRootCmd, name string) {
-	licenser.Enforce(logp.NewLogger(licenseDebugK), licenser.BasicOrTrial)
+	licenser.Enforce(logp.NewLogger(licenseDebugK), licenser.BasicAndAboveOrTrial)
 	root.AddCommand(genEnrollCmd(name, ""))
 }

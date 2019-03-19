@@ -51,7 +51,7 @@ func Validate(log *logp.Logger, license License, checks ...CheckFunc) bool {
 	return false
 }
 
-// BasicOrTrial return true if the license is basic or if the license is trial and active.
-func BasicOrTrial(log *logp.Logger, license License) bool {
+// BasicAndAboveOrTrial return true if the license is basic or if the license is trial and active.
+func BasicAndAboveOrTrial(log *logp.Logger, license License) bool {
 	return CheckBasic(log, license) || CheckTrial(log, license)
 }

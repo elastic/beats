@@ -61,9 +61,20 @@ type callbacksRegistry struct {
 // XXX: it would be fantastic to do this without a package global
 var connectCallbackRegistry = newCallbacksRegistry()
 
-// LicenseCallback is called on every client connected.
-// NOTE: for performance reason the result should be cached, this values should be set on init.
-var LicenseCallback func(*Client) error
+type licenseCallbackHolder struct {
+	callback connectCallback
+	mutex    sync.RWMutex
+}
+
+var licenseCheck = licenseCallbackHolder{}
+
+// RegisterLicenseCallback register a global license callback, this enforce that all Elasticsearch
+// clients do the check.
+func RegisterLicenseCallback(cb connectCallback) {
+	licenseCheck.mutex.Lock()
+	defer licenseCheck.mutex.Unlock()
+	licenseCheck.callback = cb
+}
 
 func newCallbacksRegistry() callbacksRegistry {
 	return callbacksRegistry{

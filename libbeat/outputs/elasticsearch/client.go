@@ -225,8 +225,11 @@ func NewClient(
 	}
 
 	client.Connection.onConnectCallback = func() error {
-		if LicenseCallback != nil {
-			if err := LicenseCallback(client); err != nil {
+		licenseCheck.mutex.RLock()
+		defer licenseCheck.mutex.RUnlock()
+
+		if licenseCheck.callback != nil {
+			if err := licenseCheck.callback(client); err != nil {
 				return err
 			}
 		}
