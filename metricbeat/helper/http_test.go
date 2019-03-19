@@ -78,6 +78,7 @@ func TestGetAuthHeaderFromTokenNoFile(t *testing.T) {
 
 func TestTimeout(t *testing.T) {
 	c := make(chan struct{})
+	defer close(c)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		<-c
 	}))
