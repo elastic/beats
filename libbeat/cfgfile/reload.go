@@ -35,6 +35,7 @@ import (
 )
 
 var (
+	// DefaultDynamicConfig provides default behavior for a Runner
 	DefaultDynamicConfig = DynamicConfig{
 		Reload: Reload{
 			Period:  10 * time.Second,
@@ -58,16 +59,20 @@ type DynamicConfig struct {
 	Reload Reload `config:"reload"`
 }
 
+// Reload defines reload behavior and frequency
 type Reload struct {
 	Period  time.Duration `config:"period"`
 	Enabled bool          `config:"enabled"`
 }
 
+// RunnerFactory is used for creating of new Runners
 type RunnerFactory interface {
 	Create(p beat.Pipeline, config *common.Config, meta *common.MapStrPointer) (Runner, error)
 	CheckConfig(config *common.Config) error
 }
 
+// Runner is a simple interface providing a simple way to
+// Start and Stop Reloader
 type Runner interface {
 	// We include fmt.Stringer here because we do log debug messages that must print
 	// something for the given Runner. We need Runner implementers to consciously implement a
@@ -220,7 +225,7 @@ func (rl *Reloader) loadConfigs(files []string) ([]*reload.ConfigWithMeta, error
 		configs, err := LoadList(file)
 		if err != nil {
 			errs = append(errs, err)
-			logp.Err("Error loading config: %s", err)
+			logp.Err("Error loading config from '%s': %v", file, err)
 			continue
 		}
 
