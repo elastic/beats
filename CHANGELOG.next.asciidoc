@@ -101,7 +101,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Migrate docker module to ECS. {pull}10927[10927]
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 
-
 *Packetbeat*
 
 - Adjust Packetbeat `http` fields to ECS Beta 2 {pull}9645[9645]
