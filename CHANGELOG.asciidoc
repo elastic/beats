@@ -8,7 +8,7 @@
 // Template, add newest changes here
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v5.6.15...5.6[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v5.6.16...5.6[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -83,6 +83,14 @@ https://github.com/elastic/beats/compare/v5.6.15...5.6[Check the HEAD diff]
 *Winlogbeat*
 
 ////////////////////////////////////////////////////////////
+
+[[release-notes-5.6.16]]
+=== Beats version 5.6.16
+https://github.com/elastic/beats/compare/v5.6.15...v5.6.16[View commits]
+
+*Winlogbeat*
+
+- Prevent Winlogbeat from dropping events with invalid XML. {pull}11006{11006}
 
 [[release-notes-5.6.15]]
 === Beats version 5.6.15
