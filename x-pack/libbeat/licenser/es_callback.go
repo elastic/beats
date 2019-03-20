@@ -25,10 +25,9 @@ func Enforce(log *logp.Logger, checks ...CheckFunc) {
 		}
 
 		if license == OSSLicense {
-			return errors.New("this Elastic licensed beat requires an Elasticsearch server with X-Pack " +
-				"and a free basic license. Please use the Elasticsearch distribution that includes " +
-				"X-Pack or download the Apache 2.0 licensed beat distribution that does not include " +
-				"X-Pack features")
+			return errors.New("This Beat requires the default distribution of Elasticsearch. Please " +
+				"upgrade to the default distribution of Elasticsearch from elastic.co, or downgrade to " +
+				"the oss-only distribution of beats")
 		}
 
 		if !Validate(log, *license, checks...) {
