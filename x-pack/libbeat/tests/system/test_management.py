@@ -13,7 +13,9 @@ from os import path
 from base import BaseTest
 
 
-INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
+# Disable because waiting artifacts from https://github.com/elastic/kibana/pull/31660
+# INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
+INTEGRATION_TESTS = False
 TIMEOUT = 2 * 60
 
 
