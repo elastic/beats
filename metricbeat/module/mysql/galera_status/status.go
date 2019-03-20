@@ -27,6 +27,7 @@ package galera_status
 import (
 	"database/sql"
 
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/module/mysql"
 
@@ -49,6 +50,7 @@ type MetricSet struct {
 // New create a new instance of the MetricSet
 // Loads query_mode config setting from the config file
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	cfgwarn.Experimental("The galera_status metricset is experimental.")
 	return &MetricSet{BaseMetricSet: base}, nil
 }
 
