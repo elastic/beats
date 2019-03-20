@@ -20,7 +20,13 @@
 package sniffer
 
 import (
+	"bytes"
+	"errors"
+	"fmt"
+	"os/exec"
 	"time"
+
+	"github.com/elastic/beats/libbeat/logp"
 
 	"github.com/tsg/gopacket"
 	"github.com/tsg/gopacket/afpacket"
@@ -28,14 +34,27 @@ import (
 )
 
 type afpacketHandle struct {
-	TPacket *afpacket.TPacket
+	TPacket              *afpacket.TPacket
+	promicsPreviousState bool
+	device               string
 }
 
 func newAfpacketHandle(device string, snaplen int, block_size int, num_blocks int,
 	timeout time.Duration) (*afpacketHandle, error) {
 
-	h := &afpacketHandle{}
-	var err error
+	promiscEnabled, err := isPromiscEnabled(device)
+	if err != nil {
+		return nil, err
+	}
+
+	h := &afpacketHandle{
+		promicsPreviousState: promiscEnabled,
+		device:               device,
+	}
+
+	if err := setPromiscMode(device, true); err != nil {
+		return nil, err
+	}
 
 	if device == "any" {
 		h.TPacket, err = afpacket.NewTPacket(
@@ -69,4 +88,40 @@ func (h *afpacketHandle) LinkType() layers.LinkType {
 
 func (h *afpacketHandle) Close() {
 	h.TPacket.Close()
+	setPromiscMode(h.device, h.promicsPreviousState)
+}
+
+func isPromiscEnabled(device string) (bool, error) {
+	if device == "any" {
+		return false, nil
+	}
+
+	c := exec.Command("ip", "link", "show", device)
+	out, err := c.CombinedOutput()
+	if err != nil {
+		return false, fmt.Errorf(string(out))
+	}
+
+	return bytes.Contains(out, []byte("PROMISC")), nil
+}
+
+func setPromiscMode(device string, enabled bool) error {
+	if device == "any" {
+		logp.Warn("Cannot set promiscuous mode to device 'any'")
+		return nil
+	}
+
+	mode := "off"
+	if enabled {
+		mode = "on"
+	}
+
+	c := exec.Command("ip", "link", "set", device, "promisc", mode)
+	out, err := c.CombinedOutput()
+	if err != nil {
+		logp.Err("Error occurred when setting promisc mode of %s to %v: %v", device, enabled, err)
+		return errors.New(string(out))
+	}
+
+	return nil
 }
