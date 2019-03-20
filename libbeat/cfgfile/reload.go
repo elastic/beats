@@ -35,7 +35,7 @@ import (
 )
 
 var (
-	// DefaultDynamicConfig provides default behavior for a Runner
+	// DefaultDynamicConfig provides default behavior for a Runner.
 	DefaultDynamicConfig = DynamicConfig{
 		Reload: Reload{
 			Period:  10 * time.Second,
@@ -225,7 +225,7 @@ func (rl *Reloader) loadConfigs(files []string) ([]*reload.ConfigWithMeta, error
 		configs, err := LoadList(file)
 		if err != nil {
 			errs = append(errs, err)
-			logp.Err("Error loading config from '%s': %v", file, err)
+			logp.Err("Error loading config from file '%s', error %v", file, err)
 			continue
 		}
 
