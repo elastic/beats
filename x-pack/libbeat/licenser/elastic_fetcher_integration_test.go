@@ -27,8 +27,8 @@ func getTestClient() *elasticsearch.Client {
 	client, err := elasticsearch.NewClient(elasticsearch.ClientSettings{
 		URL:              host,
 		Index:            outil.MakeSelector(),
-		Username:         cli.GetEnvOr("ES_USER", ""),
-		Password:         cli.GetEnvOr("ES_PASS", ""),
+		Username:         "myelastic", // NOTE: I will refactor this in a followup PR
+		Password:         "changeme",
 		Timeout:          60 * time.Second,
 		CompressionLevel: 3,
 	}, nil)

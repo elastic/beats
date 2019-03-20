@@ -18,6 +18,7 @@ https://github.com/elastic/beats/compare/v6.6.0...6.x[Check the HEAD diff]
 - Allow Central Management to send events back to kibana. {issue}9382[9382]
 - Fix panic if fields settting is used to configure `hosts.x` fields. {issue}10824[10824] {pull}10935[10935]
 - Introduce query.default_field as part of the template. {pull}11205[11205]
+- Beats Xpack now checks for Basic license on connect. {pull}11296[11296]
 
 *Auditbeat*
 
