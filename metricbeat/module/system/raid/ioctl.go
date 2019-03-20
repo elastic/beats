@@ -27,8 +27,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-//NewMDDevice is a function used for returning a new instance of an ioctl reader
-var newMDDevice func(dev string) (MDData, error) = makenewMDDevice
+//newMDDevice is a function used for returning a new instance of an ioctl reader
+var newMDDevice = makenewMDDevice
 
 func makenewMDDevice(dev string) (MDData, error) {
 
