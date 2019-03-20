@@ -48,30 +48,30 @@
       description: >
         Size of stored data at MVCC
 
-    - name: disk.wal_fsync_duration_seconds.bucket
+    - name: disk.wal_fsync_duration_ns.bucket.*
       type: object
       object_type: long
       description: >
         Latency for writing ahead logs to disk
-    - name: disk.wal_fsync_duration_seconds.count
+    - name: disk.wal_fsync_duration_ns.count
       type: long
       description: >
         Write ahead logs count
-    - name: disk.wal_fsync_duration_seconds.sum
+    - name: disk.wal_fsync_duration_ns.sum
       type: scaled_float
       description: >
         Write ahead logs latency sum
 
-    - name: disk.backend_commit_duration_seconds.bucket
+    - name: disk.backend_commit_duration_ns.bucket.*
       type: object
       object_type: long
       description: >
         Latency for writing backend changes to disk
-    - name: disk.backend_commit_duration_seconds.count
+    - name: disk.backend_commit_duration_ns.count
       type: long
       description: >
         Backend commits count
-    - name: disk.backend_commit_duration_seconds.sum
+    - name: disk.backend_commit_duration_ns.sum
       type: scaled_float
       description: >
         Backend commits latency sum
@@ -85,13 +85,12 @@
 
     # NETWORK
 
-    - name: netowrk.client_grpc_received_bytes_total
+    - name: network.client_grpc_received_bytes_total
       type: long
       description: >
         gRPC received bytes total
 
-    - name: netowrk.client_grpc_sent_bytes_total
+    - name: network.client_grpc_sent_bytes_total
       type: long
       description: >
-        gRPC received sent total
-        
+        gRPC sent bytes total

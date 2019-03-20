@@ -35,9 +35,11 @@ func init() {
 			"grpc_server_handled_total":             prometheus.Metric("server.grpc_handled_total"),
 
 			// Disk
-			"etcd_mvcc_db_total_size_in_bytes":          prometheus.Metric("disk.mvcc_db_total_size_in_bytes"),
-			"etcd_disk_wal_fsync_duration_seconds":      prometheus.Metric("disk.wal_fsync_duration_seconds"),
-			"etcd_disk_backend_commit_duration_seconds": prometheus.Metric("disk.backend_commit_duration_seconds"),
+			"etcd_mvcc_db_total_size_in_bytes": prometheus.Metric("disk.mvcc_db_total_size_in_bytes"),
+			"etcd_disk_wal_fsync_duration_seconds": prometheus.Metric("disk.wal_fsync_duration_ns",
+				prometheus.OpMultiplyBuckets(1000000000)),
+			"etcd_disk_backend_commit_duration_seconds": prometheus.Metric("disk.backend_commit_duration_ns",
+				prometheus.OpMultiplyBuckets(1000000000)),
 
 			// Memory
 			"go_memstats_alloc_bytes": prometheus.Metric("memory.go_memstats_alloc_bytes"),
@@ -45,10 +47,6 @@ func init() {
 			// Network
 			"etcd_network_client_grpc_sent_bytes_total":     prometheus.Metric("network.client_grpc_sent_bytes_total"),
 			"etcd_network_client_grpc_received_bytes_total": prometheus.Metric("network.client_grpc_received_bytes_total"),
-			"etcd_network_peer_sent_bytes_total":            prometheus.Metric("network.peer_sent_bytes_total"),
-			"etcd_network_peer_received_bytes_total":        prometheus.Metric("network.peer_received_bytes_total"),
-			"etcd_network_peer_sent_failures_total":         prometheus.Metric("network.peer_sent_failures_total"),
-			"etcd_network_peer_received_failures_total":     prometheus.Metric("network.peer_received_failures_total"),
 		},
 	}
 

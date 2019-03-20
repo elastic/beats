@@ -9671,7 +9671,7 @@ Size of stored data at MVCC
 
 --
 
-*`etcd.metrics.disk.wal_fsync_duration_seconds.bucket`*::
+*`etcd.metrics.disk.wal_fsync_duration_ns.bucket.*`*::
 +
 --
 type: object
@@ -9681,7 +9681,7 @@ Latency for writing ahead logs to disk
 
 --
 
-*`etcd.metrics.disk.wal_fsync_duration_seconds.count`*::
+*`etcd.metrics.disk.wal_fsync_duration_ns.count`*::
 +
 --
 type: long
@@ -9691,7 +9691,7 @@ Write ahead logs count
 
 --
 
-*`etcd.metrics.disk.wal_fsync_duration_seconds.sum`*::
+*`etcd.metrics.disk.wal_fsync_duration_ns.sum`*::
 +
 --
 type: scaled_float
@@ -9701,7 +9701,7 @@ Write ahead logs latency sum
 
 --
 
-*`etcd.metrics.disk.backend_commit_duration_seconds.bucket`*::
+*`etcd.metrics.disk.backend_commit_duration_ns.bucket.*`*::
 +
 --
 type: object
@@ -9711,7 +9711,7 @@ Latency for writing backend changes to disk
 
 --
 
-*`etcd.metrics.disk.backend_commit_duration_seconds.count`*::
+*`etcd.metrics.disk.backend_commit_duration_ns.count`*::
 +
 --
 type: long
@@ -9721,7 +9721,7 @@ Backend commits count
 
 --
 
-*`etcd.metrics.disk.backend_commit_duration_seconds.sum`*::
+*`etcd.metrics.disk.backend_commit_duration_ns.sum`*::
 +
 --
 type: scaled_float
@@ -9741,7 +9741,7 @@ Memory allocated bytes as of MemStats Go
 
 --
 
-*`etcd.metrics.netowrk.client_grpc_received_bytes_total`*::
+*`etcd.metrics.network.client_grpc_received_bytes_total`*::
 +
 --
 type: long
@@ -9751,12 +9751,12 @@ gRPC received bytes total
 
 --
 
-*`etcd.metrics.netowrk.client_grpc_sent_bytes_total`*::
+*`etcd.metrics.network.client_grpc_sent_bytes_total`*::
 +
 --
 type: long
 
-gRPC received sent total
+gRPC sent bytes total
 
 
 --
