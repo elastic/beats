@@ -44,7 +44,7 @@ func newAfpacketHandle(device string, snaplen int, block_size int, num_blocks in
 
 	promiscEnabled, err := isPromiscEnabled(device)
 	if err != nil {
-		return nil, err
+		logp.Err("Failed to get promiscuous mode for device '%s': %v", device, err)
 	}
 
 	h := &afpacketHandle{
@@ -53,7 +53,7 @@ func newAfpacketHandle(device string, snaplen int, block_size int, num_blocks in
 	}
 
 	if err := setPromiscMode(device, true); err != nil {
-		return nil, err
+		logp.Err("Failed to set promiscuous mode for device '%s': %v", device, err)
 	}
 
 	if device == "any" {
@@ -88,7 +88,9 @@ func (h *afpacketHandle) LinkType() layers.LinkType {
 
 func (h *afpacketHandle) Close() {
 	h.TPacket.Close()
-	setPromiscMode(h.device, h.promicsPreviousState)
+	if err := setPromiscMode(h.device, h.promicsPreviousState); err != nil {
+		logp.Err("Failed to set promiscuous mode for device '%s': %v", device, err)
+	}
 }
 
 func isPromiscEnabled(device string) (bool, error) {

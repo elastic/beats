@@ -1630,7 +1630,9 @@ logging.files:
 #============================= Process Security ================================
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
-#seccomp.enabled: true
+# Seccomp is disabled in order to help with setting of promiscuous mode.
+# If you enable seccomp you will need to enable promiscuous on the device manually.
+seccomp.enabled: false
 
 #================================= Migration ==================================
 
