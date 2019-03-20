@@ -18,6 +18,7 @@
 package actions
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -92,6 +93,9 @@ func TestRenameRun(t *testing.T) {
 			Output: common.MapStr{
 				"a": 2,
 				"b": "q",
+				"error": common.MapStr{
+					"message": "Failed to rename fields in processor: target field b already exists, drop or rename this field first",
+				},
 			},
 			error:         true,
 			FailOnError:   true,
@@ -188,6 +192,9 @@ func TestRenameRun(t *testing.T) {
 			Output: common.MapStr{
 				"a": 9,
 				"c": 10,
+				"error": common.MapStr{
+					"message": "Failed to rename fields in processor: could not put value: a.c: 10, expected map but type is int",
+				},
 			},
 			error:         true,
 			IgnoreMissing: false,
@@ -239,6 +246,7 @@ func TestRenameRun(t *testing.T) {
 			} else {
 				assert.NotNil(t, err)
 			}
+			fmt.Println(newEvent.Fields)
 
 			assert.True(t, reflect.DeepEqual(newEvent.Fields, test.Output))
 		})
@@ -350,6 +358,7 @@ func TestRenameField(t *testing.T) {
 
 			err := f.renameField(test.From, test.To, test.Input)
 			if err != nil {
+				fmt.Println(test.error)
 				assert.Equal(t, test.error, true)
 			}
 

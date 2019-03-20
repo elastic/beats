@@ -77,7 +77,7 @@ func (f *renameFields) Run(event *beat.Event) (*beat.Event, error) {
 		if err != nil && f.config.FailOnError {
 			logp.Debug("rename", "Failed to rename fields, revert to old event: %s", err)
 			event.Fields = backup
-			event.PutValue("error.message", fmt.Sprintf("Failed to rename fields in processor: %+v", err))
+			event.PutValue("error.message", fmt.Sprintf("Failed to rename fields in processor: %s", err))
 			return event, err
 		}
 	}
@@ -109,7 +109,7 @@ func (f *renameFields) renameField(from string, to string, fields common.MapStr)
 
 	_, err = fields.Put(to, value)
 	if err != nil {
-		return fmt.Errorf("could not put value: %s: %v, %+v", to, value, err)
+		return fmt.Errorf("could not put value: %s: %v, %v", to, value, err)
 	}
 	return nil
 }

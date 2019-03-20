@@ -28,12 +28,12 @@ import (
 
 func TestCopyFields(t *testing.T) {
 
-	var tests = []struct {
+	var tests = map[string]struct {
 		FromTo   fromTo
 		Input    common.MapStr
 		Expected common.MapStr
 	}{
-		{
+		"copy string from message to message_copied": {
 			FromTo: fromTo{
 				From: "message",
 				To:   "message_copied",
@@ -46,7 +46,7 @@ func TestCopyFields(t *testing.T) {
 				"message_copied": "please copy this line",
 			},
 		},
-		{
+		"copy string from nested key nested.message to top level field message_copied": {
 			FromTo: fromTo{
 				From: "nested.message",
 				To:   "message_copied",
@@ -63,7 +63,7 @@ func TestCopyFields(t *testing.T) {
 				"message_copied": "please copy this line",
 			},
 		},
-		{
+		"copy string from fieldname with dot to message_copied": {
 			FromTo: fromTo{
 				From: "dotted.message",
 				To:   "message_copied",
@@ -76,7 +76,7 @@ func TestCopyFields(t *testing.T) {
 				"message_copied": "please copy this line",
 			},
 		},
-		{
+		"copy number from fieldname with dot to dotted message.copied": {
 			FromTo: fromTo{
 				From: "message.original",
 				To:   "message.copied",
@@ -93,22 +93,24 @@ func TestCopyFields(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		p := copyFields{
-			copyFieldsConfig{
-				Fields: []fromTo{
-					test.FromTo,
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			p := copyFields{
+				copyFieldsConfig{
+					Fields: []fromTo{
+						test.FromTo,
+					},
 				},
-			},
-		}
+			}
 
-		event := &beat.Event{
-			Fields: test.Input,
-		}
+			event := &beat.Event{
+				Fields: test.Input,
+			}
 
-		newEvent, err := p.Run(event)
-		assert.NoError(t, err)
+			newEvent, err := p.Run(event)
+			assert.NoError(t, err)
 
-		assert.Equal(t, test.Expected, newEvent.Fields)
+			assert.Equal(t, test.Expected, newEvent.Fields)
+		})
 	}
 }
