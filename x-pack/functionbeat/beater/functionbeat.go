@@ -20,8 +20,8 @@ import (
 	"github.com/elastic/beats/x-pack/functionbeat/config"
 	"github.com/elastic/beats/x-pack/functionbeat/core"
 	_ "github.com/elastic/beats/x-pack/functionbeat/include" // imports features
-	"github.com/elastic/beats/x-pack/functionbeat/licenser"
 	"github.com/elastic/beats/x-pack/functionbeat/provider"
+	"github.com/elastic/beats/x-pack/libbeat/licenser"
 )
 
 var (
@@ -82,7 +82,7 @@ func (bt *Functionbeat) Run(b *beat.Beat) error {
 	defer manager.Stop()
 
 	// Wait until we receive the initial license.
-	if err := licenser.WaitForLicense(bt.ctx, bt.log, manager, checkLicense); err != nil {
+	if err := licenser.WaitForLicense(bt.ctx, bt.log, manager, licenser.BasicAndAboveOrTrial); err != nil {
 		return err
 	}
 
@@ -154,7 +154,7 @@ func makeClientFactory(log *logp.Logger, manager *licenser.Manager, pipeline bea
 
 		// Make the client aware of the current license, the client will accept sending events to the
 		// pipeline until the client is closed or if the license change and is not valid.
-		licenseAware := core.NewLicenseAwareClient(client, checkLicense)
+		licenseAware := core.NewLicenseAwareClient(client, licenser.BasicAndAboveOrTrial)
 		if err := manager.AddWatcher(licenseAware); err != nil {
 			return nil, err
 		}
