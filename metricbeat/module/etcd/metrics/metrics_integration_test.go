@@ -56,10 +56,6 @@ func TestData(t *testing.T) {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
 	assert.NotEmpty(t, events)
-
-	if err := mbtest.WriteEventsReporterV2(f, t, ""); err != nil {
-		t.Fatal("write", err)
-	}
 }
 
 func TestFetchWrite(t *testing.T) {
