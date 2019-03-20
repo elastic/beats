@@ -1,4 +1,4 @@
 - module: etcd
-  metricsets: ["metrics"]
+  metricsets: ["leader", "self", "store"]
   period: 10s
   hosts: ["localhost:2379"]
