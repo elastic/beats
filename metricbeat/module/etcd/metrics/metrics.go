@@ -27,26 +27,26 @@ func init() {
 		Metrics: map[string]prometheus.MetricMap{
 			// Server
 			"etcd_server_has_leader":                prometheus.Metric("server.has_leader"),
-			"etcd_server_leader_changes_seen_total": prometheus.Metric("server.leader_changes_seen_total"),
-			"etcd_server_proposals_committed_total": prometheus.Metric("server.proposals_committed_total"),
-			"etcd_server_proposals_pending":         prometheus.Metric("server.proposals_pending"),
-			"etcd_server_proposals_failed_total":    prometheus.Metric("server.proposals_failed_total"),
-			"grpc_server_started_total":             prometheus.Metric("server.grpc_started_total"),
-			"grpc_server_handled_total":             prometheus.Metric("server.grpc_handled_total"),
+			"etcd_server_leader_changes_seen_total": prometheus.Metric("server.leader_changes.count"),
+			"etcd_server_proposals_committed_total": prometheus.Metric("server.proposals_committed.count"),
+			"etcd_server_proposals_pending":         prometheus.Metric("server.proposals_pending.count"),
+			"etcd_server_proposals_failed_total":    prometheus.Metric("server.proposals_failed.count"),
+			"grpc_server_started_total":             prometheus.Metric("server.grpc_started.count"),
+			"grpc_server_handled_total":             prometheus.Metric("server.grpc_handled.count"),
 
 			// Disk
-			"etcd_mvcc_db_total_size_in_bytes": prometheus.Metric("disk.mvcc_db_total_size_in_bytes"),
-			"etcd_disk_wal_fsync_duration_seconds": prometheus.Metric("disk.wal_fsync_duration_ns",
+			"etcd_mvcc_db_total_size_in_bytes": prometheus.Metric("disk.mvcc_db_total_size.bytes"),
+			"etcd_disk_wal_fsync_duration_seconds": prometheus.Metric("disk.wal_fsync_duration.ns",
 				prometheus.OpMultiplyBuckets(1000000000)),
-			"etcd_disk_backend_commit_duration_seconds": prometheus.Metric("disk.backend_commit_duration_ns",
+			"etcd_disk_backend_commit_duration_seconds": prometheus.Metric("disk.backend_commit_duration.ns",
 				prometheus.OpMultiplyBuckets(1000000000)),
 
 			// Memory
-			"go_memstats_alloc_bytes": prometheus.Metric("memory.go_memstats_alloc_bytes"),
+			"go_memstats_alloc_bytes": prometheus.Metric("memory.go_memstats_alloc.bytes"),
 
 			// Network
-			"etcd_network_client_grpc_sent_bytes_total":     prometheus.Metric("network.client_grpc_sent_bytes_total"),
-			"etcd_network_client_grpc_received_bytes_total": prometheus.Metric("network.client_grpc_received_bytes_total"),
+			"etcd_network_client_grpc_sent_bytes_total":     prometheus.Metric("network.client_grpc_sent.bytes"),
+			"etcd_network_client_grpc_received_bytes_total": prometheus.Metric("network.client_grpc_received.bytes"),
 		},
 	}
 
