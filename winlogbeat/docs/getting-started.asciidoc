@@ -74,7 +74,7 @@ output.elasticsearch:
 
 logging.to_files: true
 logging.files:
-  path: C:/ProgramData/winlogbeat/Logs
+  path: C:\ProgramData\winlogbeat\Logs
 logging.level: info
 --------------------------------------------------------------------------------
 
