@@ -43,6 +43,7 @@ func TestData(t *testing.T) {
 		t.Fatalf("only one event expected, got %d", len(events))
 	}
 
+	events[0].RootFields.Put("event.origin", "/var/log/wtmp")
 	fullEvent := mbtest.StandardizeEvent(f, events[0], core.AddDatasetToEvent)
 	mbtest.WriteEventToDataJSON(t, fullEvent, "")
 }
