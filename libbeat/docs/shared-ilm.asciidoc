@@ -2,8 +2,6 @@
 [role="xpack"]
 == Set up index lifecycle management
 
-beta[]
-
 You can use the {ref}/getting-started-index-lifecycle-management.html[index
 lifecycle management] feature in {es} to manage your {beatname_uc} indices as
 they age. For example, instead of having {beatname_uc} create daily indices
