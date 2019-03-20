@@ -73,6 +73,7 @@ func (f *copyFields) Run(event *beat.Event) (*beat.Event, error) {
 		if err != nil && f.config.FailOnError {
 			logp.Debug("copy_fields", "Failed to copy fields: %s", err)
 			event.Fields = backup
+			event.PutValue("error.message", fmt.Sprintf("Failed to copy fields in copy_fields processor: %+v", err))
 			return event, err
 		}
 	}
