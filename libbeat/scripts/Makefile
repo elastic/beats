@@ -348,7 +348,7 @@ ifeq ($(BEAT_REF_YAML),true)
 	@chmod 0640 ${BEAT_NAME}.reference.yml
 endif
 
-ifneq ($(shell [[ $(BEAT_NAME) == libbeat ]] && echo true ),true)
+ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	@# Update docs
 	@mkdir -p docs
 	@${PYTHON_ENV}/bin/python ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD)/fields.yml ${BEAT_TITLE} ${ES_BEATS}
