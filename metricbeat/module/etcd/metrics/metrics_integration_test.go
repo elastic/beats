@@ -20,8 +20,6 @@
 package metrics
 
 import (
-	"bytes"
-	"encoding/json"
 	"os"
 	"testing"
 
@@ -56,44 +54,6 @@ func TestData(t *testing.T) {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
 	assert.NotEmpty(t, events)
-}
-
-func TestFetchWrite(t *testing.T) {
-	logp.TestingSetup()
-
-	compose.EnsureUp(t, "etcd")
-
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	events, errs := mbtest.ReportingFetchV2(f)
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
-	assert.NotEmpty(t, events)
-	// b := bytes.Buffer{}
-	j, _ := json.Marshal(events[0])
-	t.Logf("%s/%s event: %s", f.Module().Name(), f.Name(), j)
-}
-
-func TestWriteDataTest(t *testing.T) {
-	logp.TestingSetup()
-
-	compose.EnsureUp(t, "etcd")
-
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
-	reporter := &mbtest.CapturingReporterV2{}
-	f.Fetch(reporter)
-	events := reporter.GetEvents()
-
-	var j bytes.Buffer
-	je, e := json.Marshal(events)
-	t.Logf("pre metrics: %v", events)
-	r := json.Indent(&j, je, "", "\t")
-	if e != nil {
-		t.Logf("error: %v", e)
-	}
-
-	t.Logf("metrics: %v", r)
-
 }
 
 func getConfig() map[string]interface{} {
