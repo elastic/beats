@@ -61,6 +61,12 @@
                 "target_field": "source.geo",
                 "ignore_failure": true
             }
+        },
+        {
+            "script": {
+                "lang": "painless",
+                "source": "if (ctx.process.name == \"sshd\") {                if (ctx.event.outcome == \"Accepted\") {                  ctx.event.type = \"authentication_success\";                  ctx.event.category = \"authentication\";                  ctx.event.action = \"ssh_login\";                } else if (ctx.event.outcome == \"Invalid\" || ctx.event.outcome == \"Failed\") {                  ctx.event.type = \"authentication_failure\";                  ctx.event.category = \"authentication\";                  ctx.event.action = \"ssh_login\";                }              }"
+            }
         }
     ],
     "on_failure" : [{
