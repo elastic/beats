@@ -19,6 +19,7 @@ func CheckTrial(log *logp.Logger, license License) bool {
 			log.Error("Trial license is expired")
 			return false
 		}
+		log.Info("Trial license active")
 		return true
 	}
 	return false
@@ -27,10 +28,11 @@ func CheckTrial(log *logp.Logger, license License) bool {
 // CheckLicenseCover check that the current license cover the requested license.
 func CheckLicenseCover(licenseType LicenseType) func(*logp.Logger, License) bool {
 	return func(log *logp.Logger, license License) bool {
-		log.Debugf("Checking that license cover %s", licenseType)
+		log.Debug("Checking that license covers %s", licenseType)
 		if license.Cover(licenseType) && license.IsActive() {
 			return true
 		}
+		log.Infof("License is active for %s", licenseType)
 		return false
 	}
 }
@@ -47,4 +49,9 @@ func Validate(log *logp.Logger, license License, checks ...CheckFunc) bool {
 		}
 	}
 	return false
+}
+
+// BasicAndAboveOrTrial return true if the license is basic or if the license is trial and active.
+func BasicAndAboveOrTrial(log *logp.Logger, license License) bool {
+	return CheckBasic(log, license) || CheckTrial(log, license)
 }

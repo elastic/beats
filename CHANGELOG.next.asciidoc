@@ -16,6 +16,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Empty `meta.json` file will be treated as a missing meta file. {issue}8558[8558]
 - Rename `migration.enabled` config to `migration.6_to_7.enabled`. {pull}11284[11284]
 - Initialize the Paths before the keystore and save the keystore into `data/{beatname}.keystore`. {pull}10706[10706]
+- Beats Xpack now checks for Basic license on connect. {pull}11296[11296]
 
 *Auditbeat*
 
