@@ -27,8 +27,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-//this is a function var that we can override for the sake of testing
-var makeNewDevice = func(dev string) (MDData, error) {
+//NewMDDevice is a function used for returning a new instance of an ioctl reader
+var newMDDevice func(dev string) (MDData, error) = makenewMDDevice
+
+func makenewMDDevice(dev string) (MDData, error) {
 
 	//we're expecting the name as it comes from /proc/mdstat
 	f, err := os.Open(dev)
@@ -108,5 +110,5 @@ func (dev MDDevice) GetArrayInfo() (MDArrayInfo, error) {
 //NewDevice opens a file to a /dev/md* device
 func NewDevice(dev string) (MDData, error) {
 
-	return makeNewDevice(dev)
+	return newMDDevice(dev)
 }

@@ -20,6 +20,7 @@
 package raid
 
 import (
+	"path"
 	"path/filepath"
 
 	"github.com/pkg/errors"
@@ -73,7 +74,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		fs:            fs,
-		devFS:         systemModule.HostFS + "/dev/",
+		devFS:         path.Join(systemModule.HostFS, "/dev/"),
 	}, nil
 }
 
@@ -87,7 +88,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 
 	for _, stat := range stats {
 		//stat.Name is the raid device name, which should be visible as /dev/md*
-		dev, err := NewDevice(m.devFS + stat.Name)
+		devicePath := path.Join(m.devFS, stat.Name)
+		dev, err := NewDevice(devicePath)
 		if err != nil {
 			r.Error(errors.Wrap(err, "failed to to open raid device for ioctl"))
 			return
@@ -102,7 +104,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 			"name":           stat.Name,
 			"activity_state": stat.ActivityState,
 			"disks": common.MapStr{
-				"active":  stat.DisksActive,
+				"active":  arrayInfo.ActiveDisks,
 				"working": arrayInfo.WorkingDisks,
 				"failed":  arrayInfo.FailedDisks,
 				"spare":   arrayInfo.SpareDisks,
