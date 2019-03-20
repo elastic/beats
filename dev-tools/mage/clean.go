@@ -35,6 +35,7 @@ var DefaultCleanPaths = []string{
 	"_meta/kibana.generated",
 	"_meta/kibana/6/index-pattern/{{.BeatName}}.json",
 	"_meta/kibana/7/index-pattern/{{.BeatName}}.json",
+	// Generated fields files
 	"include/fields.go",
 	"include/module.go",
 	"include/beat.go",
