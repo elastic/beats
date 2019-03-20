@@ -135,6 +135,7 @@ func TestAuthentication(t *testing.T) {
 	require.NoError(t, err)
 
 	response, err := h.FetchResponse()
+	response.Body.Close()
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusUnauthorized, response.StatusCode, "response status code")
 
@@ -149,6 +150,7 @@ func TestAuthentication(t *testing.T) {
 	require.NoError(t, err)
 
 	response, err = h.FetchResponse()
+	response.Body.Close()
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, response.StatusCode, "response status code")
 }
