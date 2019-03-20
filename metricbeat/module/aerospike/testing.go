@@ -21,7 +21,6 @@ import (
 	"os"
 )
 
-<<<<<<< HEAD:metricbeat/module/aerospike/testing.go
 // Helper functions for testing used in the aerospike MetricSets.
 
 // GetAerospikeEnvHost returns the hostname of the Aerospike server to use for
@@ -32,16 +31,10 @@ func GetAerospikeEnvHost() string {
 
 	if len(host) == 0 {
 		host = "localhost"
-=======
-func init() {
-	if err := asset.SetFields("metricbeat", "Beat", asset.BeatFieldsPri, AssetBeat); err != nil {
-		panic(err)
->>>>>>> Introduce local fields generation:metricbeat/include/beat.go
 	}
 	return host
 }
 
-<<<<<<< HEAD:metricbeat/module/aerospike/testing.go
 // GetAerospikeEnvPort returns the port of the Aerospike server to use for
 // testing. It reads the value from the AEROSPIKE_PORT environment variable and
 // returns 3000 if it is not set.
@@ -52,10 +45,4 @@ func GetAerospikeEnvPort() string {
 		port = "3000"
 	}
 	return port
-=======
-// AssetBeat returns asset data.
-// This is the base64 encoded gzipped contents of ./build/fields/beat.yml.
-func AssetBeat() string {
-	return "eJyUUktu2zAU3OsUg+yjA2hRoPAVcoEXchwS5Ucln6zq9gVpOqiN1kW04+ObD2f0ih88FpgcY04ToF4DF5xuZ8tqil/V57Tg2wQAp5xUfKoDhLNnsBVyER/kPRA+QUIAL0wKPVbWecJYW6bO8YokkQsitXhTqXPMdgvsl39Vbd+bY8chn6GOuGKgThQfTCyitP2ma88D2CwskOCljskq6paxdCcc/UeRq6yWjf8y285ftHrDPnF7J1ZZLt5wFmsLa32udsop0bQpxv6nrhjnE3EuOWJ33rgHO7u0IkOgUdoZb87XT9peGaIcSFnxTqyFtZW6O6bOY0XlngIhGwnheHhO62DwFv7cfKEdEV+H/CVxDX+G/J8nt4BtNlu8/WQzvoddjooecsaLzeZlnn4HAAD///yQ6RY="
->>>>>>> Introduce local fields generation:metricbeat/include/beat.go
 }

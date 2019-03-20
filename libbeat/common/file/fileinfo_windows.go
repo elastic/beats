@@ -21,28 +21,15 @@ import (
 	"os"
 )
 
-<<<<<<< HEAD:libbeat/common/file/fileinfo_windows.go
 func stat(name string, statFunc func(name string) (os.FileInfo, error)) (FileInfo, error) {
 	info, err := statFunc(name)
 	if err != nil {
 		return nil, err
-=======
-func init() {
-	if err := asset.SetFields("packetbeat", "Tcp", asset.ModuleFieldsPri, AssetTcp); err != nil {
-		panic(err)
->>>>>>> Introduce local fields generation:packetbeat/protos/tcp/fields.go
 	}
 
 	return wrap(info)
 }
 
-<<<<<<< HEAD:libbeat/common/file/fileinfo_windows.go
 func wrap(info os.FileInfo) (FileInfo, error) {
 	return fileInfo{FileInfo: info}, nil
-=======
-// AssetTcp returns asset data.
-// This is the base64 encoded gzipped contents of protos/tcp.
-func AssetTcp() string {
-	return "eJwBAAD//wAAAAE="
->>>>>>> Introduce local fields generation:packetbeat/protos/tcp/fields.go
 }
