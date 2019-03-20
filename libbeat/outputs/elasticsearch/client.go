@@ -731,7 +731,7 @@ func (conn *Connection) Ping() (string, error) {
 	}
 
 	debugf("Ping status code: %v", status)
-	logp.Info("Connected to Elasticsearch version %s", response.Version.Number)
+	logp.Info("Attempting to connect to Elasticsearch version %s", response.Version.Number)
 	return response.Version.Number, nil
 }
 
