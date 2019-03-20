@@ -12,40 +12,40 @@
     "golang": {
         "heap": {
             "allocations": {
-                "active": 16670720,
-                "allocated": 14115776,
-                "frees": 2830899,
-                "idle": 6496256,
-                "mallocs": 2921961,
-                "objects": 91062,
-                "total": 458114744
+                "active": 52076544,
+                "allocated": 50143344,
+                "frees": 23897036,
+                "idle": 352256,
+                "mallocs": 24213008,
+                "objects": 315972,
+                "total": 3857953864
             },
             "cmdline": "metricbeat --httpprof :6060 -e",
             "gc": {
-                "cpu_fraction": 0.0000798538053427137,
-                "next_gc_limit": 22896432,
+                "cpu_fraction": 0.00003865910349307519,
+                "next_gc_limit": 52492048,
                 "pause": {
                     "avg": {
-                        "ns": 755847
+                        "ns": 466218
                     },
-                    "count": 77,
+                    "count": 237,
                     "max": {
-                        "ns": 7537934
+                        "ns": 4432500
                     },
                     "sum": {
-                        "ns": 58200246
+                        "ns": 110493700
                     }
                 },
-                "total_count": 77,
+                "total_count": 237,
                 "total_pause": {
-                    "ns": 58200246
+                    "ns": 110493700
                 }
             },
             "system": {
-                "obtained": 23166976,
+                "obtained": 52428800,
                 "released": 0,
-                "stack": 950272,
-                "total": 27908344
+                "stack": 983040,
+                "total": 59263224
             }
         }
     },

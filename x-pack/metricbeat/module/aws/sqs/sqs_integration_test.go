@@ -48,6 +48,7 @@ func TestFetch(t *testing.T) {
 		mtest.CheckEventField("messages.visible", "float", event, t)
 		mtest.CheckEventField("oldest_message_age.sec", "float", event, t)
 		mtest.CheckEventField("sent_message_size", "float", event, t)
+		mtest.CheckEventField("queue.name", "string", event, t)
 	}
 }
 

@@ -22,9 +22,12 @@ import (
 	"net"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/logp"
+
 	"github.com/elastic/beats/metricbeat/mb"
 )
+
+var logger = logp.NewLogger("memcached.stats")
 
 func init() {
 	mb.Registry.MustAddMetricSet("memcached", "stats", New,
@@ -42,16 +45,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-func (m *MetricSet) Fetch() (common.MapStr, error) {
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	conn, err := net.DialTimeout("tcp", m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		return nil, err
+		logger.Error(err)
+		reporter.Error(err)
+		return
 	}
 	defer conn.Close()
 
 	_, err = conn.Write([]byte("stats\n"))
 	if err != nil {
-		return nil, err
+		logger.Error(err)
+		reporter.Error(err)
+		return
 	}
 
 	scanner := bufio.NewScanner(conn)
@@ -72,5 +82,8 @@ func (m *MetricSet) Fetch() (common.MapStr, error) {
 	}
 
 	event, _ := schema.Apply(data)
-	return event, nil
+
+	reporter.Event(mb.Event{MetricSetFields: event})
+
+	return
 }

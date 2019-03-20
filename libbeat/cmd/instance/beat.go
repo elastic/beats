@@ -63,6 +63,7 @@ import (
 	"github.com/elastic/beats/libbeat/paths"
 	"github.com/elastic/beats/libbeat/plugin"
 	"github.com/elastic/beats/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/libbeat/publisher/processing"
 	svc "github.com/elastic/beats/libbeat/service"
 	"github.com/elastic/beats/libbeat/version"
 	sysinfo "github.com/elastic/go-sysinfo"
@@ -79,6 +80,8 @@ type Beat struct {
 
 	keystore keystore.Keystore
 	index    idxmgmt.Supporter
+
+	processing processing.Supporter
 }
 
 type beatConfig struct {
@@ -108,6 +111,9 @@ type beatConfig struct {
 	// elastic stack 'setup' configurations
 	Dashboards *common.Config `config:"setup.dashboards"`
 	Kibana     *common.Config `config:"setup.kibana"`
+
+	// Migration config to migration from 6 to 7
+	Migration *common.Config `config:"migration.6_to_7"`
 }
 
 var debugf = logp.MakeDebug("beat")
@@ -311,6 +317,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 			Logger:    logp.L().Named("publisher"),
 		},
 		b.Config.Pipeline,
+		b.processing,
 		b.makeOutputFactory(b.Config.Output),
 	)
 
@@ -595,6 +602,16 @@ func (b *Beat) configure(settings Settings) error {
 		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM)
 	}
 	b.index, err = imFactory(nil, b.Beat.Info, b.RawConfig)
+	if err != nil {
+		return err
+	}
+
+	processingFactory := settings.Processing
+	if processingFactory == nil {
+		processingFactory = processing.MakeDefaultBeatSupport(true)
+	}
+	b.processing, err = processingFactory(b.Info, logp.L().Named("processors"), b.RawConfig)
+
 	return err
 }
 
@@ -690,14 +707,6 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	}
 
 	if b.Config.Dashboards.Enabled() {
-		var withMigration bool
-		if b.RawConfig.HasField("migration") {
-			sub, err := b.RawConfig.Child("migration", -1)
-			if err != nil {
-				return fmt.Errorf("Failed to read migration setting: %+v", err)
-			}
-			withMigration = sub.Enabled()
-		}
 
 		// Initialize kibana config. If username and password is set in elasticsearch output config but not in kibana,
 		// initKibanaConfig will attach the username and password into kibana config as a part of the initialization.
@@ -714,7 +723,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 		// but it's assumed that KB and ES have the same minor version.
 		v := client.GetVersion()
 
-		indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, b.Info.Version, v, withMigration)
+		indexPattern, err := kibana.NewGenerator(b.Info.IndexPrefix, b.Info.Beat, b.Fields, b.Info.Version, v, b.Config.Migration.Enabled())
 		if err != nil {
 			return fmt.Errorf("error creating index pattern generator: %v", err)
 		}

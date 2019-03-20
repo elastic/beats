@@ -100,54 +100,6 @@ func MakePingIPFactory(
 	}
 }
 
-// MakePingAllIPFactory wraps a function for building a recursive Task Runner from function callbacks.
-func MakePingAllIPFactory(
-	f func(*net.IPAddr) []func(*beat.Event) error,
-) func(*net.IPAddr) jobs.Job {
-	return func(ip *net.IPAddr) jobs.Job {
-		cont := f(ip)
-		switch len(cont) {
-		case 0:
-			return emptyTask
-		case 1:
-			return MakeSimpleCont(cont[0])
-		}
-
-		tasks := make([]jobs.Job, len(cont))
-		for i, c := range cont {
-			tasks[i] = MakeSimpleCont(c)
-		}
-		return func(event *beat.Event) ([]jobs.Job, error) {
-			return tasks, nil
-		}
-	}
-}
-
-// MakePingAllIPPortFactory builds a set of TaskRunner supporting a set of
-// IP/port-pairs.
-func MakePingAllIPPortFactory(
-	ports []uint16,
-	f func(*beat.Event, *net.IPAddr, uint16) error,
-) func(*net.IPAddr) jobs.Job {
-	if len(ports) == 1 {
-		port := ports[0]
-		return MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) error {
-			return f(event, ip, port)
-		})
-	}
-
-	return MakePingAllIPFactory(func(ip *net.IPAddr) []func(event *beat.Event) error {
-		funcs := make([]func(*beat.Event) error, len(ports))
-		for i := range ports {
-			port := ports[i]
-			funcs[i] = func(event *beat.Event) error {
-				return f(event, ip, port)
-			}
-		}
-		return funcs
-	})
-}
-
 // MakeByIPJob builds a new Job based on already known IP. Similar to
 // MakeByHostJob, the pingFactory will be used to build the tasks run by the job.
 //
