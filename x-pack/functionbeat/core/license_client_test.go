@@ -11,7 +11,7 @@ import (
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/logp"
-	"github.com/elastic/beats/x-pack/functionbeat/licenser"
+	"github.com/elastic/beats/x-pack/libbeat/licenser"
 )
 
 type dummySyncClient struct{ EventCount int }
