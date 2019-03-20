@@ -24,6 +24,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"math"
 	"math/big"
 	"math/rand"
@@ -104,7 +105,7 @@ type beatConfig struct {
 	Pipeline   pipeline.Config `config:",inline"`
 	Monitoring *common.Config  `config:"xpack.monitoring"`
 
-	// central managmenet settings
+	// central management settings
 	Management *common.Config `config:"management"`
 
 	// elastic stack 'setup' configurations
@@ -569,7 +570,8 @@ func (b *Beat) configure(settings Settings) error {
 	// log paths values to help with troubleshooting
 	logp.Info(paths.Paths.String())
 
-	err = b.loadMeta()
+	metaPath := paths.Resolve(paths.Data, "meta.json")
+	err = b.loadMeta(metaPath)
 	if err != nil {
 		return err
 	}
@@ -613,12 +615,11 @@ func (b *Beat) configure(settings Settings) error {
 	return err
 }
 
-func (b *Beat) loadMeta() error {
+func (b *Beat) loadMeta(metaPath string) error {
 	type meta struct {
 		UUID uuid.UUID `json:"uuid"`
 	}
 
-	metaPath := paths.Resolve(paths.Data, "meta.json")
 	logp.Debug("beat", "Beat metadata path: %v", metaPath)
 
 	f, err := openRegular(metaPath)
@@ -628,7 +629,7 @@ func (b *Beat) loadMeta() error {
 
 	if err == nil {
 		m := meta{}
-		if err := json.NewDecoder(f).Decode(&m); err != nil {
+		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF {
 			f.Close()
 			return fmt.Errorf("Beat meta file reading error: %v", err)
 		}
@@ -650,10 +651,19 @@ func (b *Beat) loadMeta() error {
 		return fmt.Errorf("Failed to create Beat meta file: %s", err)
 	}
 
-	err = json.NewEncoder(f).Encode(meta{UUID: b.Info.ID})
-	f.Close()
+	encodeErr := json.NewEncoder(f).Encode(meta{UUID: b.Info.ID})
+	err = f.Sync()
 	if err != nil {
 		return fmt.Errorf("Beat meta file failed to write: %s", err)
+	}
+
+	err = f.Close()
+	if err != nil {
+		return fmt.Errorf("Beat meta file failed to write: %s", err)
+	}
+
+	if encodeErr != nil {
+		return fmt.Errorf("Beat meta file failed to write: %s", encodeErr)
 	}
 
 	// move temporary file into final location
@@ -699,7 +709,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	if b.Config.Dashboards.Enabled() {
 
 		// Initialize kibana config. If username and password is set in elasticsearch output config but not in kibana,
-		// initKibanaConfig will attach the ussername and password into kibana config as a part of the initialization.
+		// initKibanaConfig will attach the username and password into kibana config as a part of the initialization.
 		kibanaConfig, err := initKibanaConfig(b.Config)
 		if err != nil {
 			return fmt.Errorf("error initKibanaConfig: %v", err)
