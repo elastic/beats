@@ -486,11 +486,6 @@
   alias: true
   beat: filebeat
 
-- from: system.auth.ssh.event
-  to: event.action
-  alias: true
-  beat: filebeat
-
 - from: system.auth.program
   to: process.name
   alias: true
