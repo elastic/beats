@@ -110,9 +110,9 @@ that the reimport doesn't overwrite them.
 Mapping templates and the default index names are versioned. For example,
 Metricbeat 7.0.0 typically creates indices like this:
 
-[source,shell]
+["source","sh",subs="attributes"]
 ------------------------------------------------------------------------------
-metricbeat-7.0.0-2017-08-31
+metricbeat-7.0.0-{localdate}
 ------------------------------------------------------------------------------
 
 And the corresponding {es} template is named `metricbeat-7.0.0`.
