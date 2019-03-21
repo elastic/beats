@@ -2039,10 +2039,10 @@
 			"revisionTime": "2019-01-31T17:02:46Z"
 		},
 		{
-			"checksumSHA1": "C1AMG/E1pIW6kHrxi4+iNm1Fa9Y=",
+			"checksumSHA1": "rdbYpwLDRkBOHwSCdr5uivkyys4=",
 			"path": "github.com/tsg/gopacket/pcap",
-			"revision": "7c5392a5f2b5c5fa393c71e1f9064e22b5408995",
-			"revisionTime": "2019-01-31T17:02:46Z"
+			"revision": "dd3d0e41124a90ef5fcb14ece1b5e5922c8f8aa3",
+			"revisionTime": "2019-03-20T12:25:13Z"
 		},
 		{
 			"checksumSHA1": "nGCIgH3ohqLru6ivQSSiY6YWEow=",
