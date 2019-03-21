@@ -3002,7 +3002,7 @@ Number of reads and writes per second
 == healthcheck fields
 
 Docker container metrics.
-Healthcheck data will only be available from docker containers if the HEALTHCHECK instruction has been used
+Healthcheck data will only be available from docker containers if the `HEALTHCHECK` instruction has been used
 to build the docker images used.
 
 
