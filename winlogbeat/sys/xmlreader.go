@@ -58,7 +58,7 @@ func (r *xmlSafeReader) Read(d []byte) (n int, err error) {
 	}
 	for i := 0; i < len(r.buf); {
 		code, size := utf8.DecodeRune(r.buf[i:])
-		if unicode.IsControl(code) {
+		if !unicode.IsSpace(code) && unicode.IsControl(code) {
 			n = copy(d, r.buf[:i])
 			r.buf = r.buf[n+1:]
 			r.code = []byte(fmt.Sprintf("\\u%04x", code))
