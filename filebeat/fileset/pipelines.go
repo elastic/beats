@@ -121,11 +121,46 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 			return nil
 		}
 	}
+
+	err := setECSProcessors(esClient.GetVersion(), pipelineID, content)
+	if err != nil {
+		return fmt.Errorf("failed to adapt pipeline for ECS compatibility: %v", err)
+	}
+
 	body, err := esClient.LoadJSON(path, content)
 	if err != nil {
 		return interpretError(err, body)
 	}
 	logp.Info("Elasticsearch pipeline with ID '%s' loaded", pipelineID)
+	return nil
+}
+
+// setECSProcessors removes ECS-specific versions from processors in versions not supporting them
+func setECSProcessors(esVersion common.Version, pipelineID string, content map[string]interface{}) error {
+	ecsFlagVersion := common.MustNewVersion("6.7.0")
+	if !esVersion.LessThan(ecsFlagVersion) {
+		return nil
+	}
+
+	p, ok := content["processors"]
+	if !ok {
+		return nil
+	}
+	processors, ok := p.([]interface{})
+	if !ok {
+		return fmt.Errorf("'processors' in pipeline '%s' expected to be a list, found %T", pipelineID, p)
+	}
+
+	for _, p := range processors {
+		processor, ok := p.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		if options, ok := processor["user_agent"].(map[string]interface{}); ok {
+			logp.Debug("modules", "Removing 'ecs' option in user_agent processor for field '%v' in pipeline '%s' as it is not supported in Elasticsearch %v", options["field"], pipelineID, esVersion)
+			delete(options, "ecs")
+		}
+	}
 	return nil
 }
 
