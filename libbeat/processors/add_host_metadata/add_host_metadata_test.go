@@ -40,7 +40,7 @@ func TestConfigDefault(t *testing.T) {
 	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
 	assert.NoError(t, err)
 
-	p, err := newHostMetadataProcessor(testConfig)
+	p, err := New(testConfig)
 	switch runtime.GOOS {
 	case "windows", "darwin", "linux":
 		assert.NoError(t, err)
@@ -83,7 +83,7 @@ func TestConfigNetInfoEnabled(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	p, err := newHostMetadataProcessor(testConfig)
+	p, err := New(testConfig)
 	switch runtime.GOOS {
 	case "windows", "darwin", "linux":
 		assert.NoError(t, err)
@@ -129,7 +129,7 @@ func TestConfigName(t *testing.T) {
 	testConfig, err := common.NewConfigFrom(config)
 	assert.NoError(t, err)
 
-	p, err := newHostMetadataProcessor(testConfig)
+	p, err := New(testConfig)
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
@@ -163,7 +163,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 	testConfig, err := common.NewConfigFrom(config)
 	assert.NoError(t, err)
 
-	p, err := newHostMetadataProcessor(testConfig)
+	p, err := New(testConfig)
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
@@ -192,7 +192,7 @@ func TestPartialGeo(t *testing.T) {
 	testConfig, err := common.NewConfigFrom(config)
 	assert.NoError(t, err)
 
-	p, err := newHostMetadataProcessor(testConfig)
+	p, err := New(testConfig)
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
@@ -233,7 +233,7 @@ func TestGeoLocationValidation(t *testing.T) {
 			})
 			require.NoError(t, err)
 
-			_, err = newHostMetadataProcessor(conf)
+			_, err = New(conf)
 
 			if location.valid {
 				require.NoError(t, err)
