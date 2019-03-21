@@ -19,6 +19,7 @@ package processor
 
 import (
 	"os"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -219,6 +220,10 @@ function process(evt) {
 }
 
 func TestNewProcessorDNS(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Windows requires explicit DNS server configuration")
+	}
+
 	const script = `
 var processor = require('processor');
 
