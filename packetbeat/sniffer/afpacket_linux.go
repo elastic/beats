@@ -89,7 +89,7 @@ func (h *afpacketHandle) LinkType() layers.LinkType {
 func (h *afpacketHandle) Close() {
 	h.TPacket.Close()
 	if err := setPromiscMode(h.device, h.promicsPreviousState); err != nil {
-		logp.Err("Failed to set promiscuous mode for device '%s': %v", device, err)
+		logp.Err("Failed to set promiscuous mode for device '%s': %v", h.device, err)
 	}
 }
 
