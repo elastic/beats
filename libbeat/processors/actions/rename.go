@@ -75,9 +75,10 @@ func (f *renameFields) Run(event *beat.Event) (*beat.Event, error) {
 	for _, field := range f.config.Fields {
 		err := f.renameField(field.From, field.To, event.Fields)
 		if err != nil && f.config.FailOnError {
-			logp.Debug("rename", "Failed to rename fields, revert to old event: %s", err)
+			errMsg := fmt.Sprintf("Failed to rename fields in processor: %s", err)
+			logp.Debug("rename", errMsg)
 			event.Fields = backup
-			event.PutValue("error.message", fmt.Sprintf("Failed to rename fields in processor: %s", err))
+			event.PutValue("error.message", errMsg)
 			return event, err
 		}
 	}
