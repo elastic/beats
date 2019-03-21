@@ -33,9 +33,10 @@ import (
 )
 
 type afpacketHandle struct {
-	TPacket              *afpacket.TPacket
-	promiscPreviousState bool
-	device               string
+	TPacket                      *afpacket.TPacket
+	promiscPreviousState         bool
+	promiscPreviousStateDetected bool
+	device                       string
 }
 
 func newAfpacketHandle(device string, snaplen int, block_size int, num_blocks int,
@@ -47,12 +48,13 @@ func newAfpacketHandle(device string, snaplen int, block_size int, num_blocks in
 	}
 
 	h := &afpacketHandle{
-		promiscPreviousState: promiscEnabled,
-		device:               device,
+		promiscPreviousState:         promiscEnabled,
+		device:                       device,
+		promiscPreviousStateDetected: err == nil,
 	}
 
 	if err := setPromiscMode(device, true); err != nil {
-		logp.Err("Failed to set promiscuous mode for device '%s': %v", device, err)
+		logp.Warn("Failed to set promiscuous mode for device '%s'. Packetbeat may be unable to see any network traffic. Please follow packetbeat FAQ to learn about mitigation: Error: %v", device, err)
 	}
 
 	if device == "any" {
@@ -87,8 +89,10 @@ func (h *afpacketHandle) LinkType() layers.LinkType {
 
 func (h *afpacketHandle) Close() {
 	h.TPacket.Close()
-	if err := setPromiscMode(h.device, h.promiscPreviousState); err != nil {
-		logp.Err("Failed to set promiscuous mode for device '%s': %v", h.device, err)
+	if h.promiscPreviousStateDetected {
+		if err := setPromiscMode(h.device, h.promiscPreviousState); err != nil {
+			logp.Warn("Failed to reset promiscuous mode for device '%s'. Your device might be in promiscuous mode.: %v", h.device, err)
+		}
 	}
 }
 
@@ -104,18 +108,18 @@ func isPromiscEnabled(device string) (bool, error) {
 
 	defer syscall.Close(s)
 
-	var ifl struct {
+	var ifreq struct {
 		name  [syscall.IFNAMSIZ]byte
 		flags uint16
 	}
 
-	copy(ifl.name[:], []byte(device))
-	_, _, ep := syscall.Syscall(syscall.SYS_IOCTL, uintptr(s), syscall.SIOCGIFFLAGS, uintptr(unsafe.Pointer(&ifl)))
+	copy(ifreq.name[:], []byte(device))
+	_, _, ep := syscall.Syscall(syscall.SYS_IOCTL, uintptr(s), syscall.SIOCGIFFLAGS, uintptr(unsafe.Pointer(&ifreq)))
 	if ep != 0 {
-		return false, fmt.Errorf("Syscall SIOCGIFFLAGS exited with %v", ep)
+		return false, fmt.Errorf("ioctl command SIOCGIFFLAGS failed to get device flags for %v: return code %d", device, ep)
 	}
 
-	return ifl.flags&uint16(syscall.IFF_PROMISC) != 0, nil
+	return ifreq.flags&uint16(syscall.IFF_PROMISC) != 0, nil
 }
 
 func setPromiscMode(device string, enabled bool) error {
