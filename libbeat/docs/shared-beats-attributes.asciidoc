@@ -14,7 +14,7 @@
 :monitoringdoc: https://www.elastic.co/guide/en/elastic-stack-overview/{doc-branch}
 :dashboards: https://artifacts.elastic.co/downloads/beats/beats-dashboards/beats-dashboards-{stack-version}.zip
 :dockerimage: docker.elastic.co/beats/{beatname_lc}:{version}
-:dockergithub: https://github.com/elastic/beats-docker/tree/{doc-branch}
+:dockerconfig: https://raw.githubusercontent.com/elastic/beats/{doc-branch}/deploy/docker/{beatname_lc}.docker.yml
 :downloads: https://artifacts.elastic.co/downloads/beats
 :ES-version: {stack-version}
 :LS-version: {stack-version}
