@@ -8,10 +8,8 @@
                         "filter": [], 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -76,10 +74,8 @@
                         "filter": [], 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -220,10 +216,8 @@
                         "filter": [], 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -309,11 +303,9 @@
                         }, 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
+                            "language": "kuery",
                                 "query": "event.dataset:traefik.access"
                             }
-                        }
                     }
                 }, 
                 "title": "Sent Byte Size [Filebeat Traefik] ECS", 
@@ -477,11 +469,9 @@
                         }, 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
+                            "language": "kuery",
                                 "query": "event.module:traefik"
                             }
-                        }
                     }
                 }, 
                 "sort": [
@@ -501,17 +491,12 @@
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
-                        "filter": [
-                            {
+                        "filter": [],
                                 "query": {
-                                    "query_string": {
-                                        "analyze_wildcard": true, 
-                                        "query": "*"
-                                    }
+                            "language": "kuery",
+                            "query": ""
                                 }
                             }
-                        ]
-                    }
                 }, 
                 "optionsJSON": {
                     "darkTheme": false

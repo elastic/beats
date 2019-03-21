@@ -27,8 +27,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "event.module:nginx AND _exists_:message"
+                            "language": "kuery",
+                            "query": "event.module:nginx AND message:*"
                         }, 
                         "version": true
                     }
@@ -73,8 +73,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "event.module:nginx AND _exists_:url.original"
+                            "language": "kuery",
+                            "query": "event.module:nginx AND url.original:*"
                         }, 
                         "version": true
                     }
@@ -200,13 +200,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
