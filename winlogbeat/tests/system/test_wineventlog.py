@@ -376,3 +376,27 @@ class Test(WriteReadTest):
         evts = self.read_events(config)
         self.assertTrue(len(evts), 1)
         self.assertNotIn("message", evts[0])
+
+    def test_multiline_events(self):
+        """
+        wineventlog - Event with newlines and control characters
+        """
+        msg = """
+A trusted logon process has been registered with the Local Security Authority.
+This logon process will be trusted to submit logon requests.
+
+Subject:
+
+Security ID:  SYSTEM
+Account Name:  MS4\x1e$
+Account Domain:  WORKGROUP
+Logon ID:  0x3e7
+Logon Process Name:  IKE"""
+        self.write_event_log(msg)
+        evts = self.read_events()
+        self.assertTrue(len(evts), 1)
+        self.assertEqual(unicode(self.api), evts[0]["winlog.api"], msg=evts[0])
+        self.assertNotIn("event.original", evts[0], msg=evts[0])
+        self.assertIn("message", evts[0], msg=evts[0])
+        self.assertNotIn("\\u000a", evts[0]["message"], msg=evts[0])
+        self.assertEqual(unicode(msg), evts[0]["message"].decode('unicode-escape'), msg=evts[0])
