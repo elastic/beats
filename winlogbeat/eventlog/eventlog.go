@@ -76,6 +76,7 @@ type EventLog interface {
 // Record represents a single event from the log.
 type Record struct {
 	sys.Event
+	File   string                   // Source file when event is from a file.
 	API    string                   // The event log API type used to read the record.
 	XML    string                   // XML representation of the event.
 	Offset checkpoint.EventLogState // Position of the record within its source stream.
@@ -135,6 +136,7 @@ func (e Record) ToEvent() beat.Event {
 
 	m.Put("event.created", time.Now())
 
+	addOptional(m, "log.file.path", e.File)
 	addOptional(m, "log.level", strings.ToLower(e.Level))
 	addOptional(m, "message", sys.RemoveWindowsLineEndings(e.Message))
 	// Errors

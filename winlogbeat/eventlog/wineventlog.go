@@ -125,6 +125,7 @@ type winEventLog struct {
 	config       winEventLogConfig
 	query        string
 	channelName  string                   // Name of the channel from which to read.
+	file         bool                     // Reading from file rather than channel.
 	subscription win.EvtHandle            // Handle to the subscription.
 	maxRead      int                      // Maximum number returned in one Read.
 	lastRead     checkpoint.EventLogState // Record number of the last read event.
@@ -155,7 +156,7 @@ func (l *winEventLog) Open(state checkpoint.EventLogState) error {
 	}
 	defer win.Close(bookmark)
 
-	if filepath.IsAbs(l.channelName) {
+	if l.file {
 		return l.openFile(state, bookmark)
 	}
 	return l.openChannel(bookmark)
@@ -194,7 +195,7 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 }
 
 func (l *winEventLog) openFile(state checkpoint.EventLogState, bookmark win.EvtHandle) error {
-	path := filepath.Clean(l.channelName)
+	path := l.channelName
 
 	h, err := win.EvtQuery(0, path, "", win.EvtQueryFilePath|win.EvtQueryForwardDirection)
 	if err != nil {
@@ -350,6 +351,10 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 		Event: e,
 	}
 
+	if l.file {
+		r.File = l.channelName
+	}
+
 	if includeXML {
 		r.XML = string(x)
 	}
@@ -392,22 +397,20 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 		return win.Close(win.EvtHandle(handle))
 	}
 
-	var logPrefix string
 	if filepath.IsAbs(c.Name) {
-		logPrefix = fmt.Sprintf("WinEventLog[%s]", filepath.Base(c.Name))
-	} else {
-		logPrefix = fmt.Sprintf("WinEventLog[%s]", c.Name)
+		c.Name = filepath.Clean(c.Name)
 	}
 
 	l := &winEventLog{
 		config:      c,
 		query:       query,
 		channelName: c.Name,
+		file:        filepath.IsAbs(c.Name),
 		maxRead:     c.BatchReadSize,
 		renderBuf:   make([]byte, renderBufferSize),
 		outputBuf:   sys.NewByteBuffer(renderBufferSize),
 		cache:       newMessageFilesCache(c.Name, eventMetadataHandle, freeHandle),
-		logPrefix:   logPrefix,
+		logPrefix:   fmt.Sprintf("WinEventLog[%s]", c.Name),
 	}
 
 	// Forwarded events should be rendered using RenderEventXML. It is more
