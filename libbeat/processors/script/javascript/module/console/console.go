@@ -45,6 +45,8 @@ func (c *Console) makeLogFunc(level logp.Level) func(call goja.FunctionCall) goj
 			switch level {
 			case logp.DebugLevel:
 				log.Debug(ret.String())
+			case logp.InfoLevel:
+				log.Info(ret.String())
 			case logp.WarnLevel:
 				log.Warn(ret.String())
 			case logp.ErrorLevel:
@@ -69,7 +71,9 @@ func Require(runtime *goja.Runtime, module *goja.Object) {
 	c.util = require.Require(runtime, "util").(*goja.Object)
 
 	o := module.Get("exports").(*goja.Object)
-	o.Set("log", c.makeLogFunc(logp.DebugLevel))
+	o.Set("debug", c.makeLogFunc(logp.DebugLevel))
+	o.Set("info", c.makeLogFunc(logp.InfoLevel))
+	o.Set("log", c.makeLogFunc(logp.InfoLevel))
 	o.Set("warn", c.makeLogFunc(logp.WarnLevel))
 	o.Set("error", c.makeLogFunc(logp.ErrorLevel))
 }
