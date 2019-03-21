@@ -108,7 +108,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 				"working": arrayInfo.WorkingDisks,
 				"failed":  arrayInfo.FailedDisks,
 				"spare":   arrayInfo.SpareDisks,
-				"total":   stat.DisksTotal,
+				"total":   arrayInfo.NrDisks,
 			},
 			"blocks": common.MapStr{
 				"synced": stat.BlocksSynced,

@@ -24,8 +24,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/elastic/beats/metricbeat/mb/parse"
 	mbtest "github.com/elastic/beats/metricbeat/mb/testing"
 )
 
@@ -60,16 +58,12 @@ func (dev MockData) GetArrayInfo() (MDArrayInfo, error) {
 }
 
 func init() {
-	mb.Registry.MustAddMetricSet("system", "raid-test", New,
-		mb.WithHostParser(parse.EmptyHostParser),
-	)
 	newMDDevice = func(dev string) (MDData, error) {
 		return MockData(" "), nil
 	}
 }
 
 func TestData(t *testing.T) {
-
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
 	err := mbtest.WriteEventsReporterV2(f, t, ".")
 	if err != nil {
@@ -78,7 +72,6 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-
 	f := mbtest.NewReportingMetricSetV2(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2(f)
 

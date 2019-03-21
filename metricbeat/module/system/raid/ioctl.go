@@ -32,7 +32,6 @@ var newMDDevice = makenewMDDevice
 
 func makenewMDDevice(dev string) (MDData, error) {
 
-	//we're expecting the name as it comes from /proc/mdstat
 	f, err := os.Open(dev)
 	if err != nil {
 		return MDDevice{}, err
@@ -95,7 +94,6 @@ func (dev MDDevice) Close() error {
 
 //GetArrayInfo returns a struct describing the state of the RAID array.
 func (dev MDDevice) GetArrayInfo() (MDArrayInfo, error) {
-
 	var dat MDArrayInfo
 	//Users beware, there's a lot of undocumented things going on when it comes to actually parsing this struct and making it useful.
 	//The first return is just 0/-1 for an error, but we can get the same info from errno.
@@ -109,6 +107,5 @@ func (dev MDDevice) GetArrayInfo() (MDArrayInfo, error) {
 
 //NewDevice opens a file to a /dev/md* device
 func NewDevice(dev string) (MDData, error) {
-
 	return newMDDevice(dev)
 }
