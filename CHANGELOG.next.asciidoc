@@ -33,8 +33,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `cleanup_timeout` option to docker autodiscover, to wait some time before removing configurations after a container is stopped. {issue]10374[10374] {pull}10905[10905]
 - On Google Cloud Engine (GCE) the add_cloud_metadata will now trim the project
   info from the cloud.machine.type and cloud.availability_zone. {issue}10968[10968]
+- Empty `meta.json` file will be treated as a missing meta file. {issue}8558[8558]
 - Rename `migration.enabled` config to `migration.6_to_7.enabled`. {pull}11284[11284]
 - decode_json_field: do not process arrays when flag not set. {pull}11318[11318]
+- Beats Xpack now checks for Basic license on connect. {pull}11296[11296]
+
 *Auditbeat*
 
 - Rename `process.exe` to `process.executable` in auditd module to align with ECS. {pull}9949[9949]
@@ -99,6 +102,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update haproxy.* fields to map to ECS. {pull}10558[10558] {pull}10568[10568]
 - Collect all EC2 meta data from all instances in all states. {pull}10628[10628]
 - Migrate docker module to ECS. {pull}10927[10927]
+- Add connection and request timeouts for HTTP helper. {pull}11032[11032]
 - Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 
 *Packetbeat*
@@ -169,6 +173,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix errors in filebeat Zeek dashboard and README files. Add notice.log support. {pull}10916[10916]
 - Fix a bug when converting NetFlow fields to snake_case. {pull}10950[10950]
 - Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test case. {issue}11004[11004] {pull}11105[11105]
+- Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
 - Fix issue preventing docker container events to be stored if the container has a network interface without ip address. {issue}11225[11225] {pull}11247[11247]
 - Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test
   case. {issue}11004[11004] {pull}11105[11105]
@@ -206,6 +211,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add documentation about jolokia autodiscover fields. {issue}10925[10925] {pull}10979[10979]
 - Add missing aws.ec2.instance.state.name into fields.yml. {issue}11219[11219] {pull}11221[11221]
 - Fix ec2 metricset to collect metrics from Cloudwatch with the same timestamp. {pull}11142[11142]
+- Fix potential memory leak in stopped docker metricsets {pull}11294[11294]
 
 *Packetbeat*
 
@@ -352,6 +358,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add AWS SQS metricset. {pull}10684[10684] {issue}10053[10053]
 - Add AWS s3_request metricset. {pull}10949[10949] {issue}10055[10055]
 - Add s3_daily_storage metricset. {pull}10940[10940] {issue}10055[10055]
+- Add `coredns` metricbeat module. {pull}10585{10585]
 
 *Packetbeat*
 

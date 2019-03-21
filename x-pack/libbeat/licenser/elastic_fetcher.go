@@ -114,13 +114,18 @@ func (f *ElasticFetcher) Fetch() (*License, error) {
 	status, body, err := f.client.Request("GET", xPackURL, "", params, nil)
 	// When we are running an OSS release of elasticsearch the _xpack endpoint will return a 405,
 	// "Method Not Allowed", so we return the default OSS license.
+	if status == http.StatusBadRequest {
+		f.log.Debug("Received 'Bad request' (400) response from server, fallback to OSS license")
+		return OSSLicense, nil
+	}
+
 	if status == http.StatusMethodNotAllowed {
 		f.log.Debug("Received 'Method Not allowed' (405) response from server, fallback to OSS license")
 		return OSSLicense, nil
 	}
 
 	if status == http.StatusUnauthorized {
-		return nil, errors.New("Unauthorized access, could not connect to the xpack endpoint, verify your credentials")
+		return nil, errors.New("unauthorized access, could not connect to the xpack endpoint, verify your credentials")
 	}
 
 	if status != http.StatusOK {
