@@ -13261,9 +13261,10 @@ The client IP from SSH connections that are open and immediately dropped.
 *`system.auth.ssh.event`*::
 +
 --
-type: alias
+example: Accepted
 
-alias to: event.action
+The SSH event as found in the logs (Accepted, Invalid, Failed, etc.)
+
 
 --
 

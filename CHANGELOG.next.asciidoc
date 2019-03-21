@@ -180,6 +180,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change URLPATH grok pattern to support brackets. {issue}11135[11135] {pull}11252[11252]
 - Add support for iis log with different address format. {issue}11255[11255] {pull}11256[11256]
 - Add fix to parse syslog message with priority value 0. {issue}11010[11010]
+- Don't apply multiline rules in Logstash json logs. {pull}11346[11346]
 
 *Heartbeat*
 
@@ -301,6 +302,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change Suricata module pipeline to handle `destination.domain` being set if a reverse DNS processor is used. {issue}10510[10510]
 - Add the `network.community_id` flow identifier to field to the IPTables, Suricata, and Zeek modules. {pull}11005[11005]
 - Add support for loading custom NetFlow and IPFIX field definitions to netflow input. {pull}10945[10945]
+- Added categorization fields for SSH login events in the system/auth fileset. {pull}11334[11334]
 
 *Heartbeat*
 
