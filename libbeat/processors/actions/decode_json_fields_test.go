@@ -216,6 +216,7 @@ func TestNotJsonObjectOrArray(t *testing.T) {
 					"someString":         "foobar",
 					"someString2":        "2017 is awesome",
 					"someMap":            "{\"a\":\"b\"}",
+					"someArray":          "[1,2,3]",
 				},
 			},
 		},
@@ -229,6 +230,7 @@ func TestNotJsonObjectOrArray(t *testing.T) {
 					"someString":         "foobar",
 					"someString2":        "2017 is awesome",
 					"someMap":            common.MapStr{"a": "b"},
+					"someArray":          []int{1, 2, 3},
 				},
 			},
 		},
@@ -243,13 +245,15 @@ func TestNotJsonObjectOrArray(t *testing.T) {
 					"someNumber": 1475026826760,
 					"someString": "foobar",
 					"someString2": "2017 is awesome",
-					"someMap": "{\"a\":\"b\"}"
+					"someMap": "{\"a\":\"b\"}",
+					"someArray": "[1,2,3]"
 				  }`,
 			}
 
 			testConfig, _ = common.NewConfigFrom(map[string]interface{}{
-				"fields":    fields,
-				"max_depth": testCase.MaxDepth,
+				"fields":        fields,
+				"process_array": true,
+				"max_depth":     testCase.MaxDepth,
 			})
 
 			actual := getActualValue(t, testConfig, input)
