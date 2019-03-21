@@ -222,6 +222,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 - Prevent Winlogbeat from dropping events with invalid XML. {pull}11006{11006}
+- Fix Winlogbeat escaping CR, LF and TAB characters. {issue}11328[11328] {pull}11357[11357]
 
 *Functionbeat*
 
