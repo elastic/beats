@@ -683,11 +683,9 @@
                         }, 
                         "index": "metricbeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
+                            "language": "kuery",
                                 "query": "event.module:redis"
                             }
-                        }
                     }
                 }, 
                 "sort": [
@@ -707,16 +705,11 @@
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
-                        "filter": [
-                            {
+                        "filter": [],
                                 "query": {
-                                    "query_string": {
-                                        "analyze_wildcard": true, 
-                                        "query": "*"
-                                    }
-                                }
-                            }
-                        ], 
+                            "language": "kuery",
+                            "query": ""
+                        },
                         "highlightAll": true, 
                         "version": true
                     }

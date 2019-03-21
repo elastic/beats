@@ -76,10 +76,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "_exists_:system.auth.sudo.error"
-                            }
+                            "language": "kuery",
+                            "query": "system.auth.sudo.error:*"
                         }
                     }
                 }, 
@@ -255,10 +253,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "_exists_:system.auth.sudo"
-                            }
+                            "language": "kuery",
+                            "query": "system.auth.sudo:*"
                         }
                     }
                 }, 
@@ -282,13 +278,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }

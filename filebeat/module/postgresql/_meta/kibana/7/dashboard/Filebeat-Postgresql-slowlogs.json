@@ -7,7 +7,8 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene"
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -168,8 +169,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": "event.duration:>30000000"
+                            "language": "kuery",
+                            "query": "event.duration>30000000"
                         }, 
                         "version": true
                     }
@@ -201,7 +202,7 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": "event.duration:*"
                         }, 
                         "version": true
@@ -227,7 +228,7 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
+                            "language": "kuery",
                             "query": "postgresql.log.query:*"
                         }, 
                         "version": true
