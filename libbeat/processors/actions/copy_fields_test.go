@@ -91,6 +91,22 @@ func TestCopyFields(t *testing.T) {
 				},
 			},
 		},
+		"copy number from hierarchical message.original to top level message": {
+			FromTo: fromTo{
+				From: "message.original",
+				To:   "message",
+			},
+			Input: common.MapStr{
+				"message": common.MapStr{
+					"original": 42,
+				},
+			},
+			Expected: common.MapStr{
+				"message": common.MapStr{
+					"original": 42,
+				},
+			},
+		},
 	}
 
 	for name, test := range tests {
