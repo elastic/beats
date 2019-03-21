@@ -18,7 +18,6 @@
 package actions
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -246,7 +245,6 @@ func TestRenameRun(t *testing.T) {
 			} else {
 				assert.NotNil(t, err)
 			}
-			fmt.Println(newEvent.Fields)
 
 			assert.True(t, reflect.DeepEqual(newEvent.Fields, test.Output))
 		})
@@ -358,7 +356,6 @@ func TestRenameField(t *testing.T) {
 
 			err := f.renameField(test.From, test.To, test.Input)
 			if err != nil {
-				fmt.Println(test.error)
 				assert.Equal(t, test.error, true)
 			}
 
