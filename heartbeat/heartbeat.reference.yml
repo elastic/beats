@@ -481,8 +481,8 @@ heartbeat.scheduler:
 #    fields:
 #        - from: message
 #          to: message_copied
-#    fail_on_error: false
-#    ignore_missing: true
+#    fail_on_error: true
+#    ignore_missing: false
 
 #============================= Elastic Cloud ==================================
 
