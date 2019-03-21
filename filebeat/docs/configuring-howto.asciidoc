@@ -33,6 +33,7 @@ The following topics describe how to configure Filebeat:
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
+* <<{beatname_lc}-geoip>>
 * <<configuration-path>>
 * <<setup-kibana-endpoint>>
 * <<configuration-dashboards>>
@@ -71,6 +72,8 @@ include::{libbeat-dir}/docs/shared-ssl-config.asciidoc[]
 include::./filebeat-filtering.asciidoc[]
 
 include::{libbeat-dir}/docs/shared-config-ingest.asciidoc[]
+
+include::{libbeat-dir}/docs/shared-geoip.asciidoc[]
 
 include::{libbeat-dir}/docs/shared-path-config.asciidoc[]
 
