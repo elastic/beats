@@ -74,12 +74,12 @@ type beatProcessor struct {
 
 func (bp *beatProcessor) Run(call goja.FunctionCall) goja.Value {
 	if len(call.Arguments) != 1 {
-		panic(bp.runtime.NewGoError(errors.Errorf("Run requires one argument")))
+		panic(bp.runtime.NewGoError(errors.New("Run requires one argument")))
 	}
 
 	e, ok := call.Argument(0).ToObject(bp.runtime).Get("_private").Export().(javascript.Event)
 	if !ok {
-		panic(bp.runtime.NewGoError(errors.Errorf("arg 0 must be an Event")))
+		panic(bp.runtime.NewGoError(errors.New("arg 0 must be an Event")))
 	}
 
 	if e.IsCancelled() {
