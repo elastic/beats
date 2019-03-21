@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -168,21 +169,13 @@ func TestXML(t *testing.T) {
 	}
 }
 
+// Tests that control characters other than CR and LF are escaped
+// when the event is decoded.
 func TestInvalidXML(t *testing.T) {
-	eventXML := fmt.Sprintf(`
-<Event>
-  <UserData>
-    <Operation_ClientFailure xmlns='http://manifests.microsoft.com/win/2006/windows/WMI'>
-      <Id>{00000000-0000-0000-0000-000000000000}</Id>
-      <Message>じゃあ宇宙カウボーイ。。。%s</Message>
-    </Operation_ClientFailure>
-  </UserData>
-</Event>
-`, "\x1b")
-	_, err := UnmarshalEventXML([]byte(eventXML))
-	if !assert.NoError(t, err) {
-		assert.Equal(t, err.Error(), "XML syntax error on line 6: illegal character code U+001B")
-	}
+	evXML := strings.Replace(allXML, "%1", "\t&#xD;\n\x1b", -1)
+	ev, err := UnmarshalEventXML([]byte(evXML))
+	assert.Equal(t, nil, err)
+	assert.Equal(t, "Creating WSMan shell on server with ResourceUri: \t\r\n\\u001b", ev.Message)
 }
 
 func BenchmarkXMLUnmarshal(b *testing.B) {
