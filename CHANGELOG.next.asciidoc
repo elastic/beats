@@ -80,6 +80,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Fix issue preventing docker container events to be stored if the container has a network interface without ip address. {issue}11225[11225] {pull}11247[11247]
 - Change URLPATH grok pattern to support brackets. {issue}11135[11135] {pull}11252[11252]
 - Add support for iis log with different address format. {issue}11255[11255] {pull}11256[11256]
+- Don't apply multiline rules in Logstash json logs. {pull}11346[11346]
 
 *Heartbeat*
 
