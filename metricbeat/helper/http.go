@@ -81,6 +81,7 @@ func newHTTPFromConfig(config Config, name string, hostData mb.HostData) (*HTTP,
 	}
 
 	return &HTTP{
+		hostData: hostData,
 		client: &http.Client{
 			Transport: &http.Transport{
 				Dial:    dialer.Dial,
