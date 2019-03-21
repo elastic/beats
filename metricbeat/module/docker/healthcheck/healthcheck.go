@@ -76,3 +76,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	}
 	eventsMapping(r, containers, m)
 }
+
+//Close stops the metricset
+func (m *MetricSet) Close() error {
+
+	return m.dockerClient.Close()
+}
