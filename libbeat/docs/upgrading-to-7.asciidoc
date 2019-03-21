@@ -1,0 +1,132 @@
+[[upgrading]]
+== Upgrading
+
+This section gives general recommendations for upgrading Beats shippers:
+
+* <<upgrading-minor-versions>>
+* <<upgrading-6-to-7>>
+* <<upgrade-mapping-template>>
+
+If you're upgrading other products in the stack, also read the
+{stack-ref}/index.html[Elastic Stack Installation and Upgrade Guide]. 
+
+[[upgrading-minor-versions]]
+=== Upgrade between minor versions
+
+As a general rule, upgrading between minor versions (e.g. 7.x to 7.y, where x <
+y) can be done by simply installing the new release and restarting the Beat
+process, because the Beats keep backwards compatibility when it comes to
+configuration and exported fields. Please review the <<release-notes,release
+notes>> for potential exceptions.
+
+Upgrading between non-consecutive major versions (e.g. 5.x to 7.x) is not
+supported. If you are on version 1.x of the Beats, we recommend first upgrading
+to ?.?.
+
+// REVIEWERS: Any specific recommendations for upgrading to a specific version
+// before upgrading to 7.x? I'm not sure we want to even talk about 1.x at this
+// point because it's been EOL for so long. 
+
+[[upgrading-6-to-7]]
+=== Upgrade from 6.x to 7.x
+
+Before upgrading your Beats, review the <<breaking-changes, breaking changes>>
+doc.
+
+If you are planning an upgrade of the full stack ({es}, {kib}, or
+{ls}, in addition to Beats), read the
+{stack-ref}/index.html[Elastic Stack Installation and Upgrade Guide].
+
+We recommend that you fully upgrade {es} and {kib} to version 7.0
+before upgrading Beats.
+
+// REVIEWERS: Is there a min 6.x version that users need to upgrade to *before*
+// upgrading to 7.0?
+//
+// If so, I'll add this:
+//
+// If you are on a Beats 6.x version lower than 6.?, 
+// follow the <<upgrading-to-6.?>> section *before* doing the {es} upgrade.
+
+
+// REVIEWERS: What is the minimum version of 6.x that still runs with 7.0 stack?
+
+If you're not ready to upgrade {es} and {kib} to 7.0, that's alright.
+Beats version 7.0 works with {es} and {kib} version 6.?, so you can
+upgrade Beats now and the rest of the stack later.
+
+[[upgrading-to-6.?]]
+==== Upgrade to 6.?
+
+// REVIEWERS: Do users need to upgrade to a specific version of Beats before
+// upgrading to 7.0? If so, why? I'm assuming the ECS field migration will have
+// some affect, but not sure how having aliases affects our recommendations.
+
+The upgrade procedure assumes that you have Beats version 6.? installed. If you
+are on a previous 6.x version of Beats, upgrade to version 6.? first.
+
+// TODO: If there is a requirement to upgrade to 6.? here, add reason and any
+// specific steps users need to perform. For example, does the user need to
+// set template.overwrite=true so the template gets upgraded?
+
+==== Migrate configuration files
+
+// REVIEWERS: What changes do users need to make to their config files? Will we
+// offer any kidn of migration tool?
+
+Beats 7.0 comes with several backwards incompatible configuration changes.
+Before upgrading, review the <<breaking-changes-7.0>> document. Where possible,
+we kept the old configuration options working, but deprecated them.  However,
+deprecation was not always possible, so if you use any of the settings mentioned
+in the Breaking Changes section of the release notes, make sure you understand
+the alternatives that we provide.
+
+===== Registry format change
+
+Starting with the 7.0 version, {filebeat} stores its registry in a directory
+structure. 
+
+// TODO: Describe how to use filebeat.registry.migrate_file to point to the old
+// registry file if filebeat.registry.path has changed.
+
+==== Dashboard upgrades
+
+We recommend re-importing the {kib} dashboards after the Beats and {kib}
+upgrades are complete. This way, you will take advantage of the new Beats
+dashboards created for the 7.0 release.
+
+See <<breaking-changes-import-dashboards>> in the Breaking Changes
+documentation.
+
+NOTE: If you've modified the Beats dashboards manually, reimporting them will
+overwrite your changes. Consider saving your dashboards under new IDs, so
+that the reimport doesn't overwrite them.
+
+//REVIEWERS: Is still an issue? I thought dashboards were versioned.
+
+[[upgrade-mapping-template]]
+=== Upgrade the {es} mapping template
+
+Mapping templates and the default index names are versioned. For example,
+Metricbeat 7.0.0 typically creates indices like this:
+
+[source,shell]
+------------------------------------------------------------------------------
+metricbeat-7.0.0-2017-08-31
+------------------------------------------------------------------------------
+
+And the corresponding {es} template is named `metricbeat-7.0.0`.
+
+This means that each version of the Beat creates a new index, and it is
+guaranteed that the correct template for that version is applied.  With these
+changes in place, you generally don't have to do anything to upgrade the mapping
+template when you move to a new version.
+
+// REVIEWERS: Are there any exceptions that require extra steps here
+
+// REVIEWERS: I'm not sure what the following paragraph means. Why would this
+// result in downtime?
+
+If downtime is not acceptable, another possible approach is to configure a
+different index pattern in the new Beat version, but this will likely require
+adjustments to your {kib} dashboards.
