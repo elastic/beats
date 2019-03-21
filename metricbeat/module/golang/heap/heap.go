@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
+	"github.com/pkg/errors"
 )
 
 var logger = logp.NewLogger("golang.heap")
@@ -76,25 +77,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	data, err := m.http.FetchContent()
 	if err != nil {
-		logger.Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "Error in http fetch")
 	}
 
 	var stats Stats
 
 	err = json.Unmarshal(data, &stats)
 	if err != nil {
-		logger.Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "Error unmarshalling json")
 	}
 
 	reporter.Event(mb.Event{
 		MetricSetFields: eventMapping(stats, m),
 	})
 
+	return nil
 }
