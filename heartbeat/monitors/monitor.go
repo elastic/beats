@@ -112,18 +112,16 @@ func newMonitor(
 	}
 
 	m := &Monitor{
-		id:                mpi.ID,
-		name:              mpi.Name,
-		typ:               mpi.Type,
-		pluginName:        monitorPlugin.name,
-		scheduler:         scheduler,
-		configuredJobs:    []*configuredJob{},
-		pipelineConnector: nil,
-		watchPollTasks:    []*configuredJob{},
-		internalsMtx:      sync.Mutex{},
-		config:            config,
-		stats:             monitorPlugin.stats,
-		factoryMetadata:   nil,
+		id:             mpi.ID,
+		name:           mpi.Name,
+		typ:            mpi.Type,
+		pluginName:     monitorPlugin.name,
+		scheduler:      scheduler,
+		configuredJobs: []*configuredJob{},
+		watchPollTasks: []*configuredJob{},
+		internalsMtx:   sync.Mutex{},
+		config:         config,
+		stats:          monitorPlugin.stats,
 	}
 
 	if m.id != "" {
@@ -277,7 +275,9 @@ func (m *Monitor) makeWatchTasks(monitorPlugin pluginBuilder) error {
 }
 
 // Start starts the monitor's execution using its configured scheduler.
-func (m *Monitor) Start(p beat.PipelineConnector, meta *common.MapStrPointer) {
+func (m *Monitor) Start(pc beat.PipelineConnector, meta *common.MapStrPointer) {
+	m.pipelineConnector = pc
+	m.factoryMetadata = meta
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
 
