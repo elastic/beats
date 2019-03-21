@@ -69,7 +69,7 @@ func (r *runnerFactory) CheckConfig(config *common.Config) error {
 
 func TestNewConfigs(t *testing.T) {
 	factory := &runnerFactory{}
-	list := NewRunnerList("", factory, nil)
+	list := NewPublisherList("", factory, nil)
 
 	list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
@@ -77,12 +77,12 @@ func TestNewConfigs(t *testing.T) {
 		createConfig(3),
 	})
 
-	assert.Equal(t, len(list.copyRunnerList()), 3)
+	assert.Equal(t, len(list.copyPublisherList()), 3)
 }
 
 func TestReloadSameConfigs(t *testing.T) {
 	factory := &runnerFactory{}
-	list := NewRunnerList("", factory, nil)
+	list := NewPublisherList("", factory, nil)
 
 	list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
@@ -90,7 +90,7 @@ func TestReloadSameConfigs(t *testing.T) {
 		createConfig(3),
 	})
 
-	state := list.copyRunnerList()
+	state := list.copyPublisherList()
 	assert.Equal(t, len(state), 3)
 
 	list.Reload([]*reload.ConfigWithMeta{
@@ -100,12 +100,12 @@ func TestReloadSameConfigs(t *testing.T) {
 	})
 
 	// nothing changed
-	assert.Equal(t, state, list.copyRunnerList())
+	assert.Equal(t, state, list.copyPublisherList())
 }
 
 func TestReloadStopConfigs(t *testing.T) {
 	factory := &runnerFactory{}
-	list := NewRunnerList("", factory, nil)
+	list := NewPublisherList("", factory, nil)
 
 	list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
@@ -113,19 +113,19 @@ func TestReloadStopConfigs(t *testing.T) {
 		createConfig(3),
 	})
 
-	assert.Equal(t, len(list.copyRunnerList()), 3)
+	assert.Equal(t, len(list.copyPublisherList()), 3)
 
 	list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
 		createConfig(3),
 	})
 
-	assert.Equal(t, len(list.copyRunnerList()), 2)
+	assert.Equal(t, len(list.copyPublisherList()), 2)
 }
 
 func TestReloadStartStopConfigs(t *testing.T) {
 	factory := &runnerFactory{}
-	list := NewRunnerList("", factory, nil)
+	list := NewPublisherList("", factory, nil)
 
 	list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
@@ -133,7 +133,7 @@ func TestReloadStartStopConfigs(t *testing.T) {
 		createConfig(3),
 	})
 
-	state := list.copyRunnerList()
+	state := list.copyPublisherList()
 	assert.Equal(t, len(state), 3)
 
 	list.Reload([]*reload.ConfigWithMeta{
@@ -142,13 +142,13 @@ func TestReloadStartStopConfigs(t *testing.T) {
 		createConfig(4),
 	})
 
-	assert.Equal(t, len(list.copyRunnerList()), 3)
-	assert.NotEqual(t, state, list.copyRunnerList())
+	assert.Equal(t, len(list.copyPublisherList()), 3)
+	assert.NotEqual(t, state, list.copyPublisherList())
 }
 
 func TestStopAll(t *testing.T) {
 	factory := &runnerFactory{}
-	list := NewRunnerList("", factory, nil)
+	list := NewPublisherList("", factory, nil)
 
 	list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
@@ -156,18 +156,18 @@ func TestStopAll(t *testing.T) {
 		createConfig(3),
 	})
 
-	assert.Equal(t, len(list.copyRunnerList()), 3)
+	assert.Equal(t, len(list.copyPublisherList()), 3)
 	list.Stop()
-	assert.Equal(t, len(list.copyRunnerList()), 0)
+	assert.Equal(t, len(list.copyPublisherList()), 0)
 
-	for _, r := range list.runners {
+	for _, r := range list.publishers {
 		assert.False(t, r.(*runner).stopped)
 	}
 }
 
 func TestHas(t *testing.T) {
 	factory := &runnerFactory{}
-	list := NewRunnerList("", factory, nil)
+	list := NewPublisherList("", factory, nil)
 	config := createConfig(1)
 
 	hash, err := HashConfig(config.Config)

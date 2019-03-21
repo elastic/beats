@@ -30,36 +30,36 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 )
 
-// RunnerList implements a reloadable.List of Runners
-type RunnerList struct {
-	runners  map[uint64]Runner
-	mutex    sync.RWMutex
-	factory  RunnerFactory
-	pipeline beat.Pipeline
-	logger   *logp.Logger
+// PublisherList implements a reloadable.List of Runners
+type PublisherList struct {
+	publishers map[uint64]Publisher
+	mutex      sync.RWMutex
+	factory    PublisherFactory
+	pipeline   beat.Pipeline
+	logger     *logp.Logger
 }
 
-// NewRunnerList builds and returns a RunnerList
-func NewRunnerList(name string, factory RunnerFactory, pipeline beat.Pipeline) *RunnerList {
-	return &RunnerList{
-		runners:  map[uint64]Runner{},
-		factory:  factory,
-		pipeline: pipeline,
-		logger:   logp.NewLogger(name),
+// NewPublisherList builds and returns a PublisherList
+func NewPublisherList(name string, factory PublisherFactory, pipeline beat.Pipeline) *PublisherList {
+	return &PublisherList{
+		publishers: map[uint64]Publisher{},
+		factory:    factory,
+		pipeline:   pipeline,
+		logger:     logp.NewLogger(name),
 	}
 }
 
-// Reload the list of runners to match the given state
-func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
+// Reload the list of publishers to match the given state
+func (r *PublisherList) Reload(configs []*reload.ConfigWithMeta) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
 	var errs multierror.Errors
 
 	startList := map[uint64]*reload.ConfigWithMeta{}
-	stopList := r.copyRunnerList()
+	stopList := r.copyPublisherList()
 
-	r.logger.Debugf("Starting reload procedure, current runners: %d", len(stopList))
+	r.logger.Debugf("Starting reload procedure, current publishers: %d", len(stopList))
 
 	// diff current & desired state, create action lists
 	for _, config := range configs {
@@ -79,19 +79,19 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 
 	r.logger.Debugf("Start list: %d, Stop list: %d", len(startList), len(stopList))
 
-	// Stop removed runners
+	// Stop removed publishers
 	for hash, runner := range stopList {
 		r.logger.Debugf("Stopping runner: %s", runner)
-		delete(r.runners, hash)
+		delete(r.publishers, hash)
 		go runner.Stop()
 	}
 
-	// Start new runners
+	// Start new publishers
 	for hash, config := range startList {
 		// Pass a copy of the config to the factory, this way if the factory modifies it,
 		// that doesn't affect the hash of the original one.
 		c, _ := common.NewConfigFrom(config.Config)
-		runner, err := r.factory.Create(r.pipeline, c, config.Meta)
+		runner, err := r.factory.Create(c)
 		if err != nil {
 			r.logger.Errorf("Error creating runner from config: %s", err)
 			errs = append(errs, errors.Wrap(err, "Error creating runner from config"))
@@ -99,47 +99,47 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		}
 
 		r.logger.Debugf("Starting runner: %s", runner)
-		r.runners[hash] = runner
-		runner.Start()
+		r.publishers[hash] = runner
+		runner.Start(r.pipeline, config.Meta)
 	}
 
 	return errs.Err()
 }
 
-// Stop all runners
-func (r *RunnerList) Stop() {
+// Stop all publishers
+func (r *PublisherList) Stop() {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
-	if len(r.runners) == 0 {
+	if len(r.publishers) == 0 {
 		return
 	}
 
-	r.logger.Infof("Stopping %v runners ...", len(r.runners))
+	r.logger.Infof("Stopping %v publishers ...", len(r.publishers))
 
 	wg := sync.WaitGroup{}
-	for hash, runner := range r.copyRunnerList() {
+	for hash, publisher := range r.copyPublisherList() {
 		wg.Add(1)
 
-		delete(r.runners, hash)
+		delete(r.publishers, hash)
 
 		// Stop modules in parallel
-		go func(h uint64, run Runner) {
+		go func(h uint64, run Publisher) {
 			defer wg.Done()
-			r.logger.Debugf("Stopping runner: %s", run)
+			r.logger.Debugf("Stopping publisher: %s", run)
 			run.Stop()
-			r.logger.Debugf("Stopped runner: %s", run)
-		}(hash, runner)
+			r.logger.Debugf("Stopped publisher: %s", run)
+		}(hash, publisher)
 	}
 
 	wg.Wait()
 }
 
 // Has returns true if a runner with the given hash is running
-func (r *RunnerList) Has(hash uint64) bool {
+func (r *PublisherList) Has(hash uint64) bool {
 	r.mutex.RLock()
 	defer r.mutex.RUnlock()
-	_, ok := r.runners[hash]
+	_, ok := r.publishers[hash]
 	return ok
 }
 
@@ -150,9 +150,9 @@ func HashConfig(c *common.Config) (uint64, error) {
 	return hashstructure.Hash(config, nil)
 }
 
-func (r *RunnerList) copyRunnerList() map[uint64]Runner {
-	list := make(map[uint64]Runner, len(r.runners))
-	for k, v := range r.runners {
+func (r *PublisherList) copyPublisherList() map[uint64]Publisher {
+	list := make(map[uint64]Publisher, len(r.publishers))
+	for k, v := range r.publishers {
 		list[k] = v
 	}
 	return list

@@ -19,30 +19,29 @@ package monitors
 
 import (
 	"github.com/elastic/beats/heartbeat/scheduler"
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 )
 
-// RunnerFactory that can be used to create cfg.Runner cast versions of Monitor
+// PublisherFactory that can be used to create cfg.Runner cast versions of Monitor
 // suitable for config reloading.
-type RunnerFactory struct {
+type PublisherFactory struct {
 	sched        *scheduler.Scheduler
 	allowWatches bool
 }
 
-// NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
-func NewFactory(sched *scheduler.Scheduler, allowWatches bool) *RunnerFactory {
-	return &RunnerFactory{sched, allowWatches}
+// NewFactory takes a scheduler and creates a PublisherFactory that can create cfgfile.Runner(Monitor) objects.
+func NewFactory(sched *scheduler.Scheduler, allowWatches bool) *PublisherFactory {
+	return &PublisherFactory{sched, allowWatches}
 }
 
 // Create makes a new Runner for a new monitor with the given Config.
-func (f *RunnerFactory) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
-	monitor, err := newMonitor(c, globalPluginsReg, p, f.sched, f.allowWatches, meta)
+func (f *PublisherFactory) Create(c *common.Config) (cfgfile.Publisher, error) {
+	monitor, err := newMonitor(c, globalPluginsReg, f.sched, f.allowWatches)
 	return monitor, err
 }
 
 // CheckConfig checks to see if the given monitor config is valid.
-func (f *RunnerFactory) CheckConfig(config *common.Config) error {
+func (f *PublisherFactory) CheckConfig(config *common.Config) error {
 	return checkMonitorConfig(config, globalPluginsReg, f.allowWatches)
 }

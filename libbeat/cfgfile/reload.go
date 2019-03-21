@@ -63,9 +63,21 @@ type Reload struct {
 	Enabled bool          `config:"enabled"`
 }
 
-type RunnerFactory interface {
-	Create(p beat.Pipeline, config *common.Config, meta *common.MapStrPointer) (Runner, error)
+type PublisherFactory interface {
+	Create(c *common.Config) (Publisher, error)
 	CheckConfig(config *common.Config) error
+}
+
+type Publisher interface {
+	// We include fmt.Stringer here because we do log debug messages that must print
+	// something for the given Runner. We need Runner implementers to consciously implement a
+	// String() method because the default behavior of `%s` is to print everything recursively
+	// in a struct, which could cause a race that would cause the race detector to fail.
+	// This is something that could be anticipated for the Runner interface specifically, because
+	// most publishers will use a goroutine that modifies internal state.
+	fmt.Stringer
+	Start(p beat.PipelineConnector, meta *common.MapStrPointer)
+	Stop()
 }
 
 type Runner interface {
@@ -74,7 +86,7 @@ type Runner interface {
 	// String() method because the default behavior of `%s` is to print everything recursively
 	// in a struct, which could cause a race that would cause the race detector to fail.
 	// This is something that could be anticipated for the Runner interface specifically, because
-	// most runners will use a goroutine that modifies internal state.
+	// most publishers will use a goroutine that modifies internal state.
 	fmt.Stringer
 	Start()
 	Stop()
@@ -82,12 +94,12 @@ type Runner interface {
 
 // Reloader is used to register and reload modules
 type Reloader struct {
-	pipeline      beat.Pipeline
-	runnerFactory RunnerFactory
-	config        DynamicConfig
-	path          string
-	done          chan struct{}
-	wg            sync.WaitGroup
+	pipeline         beat.Pipeline
+	publisherFactory PublisherFactory
+	config           DynamicConfig
+	path             string
+	done             chan struct{}
+	wg               sync.WaitGroup
 }
 
 // NewReloader creates new Reloader instance for the given config
@@ -109,7 +121,7 @@ func NewReloader(pipeline beat.Pipeline, cfg *common.Config) *Reloader {
 }
 
 // Check configs are valid (only if reload is disabled)
-func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
+func (rl *Reloader) Check(publisherFactory PublisherFactory) error {
 	// If config reload is enabled we ignore errors (as they may be fixed afterwards)
 	if rl.config.Reload.Enabled {
 		return nil
@@ -137,7 +149,7 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 		if !c.Config.Enabled() {
 			continue
 		}
-		_, err := runnerFactory.Create(rl.pipeline, c.Config, c.Meta)
+		_, err := publisherFactory.Create(c.Config)
 		if err != nil {
 			return err
 		}
@@ -146,10 +158,10 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 }
 
 // Run runs the reloader
-func (rl *Reloader) Run(runnerFactory RunnerFactory) {
+func (rl *Reloader) Run(publisherFactory PublisherFactory) {
 	logp.Info("Config reloader started")
 
-	list := NewRunnerList("reload", runnerFactory, rl.pipeline)
+	list := NewPublisherList("reload", publisherFactory, rl.pipeline)
 
 	rl.wg.Add(1)
 	defer rl.wg.Done()
@@ -195,7 +207,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			debugf("Number of module configs found: %v", len(configs))
 
 			if err := list.Reload(configs); err != nil {
-				// Make sure the next run also updates because some runners were not properly loaded
+				// Make sure the next run also updates because some publishers were not properly loaded
 				overwriteUpdate = true
 			}
 		}

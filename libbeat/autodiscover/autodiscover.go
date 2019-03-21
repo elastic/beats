@@ -47,8 +47,8 @@ type Adapter interface {
 	// CreateConfig generates a valid list of configs from the given event, the received event will have all keys defined by `StartFilter`
 	CreateConfig(bus.Event) ([]*common.Config, error)
 
-	// RunnerFactory provides runner creation by feeding valid configs
-	cfgfile.RunnerFactory
+	// PublisherFactory provides runner creation by feeding valid configs
+	cfgfile.PublisherFactory
 
 	// EventFilter returns the bus filter to retrieve runner start/stop triggering events
 	EventFilter() []string
@@ -62,7 +62,7 @@ type Autodiscover struct {
 	adapter         Adapter
 	providers       []Provider
 	configs         map[string]map[uint64]*reload.ConfigWithMeta
-	runners         *cfgfile.RunnerList
+	runners         *cfgfile.PublisherList
 	meta            *meta.Map
 
 	listener bus.Listener
@@ -89,7 +89,7 @@ func NewAutodiscover(name string, pipeline beat.Pipeline, adapter Adapter, confi
 		defaultPipeline: pipeline,
 		adapter:         adapter,
 		configs:         map[string]map[uint64]*reload.ConfigWithMeta{},
-		runners:         cfgfile.NewRunnerList("autodiscover", adapter, pipeline),
+		runners:         cfgfile.NewPublisherList("autodiscover", adapter, pipeline),
 		providers:       providers,
 		meta:            meta.NewMap(),
 	}, nil

@@ -42,7 +42,7 @@ type Heartbeat struct {
 	config          config.Config
 	scheduler       *scheduler.Scheduler
 	monitorReloader *cfgfile.Reloader
-	dynamicFactory  *monitors.RunnerFactory
+	dynamicFactory  *monitors.PublisherFactory
 	autodiscover    *autodiscover.Autodiscover
 }
 
@@ -124,18 +124,18 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) error {
 	factory := monitors.NewFactory(bt.scheduler, true)
 
 	for _, cfg := range bt.config.Monitors {
-		created, err := factory.Create(b.Publisher, cfg, nil)
+		created, err := factory.Create(cfg)
 		if err != nil {
 			return errors.Wrap(err, "could not create monitor")
 		}
-		created.Start()
+		created.Start(b.Publisher, nil)
 	}
 	return nil
 }
 
 // RunCentralMgmtMonitors loads any central management configured configs.
 func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
-	monitors := cfgfile.NewRunnerList(management.DebugK, bt.dynamicFactory, b.Publisher)
+	monitors := cfgfile.NewPublisherList(management.DebugK, bt.dynamicFactory, b.Publisher)
 	reload.Register.MustRegisterList(b.Info.Beat+".monitors", monitors)
 }
 

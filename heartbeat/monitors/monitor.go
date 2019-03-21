@@ -73,7 +73,7 @@ func (m *Monitor) String() string {
 }
 
 func checkMonitorConfig(config *common.Config, registrar *pluginsReg, allowWatches bool) error {
-	m, err := newMonitor(config, registrar, nil, nil, allowWatches, nil)
+	m, err := newMonitor(config, registrar, nil, allowWatches)
 	m.Stop() // Stop the monitor to free up the ID from uniqueness checks
 	return err
 }
@@ -95,10 +95,8 @@ func (e ErrDuplicateMonitorID) Error() string {
 func newMonitor(
 	config *common.Config,
 	registrar *pluginsReg,
-	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
 	allowWatches bool,
-	factoryMetadata *common.MapStrPointer,
 ) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
@@ -120,12 +118,12 @@ func newMonitor(
 		pluginName:        monitorPlugin.name,
 		scheduler:         scheduler,
 		configuredJobs:    []*configuredJob{},
-		pipelineConnector: pipelineConnector,
+		pipelineConnector: nil,
 		watchPollTasks:    []*configuredJob{},
 		internalsMtx:      sync.Mutex{},
 		config:            config,
 		stats:             monitorPlugin.stats,
-		factoryMetadata:   factoryMetadata,
+		factoryMetadata:   nil,
 	}
 
 	if m.id != "" {
@@ -279,7 +277,7 @@ func (m *Monitor) makeWatchTasks(monitorPlugin pluginBuilder) error {
 }
 
 // Start starts the monitor's execution using its configured scheduler.
-func (m *Monitor) Start() {
+func (m *Monitor) Start(p beat.PipelineConnector, meta *common.MapStrPointer) {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
 

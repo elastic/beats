@@ -20,19 +20,18 @@ package autodiscover
 import (
 	"errors"
 
-	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/bus"
 )
 
-// FactoryAdapter is an adapter that works with any cfgfile.RunnerFactory.
+// FactoryAdapter is an adapter that works with any cfgfile.PublisherFactory.
 type FactoryAdapter struct {
-	factory cfgfile.RunnerFactory
+	factory cfgfile.PublisherFactory
 }
 
 // NewFactoryAdapter builds and returns an autodiscover adapter that works with any cfgfile.RunnerFactory.
-func NewFactoryAdapter(factory cfgfile.RunnerFactory) *FactoryAdapter {
+func NewFactoryAdapter(factory cfgfile.PublisherFactory) *FactoryAdapter {
 	return &FactoryAdapter{
 		factory: factory,
 	}
@@ -53,8 +52,8 @@ func (m *FactoryAdapter) CheckConfig(c *common.Config) error {
 }
 
 // Create a module or prospector from the given config
-func (m *FactoryAdapter) Create(p beat.Pipeline, c *common.Config, meta *common.MapStrPointer) (cfgfile.Runner, error) {
-	return m.factory.Create(p, c, meta)
+func (m *FactoryAdapter) Create(c *common.Config) (cfgfile.Publisher, error) {
+	return m.factory.Create(c)
 }
 
 // EventFilter returns the bus filter to retrieve runner start/stop triggering events

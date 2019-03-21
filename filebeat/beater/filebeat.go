@@ -378,10 +378,10 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	// Register reloadable list of inputs and modules
-	inputs := cfgfile.NewRunnerList(management.DebugK, crawler.InputsFactory, b.Publisher)
+	inputs := cfgfile.NewPublisherList(management.DebugK, crawler.InputsFactory, b.Publisher)
 	reload.Register.MustRegisterList("filebeat.inputs", inputs)
 
-	modules := cfgfile.NewRunnerList(management.DebugK, crawler.ModulesFactory, b.Publisher)
+	modules := cfgfile.NewPublisherList(management.DebugK, crawler.ModulesFactory, b.Publisher)
 	reload.Register.MustRegisterList("filebeat.modules", modules)
 
 	var adiscover *autodiscover.Autodiscover

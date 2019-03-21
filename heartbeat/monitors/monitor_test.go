@@ -39,10 +39,10 @@ func TestMonitor(t *testing.T) {
 	require.NoError(t, err)
 	defer sched.Stop()
 
-	mon, err := newMonitor(serverMonConf, reg, pipelineConnector, sched, false, nil)
+	mon, err := newMonitor(serverMonConf, reg, sched, false)
 	require.NoError(t, err)
 
-	mon.Start()
+	mon.Start(pipelineConnector, nil)
 
 	require.Equal(t, 1, len(pipelineConnector.clients))
 	pcClient := pipelineConnector.clients[0]
@@ -79,7 +79,6 @@ func TestMonitor(t *testing.T) {
 func TestDuplicateMonitorIDs(t *testing.T) {
 	serverMonConf := mockPluginConf(t, "custom", "@every 1ms", "http://example.net")
 	reg := mockPluginsReg()
-	pipelineConnector := &MockPipelineConnector{}
 
 	sched := scheduler.New(1)
 	err := sched.Start()
@@ -87,7 +86,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	defer sched.Stop()
 
 	makeTestMon := func() (*Monitor, error) {
-		return newMonitor(serverMonConf, reg, pipelineConnector, sched, false, nil)
+		return newMonitor(serverMonConf, reg, sched, false)
 	}
 
 	m1, m1Err := makeTestMon()
