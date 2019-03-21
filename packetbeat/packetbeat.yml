@@ -108,6 +108,13 @@ setup.template.settings:
   #index.codec: best_compression
   #_source.enabled: false
 
+#============================= Process Security ================================
+
+# Enable or disable seccomp system call filtering on Linux. Default is enabled.
+# Seccomp is disabled in order to help with setting of promiscuous mode.
+# If you enable seccomp you will need to enable promiscuous on the device manually.
+seccomp.enabled: false
+
 #================================ General =====================================
 
 # The name of the shipper that publishes the network data. It can be used to group
@@ -228,13 +235,6 @@ processors:
 # have the Elasticsearch output configured, you can simply uncomment the
 # following line.
 #xpack.monitoring.elasticsearch:
-
-#============================= Process Security ================================
-
-# Enable or disable seccomp system call filtering on Linux. Default is enabled.
-# Seccomp is disabled in order to help with setting of promiscuous mode.
-# If you enable seccomp you will need to enable promiscuous on the device manually.
-seccomp.enabled: false
 
 #================================= Migration ==================================
 
