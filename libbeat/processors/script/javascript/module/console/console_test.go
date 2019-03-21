@@ -46,6 +46,10 @@ function process(evt) {
 `
 
 	logp.TestingSetup(logp.ToObserverOutput())
+	observer := logp.ObserverLogs()
+	assert.NotNil(t, observer)
+	startL := logp.L()
+
 	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
 	if err != nil {
 		t.Fatal(err)
@@ -56,13 +60,14 @@ function process(evt) {
 		t.Fatal(err)
 	}
 
-	ologs := logp.ObserverLogs()
-	assert.NotNil(t, ologs)
+	endL := logp.L()
+	t.Logf("start: %p, end: %p", startL, endL)
+	assert.Equal(t, startL, endL)
 
-	ologs = ologs.FilterMessageSnippet("TestConsole")
-	assert.NotNil(t, ologs)
+	observer = observer.FilterMessageSnippet("TestConsole")
+	assert.NotNil(t, observer)
 
-	logs := ologs.TakeAll()
+	logs := observer.TakeAll()
 	assert.NotNil(t, logs)
 
 	if assert.Len(t, logs, 5) {
