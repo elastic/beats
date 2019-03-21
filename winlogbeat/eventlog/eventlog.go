@@ -62,7 +62,8 @@ type EventLog interface {
 	// from the first event specify a zero-valued EventLogState.
 	Open(state checkpoint.EventLogState) error
 
-	// Read records from the event log.
+	// Read records from the event log. If io.EOF is returned you should stop
+	// reading and close the log.
 	Read() ([]Record, error)
 
 	// Close the event log. It should not be re-opened after closing.
