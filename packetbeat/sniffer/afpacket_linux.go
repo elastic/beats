@@ -34,7 +34,7 @@ import (
 
 type afpacketHandle struct {
 	TPacket              *afpacket.TPacket
-	promicsPreviousState bool
+	promiscPreviousState bool
 	device               string
 }
 
@@ -47,7 +47,7 @@ func newAfpacketHandle(device string, snaplen int, block_size int, num_blocks in
 	}
 
 	h := &afpacketHandle{
-		promicsPreviousState: promiscEnabled,
+		promiscPreviousState: promiscEnabled,
 		device:               device,
 	}
 
@@ -87,7 +87,7 @@ func (h *afpacketHandle) LinkType() layers.LinkType {
 
 func (h *afpacketHandle) Close() {
 	h.TPacket.Close()
-	if err := setPromiscMode(h.device, h.promicsPreviousState); err != nil {
+	if err := setPromiscMode(h.device, h.promiscPreviousState); err != nil {
 		logp.Err("Failed to set promiscuous mode for device '%s': %v", h.device, err)
 	}
 }
