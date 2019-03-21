@@ -20,7 +20,7 @@
 package sniffer
 
 import (
-	"errors"
+	"fmt"
 	"syscall"
 	"time"
 	"unsafe"
@@ -97,25 +97,25 @@ func isPromiscEnabled(device string) (bool, error) {
 		return false, nil
 	}
 
-	s, e := Socket(AF_INET, SOCK_DGRAM, 0)
+	s, e := syscall.Socket(syscall.AF_INET, syscall.SOCK_DGRAM, 0)
 	if e != nil {
 		return false, e
 	}
 
-	defer Close(s)
+	defer syscall.Close(s)
 
 	var ifl struct {
-		name  [IFNAMSIZ]byte
+		name  [syscall.IFNAMSIZ]byte
 		flags uint16
 	}
 
-	copy(ifl.name[:], []byte(name))
-	_, _, ep := syscall.Syscall(SYS_IOCTL, uintptr(s), SIOCGIFFLAGS, uintptr(unsafe.Pointer(&ifl)))
+	copy(ifl.name[:], []byte(device))
+	_, _, ep := syscall.Syscall(syscall.SYS_IOCTL, uintptr(s), syscall.SIOCGIFFLAGS, uintptr(unsafe.Pointer(&ifl)))
 	if ep != 0 {
-		return false, errors.New("Syscall SIOCGIFFLAGS exited with %v", ep)
+		return false, fmt.Errorf("Syscall SIOCGIFFLAGS exited with %v", ep)
 	}
 
-	return ifl.flags&uint16(IFF_PROMISC) != 0, nil
+	return ifl.flags&uint16(syscall.IFF_PROMISC) != 0, nil
 }
 
 func setPromiscMode(device string, enabled bool) error {
