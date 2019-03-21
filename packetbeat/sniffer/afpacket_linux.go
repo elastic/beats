@@ -20,11 +20,10 @@
 package sniffer
 
 import (
-	"bytes"
 	"errors"
-	"fmt"
-	"os/exec"
+	"syscall"
 	"time"
+	"unsafe"
 
 	"github.com/elastic/beats/libbeat/logp"
 
@@ -98,13 +97,25 @@ func isPromiscEnabled(device string) (bool, error) {
 		return false, nil
 	}
 
-	c := exec.Command("ip", "link", "show", device)
-	out, err := c.CombinedOutput()
-	if err != nil {
-		return false, fmt.Errorf(string(out))
+	s, e := Socket(AF_INET, SOCK_DGRAM, 0)
+	if e != nil {
+		return false, e
 	}
 
-	return bytes.Contains(out, []byte("PROMISC")), nil
+	defer Close(s)
+
+	var ifl struct {
+		name  [IFNAMSIZ]byte
+		flags uint16
+	}
+
+	copy(ifl.name[:], []byte(name))
+	_, _, ep := syscall.Syscall(SYS_IOCTL, uintptr(s), SIOCGIFFLAGS, uintptr(unsafe.Pointer(&ifl)))
+	if ep != 0 {
+		return false, errors.New("Syscall SIOCGIFFLAGS exited with %v", ep)
+	}
+
+	return ifl.flags&uint16(IFF_PROMISC) != 0, nil
 }
 
 func setPromiscMode(device string, enabled bool) error {
@@ -113,17 +124,5 @@ func setPromiscMode(device string, enabled bool) error {
 		return nil
 	}
 
-	mode := "off"
-	if enabled {
-		mode = "on"
-	}
-
-	c := exec.Command("ip", "link", "set", device, "promisc", mode)
-	out, err := c.CombinedOutput()
-	if err != nil {
-		logp.Err("Error occurred when setting promisc mode of %s to %v: %v", device, enabled, err)
-		return errors.New(string(out))
-	}
-
-	return nil
+	return syscall.SetLsfPromisc(device, enabled)
 }

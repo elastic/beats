@@ -478,10 +478,3 @@ packetbeat.procs.enabled: false
 # duplicates if shippers are installed on multiple servers. Default value is
 # false.
 packetbeat.ignore_outgoing: false
-
-#============================= Process Security ================================
-
-# Enable or disable seccomp system call filtering on Linux. Default is enabled.
-# Seccomp is disabled in order to help with setting of promiscuous mode.
-# If you enable seccomp you will need to enable promiscuous on the device manually.
-seccomp.enabled: false

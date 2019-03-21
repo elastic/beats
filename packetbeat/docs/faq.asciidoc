@@ -22,7 +22,6 @@ ip link set <device_name> promisc on
 ----------------------------------------------------------------------
 
 For example: `ip link set enp5s0f1 promisc on`
-Packetbeat sets promiscuous mode automatically when seccomp is disabled.
 
 [float]
 [[packetbeat-loopback-interface]]
