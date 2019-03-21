@@ -56,7 +56,15 @@ function process(evt) {
 		t.Fatal(err)
 	}
 
-	logs := logp.ObserverLogs().FilterMessageSnippet("TestConsole").TakeAll()
+	ologs := logp.ObserverLogs()
+	assert.NotNil(t, ologs)
+
+	ologs = ologs.FilterMessageSnippet("TestConsole")
+	assert.NotNil(t, ologs)
+
+	logs := ologs.TakeAll()
+	assert.NotNil(t, logs)
+
 	if assert.Len(t, logs, 5) {
 		assert.Contains(t, logs[0].Message, "Debug")
 		assert.Equal(t, logs[0].Level, zap.DebugLevel)
