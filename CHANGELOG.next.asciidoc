@@ -50,6 +50,8 @@ https://github.com/elastic/beats/compare/v6.6.2...6.6[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Fix Winlogbeat escaping CR, LF and TAB characters. {issue}11328[11328] {pull}11357[11357]
+
 *Functionbeat*
 
 ==== Added
