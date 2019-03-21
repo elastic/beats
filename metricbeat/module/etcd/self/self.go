@@ -18,6 +18,7 @@
 package self
 
 import (
+	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -27,6 +28,7 @@ import (
 const (
 	defaultScheme = "http"
 	defaultPath   = "/v2/stats/self"
+	apiVersion    = "2"
 )
 
 var (
@@ -80,5 +82,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 	reporter.Event(mb.Event{
 		MetricSetFields: eventMapping(content),
+		ModuleFields:    common.MapStr{"apiVersion": apiVersion},
 	})
 }
