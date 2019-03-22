@@ -22,7 +22,7 @@ with open(sys.argv[1], 'r') as conf_file:
         if m:
             section_name = m.group(1)
             if section_name == "Processors":
-                output += line # include section name in output
+                output += line  # include section name in output
                 output += "processors:\n"
                 output += "  - add_observer_metadata: ~\n"
                 output += "\n\n"
