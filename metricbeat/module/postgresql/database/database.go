@@ -57,12 +57,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	db, err := sql.Open("postgres", m.HostData().URI)
+	defer db.Close()
 	if err != nil {
 		logger.Error(err)
 		reporter.Error(err)
 		return
 	}
-	defer db.Close()
+	
 
 	results, err := postgresql.QueryStats(db, "SELECT * FROM pg_stat_database")
 	if err != nil {
