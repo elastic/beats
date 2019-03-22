@@ -15,6 +15,19 @@
     },
     {
       "remove": {
+        "field": ["message"],
+        "ignore_failure" : true
+      }
+    },
+    {
+      "rename": {
+        "field": "json.message",
+        "target_field": "message",
+        "ignore_failure" : true
+      }
+    },
+    {
+      "remove": {
         "field": ["json", "bufsize"],
         "ignore_failure" : true
       }

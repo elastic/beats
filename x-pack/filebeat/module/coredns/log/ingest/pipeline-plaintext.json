@@ -8,12 +8,6 @@
        }
     },
     {
-      "rename": {
-        "field": "message",
-        "target_field": "log.original"
-      }
-    },
-    {
       "remove": {
         "field": ["bufsize"],
         "ignore_failure" : true
