@@ -102,11 +102,16 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 	var reason error
 	for _, event := range events {
 
-		// Extract time
+		// Extract type
 		t, err := event.Content.Meta.GetValue("type")
 		if err != nil {
 			logp.Err("Type not available in monitoring reported. Please report this error: %s", err)
 			continue
+		}
+
+		typ, ok := t.(string)
+		if !ok {
+			logp.Err("monitoring type is not a string")
 		}
 
 		var params = map[string]string{}
@@ -127,7 +132,7 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 
 		switch c.format {
 		case report.ReportingFormatXPackMonitoringBulk:
-			err = c.publishWithXPackMonitoringBulk(params, event, t)
+			err = c.publishWithXPackMonitoringBulk(params, event, typ)
 		case report.ReportingFormatBulk:
 			err = c.publishWithBulk(event)
 		}
@@ -154,11 +159,11 @@ func (c *publishClient) String() string {
 	return "publish(" + c.es.String() + ")"
 }
 
-func (c *publishClient) publishWithXPackMonitoringBulk(params map[string]string, event publisher.Event, t interface{}) error {
+func (c *publishClient) publishWithXPackMonitoringBulk(params map[string]string, event publisher.Event, typ string) error {
 	meta := common.MapStr{
 		"_index":   "",
 		"_routing": nil,
-		"_type":    t,
+		"_type":    typ,
 	}
 	bulk := [2]interface{}{
 		common.MapStr{"index": meta},
