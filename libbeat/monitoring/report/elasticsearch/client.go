@@ -134,7 +134,7 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 		case report.ReportingFormatXPackMonitoringBulk:
 			err = c.publishXPackBulk(params, event, typ)
 		case report.ReportingFormatBulk:
-			err = c.publishBulk(event)
+			err = c.publishBulk(event, typ)
 		}
 
 		if err != nil {
@@ -179,7 +179,7 @@ func (c *publishClient) publishXPackBulk(params map[string]string, event publish
 	return err
 }
 
-func (c *publishClient) publishBulk(event publisher.Event) error {
+func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
 	meta := common.MapStr{
 		"_index":   getMonitoringIndexName(),
 		"_routing": nil,
@@ -195,17 +195,9 @@ func (c *publishClient) publishBulk(event publisher.Event) error {
 
 	event.Content.Fields.Put("timestamp", event.Content.Timestamp)
 
-	t, err := event.Content.Meta.GetValue("type")
-	if err != nil {
-		return errors.Wrap(err, "could not determine type field")
-	}
-	tStr, ok := t.(string)
-	if !ok {
-		return fmt.Errorf("type is not string")
-	}
 	fields := common.MapStr{
-		"type": tStr,
-		tStr:   event.Content.Fields,
+		"type": typ,
+		typ:    event.Content.Fields,
 	}
 
 	interval, err := event.Content.Meta.GetValue("interval_ms")
