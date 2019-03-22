@@ -14,13 +14,12 @@ class Test(BaseTest):
         "af_packet only on Linux")
     def test_afpacket_promisc(self):
         """
-        Should verify whether device was switched to promisc mode and back.
+        Should switch to promisc mode and back.
         """
 
         # get device name, leave out loopback device
         devices = [f for f in os.listdir("/sys/class/net") if f != "lo"][0]
-        if len(devices) == 0
-            return
+        assert len(devices) > 0
 
         device = devices[0]
 
@@ -43,7 +42,7 @@ class Test(BaseTest):
         packetbeat = self.start_packetbeat()
 
         # wait for promisc to be turned on, cap(90s)
-        for x in range(6)
+        for x in range(6):
             time.sleep(15)
 
             ip_proc = subprocess.Popen(
