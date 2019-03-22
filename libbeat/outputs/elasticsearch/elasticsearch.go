@@ -66,7 +66,7 @@ var connectCallbackRegistry = newCallbacksRegistry()
 var globalCallbackRegistry = newCallbacksRegistry()
 
 // RegisterGlobalCallback register a global callbacks.
-func RegisterGlobalCallback(callback connectCallback) (uuid.UUID, error) {
+func RegisterGlobalCallback(callback ConnectCallback) (uuid.UUID, error) {
 	globalCallbackRegistry.mutex.Lock()
 	defer globalCallbackRegistry.mutex.Unlock()
 

@@ -24,8 +24,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/monitoring/report"
@@ -167,12 +165,12 @@ func (c *publishClient) publishWithXPackMonitoringBulk(params map[string]string,
 		report.Event{
 			Timestamp: event.Content.Timestamp,
 			Fields:    event.Content.Fields,
-		}
+		},
 	}
 
 	// Currently one request per event is sent. Reason is that each event can contain different
 	// interval params and X-Pack requires to send the interval param.
-	_, err = c.es.SendMonitoringBulk(params, bulk[:])
+	_, err := c.es.SendMonitoringBulk(params, bulk[:])
 	return err
 }
 
