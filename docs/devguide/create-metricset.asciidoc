@@ -272,7 +272,7 @@ NOTE: Make sure that you run `make collect` after updating the config file
 so that your changes are also applied to the global configuration file and the docs.
 
 For more details about the Metricbeat configuration file, see the topic about
-{metricbeat}/configuration-metricbeat.html[Modules] in the Metricbeat
+{metricbeat-ref}/configuration-metricbeat.html[Modules] in the Metricbeat
 documentation.
 
 
