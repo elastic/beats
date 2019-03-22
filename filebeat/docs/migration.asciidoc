@@ -12,7 +12,7 @@ to use for tailing log files and forwarding them to Logstash.
 * The registry file, which stores the state of the currently read files, was
   changed.
 * Command line options were removed and moved to the configuration file.
-* Configuration options for outputs are now inherited from libbeat. For details, see the {libbeat}/index.html[Beats Platform Reference].
+* Configuration options for outputs are now inherited from libbeat. For details, see the {beats-ref}/index.html[Beats Platform Reference].
 * The {logstash-ref}/plugins-inputs-beats.html[Beats input plugin for Logstash] is required.
 
 The following topics describe how to migrate from

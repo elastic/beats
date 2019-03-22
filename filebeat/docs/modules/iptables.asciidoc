@@ -28,7 +28,7 @@ When you run the module, it performs a few tasks under the hood:
 [float]
 === Compatibility
 
-This module requires the {elasticsearch-plugins}/ingest-geoip.html[ingest-geoip]
+This module requires the {plugins}/ingest-geoip.html[ingest-geoip]
 Elasticsearch plugins.
 
 include::../include/running-modules.asciidoc[]
