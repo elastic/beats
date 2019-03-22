@@ -10,18 +10,28 @@ Tests for afpacket.
 """
 
 
+def is_root():
+    if 'geteuid' not in dir(os):
+        return False
+    euid = os.geteuid()
+    print("euid is", euid)
+    return euid == 0
+
+
 class Test(BaseTest):
 
     @unittest.skipUnless(
         sys.platform.startswith("linux"),
         "af_packet only on Linux")
+    @unittest.skipUnless(is_root(), "Requires root")
     def test_afpacket_promisc(self):
         """
         Should switch to promisc mode and back.
         """
 
         # get device name, leave out loopback device
-        devices = [f for f in os.listdir("/sys/class/net") if f != "lo"]
+        devices = [f for f in os.listdir(
+            "/sys/class/net") if f.startswith("lo")]
         assert len(devices) > 0
 
         device = devices[0]
@@ -35,8 +45,8 @@ class Test(BaseTest):
 
         # turn off promics if was on
         if prev_promisc:
-            subprocess.run(["ip", "link", "set", device,
-                            "promisc", "off"], stdout=subprocess.PIPE)
+            subprocess.call(["ip", "link", "set", device,
+                             "promisc", "off"], stdout=subprocess.PIPE)
 
         self.render_config_template(
             af_packet=True,
@@ -45,8 +55,8 @@ class Test(BaseTest):
         packetbeat = self.start_packetbeat()
 
         # wait for promisc to be turned on, cap(90s)
-        for x in range(6):
-            time.sleep(15)
+        for x in range(10):
+            time.sleep(5)
 
             ip_proc = subprocess.Popen(
                 ["ip", "link", "show", device], stdout=subprocess.PIPE)
@@ -71,4 +81,4 @@ class Test(BaseTest):
 
         # reset device
         if prev_promisc:
-            subprocess.run(["ip", "link", "set", device, "promisc", "on"])
+            subprocess.call(["ip", "link", "set", device, "promisc", "on"])
