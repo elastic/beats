@@ -20,6 +20,8 @@
 package instance
 
 import (
+	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/elastic/beats/libbeat/cfgfile"
@@ -91,4 +93,25 @@ func TestInitKibanaConfig(t *testing.T) {
 	assert.Equal(t, "elastic-test-password", password)
 	assert.Equal(t, "https", protocol)
 	assert.Equal(t, "127.0.0.1:5601", host)
+}
+
+func TestEmptyMetaJson(t *testing.T) {
+	b, err := NewBeat("filebeat", "testidx", "0.9")
+	if err != nil {
+		panic(err)
+	}
+
+	// prepare empty meta file
+	metaFile, err := ioutil.TempFile("../test", "meta.json")
+	assert.Equal(t, nil, err, "Unable to create temporary meta file")
+
+	metaPath := metaFile.Name()
+	metaFile.Close()
+	defer os.Remove(metaPath)
+
+	// load metadata
+	err = b.loadMeta(metaPath)
+
+	assert.Equal(t, nil, err, "Unable to load meta file properly")
+	assert.NotEqual(t, uuid.Nil, b.Info.ID, "Beats UUID is not set")
 }

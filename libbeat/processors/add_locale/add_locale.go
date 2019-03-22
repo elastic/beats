@@ -52,10 +52,11 @@ func (t TimezoneFormat) String() string {
 }
 
 func init() {
-	processors.RegisterPlugin("add_locale", newAddLocale)
+	processors.RegisterPlugin("add_locale", New)
 }
 
-func newAddLocale(c *common.Config) (processors.Processor, error) {
+// New constructs a new add_locale processor.
+func New(c *common.Config) (processors.Processor, error) {
 	config := struct {
 		Format string `config:"format"`
 	}{

@@ -33,7 +33,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `cleanup_timeout` option to docker autodiscover, to wait some time before removing configurations after a container is stopped. {issue]10374[10374] {pull}10905[10905]
 - On Google Cloud Engine (GCE) the add_cloud_metadata will now trim the project
   info from the cloud.machine.type and cloud.availability_zone. {issue}10968[10968]
+- Empty `meta.json` file will be treated as a missing meta file. {issue}8558[8558]
 - Rename `migration.enabled` config to `migration.6_to_7.enabled`. {pull}11284[11284]
+- Beats Xpack now checks for Basic license on connect. {pull}11296[11296]
 
 *Auditbeat*
 
@@ -170,12 +172,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix errors in filebeat Zeek dashboard and README files. Add notice.log support. {pull}10916[10916]
 - Fix a bug when converting NetFlow fields to snake_case. {pull}10950[10950]
 - Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test case. {issue}11004[11004] {pull}11105[11105]
+- Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
 - Fix issue preventing docker container events to be stored if the container has a network interface without ip address. {issue}11225[11225] {pull}11247[11247]
-- Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test 
+- Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test
   case. {issue}11004[11004] {pull}11105[11105]
 - Change URLPATH grok pattern to support brackets. {issue}11135[11135] {pull}11252[11252]
 - Add support for iis log with different address format. {issue}11255[11255] {pull}11256[11256]
 - Add fix to parse syslog message with priority value 0. {issue}11010[11010]
+- Don't apply multiline rules in Logstash json logs. {pull}11346[11346]
 
 *Heartbeat*
 
@@ -207,6 +211,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add documentation about jolokia autodiscover fields. {issue}10925[10925] {pull}10979[10979]
 - Add missing aws.ec2.instance.state.name into fields.yml. {issue}11219[11219] {pull}11221[11221]
 - Fix ec2 metricset to collect metrics from Cloudwatch with the same timestamp. {pull}11142[11142]
+- Fix potential memory leak in stopped docker metricsets {pull}11294[11294]
 
 *Packetbeat*
 
@@ -218,6 +223,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 - Prevent Winlogbeat from dropping events with invalid XML. {pull}11006{11006}
+- Fix Winlogbeat escaping CR, LF and TAB characters. {issue}11328[11328] {pull}11357[11357]
 
 *Functionbeat*
 
@@ -250,7 +256,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add output test to kafka output {pull}10834[10834]
 - Add ip fields to default_field in Elasticsearch template. {pull}11035[11035]
 - Gracefully shut down on SIGHUP {pull}10704[10704]
-- Add `script` processor that supports using Javascript to process events. {pull}10850[10850]
+- Add `script` processor that supports using Javascript to process events. {pull}10850[10850] {pull}11260[11260]
 
 *Auditbeat*
 
@@ -297,6 +303,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add the `network.community_id` flow identifier to field to the IPTables, Suricata, and Zeek modules. {pull}11005[11005]
 - Add support for loading custom NetFlow and IPFIX field definitions to netflow input. {pull}10945[10945]
 - New Filebeat coredns module to ingest coredns logs. It supports both the native coredns deployment and coredns deployment in kubernetes. {pull}11200[11200]
+- Added categorization fields for SSH login events in the system/auth fileset. {pull}11334[11334]
 
 *Heartbeat*
 
