@@ -3,6 +3,7 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
+			"apiVersion": "3",
 			"disk": {
 				"backend_commit_duration": {
 					"ns": {
@@ -91,7 +92,7 @@
 		},
 		"Index": "",
 		"ID": "",
-		"Namespace": "",
+		"Namespace": "etcd",
 		"Timestamp": "0001-01-01T00:00:00Z",
 		"Error": null,
 		"Host": "",
