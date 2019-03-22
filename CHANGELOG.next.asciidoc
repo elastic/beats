@@ -63,6 +63,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Using an environment variable for the password when enrolling a beat will now raise an error if the variable doesn't exist. {pull}10936[10936]
 - Cancelling enrollment of a beat will not enroll the beat. {issue}10150[10150]
 - Allow to configure Kafka fetching strategy for the topic metadata. {pull}10682[10682]
+- Remove IP fields from default_field in Elasticsearch template.
 
 *Auditbeat*
 
