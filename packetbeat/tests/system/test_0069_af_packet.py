@@ -9,8 +9,9 @@ Tests for afpacket.
 
 class Test(BaseTest):
 
-    @unittest.skipUnless(sys.platform.startswith("linux"), "af_packet only on Linux")
-
+    @unittest.skipUnless(
+        sys.platform.startswith("linux"),
+        "af_packet only on Linux")
     def test_afpacket_promisc(self):
         """
         Should verify whether device was switched to promisc mode and back.
@@ -23,15 +24,17 @@ class Test(BaseTest):
 
         device = devices[0]
 
-        ip_proc = subprocess.Popen(["ip", "link", "show", device], stdout=subprocess.PIPE)
-        o,e = ip_proc.communicate()
-        assert e == None
+        ip_proc = subprocess.Popen(
+            ["ip", "link", "show", device], stdout=subprocess.PIPE)
+        o, e = ip_proc.communicate()
+        assert e is None
 
         prev_promisc = "PROMISC" in o.decode("utf-8")
 
         # turn off promics if was on
-        if prev_promisc == True:
-            subprocess.run(["ip", "link", "set", device, "promisc", "off"], stdout=subprocess.PIPE)
+        if prev_promisc:
+            subprocess.run(["ip", "link", "set", device,
+                            "promisc", "off"], stdout=subprocess.PIPE)
 
         self.render_config_template(
             af_packet=True,
@@ -43,26 +46,27 @@ class Test(BaseTest):
         for x in range(6)
             time.sleep(15)
 
-            ip_proc = subprocess.Popen(["ip", "link", "show", device], stdout=subprocess.PIPE)
-            o,e = ip_proc.communicate()
+            ip_proc = subprocess.Popen(
+                ["ip", "link", "show", device], stdout=subprocess.PIPE)
+            o, e = ip_proc.communicate()
 
             is_promisc = "PROMISC" in o.decode("utf-8")
             if is_promisc:
                 break
 
-        assert is_promisc == True
+        assert is_promisc
 
         # stop packetbeat and check if promisc is set to previous state
         packetbeat.kill_and_wait()
 
-        ip_proc = subprocess.Popen(["ip", "link", "show", device], stdout=subprocess.PIPE)
-        o,e = ip_proc.communicate()
-        assert e == None
+        ip_proc = subprocess.Popen(
+            ["ip", "link", "show", device], stdout=subprocess.PIPE)
+        o, e = ip_proc.communicate()
+        assert e is None
 
         is_promisc = "PROMISC" in o.decode("utf-8")
         assert is_promisc == False
 
-        #reset device
-        if prev_promisc == True:
+        # reset device
+        if prev_promisc:
             subprocess.run(["ip", "link", "set", device, "promisc", "on"])
-
