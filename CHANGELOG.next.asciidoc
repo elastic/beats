@@ -35,7 +35,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
   info from the cloud.machine.type and cloud.availability_zone. {issue}10968[10968]
 - Empty `meta.json` file will be treated as a missing meta file. {issue}8558[8558]
 - Rename `migration.enabled` config to `migration.6_to_7.enabled`. {pull}11284[11284]
-- decode_json_field: process objects and arrays only {pull}11312[11312]
 - Beats Xpack now checks for Basic license on connect. {pull}11296[11296]
 
 *Auditbeat*
@@ -147,6 +146,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Include ip and boolean type when generating index pattern. {pull}10995[10995]
 - Cancelling enrollment of a beat will not enroll the beat. {issue}10150[10150]
 - Add missing fields and test cases for libbeat add_kubernetes_metadata processor. {issue}11133[11133], {pull}11134[11134]
+- decode_json_field: process objects and arrays only {pull}11312[11312]
 
 *Auditbeat*
 
