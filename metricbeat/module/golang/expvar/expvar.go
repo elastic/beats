@@ -86,7 +86,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	json, err := m.http.FetchJSON()
 	if err != nil {
-		return errors.Wrap(err, "Error in http fetch")
+		return errors.Wrap(err, "error in http fetch")
 	}
 
 	//flatten cmdline

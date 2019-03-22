@@ -81,14 +81,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	data, err := m.http.FetchContent()
 	if err != nil {
-		return errors.Wrap(err, "Error in http fetch")
+		return errors.Wrap(err, "error in http fetch")
 	}
 
 	var stats Stats
 
 	err = json.Unmarshal(data, &stats)
 	if err != nil {
-		return errors.Wrap(err, "Error unmarshalling json")
+		return errors.Wrap(err, "error unmarshalling json")
 	}
 
 	reporter.Event(mb.Event{
