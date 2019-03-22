@@ -7,9 +7,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "query_string": {
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -133,12 +132,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -238,9 +233,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "query_string": {
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -364,12 +358,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -491,12 +481,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -565,12 +551,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -651,12 +633,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -819,12 +797,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -936,12 +910,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -1012,12 +982,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -1132,12 +1098,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -1220,12 +1182,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -1350,12 +1308,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -1480,12 +1434,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -1565,13 +1515,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true,
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -1599,12 +1544,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -1687,9 +1628,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "query_string": {
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -1773,12 +1713,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -1883,12 +1819,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -1972,12 +1904,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -2042,12 +1970,8 @@
                     "searchSourceJSON": {
                         "filter": [],
                         "query": {
-                            "language": "lucene",
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -2113,10 +2037,8 @@
                         "filter": [],
                         "index": "metricbeat-*",
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true,
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 },
@@ -2225,7 +2147,7 @@
                         "filter": [],
                         "highlightAll": true,
                         "query": {
-                            "language": "lucene",
+                            "language": "kuery",
                             "query": "host.name:\"CHANGEME_HOSTNAME\""
                         },
                         "version": true
