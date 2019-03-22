@@ -18,7 +18,6 @@
 package util
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
 
@@ -52,7 +51,7 @@ func GeoConfigToMap(config GeoConfig) (common.MapStr, error) {
 			`\s*$` //optional whitespace then end anchor
 
 		if m, _ := regexp.MatchString(locRegexp, config.Location); !m {
-			return nil, errors.New(fmt.Sprintf("Invalid lat,lon  string for add_observer_metadata: %s", config.Location))
+			return nil, fmt.Errorf("Invalid lat,lon  string for add_observer_metadata: %s", config.Location)
 		}
 	}
 

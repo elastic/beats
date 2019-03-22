@@ -52,6 +52,7 @@ const (
 	processorName = "add_observer_metadata"
 )
 
+// New creates a new instance of the add_observer_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
