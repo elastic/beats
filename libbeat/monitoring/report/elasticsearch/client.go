@@ -132,9 +132,9 @@ func (c *publishClient) Publish(batch publisher.Batch) error {
 
 		switch c.format {
 		case report.ReportingFormatXPackMonitoringBulk:
-			err = c.publishWithXPackMonitoringBulk(params, event, typ)
+			err = c.publishXPackBulk(params, event, typ)
 		case report.ReportingFormatBulk:
-			err = c.publishWithBulk(event)
+			err = c.publishBulk(event)
 		}
 
 		if err != nil {
@@ -159,7 +159,7 @@ func (c *publishClient) String() string {
 	return "publish(" + c.es.String() + ")"
 }
 
-func (c *publishClient) publishWithXPackMonitoringBulk(params map[string]string, event publisher.Event, typ string) error {
+func (c *publishClient) publishXPackBulk(params map[string]string, event publisher.Event, typ string) error {
 	meta := common.MapStr{
 		"_index":   "",
 		"_routing": nil,
@@ -179,7 +179,7 @@ func (c *publishClient) publishWithXPackMonitoringBulk(params map[string]string,
 	return err
 }
 
-func (c *publishClient) publishWithBulk(event publisher.Event) error {
+func (c *publishClient) publishBulk(event publisher.Event) error {
 	meta := common.MapStr{
 		"_index":   getMonitoringIndexName(),
 		"_routing": nil,
