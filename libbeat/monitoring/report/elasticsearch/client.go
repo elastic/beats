@@ -226,7 +226,7 @@ func (c *publishClient) publishBulk(event publisher.Event, typ string) error {
 }
 
 func getMonitoringIndexName() string {
-	version := 6
+	version := 7
 	date := time.Now().Format("2006.01.02")
 	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
 }
