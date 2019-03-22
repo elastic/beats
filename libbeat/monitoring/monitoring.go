@@ -17,7 +17,19 @@
 
 package monitoring
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/elastic/beats/libbeat/common"
+	"github.com/elastic/beats/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/libbeat/monitoring/report"
+)
+
+// MonitoringBeatConfig represents the part of the $BEAT.yml to do with monitoring settings
+type MonitoringBeatConfig struct {
+	XPackMonitoring *common.Config `config:"xpack.monitoring"`
+	Monitoring      *common.Config `config:"monitoring"`
+}
 
 type Mode uint8
 
@@ -66,4 +78,26 @@ func Remove(name string) {
 
 func Clear() error {
 	return Default.Clear()
+}
+
+// SelectConfig selects the appropriate monitoring configuration based on the user's settings in $BEAT.yml. Users may either
+// use xpack.monitoring.* settings OR monitoring.* settings but not both.
+func SelectConfig(beatCfg MonitoringBeatConfig) (*common.Config, error) {
+	switch {
+	case beatCfg.Monitoring.Enabled() && beatCfg.XPackMonitoring.Enabled():
+		errMonitoringBothConfigEnabled := errors.New("both xpack.monitoring.* and monitoring.* cannot be set. Prefer to set monitoring.* and set monitoring.elasticsearch.hosts to monitoring cluster hosts")
+		return nil, errMonitoringBothConfigEnabled
+	case beatCfg.XPackMonitoring.Enabled():
+		const warnMonitoringDeprecatedConfig = "xpack.monitoring.* settings are deprecated. Use monitoring.* instead, but set monitoring.elasticsearch.hosts to monitoring cluster hosts"
+		cfgwarn.Deprecate("7.0", warnMonitoringDeprecatedConfig)
+		monitoringCfg := beatCfg.XPackMonitoring
+		monitoringCfg.SetInt("_format", -1, int64(report.ReportingFormatXPackMonitoringBulk))
+		return monitoringCfg, nil
+	case beatCfg.Monitoring.Enabled():
+		monitoringCfg := beatCfg.Monitoring
+		monitoringCfg.SetInt("_format", -1, int64(report.ReportingFormatBulk))
+		return monitoringCfg, nil
+	default:
+		return nil, nil
+	}
 }

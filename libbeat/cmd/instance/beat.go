@@ -49,7 +49,6 @@ import (
 	"github.com/elastic/beats/libbeat/cfgfile"
 	"github.com/elastic/beats/libbeat/cloudid"
 	"github.com/elastic/beats/libbeat/common"
-	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/libbeat/common/file"
 	"github.com/elastic/beats/libbeat/common/reload"
 	"github.com/elastic/beats/libbeat/common/seccomp"
@@ -104,9 +103,10 @@ type beatConfig struct {
 	Keystore      *common.Config `config:"keystore"`
 
 	// output/publishing related configurations
-	Pipeline        pipeline.Config `config:",inline"`
-	XPackMonitoring *common.Config  `config:"xpack.monitoring"`
-	Monitoring      *common.Config  `config:"monitoring"`
+	Pipeline pipeline.Config `config:",inline"`
+
+	// monitoring settings
+	monitoring.MonitoringBeatConfig `config:",inline"`
 
 	// central management settings
 	Management *common.Config `config:"management"`
@@ -369,7 +369,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		return err
 	}
 
-	monitoringCfg, err := selectMonitoringConfig(b.Config)
+	monitoringCfg, err := monitoring.SelectConfig(b.Config.MonitoringBeatConfig)
 	if err != nil {
 		return err
 	}
@@ -997,24 +997,4 @@ func initPaths(cfg *common.Config) error {
 		return fmt.Errorf("error setting default paths: %+v", err)
 	}
 	return nil
-}
-
-func selectMonitoringConfig(beatCfg beatConfig) (*common.Config, error) {
-	switch {
-	case beatCfg.Monitoring.Enabled() && beatCfg.XPackMonitoring.Enabled():
-		const errMonitoringBothConfigEnabled = "both xpack.monitoring.* and monitoring.* cannot be set. Prefer to set monitoring.* and set monitoring.elasticsearch.hosts to monitoring cluster hosts"
-		return nil, errors.New(errMonitoringBothConfigEnabled)
-	case beatCfg.XPackMonitoring.Enabled():
-		const warnMonitoringDeprecatedConfig = "xpack.monitoring.* settings are deprecated. Use monitoring.* instead, but set monitoring.elasticsearch.hosts to monitoring cluster hosts"
-		cfgwarn.Deprecate("7.0", warnMonitoringDeprecatedConfig)
-		monitoringCfg := beatCfg.XPackMonitoring
-		monitoringCfg.SetInt("_format", -1, int64(report.ReportingFormatXPackMonitoringBulk))
-		return monitoringCfg, nil
-	case beatCfg.Monitoring.Enabled():
-		monitoringCfg := beatCfg.Monitoring
-		monitoringCfg.SetInt("_format", -1, int64(report.ReportingFormatBulk))
-		return monitoringCfg, nil
-	default:
-		return nil, nil
-	}
 }
