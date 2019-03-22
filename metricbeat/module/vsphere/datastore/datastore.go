@@ -21,10 +21,11 @@ import (
 	"context"
 	"net/url"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/metricbeat/mb"
-	"github.com/pkg/errors"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/view"
