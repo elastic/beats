@@ -187,9 +187,7 @@ func (c *publishClient) publishWithBulk(event publisher.Event) error {
 		},
 	}
 
-	esVersion := c.es.GetVersion()
-	v7 := common.MustNewVersion("7.0.0")
-	if esVersion.LessThan(v7) {
+	if c.es.GetVersion().Major < 7 {
 		action.Put("index._type", "doc")
 	}
 
