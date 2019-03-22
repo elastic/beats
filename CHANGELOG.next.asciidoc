@@ -117,6 +117,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 *Auditbeat*
 
 - Move System module to beta. {pull}10800[10800]
+- Login dataset: Add event category and type. {pull}11339[11339]
 
 *Filebeat*
 
