@@ -265,7 +265,7 @@ func TestNotJsonObjectOrArray(t *testing.T) {
 func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
 	logp.TestingSetup()
 
-	p, err := newDecodeJSONFields(config)
+	p, err := NewDecodeJSONFields(config)
 	if err != nil {
 		logp.Err("Error initializing decode_json_fields")
 		t.Fatal(err)

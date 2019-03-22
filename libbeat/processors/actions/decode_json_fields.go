@@ -58,12 +58,13 @@ var debug = logp.MakeDebug("filters")
 
 func init() {
 	processors.RegisterPlugin("decode_json_fields",
-		configChecked(newDecodeJSONFields,
+		configChecked(NewDecodeJSONFields,
 			requireFields("fields"),
 			allowedFields("fields", "max_depth", "overwrite_keys", "process_array", "target", "when")))
 }
 
-func newDecodeJSONFields(c *common.Config) (processors.Processor, error) {
+// NewDecodeJSONFields construct a new decode_json_fields processor.
+func NewDecodeJSONFields(c *common.Config) (processors.Processor, error) {
 	config := defaultConfig
 
 	err := c.Unpack(&config)
