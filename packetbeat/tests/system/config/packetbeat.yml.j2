@@ -4,6 +4,11 @@
 # keyword to sniff on all connected interfaces.
 packetbeat.interfaces.device: {{ iface_device|default("any") }}
 
+{% if af_packet %}
+packetbeat.interfaces.type: af_packet
+packetbeat.interfaces.buffer_size_mb: 100
+{% endif %}
+
 {% if bpf_filter %}
 packetbeat.interfaces.bpf_filter: {{ bpf_filter }}
 {% endif %}
