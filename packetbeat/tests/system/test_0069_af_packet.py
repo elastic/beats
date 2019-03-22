@@ -1,5 +1,8 @@
 import os
 import subprocess
+import sys
+import time
+import unittest
 from packetbeat import BaseTest
 
 """
@@ -18,7 +21,7 @@ class Test(BaseTest):
         """
 
         # get device name, leave out loopback device
-        devices = [f for f in os.listdir("/sys/class/net") if f != "lo"][0]
+        devices = [f for f in os.listdir("/sys/class/net") if f != "lo"]
         assert len(devices) > 0
 
         device = devices[0]
