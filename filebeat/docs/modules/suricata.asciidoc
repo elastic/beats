@@ -19,8 +19,8 @@ include::../include/what-happens.asciidoc[]
 [float]
 === Compatibility
 
-This module requires the {elasticsearch-plugins}/ingest-geoip.html[ingest-geoip]
-and {elasticsearch-plugins}/ingest-user-agent.html[ingest-user-agent]
+This module requires the {plugins}/ingest-geoip.html[ingest-geoip]
+and {plugins}/ingest-user-agent.html[ingest-user-agent]
 Elasticsearch plugins.
 
 This module has been developed against Suricata v4.0.4, but is expected to work

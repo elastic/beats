@@ -47,7 +47,7 @@ Elastic "as is".
 
 You can configure nested metric aliases by using dots in the mapping name (for
 example, `gc.cms_collection_time`). For more examples, see
-https://github.com/elastic/beats/blob/{doc-branch}/metricbeat/module/jolokia/jmx/_meta/test/config.yml[/jolokia/jmx/test/config.yml].
+https://github.com/elastic/beats/blob/{branch}/metricbeat/module/jolokia/jmx/_meta/test/config.yml[/jolokia/jmx/test/config.yml].
 
 All metrics from a single mapping will be POSTed to the defined host/port and
 sent to Elastic as a single event. To make it possible to differentiate between

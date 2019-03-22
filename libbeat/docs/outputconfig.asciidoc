@@ -534,7 +534,7 @@ use in Logstash for indexing and filtering:
 }
 ------------------------------------------------------------------------------
 <1> {beatname_uc} uses the `@metadata` field to send metadata to Logstash. See the
-{logstashdoc}/event-dependent-configuration.html#metadata[Logstash documentation]
+{logstash-ref}/event-dependent-configuration.html#metadata[Logstash documentation]
 for more about the `@metadata` field.
 <2> The default is {beatname_lc}. To change this value, set the
 <<logstash-index,`index`>> option in the {beatname_uc} config file.
