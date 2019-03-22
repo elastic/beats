@@ -87,9 +87,15 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 				}
 			}
 
-			eventList[labelsHash].Update(common.MapStr{
-				"metrics": promEvent.data,
-			})
+			metrics, ok := eventList[labelsHash]["metrics"]
+			if !ok {
+				metrics = common.MapStr{}
+				eventList[labelsHash]["metrics"] = metrics
+			}
+
+			if metrics, ok := metrics.(common.MapStr); ok {
+				metrics.Update(promEvent.data)
+			}
 		}
 	}
 
