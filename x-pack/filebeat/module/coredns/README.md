@@ -150,7 +150,7 @@ spec:
     metadata:
       annotations:
         "co.elastic.logs/module": "coredns"
-        "co.elastic.logs/fileset": "kubernetes"
+        "co.elastic.logs/fileset": "log"
         "co.elastic.logs/disable": "false"
       labels:
         k8s-app: coredns
