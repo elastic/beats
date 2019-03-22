@@ -35,7 +35,7 @@ import (
 )
 
 func init() {
-	processors.RegisterPlugin("add_observer_metadata", newObserverMetadataProcessor)
+	processors.RegisterPlugin("add_observer_metadata", New)
 }
 
 type observerMetadata struct {
@@ -52,7 +52,7 @@ const (
 	processorName = "add_observer_metadata"
 )
 
-func newObserverMetadataProcessor(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *common.Config) (processors.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)

@@ -128,7 +128,8 @@ output.elasticsearch:
 
 #================================ Processors =====================================
 processors:
-  - add_observer_metadata: ~
+  - add_observer_metadata:
+      netinfo.enabled: true
 
 
 #================================ Logging =====================================
