@@ -21,9 +21,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
@@ -37,7 +36,7 @@ func TestConfigDefault(t *testing.T) {
 	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
 	assert.NoError(t, err)
 
-	p, err := newObserverMetadataProcessor(testConfig)
+	p, err := New(testConfig)
 
 	newEvent, err := p.Run(event)
 	assert.NoError(t, err)
@@ -69,7 +68,7 @@ func TestConfigNetInfoEnabled(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	p, err := newObserverMetadataProcessor(testConfig)
+	p, err := New(testConfig)
 
 	newEvent, err := p.Run(event)
 	assert.NoError(t, err)
@@ -110,7 +109,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 	testConfig, err := common.NewConfigFrom(config)
 	assert.NoError(t, err)
 
-	p, err := newObserverMetadataProcessor(testConfig)
+	p, err := New(testConfig)
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)
@@ -133,7 +132,7 @@ func TestConfigGeoDisabled(t *testing.T) {
 	testConfig, err := common.NewConfigFrom(config)
 	require.NoError(t, err)
 
-	p, err := newObserverMetadataProcessor(testConfig)
+	p, err := New(testConfig)
 	require.NoError(t, err)
 
 	newEvent, err := p.Run(event)

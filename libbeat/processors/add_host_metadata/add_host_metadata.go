@@ -23,8 +23,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/libbeat/processors/util"
-
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
@@ -33,6 +31,7 @@ import (
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/metric/system/host"
 	"github.com/elastic/beats/libbeat/processors"
+	"github.com/elastic/beats/libbeat/processors/util"
 	"github.com/elastic/go-sysinfo"
 )
 
