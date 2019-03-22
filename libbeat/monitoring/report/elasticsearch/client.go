@@ -180,15 +180,17 @@ func (c *publishClient) publishWithXPackMonitoringBulk(params map[string]string,
 }
 
 func (c *publishClient) publishWithBulk(event publisher.Event) error {
-	action := common.MapStr{
-		"index": common.MapStr{
-			"_index":   getMonitoringIndexName(),
-			"_routing": nil,
-		},
+	meta := common.MapStr{
+		"_index":   getMonitoringIndexName(),
+		"_routing": nil,
 	}
 
 	if c.es.GetVersion().Major < 7 {
-		action.Put("index._type", "doc")
+		meta["_type"] = "doc"
+	}
+
+	action := common.MapStr{
+		"index": meta,
 	}
 
 	event.Content.Fields.Put("timestamp", event.Content.Timestamp)
