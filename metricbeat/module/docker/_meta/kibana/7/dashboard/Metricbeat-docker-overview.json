@@ -367,11 +367,9 @@
                         }, 
                         "index": "metricbeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
+                            "language": "kuery",
                                 "query": "event.module:docker AND metricset.name:cpu"
                             }
-                        }
                     }
                 }, 
                 "title": "CPU usage [Metricbeat Docker] ECS", 
@@ -530,11 +528,9 @@
                         }, 
                         "index": "metricbeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
+                            "language": "kuery",
                                 "query": "event.module:docker AND metricset.name:memory"
                             }
-                        }
                     }
                 }, 
                 "title": "Memory usage [Metricbeat Docker] ECS", 
@@ -690,11 +686,9 @@
                         }, 
                         "index": "metricbeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
+                            "language": "kuery",
                                 "query": "event.module:docker AND metricset.name:network"
                             }
-                        }
                     }
                 }, 
                 "title": "Network IO [Metricbeat Docker] ECS", 
@@ -864,11 +858,9 @@
                         }, 
                         "index": "metricbeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
+                            "language": "kuery",
                                 "query": "event.module:docker"
                             }
-                        }
                     }
                 }, 
                 "sort": [
@@ -888,16 +880,11 @@
                 "hits": 0, 
                 "kibanaSavedObjectMeta": {
                     "searchSourceJSON": {
-                        "filter": [
-                            {
+                        "filter": [],
                                 "query": {
-                                    "query_string": {
-                                        "analyze_wildcard": true, 
-                                        "query": "*"
-                                    }
-                                }
-                            }
-                        ], 
+                            "language": "kuery",
+                            "query": ""
+                        },
                         "highlightAll": true, 
                         "version": true
                     }

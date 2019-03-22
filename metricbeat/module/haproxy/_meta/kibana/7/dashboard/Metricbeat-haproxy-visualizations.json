@@ -240,7 +240,7 @@
                                 "id": "978f2660-4735-11e8-b619-8f82b8185e96"
                             }
                         ], 
-                        "drilldown_url": "../app/kibana#/dashboard/8cc50a50-47e0-11e8-bc13-1397384faad3-ecs?_a=(query:(language:lucene,query:'haproxy.stat.service_name:\"{{ key }}\"'))", 
+                        "drilldown_url": "../app/kibana#/dashboard/8cc50a50-47e0-11e8-bc13-1397384faad3-ecs?_a=(query:(language:kuery,query:'haproxy.stat.service_name:\"{{ key }}\"'))",
                         "filter": "haproxy.stat.component_type:(2 OR 3)", 
                         "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
                         "index_pattern": "metricbeat-*", 
@@ -1159,7 +1159,7 @@
                                 "id": "50830800-47d9-11e8-9db9-274c7a5e25e4"
                             }
                         ], 
-                        "drilldown_url": "../app/kibana#/dashboard/8cc50a50-47e0-11e8-bc13-1397384faad3-ecs?_a=(query:(language:lucene,query:'haproxy.stat.service_name:\"{{ key }}\"'))", 
+                        "drilldown_url": "../app/kibana#/dashboard/8cc50a50-47e0-11e8-bc13-1397384faad3-ecs?_a=(query:(language:kuery,query:'haproxy.stat.service_name:\"{{ key }}\"'))",
                         "filter": "", 
                         "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
                         "ignore_global_filter": 0, 
@@ -1227,7 +1227,7 @@
                                 "id": "4aeddd40-47dc-11e8-9db9-274c7a5e25e4"
                             }
                         ], 
-                        "drilldown_url": "../app/kibana#/dashboard/0836a4b0-47bd-11e8-bc13-1397384faad3-ecs?_a=(query:(language:lucene,query:'haproxy.stat.proxy.name:\"{{ key }}\"'))", 
+                        "drilldown_url": "../app/kibana#/dashboard/0836a4b0-47bd-11e8-bc13-1397384faad3-ecs?_a=(query:(language:kuery,query:'haproxy.stat.proxy.name:\"{{ key }}\"'))",
                         "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
                         "index_pattern": "metricbeat-*", 
                         "interval": "auto", 
@@ -1291,7 +1291,7 @@
                                 "id": "b81d8640-47dc-11e8-9a25-99b107967d82"
                             }
                         ], 
-                        "drilldown_url": "../app/kibana#/dashboard/e9057ae0-47c5-11e8-bc13-1397384faad3-ecs?_a=(query:(language:lucene,query:'haproxy.stat.proxy.name:\"{{ key }}\"'))", 
+                        "drilldown_url": "../app/kibana#/dashboard/e9057ae0-47c5-11e8-bc13-1397384faad3-ecs?_a=(query:(language:kuery,query:'haproxy.stat.proxy.name:\"{{ key }}\"'))",
                         "id": "61ca57f0-469d-11e7-af02-69e470af7417", 
                         "index_pattern": "metricbeat-*", 
                         "interval": "auto", 

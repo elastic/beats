@@ -15,23 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package stats
+package module
 
 import (
-	"testing"
-
-	"github.com/elastic/beats/metricbeat/helper/prometheus/ptest"
+	// Register javascript modules.
+	_ "github.com/elastic/beats/libbeat/processors/script/javascript/module/console"
+	_ "github.com/elastic/beats/libbeat/processors/script/javascript/module/path"
+	_ "github.com/elastic/beats/libbeat/processors/script/javascript/module/processor"
+	_ "github.com/elastic/beats/libbeat/processors/script/javascript/module/require"
 )
-
-const testFile = "_meta/test/metrics"
-
-func TestEventMapping(t *testing.T) {
-	ptest.TestMetricSet(t, "coredns", "stats",
-		ptest.TestCases{
-			{
-				MetricsFile:  "./_meta/test/metrics",
-				ExpectedFile: "./_meta/test/metrics.expected",
-			},
-		},
-	)
-}

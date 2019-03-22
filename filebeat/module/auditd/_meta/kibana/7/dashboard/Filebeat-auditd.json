@@ -8,10 +8,8 @@
                         "filter": [], 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -63,11 +61,9 @@
                         "filter": [], 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
+                            "language": "kuery",
                                 "query": "event.action:EXECVE"
                             }
-                        }
                     }
                 }, 
                 "title": "Top Exec Commands [Filebeat Auditd] ECS", 
@@ -156,10 +152,8 @@
                         "filter": [], 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -232,10 +226,8 @@
                         "filter": [], 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "*"
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -295,10 +287,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
+                            "language": "kuery",
                                 "query": "event.dataset:auditd.log"
-                            }
                         }, 
                         "version": true
                     }
@@ -323,13 +313,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }
