@@ -519,10 +519,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "_exists_:system.auth.useradd"
-                            }
+                            "language": "kuery",
+                            "query": "system.auth.useradd:*"
                         }
                     }
                 }, 
@@ -551,10 +549,8 @@
                         "highlightAll": true, 
                         "index": "filebeat-*", 
                         "query": {
-                            "query_string": {
-                                "analyze_wildcard": true, 
-                                "query": "_exists_:system.auth.groupadd"
-                            }
+                            "language": "kuery",
+                            "query": "system.auth.groupadd:*"
                         }
                     }
                 }, 
@@ -578,13 +574,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }

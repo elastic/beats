@@ -7,13 +7,8 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -42,13 +37,8 @@
                         "filter": [], 
                         "index": "metricbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -131,12 +121,8 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -168,7 +154,7 @@
                                 "value": 0.85
                             }
                         ], 
-                        "drilldown_url": "../app/kibana#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8-ecs?_a=(query:(query_string:(analyze_wildcard:!t,query:'host.name:\"{{key}}\"')))", 
+                        "drilldown_url": "../app/kibana#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8-ecs?_a=(query:(language:kuery,query:'host.name:\"{{key}}\"'))",
                         "filter": "", 
                         "id": "31e5afa0-1b1c-11e7-b09e-037021c4f8df", 
                         "index_pattern": "metricbeat-*", 
@@ -218,12 +204,8 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -255,7 +237,7 @@
                                 "value": 0.85
                             }
                         ], 
-                        "drilldown_url": "../app/kibana#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8-ecs?_a=(query:(query_string:(analyze_wildcard:!t,query:'host.name:\"{{key}}\"')))", 
+                        "drilldown_url": "../app/kibana#/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8-ecs?_a=(query:(language:kuery,query:'host.name:\"{{key}}\"'))",
                         "filter": "", 
                         "id": "31e5afa0-1b1c-11e7-b09e-037021c4f8df", 
                         "index_pattern": "metricbeat-*", 
@@ -306,13 +288,8 @@
                         "filter": [], 
                         "index": "metricbeat-*", 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -412,12 +389,8 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -542,12 +515,8 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -672,12 +641,8 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -782,12 +747,8 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -870,12 +831,8 @@
                     "searchSourceJSON": {
                         "filter": [], 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }
                     }
                 }, 
@@ -992,13 +949,8 @@
                         "filter": [], 
                         "highlightAll": true, 
                         "query": {
-                            "language": "lucene", 
-                            "query": {
-                                "query_string": {
-                                    "analyze_wildcard": true, 
-                                    "query": "*"
-                                }
-                            }
+                            "language": "kuery",
+                            "query": ""
                         }, 
                         "version": true
                     }

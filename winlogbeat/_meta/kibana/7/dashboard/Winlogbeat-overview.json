@@ -8,10 +8,8 @@
           "searchSourceJSON": {
             "filter": [],
             "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
@@ -137,8 +135,8 @@
             "filter": [],
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "language": "lucene",
-              "query": "*"
+              "language": "kuery",
+              "query": ""
             }
           }
         },
@@ -340,10 +338,8 @@
             "filter": [],
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "query_string": {
-                "analyze_wildcard": true,
-                "query": "*"
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
@@ -389,13 +385,8 @@
             "filter": [],
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
@@ -503,13 +494,8 @@
             "filter": [],
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
@@ -617,13 +603,8 @@
             "filter": [],
             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "query": {
-              "language": "lucene",
-              "query": {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "*"
-                }
-              }
+              "language": "kuery",
+              "query": ""
             }
           }
         },
