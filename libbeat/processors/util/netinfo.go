@@ -6,10 +6,8 @@ import (
 	"github.com/joeshaw/multierror"
 )
 
-func GetNetInfo() ([]string, []string, error) {
-	var ipList []string
-	var hwList []string
-
+// GetNetInfo returns lists of IPs and MACs for the machine it is executed on.
+func GetNetInfo() (ipList []string, hwList []string, err error) {
 	// Get all interfaces and loop through them
 	ifaces, err := net.Interfaces()
 	if err != nil {
