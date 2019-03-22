@@ -36,6 +36,7 @@ https://github.com/elastic/beats/compare/v6.5.4...6.5[Check the HEAD diff]
 *Affecting all Beats*
 
 - Enforce validation for the Central Management access token. {issue}9621[9621]
+- Start autodiscover consumers before producers. {pull}7926[7926]
 
 *Auditbeat*
 
