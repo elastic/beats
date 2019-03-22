@@ -28,55 +28,51 @@ import (
 	"github.com/elastic/beats/libbeat/processors"
 )
 
-type renameFields struct {
-	config renameFieldsConfig
+type copyFields struct {
+	config copyFieldsConfig
 }
 
-type renameFieldsConfig struct {
+type copyFieldsConfig struct {
 	Fields        []fromTo `config:"fields"`
 	IgnoreMissing bool     `config:"ignore_missing"`
 	FailOnError   bool     `config:"fail_on_error"`
 }
 
-type fromTo struct {
-	From string `config:"from"`
-	To   string `config:"to"`
-}
-
 func init() {
-	processors.RegisterPlugin("rename",
-		configChecked(newRenameFields,
-			requireFields("fields")))
+	processors.RegisterPlugin("copy_fields",
+		configChecked(newCopyFields,
+			requireFields("fields"),
+		),
+	)
 }
 
-func newRenameFields(c *common.Config) (processors.Processor, error) {
-	config := renameFieldsConfig{
+func newCopyFields(c *common.Config) (processors.Processor, error) {
+	config := copyFieldsConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
 	}
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unpack the rename configuration: %s", err)
+		return nil, fmt.Errorf("failed to unpack the configuration of copy processor: %s", err)
 	}
 
-	f := &renameFields{
+	f := &copyFields{
 		config: config,
 	}
 	return f, nil
 }
 
-func (f *renameFields) Run(event *beat.Event) (*beat.Event, error) {
+func (f *copyFields) Run(event *beat.Event) (*beat.Event, error) {
 	var backup common.MapStr
-	// Creates a copy of the event to revert in case of failure
 	if f.config.FailOnError {
 		backup = event.Fields.Clone()
 	}
 
 	for _, field := range f.config.Fields {
-		err := f.renameField(field.From, field.To, event.Fields)
+		err := f.copyField(field.From, field.To, event.Fields)
 		if err != nil && f.config.FailOnError {
-			errMsg := fmt.Errorf("Failed to rename fields in processor: %s", err)
-			logp.Debug("rename", errMsg.Error())
+			errMsg := fmt.Errorf("Failed to copy fields in copy_fields processor: %s", err)
+			logp.Debug("copy_fields", errMsg.Error())
 			event.Fields = backup
 			event.PutValue("error.message", errMsg.Error())
 			return event, err
@@ -86,8 +82,7 @@ func (f *renameFields) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (f *renameFields) renameField(from string, to string, fields common.MapStr) error {
-	// Fields cannot be overwritten. Either the target field has to be dropped first or renamed first
+func (f *copyFields) copyField(from string, to string, fields common.MapStr) error {
 	exists, _ := fields.HasKey(to)
 	if exists {
 		return fmt.Errorf("target field %s already exists, drop or rename this field first", to)
@@ -95,26 +90,19 @@ func (f *renameFields) renameField(from string, to string, fields common.MapStr)
 
 	value, err := fields.GetValue(from)
 	if err != nil {
-		// Ignore ErrKeyNotFound errors
 		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
 			return nil
 		}
 		return fmt.Errorf("could not fetch value for key: %s, Error: %s", from, err)
 	}
 
-	// Deletion must happen first to support cases where a becomes a.b
-	err = fields.Delete(from)
-	if err != nil {
-		return fmt.Errorf("could not delete key: %s,  %+v", from, err)
-	}
-
 	_, err = fields.Put(to, value)
 	if err != nil {
-		return fmt.Errorf("could not put value: %s: %v, %v", to, value, err)
+		return fmt.Errorf("could not copy value to %s: %v, %+v", to, value, err)
 	}
 	return nil
 }
 
-func (f *renameFields) String() string {
-	return "rename=" + fmt.Sprintf("%+v", f.config.Fields)
+func (f *copyFields) String() string {
+	return "copy_fields=" + fmt.Sprintf("%+v", f.config.Fields)
 }
