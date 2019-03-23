@@ -502,6 +502,12 @@ metricbeat.modules:
   hosts: ["localhost:11211"]
   enabled: true
 
+#-------------------------------- Mesos Module --------------------------------
+- module: mesos
+  metricsets: ["master"]
+  period: 10s
+  hosts: ["localhost:5050"]
+
 #------------------------------- MongoDB Module -------------------------------
 - module: mongodb
   metricsets: ["dbstats", "status", "collstats", "metrics", "replstatus"]

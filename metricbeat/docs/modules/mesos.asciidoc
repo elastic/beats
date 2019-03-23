@@ -1,0 +1,38 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[metricbeat-module-mesos]]
+== mesos module
+
+experimental[]
+
+This is the mesos module.
+
+The default metricset is `master`.
+
+
+[float]
+=== Example configuration
+
+The mesos module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: mesos
+  metricsets: ["master"]
+  period: 10s
+  hosts: ["localhost:5050"]
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-mesos-master,master>>
+
+include::mesos/master.asciidoc[]
+

@@ -1,0 +1,173 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "mesos.master",
+        "duration": 115000,
+        "module": "mesos"
+    },
+    "mesos": {
+        "master": {
+            "allocator": {
+                "mesos": {
+                    "allocation_run_MS": {
+                        "count": 879,
+                        "max": 0.045824,
+                        "min": 0.00384,
+                        "p50": 0.011008,
+                        "p90": 0.011776,
+                        "p95": 0.012032,
+                        "p99": 0.01792,
+                        "p999": 0.0433515519999999,
+                        "p9999": 0.0455767552
+                    },
+                    "allocation_run_latency_MS": {
+                        "count": 879,
+                        "max": 0.098048,
+                        "min": 0.00512,
+                        "p50": 0.022016,
+                        "p90": 0.028928,
+                        "p95": 0.0483071999999998,
+                        "p99": 0.06826496,
+                        "p999": 0.0742225919999988,
+                        "p9999": 0.0956654591999996
+                    },
+                    "allocation_run_latency_ms": 0.020992,
+                    "allocation_run_ms": 0.011008,
+                    "allocation_runs": 879,
+                    "event_queue_dispatches": 1,
+                    "resources": {
+                        "cpus": {
+                            "offered_or_allocated": 0,
+                            "total": 0
+                        },
+                        "disk": {
+                            "offered_or_allocated": 0,
+                            "total": 0
+                        },
+                        "mem": {
+                            "offered_or_allocated": 0,
+                            "total": 0
+                        }
+                    }
+                }
+            },
+            "master": {
+                "cpus_percent": 0,
+                "cpus_revocable_percent": 0,
+                "cpus_revocable_total": 0,
+                "cpus_revocable_used": 0,
+                "cpus_total": 0,
+                "cpus_used": 0,
+                "disk_percent": 0,
+                "disk_revocable_percent": 0,
+                "disk_revocable_total": 0,
+                "disk_revocable_used": 0,
+                "disk_total": 0,
+                "disk_used": 0,
+                "dropped_messages": 0,
+                "elected": 1,
+                "event_queue_dispatches": 2,
+                "event_queue_http_requests": 0,
+                "event_queue_messages": 0,
+                "frameworks_active": 0,
+                "frameworks_connected": 0,
+                "frameworks_disconnected": 0,
+                "frameworks_inactive": 0,
+                "gpus_percent": 0,
+                "gpus_revocable_percent": 0,
+                "gpus_revocable_total": 0,
+                "gpus_revocable_used": 0,
+                "gpus_total": 0,
+                "gpus_used": 0,
+                "invalid_executor_to_framework_messages": 0,
+                "invalid_framework_to_executor_messages": 0,
+                "invalid_operation_status_update_acknowledgements": 0,
+                "invalid_status_update_acknowledgements": 0,
+                "invalid_status_updates": 0,
+                "mem_percent": 0,
+                "mem_revocable_percent": 0,
+                "mem_revocable_total": 0,
+                "mem_revocable_used": 0,
+                "mem_total": 0,
+                "mem_used": 0,
+                "messages_authenticate": 0,
+                "messages_deactivate_framework": 0,
+                "messages_decline_offers": 0,
+                "messages_executor_to_framework": 0,
+                "messages_exited_executor": 0,
+                "messages_framework_to_executor": 0,
+                "messages_kill_task": 0,
+                "messages_launch_tasks": 0,
+                "messages_operation_status_update_acknowledgement": 0,
+                "messages_reconcile_operations": 0,
+                "messages_reconcile_tasks": 0,
+                "messages_register_framework": 0,
+                "messages_register_slave": 0,
+                "messages_reregister_framework": 0,
+                "messages_reregister_slave": 0,
+                "messages_resource_request": 0,
+                "messages_revive_offers": 0,
+                "messages_status_update": 0,
+                "messages_status_update_acknowledgement": 0,
+                "messages_unregister_framework": 0,
+                "messages_unregister_slave": 0,
+                "messages_update_slave": 0,
+                "outstanding_offers": 0,
+                "recovery_slave_removals": 0,
+                "slave_Removals": {
+                    "reason_registered": 0,
+                    "reason_unhealthy": 0,
+                    "reason_unregistered": 0
+                },
+                "slave_registrations": 0,
+                "slave_removals": 0,
+                "slave_reregistrations": 0,
+                "slave_unreachable_canceled": 0,
+                "slave_unreachable_completed": 0,
+                "slave_unreachable_scheduled": 0,
+                "slaves_active": 0,
+                "slaves_connected": 0,
+                "slaves_disconnected": 0,
+                "slaves_inactive": 0,
+                "slaves_unreachable": 0,
+                "tasks_error": 0,
+                "tasks_failed": 0,
+                "tasks_finished": 0,
+                "tasks_killed": 0,
+                "tasks_killing": 0,
+                "tasks_lost": 0,
+                "tasks_running": 0,
+                "tasks_staging": 0,
+                "tasks_starting": 0,
+                "tasks_unreachable": 0,
+                "uptime_secs": 880.232637184,
+                "valid_executor_to_framework_messages": 0,
+                "valid_framework_to_executor_messages": 0,
+                "valid_operation_status_update_acknowledgements": 0,
+                "valid_status_update_acknowledgements": 0,
+                "valid_status_updates": 0
+            },
+            "registrar": {
+                "log": {},
+                "state_fetch_ms": 0.527104,
+                "state_store_MS": {},
+                "state_store_ms": 0.133888
+            },
+            "system": {
+                "cpus_total": 12,
+                "load_15min": 0.44,
+                "load_1min": 0.72,
+                "load_5min": 0.5,
+                "mem_free_bytes": 2188693504,
+                "mem_total_bytes": 16683503616
+            }
+        }
+    },
+    "metricset": {
+        "name": "master"
+    },
+    "service": {
+        "address": "127.0.0.1:5050",
+        "type": "mesos"
+    }
+}

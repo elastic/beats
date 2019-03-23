@@ -1,0 +1,11 @@
+- key: mesos
+  title: "mesos"
+  description: >
+    mesos module
+  release: experimental
+  fields:
+    - name: mesos
+      type: group
+      description: >
+        `mesos` contains statistics that were read from Mesos
+      fields:

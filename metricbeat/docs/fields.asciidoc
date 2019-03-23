@@ -43,6 +43,7 @@ grouped in the following categories:
 * <<exported-fields-kvm>>
 * <<exported-fields-logstash>>
 * <<exported-fields-memcached>>
+* <<exported-fields-mesos>>
 * <<exported-fields-mongodb>>
 * <<exported-fields-mssql>>
 * <<exported-fields-munin>>
@@ -14530,6 +14531,1443 @@ Number of bytes currently used for caching items.
 type: long
 
 Number of bytes this server is allowed to use for storage.
+
+
+--
+
+[[exported-fields-mesos]]
+== mesos fields
+
+mesos module
+
+
+
+[float]
+== mesos fields
+
+`mesos` contains statistics that were read from Mesos
+
+
+
+[float]
+== master fields
+
+Contains Mesos master stats
+
+
+
+
+*`mesos.master.master.cpus_percent`*::
++
+--
+type: long
+
+Percentage of allocated CPUs
+
+
+--
+
+*`mesos.master.master.cpus_used`*::
++
+--
+type: long
+
+Number of allocated CPUs
+
+
+--
+
+*`mesos.master.master.cpus_total`*::
++
+--
+type: long
+
+Number of CPUs
+
+
+--
+
+*`mesos.master.master.cpus_revocable_percent`*::
++
+--
+type: long
+
+Percentage of allocated revocable CPUs
+
+
+--
+
+*`mesos.master.master.cpus_revocable_total`*::
++
+--
+type: long
+
+Number of revocable CPUs
+
+
+--
+
+*`mesos.master.master.cpus_revocable_used`*::
++
+--
+type: long
+
+Number of allocated revocable CPUs
+
+
+--
+
+*`mesos.master.master.disk_percent`*::
++
+--
+type: long
+
+Percentage of allocated disk space
+
+
+--
+
+*`mesos.master.master.disk_used`*::
++
+--
+type: long
+
+Allocated disk space in MB
+
+
+--
+
+*`mesos.master.master.disk_revocable_percent`*::
++
+--
+type: long
+
+Percentage of allocated revocable disk space
+
+
+--
+
+*`mesos.master.master.disk_revocable_total`*::
++
+--
+type: long
+
+Revocable disk space in MB
+
+
+--
+
+*`mesos.master.master.disk_revocable_used`*::
++
+--
+type: long
+
+Allocated revocable disk space in MB
+
+
+--
+
+*`mesos.master.master.gpus_percent`*::
++
+--
+type: long
+
+Percentage of allocated GPUs
+
+
+--
+
+*`mesos.master.master.gpus_used`*::
++
+--
+type: long
+
+Number of allocated GPUs
+
+
+--
+
+*`mesos.master.master.gpus_total`*::
++
+--
+type: long
+
+Number of GPUs
+
+
+--
+
+*`mesos.master.master.gpus_revocable_percent`*::
++
+--
+type: long
+
+Percentage of allocated revocable GPUs
+
+
+--
+
+*`mesos.master.master.gpus_revocable_total`*::
++
+--
+type: long
+
+Number of revocable GPUs
+
+
+--
+
+*`mesos.master.master.gpus_revocable_used`*::
++
+--
+type: long
+
+Number of allocated revocable GPUs
+
+
+--
+
+*`mesos.master.master.mem_percent`*::
++
+--
+type: long
+
+Percentage of allocated memory
+
+
+--
+
+*`mesos.master.master.mem_used`*::
++
+--
+type: long
+
+Allocated memory in MB
+
+
+--
+
+*`mesos.master.master.mem_total`*::
++
+--
+type: long
+
+Memory in MB
+
+
+--
+
+*`mesos.master.master.mem_revocable_percent`*::
++
+--
+type: long
+
+Percentage of allocated revocable memory
+
+
+--
+
+*`mesos.master.master.mem_revocable_total`*::
++
+--
+type: long
+
+Revocable memory in MB
+
+
+--
+
+*`mesos.master.master.mem_revocable_used`*::
++
+--
+type: long
+
+Allocated revocable memory in MB
+
+
+--
+
+*`mesos.master.master.elected`*::
++
+--
+type: long
+
+Whether this is the elected master
+
+
+--
+
+*`mesos.master.master.uptime_secs`*::
++
+--
+type: long
+
+Uptime in seconds
+
+
+--
+
+*`mesos.master.master.slave_registrations`*::
++
+--
+type: long
+
+Number of agents that were able to cleanly re-join the cluster and connect back to the master after the master is disconnected.
+
+
+--
+
+*`mesos.master.master.slave_reregistrations`*::
++
+--
+type: long
+
+Number of agent re-registrations
+
+
+--
+
+*`mesos.master.master.slave_unreachable_scheduled`*::
++
+--
+type: long
+
+Number of agents which have failed their health check and are scheduled to be marked unreachable.
+
+
+--
+
+*`mesos.master.master.slave_unreachable_canceled`*::
++
+--
+type: long
+
+Number of times that an agent was due to be marked unreachable but this transition was cancelled.
+
+
+--
+
+*`mesos.master.master.slave_unreachable_completed`*::
++
+--
+type: long
+
+Number of agents that were marked as unreachable because they failed health checks.
+
+
+--
+
+*`mesos.master.master.slaves_active`*::
++
+--
+type: long
+
+Number of active agents
+
+
+--
+
+*`mesos.master.master.slaves_connected`*::
++
+--
+type: long
+
+Number of connected agents
+
+
+--
+
+*`mesos.master.master.slaves_disconnected`*::
++
+--
+type: long
+
+Number of disconnected agents
+
+
+--
+
+*`mesos.master.master.slaves_inactive`*::
++
+--
+type: long
+
+Number of inactive agents
+
+
+--
+
+*`mesos.master.master.slaves_unreachable`*::
++
+--
+type: long
+
+Number of unreachable agents.
+
+
+--
+
+*`mesos.master.master.frameworks_active`*::
++
+--
+type: long
+
+Number of active frameworks
+
+
+--
+
+*`mesos.master.master.frameworks_connected`*::
++
+--
+type: long
+
+Number of connected frameworks
+
+
+--
+
+*`mesos.master.master.frameworks_disconnected`*::
++
+--
+type: long
+
+Number of disconnected frameworks
+
+
+--
+
+*`mesos.master.master.frameworks_inactive`*::
++
+--
+type: long
+
+Number of inactive frameworks
+
+
+--
+
+*`mesos.master.master.outstanding_offers`*::
++
+--
+type: long
+
+Number of outstanding resource offers
+
+
+--
+
+*`mesos.master.master.tasks_error`*::
++
+--
+type: long
+
+Number of tasks that were invalid
+
+
+--
+
+*`mesos.master.master.tasks_failed`*::
++
+--
+type: long
+
+Number of failed tasks
+
+
+--
+
+*`mesos.master.master.tasks_finished`*::
++
+--
+type: long
+
+Number of finished tasks
+
+
+--
+
+*`mesos.master.master.tasks_killed`*::
++
+--
+type: long
+
+Number of killed tasks
+
+
+--
+
+*`mesos.master.master.tasks_killing`*::
++
+--
+type: long
+
+Number of tasks currently being killed
+
+
+--
+
+*`mesos.master.master.tasks_lost`*::
++
+--
+type: long
+
+Number of lost tasks
+
+
+--
+
+*`mesos.master.master.tasks_running`*::
++
+--
+type: long
+
+Number of running tasks
+
+
+--
+
+*`mesos.master.master.tasks_staging`*::
++
+--
+type: long
+
+Number of staging tasks
+
+
+--
+
+*`mesos.master.master.tasks_starting`*::
++
+--
+type: long
+
+Number of starting tasks
+
+
+--
+
+*`mesos.master.master.tasks_unreachable`*::
++
+--
+type: long
+
+Number of unreachable tasks
+
+
+--
+
+*`mesos.master.master.invalid_executor_to_framework_messages`*::
++
+--
+type: long
+
+Number of invalid executor to framework messages
+
+
+--
+
+*`mesos.master.master.invalid_framework_to_executor_messages`*::
++
+--
+type: long
+
+Number of invalid framework to executor messages
+
+
+--
+
+*`mesos.master.master.invalid_operation_status_update_acknowledgements`*::
++
+--
+type: long
+
+Number of invalid operation status update acknowledgements
+
+
+--
+
+*`mesos.master.master.invalid_status_update_acknowledgements`*::
++
+--
+type: long
+
+Number of invalid status update acknowledgements
+
+
+--
+
+*`mesos.master.master.invalid_status_updates`*::
++
+--
+type: long
+
+Number of invalid status updates
+
+
+--
+
+*`mesos.master.master.dropped_messages`*::
++
+--
+type: long
+
+Number of dropped messages
+
+
+--
+
+*`mesos.master.master.messages_authenticate`*::
++
+--
+type: long
+
+Number of authentication messages
+
+
+--
+
+*`mesos.master.master.messages_deactivate_framework`*::
++
+--
+type: long
+
+Number of framework deactivation messages
+
+
+--
+
+*`mesos.master.master.messages_decline_offers`*::
++
+--
+type: long
+
+Number of offers declined
+
+
+--
+
+*`mesos.master.master.messages_executor_to_framework`*::
++
+--
+type: long
+
+Number of executor to framework messages
+
+
+--
+
+*`mesos.master.master.messages_exited_executor`*::
++
+--
+type: long
+
+Number of terminated executor messages
+
+
+--
+
+*`mesos.master.master.messages_framework_to_executor`*::
++
+--
+type: long
+
+Number of messages from a framework to an executor
+
+
+--
+
+*`mesos.master.master.messages_kill_task`*::
++
+--
+type: long
+
+Number of kill task messages
+
+
+--
+
+*`mesos.master.master.messages_launch_tasks`*::
++
+--
+type: long
+
+Number of launch task messages
+
+
+--
+
+*`mesos.master.master.messages_operation_status_update_acknowledgement`*::
++
+--
+type: long
+
+Number of operation status update acknowledgement messages
+
+
+--
+
+*`mesos.master.master.messages_reconcile_operations`*::
++
+--
+type: long
+
+Number of reconcile operations messages
+
+
+--
+
+*`mesos.master.master.messages_reconcile_tasks`*::
++
+--
+type: long
+
+Number of reconcile operations messages
+
+
+--
+
+*`mesos.master.master.messages_register_framework`*::
++
+--
+type: long
+
+Number of framework registration messages
+
+
+--
+
+*`mesos.master.master.messages_register_slave`*::
++
+--
+type: long
+
+Number of agent registration messages
+
+
+--
+
+*`mesos.master.master.messages_reregister_framework`*::
++
+--
+type: long
+
+Number of framework re-registration messages
+
+
+--
+
+*`mesos.master.master.messages_reregister_slave`*::
++
+--
+type: long
+
+Number of agent re-registration messages
+
+
+--
+
+*`mesos.master.master.messages_resource_request`*::
++
+--
+type: long
+
+Number of resource request messages
+
+
+--
+
+*`mesos.master.master.messages_revive_offers`*::
++
+--
+type: long
+
+Number of offer revival messages
+
+
+--
+
+*`mesos.master.master.messages_status_update`*::
++
+--
+type: long
+
+Number of status update messages
+
+
+--
+
+*`mesos.master.master.messages_status_update_acknowledgement`*::
++
+--
+type: long
+
+Number of status update acknowledgement messages
+
+
+--
+
+*`mesos.master.master.messages_unregister_framework`*::
++
+--
+type: long
+
+Number of framework unregistration messages
+
+
+--
+
+*`mesos.master.master.messages_unregister_slave`*::
++
+--
+type: long
+
+Number of agent unregistration messages
+
+
+--
+
+*`mesos.master.master.messages_update_slave`*::
++
+--
+type: long
+
+Number of update agent messages
+
+
+--
+
+*`mesos.master.master.recovery_slave_removals`*::
++
+--
+type: long
+
+Number of agents not reregistered during master failover
+
+
+--
+
+*`mesos.master.master.slave_removals`*::
++
+--
+type: long
+
+Number of agent removed for various reasons, including maintenance
+
+
+--
+
+[float]
+== slave_Removals fields
+
+Number of agent removed for various reasons, including maintenance
+
+
+
+*`mesos.master.master.slave_Removals.reason_registered`*::
++
+--
+type: long
+
+Number of agents removed when new agents registered at the same address
+
+
+--
+
+*`mesos.master.master.slave_Removals.reason_unhealthy`*::
++
+--
+type: long
+
+Number of agents failed due to failed health checks
+
+
+--
+
+*`mesos.master.master.slave_Removals.reason_unregistered`*::
++
+--
+type: long
+
+Number of agents unregistered
+
+
+--
+
+*`mesos.master.master.valid_framework_to_executor_messages`*::
++
+--
+type: long
+
+Number of valid framework to executor messages
+
+
+--
+
+*`mesos.master.master.valid_operation_status_update_acknowledgements`*::
++
+--
+type: long
+
+Number of valid operation status update acknowledgement messages
+
+
+--
+
+*`mesos.master.master.valid_status_update_acknowledgements`*::
++
+--
+type: long
+
+Number of valid status update acknowledgement messages
+
+
+--
+
+*`mesos.master.master.valid_status_updates`*::
++
+--
+type: long
+
+Number of valid status update messages
+
+
+--
+
+*`mesos.master.master.valid_executor_to_framework_messages`*::
++
+--
+type: long
+
+Number of valid executor to framework messages
+
+
+--
+
+*`mesos.master.master.event_queue_dispatches`*::
++
+--
+type: long
+
+Number of dispatches in the event queue
+
+
+--
+
+*`mesos.master.master.event_queue_http_requests`*::
++
+--
+type: long
+
+Number of HTTP requests in the event queue
+
+
+--
+
+*`mesos.master.master.event_queue_messages`*::
++
+--
+type: long
+
+Number of messages in the event queue
+
+
+--
+
+*`mesos.master.master.operator_event_stream_subscribers`*::
++
+--
+type: long
+
+Number of subscribers to the operator event stream
+
+
+--
+
+
+*`mesos.master.system.cpus_total`*::
++
+--
+type: long
+
+Number of CPUs available
+
+
+--
+
+*`mesos.master.system.load_15min`*::
++
+--
+type: scaled_float
+
+Load average for the past 15 minutes
+
+
+--
+
+*`mesos.master.system.load_5min`*::
++
+--
+type: scaled_float
+
+Load average for the past 5 minutes
+
+
+--
+
+*`mesos.master.system.load_1min`*::
++
+--
+type: scaled_float
+
+Load average for the past minute
+
+
+--
+
+*`mesos.master.system.mem_free_bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Free memory in bytes
+
+
+--
+
+*`mesos.master.system.mem_total_bytes`*::
++
+--
+type: long
+
+format: bytes
+
+Total memory in bytes
+
+
+--
+
+
+*`mesos.master.registrar.state_fetch_ms`*::
++
+--
+type: long
+
+Registry read latency in ms
+
+
+--
+
+*`mesos.master.registrar.state_store_ms`*::
++
+--
+type: scaled_float
+
+Registry write latency in ms
+
+
+--
+
+
+*`mesos.master.registrar.state_store_MS.max`*::
++
+--
+type: scaled_float
+
+Maximum registry write latency in ms
+
+
+--
+
+*`mesos.master.registrar.state_store_MS.min`*::
++
+--
+type: scaled_float
+
+Minimum registry write latency in ms
+
+
+--
+
+*`mesos.master.registrar.state_store_MS.p50`*::
++
+--
+type: scaled_float
+
+Median registry write latency in ms
+
+
+--
+
+*`mesos.master.registrar.state_store_MS.p90`*::
++
+--
+type: scaled_float
+
+90th percentile registry write latency in ms
+
+
+--
+
+*`mesos.master.registrar.state_store_MS.p95`*::
++
+--
+type: scaled_float
+
+95th percentile registry write latency in ms
+
+
+--
+
+*`mesos.master.registrar.state_store_MS.p99`*::
++
+--
+type: scaled_float
+
+99th percentile registry write latency in ms
+
+
+--
+
+*`mesos.master.registrar.state_store_MS.p999`*::
++
+--
+type: scaled_float
+
+99.9th percentile registry write latency in ms
+
+
+--
+
+*`mesos.master.registrar.state_store_MS.p9999`*::
++
+--
+type: scaled_float
+
+99.99th percentile registry write latency in ms
+
+
+--
+
+*`mesos.master.registrar.state_store_MS.count`*::
++
+--
+type: long
+
+--
+
+[float]
+== log fields
+
+The following metrics provide information about the replicated log underneath the registrar, which is the persistent store for masters.
+
+
+
+*`mesos.master.registrar.log.recovered`*::
++
+--
+type: long
+
+Whether the replicated log for the registrar has caught up with the other masters in the cluster.
+
+
+--
+
+*`mesos.master.registrar.log.ensemble_size`*::
++
+--
+type: long
+
+The number of masters in the ensemble (cluster) that the current master communicates with (including itself) to form the replicated log quorum.
+
+
+--
+
+[float]
+== allocator fields
+
+The following metrics provide information about performance and resource allocations in the allocator.
+
+
+
+
+*`mesos.master.allocator.mesos.allocation_run_ms`*::
++
+--
+type: scaled_float
+
+--
+
+
+*`mesos.master.allocator.mesos.allocation_run_MS.count`*::
++
+--
+type: long
+
+Number of allocation algorithm time measurements in the window
+
+
+--
+
+*`mesos.master.allocator.mesos.allocation_run_MS.max`*::
++
+--
+type: scaled_float
+
+Maximum time spent in allocation algorithm in ms
+
+
+--
+
+*`mesos.master.allocator.mesos.allocation_run_MS.min`*::
++
+--
+type: scaled_float
+
+Minimum time spent in allocation algorithm in ms
+
+
+--
+
+*`mesos.master.allocator.mesos.allocation_run_MS.p50`*::
++
+--
+type: scaled_float
+
+Median time spent in allocation algorithm in ms
+
+
+--
+
+*`mesos.master.allocator.mesos.allocation_run_MS.p90`*::
++
+--
+type: scaled_float
+
+90th percentile of time spent in allocation algorithm in ms
+
+
+--
+
+*`mesos.master.allocator.mesos.allocation_run_MS.p95`*::
++
+--
+type: scaled_float
+
+95th percentile of time spent in allocation algorithm in ms
+
+
+--
+
+*`mesos.master.allocator.mesos.allocation_run_MS.p99`*::
++
+--
+type: scaled_float
+
+99th percentile of time spent in allocation algorithm in ms
+
+
+--
+
+*`mesos.master.allocator.mesos.allocation_run_MS.p999`*::
++
+--
+type: scaled_float
+
+99.9th percentile of time spent in allocation algorithm in ms
+
+
+--
+
+*`mesos.master.allocator.mesos.allocation_run_MS.p9999`*::
++
+--
+type: scaled_float
+
+99.99th percentile of time spent in allocation algorithm in ms
+
+
+--
+
+*`mesos.master.allocator.mesos.allocation_runs`*::
++
+--
+type: long
+
+Number of times the allocation algorithm has run
+
+
+--
+
+[float]
+== allocation_run_latency_MS fields
+
+Allocation batch latency in ms
+
+
+
+*`mesos.master.allocator.mesos.allocation_run_latency_MS.count`*::
++
+--
+type: long
+
+Number of allocation batch latency measurements in the window
+
+
+--
+
+*`mesos.master.allocator.mesos.allocation_run_latency_MS.max`*::
++
+--
+type: scaled_float
+
+Maximum allocation batch latency in ms
+
+
+--
+
+*`mesos.master.allocator.mesos.allocation_run_latency_MS.min`*::
++
+--
+type: scaled_float
+
+Minimum allocation batch latency in ms
+
+
+--
+
+*`mesos.master.allocator.mesos.allocation_run_latency_MS.p50`*::
++
+--
+type: scaled_float
+
+Median allocation batch latency in ms
+
+
+--
+
+*`mesos.master.allocator.mesos.allocation_run_latency_MS.p90`*::
++
+--
+type: scaled_float
+
+90th percentile allocation batch latency in ms
+
+
+--
+
+*`mesos.master.allocator.mesos.allocation_run_latency_MS.p95`*::
++
+--
+type: scaled_float
+
+95th percentile allocation batch latency in ms
+
+
+--
+
+*`mesos.master.allocator.mesos.allocation_run_latency_MS.p99`*::
++
+--
+type: scaled_float
+
+99th percentile allocation batch latency in ms
+
+
+--
+
+*`mesos.master.allocator.mesos.allocation_run_latency_MS.p999`*::
++
+--
+type: scaled_float
+
+99.9th percentile allocation batch latency in ms
+
+
+--
+
+*`mesos.master.allocator.mesos.allocation_run_latency_MS.p9999`*::
++
+--
+type: scaled_float
+
+99.99th percentile allocation batch latency in ms
+
+
+--
+
+*`mesos.master.allocator.mesos.event_queue_dispatches`*::
++
+--
+type: long
+
+Number of dispatch events in the event queue
+
+
+--
+
+
+
+*`mesos.master.allocator.mesos.resources.cpus.offered_or_allocated`*::
++
+--
+type: long
+
+Number of CPUs offered or allocated
+
+
+--
+
+*`mesos.master.allocator.mesos.resources.cpus.total`*::
++
+--
+type: long
+
+Number of CPUs
+
+
+--
+
+
+*`mesos.master.allocator.mesos.resources.disk.offered_or_allocated`*::
++
+--
+type: long
+
+Allocated or offered disk space in MB
+
+
+--
+
+*`mesos.master.allocator.mesos.resources.disk.total`*::
++
+--
+type: long
+
+Total disk space in MB
+
+
+--
+
+
+*`mesos.master.allocator.mesos.resources.mem.offered_or_allocated`*::
++
+--
+type: long
+
+Allocated or offered memory in MB
+
+
+--
+
+*`mesos.master.allocator.mesos.resources.mem.total`*::
++
+--
+type: long
+
+Total memory in MB
 
 
 --

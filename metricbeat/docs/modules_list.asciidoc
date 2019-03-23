@@ -101,6 +101,8 @@ This file is generated! See scripts/docs_collector.py
 |<<metricbeat-metricset-logstash-node_stats,node_stats>>   
 |<<metricbeat-module-memcached,Memcached>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-memcached-stats,stats>>   
+|<<metricbeat-module-mesos,mesos>>  experimental[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-mesos-master,master>> experimental[]  
 |<<metricbeat-module-mongodb,MongoDB>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .5+| .5+|  |<<metricbeat-metricset-mongodb-collstats,collstats>>   
 |<<metricbeat-metricset-mongodb-dbstats,dbstats>>   
@@ -198,6 +200,7 @@ include::modules/kubernetes.asciidoc[]
 include::modules/kvm.asciidoc[]
 include::modules/logstash.asciidoc[]
 include::modules/memcached.asciidoc[]
+include::modules/mesos.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mssql.asciidoc[]
 include::modules/munin.asciidoc[]

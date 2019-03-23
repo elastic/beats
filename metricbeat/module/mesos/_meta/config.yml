@@ -1,0 +1,4 @@
+- module: mesos
+  metricsets: ["master"]
+  period: 10s
+  hosts: ["localhost:5050"]

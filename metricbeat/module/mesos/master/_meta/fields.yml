@@ -1,0 +1,614 @@
+- name: master
+  type: group
+  description: >
+    Contains Mesos master stats
+  release: experimental
+  fields:
+    - name: master 
+      type: group
+      fields:
+        - name: cpus_percent
+          type: long
+          description: >
+            Percentage of allocated CPUs
+        - name: cpus_used
+          type: long
+          description: >
+            Number of allocated CPUs
+        - name: cpus_total
+          type: long
+          description: >
+            Number of CPUs
+        - name: cpus_revocable_percent
+          type: long
+          description: >
+            Percentage of allocated revocable CPUs
+        - name: cpus_revocable_total
+          type: long
+          description: >
+            Number of revocable CPUs
+        - name: cpus_revocable_used
+          type: long
+          description: >
+            Number of allocated revocable CPUs
+        - name: disk_percent
+          type: long
+          description: >
+            Percentage of allocated disk space
+        - name: disk_used
+          type: long
+          description: >
+            Allocated disk space in MB
+        - name: disk_total
+          type: long
+          description: >
+            Disk space in MB
+          name: disk_revocable_percent
+          type: long
+          description: >
+            Percentage of allocated revocable disk space
+        - name: disk_revocable_total
+          type: long
+          description: >
+            Revocable disk space in MB
+        - name: disk_revocable_used
+          type: long
+          description: >
+            Allocated revocable disk space in MB
+        - name: gpus_percent
+          type: long
+          description: >
+            Percentage of allocated GPUs
+        - name: gpus_used
+          type: long
+          description: >
+            Number of allocated GPUs
+        - name: gpus_total
+          type: long
+          description: >
+            Number of GPUs
+        - name: gpus_revocable_percent
+          type: long
+          description: >
+            Percentage of allocated revocable GPUs
+        - name: gpus_revocable_total
+          type: long
+          description: >
+            Number of revocable GPUs
+        - name: gpus_revocable_used
+          type: long
+          description: >
+            Number of allocated revocable GPUs
+        - name: mem_percent
+          type: long
+          description: >
+            Percentage of allocated memory
+        - name: mem_used
+          type: long
+          description: >
+            Allocated memory in MB
+        - name: mem_total
+          type: long
+          description: >
+            Memory in MB
+        - name: mem_revocable_percent
+          type: long
+          description: >
+            Percentage of allocated revocable memory
+        - name: mem_revocable_total
+          type: long
+          description: >
+            Revocable memory in MB
+        - name: mem_revocable_used
+          type: long
+          description: >
+            Allocated revocable memory in MB
+        - name: elected
+          type: long
+          description: >
+            Whether this is the elected master
+        - name: uptime_secs
+          type: long
+          description: >
+            Uptime in seconds
+        - name: slave_registrations
+          type: long
+          description: >
+            Number of agents that were able to cleanly re-join the cluster and connect back to the master after the master is disconnected.
+        - name: slave_reregistrations
+          type: long
+          description: >
+            Number of agent re-registrations
+        - name: slave_unreachable_scheduled
+          type: long
+          description: >
+            Number of agents which have failed their health check and are scheduled to be marked unreachable.
+        - name: slave_unreachable_canceled
+          type: long
+          description: >
+            Number of times that an agent was due to be marked unreachable but this transition was cancelled.
+        - name: slave_unreachable_completed
+          type: long
+          description: >
+            Number of agents that were marked as unreachable because they failed health checks.
+        - name: slaves_active
+          type: long
+          description: >
+            Number of active agents
+        - name: slaves_connected
+          type: long
+          description: >
+            Number of connected agents
+        - name: slaves_disconnected
+          type: long
+          description: >
+            Number of disconnected agents
+        - name: slaves_inactive
+          type: long
+          description: >
+            Number of inactive agents
+        - name: slaves_unreachable
+          type: long
+          description: >
+            Number of unreachable agents.
+        - name: frameworks_active
+          type: long
+          description: >
+            Number of active frameworks
+        - name: frameworks_connected
+          type: long
+          description: >
+            Number of connected frameworks
+        - name: frameworks_disconnected
+          type: long
+          description: >
+            Number of disconnected frameworks
+        - name: frameworks_inactive
+          type: long
+          description: >
+            Number of inactive frameworks
+        - name: outstanding_offers
+          type: long
+          description: >
+            Number of outstanding resource offers
+        - name: tasks_error
+          type: long
+          description: >
+            Number of tasks that were invalid
+        - name: tasks_failed
+          type: long
+          description: >
+            Number of failed tasks
+        - name: tasks_finished
+          type: long
+          description: >
+            Number of finished tasks
+        - name: tasks_killed
+          type: long
+          description: >
+            Number of killed tasks
+        - name: tasks_killing
+          type: long
+          description: >
+            Number of tasks currently being killed
+        - name: tasks_lost
+          type: long
+          description: >
+            Number of lost tasks
+        - name: tasks_running
+          type: long
+          description: >
+            Number of running tasks
+        - name: tasks_staging
+          type: long
+          description: >
+            Number of staging tasks
+        - name: tasks_starting
+          type: long
+          description: >
+            Number of starting tasks
+        - name: tasks_unreachable
+          type: long
+          description: >
+            Number of unreachable tasks
+        - name: invalid_executor_to_framework_messages
+          type: long
+          description: >
+            Number of invalid executor to framework messages
+        - name: invalid_framework_to_executor_messages
+          type: long
+          description: >
+            Number of invalid framework to executor messages
+        - name: invalid_operation_status_update_acknowledgements
+          type: long
+          description: >
+            Number of invalid operation status update acknowledgements
+        - name: invalid_status_update_acknowledgements
+          type: long
+          description: >
+            Number of invalid status update acknowledgements
+        - name: invalid_status_updates
+          type: long
+          description: >
+            Number of invalid status updates
+        - name: dropped_messages
+          type: long
+          description: >
+            Number of dropped messages
+        - name: messages_authenticate
+          type: long
+          description: >
+            Number of authentication messages
+        - name: messages_deactivate_framework
+          type: long
+          description: >
+            Number of framework deactivation messages
+        - name: messages_decline_offers
+          type: long
+          description: >
+            Number of offers declined
+        - name: messages_executor_to_framework
+          type: long
+          description: >
+            Number of executor to framework messages
+        - name: messages_exited_executor
+          type: long
+          description: >
+            Number of terminated executor messages
+        - name: messages_framework_to_executor
+          type: long
+          description: >
+            Number of messages from a framework to an executor
+        - name: messages_kill_task
+          type: long
+          description: >
+            Number of kill task messages
+        - name: messages_launch_tasks
+          type: long
+          description: >
+            Number of launch task messages
+        - name: messages_operation_status_update_acknowledgement
+          type: long
+          description: >
+            Number of operation status update acknowledgement messages
+        - name: messages_reconcile_operations
+          type: long
+          description: >
+            Number of reconcile operations messages
+        - name: messages_reconcile_tasks
+          type: long
+          description: >
+            Number of reconcile operations messages
+        - name: messages_register_framework
+          type: long
+          description: >
+            Number of framework registration messages
+        - name: messages_register_slave
+          type: long
+          description: >
+            Number of agent registration messages
+        - name: messages_reregister_framework
+          type: long
+          description: >
+            Number of framework re-registration messages
+        - name: messages_reregister_slave
+          type: long
+          description: >
+            Number of agent re-registration messages
+        - name: messages_resource_request
+          type: long
+          description: >
+            Number of resource request messages
+        - name: messages_revive_offers
+          type: long
+          description: >
+            Number of offer revival messages
+        - name: messages_status_update
+          type: long
+          description: >
+            Number of status update messages
+        - name: messages_status_update_acknowledgement
+          type: long
+          description: >
+            Number of status update acknowledgement messages
+        - name: messages_unregister_framework
+          type: long
+          description: >
+            Number of framework unregistration messages
+        - name: messages_unregister_slave
+          type: long
+          description: >
+            Number of agent unregistration messages
+        - name: messages_update_slave
+          type: long
+          description: >
+            Number of update agent messages
+        - name: recovery_slave_removals
+          type: long
+          description: >
+            Number of agents not reregistered during master failover
+        - name: slave_removals
+          type: long
+          description: >
+            Number of agent removed for various reasons, including maintenance
+        - name: slave_Removals
+          type: group
+          description: >
+            Number of agent removed for various reasons, including maintenance
+          fields:
+            - name: reason_registered
+              type: long
+              description: >
+                Number of agents removed when new agents registered at the same address
+            - name: reason_unhealthy 
+              type: long
+              description: >
+                Number of agents failed due to failed health checks
+            - name: reason_unregistered
+              type: long
+              description: >
+                Number of agents unregistered
+        - name: valid_framework_to_executor_messages
+          type: long
+          description: >
+            Number of valid framework to executor messages
+        - name: valid_operation_status_update_acknowledgements
+          type: long
+          description: >
+            Number of valid operation status update acknowledgement messages
+        - name: valid_status_update_acknowledgements
+          type: long
+          description: >
+            Number of valid status update acknowledgement messages
+        - name: valid_status_updates
+          type: long
+          description: >
+            Number of valid status update messages
+        - name: valid_executor_to_framework_messages
+          type: long
+          description: >
+            Number of valid executor to framework messages
+        - name: event_queue_dispatches
+          type: long
+          description: >
+            Number of dispatches in the event queue
+        - name: event_queue_http_requests
+          type: long
+          description: >
+            Number of HTTP requests in the event queue
+        - name: event_queue_messages
+          type: long
+          description: >
+            Number of messages in the event queue
+        - name:  operator_event_stream_subscribers
+          type: long
+          description: >
+            Number of subscribers to the operator event stream
+
+    - name: system
+      type: group
+      fields:
+        - name: cpus_total
+          type: long
+          description: >
+            Number of CPUs available
+        - name: load_15min
+          type: scaled_float
+          description: >
+            Load average for the past 15 minutes
+        - name: load_5min
+          type: scaled_float
+          description: >
+            Load average for the past 5 minutes
+        - name: load_1min
+          type: scaled_float
+          description: >
+            Load average for the past minute
+        - name: mem_free_bytes
+          type: long
+          format: bytes
+          description: >
+            Free memory in bytes
+        - name: mem_total_bytes
+          type: long
+          format: bytes
+          description: >
+            Total memory in bytes
+
+    - name: registrar
+      type: group
+      fields:
+        - name: state_fetch_ms
+          type: long
+          description: >
+            Registry read latency in ms
+        - name: state_store_ms
+          type: scaled_float
+          description: >
+            Registry write latency in ms
+        - name: state_store_MS
+          type: group
+          fields:
+            - name: max
+              type: scaled_float
+              description: >
+                Maximum registry write latency in ms
+            - name: min
+              type: scaled_float
+              description: >
+                Minimum registry write latency in ms
+            - name: p50
+              type: scaled_float
+              description: >
+                Median registry write latency in ms
+            - name: p90
+              type: scaled_float
+              description: >
+                90th percentile registry write latency in ms
+            - name: p95
+              type: scaled_float
+              description: >
+                95th percentile registry write latency in ms
+            - name: p99
+              type: scaled_float
+              description: >
+                99th percentile registry write latency in ms
+            - name: p999
+              type: scaled_float
+              description: >
+                99.9th percentile registry write latency in ms
+            - name: p9999
+              type: scaled_float
+              description: >
+                99.99th percentile registry write latency in ms
+            - name: count
+              type: long
+        
+        - name: log
+          type: group
+          description: >
+            The following metrics provide information about the replicated log underneath the registrar, which is the persistent store for masters.
+          fields:
+            - name: recovered
+              type: long
+              description: >
+                Whether the replicated log for the registrar has caught up with the other masters in the cluster.
+            - name: ensemble_size
+              type: long
+              description: >
+                The number of masters in the ensemble (cluster) that the current master communicates with (including itself) to form the replicated log quorum.
+
+    - name: allocator
+      type: group
+      description: >
+        The following metrics provide information about performance and resource allocations in the allocator.
+      fields:
+        - name: mesos
+          type: group
+          fields:
+            - name: allocation_run_ms
+              type: scaled_float
+            - name: allocation_run_MS
+              type: group
+              fields:
+                - name: count
+                  type: long
+                  description: >
+                    Number of allocation algorithm time measurements in the window
+                - name: max
+                  type: scaled_float
+                  description: >
+                    Maximum time spent in allocation algorithm in ms
+                - name: min
+                  type: scaled_float
+                  description: >
+                    Minimum time spent in allocation algorithm in ms
+                - name: p50
+                  type: scaled_float
+                  description: >
+                    Median time spent in allocation algorithm in ms
+                - name: p90
+                  type: scaled_float
+                  description: >
+                    90th percentile of time spent in allocation algorithm in ms
+                - name: p95
+                  type: scaled_float
+                  description: >
+                    95th percentile of time spent in allocation algorithm in ms
+                - name: p99
+                  type: scaled_float
+                  description: >
+                    99th percentile of time spent in allocation algorithm in ms
+                - name: p999
+                  type: scaled_float
+                  description: >
+                    99.9th percentile of time spent in allocation algorithm in ms
+                - name: p9999
+                  type: scaled_float
+                  description: >
+                    99.99th percentile of time spent in allocation algorithm in ms
+            - name: allocation_runs
+              type: long
+              description: >
+                Number of times the allocation algorithm has run
+            - name: allocation_run_latency_MS
+              type: group
+              description: >
+                Allocation batch latency in ms
+              fields:
+                - name: count
+                  type: long
+                  description: >
+                    Number of allocation batch latency measurements in the window
+                - name: max
+                  type: scaled_float
+                  description: >
+                    Maximum allocation batch latency in ms
+                - name: min
+                  type: scaled_float
+                  description: >
+                    Minimum allocation batch latency in ms
+                - name: p50
+                  type: scaled_float
+                  description: >
+                    Median allocation batch latency in ms
+                - name: p90
+                  type: scaled_float
+                  description: >
+                    90th percentile allocation batch latency in ms
+                - name: p95
+                  type: scaled_float
+                  description: >
+                    95th percentile allocation batch latency in ms
+                - name: p99
+                  type: scaled_float
+                  description: >
+                    99th percentile allocation batch latency in ms
+                - name: p999
+                  type: scaled_float
+                  description: >
+                    99.9th percentile allocation batch latency in ms
+                - name: p9999
+                  type: scaled_float
+                  description: >
+                    99.99th percentile allocation batch latency in ms
+            - name: event_queue_dispatches
+              type: long
+              description: >
+                Number of dispatch events in the event queue
+            - name: resources
+              type: group
+              fields:
+                - name: cpus
+                  type: group
+                  fields:
+                    - name: offered_or_allocated
+                      type: long
+                      description: >
+                        Number of CPUs offered or allocated
+                    - name: total
+                      type: long
+                      description: >
+                        Number of CPUs
+                - name: disk
+                  type: group
+                  fields:
+                    - name: offered_or_allocated
+                      type: long
+                      description: >
+                        Allocated or offered disk space in MB
+                    - name: total
+                      type: long
+                      description: >
+                        Total disk space in MB
+                - name: mem
+                  type: group
+                  fields:
+                    - name: offered_or_allocated
+                      type: long
+                      description: >
+                        Allocated or offered memory in MB
+                    - name: total
+                      type: long
+                      description: >
+                        Total memory in MB

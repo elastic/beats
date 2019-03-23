@@ -32,6 +32,7 @@ services:
       #- ./module/kubernetes/_meta/env
       - ./module/logstash/_meta/env
       - ./module/memcached/_meta/env
+      - ./module/mesos/_meta/env
       - ./module/mongodb/_meta/env
       - ./module/munin/_meta/env
       - ./module/mysql/_meta/env
@@ -172,6 +173,9 @@ services:
 
   memcached:
     build: ./module/memcached/_meta
+
+  mesos:
+    build: ./module/mesos/_meta
 
   mongodb:
     build: ./module/mongodb/_meta
