@@ -10,9 +10,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 ifdef::has_solutions[]
-TIP: The example dashboards are a great way to get started visualizing
-{beatname_uc} data in {kib}. For deeper observability into what's happening with
-your infrastructure, though, you'll want to use the
+TIP: For deeper observability into your infrastructure, use the
 {infra-guide}/infrastructure-ui-overview.html[Infrastructure] and
 {infra-guide}/logs-ui-overview.html[Logs] UIs in {kib}. For setup details, see
 the {infra-guide}/index.html[Infrastructure Monitoring Guide].
