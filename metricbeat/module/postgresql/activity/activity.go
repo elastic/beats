@@ -18,8 +18,6 @@
 package activity
 
 import (
-	"database/sql"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/logp"
@@ -57,15 +55,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
-	db, err := sql.Open("postgres", m.HostData().URI)
-	if err != nil {
-		logger.Error(err)
-		reporter.Error(err)
-		return
-	}
-	defer db.Close()
-
-	results, err := postgresql.QueryStats(db, "SELECT * FROM pg_stat_activity")
+	results, err := postgresql.QueryStats("postgres", m.HostData().URI, "SELECT * FROM pg_stat_activity")
 	if err != nil {
 		err = errors.Wrap(err, "QueryStats")
 		logger.Error(err)

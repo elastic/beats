@@ -21,7 +21,7 @@ Package postgresql is Metricbeat module for PostgreSQL server.
 package postgresql
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -102,8 +102,15 @@ func ParseURL(mod mb.Module, rawURL string) (mb.HostData, error) {
 	return h, nil
 }
 
-func QueryStats(db *sql.DB, query string) ([]map[string]interface{}, error) {
-	rows, err := db.Query(query)
+func QueryStats(driver, uri, query string) ([]map[string]interface{}, error) {
+	db, err := DBCache.GetConnection(driver, uri)
+	if db != nil {
+		defer db.Close()
+	}
+	if err != nil {
+		return nil, errors.Wrapf(err, "connecting to %s:%s", driver, uri)
+	}
+	rows, err := db.QueryContext(context.Background(), query)
 	if err != nil {
 		return nil, err
 	}
