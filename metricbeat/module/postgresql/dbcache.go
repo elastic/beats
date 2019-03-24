@@ -6,23 +6,23 @@ import (
 	"sync"
 )
 
-type dbEntry struct {
+type cacheKey struct {
 	driver string
 	uri    string
 }
 
 type dbCacheType struct {
-	dbs  map[dbEntry]*sql.DB
+	dbs  map[cacheKey]*sql.DB
 	lock sync.Mutex
 }
 
 // DBCache keeps a cache of databases for different drivers and URIs.
 var DBCache = dbCacheType{
-	dbs: make(map[dbEntry]*sql.DB, 4),
+	dbs: make(map[cacheKey]*sql.DB, 4),
 }
 
 func (cache *dbCacheType) getDB(driver, uri string) (db *sql.DB, err error) {
-	key := dbEntry{
+	key := cacheKey{
 		driver: driver,
 		uri:    uri,
 	}
