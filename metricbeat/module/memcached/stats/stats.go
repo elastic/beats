@@ -22,12 +22,10 @@ import (
 	"net"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/metricbeat/mb"
 )
-
-var logger = logp.NewLogger("memcached.stats")
 
 func init() {
 	mb.Registry.MustAddMetricSet("memcached", "stats", New,
@@ -48,20 +46,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	conn, err := net.DialTimeout("tcp", m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		logger.Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error in fetch")
 	}
 	defer conn.Close()
 
 	_, err = conn.Write([]byte("stats\n"))
 	if err != nil {
-		logger.Error(err)
-		reporter.Error(err)
-		return
+		return errors.Wrap(err, "error in connection")
 	}
 
 	scanner := bufio.NewScanner(conn)
@@ -85,5 +79,5 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 	reporter.Event(mb.Event{MetricSetFields: event})
 
-	return
+	return nil
 }
