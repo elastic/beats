@@ -123,6 +123,7 @@ https://github.com/elastic/beats/compare/v7.0.0-beta1...master[Check the HEAD di
 - Add ISO8601 timestamp support in syslog metricset. {issue}8716[8716] {pull}10736[10736]
 - Add support for loading custom NetFlow and IPFIX field definitions to netflow input. {pull}10945[10945] {pull}11223[11223]
 - Added categorization fields for SSH login events in the system/auth fileset. {pull}11334[11334]
+- Add support for MySQL 8.0, Percona 8.0 and MariaDB 10.3. {pull}11417[11417]
 
 *Heartbeat*
 
