@@ -79,7 +79,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		for _, promEvent := range promEvents {
 			labelsHash := promEvent.LabelsHash()
 			if _, ok := eventList[labelsHash]; !ok {
-				eventList[labelsHash] = common.MapStr{}
+				eventList[labelsHash] = common.MapStr{
+					"metrics": common.MapStr{},
+				}
 
 				// Add labels
 				if len(promEvent.labels) > 0 {
@@ -87,15 +89,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 				}
 			}
 
-			metrics, ok := eventList[labelsHash]["metrics"]
-			if !ok {
-				metrics = common.MapStr{}
-				eventList[labelsHash]["metrics"] = metrics
-			}
-
-			if metrics, ok := metrics.(common.MapStr); ok {
-				metrics.Update(promEvent.data)
-			}
+			// Not checking anything here because we create these maps some lines before
+			metrics := eventList[labelsHash]["metrics"].(common.MapStr)
+			metrics.Update(promEvent.data)
 		}
 	}
 
