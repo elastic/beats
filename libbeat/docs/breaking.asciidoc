@@ -33,10 +33,10 @@ include::./field-name-changes.asciidoc[]
 [[breaking-changes-6.7]]
 === Breaking changes in 6.7
 
-The Central management document format used by Kibana has changed. As a result of the template
-template changes, enrolled beats and tags and tags created prior to 6.7 will not work with the new
+The Central management data structure used by Kibana to store the information has changed. As a result of the
+template changes, enrolled beats and tags created prior to 6.7 will not work with the new
 UI until their are moved to the new format, we have created a one time [tool](https://github.com/elastic/migrate-management-beats/releases) to help you migrate your data from
-6.6 to 6.7. {see-relnotes}
+6.6 to 6.7, refer to the [documentation](https://github.com/elastic/migrate-management-beats/blob/master/README.md) for instruction. {see-relnotes}
 
 [[breaking-changes-6.3]]
 === Breaking changes in 6.3
