@@ -18,6 +18,7 @@
 package module
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"sync"
@@ -312,6 +313,19 @@ func (r *eventReporter) V1() mb.PushReporter {
 	return reporterV1{v2: r.V2(), module: r.msw.module.Name()}
 }
 func (r *eventReporter) V2() mb.PushReporterV2 { return reporterV2{r} }
+
+// Implement context.Context
+func (r *eventReporter) Deadline() (time.Time, bool) { return time.Time{}, false }
+func (r *eventReporter) Done() <-chan struct{}       { return r.done }
+func (r *eventReporter) Err() error {
+	select {
+	case <-r.done:
+		return context.Canceled
+	default:
+		return nil
+	}
+}
+func (r *eventReporter) Value(key interface{}) interface{} { return nil }
 
 // reporterV1 wraps V2 to provide a v1 interface.
 type reporterV1 struct {

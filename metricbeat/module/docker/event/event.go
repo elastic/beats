@@ -18,7 +18,6 @@
 package event
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -77,7 +76,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Run listens for docker events and reports them
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
-	ctx, cancel := context.WithCancel(context.Background())
 	options := types.EventsOptions{
 		Since: fmt.Sprintf("%d", time.Now().Unix()),
 	}
@@ -85,7 +83,7 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	defer m.dockerClient.Close()
 
 	for {
-		events, errors := m.dockerClient.Events(ctx, options)
+		events, errors := m.dockerClient.Events(reporter, options)
 
 	WATCH:
 		for {
@@ -102,7 +100,6 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 
 			case <-reporter.Done():
 				m.logger.Debug("docker", "event watcher stopped")
-				cancel()
 				return
 			}
 		}

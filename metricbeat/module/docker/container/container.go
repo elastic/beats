@@ -18,8 +18,6 @@
 package container
 
 import (
-	"context"
-
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
@@ -68,7 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // This is based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/list-containers.
 func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	// Fetch a list of all containers.
-	containers, err := m.dockerClient.ContainerList(context.Background(), types.ContainerListOptions{})
+	containers, err := m.dockerClient.ContainerList(r, types.ContainerListOptions{})
 	if err != nil {
 		err = errors.Wrap(err, "failed to get docker containers list")
 		logger.Error(err)
