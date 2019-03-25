@@ -29,7 +29,6 @@ import (
 
 func TestFetchEventContents(t *testing.T) {
 	model := simulator.ESX()
-	err := model.Create()
 	if err := model.Create(); err != nil {
 		t.Fatal(err)
 	}
@@ -39,11 +38,10 @@ func TestFetchEventContents(t *testing.T) {
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(ts))
 	events, errs := mbtest.ReportingFetchV2Error(f)
-	if err != nil {
-		if len(errs) > 0 {
-			t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-		}
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
+
 	assert.NotEmpty(t, events)
 
 	event := events[0].MetricSetFields
