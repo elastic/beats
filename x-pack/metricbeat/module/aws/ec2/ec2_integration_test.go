@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+// +build integration
+
 package ec2
 
 import (
@@ -14,7 +16,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	config, info := mtest.GetConfigForTest("ec2")
+	config, info := mtest.GetConfigForTest("ec2", "300s")
 	if info != "" {
 		t.Skip("Skipping TestFetch: " + info)
 	}
@@ -37,11 +39,17 @@ func TestFetch(t *testing.T) {
 		mtest.CheckEventField("service.name", "string", event, t)
 		mtest.CheckEventField("cloud.availability_zone", "string", event, t)
 		mtest.CheckEventField("cloud.provider", "string", event, t)
-		mtest.CheckEventField("cloud.image.id", "string", event, t)
 		mtest.CheckEventField("cloud.instance.id", "string", event, t)
 		mtest.CheckEventField("cloud.machine.type", "string", event, t)
 		mtest.CheckEventField("cloud.provider", "string", event, t)
 		mtest.CheckEventField("cloud.region", "string", event, t)
+		mtest.CheckEventField("instance.image.id", "string", event, t)
+		mtest.CheckEventField("instance.state.name", "string", event, t)
+		mtest.CheckEventField("instance.state.code", "int", event, t)
+		mtest.CheckEventField("instance.monitoring.state", "string", event, t)
+		mtest.CheckEventField("instance.core.count", "int", event, t)
+		mtest.CheckEventField("instance.threads_per_core", "int", event, t)
+
 		// MetricSetField
 		mtest.CheckEventField("cpu.total.pct", "float", event, t)
 		mtest.CheckEventField("cpu.credit_usage", "float", event, t)
@@ -63,7 +71,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	config, info := mtest.GetConfigForTest("ec2")
+	config, info := mtest.GetConfigForTest("ec2", "300s")
 	if info != "" {
 		t.Skip("Skipping TestData: " + info)
 	}

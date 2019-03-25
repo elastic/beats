@@ -32,11 +32,11 @@ func GetMySQLEnvDSN() string {
 	dsn := os.Getenv("MYSQL_DSN")
 
 	if len(dsn) == 0 {
-		c := &mysql.Config{
-			Net:  "tcp",
-			Addr: "127.0.0.1:3306",
-			User: "root",
-		}
+		c := mysql.NewConfig()
+		c.Net = "tcp"
+		c.Addr = "127.0.0.1:3306"
+		c.User = "root"
+		c.Passwd = "test"
 		dsn = c.FormatDSN()
 	}
 	return dsn

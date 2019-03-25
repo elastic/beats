@@ -18,7 +18,7 @@
 package status
 
 import (
-	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
@@ -26,7 +26,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -55,8 +55,8 @@ func fetchStatData(URL string) ([]byte, error) {
 
 	u, err := url.Parse(URL)
 	if err != nil {
-		logp.Err("parsing uwsgi stats url failed: %+v", err)
-		return nil, err
+
+		return nil, errors.Wrap(err, "parsing uwsgi stats url failed")
 	}
 
 	switch u.Scheme {
@@ -83,8 +83,8 @@ func fetchStatData(URL string) ([]byte, error) {
 		defer res.Body.Close()
 
 		if res.StatusCode != 200 {
-			logp.Err("failed to fetch uwsgi status with code: %d", res.StatusCode)
-			return nil, errors.New("http failed")
+
+			return nil, fmt.Errorf("failed to fetch uwsgi status with code: %d", res.StatusCode)
 		}
 		reader = res.Body
 	default:
@@ -93,8 +93,7 @@ func fetchStatData(URL string) ([]byte, error) {
 
 	data, err := ioutil.ReadAll(reader)
 	if err != nil {
-		logp.Err("uwsgi data read failed: %+v", err)
-		return nil, err
+		return nil, errors.Wrap(err, "uwsgi data read failed")
 	}
 
 	return data, nil
@@ -102,14 +101,14 @@ func fetchStatData(URL string) ([]byte, error) {
 
 // Fetch methods implements the data gathering and data conversion to the right
 // format.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	content, err := fetchStatData(m.HostData().URI)
 	if err != nil {
-		return []common.MapStr{
-			common.MapStr{
-				"error": err.Error(),
-			},
-		}, err
+		reporter.Event(mb.Event{MetricSetFields: common.MapStr{
+			"error": err.Error(),
+		}},
+		)
+		return err
 	}
-	return eventsMapping(content)
+	return eventsMapping(content, reporter)
 }

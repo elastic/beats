@@ -31,7 +31,9 @@ import (
 	"github.com/elastic/beats/libbeat/outputs"
 	"github.com/elastic/beats/libbeat/outputs/codec"
 	"github.com/elastic/beats/libbeat/outputs/outil"
+	"github.com/elastic/beats/libbeat/outputs/transport"
 	"github.com/elastic/beats/libbeat/publisher"
+	"github.com/elastic/beats/libbeat/testing"
 )
 
 type client struct {
@@ -267,4 +269,19 @@ func (r *msgRef) dec() {
 		r.batch.ACK()
 		stats.Acked(r.total)
 	}
+}
+
+func (c *client) Test(d testing.Driver) {
+	if c.config.Net.TLS.Enable == true {
+		d.Warn("TLS", "Kafka output doesn't support TLS testing")
+	}
+
+	for _, host := range c.hosts {
+		d.Run("Kafka: "+host, func(d testing.Driver) {
+			netDialer := transport.TestNetDialer(d, c.config.Net.DialTimeout)
+			_, err := netDialer.Dial("tcp", host)
+			d.Error("dial up", err)
+		})
+	}
+
 }

@@ -214,7 +214,7 @@ include::{libbeat-dir}/docs/shared-template-load.asciidoc[]
 [[load-kibana-dashboards]]
 === Step 4: Set up the Kibana dashboards
 
-include::{libbeat-dir}/docs/dashboards.asciidoc[]
+Dashboards for heartbeat can be found in the https://github.com/elastic/uptime-contrib[uptime-contrib] github repository.
 
 [[heartbeat-starting]]
 === Step 5: Start Heartbeat
@@ -243,7 +243,7 @@ sudo ./heartbeat -e
 ----------------------------------------------------------------------
 <1> You'll be running Heartbeat as root, so you need to change ownership of the
 configuration file, or run Heartbeat with `--strict.perms=false` specified. See
-{libbeat}/config-file-permissions.html[Config File Ownership and Permissions]
+{beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]
 in the _Beats Platform Reference_.
 
 *win:*

@@ -1,4 +1,4 @@
-The Kibana module only tracks the high-level metrics. To monitor more Kibana metrics, use our {monitoringdoc}/xpack-monitoring.html[monitoring] feature.
+The Kibana module only tracks the high-level metrics. To monitor more Kibana metrics, use our {stack-ov}/xpack-monitoring.html[monitoring] feature.
 
 The default metricset is `status`.
 

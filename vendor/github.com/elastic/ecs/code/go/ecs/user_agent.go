@@ -19,8 +19,9 @@
 
 package ecs
 
-// The user_agent fields normally come from a browser request. They often show
-// up in web service logs coming from the parsed user agent string.
+// The user_agent fields normally come from a browser request.
+// They often show up in web service logs coming from the parsed user agent
+// string.
 type UserAgent struct {
 	// Unparsed version of the user_agent.
 	Original string `ecs:"original"`

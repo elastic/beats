@@ -16,6 +16,7 @@ services:
       - ./module/apache/_meta/env
       - ./module/ceph/_meta/env
       - ./module/consul/_meta/env
+      - ./module/coredns/_meta/env
       - ./module/couchbase/_meta/env
       - ./module/couchdb/_meta/env
       - ./module/dropwizard/_meta/env
@@ -62,6 +63,9 @@ services:
 
   consul:
     build: ./module/consul/_meta
+
+  coredns:
+    build: ./module/coredns/_meta
 
   couchbase:
     build: ./module/couchbase/_meta

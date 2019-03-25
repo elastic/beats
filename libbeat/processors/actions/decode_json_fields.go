@@ -52,18 +52,20 @@ var (
 		MaxDepth:     1,
 		ProcessArray: false,
 	}
+	errProcessingSkipped = errors.New("processing skipped")
 )
 
 var debug = logp.MakeDebug("filters")
 
 func init() {
 	processors.RegisterPlugin("decode_json_fields",
-		configChecked(newDecodeJSONFields,
+		configChecked(NewDecodeJSONFields,
 			requireFields("fields"),
 			allowedFields("fields", "max_depth", "overwrite_keys", "process_array", "target", "when")))
 }
 
-func newDecodeJSONFields(c *common.Config) (processors.Processor, error) {
+// NewDecodeJSONFields construct a new decode_json_fields processor.
+func NewDecodeJSONFields(c *common.Config) (processors.Processor, error) {
 	config := defaultConfig
 
 	err := c.Unpack(&config)
@@ -149,7 +151,7 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 		var tmp interface{}
 		err := unmarshal(maxDepth, str, &tmp, processArray)
 		if err != nil {
-			return v, false
+			return v, err == errProcessingSkipped
 		}
 
 		return tmp, true
@@ -166,7 +168,7 @@ func unmarshal(maxDepth int, text string, fields *interface{}, processArray bool
 	// We want to process arrays here
 	case []interface{}:
 		if !processArray {
-			break
+			return errProcessingSkipped
 		}
 
 		for i, v := range O {

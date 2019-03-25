@@ -5,6 +5,7 @@
 package mtest
 
 import (
+	"errors"
 	"os"
 	"testing"
 
@@ -14,7 +15,7 @@ import (
 )
 
 // GetConfigForTest function gets aws credentials for integration tests.
-func GetConfigForTest(metricSetName string) (map[string]interface{}, string) {
+func GetConfigForTest(metricSetName string, period string) (map[string]interface{}, string) {
 	accessKeyID, okAccessKeyID := os.LookupEnv("AWS_ACCESS_KEY_ID")
 	secretAccessKey, okSecretAccessKey := os.LookupEnv("AWS_SECRET_ACCESS_KEY")
 	sessionToken, okSessionToken := os.LookupEnv("AWS_SESSION_TOKEN")
@@ -32,7 +33,7 @@ func GetConfigForTest(metricSetName string) (map[string]interface{}, string) {
 	} else {
 		config = map[string]interface{}{
 			"module":            "aws",
-			"period":            "300s",
+			"period":            period,
 			"metricsets":        []string{metricSetName},
 			"access_key_id":     accessKeyID,
 			"secret_access_key": secretAccessKey,
@@ -48,36 +49,43 @@ func GetConfigForTest(metricSetName string) (map[string]interface{}, string) {
 
 // CheckEventField function checks a given field type and compares it with the expected type for integration tests.
 func CheckEventField(metricName string, expectedType string, event mb.Event, t *testing.T) {
-	if ok, err := event.MetricSetFields.HasKey(metricName); ok {
-		assert.NoError(t, err)
-		metricValue, err := event.MetricSetFields.GetValue(metricName)
-		assert.NoError(t, err)
-		compareType(metricValue, expectedType, t)
-	} else if ok, err := event.RootFields.HasKey(metricName); ok {
-		assert.NoError(t, err)
-		rootValue, err := event.RootFields.GetValue(metricName)
-		assert.NoError(t, err)
-		compareType(rootValue, expectedType, t)
+	ok1, err1 := event.MetricSetFields.HasKey(metricName)
+	ok2, err2 := event.RootFields.HasKey(metricName)
+	if ok1 || ok2 {
+		if ok1 {
+			assert.NoError(t, err1)
+			metricValue, err := event.MetricSetFields.GetValue(metricName)
+			assert.NoError(t, err)
+			err = compareType(metricValue, expectedType, metricName)
+			assert.NoError(t, err)
+			t.Log("Succeed: Field " + metricName + " matches type " + expectedType)
+		} else if ok2 {
+			assert.NoError(t, err2)
+			rootValue, err := event.RootFields.GetValue(metricName)
+			assert.NoError(t, err)
+			err = compareType(rootValue, expectedType, metricName)
+			assert.NoError(t, err)
+			t.Log("Succeed: Field " + metricName + " matches type " + expectedType)
+		}
+	} else {
+		t.Log("Field " + metricName + " does not exist in metric set fields")
 	}
 }
 
-func compareType(metricValue interface{}, expectedType string, t *testing.T) {
+func compareType(metricValue interface{}, expectedType string, metricName string) (err error) {
 	switch metricValue.(type) {
 	case float64:
 		if expectedType != "float" {
-			t.Log("Failed: Field is not in type " + expectedType)
-			t.Fail()
+			err = errors.New("Failed: Field " + metricName + " is not in type " + expectedType)
 		}
 	case string:
 		if expectedType != "string" {
-			t.Log("Failed: Field is not in type " + expectedType)
-			t.Fail()
+			err = errors.New("Failed: Field " + metricName + " is not in type " + expectedType)
 		}
 	case int64:
 		if expectedType != "int" {
-			t.Log("Failed: Field is not in type " + expectedType)
-			t.Fail()
+			err = errors.New("Failed: Field " + metricName + " is not in type " + expectedType)
 		}
 	}
-	t.Log("Succeed: Field matches type " + expectedType)
+	return
 }

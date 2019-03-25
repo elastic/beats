@@ -30,6 +30,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - ILM will be available by default if Elasticsearch > 7.0 is used. {pull}10347[10347]
 - Allow Central Management to send events back to kibana. {issue}9382[9382]
 - Initialize the Paths before the keystore and save the keystore into `data/{beatname}.keystore`. {pull}10706[10706]
+- Add `cleanup_timeout` option to docker autodiscover, to wait some time before removing configurations after a container is stopped. {issue]10374[10374] {pull}10905[10905]
+- On Google Cloud Engine (GCE) the add_cloud_metadata will now trim the project
+  info from the cloud.machine.type and cloud.availability_zone. {issue}10968[10968]
+- Empty `meta.json` file will be treated as a missing meta file. {issue}8558[8558]
+- Rename `migration.enabled` config to `migration.6_to_7.enabled`. {pull}11284[11284]
+- Beats Xpack now checks for Basic license on connect. {pull}11296[11296]
 
 *Auditbeat*
 
@@ -43,6 +49,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename user fields to ECS in auditd module. {pull}10456[10456]
 - Rename `event.type` to `auditd.message_type` in auditd module because event.type is reserved for future use by ECS. {pull}10536[10536]
 - Rename `auditd.messages` to `event.original` and `auditd.warnings` to `error.message`. {pull}10577[10577]
+- Process dataset: Only report processes with executable. {pull}11232[11232]
 
 *Filebeat*
 
@@ -54,6 +61,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - monitor IDs are now configurable. Auto generated monitor IDs now use a different formula based on a hash of their config values. If you wish to have continuity with the old format of monitor IDs you'll need to set the `id` property explicitly. {pull}9697[9697]
 - A number of fields have been aliased to their relevant counterparts in the `url.*` field. Existing visualizations should mostly work. The fields that have been moved are `monitor.scheme -> url.scheme`, `monitor.host -> url.domain`, `resolve.host -> url.domain`, `http.url -> url.full`,  `tcp.port -> url.port`. In addition to these moves the new fields `url.username`, `url.password`, `url.path`, and `url.query` are now present. It should be noted that the `url.password` field does not contain actual password values, but rather the text `<hidden>` {pull}9570[9570].
 - The included Kibana HTTP dashboard is now removed in favor of the Uptime app in Kibana. {pull}10294[10294]
+- Removed the `add_host_metadata` and `add_cloud_metadata` processors from the default config. These don't fit well with ECS for Heartbeat and were rarely used.
 
 *Journalbeat*
 
@@ -93,6 +101,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update haproxy.* fields to map to ECS. {pull}10558[10558] {pull}10568[10568]
 - Collect all EC2 meta data from all instances in all states. {pull}10628[10628]
 - Migrate docker module to ECS. {pull}10927[10927]
+- Add connection and request timeouts for HTTP helper. {pull}11032[11032]
+- Add new option `OpMultiplyBuckets` to scale histogram buckets to avoid decimal points in final events {pull}10994[10994]
 
 *Packetbeat*
 
@@ -110,10 +120,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 - Mark Functionbeat  as GA. {pull}10564[10564]
-
 - Correctly normalize Cloudformation resource name. {issue}10087[10087]
 - Functionbeat can now deploy a function for Kinesis. {10116}10116[10116]
 - Allow functionbeat to use the keystore. {issue}9009[9009]
+- Correctly extract Kinesis Data field from the Kinesis Record. {pull}11141[11141]
 
 ==== Bugfixes
 
@@ -130,12 +140,24 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix a issue when remote and local configuration didn't match when fetching configuration from Central Management. {issue}10587[10587]
 - Fix unauthorized error when loading dashboards by adding username and password into kibana config. {issue}10513[10513] {pull}10675[10675]
 - Ensure all beat commands respect configured settings. {pull}10721[10721]
+- Allow to configure Kafka fetching strategy for the topic metadata. {pull}10682[10682]
+- Using an environment variable for the password when enrolling a beat will now raise an error if the variable doesn't exist. {pull}10936[10936]
+- Add missing `host.containerized` and `host.os.build` to fields.ecs.yml. {pull}11016[11016]
+- Reconnections of Kubernetes watchers are now logged at debug level when they are harmless. {pull}10988[10988]
+- Include ip and boolean type when generating index pattern. {pull}10995[10995]
+- Cancelling enrollment of a beat will not enroll the beat. {issue}10150[10150]
+- Add missing fields and test cases for libbeat add_kubernetes_metadata processor. {issue}11133[11133], {pull}11134[11134]
+- decode_json_field: do not process arrays when flag not set. {pull}11318[11318]
+- Report faulting file when config reload fails. {pull}[11304]11304
+- Remove IP fields from default_field in Elasticsearch template.
 
 *Auditbeat*
 
 - Enable System module config on Windows. {pull}10237[10237]
 - Package: Disable librpm signal handlers. {pull}10694[10694]
 - Login: Handle different bad login UTMP types. {pull}10865[10865]
+- System module: Fix and unify bucket closing logic. {pull}10897[10897]
+- User dataset: Numerous fixes to error handling. {pull}10942[10942]
 
 *Filebeat*
 
@@ -151,11 +173,23 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Cover empty request data, url and version in Apache2 module{pull}10730[10730]
 - Fix registry entries not being cleaned due to race conditions. {pull}10747[10747]
 - Improve detection of file deletion on Windows. {pull}10747[10747]
+- Fix errors in filebeat Zeek dashboard and README files. Add notice.log support. {pull}10916[10916]
+- Fix a bug when converting NetFlow fields to snake_case. {pull}10950[10950]
+- Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test case. {issue}11004[11004] {pull}11105[11105]
+- Fix goroutine leak happening when harvesters are dynamically stopped. {pull}11263[11263]
+- Fix issue preventing docker container events to be stored if the container has a network interface without ip address. {issue}11225[11225] {pull}11247[11247]
+- Add on_failure handler for Zeek ingest pipelines. Fix one field name error for notice and add an additional test
+  case. {issue}11004[11004] {pull}11105[11105]
+- Change URLPATH grok pattern to support brackets. {issue}11135[11135] {pull}11252[11252]
+- Add support for iis log with different address format. {issue}11255[11255] {pull}11256[11256]
+- Add fix to parse syslog message with priority value 0. {issue}11010[11010]
+- Don't apply multiline rules in Logstash json logs. {pull}11346[11346]
 
 *Heartbeat*
 
 - Made monitors.d configuration part of the default config. {pull}9004[9004]
 - Fixed rare issue where TLS connections to endpoints with x509 certificates missing either notBefore or notAfter would cause the check to fail with a stacktrace.  {pull}9566[9566]
+- Fix checks for TCP send/receive data {pull}11118[11118]
 
 *Journalbeat*
 
@@ -173,6 +207,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added function to close sql database connection. {pull}10355[10355]
 - Fix issue with `elasticsearch/node_stats` metricset (x-pack) not indexing `source_node` field. {pull}10639[10639]
 - Migrate docker autodiscover to ECS. {issue}10757[10757] {pull}10862[10862]
+- Fix issue in kubernetes module preventing usage percentages to be properly calculated. {pull}10946[10946]
+- Fix for not reusable http client leading to connection leaks in Jolokia module {pull}11014[11014]
+- Fix parsing error using GET in Jolokia module. {pull}11075[11075] {issue}11071[11071]
+- Collect metrics when EC2 instances are not in running state. {issue}11008[11008] {pull}11023[11023]
+- Change ECS field cloud.provider to aws. {pull}11023[11023]
+- Add documentation about jolokia autodiscover fields. {issue}10925[10925] {pull}10979[10979]
+- Add missing aws.ec2.instance.state.name into fields.yml. {issue}11219[11219] {pull}11221[11221]
+- Fix ec2 metricset to collect metrics from Cloudwatch with the same timestamp. {pull}11142[11142]
+- Fix potential memory leak in stopped docker metricsets {pull}11294[11294]
 
 *Packetbeat*
 
@@ -182,6 +225,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Avoid reporting unknown MongoDB opcodes more than once. {pull}10878[10878]
 
 *Winlogbeat*
+
+- Prevent Winlogbeat from dropping events with invalid XML. {pull}11006{11006}
+- Fix Winlogbeat escaping CR, LF and TAB characters. {issue}11328[11328] {pull}11357[11357]
 
 *Functionbeat*
 
@@ -211,7 +257,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `network` condition to processors for matching IP addresses against CIDRs. {pull}10743[10743]
 - Add if/then/else support to processors. {pull}10744[10744]
 - Add `community_id` processor for computing network flow hashes. {pull}10745[10745]
-
+- Add output test to kafka output {pull}10834[10834]
+- Add ip fields to default_field in Elasticsearch template. {pull}11035[11035]
+- Gracefully shut down on SIGHUP {pull}10704[10704]
+- New processor: `copy_fields`. {pull}11303[11303]
+- Add `error.message` to events when `fail_on_error` is set in `rename` and `copy_fields` processors. {pull}11303[11303]
 
 *Auditbeat*
 
@@ -224,6 +274,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `entity_id` fields. {pull}10500[10500]
 - Add seven dashboards for the system module. {pull}10511[10511]
 - Move System module to beta. {pull}10800[10800]
+- Login dataset: Add event category and type. {pull}11339[11339]
 
 *Filebeat*
 
@@ -250,7 +301,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Populate more ECS fields in the Suricata module. {pull}10006[10006]
 - Add ISO8601 timestamp support in syslog metricset. {issue}8716[8716] {pull}10736[10736]
 - Add more info to message logged when a duplicated symlink file is found {pull}10845[10845]
+- Add option to configure docker input with paths {pull}10687[10687]
 - Add Netflow module to enrich flow events with geoip data. {pull}10877[10877]
+- Set `event.category: network_traffic` for Suricata. {pull}10882[10882]
+- Add configuration knob for auto-discover hints to control whether log harvesting is enabled for the pod/container. {issue}10811[10811] {pull}10911[10911]
+- Change Suricata module pipeline to handle `destination.domain` being set if a reverse DNS processor is used. {issue}10510[10510]
+- Add the `network.community_id` flow identifier to field to the IPTables, Suricata, and Zeek modules. {pull}11005[11005]
+- Add support for loading custom NetFlow and IPFIX field definitions to netflow input. {pull}10945[10945]
+- Added categorization fields for SSH login events in the system/auth fileset. {pull}11334[11334]
+- Add support for MySQL 8.0 slow logs and tests also for Percona 8.0 and MariaDB 10.3. {pull}11417[11417]
 
 *Heartbeat*
 
@@ -305,6 +364,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add overview dashboard to Zookeeper Metricbeat module {pull}10379[10379]
 - Add Consul Metricbeat module with Agent Metricset {pull}8631[8631]
 - Add filters and pie chart for AWS EC2 dashboard. {pull}10596[10596]
+- Add AWS SQS metricset. {pull}10684[10684] {issue}10053[10053]
+- Add AWS s3_request metricset. {pull}10949[10949] {issue}10055[10055]
+- Add s3_daily_storage metricset. {pull}10940[10940] {issue}10055[10055]
+- Add `coredns` metricbeat module. {pull}10585{10585]
 
 *Packetbeat*
 

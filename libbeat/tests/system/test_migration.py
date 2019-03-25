@@ -47,7 +47,7 @@ class TestCommands(BaseTest):
             extra_args=[
                 "export", "template",
                 "-E", "setup.template.fields=" + self.fields_path,
-                "-E", "migration.enabled=false",
+                "-E", "migration.6_to_7.enabled=false",
             ],
             config="libbeat.yml")
 
@@ -64,7 +64,7 @@ class TestCommands(BaseTest):
             extra_args=[
                 "export", "template",
                 "-E", "setup.template.fields=" + self.fields_path,
-                "-E", "migration.enabled=true",
+                "-E", "migration.6_to_7.enabled=true",
             ],
             config="libbeat.yml")
 

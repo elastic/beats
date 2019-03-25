@@ -18,7 +18,8 @@
 package bucket
 
 import (
-	"github.com/elastic/beats/libbeat/common"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/metricbeat/helper"
 	"github.com/elastic/beats/metricbeat/mb"
 	"github.com/elastic/beats/metricbeat/mb/parse"
@@ -63,13 +64,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right format
-// It returns the event which is then forward to the output. In case of an error, a
-// descriptive error must be returned.
-func (m *MetricSet) Fetch() ([]common.MapStr, error) {
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	content, err := m.http.FetchContent()
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "error in fetch")
 	}
-	return eventsMapping(content), nil
+
+	events := eventsMapping(content)
+	for _, event := range events {
+		reporter.Event(mb.Event{MetricSetFields: event})
+	}
+
+	return nil
 }

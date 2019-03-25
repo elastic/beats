@@ -273,7 +273,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...v7.0.0-beta1[Check the 
 - Added support for ingesting structured Elasticsearch server logs {pull}10428[10428]
 - Populate more ECS fields in the Suricata module. {pull}10006[10006]
 - Add module zeek. {issue}9931[9931] {pull}10034[10034]
-- Add support for CRI-O based logs autodiscover {pull}10687[10687]
 
 *Heartbeat*
 

@@ -18,12 +18,14 @@
 package dialchain
 
 import (
+	"fmt"
 	"net"
-	"strconv"
+	"net/url"
 	"time"
 
 	"github.com/elastic/beats/heartbeat/monitors"
 	"github.com/elastic/beats/heartbeat/monitors/jobs"
+	"github.com/elastic/beats/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/outputs/transport"
 )
@@ -136,59 +138,60 @@ func MakeDialerJobs(
 ) ([]jobs.Job, error) {
 	var jobs []jobs.Job
 	for _, endpoint := range endpoints {
-		endpointJobs, err := makeEndpointJobs(b, scheme, endpoint, mode, fn)
-		if err != nil {
-			return nil, err
+		for _, port := range endpoint.Ports {
+			endpointURL, err := url.Parse(fmt.Sprintf("%s://%s:%d", scheme, endpoint.Host, port))
+			if err != nil {
+				return nil, err
+			}
+			endpointJob, err := makeEndpointJob(b, endpointURL, mode, fn)
+			if err != nil {
+				return nil, err
+			}
+			jobs = append(jobs, wrappers.WithURLField(endpointURL, endpointJob))
 		}
-		jobs = append(jobs, endpointJobs...)
+
 	}
 
 	return jobs, nil
 }
 
-func makeEndpointJobs(
+func makeEndpointJob(
 	b *Builder,
-	scheme string,
-	endpoint Endpoint,
+	endpointURL *url.URL,
 	mode monitors.IPSettings,
 	fn func(*beat.Event, transport.Dialer, string) error,
-) ([]jobs.Job, error) {
+) (jobs.Job, error) {
 
 	// Check if SOCKS5 is configured, with relying on the socks5 proxy
 	// in resolving the actual IP.
 	// Create one job for every port number configured.
 	if b.resolveViaSocks5 {
-		js := make([]jobs.Job, len(endpoint.Ports))
-		for i, port := range endpoint.Ports {
-			address := net.JoinHostPort(endpoint.Host, strconv.Itoa(int(port)))
-			js[i] = jobs.MakeSimpleJob(func(event *beat.Event) error {
-				return b.Run(event, address, func(event *beat.Event, dialer transport.Dialer) error {
-					return fn(event, dialer, address)
+		return wrappers.WithURLField(endpointURL,
+			jobs.MakeSimpleJob(func(event *beat.Event) error {
+				hostPort := net.JoinHostPort(endpointURL.Hostname(), endpointURL.Port())
+				return b.Run(event, hostPort, func(event *beat.Event, dialer transport.Dialer) error {
+					return fn(event, dialer, hostPort)
 				})
-			})
-		}
-		return js, nil
+			})), nil
 	}
 
 	// Create job that first resolves one or multiple IP (depending on
 	// config.Mode) in order to create one continuation Task per IP.
-	settings := monitors.MakeHostJobSettings(endpoint.Host, mode)
+	settings := monitors.MakeHostJobSettings(endpointURL.Hostname(), mode)
 
 	job, err := monitors.MakeByHostJob(settings,
-		monitors.MakePingAllIPPortFactory(endpoint.Ports,
-			func(event *beat.Event, ip *net.IPAddr, port uint16) error {
+		monitors.MakePingIPFactory(
+			func(event *beat.Event, ip *net.IPAddr) error {
 				// use address from resolved IP
-				portStr := strconv.Itoa(int(port))
-				ipAddr := net.JoinHostPort(ip.String(), portStr)
-				hostAddr := net.JoinHostPort(endpoint.Host, portStr)
+				ipPort := net.JoinHostPort(ip.String(), endpointURL.Port())
 				cb := func(event *beat.Event, dialer transport.Dialer) error {
-					return fn(event, dialer, hostAddr)
+					return fn(event, dialer, ipPort)
 				}
-				err := b.Run(event, ipAddr, cb)
+				err := b.Run(event, ipPort, cb)
 				return err
 			}))
 	if err != nil {
 		return nil, err
 	}
-	return []jobs.Job{job}, nil
+	return job, nil
 }

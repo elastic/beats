@@ -50,10 +50,23 @@
             }
         },
         {
-            "rename": {
+            "append": {
+                "if": "ctx.suricata?.eve?.http?.hostname != null",
+                "value": "{{suricata.eve.http.hostname}}",
+                "field": "destination.domain"
+            }
+        },
+        {
+            "remove": {
                 "field": "suricata.eve.http.hostname",
-                "target_field": "destination.domain",
-                "ignore_missing": true
+                "ignore_failure": true
+            }
+        },
+        {
+            "script": {
+                "lang": "painless",
+                "source": "def domain = ctx.destination?.domain; if (domain instanceof Collection) { domain = domain.stream().distinct().collect(Collectors.toList()); if (domain.length == 1) { domain = domain[0]; }ctx.destination.domain = domain; }",
+                "ignore_failure": true
             }
         },
         {
@@ -227,6 +240,7 @@
         },
         {
             "geoip": {
+                "if": "ctx.source?.geo == null",
                 "field": "source.ip",
                 "target_field": "source.geo",
                 "ignore_missing": true
@@ -234,6 +248,7 @@
         },
         {
             "geoip": {
+                "if": "ctx.destination?.geo == null",
                 "field": "destination.ip",
                 "target_field": "destination.geo",
                 "ignore_missing": true
@@ -254,9 +269,9 @@
             }
         },
         {
-            "set": {
-                "field": "event.kind",
-                "value": "event"
+            "script": {
+                "lang": "painless",
+                "source": "def t = ctx.suricata?.eve?.event_type; if (t == \"stats\") {\n  ctx['event']['kind'] = \"metric\";\n} else if (t == \"alert\") {\n  ctx['event']['kind'] = \"alert\";\n  ctx['event']['category'] = \"network_traffic\";\n} else {\n  ctx['event']['kind'] = \"event\";\n  ctx['event']['category'] = \"network_traffic\";\n}"
             }
         }
     ],

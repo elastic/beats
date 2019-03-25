@@ -17,7 +17,7 @@ processors:
           to: "zeek.connection"
 
         - from: "zeek.connection.duration"
-          to: "event.duration"
+          to: "temp.duration"
 
         - from: "zeek.connection.id.orig_h"
           to: "source.address"
@@ -57,3 +57,19 @@ processors:
           
       ignore_missing: true
       fail_on_error: false
+{{ if .community_id }}
+  - if:
+      equals.network.transport: icmp
+    then:
+      community_id:
+        fields:
+          source_ip: source.address
+          destination_ip: destination.address
+          icmp_type: source.port
+          icmp_code: destination.port
+    else:
+      community_id:
+        fields:
+          source_ip: source.address
+          destination_ip: destination.address
+{{ end }}

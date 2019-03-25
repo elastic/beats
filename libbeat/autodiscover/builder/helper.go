@@ -155,7 +155,7 @@ func IsNoOp(hints common.MapStr, key string) bool {
 }
 
 // GenerateHints parses annotations based on a prefix and sets up hints that can be picked up by individual Beats.
-func GenerateHints(annotations common.MapStr, container, prefix string) common.MapStr {
+func GenerateHints(annotations common.MapStr, container, prefix string, defaultDisable bool) common.MapStr {
 	hints := common.MapStr{}
 	if rawEntries, err := annotations.GetValue(prefix); err == nil {
 		if entries, ok := rawEntries.(common.MapStr); ok {
@@ -193,6 +193,11 @@ func GenerateHints(annotations common.MapStr, container, prefix string) common.M
 				}
 			}
 		}
+	}
+
+	// Update hints: if .disabled annotation does not exist, set according to disabledByDefault flag
+	if _, err := hints.GetValue("logs.disable"); err != nil && defaultDisable {
+		hints.Put("logs.disable", "true")
 	}
 
 	return hints
