@@ -35,13 +35,15 @@ func TestFetchEventContents(t *testing.T) {
 	ts := model.Service.NewServer()
 	defer ts.Close()
 
-	f := mbtest.NewEventsFetcher(t, getConfig(ts))
-	events, err := f.Fetch()
-	if err != nil {
-		t.Fatal("fetch error", err)
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(ts))
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
 
-	event := events[0]
+	assert.NotEmpty(t, events)
+
+	event := events[0].MetricSetFields
 
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(), event.StringToPrint())
 
@@ -83,9 +85,9 @@ func TestData(t *testing.T) {
 	ts := model.Service.NewServer()
 	defer ts.Close()
 
-	f := mbtest.NewEventsFetcher(t, getConfig(ts))
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(ts))
 
-	if err := mbtest.WriteEvents(f, t); err != nil {
+	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
 		t.Fatal("write", err)
 	}
 }
