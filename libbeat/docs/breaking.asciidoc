@@ -26,9 +26,49 @@ See the following topics for a description of breaking changes:
 This section discusses the main changes that you should be aware of if you
 upgrade the Beats to version 7.0. {see-relnotes}
 
+==== Disable HTML escaping
+
+Starting with verion 7.0, embedded HTML or special symbols like `<` and `>` are
+not escaped anymore by default when publishing events.
+The old behavior of escaping HTML can still be configured by `escape_html:
+true` in the outputs configuration.
+
+//tag::notable-breaking-changes[]
+
 ==== Field name changes
 
 include::./field-name-changes.asciidoc[]
+
+//end::notable-breaking-changes[]
+
+==== Auditbeat type changes
+
+The Auditbeat JSON data types produced by the output have been changed to align
+with the data types used in the Elasticsearch index template.
+
+.Auditbeat Type Changes in 7.0
+[frame="topbot",options="header"]
+|======================
+|Field|Old Type|New Type
+|`file.gid`     |number |string
+|`file.uid`     |number |string
+|`process.pid`  |string |number
+|`process.ppid` |string |number
+|======================
+
+//tag::notable-breaking-changes[]
+==== Filebeat registry
+
+Filebeat will store the registry in a sub-directory, starting with version 7.0.
+The directory is configured using the new `filebeat.registry.path` setting. 
+Filebeat will automatically migrate the registry file, if it find the old
+registry file at the configured location.
+
+The settings `filebeat.registry_flush` and `filebeat.registry_file_permission`
+have been renamed to `filebeat.registry.flush` and
+`filebeat.registry.file_permission`.
+
+//end::notable-breaking-changes[]
 
 [[breaking-changes-6.7]]
 === Breaking changes in 6.7
