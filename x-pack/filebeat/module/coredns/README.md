@@ -55,7 +55,7 @@ kubectl apply -f filebeat
 
   processors:
     - add_kubernetes_metadata:
-      in_cluster: true
+        in_cluster: true
 ```
 
 This enables auto-discovery and hints for filebeat. When default.disable is set to true (default value is false), it will disable log harvesting for the pod/container, unless it has specific annotations enabled. This gives users more granular control on kubernetes log ingestion. The `add_kubernetes_metadata` processor will add enrichment data for Kubernetes to the ingest logs.
