@@ -32,7 +32,7 @@ type intervalRotator struct {
 	clock       clock
 	weekly      bool
 	arbitrary   bool
-	newInterval func(lastTime time.Time, currentTime time.Time) bool
+	newInterval func(lastTime time.Time, currentTime time.Time, step time.Duration) bool
 }
 
 type clock interface {
@@ -61,48 +61,40 @@ func newIntervalRotator(interval time.Duration) (*intervalRotator, error) {
 func (r *intervalRotator) initialize() error {
 	r.clock = realClock{}
 
-	switch r.interval {
-	case time.Second:
+	r.newInterval = newStep
+	if r.interval < time.Minute {
 		r.fileFormat = "2006-01-02-15-04-05"
-		r.newInterval = newSecond
-	case time.Minute:
+	} else if r.interval < time.Hour {
 		r.fileFormat = "2006-01-02-15-04"
-		r.newInterval = newMinute
-	case time.Hour:
+	} else if r.interval < 24*time.Hour {
 		r.fileFormat = "2006-01-02-15"
-		r.newInterval = newHour
-	case 24 * time.Hour: // calendar day
+	} else if r.interval < 7*24*time.Hour {
 		r.fileFormat = "2006-01-02"
-		r.newInterval = newDay
-	case 7 * 24 * time.Hour: // calendar week
+	} else if r.interval < 30*24*time.Hour {
 		r.fileFormat = ""
-		r.newInterval = newWeek
 		r.weekly = true
-	case 30 * 24 * time.Hour: // calendar month
+	} else if r.interval < 365*24*time.Hour {
 		r.fileFormat = "2006-01"
-		r.newInterval = newMonth
-	case 365 * 24 * time.Hour: // calendar year
-		r.fileFormat = "2006"
-		r.newInterval = newYear
-	default:
+	} else if r.interval >= 365*24*time.Hour {
+		r.fileFormat = "2006-01"
+	} else {
 		r.arbitrary = true
 		r.fileFormat = "2006-01-02-15-04-05"
-		r.newInterval = func(lastTime time.Time, currentTime time.Time) bool {
+		r.newInterval = func(lastTime time.Time, currentTime time.Time, step time.Duration) bool {
 			lastInterval := lastTime.Unix() / (int64(r.interval) / int64(time.Second))
 			currentInterval := currentTime.Unix() / (int64(r.interval) / int64(time.Second))
 			return lastInterval != currentInterval
 		}
+
 	}
+
 	return nil
 }
 
 func (r *intervalRotator) LogPrefix(filename string, modTime time.Time) string {
 	var t time.Time
-	if r.lastRotate.IsZero() {
-		t = modTime
-	} else {
-		t = r.lastRotate
-	}
+
+	t = modTime
 
 	if r.weekly {
 		y, w := t.ISOWeek()
@@ -118,7 +110,7 @@ func (r *intervalRotator) LogPrefix(filename string, modTime time.Time) string {
 
 func (r *intervalRotator) NewInterval() bool {
 	now := r.clock.Now()
-	newInterval := r.newInterval(r.lastRotate, now)
+	newInterval := r.newInterval(r.lastRotate, now, r.interval)
 	return newInterval
 }
 
@@ -162,33 +154,6 @@ func IntervalLogIndex(filename string) (uint64, int, error) {
 	return u64, i, err
 }
 
-func newSecond(lastTime time.Time, currentTime time.Time) bool {
-	return lastTime.Second() != currentTime.Second() || newMinute(lastTime, currentTime)
-}
-
-func newMinute(lastTime time.Time, currentTime time.Time) bool {
-	return lastTime.Minute() != currentTime.Minute() || newHour(lastTime, currentTime)
-}
-
-func newHour(lastTime time.Time, currentTime time.Time) bool {
-	return lastTime.Hour() != currentTime.Hour() || newDay(lastTime, currentTime)
-}
-
-func newDay(lastTime time.Time, currentTime time.Time) bool {
-	return lastTime.Day() != currentTime.Day() || newMonth(lastTime, currentTime)
-}
-
-func newWeek(lastTime time.Time, currentTime time.Time) bool {
-	lastYear, lastWeek := lastTime.ISOWeek()
-	currentYear, currentWeek := currentTime.ISOWeek()
-	return lastWeek != currentWeek ||
-		lastYear != currentYear
-}
-
-func newMonth(lastTime time.Time, currentTime time.Time) bool {
-	return lastTime.Month() != currentTime.Month() || newYear(lastTime, currentTime)
-}
-
-func newYear(lastTime time.Time, currentTime time.Time) bool {
-	return lastTime.Year() != currentTime.Year()
+func newStep(lastTime time.Time, currentTime time.Time, step time.Duration) bool {
+	return !currentTime.Before(lastTime.Add(step))
 }
