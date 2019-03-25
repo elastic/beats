@@ -120,7 +120,8 @@ uploaded. For example:
 {beatname_lc}.provider.aws.deploy_bucket: "functionbeat-deploy"
 ----
 
-. Define the functions that want to deploy. For each function, you must specify:
+. Define the functions that you want to deploy. For each function, you must
+specify:
 +
 [horizontal]
 `name`:: A unique name for the Lambda function.  
