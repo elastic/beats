@@ -29,13 +29,15 @@ import (
 	"github.com/elastic/beats/libbeat/paths"
 )
 
-// TemplateLoader is a subset of the Elasticsearch client API capable of
+// ESClient is a subset of the Elasticsearch client API capable of
 // loading the template.
 type ESClient interface {
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
 	GetVersion() common.Version
 }
 
+// Loader is a template loader capable of loading the template using
+// Elasticsearch Client API
 type Loader struct {
 	config    TemplateConfig
 	client    ESClient

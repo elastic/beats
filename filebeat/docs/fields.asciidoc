@@ -7382,7 +7382,19 @@ type: long
 
 format: bytes
 
-The size of the query result.
+The number of bytes sent to client.
+
+
+--
+
+*`mysql.slowlog.bytes_received`*::
++
+--
+type: long
+
+format: bytes
+
+The number of bytes received from client.
 
 
 --
@@ -7565,6 +7577,46 @@ Number of merge passes executed for the query.
 
 --
 
+*`mysql.slowlog.sort_merge_passes`*::
++
+--
+type: long
+
+Number of merge passes that the sort algorithm has had to do.
+
+
+--
+
+*`mysql.slowlog.sort_range_count`*::
++
+--
+type: long
+
+Number of sorts that were done using ranges. 
+
+
+--
+
+*`mysql.slowlog.sort_rows`*::
++
+--
+type: long
+
+Number of sorted rows.
+
+
+--
+
+*`mysql.slowlog.sort_scan_count`*::
++
+--
+type: long
+
+Number of sorts that were done by scanning the table.
+
+
+--
+
 *`mysql.slowlog.log_slow_rate_type`*::
 +
 --
@@ -7581,6 +7633,76 @@ Type of slow log rate limit, it can be `session` if the rate limit is applied pe
 type: keyword
 
 Slow log rate limit, a value of 100 means that one in a hundred queries or sessions are being logged.
+
+
+--
+
+*`mysql.slowlog.read_first`*::
++
+--
+type: long
+
+The number of times the first entry in an index was read.
+
+
+--
+
+*`mysql.slowlog.read_last`*::
++
+--
+type: long
+
+The number of times the last key in an index was read.
+
+
+--
+
+*`mysql.slowlog.read_key`*::
++
+--
+type: long
+
+The number of requests to read a row based on a key.
+
+
+--
+
+*`mysql.slowlog.read_next`*::
++
+--
+type: long
+
+The number of requests to read the next row in key order.
+
+
+--
+
+*`mysql.slowlog.read_prev`*::
++
+--
+type: long
+
+The number of requests to read the previous row in key order.
+
+
+--
+
+*`mysql.slowlog.read_rnd`*::
++
+--
+type: long
+
+The number of requests to read a row based on a fixed position. 
+
+
+--
+
+*`mysql.slowlog.read_rnd_next`*::
++
+--
+type: long
+
+The number of requests to read the next row in the data file.
 
 
 --
