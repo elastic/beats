@@ -35,7 +35,7 @@ include::./field-name-changes.asciidoc[]
 
 The data structure used to store Beats central management data in Kibana has changed. As a result of the
 template changes, enrolled Beats and configuration tags created prior to 6.7 will not work until you migrate them to the new format.
-UI until their are moved to the new format, we have created a one time [tool](https://github.com/elastic/migrate-management-beats/releases) to help you migrate your data from
+To migrate to the new format, use the https://github.com/elastic/migrate-management-beats/releases[migration tool] we've created.
 6.6 to 6.7, refer to the [documentation](https://github.com/elastic/migrate-management-beats/blob/master/README.md) for instruction. {see-relnotes}
 
 [[breaking-changes-6.3]]
