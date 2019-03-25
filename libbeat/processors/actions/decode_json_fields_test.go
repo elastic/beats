@@ -201,7 +201,6 @@ func TestTargetRootOption(t *testing.T) {
 }
 
 func TestNotJsonObjectOrArray(t *testing.T) {
-
 	var cases = []struct {
 		MaxDepth int
 		Expected common.MapStr
@@ -260,6 +259,53 @@ func TestNotJsonObjectOrArray(t *testing.T) {
 			assert.Equal(t, testCase.Expected.String(), actual.String())
 		})
 	}
+}
+func TestArrayWithArraysDisabled(t *testing.T) {
+	input := common.MapStr{
+		"msg": `{
+			"arrayOfMap": "[{\"a\":\"b\"}]"
+		  }`,
+	}
+
+	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+		"fields":        fields,
+		"max_depth":     10,
+		"process_array": false,
+	})
+
+	actual := getActualValue(t, testConfig, input)
+
+	expected := common.MapStr{
+		"msg": common.MapStr{
+			"arrayOfMap": "[{\"a\":\"b\"}]",
+		},
+	}
+
+	assert.Equal(t, expected.String(), actual.String())
+}
+
+func TestArrayWithArraysEnabled(t *testing.T) {
+	input := common.MapStr{
+		"msg": `{
+			"arrayOfMap": "[{\"a\":\"b\"}]"
+		  }`,
+	}
+
+	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+		"fields":        fields,
+		"max_depth":     10,
+		"process_array": true,
+	})
+
+	actual := getActualValue(t, testConfig, input)
+
+	expected := common.MapStr{
+		"msg": common.MapStr{
+			"arrayOfMap": []common.MapStr{common.MapStr{"a": "b"}},
+		},
+	}
+
+	assert.Equal(t, expected.String(), actual.String())
 }
 
 func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
