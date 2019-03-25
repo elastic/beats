@@ -20,6 +20,7 @@ The following topics describe how to configure {beatname_uc}:
 * <<configuration-ssl>>
 * <<filtering-and-enhancing-data>>
 * <<configuring-ingest-node>>
+* <<{beatname_lc}-geoip>>
 * <<configuration-path>>
 * <<setup-kibana-endpoint>>
 * <<configuration-template>>
@@ -47,6 +48,8 @@ include::{libbeat-dir}/docs/shared-ssl-config.asciidoc[]
 include::./filtering.asciidoc[]
 
 include::{libbeat-dir}/docs/shared-config-ingest.asciidoc[]
+
+include::{libbeat-dir}/docs/shared-geoip.asciidoc[]
 
 include::{libbeat-dir}/docs/shared-path-config.asciidoc[]
 
