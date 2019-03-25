@@ -308,8 +308,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add the `network.community_id` flow identifier to field to the IPTables, Suricata, and Zeek modules. {pull}11005[11005]
 - Add support for loading custom NetFlow and IPFIX field definitions to netflow input. {pull}10945[10945]
 - Added categorization fields for SSH login events in the system/auth fileset. {pull}11334[11334]
-- New Filebeat coredns module to ingest coredns logs. It supports both the native coredns deployment and coredns deployment in kubernetes. {pull}11200[11200]
 - Add support for MySQL 8.0 slow logs and tests also for Percona 8.0 and MariaDB 10.3. {pull}11417[11417]
+- New Filebeat coredns module to ingest coredns logs. It supports both native coredns deployment and coredns deployment in kubernetes. {pull}11200[11200]
 
 *Heartbeat*
 
