@@ -137,28 +137,30 @@ func TestTruncateFields(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		p := truncateFields{
-			config: truncateFieldsConfig{
-				Fields:      []string{"message"},
-				MaxBytes:    test.MaxBytes,
-				MaxCount:    test.MaxCount,
-				FailOnError: true,
-			},
-			truncate: test.TruncateFunc,
-		}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			p := truncateFields{
+				config: truncateFieldsConfig{
+					Fields:      []string{"message"},
+					MaxBytes:    test.MaxBytes,
+					MaxCount:    test.MaxCount,
+					FailOnError: true,
+				},
+				truncate: test.TruncateFunc,
+			}
 
-		event := &beat.Event{
-			Fields: test.Input,
-		}
+			event := &beat.Event{
+				Fields: test.Input,
+			}
 
-		newEvent, err := p.Run(event)
-		if test.ShouldError {
-			assert.Error(t, err)
-		} else {
-			assert.NoError(t, err)
-		}
+			newEvent, err := p.Run(event)
+			if test.ShouldError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
 
-		assert.Equal(t, test.Output, newEvent.Fields)
+			assert.Equal(t, test.Output, newEvent.Fields)
+		})
 	}
 }
