@@ -71,6 +71,10 @@ func (o *subOutlet) Close() error {
 	return nil
 }
 
+func (o *subOutlet) Done() <-chan struct{} {
+	return o.done
+}
+
 func (o *subOutlet) OnEvent(d *util.Data) bool {
 
 	o.mutex.Lock()
@@ -114,8 +118,12 @@ func (o *subOutlet) OnEvent(d *util.Data) bool {
 func CloseOnSignal(outlet Outleter, sig <-chan struct{}) Outleter {
 	if sig != nil {
 		go func() {
-			<-sig
-			outlet.Close()
+			select {
+			case <-outlet.Done():
+				return
+			case <-sig:
+				outlet.Close()
+			}
 		}()
 	}
 	return outlet

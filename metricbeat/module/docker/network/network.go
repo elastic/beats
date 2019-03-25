@@ -77,3 +77,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) {
 	formattedStats := m.netService.getNetworkStatsPerContainer(stats, m.dedot)
 	eventsMapping(r, formattedStats)
 }
+
+//Close stops the metricset
+func (m *MetricSet) Close() error {
+
+	return m.dockerClient.Close()
+}

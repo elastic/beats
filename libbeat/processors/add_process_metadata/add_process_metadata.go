@@ -71,10 +71,11 @@ type processMetadataProvider interface {
 }
 
 func init() {
-	processors.RegisterPlugin(processorName, newProcessMetadataProcessor)
+	processors.RegisterPlugin(processorName, New)
 }
 
-func newProcessMetadataProcessor(cfg *common.Config) (processors.Processor, error) {
+// New constructs a new add_process_metadata processor.
+func New(cfg *common.Config) (processors.Processor, error) {
 	return newProcessMetadataProcessorWithProvider(cfg, &procCache)
 }
 

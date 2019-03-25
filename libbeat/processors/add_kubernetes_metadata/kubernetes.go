@@ -41,7 +41,7 @@ type kubernetesAnnotator struct {
 }
 
 func init() {
-	processors.RegisterPlugin("add_kubernetes_metadata", newKubernetesAnnotator)
+	processors.RegisterPlugin("add_kubernetes_metadata", New)
 
 	// Register default indexers
 	Indexing.AddIndexer(PodNameIndexerName, NewPodNameIndexer)
@@ -52,7 +52,8 @@ func init() {
 	Indexing.AddMatcher(FieldFormatMatcherName, NewFieldFormatMatcher)
 }
 
-func newKubernetesAnnotator(cfg *common.Config) (processors.Processor, error) {
+// New constructs a new add_kubernetes_metadata processor.
+func New(cfg *common.Config) (processors.Processor, error) {
 	config := defaultKubernetesAnnotatorConfig()
 
 	err := cfg.Unpack(&config)

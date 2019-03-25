@@ -819,6 +819,18 @@
 			"revisionTime": "2019-01-28T17:26:24Z"
 		},
 		{
+			"checksumSHA1": "uamJV//FmbK8VqZ8BmZ0Wzi0zM4=",
+			"path": "github.com/dop251/goja_nodejs/require",
+			"revision": "adff31b136e6b7e044712aab7236a775e1bd085e",
+			"revisionTime": "2017-10-11T08:15:05Z"
+		},
+		{
+			"checksumSHA1": "TB6Dp0Oqeu7i+qPLv5DukMEqlvE=",
+			"path": "github.com/dop251/goja_nodejs/util",
+			"revision": "adff31b136e6b7e044712aab7236a775e1bd085e",
+			"revisionTime": "2017-10-11T08:15:05Z"
+		},
+		{
 			"checksumSHA1": "rhLUtXvcmouYuBwOq9X/nYKzvNg=",
 			"path": "github.com/dustin/go-humanize",
 			"revision": "259d2a102b871d17f30e3cd9881a642961a1e486",

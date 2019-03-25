@@ -77,10 +77,11 @@ func TestGetAuthHeaderFromTokenNoFile(t *testing.T) {
 }
 
 func TestTimeout(t *testing.T) {
-	c := make(chan struct{})
-	defer close(c)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		<-c
+		select {
+		case <-time.After(5 * time.Nanosecond):
+		case <-r.Context().Done():
+		}
 	}))
 	defer ts.Close()
 
@@ -113,13 +114,58 @@ func TestConnectTimeout(t *testing.T) {
 	checkTimeout(t, h)
 }
 
+func TestAuthentication(t *testing.T) {
+	expectedUser := "elastic"
+	expectedPassword := "super1234"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user, password, ok := r.BasicAuth()
+		if !ok || user != expectedUser || password != expectedPassword {
+			w.WriteHeader(http.StatusUnauthorized)
+		}
+	}))
+	defer ts.Close()
+
+	cfg := defaultConfig()
+
+	// Unauthorized
+	hostData := mb.HostData{
+		URI:          ts.URL,
+		SanitizedURI: ts.URL,
+	}
+	h, err := newHTTPFromConfig(cfg, "test", hostData)
+	require.NoError(t, err)
+
+	response, err := h.FetchResponse()
+	response.Body.Close()
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusUnauthorized, response.StatusCode, "response status code")
+
+	// Authorized
+	hostData = mb.HostData{
+		URI:          ts.URL,
+		SanitizedURI: ts.URL,
+		User:         expectedUser,
+		Password:     expectedPassword,
+	}
+	h, err = newHTTPFromConfig(cfg, "test", hostData)
+	require.NoError(t, err)
+
+	response, err = h.FetchResponse()
+	response.Body.Close()
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, response.StatusCode, "response status code")
+}
+
 func checkTimeout(t *testing.T, h *HTTP) {
 	t.Helper()
 
 	done := make(chan struct{})
 	go func() {
-		_, err := h.FetchResponse()
+		response, err := h.FetchResponse()
 		assert.Error(t, err)
+		if response != nil {
+			response.Body.Close()
+		}
 		done <- struct{}{}
 	}()
 
