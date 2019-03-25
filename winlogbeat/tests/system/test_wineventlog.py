@@ -395,7 +395,7 @@ Logon Process Name:  IKE"""
         self.write_event_log(msg)
         evts = self.read_events()
         self.assertTrue(len(evts), 1)
-        self.assertEqual(unicode(self.api), evts[0]["winlog.api"], msg=evts[0])
+        self.assertEqual(unicode(self.api), evts[0]["type"], msg=evts[0])
         self.assertNotIn("event.original", evts[0], msg=evts[0])
         self.assertIn("message", evts[0], msg=evts[0])
         self.assertNotIn("\\u000a", evts[0]["message"], msg=evts[0])
