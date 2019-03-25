@@ -27,13 +27,13 @@ to sign all our packages. It is available from https://pgp.mit.edu.
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of Beats has not yet been released.
+Version {stack-version} of {repo} has not yet been released.
 
 endif::[]
 
 ifeval::["{release-state}"!="unreleased"]
 
-To add the Beats repository for APT:
+To add the {repo} repository for APT:
 
 . Download and install the Public Signing Key:
 +
@@ -102,13 +102,13 @@ endif::[]
 
 ifeval::["{release-state}"=="unreleased"]
 
-Version {stack-version} of Beats has not yet been released.
+Version {stack-version} of {repo} has not yet been released.
 
 endif::[]
 
 ifeval::["{release-state}"!="unreleased"]
 
-To add the Beats repository for YUM:
+To add the {repo} repository for YUM:
 
 . Download and install the public signing key:
 +
@@ -155,7 +155,7 @@ running:
 sudo yum install {beatname_pkg}
 --------------------------------------------------
 
-. To configure the Beat to start automatically during boot, run:
+. To configure {beatname_uc} to start automatically during boot, run:
 +
 ["source","sh",subs="attributes"]
 --------------------------------------------------
