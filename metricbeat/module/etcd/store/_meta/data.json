@@ -1,7 +1,7 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "etcd": {
-        "apiVersion": "2",
+        "api_version": "2",
         "store": {
             "compareanddelete": {
                 "fail": 0,
@@ -28,7 +28,7 @@
             },
             "sets": {
                 "fail": 0,
-                "success": 10
+                "success": 12
             },
             "update": {
                 "fail": 0,

@@ -9501,6 +9501,16 @@ etcd Module
 
 
 
+*`etcd.api_version`*::
++
+--
+type: keyword
+
+Etcd API version for metrics retrieval
+
+
+--
+
 [float]
 == leader fields
 
@@ -9585,13 +9595,13 @@ ID of actual leader
 --
 
 [float]
-== metrics fields
+== server fields
 
-Etcd metrics from the /metrics endpoint
+Server metrics from the Etcd V3 /metrics endpoint
 
 
 
-*`etcd.metrics.server.has_leader`*::
+*`etcd.server.has_leader`*::
 +
 --
 type: byte
@@ -9601,7 +9611,7 @@ Whether a leader exists in the cluster
 
 --
 
-*`etcd.metrics.server.leader_changes.count`*::
+*`etcd.server.leader_changes.count`*::
 +
 --
 type: long
@@ -9611,7 +9621,7 @@ Number of leader changes seen at the cluster
 
 --
 
-*`etcd.metrics.server.proposals_committed.count`*::
+*`etcd.server.proposals_committed.count`*::
 +
 --
 type: long
@@ -9621,7 +9631,7 @@ Number of consensus proposals commited
 
 --
 
-*`etcd.metrics.server.proposals_pending.count`*::
+*`etcd.server.proposals_pending.count`*::
 +
 --
 type: long
@@ -9631,7 +9641,7 @@ Number of consensus proposals pending
 
 --
 
-*`etcd.metrics.server.proposals_failed.count`*::
+*`etcd.server.proposals_failed.count`*::
 +
 --
 type: long
@@ -9641,7 +9651,7 @@ Number of consensus proposals failed
 
 --
 
-*`etcd.metrics.server.grpc_started.count`*::
+*`etcd.server.grpc_started.count`*::
 +
 --
 type: long
@@ -9651,7 +9661,7 @@ Number of sent gRPC requests
 
 --
 
-*`etcd.metrics.server.grpc_handled.count`*::
+*`etcd.server.grpc_handled.count`*::
 +
 --
 type: long
@@ -9661,7 +9671,14 @@ Number of received gRPC requests
 
 --
 
-*`etcd.metrics.disk.mvcc_db_total_size.bytes`*::
+[float]
+== disk fields
+
+Disk metrics from the Etcd V3 /metrics endpoint
+
+
+
+*`etcd.disk.mvcc_db_total_size.bytes`*::
 +
 --
 type: long
@@ -9673,7 +9690,7 @@ Size of stored data at MVCC
 
 --
 
-*`etcd.metrics.disk.wal_fsync_duration.ns.bucket.*`*::
+*`etcd.disk.wal_fsync_duration.ns.bucket.*`*::
 +
 --
 type: object
@@ -9683,7 +9700,7 @@ Latency for writing ahead logs to disk
 
 --
 
-*`etcd.metrics.disk.wal_fsync_duration.ns.count`*::
+*`etcd.disk.wal_fsync_duration.ns.count`*::
 +
 --
 type: long
@@ -9693,7 +9710,7 @@ Write ahead logs count
 
 --
 
-*`etcd.metrics.disk.wal_fsync_duration.ns.sum`*::
+*`etcd.disk.wal_fsync_duration.ns.sum`*::
 +
 --
 type: long
@@ -9703,7 +9720,7 @@ Write ahead logs latency sum
 
 --
 
-*`etcd.metrics.disk.backend_commit_duration.ns.bucket.*`*::
+*`etcd.disk.backend_commit_duration.ns.bucket.*`*::
 +
 --
 type: object
@@ -9713,7 +9730,7 @@ Latency for writing backend changes to disk
 
 --
 
-*`etcd.metrics.disk.backend_commit_duration.ns.count`*::
+*`etcd.disk.backend_commit_duration.ns.count`*::
 +
 --
 type: long
@@ -9723,7 +9740,7 @@ Backend commits count
 
 --
 
-*`etcd.metrics.disk.backend_commit_duration.ns.sum`*::
+*`etcd.disk.backend_commit_duration.ns.sum`*::
 +
 --
 type: long
@@ -9733,7 +9750,14 @@ Backend commits latency sum
 
 --
 
-*`etcd.metrics.memory.go_memstats_alloc.bytes`*::
+[float]
+== memory fields
+
+Memory metrics from the Etcd V3 /metrics endpoint
+
+
+
+*`etcd.memory.go_memstats_alloc.bytes`*::
 +
 --
 type: long
@@ -9745,7 +9769,14 @@ Memory allocated bytes as of MemStats Go
 
 --
 
-*`etcd.metrics.network.client_grpc_sent.bytes`*::
+[float]
+== network fields
+
+Network metrics from the Etcd V3 /metrics endpoint
+
+
+
+*`etcd.network.client_grpc_sent.bytes`*::
 +
 --
 type: long
@@ -9757,7 +9788,7 @@ gRPC sent bytes total
 
 --
 
-*`etcd.metrics.network.client_grpc_received.bytes`*::
+*`etcd.network.client_grpc_received.bytes`*::
 +
 --
 type: long

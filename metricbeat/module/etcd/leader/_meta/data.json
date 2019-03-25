@@ -1,7 +1,7 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "etcd": {
-        "apiVersion": "2",
+        "api_version": "2",
         "leader": {
             "followers": {},
             "leader": "8e9e05c52164694d"

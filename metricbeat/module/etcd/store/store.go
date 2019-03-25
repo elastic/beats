@@ -78,7 +78,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	reporter.Event(mb.Event{
 		MetricSetFields: eventMapping(content),
-		ModuleFields:    common.MapStr{"apiVersion": apiVersion},
+		ModuleFields:    common.MapStr{"api_version": apiVersion},
 	})
 
 	return nil

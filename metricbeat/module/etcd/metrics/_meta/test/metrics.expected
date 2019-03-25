@@ -3,7 +3,7 @@
 		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
-			"apiVersion": "3",
+			"api_version": "3",
 			"disk": {
 				"backend_commit_duration": {
 					"ns": {

@@ -48,7 +48,7 @@ func init() {
 			"etcd_network_client_grpc_sent_bytes_total":     prometheus.Metric("network.client_grpc_sent.bytes"),
 			"etcd_network_client_grpc_received_bytes_total": prometheus.Metric("network.client_grpc_received.bytes"),
 		},
-		ExtraFields: map[string]string{"apiVersion": "3"},
+		ExtraFields: map[string]string{"api_version": "3"},
 		Namespace:   "etcd",
 	}
 
