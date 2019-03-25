@@ -1,16 +1,13 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "etcd": {
+        "apiVersion": "2",
         "self": {
             "id": "8e9e05c52164694d",
             "leaderinfo": {
                 "leader": "8e9e05c52164694d",
-                "starttime": "2019-02-18T21:42:23.191073075Z",
-                "uptime": "23m12.747903053s"
+                "starttime": "2019-03-21T20:53:07.492456219+01:00",
+                "uptime": "10h15m15.068811346s"
             },
             "name": "default",
             "recv": {
@@ -27,7 +24,7 @@
                 "bandwidthrate": 0,
                 "pkgrate": 0
             },
-            "starttime": "2019-02-18T21:42:21.490011868Z",
+            "starttime": "2019-03-21T20:53:07.290699112+01:00",
             "state": "StateLeader"
         }
     },
