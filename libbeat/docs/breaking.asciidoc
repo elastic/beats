@@ -35,7 +35,7 @@ include::./field-name-changes.asciidoc[]
 
 The Central management document format used by Kibana has changed. As a result of the template
 changes beats and tags created prior to 6.7 will not work with the new UI until their are moved to
-the new format, we have created a one time [tool]() to help you migrate your data from
+the new format, we have created a one time [tool](https://github.com/elastic/migrate-management-beats/releases) to help you migrate your data from
 6.6 to 6.7. {see-relnotes}
 
 [[breaking-changes-6.3]]
@@ -87,7 +87,7 @@ as recommended in the {logstash-ref}/plugins-inputs-beats.html[Beats input
 plugin] documentation. This results in a `host` field in 6.2 indices, and a
 `host.name` field in 6.3 indices. There are no mapping conflicts, but
 any visualizations or searches that use `host` will no longer show results for
-6.3 indices. 
+6.3 indices.
 
 *What do you need to change?*
 
@@ -130,7 +130,7 @@ index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
 For more information, see the documentation for the
 {logstash-ref}/plugins-inputs-beats.html[Beats input plugin].
 
-* Or, in the Beats config file, configure Beats to drop all `host.*` fields: 
+* Or, in the Beats config file, configure Beats to drop all `host.*` fields:
 +
 [source,yaml]
 ----
@@ -149,7 +149,7 @@ With this configuration, Beats drops the `host` fields before sending the
 event to Logstash, and Logstash adds a default `host` field, as it did with
 previous Beats versions. This approach resolves the mapping conflict, but you
 should plan to migrate your Logstash configurations to use `host.name` in
-future releases. 
+future releases.
 
 [[beats-template-non-versioned-indices]]
 ===== Use case: You use the Beats index template and your indices are not versioned
@@ -160,7 +160,7 @@ pattern to create versioned indices.
 
 You cannot resolve the problem by dropping the `host.*` fields, because Logstash
 will add a default `host` field, resulting in a mapping conflict with the
-`host` field defined as an object in the index template. 
+`host` field defined as an object in the index template.
 
 *What do you need to change?*
 
