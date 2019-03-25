@@ -100,7 +100,7 @@ func (p *Processor) Process(fields common.Fields, path string, output common.Map
 		}
 
 		switch field.Type {
-		case "", "keyword", "text", "ip":
+		case "", "keyword", "text":
 			addToDefaultFields(&field)
 		}
 
