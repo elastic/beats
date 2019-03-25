@@ -260,6 +260,7 @@ func TestNotJsonObjectOrArray(t *testing.T) {
 		})
 	}
 }
+
 func TestArrayWithArraysDisabled(t *testing.T) {
 	input := common.MapStr{
 		"msg": `{
@@ -302,6 +303,30 @@ func TestArrayWithArraysEnabled(t *testing.T) {
 	expected := common.MapStr{
 		"msg": common.MapStr{
 			"arrayOfMap": []common.MapStr{common.MapStr{"a": "b"}},
+		},
+	}
+
+	assert.Equal(t, expected.String(), actual.String())
+}
+
+func TestArrayWithInvalidArray(t *testing.T) {
+	input := common.MapStr{
+		"msg": `{
+			"arrayOfMap": "[]]"
+		  }`,
+	}
+
+	testConfig, _ = common.NewConfigFrom(map[string]interface{}{
+		"fields":        fields,
+		"max_depth":     10,
+		"process_array": true,
+	})
+
+	actual := getActualValue(t, testConfig, input)
+
+	expected := common.MapStr{
+		"msg": common.MapStr{
+			"arrayOfMap": "[]]",
 		},
 	}
 
