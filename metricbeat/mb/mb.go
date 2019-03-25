@@ -180,9 +180,9 @@ type PushMetricSet interface {
 // ReporterV2 is used by a MetricSet to report Events. The methods return false
 // if and only if publishing failed because the MetricSet is being closed.
 type ReporterV2 interface {
-	context.Context
 	Event(event Event) bool // Event reports a single successful event.
 	Error(err error) bool
+	Context() context.Context
 }
 
 // PushReporterV2 is used by a MetricSet to report events, errors, or errors with
@@ -190,6 +190,10 @@ type ReporterV2 interface {
 // stop.
 type PushReporterV2 interface {
 	ReporterV2
+
+	// Done returns a channel that's closed when work done on behalf of this
+	// reporter should be canceled.
+	Done() <-chan struct{}
 }
 
 // ReportingMetricSetV2 is a MetricSet that reports events or errors through the

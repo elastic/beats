@@ -83,7 +83,7 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	defer m.dockerClient.Close()
 
 	for {
-		events, errors := m.dockerClient.Events(reporter, options)
+		events, errors := m.dockerClient.Events(reporter.Context(), options)
 
 	WATCH:
 		for {
@@ -98,7 +98,7 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 				time.Sleep(1 * time.Second)
 				break WATCH
 
-			case <-reporter.Done():
+			case <-reporter.Context().Done():
 				m.logger.Debug("docker", "event watcher stopped")
 				return
 			}

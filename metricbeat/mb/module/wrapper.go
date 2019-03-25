@@ -182,9 +182,9 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 
 	// Events and errors are reported through this.
 	reporter := &eventReporter{
-		msw:  msw,
-		out:  out,
-		done: done,
+		msw:     msw,
+		out:     out,
+		context: &eventReporterContext{done},
 	}
 
 	switch ms := msw.MetricSet.(type) {
@@ -300,10 +300,10 @@ type reporter interface {
 // used by MetricSet implementations to report an event(s), an error, or an error
 // with some additional metadata.
 type eventReporter struct {
-	msw   *metricSetWrapper
-	done  <-chan struct{}
-	out   chan<- beat.Event
-	start time.Time // Start time of the current fetch (or zero for push sources).
+	msw     *metricSetWrapper
+	context context.Context
+	out     chan<- beat.Event
+	start   time.Time // Start time of the current fetch (or zero for push sources).
 }
 
 // startFetchTimer demarcates the start of a new fetch. The elapsed time of a
@@ -312,12 +312,17 @@ func (r *eventReporter) StartFetchTimer() { r.start = time.Now() }
 func (r *eventReporter) V1() mb.PushReporter {
 	return reporterV1{v2: r.V2(), module: r.msw.module.Name()}
 }
-func (r *eventReporter) V2() mb.PushReporterV2 { return reporterV2{r} }
+func (r *eventReporter) V2() mb.PushReporterV2    { return reporterV2{r} }
+func (r *eventReporter) Context() context.Context { return r.context }
 
 // Implement context.Context
-func (r *eventReporter) Deadline() (time.Time, bool) { return time.Time{}, false }
-func (r *eventReporter) Done() <-chan struct{}       { return r.done }
-func (r *eventReporter) Err() error {
+type eventReporterContext struct {
+	done <-chan struct{}
+}
+
+func (r *eventReporterContext) Deadline() (time.Time, bool) { return time.Time{}, false }
+func (r *eventReporterContext) Done() <-chan struct{}       { return r.done }
+func (r *eventReporterContext) Err() error {
 	select {
 	case <-r.done:
 		return context.Canceled
@@ -325,7 +330,7 @@ func (r *eventReporter) Err() error {
 		return nil
 	}
 }
-func (r *eventReporter) Value(key interface{}) interface{} { return nil }
+func (r *eventReporterContext) Value(key interface{}) interface{} { return nil }
 
 // reporterV1 wraps V2 to provide a v1 interface.
 type reporterV1 struct {
@@ -348,7 +353,7 @@ type reporterV2 struct {
 	*eventReporter
 }
 
-func (r reporterV2) Done() <-chan struct{} { return r.done }
+func (r reporterV2) Done() <-chan struct{} { return r.context.Done() }
 func (r reporterV2) Error(err error) bool  { return r.Event(mb.Event{Error: err}) }
 func (r reporterV2) Event(event mb.Event) bool {
 	if event.Took == 0 && !r.start.IsZero() {
@@ -377,7 +382,7 @@ func (r reporterV2) Event(event mb.Event) bool {
 		event.Namespace = r.msw.Registration().Namespace
 	}
 	beatEvent := event.BeatEvent(r.msw.module.Name(), r.msw.MetricSet.Name(), r.msw.module.eventModifiers...)
-	if !writeEvent(r.done, r.out, beatEvent) {
+	if !writeEvent(r.context.Done(), r.out, beatEvent) {
 		return false
 	}
 	r.msw.stats.events.Add(1)

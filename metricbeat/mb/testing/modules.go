@@ -184,9 +184,9 @@ func NewReportingMetricSetV2Error(t testing.TB, config interface{}) mb.Reporting
 
 // CapturingReporterV2 is a reporter used for testing which stores all events and errors
 type CapturingReporterV2 struct {
-	context.Context
-	events []mb.Event
-	errs   []error
+	context context.Context
+	events  []mb.Event
+	errs    []error
 }
 
 // Event is used to report an event
@@ -206,6 +206,11 @@ func (r *CapturingReporterV2) GetEvents() []mb.Event {
 	return r.events
 }
 
+// Context returns reporter context
+func (r *CapturingReporterV2) Context() context.Context {
+	return r.context
+}
+
 // GetErrors returns all reported errors
 func (r *CapturingReporterV2) GetErrors() []error {
 	return r.errs
@@ -214,7 +219,7 @@ func (r *CapturingReporterV2) GetErrors() []error {
 // ReportingFetchV2 runs the given reporting metricset and returns all of the
 // events and errors that occur during that period.
 func ReportingFetchV2(metricSet mb.ReportingMetricSetV2) ([]mb.Event, []error) {
-	r := &CapturingReporterV2{Context: context.Background()}
+	r := &CapturingReporterV2{context: context.Background()}
 	metricSet.Fetch(r)
 	return r.events, r.errs
 }
@@ -222,7 +227,7 @@ func ReportingFetchV2(metricSet mb.ReportingMetricSetV2) ([]mb.Event, []error) {
 // ReportingFetchV2Error runs the given reporting metricset and returns all of the
 // events and errors that occur during that period.
 func ReportingFetchV2Error(metricSet mb.ReportingMetricSetV2Error) ([]mb.Event, []error) {
-	r := &CapturingReporterV2{Context: context.Background()}
+	r := &CapturingReporterV2{context: context.Background()}
 	err := metricSet.Fetch(r)
 	if err != nil {
 		r.errs = append(r.errs, err)
@@ -312,7 +317,7 @@ func NewPushMetricSetV2(t testing.TB, config interface{}) mb.PushMetricSetV2 {
 // capturingPushReporterV2 stores all the events and errors from a metricset's
 // Run method.
 type capturingPushReporterV2 struct {
-	context.Context
+	context context.Context
 	eventsC chan mb.Event
 }
 
@@ -320,7 +325,7 @@ type capturingPushReporterV2 struct {
 // is closed it returns false.
 func (r *capturingPushReporterV2) report(event mb.Event) bool {
 	select {
-	case <-r.Done():
+	case <-r.context.Done():
 		// Publisher is stopped.
 		return false
 	case r.eventsC <- event:
@@ -338,12 +343,22 @@ func (r *capturingPushReporterV2) Error(err error) bool {
 	return r.report(mb.Event{Error: err})
 }
 
+// Context returns the reporter context
+func (r *capturingPushReporterV2) Context() context.Context {
+	return r.context
+}
+
+// Done returns the Done channel for this reporter context
+func (r *capturingPushReporterV2) Done() <-chan struct{} {
+	return r.context.Done()
+}
+
 // RunPushMetricSetV2 run the given push metricset for the specific amount of
 // time and returns all of the events and errors that occur during that period.
 func RunPushMetricSetV2(timeout time.Duration, waitEvents int, metricSet mb.PushMetricSetV2) []mb.Event {
 	var (
 		ctx, cancel = context.WithCancel(context.Background())
-		r           = &capturingPushReporterV2{Context: ctx, eventsC: make(chan mb.Event)}
+		r           = &capturingPushReporterV2{context: ctx, eventsC: make(chan mb.Event)}
 		wg          sync.WaitGroup
 		events      []mb.Event
 	)
