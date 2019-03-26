@@ -1,17 +1,12 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
-        "action": "existing_user",
+        "action": "user_added",
         "dataset": "user",
-        "id": "11b3b49c-79a1-4983-aea9-3257a3073a71",
-        "kind": "state",
+        "kind": "event",
         "module": "system"
     },
-    "message": "Existing user elastic (UID: 1002, Groups: elastic,docker)",
+    "message": "New user elastic (UID: 1001, Groups: elastic,docker)",
     "service": {
         "type": "system"
     },
@@ -19,31 +14,26 @@
         "audit": {
             "user": {
                 "dir": "/home/elastic",
-                "gid": "1002",
+                "gid": "1001",
                 "group": [
                     {
-                        "gid": "1002",
+                        "gid": "1001",
                         "name": "elastic"
                     },
                     {
-                        "gid": "999",
+                        "gid": "1002",
                         "name": "docker"
                     }
                 ],
                 "name": "elastic",
-                "password": {
-                    "last_changed": "2018-12-07T00:00:00Z",
-                    "type": "shadow_password"
-                },
-                "shell": "/usr/bin/zsh",
-                "uid": "1002",
-                "user_information": ",,,"
+                "shell": "/bin/bash",
+                "uid": "1001"
             }
         }
     },
     "user": {
-        "entity_id": "4a80efe9ab38d1bb28aaa207d03ef24a702602d0ae55cc4661946fa1d8eee6b5",
-        "id": "1002",
+        "entity_id": "FgDfgeDptvvfdX+L",
+        "id": "1001",
         "name": "elastic"
     }
 }
