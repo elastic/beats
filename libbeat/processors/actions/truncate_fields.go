@@ -34,7 +34,7 @@ import (
 type truncateFieldsConfig struct {
 	Fields        []string `config:"fields"`
 	MaxBytes      int      `config:"max_bytes" validate:"min=0"`
-	MaxCount      int      `config:"max_character_count" validate:"min=0"`
+	MaxChars      int      `config:"max_characters" validate:"min=0"`
 	IgnoreMissing bool     `config:"ignore_missing"`
 	FailOnError   bool     `config:"fail_on_error"`
 }
@@ -50,7 +50,7 @@ func init() {
 	processors.RegisterPlugin("truncate_fields",
 		configChecked(newTruncateFields,
 			requireFields("fields"),
-			mutuallyExclusiveRequiredFields("max_bytes", "max_count"),
+			mutuallyExclusiveRequiredFields("max_bytes", "max_characters"),
 		),
 	)
 }
@@ -153,8 +153,8 @@ func (f *truncateFields) truncateBytes(value []byte) ([]byte, error) {
 
 func (f *truncateFields) truncateCharacters(value []byte) ([]byte, error) {
 	count := utf8.RuneCount(value)
-	if count > f.config.MaxCount {
-		count = f.config.MaxCount
+	if count > f.config.MaxChars {
+		count = f.config.MaxChars
 	}
 
 	r := bytes.NewReader(value)
