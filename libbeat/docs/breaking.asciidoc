@@ -138,7 +138,7 @@ With this configuration, Beats drops the `host` fields before sending the
 event to Logstash, and Logstash adds a default `host` field, as it did with
 previous Beats versions. This approach resolves the mapping conflict, but you
 should plan to migrate your Logstash configurations to use `host.name` in
-future releases.
+future releases. 
 
 [[beats-template-non-versioned-indices]]
 ===== Use case: You use the Beats index template and your indices are not versioned
