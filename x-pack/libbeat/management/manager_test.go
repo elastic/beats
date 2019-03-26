@@ -185,6 +185,85 @@ func TestRemoveItems(t *testing.T) {
 	assertEvents(t, events, reporter)
 }
 
+func TestAddScriptProcessor(t *testing.T) {
+	registry := reload.NewRegistry()
+	id, err := uuid.NewV4()
+	if err != nil {
+		t.Fatalf("error while generating id: %v", err)
+	}
+	accessToken := "footoken"
+	reloadable := reloadable{
+		reloaded: make(chan *reload.ConfigWithMeta, 1),
+	}
+	registry.MustRegister("test.blocks", &reloadable)
+
+	mux := http.NewServeMux()
+	var i int
+	responses := []http.HandlerFunc{ // Initial load
+		responseText(`{"configuration_blocks":[{"type":"processors","config":{ "script": { "lang": "javascript"}}}]}`),
+		// will not resend new events
+		responseText(`{"configuration_blocks":[{"type":"processors","config":{ "script": { "lang": "javascript"}}}]}`),
+		// recover on call
+		http.NotFound,
+	}
+
+	mux.Handle(fmt.Sprintf("/api/beats/agent/%s/configuration", id), http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		responses[i](w, r)
+		i++
+	}))
+
+	reporter := addEventsReporterHandle(mux, id)
+	server := httptest.NewServer(mux)
+
+	c, err := api.ConfigFromURL(server.URL, common.NewConfig())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	config := &Config{
+		Enabled:     true,
+		Period:      100 * time.Millisecond,
+		Kibana:      c,
+		AccessToken: accessToken,
+		EventsReporter: EventReporterConfig{
+			Period:       50 * time.Millisecond,
+			MaxBatchSize: 1,
+		},
+		Blacklist: ConfigBlacklistSettings{
+			Patterns: map[string]string{
+				"output":     "console|file",
+				"processors": "script",
+			},
+		},
+	}
+
+	manager, err := NewConfigManagerWithConfig(config, registry, id)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	manager.Start()
+
+	// On first reload we will get apache2 module
+	config1 := <-reloadable.reloaded
+	assert.Nil(t, config1)
+
+	// Cleanup
+	manager.Stop()
+	os.Remove(paths.Resolve(paths.Data, "management.yml"))
+
+	events := []api.Event{
+		&Starting,
+		&InProgress,
+		&Error{Type: ConfigError, Err: errors.New("Config for 'processors' is blacklisted")},
+		&Failed,
+		&InProgress, // recovering on NotFound, to get out of the blocking.
+		&Running,
+		&Stopped,
+	}
+	assertEvents(t, events, reporter)
+}
+
 func responseText(s string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, s)
@@ -424,7 +503,7 @@ func assertEvents(t *testing.T, events []api.Event, reporter *collectEventReques
 	for i := 0; i < len(events); i++ {
 		switch v := requests[i].Event.(type) {
 		case *State:
-			assert.Equal(t, events[i], requests[i].Event)
+			assert.Equal(t, events[i], requests[i].Event, fmt.Sprintf("Event '%v' is not equal to '%v'", events[i], requests[i].Event))
 		case *Error:
 			comparable := events[i].(*Error)
 			assert.Error(t, comparable.Err, v.Err)
