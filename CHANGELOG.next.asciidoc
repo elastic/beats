@@ -150,6 +150,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - decode_json_field: do not process arrays when flag not set. {pull}11318[11318]
 - Report faulting file when config reload fails. {pull}[11304]11304
 - Remove IP fields from default_field in Elasticsearch template.
+- Fix a typo in libbeat/outputs/transport/client.go by updating `c.conn.LocalAddr()` to `c.conn.RemoteAddr()`. {pull}11242[11242]
 
 *Auditbeat*
 

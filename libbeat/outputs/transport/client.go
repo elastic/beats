@@ -174,7 +174,7 @@ func (c *Client) LocalAddr() net.Addr {
 func (c *Client) RemoteAddr() net.Addr {
 	conn := c.getConn()
 	if conn != nil {
-		return c.conn.LocalAddr()
+		return c.conn.RemoteAddr()
 	}
 	return nil
 }
