@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
-	"sync"
 
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/common/cfgwarn"
@@ -127,66 +126,55 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error in Retrieve")
 	}
 
-	var wg sync.WaitGroup
-
 	for _, vm := range vmt {
 
-		wg.Add(1)
+		freeMemory := (int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024) - (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024)
 
-		go func(vm mo.VirtualMachine, c *vim25.Client) {
+		event := common.MapStr{}
 
-			defer wg.Done()
+		event["name"] = vm.Summary.Config.Name
+		event.Put("cpu.used.mhz", vm.Summary.QuickStats.OverallCpuUsage)
+		event.Put("memory.used.guest.bytes", int64(vm.Summary.QuickStats.GuestMemoryUsage)*1024*1024)
+		event.Put("memory.used.host.bytes", int64(vm.Summary.QuickStats.HostMemoryUsage)*1024*1024)
+		event.Put("memory.total.guest.bytes", int64(vm.Summary.Config.MemorySizeMB)*1024*1024)
+		event.Put("memory.free.guest.bytes", freeMemory)
 
-			freeMemory := (int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024) - (int64(vm.Summary.QuickStats.GuestMemoryUsage) * 1024 * 1024)
+		if vm.Summary.Runtime.Host != nil {
+			event["host"] = vm.Summary.Runtime.Host.Value
+		} else {
+			m.Logger().Debug("'Host', 'Runtime' or 'Summary' data not found. This is either a parsing error " +
+				"from vsphere library, an error trying to reach host/guest or incomplete information returned " +
+				"from host/guest")
+		}
 
-			event := common.MapStr{}
+		// Get custom fields (attributes) values if get_custom_fields is true.
+		if m.GetCustomFields && vm.Summary.CustomValue != nil {
+			customFields := getCustomFields(vm.Summary.CustomValue, customFieldsMap)
 
-			event["name"] = vm.Summary.Config.Name
-			event.Put("cpu.used.mhz", vm.Summary.QuickStats.OverallCpuUsage)
-			event.Put("memory.used.guest.bytes", int64(vm.Summary.QuickStats.GuestMemoryUsage)*1024*1024)
-			event.Put("memory.used.host.bytes", int64(vm.Summary.QuickStats.HostMemoryUsage)*1024*1024)
-			event.Put("memory.total.guest.bytes", int64(vm.Summary.Config.MemorySizeMB)*1024*1024)
-			event.Put("memory.free.guest.bytes", freeMemory)
-
-			if vm.Summary.Runtime.Host != nil {
-				event["host"] = vm.Summary.Runtime.Host.Value
-			} else {
-				m.Logger().Debug("'Host', 'Runtime' or 'Summary' data not found. This is either a parsing error " +
-					"from vsphere library, an error trying to reach host/guest or incomplete information returned " +
-					"from host/guest")
+			if len(customFields) > 0 {
+				event["custom_fields"] = customFields
 			}
+		} else {
+			m.Logger().Debug("custom fields not activated or custom values not found/parse in Summary data. This " +
+				"is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete " +
+				"information returned from host/guest")
+		}
 
-			// Get custom fields (attributes) values if get_custom_fields is true.
-			if m.GetCustomFields && vm.Summary.CustomValue != nil {
-				customFields := getCustomFields(vm.Summary.CustomValue, customFieldsMap)
-
-				if len(customFields) > 0 {
-					event["custom_fields"] = customFields
-				}
+		if vm.Summary.Vm != nil {
+			networkNames, err := getNetworkNames(c, vm.Summary.Vm.Reference())
+			if err != nil {
+				m.Logger().Debug(err.Error())
 			} else {
-				m.Logger().Debug("custom fields not activated or custom values not found/parse in Summary data. This " +
-					"is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete " +
-					"information returned from host/guest")
-			}
-
-			if vm.Summary.Vm != nil {
-				networkNames, err := getNetworkNames(c, vm.Summary.Vm.Reference())
-				if err != nil {
-					m.Logger().Debug(err.Error())
-				} else {
-					if len(networkNames) > 0 {
-						event["network_names"] = networkNames
-					}
+				if len(networkNames) > 0 {
+					event["network_names"] = networkNames
 				}
 			}
+		}
 
-			reporter.Event(mb.Event{
-				MetricSetFields: event,
-			})
-		}(vm, c)
+		reporter.Event(mb.Event{
+			MetricSetFields: event,
+		})
 	}
-
-	wg.Wait()
 
 	return nil
 }
