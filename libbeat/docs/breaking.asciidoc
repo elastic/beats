@@ -76,7 +76,7 @@ as recommended in the {logstash-ref}/plugins-inputs-beats.html[Beats input
 plugin] documentation. This results in a `host` field in 6.2 indices, and a
 `host.name` field in 6.3 indices. There are no mapping conflicts, but
 any visualizations or searches that use `host` will no longer show results for
-6.3 indices.
+6.3 indices. 
 
 *What do you need to change?*
 
@@ -119,7 +119,7 @@ index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
 For more information, see the documentation for the
 {logstash-ref}/plugins-inputs-beats.html[Beats input plugin].
 
-* Or, in the Beats config file, configure Beats to drop all `host.*` fields:
+* Or, in the Beats config file, configure Beats to drop all `host.*` fields: 
 +
 [source,yaml]
 ----
@@ -149,7 +149,7 @@ pattern to create versioned indices.
 
 You cannot resolve the problem by dropping the `host.*` fields, because Logstash
 will add a default `host` field, resulting in a mapping conflict with the
-`host` field defined as an object in the index template.
+`host` field defined as an object in the index template. 
 
 *What do you need to change?*
 
