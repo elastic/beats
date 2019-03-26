@@ -4205,7 +4205,8 @@ Various key/value attributes of the object, depending on its type
 [float]
 == healthcheck fields
 
-Docker container metrics.
+Docker healthcheck metrics.
+Healthcheck data will only be available from docker containers where the docker `HEALTHCHECK` instruction has been used to build the docker image.
 
 
 
