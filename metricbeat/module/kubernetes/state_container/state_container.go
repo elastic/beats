@@ -18,8 +18,6 @@
 package state_container
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/libbeat/common"
 	p "github.com/elastic/beats/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/metricbeat/mb"
@@ -118,8 +116,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	}
 
 	m.enricher.Enrich(events)
-
-	fmt.Println("events", len(events))
 
 	// Calculate deprecated nanocores values
 	for _, event := range events {
