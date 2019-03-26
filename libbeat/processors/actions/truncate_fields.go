@@ -176,5 +176,11 @@ func (f *truncateFields) truncateCharacters(value []byte) ([]byte, error) {
 }
 
 func (f *truncateFields) String() string {
-	return "truncate_fields=" + strings.Join(f.config.Fields, ", ")
+	var limit string
+	if f.config.MaxBytes > 0 {
+		limit = fmt.Sprintf("max_bytes=%d", f.config.MaxBytes)
+	} else {
+		limit = fmt.Sprintf("max_characters=%d", f.config.MaxChars)
+	}
+	return "truncate_fields=" + strings.Join(f.config.Fields, ", ") + limit
 }
