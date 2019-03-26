@@ -7,12 +7,12 @@
   settings: ["ssl", "http"]
   fields:
     # Order is important here, labels will match first, the rest are double
-    - name: prometheus.labels
+    - name: prometheus.labels.*
       type: object
       object_type: keyword
       description: >
         Prometheus metric labels
-    - name: prometheus.metrics
+    - name: prometheus.metrics.*
       type: object
       object_type: double
       object_type_mapping_type: "*"
