@@ -16,6 +16,7 @@ grouped in the following categories:
 * <<exported-fields-auditd>>
 * <<exported-fields-beat>>
 * <<exported-fields-cloud>>
+* <<exported-fields-coredns>>
 * <<exported-fields-docker-processor>>
 * <<exported-fields-ecs>>
 * <<exported-fields-elasticsearch>>
@@ -1124,6 +1125,114 @@ alias to: cloud.project.id
 type: alias
 
 alias to: cloud.region
+
+--
+
+[[exported-fields-coredns]]
+== Coredns fields
+
+Module for handling logs produced by coredns
+
+
+
+[float]
+== coredns fields
+
+coredns fields after normalization
+
+
+
+*`coredns.id`*::
++
+--
+type: keyword
+
+id of the DNS transaction
+
+
+--
+
+*`coredns.query.size`*::
++
+--
+type: integer
+
+format: bytes
+
+size of the DNS query
+
+
+--
+
+*`coredns.query.class`*::
++
+--
+type: keyword
+
+DNS query class
+
+
+--
+
+*`coredns.query.name`*::
++
+--
+type: keyword
+
+DNS query name
+
+
+--
+
+*`coredns.query.type`*::
++
+--
+type: keyword
+
+DNS query type
+
+
+--
+
+*`coredns.response.code`*::
++
+--
+type: keyword
+
+DNS response code
+
+
+--
+
+*`coredns.response.flags`*::
++
+--
+type: keyword
+
+DNS response flags
+
+
+--
+
+*`coredns.response.size`*::
++
+--
+type: integer
+
+format: bytes
+
+size of the DNS response
+
+
+--
+
+*`coredns.dnssec_ok`*::
++
+--
+type: boolean
+
+dnssec flag
+
 
 --
 
