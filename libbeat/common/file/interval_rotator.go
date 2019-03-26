@@ -31,6 +31,7 @@ type intervalRotator struct {
 	fileFormat  string
 	clock       clock
 	weekly      bool
+	yearly      bool
 	arbitrary   bool
 	newInterval func(lastTime time.Time, currentTime time.Time, step time.Duration) bool
 }
@@ -77,6 +78,7 @@ func (r *intervalRotator) initialize() error {
 		r.fileFormat = "2006-01"
 	} else if r.interval >= 365*24*time.Hour {
 		r.fileFormat = "2006-01"
+		r.yearly = true
 	} else {
 		r.arbitrary = true
 		r.fileFormat = "2006-01-02-15-04-05"
@@ -99,6 +101,10 @@ func (r *intervalRotator) LogPrefix(filename string, modTime time.Time) string {
 	if r.weekly {
 		y, w := t.ISOWeek()
 		return fmt.Sprintf("%s-%04d-%02d-", filename, y, w)
+	}
+	if r.yearly {
+		y, _ := t.ISOWeek()
+		return fmt.Sprintf("%s-%04d-", filename, y)
 	}
 	if r.arbitrary {
 		intervalNumber := t.Unix() / (int64(r.interval) / int64(time.Second))
