@@ -1050,7 +1050,7 @@ alias to: agent.hostname
 --
 
 [[exported-fields-cisco]]
-== Cisco fields fields
+== Cisco fields
 
 Module for handling Cisco network device logs.
 

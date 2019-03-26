@@ -82,7 +82,7 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#----------------------------- Cisco Fields Module -----------------------------
+#-------------------------------- Cisco Module --------------------------------
 - module: cisco
   asa:
     enabled: true

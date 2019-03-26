@@ -1,5 +1,5 @@
 - key: cisco
-  title: Cisco fields
+  title: Cisco
   description: >
     Module for handling Cisco network device logs.
   fields:
